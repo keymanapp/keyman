@@ -50,10 +50,10 @@ class FalseRule extends Rule {
   }
 }
 
-let root: ASTNode            = null;
-let trueRule: Rule           = null;
-let falseRule: Rule          = null;
-let parameters: Token[]      = null;
+let root: ASTNode       = null;
+let trueRule: Rule      = null;
+let falseRule: Rule     = null;
+let parameters: Token[] = null;
 
 describe("Recursive Descent Tests", () => {
   beforeEach(() => {
@@ -78,7 +78,6 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three child Rules)", () => {
       Rule.tokenBuffer     = new TokenBuffer(LIST_OF_THREE);
-      trueRule             = new TrueRule();
       const sequence: Rule = new SequenceRule([trueRule, trueRule, trueRule]);
       assert.isTrue(sequence.parse(root));
       assert.isTrue(root.hasChild());
@@ -88,8 +87,6 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with an unsuccessful child Rule (three child Rules)", () => {
       Rule.tokenBuffer     = new TokenBuffer(LIST_OF_THREE);
-      trueRule             = new TrueRule();
-      falseRule            = new FalseRule();
       const sequence: Rule = new SequenceRule([trueRule, falseRule, trueRule]);
       assert.isFalse(sequence.parse(root));
       assert.isFalse(root.hasChild());
@@ -111,8 +108,6 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three child Rules)", () => {
       Rule.tokenBuffer      = new TokenBuffer(LIST_OF_THREE);
-      trueRule              = new TrueRule();
-      falseRule             = new FalseRule();
       const alternate: Rule = new AlternateRule([trueRule, trueRule, falseRule]);
       assert.isTrue(alternate.parse(root));
       assert.isTrue(root.hasChild());
@@ -122,7 +117,6 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with an unsuccessful child Rule (three child Rules)", () => {
       Rule.tokenBuffer      = new TokenBuffer(LIST_OF_THREE);
-      falseRule             = new FalseRule();
       const alternate: Rule = new AlternateRule([falseRule, falseRule, falseRule]);
       assert.isFalse(alternate.parse(root));
       assert.isFalse(root.hasChild());
@@ -131,8 +125,7 @@ describe("Recursive Descent Tests", () => {
   });
   describe("OptionalRule Tests", () => {
     it("can construct an OptionalRule", () => {
-      const child: Rule    = new TrueRule();
-      const optional: Rule = new OptionalRule(child);
+      const optional: Rule = new OptionalRule(trueRule);
       assert.isNotNull(optional);
     });
     it("can parse with a successful child Rule", () => {
@@ -165,7 +158,6 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three Tokens)", () => {
       Rule.tokenBuffer = new TokenBuffer(LIST_OF_THREE);
-      trueRule         = new TrueRule();
       const many: Rule = new ManyRule(trueRule);
       assert.isTrue(many.parse(root));
       assert.isTrue(root.hasChild());
@@ -195,7 +187,6 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three Tokens)", () => {
       Rule.tokenBuffer      = new TokenBuffer(LIST_OF_THREE);
-      trueRule              = new TrueRule();
       const oneOrMany: Rule = new OneOrManyRule(trueRule);
       assert.isTrue(oneOrMany.parse(root));
       assert.isTrue(root.hasChild());
