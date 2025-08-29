@@ -73,7 +73,6 @@ run_linux() {
 run_web() {
   docker_wrapper run ${DOCKER_RUN_ARGS} -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
-    -e "KEYMAN_ROOT=/home/build/build" \
     "keymanapp/keyman-web-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
