@@ -1,0 +1,688 @@
+<?xml version="1.0"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="km" conformsTo="45">
+  <info author="Nguonnyny Tan" name="khmer_ldml"/>
+  <version number="1.0.0"/>
+  <keys>
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>
+    <import base="cldr" path="45/keys-Zyyy-currency.xml"/>
+
+    <!-- default -->
+    <!-- row 1 -->
+    <key id="grave" output="«" />
+    <key id="1" output="១" />
+    <key id="2" output="២" />
+    <key id="3" output="៣" />
+    <key id="4" output="៤" />
+    <key id="5" output="៥" />
+    <key id="6" output="៦" />
+    <key id="7" output="៧" />
+    <key id="8" output="៨" />
+    <key id="9" output="៩" />
+    <key id="0" output="០" />
+    <key id="hyphen" output="ឥ" />
+    <key id="equal" output="ឲ" />
+    <!-- row 2 -->
+    <key id="q" output="ឆ" />
+    <key id="w" output="ឹ" />
+    <key id="e" output="េ" />
+    <key id="r" output="រ" />
+    <key id="t" output="ត" />
+    <key id="y" output="យ" />
+    <key id="u" output="ុ" />
+    <key id="i" output="ិ" />
+    <key id="o" output="ោ" />
+    <key id="p" output="ផ" />
+    <key id="open-square" output="ៀ" />
+    <key id="close-square" output="ឪ" />
+    <key id="backslash" output="ឮ" />
+    <!-- row 3 -->
+    <key id="a" output="ា" />
+    <key id="s" output="ស" />
+    <key id="d" output="ដ" />
+    <key id="f" output="ថ" />
+    <key id="g" output="ង" />
+    <key id="h" output="ហ" />
+    <key id="j" output="្" />
+    <key id="k" output="\u{1780}" />
+    <key id="l" output="ល" />
+    <key id="semi-colon" output="ើ" />
+    <key id="apos" output="់" />
+    <!-- row 4 -->
+    <key id="z" output="ឋ" />
+    <key id="x" output="ខ" />
+    <key id="c" output="ច" />
+    <key id="v" output="វ" />
+    <key id="b" output="ប" />
+    <key id="n" output="ន" />
+    <key id="m" output="ម" />
+    <key id="comma" output="ុំ" />
+    <key id="period" output="។" />
+    <key id="slash" output= "៊" /> <!--  ៊ -->
+
+    <!-- shift -->
+    <!-- row 1 -->
+    <key id="tilde" output="»" />
+    <key id="bang" output="!" />
+    <key id="at" output="ៗ" />
+    <key id="hash" output="&quot;"/>
+    <key id="dollar" output="៛" />
+    <key id="percent" output="%" />
+    <key id="caret" output="៍" />
+    <key id="amp" output="័" />
+    <key id="asterisk" output="៏" />
+    <key id="open-paren" output="(" />
+    <key id="close-paren" output=")" />
+    <key id="underscore" output="៌" />
+    <key id="plus" output="=" />
+    <!-- row 2 -->
+    <key id="Q" output="ឈ" />
+    <key id="W" output="ឺ" />
+    <key id="E" output="ែ" />
+    <key id="R" output="ឬ" />
+    <key id="T" output="ទ" />
+    <key id="Y" output="ួ" />
+    <key id="U" output="ូ" />
+    <key id="I" output="ី" />
+    <key id="O" output="ៅ" />
+    <key id="P" output="ភ" />
+    <key id="open-curly" output="ឿ" />
+    <key id="close-curly" output="ឧ" />
+    <key id="pipe" output="ឭ" />
+    <!-- row 3 -->
+    <key id="A" output="ាំ" />
+    <key id="S" output="ៃ" />
+    <key id="D" output="ឌ" />
+    <key id="F" output="ធ" />
+    <key id="G" output="អ" />
+    <key id="H" output="ះ" />
+    <key id="J" output="ញ" />
+    <key id="K" output="គ" />
+    <key id="L" output="ឡ" />
+    <key id="colon" output="ោះ" />
+    <key id="double-quote" output="៉" /><!--  ៉ -->
+    <!-- row 4 -->
+    <key id="Z" output="ឍ" />
+    <key id="X" output="ឃ" />
+    <key id="C" output="ជ" />
+    <key id="V" output="េះ" />
+    <key id="B" output="ព" />
+    <key id="N" output="ណ" />
+    <key id="M" output="ំ" />
+    <key id="open-angle" output="ុះ" />
+    <key id="close-angle" output="៕" />
+    <key id="question" output="?" />
+
+    <!-- right alt -->
+    <!-- row 1 -->
+    <key id="altR-grave" gap="true" />
+    <key id="altR-1" gap="true"/>
+    <key id="altR-2" output="@" />
+    <key id="altR-3" output="៑" />
+    <key id="altR-4" output="$" />
+    <key id="altR-5" output="€" />
+    <key id="altR-6" output="៙" />
+    <key id="altR-7" output="៚" />
+    <key id="altR-8" output="*" />
+    <key id="altR-9" output="{" />
+    <key id="altR-0" output="}" />
+    <key id="altR-hyphen" output="≈" />
+    <key id="altR-equal" output="៎" />
+    <!-- row 2 -->
+    <key id="altR-q" output="ៜ" />
+    <key id="altR-w" output="៝"/>
+    <key id="altR-e" output="ឯ" />
+    <key id="altR-r" output="ឫ" />
+    <key id="altR-t" output="ឨ" />
+    <key id="altR-y" output="[" />
+    <key id="altR-u" output="]" />
+    <key id="altR-i" output="ឦ" />
+    <key id="altR-o" output="ឱ" />
+    <key id="altR-p" output="ឰ" />
+    <key id="altR-open-square" output="ឩ" />
+    <key id="altR-close-square" output="ឳ" />
+    <key id="altR-backslash" output="\" />
+    <!-- row 3 -->
+    <key id="altR-a" output="+" />
+    <key id="altR-s" output="-"/>
+    <key id="altR-d" output="×" />
+    <key id="altR-f" output="÷" />
+    <key id="altR-g" output=":" />
+    <key id="altR-h" output="‘" />
+    <key id="altR-j" output="’" />
+    <key id="altR-k" output="ឝ" />
+    <key id="altR-l" output="៘" />
+    <key id="altR-semi-colon" output="៖" />
+    <key id="altR-apos" output="ៈ" />
+    <!-- row 4 -->
+    <key id="altR-z" output="&lt;" />
+    <key id="altR-x" output=">"/>
+    <key id="altR-c" output="#" />
+    <key id="altR-v" output="&amp;" />
+    <key id="altR-b" output="ឞ" />
+    <key id="altR-n" output=";" />
+    <key id="altR-m" output="៓" />
+    <key id="altR-comma" output="," />
+    <key id="altR-period" output="." />
+    <key id="altR-slash" output="/" />
+
+    <!-- shift right alt -->
+    <!-- row 1 -->
+    <key id="altR-tilde" gap="true" />
+    <key id="altR-bang" output="៱" />
+    <key id="altR-at" output="៲"/>
+    <key id="altR-hash" output="៳" />
+    <key id="altR-dollar" output="៴" />
+    <key id="altR-percent" output="៵" />
+    <key id="altR-caret" output="៶" />
+    <key id="altR-amp" output="៷" />
+    <key id="altR-asterisk" output="៸" />
+    <key id="altR-open-paren" output="៹" />
+    <key id="altR-close-paren" output="៰" />
+    <key id="altR-underscore" gap="true" />
+    <key id="altR-plus" gap="true" />
+    <!-- row 2 -->
+    <key id="altR-Q" output="᧠" />
+    <key id="altR-W" output="᧡" />
+    <key id="altR-E" output="᧢"/>
+    <key id="altR-R" output="᧣" />
+    <key id="altR-T" output="᧤" />
+    <key id="altR-Y" output="᧥" />
+    <key id="altR-U" output="᧦" />
+    <key id="altR-I" output="᧧" />
+    <key id="altR-O" output="᧨" />
+    <key id="altR-P" output="᧩" />
+    <key id="altR-open-curly" output="᧪" />
+    <key id="altR-close-curly" output="᧫" />
+    <key id="altR-pipe" gap="true" />
+    <!-- row 3 -->
+    <key id="altR-A" output="᧬" />
+    <key id="altR-S" output="᧭" />
+    <key id="altR-D" output="᧮"/>
+    <key id="altR-F" output="᧯" />
+    <key id="altR-G" output="᧰" />
+    <key id="altR-H" output="᧱" />
+    <key id="altR-J" output="᧲" />
+    <key id="altR-K" output="᧳" />
+    <key id="altR-L" output="᧴" />
+    <key id="altR-colon" output="᧵" />
+    <key id="altR-double-quote" output="᧶" />
+    <!-- row 4 -->
+    <key id="altR-Z" output="᧷" />
+    <key id="altR-X" output="᧸" />
+    <key id="altR-C" output="᧹"/>
+    <key id="altR-V" output="᧺" />
+    <key id="altR-B" output="᧻" />
+    <key id="altR-N" output="᧼" />
+    <key id="altR-M" output="᧽" />
+    <key id="altR-open-angle" output="᧾" />
+    <key id="altR-close-angle" output="᧿" />
+    <key id="altR-question" gap="true" />
+
+    <key id="zero-width-space" output="\u{200B}" />
+
+  </keys>
+
+<variables>
+    <!-- ា to  ៅ -->
+    <uset id="v_gen" value="[\u{17B6}\u{17B7}\u{17B8}\u{17B9}\u{17BA}\u{17BB}\u{17BC}\u{17BD}\u{17BE}\u{17BF}\u{17C0}\u{17C1}\u{17C2}\u{17C3}\u{17C4}\u{17C5}]" />
+    <uset id="v_pseudo" value="[\u{17C6}\u{17C7}\u{17C8}]" /> <!--  ំ  ះ  ៈ -->
+    <uset id="v_any" value="[$[v_gen] $[v_pseudo]]" /> <!-- all vowels -->
+    <uset id="v_combo_N" value="[\u{17B6}\u{17BB}]" />  <!-- ា  ុ -->
+    <uset id="v_combo_R" value="[\u{17C1}\u{17C4}\u{17BB}\u{17B7}\u{17B8}\u{17B9}\u{17C2}]" /> <!-- េ  ោ  ុ  ិ  ី  ឹ  ែ -->
+    <uset id="v_above" value="[\u{17B7}\u{17B8}\u{17B9}\u{17BA}\u{17BE}\u{17D0}]" /> <!--  ិ   ី   ឹ  ឺ  ើ   ័  -->
+    <uset id="c_shifter" value="[\u{17C9}\u{17CA}]" /> <!--  ៉  ៊ -->
+
+    <!-- ក to អ and have ដ and ត -->
+    <uset id="c_out" value="[\u{1780}\u{1781}\u{1782}\u{1783}\u{1784}\u{1785}\u{1786}\u{1787}\u{1788}\u{1789}\u{178A}\u{178B}\u{178C}\u{178D}\u{178E}\u{178F}\u{1790}\u{1791}\u{1792}\u{1793}\u{1794}\u{1795}\u{1796}\u{1797}\u{1798}\u{1799}\u{179A}\u{179B}\u{179C}\u{179D}\u{179E}\u{179F}\u{17A0}\u{17A1}\u{17A2}]" />
+
+    <!-- ក to អ and have 2 ត -->
+    <uset id="subcons" value="[\u{1780}\u{1781}\u{1782}\u{1783}\u{1784}\u{1785}\u{1786}\u{1787}\u{1788}\u{1789}\u{178F}\u{178B}\u{178C}\u{178D}\u{178E}\u{178F}\u{1790}\u{1791}\u{1792}\u{1793}\u{1794}\u{1795}\u{1796}\u{1797}\u{1798}\u{1799}\u{179A}\u{179B}\u{179C}\u{179D}\u{179E}\u{179F}\u{17A0}\u{17A1}\u{17A2}]" />
+
+    <!-- ង ញ ម យ រ វ ន ល -->
+    <uset id="shiftable_c_2nd" value="[\u{1784}\u{1789}\u{1798}\u{1799}\u{179A}\u{179C}\u{1793}\u{179B}]" />
+    <uset id="shiftable_BA" value="[\u{1794}]" /> <!-- ប -->
+    <uset id="shiftable_c_2nd_with_BA" value="[$[shiftable_c_2nd] $[shiftable_BA]]" />
+
+    <!-- ប យ ល ម ន ញ ង រ វ អ -->
+    <uset id="c_combo_SA" value="[\u{1794}\u{1799}\u{179B}\u{1798}\u{1793}\u{1789}\u{1784}\u{179A}\u{179C}\u{17A2}]" />
+    <uset id="c_combo_QA" value="[\u{1786}\u{1788}\u{1794}\u{1795}\u{178F}\u{1791}]" /> <!-- ឆ ឈ ប ផ ត ទ -->
+    <uset id="c_combo_HA" value="[\u{179C}\u{17A3}]" /> <!-- វ អ -->
+    <uset id="shiftable_c_1st" value="[\u{179F}\u{17A0}\u{17A2}]" /> <!-- ស ហ អ -->
+    <uset id="c_1st_combo_LO" value="[\u{1794}\u{17A0}\u{17A2}]" /> <!-- ប ហ អ -->
+    <uset id="c_1st_combo_MO" value="[\u{17A0}\u{179F}\u{17A2}]" /> <!-- ហ ស អ -->
+    <uset id="c_2nd_combo_LO" value="[\u{1799}\u{1798}\u{1784}\u{1794}\u{179C}]" /> <!-- យ ម ង ប វ -->
+    <uset id="c_2nd_combo_MO" value="[\u{1799}\u{179B}\u{1784}\u{179A}]" /> <!-- យ ល ង វ -->
+
+</variables>
+
+
+  <transforms type="simple">
+    <transformGroup>
+        <!-- normal rule -->
+        <!-- Constraints -->
+        <transform from="($[v_gen])\u{17cb}" to="$1" /><!-- no Bantoc after any genuine vowel   -->
+        <transform from="($[v_pseudo])\u{17cb}" to="$1" /><!-- no Bantoc after any pseudo vowel -->
+        <transform from="($[c_shifter])\u{17cb}" to="$1" /> <!-- no Bantoc after Triisap/Muusikatoan  -->
+        <transform from="(\u{17D2}$[c_out])\u{17cb}" to="$1" /> <!-- no Bantoc on a subscript  -->
+        <transform from="($[c_shifter])($[c_shifter])" to="$1" /> <!-- no two Triisap/Muusikatoan  -->
+
+        <transform from="\u{17D2}\u{178A}" to="\u{17D2}\u{178F}" /><!--@@ ceong da to ceong ta -->
+
+        <!-- rotation of ះ and ៈ -->
+        <transform from="\u{17C7}ះ" to="\u{17C8}" />
+        <transform from="\u{17C8}ះ" to="\u{17C7}" />
+        <transform from="\u{200B}\u{200B}" to="\u{0020}" /><!-- press space twice to get white space -->
+
+        <!-- When pressing [K_U] after ាំ and ុំ, the U+17BB is converted to a respective consonant shifter placing before them (ាំ and ុំ) -->
+        <!-- consonant shifter to fix ស ាំ ុ > ស៊ាំ  -->
+        <transform from="($[shiftable_c_1st])\u{17B6}\u{17C6}\u{17BB}" to="$1\u{17CA}\u{17B6}\u{17C6}" />
+        <!-- consonant shifter to fix ម ាំ  ុ > ម៉ាំ   -->
+        <transform from="($[shiftable_c_2nd_with_BA])\u{17B6}\u{17C6}\u{17BB}" to="$1\u{17C9}\u{17B6}\u{17C6}" />
+    </transformGroup>
+
+    <transformGroup>
+        <!-- normalization -->
+        <transform from="\u{17D2}\u{1799}\u{17C1}\u{17BA}" to="\u{17BF}" /> <!-- េ្យឺ > ឿ -->
+        <transform from="\u{17D2}\u{1799}\u{17C1}\u{17B9}" to="\u{17BF}" /> <!-- េ្យឹ > ឿ -->
+        <transform from="\u{17D2}\u{1799}\u{17C1}\u{17B8}" to="\u{17BF}" /> <!-- េ្យី > ឿ -->
+
+        <transform from="\u{17D2}\u{1799}(\u{17D2}$[c_out])\u{17C1}\u{17BA}" to="$1\u{17BF}" /> <!-- គ្រេ្យឺង > គ្រឿង -->
+        <transform from="\u{17D2}\u{1799}(\u{17D2}$[c_out])\u{17C1}\u{17B9}" to="$1\u{17BF}" /> <!-- គ្រេ្យឹង > គ្រឿង -->
+        <transform from="\u{17D2}\u{1799}(\u{17D2}$[c_out])\u{17C1}\u{17B8}" to="$1\u{17BF}" /> <!-- គ្រេ្យីង > គ្រឿង -->
+
+        <!-- Case #6 and #7: Illegitimate vowel combinations should be transformed to the legitimate ones -->
+        <transform from="\u{17C1}\u{17B6}" to="\u{17C4}" /><!-- េ +  ា =  ោ -->
+        <transform from="\u{17B6}\u{17C1}" to="\u{17C4}" /><!-- ា +  េ =  ោ -->
+        <transform from="\u{17C1}\u{17B8}" to="\u{17BE}" /><!-- េ +  ី =  ើ -->
+        <transform from="\u{17B8}\u{17C1}" to="\u{17BE}" /><!-- ី +  េ =  ើ -->
+
+        <!-- Case #5: Illegitimate vowel combinations should be transformed to the legitimate ones -->
+        <transform from="\u{17C6}\u{17BB}" to="\u{17BB}\u{17C6}" /><!-- ំ +  ុ =  ុំ -->
+        <transform from="\u{17C6}\u{17B6}" to="\u{17B6}\u{17C6}" /><!-- ំ + ា =  ាំ -->
+    </transformGroup>
+
+    <transformGroup>
+        <!-- part of Case #4 -->
+        <!-- consonant clusters 1st > 2nd series (with U+17BB) -->
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17BB}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})($[v_above])\u{17BB}" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17BB}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])($[v_above])\u{17BB}" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{1798}\u{17D2}$[shiftable_c_1st])\u{17BB}($[v_above])" to="$1\u{17CA}$2"/> <!-- c_1st_combo_MO is the same as shiftable_c_1st  -->
+        <transform from="(\u{1798}\u{17D2}$[shiftable_c_1st])($[v_above])\u{17BB}" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{179F}\u{17D2}\u{1794})\u{17BB}($[v_above])" to="$1\u{17C9}$2"/> <!-- prevent ស្បុិ from transforming to ស្ប៊ិ​​​, but produce ស្ប៉ិ instead because ប never have Triisap shifted down.   -->
+        <transform from="(\u{179F}\u{17D2}\u{1794})($[v_above])\u{17BB}" to="$1\u{17C9}$2"/>
+
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17BB}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])($[v_above])\u{17BB}" to="$1\u{17CA}$2"/>
+
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17BB}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})($[v_above])\u{17BB}" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17BB}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{17A2}\u{17D2}\u{1784})($[v_above])\u{17BB}" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17BB}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{17A2}\u{17D2}\u{179C})($[v_above])\u{17BB}" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A0}\u{17D2}\u{1794})\u{17BB}($[v_above])" to="$1\u{17C9}$2"/> <!-- change U+17BB preceded by HA and coeng BA to U+17C9 before the above vowel -->
+        <transform from="(\u{17A0}\u{17D2}\u{1794})($[v_above])\u{17BB}" to="$1\u{17C9}$2"/> <!-- change U+17BB preceded by HA and coeng BA to U+17C9 before the above vowel -->
+
+        <transform from="(\u{17A0}\u{17D2}$[shiftable_c_2nd_with_BA])\u{17BB}($[v_above])" to="$1\u{17CA}$2"/> <!-- change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before the above vowel -->
+        <transform from="(\u{17A0}\u{17D2}$[shiftable_c_2nd_with_BA])($[v_above])\u{17BB}" to="$1\u{17CA}$2"/> <!-- change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before the above vowel -->
+
+        <!-- consonant clusters 2nd > 1st series (with U+17BB) -->
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17BB}($[v_above])" to="$1\u{17C9}$2"/>
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])($[v_above])\u{17BB}" to="$1\u{17C9}$2"/>
+
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17BB}($[v_above])" to="$1\u{17C9}$2"/>
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])($[v_above])\u{17BB}" to="$1\u{17C9}$2"/>
+
+        <!-- single consonants 1st > 2nd series (with U+17BB) -->
+        <transform from="($[shiftable_c_1st])\u{17BB}($[v_above])" to="$1\u{17CA}$2"/> <!-- change U+17BB to U+17CA before the above vowel  -->
+        <transform from="($[shiftable_c_1st])($[v_above])\u{17BB}" to="$1\u{17CA}$2"/> <!-- change U+17BB to U+17CA and place it before the above vowel -->
+
+        <!-- single consonants 2nd > 1st series (with U+17BB) -->
+        <transform from="($[shiftable_c_2nd_with_BA])\u{17BB}($[v_above])" to="$1\u{17C9}$2"/> <!-- change U+17BB to U+17C9 before the above vowel  -->
+        <transform from="($[shiftable_c_2nd_with_BA])($[v_above])\u{17BB}" to="$1\u{17C9}$2"/> <!-- change U+17BB to U+17C9 before the above vowel  -->
+
+        <!-- prevent incorrect use of consonant shifter with 2nd series consonant clusters (without U+17BB) -->
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17CA}($[v_above])" to="$1\u{17C9}$2"/>
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17CA}($[v_above])" to="$1\u{17C9}$2"/>
+
+        <!-- single consonants 2nd > 1st series (without U+17BB) -->
+        <transform from="($[shiftable_c_2nd])\u{17CA}($[v_above])" to="$1\u{17C9}$2"/> <!-- change U+17CA to U+17C9 before the above vowel  -->
+        <transform from="(\u{17D2}$[shiftable_c_2nd])\u{17CA}($[v_above])" to="$1"/> <!-- stop ស្រ៊ី  from becoming ស្រ៉ី  (ERROR!)-->
+    </transformGroup>
+
+    <transformGroup>
+        <!-- Rotate vowels -->
+        <transform from="($[v_gen])($[v_gen])" to="$2" /> <!-- the last vowel stroke replaces the previous one -->
+
+        <!-- Rotation of two-part vowels -->
+        <transform from="($[v_gen])($[v_pseudo])($[v_gen])" to="$3" /> <!-- two-part vowel rotates to a genuine vowel -->
+        <transform from="($[v_gen])($[v_pseudo])($[v_pseudo])" to="$3" /> <!-- two-part vowel rotates to a pseudo vowel -->
+        <transform from="($[v_pseudo])($[v_gen])($[v_pseudo])" to="$2$3" /> <!-- a pseudo vowel roates to a two-part vowel -->
+        <transform from="($[v_pseudo])($[v_pseudo])" to="$2" /> <!-- pseudo vowel rotates to another pseudo vowel -->
+        <transform from="($[v_pseudo])($[v_gen])" to="$2" /> <!-- @@a pseudo vowel roates to a genuine vowel -->
+
+        <!-- Delete extraneous coeng markers -->
+        <transform from="\u{17D2}\u{17D2}" to="\u{17D2}" /> <!-- no two coengs are allowed -->
+        <transform from="\u{17D2}($[v_any])" to="$1" /><!-- coeng is deleted when a vowel is put after it  -->
+    </transformGroup>
+
+    <transformGroup>
+        <!-- a subscript placed after a shifter and a vowel (a genuine/pseudo vowel or a two-part vowel) has to move to before them. -->
+        <transform from="($[c_shifter]$[v_combo_N]\u{17C6})(\u{17D2}$[subcons])" to="$2$1" /> <!-- after a two-part vowel -->
+        <transform from="($[c_shifter]$[v_combo_R]\u{17C7})(\u{17D2}$[subcons])" to="$2$1" /> <!-- after a two-part vowel -->
+        <transform from="($[c_shifter]$[v_any])(\u{17D2}$[subcons])" to="$2$1" /> <!-- after a genuine/pseudo vowel -->
+
+        <transform from="(\u{17D2}\u{179A}$[v_any])(\u{17D2}$[subcons])" to="$2$1"/> <!-- when a vowel intervenes, move it to the end -->
+        <transform from="(\u{17D2}\u{179A}$[v_combo_N]\u{17C6})(\u{17D2}$[subcons])" to="$2$1"/> <!-- when a two-part vowel intervenes, move it to the end too -->
+        <transform from="(\u{17D2}\u{179A}$[v_combo_R]\u{17C7})(\u{17D2}$[subcons])" to="$2$1"/> <!-- when a two-part vowel intervenes, move it to the end too -->
+
+        <!-- @@Case #1: when a subscript is typed after a vowel, the subscript should be automatically moved to before the vowel. -->
+        <transform from="($[v_combo_N]\u{17C6})(\u{17D2}$[subcons])" to="$2$1" /> <!-- two-part vowels have to come after a subscript -->
+        <transform from="($[v_combo_R])\u{17C7}\u{17D2}($[subcons])" to="\u{17D2}$2$1\u{17C7}" /> <!-- two-part vowels have to come after a subscript -->
+        <transform from="($[v_any])(\u{17D2}$[subcons])" to="$2$1" /> <!-- a vowel has to come after a subscript -->
+    </transformGroup>
+
+    <transformGroup>
+        <transform from="(\u{17D2}\u{179A})\u{17D2}\u{178A}" to="\u{17D2}\u{178F}$1" /> <!-- ្ដ placed after ្រ has to be changed to ្ត placed before ្រ -->
+
+        <!-- Case #2: when [D2+9A] is typed before a subscript, it should be moved to after it. -->
+        <transform from="\u{17D2}\u{178A}($[v_any])(\u{17D2}\u{179A})" to="\u{17D2}\u{178F}$2$1" /> <!-- fixed 6e -->
+        <transform from="\u{17D2}\u{178A}($[v_combo_N]\u{17C6})(\u{17D2}\u{179A})" to="\u{17D2}\u{178F}$2$1" /> <!-- fixed 6e -->
+        <transform from="\u{17D2}\u{178A}($[v_combo_R]\u{17C7})(\u{17D2}\u{179A})" to="\u{17D2}\u{178F}$2$1" /> <!-- fixed 6e -->
+
+        <transform from="(\u{17D2}\u{179A}$[v_any])\u{17D2}\u{178A}" to="\u{17D2}\u{178F}$1" /> <!-- fixed 6g -->
+        <transform from="(\u{17D2}\u{179A})($[v_combo_N]\u{17C6})\u{17D2}\u{178A}" to="\u{17D2}\u{178F}$1$2" /> <!-- fixed 6g -->
+        <transform from="(\u{17D2}\u{179A})($[v_combo_R]\u{17C7})\u{17D2}\u{178A}" to="\u{17D2}\u{178F}$1$2" /> <!-- fixed 6g -->
+
+        <transform from="(\u{17D2}\u{179A}$[c_shifter])(\u{17D2}$[subcons])" to="$2$1"/> <!-- when a shifter intervenes, move it to the end -->
+        <transform from="(\u{17D2}\u{179A})(\u{17D2}$[subcons])" to="$2$1"/> <!-- move any subscript placed after [D2+DA] to before them -->
+        <!-- 3 lines of code need to put before Case #1 -->
+    </transformGroup>
+
+    <transformGroup>
+        <!-- Case #3: when a subscript is placed after a consonant shifter, they should be reversed. -->
+        <transform from="($[c_shifter])(\u{17D2}$[subcons])" to="$2$1"/>
+
+        <!-- Reordering - Triisap and Muusikatoan store before a vowel and a vowelcomboR and pseudo vowel. -->
+        <transform from="($[c_shifter])($[v_gen]$[v_pseudo])($[c_shifter])" to="$3$2"/> <!-- when a two-part vowel is in between two consonants shifter, replace the one on the left with the one the right.  -->
+        <transform from="($[v_gen]$[v_pseudo])($[c_shifter])" to="$2$1"/> <!-- place a two-part vowel after a consonant shifter(i.e. មោះ៉ )  -->
+        <transform from="($[c_shifter])($[v_any])($[c_shifter])" to="$3$2"/> <!-- when either a genuine or pseudo vowel is in between two consonant shifters, replace the one on the left with the one on the right  -->
+        <transform from="($[v_any])($[c_shifter])" to="$2$1"/> <!-- place either a genuine or pseudo vowel after a consonant shifter  -->
+    </transformGroup>
+
+    <transformGroup>
+        <!-- Case #4 -->
+        <!-- half of the code are placed before "Rotation of two-part vowels"  -->
+        <!-- consonant clusters 1st > 2nd series (with U+17BB) -->
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{1798}\u{17D2}$[shiftable_c_1st])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+        <transform from="(\u{1798}\u{17D2}$[shiftable_c_1st])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{179F}\u{17D2}\u{1794})\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/>
+        <transform from="(\u{179F}\u{17D2}\u{1794})\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/>
+
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A0}\u{17D2}\u{1794})\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/> <!-- change U+17BB preceded by HA and coeng BA to U+17C9 before ាំ  -->
+        <transform from="(\u{17A0}\u{17D2}\u{1794})\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/> <!-- change U+17BB preceded by HA and coeng BA to U+17C9 before U+17B6 U+17C6 -->
+
+        <transform from="(\u{17A0}\u{17D2}$[shiftable_c_2nd_with_BA])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/> <!-- change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before ាំ  -->
+        <transform from="(\u{17A0}\u{17D2}$[shiftable_c_2nd_with_BA])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/> <!-- change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before U+17B6 U+17C6  -->
+
+        <!-- consonant clusters 2nd > 1st series (with U+17BB) -->
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/>
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/>
+
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/>
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/>
+
+        <!-- single consonants 1st > 2nd series (with U+17BB) -->
+        <transform from="($[shiftable_c_1st])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/> <!-- change U+17BB to U+17CA before ាំ  -->
+        <transform from="($[shiftable_c_1st])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/> <!-- change U+17BB U+17C6 to U+17CA  -->
+
+        <!-- single consonants 2nd > 1st series (with U+17BB) -->
+        <transform from="($[shiftable_c_2nd_with_BA])\u{17BB}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/> <!-- change U+17BB to U+17C9 before ាំ  -->
+        <transform from="($[shiftable_c_2nd_with_BA])\u{17BB}\u{17C6}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/> <!-- change U+17BB U+17C6 to U+17C9  -->
+
+        <!-- prevent incorrect use of consonant shifter with 2nd series consonant clusters (without U+17BB) -->
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17CA}($[v_gen]$[v_pseudo])" to="$1\u{17C9}$2"/>
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17CA}($[v_gen]$[v_pseudo])" to="$1\u{17C9}$2"/>
+
+        <!-- single consonants 2nd > 1st series (without U+17BB) -->
+        <transform from="(\u{17D2}$[shiftable_c_2nd]\u{17CA}$[v_gen]$[v_pseudo])" to="$1"/>
+        <transform from="($[shiftable_c_2nd])\u{17CA}($[v_gen]$[v_pseudo])" to="$1\u{17C9}$2"/> <!-- change U+17CA to U+17C9 before ាំ -->
+    </transformGroup>
+
+    <transformGroup>
+        <!-- SPECIAL CASE: the following clusters may accept either of the two consonant shifters. -->
+        <transform from="(\u{1794}\u{17D2}\u{1799}$[c_shifter])" to="$1" />
+        <transform from="(\u{179F}\u{17D2}\u{1794}$[c_shifter])" to="$1" />
+        <transform from="(\u{1786}\u{17D2}\u{1794}$[c_shifter])" to="$1" />
+        <transform from="(\u{1794}\u{17D2}\u{1799}$[c_shifter])" to="$1" />
+        <transform from="(\u{179F}\u{17D2}\u{1794}$[c_shifter])" to="$1" />
+    </transformGroup>
+
+    <transformGroup>
+        <!-- single 1st > 2nd series (without U+17BB)  -->
+        <transform from="($[shiftable_c_1st])\u{17C9}($[v_above])" to="$1\u{17CA}$2"/> <!-- change U+17C9 to U+17CA before the above vowel -->
+        <transform from="($[shiftable_c_1st])\u{17C9}($[v_gen]$[v_pseudo])" to="$1\u{17CA}$2"/> <!-- change U+17C9 to U+17CA before ាំ -->
+
+        <!-- consonant clusters 1st > 2nd series (without U+17BB) -->
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17C9}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17C9}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{1798}\u{17D2}$[c_1st_combo_MO])\u{17C9}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{1798}\u{17D2}$[c_1st_combo_MO])\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{179F}\u{17D2}\u{1794}\u{17C9}$[v_above])" to="$1"/> <!-- prevent ស្ប៉ី from transforming to ស្ប៊ី -->
+        <transform from="(\u{179F}\u{17D2}\u{1794})\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17C9}$2"/> <!-- prevent ស្ប៉ាំ from transforming to ស្ប៊ាំ -->
+
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17C9}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17C9}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17C9}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17C9}($[v_above])" to="$1\u{17CA}$2"/>
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17C9}(\u{17B6}\u{17C6})" to="$1\u{17CA}$2"/>
+    </transformGroup>
+
+    <transformGroup>
+        <!-- U+17B6 U+17BB and U+17C6 in that order preceeded by any first series consonant (cluster) are transformed to U+17CA U+17B6 and U+17C6 -->
+        <transform from="($[shiftable_c_1st])(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="($[shiftable_c_1st])\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+
+        <transform from="(\u{1798}\u{17D2}$[c_1st_combo_MO])(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="(\u{1798}\u{17D2}$[c_1st_combo_MO])\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{1784})(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{179C})(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17CA}$2$3"/>
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17CA}$3$2"/>
+    </transformGroup>
+
+    <transformGroup>
+        <!-- U+17B6 U+17BB and U+17C6 in that order preceeded by any second series consonant (cluster) are transformed to U+17C9 U+17B6 and U+17C6 -->
+        <transform from="($[shiftable_c_2nd_with_BA])(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17C9}$2$3" />
+        <transform from="($[shiftable_c_2nd_with_BA])\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17C9}$3$2" />
+
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17C9}$2$3" />
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17C9}$3$2" />
+
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])(\u{17B6})\u{17BB}(\u{17C6})" to="$1\u{17C9}$2$3" />
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17BB}(\u{17C6})(\u{17B6})" to="$1\u{17C9}$3$2" />
+    </transformGroup>
+
+    <transformGroup>
+        <!-- េុី/ុេី/៉េី  > ៊ើ -->
+        <transform from="($[shiftable_c_1st])\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[shiftable_c_1st])\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[shiftable_c_1st])\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" />
+
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[c_combo_QA]\u{17D2}\u{17A2})\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" />
+
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{179B}\u{17D2}$[c_1st_combo_LO])\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" />
+
+        <transform from="(\u{1798}\u{17D2}$[c_1st_combo_MO])\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{1798}\u{17D2}$[c_1st_combo_MO])\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{1798}\u{17D2}$[c_1st_combo_MO])\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" />
+
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{179F}\u{17D2}$[c_combo_SA])\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" />
+
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[c_combo_HA]\u{17D2}\u{17A0})\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}" />
+
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}"/> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}"/> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{17A2}\u{17D2}\u{1784})\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}"/>
+
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17CA}\u{17BE}"/> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}"/> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{17A2}\u{17D2}\u{179C})\u{17C9}\u{17C1}\u{17B8}" to="$1\u{17CA}\u{17BE}"/>
+    </transformGroup>
+
+    <transformGroup>
+        <!-- េុី/ុេី/៊េី  > ៉ើ -->
+        <transform from="($[shiftable_c_2nd])\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17C9}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[shiftable_c_2nd])\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17C9}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="($[shiftable_c_2nd])\u{17CA}\u{17C1}\u{17B8}" to="$1\u{17C9}\u{17BE}" />
+
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17C9}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17C9}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{179B}\u{17D2}$[c_2nd_combo_LO])\u{17CA}\u{17C1}\u{17B8}" to="$1\u{17C9}\u{17BE}" />
+
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17C1}\u{17BB}\u{17B8}" to="$1\u{17C9}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17BB}\u{17C1}\u{17B8}" to="$1\u{17C9}\u{17BE}" /> <!-- cancel out by vowel rotation -->
+        <transform from="(\u{1798}\u{17D2}$[c_2nd_combo_MO])\u{17CA}\u{17C1}\u{17B8}" to="$1\u{17C9}\u{17BE}" />
+    </transformGroup>
+
+    <transformGroup>
+        <!-- place Robat after a base before any vowel -->
+        <transform from="($[c_out])($[v_gen])(\u{17CC})" to="$1$3$2" />
+
+        <!-- BONUSES​(note that these combinations are invalid and they can't be found in the CN dictionary 1967 nor RH 1997, but users think they are) -->
+        <transform from="\u{1791}\u{17D2}\u{1794}" to="\u{17A1}" /> <!-- ទ្ប transforms to ឡ  -->
+
+        <transform from="\u{1794}\u{17D2}\u{1789}" to="\u{17AB}" /> <!-- ប្ញ transforms to ឫ -->
+        <transform from="\u{17AB}\u{17BB}" to="\u{17AC}" /> <!-- ឫុ transforms to ឬ -->
+
+        <transform from="\u{17AD}\u{17B6}" to="\u{1789}" /> <!-- ឭា transforms to ញ  -->
+        <transform from="\u{17AE}\u{17B6}" to="\u{1789}" /> <!-- ឮា transforms to ញ  -->
+
+        <transform from="\u{1796}\u{17D2}\u{1789}" to="\u{17AD}" /> <!-- ព្ញ transforms to ឭ -->
+        <transform from="\u{17AD}\u{17BB}" to="\u{17AE}" /> <!-- ឭុ transforms to ឮ -->
+
+        <transform from="\u{1796}\u{17D2}\u{178B}" to="\u{17B0}" /> <!-- ព្ឋ transforms to ឰ   -->
+
+        <transform from="\u{17A7}\u{17B7}" to="\u{17B1}" /> <!-- ឧិ transforms to ឱ  -->
+        <transform from="\u{17A7}\u{17CC}" to="\u{17B1}" /> <!-- ឧ៌ transforms to ឱ  -->
+        <transform from="\u{17A7}\u{17CD}" to="\u{17B1}" /> <!-- ឧ៍ transforms to ឱ  -->
+    </transformGroup>
+
+    <transformGroup>
+        <!-- U+17D4 U+179B U+17D4 > U+17D8 c ។ល។  transforms to U+17D8 -->
+        <transform from="\u{178A}\u{17D2}\u{1792}" to="\u{178A}\u{17D2}\u{178B}" /> <!-- ដ្ធ > ដ្ឋ -->
+        <transform from="\u{1791}\u{17D2}\u{178B}" to="\u{1791}\u{17D2}\u{1792}" /> <!-- ទ្ឋ > ទ្ធ -->
+
+        <!-- additional rules -->
+        <transform from="(\u{1796}\u{1793}\u{17D2})\u{178B}" to="$1\u{1792}" /> <!-- ពន្ឋ > ពន្ធ -->
+        <transform from="(\u{1796}\u{17D0}\u{1793}\u{17D2})\u{178B}" to="$1\u{1792}" /> <!-- ព័ន្ឋ > ព័ន្ធ -->
+
+        <transform from="\u{17AA}(\u{17D2}\u{1799})" to="\u{17B1}$1" /> <!-- ឪ្យ > ឱ្យ -->
+        <transform from="\u{17B3}(\u{17D2}\u{1799})" to="\u{17B1}$1" /> <!-- ឳ្យ > ឱ្យ -->
+
+        <transform from="\u{1789}(\u{17D2}\u{179C})" to="\u{1796}$1\u{17B6}" /> <!-- ញ្វ (as in សញ្វវុធ) > ព្វា as in សញ្វវុធ -->
+        <!-- 6 rules are before case #6 -->
+    </transformGroup>
+
+  </transforms>
+
+  <transforms type="backspace">
+  <transformGroup>
+        <!-- One backspace deletes a two-part vowels -->
+        <transform from="$[v_combo_N]\u{17C6}" />
+        <transform from="$[v_combo_R]\u{17C7}" />
+    </transformGroup>
+  </transforms>
+
+  <layers formId="us">
+    <layer id="base" modifiers="none">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal"/>
+      <row keys="q w e r t y u i o p open-square close-square backslash"/>
+      <row keys="a s d f g h j k l semi-colon apos"/>
+      <row keys="z x c v b n m comma period slash"/>
+      <row keys="zero-width-space"/>
+    </layer>
+    <layer id="upper" modifiers="shift">
+      <row keys="tilde bang at hash dollar percent caret amp asterisk open-paren close-paren underscore plus"/>
+      <row keys="Q W E R T Y U I O P open-curly close-curly pipe"/>
+      <row keys="A S D F G H J K L colon double-quote"/>
+      <row keys="Z X C V B N M open-angle close-angle question"/>
+      <row keys="zero-width-space"/>
+    </layer>
+    <layer modifiers="altR">
+      <row keys="altR-grave altR-1 altR-2 altR-3 altR-4 altR-5 altR-6 altR-7 altR-8 altR-9 altR-0 altR-hyphen altR-equal"/>
+      <row keys="altR-q altR-w altR-e altR-r altR-t altR-y altR-u altR-i altR-o altR-p altR-open-square altR-close-square altR-backslash"/>
+      <row keys="altR-a altR-s altR-d altR-f altR-g altR-h altR-j altR-k altR-l altR-semi-colon altR-apos"/>
+      <row keys="altR-z altR-x altR-c altR-v altR-b altR-n altR-m altR-comma altR-period altR-slash"/>
+      <row keys="zero-width-space"/>
+    </layer>
+    <layer modifiers="altR shift">
+      <row keys="altR-tilde altR-bang altR-at altR-hash altR-dollar altR-percent altR-caret altR-amp altR-asterisk altR-open-paren altR-close-paren altR-underscore altR-plus"/>
+      <row keys="altR-Q altR-W altR-E altR-R altR-T altR-Y altR-U altR-I altR-O altR-P altR-open-curly altR-close-curly altR-pipe"/>
+      <row keys="altR-A altR-S altR-D altR-F altR-G altR-H altR-J altR-K altR-L altR-colon altR-double-quote"/>
+      <row keys="altR-Z altR-X altR-C altR-V altR-B altR-N altR-M altR-open-angle altR-close-angle altR-question"/>
+      <row keys="zero-width-space"/>
+    </layer>
+  </layers>
+
+</keyboard3>
