@@ -1,0 +1,105 @@
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="keyboard">
+    <xs:complexType>
+      <xs:sequence>
+
+        <xs:element name="layouts">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="layout" minOccurs="1" maxOccurs="unbounded">
+                <xs:attribute name="@_first" />
+                <xs:attribute name="@_last" />
+                <xs:attribute name="@_mapSet" />
+                <xs:attribute name="@_modifiers" />
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute />
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="modifierMap">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="keyMapSelect" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="modifier" minOccurs="1" maxOccurs="unbounded">
+                      <xs:attribute name="@_keys" />
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="@_mapIndex" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="@_defaultIndex" />
+            <xs:attribute name="@_id" />
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="keyMapSet" minOccurs="1" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="keyMap" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="key" minOccurs="1" maxOccurs="unbounded">
+                      <xs:attribute name="@_code" />
+                      <xs:attribute name="@_action" />
+                      <xs:attribute name="@_output" />
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="@_index" />
+                  <xs:attribute name="@_baseIndex" />
+                  <xs:attribute name="@_baseMapSet" />
+                </xs:complexType>
+              </xs:element>
+              <xs:attribute name="@_id" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="actions">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="action" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="when" minOccurs="1" maxOccurs="unbounded">
+                      <xs:attribute name="@_state" />
+                      <xs:attribute name="@_output" />
+                      <xs:attribute name="@_next" />
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="@_id" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute />
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="terminators">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="when" minOccurs="1" maxOccurs="unbounded">
+                <xs:attribute name="@_state" />
+                <xs:attribute name="@_output" />
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute />
+          </xs:complexType>
+        </xs:element>
+
+        <xs:attribute name="@_group" />
+        <xs:attribute name="@_id" />
+        <xs:attribute name="@_name" />
+        <xs:attribute name="@_maxout" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
