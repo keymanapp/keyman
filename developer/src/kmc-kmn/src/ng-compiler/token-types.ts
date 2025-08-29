@@ -12,7 +12,6 @@
 
 export enum TokenTypes {
   ALWAYS              = "ALWAYS",
-  AMPERSAND           = "AMPERSAND",
   ANSI                = "ANSI",
   ANY                 = "ANY",
   BASELAYOUT          = "BASELAYOUT",
