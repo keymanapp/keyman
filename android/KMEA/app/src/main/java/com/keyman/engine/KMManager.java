@@ -718,7 +718,7 @@ public final class KMManager {
    * @param bottom int padding to account for navigation bar on bottom of screen
    */
   public static void applyInsetsToKeyboard(int left, int right, int bottom) {
-    // Only applies to In-App keyboard
+    // Only applies to In-App keyboard #14619
     if (InAppKeyboard != null) {
       applyInsetsPaddingToKeyboardView(InAppKeyboard, left, right, bottom);
     }
