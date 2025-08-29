@@ -20,12 +20,11 @@
         </keyMapSelect>
         <keyMapSelect mapIndex="1">
             <modifier keys="caps"/>
-        </keyMapSelect>        
+        </keyMapSelect>
         <keyMapSelect mapIndex="2">
             <modifier keys="shift"/>
-        </keyMapSelect>        
+        </keyMapSelect>
     </modifierMap>
-    
     <!-- different amount of tags MapSelect(2) vs. KeyMap(3) -->
     <keyMapSet id="ANSI">
         <keyMap index="0">
@@ -34,7 +33,7 @@
             <key code="2" output="d"/>
             <key code="3" output="f"/>
             <key code="4" output="h"/>
-            
+
             <key code="9" output="v"/>
             <key code="10" output="\"/>
         </keyMap>
@@ -55,7 +54,7 @@
     <actions>
         <action id="A_1">
             <when state="none" output="A"/>
-        </action>      
+        </action>
         <action id="A_9">
             <when state="none" output="A"/>
         </action>

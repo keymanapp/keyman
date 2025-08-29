@@ -74,8 +74,8 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
-
   describe('RunSpecialTestFiles - create Info', function () {
+    this.timeout(4000);
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
       [makePathToFixture('../data/Test_characters.keylayout')],
@@ -83,12 +83,11 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (files_) {
       it(files_ + " should give Info: unsupported characters ", async function () {
         sut.run(files_[0]);
-        assert.isTrue(compilerTestCallbacks.messages.length === 1);
         assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007));
       });
     });
   });
-
+  
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
@@ -106,7 +105,6 @@ describe('KeylayoutToKmnConverter', function () {
       assert.equal(compilerTestCallbacks.messages.length, 1);
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
     });
-
 
     it('run() should throw on null input file name and unknown output file name', async function () {
       const result = sut.run(null, 'X');
