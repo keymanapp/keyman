@@ -78,7 +78,7 @@ export class SequenceRule extends MultiChildRule {
 
   /**
    * Parse each rule in turn, succeeding only if all succeed.
-   * In the event of failure, reset the TokenBuffer to the position
+   * In the event of failure, reset the Rule.tokenBuffer to the position
    * saved at the start of the attempted parse.
    *
    * @param node where to build the AST
@@ -115,9 +115,8 @@ export class AlternateRule extends MultiChildRule {
   }
 
   /**
-   * Parse each rule in turn, succeeding if any succeed.
-   * In the event of failure, reset the TokenBuffer to the position
-   * saved at the start of the attempted parse.
+   * Parse each rule in turn, succeeding if any succeed. In the event of failure,
+   * reset the Rule.tokenBuffer to the position saved at the start of the attempted parse.
    *
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
@@ -155,7 +154,7 @@ export class OptionalRule extends SingleChildRule {
 
   /**
    * Parses the stored rule, always succeeding as the rule is optional.
-   * In the event of failure of the stored rule, reset the TokenBuffer
+   * In the event of failure of the stored rule, reset the Rule.tokenBuffer
    * to the position saved at the start of the attempted parse.
    *
    * @param node where to build the AST
@@ -189,9 +188,9 @@ export class ManyRule extends SingleChildRule {
 
   /**
    * Parses the stored rule as many times as possible, always succeeding
-   * as the rule is optional.
-   * In the event of failure of the stored rule, reset the TokenBuffer
-   * to the position saved at the start of that individual attempt to parse.
+   * as the rule is optional. In the event of failure of the stored rule,
+   * reset the Rule.tokenBuffer to the position saved at the start of that
+   * individual attempt to parse.
    *
    * @param node where to build the AST
    * @returns true
@@ -223,9 +222,9 @@ export class OneOrManyRule extends SingleChildRule {
 
   /**
    * Parses the stored rule as many times as possible, succeeding if the
-   * rule suceeds at least once.
-   * In the event of failure of the stored rule, reset the TokenBuffer
-   * to the position saved at the start of that individual attempt to parse.
+   * rule suceeds at least once. In the event of failure of the stored rule,
+   * reset the Rule.tokenBuffer to the position saved at the start of that
+   * individual attempt to parse.
    *
    * @param node where to build the AST
    * @returns true
@@ -278,11 +277,11 @@ export class TokenRule extends Rule {
   }
 
   /**
-   * Parse the next Token looking to match the stored TokenType.
+   * Parse the next token looking to match the stored TokenType.
    * If matched, the rule succeeds.  Moreover, if adding an ASTNode has
    * been requested (addNode), and there is a valid mapping from the
    * TokenType to a NodeType, then add the ASTNode. If there is no match,
-   * reset the TokenBuffer to the position saved at the start of the method.
+   * reset the Rule.tokenBuffer to the position saved at the start of the method.
    *
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
@@ -342,7 +341,7 @@ export class AlternateTokenRule extends Rule {
    * If so, the rule succeeds. Moreover, if adding an ASTNode has
    * been requested (addNode), and there is a valid mapping from the
    * TokenType to a NodeType, then add the ASTNode. If there is no match,
-   * reset the TokenBuffer to the position saved at the start of the method.
+   * reset the Rule.tokenBuffer to the position saved at the start of the method.
    *
    * @param node where to build the AST
    * @returns true if the current token was successfully matched
@@ -366,10 +365,16 @@ export class AlternateTokenRule extends Rule {
   }
 }
 
-export function parameterSequence(parameters: Token[], numExpected: number): boolean {
-  return tokenSequence(parameters, TokenTypes.PARAMETER, numExpected);
-}
-
+/**
+ * Attempt to match a sequence of an expected number of tokens all of the same TokenType,
+ * returning the matched tokens in a supplied array.  If there is no match, reset the
+ * Rule.tokenBuffer to the position saved at the start of the function.
+ *
+ * @param tokens the matched tokens (if any) are pushed onto this array
+ * @param tokenType the TokenType to potentially match
+ * @param numExpected the number of expected tokens of the same type
+ * @returns true if the expected sequence of tokens was successfully matched
+ */
 export function tokenSequence(tokens: Token[], tokenType: TokenTypes, numExpected: number): boolean {
   let parseSuccess: boolean = true;
   const save: number = Rule.tokenBuffer.currentPosition;
@@ -394,4 +399,17 @@ export function tokenSequence(tokens: Token[], tokenType: TokenTypes, numExpecte
   }
 
   return parseSuccess;
+}
+
+/**
+ * Attempt to match a sequence of an expected number of PARAMETER tokens,
+ * returning the matched tokens in a supplied array.  If there is no match, reset the
+ * Rule.tokenBuffer to the position saved at the start of the function.
+ * 
+ * @param parameters the matched PARAMETER tokens (if any) are pushed onto this array
+ * @param numExpected the number of expected PARAMETER tokens
+ * @returns true if the expected sequence of PARAMETER tokens was successfully matched
+ */
+export function parameterSequence(parameters: Token[], numExpected: number): boolean {
+  return tokenSequence(parameters, TokenTypes.PARAMETER, numExpected);
 }
