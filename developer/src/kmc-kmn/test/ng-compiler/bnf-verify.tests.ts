@@ -18,6 +18,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { readFileSync } from 'fs';
+import { TokenTypes } from '../../src/ng-compiler/token-types.js';
 
 interface Dictionary {
   [key: string]: string;
@@ -34,6 +35,18 @@ describe("Verify Parser Against BNF Tests", () => {
     ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
     const sourceRules: Dictionary = getSourceRules(sourceBuffer);
     assert.deepEqual(bnfRules, sourceRules);
+  });
+});
+describe("Verify BNF Against Lexer Tests", () => {
+  it("contains all the Lexer tokens", () => {
+    const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString()
+    const match = [...bnfBuffer.matchAll(/[A-Z_]{2,}/g)];
+    const bnfTokens = match.map((x) => x[0]);
+    bnfTokens.push('COMMENT', 'CONTINUATION', 'EOF', 'WHITESPACE');
+    bnfTokens.sort();
+    const bnfTokenSet = new Set<String>(bnfTokens);
+    const tokenTypes: string[] = Object.keys(TokenTypes).sort();
+    assert.deepEqual([...bnfTokenSet], tokenTypes);
   });
 });
 

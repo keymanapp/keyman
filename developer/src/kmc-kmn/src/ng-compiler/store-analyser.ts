@@ -16,8 +16,6 @@ import { OneOrManyRule  } from "./recursive-descent.js";
 import { NodeTypes } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 
-
-
 export class SystemStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
@@ -77,6 +75,7 @@ export class SystemStoreNameRule extends AlternateTokenRule {
       TokenTypes.MESSAGE,
       TokenTypes.MNEMONICLAYOUT,
       TokenTypes.NAME,
+      TokenTypes.OLDCHARPOSMATCHING,
       TokenTypes.TARGETS,
       TokenTypes.VERSION,
       TokenTypes.VISUALKEYBOARD,
