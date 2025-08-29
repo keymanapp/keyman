@@ -955,7 +955,7 @@ begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
       bucStateContext.CurrentState.HandleCheck;
-      Result := kmShellExit;
+      Result := kmShellContinue;
     end
     else
     begin
