@@ -39,7 +39,8 @@ dch keyman --newversion "${KEYMAN_VERSION}" --force-bad-version --nomultimaint
 
 # Create the tarball
 
-# shellcheck disable=2034
+# files and folders to include in the tarball
+# shellcheck disable=2034  # to_exclude appears to be unused
 to_include=(
   common/build.sh \
   common/cpp \
@@ -57,7 +58,8 @@ to_include=(
   ./*.json \
 )
 
-# shellcheck disable=2034
+# files and subfolders to exclude from paths included in 'to_include'
+# shellcheck disable=2034  # to_exclude appears to be unused
 to_exclude=(
   common/test/keyboards/baseline/kmcomp-*.zip \
   core/build \
@@ -68,6 +70,7 @@ to_exclude=(
   linux/keyman-config/buildtools/build-langtags.py \
   linux/keyman-system-service/build
 )
+
 # array to store list of --tar-ignore parameters generated from to_include and to_exclude.
 ignored_files=()
 
@@ -93,6 +96,7 @@ dpkg-source \
   "${ignored_files[@]}" \
   \
   -Zgzip -b .
+
 mv ../keyman_"${KEYMAN_VERSION}".tar.gz linux/dist/keyman-"${KEYMAN_VERSION}".tar.gz
 echo "3.0 (quilt)" > debian/source/format
 cd "${BASEDIR}"
