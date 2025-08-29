@@ -43,7 +43,6 @@ PUSH=
 DEBKEYID=
 REVISION=1
 IS_BETA=false
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 while (( $# )); do
     case $1 in
@@ -147,29 +146,27 @@ else
 fi
 
 DEPLOY_BRANCH="${ORIGIN_DEPLOY_BRANCH#origin/}"
+BRANCH_BASENAME="tmp-packaging-${DEPLOY_BRANCH}"
+WORKTREE_BRANCH="maint/linux/${BRANCH_BASENAME}"
+PREV_DIR="${PWD}"
+
+# cleanup any residues of previous runs
+WORKTREE_DIR="$(git worktree list --porcelain | awk -v name="${BRANCH_BASENAME}" \
+  '$1 == "worktree" && $2 ~ name { print $2 }')"
+if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
+  git worktree remove -f "${WORKTREE_DIR}"
+fi
+if git branch | grep -q "${WORKTREE_BRANCH}"; then
+  git branch -D "${WORKTREE_BRANCH}"
+fi
 
 # Create a temporary worktree so that we start with a clean copy of the
 # target branch (stable/beta). Checkout stable/beta branch so that
 # scripts/debian.sh picks up correct version
+WORKTREE_DIR="$(mktemp -d)/${BRANCH_BASENAME}"
+builder_heading "Creating temporary worktree at ${WORKTREE_DIR}"
+git worktree add -f -b "${WORKTREE_BRANCH}" "${WORKTREE_DIR}" "${DEPLOY_BRANCH}"
 
-WORKTREE_BRANCH="maint/linux/tmp-packaging-${DEPLOY_BRANCH}"
-PREV_DIR="${PWD}"
-
-WORKTREE_DIR="$(git worktree list --porcelain | awk -v name="tmp-packaging-${DEPLOY_BRANCH}" \
-  '$1 == "worktree" && $2 ~ name { print $2 }')"
-
-if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
-  builder_heading "Reusing existing worktree at ${WORKTREE_DIR}"
-  cd "${WORKTREE_DIR}"
-  git checkout -B "${WORKTREE_BRANCH}" "${DEPLOY_BRANCH}"
-else
-  WORKTREE_DIR="$(mktemp -d)/tmp-packaging-${DEPLOY_BRANCH}"
-  builder_heading "Creating temporary worktree at ${WORKTREE_DIR}"
-  if git branch | grep -q "${WORKTREE_BRANCH}"; then
-    git branch -D "${WORKTREE_BRANCH}"
-  fi
-  git worktree add -f -b "${WORKTREE_BRANCH}" "${WORKTREE_DIR}" "${DEPLOY_BRANCH}"
-fi
 cd "${WORKTREE_DIR}"
 
 trap cleanup_worktree EXIT
