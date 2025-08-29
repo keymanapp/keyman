@@ -259,7 +259,7 @@ export class TokenRule extends Rule {
   /**
    * Construct a TokenRule
    *
-   * @param tokenType the TokenType to match
+   * @param tokenType the TokenType to potentially match
    * @param addNode whether to add an ASTNode if the rule succeeds
    */
   public constructor(tokenType: TokenTypes, addNode: boolean=false) {
@@ -281,7 +281,8 @@ export class TokenRule extends Rule {
    * Parse the next Token looking to match the stored TokenType.
    * If matched, the rule succeeds.  Moreover, if adding an ASTNode has
    * been requested (addNode), and there is a valid mapping from the
-   * TokenType to a NodeType, then add the ASTNode.
+   * TokenType to a NodeType, then add the ASTNode. If there is no match,
+   * reset the TokenBuffer to the position saved at the start of the method.
    *
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
@@ -312,16 +313,40 @@ export class TokenRule extends Rule {
   }
 }
 
+/**
+ * AlternateTokenRule is an optimisation of an AlternateRule where
+ * the rules array would consist entirely of TokenRules (all with the
+ * same addNode setting). Instead, the TokenType of the current token
+ * is directly compared against a supplied array of TokenTypes looking
+ * for the first match.
+ */
 export class AlternateTokenRule extends Rule {
-  private tokenTypes: Set<TokenTypes>;
+  private tokenTypes: Set<TokenTypes>; // a Set is used to avoid unnecessary duplicates
   private addNode: boolean;
 
+  /**
+   * Construct an AlternateTokenRule
+   *
+   * @param tokenTypes the array of TokenTypes to be potentially matched
+   * @param addNode whether to add an ASTNode if the rule succeeds
+   */
   public constructor(tokenTypes: TokenTypes[], addNode: boolean=false) {
     super();
     this.tokenTypes = new Set<TokenTypes>(tokenTypes);
+    // TODO: warning if there is a duplicate TokenType in the supplied array
     this.addNode    = addNode;
   }
 
+  /**
+   * Check if the current TokenType is included in the tokenTypes Set.
+   * If so, the rule succeeds. Moreover, if adding an ASTNode has
+   * been requested (addNode), and there is a valid mapping from the
+   * TokenType to a NodeType, then add the ASTNode. If there is no match,
+   * reset the TokenBuffer to the position saved at the start of the method.
+   *
+   * @param node where to build the AST
+   * @returns true if the current token was successfully matched
+   */
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = false;
     const token: Token = Rule.tokenBuffer.nextToken();
