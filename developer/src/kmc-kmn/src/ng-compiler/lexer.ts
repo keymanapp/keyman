@@ -257,6 +257,10 @@ export class Lexer {
 
     return parseInProgress;
   }
+
+  public toString(): string {
+    return `{${this.scanRecognisers}}`;
+  }
 }
 
 /**
