@@ -21,13 +21,17 @@ builder_describe \
   ":web" \
   "run+                             Run command in docker image" \
   "--distro=DISTRO                  The distribution (debian or ubuntu, default: ubuntu)" \
-  "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})"
+  "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
+  "--registry=REGISTRY              The container registry to keep the images (default: ghcr.io/keymanapp)" \
+  "--username=REGISTRY_USERNAME     The user for the container registry (default: keymanapp)" \
+  "--password=REGISTRY_PASSWORD     The password for the container registry user (default: password)" \
 
 builder_parse "$@"
 
 check_for_default_values
 convert_parameters_to_args
 setup_docker
+setup_container_registry
 
 if is_default_values; then
   image_version=default
@@ -40,21 +44,21 @@ fi
 run_android() {
   docker_wrapper run ${DOCKER_RUN_ARGS} -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
-    "keymanapp/keyman-android-ci:${image_version}" \
+    "${registry_slash}keymanapp/keyman-android-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_core() {
   docker_wrapper run ${DOCKER_RUN_ARGS} -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
-    "keymanapp/keyman-core-ci:${image_version}" \
+    "${registry_slash}keymanapp/keyman-core-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_developer() {
   docker_wrapper run ${DOCKER_RUN_ARGS} -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
-    "keymanapp/keyman-developer-ci:${image_version}" \
+    "${registry_slash}keymanapp/keyman-developer-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
@@ -66,14 +70,14 @@ run_linux() {
     -v "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}":/home/build/build/linux/build \
     -v "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}":/home/build/build/linux/keyman-system-service/build \
     -e DESTDIR=/tmp \
-    "keymanapp/keyman-linux-ci:${image_version}" \
+    "${registry_slash}keymanapp/keyman-linux-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_web() {
   docker_wrapper run ${DOCKER_RUN_ARGS} -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
-    "keymanapp/keyman-web-ci:${image_version}" \
+    "${registry_slash}keymanapp/keyman-web-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 

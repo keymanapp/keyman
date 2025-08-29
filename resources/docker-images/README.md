@@ -57,9 +57,9 @@ reason is that the Docker images use a different user, so that paths
 will be different.
 
 **Warning:** On Windows, don't mix building in Windows/git-bash and WSL/Docker
-without a full clean (`git clean -fdx`) of the repository. Mixed building will 
+without a full clean (`git clean -fdx`) of the repository. Mixed building will
 fail for many reasons, including, among others:
-* many CLI tools have different names, and references are cached in configure 
+* many CLI tools have different names, and references are cached in configure
   steps
 * cached paths may be stored with backslashes which work only on Windows
 * Keyman Core has varying targets based on the build platform
@@ -74,3 +74,36 @@ To run the tests locally, use the `run.sh` script:
 # Run common/web tests
 resources/docker-images/run.sh :web -- common/web/build.sh --debug test
 ```
+
+## Using a Docker container registry
+
+It is possible to keep the Docker images in a container registry.
+
+The parameters for `run.sh` and `build.sh` are
+* `--registry`
+
+  the container registry used to keep the images
+* `--username`
+
+  a user name for the container registry
+* `--password`
+
+  the user's password
+
+`--username` and `--password` are not required, if the registry can be
+accessed without username and password.
+
+The default for the registry is `ghcr.io`.
+
+Building the images for a registry and pushing them to it, looks like:
+
+```shell
+resources/docker-images/build.sh --registry 'myregistry:5678' --username 'user' --password 'password' build,publish:
+```
+
+Running tests locally with the `run.sh` looks like:
+
+```shell
+resources/docker-images/run.sh :web --registry 'myregistry:5678' --username 'user' --password 'password' -- web/build.sh configure:
+```
+
