@@ -29,6 +29,7 @@ export class Lexer {
    * Construct a Lexer
    *
    * @param buffer the string to search for tokens
+   * @param filename the filename to use in tokens
    */
   public constructor(buffer: string, filename: string=null) {
     this.buffer           = buffer;
