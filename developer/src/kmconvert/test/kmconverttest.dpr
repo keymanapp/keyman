@@ -11,6 +11,7 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
+  DUnitX.Loggers.TeamCity in '..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.Developer.System.Test.KMConvertParametersTest in 'Keyman.Developer.System.Test.KMConvertParametersTest.pas',
   Keyman.Developer.System.KMConvertParameters in '..\..\kmconvert\Keyman.Developer.System.KMConvertParameters.pas',
   UKeymanTargets in '..\..\common\delphi\general\UKeymanTargets.pas',
@@ -69,6 +70,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);
