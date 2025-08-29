@@ -68,6 +68,7 @@ to_exclude=(
   linux/keyman-config/buildtools/build-langtags.py \
   linux/keyman-system-service/build
 )
+# array to store list of --tar-ignore parameters generated from to_include and to_exclude.
 ignored_files=()
 
 generate_tar_ignore_list "./" to_include to_exclude ignored_files "$(basename "${KEYMAN_ROOT}")"
