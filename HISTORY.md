@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.108 alpha 2025-08-29
+
+* fix(android): Fix insets for in-app vs system keyboard (#14619)
+* maint(resources): ensure REPO_ROOT is fully resolved (#14643)
+
 ## 19.0.107 alpha 2025-08-28
 
 * maint(resources): fix parse bug in build-bot and add extra logging (#14611)
