@@ -58,7 +58,8 @@ to_include=(
   ./*.json \
 )
 
-# files and subfolders to exclude from paths included in 'to_include'
+# files and subfolders to exclude from paths included in 'to_include',
+# i.e. the exceptions to 'to_include'.
 # shellcheck disable=2034  # to_exclude appears to be unused
 to_exclude=(
   common/test/keyboards/baseline/kmcomp-*.zip \
@@ -76,6 +77,10 @@ ignored_files=()
 
 generate_tar_ignore_list "./" to_include to_exclude ignored_files "$(basename "${KEYMAN_ROOT}")"
 
+# Note: explicitly specify the --tar-ignores here for files/folders that we always
+# want to ignore regardless of their location. Having them here allows us to pass
+# the wildcards to dpkg-source - whereas the wildcards in 'to_exclude' will be
+# resolved and replaced with multiple --tar-ignore entries.
 dpkg-source \
   --tar-ignore=*~ \
   --tar-ignore=.git \
