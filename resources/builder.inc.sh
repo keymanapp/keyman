@@ -19,7 +19,7 @@
 # * _builder_ functions and variables are internal use only for builder.inc.sh, and
 #   subject to change at any time. Do not use them in other scripts.
 # * Note: the running script is the top-level script that includes either
-#   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
+#   builder.inc.sh directly, or, just in the Keyman repo, via builder-basic.inc.sh.
 #
 
 # Exit on command failure and when using unset variables:
@@ -627,7 +627,7 @@ builder_has_action() {
 #   }
 #
 #   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
-#   builder_run_action configure    verify_npm_setup
+#   builder_run_action configure    node_select_version_and_npm_ci
 #   builder_run_action build        do_build
 # ```
 #
@@ -1504,10 +1504,13 @@ _builder_parse_expanded_parameters() {
     shift # past the processed argument
   done
 
+  # Add default action if not specified, but not for child builds
   if (( ! ${#_builder_chosen_action_targets[@]} )); then
-    for e in "${_builder_targets[@]}"; do
-      _builder_chosen_action_targets+=("$_builder_default_action$e")
-    done
+    if ! builder_is_child_build; then
+      for e in "${_builder_targets[@]}"; do
+        _builder_chosen_action_targets+=("$_builder_default_action$e")
+      done
+    fi
   fi
 
   # We only want to define internal dependencies after both builder_parse and builder_describe_outputs have been called

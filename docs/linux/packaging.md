@@ -35,10 +35,10 @@ and of course the source code for the packages:
 
 - [.github/workflows/deb-packaging.yml](https://github.com/keymanapp/keyman/blob/master/.github/workflows/deb-packaging.yml)
   contains the definition of the packaging GHA
-- [resources/build/run-required-test-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/run-required-test-builds.sh)
+- [resources/teamcity/triggers/trigger-test-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/teamcity/triggers/trigger-test-builds.sh)
   runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_Test?)
   to trigger the builds for the various platforms, among them the GHA package build.
-- [resources/build/increment-version.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/increment-version.sh)
+- [resources/teamcity/triggers/trigger-release-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/teamcity/triggers/trigger-release-builds.sh)
   runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsMaster?)
   and increments the version number before triggering the builds for the
   various platforms.

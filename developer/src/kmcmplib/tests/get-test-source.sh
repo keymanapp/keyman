@@ -3,7 +3,7 @@
 # Finds all keyboards in the keyboards repo (passed in $1) that are valid source
 # keyboards (i.e. <area>/<prefix>/<name>/source/<name>.kmn)
 #
-# Called from meson.build, so this script does not use build-utils.sh. Do not run this
+# Called from meson.build, so this script does not use builder-basic.inc.sh. Do not run this
 # script directly.
 #
 set -eu
