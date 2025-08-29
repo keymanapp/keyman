@@ -7,12 +7,12 @@
  */
 
 /*
- * This test is somewhat brittle as it depends on the local variable names used
- * in the Rule assigned to this.rule in each of the implemented source code rules.
- * These are processed and then checked against the processed non-terminals and
- * terminals in the BNF grammar rules for equality. A more thorough test would
- * check the actual classes of each source code variable, but would require much
- * more parsing of the TypeScript source code.
+ * This grammar rule test is somewhat brittle as it depends on the local variable
+ * names used in the Rule assigned to this.rule in each of the implemented source
+ * code rules. These are processed and then checked against the processed
+ * non-terminals and terminals in the BNF grammar rules for equality. A more thorough
+ * test would check the actual classes of each source code variable, but would
+ * require much more parsing of the TypeScript source code.
  */
 
 import 'mocha';
