@@ -64,18 +64,17 @@ export function convertToUnicodeCodePoint(instr: string): string {
   if ((instr === null) || (instr === undefined)) {
     return undefined;
   }
-
-  if (instr.substring(0, 3) === "&#x") {
-    const num_length = instr.length - instr.indexOf("x") - 1;
-    const num_str = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
-    return ("U+" + num_str.slice(-num_length).padStart(4, "0"));
+  if (instr.startsWith("&#x")) {
+    const numLength = instr.length - 3;
+    const numStr = instr.substring(3, instr.length - 1);
+    return ("U+" + numStr.slice(-numLength).padStart(4, "0"));
   }
 
   // if not hex: convert to hex
-  if ((instr.substring(0, 2) === "&#")) {
-    const num_length = instr.length - instr.indexOf("#") - 1;
-    const num_str = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
-    return "U+" + Number(num_str.slice(-num_length)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
+  if (instr.startsWith("&#")) {
+    const numLength = instr.length - 2;
+    const numStr = instr.substring(2, instr.length - 1);
+    return "U+" + Number(numStr.slice(-numLength)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
   }
   else
     return instr;
