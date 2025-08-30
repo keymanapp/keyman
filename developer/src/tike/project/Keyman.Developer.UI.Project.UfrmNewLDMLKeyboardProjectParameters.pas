@@ -154,9 +154,14 @@ begin
       try
         pt.Generate;
       except
-        on E:EFOpenError do
+        on E:ELDMLKeyboardProjectTemplate do
         begin
           ShowMessage('Unable to create project: '+E.Message);
+          Exit(False);
+        end;
+        on E:EFOpenError do
+        begin
+          ShowMessage('Unable to create project; template files may be missing: '+E.Message);
           Exit(False);
         end;
       end;

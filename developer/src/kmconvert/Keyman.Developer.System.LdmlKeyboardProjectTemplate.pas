@@ -56,7 +56,8 @@ end;
 procedure TLDMLKeyboardProjectTemplate.Generate;
 begin
   if not ForceDirectories(BasePath + ID + '\' + SFolder_Source) then
-    raise ELDMLKeyboardProjectTemplate.Create('Could not create destination path '+BasePath+ID);
+    raise ELDMLKeyboardProjectTemplate.Create('Could not create destination path '''+BasePath+ID+'''. '+
+      'Please check the path and try again. The error was: '+SysErrorMessage(GetLastError));
 
   WriteDocumentation;
 

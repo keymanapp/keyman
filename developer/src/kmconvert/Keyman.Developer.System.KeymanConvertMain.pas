@@ -7,6 +7,7 @@ procedure Run;
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
   Winapi.ActiveX,
 
@@ -100,7 +101,12 @@ begin
     except
       on E:EKeyboardProjectTemplate do
       begin
-        writeln(E.Message);
+        writeln('ERROR: Unable to create project: '+E.Message);
+        Exit(False);
+      end;
+      on E:EFOpenError do
+      begin
+        writeln('ERROR: Unable to create project; template files may be missing: '+E.Message);
         Exit(False);
       end;
     end;
@@ -138,7 +144,12 @@ begin
     except
       on E:ELDMLKeyboardProjectTemplate do
       begin
-        writeln(E.Message);
+        writeln('ERROR: Unable to create project: '+E.Message);
+        Exit(False);
+      end;
+      on E:EFOpenError do
+      begin
+        writeln('ERROR: Unable to create project; template files may be missing: '+E.Message);
         Exit(False);
       end;
     end;
@@ -176,7 +187,12 @@ begin
     except
       on E:EModelProjectTemplate do
       begin
-        writeln(E.Message);
+        writeln('ERROR: Unable to create project: '+E.Message);
+        Exit(False);
+      end;
+      on E:EFOpenError do
+      begin
+        writeln('ERROR: Unable to create project; template files may be missing: '+E.Message);
         Exit(False);
       end;
     end;
