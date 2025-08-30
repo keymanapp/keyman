@@ -21,7 +21,7 @@ void ReportCompilerMessage(KMX_DWORD msg, const std::vector<std::string>& parame
 
   KMCMP_COMPILER_RESULT_MESSAGE message;
   message.errorCode = msg;
-  message.lineNumber = kmcmp::currentLine + 1;
+  message.lineNumber = kmcmp::currentLine;
   message.columnNumber = kmcmp::ErrChr;
   message.parameters = parameters;
   message.filename = kmcmp::messageFilename;

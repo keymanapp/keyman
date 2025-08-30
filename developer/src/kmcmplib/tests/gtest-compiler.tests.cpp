@@ -175,7 +175,7 @@ TEST_F(CompilerTest, ReportCompilerMessage_test) {
     ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile, params);
     EXPECT_EQ(1, kmcmp::nErrors);
     EXPECT_EQ(KmnCompilerMessages::FATAL_CannotCreateTempfile, msgproc_errors[0].errorCode);
-    EXPECT_EQ(kmcmp::currentLine+1, msgproc_errors[0].lineNumber);
+    EXPECT_EQ(kmcmp::currentLine, msgproc_errors[0].lineNumber);
     EXPECT_EQ(kmcmp::ErrChr, msgproc_errors[0].columnNumber);
     EXPECT_TRUE(msgproc_errors[0].filename == kmcmp::messageFilename);
     EXPECT_TRUE(msgproc_errors[0].parameters == params);
