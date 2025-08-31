@@ -34,7 +34,7 @@ builder_parse "$@"
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
-  BUILD_FLAGS="assembleDebug -x lint -x test"
+  BUILD_FLAGS="assembleDebug -x lintDebug -x testDebug"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 

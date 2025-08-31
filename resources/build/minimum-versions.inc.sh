@@ -24,18 +24,20 @@ KEYMAN_MIN_TARGET_VERSION_WEB_FIREFOX=79.0    # TBD
 KEYMAN_MIN_TARGET_VERSION_WEB_OPERA=47.0      # TBD
 KEYMAN_MIN_TARGET_VERSION_WEB_SAFARI=13.0     # iOS 13.0, macOS 10.13.6+
 
-# Dependency versions
+# Dependency minimum versions
 KEYMAN_MIN_VERSION_NODE_MAJOR=20              # node version source of truth is /package.json:/engines/node; use KEYMAN_USE_NVM to automatically update
 KEYMAN_MIN_VERSION_NPM=10.5.1                 # 10.5.0 has bug, discussed in #10350
 KEYMAN_MIN_VERSION_EMSCRIPTEN=3.1.58          # Use KEYMAN_USE_EMSDK to automatically update to this version
 KEYMAN_MIN_VERSION_VISUAL_STUDIO=2019
 KEYMAN_MIN_VERSION_MESON=1.0.0
 
-KEYMAN_VERSION_GRADLE=7.6.4                   # See /android/KMEA/gradle/wrapper/gradle-wrapper.properties
+KEYMAN_VERSION_GRADLE=8.12                    # See /android/KMEA/gradle/wrapper/gradle-wrapper.properties
+
+# Dependencies with fixed versions
 KEYMAN_VERSION_ICU=73.1                       # See /core/subprojects/icu-minimal.wrap
 
 # Language and runtime versions
-KEYMAN_VERSION_JAVA=11                        # We're using Java/OpenJDK 11
+KEYMAN_VERSION_JAVA=21                        # We're using Java/OpenJDK 21
 KEYMAN_MIN_VERSION_CPP=17                     # C++17
 KEYMAN_MIN_VERSION_ANDROID_SDK=21
 
