@@ -79,6 +79,9 @@ public class KMPBrowserActivity extends BaseActivity {
       return;
     }
 
+    setupEdgeToEdge(R.id.kmp_browser_layout);
+    setupStatusBarColors(R.color.complementary_5, android.R.color.white);
+
     webView = (WebView) findViewById(R.id.kmpBrowserWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
