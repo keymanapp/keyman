@@ -9,16 +9,33 @@
 import { Token } from "./lexer.js";
 import { NodeTypes } from "./node-types.js";
 
+/**
+ * ASTNode objects form the abstract syntax tree created by the recursive-
+ * descent parser. The class provides methods used for building, testing
+ * and using the AST to build the in-memory semantic model.
+ */
 export class ASTNode {
-  private _nodeType: NodeTypes;
-  private _token: Token;
+  private _nodeType: NodeTypes; // the node type
+  private _token: Token; // a token (if appropriate) from the input
   private children: ASTNode[] = [];
 
+  /**
+   * Construct an ASTNode
+   *
+   * @param nodeType the node type
+   * @param token a token from the input (or null)
+   */
   public constructor(nodeType: NodeTypes, token: Token=null) {
     this._nodeType = nodeType;
     this._token    = token;
   }
 
+  /**
+   * Add a child node
+   *
+   * @param child the node to add
+   * @returns this
+   */
   public addChild(child: ASTNode): ASTNode {
     if (child != null) {
       this.children.push(child);
@@ -26,6 +43,12 @@ export class ASTNode {
     return this;
   }
 
+  /**
+   * Add an array of child nodes
+   *
+   * @param children the array of nodes to add
+   * @returns this
+   */
   public addChildren(children: ASTNode[]): ASTNode {
     if (children != null) {
       this.children.push(...children);
@@ -33,11 +56,24 @@ export class ASTNode {
     return this;
   }
 
-  public addNewChildWithToken(nodeType: NodeTypes, token: Token): ASTNode {
+  /**
+   * Add a new child node by type with optional token
+   *
+   * @param nodeType the node type to add
+   * @param token the token (or null)
+   * @returns this
+   */
+  public addNewChildWithToken(nodeType: NodeTypes, token: Token=null): ASTNode {
     this.addChild(new ASTNode(nodeType, token));
     return this;
   }
 
+  /**
+   * Gather an array of all nodes in a tree of a given type
+   *
+   * @param requiredType the required type
+   * @returns an array of matching nodes (or an empty array)
+   */
   public getDescendents(requiredType: NodeTypes) {
     const result: ASTNode[] = [];
     if (requiredType != null) {
