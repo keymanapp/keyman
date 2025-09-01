@@ -3,7 +3,8 @@
 /**
  * Please note that this is an experimental handwritten keyboard designed for initial testing of modifier chirality support for KeymanWeb.
  * As it is handcoded, it uses multiple codesize optimization techniques that Keyman Developer simply does not and will not employ, and it
- * will only work with KeymanWeb based implementations.  (Not supported for Keyman Desktop or Keyman for Mac.)
+ * will only work with KeymanWeb based implementations.  (Not supported for Keyman for Windows,
+ * Keyman for Linux, or Keyman for Mac.)
  *
  * (This keyboard was written before Developer's implementation of chirality support and was used to bootstrap KeymanWeb chirality, serving
  *  as the initial wave of testing.)
