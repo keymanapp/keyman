@@ -26,15 +26,7 @@ export class SystemStoreAssignRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const children: ASTNode[] = tmp.getChildren();
-      const storeNode: ASTNode  = children.splice(0, 1)[0];
-      storeNode.addChildren(children);
-      node.addChild(storeNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfFirstNode(node);
   }
 }
 
@@ -317,15 +309,7 @@ export class HeaderAssignRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const children: ASTNode[] = tmp.getChildren();
-      const nameNode: ASTNode = children.splice(0, 1)[0];
-      nameNode.addChildren(children);
-      node.addChild(nameNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfFirstNode(node);
   }
 }
 

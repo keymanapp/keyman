@@ -56,9 +56,20 @@ export abstract class SingleChildRule extends Rule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const storeNode: ASTNode = tmp.removeSoleChildOfType(nodeType);
-      storeNode.addChildren(tmp.getChildren());
-      node.addChild(storeNode);
+      const givenNode: ASTNode = tmp.removeSoleChildOfType(nodeType);
+      givenNode.addChildren(tmp.getChildren());
+      node.addChild(givenNode);
+    }
+    return parseSuccess;
+  };
+
+  protected parseToChildrenOfFirstNode(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const firstNode: ASTNode = tmp.removeFirstChild();
+      firstNode.addChildren(tmp.getChildren());
+      node.addChild(firstNode);
     }
     return parseSuccess;
   };
