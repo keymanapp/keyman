@@ -104,6 +104,6 @@ resources/docker-images/build.sh --registry 'myregistry:5678' --username 'user' 
 Running tests locally with the `run.sh` looks like:
 
 ```shell
-resources/docker-images/run.sh :web --registry 'myregistry:5678' --username 'user' --password 'password' -- web/build.sh configure:
+resources/docker-images/run.sh :web --registry 'myregistry:5678' --username 'user' --password 'password' -- web/build.sh test
 ```
 
