@@ -16,6 +16,7 @@ ruleBlock: beginStatement|groupStatement|productionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
 useStatement: USE LEFT_BR groupName RIGHT_BR
+groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupName: groupNameElement+
 groupNameElement: PARAMETER|OCTAL|permittedKeyword
 permittedKeyword: ALWAYS|ANSI|BEEP|BEGIN|BITMAP_HEADER|CAPS|CLEARCONTEXT|
@@ -23,7 +24,6 @@ permittedKeyword: ALWAYS|ANSI|BEEP|BEGIN|BITMAP_HEADER|CAPS|CLEARCONTEXT|
   KEY_CODE|KEYS|LANGUAGE_HEADER|LAYOUT_HEADER|MATCH|MESSAGE_HEADER|
   NAME_HEADER|NEWCONTEXT|NOMATCH|NUL|OCTAL|OFF|ON|ONLY|POSTKEYSTROKE|
   READONLY|RETURN|SHIFT|UNICODE|USING|VERSION_HEADER
-groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
 productionBlock: lhsBlock CHEVRON rhsBlock

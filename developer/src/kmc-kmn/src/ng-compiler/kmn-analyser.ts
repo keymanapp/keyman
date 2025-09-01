@@ -275,11 +275,7 @@ export class RuleBlockRule extends SingleChildRule {
     const beginStatement: Rule  = new BeginStatementRule();
     const groupStatement: Rule  = new GroupStatementRule();
     const productionBlock: Rule = new ProductionBlockRule();
-    this.rule = new AlternateRule([
-      beginStatement,
-      groupStatement,
-      productionBlock,
-    ]);
+    this.rule = new AlternateRule([beginStatement, groupStatement, productionBlock]);
   }
 }
 
@@ -444,8 +440,8 @@ export class GroupQualifierRule extends SingleChildRule {
 export class UsingKeysRule extends SingleChildRule {
   public constructor() {
     super();
-    const using: Rule      = new TokenRule(TokenTypes.USING);
-    const keys: Rule       = new TokenRule(TokenTypes.KEYS);
+    const using: Rule = new TokenRule(TokenTypes.USING);
+    const keys: Rule  = new TokenRule(TokenTypes.KEYS);
     this.rule = new SequenceRule([using, keys]);
   }
 
