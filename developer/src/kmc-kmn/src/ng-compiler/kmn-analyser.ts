@@ -9,11 +9,12 @@
  */
 
 import { TokenTypes } from "./token-types.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
-import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule as DeadkeyStatementRule, IfLikeStatementRule, IndexStatementRule, LayerStatementRule, NotanyStatementRule as NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
-import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, HeaderAssignRule } from "./store-analyser.js";
-import { SystemStoreAssignRule, NormalStoreAssignRule } from "./store-analyser.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
+import { Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
+import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyser.js";
+import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
+import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyser.js";
+import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyser.js";
 import { NodeTypes } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 
