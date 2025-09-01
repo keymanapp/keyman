@@ -92,8 +92,8 @@ setup_docker() {
 
 setup_container_registry() {
   registry=${REGISTRY:-ghcr.io}
-  username=${REGISTRY_USERNAME:-}
-  password=${REGISTRY_PASSWORD:-}
+  local username=${REGISTRY_USERNAME:-}
+  local password=${REGISTRY_PASSWORD:-}
   registry_slash=''
 
   builder_echo debug "Setting up container registry."
