@@ -18,7 +18,7 @@ let bitmap: ASTNode    = null;
 let copyright: ASTNode = null;
 let version: ASTNode   = null;
 
-function init_variables(): void {
+function initVariables(): void {
   root      = new ASTNode(NodeTypes.TMP);
   bitmap    = new ASTNode(NodeTypes.BITMAP);
   copyright = new ASTNode(NodeTypes.COPYRIGHT);
@@ -42,7 +42,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.addChild()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can add child", () => {
         root.addChild(bitmap);
@@ -60,7 +60,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.addChildren()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can add two children", () => {
         root.addChildren([bitmap, copyright]);
@@ -77,7 +77,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.addNewChildWithToken()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can construct and add a child with a token", () => {
         const token = new Token(TokenTypes.BITMAP, 'bitmap');
@@ -91,7 +91,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.getDescendents()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -118,7 +118,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.hasChild()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle if there are no children", () => {
         assert.isFalse(root.hasChild());
@@ -134,7 +134,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.hasChildOfType()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -160,7 +160,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.hasSoleChildOfType()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -186,7 +186,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.getText()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle when there is no token", () => {
         assert.equal(root.getText(), '');
@@ -199,7 +199,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.getTextOfType()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -232,7 +232,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.getSoleChild()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle when there are no children", () => {
         assert.isNull(root.getSoleChild());
@@ -251,7 +251,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.getSoleChildOfType()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -282,7 +282,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.getChildren()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle when there are no children", () => {
         assert.deepEqual(root.getChildren(), []);
@@ -301,7 +301,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.getChildrenOfType()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -332,7 +332,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.removeChildren()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle when there are no children", () => {
         assert.deepEqual(root.removeChildren(), []);
@@ -343,15 +343,39 @@ describe("Tree Construction Tests", () => {
         assert.deepEqual(root.removeChildren(), [bitmap]);
         assert.equal(root.toString(), '[TMP]');
       });
-      it("can removet children when there are two", () => {
+      it("can remove children when there are two", () => {
         root.addChildren([bitmap, copyright]);
         assert.deepEqual(root.removeChildren(), [bitmap, copyright]);
         assert.equal(root.toString(), '[TMP]');
       });
     });
+    describe("ASTNode.removeFirstChild()", () => {
+      beforeEach(() => {
+        initVariables();
+      });
+      it("can handle when there are no children", () => {
+        assert.deepEqual(root.removeFirstChild(), null);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can remove the first child when there is only one child", () => {
+        root.addChild(bitmap);
+        assert.deepEqual(root.removeFirstChild(), bitmap);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can remove the first child when there are two", () => {
+        root.addChildren([bitmap, copyright]);
+        assert.deepEqual(root.removeFirstChild(), bitmap);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT]}]');
+      });
+      it("can remove the first child when there are three", () => {
+        root.addChildren([bitmap, copyright, version]);
+        assert.deepEqual(root.removeFirstChild(), bitmap);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
+    });
     describe("ASTNode.removeSoleChildOfType()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -382,7 +406,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.removeChildrenOfType()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
@@ -413,7 +437,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.removeChildrenOfTypes()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle null type array", () => {
         root.addChildren([copyright, version]); // extra children
@@ -463,7 +487,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.removeBlocks()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle null parentType", () => {
         const group1      = new ASTNode(NodeTypes.GROUP, new Token(TokenTypes.GROUP, '1'));
@@ -521,7 +545,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.toString()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a simple node", () => {
         assert.equal(root.toString(), '[TMP]');
@@ -542,7 +566,7 @@ describe("Tree Construction Tests", () => {
     });
     describe("ASTNode.toText()", () => {
       beforeEach(() => {
-        init_variables();
+        initVariables();
       });
       it("can handle a node without a SOURCE_CODE child", () => {
         assert.equal(root.toText(), '');

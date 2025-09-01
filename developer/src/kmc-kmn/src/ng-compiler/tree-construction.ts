@@ -122,6 +122,10 @@ export class ASTNode {
     return list;
   }
 
+  public removeFirstChild(): ASTNode {
+    return this.hasChild() ? this.children.shift() : null;
+  }
+
   public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
     return this.hasSoleChildOfType(requiredType) ?
       this.removeChildrenOfType(requiredType)[0] : null;
