@@ -98,7 +98,7 @@ setup_container_registry() {
 
   builder_echo debug "Setting up container registry."
 
-  if [[ -z "${registry:-}" ]] || [[ "${registry:-}" == "docker.io" ]]; then
+  if [[ "${registry:-}" == "docker.io" ]]; then
     builder_echo debug "Container registry is 'docker.io'."
     registry=
   else
