@@ -102,100 +102,111 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Left = 424
     Top = 11
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editKeyboardName
+    WordWrap = True
   end
   object lblDescriptionValidation: TLabel
     Left = 424
     Top = 38
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = memoDescription
+    WordWrap = True
   end
   object lblKeyboardIDValidation: TLabel
     Left = 424
     Top = 496
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editKeyboardID
+    WordWrap = True
   end
   object lblPathValidation: TLabel
     Left = 424
     Top = 469
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editPath
+    WordWrap = True
   end
   object lblCopyrightValidation: TLabel
     Left = 424
     Top = 150
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editCopyright
+    WordWrap = True
   end
   object lblVersionValidation: TLabel
     Left = 424
     Top = 203
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editVersion
+    WordWrap = True
   end
   object lblAuthorValidation: TLabel
     Left = 424
     Top = 123
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editAuthor
+    WordWrap = True
   end
   object lblTargetsValidation: TLabel
     Left = 424
     Top = 230
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = clbTargets
+    WordWrap = True
   end
   object lblLanguagesValidation: TLabel
     Left = 424
     Top = 332
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = gridKeyboardLanguages
+    WordWrap = True
   end
   object lblProjectFilenameValidation: TLabel
     Left = 424
     Top = 523
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editProjectFilename
+    WordWrap = True
   end
   object lblFullCopyrightValidation: TLabel
     Left = 424
     Top = 176
     Width = 250
-    Height = 13
+    Height = 26
     AutoSize = False
     Caption = '(validation)'
     FocusControl = editFullCopyright
+    WordWrap = True
   end
   object lblDescriptionMarkdown: TLabel
     Left = 121
