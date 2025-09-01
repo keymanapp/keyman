@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 19.0.109 alpha 2025-08-31
+
+* fix(developer): handle missing model id in package with compiler error (#14649)
+* fix(developer): handle failure to create destination path when generating new project (#14650)
+
+## 19.0.108 alpha 2025-08-29
+
+* fix(android): Fix insets for in-app vs system keyboard (#14619)
+* maint(resources): ensure REPO_ROOT is fully resolved (#14643)
+
 ## 19.0.107 alpha 2025-08-28
 
 * maint(resources): fix parse bug in build-bot and add extra logging (#14611)
