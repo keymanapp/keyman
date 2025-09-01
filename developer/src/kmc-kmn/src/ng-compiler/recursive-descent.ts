@@ -52,7 +52,7 @@ export abstract class SingleChildRule extends Rule {
     return this.rule === null ? false : this.rule.parse(node);
   }
 
-  protected parse_toChildrenOfGivenType(node: ASTNode, nodeType: NodeTypes): boolean {
+  protected parseToChildrenOfGivenType(node: ASTNode, nodeType: NodeTypes): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
