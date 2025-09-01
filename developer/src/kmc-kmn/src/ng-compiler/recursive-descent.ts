@@ -52,13 +52,24 @@ export abstract class SingleChildRule extends Rule {
     return this.rule === null ? false : this.rule.parse(node);
   }
 
-  protected parseToChildrenOfGivenType(node: ASTNode, nodeType: NodeTypes): boolean {
+  protected parseToChildrenOfGivenNode(node: ASTNode, nodeType: NodeTypes): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const givenNode: ASTNode = tmp.removeSoleChildOfType(nodeType);
       givenNode.addChildren(tmp.getChildren());
       node.addChild(givenNode);
+    }
+    return parseSuccess;
+  };
+
+  protected parseToChildrenOfNewNode(node: ASTNode, nodeType: NodeTypes): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const newNode: ASTNode = new ASTNode(nodeType);
+      newNode.addChildren(tmp.getChildren());
+      node.addChild(newNode);
     }
     return parseSuccess;
   };

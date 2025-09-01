@@ -157,8 +157,8 @@ export class TextRule extends SingleChildRule {
 export class PlainTextRule extends SingleChildRule {
   public constructor() {
     super();
-    const textRange: Rule     = new TextRangeRule();
-    const simpleText: Rule    = new SimpleTextRule();
+    const textRange: Rule  = new TextRangeRule();
+    const simpleText: Rule = new SimpleTextRule();
     this.rule = new AlternateRule([textRange, simpleText]);
   }
 }
@@ -203,14 +203,7 @@ export class TextRangeRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const rangeNode: ASTNode = new ASTNode(NodeTypes.RANGE);
-      rangeNode.addChildren(tmp.getChildren());
-      node.addChild(rangeNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfNewNode(node, NodeTypes.RANGE);
   }
 }
 
@@ -237,14 +230,7 @@ export class VirtualKeyRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const virtualKeyNode = new ASTNode(NodeTypes.VIRTUAL_KEY);
-      virtualKeyNode.addChildren(tmp.getChildren());
-      node.addChild(virtualKeyNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfNewNode(node, NodeTypes.VIRTUAL_KEY);
   }
 }
 
@@ -308,14 +294,7 @@ export class BeginStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const beginNode = tmp.removeSoleChildOfType(NodeTypes.BEGIN);
-      beginNode.addChildren(tmp.getChildren());
-      node.addChild(beginNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.BEGIN);
   }
 }
 
@@ -372,14 +351,7 @@ export class GroupStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const groupNode = tmp.removeSoleChildOfType(NodeTypes.GROUP);
-      groupNode.addChildren(tmp.getChildren());
-      node.addChild(groupNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.GROUP);
   }
 }
 
@@ -520,14 +492,7 @@ export class LhsBlockRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lhsNode = new ASTNode(NodeTypes.LHS);
-      lhsNode.addChildren(tmp.getChildren());
-      node.addChild(lhsNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfNewNode(node, NodeTypes.LHS);
   }
 }
 
@@ -556,14 +521,7 @@ export class InputContextRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const inputContextNode = new ASTNode(NodeTypes.INPUT_CONTEXT);
-      inputContextNode.addChildren(tmp.getChildren());
-      node.addChild(inputContextNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfNewNode(node, NodeTypes.INPUT_CONTEXT);
   }
 }
 
@@ -595,14 +553,7 @@ export class KeystrokeRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const keystrokeNode = new ASTNode(NodeTypes.KEYSTROKE);
-      keystrokeNode.addChildren(tmp.getChildren());
-      node.addChild(keystrokeNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfNewNode(node, NodeTypes.KEYSTROKE);
   }
 }
 
@@ -614,14 +565,7 @@ export class RhsBlockRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const rhsNode = new ASTNode(NodeTypes.RHS);
-      rhsNode.addChildren(tmp.getChildren());
-      node.addChild(rhsNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfNewNode(node, NodeTypes.RHS);
   }
 }
 

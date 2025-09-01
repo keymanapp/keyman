@@ -112,7 +112,7 @@ abstract class AbstractShortcutRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, this.shortcutNodeType);
+    return this.parseToChildrenOfGivenNode(node, this.shortcutNodeType);
   }
 }
 
@@ -189,7 +189,7 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, NodeTypes.IF);
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.IF);
   }
 }
 
@@ -260,7 +260,7 @@ export class ContextStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, NodeTypes.CONTEXT);
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.CONTEXT);
   }
 }
 
@@ -284,7 +284,7 @@ export class IndexStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, NodeTypes.INDEX);
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.INDEX);
   }
 }
 
@@ -319,6 +319,6 @@ export class OutsStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, NodeTypes.OUTS);
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.OUTS);
   }
 }

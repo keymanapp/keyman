@@ -89,7 +89,7 @@ export class NormalStoreAssignRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, NodeTypes.STORE)
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.STORE)
   }
 }
 
@@ -182,7 +182,7 @@ export class SetNormalStoreRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, NodeTypes.SET);
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.SET);
   }
 }
 
@@ -208,7 +208,7 @@ export class SetSystemStoreRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenType(node, NodeTypes.SET);
+    return this.parseToChildrenOfGivenNode(node, NodeTypes.SET);
   }
 }
 
