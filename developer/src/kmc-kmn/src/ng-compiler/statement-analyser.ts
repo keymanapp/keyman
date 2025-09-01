@@ -112,14 +112,7 @@ abstract class AbstractShortcutRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const shortcutNode = tmp.removeSoleChildOfType(this.shortcutNodeType);
-      shortcutNode.addChildren(tmp.getChildren());
-      node.addChild(shortcutNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfGivenType(node, this.shortcutNodeType);
   }
 }
 
@@ -196,15 +189,7 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const ifNode   = tmp.removeSoleChildOfType(NodeTypes.IF);
-      const children = tmp.getChildren();
-      ifNode.addChildren(children);
-      node.addChild(ifNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfGivenType(node, NodeTypes.IF);
   }
 }
 
@@ -275,14 +260,7 @@ export class ContextStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const contextNode = tmp.removeSoleChildOfType(NodeTypes.CONTEXT);
-      contextNode.addChildren(tmp.getChildren());
-      node.addChild(contextNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfGivenType(node, NodeTypes.CONTEXT);
   }
 }
 
@@ -306,14 +284,7 @@ export class IndexStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const indexNode = tmp.removeSoleChildOfType(NodeTypes.INDEX);
-      indexNode.addChildren(tmp.getChildren());
-      node.addChild(indexNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfGivenType(node, NodeTypes.INDEX);
   }
 }
 
@@ -329,8 +300,7 @@ export class OffsetRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const child = tmp.getSoleChild();
-      node.addNewChildWithToken(NodeTypes.OFFSET, child.token);
+      node.addNewChildWithToken(NodeTypes.OFFSET, tmp.getSoleChild().token);
     }
     return parseSuccess;
   };
@@ -349,13 +319,6 @@ export class OutsStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const outsNode = tmp.removeSoleChildOfType(NodeTypes.OUTS);
-      outsNode.addChild(tmp.getSoleChild());
-      node.addChild(outsNode);
-    }
-    return parseSuccess;
+    return this.parseToChildrenOfGivenType(node, NodeTypes.OUTS);
   }
 }
