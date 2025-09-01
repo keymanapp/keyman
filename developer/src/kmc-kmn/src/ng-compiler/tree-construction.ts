@@ -89,10 +89,21 @@ export class ASTNode {
       child.collectDescendents(result, requiredType);
   }
 
+  /**
+   * Check if this node has any children
+   *
+   * @returns true if there is at least one child node
+   */
   public hasChild(): boolean {
     return this.children.length > 0;
   }
 
+  /**
+   * Check if this node has any children of a given type
+   *
+   * @param requiredType the required type
+   * @returns true if there is at least one child of the required type
+   */
   public hasChildOfType(requiredType: NodeTypes): boolean  {
     if (requiredType != null) {
       for (const child of this.children) {
@@ -101,10 +112,15 @@ export class ASTNode {
         }
       }
     }
-
     return false;
   }
 
+  /**
+   * Check if this node has one and only one child of a given type
+   *
+   * @param requiredType the required type
+   * @returns true if there is one and only one child of the required type
+   */
   public hasSoleChildOfType(requiredType: NodeTypes): boolean  {
     let count = 0;
     if (requiredType != null) {
