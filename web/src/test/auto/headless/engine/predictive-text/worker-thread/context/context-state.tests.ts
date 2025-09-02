@@ -261,6 +261,38 @@ describe('ContextState', () => {
       assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
+    it("properly matches and aligns when whitespace before final empty token is extended", function() {
+      let existingContext = {
+        left: "an apple a day keeps the doctor ", startOfBuffer: true, endOfBuffer: true
+      };
+      let transform = {
+        insert: ' ',
+        deleteLeft: 0
+      }
+      let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", "  ", ""];
+
+      let baseState = new ContextState(existingContext, plainModel);
+      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+      // We want to preserve the added whitespace when predicting a token that follows after it.
+      assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
+
+      // The 'wordbreak' transform
+      let state = newContextMatch?.final;
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.deepEqual(
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        [[{ sample: {insert: '', deleteLeft: 0}, p: 1 }]]
+      );
+
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+    });
+
     it("properly matches and aligns when a 'wordbreak' is removed via backspace", function() {
       let existingContext = {
         left: "an apple a day keeps the doctor ", startOfBuffer: true, endOfBuffer: true
