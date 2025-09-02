@@ -702,6 +702,7 @@
 * docs(linux): clarify requirement of patched ibus for Keyman < 18 (#14113)
 * chore(linux): Update debian changelog (#14118)
 * fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult enum (#14208)
+* fix(windows): fix download failing when cache.json missing (#14207)
 * fix(web): deploy `web/build/publish` folder (#14238)
 * fix(ios): restore keyboard scale map for iPad Air 2 (#14306)
 * chore(developer): upgrade multer to 2.0.2 (#14417)
