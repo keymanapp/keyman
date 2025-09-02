@@ -21,9 +21,6 @@ env:
 
 
 jobs:
-
-  prepare:
-    runs-on: ubuntu-latest
   build:
     runs-on: ubuntu-latest
     steps:
@@ -42,11 +39,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-
     needs: build
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -61,8 +56,8 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-
     needs: test
+
     steps:
 
       - name: Checkout repository
