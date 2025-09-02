@@ -103,6 +103,7 @@ def _list_languages_for_keyboard_impl(packageId, packageDir):
     return result
 
 
+# Used in bash completion
 def list_languages_for_keyboard(packageId, packageDir):
     result = _list_languages_for_keyboard_impl(packageId, packageDir)
     print(result)

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2154 # (variables are set in build-utils.sh)
+# shellcheck disable=SC2154 # (variables are set in builder-basic.inc.sh)
 
 output_log() {
   echo "$1" >&2

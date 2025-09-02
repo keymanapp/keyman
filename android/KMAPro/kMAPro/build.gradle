@@ -11,8 +11,14 @@ apply from: "$rootPath/version.gradle"
 
 String tier = new File('../../TIER.md').getText('UTF-8').trim();
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -24,15 +30,10 @@ android {
         buildConfig = true
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
@@ -113,6 +114,12 @@ android {
         disable 'MissingQuantity', 'MissingTranslation'
         lintConfig file("lint.xml")
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 // how to configure the sentry android gradle plugin
@@ -157,19 +164,17 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 }
 
 repositories {
-    flatDir {
-        dirs 'libs'
-    }
     google()
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
-    api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:7.8.0'
+    implementation files('libs/keyman-engine.aar')
+    implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
     implementation "com.android.installreferrer:installreferrer:2.2"
 

@@ -12,6 +12,7 @@ import { KeylayoutToKmnConverter, ProcesData, Rule } from './keylayout-to-kmn-co
 
 //_S2 TODO use module see PR 14666
 // import { kmcConvertutil } from '@keymanapp/common-types';
+
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
