@@ -20,7 +20,6 @@
         <keyMapSelect mapIndex="1">
             <modifier keys="caps"/>
         </keyMapSelect>
-     
     </modifierMap>
     <keyMapSet id="ANSI">
         <keyMap index="0">

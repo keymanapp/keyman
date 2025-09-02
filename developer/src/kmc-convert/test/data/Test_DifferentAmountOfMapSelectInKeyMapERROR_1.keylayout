@@ -20,8 +20,8 @@
         </keyMapSelect>
         <keyMapSelect mapIndex="1">
             <modifier keys="caps"/>
-        </keyMapSelect>        
-    </modifierMap>    
+        </keyMapSelect>
+    </modifierMap>
     <!-- different amount of tags MapSelect(2) vs. KeyMap(3) -->
     <keyMapSet id="ANSI">
         <keyMap index="0">
@@ -67,7 +67,7 @@
     <actions>
         <action id="A_1">
             <when state="none" output="A"/>
-        </action>      
+        </action>
         <action id="A_9">
             <when state="none" output="A"/>
         </action>

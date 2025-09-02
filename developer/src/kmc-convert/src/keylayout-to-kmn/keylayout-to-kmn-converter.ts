@@ -78,7 +78,7 @@ export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly SKIP_COMMENTED_LINES = false;
-  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint
+  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the highest control character we print out as a Unicode CodePoint
   static readonly MAX_KEY_COUNT = 49;                             // At most we use key Nr 0 (A) -> key Nr 49 (Space)
   static USE_KEY_COUNT = KeylayoutToKmnConverter.MAX_KEY_COUNT;   // we use key Nr 0 (A) -> highest available key of .keylayout file
 
@@ -168,6 +168,7 @@ export class KeylayoutToKmnConverter {
         }
         modifierBehavior.push(singleModifierSet);
       }
+      
       const behav = 0;
       // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
       KeylayoutToKmnConverter.USE_KEY_COUNT = find_usedKeysCount(jsonObj, behav);
@@ -341,6 +342,7 @@ export class KeylayoutToKmnConverter {
 
               // Data of Block Nr 1  ....................................................................................................................................................................
               // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behaviour,modifier,output] ......................................................................
+
               /*  eg: ['0','K_A','a9','0','â'] */    const b1_keycode_obj: KeylayoutFileData[] = this.get_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_obj);
               /*  eg: ['K_A','a9','0','NCAPS','â']*/  const b1_modifierKey_obj: KeylayoutFileData[] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_obj, isCapsused);
                   // .......................................................................................................................................................................................
@@ -878,7 +880,7 @@ export class KeylayoutToKmnConverter {
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k].id &&
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k].id &&              
             data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.MAX_KEY_COUNT) {
             returnObject = {
               keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
@@ -904,7 +906,6 @@ export class KeylayoutToKmnConverter {
   public get_ActionStateOutput_array__From__ActionState(data: any, search: string): ActionStateOutput[] {
     const returnObjarray1D: ActionStateOutput[] = [];
     let returnObject: ActionStateOutput;
-
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
         if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
