@@ -30,7 +30,8 @@ jobs:
 
       - name: Build Docker images
         run: |
-          if [ -n "${{ env.USERNAME }}" ]; then
+          echo ${{ github.event.action }}
+          if [ -z "${{ env.USERNAME }}" ]; then
             resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }}
           else
             echo ${{ env.PASSWORD }} | resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
@@ -47,7 +48,7 @@ jobs:
 
       - name: Test Docker images
         run: |
-          if [ -n "${{ env.USERNAME }}" ]; then
+          if [ -z "${{ env.USERNAME }}" ]; then
             resources/docker-images/build.sh test: --registry ${{ env.REGISTRY }}
           else
             echo ${{ env.PASSWORD }} | resources/docker-images/build.sh test: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
@@ -65,7 +66,7 @@ jobs:
 
       - name: Publish Docker images
         run: |
-          if [ -n "${{ env.USERNAME }}" ]; then
+          if [ -z "${{ env.USERNAME }}" ]; then
             resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }}
           else
             echo ${{ env.PASSWORD }} | resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
