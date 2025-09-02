@@ -167,11 +167,11 @@ export class ContextTokenization {
     const tokenDistribution = alignedTransformDistribution.map((entry) => {
       const remap: Map<number, ProbabilityMass<Transform>> = new Map();
 
-      for(let pair of entry.sample.entries()) {
+      for(const pair of entry.sample.entries()) {
         remap.set(pair[0], {
           sample: pair[1],
           p: entry.p
-        })
+        });
       }
 
       return remap;
