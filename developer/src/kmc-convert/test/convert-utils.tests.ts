@@ -10,7 +10,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks } from './helpers/index.js';
-import * as util from '../src/utils.js';
+import * as util from '../src/convert-utils.js';
 
 describe('kmcConvert util', function () {
 
