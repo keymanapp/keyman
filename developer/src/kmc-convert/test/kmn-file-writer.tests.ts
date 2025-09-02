@@ -9,7 +9,6 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { util } from '@keymanapp/common-types';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter, ProcesData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
@@ -139,6 +138,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe('convertToUnicodeCodePoint ', function () {
+    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
@@ -161,13 +161,14 @@ describe('KmnFileWriter', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = util.convertToUnicodeCodePoint(values[0] as string);
+        const result = sut_w.convertToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
   });
 
   describe('convertToUnicodeCharacter ', function () {
+    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
@@ -177,8 +178,8 @@ describe('KmnFileWriter', function () {
       ["&#4660;", 'ሴ'],
       ["&#128518;", '😆'],
       ["&#1000000;", undefined],
-      ["U+0061;", 'a'],
-      ["U+1234;", 'ሴ'],
+      ["U+0061", 'a'],
+      ["U+1234", 'ሴ'],
       ["U+1F60E", '😎'],
       ["U+1000000;", undefined],
       ["&commat;", undefined],
@@ -192,7 +193,7 @@ describe('KmnFileWriter', function () {
       [null, undefined]
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = util.convertToUnicodeCharacter(values[0] as string);
+        const result = sut_w.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
