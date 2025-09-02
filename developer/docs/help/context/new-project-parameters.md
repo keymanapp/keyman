@@ -7,7 +7,7 @@ title: New Project Parameters Dialog
 Allows you to quickly fill in common parameters for a new keyboard project,
 adding keyboard, package, documentation and metadata files, following the
 [file layout](/developer/keyboards/) used in the
-[Keyman keyboardsrepository](https://github.com/keymanapp/keyboards).
+[Keyman keyboards repository](https://github.com/keymanapp/keyboards).
 
 Projects can also be created from the command line with
 [kmc generate](kmc).
