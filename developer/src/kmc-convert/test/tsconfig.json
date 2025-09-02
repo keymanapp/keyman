@@ -9,6 +9,7 @@
     },
   "include": [
       "**/test-*.ts",
+      "**/*.tests.ts",
       "./helpers/index.ts",
   ],
   "references": [
