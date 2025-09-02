@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.111 alpha 2025-09-02
+
+* change(developer): update SIL logo (#14656)
+* fix(developer): remove incorrect offset for compiler error line (#14651)
+* fix(developer): add clear messages about validation failures to New Project Parameters form (#14657)
+* fix(developer): add clear messages about validation failures to New LDML Project Parameters form (#14658)
+* maint: add registry usage for Docker images (#14648)
+
 ## 19.0.110 alpha 2025-09-01
 
 * maint(windows): for `build` buildlevel, do not publish artifacts (#14654)
