@@ -143,7 +143,37 @@ describe('ContextTokenization', function() {
           tailTokenShift: 0
         },
         plainModel,
-        [{ sample: inputTransformMap, p: 1}]
+        [{ sample: inputTransformMap, p: 1 }]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+    });
+
+    it('merges new whitespace character added to last whitespace token if tail is empty', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', '  ', ''].map((t) => (
+        {text: t, isWhitespace: t != '' && t.trim() == ''}
+      ));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set( 0, { insert: '',  deleteLeft: 0 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          matchLength: 7,
+          tailEditLength: 2,
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1 }]
       );
 
       assert.isOk(tokenization);

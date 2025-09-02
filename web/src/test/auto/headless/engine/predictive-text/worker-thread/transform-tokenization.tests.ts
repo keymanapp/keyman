@@ -353,6 +353,33 @@ describe('tokenizeTransform', () => {
       assert.equal(result.size, 3);
       assert.deepEqual(result, expectedMap);
     });
+
+    it('properly places extra whitespaces on preceding whitespace token', () => {
+      const context = {
+        left: 'do it properly ', // 'do', ' ', 'it', ' ', 'properly', ' ', ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      // Adjacent whitespace entries are generally merged into a single blob.
+      const editTransform = {
+        insert: ' ',  // Should be combined with the final ' ', not the tail ''.
+        deleteLeft: 0
+      };
+
+      const result = tokenizeTransform(
+        defaultTokenize,
+        context,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(0, { insert: '', deleteLeft: 0 });
+      assert.equal(result.size, 2);
+      assert.deepEqual(result, expectedMap);
+    });
   });
 
   describe('with mocked dictionary-based wordbreaking', () => {
