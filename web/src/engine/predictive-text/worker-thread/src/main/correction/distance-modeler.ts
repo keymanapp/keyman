@@ -3,7 +3,7 @@ import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-uti
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
+import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
@@ -89,11 +89,6 @@ export interface PartialSearchEdge {
  */
 export class SearchNode {
   /**
-   * The root traversal of the active LexicalModel
-   */
-  private readonly root: LexiconTraversal;
-
-  /**
    * The search-term keying method used by the active LexicalModel
    * @param str
    * @returns
@@ -104,19 +99,14 @@ export class SearchNode {
    * Calculations used to determine the edit-distance required for the path represented by
    * this SearchNode instance.
    */
-  calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
-
-  // TODO:  the property below is actually redundant with
-  // `this.calculation.lastMatchEntry.traversal ?? this.root`! There are decent
-  // reasons to drop it from calculation though, but also good ones to remember
-  // the intermediate traversals reached when building the match string.
+  calculation: ClassicalDistanceCalculation<string>;
 
   /**
-   * The Traversal (2d lexicon iterator) representing the lexicon's contents for
-   * the prefix currently represented by this SearchNode instance's represented
-   * search path.
+   * The Traversals (2d lexicon iterator) representing each prior step into the
+   * lexicon for the prefix currently represented by this SearchNode instance's
+   * represented search path.
    */
-  currentTraversal: LexiconTraversal;
+  matchedTraversals: LexiconTraversal[];
 
   /**
    * The actual Transform input sequence being considered as a potential correction.
@@ -147,13 +137,14 @@ export class SearchNode {
         this.partialEdge = Object.assign({}, this.partialEdge);
       }
       this.priorInput = priorNode.priorInput.slice(0);
+      this.matchedTraversals = priorNode.matchedTraversals.slice();
+
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
       delete this._inputCost;
     } else {
       this.calculation = new ClassicalDistanceCalculation();
-      this.root = rootTraversal;
-      this.currentTraversal = rootTraversal;
+      this.matchedTraversals = [rootTraversal];
       this.priorInput = [];
       this.toKey = toKey;
     }
@@ -174,6 +165,15 @@ export class SearchNode {
    */
   get hasPartialInput(): boolean {
     return !!this.partialEdge;
+  }
+
+  /**
+   * The Traversal (2d lexicon iterator) representing the lexicon's contents for
+   * the prefix currently represented by this SearchNode instance's represented
+   * search path.
+   */
+  get currentTraversal(): LexiconTraversal {
+    return this.matchedTraversals[this.matchedTraversals.length - 1];
   }
 
   /**
@@ -238,18 +238,12 @@ export class SearchNode {
     let edges: SearchNode[] = [];
 
     for(let lexicalChild of this.currentTraversal.children()) {
-      let traversal = lexicalChild.traversal();
-      let matchToken = {
-        key: lexicalChild.char,
-        traversal: traversal
-      }
-
-      let childCalc = this.calculation.addMatchChar(matchToken);
+      let childCalc = this.calculation.addMatchChar(lexicalChild.char);
 
       let searchChild = new SearchNode(this);
       searchChild.calculation = childCalc;
       searchChild.priorInput = this.priorInput;
-      searchChild.currentTraversal = traversal;
+      searchChild.matchedTraversals.push(lexicalChild.traversal());
 
       edges.push(searchChild);
     }
@@ -265,7 +259,7 @@ export class SearchNode {
   private processDeletionSubset(): SearchNode {
     // We're on easy street:  all transforms are already essentially merged into
     // a single mass here.
-    let calculation = this.calculation.addInputChar({ key: SENTINEL_CODE_UNIT });
+    let calculation = this.calculation.addInputChar(SENTINEL_CODE_UNIT);
 
     // If on a 'delete' style path, we just build out the paths into a single
     // merged path.
@@ -337,8 +331,9 @@ export class SearchNode {
     for(const [char, subset] of subsetMap.entries()) {
       // build new node for the next char.
       let calculation = this.calculation;
+      let childTraversal: LexiconTraversal;
       if(char) {
-        const childTraversal = traversal.child(char);
+        childTraversal = traversal.child(char);
         // These cases - where there's no match in the lexicon - are bundled
         // after this for-loop.
         //
@@ -350,8 +345,8 @@ export class SearchNode {
           continue;
         }
 
-        calculation = calculation.addInputChar({key: char});
-        calculation = calculation.addMatchChar({key: char, traversal: childTraversal});
+        calculation = calculation.addInputChar(char);
+        calculation = calculation.addMatchChar(char);
       } // else we COULD bundle these as a single subset... but it's likely not that important.
       // after all, the cost ISN'T shifting, so we'll process 'em almost immediately and move on.
 
@@ -359,20 +354,24 @@ export class SearchNode {
 
       const node = new SearchNode(this);
       node.calculation = calculation;
-      node.currentTraversal = calculation.lastMatchEntry?.traversal ?? this.root;
       node.partialEdge.subsetSubindex++;
       // Append the newly-processed char to the subset's `insert` string.
       node.partialEdge.transformSubset = {...subset, key: startSubset.key, insert: subset.insert + char};
+      // '' inserts do not traverse deeper; do not add an empty traversal entry!
+      if(childTraversal) {
+        node.matchedTraversals.push(childTraversal);
+      }
       nodesToReturn.push(node);
     };
 
     // These come at a notably higher cost (due to required edit) and are less likely to be processed.
     // It's best to batch them so we only need a single in-memory node to represent them, rather than
     // one node per transform / subset, which can scale very rapidly.
-    let calculation = this.calculation.addInputChar({ key: SENTINEL_CODE_UNIT });
+    let calculation = this.calculation.addInputChar(SENTINEL_CODE_UNIT);
 
     for(const child of traversal.children()) {
-      let childCalc =  calculation.addMatchChar({key: child.char, traversal: child.traversal()});
+      const childTraversal = child.traversal();
+      let childCalc =  calculation.addMatchChar(child.char);
       let childSubset: TransformSubset<number>;
 
       if(keySet.has(child.char)) {
@@ -403,7 +402,7 @@ export class SearchNode {
 
       const node = new SearchNode(this);
       node.calculation = childCalc;
-      node.currentTraversal = childCalc.lastMatchEntry?.traversal ?? this.root;
+      node.matchedTraversals.push(childTraversal);
       node.partialEdge.subsetSubindex++;
       node.partialEdge.transformSubset = childSubset;
       nodesToReturn.push(node);
@@ -439,12 +438,9 @@ export class SearchNode {
         continue;
       }
 
-      let edgeCalc = this.calculation;
-      let newMatchLength = Math.max(0, edgeCalc.matchSequence.length - dl);
-      edgeCalc = edgeCalc.getSubset(edgeCalc.inputSequence.length - dl, newMatchLength);
-
-      // Get the traversal at the new end location.
-      const traversalBase = edgeCalc.lastMatchEntry?.traversal ?? this.root;
+      const calc = this.calculation;
+      const newMatchLength = Math.max(0, calc.matchSequence.length - dl);
+      const edgeCalc = calc.getSubset(calc.inputSequence.length - dl, newMatchLength);
 
       for(let ins = 0; ins < dlSubset.length; ins++) {
         const insSubset = dlSubset[ins];
@@ -462,7 +458,8 @@ export class SearchNode {
             entries: [ { sample: { insert: SENTINEL_CODE_UNIT.repeat(ins), deleteLeft: dl }, p: insSubset.cumulativeMass}]
           }
         }
-        node.currentTraversal = traversalBase;
+        // Get the traversal at the new end location.  (Root is always at index 0.)
+        node.matchedTraversals = this.matchedTraversals.slice(0, newMatchLength+1);
 
         edges.push(node);
       }
@@ -520,7 +517,7 @@ export class SearchNode {
       // at the same level of the search, against the same match, look identical - not cool!
       inputString += `-${subset.entries[0].sample.deleteLeft}+<${subset.key},${partialEdge.subsetSubindex},${subset.entries[0].sample.insert}>`;
     }
-    let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
+    let matchString =  this.calculation.matchSequence.join('');
 
     // TODO:  might should also track diagonalWidth.
     return inputString + ' @@ ' + matchString;
@@ -533,7 +530,7 @@ export class SearchNode {
   get resultKey(): string {
     // Filter out any duplicated match sequences.  The same match sequence may be reached via
     // different input sequences, after all.
-    return this.calculation.matchSequence.map(value => value.key).join('');
+    return this.calculation.matchSequence.join('');
   }
 
   /**
@@ -597,7 +594,7 @@ export class SearchResult {
   }
 
   get matchSequence(): TraversableToken<string>[] {
-    return this.resultNode.calculation.matchSequence;
+    return this.resultNode.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.resultNode.matchedTraversals[i+1]}));
   };
 
   get matchString(): string {
