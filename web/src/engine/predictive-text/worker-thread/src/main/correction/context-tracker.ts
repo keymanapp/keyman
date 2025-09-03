@@ -3,6 +3,7 @@ import { RewindableCache } from '@keymanapp/web-utils';
 
 import { determineModelTokenizer } from '../model-helpers.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import Configuration = LexicalModelTypes.Configuration;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -11,12 +12,32 @@ import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
 export class ContextTracker {
-  readonly cache = new RewindableCache<ContextTransition>(5);
+  private readonly cache = new RewindableCache<ContextTransition>(5);
+  /**
+   * Tracks the most recent transition handled by the context-tracking engine.
+   */
+  latest: ContextTransition;
+
+  /**
+   * Notes the current configuration of the model and of the sliding context window.
+   */
+  configuration: Configuration;
+
+  /**
+   * The active lexical model.
+   */
+  readonly model: LexicalModel;
 
   /** @internal */
   public unitTestEndPoints = {
     cache: () => this.cache
   };
+
+  constructor(model: LexicalModel, context: Context, transitionId: number, config: Configuration) {
+    this.model = model;
+    this.configuration = config;
+    this.reset(context, transitionId);
+  }
 
   /**
    * Compares the current, post-input context against the most recently-seen contexts from previous prediction calls, returning
@@ -52,7 +73,7 @@ export class ContextTracker {
     const transitionId = inputTransform?.sample.id;
 
     if(tokenizedPostContext.left.length > 0) {
-      for(const id of this.cache.keys()) {
+      for(const id of [...this.cache.keys()]) {
         const priorMatchState = this.cache.get(id);
 
         // Skip intermediate multitap-produced contexts.
@@ -104,7 +125,14 @@ export class ContextTracker {
     //
     // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
+    //
+    // If we couldn't find a good match, we need to directly apply the final transform first.
+    if(transformDistribution) {
+      context = applyTransform(transformDistribution[0].sample, context);
+    }
+
     let state = new ContextState(context, model);
+
     const transition = new ContextTransition(state, transitionId);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can
     // then use a different path.
@@ -113,16 +141,29 @@ export class ContextTracker {
     return transition;
   }
 
-  get newest() {
-    let key = this.cache.keys()[0];
-    if(key === undefined) {
-      return undefined;
-    } else {
-      return this.cache.get(key);
-    }
+  reset(context: Context, transitionId: number) {
+    this.cache.clear();
+    this.latest = new ContextTransition(new ContextState(context, this.model), transitionId)
+    this.latest.finalize(this.latest.base, [{
+      sample: {
+        insert: '',
+        deleteLeft: 0,
+        id: transitionId
+      },
+      p: 0
+    }]);
   }
 
-  clearCache() {
-    this.cache.clear();
+  findAndRevert(id: number) {
+    const transition = this.cache.get(id);
+    if(transition) {
+      this.cache.rewindTo(id);
+      this.cache.get(id);
+    }
+    return transition;
+  }
+
+  saveLatest() {
+    this.cache.add(this.latest.transitionId, this.latest);
   }
 }

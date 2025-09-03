@@ -7,10 +7,10 @@ import TransformUtils from './transformUtils.js';
 import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
-import { ContextTransition } from './correction/context-transition.js';
-import { ContextState } from './correction/context-state.js';
+import { ContextTracker } from './correction/context-tracker.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
+import Configuration = LexicalModelTypes.Configuration;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Keep = LexicalModelTypes.Keep;
@@ -66,17 +66,27 @@ export class ModelCompositor {
 
   private testMode: boolean = false;
   private verbose: boolean = true;
+  private configuration: Configuration;
 
   constructor(
     lexicalModel: LexicalModel,
     testMode?: boolean
   ) {
     this.lexicalModel = lexicalModel;
-    if(lexicalModel.traverseFromRoot) {
-      this._contextTracker = new correction.ContextTracker();
-    }
     this.punctuation = determinePunctuationFromModel(lexicalModel);
     this.testMode = !!testMode;
+  }
+
+  setConfiguration(config: Configuration) {
+    this.configuration = config;
+  }
+
+  initContextTracker(context: Context, transformId: number) {
+    if(this.contextTracker || !this.lexicalModel.traverseFromRoot) {
+      return;
+    }
+
+    this._contextTracker = new ContextTracker(this.lexicalModel, context, transformId, this.configuration);
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Outcome<Suggestion|Keep>[]> {
@@ -118,6 +128,9 @@ export class ModelCompositor {
     // Only allow new-word suggestions if space was the most likely keypress.
     // const allowSpace = TransformUtils.isWhitespace(inputTransform);
     const inputTransform = transformDistribution[0].sample;
+    const transformId = inputTransform.id;
+    this.initContextTracker(context, transformId);
+
     const allowBksp = TransformUtils.isBackspace(inputTransform);
     const allowWhitespace = TransformUtils.isWhitespace(inputTransform);
 
@@ -256,13 +269,18 @@ export class ModelCompositor {
 
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
-      let originalTransition = this.contextTracker.newest;
+      let originalTransition = this.contextTracker.latest;
+      if(originalTransition.transitionId != suggestion.transformId) {
+        originalTransition = this.contextTracker.findAndRevert(suggestion.transformId);
+      }
       if(!originalTransition) {
-        originalTransition = this.contextTracker.analyzeState(this.lexicalModel, context);
+        this.contextTracker.reset(context, suggestion.transformId);
+        originalTransition = this.contextTracker.latest;
       }
 
       const appliedTransition = originalTransition.applySuggestion(suggestion);
-      this.contextTracker.cache.add(suggestion.transformId, appliedTransition);
+      this.contextTracker.latest = appliedTransition;
+      this.contextTracker.saveLatest();
     }
 
     return reversion;
@@ -299,39 +317,34 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    let originalTransition = this.contextTracker.cache.get(-reversion.transformId);
+    let originalTransition = this.contextTracker.findAndRevert(-reversion.transformId);
 
     if(!originalTransition) {
-      // We forgot the original base state... and what suggestions we gave.  We can make
-      // decent guesses for those, though.
+      this.contextTracker.reset(context, -reversion.transformId);
+      originalTransition = this.contextTracker.latest;
+
       suggestions = fallbackSuggestions();
-      // Create a base transition from scratch to replace the lost original transition data.
-      originalTransition = new ContextTransition(new ContextState(context, this.lexicalModel), -reversion.transformId);
-      this.contextTracker.clearCache();
     } else {
-      // Remove all contexts more recent than the one we're reverting to.
-      this.contextTracker.cache.rewindTo(-reversion.transformId);
-    }
+      if(!suggestions) {
+        // Will need to be modified a bit if/when phrase-level suggestions are implemented.
+        // Those will be tracked on the first token of the phrase, which won't be the tail
+        // if they cover multiple tokens.
+        let suggests = originalTransition.final.suggestions;
 
-    // If we did actually have the original transition object...
-    if(!suggestions) {
-      // Will need to be modified a bit if/when phrase-level suggestions are implemented.
-      // Those will be tracked on the first token of the phrase, which won't be the tail
-      // if they cover multiple tokens.
-      let suggests = originalTransition.final.suggestions;
+        suggests.forEach(function(suggestion) {
+          // No need to muck around with the original associated transition ids here.
+          // But, we should clear any auto-acceptance flags.
+          suggestion.autoAccept = false;
+        });
 
-      suggests.forEach(function(suggestion) {
-        // No need to muck around with the original associated transition ids here.
-        // But, we should clear any auto-acceptance flags.
-        suggestion.autoAccept = false;
-      });
-
-      suggestions = Promise.resolve(suggests);
+        suggestions = Promise.resolve(suggests);
+      }
     }
 
     // An applied reversion should replace the original Transition's effects.
     const revertedTransition = originalTransition.reproduceOriginal();
-    this.contextTracker.cache.add(-reversion.transformId, revertedTransition);
+    this.contextTracker.latest = revertedTransition;
+    this.contextTracker.saveLatest();
 
     // In case we needed the fallback strategy.
     revertedTransition.final.suggestions = await suggestions;
@@ -356,8 +369,7 @@ export class ModelCompositor {
     // Designed for use when the caret has been directly moved and/or the context sourced from a different control
     // than before.
     if(this.contextTracker) {
-      this.contextTracker.clearCache();
-      this.contextTracker.analyzeState(this.lexicalModel, context, null);
+      this.contextTracker.reset(context, stateId);
     }
   }
 }

@@ -55,10 +55,9 @@ export function isSubstitutionAlignable(
   let subEditPath = ClassicalDistanceCalculation.computeDistance(
     [...matchingToken].map(value => ({key: value})),
     [...incomingToken].map(value => ({key: value})),
-    // Diagonal width to consider must be at least 2, as adding a single
-    // whitespace after a token tends to add two tokens: one for whitespace,
-    // one for the empty token to follow it.
-    3
+    // Use max length in case the word is actually already partly out of
+    // the sliding context window.
+    Math.max(incomingToken.length, matchingToken.length)
   ).editPath();
 
   const firstInsert = subEditPath.indexOf('insert');
@@ -77,7 +76,7 @@ export function isSubstitutionAlignable(
     if(firstSubstitute > -1) {
       return false;
     } else if(firstMatch > -1) {
-      // Should not have inserts on both sides of matched text!
+      // Should not have inserts or deletes on both sides of matched text!
       if(firstInsert > -1 && firstInsert < firstMatch && subEditPath.lastIndexOf('insert') > firstMatch) {
         return false;
       } else if(firstDelete > -1 && firstDelete < firstMatch && subEditPath.lastIndexOf('delete') > firstMatch) {
