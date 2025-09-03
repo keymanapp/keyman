@@ -21,7 +21,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
-  private _mayAutoCorrect: boolean = false; // initialized to false - #12767
+  private _mayAutoCorrect: boolean = true;
 
   private _state: StateChangeEnum = 'inactive';
 
@@ -211,11 +211,15 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       console.warn("Could not apply the Suggestion!");
       return null;
     } else {
+      this.recentTranscriptions.rewindTo(suggestion.transformId);
       // Apply the Suggestion!
 
       // Step 1:  determine the final output text
       const final = Mock.from(original.preInput, false);
       final.apply(suggestion.transform);
+      if(suggestion.appendedTransform) {
+        final.apply(suggestion.appendedTransform);
+      }
 
       // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
       // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
@@ -284,11 +288,16 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return Promise.resolve([] as Suggestion[]);
     }
 
+    this.recentTranscriptions.rewindTo(-reversion.transformId);
+
     // Apply the Reversion!
 
     // Step 1:  determine the final output text
     const final = Mock.from(original.preInput, false);
     final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
+    if(reversion.appendedTransform) {
+      final.apply(reversion.appendedTransform);
+    }
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
     // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
@@ -297,7 +306,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     outputTarget.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(
+      reversion,
+      new ContextWindow(final, this.configuration, null)
+    );
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -324,11 +336,13 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
+    // We record the current context state before any prediction requests...
     const context = new ContextWindow(transcription.preInput, this.configuration, layerId);
     this.recordTranscription(transcription);
 
+    // ... even those triggered by context-resets.
     if(resetContext) {
-      this.lmEngine.resetContext(context);
+      this.lmEngine.resetContext(context, transcription.token);
     }
 
     let alternates = transcription.alternates;
@@ -361,6 +375,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    * Retrieves the context and output state of KMW immediately before the prediction with
    * token `id` was generated.  Must correspond to a 'recent' one, as only so many are stored
    * in `ModelManager`'s history buffer.
+   *
    * @param id A unique identifier corresponding to a recent `Transcription`.
    * @returns The matching `Transcription`, or `null` none is found.
    */
