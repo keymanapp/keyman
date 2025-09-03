@@ -797,6 +797,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (this.usesFixedWidthScaling) {
       let baseWidth = this.width;
       baseWidth -= this._borderWidth * 2;
+      baseWidth = (isNaN(baseWidth) || baseWidth < 0) ? 0 : baseWidth;
       return ParsedLengthStyle.inPixels(baseWidth);
     } else {
       return ParsedLengthStyle.forScalar(1);
