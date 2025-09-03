@@ -9,7 +9,7 @@ java {
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.keyman.kmsample1"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId "com.keyman.kmsample1"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
     }
@@ -30,12 +30,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 repositories {
-    flatDir {
-        dirs 'libs'
-    }
     google()
 
 }
@@ -43,7 +46,8 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
-    api(name: 'keyman-engine', ext: 'aar')
+    implementation files('libs/keyman-engine.aar')
     implementation 'androidx.preference:preference:1.2.1'
 }

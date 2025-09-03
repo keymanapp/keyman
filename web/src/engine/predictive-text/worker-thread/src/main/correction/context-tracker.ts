@@ -176,7 +176,7 @@ export class ContextTracker {
               this.cache.add(transitionId, result);
             } else {
               this.cache.add(priorMatchState.transitionId, priorMatchState);
-              return this.cache.get(priorMatchState.transitionId);
+              return priorMatchState;
             }
           }
 

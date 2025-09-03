@@ -12,7 +12,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-verify_on_mac
+mac_verify_on_mac
 
 #xcodebuild -exportLocalizations -project "engine/KMEI/KeymanEngine.xcodeproj"
 #xcodebuild -exportLocalizations -project "keyman/Keyman/Keyman.xcodeproj"
