@@ -216,6 +216,11 @@ export interface ResetContextMessage {
    * The new context to be used as a base for future context mutations and predictions.
    */
   context: Context;
+
+  /**
+   * The state ID associated with the context for unique cross-thread identification.
+   */
+  stateId: number;
 }
 
 /**
