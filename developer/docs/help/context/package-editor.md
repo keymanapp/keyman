@@ -123,7 +123,7 @@ be displayed before the package is installed as information about the package.
 
 : Version numbers should be in the form `major.minor[.patch]`. Patch is optional
 but is helpful for small bug fix releases. Each of the sections of the version
-should be an integer. Keyman Desktop does integer comparisons on the version
+should be an integer. Keyman for Windows does integer comparisons on the version
 number components, so, for example, version 2.04 is regarded as newer than
 version 2.1. Alphabetic or date formats should be avoided as the installer for
 the keyboard cannot determine which version is older reliably.
