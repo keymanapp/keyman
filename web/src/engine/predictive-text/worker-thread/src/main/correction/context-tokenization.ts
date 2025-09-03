@@ -8,9 +8,9 @@
  */
 
 import { ContextToken } from './context-token.js';
-import { ClassicalDistanceCalculation } from './classical-calculation.js';
+import { ClassicalDistanceCalculation, EditOperation } from './classical-calculation.js';
 import { getEditPathLastMatch, isSubstitutionAlignable } from './alignment-helpers.js';
-import { Token } from '@keymanapp/models-templates';
+import { SENTINEL_CODE_UNIT, Token } from '@keymanapp/models-templates';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Distribution = LexicalModelTypes.Distribution;
@@ -26,7 +26,14 @@ export type ContextStateAlignment = {
   /**
    * Denotes whether or not alignment is possible between two contexts.
    */
-  canAlign: false
+  canAlign: false,
+
+  /**
+   * Indicates the edit path that could not be handled.  (Useful for error reporting)
+   *
+   * The edit path does not include actual user text and is sanitized.
+   */
+  editPath: EditOperation[];
 } | {
   /**
    * Denotes whether or not alignment is possible between two contexts.
@@ -102,19 +109,37 @@ export class ContextTokenization {
    * Determines the alignment between a new, incoming tokenization source and the
    * tokenization modeled by the current instance.
    * @param incomingTokenization Raw strings corresponding to the tokenization of the incoming context
+   * @param isSliding Notes if the context window is full (and sliding-alignment is particularly needed)
    * @param noSubVerify When true, this disables inspection of 'substitute' transitions that avoids
    * wholesale replacement of the original token.
    * @returns Alignment data that details if and how the incoming tokenization aligns with
    * the tokenization modeled by this instance.
    */
-  computeAlignment(incomingTokenization: string[], noSubVerify?: boolean): ContextStateAlignment {
+  computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
     // Map the tokenized state to an edit-distance friendly version.
     const tokenizationToMatch = this.exampleInput;
 
+    const src = tokenizationToMatch.map(value => ({key: value}));
+    const dst = incomingTokenization.map(value => ({key: value}));
+
+    // let changedEmptyTail = false;
+    if(dst[dst.length - 1].key == '') {
+      // Only allow matching if the tokenizations are identical, thus the empty
+      // token was unaffected.
+      if(src.length != dst.length || src[dst.length - 1].key != '') {
+        // Do not allow empty-token matches to match each other; this complicates
+        // things when applying zero-root suggestions.
+        //
+        // The SENTINEL char should never appear in raw text, thus should never
+        // match anything in the "tokenization to match".
+        dst[dst.length - 1].key = SENTINEL_CODE_UNIT;
+      }
+    }
+
     // Inverted order, since 'match' existed before our new context.
     let mapping = ClassicalDistanceCalculation.computeDistance(
-      tokenizationToMatch.map(value => ({key: value})),
-      incomingTokenization.map(value => ({key: value})),
+      src,
+      dst,
       // Diagonal width to consider must be at least 2, as adding a single
       // whitespace after a token tends to add two tokens: one for whitespace,
       // one for the empty token to follow it.
@@ -122,6 +147,11 @@ export class ContextTokenization {
     );
 
     let editPath = mapping.editPath();
+    const failure: ContextStateAlignment = {
+      canAlign: false,
+      editPath
+    };
+
     // Special case:  new context bootstrapping - first token often substitutes.
     // The text length is small enough that no words should be able to rotate out the start of the context.
     // Special handling needed in case of no 'match'; the rest of the method assumes at least one 'match'.
@@ -132,9 +162,7 @@ export class ContextTokenization {
         if(editPath[i] == 'substitute') {
           subCount++;
           if(!noSubVerify && !isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
-            return {
-              canAlign: false
-            };
+            return failure;
           }
         } else if(editPath[i] == 'match') {
           // If a substitution is already recorded, treat the 'match' as a substitution.
@@ -164,16 +192,12 @@ export class ContextTokenization {
 
     if(firstMatch == -1) {
       // If there are no matches, there's no alignment.
-      return {
-        canAlign: false
-      };
+      return failure;
     }
 
     // Transpositions are not allowed at the token level during context alignment.
     if(editPath.find((entry) => entry.indexOf('transpose') > -1)) {
-      return {
-        canAlign: false
-      };
+      return failure;
     }
 
     const lastMatch = getEditPathLastMatch(editPath);
@@ -182,9 +206,7 @@ export class ContextTokenization {
     // continuous block of 'match' entries.  If there's anything else in
     // the middle, we have a context mismatch.
     if(lastMatch == -1) {
-      return {
-        canAlign: false
-      };
+      return failure;
     }
 
     let matchLength = lastMatch - firstMatch + 1;
@@ -200,9 +222,7 @@ export class ContextTokenization {
     if(tailInsertLength > 0 && tailDeleteLength > 0) {
       // Something's gone weird if this happens; that should appear as a substitution instead.
       // Otherwise, we have a VERY niche edit scenario.
-      return {
-        canAlign: false
-      };
+      return failure;
     }
     const tailSubstituteLength = (editPath.length - 1 - lastMatch) - tailInsertLength - tailDeleteLength;
 
@@ -240,9 +260,7 @@ export class ContextTokenization {
           // All deletions should appear at the sliding window edge; if a deletion appears
           // after the edge, but before the first match, something's wrong.
           if(priorEdit && priorEdit != 'delete') {
-            return {
-              canAlign: false
-            };
+            return failure;
           }
           leadTokensRemoved++;
           break;
@@ -252,20 +270,23 @@ export class ContextTokenization {
           // Any extras in the front would be pure inserts, not substitutions, due to
           // the sliding context window and its implications.
           if(leadSubstitutions++ > 0) {
-            return {
-              canAlign: false
-            };
+            return failure;
           }
 
           // Find the word before and after substitution.
-          const incomingSub = incomingTokenization[i - (leadTokensRemoved > 0 ? leadTokensRemoved : 0)];
-          const matchingSub = tokenizationToMatch[i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0)];
+          const incomingIndex = i - (leadTokensRemoved > 0 ? leadTokensRemoved : 0);
+          const matchingIndex = i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0);
+          const incomingSub = incomingTokenization[incomingIndex];
+          const matchingSub = tokenizationToMatch[matchingIndex];
+
+          const atSlidePoint = isSliding && (incomingIndex == 0 || matchingIndex == 0);
 
           // Double-check the word - does the 'substituted' word itself align?
-          if(!noSubVerify && !isSubstitutionAlignable(incomingSub, matchingSub)) {
-            return {
-              canAlign: false
-            };
+          //
+          // Exception: if the word is at the start of the context window and the
+          // context window is likely sliding, don't check it.
+          if(!noSubVerify && !atSlidePoint && !isSubstitutionAlignable(incomingSub, matchingSub)) {
+            return failure;
           }
 
           // There's no major need to drop parts of a token being 'slid' out of the context window.
@@ -275,9 +296,7 @@ export class ContextTokenization {
         case 'insert':
           // Only allow an insert at the leading edge, as with 'delete's.
           if(priorEdit && priorEdit != 'insert') {
-            return {
-              canAlign: false
-            };
+            return failure;
           }
           // In case of backspaces, it's also possible to 'insert' a 'new'
           // token - an old one that's slid back into view.
@@ -286,9 +305,7 @@ export class ContextTokenization {
         default:
           // No 'match' can exist before the first found index for a 'match'.
           // No 'transpose-' edits should exist within this section, either.
-          return {
-            canAlign: false
-          };
+          return failure;
       }
       priorEdit = editPath[i];
     }
@@ -323,7 +340,8 @@ export class ContextTokenization {
     tokenizedContext: Token[],
     alignment: ContextStateAlignment,
     lexicalModel: LexicalModel,
-    // FUTURE NOTE:  especially for epic-dict-breaker, we'll want an array of these - to align across multiple transitions.
+    // FUTURE NOTE:  especially for epic-dict-breaker, we'll want an array of these - to align across multiple transitions
+    // in case word boundaries shift back and forth.
     alignedTransformDistribution: Distribution<Transform[]>
   ): ContextTokenization {
     if(!alignment.canAlign) {
@@ -341,7 +359,9 @@ export class ContextTokenization {
     // If we have a perfect match with a pre-existing tokenization, no mutations have
     // happened; just re-use the old context tokenization.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      return this;
+      // We must build a new instance in case the original did not have
+      // alignment data (like when it's the initial context!)
+      return new ContextTokenization(this.tokens, alignment);
     } else {
       // If we didn't get any input, we really should perfectly match
       // a previous context state.  If such a state is out of our cache,
@@ -357,11 +377,15 @@ export class ContextTokenization {
     if(leadTokenShift < 0) {
       tokenization.splice(0, -leadTokenShift);
     } else if(leadTokenShift > 0) {
-      // TODO:  insert token(s) at the start to match the text that's back within the
+      // insert token(s) at the start to match the text that's back within the
       // sliding context window.
-      //
-      // (was not part of original source method [`attemptContextMatch`])
-      return null;
+
+      const reinsertedTokens = tokenizedContext.slice(0, leadTokenShift);
+      while(reinsertedTokens.length > 0) {
+        const reinserted = reinsertedTokens.pop();
+        const token = new ContextToken(lexicalModel, reinserted.text);
+        tokenization.unshift(token);
+      }
     }
 
     // If no TAIL mutations have happened, we're safe to return now.
@@ -371,10 +395,20 @@ export class ContextTokenization {
 
     // ***
 
+    const incomingOffset = (leadTokenShift > 0 ? leadTokenShift : 0);
+    const matchingOffset = (leadTokenShift < 0 ? -leadTokenShift : 0);
+
+    // If a word is being slid out of context-window range, start trimming it - we should
+    // no longer need to worry about reusing its original correction-search results.
+    if(matchLength > 0 && this.tokens[matchingOffset].exampleInput != tokenizedContext[incomingOffset].text) {
+      //this.tokens[matchingOffset]'s clone is at tokenization[0] after the splice call in a previous block.
+      tokenization[0] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset].text);
+    }
+
     // first non-matched tail index within the incoming context
-    const incomingTailUpdateIndex = matchLength + (leadTokenShift > 0 ? leadTokenShift : 0);
+    const incomingTailUpdateIndex = matchLength + incomingOffset;
     // first non-matched tail index in `matchState`, the base context state.
-    const matchingTailUpdateIndex = matchLength - (leadTokenShift < 0 ? leadTokenShift : 0);
+    const matchingTailUpdateIndex = matchLength + matchingOffset;
 
     // The assumed input from the input distribution is always at index 0.
     const tokenizedPrimaryInput = hasDistribution ? alignedTransformDistribution[0].sample : null;
