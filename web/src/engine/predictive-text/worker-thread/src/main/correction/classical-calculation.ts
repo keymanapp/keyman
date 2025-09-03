@@ -418,6 +418,11 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     col: number = this.matchSequence.length - 1
   ): EditTuple<TUnit>[][] {
     const currentCost = this.getCostAt(row, col);
+    if(currentCost == Number.MAX_VALUE) {
+      // We're too far off the main diagonal - a proper edit distance is not viable!
+      throw new Error("Cannot find path - diagonal width is not large enough.")
+    }
+
     const validPaths: EditTuple<TUnit>[][] = [];
 
     const tryPath = (row: number, col: number, ops: EditTuple<TUnit>[]) => {

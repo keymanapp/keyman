@@ -46,6 +46,7 @@ describe('ContextTokenization', function() {
       let alignment: ContextStateAlignment = {
         canAlign: true,
         leadTokenShift: 0,
+        leadEditLength: 0,
         matchLength: 6,
         tailEditLength: 1,
         tailTokenShift: 0
@@ -67,6 +68,7 @@ describe('ContextTokenization', function() {
       let baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), {
         canAlign: true,
         leadTokenShift: 0,
+        leadEditLength: 0,
         matchLength: 6,
         tailEditLength: 1,
         tailTokenShift: 0
@@ -111,6 +113,7 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 7,
           tailEditLength: 0,
           tailTokenShift: 2
@@ -138,6 +141,7 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 6,
           tailEditLength: 1,
           tailTokenShift: 0
@@ -168,6 +172,7 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 7,
           tailEditLength: 2,
           tailTokenShift: 0
@@ -206,7 +211,8 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
-          matchLength: 22,
+          leadEditLength: 1,
+          matchLength: 21,
           tailEditLength: 1,
           tailTokenShift: 0
         },
@@ -216,6 +222,7 @@ describe('ContextTokenization', function() {
 
       assert.isOk(tokenization);
       assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
     });
 
     it('context-window slide deletes majority of word', () => {
@@ -241,7 +248,8 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
-          matchLength: 24,
+          leadEditLength: 1,
+          matchLength: 23,
           tailEditLength: 1,
           tailTokenShift: 0
         },
@@ -251,6 +259,201 @@ describe('ContextTokenization', function() {
 
       assert.isOk(tokenization);
       assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles extension of head token from backward context-window slide', () => {
+      const baseTexts = [
+        "sauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: '', deleteLeft: 0 });
+
+      const tokenization = baseTokenization.transitionTo(
+        // Yay for being able to mock the alignment data for the test! We don't
+        // actually need to use a full 64-char string as long as we craft this
+        // properly.
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          leadEditLength: 1,
+          matchLength: baseTexts.length - 1,
+          tailEditLength: 0,
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles large backward context-window slide jump', () => {
+      // Note:  this is not the actual pathway used for reverting suggestions,
+      // though the scenario is somewhat analogous.
+      const baseTexts = [
+        "nd", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ", "breakfast"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        "sauce", " ", "and", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ",
+        "brea"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(0, { insert: '', deleteLeft: 5 });
+
+      const tokenization = baseTokenization.transitionTo(
+        // Yay for being able to mock the alignment data for the test! We don't
+        // actually need to use a full 64-char string as long as we craft this
+        // properly.
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 2, // "applesauce", " "
+          leadEditLength: 1, // "nd" / "and"
+          matchLength: baseTexts.length - 2,
+          tailEditLength: 1, // "breakfast" / "brea"
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "brea");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "brea".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles word-break boundary shift during backward context-window slide', () => {
+      const baseTexts = [
+        // Without any preceding adjacent char in view, we can only interpret
+        // the leading `'` as an opening single-quote.
+        /*isn*/ "'", "t", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "think"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        // With one preceding adjacent non-whitespace char in view, we now
+        // realize it was part of a word... and remove a wordbreak!
+        /*is"*/ "n't", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "thin"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(0, { insert: '', deleteLeft: 1 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: -1, // "'",
+          leadEditLength: 1, // "t" / "n't"
+          matchLength: baseTexts.length - 3,
+          tailEditLength: 1, // "think" / "thin"
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "thin");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "thin".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles word-break boundary shifts at both ends during backward context-window slide', () => {
+      const baseTexts = [
+        // Without any preceding adjacent char in view, we can only interpret
+        // the leading `'` as an opening single-quote.
+        /*isn*/ "'", "t", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find", " ", ""
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        // With one preceding adjacent non-whitespace char in view, we now
+        // realize it was part of a word... and remove a wordbreak!
+        /*is"*/ "n't", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(0, { insert: '', deleteLeft: 1 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: -1, // "'",
+          leadEditLength: 1, // "t" / "n't"
+          matchLength: baseTexts.length - 4,
+          tailEditLength: 0,
+          tailTokenShift: -2 // " ", ""
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "find");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "find".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles word-break boundary shifts at both ends during forward context-window slide', () => {
+      const baseTexts = [
+        // With one preceding adjacent non-whitespace char in view, it's part of
+        // a word... and remove a wordbreak!
+        /*is"*/ "n't", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        // Without any preceding adjacent char in view, we can only interpret
+        // the leading `'` as an opening single-quote.
+        /*isn*/ "'", "t", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find", " ", ""
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set(2, { insert: '', deleteLeft: 0 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 1, // "'",
+          leadEditLength: 1, // "n't" / "t"
+          matchLength: baseTexts.length - 1,
+          tailEditLength: 0,
+          tailTokenShift: 2 // " ", ""
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
     });
   });
 });

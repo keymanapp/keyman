@@ -98,15 +98,16 @@ export class ContextTokenization {
 
     const {
       leadTokenShift,
+      leadEditLength,
       matchLength,
       tailEditLength,
       tailTokenShift
     } = alignment;
     const hasDistribution = alignedTransformDistribution?.length > 0;
 
-    // If we have a perfect match with a pre-existing tokenization, no mutations have
-    // happened; just re-use the old context tokenization.
-    if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
+    // If we have a perfect match with a pre-existing tokenization, no mutations
+    // have happened; just re-use the old context tokenization.
+    if(leadEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0 && tailEditLength == 0) {
       // We must build a new instance in case the original did not have
       // alignment data (like when it's the initial context!)
       return new ContextTokenization(this.tokens, alignment);
@@ -136,27 +137,28 @@ export class ContextTokenization {
       }
     }
 
-    // If no TAIL mutations have happened, we're safe to return now.
-    if(tailEditLength == 0 && tailTokenShift == 0) {
-      return new ContextTokenization(tokenization, alignment);
-    }
-
-    // ***
-
     const incomingOffset = (leadTokenShift > 0 ? leadTokenShift : 0);
     const matchingOffset = (leadTokenShift < 0 ? -leadTokenShift : 0);
 
     // If a word is being slid out of context-window range, start trimming it - we should
     // no longer need to worry about reusing its original correction-search results.
-    if(matchLength > 0 && this.tokens[matchingOffset].exampleInput != tokenizedContext[incomingOffset].text) {
-      //this.tokens[matchingOffset]'s clone is at tokenization[0] after the splice call in a previous block.
-      tokenization[0] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset].text);
+    for(let i = 0; i < leadEditLength; i++) {
+      if(this.tokens[matchingOffset+i].exampleInput != tokenizedContext[incomingOffset+i].text) {
+        //this.tokens[matchingOffset]'s clone is at tokenization[incomingOffset]
+        //after the splice call in a previous block.
+        tokenization[incomingOffset+i] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset+i].text);
+      }
+    }
+
+    // If no TAIL mutations have happened, we're safe to return now.
+    if(tailEditLength == 0 && tailTokenShift == 0) {
+      return new ContextTokenization(tokenization, alignment);
     }
 
     // first non-matched tail index within the incoming context
-    const incomingTailUpdateIndex = matchLength + incomingOffset;
+    const incomingTailUpdateIndex = matchLength + leadEditLength + incomingOffset;
     // first non-matched tail index in `matchState`, the base context state.
-    const matchingTailUpdateIndex = matchLength + matchingOffset;
+    const matchingTailUpdateIndex = matchLength + leadEditLength + matchingOffset;
 
     // The assumed input from the input distribution is always at index 0.
     const tokenizedPrimaryInput = hasDistribution ? alignedTransformDistribution[0].sample : null;
