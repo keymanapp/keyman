@@ -9,6 +9,113 @@ export interface EditToken<TUnit> {
   key: TUnit;
 }
 
+// Implemented externally from the class so that it may be more easily
+// disconnected from the class; it's not the smallest method.
+export function visualizeCalculation<TUnit>(calc: ClassicalDistanceCalculation<TUnit>) {
+  const path =  calc.editPath();
+
+  const inputs = calc.inputSequence.map(i => '' + i.key);
+  const matches = calc.matchSequence.map(i => '' + i.key);
+  const maxInputLen = Math.max(...inputs.map(i => i.length));
+  const maxMatchLen = Math.max(...matches.map(m => m.length));
+
+  const paddedMatchSequence = matches.map(m => `${' '.repeat(maxMatchLen - m.length)}${m}`);
+  const noInputPadding = ' '.repeat(maxInputLen+1);
+
+  const rowStrs: string[] = [];
+  for(let j = 0; j < maxMatchLen; j++) {
+    rowStrs.push(
+      //               '#|'
+      noInputPadding + '  ' + paddedMatchSequence.map((m) => m.charAt(j)).join('')
+    );
+  }
+  rowStrs.push('');
+
+  let topRow = noInputPadding + `${calc.getCostAt(-1, -1)}|`;
+  for(let m = 0; m < calc.diagonalWidth; m++) {
+    const cost = calc.getCostAt(-1, m);
+    topRow += cost > 36 ? '-' : cost.toString(36);
+  }
+  rowStrs.push(topRow);
+  rowStrs.push(noInputPadding + '-'.repeat(matches.length + 2));
+
+  // Used for looking up the original input and match entries at each stage
+  // in the visualized path
+  let inputIndex = 0;
+  let matchIndex = 0;
+
+  // Main visualization loop
+  for(let i=0; i < inputs.length; i++) {
+    let needRowPadding = true;
+    const input = '' + inputs[i];
+    let rowStr = `${' '.repeat(maxInputLen - input.length)}${input} ` + (i - calc.diagonalWidth < 0 ? '' : ` |`);
+    for(let j=-calc.diagonalWidth; j <= calc.diagonalWidth && i + j < calc.matchSequence.length; j++) {
+      const m = i + j;
+      if(m >= -1) {
+        if(needRowPadding) {
+          needRowPadding = false;
+          rowStr += " ".repeat(m > 0 ? m : 0);
+        }
+        const cost = calc.getCostAt(i, m);
+        rowStr += cost > 36 ? '-' : cost.toString(36);
+
+        if(m == -1) {
+          rowStr += '|';
+        }
+      }
+    }
+
+    // final row padding
+    const sparseCount = matches.length - (i + calc.diagonalWidth);
+    rowStr += " ".repeat(sparseCount > 0 ? sparseCount : 1);
+
+    let edits: string[] = [];
+    const printEdit = (edit: EditOperation) => {
+      let tokenText: string;
+      switch(edit) {
+        case 'delete':
+        case 'transpose-delete':
+          tokenText = `'${inputs[inputIndex]}'`;
+          inputIndex++;
+          break;
+        case 'insert':
+        case 'transpose-insert':
+          tokenText = `'${matches[matchIndex]}'`;
+          matchIndex++;
+          break;
+        case 'substitute':
+          tokenText = `'${inputs[inputIndex]}' => '${matches[matchIndex]}'`;
+          // fallthrough
+        case 'match':
+          tokenText = tokenText || `'${inputs[inputIndex]}'`;
+          inputIndex++;
+          matchIndex++;
+          break;
+        // transpose-start, transpose-end:  may not actually be correct, though.
+        default:
+          tokenText = `'${inputs[inputIndex]}'`;
+          inputIndex++;
+          matchIndex++;
+      }
+      return `${edit}(${tokenText})`;
+    }
+    do {
+      edits.push(printEdit(path.shift()));
+    } while(path.length > 0 && edits[edits.length-1].indexOf('insert') != -1);
+    // If final row, dump the rest of the edit path into the current row.
+    if(i == calc.inputSequence.length - 1) {
+      // Capture final 'insert's!
+      while(path.length > 0) {
+        edits.push(printEdit(path.shift()));
+      }
+    }
+    rowStr += edits.join(', ');
+
+    rowStrs.push(rowStr);
+  }
+  return '\n' + rowStrs.join('\n');
+}
+
 // A semi-optimized 'online'/iterative Damerau-Levenshtein calculator with the following features:
 // - may add new character to the 'input' string or to the 'match' string, reusing all old calculations efficiently.
 // - allows a 'focused' evaluation that seeks if the edit distance is within a specific range.  Designed for use in match-searching,
@@ -94,7 +201,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return retVal;
   }
 
-  private getCostAt(i: number, j: number, width: number = this.diagonalWidth): number {
+  public getCostAt(i: number, j: number, width: number = this.diagonalWidth): number {
     // Check for and handle the set of fixed-value virtualized indices.
     if(i < 0 || j < 0) {
       if(i == -1 && j >= -1) {
@@ -572,4 +679,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
     return buffer;
   }
+
+  // public get visualization() {
+  //   return visualizeCalculation(this);
+  // }
 }
