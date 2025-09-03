@@ -44,7 +44,7 @@ If you find that you can see the characters for a language on screen,
 but they don't display quite right, you may be experiencing a limitation
 in your operating system. An example of this is visible in the Tibetan
 script on the right. Installing Keyman for Windows, Keyman for Linux,
-or Keyman for Mac may help resolve these issues.
+or Keyman for macOS may help resolve these issues.
 
 <span id="two"></span>
 
