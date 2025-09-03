@@ -119,12 +119,6 @@ export class ModelCompositor {
       })
     }
 
-    // Fulfill pre-condition:  the transform distribution should be sorted in
-    // descending order.
-    transformDistribution.sort(function(a, b) {
-      return b.p - a.p;
-    });
-
     // Only allow new-word suggestions if space was the most likely keypress.
     // const allowSpace = TransformUtils.isWhitespace(inputTransform);
     const inputTransform = transformDistribution[0].sample;

@@ -24,7 +24,7 @@ builder_describe "Builds the $TARGET app for use on iOS devices - iPhone and iPa
 
 builder_parse "$@"
 
-verify_on_mac
+mac_verify_on_mac
 
 KMEI_BUILD_DIR="$KEYMAN_ROOT/ios/build"
 DERIVED_DATA="$THIS_SCRIPT_PATH/build"
@@ -100,7 +100,7 @@ function do_build() {
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .ipa file for deployment to real devices."
-    run_xcodebuild $XCODEFLAGS_EXT \
+    mac_xcodebuild $XCODEFLAGS_EXT \
             -scheme $TARGET \
             -archivePath "$ARCHIVE_PATH" \
             archive \
@@ -114,7 +114,7 @@ function do_build() {
 
     # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
     # Xcode to generate a build error.
-    run_xcodebuild $XCODEFLAGS \
+    mac_xcodebuild $XCODEFLAGS \
             -exportArchive \
             -archivePath "$ARCHIVE_PATH" \
             -exportOptionsPlist exportAppStore.plist \
@@ -123,7 +123,7 @@ function do_build() {
             KEYMAN_VERSION=$KEYMAN_VERSION \
             KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
   else
-    run_xcodebuild $CODE_SIGN \
+    mac_xcodebuild $CODE_SIGN \
             $XCODEFLAGS_EXT \
             -scheme "$TARGET" \
             KEYMAN_VERSION=$KEYMAN_VERSION \
@@ -132,7 +132,7 @@ function do_build() {
 
   if builder_has_option --sim-artifact; then
     echo "Preparing .app file as Simulator-targeted build artifact."
-    run_xcodebuild $CODE_SIGN \
+    mac_xcodebuild $CODE_SIGN \
             $XCODEFLAGS_EXT \
             -scheme "$TARGET" \
             -sdk iphonesimulator \

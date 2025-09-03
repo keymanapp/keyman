@@ -19,7 +19,7 @@ builder_describe "Defines actions for use in CI-related iOS builds." \
 
 builder_parse "$@"
 
-verify_on_mac
+mac_verify_on_mac
 
 function do_build() {
   ./build.sh                         clean configure build:engine build:app --sim-artifact

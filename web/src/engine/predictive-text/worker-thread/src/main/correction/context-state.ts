@@ -214,7 +214,10 @@ export class ContextState {
     // computeDistance 'radius' in the called function.
     const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isSliding, isApplyingSuggestion);
 
-    if(!alignmentResults.canAlign) {
+    if(alignmentResults.canAlign == false) { // Needs to be explicit for TS type inference.
+      if(console && console.error) {
+        console.error(`Could not align contexts with edit path ${JSON.stringify(alignmentResults.editPath)}`);
+      }
       return null;
     }
 
@@ -226,6 +229,9 @@ export class ContextState {
     );
 
     if(!resultTokenization) {
+      if(console && console.error) {
+        console.error(`Transition to alignable tokenization failed:  alignment properties ${JSON.stringify(alignmentResults)}`);
+      }
       return null;
     }
 
@@ -241,6 +247,8 @@ export class ContextState {
     // Used to construct and represent the part of the incoming transform that
     // does not land as part of the final token in the resulting context.  This
     // component should be preserved by any suggestions that get applied.
+    //
+    // undefined by default, which asserts we're still affecting the same token.
     let preservationTransform: Transform;
 
     // Handling for non-whitespace word boundaries - for example,
@@ -252,10 +260,15 @@ export class ContextState {
       preservationTransform = { insert: '', deleteLeft: 0 };
     }
 
-    // Leave out the final entry!
-    for(let i = 0; i < transformSequenceDistribution?.[0].sample.length - 1; i++) {
-      const primaryInput = transformSequenceDistribution[0].sample[i];
-      preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput): primaryInput;
+    if(transformSequenceDistribution) {
+      const transformKeys = [...transformSequenceDistribution[0].sample.keys()];
+      // Leave out the final entry - that part is replaceable by suggestions.
+      transformKeys.pop();
+
+      for(let i of transformKeys) {
+        const primaryInput = transformSequenceDistribution[0].sample.get(i);
+        preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput): primaryInput;
+      }
     }
 
     const state = new ContextState(postContext, lexicalModel);

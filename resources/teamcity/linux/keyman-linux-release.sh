@@ -24,12 +24,13 @@ builder_describe \
   "build          make a release build" \
   "test           run unit tests" \
   "publish        make a source tarball and publish to downloads and launchpad" \
-  "--gpgkey=GPGKEYGRIP      GPG key for signing" \
-  "--gpgpw=GPGKEYPW         GPG key passphrase" \
-  "--rsync-path=RSYNC_PATH  rsync path on remote server" \
-  "--rsync-user=RSYNC_USER  rsync user on remote server" \
-  "--rsync-host=RSYNC_HOST  rsync host on remote server" \
-  "--rsync-root=RSYNC_ROOT  rsync root on remote server"
+  "--gpgkey=GPGKEYGRIP                GPG key for signing" \
+  "--gpgpw=GPGKEYPW                   GPG key passphrase" \
+  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
+  "--rsync-user=RSYNC_USER            rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository" \
 
 builder_parse "$@"
 
@@ -120,8 +121,7 @@ function _publish_linux_help() {
     cd "${KEYMAN_ROOT}/../help.keyman.com" || exit 1
     # shellcheck disable=SC2016
     git config credential.helper '!f() { sleep 1; echo "username=${GITHUB_USER}"; echo "password=${GITHUB_TOKEN}"; }; f'
-    cd "${KEYMAN_ROOT}/resources/build"
-    ./help-keyman-com.sh linux
+    "${KEYMAN_ROOT}/resources/build/ci/help-keyman-com.sh" linux
   )
 
   builder_echo end "upload linux help" success "Upload new Keyman Linux help to help.keyman.com"

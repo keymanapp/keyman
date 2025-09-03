@@ -1,6 +1,22 @@
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 
+/**
+ * The human-readable names for legal edit-operation edges on the edit path.
+ */
 export type EditOperation = 'insert' | 'delete' | 'match' | 'substitute' | 'transpose-start' | 'transpose-end' | 'transpose-insert' | 'transpose-delete';
+
+/**
+ * Represents individual nodes on calculated edit paths and the relevant
+ * edited value(s) at each step.
+ */
+export interface EditTuple<TUnit> {
+  /** The edit operation taking place at this position in the edit path */
+  op: EditOperation,
+  /** The value for the `input` source at this position in the edit path */
+  input?: TUnit,
+  /** The value for the `match` source at this position in the edit path */
+  match?: TUnit
+}
 
 /**
  * Represents the lowest-level unit for comparison during edit-distance calculations.
@@ -9,20 +25,156 @@ export interface EditToken<TUnit> {
   key: TUnit;
 }
 
-// A semi-optimized 'online'/iterative Damerau-Levenshtein calculator with the following features:
-// - may add new character to the 'input' string or to the 'match' string, reusing all old calculations efficiently.
-// - allows a 'focused' evaluation that seeks if the edit distance is within a specific range.  Designed for use in match-searching,
-//   where we want to find the 'closest' matching strings in a lexicon.
-// - towards such a match-searching algorithm/heuristic: should nothing be found within that range, all prior calculations may be reused
-//   to search across the lexicon with an incremented edit distance.
-// - minimized memory footprint: O(m) memory footprint (where m = length of 'input' string), rather than O(mn) (where n = length of 'match' string)
-//   - guaranteed to use a smaller footprint than DiagonalizedIterativeDamerauLevenshteinCalculation.
-//
-// In short:  Used to optimize calculations for low edit-distance checks, then expanded if/as necessary
-//            if a greater edit distance is requested.
-//
-// Reference: https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm#Possible_modifications
-//    - Motivating statement:  "if we are only interested in the distance if it is smaller than a threshold..."
+// Implemented externally from the class so that it may be more easily
+// disconnected from the class; it's not the smallest method.
+/**
+ * Produces a visualization of a ClassicalDistanceCalculation instance,
+ * displaying its calculated values, how they align to the input and match
+ * sources, and what steps were taken on the 'best' edit path to align the input
+ * and match sources.
+ *
+ * Example case:
+ *
+ * - Input sequence: ['quick', 'brown', 'fox', 'jumped', 'ove']
+ * - Match sequence: ['uick', 'brown', 'fox', 'jumped', 'over', 't']
+ *
+ * ```
+ *             j
+ *           b u
+ *          ur mo
+ *          iofpv
+ *          cwoee
+ *          knxdrt
+ *
+ *        0|123
+ *        --------
+ *  quick 1|1234   substitute('quick' => 'uick')
+ *  brown 2|21234  match('brown')
+ *    fox 3|321234 match('fox')
+ * jumped  |432123 match('jumped')
+ *    ove  | 43223 substitute('ove' => 'over'), insert('t')
+ * ```
+ *
+ * @param calc The distance calculation object to visualize
+ * @param path If set, uses this path instead of the 'best' edit path in the
+ * visualization
+ * @returns
+ */
+export function visualizeCalculation<TUnit>(calc: ClassicalDistanceCalculation<TUnit>, path?: EditTuple<TUnit>[]) {
+  path = (path ?? calc.editPath()[0]).slice();
+
+  const inputs = calc.inputSequence.map(i => '' + i.key);
+  const matches = calc.matchSequence.map(i => '' + i.key);
+  const maxInputLen = Math.max(...inputs.map(i => i.length));
+  const maxMatchLen = Math.max(...matches.map(m => m.length));
+
+  const paddedMatchSequence = matches.map(m => `${' '.repeat(maxMatchLen - m.length)}${m}`);
+  const noInputPadding = ' '.repeat(maxInputLen+1);
+
+  const rowStrs: string[] = [];
+  for(let j = 0; j < maxMatchLen; j++) {
+    rowStrs.push(
+      //               '#|'
+      noInputPadding + '  ' + paddedMatchSequence.map((m) => m.charAt(j)).join('')
+    );
+  }
+  rowStrs.push('');
+
+  let topRow = noInputPadding + `${calc.getCostAt(-1, -1)}|`;
+  for(let m = 0; m < calc.diagonalWidth; m++) {
+    const cost = calc.getCostAt(-1, m);
+    topRow += cost > 36 ? '-' : cost.toString(36);
+  }
+  rowStrs.push(topRow);
+  rowStrs.push(noInputPadding + '-'.repeat(matches.length + 2));
+
+  // Main visualization loop
+  for(let i=0; i < inputs.length; i++) {
+    let needRowPadding = true;
+    const input = '' + inputs[i];
+    let rowStr = `${' '.repeat(maxInputLen - input.length)}${input} ` + (i - calc.diagonalWidth < 0 ? '' : ` |`);
+    for(let j=-calc.diagonalWidth; j <= calc.diagonalWidth && i + j < calc.matchSequence.length; j++) {
+      const m = i + j;
+      if(m >= -1) {
+        if(needRowPadding) {
+          needRowPadding = false;
+          rowStr += " ".repeat(m > 0 ? m : 0);
+        }
+        const cost = calc.getCostAt(i, m);
+        rowStr += cost > 36 ? '-' : cost.toString(36);
+
+        if(m == -1) {
+          rowStr += '|';
+        }
+      }
+    }
+
+    // final row padding
+    const sparseCount = matches.length - (i + calc.diagonalWidth);
+    rowStr += " ".repeat(sparseCount > 0 ? sparseCount : 1);
+
+    let edits: string[] = [];
+    const printEdit = (edit: EditTuple<TUnit>) => {
+      let tokenText: string;
+      switch(edit.op) {
+        case 'delete':
+        case 'transpose-delete':
+          tokenText = `'${edit.input}'`;
+          break;
+        case 'insert':
+        case 'transpose-insert':
+          tokenText = `'${edit.match}'`;
+          break;
+        case 'substitute':
+        case 'match':
+          const op = edit.op == 'substitute' ? '=>' : '==';
+          tokenText = tokenText || `'${edit.input}' ${op} '${edit.match}'`;
+          break;
+        // transpose-start, transpose-end
+        default:
+          tokenText = `'${edit.input}' vs '${edit.match}'`;
+      }
+      return `${edit.op}(${tokenText})`;
+    }
+    do {
+      edits.push(printEdit(path.shift()));
+    } while(path.length > 0 && edits[edits.length-1].indexOf('insert') != -1);
+    // If final row, dump the rest of the edit path into the current row.
+    if(i == calc.inputSequence.length - 1) {
+      // Capture final 'insert's!
+      while(path.length > 0) {
+        edits.push(printEdit(path.shift()));
+      }
+    }
+    rowStr += edits.join(', ');
+
+    rowStrs.push(rowStr);
+  }
+  return '\n' + rowStrs.join('\n');
+}
+
+/**
+ * A semi-optimized 'online'/iterative Damerau-Levenshtein calculator with the
+ * following features:
+ * - may add new character to the 'input' string or to the 'match' string,
+ *   reusing all old calculations efficiently.
+ * - allows a 'focused' evaluation that seeks if the edit distance is within a
+ *   specific range.  Designed for use in match-searching, where we want to find
+ *   the 'closest' matching strings in a lexicon.
+ * - towards such a match-searching algorithm/heuristic: should nothing be found
+ *   within that range, all prior calculations may be reused to search across
+ *   the lexicon with an incremented edit distance.
+ * - minimized memory footprint: O(m) memory footprint (where m = length of
+ *   'input' string), rather than O(mn) (where n = length of 'match' string)
+ *
+ * In short:  Used to optimize calculations for low edit-distance checks, then
+ *            expanded if/as necessary if a greater edit distance is requested.
+ *
+ * Reference:
+ * https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm#Possible_modifications
+ *    - Motivating statement:  "if we are only interested in the distance if it
+ *      is smaller than a threshold..."
+ */
 export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditToken<TUnit> = EditToken<TUnit>, TMatch extends EditToken<TUnit> = EditToken<TUnit>> {
   /**
    * Stores ONLY the computed diagonal elements, nothing else.
@@ -60,7 +212,14 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
   inputSequence: TInput[] = [];
   matchSequence: TMatch[] = [];
 
+  /**
+   * Constructs a new calculation object instance.
+   */
   constructor();
+  /**
+   * Clones an already-existing instance, aliasing old data only where safe.
+   * @param other
+   */
   constructor(other: ClassicalDistanceCalculation<TUnit, TInput, TMatch>);
   constructor(other?: ClassicalDistanceCalculation<TUnit, TInput, TMatch>) {
     if(other) {
@@ -94,7 +253,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return retVal;
   }
 
-  private getCostAt(i: number, j: number, width: number = this.diagonalWidth): number {
+  public getCostAt(i: number, j: number, width: number = this.diagonalWidth): number {
     // Check for and handle the set of fixed-value virtualized indices.
     if(i < 0 || j < 0) {
       if(i == -1 && j >= -1) {
@@ -168,75 +327,217 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
   /**
    * Determines the edit path used to obtain the optimal cost, distinguishing between zero-cost
    * substitutions ('match' operations) and actual substitutions.
+   *
+   * If multiple edit paths are valid, this method will also sort them in a manner favoring, in order:
+   * - long, contiguous stretches of 'match' entries
+   * - long, contiguous stretches of 'match' + 'substitute' entries
+   * - long, contiguous stretches of 'match' + 'substitute' + 'transpose' entries
    * @param row
    * @param col
    */
-  public editPath(row: number = this.inputSequence.length - 1, col: number = this.matchSequence.length - 1): EditOperation[] {
-    let currentCost = this.getCostAt(row, col);
-    let ops: EditOperation[] = null;
-    let parent: [number, number] = null;
+  public editPath(): EditTuple<TUnit>[][] {
+    const results = this._editPath();
 
-    let insertParentCost = this.getCostAt(row, col-1);
-    let deleteParentCost = this.getCostAt(row-1, col);
-    let substitutionParentCost = this.getCostAt(row-1, col-1);
-    let [lastInputIndex, lastMatchIndex] = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
+    if(results.length <= 1) {
+      return results;
+    }
+
+    const properties = results.map((result) => {
+      let maxM = 0;   // includes matches
+      let maxMS = 0;  // includes above + substitutions
+      let maxMST = 0; // includes above + transposes
+
+      let m = 0;  // same as above, but running counter
+      let ms = 0;
+      let mst = 0;
+
+      for(let edit of result) {
+        if(edit.op == 'match') {
+          m++;
+          ms++;
+          mst++;
+          continue;
+        }
+
+        maxM = Math.max(maxM, m);
+        m = 0;
+
+        if(edit.op == 'substitute') {
+          ms++;
+          mst++;
+          continue;
+        }
+
+        maxMS = Math.max(maxMS, ms);
+        ms = 0;
+
+        if(edit.op.indexOf('transpose') > -1) {
+          mst++;
+          continue;
+        }
+
+        maxMST = Math.max(maxMST, mst);
+        mst = 0;
+      }
+
+      maxM = Math.max(maxM, m);
+      maxMS = Math.max(maxMS, ms);
+      maxMST = Math.max(maxMST, ms);
+
+      return {
+        result,
+        maxM,
+        maxMS,
+        maxMST
+      }
+    });
+
+    properties.sort((a, b) => {
+      const tier0 = b.maxM - a.maxM;
+      if(tier0 != 0) {
+        return tier0;
+      }
+      const tier1 = b.maxMS - a.maxMS;
+      if(tier1 != 0) {
+        return tier1;
+      }
+      return b.maxMST - a.maxMST;
+    });
+
+    return properties.map((p) => p.result);
+  };
+
+  /**
+   * Determines the edit path used to obtain the optimal cost, distinguishing between zero-cost
+   * substitutions ('match' operations) and actual substitutions.
+   * @param row
+   * @param col
+   */
+  private _editPath(
+    row: number = this.inputSequence.length - 1,
+    col: number = this.matchSequence.length - 1
+  ): EditTuple<TUnit>[][] {
+    const currentCost = this.getCostAt(row, col);
+    if(currentCost == Number.MAX_VALUE) {
+      // We're too far off the main diagonal - a proper edit distance is not viable!
+      throw new Error("Cannot find path - diagonal width is not large enough.")
+    }
+
+    const validPaths: EditTuple<TUnit>[][] = [];
+
+    const tryPath = (row: number, col: number, ops: EditTuple<TUnit>[]) => {
+      // Recursively build the edit path.
+      let results: EditTuple<TUnit>[][];
+      if(row >= 0 && col >= 0) {
+        results = this._editPath(row, col);
+      } else {
+        results = [[]];
+        const result = results[0];
+        for(let r = 0; r <= row; r++) {
+          // There are initial deletions.
+          result.push({
+            op: 'delete',
+            input: this.inputSequence[r].key
+          });
+        }
+        for(let c = 0; c <= col; c++) {
+          // There are initial insertions.
+          result.push({
+            op: 'insert',
+            match: this.matchSequence[c].key
+          });
+        }
+      }
+
+      // If null, there must not be any valid results
+      if(results) {
+        // ... also, if the array's empty.
+        results.forEach(r => validPaths.push(r.concat(ops)));
+      }
+    }
+
+    const [lastInputIndex, lastMatchIndex] = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
     if(lastInputIndex >= 0 && lastMatchIndex >= 0) {
       // OK, a transposition source is quite possible.  Still need to do more vetting, to be sure.
       let expectedCost = 1;
 
       // This transposition includes either 'transpose-insert' or 'transpose-delete' operations.
-      ops = ['transpose-start']; // always needs a 'start'.
+      let i = row;
+      let m = col;
+      let ops: EditTuple<TUnit>[] = [];
+
       if(lastInputIndex != row-1) {
-        let count = row - lastInputIndex - 1;
-        ops = ops.concat( Array(count).fill('transpose-delete') );
-        expectedCost += count;
+        let count = row - lastInputIndex;
+        ops.push({
+          op: 'transpose-start',
+          input: this.inputSequence[i-count]?.key,
+          match: this.matchSequence[lastMatchIndex]?.key
+        });
+        // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
+        // after the if-else.
+        for(let x=count-1; x > 0; x--) {
+          ops.push({
+            op: 'transpose-delete',
+            input: this.inputSequence[i-x]?.key
+          });
+        }
+        expectedCost += count-1;
       } else {
-        let count = col - lastMatchIndex - 1;
-        ops = ops.concat( Array(count).fill('transpose-insert') );
-        expectedCost += count;
+        let count = col - lastMatchIndex;
+        ops.push({
+          op: 'transpose-start',
+          input: this.inputSequence[lastInputIndex]?.key,
+          match: this.matchSequence[m-count]?.key
+        });
+        // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
+        // after the if-else.
+        for(let y=count-1; y > 0; y--) {
+          ops.push({
+            op: 'transpose-insert',
+            match: this.matchSequence[m-y]?.key
+          });
+        }
+        expectedCost += count - 1;
       }
-      ops.push('transpose-end');
+
+      ops.push({
+        op: 'transpose-end',
+        input: this.inputSequence[i]?.key,
+        match: this.matchSequence[m]?.key
+      });
 
       // Double-check our expectations.
-      if(this.getCostAt(lastInputIndex-1, lastMatchIndex-1) != currentCost - expectedCost) {
-        ops = null;
-      }
-      parent = [lastInputIndex-1, lastMatchIndex-1];
-    }
-
-    if(ops) {
-      // bypass the ladder.
-    } else if(insertParentCost == currentCost - 1) {
-      // check 'insert' BEFORE 'substitute' - we categorize the path in reverse,
-      // and we want 'insert's to appear after 'substitute's at the path's tail,
-      // the part that matters most.
-      ops = ['insert'];
-      parent = [row, col-1];
-    } else if(substitutionParentCost == currentCost - 1) {
-        ops = ['substitute'];
-      parent = [row-1, col-1];
-    } else if(deleteParentCost == currentCost - 1) {
-      ops = ['delete'];
-      parent = [row-1, col];
-    } else { //if(substitutionParentCost == currentCost) {
-      ops = ['match'];
-      parent = [row-1, col-1];
-    }
-
-    // Recursively build the edit path.
-    if(parent[0] >= 0 && parent[1] >= 0) {
-      return this.editPath(parent[0], parent[1]).concat(ops);
-    } else {
-      if(parent[0] > -1) {
-        // There are initial deletions.
-        return Array(parent[0]+1).fill('delete').concat(ops);
-      } else if(parent[1] > -1) {
-        // There are initial insertions.
-        return Array(parent[1]+1).fill('insert').concat(ops);
-      } else {
-        return ops;
+      if(this.getCostAt(lastInputIndex-1, lastMatchIndex-1) == currentCost - expectedCost) {
+        tryPath(lastInputIndex - 1, lastMatchIndex -1, ops);
       }
     }
+
+    // Could rework to evaluate whether the selected path actually resolves...
+    // But there would likely be edge cases that still wouldn't be handled
+    // properly.
+    const input = this.inputSequence[row]?.key;
+    const match = this.matchSequence[col]?.key;
+
+    const insertParentCost = this.getCostAt(row, col-1);
+    if(insertParentCost == currentCost - 1) {
+      tryPath(row, col-1, [{op: 'insert', match}]);
+    }
+
+    const deleteParentCost = this.getCostAt(row-1, col);
+    if(deleteParentCost == currentCost - 1) {
+      tryPath(row-1, col, [{op: 'delete', input}]);
+    }
+
+    const substitutionParentCost = this.getCostAt(row-1, col-1);
+    if(substitutionParentCost == currentCost - 1) {
+      tryPath(row-1, col-1, [{op: 'substitute', input, match}]);
+      // VERY IMPORTANT:  validate the match.  The path can go "off the rails" if
+      // we don't validate this!
+    } else if(substitutionParentCost == currentCost && input == match) {
+      tryPath(row-1, col-1, [{op: 'match', input, match}]);
+    }
+
+    return validPaths;
   }
 
   private static getTransposeParent<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
@@ -481,11 +782,12 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
   }
 
   private static propagateUpdateFrom<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
-      buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>,
-      r: number,
-      c: number,
-      value: number,
-      diagonalIndex: number) {
+    buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>,
+    r: number,
+    c: number,
+    value: number,
+    diagonalIndex: number
+  ) {
     // Note:  this function does not actually need the `c` parameter!
     //        That said, it's very useful when tracing stack traces & debugging.
     if(value < buffer.resolvedDistances[r][diagonalIndex]) {
@@ -572,4 +874,19 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
     return buffer;
   }
+
+  // /**
+  //  * Produces a string-based visualization of this instance, the edit-distance
+  //  * calculation it represents, and the corresponding best-ranked edit path.
+  //  *
+  //  * This property should never be included within production builds, as it is
+  //  * not used there and is not a small function.  The helper function it calls
+  //  * is safe thanks to tree-shaking.
+  //  *
+  //  * @param path
+  //  * @returns
+  //  */
+  // public visualize(path?: EditTuple<TUnit>[]) {
+  //   return visualizeCalculation(this, path);
+  // }
 }

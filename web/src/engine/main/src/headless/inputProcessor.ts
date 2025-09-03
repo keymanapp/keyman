@@ -480,9 +480,6 @@ export class InputProcessor {
         // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
         const KEYSTROKE_EPSILON = Math.exp(-5);
 
-        // Sort the distribution into probability-descending order.
-        keyDistribution.sort((a, b) => b.p - a.p);
-
         alternates = [];
 
         let totalMass = 0; // Tracks sum of non-error probabilities.
