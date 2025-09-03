@@ -88,7 +88,7 @@ export type ContextStateAlignment = {
  * @param editPath
  * @returns
  */
-export function getEditPathLastMatch(editPath: EditOperation[]) {
+export function getEditPathLastMatch(editPath: EditOperation[], forAppliedSuggestion?: boolean) {
   // Assertion:  for a long context, the bulk of the edit path should be a
   // continuous block of 'match' entries.  If there's anything but a substitution
   // in the middle, we have a context mismatch.
@@ -101,7 +101,12 @@ export function getEditPathLastMatch(editPath: EditOperation[]) {
   if(firstMatch > -1) {
     for(let i = firstMatch+1; i <= lastMatch; i++) {
       if(editPath[i] != 'match') {
-        return (editPath[i] == 'substitute') ? (i - 1) : -1;
+        // fun case: ' ' + ' applied ' has an unusual edit path.
+        // we get an 'insert'.
+        return (
+          (editPath[i] == 'substitute')
+          || (forAppliedSuggestion && editPath[i] == 'insert')
+        ) ? (i - 1) : -1;
       }
     }
   }
@@ -208,8 +213,8 @@ export function isSubstitutionAlignable(
  * @param tokenizationToMatch Raw strings corresponding to the tokenization of the original context
  * @param incomingTokenization Raw strings corresponding to the tokenization of the incoming context
  * @param isSliding Notes if the context window is full (and sliding-alignment is particularly needed)
- * @param noSubVerify When true, this disables inspection of 'substitute' transitions that avoids
- * wholesale replacement of the original token.
+ * @param forAppliedSuggestion When true, this asserts that the contexts are alignable and loosens
+ * alignment requirements accordingly.
  * @returns Alignment data that details if and how the incoming tokenization aligns with
  * the tokenization modeled by this instance.
  */
@@ -217,7 +222,7 @@ export function computeAlignment(
   tokenizationToMatch: string[],
   incomingTokenization: string[],
   isSliding: boolean,
-  noSubVerify?: boolean
+  forAppliedSuggestion?: boolean
 ): ContextStateAlignment {
   const src = tokenizationToMatch.map(value => ({key: value}));
   const dst = incomingTokenization.map(value => ({key: value}));
@@ -268,7 +273,7 @@ export function computeAlignment(
     for(let i = 0; i < editPath.length; i++) {
       if(editPath[i] == 'substitute') {
         subCount++;
-        if(!noSubVerify && !isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
+        if(!forAppliedSuggestion && !isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
           return failure;
         }
       } else if(editPath[i] == 'match') {
@@ -308,7 +313,7 @@ export function computeAlignment(
     return failure;
   }
 
-  const lastMatch = getEditPathLastMatch(editPath);
+  const lastMatch = getEditPathLastMatch(editPath, forAppliedSuggestion);
 
   // Assertion:  for a long context, the bulk of the edit path should be a
   // continuous block of 'match' entries.  If there's anything else in
@@ -386,7 +391,7 @@ export function computeAlignment(
         //
         // Exception: if the word is at the start of the context window and the
         // context window is likely sliding, don't check it.
-        if(!noSubVerify && !atSlidePoint && !isSubstitutionAlignable(incomingSub, matchingSub)) {
+        if(!forAppliedSuggestion && !atSlidePoint && !isSubstitutionAlignable(incomingSub, matchingSub)) {
           return failure;
         }
 
