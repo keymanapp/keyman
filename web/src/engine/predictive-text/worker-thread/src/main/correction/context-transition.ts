@@ -12,7 +12,21 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { ContextState } from './context-state.js';
 
 import Distribution = LexicalModelTypes.Distribution;
+import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { buildMergedTransform } from '@keymanapp/models-templates';
+import { ContextTracker } from './context-tracker.js';
+
+// Mark affected tokens with the applied-suggestion transition ID
+// for easy future reference.
+const tagTokens = (state: ContextState, suggestion: Suggestion) => {
+  const alignment = state.tokenization.alignment
+  const appliedTokenCount = (alignment.canAlign && true) && (alignment.tailEditLength + Math.max(alignment.tailTokenShift, 0));
+  const tokens = state.tokenization.tokens;
+  for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
+    tokens[i].appliedTransitionId = suggestion.transformId;
+  }
+}
 
 /**
  * Represents the transition between two context states as triggered
@@ -76,7 +90,9 @@ export class ContextTransition {
 
       // These need to be deep-copied.
       this.base = new ContextState(baseTransition.base);
-      this._final = new ContextState(baseTransition._final);
+      if(baseTransition._final) {
+        this._final = new ContextState(baseTransition._final);
+      }
     }
   }
 
@@ -111,5 +127,81 @@ export class ContextTransition {
     // in the refactoring process.
     this._transitionId = inputDistribution?.find((entry) => entry.sample.id !== undefined)?.sample.id;
     this.preservationTransform = preservationTransform;
+  }
+
+  /**
+   * Applies a suggestion generated from this context transition on top of the transition itself,
+   * replacing its final context state.  This does _not_, however, replace the original fat-finger
+   * distribution or other intermediate data regarding associated keystrokes.
+   * @param suggestion
+   * @returns
+   */
+  applySuggestion(suggestion: Suggestion) {
+    const preAppliedState = this.final;
+    if(!preAppliedState.suggestions.find((s) => s.id == suggestion?.id)) {
+      throw new Error("Could not find matching suggestion to apply");
+    }
+
+    // This closure captures `suggestion`, and definition here / within the class also
+    // gives us private access to `._final`.
+    const buildAppliedTransition = (
+      transition: ContextTransition,
+      baseState: ContextState,
+      transform: Transform
+    ) => {
+      const state = ContextTracker.attemptMatchContext(
+        baseState.context,
+        baseState.model,
+        baseState,
+        [{sample: transform, p: 1}],
+        true
+      ).final;
+
+      tagTokens(state, suggestion);
+      transition._final = state;
+
+      // Applying a suggestion should not forget the original suggestion set.
+      state.appliedSuggestionId = suggestion.id;
+      state.suggestions = preAppliedState.suggestions;
+    }
+
+    const fullTransform = suggestion.appendedTransform
+      ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
+      : suggestion.transform;
+
+    // Start from a deep copy, then replace as needed to overwrite with the context
+    // state resulting from the suggestion while preserving suggestion + primary
+    // keystroke data.
+    const resultTransition = new ContextTransition(this);
+    buildAppliedTransition(resultTransition, this.base, fullTransform);
+
+    // An applied suggestion should replace the original Transition's effects, though keeping
+    // the original input around.
+    resultTransition._transitionId = suggestion.transformId;
+    resultTransition.final.appliedInput = preAppliedState.appliedInput;
+
+    return resultTransition;
+  }
+
+  /**
+   * Recreates the original context transition and its effects from before
+   * any application of suggestions based on the transition was applied.
+   * @returns
+   */
+  reproduceOriginal() {
+    // By keeping the original keystroke data and effects around even after
+    // applying the suggestion, we can easily reconstruct the original .final.
+    const original = ContextTracker.attemptMatchContext(
+      this.base.context,
+      this.base.model,
+      this.base,
+      this.inputDistribution
+    );
+
+    if(this.final.suggestions) {
+      original.final.suggestions = this.final.suggestions;
+    }
+
+    return original;
   }
 }
