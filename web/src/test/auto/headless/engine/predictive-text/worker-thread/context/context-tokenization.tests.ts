@@ -21,7 +21,7 @@ var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
 
 function buildBaseTokenization(textTokens: string[]) {
-  const tokens = textTokens.map((entry) => new ContextToken(plainModel, entry));
+  const tokens = textTokens.map((entry) => toToken(entry));
   return new ContextTokenization(tokens);
 }
 
@@ -490,6 +490,97 @@ describe('ContextTokenization', function() {
       const computedAlignment = baseTokenization.computeAlignment(newContext);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+  });
+
+  describe('transitionTo', function() {
+    it('simple case - new whitespace + new empty token', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          matchLength: 7,
+          tailEditLength: 0,
+          tailTokenShift: 2
+        },
+        plainModel,
+        [{ sample: [{ insert: ' ', deleteLeft: 0 }, { insert: '', deleteLeft: 0 }], p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+    });
+
+    it('simple case - new character added to last token', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          matchLength: 6,
+          tailEditLength: 1,
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: [{ insert: 'y', deleteLeft: 0 }], p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+    });
+
+    it('simple case - context-window slide deletes first char of word', () => {
+      // string length: 64
+      const baseTexts = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ",
+        "seem", " ", "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", ""
+      ];
+      assert.equal(baseTexts.join('').length, 64);
+
+      assert.equal(baseTexts.length, 23);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        "pplesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ",
+        "seem", " ", "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "b"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          matchLength: 22,
+          tailEditLength: 1,
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: [{ insert: 'b', deleteLeft: 0 }], p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      // The full original token should be preserved.
+      assert.equal(tokenization.tokens[0].exampleInput, 'applesauce');
+      assert.deepEqual(tokenization.tokens.map(
+        (t, i) => ({
+          text: i == 0 ? 'pplesauce' : t.exampleInput,
+          isWhitespace: t.isWhitespace
+        })),
+        targetTokens
+      );
     });
   });
 });

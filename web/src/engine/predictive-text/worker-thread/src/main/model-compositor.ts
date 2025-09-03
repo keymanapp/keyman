@@ -7,6 +7,9 @@ import TransformUtils from './transformUtils.js';
 import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
+import { ContextTransition } from './correction/context-transition.js';
+import { ContextState } from './correction/context-state.js';
+
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
@@ -17,8 +20,6 @@ import Outcome = LexicalModelTypes.Outcome;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import { ContextTransition } from './correction/context-transition.js';
-import { ContextState } from './correction/context-state.js';
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;

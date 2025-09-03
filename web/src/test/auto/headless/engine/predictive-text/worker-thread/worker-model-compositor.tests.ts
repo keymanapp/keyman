@@ -902,11 +902,11 @@ describe('ModelCompositor', function() {
       assert.equal(reversion.id, -baseSuggestion.id);
 
       let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));
-      const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(13));
+      const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(15));
 
       // Accepting the suggestion rewrites the latest context transition.
-      assert.equal(compositor.contextTracker.cache.size, 2);
-      assert.sameMembers(compositor.contextTracker.cache.keys(), contextIds);
+      assert.equal(compositor.contextTracker.cache.size, 3);
+      assert.sameMembers(compositor.contextTracker.cache.keys(), [15, ...contextIds]);
       assert.notSameDeepMembers(compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.get(key)), transitionInstances);
 
       // The replacement should be marked on the context-tracking token for the applied version of the results.
@@ -915,6 +915,7 @@ describe('ModelCompositor', function() {
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       await compositor.applyReversion(reversion, appliedContext);
+      assert.equal(compositor.contextTracker.cache.size, 2);
       assert.isUndefined(compositor.contextTracker.cache.get(13).final.appliedSuggestionId);
     });
   });
