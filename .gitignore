@@ -152,8 +152,8 @@
 # Atom/Nuclide
 compile_flags.txt
 
-# Auto-generated resource script
-resources/environment.sh
+# Auto-generated resource script for xcode
+resources/build/mac/xcode-environment.inc.sh
 
 # Copy of the master VERSION.md used for Linux packaging
 /core/VERSION.md

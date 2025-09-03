@@ -113,6 +113,7 @@ describe('ModelCompositor', function() {
         let context = {
           left: '', startOfBuffer: true, endOfBuffer: true,
         };
+        compositor.initContextTracker(context, 0); // Initialize context tracking first!
 
         // The 'weights' involved imply that we have an edge-case fat finger on the bottom of
         // the 'q' key, slightly in its favor.
@@ -121,7 +122,6 @@ describe('ModelCompositor', function() {
           {sample: {insert: 'a', deleteLeft: 0, id: 1}, p: 0.4}   // but at lower weight than 'and' (998).
         ];
 
-        await compositor.predict({insert: '', deleteLeft: 0, id: 0}, context); // Initialize context tracking first!
         let suggestions = await compositor.predict(inputDistribution, context);
 
         // remove the keep suggestion; we're not testing that here.

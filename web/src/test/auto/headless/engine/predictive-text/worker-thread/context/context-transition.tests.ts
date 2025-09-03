@@ -95,88 +95,174 @@ describe('ContextTransition', () => {
     });
   });
 
-  it('applySuggestion', () => {
-    const baseContext = {
-      left: "hello wo",
-      startOfBuffer: true,
-      endOfBuffer: true
-    };
-    const baseState = new ContextState(baseContext, plainModel);
+  describe('applySuggestion', () => {
+    it('properly handles standard cases without suggestion-preserved text', () => {
+      const baseContext = {
+        left: "hello wo",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+      const baseState = new ContextState(baseContext, plainModel);
 
-    // currently, also calls the .finalize method internally.
-    const transition = baseState.analyzeTransition(baseContext, [
-      { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
-    ]);
-    assert.isOk(transition);
+      // currently, also calls the .finalize method internally.
+      const transition = baseState.analyzeTransition(baseContext, [
+        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
+      ]);
+      assert.isOk(transition);
 
-    let suggestions = transition.final.suggestions = [{
-      transform: {
-        insert: 'rld',
-        deleteLeft: 0,
-        id: 2
-      },
-      appendedTransform: {
-        insert: ' ',
-        deleteLeft: 0,
-        id: 2
-      },
-      transformId: 2,
-      id: 10,
-      displayAs: 'world'
-    }, {
-      transform: {
-        insert: 'n',
-        deleteLeft: 0,
-        id: 2
-      },
-      appendedTransform: {
-        insert: ' ',
-        deleteLeft: 0,
-        id: 2
-      },
-      transformId: 2,
-      id: 11,
-      displayAs: 'won'
-    }];
+      let suggestions = transition.final.suggestions = [{
+        transform: {
+          insert: 'rld',
+          deleteLeft: 0,
+          id: 2
+        },
+        appendedTransform: {
+          insert: ' ',
+          deleteLeft: 0,
+          id: 2
+        },
+        transformId: 2,
+        id: 10,
+        displayAs: 'world'
+      }, {
+        transform: {
+          insert: 'n',
+          deleteLeft: 0,
+          id: 2
+        },
+        appendedTransform: {
+          insert: ' ',
+          deleteLeft: 0,
+          id: 2
+        },
+        transformId: 2,
+        id: 11,
+        displayAs: 'won'
+      }];
 
-    const appliedTransition = transition.applySuggestion(suggestions[0]);
-    assert.notEqual(appliedTransition.base, transition);
-    assert.isOk(appliedTransition.appended);
-    assert.notEqual(appliedTransition.appended, transition);
-    assert.sameOrderedMembers(appliedTransition.base.final.tokenization.exampleInput, [
-      'hello', ' ', 'world'
-    ]);
-    assert.sameOrderedMembers(appliedTransition.appended.final.tokenization.exampleInput, [
-      'hello', ' ', 'world', ' ', ''
-    ]);
-    assert.equal(appliedTransition.base.final.appliedSuggestionId, suggestions[0].id);
-    assert.equal(appliedTransition.appended.final.appliedSuggestionId, suggestions[0].id);
+      const appliedTransition = transition.applySuggestion(suggestions[0]);
+      assert.notEqual(appliedTransition.base, transition);
+      assert.isOk(appliedTransition.appended);
+      assert.notEqual(appliedTransition.appended, transition);
+      assert.sameOrderedMembers(appliedTransition.base.final.tokenization.exampleInput, [
+        'hello', ' ', 'world'
+      ]);
+      assert.sameOrderedMembers(appliedTransition.appended.final.tokenization.exampleInput, [
+        'hello', ' ', 'world', ' ', ''
+      ]);
+      assert.equal(appliedTransition.base.final.appliedSuggestionId, suggestions[0].id);
+      assert.equal(appliedTransition.appended.final.appliedSuggestionId, suggestions[0].id);
 
-    // 3 long, only last token was edited.
-    appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
-      if(index >= 2) {
-        assert.equal(token.appliedTransitionId, suggestions[0].transformId);
-      } else {
-        assert.isUndefined(token.appliedTransitionId);
-      }
+      // 3 long, only last token was edited.
+      appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
+        if(index >= 2) {
+          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+        } else {
+          assert.isUndefined(token.appliedTransitionId);
+        }
+      });
+
+      appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
+        if(index >= 2) {
+          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+        } else {
+          assert.isUndefined(token.appliedTransitionId);
+        }
+      });
+      assert.deepEqual(appliedTransition.base.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.appended.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.base.final.inputTransforms, transition.final.inputTransforms);
+      assert.deepEqual(appliedTransition.base.inputDistribution, transition.inputDistribution);
+
+      const emptyTransformMap = new Map<number, Distribution<Transform>>();
+      emptyTransformMap.set(2, [{sample: {insert: '', deleteLeft: 0, id: 2}, p: 1}])
+      assert.deepEqual(appliedTransition.appended.final.appliedInput, {insert: '', deleteLeft: 0});
+      assert.isEmpty(appliedTransition.appended.inputDistribution);
     });
 
-    appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
-      if(index >= 2) {
-        assert.equal(token.appliedTransitionId, suggestions[0].transformId);
-      } else {
-        assert.isUndefined(token.appliedTransitionId);
-      }
-    });
-    assert.deepEqual(appliedTransition.base.final.suggestions, transition.final.suggestions);
-    assert.deepEqual(appliedTransition.appended.final.suggestions, transition.final.suggestions);
-    assert.deepEqual(appliedTransition.base.final.inputTransforms, transition.final.inputTransforms);
-    assert.deepEqual(appliedTransition.base.inputDistribution, transition.inputDistribution);
+     it('properly handles cases with suggestion-preserved text', () => {
+      const baseContext = {
+        left: "hello world ",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+      const baseState = new ContextState(baseContext, plainModel);
 
-    const emptyTransformMap = new Map<number, Distribution<Transform>>();
-    emptyTransformMap.set(2, [{sample: {insert: '', deleteLeft: 0, id: 2}, p: 1}])
-    assert.deepEqual(appliedTransition.appended.final.appliedInput, {insert: '', deleteLeft: 0});
-    assert.isEmpty(appliedTransition.appended.inputDistribution);
+      // currently, also calls the .finalize method internally.
+      const transition = baseState.analyzeTransition(baseContext, [
+        { sample: { insert: ' ', deleteLeft: 0, id: 2 }, p: 1 }
+      ]);
+      assert.isOk(transition);
+
+      let suggestions = transition.final.suggestions = [{
+        transform: {
+          insert: ' the',
+          deleteLeft: 0,
+          id: 2
+        },
+        appendedTransform: {
+          insert: ' ',
+          deleteLeft: 0,
+          id: 2
+        },
+        transformId: 2,
+        id: 10,
+        displayAs: 'the'
+      }, {
+        transform: {
+          insert: ' and',
+          deleteLeft: 0,
+          id: 2
+        },
+        appendedTransform: {
+          insert: ' ',
+          deleteLeft: 0,
+          id: 2
+        },
+        transformId: 2,
+        id: 11,
+        displayAs: 'and'
+      }];
+
+      const appliedTransition = transition.applySuggestion(suggestions[0]);
+      assert.notEqual(appliedTransition.base, transition);
+      assert.isOk(appliedTransition.appended);
+      assert.notEqual(appliedTransition.appended, transition);
+      assert.sameOrderedMembers(appliedTransition.base.final.tokenization.exampleInput, [
+        'hello', ' ', 'world', '  ', 'the'
+      ]);
+      assert.sameOrderedMembers(appliedTransition.appended.final.tokenization.exampleInput, [
+        'hello', ' ', 'world', '  ', 'the', ' ', ''
+      ]);
+      assert.equal(appliedTransition.base.final.appliedSuggestionId, suggestions[0].id);
+      assert.equal(appliedTransition.appended.final.appliedSuggestionId, suggestions[0].id);
+
+      // 3 long, only last token was edited.
+      appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
+        if(index >= 3) {
+          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+        } else {
+          assert.isUndefined(token.appliedTransitionId);
+        }
+      });
+
+      appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
+        if(index >= 3) {
+          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+        } else {
+          assert.isUndefined(token.appliedTransitionId);
+        }
+      });
+      assert.deepEqual(appliedTransition.base.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.appended.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.base.final.inputTransforms, transition.final.inputTransforms);
+      assert.deepEqual(appliedTransition.base.inputDistribution, transition.inputDistribution);
+
+      const emptyTransformMap = new Map<number, Distribution<Transform>>();
+      emptyTransformMap.set(2, [{sample: {insert: '', deleteLeft: 0, id: 2}, p: 1}])
+      assert.deepEqual(appliedTransition.appended.final.appliedInput, {insert: '', deleteLeft: 0});
+      assert.isEmpty(appliedTransition.appended.inputDistribution);
+    });
   });
 
   describe('reproduceOriginal', () => {

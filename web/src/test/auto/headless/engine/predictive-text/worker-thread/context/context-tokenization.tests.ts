@@ -12,18 +12,15 @@ import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
+import { ContextStateAlignment, ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
 
+import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
-
-function buildBaseTokenization(textTokens: string[]) {
-  const tokens = textTokens.map((entry) => toToken(entry));
-  return new ContextTokenization(tokens);
-}
 
 function toToken(text: string) {
   let isWhitespace = text == ' ';
@@ -46,9 +43,10 @@ describe('ContextTokenization', function() {
 
     it("constructs from a token array + alignment data", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      let alignment = {
+      let alignment: ContextStateAlignment = {
         canAlign: true,
         leadTokenShift: 0,
+        leadEditLength: 0,
         matchLength: 6,
         tailEditLength: 1,
         tailTokenShift: 0
@@ -70,6 +68,7 @@ describe('ContextTokenization', function() {
       let baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), {
         canAlign: true,
         leadTokenShift: 0,
+        leadEditLength: 0,
         matchLength: 6,
         tailEditLength: 1,
         tailTokenShift: 0
@@ -100,521 +99,27 @@ describe('ContextTokenization', function() {
     assert.deepEqual(tokenization.exampleInput, rawTextTokens);
   });
 
-  describe('computeAlignment', () => {
-    it("properly matches and aligns when contexts match", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [...baseContext];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 5,
-        tailEditLength: 0,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns with applied-suggestion contexts", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'o'
-      ];
-      const newContext = [...baseContext];
-      newContext[4] = 'over';
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 4,
-        tailEditLength: 1,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns with applied-suggestion at start of context", () => {
-      const baseContext = [
-        'te'
-      ];
-      const newContext = [
-        'testing',
-        ' ',
-        ''
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false, true);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 0,
-        tailEditLength: 1,
-        tailTokenShift: 2
-      });
-    });
-
-    it("detects unalignable contexts - no matching tokens", () => {
-      const baseContext = [
-        'swift', 'tan', 'wolf', 'leaped', 'across'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("detects unalignable contexts - too many mismatching tokens", () => {
-      const baseContext = [
-        'swift', 'tan', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("fails alignment for leading-edge word substitutions", () => {
-      const baseContext = [
-        'swift', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("fails alignment for small leading-edge word substitutions", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'sick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("properly matches and aligns when lead token is modified", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'uick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 5,
-        tailEditLength: 0,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns when lead token is removed", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: -1,
-        matchLength: 4,
-        tailEditLength: 0,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns when lead token is added", () => {
-      const baseContext = [
-        'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 1,
-        matchLength: 4,
-        tailEditLength: 0,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns when lead tokens are removed and modified", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'ox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: -2,
-        matchLength: 3,
-        tailEditLength: 0,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns when lead tokens are added and modified", () => {
-      const baseContext = [
-        'rown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 1,
-        matchLength: 4,
-        tailEditLength: 0,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns when lead token is removed and tail token is added", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'brown', 'fox', 'jumped', 'over', 'the'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: -1,
-        matchLength: 4,
-        tailEditLength: 0,
-        tailTokenShift: 1
-      });
-    });
-
-    it("properly matches and aligns when lead token and tail token are modified", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'ove'
-      ];
-      const newContext = [
-        'uick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 4, // we treat 'quick' and 'uick' as the same
-        tailEditLength: 1,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly matches and aligns when lead token and tail token are modified + new token appended", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'ove'
-      ];
-      const newContext = [
-        'uick', 'brown', 'fox', 'jumped', 'over', 't'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 4, // we treat 'quick' and 'uick' as the same
-        tailEditLength: 1,
-        tailTokenShift: 1
-      });
-    });
-
-    it("properly handles context window sliding backward", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'e', 'quick', 'brown', 'fox', 'jumped', 'ove'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 1,
-        matchLength: 4, // we treat 'quick' and 'uick' as the same
-        tailEditLength: 1,
-        tailTokenShift: 0
-      });
-    });
-
-    it("properly handles context window sliding far backward", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'the', 'quick', 'brown', 'fox', 'jumped'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 1,
-        matchLength: 4, // we treat 'quick' and 'uick' as the same
-        tailEditLength: 0,
-        tailTokenShift: -1
-      });
-    });
-
-    it("properly handles context window sliding farther backward", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'the', 'quick', 'brown', 'fox', 'jumpe'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 1,
-        matchLength: 3, // we treat 'quick' and 'uick' as the same
-        tailEditLength: 1,
-        tailTokenShift: -1
-      });
-    });
-
-    it("fails alignment for mid-head deletion", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("fails alignment for mid-head insertion", () => {
-      const baseContext = [
-        'quick', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("fails alignment for mid-tail deletion", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("fails alignment for mid-tail insertion", () => {
-      const baseContext = [
-        'quick', 'brown', 'fox', 'jumped', 'over'
-      ];
-      const newContext = [
-        'quick', 'brown', 'fox', 'jumped', 'far', 'over'
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {canAlign: false});
-    });
-
-    it("handles late-context suggestion application after backspace", () => {
-      const baseContext = [
-        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'oven', ' ', ''
-      ];
-      const newContext = [
-        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'over', ' ', ''
-      ];
-
-      const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
-
-      assert.deepEqual(computedAlignment, {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 8,
-        tailEditLength: 3,
-        tailTokenShift: 0
-      });
-    });
-
-    it("handles sliding context-window scenarios", () => {
-      // // Explicitly-defined window, though it's not needed directly by the method.
-      // const config = {
-      //   leftContextCodePoints: 64,
-      //   rightContextCodePoints: 64
-      // };
-
-      const baseContext1 = [
-        // "ap" prefix not in actual view, but preserved by prior tokenization rounds.
-        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
-        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "be"
-      ];
-
-      const incomingContext1 = [
-        "plesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
-        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "bes"
-      ];
-
-      // 66 chars above, vs a sliding window of length 64.
-      assert.equal(baseContext1.reduce((accum, curr) => accum + curr.length, 0), 66);
-      // Actual window + one newly-typed character
-      assert.equal(incomingContext1.reduce((accum, curr) => accum + curr.length, 0), 65);
-
-      const tokenization1 = new ContextTokenization(buildBaseTokenization(baseContext1));
-
-      assert.deepEqual(tokenization1.computeAlignment(incomingContext1, true), {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 22,
-        tailEditLength: 1,
-        tailTokenShift: 0
-      });
-
-      // Our tokenization scheme remembers the full original word before any of it slid out of
-      // the context window.
-      const baseContext2 = [
-        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
-        //                                                                 +2    +1     +4
-        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "brea"
-      ];
-
-      const incomingContext2 = [
-        // "plesauce" => "e":  -7 chars.
-        "e", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
-        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "break"
-      ];
-
-      // 73 chars above, vs a sliding window of length 64.
-      assert.equal(baseContext2.reduce((accum, curr) => accum + curr.length, 0), 73);
-      // Actual window + one newly-typed character
-      assert.equal(incomingContext2.reduce((accum, curr) => accum + curr.length, 0), 65);
-
-      const tokenization2 = new ContextTokenization(buildBaseTokenization(baseContext2));
-      assert.deepEqual(tokenization2.computeAlignment(incomingContext2, true), {
-        canAlign: true,
-        leadTokenShift: 0,
-        matchLength: 24,
-        tailEditLength: 1,
-        tailTokenShift: 0
-      });
-
-      const baseContext3 = [
-        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ", "like", " ",
-        "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "break"
-      ];
-
-      const incomingContext3 = [
-        " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ", "like", " ",
-        "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "breakf"
-      ];
-
-      // 74 chars above, vs a sliding window of length 64.
-      assert.equal(baseContext3.reduce((accum, curr) => accum + curr.length, 0), 74);
-      // Actual window + one newly-typed character
-      assert.equal(incomingContext3.reduce((accum, curr) => accum + curr.length, 0), 65);
-
-      const tokenization3 = new ContextTokenization(buildBaseTokenization(baseContext3));
-      assert.deepEqual(tokenization3.computeAlignment(incomingContext3, true), {
-        canAlign: true,
-        leadTokenShift: -1,
-        matchLength: 23,
-        tailEditLength: 1,
-        tailTokenShift: 0
-      });
-    });
-  });
-
   describe('transitionTo', function() {
     it('simple case - new whitespace + new empty token', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set(2, { insert: '', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 7,
           tailEditLength: 0,
           tailTokenShift: 2
         },
         plainModel,
-        [{ sample: [{ insert: ' ', deleteLeft: 0 }, { insert: '', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1}]
       );
 
       assert.isOk(tokenization);
@@ -629,16 +134,51 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'y', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 6,
           tailEditLength: 1,
           tailTokenShift: 0
         },
         plainModel,
-        [{ sample: [{ insert: 'y', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1 }]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+    });
+
+    it('merges new whitespace character added to last whitespace token if tail is empty', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', '  ', ''].map((t) => (
+        {text: t, isWhitespace: t != '' && t.trim() == ''}
+      ));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set( 0, { insert: '',  deleteLeft: 0 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          leadEditLength: 0,
+          matchLength: 7,
+          tailEditLength: 2,
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1 }]
       );
 
       assert.isOk(tokenization);
@@ -664,20 +204,25 @@ describe('ContextTokenization', function() {
         "seem", " ", "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "b"
       ];
       const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'b', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
-          matchLength: 22,
+          leadEditLength: 1,
+          matchLength: 21,
           tailEditLength: 1,
           tailTokenShift: 0
         },
         plainModel,
-        [{ sample: [{ insert: 'b', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1}]
       );
 
       assert.isOk(tokenization);
       assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
     });
 
     it('context-window slide deletes majority of word', () => {
@@ -696,20 +241,219 @@ describe('ContextTokenization', function() {
         "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "break"
       ];
       const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'k', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
-          matchLength: 24,
+          leadEditLength: 1,
+          matchLength: 23,
           tailEditLength: 1,
           tailTokenShift: 0
         },
         plainModel,
-        [{ sample: [{ insert: 'k', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1}]
       );
 
       assert.isOk(tokenization);
       assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles extension of head token from backward context-window slide', () => {
+      const baseTexts = [
+        "sauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: '', deleteLeft: 0 });
+
+      const tokenization = baseTokenization.transitionTo(
+        // Yay for being able to mock the alignment data for the test! We don't
+        // actually need to use a full 64-char string as long as we craft this
+        // properly.
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          leadEditLength: 1,
+          matchLength: baseTexts.length - 1,
+          tailEditLength: 0,
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles large backward context-window slide jump', () => {
+      // Note:  this is not the actual pathway used for reverting suggestions,
+      // though the scenario is somewhat analogous.
+      const baseTexts = [
+        "nd", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ", "breakfast"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        "sauce", " ", "and", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ",
+        "brea"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(0, { insert: '', deleteLeft: 5 });
+
+      const tokenization = baseTokenization.transitionTo(
+        // Yay for being able to mock the alignment data for the test! We don't
+        // actually need to use a full 64-char string as long as we craft this
+        // properly.
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 2, // "applesauce", " "
+          leadEditLength: 1, // "nd" / "and"
+          matchLength: baseTexts.length - 2,
+          tailEditLength: 1, // "breakfast" / "brea"
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "brea");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "brea".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles word-break boundary shift during backward context-window slide', () => {
+      const baseTexts = [
+        // Without any preceding adjacent char in view, we can only interpret
+        // the leading `'` as an opening single-quote.
+        /*isn*/ "'", "t", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "think"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        // With one preceding adjacent non-whitespace char in view, we now
+        // realize it was part of a word... and remove a wordbreak!
+        /*is"*/ "n't", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "thin"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(0, { insert: '', deleteLeft: 1 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: -1, // "'",
+          leadEditLength: 1, // "t" / "n't"
+          matchLength: baseTexts.length - 3,
+          tailEditLength: 1, // "think" / "thin"
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "thin");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "thin".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles word-break boundary shifts at both ends during backward context-window slide', () => {
+      const baseTexts = [
+        // Without any preceding adjacent char in view, we can only interpret
+        // the leading `'` as an opening single-quote.
+        /*isn*/ "'", "t", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find", " ", ""
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        // With one preceding adjacent non-whitespace char in view, we now
+        // realize it was part of a word... and remove a wordbreak!
+        /*is"*/ "n't", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(0, { insert: '', deleteLeft: 1 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: -1, // "'",
+          leadEditLength: 1, // "t" / "n't"
+          matchLength: baseTexts.length - 4,
+          tailEditLength: 0,
+          tailTokenShift: -2 // " ", ""
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "find");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "find".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
+    });
+
+    it('handles word-break boundary shifts at both ends during forward context-window slide', () => {
+      const baseTexts = [
+        // With one preceding adjacent non-whitespace char in view, it's part of
+        // a word... and remove a wordbreak!
+        /*is"*/ "n't", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        // Without any preceding adjacent char in view, we can only interpret
+        // the leading `'` as an opening single-quote.
+        /*isn*/ "'", "t", " ", "orange", " ", "juice", " ", "tasty", "?", "  ", "I", " ", "find", " ", ""
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+
+      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set(2, { insert: '', deleteLeft: 0 });
+
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 1, // "'",
+          leadEditLength: 1, // "n't" / "t"
+          matchLength: baseTexts.length - 1,
+          tailEditLength: 0,
+          tailTokenShift: 2 // " ", ""
+        },
+        plainModel,
+        [{ sample: inputTransformMap, p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.equal(tokenization.tail.exampleInput, "");
+      assert.equal(tokenization.tail.searchSpace.inputSequence.length, "".length);
+      assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
     });
   });
 });

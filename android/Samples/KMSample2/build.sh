@@ -8,7 +8,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 ################################ Main script ################################
 
@@ -40,7 +39,6 @@ fi
 
 
 builder_describe_outputs \
-  configure             /android/Samples/KMSample2/app/libs/keyman-engine.aar \
   build:app             /android/Samples/KMSample2/app/build/outputs/apk/$CONFIG/$ARTIFACT
 
 

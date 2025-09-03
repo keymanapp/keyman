@@ -20,7 +20,7 @@ builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad.
 
 builder_parse "$@"
 
-verify_on_mac
+mac_verify_on_mac
 
 CONFIG="Release"
 if builder_is_debug_build; then
@@ -124,7 +124,7 @@ function build_engine() {
 
   rm -rf "$BUILD_PATH/$CONFIG-universal"
 
-  run_xcodebuild $XCODEFLAGS_EXT \
+  mac_xcodebuild $XCODEFLAGS_EXT \
             $CODE_SIGN \
             -scheme KME-universal \
             KEYMAN_VERSION=$KEYMAN_VERSION \

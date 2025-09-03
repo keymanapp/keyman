@@ -4,27 +4,27 @@ set -e
 set -u
 
 #
-# Usage: increment-version.sh [-f] [commit base]
+# Usage: trigger-release-builds.sh [-f] [commit base]
 #
-# Increments the patch version on VERSION.md
+# Triggers release builds for the current version, increments the patch version
+# on VERSION.md, writes version history to HISTORY.md, and creates an automerge
+# PR with the version increment and history update.
 #
-# If -f is specified, triggers a build even with
-# no detected changes.
+# If -f is specified, triggers a build even with no detected changes.
 #
-# If commit is specified, pushes the new version
-# to the repository. base snould be either
-# master or beta.
+# If commit is specified, pushes the new version to the repository. base snould
+# be either master or beta.
 #
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
-. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
-. "${THIS_SCRIPT%/*}/sentry-control.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/trigger-definitions.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/trigger-builds.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/sentry-control.inc.sh"
 
 gitbranch=`git branch --show-current`
 
@@ -77,7 +77,7 @@ else
 fi
 
 if [[ $action == help ]]; then
-  echo "Usage: increment-version.sh [-f] [commit base]"
+  echo "Usage: trigger-release-builds.sh [-f] [commit base]"
   echo "  -f  forces a build even with no changes"
   echo "  base must be either master, beta or stable-x.y."
   echo "  base must be equal to currently checked-out"
@@ -87,20 +87,20 @@ fi
 
 # Let's ensure our base is up to date with GitHub to
 # avoid transient errors
-echo "increment-version.sh: updating branch $base from GitHub"
+echo "trigger-release-builds.sh: updating branch $base from GitHub"
 git pull origin $base
 
 #
 # Run the increment + history refresh
 #
 
-echo "increment-version.sh: building resources/build/version"
+echo "trigger-release-builds.sh: building resources/build/version"
 pushd "$KEYMAN_ROOT"
 npm ci
 
 "$KEYMAN_ROOT/resources/build/version/build.sh"
 
-echo "increment-version.sh: running resources/build/version"
+echo "trigger-release-builds.sh: running resources/build/version"
 pushd "$KEYMAN_ROOT"
 ABORT=0
 if [[ -z "$fromversion" ]]; then
@@ -131,7 +131,7 @@ popd > /dev/null
 #
 
 if [ "$action" == "commit" ]; then
-  echo "increment-version.sh: committing to repository and tagging release version $KEYMAN_VERSION_WITH_TAG"
+  echo "trigger-release-builds.sh: committing to repository and tagging release version $KEYMAN_VERSION_WITH_TAG"
   KEYMAN_VERSION_MD="$KEYMAN_ROOT/VERSION.md"
   NEWVERSION=`cat $KEYMAN_VERSION_MD | tr -d "[:space:]"`
 
@@ -186,15 +186,15 @@ if [ "$action" == "commit" ]; then
     # If HISTORY.md has been updated, then we want to create a branch and push
     # it for review
     if git status --porcelain=v1 | grep -q HISTORY.md; then
-      # TODO: once we are sure this is stable, rename this to
-      # "$branch-master-history" to get automatic merges with "auto/..." branch
-      # name
-      git switch -c "chore/version-$base-$NEWVERSION-master-history" master
+      git switch -c "auto/cherry-pick-$KEYMAN_VERSION-history-to-alpha" master
       git add HISTORY.md
-      git commit -m "$message (history cherry-pick to master)"
-      # TODO: once we are sure this is stable, add `-l auto,automerge` to get
-      # the "auto" label
-      hub pull-request -fp --no-edit
+      git commit -m "auto: cherry-pick $KEYMAN_VERSION history to alpha
+
+Build-bot: skip
+Test-bot: skip
+"
+
+      hub pull-request -fp --no-edit -l automerge
     fi
 
     # Return to our best working branch
