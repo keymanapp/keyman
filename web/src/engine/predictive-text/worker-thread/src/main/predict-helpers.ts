@@ -279,11 +279,14 @@ export async function correctAndEnumerate(
   }
 
   // Corrections and predictions are based upon the post-context state, though.
-  let transition = contextState.analyzeTransition(context, transformDistribution);
-  if(!transition) {
-    console.warn("Unexpected failure when computing context-state transition");
-    // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
-    transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
+  let transition = contextTracker.latest;
+  if(transformDistribution.length != 1 || !TransformUtils.isEmpty(transformDistribution[0].sample)) {
+    transition = contextState.analyzeTransition(context, transformDistribution);
+    if(!transition) {
+      console.warn("Unexpected failure when computing context-state transition");
+      // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
+      transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
+    }
   }
   contextTracker.latest = transition;
   const postContextState = transition.final;
