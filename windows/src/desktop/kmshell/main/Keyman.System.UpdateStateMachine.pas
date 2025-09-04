@@ -88,14 +88,18 @@ type
     procedure HandleFirstRun;
     function CurrentStateName: string;
     (**
-     * Checks if Keyman is the WaitingRestartState and that
-     * Keyman has not run in this Windows session.
-     * The sole purpose is for the calling code then produce
-     * a UI to confirm the user wants to continue install.
+     * Checks if Keyman is the WaitingRestartState, the cache is valid
+     * and that Keyman has not run in this Windows session.
+     * The purpose is for the calling code to produce
+     * a UI to confirm the user wants to install an update,
+     * if everything is ready to start a update.
+     *
+     * NOTE: If it finds the cache is invalid it will abort causing
+     * the State Machine to change state, returning to idle.
      *
      * @returns True  if the Keyman is ready to install.
      *)
-    function ReadyToInstall: Boolean;
+    function ValidateReadyToInstall: Boolean;
     function IsInstallingState: Boolean;
 
     function GetAutomaticUpdates: Boolean;
@@ -558,14 +562,31 @@ begin
   Result := CurrentState.ClassName;
 end;
 
-function TUpdateStateMachine.ReadyToInstall: Boolean;
+function TUpdateStateMachine.ValidateReadyToInstall: Boolean;
 begin
   if not IsCurrentStateAssigned then
     Exit(False);
-  if (CurrentState is WaitingRestartState) and not HasKeymanRun then
-    Result := True
-  else
-    Result := False;
+
+  if not (CurrentState is WaitingRestartState) then
+    Exit(False);
+
+  // Validate the cache otherwise we could
+  // prompt the caller for update but then fail.
+  // Also combined #14295 moved check here from initprog.pas
+  // The setting for automatic updates may have been set to disable
+  // after updates were checked and downloaded. The user should
+  // not be prompted for an update in this case and the update should
+  // abort.
+  if not (TUpdateCheckStorage.CheckMetaDataForUpdate and Self.GetAutomaticUpdates) then
+  begin
+    HandleAbort;
+    Exit(False);
+  end;
+
+  if not HasKeymanRun then
+    Exit(True);
+
+  Result := False;
 end;
 
 function TUpdateStateMachine.IsInstallingState: Boolean;
