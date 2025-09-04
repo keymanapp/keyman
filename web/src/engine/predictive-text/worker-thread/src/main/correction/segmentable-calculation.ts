@@ -93,8 +93,8 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
   // TODO:  visualization
 }
 
-function getMergeSplitParent (
-  buffer: ClassicalDistanceCalculation<string>,
+function getMergeSplitParent<TOpSet> (
+  buffer: ClassicalDistanceCalculation<string, TOpSet>,
   r: number,
   c: number
 ): [number, number] {
