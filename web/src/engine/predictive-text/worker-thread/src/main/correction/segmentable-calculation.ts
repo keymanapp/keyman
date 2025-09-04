@@ -29,50 +29,6 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
     super(other);
   }
 
-  private static getMergeSplitParent(
-    buffer: SegmentableDistanceCalculation,
-    r: number,
-    c: number
-  ): [number, number] {
-    const mergeTarget = buffer.matchSequence[c];
-    const splitTarget = buffer.inputSequence[r];
-
-    // Block any operations where the initial tokens are identical.
-    // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
-    if(r < 0 || c < 0 || splitTarget == mergeTarget) {
-      return [-1, -1];
-    }
-
-
-    // Merge checks
-    let mergedInputs = '';
-    let lastMergeIndex = -1;
-    for(let i = r; i >= 0; i--) {
-      mergedInputs = buffer.inputSequence[i] + mergedInputs;
-      if(mergedInputs == mergeTarget) {
-        lastMergeIndex = i;
-        break;
-      } else if(mergedInputs.length > mergeTarget.length) {
-        break;
-      }
-    }
-
-    // Split checks
-    let mergedMatches = '';
-    let lastSplitIndex = -1;
-    for(let i = c; i >= 0; i--) {
-      mergedMatches = buffer.matchSequence[i] + mergedMatches;
-      if(mergedMatches == splitTarget) {
-        lastSplitIndex = i;
-        break;
-      } else if(mergedMatches.length > splitTarget.length) {
-        break;
-      }
-    }
-
-    return [lastMergeIndex, lastSplitIndex];
-  }
-
   private static selectInitialCostAt(
     buffer: SegmentableDistanceCalculation,
     r: number,
@@ -82,7 +38,7 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
     let mergeCost = Number.MAX_VALUE;
     let splitCost = Number.MAX_VALUE;
 
-    const [lastMergeIndex, lastSplitIndex] = SegmentableDistanceCalculation.getMergeSplitParent(buffer, r, c);
+    const [lastMergeIndex, lastSplitIndex] = getMergeSplitParent(buffer, r, c);
     mergeCost = lastMergeIndex == -1 ? mergeCost : (buffer.getCostAt(lastMergeIndex-1, c-1) + 1);
     splitCost = lastSplitIndex == -1 ? splitCost : (buffer.getCostAt(r-1, lastSplitIndex-1) + 1);
 
@@ -127,8 +83,56 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
     return returnBuffer;
   }
 
-  // TODO:  diagonal expansion
+  public increaseMaxDistance(): ClassicalDistanceCalculation<string> {
+    // TODO:  diagonal expansion
+    // But it's not particularly needed for our use cases.
+    throw new Error("Not yet supported for this edit-distance calculation type.");
+  }
+
   // TODO:  edit path with 'split', 'merge' handling  // progress:  infrastructure is likely prepped?
   // TODO:  visualization
 }
 
+function getMergeSplitParent (
+  buffer: ClassicalDistanceCalculation<string>,
+  r: number,
+  c: number
+): [number, number] {
+  const mergeTarget = buffer.matchSequence[c];
+  const splitTarget = buffer.inputSequence[r];
+
+  // Block any operations where the initial tokens are identical.
+  // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
+  if(r < 0 || c < 0 || splitTarget == mergeTarget) {
+    return [-1, -1];
+  }
+
+
+  // Merge checks
+  let mergedInputs = '';
+  let lastMergeIndex = -1;
+  for(let i = r; i >= 0; i--) {
+    mergedInputs = buffer.inputSequence[i] + mergedInputs;
+    if(mergedInputs == mergeTarget) {
+      lastMergeIndex = i;
+      break;
+    } else if(mergedInputs.length > mergeTarget.length) {
+      break;
+    }
+  }
+
+  // Split checks
+  let mergedMatches = '';
+  let lastSplitIndex = -1;
+  for(let i = c; i >= 0; i--) {
+    mergedMatches = buffer.matchSequence[i] + mergedMatches;
+    if(mergedMatches == splitTarget) {
+      lastSplitIndex = i;
+      break;
+    } else if(mergedMatches.length > splitTarget.length) {
+      break;
+    }
+  }
+
+  return [lastMergeIndex, lastSplitIndex];
+}
