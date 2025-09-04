@@ -726,7 +726,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
   //  * @param path
   //  * @returns
   //  */
-  // public visualize(path?: EditTuple<TUnit>[]) {
+  // public visualize(path?: EditTuple<TUnit, TOpSet>[]) {
   //   return visualizeCalculation(this, path);
   // }
 }
@@ -866,6 +866,12 @@ export function findTransposeEdges<TUnit, TOpSet>(
   }
 }
 
+type EdgeFinder<TUnit, TOpSet> = (
+  pathBuilder: PathBuilder<TUnit, TOpSet>,
+  row: number,
+  col: number
+) => void
+
 /**
  * Determines the edit path used to obtain the optimal cost, distinguishing between zero-cost
  * substitutions ('match' operations) and actual substitutions.
@@ -879,14 +885,7 @@ export function findBaseEdges<TUnit, TOpSet>(
 ): void {
   const calc = pathBuilder.calc;
   const currentCost = calc.getCostAt(row, col);
-  if(currentCost == Number.MAX_VALUE) {
-    // We're too far off the main diagonal - a proper edit distance is not viable!
-    throw new Error("Cannot find path - diagonal width is not large enough.")
-  }
 
-  // Could rework to evaluate whether the selected path actually resolves...
-  // But there would likely be edge cases that still wouldn't be handled
-  // properly.
   const input = calc.inputSequence[row];
   const match = calc.matchSequence[col];
 
@@ -912,15 +911,15 @@ export function findBaseEdges<TUnit, TOpSet>(
 
 export class PathBuilder<TUnit, TOpSet = EditOperation> {
   readonly calc: ClassicalDistanceCalculation<TUnit, TOpSet>;
-  readonly edgeFinders: (typeof findBaseEdges)[];
+  readonly edgeFinders: (EdgeFinder<TUnit, TOpSet>)[];
   readonly validPaths: EditTuple<TUnit, TOpSet>[][] = [];
 
-  constructor(calc: ClassicalDistanceCalculation<TUnit, TOpSet>, edgeFinders: (typeof findBaseEdges)[]) {
+  constructor(calc: ClassicalDistanceCalculation<TUnit, TOpSet>, edgeFinders: (EdgeFinder<TUnit, TOpSet>)[]) {
     this.calc = calc;
     this.edgeFinders = edgeFinders;
   }
 
-  addEdgeFinder(finder: (typeof findBaseEdges)) {
+  addEdgeFinder(finder: EdgeFinder<TUnit, TOpSet>) {
     this.edgeFinders.push(finder);
   }
 
