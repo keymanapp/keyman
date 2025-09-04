@@ -17,7 +17,7 @@ import {
 } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from 'keyman/engine/js-processor';
 
-import { buildCorrectiveLayout } from './correctionLayout.js';
+import { buildCorrectiveLayout, correctionKeyFilter } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
 
 import {
@@ -1638,7 +1638,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const keyDistribution = keyEvent.keyDistribution;
     if(keyDistribution && keyDistribution.length > 1) {
       const matchIndex = keyDistribution.findIndex(keySample => keySample.keySpec == keySpec);
-      if(matchIndex < 0) {
+      if(matchIndex < 0 && correctionKeyFilter(keySpec)) {
         console.error("Could not find and prioritize output key in its fat-finger distribution");
       } else if(matchIndex > 0) {
         // Possibly not ideal for easy reading during inspection, but it's
