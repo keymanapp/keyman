@@ -65,6 +65,18 @@ describe('Split/merge aware edit-distance calculation', () => {
     ['a', 'b', 'c', 'd', 'f', 'gh'].forEach(c => calc = calc.addMatchChar(c));
 
     assert.equal(calc.getFinalCost(), 4);
+
+    const editPaths = calc.editPath();
+    assert.equal(editPaths.length, 1);
+    assert.sameDeepOrderedMembers(editPaths[0], [
+      { op: 'split', input: 'ab', match: 'a' },
+      { op: 'split', input: 'ab', match: 'b' },
+      { op: 'transpose-start', input: 'd', match: 'c' },
+      { op: 'transpose-end', input: 'c', match: 'd' },
+      { op: 'substitute', input: 'e', match: 'f' },
+      { op: 'merge', input: 'g', match: 'gh' },
+      { op: 'merge', input: 'h', match: 'gh' }
+    ]);
   });
 
   it("abc,d,f,g,h -> a,b,c,d,fgh = 2", () => {
@@ -75,5 +87,17 @@ describe('Split/merge aware edit-distance calculation', () => {
     ['a', 'b', 'c', 'd', 'fgh'].forEach(c => calc = calc.addMatchChar(c));
 
     assert.equal(calc.getFinalCost(), 2);
+
+    const editPaths = calc.editPath();
+    assert.equal(editPaths.length, 1);
+    assert.sameDeepOrderedMembers(editPaths[0], [
+      { op: 'split', input: 'abc', match: 'a' },
+      { op: 'split', input: 'abc', match: 'b' },
+      { op: 'split', input: 'abc', match: 'c' },
+      { op: 'match', input: 'd', match: 'd' },
+      { op: 'merge', input: 'f', match: 'fgh' },
+      { op: 'merge', input: 'g', match: 'fgh' },
+      { op: 'merge', input: 'h', match: 'fgh' }
+    ]);
   });
 });
