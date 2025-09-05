@@ -280,7 +280,33 @@ export async function correctAndEnumerate(
 
   // Corrections and predictions are based upon the post-context state, though.
   let transition = contextTracker.latest;
-  if(transformDistribution.length != 1 || !TransformUtils.isEmpty(transformDistribution[0].sample)) {
+
+  // If the input matches something we've already seen (say, a ' ' or '.'
+  // that auto-applied a suggestion).
+  if(
+    transition.transitionId == inputTransform.id &&
+    transition.final.context.left == postContext.left
+  ) {
+    // Retrieve the already-performed transition and re-predict based
+    // on its values.
+    transition.inputDistribution = transformDistribution;
+    contextState = transition.final;
+
+    return correctAndEnumerate(
+      contextTracker,
+      lexicalModel,
+      timer,
+      // TODO:  consider finding a way to add in the auto-appended whitespace
+      // if `inputTransform` does not match it?
+      [{sample: { insert: '', deleteLeft: 0 }, p: 1}],
+      postContext // We need to restart in order to reset constants.
+    );
+  } else if(
+    // If the input is a solitary empty transform, indicating a request to
+    // obtain the most recent prior request's results...
+    transformDistribution.length != 1 ||
+    !TransformUtils.isEmpty(transformDistribution[0].sample)
+  ) {
     transition = contextState.analyzeTransition(context, transformDistribution);
     if(!transition) {
       console.warn("Unexpected failure when computing context-state transition");
