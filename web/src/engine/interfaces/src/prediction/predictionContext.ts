@@ -163,6 +163,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // layerID can be obtained by whoever/whatever holds the InputProcessor instance.
     if(suggestion.tag == 'revert') {
       this.suggestionReverter(suggestion as Reversion);
+      this.recentRevert = true;
       return null;
     } else {
       return this.suggestionApplier(suggestion, ruleBehavior);
