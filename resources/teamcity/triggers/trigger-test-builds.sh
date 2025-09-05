@@ -240,7 +240,16 @@ find_platform_changes
 
 if [ "$prremote" == "origin" ]; then
   # We only accept Build-bot commands on trusted local origin PRs
-  prcommits=`curl -s -H "User-Agent: @keymanapp"  -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM/commits`
+  cd "${KEYMAN_ROOT}/resources/build/ci/github"
+  npm ci
+  if builder_is_windows; then
+    # See https://stackoverflow.com/questions/45890339/stdout-is-not-a-tty-using-bash-for-node-tape-tap-spec
+    NODE_WRAPPER=node.exe
+  else
+    NODE_WRAPPER=node
+  fi
+  # Note: we may move all of this into javascript at some point!
+  prcommits=$(${NODE_WRAPPER} api-pull-commits.mjs $GITHUB_TOKEN $PRNUM)
   test_bot_check_pr_body "$PRNUM" "$prinfo"
   build_bot_check_messages $PRNUM "$prinfo" "$prcommits"
 fi
