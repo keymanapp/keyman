@@ -85,7 +85,7 @@ function triggerTestBuilds() {
           builder_echo "DRY RUN: Triggering GitHub action build ${job}/${branch}, level = ${platformBuildLevel}"
         else
           builder_echo "Triggering GitHub action build ${job}/${branch}, level = ${platformBuildLevel}"
-          triggerGitHubActionsBuild true "${platformBuildLevel}" "${job}" "${branch}"
+          triggerGitHubActionsBuild true "${platformBuildLevel}" "${job}" "${branch}" "${KEYMAN_API_CHECK_SKIP}"
         fi
       else
         if builder_has_option --dry-run; then
@@ -240,6 +240,8 @@ find_platform_changes
 # This will modify the build_platforms array
 #
 
+KEYMAN_API_CHECK_SKIP="false"
+
 if [[ "${prremote}" == "origin" ]]; then
   # We only accept Build-bot commands on trusted local origin PRs
   cd "${KEYMAN_ROOT}/resources/build/ci/github"
@@ -254,6 +256,7 @@ if [[ "${prremote}" == "origin" ]]; then
   prcommits=$(${NODE_WRAPPER} api-pull-commits.mjs "${GITHUB_TOKEN}" "${PRNUM}")
   test_bot_check_pr_body "${PRNUM}" "${prinfo}"
   build_bot_check_messages "${PRNUM}" "${prinfo}" "${prcommits}"
+  KEYMAN_API_CHECK_SKIP="$(is_skip_keyman_api_check "${PRNUM}" "${prinfo}")"
 fi
 
 #
