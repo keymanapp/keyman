@@ -797,6 +797,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (this.usesFixedWidthScaling) {
       let baseWidth = this.width;
       baseWidth -= this._borderWidth * 2;
+      baseWidth = (isNaN(baseWidth) || baseWidth < 0) ? 0 : baseWidth;
       return ParsedLengthStyle.inPixels(baseWidth);
     } else {
       return ParsedLengthStyle.forScalar(1);
@@ -821,7 +822,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // Touch OSKs may apply internal padding to prevent row cropping at the edges.
       // ... why not precompute both, rather than recalculate each time?
       // - appears to contribute to layout reflow costs on layer swaps!
-      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this._borderWidth * 2 - this.layerGroup.verticalPadding);
+      let baseHeight = this.layoutHeight.val - this._borderWidth * 2 - this.layerGroup.verticalPadding;
+      baseHeight = (isNaN(baseHeight) || baseHeight < 0) ? 0 : baseHeight;
+      return ParsedLengthStyle.inPixels(baseHeight);
     } else {
       return ParsedLengthStyle.forScalar(1);
     }
