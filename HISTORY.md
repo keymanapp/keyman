@@ -1,5 +1,41 @@
 # Keyman Version History
 
+## 19.0.111 alpha 2025-09-02
+
+* change(developer): update SIL logo (#14656)
+* fix(developer): remove incorrect offset for compiler error line (#14651)
+* fix(developer): add clear messages about validation failures to New Project Parameters form (#14657)
+* fix(developer): add clear messages about validation failures to New LDML Project Parameters form (#14658)
+* maint: add registry usage for Docker images (#14648)
+
+## 19.0.110 alpha 2025-09-01
+
+* maint(windows): for `build` buildlevel, do not publish artifacts (#14654)
+* maint(linux): generate tar-ignore in `dist.sh` (#14639)
+* fix: fixing some issues for bulding and testing with Docker containers (#14645)
+* maint(linux): create temporary worktree for packaging (#14598)
+
+## 19.0.109 alpha 2025-08-31
+
+* fix(developer): handle missing model id in package with compiler error (#14649)
+* fix(developer): handle failure to create destination path when generating new project (#14650)
+
+## 19.0.108 alpha 2025-08-29
+
+* fix(android): Fix insets for in-app vs system keyboard (#14619)
+* maint(resources): ensure REPO_ROOT is fully resolved (#14643)
+
+## 19.0.107 alpha 2025-08-28
+
+* maint(resources): fix parse bug in build-bot and add extra logging (#14611)
+* fix(android): Update Gradle files to remove flatDir warnings (#14583)
+* maint(resources): move build trigger scripts into resources/teamcity (#14607)
+* chore(linux): Update debian changelog (#14590)
+* docs: update package-editor page section details tab (#14585)
+* fix(android): polyfill globalThis for API 28 devices (#14541)
+* feat: support pagination in build bot PR commit reading (#14638)
+* refactor(linux): remove shellcheck warnings and reformat (#14572)
+
 ## 19.0.106 alpha 2025-08-27
 
 * fix(windows): check if automatic updates off before prompt (#14295)
@@ -674,6 +710,7 @@
 * docs(linux): clarify requirement of patched ibus for Keyman < 18 (#14113)
 * chore(linux): Update debian changelog (#14118)
 * fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult enum (#14208)
+* fix(windows): fix download failing when cache.json missing (#14207)
 * fix(web): deploy `web/build/publish` folder (#14238)
 * fix(ios): restore keyboard scale map for iPad Air 2 (#14306)
 * chore(developer): upgrade multer to 2.0.2 (#14417)

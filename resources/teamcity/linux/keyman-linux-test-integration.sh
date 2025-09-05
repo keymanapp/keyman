@@ -41,7 +41,9 @@ if builder_has_action all; then
   linux_install_dependencies_action
   linux_additional_test_dependencies_action
   tc_set_variables_for_nvm
+  # shellcheck disable=SC2119
   linux_build_action
+  # shellcheck disable=SC2119
   linux_unit_tests_action
 else
   builder_run_action  clean       clean_action

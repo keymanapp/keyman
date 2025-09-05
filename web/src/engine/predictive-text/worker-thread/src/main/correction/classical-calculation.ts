@@ -18,13 +18,6 @@ export interface EditTuple<TUnit> {
   match?: TUnit
 }
 
-/**
- * Represents the lowest-level unit for comparison during edit-distance calculations.
- */
-export interface EditToken<TUnit> {
-  key: TUnit;
-}
-
 // Implemented externally from the class so that it may be more easily
 // disconnected from the class; it's not the smallest method.
 /**
@@ -63,8 +56,8 @@ export interface EditToken<TUnit> {
 export function visualizeCalculation<TUnit>(calc: ClassicalDistanceCalculation<TUnit>, path?: EditTuple<TUnit>[]) {
   path = (path ?? calc.editPath()[0]).slice();
 
-  const inputs = calc.inputSequence.map(i => '' + i.key);
-  const matches = calc.matchSequence.map(i => '' + i.key);
+  const inputs = calc.inputSequence.map(i => '' + i);
+  const matches = calc.matchSequence.map(i => '' + i);
   const maxInputLen = Math.max(...inputs.map(i => i.length));
   const maxMatchLen = Math.max(...matches.map(m => m.length));
 
@@ -175,7 +168,7 @@ export function visualizeCalculation<TUnit>(calc: ClassicalDistanceCalculation<T
  *    - Motivating statement:  "if we are only interested in the distance if it
  *      is smaller than a threshold..."
  */
-export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditToken<TUnit> = EditToken<TUnit>, TMatch extends EditToken<TUnit> = EditToken<TUnit>> {
+export class ClassicalDistanceCalculation<TUnit = string> {
   /**
    * Stores ONLY the computed diagonal elements, nothing else.
    *
@@ -209,8 +202,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
                               // as a naive workaround for multi-char transform limitations.
 
   // The sequence of characters input so far.
-  inputSequence: TInput[] = [];
-  matchSequence: TMatch[] = [];
+  inputSequence: TUnit[] = [];
+  matchSequence: TUnit[] = [];
 
   /**
    * Constructs a new calculation object instance.
@@ -220,8 +213,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
    * Clones an already-existing instance, aliasing old data only where safe.
    * @param other
    */
-  constructor(other: ClassicalDistanceCalculation<TUnit, TInput, TMatch>);
-  constructor(other?: ClassicalDistanceCalculation<TUnit, TInput, TMatch>) {
+  constructor(other: ClassicalDistanceCalculation<TUnit>);
+  constructor(other?: ClassicalDistanceCalculation<TUnit>) {
     if(other) {
       // Clone class properties.
       let rowCount = other.resolvedDistances.length;
@@ -277,7 +270,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
    * Does not actually mutate the instance.
    */
   getFinalCost(): number {
-    let buffer = this as ClassicalDistanceCalculation<TUnit, TInput, TMatch>;
+    let buffer = this as ClassicalDistanceCalculation<TUnit>;
     let val = buffer.getHeuristicFinalCost();
 
     while(val > buffer.diagonalWidth) {
@@ -304,7 +297,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
    * @param threshold
    */
   hasFinalCostWithin(threshold: number): boolean {
-    let buffer = this as ClassicalDistanceCalculation<TUnit, TInput, TMatch>;
+    let buffer = this as ClassicalDistanceCalculation<TUnit>;
     let val = buffer.getHeuristicFinalCost();
     let guaranteedBound = this.diagonalWidth;
 
@@ -437,14 +430,14 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
           // There are initial deletions.
           result.push({
             op: 'delete',
-            input: this.inputSequence[r].key
+            input: this.inputSequence[r]
           });
         }
         for(let c = 0; c <= col; c++) {
           // There are initial insertions.
           result.push({
             op: 'insert',
-            match: this.matchSequence[c].key
+            match: this.matchSequence[c]
           });
         }
       }
@@ -470,15 +463,15 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
         let count = row - lastInputIndex;
         ops.push({
           op: 'transpose-start',
-          input: this.inputSequence[i-count]?.key,
-          match: this.matchSequence[lastMatchIndex]?.key
+          input: this.inputSequence[i-count],
+          match: this.matchSequence[lastMatchIndex]
         });
         // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
         // after the if-else.
         for(let x=count-1; x > 0; x--) {
           ops.push({
             op: 'transpose-delete',
-            input: this.inputSequence[i-x]?.key
+            input: this.inputSequence[i-x]
           });
         }
         expectedCost += count-1;
@@ -486,15 +479,15 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
         let count = col - lastMatchIndex;
         ops.push({
           op: 'transpose-start',
-          input: this.inputSequence[lastInputIndex]?.key,
-          match: this.matchSequence[m-count]?.key
+          input: this.inputSequence[lastInputIndex],
+          match: this.matchSequence[m-count]
         });
         // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
         // after the if-else.
         for(let y=count-1; y > 0; y--) {
           ops.push({
             op: 'transpose-insert',
-            match: this.matchSequence[m-y]?.key
+            match: this.matchSequence[m-y]
           });
         }
         expectedCost += count - 1;
@@ -502,8 +495,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
       ops.push({
         op: 'transpose-end',
-        input: this.inputSequence[i]?.key,
-        match: this.matchSequence[m]?.key
+        input: this.inputSequence[i],
+        match: this.matchSequence[m]
       });
 
       // Double-check our expectations.
@@ -515,8 +508,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     // Could rework to evaluate whether the selected path actually resolves...
     // But there would likely be edge cases that still wouldn't be handled
     // properly.
-    const input = this.inputSequence[row]?.key;
-    const match = this.matchSequence[col]?.key;
+    const input = this.inputSequence[row];
+    const match = this.matchSequence[col];
 
     const insertParentCost = this.getCostAt(row, col-1);
     if(insertParentCost == currentCost - 1) {
@@ -540,21 +533,21 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return validPaths;
   }
 
-  private static getTransposeParent<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
-      buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>,
+  private static getTransposeParent<TUnit>(
+      buffer: ClassicalDistanceCalculation<TUnit>,
       r: number,
       c: number
   ): [number, number] {
     // Block any transpositions where the tokens are identical.
     // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
-    if(r < 0 || c < 0 || buffer.inputSequence[r].key == buffer.matchSequence[c].key) {
+    if(r < 0 || c < 0 || buffer.inputSequence[r] == buffer.matchSequence[c]) {
       return [-1, -1];
     }
 
     // Transposition checks
     let lastInputIndex = -1;
     for(let i = r-1; i >= 0; i--) {
-      if(buffer.inputSequence[i].key == buffer.matchSequence[c].key) {
+      if(buffer.inputSequence[i] == buffer.matchSequence[c]) {
         lastInputIndex = i;
         break;
       }
@@ -562,7 +555,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
     let lastMatchIndex = -1;
     for(let i = c-1; i >= 0; i--) {
-      if(buffer.matchSequence[i].key == buffer.inputSequence[r].key) {
+      if(buffer.matchSequence[i] == buffer.inputSequence[r]) {
         lastMatchIndex = i;
         break;
       }
@@ -571,13 +564,13 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return [lastInputIndex, lastMatchIndex];
   }
 
-  private static initialCostAt<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
-      buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>,
+  private static initialCostAt<TUnit>(
+      buffer: ClassicalDistanceCalculation<TUnit>,
       r: number,
       c: number,
       insertCost?: number,
       deleteCost?: number) {
-    var baseSubstitutionCost = buffer.inputSequence[r].key == buffer.matchSequence[c].key ? 0 : 1;
+    var baseSubstitutionCost = buffer.inputSequence[r] == buffer.matchSequence[c] ? 0 : 1;
     var substitutionCost: number = buffer.getCostAt(r-1, c-1) + baseSubstitutionCost;
     var insertionCost: number = insertCost || buffer.getCostAt(r, c-1) + 1; // If set meaningfully, will never equal zero.
     var deletionCost: number = deleteCost || buffer.getCostAt(r-1, c) + 1;  // If set meaningfully, will never equal zero.
@@ -591,7 +584,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return Math.min(substitutionCost, deletionCost, insertionCost, transpositionCost);
   }
 
-  getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
+  getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation<TUnit> {
     let trimmedInstance = new ClassicalDistanceCalculation(this);
 
     if(inputLength > this.inputSequence.length || matchLength > this.matchSequence.length) {
@@ -637,7 +630,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
   }
 
   // Inputs add an extra row / first index entry.
-  addInputChar(token: TInput): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
+  addInputChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
     let returnBuffer = new ClassicalDistanceCalculation(this);
 
     let r = returnBuffer.inputSequence.length;
@@ -660,7 +653,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return returnBuffer;
   }
 
-  addMatchChar(token: TMatch): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
+  addMatchChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
     let returnBuffer = new ClassicalDistanceCalculation(this);
 
     let c = returnBuffer.matchSequence.length;
@@ -680,7 +673,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return returnBuffer;
   }
 
-  public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
+  public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit> {
     let returnBuffer = new ClassicalDistanceCalculation(this);
     returnBuffer.diagonalWidth++;
 
@@ -689,7 +682,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     }
 
     // An abstraction of the common aspects of transposition handling during diagonal extensions.
-    function forPossibleTranspositionsInDiagonal(startPos: number, fixedChar: TUnit, lookupString: EditToken<TUnit>[], closure: (axisIndex: number, diagIndex: number) => void) {
+    function forPossibleTranspositionsInDiagonal(startPos: number, fixedChar: TUnit, lookupString: TUnit[], closure: (axisIndex: number, diagIndex: number) => void) {
       let diagonalCap = 2 * (returnBuffer.diagonalWidth - 1);  // The maximum diagonal index permitted
       let axisCap = lookupString.length - 1;   // The maximum index supported by the axis of iteration
 
@@ -698,7 +691,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
       // Iterate within the diagonal and call our closure for any potential transpositions.
       for(let diagonalIndex = 0; diagonalIndex <= diagonalCap; diagonalIndex++) {
-        if(fixedChar == lookupString[startPos + diagonalIndex].key) {
+        if(fixedChar == lookupString[startPos + diagonalIndex]) {
           closure(startPos + diagonalIndex, diagonalIndex);
         }
       }
@@ -726,7 +719,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
           // cells (r+2, * > c+2):  new transposition source
           let transposeRow = r+2;
           if(r+2 < this.inputSequence.length) { // Row to check for transposes must exist.
-            let rowChar = returnBuffer.inputSequence[r+1].key;
+            let rowChar = returnBuffer.inputSequence[r+1];
             // First possible match in input could be at index c + 2, which adjusts col c+2's cost.  Except that entry in r+2
             // doesn't exist yet - so we start with c+3 instead.
             forPossibleTranspositionsInDiagonal(c + 3, rowChar, returnBuffer.matchSequence, function(axisIndex, diagIndex) {
@@ -762,7 +755,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
           // cells(* > r+2, c+2): new transposition source
           let transposeCol = c+2;
           if(c+2 < this.matchSequence.length) { // Row to check for transposes must exist.
-            let colChar = returnBuffer.matchSequence[r+1].key;
+            let colChar = returnBuffer.matchSequence[r+1];
             // First possible match in input could be at index r + 2, which adjusts row r+2's cost.  Except that entry in c+2
             // doesn't exist yet - so we start with r+3 instead.
             forPossibleTranspositionsInDiagonal(r+3, colChar, returnBuffer.inputSequence, function(axisIndex, diagIndex) {
@@ -781,8 +774,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
     return returnBuffer;
   }
 
-  private static propagateUpdateFrom<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
-    buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>,
+  private static propagateUpdateFrom<TUnit>(
+    buffer: ClassicalDistanceCalculation<TUnit>,
     r: number,
     c: number,
     value: number,
@@ -814,13 +807,13 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
     // If both, check for propagation via substitution and possible transpositions
     if(internalRow && internalCol) {
-      let updateCost = value + (buffer.inputSequence[r+1].key == buffer.matchSequence[c+1].key ? 0 : 1);
+      let updateCost = value + (buffer.inputSequence[r+1] == buffer.matchSequence[c+1] ? 0 : 1);
       this.propagateUpdateFrom(buffer, r+1, c+1, updateCost, diagonalIndex);
 
       // Propagating transpositions (only possible if 'internal'.)
       let nextInputIndex = -1;
       for(let i = r+2; i < buffer.inputSequence.length; i++) {
-        if(buffer.inputSequence[i].key == buffer.matchSequence[c+1].key) {
+        if(buffer.inputSequence[i] == buffer.matchSequence[c+1]) {
           nextInputIndex = i;
           break;
         }
@@ -828,7 +821,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
       let nextMatchIndex = -1;
       for(let i = c+2; i < buffer.matchSequence.length; i++) {
-        if(buffer.matchSequence[i].key == buffer.inputSequence[r+1].key) {
+        if(buffer.matchSequence[i] == buffer.inputSequence[r+1]) {
           nextMatchIndex = i;
           break;
         }
@@ -842,25 +835,25 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
   }
 
   get mapKey(): string {
-    let inputString = this.inputSequence.map((value) => value.key).join('');
-    let matchString =  this.matchSequence.map((value) => value.key).join('');
+    let inputString = this.inputSequence.join('');
+    let matchString =  this.matchSequence.join('');
     return inputString + SENTINEL_CODE_UNIT + matchString + SENTINEL_CODE_UNIT + this.diagonalWidth;
   }
 
-  get lastInputEntry(): TInput {
+  get lastInputEntry(): TUnit {
     return this.inputSequence[this.inputSequence.length-1];
   }
 
-  get lastMatchEntry(): TMatch {
+  get lastMatchEntry(): TUnit {
     return this.matchSequence[this.matchSequence.length-1];
   }
 
-  static computeDistance<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
-      input: TInput[],
-      match: TMatch[],
+  static computeDistance<TUnit>(
+      input: TUnit[],
+      match: TUnit[],
       bandSize: number = 1) {
     // Initialize the calculation buffer, setting the diagonal width (as appropriate) in advance.
-    let buffer = new ClassicalDistanceCalculation<TUnit, TInput, TMatch>();
+    let buffer = new ClassicalDistanceCalculation<TUnit>();
     bandSize = bandSize || 1;
     buffer.diagonalWidth = bandSize;
 

@@ -19,9 +19,9 @@ archive.
 You can distribute keyboards and lexical models in package files, but
 you can't include both in the same package file.
 
-#### Keyman Desktop
+#### Keyman for Windows
 
-Keyman Desktop can install package files, including installing fonts,
+Keyman for Windows can install package files, including installing fonts,
 creating Start Menu shortcuts, and adding appropriate registry entries
 for uninstallation.
 
@@ -37,20 +37,20 @@ in Keyman Configuration.
 #### Keyman for Android and Keyman for iPhone and iPad
 
 Keyman mobile applications can install the same package files as Keyman
-Desktop, as long as the package includes keyboards for touch layouts.
+for Windows, as long as the package includes keyboards for touch layouts.
 
 ## Package file contents
 
 A package can have a variety of different files contained within. The
 following files and file types are recognized by the package installer:
 
-\*.kmx (Desktop and macOS only)
+\*.kmx (Keyman for Windows, Linux, and macOS only)
 :   Keyboard files. Each of these will be installed. Keyman
     Configuration will not allow installation or uninstallation of a
     single keyboard from a package. They will always be treated as a
     group for installation and uninstallation.
 
-\*.kvk (Desktop and macOS only)
+\*.kvk (Keyman for Windows, Linux, and macOS only)
 :   On Screen Keyboard files, associated with each keyboard file.
 
 \*.js (mobile only)
@@ -91,7 +91,7 @@ kmp.json
 
 > ### Tip
 Read [Step 2: Organizing the Keyboard Files](../../../keyboards/github/step-2)
-to know which files to include or exclude in the keybord folder. 
+to know which files to include or exclude in the keybord folder.
 
 Once the keyboard package .kmp file is created, you can share them via
 external storage devices (USB drive, SD card, etc). You can also share

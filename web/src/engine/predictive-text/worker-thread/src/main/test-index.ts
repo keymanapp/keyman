@@ -13,3 +13,4 @@ export * from './correction/transform-tokenization.js';
 export * from './predict-helpers.js';
 export { default as TransformUtils } from './transformUtils.js'
 export { default as LMLayerWorker } from './index.js'
+export * from './transform-subsets.js';

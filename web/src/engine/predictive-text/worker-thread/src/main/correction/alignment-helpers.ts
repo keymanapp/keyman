@@ -130,8 +130,8 @@ export function isSubstitutionAlignable(
 ): boolean {
   // 1 - Determine the edit path for the word.
   let subEditCalc = ClassicalDistanceCalculation.computeDistance(
-    [...matchingToken].map(value => ({key: value})),
-    [...incomingToken].map(value => ({key: value})),
+    [...matchingToken],
+    [...incomingToken],
     // Use max length in case the word is actually already partly out of
     // the sliding context window.
     Math.max(incomingToken.length, matchingToken.length)
@@ -224,20 +224,20 @@ export function computeAlignment(
   isSliding: boolean,
   forAppliedSuggestion?: boolean
 ): ContextStateAlignment {
-  const src = tokenizationToMatch.map(value => ({key: value}));
-  const dst = incomingTokenization.map(value => ({key: value}));
+  const src = tokenizationToMatch;
+  const dst = incomingTokenization;
 
   // let changedEmptyTail = false;
-  if(dst[dst.length - 1].key == '') {
+  if(dst[dst.length - 1] == '') {
     // Only allow matching if the tokenizations are identical, thus the empty
     // token was unaffected.
-    if(src.length != dst.length || src[dst.length - 1].key != '') {
+    if(src.length != dst.length || src[dst.length - 1] != '') {
       // Do not allow empty-token matches to match each other; this complicates
       // things when applying zero-root suggestions.
       //
       // The SENTINEL char should never appear in raw text, thus should never
       // match anything in the "tokenization to match".
-      dst[dst.length - 1].key = SENTINEL_CODE_UNIT;
+      dst[dst.length - 1] = SENTINEL_CODE_UNIT;
     }
   }
 

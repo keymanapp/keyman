@@ -14,7 +14,7 @@ builder_describe "Installation files for Keyman for Windows" \
 # NOTE: not using deps here because we will only do this in the 'publish' phase
 # after all other builds complete
 
-builder_describe_outputs \
+builder_if_release_build_level builder_describe_outputs \
   publish       /windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe
 
 builder_parse "$@"
@@ -96,7 +96,7 @@ function do_publish() {
   #
   wrap-signcode //d "Keyman for Windows" keymandesktop.exe
 
-  copy-installer
+  builder_if_release_build_level copy-installer
 }
 
 function copy-installer() {
@@ -107,7 +107,7 @@ function copy-installer() {
   cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe"
   cp "$WINDOWS_PROGRAM_APP/setup.exe" "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup.exe"
 
-  builder_if_release_build_level verify-installer-signatures
+  verify-installer-signatures
 
   # Copy the unsigned setup.exe for use in bundling scenarios; zip it up for clarity
   (
