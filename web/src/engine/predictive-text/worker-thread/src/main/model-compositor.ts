@@ -1,5 +1,4 @@
 import * as models from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import * as correction from './correction/index.js'
@@ -149,7 +148,7 @@ export class ModelCompositor {
     const SEARCH_TIMEOUT = correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
     const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
 
-    const { postContextState, rawPredictions } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
+    const { postContextState, rawPredictions, revertableTransitionId } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
 
     if(this.activeTimer == timer) {
       this.activeTimer = null;
@@ -198,6 +197,19 @@ export class ModelCompositor {
       this.SUGGESTION_ID_SEED++;
     });
 
+    if(revertableTransitionId) {
+      const reversion = this.contextTracker.peek(revertableTransitionId)?.reversion;
+      if(reversion) {
+        if(suggestions[0]?.tag == 'keep') {
+          const keep = suggestions.shift();
+          suggestions.unshift(reversion);
+          suggestions.unshift(keep);
+        } else {
+          suggestions.unshift(reversion)
+        }
+      }
+    }
+
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(postContextState) {
@@ -207,33 +219,27 @@ export class ModelCompositor {
     return suggestions;
   }
 
+  /**
+   *
+   * @param suggestion Suggestion selected, whether automatically or by the user.
+   * @param context The context to which the suggestion should be applied.
+   * @param postTransform The original transform that is being replaced by the applied suggestion (!)
+   * @returns
+   */
   acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
-    // Step 1:  generate and save the reversion's Transform.
-    const sourceTransform = models.buildMergedTransform(suggestion.transform, suggestion.appendedTransform ?? { insert: '', deleteLeft: 0 });
-    const deletedLeftChars = KMWString.substr(context.left, -sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    const insertedLength = KMWString.length(sourceTransform.insert);
-
-    let reversionTransform: Transform = {
-      insert: deletedLeftChars,
-      deleteLeft: insertedLength
-    };
+    // Step 1:  re-use the original input Transform as the reversion's Transform.
+    // The Web engine will restore the original state of the context before accepting
+    // and before reverting; all we need to do is put the original keystroke back in place.
+    let reversionTransform: Transform = postTransform;
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
-    let postContext = context;
-    if(postTransform) {
-      // The code above restores the state to the context at the time the `Suggestion` was created.
-      // `postTransform` handles any missing context that came later.
-      reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
-
-      // Now that we've built the reversion based upon the Suggestion's original context,
-      // we manipulate it in order to get a proper 'displayAs' string.
-      postContext = models.applyTransform(postTransform, postContext);
-    }
+    const postContext = models.applyTransform(postTransform, context);
 
     let revertedPrefix: string;
     let postContextTokenization = this.tokenize(postContext);
     if(postContextTokenization) {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
+      // In case we ever actually put that back in place.
       const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
       revertedPrefix = (preCaretToken && !preCaretToken.isWhitespace) ? preCaretToken.text : '';
       revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0].text : '';
@@ -284,6 +290,10 @@ export class ModelCompositor {
           id: suggestion.appendedTransform.id
         }
       }
+
+      // Ensure the reversion is annotated on the base, suggested-altered transition that
+      // is cached!
+      transitions.base.reversion = reversion;
     }
 
     return reversion;

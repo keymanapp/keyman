@@ -12,6 +12,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { ContextState } from './context-state.js';
 
 import Distribution = LexicalModelTypes.Distribution;
+import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
@@ -61,6 +62,19 @@ export class ContextTransition {
    * (Refer to #12494 for an example case.)
    */
   preservationTransform?: Transform;
+
+  /**
+   * When set, indicates that the text insertion point has returned to the endpoint of a
+   * token last edited by application of a Suggestion.  This is not set immediately after
+   * it is applied; there must be at least one intermediate edit.
+   */
+  revertableTransitionId?: number;
+
+  /**
+   * Set with the Reversion at the time that a Suggestion was applied, overwriting the
+   * original context transition modeled by this instance.
+   */
+  reversion?: Reversion;
 
   /**
    * Constructs a partial context transition object for use during the process

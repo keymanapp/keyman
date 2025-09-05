@@ -162,6 +162,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return this.lmEngine.wordbreak(context);
   }
 
+  public hasState(transitionId: number) {
+    return !!this.recentTranscriptions.get(transitionId);
+  }
+
   public predict(transcription: Transcription, layerId: string): Promise<Suggestion[]> {
     if(!this.isActive) {
       return null;
@@ -284,30 +288,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     // We must accept the Suggestion from its original context, which was before
     // `original.transform` was applied.
-    let reversionPromise: Promise<Reversion> = this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform);
-
-    // Also, request new prediction set based on the resulting context.
-    reversionPromise = reversionPromise.then((reversion) => {
-      const mappedReversion: Reversion = {
-        // By mapping back to the original Transcription that generated the Suggestion,
-        // the input will be automatically rewound to the preInput state.
-        transform: original.transform,
-        // The ID part is critical; the reversion can't be applied without it.
-        transformId: -original.token, // reversions use the additive inverse.
-        displayAs: reversion.displayAs,  // The real reason we needed to call the LMLayer.
-        id: reversion.id,
-        tag: reversion.tag,
-        appendedTransform: reversion.appendedTransform
-      }
-      // // If using the version from lm-layer:
-      // let mappedReversion = reversion;
-      // mappedReversion.transformId = reversionTranscription.token;
-      this.predictFromTarget(outputTarget, getLayerId());
-      return mappedReversion;
-    });
-
     return {
-      reversion: reversionPromise,
+      reversion: this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform),
       appendedRuleBehavior: resultBehavior
     };
   }
@@ -502,18 +484,5 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public get wordbreaksAfterSuggestions() {
     return this.configuration?.appendsWordbreaks;
-  }
-
-  public tryRevertSuggestion(): boolean {
-    if(!this.isActive) {
-      return false;
-    }
-
-    // If and when we do auto-revert, the suggestion is to pass this object to the event and
-    // denote any mutations to the contained value.
-    //let returnObj = {shouldSwallow: false};
-    this.emit('tryrevert');
-
-    return false;
   }
 }

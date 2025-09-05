@@ -180,19 +180,6 @@ export class InputProcessor {
       }
     }
 
-    // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
-    // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
-    // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
-    if(this.languageProcessor.isActive) {
-      // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
-
-      // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
-      if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
-        return new RuleBehavior();
-      }
-      // checks to potentially cancel out previously-appended whitespace need to evaluate rules first.
-    }
-
     // // ...end I3363 (Build 301)
 
     // Create a "mock" backup of the current outputTarget in its pre-input state.
@@ -207,7 +194,8 @@ export class InputProcessor {
 
     // Check to see if the incoming keystroke should revert the appended component of an
     // immediately-preceding applied Suggestion.
-    ruleBehavior = this.doPredictiveAutoBreaking(ruleBehavior, outputTarget, predictionContext) || ruleBehavior;
+    const autoBreakingBehavior = this.doPredictiveAutoBreaking(ruleBehavior, outputTarget, predictionContext);
+    ruleBehavior = autoBreakingBehavior ?? ruleBehavior;
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -281,6 +269,14 @@ export class InputProcessor {
     // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
     ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription, this.keyboardProcessor.layerId);
 
+    if(autoBreakingBehavior) {
+      // We need a separate prediction request for this case; we don't want to
+      // replace the results of a appended-transform that auto-accepted a
+      // suggestion.  New suggestions should be done from the current state,
+      // without affecting the results of this keystroke.
+      this.languageProcessor.predictFromTarget(outputTarget, this.keyboardProcessor.layerId);
+    }
+
     // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
     if(!ruleBehavior.triggersDefaultCommand) {
       // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
@@ -332,8 +328,8 @@ export class InputProcessor {
 
     // ...and is this immediately after a Suggestion with an appended Transform was applied?
     // (If not, don't consider reverting an appended transform.)
-    if(predictionContext.revertSuggestion?.appendedTransform && predictionContext.recentAcceptCause == 'banner') {
-      const reversion = predictionContext.revertSuggestion;
+    if(predictionContext.immediateReversion?.appendedTransform && predictionContext.recentAcceptCause == 'banner') {
+      const reversion = predictionContext.immediateReversion;
       // For reversions, the appended transform exists (if it did for the applied suggestion)
       // and has an ID set to the appended transform from the suggestion.
       const base = this.contextCache.get(reversion.appendedTransform.id);
@@ -401,14 +397,10 @@ export class InputProcessor {
         // the correct location.
         predictionContext.selected.appendedTransform = ruleBehavior.transcription.transform;
 
-        // With that done, do all usual suggestion-acceptance procedures.
-        // **DO NOT AWAIT the reversion.**  We DO NOT want any worker-async causing
-        // async in the keystroke-processing pipeline!
-        //
         // This call will also produce the corrected RuleBehavior for us.
         const results = predictionContext.accept(predictionContext.selected, ruleBehavior);
 
-        if(!results.appendedRuleBehavior) {
+        if(!results) {
           console.error("Breaking-mark auto-applied suggestion did not build expected RuleBehavior!");
 
           const appliedAppendedTranscription = this.contextCache.get(ruleBehavior.transcription.token);
@@ -424,7 +416,7 @@ export class InputProcessor {
           );
         }
 
-        return results.appendedRuleBehavior ?? ruleBehavior;
+        return results ?? ruleBehavior;
       }
     }
 

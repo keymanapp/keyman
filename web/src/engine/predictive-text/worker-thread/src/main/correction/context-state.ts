@@ -10,17 +10,18 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import Context = LexicalModelTypes.Context;
-import Distribution = LexicalModelTypes.Distribution;
-import LexicalModel = LexicalModelTypes.LexicalModel;
-import Suggestion = LexicalModelTypes.Suggestion;
-import Transform = LexicalModelTypes.Transform;
 import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
 import { determineModelTokenizer } from '#./model-helpers.js';
 import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
 import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
+
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
 
 /**
  * Represents a state of the active context at some point in time along with the
@@ -84,7 +85,7 @@ export class ContextState {
       return undefined;
     }
 
-    return this.suggestions[this.appliedSuggestionId]?.transformId;
+    return this.suggestions.find(s => s.id == this.appliedSuggestionId)?.transformId;
   }
 
   /**
@@ -236,6 +237,7 @@ export class ContextState {
     }
 
     const transition = new ContextTransition(this, this.appliedInput?.id);
+    // Occurs on context resets & after applying suggestions/reversions
     if(resultTokenization == this.tokenization) {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
@@ -243,6 +245,18 @@ export class ContextState {
       transition.finalize(state, transformDistribution);
       return transition;
     }
+
+    // So, if we have a suggestion transition ID at the end and didn't just apply...
+    // we've just returned to the end of an applied suggestion's token.
+    //
+    // epic/dict-breaker:  if ANY decently-likely tokenization satisfies this, we still
+    // have a reasonable candidate for display of a delayed reversion.  (Not 'all' -
+    // 'any'.)
+    const tokens = resultTokenization.tokens;
+    const lastIndex = tokens.length - 1;
+    // Ignore a context-final empty '' token; the interesting one is what comes before.
+    const nonEmptyTail = tokens[lastIndex].exampleInput != '' ? tokens[lastIndex] : tokens[lastIndex - 1];
+    const appliedSuggestionTransitionId = nonEmptyTail?.appliedTransitionId;
 
     // Used to construct and represent the part of the incoming transform that
     // does not land as part of the final token in the resulting context.  This
@@ -275,6 +289,7 @@ export class ContextState {
     state.tokenization = resultTokenization;
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution, preservationTransform);
+    transition.revertableTransitionId = appliedSuggestionTransitionId;
     return transition;
   }
 }
