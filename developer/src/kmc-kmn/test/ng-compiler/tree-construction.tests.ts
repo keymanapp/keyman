@@ -599,7 +599,11 @@ describe("Tree Construction Tests", () => {
       beforeEach(() => {
         initVariables();
       });
-      it("can handle a node without a SOURCE_CODE child", () => {
+      it("can handle a node without a SOURCE_CODE child (no children)", () => {
+        assert.equal(root.toText(), '');
+      });
+      it("can handle a node without a SOURCE_CODE child (two children)", () => {
+        root.addChildren([bitmap, copyright]);
         assert.equal(root.toText(), '');
       });
       it("can extract source code", () => {

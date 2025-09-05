@@ -128,7 +128,8 @@ export class ASTNode {
   }
 
   /**
-   * Get the text of the stored token of a single child of the required type, if any.
+   * Get the text of the stored token of a single child of the required type,
+   * if there is one and only one such child.
    *
    * @param requiredType the required type
    * @returns token text or an empty string
