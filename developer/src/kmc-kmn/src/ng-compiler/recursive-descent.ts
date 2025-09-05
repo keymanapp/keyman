@@ -75,7 +75,7 @@ export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChil
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
+    if (parseSuccess && tmp.hasSoleChildOfType(this.nodeType)) {
       const givenNode: ASTNode = tmp.removeSoleChildOfType(this.nodeType);
       givenNode.addChildren(tmp.getChildren());
       node.addChild(givenNode);
@@ -134,7 +134,7 @@ export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChil
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
+    if (parseSuccess && tmp.hasChild()) {
       const firstNode: ASTNode = tmp.removeFirstChild();
       firstNode.addChildren(tmp.getChildren());
       node.addChild(firstNode);
