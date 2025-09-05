@@ -289,11 +289,15 @@ export class KmpCompiler implements KeymanCompiler {
     //
 
     if(kps.Keyboards?.Keyboard?.length) {
+      if(!this.validateKeyboards(kps.Keyboards.Keyboard)) {
+        // error reported by validateKeyboards
+        return null;
+      }
       kmp.keyboards = kps.Keyboards.Keyboard.map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
         oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
         name: '', // filled by PackageMetadataUpdater
-        id:keyboard.ID?.trim(),
+        id:keyboard.ID.trim(),
         version: DEFAULT_KEYBOARD_VERSION,  // filled by PackageMetadataUpdater
         rtl: false, // filled by PackageMetadataUpdater
         languages: keyboard.Languages?.Language?.length ?
@@ -322,6 +326,10 @@ export class KmpCompiler implements KeymanCompiler {
     //
 
     if(kps.LexicalModels?.LexicalModel?.length) {
+      if(!this.validateLexicalModels(kps.LexicalModels.LexicalModel)) {
+        // error reported by validateLexicalModels
+        return null;
+      }
       kmp.lexicalModels = kps.LexicalModels.LexicalModel.map((model: KpsFile.KpsFileLexicalModel) => ({
         name:model.ID.trim(),
         id:model.ID.trim(),
@@ -451,6 +459,30 @@ export class KmpCompiler implements KeymanCompiler {
       }
     }
     return o;
+  }
+
+  private validateKeyboards(keyboards: KpsFile.KpsFileKeyboard[]): boolean {
+    let index = 1;
+    for(const keyboard of keyboards) {
+      if(!keyboard.ID || keyboard.ID.trim() == '') {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_MissingKeyboardId({index}));
+        return false;
+      }
+      index++;
+    }
+    return true;
+  }
+
+  private validateLexicalModels(models: KpsFile.KpsFileLexicalModel[]): boolean {
+    let index = 1;
+    for(const model of models) {
+      if(!model.ID || model.ID.trim() == '') {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_MissingModelId({index}));
+        return false;
+      }
+      index++;
+    }
+    return true;
   }
 
   /**
