@@ -26,4 +26,14 @@ describe('AnalyzerMessages', function () {
   });
 
   // TODO: test each message
+
+  it('Warn_PreviousMapFileCouldNotBeLoaded returns expected message', function () {
+    const msg = AnalyzerMessages.Warn_PreviousMapFileCouldNotBeLoaded({ filename: 'file.map' });
+    if (typeof msg !== 'object') throw new Error('Expected an object');
+    if (!('code' in msg)) throw new Error('Expected message to have a code');
+    if (typeof msg.message !== 'string') throw new Error('Expected message to have a message string');
+
+    if (!msg.message.includes('file.map')) throw new Error('Message does not include filename');
+    if (!msg.message.includes('missing or not a valid JSON')) throw new Error('Unexpected message format');
+  });
 });
