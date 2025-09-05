@@ -105,6 +105,7 @@ export class InputProcessor {
       if(keyEvent.baseTranscriptionToken) {
         const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
         if(transcription) {
+          this.contextCache.rewindTo(keyEvent.baseTranscriptionToken);
           // Has there been a context change at any point during the multitap?  If so, we need
           // to revert it.  If not, we assume it's a layer-change multitap, in which case
           // no such reset is needed.
@@ -322,9 +323,6 @@ export class InputProcessor {
         // Reasoning for the selected value may be seen there.  Short version - keystrokes
         // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
         const KEYSTROKE_EPSILON = Math.exp(-5);
-
-        // Sort the distribution into probability-descending order.
-        keyDistribution.sort((a, b) => b.p - a.p);
 
         alternates = [];
 
