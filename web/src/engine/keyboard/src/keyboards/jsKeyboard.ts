@@ -1,9 +1,10 @@
-import Codes from "../codes.js";
+import { Codes } from "../codes.js";
 import { Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
-import KeyEvent from "../keyEvent.js";
-import { type OutputTarget } from "../outputTarget.interface.js";
+import { KeyEvent } from "../keyEvent.js";
+import { type OutputTargetInterface } from "../outputTargetInterface.js";
 import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+import { VariableStoreDictionary } from "../variableStore.js";
 
 import ComplexKeyboardStore = KeymanWebKeyboard.ComplexKeyboardStore;
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
@@ -12,7 +13,7 @@ import LayoutSpec = KeymanWebKeyboard.LayoutSpec;
 type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
 import { Version, DeviceSpec } from "@keymanapp/web-utils";
-import StateKeyMap from "./stateKeyMap.js";
+import { StateKeyMap } from "./stateKeyMap.js";
 
 /**
  * Stores preprocessed properties of a keyboard for quick retrieval later.
@@ -29,10 +30,6 @@ export enum LayoutState {
   NOT_LOADED = undefined,
   POLYFILLED = 1
 }
-
-export interface VariableStoreDictionary {
-  [name: string]: string;
-};
 
 type KmwKeyboardObject = KeyboardObject & {
   /**
@@ -51,9 +48,9 @@ type KmwKeyboardObject = KeyboardObject & {
  * and keyboard-centered functionality in an object-oriented way without modifying the
  * wrapped keyboard itself.
  */
-export default class Keyboard {
+export class JSKeyboard {
   public static DEFAULT_SCRIPT_OBJECT: KmwKeyboardObject = {
-    'gs': function(outputTarget: OutputTarget, keystroke: KeyEvent) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
+    'gs': function(outputTarget: OutputTargetInterface, keystroke: KeyEvent) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
     'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
     'KN': '',
     'KV': Layouts.DEFAULT_RAW_SPEC,
@@ -73,7 +70,7 @@ export default class Keyboard {
     if(keyboardScript) {
       this.scriptObject = keyboardScript;
     } else {
-      this.scriptObject = Keyboard.DEFAULT_SCRIPT_OBJECT;
+      this.scriptObject = JSKeyboard.DEFAULT_SCRIPT_OBJECT;
     }
     this.layoutStates = {};
   }
@@ -81,26 +78,26 @@ export default class Keyboard {
   /**
    * Calls the keyboard's `gs` function, which represents the keyboard source's begin Unicode group.
    */
-  process(outputTarget: OutputTarget, keystroke: KeyEvent): boolean {
+  process(outputTarget: OutputTargetInterface, keystroke: KeyEvent): boolean {
     return this.scriptObject['gs'](outputTarget, keystroke);
   }
 
   /**
    * Calls the keyboard's `gn` function, which represents the keyboard source's begin newContext group.
    */
-  processNewContextEvent(outputTarget: OutputTarget, keystroke: KeyEvent): boolean {
+  processNewContextEvent(outputTarget: OutputTargetInterface, keystroke: KeyEvent): boolean {
     return this.scriptObject['gn'] ? this.scriptObject['gn'](outputTarget, keystroke) : false;
   }
 
   /**
    * Calls the keyboard's `gpk` function, which represents the keyboard source's begin postKeystroke group.
    */
-  processPostKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): boolean {
+  processPostKeystroke(outputTarget: OutputTargetInterface, keystroke: KeyEvent): boolean {
     return this.scriptObject['gpk'] ? this.scriptObject['gpk'](outputTarget, keystroke) : false;
   }
 
   get isHollow(): boolean {
-    return this.scriptObject == Keyboard.DEFAULT_SCRIPT_OBJECT;
+    return this.scriptObject == JSKeyboard.DEFAULT_SCRIPT_OBJECT;
   }
 
   get id(): string {
@@ -362,7 +359,7 @@ export default class Keyboard {
    * @param       {number}    _PData        1 or 0
    * Notifies keyboard of keystroke or other event
    */
-  notify(_PCommand: number, _PTarget: OutputTarget, _PData: number) { // I2187
+  notify(_PCommand: number, _PTarget: OutputTargetInterface, _PData: number) { // I2187
     // Good example use case - the Japanese CJK-picker keyboard
     if(typeof(this.scriptObject['KNS']) == 'function') {
       this.scriptObject['KNS'](_PCommand, _PTarget, _PData);
