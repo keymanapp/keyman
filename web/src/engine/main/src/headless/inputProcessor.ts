@@ -328,8 +328,8 @@ export class InputProcessor {
 
     // ...and is this immediately after a Suggestion with an appended Transform was applied?
     // (If not, don't consider reverting an appended transform.)
-    if(predictionContext.revertSuggestion?.appendedTransform && predictionContext.recentAcceptCause == 'banner') {
-      const reversion = predictionContext.revertSuggestion;
+    if(predictionContext.immediateReversion?.appendedTransform && predictionContext.recentAcceptCause == 'banner') {
+      const reversion = predictionContext.immediateReversion;
       // For reversions, the appended transform exists (if it did for the applied suggestion)
       // and has an ID set to the appended transform from the suggestion.
       const base = this.contextCache.get(reversion.appendedTransform.id);

@@ -24,15 +24,16 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
   private _currentSuggestions: Suggestion[] = [];
   private _keepSuggestion: Keep;
+  private _revertSuggestion: Reversion;
 
   public get keepSuggestion(): Keep {
     return this._keepSuggestion;
   }
 
-  private _revertSuggestion: Reversion;
+  private _immediateReversion: Reversion;
 
-  public get revertSuggestion(): Reversion {
-    return this._revertSuggestion;
+  public get immediateReversion(): Reversion {
+    return this._immediateReversion;
   }
 
   // Set to null/undefined if there was no recent acceptance.
@@ -86,7 +87,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.suggestionApplier = (suggestion, ruleBehavior) => {
       if(validSuggestionState()) {
         const results = langProcessor.applySuggestion(suggestion, this.currentTarget, getLayerId, ruleBehavior);
-        results.reversion.then((reversion) => this._revertSuggestion = reversion);
+        results.reversion.then((reversion) => this._immediateReversion = reversion);
         return results.appendedRuleBehavior;
       } else {
         return null;
@@ -128,6 +129,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // If there is an auto-select option that doesn't match the current context,
     // we need to present the user a way to preserve the current context instead.
     const keepNeeded = this.selected && (this.keepSuggestion != this.selected);
+
+    if(this._revertSuggestion) {
+      suggestions.push(this._revertSuggestion);
+    }
 
     if(mayShowKeep && (keepNeeded || this.keepSuggestion.matchesModel)) {
       suggestions.push(this.keepSuggestion);
@@ -252,9 +257,12 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // and prevent it from being hidden after reversion operations.
     this._keepSuggestion = null;
     this._revertSuggestion = null;
+    this._immediateReversion = null;
     for (const s of suggestions) {
       if(s.tag == 'keep') {
         this._keepSuggestion = s as Keep;
+      } else if(s.tag == 'revert') {
+        this._revertSuggestion = s as Reversion;
       }
 
       if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
@@ -262,12 +270,12 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       }
     }
 
-    // Verify that the transition IDs are still valid!
-    this._currentSuggestions = suggestions.filter(s => this.langProcessor.hasState(Math.abs(s.transformId)))
-
-    if(this.keepSuggestion) {
-      this._currentSuggestions.splice(this._currentSuggestions.indexOf(this.keepSuggestion), 1);
-    }
+    // Verify that the transition IDs are still valid and remove special entries.
+    this._currentSuggestions = suggestions.filter(s => {
+      return this.langProcessor.hasState(Math.abs(s.transformId)) &&
+      s != this._keepSuggestion &&
+      s != this._revertSuggestion
+    });
 
     // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
     if(!this.swallowPrediction) {
