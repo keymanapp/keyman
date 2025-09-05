@@ -72,7 +72,8 @@ export class ContextTransition {
    */
   constructor(context: ContextState, transitionId: number);
   /**
-   * Deep-copies a ContextTransition instance.
+   * Deep-copies a ContextTransition instance, optionally assigning a different
+   * transition ID to it in the process.
    * @param baseTransition
    */
   constructor(baseTransition: ContextTransition);

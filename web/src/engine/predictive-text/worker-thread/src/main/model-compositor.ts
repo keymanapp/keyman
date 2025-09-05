@@ -323,7 +323,12 @@ export class ModelCompositor {
     // Note that the base reversion's .transformId will predate the appendedTransform id
     // used to add whitespace (if one existed), so reverting to the base ID's associated
     // context also reverts the appendedTransform.
-    let originalTransition = this.contextTracker.findAndRevert(appendedOnly ? reversion.appendedTransform.id : -reversion.transformId);
+    let originalTransition = this.contextTracker.findAndRevert(-reversion.transformId);
+
+    if(appendedOnly) {
+      this.contextTracker.latest = originalTransition;
+      return Promise.resolve([]);
+    }
 
     if(!originalTransition) {
       this.contextTracker.reset(context, -reversion.transformId);
@@ -331,7 +336,7 @@ export class ModelCompositor {
 
       suggestions = fallbackSuggestions();
     } else {
-      if(suggestions || appendedOnly) {
+      if(suggestions) {
         suggestions = Promise.resolve([]);
       } else {
         // Will need to be modified a bit if/when phrase-level suggestions are implemented.
