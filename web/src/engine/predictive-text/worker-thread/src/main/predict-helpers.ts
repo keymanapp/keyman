@@ -24,6 +24,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
+import { ContextTransition } from './test-index.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -280,10 +281,18 @@ export async function correctAndEnumerate(
 
   // Corrections and predictions are based upon the post-context state, though.
   let transition = contextTracker.latest;
+  const inputIsEmpty = TransformUtils.isEmpty(inputTransform) && transformDistribution.length == 1;
 
-  // If the input matches something we've already seen (say, a ' ' or '.'
-  // that auto-applied a suggestion).
-  if(
+  // Don't replace any applied-suggestion data if we have a request to trigger with
+  // the current context state.
+  if(inputIsEmpty) {
+    // Directly build a simple empty transition that duplicates the last seen state.
+    const priorState = contextTracker.latest.final;
+    transition = new ContextTransition(priorState, inputTransform.id);
+    transition.finalize(priorState, transformDistribution);
+  } else if(
+    // If the input matches something we've already seen (say, a ' ' or '.'
+    // that auto-applied a suggestion).
     transition.transitionId == inputTransform.id &&
     transition.final.context.left == postContext.left
   ) {
@@ -292,21 +301,16 @@ export async function correctAndEnumerate(
     transition.inputDistribution = transformDistribution;
     contextState = transition.final;
 
-    return correctAndEnumerate(
-      contextTracker,
-      lexicalModel,
-      timer,
-      // TODO:  consider finding a way to add in the auto-appended whitespace
-      // if `inputTransform` does not match it?
-      [{sample: { insert: '', deleteLeft: 0 }, p: 1}],
-      postContext // We need to restart in order to reset constants.
-    );
-  } else if(
-    // If the input is a solitary empty transform, indicating a request to
-    // obtain the most recent prior request's results...
-    transformDistribution.length != 1 ||
-    !TransformUtils.isEmpty(transformDistribution[0].sample)
-  ) {
+    // Not yet done; we may want to consider saving the fat-finger distribution of
+    // incoming text for this case for correction-search - we didn't get it
+    // when applying a prior suggestion.
+
+    // Do NOT recurse; return none instead.
+    return {
+      rawPredictions: [],
+      postContextState: transition.final
+    };
+  } else {
     transition = contextState.analyzeTransition(context, transformDistribution);
     if(!transition) {
       console.warn("Unexpected failure when computing context-state transition");
