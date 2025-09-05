@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/android/android-actions.inc.sh"
@@ -66,7 +66,7 @@ function _publish_to_playstore() {
   local PUBTARGETS="$1"
   builder_echo start "publish to Google Play Store" "Publishing release to Google Play Store"
 
-  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}"
+  "${KEYMAN_ROOT}/android/build.sh" "publish-play-store:${PUBTARGETS}"
 
   builder_echo end "publish to Google Play Store" success "Finished publishing release to Google Play Store"
 }
@@ -93,6 +93,7 @@ function do_publish() {
 
   _create_zip_archive
   _publish_to_downloads_keyman_com
+  android_publish_symbols "${PUBTARGETS}"
   _publish_to_playstore "${PUBTARGETS}"
   tc_upload_help "Keyman for Android" android
 }

@@ -3,7 +3,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 # Test builder_describe_outputs and dependencies
@@ -17,7 +17,8 @@ builder_describe "parent test module" \
   build \
   test \
   install \
-  error
+  error \
+  nothing
 
 builder_parse "$@"
 
@@ -79,5 +80,8 @@ builder_run_child_actions install:child1
 test_present child1 install
 
 builder_run_child_actions error
+
+# Test that there is a no-op for unsupported child actions
+builder_run_child_actions nothing
 
 echo Done

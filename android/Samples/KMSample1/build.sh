@@ -4,11 +4,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 ################################ Main script ################################
 
@@ -23,7 +22,7 @@ builder_describe "Build KMSample1 app for Android." \
   "configure" \
   "build" \
   "test" \
-  ":app                   KMSample1" 
+  ":app                   KMSample1"
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -39,7 +38,6 @@ fi
 
 
 builder_describe_outputs \
-  configure             /android/Samples/KMSample1/app/libs/keyman-engine.aar \
   build:app             /android/Samples/KMSample1/app/build/outputs/apk/$CONFIG/$ARTIFACT
 
 

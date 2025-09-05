@@ -5,13 +5,16 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/builder.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 ################################ Main script ################################
+
+SUBPROJECT_NAME=engine/predictive-text/templates
 
 builder_describe "Builds the predictive-text model template implementation module" \
   "@/common/web/keyman-version" \
@@ -36,16 +39,7 @@ function do_build() {
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
-function do_test() {
-  local FLAGS=
-  if builder_is_ci_build; then
-    FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-
-  c8 mocha $FLAGS --require tests/helpers.js --recursive tests
-}
-
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
-builder_run_action test       do_test
+builder_run_action test       test-headless-typescript $SUBPROJECT_NAME
