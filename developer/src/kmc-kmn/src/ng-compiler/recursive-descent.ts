@@ -15,7 +15,7 @@ import { TOKEN_TO_NODE } from "./token-to-node.js";
 
 /**
  * Rule is the abstract base class of all the recursive-descent
- * syntax analyser rules
+ * syntax analyser rules.
  */
 export abstract class Rule { // equivalent to a no-child rule
   protected static _tokenBuffer: TokenBuffer = null;
@@ -28,7 +28,7 @@ export abstract class Rule { // equivalent to a no-child rule
   public static get tokenBuffer(): TokenBuffer { return Rule._tokenBuffer; }
 
   /**
-   * Parse the tokenBuffer, building it into an abstract syntax tree (AST)
+   * Parse the tokenBuffer, building it into an abstract syntax tree (AST).
    *
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
@@ -38,7 +38,7 @@ export abstract class Rule { // equivalent to a no-child rule
 
 /**
  * SingleChildRule is the abstract base class of all the recursive-descent
- * syntax analyser rules with a single child
+ * syntax analyser rules with a single child.
  */
 export abstract class SingleChildRule extends Rule {
   protected rule: Rule;
@@ -53,6 +53,10 @@ export abstract class SingleChildRule extends Rule {
   }
 }
 
+/**
+ * SingleChildRuleParseToTreeFromGivenNode extends SingleChildRule with a parse()
+ * method that builds a tree rooted at the given node.
+ */
 export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChildRule {
   protected nodeType: NodeTypes = null;
 
@@ -61,6 +65,13 @@ export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChil
     this.nodeType = nodeType;
   }
 
+  /**
+   * Parses the stored rule. If successful, rearranges the resulting tree
+   * to be rooted at the node of given type.
+   *
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
@@ -73,6 +84,10 @@ export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChil
   };
 }
 
+/**
+ * SingleChildRuleParseToTreeFromNewNode extends SingleChildRule with a parse()
+ * method that builds a tree rooted at a new node.
+ */
 export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildRule {
   protected nodeType: NodeTypes = null;
 
@@ -81,6 +96,13 @@ export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildR
     this.nodeType = nodeType;
   }
 
+  /**
+   * Parses the stored rule. If successful, rearranges the resulting tree
+   * to be rooted at a new node of the given type.
+   *
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
@@ -93,11 +115,22 @@ export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildR
   };
 }
 
+/**
+ * SingleChildRuleParseToTreeFromFirstNode extends SingleChildRule with a parse()
+ * method that builds a tree rooted at the first node found.
+ */
 export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChildRule {
   public constructor() {
     super();
   }
 
+  /**
+   * Parses the stored rule. If successful, rearranges the resulting tree
+   * to be rooted at the first node found.
+   *
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
@@ -112,7 +145,7 @@ export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChil
 
 /**
  * MultiChildRule is the abstract base class of all the recursive-descent
- * syntax analyser rules with multiple children
+ * syntax analyser rules with multiple children.
  */
 export abstract class MultiChildRule extends Rule {
   protected rules: Rule[];
@@ -126,7 +159,7 @@ export abstract class MultiChildRule extends Rule {
 
 /**
  * SequenceRule represents sequential rules in the recursive-descent
- * syntax analyser
+ * syntax analyser.
  */
 export class SequenceRule extends MultiChildRule {
   public constructor(rules: Rule[]) {
@@ -164,7 +197,7 @@ export class SequenceRule extends MultiChildRule {
 
 /**
  * AlternateRule represents alternative rules in the recursive-descent
- * syntax analyser
+ * syntax analyser.
  */
 export class AlternateRule extends MultiChildRule {
   public constructor(rules: Rule[]) {
@@ -202,7 +235,7 @@ export class AlternateRule extends MultiChildRule {
 
 /**
  * OptionalRule represents optional rules in the recursive-descent
- * syntax analyser ('?' in the BNF)
+ * syntax analyser ('?' in the BNF).
  */
 export class OptionalRule extends SingleChildRule {
   public constructor(rule: Rule) {
@@ -236,7 +269,7 @@ export class OptionalRule extends SingleChildRule {
 
 /**
  * ManyRule represents 'many' rules in the recursive-descent
- * syntax analyser ('*' in the BNF)
+ * syntax analyser ('*' in the BNF).
  */
 export class ManyRule extends SingleChildRule {
   public constructor(rule: Rule) {
@@ -270,7 +303,7 @@ export class ManyRule extends SingleChildRule {
 
 /**
  * OneOrManyRule represents one-or-many rules in the recursive-descent
- * syntax analyser ('+' in the BNF)
+ * syntax analyser ('+' in the BNF).
  */
 export class OneOrManyRule extends SingleChildRule {
   public constructor(rule: Rule) {
@@ -305,7 +338,7 @@ export class OneOrManyRule extends SingleChildRule {
 }
 
 /**
- * TokenRule represents a Token (terminal) in the BNF
+ * TokenRule represents a Token (terminal) in the BNF.
  */
 export class TokenRule extends Rule {
   private static tokenToNodeMap: Map<TokenTypes, NodeTypes>;
