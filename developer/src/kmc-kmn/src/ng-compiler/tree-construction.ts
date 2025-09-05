@@ -139,7 +139,7 @@ export class ASTNode {
   }
 
   /**
-   * Get the sole child node, if there is one and only one
+   * Get the sole child node, if there is one and only one.
    *
    * @returns the sole child node or null
    */
@@ -149,7 +149,7 @@ export class ASTNode {
   }
 
   /**
-   * Get the sole child node of the required type, if there is one and only one
+   * Get the sole child node of the required type, if there is one and only one.
    *
    * @returns the sole child node or null
    */
@@ -159,7 +159,7 @@ export class ASTNode {
   }
 
   /**
-   * Get an array of the child nodes
+   * Get an array of the child nodes.
    *
    * @returns the child nodes or an empty array
    */
@@ -168,7 +168,7 @@ export class ASTNode {
   }
 
   /**
-   * Get an array of the child nodes of the required type
+   * Get an array of the child nodes of the required type.
    *
    * @returns the child nodes or an empty array
    */
@@ -176,25 +176,51 @@ export class ASTNode {
     return this.children.filter((child) => child.nodeType === requiredType);
   }
 
+  /**
+   * Remove and return all children as an array.
+   *
+   * @returns an array of child nodes
+   */
   public removeChildren(): ASTNode[] {
     const list: ASTNode[] = this.getChildren();
     this.children = [];
     return list;
   }
 
+  /**
+   * Remove and return the first child node.
+   *
+   * @returns the first child node or null
+   */
   public removeFirstChild(): ASTNode {
     return this.hasChild() ? this.children.shift() : null;
   }
 
+  /**
+   * Remove and return the sole child node of the required type,
+   * if there is one and only one.
+   *
+   * @returns the sole child of the required type or null
+   */
   public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
     return this.hasSoleChildOfType(requiredType) ?
       this.removeChildrenOfType(requiredType)[0] : null;
   }
 
+  /**
+   * Remove and return all children of the required type as an array.
+   *
+   * @returns all children of the required type or an empty array
+   */
   public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
     return this.removeChildrenOfTypes([requiredType]);
   }
 
+  /**
+   * Remove and return all children of the required types as an array.
+   *
+   * @returns all children of the required types or an empty array
+   */
   public removeChildrenOfTypes(requiredTypes: NodeTypes[]): ASTNode[] {
     if (!requiredTypes?.length) {
       return [];
@@ -215,6 +241,15 @@ export class ASTNode {
     return list;
   }
 
+  /**
+   * Removes all parent and child node types, assembling them into
+   * an array of parent nodes, with all children found between one
+   * parent and the next (or the end of the children) added to the
+   * current parent. The array of parent nodes (with their newly
+   * added children) are returned.
+   *
+   * @returns an array of parent trees or an empy array
+   */
   public removeBlocks(parentType: NodeTypes, childType: NodeTypes): ASTNode[] {
     const blocks: ASTNode[]   = [];
     const children: ASTNode[] = [];
@@ -265,6 +300,12 @@ export class ASTNode {
     return buf;
   }
 
+  /**
+   * Reassembles the source code file by concatenating
+   * the token text of the children of the SOURCE_CODE node.
+   *
+   * @returns the source code
+   */
   public toText(): string {
     let text: string = '';
     if (this.hasSoleChildOfType(NodeTypes.SOURCE_CODE)) {
