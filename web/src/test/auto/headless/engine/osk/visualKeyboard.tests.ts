@@ -103,6 +103,12 @@ describe('VisualKeyboard', () => {
       assert.equal(vk.layoutHeight.val, 0);
     });
 
+    it('ignores invalid borderWidth for LayoutHeight', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = 100;
+      vk['_borderWidth'] = "3px";
+      assert.equal(vk.layoutHeight.val, 0);
+    });
   });
 
   describe('LayoutWidth', () => {
@@ -158,6 +164,77 @@ describe('VisualKeyboard', () => {
       const vk = createVisualKeyboard(true);
       vk['_width'] = "100px";
       assert.equal(vk.layoutWidth.val, 0);
+    });
+
+    it('ignores invalid borderWidth for LayoutWidth', () => {
+      const vk = createVisualKeyboard();
+      vk['_width'] = 100;
+      vk['_borderWidth'] = "3px";
+      assert.equal(vk.layoutWidth.val, 0);
+    });
+
+  });
+
+  describe('InternalHeight', () => {
+    it('calculates InternalHeight correctly for number', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = 100;
+      assert.equal(vk.internalHeight.val, 88);
+    });
+
+    it('calculates InternalHeight correctly for number string', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = "100";
+      assert.equal(vk.internalHeight.val, 88);
+    });
+
+    it('accepts small heights for InternalHeight', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = "5";
+      assert.equal(vk.internalHeight.val, 0);
+    });
+
+    it('ignores non-number string for InternalHeight', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = "100px";
+      assert.equal(vk.internalHeight.val, 0);
+    });
+
+    it('ignores invalid string for InternalHeight', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = "invalid";
+      assert.equal(vk.internalHeight.val, 0);
+    });
+
+    it('ignores undefined value for InternalHeight', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = undefined;
+      assert.equal(vk.internalHeight.val, 0);
+    });
+
+    it('ignores null value for InternalHeight', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = null;
+      assert.equal(vk.internalHeight.val, 0);
+    });
+
+    it('calculates InternalHeight correctly with fixed scaling', () => {
+      const vk = createVisualKeyboard(true);
+      vk['_height'] = 100;
+      assert.equal(vk.internalHeight.val, 88);
+    });
+
+    it('calculates InternalHeight correctly with fixed scaling and string', () => {
+      const vk = createVisualKeyboard(true);
+      vk['_height'] = "100px";
+      assert.equal(vk.internalHeight.val, 0);
+    });
+
+    it('ignores invalid borderWidth for InternalHeight', () => {
+      const vk = createVisualKeyboard();
+      vk['_height'] = 100;
+      vk['_borderWidth'] = "3px";
+      assert.equal(vk.internalHeight.val, 0);
     });
 
   });
