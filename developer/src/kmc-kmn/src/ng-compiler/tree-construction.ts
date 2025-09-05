@@ -31,7 +31,7 @@ export class ASTNode {
   }
 
   /**
-   * Add a child node
+   * Add a child node.
    *
    * @param child the node to add
    * @returns this
@@ -44,7 +44,7 @@ export class ASTNode {
   }
 
   /**
-   * Add an array of child nodes
+   * Add an array of child nodes.
    *
    * @param children the array of nodes to add
    * @returns this
@@ -57,7 +57,7 @@ export class ASTNode {
   }
 
   /**
-   * Add a new child node by type with optional token
+   * Add a new child node by type with optional token.
    *
    * @param nodeType the node type to add
    * @param token the token (or null)
@@ -69,7 +69,7 @@ export class ASTNode {
   }
 
   /**
-   * Gather an array of all nodes in a tree of a given type
+   * Gather an array of all nodes in a tree of a given type.
    *
    * @param requiredType the required type
    * @returns an array of matching nodes (or an empty array)
@@ -90,7 +90,7 @@ export class ASTNode {
   }
 
   /**
-   * Check if this node has any children
+   * Check if this node has any children.
    *
    * @returns true if there is at least one child node
    */
@@ -99,7 +99,7 @@ export class ASTNode {
   }
 
   /**
-   * Check if this node has any children of a given type
+   * Check if this node has any children of a given type.
    *
    * @param requiredType the required type
    * @returns true if there is at least one child of the required type
@@ -116,7 +116,7 @@ export class ASTNode {
   }
 
   /**
-   * Check if this node has one and only one child of a given type
+   * Check if this node has one and only one child of a given type.
    *
    * @param requiredType the required type
    * @returns true if there is one and only one child of the required type
@@ -133,39 +133,62 @@ export class ASTNode {
     return count === 1;
   }
 
+  /**
+   * Get the text of the stored token, if any.
+   *
+   * @returns token text or an empty string
+   */
   public getText(): String {
     return (this._token != null) ? this._token.text : '';
   }
 
+  /**
+   * Get the text of the stored token of a single child of the required type, if any.
+   *
+   * @param requiredType the required type
+   * @returns token text or an empty string
+   */
   public getTextOfType(requiredType: NodeTypes): String  {
     const child: ASTNode = this.getSoleChildOfType(requiredType);
     return (child != null) ? child.getText() : '';
   }
 
+  /**
+   * Get the sole child node, if there is one and only one
+   *
+   * @returns the sole child node or null
+   */
   public getSoleChild(): ASTNode {
     const children: ASTNode[] = this.getChildren();
     return (children.length == 1) ? children[0] : null;
   }
 
+  /**
+   * Get the sole child node of the required type, if there is one and only one
+   *
+   * @returns the sole child node or null
+   */
   public getSoleChildOfType(requiredType: NodeTypes): ASTNode {
     const children: ASTNode[] = this.getChildrenOfType(requiredType);
     return (children.length == 1) ? children[0] : null;
   }
 
+  /**
+   * Get an array of the child nodes
+   *
+   * @returns the child nodes or an empty array
+   */
   public getChildren(): ASTNode[] {
     return Array(...this.children);
   }
 
+  /**
+   * Get an array of the child nodes of the required type
+   *
+   * @returns the child nodes or an empty array
+   */
   public getChildrenOfType(requiredType: NodeTypes): ASTNode[] {
-    const list: ASTNode[] = [];
-    if (requiredType != null) {
-      for (const child of this.children) {
-        if (child.nodeType === requiredType) {
-          list.push(child);
-        }
-      }
-    }
-    return list;
+    return this.children.filter((child) => child.nodeType === requiredType);
   }
 
   public removeChildren(): ASTNode[] {
