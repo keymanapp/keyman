@@ -194,7 +194,8 @@ export class InputProcessor {
 
     // Check to see if the incoming keystroke should revert the appended component of an
     // immediately-preceding applied Suggestion.
-    ruleBehavior = this.doPredictiveAutoBreaking(ruleBehavior, outputTarget, predictionContext) || ruleBehavior;
+    const autoBreakingBehavior = this.doPredictiveAutoBreaking(ruleBehavior, outputTarget, predictionContext);
+    ruleBehavior = autoBreakingBehavior ?? ruleBehavior;
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -267,6 +268,14 @@ export class InputProcessor {
 
     // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
     ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription, this.keyboardProcessor.layerId);
+
+    if(autoBreakingBehavior) {
+      // We need a separate prediction request for this case; we don't want to
+      // replace the results of a appended-transform that auto-accepted a
+      // suggestion.  New suggestions should be done from the current state,
+      // without affecting the results of this keystroke.
+      this.languageProcessor.predictFromTarget(outputTarget, this.keyboardProcessor.layerId);
+    }
 
     // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
     if(!ruleBehavior.triggersDefaultCommand) {
@@ -388,10 +397,6 @@ export class InputProcessor {
         // the correct location.
         predictionContext.selected.appendedTransform = ruleBehavior.transcription.transform;
 
-        // With that done, do all usual suggestion-acceptance procedures.
-        // **DO NOT AWAIT the reversion.**  We DO NOT want any worker-async causing
-        // async in the keystroke-processing pipeline!
-        //
         // This call will also produce the corrected RuleBehavior for us.
         const results = predictionContext.accept(predictionContext.selected, ruleBehavior);
 
