@@ -52,17 +52,6 @@ export abstract class SingleChildRule extends Rule {
     return this.rule === null ? false : this.rule.parse(node);
   }
 
-  protected parseToChildrenOfNewNode(node: ASTNode, nodeType: NodeTypes): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const newNode: ASTNode = new ASTNode(nodeType);
-      newNode.addChildren(tmp.getChildren());
-      node.addChild(newNode);
-    }
-    return parseSuccess;
-  };
-
   protected parseToChildrenOfFirstNode(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
@@ -90,6 +79,26 @@ export abstract class SingleChildRuleParseToTreeOfGivenNode extends SingleChildR
       const givenNode: ASTNode = tmp.removeSoleChildOfType(this.nodeType);
       givenNode.addChildren(tmp.getChildren());
       node.addChild(givenNode);
+    }
+    return parseSuccess;
+  };
+}
+
+export abstract class SingleChildRuleParseToTreeOfNewNode extends SingleChildRule {
+  protected nodeType: NodeTypes = null;
+
+  public constructor(nodeType: NodeTypes) {
+    super();
+    this.nodeType = nodeType;
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const newNode: ASTNode = new ASTNode(this.nodeType);
+      newNode.addChildren(tmp.getChildren());
+      node.addChild(newNode);
     }
     return parseSuccess;
   };

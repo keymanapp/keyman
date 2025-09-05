@@ -9,7 +9,7 @@
  */
 
 import { TokenTypes } from "./token-types.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToTreeOfGivenNode } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToTreeOfGivenNode, SingleChildRuleParseToTreeOfNewNode } from "./recursive-descent.js";
 import { Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyser.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
@@ -194,17 +194,13 @@ export class SimpleTextRule extends SingleChildRule {
   }
 }
 
-export class TextRangeRule extends SingleChildRule {
+export class TextRangeRule extends SingleChildRuleParseToTreeOfNewNode {
   public constructor() {
-    super();
+    super(NodeTypes.RANGE);
     const simpleText: Rule        = new SimpleTextRule();
     const rangeEnd: Rule          = new RangeEndRule();
     const oneOrManyRangeEnd: Rule = new OneOrManyRule(rangeEnd);
     this.rule = new SequenceRule([simpleText, oneOrManyRangeEnd]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfNewNode(node, NodeTypes.RANGE);
   }
 }
 
@@ -217,9 +213,9 @@ export class RangeEndRule extends SingleChildRule {
   }
 }
 
-export class VirtualKeyRule extends SingleChildRule {
+export class VirtualKeyRule extends SingleChildRuleParseToTreeOfNewNode {
   public constructor() {
-    super();
+    super(NodeTypes.VIRTUAL_KEY);
     const leftSquare: Rule   = new TokenRule(TokenTypes.LEFT_SQ);
     const modifier: Rule     = new ModifierRule();
     const manyModifier: Rule = new ManyRule(modifier);
@@ -228,10 +224,6 @@ export class VirtualKeyRule extends SingleChildRule {
     this.rule = new SequenceRule([
       leftSquare, manyModifier, keyCode, rightSquare
     ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfNewNode(node, NodeTypes.VIRTUAL_KEY);
   }
 }
 
@@ -471,17 +463,13 @@ export class ProductionBlockRule extends SingleChildRule {
   }
 }
 
-export class LhsBlockRule extends SingleChildRule {
+export class LhsBlockRule extends SingleChildRuleParseToTreeOfNewNode {
   public constructor() {
-    super();
+    super(NodeTypes.LHS);
     const match: Rule      = new TokenRule(TokenTypes.MATCH, true);
     const nomatch: Rule    = new TokenRule(TokenTypes.NOMATCH, true);
     const inputBlock: Rule = new InputBlockRule();
     this.rule = new AlternateRule([match, nomatch,inputBlock]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfNewNode(node, NodeTypes.LHS);
   }
 }
 
@@ -502,15 +490,11 @@ export class InputBlockRule extends SingleChildRule {
   }
 }
 
-export class InputContextRule extends SingleChildRule {
+export class InputContextRule extends SingleChildRuleParseToTreeOfNewNode {
   public constructor() {
-    super();
+    super(NodeTypes.INPUT_CONTEXT);
     const inputElement = new InputElementRule();
     this.rule = new OneOrManyRule(inputElement);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfNewNode(node, NodeTypes.INPUT_CONTEXT);
   }
 }
 
@@ -532,29 +516,21 @@ export class InputElementRule extends SingleChildRule {
   }
 }
 
-export class KeystrokeRule extends SingleChildRule {
+export class KeystrokeRule extends SingleChildRuleParseToTreeOfNewNode {
   public constructor() {
-    super();
+    super(NodeTypes.KEYSTROKE);
     const plus: Rule            = new TokenRule(TokenTypes.PLUS);
     const inputElement          = new InputElementRule();
     const oneOrManyInputElement = new OneOrManyRule(inputElement);
     this.rule = new SequenceRule([plus, oneOrManyInputElement]);
   }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfNewNode(node, NodeTypes.KEYSTROKE);
-  }
 }
 
-export class RhsBlockRule extends SingleChildRule {
+export class RhsBlockRule extends SingleChildRuleParseToTreeOfNewNode {
   public constructor() {
-    super();
+    super(NodeTypes.RHS);
     const outputStatement: Rule = new OutputStatementRule();
     this.rule = new OneOrManyRule(outputStatement);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfNewNode(node, NodeTypes.RHS);
   }
 }
 
