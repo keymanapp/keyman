@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.113 alpha 2025-09-04
+
+* fix(android): Update KMSample1 layout when changing orientation (#14678)
+
 ## 19.0.112 alpha 2025-09-03
 
 * fix(developer): add clear messages about validation failures to New LM Project Parameters form (#14659)
