@@ -53,7 +53,7 @@ export abstract class SingleChildRule extends Rule {
   }
 }
 
-export abstract class SingleChildRuleParseToTreeOfGivenNode extends SingleChildRule {
+export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChildRule {
   protected nodeType: NodeTypes = null;
 
   public constructor(nodeType: NodeTypes) {
@@ -73,7 +73,7 @@ export abstract class SingleChildRuleParseToTreeOfGivenNode extends SingleChildR
   };
 }
 
-export abstract class SingleChildRuleParseToTreeOfNewNode extends SingleChildRule {
+export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildRule {
   protected nodeType: NodeTypes = null;
 
   public constructor(nodeType: NodeTypes) {
@@ -93,7 +93,7 @@ export abstract class SingleChildRuleParseToTreeOfNewNode extends SingleChildRul
   };
 }
 
-export abstract class SingleChildRuleParseToTreeOfFirstNode extends SingleChildRule {
+export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChildRule {
   public constructor() {
     super();
   }

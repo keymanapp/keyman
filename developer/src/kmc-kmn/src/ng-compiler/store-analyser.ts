@@ -11,12 +11,12 @@
 import { TokenTypes } from "./token-types.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OptionalRule, Rule, SingleChildRuleParseToTreeOfFirstNode, SingleChildRuleParseToTreeOfGivenNode } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OptionalRule, Rule, SingleChildRuleParseToTreeFromFirstNode, SingleChildRuleParseToTreeFromGivenNode } from "./recursive-descent.js";
 import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";import { OneOrManyRule  } from "./recursive-descent.js";
 import { NodeTypes } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 
-export class SystemStoreAssignRule extends SingleChildRuleParseToTreeOfFirstNode {
+export class SystemStoreAssignRule extends SingleChildRuleParseToTreeFromFirstNode {
   public constructor() {
     super();
     const systemStore: Rule = new SystemStoreRule();
@@ -75,7 +75,7 @@ export class SystemStoreNameRule extends AlternateTokenRule {
   }
 }
 
-export class NormalStoreAssignRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class NormalStoreAssignRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.STORE);
     const normalStore: Rule = new NormalStoreRule();
@@ -152,7 +152,7 @@ export class StoreNameRule extends SingleChildRule {
   }
 }
 
-export class SetNormalStoreRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class SetNormalStoreRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.SET);
     const set: Rule             = new TokenRule(TokenTypes.SET, true);
@@ -174,7 +174,7 @@ export class SetNormalStoreRule extends SingleChildRuleParseToTreeOfGivenNode {
   }
 }
 
-export class SetSystemStoreRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class SetSystemStoreRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.SET);
     const set: Rule                   = new TokenRule(TokenTypes.SET, true);
@@ -284,7 +284,7 @@ export class ShiftFreesCapsRule extends CapsLockStatementRule {
   }
 }
 
-export class HeaderAssignRule extends SingleChildRuleParseToTreeOfFirstNode {
+export class HeaderAssignRule extends SingleChildRuleParseToTreeFromFirstNode {
   public constructor() {
     super();
     const headerName: Rule  = new HeaderNameRule();

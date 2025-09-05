@@ -10,7 +10,7 @@
 
 import { TokenTypes } from "./token-types.js";
 import { PlainTextRule } from "./kmn-analyser.js";
-import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeOfGivenNode, TokenRule } from "./recursive-descent.js";
+import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
 import { NodeTypes } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
@@ -96,7 +96,7 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
-abstract class AbstractShortcutRule extends SingleChildRuleParseToTreeOfGivenNode {
+abstract class AbstractShortcutRule extends SingleChildRuleParseToTreeFromGivenNode {
   protected leftBracket: Rule;
   protected plainText: Rule;
   protected oneOrManyPlainText: Rule;
@@ -162,7 +162,7 @@ export class IfStatementRule extends SingleChildRule {
   }
 }
 
-abstract class AbstractIfStoreStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
+abstract class AbstractIfStoreStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   protected ifRule: Rule;
   protected leftBracket: Rule;
   protected comparison: Rule;
@@ -232,7 +232,7 @@ export class ComparisonRule extends SingleChildRule {
   }
 }
 
-export class ContextStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class ContextStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.CONTEXT);
     const context: Rule       = new TokenRule(TokenTypes.CONTEXT, true);
@@ -248,7 +248,7 @@ export class ContextStatementRule extends SingleChildRuleParseToTreeOfGivenNode 
   }
 }
 
-export class IndexStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class IndexStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.INDEX);
     const index: Rule           = new TokenRule(TokenTypes.INDEX, true);
@@ -286,7 +286,7 @@ export class OffsetRule extends SingleChildRule {
   };
 }
 
-export class OutsStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class OutsStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.OUTS);
     const outs: Rule         = new TokenRule(TokenTypes.OUTS, true);

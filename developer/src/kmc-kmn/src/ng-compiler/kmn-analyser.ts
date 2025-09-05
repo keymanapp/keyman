@@ -9,7 +9,7 @@
  */
 
 import { TokenTypes } from "./token-types.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToTreeOfGivenNode, SingleChildRuleParseToTreeOfNewNode } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToTreeFromGivenNode, SingleChildRuleParseToTreeFromNewNode } from "./recursive-descent.js";
 import { Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyser.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
@@ -194,7 +194,7 @@ export class SimpleTextRule extends SingleChildRule {
   }
 }
 
-export class TextRangeRule extends SingleChildRuleParseToTreeOfNewNode {
+export class TextRangeRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeTypes.RANGE);
     const simpleText: Rule        = new SimpleTextRule();
@@ -213,7 +213,7 @@ export class RangeEndRule extends SingleChildRule {
   }
 }
 
-export class VirtualKeyRule extends SingleChildRuleParseToTreeOfNewNode {
+export class VirtualKeyRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeTypes.VIRTUAL_KEY);
     const leftSquare: Rule   = new TokenRule(TokenTypes.LEFT_SQ);
@@ -271,7 +271,7 @@ export class RuleBlockRule extends SingleChildRule {
   }
 }
 
-export class BeginStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class BeginStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.BEGIN);
     const begin: Rule          = new TokenRule(TokenTypes.BEGIN, true);
@@ -317,7 +317,7 @@ export class UseStatementRule extends SingleChildRule {
   }
 }
 
-export class GroupStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
+export class GroupStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.GROUP);
     const group: Rule              = new TokenRule(TokenTypes.GROUP, true);
@@ -463,7 +463,7 @@ export class ProductionBlockRule extends SingleChildRule {
   }
 }
 
-export class LhsBlockRule extends SingleChildRuleParseToTreeOfNewNode {
+export class LhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeTypes.LHS);
     const match: Rule      = new TokenRule(TokenTypes.MATCH, true);
@@ -490,7 +490,7 @@ export class InputBlockRule extends SingleChildRule {
   }
 }
 
-export class InputContextRule extends SingleChildRuleParseToTreeOfNewNode {
+export class InputContextRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeTypes.INPUT_CONTEXT);
     const inputElement = new InputElementRule();
@@ -516,7 +516,7 @@ export class InputElementRule extends SingleChildRule {
   }
 }
 
-export class KeystrokeRule extends SingleChildRuleParseToTreeOfNewNode {
+export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeTypes.KEYSTROKE);
     const plus: Rule            = new TokenRule(TokenTypes.PLUS);
@@ -526,7 +526,7 @@ export class KeystrokeRule extends SingleChildRuleParseToTreeOfNewNode {
   }
 }
 
-export class RhsBlockRule extends SingleChildRuleParseToTreeOfNewNode {
+export class RhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeTypes.RHS);
     const outputStatement: Rule = new OutputStatementRule();
