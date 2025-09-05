@@ -619,34 +619,23 @@ export class ClassicalDistanceCalculation<TUnit = string> {
     return trimmedInstance;
   }
 
-  private static forDiagonalOfAxis(diagonalWidth: number, centerIndex: number, axisCap: number, closure: (axisIndex: number, diagIndex: number) => void) {
-    let diagonalCap = axisCap - centerIndex < diagonalWidth ? axisCap - centerIndex + diagonalWidth : 2 * diagonalWidth;
-    let startOffset = centerIndex - diagonalWidth;  // The axis's index for diagonal entry 0.  May be negative.
-    let diagonalStart = startOffset < 0 ? 0 : startOffset;
-
-    for(let diagonalIndex = diagonalStart - startOffset; diagonalIndex <= diagonalCap; diagonalIndex++) {
-      closure(startOffset + diagonalIndex, diagonalIndex);
-    }
-  }
-
   // Inputs add an extra row / first index entry.
   addInputChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
-    let returnBuffer = new ClassicalDistanceCalculation(this);
-
-    let r = returnBuffer.inputSequence.length;
-    returnBuffer.inputSequence.push(token);
+    const returnBuffer = new ClassicalDistanceCalculation(this);
 
     // Insert a row, even if we don't actually do anything with it yet.
     // Initialize all entries with Number.MAX_VALUE, as `undefined` use leads to JS math issues.
-    let row = Array(2 * returnBuffer.diagonalWidth + 1).fill(Number.MAX_VALUE);
-    returnBuffer.resolvedDistances[r] = row;
+    const row = Array(2 * returnBuffer.diagonalWidth + 1).fill(Number.MAX_VALUE);
+    returnBuffer.resolvedDistances[returnBuffer.inputSequence.length] = row;
+
+    returnBuffer.inputSequence.push(token);
 
     // If there isn't a 'match' entry yet, there are no values to compute.  Exit immediately.
     if(returnBuffer.matchSequence.length == 0) {
       return returnBuffer;
     }
 
-    ClassicalDistanceCalculation.forDiagonalOfAxis(returnBuffer.diagonalWidth, r, returnBuffer.matchSequence.length - 1, function(c, diagIndex) {
+    forNewIndices(returnBuffer, true, function(r, c, diagIndex) {
       row[diagIndex] = ClassicalDistanceCalculation.initialCostAt(returnBuffer, r, c);
     });
 
@@ -654,9 +643,7 @@ export class ClassicalDistanceCalculation<TUnit = string> {
   }
 
   addMatchChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
-    let returnBuffer = new ClassicalDistanceCalculation(this);
-
-    let c = returnBuffer.matchSequence.length;
+    const returnBuffer = new ClassicalDistanceCalculation(this);
     returnBuffer.matchSequence.push(token);
 
     // If there isn't a 'match' entry yet, there are no values to compute.  Exit immediately.
@@ -664,10 +651,10 @@ export class ClassicalDistanceCalculation<TUnit = string> {
       return returnBuffer;
     }
 
-    ClassicalDistanceCalculation.forDiagonalOfAxis(returnBuffer.diagonalWidth, c, returnBuffer.inputSequence.length - 1, function(r, diagIndex) {
-      var row = returnBuffer.resolvedDistances[r];
+    forNewIndices(returnBuffer, false, (r, c, diagIndex) => {
+      const row = returnBuffer.resolvedDistances[r];
       // Since diagIndex is from the perspective of the row, it must be inverted to properly index the column.
-      row[2 * returnBuffer.diagonalWidth - diagIndex] = ClassicalDistanceCalculation.initialCostAt(returnBuffer, r, c);
+      row[diagIndex] = ClassicalDistanceCalculation.initialCostAt(returnBuffer, r, c);
     });
 
     return returnBuffer;
@@ -882,4 +869,44 @@ export class ClassicalDistanceCalculation<TUnit = string> {
   // public visualize(path?: EditTuple<TUnit>[]) {
   //   return visualizeCalculation(this, path);
   // }
+}
+
+/**
+ * This method is intended for use when one axis of a distance calculation is extended
+ * due to new input (either a new input or match entry).
+ *
+ * This method determines all valid indices for the internal, sparse representation that
+ * are newly valid and calls the provided closure for each set.
+ *
+ * @param calc  The calculation object that received new input
+ * @param extendingIsRow  Set to true if the extending axis is the row.
+ * @param closure
+ */
+export function forNewIndices<TUnit>(
+  calc: ClassicalDistanceCalculation<TUnit>,
+  extendingIsRow: boolean,
+  /**
+   * The closure will be called with two values for indexing
+   * @param r The row index under consideration
+   * @param c The column index under consideration
+   * @param diagIndex A valid, corresponding internal index within the sparse row
+   */
+  closure: (r: number, c: number, diagIndex: number) => void
+) {
+  const diagonalWidth = calc.diagonalWidth;
+  const extendingAxisCap = extendingIsRow ? calc.inputSequence.length - 1 : calc.matchSequence.length - 1;
+  const fixedAxisCap = extendingIsRow ? calc.matchSequence.length - 1 : calc.inputSequence.length - 1;
+
+  let diagonalCap = fixedAxisCap - extendingAxisCap < diagonalWidth ? fixedAxisCap - extendingAxisCap + diagonalWidth : 2 * diagonalWidth;
+  let startOffset = extendingAxisCap - diagonalWidth;  // The axis's index for diagonal entry 0.  May be negative.
+  let diagonalStart = startOffset < 0 ? 0 : startOffset;
+
+  for(let diagonalIndex = diagonalStart - startOffset; diagonalIndex <= diagonalCap; diagonalIndex++) {
+    if(extendingIsRow) {
+      closure(extendingAxisCap, startOffset + diagonalIndex, diagonalIndex);
+    } else {
+      // Invert 'diagonalIndex' direction for columns.
+      closure(startOffset + diagonalIndex, extendingAxisCap, 2 * diagonalWidth - diagonalIndex);
+    }
+  }
 }

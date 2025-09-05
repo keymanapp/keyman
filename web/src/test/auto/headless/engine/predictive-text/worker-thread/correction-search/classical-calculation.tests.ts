@@ -1,5 +1,6 @@
 import { assert } from 'chai';
-import { ClassicalDistanceCalculation, EditTuple } from '@keymanapp/lm-worker/test-index';
+import { ClassicalDistanceCalculation, EditTuple, forNewIndices } from '@keymanapp/lm-worker/test-index';
+import sinon from 'sinon';
 
 // Very useful for diagnosing unit test issues when path inspection is needed.
 // Not currently used ('cause that's noisy during test runs).
@@ -54,6 +55,125 @@ function compute(input: string, match: string, mode?: string, bandSize?: number)
 
   return buffer;
 }
+
+describe('forNewIndices', () => {
+  it('iterates extended row properly (small calc)', () => {
+    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
+    mockedCalc.diagonalWidth = 2;
+    mockedCalc.inputSequence = new Array(2);
+    mockedCalc.matchSequence = new Array(3);
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, true, fake);
+
+    assert.equal(fake.callCount, 3);
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should be fixed - the last row.
+      assert.equal(fake.args[i][0], 1);
+
+      // column value should increment on each step.
+      assert.equal(fake.args[i][1], 0 + i);
+
+      // actual column position within the internal representation of the row
+      assert.equal(fake.args[i][2], 1 + i);
+    }
+  });
+
+  it('iterates extended row properly (large calc)', () => {
+    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
+    mockedCalc.diagonalWidth = 2;
+    mockedCalc.inputSequence = new Array(8);
+    mockedCalc.matchSequence = new Array(9);
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, true, fake);
+
+    assert.equal(fake.callCount, 4);  // diagonalWidth + 1, + 1 because +1 column over rows.
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should be fixed - the last row.
+      assert.equal(fake.args[i][0], 7);
+
+      // column value should increment on each step
+      assert.equal(fake.args[i][1], 5 /* last row index - diagonalWidth */ + i);
+
+      // actual column position within the internal representation of the row
+      // and start as far left as possible
+      assert.equal(fake.args[i][2], i);
+    }
+  });
+
+  it('iterates extended column properly (small calc)', () => {
+    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
+    mockedCalc.diagonalWidth = 2;
+    mockedCalc.inputSequence = new Array(3);
+    mockedCalc.matchSequence = new Array(2);
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, false, fake);
+
+    assert.equal(fake.callCount, 3);
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should increment on each step.
+      assert.equal(fake.args[i][0], 0 + i);
+
+      // column value should be fixed - the last column.
+      assert.equal(fake.args[i][1], 1);
+
+      // Actual column position within the internal representation of the row.
+      // Note that internally, columns 'shift backward' when moving forward
+      // in rows.
+      assert.equal(fake.args[i][2], 3 - i);
+    }
+  });
+
+  it('iterates extended column properly (large calc) (1)', () => {
+    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
+    mockedCalc.diagonalWidth = 3;
+    mockedCalc.inputSequence = new Array(8);
+    mockedCalc.matchSequence = new Array(9);
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, false, fake);
+
+    assert.equal(fake.callCount, 3); // diagonalWidth + 1,  -1 because 1 less row
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should increment on each step.
+      assert.equal(fake.args[i][0], (8 - 3) + i);
+
+      // column value should be fixed - the last column.
+      assert.equal(fake.args[i][1], 8);
+
+      // Actual column position within the internal representation of the row.
+      // Note that internally, columns 'shift backward' when moving forward
+      // in rows.
+      assert.equal(fake.args[i][2], 6 - i); // 6 = 2 * diagWidth
+    }
+  });
+
+  it('iterates extended column properly (large calc) (2)', () => {
+    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
+    mockedCalc.diagonalWidth = 3;
+    mockedCalc.inputSequence = new Array(9);
+    mockedCalc.matchSequence = new Array(9);
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, false, fake);
+
+    assert.equal(fake.callCount, 4); // diagonalWidth + 1
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should increment on each step.
+      assert.equal(fake.args[i][0], (9 - 4) + i);
+
+      // column value should be fixed - the last column.
+      assert.equal(fake.args[i][1], 8);
+
+      // Actual column position within the internal representation of the row.
+      // Note that internally, columns 'shift backward' when moving forward
+      // in rows.
+      assert.equal(fake.args[i][2], 6 - i); // 6 = 2 * diagWidth
+    }
+  });
+});
 
 describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
   describe('unweighted', function() {
