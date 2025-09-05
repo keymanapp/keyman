@@ -105,14 +105,7 @@ export class ASTNode {
    * @returns true if there is at least one child of the required type
    */
   public hasChildOfType(requiredType: NodeTypes): boolean  {
-    if (requiredType != null) {
-      for (const child of this.children) {
-        if (child.nodeType === requiredType) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.getChildrenOfType(requiredType).length > 0;
   }
 
   /**
@@ -122,15 +115,7 @@ export class ASTNode {
    * @returns true if there is one and only one child of the required type
    */
   public hasSoleChildOfType(requiredType: NodeTypes): boolean  {
-    let count = 0;
-    if (requiredType != null) {
-      for (const child of this.children) {
-        if (child.nodeType === requiredType) {
-          count += 1;
-        }
-      }
-    }
-    return count === 1;
+    return this.getChildrenOfType(requiredType).length == 1
   }
 
   /**
