@@ -53,9 +53,14 @@ describe("Tree Construction Tests", () => {
         root.addChild(copyright);
         assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
       });
-      it("can handle adding a null", () => {
+      it("can handle adding a null (no children)", () => {
         root.addChild(null);
-        assert.equal(root.getChildren().length, 0);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can handle adding a null (one child)", () => {
+        root.addChild(bitmap);
+        root.addChild(null);
+        assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
       });
     });
     describe("ASTNode.addChildren()", () => {
@@ -70,13 +75,23 @@ describe("Tree Construction Tests", () => {
         root.addChildren([bitmap, copyright]);
         assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
       });
-      it("can handle adding empty list of children", () => {
+      it("can handle adding empty list of children (no children)", () => {
         root.addChildren([]);
         assert.equal(root.toString(), '[TMP]');
       });
-      it("can handle adding a null", () => {
+      it("can handle adding a null (no children)", () => {
         root.addChildren(null);
-        assert.equal(root.getChildren().length, 0);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can handle adding empty list of children (one child)", () => {
+        root.addChild(bitmap);
+        root.addChildren([]);
+        assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
+      });
+      it("can handle adding a null (one child)", () => {
+        root.addChild(bitmap);
+        root.addChildren(null);
+        assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
       });
     });
     describe("ASTNode.addNewChildWithToken()", () => {
