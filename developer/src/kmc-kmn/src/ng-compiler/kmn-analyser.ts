@@ -9,7 +9,7 @@
  */
 
 import { TokenTypes } from "./token-types.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToTreeOfGivenNode } from "./recursive-descent.js";
 import { Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyser.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
@@ -279,19 +279,15 @@ export class RuleBlockRule extends SingleChildRule {
   }
 }
 
-export class BeginStatementRule extends SingleChildRule {
+export class BeginStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
   public constructor() {
-    super();
+    super(NodeTypes.BEGIN);
     const begin: Rule          = new TokenRule(TokenTypes.BEGIN, true);
     const entryPointRule: Rule = new EntryPointRule();
     const optEntryPoint: Rule  = new OptionalRule(entryPointRule);
     const chevron: Rule        = new TokenRule(TokenTypes.CHEVRON);
     const useStatement: Rule   = new UseStatementRule();
     this.rule = new SequenceRule([begin, optEntryPoint, chevron, useStatement]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenNode(node, NodeTypes.BEGIN);
   }
 }
 
@@ -329,9 +325,9 @@ export class UseStatementRule extends SingleChildRule {
   }
 }
 
-export class GroupStatementRule extends SingleChildRule {
+export class GroupStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
   public constructor() {
-    super();
+    super(NodeTypes.GROUP);
     const group: Rule              = new TokenRule(TokenTypes.GROUP, true);
     const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
     const groupName: Rule          = new GroupNameRule();
@@ -345,10 +341,6 @@ export class GroupStatementRule extends SingleChildRule {
       rightBracket,
       optGroupQualifier,
     ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenNode(node, NodeTypes.GROUP);
   }
 }
 

@@ -10,7 +10,7 @@
 
 import { TokenTypes } from "./token-types.js";
 import { PlainTextRule } from "./kmn-analyser.js";
-import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
+import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeOfGivenNode, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
 import { NodeTypes } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
@@ -96,31 +96,25 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
-abstract class AbstractShortcutRule extends SingleChildRule {
+abstract class AbstractShortcutRule extends SingleChildRuleParseToTreeOfGivenNode {
   protected leftBracket: Rule;
   protected plainText: Rule;
   protected oneOrManyPlainText: Rule;
   protected rightBracket: Rule;
-  protected shortcutNodeType: NodeTypes;
 
-  public constructor() {
-    super();
+  public constructor(nodeType: NodeTypes) {
+    super(nodeType);
     this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
     this.plainText          = new PlainTextRule();
     this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
     this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
   }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenNode(node, this.shortcutNodeType);
-  }
 }
 
 export class BaselayoutStatementRule extends AbstractShortcutRule {
   public constructor() {
-    super();
-    this.shortcutNodeType = NodeTypes.BASELAYOUT_SHORTCUT;
-    const baselayout: Rule   = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
+    super(NodeTypes.BASELAYOUT_SHORTCUT);
+    const baselayout: Rule = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
     this.rule = new SequenceRule([
       baselayout, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
     ]);
@@ -129,9 +123,8 @@ export class BaselayoutStatementRule extends AbstractShortcutRule {
 
 export class LayerStatementRule extends AbstractShortcutRule {
   public constructor() {
-    super();
-    this.shortcutNodeType = NodeTypes.LAYER_SHORTCUT;
-    const layer: Rule     = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
+    super(NodeTypes.LAYER_SHORTCUT);
+    const layer: Rule = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
     this.rule = new SequenceRule([
       layer, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
     ]);
@@ -140,8 +133,7 @@ export class LayerStatementRule extends AbstractShortcutRule {
 
 export class PlatformStatementRule extends AbstractShortcutRule {
   public constructor() {
-    super();
-    this.shortcutNodeType = NodeTypes.PLATFORM_SHORTCUT;
+    super(NodeTypes.PLATFORM_SHORTCUT);
     const platform: Rule  = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
     this.rule = new SequenceRule([
       platform, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
@@ -170,7 +162,7 @@ export class IfStatementRule extends SingleChildRule {
   }
 }
 
-abstract class AbstractIfStoreStatementRule extends SingleChildRule {
+abstract class AbstractIfStoreStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
   protected ifRule: Rule;
   protected leftBracket: Rule;
   protected comparison: Rule;
@@ -179,17 +171,13 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRule {
   protected oneOrManyPlainText: Rule;
 
   public constructor() {
-    super();
+    super(NodeTypes.IF);
     this.ifRule             = new TokenRule(TokenTypes.IF, true);
     this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
     this.comparison         = new ComparisonRule();
     this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
     this.plainText          = new PlainTextRule();
     this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenNode(node, NodeTypes.IF);
   }
 }
 
@@ -244,9 +232,9 @@ export class ComparisonRule extends SingleChildRule {
   }
 }
 
-export class ContextStatementRule extends SingleChildRule {
+export class ContextStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
   public constructor() {
-    super();
+    super(NodeTypes.CONTEXT);
     const context: Rule       = new TokenRule(TokenTypes.CONTEXT, true);
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
     const offset: Rule        = new OffsetRule();
@@ -258,15 +246,11 @@ export class ContextStatementRule extends SingleChildRule {
       rightBracket,
     ]);
   }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenNode(node, NodeTypes.CONTEXT);
-  }
 }
 
-export class IndexStatementRule extends SingleChildRule {
+export class IndexStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
   public constructor() {
-    super();
+    super(NodeTypes.INDEX);
     const index: Rule           = new TokenRule(TokenTypes.INDEX, true);
     const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
@@ -281,10 +265,6 @@ export class IndexStatementRule extends SingleChildRule {
       offset,
       rightBracket,
     ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenNode(node, NodeTypes.INDEX);
   }
 }
 
@@ -306,9 +286,9 @@ export class OffsetRule extends SingleChildRule {
   };
 }
 
-export class OutsStatementRule extends SingleChildRule {
+export class OutsStatementRule extends SingleChildRuleParseToTreeOfGivenNode {
   public constructor() {
-    super();
+    super(NodeTypes.OUTS);
     const outs: Rule         = new TokenRule(TokenTypes.OUTS, true);
     const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
     const storeName: Rule    = new StoreNameRule();
@@ -316,9 +296,5 @@ export class OutsStatementRule extends SingleChildRule {
     this.rule = new SequenceRule([
       outs, leftBracket, storeName, rightBracket
     ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    return this.parseToChildrenOfGivenNode(node, NodeTypes.OUTS);
   }
 }
