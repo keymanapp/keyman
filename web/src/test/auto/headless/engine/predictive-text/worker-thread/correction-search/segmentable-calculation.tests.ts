@@ -69,13 +69,13 @@ describe('Split/merge aware edit-distance calculation', () => {
     const editPaths = calc.editPath();
     assert.equal(editPaths.length, 1);
     assert.sameDeepOrderedMembers(editPaths[0], [
-      { op: 'split', input: 'ab', match: 'a' },
-      { op: 'split', input: 'ab', match: 'b' },
-      { op: 'transpose-start', input: 'd', match: 'c' },
-      { op: 'transpose-end', input: 'c', match: 'd' },
-      { op: 'substitute', input: 'e', match: 'f' },
-      { op: 'merge', input: 'g', match: 'gh' },
-      { op: 'merge', input: 'h', match: 'gh' }
+      { op: 'split', input: 0, match: 0 },
+      { op: 'split', input: 0, match: 1 },
+      { op: 'transpose-start', input: 1, match: 2 },
+      { op: 'transpose-end', input: 2, match: 3 },
+      { op: 'substitute', input: 3, match: 4 },
+      { op: 'merge', input: 4, match: 5 },
+      { op: 'merge', input: 5, match: 5 }
     ]);
   });
 
@@ -91,13 +91,13 @@ describe('Split/merge aware edit-distance calculation', () => {
     const editPaths = calc.editPath();
     assert.equal(editPaths.length, 1);
     assert.sameDeepOrderedMembers(editPaths[0], [
-      { op: 'split', input: 'abc', match: 'a' },
-      { op: 'split', input: 'abc', match: 'b' },
-      { op: 'split', input: 'abc', match: 'c' },
-      { op: 'match', input: 'd', match: 'd' },
-      { op: 'merge', input: 'f', match: 'fgh' },
-      { op: 'merge', input: 'g', match: 'fgh' },
-      { op: 'merge', input: 'h', match: 'fgh' }
+      { op: 'split', input: 0, match: 0 },
+      { op: 'split', input: 0, match: 1 },
+      { op: 'split', input: 0, match: 2 },
+      { op: 'match', input: 1, match: 3 },
+      { op: 'merge', input: 2, match: 4 },
+      { op: 'merge', input: 3, match: 4 },
+      { op: 'merge', input: 4, match: 4 }
     ]);
   });
 });

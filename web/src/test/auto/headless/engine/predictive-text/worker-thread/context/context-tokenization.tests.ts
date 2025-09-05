@@ -45,6 +45,15 @@ describe('ContextTokenization', function() {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       let alignment: ContextStateAlignment = {
         canAlign: true,
+        editPath: [
+          {op: 'match', input: 0, match: 0},
+          {op: 'match', input: 1, match: 1},
+          {op: 'match', input: 2, match: 2},
+          {op: 'match', input: 3, match: 3},
+          {op: 'match', input: 4, match: 4},
+          {op: 'match', input: 5, match: 5},
+          {op: 'match', input: 6, match: 6}
+        ],
         leadTokenShift: 0,
         leadEditLength: 0,
         matchLength: 6,
@@ -67,6 +76,15 @@ describe('ContextTokenization', function() {
 
       let baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), {
         canAlign: true,
+        editPath: [
+          {op: 'match', input: 0, match: 0},
+          {op: 'match', input: 1, match: 1},
+          {op: 'match', input: 2, match: 2},
+          {op: 'match', input: 3, match: 3},
+          {op: 'match', input: 4, match: 4},
+          {op: 'match', input: 5, match: 5},
+          {op: 'match', input: 6, match: 6}
+        ],
         leadTokenShift: 0,
         leadEditLength: 0,
         matchLength: 6,
@@ -112,6 +130,17 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'match', input: 0, match: 0},
+            {op: 'match', input: 1, match: 1},
+            {op: 'match', input: 2, match: 2},
+            {op: 'match', input: 3, match: 3},
+            {op: 'match', input: 4, match: 4},
+            {op: 'match', input: 5, match: 5},
+            {op: 'match', input: 6, match: 6},
+            {op: 'insert', match: 7},
+            {op: 'insert', match: 8}
+          ],
           leadTokenShift: 0,
           leadEditLength: 0,
           matchLength: 7,
@@ -140,6 +169,15 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'match', input: 0, match: 0},
+            {op: 'match', input: 1, match: 1},
+            {op: 'match', input: 2, match: 2},
+            {op: 'match', input: 3, match: 3},
+            {op: 'match', input: 4, match: 4},
+            {op: 'match', input: 5, match: 5},
+            {op: 'substitute', input: 6, match: 6}
+          ],
           leadTokenShift: 0,
           leadEditLength: 0,
           matchLength: 6,
@@ -171,6 +209,17 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'match', input: 0, match: 0},
+            {op: 'match', input: 1, match: 1},
+            {op: 'match', input: 2, match: 2},
+            {op: 'match', input: 3, match: 3},
+            {op: 'match', input: 4, match: 4},
+            {op: 'match', input: 5, match: 5},
+            {op: 'match', input: 6, match: 6},
+            {op: 'substitute', input: 7, match: 7},
+            {op: 'substitute', input: 8, match: 8}
+          ],
           leadTokenShift: 0,
           leadEditLength: 0,
           matchLength: 7,
@@ -210,6 +259,31 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'substitute', input: 0, match: 0},
+            {op: 'match', input: 1, match: 1},
+            {op: 'match', input: 2, match: 2},
+            {op: 'match', input: 3, match: 3},
+            {op: 'match', input: 4, match: 4},
+            {op: 'match', input: 5, match: 5},
+            {op: 'match', input: 6, match: 6},
+            {op: 'match', input: 7, match: 7},
+            {op: 'match', input: 8, match: 8},
+            {op: 'match', input: 9, match: 9},
+            {op: 'match', input: 10, match: 10},
+            {op: 'match', input: 11, match: 11},
+            {op: 'match', input: 12, match: 12},
+            {op: 'match', input: 13, match: 13},
+            {op: 'match', input: 14, match: 14},
+            {op: 'match', input: 15, match: 15},
+            {op: 'match', input: 16, match: 16},
+            {op: 'match', input: 17, match: 17},
+            {op: 'match', input: 18, match: 18},
+            {op: 'match', input: 19, match: 19},
+            {op: 'match', input: 20, match: 20},
+            {op: 'match', input: 21, match: 21},
+            {op: 'substitute', input: 22, match: 22}
+          ],
           leadTokenShift: 0,
           leadEditLength: 1,
           matchLength: 21,
@@ -247,6 +321,33 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'substitute', input: 0, match: 0},
+            {op: 'match', input: 1, match: 1},
+            {op: 'match', input: 2, match: 2},
+            {op: 'match', input: 3, match: 3},
+            {op: 'match', input: 4, match: 4},
+            {op: 'match', input: 5, match: 5},
+            {op: 'match', input: 6, match: 6},
+            {op: 'match', input: 7, match: 7},
+            {op: 'match', input: 8, match: 8},
+            {op: 'match', input: 9, match: 9},
+            {op: 'match', input: 10, match: 10},
+            {op: 'match', input: 11, match: 11},
+            {op: 'match', input: 12, match: 12},
+            {op: 'match', input: 13, match: 13},
+            {op: 'match', input: 14, match: 14},
+            {op: 'match', input: 15, match: 15},
+            {op: 'match', input: 16, match: 16},
+            {op: 'match', input: 17, match: 17},
+            {op: 'match', input: 18, match: 18},
+            {op: 'match', input: 19, match: 19},
+            {op: 'match', input: 20, match: 20},
+            {op: 'match', input: 21, match: 21},
+            {op: 'match', input: 22, match: 22},
+            {op: 'match', input: 23, match: 23},
+            {op: 'substitute', input: 24, match: 24}
+          ],
           leadTokenShift: 0,
           leadEditLength: 1,
           matchLength: 23,
@@ -282,6 +383,19 @@ describe('ContextTokenization', function() {
         // properly.
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'substitute', input: 0, match: 0},
+            {op: 'match', input: 1, match: 1},
+            {op: 'match', input: 2, match: 2},
+            {op: 'match', input: 3, match: 3},
+            {op: 'match', input: 4, match: 4},
+            {op: 'match', input: 5, match: 5},
+            {op: 'match', input: 6, match: 6},
+            {op: 'match', input: 7, match: 7},
+            {op: 'match', input: 8, match: 8},
+            {op: 'match', input: 9, match: 9},
+            {op: 'match', input: 10, match: 10}
+          ],
           leadTokenShift: 0,
           leadEditLength: 1,
           matchLength: baseTexts.length - 1,
@@ -321,6 +435,21 @@ describe('ContextTokenization', function() {
         // properly.
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'insert', match: 0},
+            {op: 'insert', match: 1},
+            {op: 'match', input: 0, match: 2},
+            {op: 'match', input: 1, match: 3},
+            {op: 'match', input: 2, match: 4},
+            {op: 'match', input: 3, match: 5},
+            {op: 'match', input: 4, match: 6},
+            {op: 'match', input: 5, match: 7},
+            {op: 'match', input: 6, match: 8},
+            {op: 'match', input: 7, match: 9},
+            {op: 'match', input: 8, match: 10},
+            {op: 'match', input: 9, match: 11},
+            {op: 'match', input: 10, match: 12}
+          ],
           leadTokenShift: 2, // "applesauce", " "
           leadEditLength: 1, // "nd" / "and"
           matchLength: baseTexts.length - 2,
@@ -360,6 +489,21 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'delete', input: 0},
+            {op: 'substitute', input: 1, match: 0},
+            {op: 'substitute', input: 2, match: 1},
+            {op: 'substitute', input: 3, match: 2},
+            {op: 'substitute', input: 4, match: 3},
+            {op: 'substitute', input: 5, match: 4},
+            {op: 'substitute', input: 6, match: 5},
+            {op: 'substitute', input: 7, match: 6},
+            {op: 'substitute', input: 8, match: 7},
+            {op: 'match', input: 9, match: 8},
+            {op: 'match', input: 10, match: 9},
+            {op: 'match', input: 11, match: 10},
+            {op: 'match', input: 12, match: 11}
+          ],
           leadTokenShift: -1, // "'",
           leadEditLength: 1, // "t" / "n't"
           matchLength: baseTexts.length - 3,
@@ -399,6 +543,23 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'delete', input: 0},
+            {op: 'substitute', input: 1, match: 0},
+            {op: 'substitute', input: 2, match: 1},
+            {op: 'substitute', input: 3, match: 2},
+            {op: 'substitute', input: 4, match: 3},
+            {op: 'substitute', input: 5, match: 4},
+            {op: 'substitute', input: 6, match: 5},
+            {op: 'substitute', input: 7, match: 6},
+            {op: 'substitute', input: 8, match: 7},
+            {op: 'match', input: 9, match: 8},
+            {op: 'match', input: 10, match: 9},
+            {op: 'match', input: 11, match: 10},
+            {op: 'match', input: 12, match: 11},
+            {op: 'delete', input: 13},
+            {op: 'delete', input: 14}
+          ],
           leadTokenShift: -1, // "'",
           leadEditLength: 1, // "t" / "n't"
           matchLength: baseTexts.length - 4,
@@ -439,6 +600,23 @@ describe('ContextTokenization', function() {
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
+          editPath: [
+            {op: 'delete', input: 0},
+            {op: 'substitute', input: 1, match: 0},
+            {op: 'substitute', input: 2, match: 1},
+            {op: 'substitute', input: 3, match: 2},
+            {op: 'substitute', input: 4, match: 3},
+            {op: 'substitute', input: 5, match: 4},
+            {op: 'substitute', input: 6, match: 5},
+            {op: 'substitute', input: 7, match: 6},
+            {op: 'substitute', input: 8, match: 7},
+            {op: 'match', input: 9, match: 8},
+            {op: 'match', input: 10, match: 9},
+            {op: 'match', input: 11, match: 10},
+            {op: 'match', input: 12, match: 11},
+            {op: 'insert', match: 12},
+            {op: 'insert', match: 13}
+          ],
           leadTokenShift: 1, // "'",
           leadEditLength: 1, // "n't" / "t"
           matchLength: baseTexts.length - 1,

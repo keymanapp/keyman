@@ -9,7 +9,8 @@
  */
 
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
-import { ClassicalDistanceCalculation, EditOperation } from "./classical-calculation.js";
+import { ClassicalDistanceCalculation, EditTuple } from "./classical-calculation.js";
+import { ExtendedEditOperation } from './segmentable-calculation.js';
 
 /**
  * Represents token-count values resulting from an alignment attempt between two
@@ -26,12 +27,20 @@ export type ContextStateAlignment = {
    *
    * The edit path does not include actual user text and is sanitized.
    */
-  editPath: EditOperation[];
+  editPath: EditTuple<ExtendedEditOperation>[];
 } | {
   /**
    * Denotes whether or not alignment is possible between two contexts.
    */
   canAlign: true,
+
+  /**
+   * Indicates the edit path that could not be handled.  (Useful for error reporting)
+   *
+   * The edit path does not include actual user text and is sanitized.
+   */
+  editPath: EditTuple<ExtendedEditOperation>[];
+
   /**
    * Notes the number of tokens added to the head of the 'incoming'/'new' context
    * of the contexts being aligned.  If negative, the incoming context deleted
@@ -88,7 +97,7 @@ export type ContextStateAlignment = {
  * @param editPath
  * @returns
  */
-export function getEditPathLastMatch(editPath: EditOperation[], forAppliedSuggestion?: boolean) {
+export function getEditPathLastMatch(editPath: ExtendedEditOperation[], forAppliedSuggestion?: boolean) {
   // Assertion:  for a long context, the bulk of the edit path should be a
   // continuous block of 'match' entries.  If there's anything but a substitution
   // in the middle, we have a context mismatch.
@@ -261,7 +270,7 @@ export function computeAlignment(
 
   const failure: ContextStateAlignment = {
     canAlign: false,
-    editPath
+    editPath: editPaths[0]
   };
 
   // Special case:  new context bootstrapping - first token often substitutes.
@@ -291,6 +300,7 @@ export function computeAlignment(
 
     return {
       canAlign: true,
+      editPath: editPaths[0],
       matchLength: matchCount,
       leadTokenShift: 0,
       leadEditLength: 0,
@@ -344,6 +354,7 @@ export function computeAlignment(
   if(firstMatch == 0 && lastMatch == editPath.length - 1) {
     return {
       canAlign: true,
+      editPath: editPaths[0],
       leadTokenShift: 0,
       leadEditLength: 0,
       matchLength,
@@ -418,6 +429,7 @@ export function computeAlignment(
 
   return {
     canAlign: true,
+    editPath: editPaths[0],
     // leadTokensRemoved represents the number of tokens that must be removed from the base context
     // when aligning the contexts.  Externally, it's more helpful to think in terms of the count added
     // to the incoming context.
