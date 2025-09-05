@@ -180,19 +180,6 @@ export class InputProcessor {
       }
     }
 
-    // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
-    // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
-    // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
-    if(this.languageProcessor.isActive) {
-      // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
-
-      // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
-      if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
-        return new RuleBehavior();
-      }
-      // checks to potentially cancel out previously-appended whitespace need to evaluate rules first.
-    }
-
     // // ...end I3363 (Build 301)
 
     // Create a "mock" backup of the current outputTarget in its pre-input state.
@@ -408,7 +395,7 @@ export class InputProcessor {
         // This call will also produce the corrected RuleBehavior for us.
         const results = predictionContext.accept(predictionContext.selected, ruleBehavior);
 
-        if(!results.appendedRuleBehavior) {
+        if(!results) {
           console.error("Breaking-mark auto-applied suggestion did not build expected RuleBehavior!");
 
           const appliedAppendedTranscription = this.contextCache.get(ruleBehavior.transcription.token);
@@ -424,7 +411,7 @@ export class InputProcessor {
           );
         }
 
-        return results.appendedRuleBehavior ?? ruleBehavior;
+        return results ?? ruleBehavior;
       }
     }
 
