@@ -62,14 +62,30 @@ export class ContextState {
 
   /**
    * The full set of Suggestions produced for the transition to this context state.
+   *
+   * May be undefined if no suggestions were generated for this state.
    */
-  suggestions: Suggestion[];
+  suggestions?: Suggestion[];
 
   /**
    * If set, denotes the suggestion ID for the suggestion (from .suggestions) that
    * was applied for the final transition to this context state.
    */
   appliedSuggestionId?: number;
+
+  /**
+   * If a suggestion was applied, returns the transition ID associated with the
+   * applied suggestion.
+   *
+   * Otherwise, returns `undefined`.
+   */
+  get appliedSuggestionTransitionId(): number | undefined {
+    if(!this.appliedSuggestionId) {
+      return undefined;
+    }
+
+    return this.suggestions[this.appliedSuggestionId]?.transformId;
+  }
 
   /**
    * Indicates whether or not the applied suggestion (if it exists) was applied
@@ -145,6 +161,7 @@ export class ContextState {
       baseTokens.push(new ContextToken(this.model));
     }
     this.tokenization = new ContextTokenization(baseTokens);
+    this.inputTransforms = new Map();
   }
 
   /**

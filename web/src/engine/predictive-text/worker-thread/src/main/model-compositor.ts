@@ -209,9 +209,9 @@ export class ModelCompositor {
 
   acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
     // Step 1:  generate and save the reversion's Transform.
-    let sourceTransform = models.buildMergedTransform(suggestion.transform, suggestion.appendedTransform ?? { insert: '', deleteLeft: 0});
-    let deletedLeftChars = KMWString.substr(context.left, -sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    let insertedLength = KMWString.length(sourceTransform.insert);
+    const sourceTransform = models.buildMergedTransform(suggestion.transform, suggestion.appendedTransform ?? { insert: '', deleteLeft: 0 });
+    const deletedLeftChars = KMWString.substr(context.left, -sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    const insertedLength = KMWString.length(sourceTransform.insert);
 
     let reversionTransform: Transform = {
       insert: deletedLeftChars,
@@ -272,9 +272,18 @@ export class ModelCompositor {
         originalTransition = this.contextTracker.latest;
       }
 
-      const appliedTransition = originalTransition.applySuggestion(suggestion);
-      this.contextTracker.latest = appliedTransition;
+      const transitions = originalTransition.applySuggestion(suggestion);
+      this.contextTracker.latest = transitions.base;
       this.contextTracker.saveLatest();
+      if(transitions.appended) {
+        this.contextTracker.latest = transitions.appended;
+        this.contextTracker.saveLatest();
+        reversion.appendedTransform = {
+          insert: '',
+          deleteLeft: suggestion.appendedTransform.insert.length,
+          id: suggestion.appendedTransform.id
+        }
+      }
     }
 
     return reversion;
@@ -287,7 +296,7 @@ export class ModelCompositor {
    * the original keystroke's effects.
    * @returns
    */
-  async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
+  async applyReversion(reversion: Reversion, context: Context, appendedOnly?: boolean): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
@@ -311,7 +320,10 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    let originalTransition = this.contextTracker.findAndRevert(-reversion.transformId);
+    // Note that the base reversion's .transformId will predate the appendedTransform id
+    // used to add whitespace (if one existed), so reverting to the base ID's associated
+    // context also reverts the appendedTransform.
+    let originalTransition = this.contextTracker.findAndRevert(appendedOnly ? reversion.appendedTransform.id : -reversion.transformId);
 
     if(!originalTransition) {
       this.contextTracker.reset(context, -reversion.transformId);
@@ -319,7 +331,9 @@ export class ModelCompositor {
 
       suggestions = fallbackSuggestions();
     } else {
-      if(!suggestions) {
+      if(suggestions || appendedOnly) {
+        suggestions = Promise.resolve([]);
+      } else {
         // Will need to be modified a bit if/when phrase-level suggestions are implemented.
         // Those will be tracked on the first token of the phrase, which won't be the tail
         // if they cover multiple tokens.
