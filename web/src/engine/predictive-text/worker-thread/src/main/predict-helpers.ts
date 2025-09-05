@@ -187,6 +187,7 @@ export async function correctAndEnumerate(
   const postContext = models.applyTransform(inputTransform, context);
   let rawPredictions: CorrectionPredictionTuple[] = [];
 
+  const inputIsBksp = TransformUtils.isBackspace(inputTransform);
   // If `this.contextTracker` does not exist, we don't have the
   // `LexiconTraversal` pattern available to us.  We're unable to efficiently
   // iterate through the lexicon as a result, so we use a far lazier pattern -
@@ -199,7 +200,6 @@ export async function correctAndEnumerate(
 
     // Only allow new-word suggestions if space was the most likely keypress.
     const allowSpace = TransformUtils.isWhitespace(inputTransform);
-    const allowBksp = TransformUtils.isBackspace(inputTransform);
 
     // Generates raw prediction distributions for each valid input.  Can only 'correct'
     // against the final input.
@@ -215,7 +215,7 @@ export async function correctAndEnumerate(
         // Filter out special keys unless they're expected.
         if(TransformUtils.isWhitespace(transform) && !allowSpace) {
           return null;
-        } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
+        } else if(TransformUtils.isBackspace(transform) && !inputIsBksp) {
           return null;
         }
 
@@ -340,7 +340,7 @@ export async function correctAndEnumerate(
   const alignment = postContextState.tokenization.alignment;
 
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  if(transition.preservationTransform) {
+  if(transition.preservationTransform && !inputIsBksp) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
     // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
     deleteLeft = 0;
