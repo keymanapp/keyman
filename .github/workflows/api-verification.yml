@@ -23,6 +23,7 @@ jobs:
       GIT_BRANCH: ${{ steps.environment_step.outputs.GIT_BRANCH }}
       GIT_BASE_BRANCH: ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}
       GIT_USER: ${{ steps.environment_step.outputs.GIT_USER }}
+      SKIP_API_CHECK: ${{ steps.environment_step.outputs.SKIP_API_CHECK }}
 
     steps:
     - name: Restore artifacts
@@ -40,7 +41,7 @@ jobs:
 
     - name: Set pending status on PR builds
       id: set_status
-      if: steps.environment_step.outputs.IS_TEST_BUILD == 'true'
+      if: steps.environment_step.outputs.IS_TEST_BUILD == 'true' && steps.environment_step.outputs.SKIP_API_CHECK != 'true'
       shell: bash
       run: |
         gh api \
@@ -53,6 +54,7 @@ jobs:
           -f context="$STATUS_CONTEXT"
 
     - name: Checkout
+      if: steps.environment_step.outputs.SKIP_API_CHECK != 'true'
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ steps.environment_step.outputs.GIT_SHA }}'
@@ -61,11 +63,13 @@ jobs:
         path: ${{ github.workspace }}/keyman/
 
     - name: Install devscripts
+      if: steps.environment_step.outputs.SKIP_API_CHECK != 'true'
       uses: ./keyman/.github/actions/apt-install
       with:
         packages: devscripts equivs
 
     - name: "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
+      if: steps.environment_step.outputs.SKIP_API_CHECK != 'true'
       run: |
         echo "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }}):" >> $GITHUB_STEP_SUMMARY
 
@@ -79,17 +83,17 @@ jobs:
           verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
+      if: steps.environment_step.outputs.SKIP_API_CHECK != 'true' && always()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: libkeymancore.symbols
         path: ${{ github.workspace }}/keyman/linux/debian/tmp/DEBIAN/symbols
-      if: always()
 
   set_status:
     name: Set result status on PR builds
     needs: [api_verification]
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.api_verification.outputs.IS_TEST_BUILD == 'true' }}
+    if: ${{ always() && needs.api_verification.outputs.IS_TEST_BUILD == 'true' && needs.api_verification.outputs.SKIP_API_CHECK != 'true' }}
     steps:
     - name: Set success
       if: needs.api_verification.result == 'success'

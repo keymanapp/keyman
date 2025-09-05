@@ -84,12 +84,14 @@ function triggerTeamCityBuild() {
 #   2: 'skip' - don't run build; 'build' - run build and unit tests; 'test' - run build, unit tests, and deploy
 #   3: Action name
 #   4: branch name in git
+#   5: 'true' to skip API checks, 'false' to run them (optional, default 'false')
 #
 function triggerGitHubActionsBuild() {
   local IS_TEST_BUILD="$1"
   local BUILD_LEVEL="$2"
   local GITHUB_ACTION="$3"
   local GIT_BRANCH="$4"
+  local SKIP_API_CHECK="${5:-"false"}"
   local GIT_BASE_BRANCH="${GIT_BRANCH}"
   local GIT_USER="keyman-server"
   local GIT_BUILD_SHA GIT_BASE_REF JSON
@@ -127,7 +129,8 @@ function triggerGitHubActionsBuild() {
       \"baseRef\": \"${GIT_BASE_REF}\", \
       \"user\": \"${GIT_USER}\", \
       \"isTestBuild\": \"${IS_TEST_BUILD}\", \
-      \"buildLevel\": \"${BUILD_LEVEL}\" \
+      \"buildLevel\": \"${BUILD_LEVEL}\", \
+      \"skipApiCheck\": \"${SKIP_API_CHECK}\" \
     }}"
 
   echo "GitHub Action Data: ${DATA}"
