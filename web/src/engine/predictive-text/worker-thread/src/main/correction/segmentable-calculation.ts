@@ -89,7 +89,7 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
     throw new Error("Not yet supported for this edit-distance calculation type.");
   }
 
-  protected _buildPath(pathBuilder?: PathBuilder<string, ExtendedEditOperation>): EditTuple<string, ExtendedEditOperation>[][] {
+  protected _buildPath(pathBuilder?: PathBuilder<string, ExtendedEditOperation>): EditTuple<ExtendedEditOperation>[][] {
     pathBuilder = pathBuilder ?? new PathBuilder<string, ExtendedEditOperation>(this, []);
     pathBuilder.addEdgeFinder(findSplitMergeEdges);
     super._buildPath(pathBuilder); // actually evaluates the edit-path.
@@ -159,22 +159,19 @@ export function findSplitMergeEdges<TOpSet>(
     throw new Error("Cannot find path - diagonal width is not large enough.")
   }
 
-  const input = calc.inputSequence[row];
-  const match = calc.matchSequence[col];
-
   const [lastMergeIndex, lastSplitIndex] = getMergeSplitParent(calc, row, col);
   if(lastMergeIndex != -1) {
-    const ops: EditTuple<string, ExtendedEditOperation>[] = [];
+    const ops: EditTuple<ExtendedEditOperation>[] = [];
     for(let r = lastMergeIndex; r <= row; r++) {
-      ops.push({ input: calc.inputSequence[r], match, op: 'merge' });
+      ops.push({ input: r, match: col, op: 'merge' });
     }
     pathBuilder.backtracePath(lastMergeIndex - 1, col - 1, ops);
   }
 
   if(lastSplitIndex != -1) {
-    const ops: EditTuple<string, ExtendedEditOperation>[] = [];
+    const ops: EditTuple<ExtendedEditOperation>[] = [];
     for(let c = lastSplitIndex; c <= col; c++) {
-      ops.push({ input, match: calc.matchSequence[c], op: 'split' });
+      ops.push({ input: row, match: c, op: 'split' });
     }
     pathBuilder.backtracePath(row - 1, lastSplitIndex - 1, ops);
   }
