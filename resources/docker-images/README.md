@@ -107,3 +107,9 @@ Running tests locally with the `run.sh` looks like:
 resources/docker-images/run.sh :web --registry 'myregistry:5678' --username 'user' --password 'password' -- web/build.sh test
 ```
 
+## Running GitHub Actions locally
+
+There exist [GitHub actions for building the Docker images](../../.github/workflows/build-test-publish-docker.yml).
+Mainly for test resaons The workflow can be started locally.
+As a prerequisite [act](https://nektosact.com/) must be installed.
+There is [an example script](./act.sh) for running the workflow with act.
