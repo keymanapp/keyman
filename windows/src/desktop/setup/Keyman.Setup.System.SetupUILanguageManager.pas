@@ -6,22 +6,29 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.Generics.Defaults,
+  System.Math,
 
   Keyman.System.UILanguageManager,
   SetupStrings;
 
 type
+  TLanguageName = record
+    OrgLanguageName: string;     // original name (not necessarily latin based)
+    ExtendedLanguageName: string;// name being used for displaying
+    LanguageName4Sort: string;   // name being used for sorting
+  end;
   TSetupUILanguageManager = class(TUILanguageManager)
   public type
     TLocaleArray = array[TInstallInfoText] of string;
-    TSetupLocales = TDictionary<string,string>;
+    TSetupLocales = TDictionary<string,TLanguageName>;
   private class var
     FStrings: TDictionary<string, TLocaleArray>;
     FActiveLocale: string;
     FLocales: TSetupLocales;
     FIndexMapping: TDictionary<Integer,Integer>;
     FHasChanged: Boolean;
-    FSortedValues: TList< TPair<string,string>>;
+    FSortedValues: TList< TPair<string,TLanguageName>>;
+    FSortedDisplayValues: TList< TPair<string,string>>;
   private
     class procedure CreateStatic;
     class procedure DestroyStatic;
@@ -32,7 +39,8 @@ type
     class function Get(id: TInstallInfoText): string;
     class function Locales: TSetupLocales; static;
     class function IndexMapping: TDictionary<Integer,Integer>; static;
-    class function SortedValues: TList< TPair<string,string>>; static;
+    class function SortedValues: TList< TPair<string,TLanguageName>>; static;
+    class function SortedDisplayValues: TList< TPair<string,string>>; static;
     class property ActiveLocale: string read FActiveLocale write FActiveLocale;
     class procedure RegisterSetupStrings(const tag: string; const locale: TLocaleArray);
     class procedure Reorder;
@@ -44,6 +52,28 @@ uses
   System.SysUtils,
   Winapi.Windows;
 
+  // checks a string for non latin based characters
+  // Only ranges [$0000,$007F] (Basic Latin) and
+  //  [$0080, $00FF] (Latin-1 Supplement) are considered as Latin Based
+  //  Latin Extended-A ([$0100,$017F]), Latin Extended-B ([$0180,$024F])
+  //  and Latin Extended Additional ([$1E00,$1EFF]) are not considered
+  // True: all characters are latin based
+  // False: otherwise
+  function isLatinBasedOnly(name: string): Boolean;
+  var
+    ch: Char;
+    code: Integer;
+  begin
+    Result := True;
+    for ch in name do
+    begin
+      code := Ord(ch);
+      Result := Result and (InRange(code, $0000, $007F) or // Basic Latin
+                              InRange(code, $0080, $00FF)  // Latin-1 Supplement
+                           );
+    end;
+  end;
+  
 class procedure TSetupUILanguageManager.CreateStatic;
 begin
   if not Assigned(FStrings) then
@@ -80,7 +110,7 @@ end;
   This list is regenerated in Reorder.
   @returns A list of sorted locale pairs (Key = xxxxx, Value = yyyyy)
 *)
-class function TSetupUILanguageManager.SortedValues: TList< TPair<string,string>>;
+class function TSetupUILanguageManager.SortedValues: TList< TPair<string,TLanguageName>>;
 begin
   if FHasChanged then
   begin
@@ -90,12 +120,29 @@ begin
   Result := FSortedValues;
 end;
 
+(*
+
+  Returns the list of key-value pairs where the keys have the same order as the list returned by SortedValues. For non-latin based languages the values are composed of the non-latin based named with the English name in parentheses.
+  This list is regenerated in Reorder.
+  @returns A list of sorted locale pairs (Key = xxxxx, Value = yyyyy)
+*)
+class function TSetupUILanguageManager.SortedDisplayValues: TList< TPair<string,string>>;
+begin
+  if FHasChanged then
+  begin
+    Reorder;
+    FHasChanged := False;
+  end;
+  Result := FSortedDisplayValues;
+end;
+
 class procedure TSetupUILanguageManager.DestroyStatic;
 begin
   FreeAndNil(FStrings);
   FreeAndNil(FLocales);
   FreeAndNil(FIndexMapping);
   FreeAndNil(FSortedValues);
+  FreeAndNil(FSortedDisplayValues);
 end;
 
 /// Sets the Setup UI language to the first matching user preferred UI language, if any found.
@@ -136,33 +183,46 @@ end;
 
 class procedure TSetupUILanguageManager.RegisterSetupStrings(const tag: string;
   const locale: TLocaleArray);
+var
+  languageTriple : TLanguageName;
 begin
   CreateStatic;
   if FActiveLocale = '' then
     FActiveLocale := tag;
   FStrings.Add(tag, locale);
-  FLocales.Add(tag, locale[ssLanguageName]);
+  languageTriple.OrgLanguageName := locale[ssLanguageName];
+  if isLatinBasedOnly(locale[ssLanguageName]) then
+  begin
+    languageTriple.ExtendedLanguageName := locale[ssLanguageName];
+    languageTriple.LanguageName4Sort := locale[ssLanguageName];
+  end
+  else
+  begin
+    languageTriple.ExtendedLanguageName := locale[ssLanguageName] + ' (' + locale[ssLanguageNameInEnglish] + ')' ;
+    languageTriple.LanguageName4Sort := locale[ssLanguageNameInEnglish];
+  end;
+  FLocales.Add(tag, languageTriple);
   FHasChanged := True;
 end;
 
 class procedure TSetupUILanguageManager.Reorder;
 var
-  item: TPair<string,string>;
+  item: TPair<string,TLanguageName>;
   i: integer;
   j: integer;
-  sortedPairA: TList< TPair<string,string>>;
+  sortedPairA: TList< TPair<string,TLanguageName>>;
 begin
-  sortedPairA := TList< TPair<string,string>>.Create();
+  sortedPairA := TList< TPair<string,TLanguageName>>.Create();
   for item in FLocales do
   begin
     sortedPairA.Add(item);
   end;
   sortedPairA.Sort(
-    TComparer<TPair<string, string>>.Construct(
-      function(const Left, Right: TPair<string, string>): Integer
+    TComparer<TPair<string, TLanguageName>>.Construct(
+      function(const Left, Right: TPair<string, TLanguageName>): Integer
       begin
         // Sort by the Key value
-        Result := CompareText(Left.Value, Right.Value);
+        Result := CompareText(Left.Value.LanguageName4Sort, Right.Value.LanguageName4Sort);
       end
     )
                   );
