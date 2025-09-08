@@ -173,7 +173,7 @@ describe("PredictionContext", () => {
     assert.deepEqual(suggestions.splice(1), expected);
   });
 
-  it('sendUpdateState retrieves the most recent suggestion set', async function() {
+  it('retrieves the most recent suggestion set when sendUpdateState is called', async function() {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -197,7 +197,7 @@ describe("PredictionContext", () => {
     assert.sameOrderedMembers(suggestions, initialSuggestions);
   });
 
-  it('suggestion application logic & triggered effects', async function () {
+  it('properly applies manually-selected suggestions & related effects', async function () {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -247,7 +247,7 @@ describe("PredictionContext", () => {
     assert.notEqual(textState.getText(), previousTextState.getText());
     assert.equal(textState.getText(), 'apply ');
 
-    let reversion = await promiseForApplyReversion;
+    const reversion = await promiseForApplyReversion.reversion;
     await postApplySuggestions;
 
     // Check 2:  a second 'update' - post-application predictions!
@@ -259,6 +259,9 @@ describe("PredictionContext", () => {
 
     // Check 4+:  for the returned reversion object.
     assert.isOk(reversion);
+    // The reversion object should be visible here, as needed for auto-correct.
+    // In upcoming sibling PR - moves to `.immediateReversion`
+    assert.equal(predictiveContext.revertSuggestion, reversion);
 
     // All other reversion details are tested in the 'reversion application logic...' section defined below.
   });
