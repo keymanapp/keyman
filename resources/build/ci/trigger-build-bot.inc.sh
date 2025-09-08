@@ -41,7 +41,7 @@ function test_bot_check_pr_body() {
 
 #
 # Check the Keyman-Api-Check command whether or not to run API checks.
-# Any value other than 'ignore' or no Keyman-Api-Check command will run
+# Any value other than 'skip' or no Keyman-Api-Check command will run
 # the API checks.
 #
 # Parameters:
@@ -56,7 +56,7 @@ function is_skip_keyman_api_check() {
   set -o noglob
   IFS=$'\n'
   prbody="$(echo "${prinfo}" | "${JQ}" -r '.body')"
-  prApiCheck="$(echo "${prbody}" | grep 'Keyman-Api-Check:' | cut -d: -f 2 - | tr -d '[:space:]')"
+  prApiCheck="$(echo -e "${prbody}" | grep '^Keyman-Api-Check:' | cut -d: -f 2 - | tr -d '[:space:]')"
   unset IFS
   set +o noglob
 

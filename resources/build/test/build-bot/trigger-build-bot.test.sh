@@ -224,6 +224,10 @@ test_is_skip_keyman_api_check() {
   assert-equal "${result}" "false" "PR #2: omitted 'Keyman-Api-Check' should return false"
   result=$(is_skip_keyman_api_check 3 '{ "body": "Keyman-Api-Check: invalid" }')
   assert-equal "${result}" "false" "PR #3: invalid data for 'Keyman-Api-Check' should return false"
+  result=$(is_skip_keyman_api_check 4 '{ "body": "Some message\nKeyman-Api-Check: skip" }')
+  assert-equal "${result}" "true" "PR #4: 'Keyman-Api-Check: skip' at start of line should return true"
+  result=$(is_skip_keyman_api_check 5 '{ "body": "Here Keyman-Api-Check: skip\nis in the middle of the line" }')
+  assert-equal "${result}" "false" "PR #5: 'Keyman-Api-Check: skip' in the middle of the line should return false"
   builder_echo end test_is_skip_keyman_api_check success 'SUCCESS: test_is_skip_keyman_api_check'
 }
 
