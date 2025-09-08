@@ -216,6 +216,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     if(!this.swallowPrediction || source == 'context') {
       this._recentAcceptCause = null;
       this.recentRevert = false;
+      this._immediateReversion = null;
 
       if(source == 'context') {
         this.swallowPrediction = false;
@@ -258,7 +259,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // and prevent it from being hidden after reversion operations.
     this._keepSuggestion = null;
     this._revertSuggestion = null;
-    this._immediateReversion = null;
     for (const s of suggestions) {
       if(s.tag == 'keep') {
         this._keepSuggestion = s as Keep;
@@ -282,6 +282,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     if(!this.swallowPrediction) {
       this._recentAcceptCause = null;
       this.recentRevert = false;
+      this._immediateReversion = null;
     } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
       this.swallowPrediction = false;
     }
