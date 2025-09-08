@@ -12,6 +12,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/build/ci/trigger-definitions.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/ci/trigger-builds.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/ci/trigger-build-bot.inc.sh"
@@ -29,15 +30,15 @@ if ! builder_has_option --branch; then
   builder_die "--branch parameter is required"
 fi
 
-if [[ ! "$PRNUM" =~ ^([0-9]+|master|beta|stable-[0-9]+\.[0-9]+)$ ]]; then
-  builder_die "Invalid parameter --branch '$PRNUM'; expected 'master', 'beta', 'stable-x.y', or PR number"
+if [[ ! "${PRNUM}" =~ ^([0-9]+|master|beta|stable-[0-9]+\.[0-9]+)$ ]]; then
+  builder_die "Invalid parameter --branch '${PRNUM}'; expected 'master', 'beta', 'stable-x.y', or PR number"
 fi
 
 #
 # Debug logging
 #
 function debug_echo() {
-  if [ ! -z ${DEBUG:-} ]; then
+  if [[ ! -z ${DEBUG:-} ]]; then
     echo "DEBUG: $1"
   fi
   true
@@ -59,44 +60,45 @@ function triggerTestBuilds() {
 
   # Cancel any already running builds for this branch
   if builder_has_option --dry-run; then
-    builder_echo "DRY RUN: cancel current builds for $branch"
+    builder_echo "DRY RUN: cancel current builds for ${branch}"
   else
-    node "$KEYMAN_ROOT/resources/build/ci/cancel-builds/cancel-test-builds.mjs" "$branch" "$TEAMCITY_TOKEN"
+    node "${KEYMAN_ROOT}/resources/build/ci/cancel-builds/cancel-test-builds.mjs" "${branch}" "${TEAMCITY_TOKEN}"
   fi
 
   for platform in "${!platforms[@]}"; do
-    local platformBuildLevel=${platforms[$platform]}
-    if [[ $platformBuildLevel == skip ]]; then
-      builder_echo heading "$platform: skipping build"
+    local platformBuildLevel=${platforms[${platform}]}
+    if [[ ${platformBuildLevel} == skip ]]; then
+      builder_echo heading "${platform}: skipping build"
       continue
     fi
 
-    builder_echo heading "$platform: checking for git changes"
-    eval test_builds='(${'bc_test_$platform'[@]})'
+    builder_echo heading "${platform}: checking for git changes"
+    eval test_builds='(${'bc_test_${platform}'[@]})'
+    # shellcheck disable=SC2154
     for test_build in "${test_builds[@]}"; do
-      if [[ $test_build == "" ]]; then continue; fi
+      if [[ ${test_build} == "" ]]; then continue; fi
       found_build=true
-      if [ "${test_build:(-7)}" == "_GitHub" ]; then
+      if [[ "${test_build:(-7)}" == "_GitHub" ]]; then
         local job=${test_build%_GitHub}
 
         if builder_has_option --dry-run; then
-          builder_echo "DRY RUN: Triggering GitHub action build $job/$branch, level = $platformBuildLevel"
+          builder_echo "DRY RUN: Triggering GitHub action build ${job}/${branch}, level = ${platformBuildLevel}"
         else
-          builder_echo "Triggering GitHub action build $job/$branch, level = $platformBuildLevel"
-          triggerGitHubActionsBuild true $platformBuildLevel "$job" "$branch"
+          builder_echo "Triggering GitHub action build ${job}/${branch}, level = ${platformBuildLevel}"
+          triggerGitHubActionsBuild true "${platformBuildLevel}" "${job}" "${branch}"
         fi
       else
         if builder_has_option --dry-run; then
-          builder_echo "DRY RUN: Triggering build configuration $test_build on teamcity for $branch, level = $platformBuildLevel"
+          builder_echo "DRY RUN: Triggering build configuration ${test_build} on teamcity for ${branch}, level = ${platformBuildLevel}"
         else
-          builder_echo "Triggering build configuration $test_build on teamcity for $branch, level = $platformBuildLevel"
-          triggerTeamCityBuild true $platformBuildLevel "$test_build" "$vcs_test" "$branch"
+          builder_echo "Triggering build configuration ${test_build} on teamcity for ${branch}, level = ${platformBuildLevel}"
+          triggerTeamCityBuild true "${platformBuildLevel}" "${test_build}" "${vcs_test}" "${branch}"
         fi
       fi
     done
   done
 
-  if [[ $found_build == false ]]; then
+  if [[ ${found_build} == false ]]; then
     postSkippedBuildsStatusResult
   fi
 }
@@ -111,7 +113,7 @@ function postSkippedBuildsStatusResult() {
     curl --silent --write-out '\n' \
       --request POST \
       --header "Accept: application/vnd.github+json" \
-      --header "Authorization: token $GITHUB_TOKEN" \
+      --header "Authorization: token ${GITHUB_TOKEN}" \
       --data '{"state":"success","description":"Skipping since no platform builds necessary","context":"Test Build (Keyman)"}' \
       "https://api.github.com/repos/keymanapp/keyman/statuses/${BUILD_VCS_NUMBER}"
   fi
@@ -122,10 +124,10 @@ function postSkippedBuildsStatusResult() {
 # branches as well as pull requests
 #
 
-if [[ ! "$PRNUM" =~ ^[[:digit:]]+$ ]]; then
+if [[ ! "${PRNUM}" =~ ^[[:digit:]]+$ ]]; then
   # branch name is 'master', 'beta', or 'stable-x.y'
-  builder_echo "Branch $PRNUM needs to pass tests on all platforms."
-  triggerTestBuilds main_branch_platform_build_levels $PRNUM
+  builder_echo "Branch ${PRNUM} needs to pass tests on all platforms."
+  triggerTestBuilds main_branch_platform_build_levels "${PRNUM}"
   exit 0
 fi
 
@@ -136,20 +138,20 @@ fi
 # targeted by the PR other than to ask GitHub, anyway.)
 #
 
-builder_echo grey "# Get information about pull request #$PRNUM from GitHub"
-prinfo=`curl -s -H "User-Agent: @keymanapp" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
-prbase=`echo ${prinfo} | "$JQ" -r '.base.ref'`
-prhead=`echo ${prinfo} | "$JQ" -r '.head.ref'`
-prbaserepo=`echo ${prinfo} | "$JQ" -r '.base.repo.html_url'`
-prheadrepo=`echo ${prinfo} | "$JQ" -r '.head.repo.html_url'`
+builder_echo grey "# Get information about pull request #${PRNUM} from GitHub"
+prinfo=$(curl -s -H "User-Agent: @keymanapp" -H "Authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/keymanapp/keyman/pulls/${PRNUM}")
+prbase=$(echo "${prinfo}" | "${JQ}" -r '.base.ref')
+prhead=$(echo "${prinfo}" | "${JQ}" -r '.head.ref')
+prbaserepo=$(echo "${prinfo}" | "${JQ}" -r '.base.repo.html_url')
+prheadrepo=$(echo "${prinfo}" | "${JQ}" -r '.head.repo.html_url')
 
-debug_echo "PRNUM: $PRNUM"
-debug_echo "BASE: $prbase ($prbaserepo)"
-debug_echo "HEAD: $prhead ($prheadrepo)"
+debug_echo "PRNUM: ${PRNUM}"
+debug_echo "BASE: ${prbase} (${prbaserepo})"
+debug_echo "HEAD: ${prhead} (${prheadrepo})"
 
 prremote=origin
-if [ "$prbaserepo" != "https://github.com/keymanapp/keyman" ]; then
-  echo "Unknown base repository $prbaserepo."
+if [[ "${prbaserepo}" != "https://github.com/keymanapp/keyman" ]]; then
+  echo "Unknown base repository ${prbaserepo}."
   exit 1
 fi
 
@@ -160,7 +162,7 @@ fi
 
 # (Ensure we are within the repository before running git calls)
 builder_echo grey "# Ensure our local branch is up to date"
-pushd "$KEYMAN_ROOT" > /dev/null
+pushd "${KEYMAN_ROOT}" > /dev/null
 git fetch origin > /dev/null
 
 #
@@ -169,10 +171,10 @@ git fetch origin > /dev/null
 # on untrusted forks.
 #
 
-if [ "$prheadrepo" != "https://github.com/keymanapp/keyman" ]; then
+if [[ "${prheadrepo}" != "https://github.com/keymanapp/keyman" ]]; then
   prremote=external-rrtb
-  git remote add "$prremote" "$prheadrepo"
-  git fetch "$prremote" > /dev/null
+  git remote add "${prremote}" "${prheadrepo}"
+  git fetch "${prremote}" > /dev/null
 fi
 
 #
@@ -181,18 +183,18 @@ fi
 #
 
 builder_echo grey "# Get list of changed files in the pull request"
-prfiles=`git diff --name-only "origin/$prbase"..."$prremote/$prhead" || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
-if [ "$prfiles" == "abort" ]; then
+prfiles=$(git diff --name-only "origin/${prbase}...${prremote}/${prhead}" || ( if [[ $? == 128 ]]; then echo abort; else exit $?; fi ))
+if [[ "${prfiles}" == "abort" ]]; then
   # Don't trigger any builds, exit with success
-  if [ "$prremote" != "origin" ]; then
-    git remote remove "$prremote"
+  if [[ "${prremote}" != "origin" ]]; then
+    git remote remove "${prremote}"
   fi
-  echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
+  echo "Remote branch origin/${prhead} has gone away; probably an automatic pull request. Skipping build."
   exit 0
 fi
 
-if [ "$prremote" != "origin" ]; then
-  git remote remove "$prremote"
+if [[ "${prremote}" != "origin" ]]; then
+  git remote remove "${prremote}"
 fi
 
 debug_echo "Files found: ${prfiles[*]}"
@@ -212,9 +214,9 @@ function find_platform_changes() {
   while IFS= read -r line; do
     # for each platform
     for platform in "${available_platforms[@]}"; do
-      if [[ ! " ${!build_platforms[@]} " =~ " $platform " ]]; then
+      if [[ ! " ${!build_platforms[*]} " =~ " ${platform} " ]]; then
         # Which platform are we watching?
-        eval watch='$'watch_$platform
+        eval watch="'$'watch_${platform}"
 
         # Add common patterns to the watch list
         watch="^(${platform}|(oem/[^/]+/${platform})|resources/((?!teamcity)|teamcity/(${platform}|includes))|${watch})"
@@ -222,13 +224,13 @@ function find_platform_changes() {
         # (grep has a --perl-regexp option, but not the version on macOS)
         if perl -e 'exit($ARGV[0] =~ /$ARGV[1]/ ? 0 : 1)' "${line}" "${watch}"; then
           # By default, we'll build a 'release' test build for touched platforms
-          build_platforms[$platform]=$build_level_release
+          build_platforms[${platform}]=${build_level_release}
         fi
       fi
     done
-  done <<< "$prfiles"
+  done <<< "${prfiles}"
 
-  builder_echo blue "Default build platforms: ${!build_platforms[@]}"
+  builder_echo blue "Default build platforms: ${!build_platforms[*]}"
 }
 
 find_platform_changes
@@ -238,7 +240,7 @@ find_platform_changes
 # This will modify the build_platforms array
 #
 
-if [ "$prremote" == "origin" ]; then
+if [[ "${prremote}" == "origin" ]]; then
   # We only accept Build-bot commands on trusted local origin PRs
   cd "${KEYMAN_ROOT}/resources/build/ci/github"
   npm ci
@@ -249,9 +251,9 @@ if [ "$prremote" == "origin" ]; then
     NODE_WRAPPER=node
   fi
   # Note: we may move all of this into javascript at some point!
-  prcommits=$(${NODE_WRAPPER} api-pull-commits.mjs $GITHUB_TOKEN $PRNUM)
-  test_bot_check_pr_body "$PRNUM" "$prinfo"
-  build_bot_check_messages $PRNUM "$prinfo" "$prcommits"
+  prcommits=$(${NODE_WRAPPER} api-pull-commits.mjs "${GITHUB_TOKEN}" "${PRNUM}")
+  test_bot_check_pr_body "${PRNUM}" "${prinfo}"
+  build_bot_check_messages "${PRNUM}" "${prinfo}" "${prcommits}"
 fi
 
 #
@@ -260,7 +262,7 @@ fi
 
 if [[ ! -z "${build_platforms[*]:-}" ]] && (( ${#build_platforms[@]} > 0)); then
   builder_echo heading "Start test builds"
-  triggerTestBuilds build_platforms $PRNUM
+  triggerTestBuilds build_platforms "${PRNUM}"
 else
   builder_echo heading "No builds to start"
   postSkippedBuildsStatusResult
