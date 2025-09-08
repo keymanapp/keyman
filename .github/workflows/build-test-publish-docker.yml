@@ -8,7 +8,7 @@ run-name: "Build, test, and publish Docker images (branch ${{ github.ref_name }}
 on:
   schedule:
     #run every Fri, 3 pm UTC
-    - cron: '0 15 * * 5' #
+    - cron: '0 15 * * 5'
 
   repository_dispatch:
     types: ['build-test-publish-docker:*']
@@ -19,7 +19,6 @@ env:
   PASSWORD: "${{ github.token }}"
 
 jobs:
-
   message:
     runs-on: ubuntu-latest
     if: ${{ github.event.act }}
@@ -28,8 +27,7 @@ jobs:
       - name: Print message
         run: |
           echo "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
-
-   build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
