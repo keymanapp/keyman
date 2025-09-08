@@ -12,9 +12,12 @@ import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ContextState, ContextTransition, models } from '@keymanapp/lm-worker/test-index';
 
+import Distribution = LexicalModelTypes.Distribution;
+import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
@@ -138,20 +141,43 @@ describe('ContextTransition', () => {
       }];
 
       const appliedTransition = transition.applySuggestion(suggestions[0]);
-      assert.notEqual(appliedTransition, transition);
-      assert.sameOrderedMembers(appliedTransition.final.tokenization.exampleInput, [
+      assert.notEqual(appliedTransition.base, transition);
+      assert.isOk(appliedTransition.appended);
+      assert.notEqual(appliedTransition.appended, transition);
+      assert.sameOrderedMembers(appliedTransition.base.final.tokenization.exampleInput, [
+        'hello', ' ', 'world'
+      ]);
+      assert.sameOrderedMembers(appliedTransition.appended.final.tokenization.exampleInput, [
         'hello', ' ', 'world', ' ', ''
       ]);
-      assert.equal(appliedTransition.final.appliedSuggestionId, suggestions[0].id);
-      appliedTransition.final.tokenization.tokens.forEach((token, index) => {
+      assert.equal(appliedTransition.base.final.appliedSuggestionId, suggestions[0].id);
+      assert.equal(appliedTransition.appended.final.appliedSuggestionId, suggestions[0].id);
+
+      // 3 long, only last token was edited.
+      appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
         if(index >= 2) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {
           assert.isUndefined(token.appliedTransitionId);
         }
       });
-      assert.deepEqual(appliedTransition.final.suggestions, transition.final.suggestions);
-      assert.deepEqual(appliedTransition.final.inputTransforms, transition.final.inputTransforms);
+
+      appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
+        if(index >= 2) {
+          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+        } else {
+          assert.isUndefined(token.appliedTransitionId);
+        }
+      });
+      assert.deepEqual(appliedTransition.base.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.appended.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.base.final.inputTransforms, transition.final.inputTransforms);
+      assert.deepEqual(appliedTransition.base.inputDistribution, transition.inputDistribution);
+
+      const emptyTransformMap = new Map<number, Distribution<Transform>>();
+      emptyTransformMap.set(2, [{sample: {insert: '', deleteLeft: 0, id: 2}, p: 1}])
+      assert.deepEqual(appliedTransition.appended.final.appliedInput, {insert: '', deleteLeft: 0});
+      assert.isEmpty(appliedTransition.appended.inputDistribution);
     });
 
      it('properly handles cases with suggestion-preserved text', () => {
@@ -199,20 +225,43 @@ describe('ContextTransition', () => {
       }];
 
       const appliedTransition = transition.applySuggestion(suggestions[0]);
-      assert.notEqual(appliedTransition, transition);
-      assert.sameOrderedMembers(appliedTransition.final.tokenization.exampleInput, [
+      assert.notEqual(appliedTransition.base, transition);
+      assert.isOk(appliedTransition.appended);
+      assert.notEqual(appliedTransition.appended, transition);
+      assert.sameOrderedMembers(appliedTransition.base.final.tokenization.exampleInput, [
+        'hello', ' ', 'world', '  ', 'the'
+      ]);
+      assert.sameOrderedMembers(appliedTransition.appended.final.tokenization.exampleInput, [
         'hello', ' ', 'world', '  ', 'the', ' ', ''
       ]);
-      assert.equal(appliedTransition.final.appliedSuggestionId, suggestions[0].id);
-      appliedTransition.final.tokenization.tokens.forEach((token, index) => {
+      assert.equal(appliedTransition.base.final.appliedSuggestionId, suggestions[0].id);
+      assert.equal(appliedTransition.appended.final.appliedSuggestionId, suggestions[0].id);
+
+      // 3 long, only last token was edited.
+      appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
         if(index >= 3) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {
           assert.isUndefined(token.appliedTransitionId);
         }
       });
-      assert.deepEqual(appliedTransition.final.suggestions, transition.final.suggestions);
-      assert.deepEqual(appliedTransition.final.inputTransforms, transition.final.inputTransforms);
+
+      appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
+        if(index >= 3) {
+          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+        } else {
+          assert.isUndefined(token.appliedTransitionId);
+        }
+      });
+      assert.deepEqual(appliedTransition.base.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.appended.final.suggestions, transition.final.suggestions);
+      assert.deepEqual(appliedTransition.base.final.inputTransforms, transition.final.inputTransforms);
+      assert.deepEqual(appliedTransition.base.inputDistribution, transition.inputDistribution);
+
+      const emptyTransformMap = new Map<number, Distribution<Transform>>();
+      emptyTransformMap.set(2, [{sample: {insert: '', deleteLeft: 0, id: 2}, p: 1}])
+      assert.deepEqual(appliedTransition.appended.final.appliedInput, {insert: '', deleteLeft: 0});
+      assert.isEmpty(appliedTransition.appended.inputDistribution);
     });
   });
 
@@ -310,10 +359,10 @@ describe('ContextTransition', () => {
         displayAs: 'won'
       }];
 
-      const appliedTransition = transition.applySuggestion(suggestions[0]);
+      const appliedTransitions = transition.applySuggestion(suggestions[0]);
       // To the point above, this matches the 'applySuggestion' test case.
 
-      const restoredTransition = appliedTransition.reproduceOriginal();
+      const restoredTransition = appliedTransitions.base.reproduceOriginal();
       assertClonedTransitionMatch(restoredTransition, transition);
     });
   });

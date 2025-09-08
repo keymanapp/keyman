@@ -210,66 +210,76 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return null;
-    } else {
-      this.recentTranscriptions.rewindTo(suggestion.transformId);
-      // Apply the Suggestion!
-
-      // Step 1:  determine the final output text
-      const final = Mock.from(original.preInput, false);
-      final.apply(suggestion.transform);
-      if(suggestion.appendedTransform) {
-        final.apply(suggestion.appendedTransform);
-      }
-
-      // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
-      // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
-      // values as needed for use with their IME interfaces.
-      const transform = final.buildTransformFrom(outputTarget);
-      outputTarget.apply(transform);
-
-      // Tell the banner that a suggestion was applied, so it can call the
-      // keyboard's PostKeystroke entry point as needed
-      this.emit('suggestionapplied', outputTarget);
-
-      // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
-      // replacing the suggestion transform with the original input text.
-      const preApply = Mock.from(original.preInput, false);
-      preApply.apply(original.transform);
-
-      // Builds the reversion option according to the loaded lexical model's known
-      // syntactic properties.
-      const suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
-
-      // We must accept the Suggestion from its original context, which was before
-      // `original.transform` was applied.
-      let reversionPromise: Promise<Reversion> = this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform);
-
-      // Also, request new prediction set based on the resulting context.
-      reversionPromise = reversionPromise.then((reversion) => {
-        const mappedReversion: Reversion = {
-          // By mapping back to the original Transcription that generated the Suggestion,
-          // the input will be automatically rewound to the preInput state.
-          transform: original.transform,
-          // The ID part is critical; the reversion can't be applied without it.
-          transformId: -original.token, // reversions use the additive inverse.
-          displayAs: reversion.displayAs,  // The real reason we needed to call the LMLayer.
-          id: reversion.id,
-          tag: reversion.tag
-        }
-        // // If using the version from lm-layer:
-        // let mappedReversion = reversion;
-        // mappedReversion.transformId = reversionTranscription.token;
-        this.predictFromTarget(outputTarget, getLayerId());
-        return mappedReversion;
-      });
-
-      return reversionPromise;
     }
+
+    this.recentTranscriptions.rewindTo(suggestion.transformId);
+
+    // Apply the Suggestion!
+
+    // Step 1:  determine the final output text
+    const intermediate = Mock.from(original.preInput, false);
+    intermediate.apply(suggestion.transform);
+    let final = intermediate;
+    if(suggestion.appendedTransform) {
+      final = Mock.from(intermediate);
+      final.apply(suggestion.appendedTransform);
+
+      // Somewhere here, save-state the intermediate state!
+      const appendedTranscription = final.buildTranscriptionFrom(intermediate, null, false);
+      this.recordTranscription(appendedTranscription);
+      // We set the appended transform with its own ID before passing it off to the predictive-text worker.
+      suggestion.appendedTransform.id = appendedTranscription.token;
+    }
+
+    // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
+    // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
+    // values as needed for use with their IME interfaces.
+    const transform = final.buildTransformFrom(outputTarget);
+    outputTarget.apply(transform);
+
+    // Tell the banner that a suggestion was applied, so it can call the
+    // keyboard's PostKeystroke entry point as needed
+    this.emit('suggestionapplied', outputTarget);
+
+    // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
+    // replacing the suggestion transform with the original input text.
+    const preApply = Mock.from(original.preInput, false);
+    preApply.apply(original.transform);
+
+    // Builds the reversion option according to the loaded lexical model's known
+    // syntactic properties.
+    const suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
+
+    // We must accept the Suggestion from its original context, which was before
+    // `original.transform` was applied.
+    let reversionPromise: Promise<Reversion> = this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform);
+
+    // Also, request new prediction set based on the resulting context.
+    reversionPromise = reversionPromise.then((reversion) => {
+      const mappedReversion: Reversion = {
+        // By mapping back to the original Transcription that generated the Suggestion,
+        // the input will be automatically rewound to the preInput state.
+        transform: original.transform,
+        // The ID part is critical; the reversion can't be applied without it.
+        transformId: -original.token, // reversions use the additive inverse.
+        displayAs: reversion.displayAs,  // The real reason we needed to call the LMLayer.
+        id: reversion.id,
+        tag: reversion.tag,
+        appendedTransform: reversion.appendedTransform
+      }
+      // // If using the version from lm-layer:
+      // let mappedReversion = reversion;
+      // mappedReversion.transformId = reversionTranscription.token;
+      this.predictFromTarget(outputTarget, getLayerId());
+      return mappedReversion;
+    });
+
+    return reversionPromise;
   }
 
-  public applyReversion(reversion: Reversion, outputTarget: OutputTarget) {
+  public applyReversion(reversion: Reversion, outputTarget: OutputTarget, appendedOnly?: boolean) {
     if(!outputTarget) {
-      throw "Accepting suggestions requires a destination OutputTarget instance."
+      throw new Error("Accepting suggestions requires a destination OutputTarget instance.");
     }
 
     if(!this.isActive) {
@@ -282,22 +292,22 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     //
     // Reversions use the additive inverse of the id token of the Transcription being
     // reverted to.
-    const original = this.getPredictionState(-reversion.transformId);
+    const reversionId = appendedOnly ? reversion.appendedTransform.id : -reversion.transformId;
+    const original = this.getPredictionState(reversionId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return Promise.resolve([] as Suggestion[]);
     }
 
-    this.recentTranscriptions.rewindTo(-reversion.transformId);
+    this.recentTranscriptions.rewindTo(reversionId);
 
     // Apply the Reversion!
 
     // Step 1:  determine the final output text
     const final = Mock.from(original.preInput, false);
-    final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
-    if(reversion.appendedTransform) {
-      final.apply(reversion.appendedTransform);
-    }
+    if(!appendedOnly) {
+      final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
+    } // else: the retrieved transcription matches the applied Suggestion's root, without the appended part.
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
     // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
@@ -308,7 +318,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
     const promise = this.currentPromise = this.lmEngine.revertSuggestion(
       reversion,
-      new ContextWindow(final, this.configuration, null)
+      new ContextWindow(final, this.configuration, null),
+      appendedOnly
     );
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
@@ -455,7 +466,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public get wordbreaksAfterSuggestions() {
-    return this.configuration.wordbreaksAfterSuggestions;
+    return this.configuration?.appendsWordbreaks;
   }
 
   public tryAcceptSuggestion(source: string): boolean {

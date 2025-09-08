@@ -70,7 +70,7 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
 
   applyReversion(reversion: LexicalModelTypes.Reversion, outputTarget: OutputTarget): Promise<LexicalModelTypes.Suggestion[]>;
 
-  get wordbreaksAfterSuggestions(): boolean;
+  get wordbreaksAfterSuggestions(): LexicalModelTypes.Configuration['appendsWordbreaks'];
 
   get mayAutoCorrect(): boolean;
 }

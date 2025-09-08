@@ -849,6 +849,7 @@ describe('ModelCompositor', function() {
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
       let baseSuggestion = initialSuggestions[1];
+      baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
@@ -890,17 +891,21 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 0);
 
       let baseSuggestion = initialSuggestions[1];
+      baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 1);
+      // Two rewind states:  one for the suggestion's base word text, one for
+      // appended post-suggestion whitespace.
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
+      let contextIds = compositor.contextTracker.unitTestEndPoints.cache().keys();
 
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
-      const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().get(13);
+      const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().get(15);
 
       // Accepting the suggestion rewrites the latest context transition.
-      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 1);
-      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [baseSuggestion.transformId]);
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
+      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [...contextIds]);
 
       // The replacement should be marked on the context-tracking token for the applied version of the results.
       assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);

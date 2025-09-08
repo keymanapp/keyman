@@ -23,11 +23,24 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private initNewContext: boolean = true;
 
   private _currentSuggestions: Suggestion[] = [];
-  private keepSuggestion: Keep;
-  private revertSuggestion: Reversion;
+  private _keepSuggestion: Keep;
+
+  public get keepSuggestion(): Keep {
+    return this._keepSuggestion;
+  }
+
+  private _revertSuggestion: Reversion;
+
+  public get revertSuggestion(): Reversion {
+    return this._revertSuggestion;
+  }
 
   // Set to null/undefined if there was no recent acceptance.
-  private recentAcceptCause: 'key' | 'banner';
+  private _recentAcceptCause: 'key' | 'banner';
+
+  public get recentAcceptCause(): 'key' | 'banner' {
+    return this._recentAcceptCause;
+  }
   private revertAcceptancePromise: Promise<Reversion>;
 
   private swallowPrediction: boolean = false;
@@ -161,8 +174,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * @returns if `suggestion` is a `Suggestion`, will return a `Promise<Reversion>`; else, `null`.
    */
   public accept(suggestion: Suggestion): Promise<Reversion> | Promise<null> {
-    const _this = this;
-
     // Selecting a suggestion or a reversion should both clear selection
     // and clear the reversion-displaying state of the banner.
     this.selected = null;
@@ -173,23 +184,23 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       // We get here either if suggestion acceptance fails or if it was a reversion.
       if(suggestion && suggestion.tag == 'revert') {
         // Reversion state management
-        this.recentAcceptCause = null;
+        this._recentAcceptCause = null;
         this.recentRevert = true;
       }
 
       return Promise.resolve(null);
     }
 
-    this.revertAcceptancePromise.then(function(suggestion) {
+    this.revertAcceptancePromise.then((suggestion) => {
       // Always null-check!
       if(suggestion) {
-        _this.revertSuggestion = suggestion;
+        this._revertSuggestion = suggestion;
       }
     });
 
     // By default, we assume we were triggered by the banner.
     // Acceptance by keystroke will overwrite this later (in `tryAccept`)
-    this.recentAcceptCause = 'banner';
+    this._recentAcceptCause = 'banner';
     this.recentRevert = false;
 
     this.swallowPrediction = true;
@@ -219,9 +230,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
       // doTryAccept is the path for keystroke-based auto-acceptance.
       // Overwrite the cause to reflect this.
-      this.recentAcceptCause = 'key';
+      this._recentAcceptCause = 'key';
     } else if(recentAcceptCause && source == 'space') {
-      this.recentAcceptCause = null;
+      this._recentAcceptCause = null;
       if(recentAcceptCause == 'key') {
         // No need to swallow the keystroke's whitespace; we triggered the prior acceptance
         // FROM a space, so we've already aliased the suggestion's built-in space.
@@ -251,7 +262,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     if(this.doRevert) {
       // If so, clear the 'revert' option and start doing normal predictions again.
       this.doRevert = false;
-      this.recentAcceptCause = null;
+      this._recentAcceptCause = null;
       // Otherwise, did we just accept something before the revert signal was received?
     } else if(this.recentAcceptCause) {
       this.showRevert();
@@ -274,7 +285,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.selected = null;
 
     if(!this.swallowPrediction || source == 'context') {
-      this.recentAcceptCause = null;
+      this._recentAcceptCause = null;
       this.doRevert = false;
       this.recentRevert = false;
 
@@ -318,10 +329,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
     // and prevent it from being hidden after reversion operations.
-    this.keepSuggestion = null;
+    this._keepSuggestion = null;
     for (const s of suggestions) {
       if(s.tag == 'keep') {
-        this.keepSuggestion = s as Keep;
+        this._keepSuggestion = s as Keep;
       }
 
       if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
@@ -335,7 +346,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
     if(!this.swallowPrediction) {
-      this.recentAcceptCause = null;
+      this._recentAcceptCause = null;
       this.doRevert = false;
       this.recentRevert = false;
     } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
