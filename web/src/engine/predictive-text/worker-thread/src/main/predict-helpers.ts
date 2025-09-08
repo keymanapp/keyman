@@ -24,6 +24,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
+import { ContextTransition } from './test-index.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -279,11 +280,43 @@ export async function correctAndEnumerate(
   }
 
   // Corrections and predictions are based upon the post-context state, though.
-  let transition = contextState.analyzeTransition(context, transformDistribution);
-  if(!transition) {
-    console.warn("Unexpected failure when computing context-state transition");
-    // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
-    transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
+  let transition = contextTracker.latest;
+  const inputIsEmpty = TransformUtils.isEmpty(inputTransform) && transformDistribution.length == 1;
+
+  // Don't replace any applied-suggestion data if we have a request to trigger with
+  // the current context state.
+  if(inputIsEmpty) {
+    // Directly build a simple empty transition that duplicates the last seen state.
+    const priorState = contextTracker.latest.final;
+    transition = new ContextTransition(priorState, inputTransform.id);
+    transition.finalize(priorState, transformDistribution);
+  } else if(
+    // If the input matches something we've already seen (say, a ' ' or '.'
+    // that auto-applied a suggestion).
+    transition.transitionId == inputTransform.id &&
+    transition.final.context.left == postContext.left
+  ) {
+    // Retrieve the already-performed transition and re-predict based
+    // on its values.
+    transition.inputDistribution = transformDistribution;
+    contextState = transition.final;
+
+    // Not yet done; we may want to consider saving the fat-finger distribution of
+    // incoming text for this case for correction-search - we didn't get it
+    // when applying a prior suggestion.
+
+    // Do NOT recurse; return none instead.
+    return {
+      rawPredictions: [],
+      postContextState: transition.final
+    };
+  } else {
+    transition = contextState.analyzeTransition(context, transformDistribution);
+    if(!transition) {
+      console.warn("Unexpected failure when computing context-state transition");
+      // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
+      transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
+    }
   }
   contextTracker.latest = transition;
   const postContextState = transition.final;

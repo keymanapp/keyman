@@ -1,6 +1,7 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
 import { OutputTarget } from "keyman/engine/keyboard";
+import { type RuleBehavior } from "keyman/engine/js-processor";
 
 export class ReadySuggestions {
   suggestions: LexicalModelTypes.Suggestion[];
@@ -30,16 +31,11 @@ export type StateChangeEnum = 'active' | 'configured' | 'inactive';
  */
 export type StateChangeHandler = (state: StateChangeEnum) => any;
 
-/**
- * Covers 'tryaccept' events.
- */
-export type TryUIHandler = (source: string, returnObj: { shouldSwallow: boolean }) => boolean;
 
 export interface LanguageProcessorEventMap {
   'suggestionsready': ReadySuggestionsHandler,
   'invalidatesuggestions': InvalidateSuggestionsHandler,
   'statechange': StateChangeHandler,
-  'tryaccept': TryUIHandler,
   'tryrevert': () => void,
 
   /**
@@ -66,7 +62,15 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  applySuggestion(suggestion: LexicalModelTypes.Suggestion, outputTarget: OutputTarget, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
+  applySuggestion(
+    suggestion: LexicalModelTypes.Suggestion,
+    outputTarget: OutputTarget,
+    getLayerId: () => string,
+    ruleBehavior?: RuleBehavior
+  ): {
+    reversion: Promise<LexicalModelTypes.Reversion>,
+    appendedRuleBehavior?: RuleBehavior
+  };
 
   applyReversion(reversion: LexicalModelTypes.Reversion, outputTarget: OutputTarget): Promise<LexicalModelTypes.Suggestion[]>;
 

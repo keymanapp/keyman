@@ -667,7 +667,7 @@ export class SuggestionBanner extends Banner {
           // Invalidate the suggestions internally, but don't visually update;
           // this will avoid banner-flicker.
           this.currentSuggestions = [];
-          this.predictionContext.accept(suggestion.suggestion).then(() => {
+          this.predictionContext.accept(suggestion.suggestion).reversion.then(() => {
             // Reset the scroll state
             this.container.scrollLeft = this.isRTL ? this.container.scrollWidth : 0;
           });
