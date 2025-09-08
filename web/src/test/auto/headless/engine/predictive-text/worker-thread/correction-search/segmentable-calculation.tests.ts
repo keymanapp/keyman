@@ -100,4 +100,101 @@ describe('Split/merge aware edit-distance calculation', () => {
       { op: 'merge', input: 4, match: 4 }
     ]);
   });
+
+  it("abcde,f -> b,c,d,e,f = 2", () => {
+    let calc = new SegmentableDistanceCalculation();
+    calc.diagonalWidth = 4;
+
+    // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
+    // (The 'a' doesn't land.)
+    ['abcde', 'f'].forEach(c => calc = calc.addInputChar(c));
+    ['b', 'c', 'd', 'e', 'f'].forEach(c => calc = calc.addMatchChar(c));
+
+    assert.equal(calc.getFinalCost(), 2);
+
+    const editPaths = calc.editPath();
+    assert.equal(editPaths.length, 1);
+    assert.sameDeepOrderedMembers(editPaths[0], [
+      { op: 'split', input: 0, match: 0 },
+      { op: 'split', input: 0, match: 1 },
+      { op: 'split', input: 0, match: 2 },
+      { op: 'split', input: 0, match: 3 },
+      { op: 'match', input: 1, match: 4 }
+    ]);
+  });
+
+  it("a,b,c,d,e -> a, bcdef = 2", () => {
+    let calc = new SegmentableDistanceCalculation();
+    calc.diagonalWidth = 4;
+
+    // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
+    // (The 'a' doesn't land.)
+    ['a', 'b', 'c', 'd', 'e'].forEach(c => calc = calc.addInputChar(c));
+    ['a', 'bcdef'].forEach(c => calc = calc.addMatchChar(c));
+
+    assert.equal(calc.getFinalCost(), 2);
+
+    const editPaths = calc.editPath();
+    assert.equal(editPaths.length, 1);
+    assert.sameDeepOrderedMembers(editPaths[0], [
+      { op: 'match', input: 0, match: 0 },
+      { op: 'merge', input: 1, match: 1 },
+      { op: 'merge', input: 2, match: 1 },
+      { op: 'merge', input: 3, match: 1 },
+      { op: 'merge', input: 4, match: 1 }
+    ]);
+  });
+
+  it("abc,d,e,f,g -> b,c,d,e,fgh = 4", () => {
+    let calc = new SegmentableDistanceCalculation();
+    calc.diagonalWidth = 4;
+
+    // Partial merge = cost of 2:  1 for merging, 1 for being incomplete.
+    // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
+    ['abc', 'd', 'e', 'f', 'g'].forEach(c => calc = calc.addInputChar(c));
+    ['b', 'c', 'd', 'e', 'fgh'].forEach(c => calc = calc.addMatchChar(c));
+
+    assert.equal(calc.getFinalCost(), 4);
+
+    const editPaths = calc.editPath();
+    assert.isAbove(editPaths.length, 3);
+    assert.sameDeepOrderedMembers(editPaths[0], [
+      { op: 'split', input: 0, match: 0 },
+      { op: 'split', input: 0, match: 1 },
+      { op: 'match', input: 1, match: 2 },
+      { op: 'match', input: 2, match: 3 },
+      { op: 'merge', input: 3, match: 4 },
+      { op: 'merge', input: 4, match: 4 }
+    ]);
+  });
+
+  it("abcd,e,f,g -> b,c,d,efgh = 4", () => {
+    let calc = new SegmentableDistanceCalculation();
+    calc.diagonalWidth = 4;
+
+    // Partial merge = cost of 2:  1 for merging, 1 for being incomplete.
+    // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
+    ['abcd', 'e', 'f', 'g'].forEach(c => calc = calc.addInputChar(c));
+    ['b', 'c', 'd', 'efgh'].forEach(c => calc = calc.addMatchChar(c));
+
+    assert.equal(calc.getFinalCost(), 4);
+
+    const editPaths = calc.editPath();
+    assert.equal(editPaths.length, 2);
+    assert.sameDeepOrderedMembers(editPaths[0], [
+      { op: 'split', input: 0, match: 0 },
+      { op: 'split', input: 0, match: 1 },
+      { op: 'split', input: 0, match: 2 },
+      { op: 'merge', input: 1, match: 3 },
+      { op: 'merge', input: 2, match: 3 },
+      { op: 'merge', input: 3, match: 3 }
+    ]);
+
+    assert.sameDeepOrderedMembers(editPaths[1], [
+      { op: 'substitute', input: 0, match: 0 },
+      { op: 'substitute', input: 1, match: 1 },
+      { op: 'substitute', input: 2, match: 2 },
+      { op: 'substitute', input: 3, match: 3 }
+    ]);
+  });
 });
