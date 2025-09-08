@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.114 alpha 2025-09-08
+
+* docs(web): Improve empty What's New page for Web (#14660)
+* maint(linux): remove obsolete Makefile (#14694)
+* maint(resources): honor configure comment character in commit message (#14695)
+* fix(web): fix error trying to calculate style scaling effects (#14684)
+* refactor(resources): remove shellcheck warnings (#14698)
+
 ## 19.0.113 alpha 2025-09-04
 
 * fix(android): Update KMSample1 layout when changing orientation (#14678)
