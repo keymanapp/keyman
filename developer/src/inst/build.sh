@@ -78,7 +78,7 @@ function do_publish() {
   # Copy the installation archive
   #
 
-  copy_keyman_developer_to_artifacts
+  copy-keymandeveloper-installer-to-artifacts
 
   builder_if_release_build_level verify-installer-signatures
 }
