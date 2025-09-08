@@ -223,17 +223,17 @@ export class ModelCompositor {
    *
    * @param suggestion Suggestion selected, whether automatically or by the user.
    * @param context The context to which the suggestion should be applied.
-   * @param postTransform The original transform that is being replaced by the applied suggestion (!)
+   * @param originalInput The original transform that is being replaced by the applied suggestion (!)
    * @returns
    */
-  acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
+  acceptSuggestion(suggestion: Suggestion, context: Context, originalInput?: Transform): Reversion {
     // Step 1:  re-use the original input Transform as the reversion's Transform.
     // The Web engine will restore the original state of the context before accepting
     // and before reverting; all we need to do is put the original keystroke back in place.
-    let reversionTransform: Transform = postTransform;
+    let reversionTransform: Transform = originalInput ?? { insert: '', deleteLeft: 0 };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
-    const postContext = models.applyTransform(postTransform, context);
+    const postContext = originalInput ? models.applyTransform(originalInput, context) : context;
 
     let revertedPrefix: string;
     let postContextTokenization = this.tokenize(postContext);

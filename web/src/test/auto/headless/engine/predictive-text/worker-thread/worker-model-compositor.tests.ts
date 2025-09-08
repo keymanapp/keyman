@@ -663,7 +663,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
@@ -706,7 +706,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello world ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
@@ -742,7 +742,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello world ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
@@ -785,7 +785,8 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
+      assert.equal(revertedContext.left, "hi");
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
