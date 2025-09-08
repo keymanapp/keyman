@@ -84,7 +84,7 @@ if builder_start_action build; then
   echo "BUILD_FLAGS $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
-  mv "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk" "keyman-${KEYMAN_VERSION_FOR_PR_FILENAME}.apk"
+  mv "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk" "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION_FOR_PR_FILENAME}.apk"
 
   builder_finish_action success build
 fi
