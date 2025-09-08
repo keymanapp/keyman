@@ -159,6 +159,40 @@ describe('ModelCompositor', function() {
         };
 
         let suggestions = await compositor.predict(inputTransform, context);
+        // Lots of suggestions are rooted on 'the'.  We should have more than
+        // just a single 'keep' suggestion.
+        assert.isAbove(suggestions.length, 1);
+
+        // Verify the deleteLeft length - gotta make sure we get that right.
+        suggestions.forEach(function(suggestion) {
+          // Suggestions always delete the full root of the suggestion.
+          //
+          // After a backspace, that means the text 'the' - 3 chars.
+          // Char 4 is for the original backspace, as suggestions are built
+          // based on the context state BEFORE the triggering input -
+          // here, a backspace.
+          assert.equal(suggestion.transform.deleteLeft, 4);
+        });
+      });
+
+      it('properly handles complex transforms that change the root token', async function() {
+        let compositor = new ModelCompositor(plainModel, true);
+        let context = {
+          left: 'the ', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: 'r',
+          deleteLeft: 1
+        };
+
+        let suggestions = await compositor.predict(inputTransform, context);
+        // Lots of suggestions are rooted on 'the'.  We should have more than
+        // just a single 'keep' suggestion.
+        assert.isAbove(suggestions.length, 1);
+        assert.isOk(suggestions.find((s => s.displayAs.startsWith("ther"))));
+
+        // Verify the deleteLeft length - gotta make sure we get that right.
         suggestions.forEach(function(suggestion) {
           // Suggestions always delete the full root of the suggestion.
           //

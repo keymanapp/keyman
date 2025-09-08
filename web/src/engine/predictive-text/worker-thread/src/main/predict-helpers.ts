@@ -194,7 +194,6 @@ export async function correctAndEnumerate(
   const postContext = models.applyTransform(inputTransform, context);
   let rawPredictions: CorrectionPredictionTuple[] = [];
 
-  const inputIsBksp = TransformUtils.isBackspace(inputTransform);
   // If `this.contextTracker` does not exist, we don't have the
   // `LexiconTraversal` pattern available to us.  We're unable to efficiently
   // iterate through the lexicon as a result, so we use a far lazier pattern -
@@ -207,6 +206,7 @@ export async function correctAndEnumerate(
 
     // Only allow new-word suggestions if space was the most likely keypress.
     const allowSpace = TransformUtils.isWhitespace(inputTransform);
+    const allowBksp = TransformUtils.isBackspace(inputTransform);
 
     // Generates raw prediction distributions for each valid input.  Can only 'correct'
     // against the final input.
@@ -222,7 +222,7 @@ export async function correctAndEnumerate(
         // Filter out special keys unless they're expected.
         if(TransformUtils.isWhitespace(transform) && !allowSpace) {
           return null;
-        } else if(TransformUtils.isBackspace(transform) && !inputIsBksp) {
+        } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
           return null;
         }
 
@@ -348,7 +348,7 @@ export async function correctAndEnumerate(
   const alignment = postContextState.tokenization.alignment;
 
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  if(transition.preservationTransform && !inputIsBksp) {
+  if(transition.preservationTransform && alignment?.canAlign && alignment.tailTokenShift > 0) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
     // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
     deleteLeft = 0;
@@ -921,7 +921,13 @@ export function finalizeSuggestions(
     //
     // Note:  may need adjustment if/when supporting phrase-level correction.
     if(tuple.preservationTransform) {
-      let mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
+      const presDL = tuple.preservationTransform.deleteLeft;
+      const mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
+      // Any preserved delete-left is applied early because it directly affects the suggestion
+      // root; we need to remove that preserved delete-left here.
+      if(presDL > 0) {
+        mergedTransform.deleteLeft -= presDL;
+      }
       mergedTransform.id = prediction.sample.transformId;
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
