@@ -112,4 +112,33 @@ resources/docker-images/run.sh :web --registry 'myregistry:5678' --username 'use
 There exist [GitHub actions for building the Docker images](../../.github/workflows/build-test-publish-docker.yml).
 For testing and developing the workflow can be started locally.
 As a prerequisite [act](https://nektosact.com/) must be installed.
-There is [an example script](./act.sh) for running the workflow with act.
+
+This is an exmaple for running the workflow with act:
+
+```bash
+#!/bin/bash
+# runs GitHub workflow locally for building, testing and publishing Docker images
+# requires act (https://nektosact.com/)
+# requires a GitHub token with repo permissions (e.g. GITHUB_TOKEN from a personal access token)
+# requires Docker with buildx support
+
+tempfile=/tmp/event.json
+
+cat > ${tempfile} <<EOF
+{
+  "client_payload": {
+  },
+  "action": "build-test-publish-docker",
+  "act": true
+}
+EOF
+
+act repository_dispatch \
+  -e /tmp/event.json \
+  --actor='<username>' \
+  -s GITHUB_TOKEN='<GitHub token>' \
+  --container-options "--user runner:$(getent group docker | cut -d: -f3)" \
+   -W '.github/workflows/build-test-publish-docker.yml'
+
+rm -f ${tempfile}
+```

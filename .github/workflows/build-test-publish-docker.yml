@@ -1,5 +1,5 @@
-name: build-test-publish-docker
-run-name: "Build, test, publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+name: "Build, test, and publish Docker images"
+run-name: "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
 
 # This workflow runs the build, test and publish steps for the
 # Keyman build Docker images.
@@ -14,33 +14,54 @@ on:
     types: ['build-test-publish-docker:*']
 
 env:
-  # Use GitHub registry, if empty
   REGISTRY: ghcr.io
   USERNAME: "${{ github.actor }}"
   PASSWORD: "${{ github.token }}"
 
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
 
+  message:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.act }}
+
+    steps:
+      - name: Print message
+        run: |
+          echo "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+
+   build:
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Build Docker images
         run: |
-          echo ${{ github.event.action }}
           if [ -z "${{ env.USERNAME }}" ]; then
             resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }}
           else
             echo ${{ env.PASSWORD }} | resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
           fi
 
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Publish Docker images
+        run: |
+          if [ -z "${{ env.USERNAME }}" ]; then
+            resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }}
+          else
+            echo ${{ env.PASSWORD }} | resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
+          fi
 
   test:
     runs-on: ubuntu-latest
-    needs: build
+    needs: publish
 
     steps:
       - name: Checkout repository
@@ -53,22 +74,3 @@ jobs:
           else
             echo ${{ env.PASSWORD }} | resources/docker-images/build.sh test: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
           fi
-
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Publish Docker images
-        run: |
-          if [ -z "${{ env.USERNAME }}" ]; then
-            resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }}
-          else
-            echo ${{ env.PASSWORD }} | resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
-          fi
-

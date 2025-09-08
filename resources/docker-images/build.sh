@@ -69,7 +69,7 @@ publish_action() {
   local platform=$1
   local version_list=("${build_version}")
 
-  builder_echo debug "publishing image for ${platform}"
+  builder_echo debug "publishing image for ${platform}."
 
   if is_default_values; then
     version_list+=("default")

@@ -1,0 +1,19 @@
+
+
+on:
+  schedule:
+    #run every Fri, 6 pm UTC
+    - cron: '0 18 * * 5' #
+
+jobs:
+  cleanup-images:
+    name: ghcr.io cleanup action
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          dry-run: true
+          expand-packages: true
+          packages: keyman-*-ci
+          delete-untagged: true
