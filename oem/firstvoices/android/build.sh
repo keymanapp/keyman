@@ -76,7 +76,7 @@ if builder_start_action build; then
   echo "BUILD_FLAGS: $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
-  mv "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk" "${ARTIFACT}"
+  mv "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/$CONFIG/firstvoices-${KEYMAN_VERSION}.apk" "${ARTIFACT}"
 
   builder_finish_action success build
 fi
