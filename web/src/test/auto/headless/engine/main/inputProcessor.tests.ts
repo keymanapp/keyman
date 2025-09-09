@@ -1,27 +1,38 @@
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+
 import { assert } from 'chai';
-import fs from 'fs';
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-import { InputProcessor } from 'keyman/engine/main';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
-import { KeyboardTest } from '@keymanapp/recorder-core';
-
+import { KeyboardTest, RecordedPhysicalKeystroke, RecordedSequenceTestSet } from '@keymanapp/recorder-core';
 import { Worker } from '@keymanapp/lexical-model-layer/node';
 import * as utils from '@keymanapp/web-utils';
+
+import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { KeyEvent, KeyEventSpec, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { InputProcessor } from 'keyman/engine/main';
+
+import DeviceSpec = utils.DeviceSpec;
 const KMWString = utils.KMWString;
 
-// Required initialization setup.
-global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
-                    // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
+const require = createRequire(import.meta.url);
 
-let device = {
-  formFactor: 'phone',
-  OS: 'ios',
-  browser: 'safari'
+declare global {
+  var keyman: typeof MinimalKeymanGlobal;
+  var KeymanWeb: any;
+}
+
+// Required initialization setup.
+//
+// So that keyboard-based checks against the global `keyman` succeed.
+// 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
+global['keyman'] = MinimalKeymanGlobal;
+
+let device: DeviceSpec = {
+  formFactor: DeviceSpec.FormFactor.Phone,
+  OS: DeviceSpec.OperatingSystem.iOS,
+  browser: DeviceSpec.Browser.Safari,
+  touchable: true
 };
 
 // Initialize supplementary plane string extensions
@@ -31,7 +42,7 @@ KMWString.enableSupplementaryPlane(false);
 describe('InputProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let core = new InputProcessor(device);
+      let core = new InputProcessor(device, null);
       assert.isNotNull(core);
     });
 
@@ -40,6 +51,7 @@ describe('InputProcessor', function() {
       try {
         // Can construct without the second parameter; if so, the final assertion - .mayPredict
         // will be invalidated.  (No worker, no ability to predict.)
+        // @ts-ignore
         core = new InputProcessor(device, Worker);
 
         assert.isOk(core.keyboardProcessor);
@@ -60,6 +72,7 @@ describe('InputProcessor', function() {
         assert.isUndefined(core.languageProcessor.activeModel);
         assert.isFalse(core.languageProcessor.isActive);
         assert.isTrue(core.languageProcessor.mayPredict);
+        assert.isTrue(core.languageProcessor.canEnable);
       } finally {
         core?.languageProcessor?.shutdown();
       }
@@ -67,8 +80,7 @@ describe('InputProcessor', function() {
   });
 
   describe('efficiency tests', function() {
-    let testDistribution = [];
-    let keyboardWithHarness;
+    let keyboardWithHarness: KeyboardInterface;
 
     let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
 
@@ -82,28 +94,17 @@ describe('InputProcessor', function() {
     }
 
     this.beforeAll(async function() {
-      testDistribution = [];
-
-      for(let c = 'A'.charCodeAt(0); c <= 'Z'.charCodeAt(0); c++) {
-        let char = String.fromCharCode(c);
-
-        testDistribution.push({
-          keyId: "K_" + char,
-          p: 1 / 26
-        });
-      }
-
       // Load the keyboard.
       let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
-      keyboardWithHarness = keyboardLoader.harness;
+      keyboardWithHarness = keyboardLoader.harness as KeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
     });
 
     describe('without fat-fingering', function() {
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device);
+        let core = new InputProcessor(device, null);
         let context = new Mock("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
@@ -112,7 +113,7 @@ describe('InputProcessor', function() {
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
 
@@ -123,7 +124,7 @@ describe('InputProcessor', function() {
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
 
-        let core = new InputProcessor(device);  // I mean, it IS long context, and time
+        let core = new InputProcessor(device, null);  // I mean, it IS long context, and time
                                           // thresholding is disabled within Node.
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
@@ -132,7 +133,7 @@ describe('InputProcessor', function() {
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
     });
@@ -140,17 +141,16 @@ describe('InputProcessor', function() {
     describe('with fat-fingering', function() {
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device);
+        let core = new InputProcessor(device, null);
         let context = new Mock("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        key.keyDistribution = testDistribution;
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
 
@@ -164,51 +164,52 @@ describe('InputProcessor', function() {
                                           // Keep at the same 'order of magnitude' as the
                                           // 'without fat-fingers' test.
 
-        let core = new InputProcessor(device);  // It IS long context, and time
+        let core = new InputProcessor(device, null);  // It IS long context, and time
                                           // thresholding is disabled within Node.
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness as KeyboardInterface;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
-        key.keyDistribution = testDistribution;
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
-        let behavior = core.processKeyEvent(event, context);
+        let behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
     });
   });
 
   describe('Deadkeys bug #8568 - backspace should not reset all deadkeys', function () {
-    let keyboardWithHarness;
+    let keyboardWithHarness: KeyboardInterface;
     let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
     // For convenience we define the key sequence in a test file although we don't use the
     // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
-    let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext));
+    let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext.toString()));
 
     before(async function () {
       // Load the keyboard.
       let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
-      keyboardWithHarness = keyboardLoader.harness;
+      keyboardWithHarness = keyboardLoader.harness as KeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
 
       // This part provides extra assurance that the keyboard properly loaded.
       assert.equal(keyboard.id, "Keyboard_test_8568_deadkeys");
     });
 
-    for (let testSet of testDefinitions.inputTestSets[0]['testSet']) {
+    const testsToRun: RecordedSequenceTestSet = testDefinitions.inputTestSets[0] as RecordedSequenceTestSet;
+    for (let testSet of testsToRun.testSet) {
       it(testSet.msg ?? 'test', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device);
+        let core = new InputProcessor(device, null);
         let context = new Mock("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
 
-        for (let keystroke of testSet.inputs) {
-          let keyEvent = {
+        for (let key of testSet.inputs) {
+          const keystroke = key as RecordedPhysicalKeystroke;
+          let keySpec: KeyEventSpec = {
             Lcode: keystroke.keyCode,
             Lmodifiers: keystroke.modifiers,
             LmodifierChange: keystroke.modifierChanged,
@@ -217,10 +218,10 @@ describe('InputProcessor', function() {
             kName: '',
             device: device,
             isSynthetic: false,
-            LisVirtualKey: keyboard.definesPositionalOrMnemonic // Only false for 1.0 keyboards.
+            LisVirtualKey: keyboard.definesPositionalOrMnemonic // Only false for 1.0 keyboards.,
           };
 
-          let behavior = core.processKeyEvent(keyEvent, context);
+          let behavior = core.processKeyEvent(new KeyEvent(keySpec), context, null);
           assert.isNotNull(behavior);
         }
         assert.equal(context.getText(), testSet.output);

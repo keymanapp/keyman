@@ -1,13 +1,16 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
-import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { DeviceSpec } from 'keyman/engine/keyboard';
 import { Mock } from 'keyman/engine/js-processor';
 
-function compileDummyModel(suggestionSets) {
+import Suggestion = LexicalModelTypes.Suggestion;
+
+function compileDummyModel(suggestionSets: Suggestion[][]) {
   return `
 LMLayerWorker.loadModel(new models.DummyModel({
   futureSuggestions: ${JSON.stringify(suggestionSets, null, 2)},
@@ -15,7 +18,7 @@ LMLayerWorker.loadModel(new models.DummyModel({
 `;
 }
 
-const appleDummySuggestionSets = [[
+const appleDummySuggestionSets: Suggestion[][] = [[
   // Set 1:
   {
     transform: { insert: 'e', deleteLeft: 0},
@@ -64,9 +67,10 @@ function dummiedGetLayer() {
 }
 
 describe("PredictionContext", () => {
-  let langProcessor;
+  let langProcessor: LanguageProcessor;
 
   beforeEach(function() {
+    // @ts-ignore
     langProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
   });
 
@@ -91,7 +95,7 @@ describe("PredictionContext", () => {
     assert.isEmpty(updateFake.firstCall.args[0]); // should have no suggestions. (if convenient for testing)
 
     await promise;
-    let suggestions;
+    let suggestions: Suggestion[];
 
     // Initialization results:  our first set of dummy suggestions.
     assert.equal(updateFake.callCount, 2);
@@ -130,7 +134,7 @@ describe("PredictionContext", () => {
     assert.isEmpty(updateFake.firstCall.args[0]); // should have no suggestions. (if convenient for testing)
 
     await promise;
-    let suggestions;
+    let suggestions: Suggestion[];
 
     // Initialization results:  our first set of dummy suggestions.
     assert.equal(updateFake.callCount, 2);
@@ -205,7 +209,7 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let suggestions;
+    let suggestions: Suggestion[];
 
     let previousTextState = Mock.from(textState);
     textState.insertTextBeforeCaret('e'); // appl| + e = apple
@@ -281,7 +285,7 @@ describe("PredictionContext", () => {
 
     // We need to capture the suggestion we wish to apply.  We could hardcode a forced
     // value, but that might become brittle in the long-term.
-    const originalSuggestionSet = suggestionCaptureFake.firstCall.args[0];
+    const originalSuggestionSet: Suggestion[] = suggestionCaptureFake.firstCall.args[0];
     const suggestionApply = originalSuggestionSet.find((obj) => obj.displayAs == 'apply');
     assert.isOk(suggestionApply);
 
@@ -346,7 +350,7 @@ describe("PredictionContext", () => {
     await postRevertSuggestions;
 
     assert.equal(updateFake.callCount, 1);
-    const suggestionsPostReversion = updateFake.firstCall.args[0];
+    const suggestionsPostReversion: Suggestion[] = updateFake.firstCall.args[0];
     assert.deepEqual(suggestionsPostReversion.map((obj) => obj.displayAs), ['reverted']);
   });
 });
