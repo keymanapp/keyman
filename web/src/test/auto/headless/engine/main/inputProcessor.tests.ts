@@ -1,21 +1,35 @@
+import { env } from 'node:process';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 
 import { assert } from 'chai';
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KeyboardTest, RecordedPhysicalKeystroke, RecordedSequenceTestSet } from '@keymanapp/recorder-core';
 import { Worker } from '@keymanapp/lexical-model-layer/node';
-import * as utils from '@keymanapp/web-utils';
+import { DeviceSpec, KMWString } from '@keymanapp/web-utils';
 
+import { InputProcessor } from 'keyman/engine/main';
 import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { KeyEvent, KeyEventSpec, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
-import { InputProcessor } from 'keyman/engine/main';
+import { PredictionContext } from 'keyman/engine/interfaces';
 
-import DeviceSpec = utils.DeviceSpec;
-const KMWString = utils.KMWString;
+import Context = LexicalModelTypes.Context;
+import Suggestion = LexicalModelTypes.Suggestion;
 
 const require = createRequire(import.meta.url);
+const KEYMAN_ROOT = env.KEYMAN_ROOT;
+
+const dummyModel = (suggestionSets: Suggestion[][]) => ({
+  id: 'dummy',
+  languages: ['en'],
+  code: `
+LMLayerWorker.loadModel(new models.DummyModel({
+  futureSuggestions: ${JSON.stringify(suggestionSets, null, 2)},
+}));
+`
+});
 
 declare global {
   var keyman: typeof MinimalKeymanGlobal;
@@ -109,7 +123,7 @@ describe('InputProcessor', function() {
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
+        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
@@ -129,7 +143,7 @@ describe('InputProcessor', function() {
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
+        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
@@ -146,7 +160,7 @@ describe('InputProcessor', function() {
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
+        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
@@ -169,7 +183,7 @@ describe('InputProcessor', function() {
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness as KeyboardInterface;
         let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
+        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
@@ -227,5 +241,214 @@ describe('InputProcessor', function() {
         assert.equal(context.getText(), testSet.output);
       });
     }
+  });
+
+  describe('Predictive-text integration tests', () => {
+    let keyboardWithHarness: KeyboardInterface;
+    const device: DeviceSpec = {
+      formFactor: DeviceSpec.FormFactor.Phone,
+      OS: DeviceSpec.OperatingSystem.iOS,
+      browser: DeviceSpec.Browser.Safari,
+      touchable: true
+    };
+    const baseStates = {
+      K_CAPS: false,
+      K_NUMLOCK: false,
+      K_SCROLL: false
+    };
+    const simpleTestingDummyModel = dummyModel([
+      // empty:  should not show any suggestions on first load + context-set.
+      [],
+      [
+        {
+          transform: { insert: 'testing', deleteLeft: 4 },
+          appendedTransform: { insert: ' ', deleteLeft: 0 },
+          transformId: 0, // will be overwritten by the DummyModel to match the transition ID.
+          id: 1,
+          displayAs: 'testing'
+        }
+      ]
+    ]);
+
+    before(async () => {
+      // Load the keyboard.
+      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js'));
+      keyboardWithHarness = keyboardLoader.harness as KeyboardInterface;
+      keyboardWithHarness.activeKeyboard = keyboard;
+
+      // This part provides extra assurance that the keyboard properly loaded.
+      assert.equal(keyboard.id, "Keyboard_test_simple_deadkeys");
+    });
+
+    it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (dummy models)', async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        await langProcessor.loadModel(simpleTestingDummyModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for test', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for testi', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for testing', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for testing ', startOfBuffer: true, endOfBuffer: true },
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_I')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
+        assert.isOk(ruleBehavior);
+        const testiPredictions = await ruleBehavior.predictionPromise;
+        const pred_testing = testiPredictions.find((s) => s.displayAs == 'testing')
+        assert.isOk(pred_testing);
+
+        const acceptResults = predContext.accept(pred_testing);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        await acceptResults.reversion;
+        // The reversion should be available on the prediction context and should have
+        // an appended transform component.
+        assert.isOk(predContext.revertSuggestion, "no reversion was returned by the model")
+        assert.isOk(
+          predContext.revertSuggestion?.appendedTransform,
+          "the reversion returned by the model did not include an appended transform"
+        );
+
+        const behavior2 = core.processKeyEvent(new KeyEvent(getEventFor('K_SPACE')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left); // no new whitespace!
+        assert.isOk(behavior2);
+        // Is after the suggestion still, but with the appended space removed!
+        assert.equal(behavior2.transcription.preInput.getTextBeforeCaret(), contexts[2].left);
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (trie models)', async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        await langProcessor.loadModel({
+          id: 'simple-trie',
+          languages: ['en'],
+          path: `${KEYMAN_ROOT}/common/test/resources/models/simple-trie.js`
+        });
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tec', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical ', startOfBuffer: true, endOfBuffer: true },
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
+        assert.isOk(ruleBehavior);
+        const testiPredictions = await ruleBehavior.predictionPromise;
+        const pred_testing = testiPredictions.find((s) => s.displayAs == 'technical')
+        assert.isOk(pred_testing);
+
+        const acceptResults = predContext.accept(pred_testing);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        await acceptResults.reversion;
+        // The reversion should be available on the prediction context and should have
+        // an appended transform component.
+        assert.isOk(predContext.revertSuggestion, "no reversion was returned by the model")
+        assert.isOk(
+          predContext.revertSuggestion?.appendedTransform,
+          "the reversion returned by the model did not include an appended transform"
+        );
+
+        const behavior2 = core.processKeyEvent(new KeyEvent(getEventFor('K_SPACE')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left); // no new whitespace!
+        assert.isOk(behavior2);
+        // Is after the suggestion still, but with the appended space removed!
+        assert.equal(behavior2.transcription.preInput.getTextBeforeCaret(), contexts[2].left);
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it('auto-applies a suggestion properly when available and triggered appropriately', async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        await langProcessor.loadModel(simpleTestingDummyModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for test', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for testi', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for testing', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for testing.', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for testing..', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_I')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
+        assert.isOk(ruleBehavior);
+        const testiPredictions = await ruleBehavior.predictionPromise;
+        const pred_testing = testiPredictions.find((s) => s.displayAs == 'testing')
+        assert.isOk(pred_testing);
+        assert.isTrue(pred_testing.autoAccept);
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        const behavior2 = core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        assert.isOk(behavior2);
+        // Is after the suggestion still, but with the appended space removed!
+        assert.equal(behavior2.transcription.preInput.getTextBeforeCaret(), contexts[2].left);
+
+        await behavior2.predictionPromise;
+
+        // Verify that the second period is emitted properly.
+        core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[4].left);
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
   });
 });

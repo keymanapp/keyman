@@ -12,10 +12,6 @@ import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { Mock } from 'keyman/engine/js-processor';
 
-/*
- * Unit tests for the Dummy prediction model.
- */
-
 const KEYMAN_ROOT = env.KEYMAN_ROOT;
 
 declare global {
