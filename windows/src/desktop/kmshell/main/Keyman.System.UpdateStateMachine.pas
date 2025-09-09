@@ -89,8 +89,9 @@ type
     function CurrentStateName: string;
     (**
      * Checks if Keyman is the WaitingRestartState, the cache is valid
-     * and that Keyman has not run in this Windows session.
-     * The purpose is for the calling code to produce
+     * and that Keyman has not run in this Windows session. It also confirms
+     * that automatic updates are still enabled #14295.
+     * The purpose is for the calling code can choose to produce
      * a UI to confirm the user wants to install an update,
      * if everything is ready to start a update.
      *
@@ -570,13 +571,9 @@ begin
   if not (CurrentState is WaitingRestartState) then
     Exit(False);
 
-  // Validate the cache otherwise we could
-  // prompt the caller for update but then fail.
-  // Also combined #14295 moved check here from initprog.pas
-  // The setting for automatic updates may have been set to disable
-  // after updates were checked and downloaded. The user should
-  // not be prompted for an update in this case and the update should
-  // abort.
+  // Verify conditions since entering WaitingRestartState:
+  // If the cache is not valid or automatic updates have
+  // been disabled clear the cache and return to the idle state.
   if not (TUpdateCheckStorage.CheckMetaDataForUpdate and Self.GetAutomaticUpdates) then
   begin
     HandleAbort;
