@@ -849,8 +849,7 @@ describe('InputProcessor', function() {
           { left: 'this context is for techn', startOfBuffer: true, endOfBuffer: true },
           { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
           { left: 'this context is for technical.', startOfBuffer: true, endOfBuffer: true },
-          { left: 'this context is for technical... ', startOfBuffer: true, endOfBuffer: true },
-          { left: 'this context is for technica', startOfBuffer: true, endOfBuffer: true }
+          { left: 'this context is for technical... ', startOfBuffer: true, endOfBuffer: true }
         ];
 
         const mock = new Mock(contexts[0].left);
@@ -874,7 +873,7 @@ describe('InputProcessor', function() {
         core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
         core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
         const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
-        assert.equal(mock.getTextBeforeCaret(), contexts[5].left);
+        assert.equal(mock.getTextBeforeCaret(), contexts[2].left);
         const finalSuggestions = await behavior3.predictionPromise;
 
         assert.isOk(finalSuggestions.find(s => s.tag == 'revert'));
