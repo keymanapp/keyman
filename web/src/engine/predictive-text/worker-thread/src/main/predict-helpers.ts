@@ -151,6 +151,77 @@ export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: Correctio
   return b.totalProb - a.totalProb;
 }
 
+export async function correctAndEnumerateWithoutTraversals(
+  lexicalModel: LexicalModel,
+  transformDistribution: Distribution<Transform>,
+  context: Context
+): Promise<{
+  /**
+   * For models that support correction-search caching, this provides the
+   * cached object corresponding to this method's operation.
+   *
+   * Otherwise, is `null`.
+   */
+  postContextState?: ContextState;
+
+  /**
+   * The suggestions generated based on the user's input state.
+   */
+  rawPredictions: CorrectionPredictionTuple[];
+
+  /**
+   * The id of a prior ContextTransition event that triggered a Suggestion found
+   * at the end of the Context.  Will be undefined if no edits have occurred
+   * since the Suggestion was applied.
+   */
+  revertableTransitionId?: number
+}> {
+  const inputTransform = transformDistribution[0].sample;
+  let rawPredictions: CorrectionPredictionTuple[] = [];
+
+  let predictionRoots: ProbabilityMass<Transform>[];
+
+  // Only allow new-word suggestions if space was the most likely keypress.
+  const allowSpace = TransformUtils.isWhitespace(inputTransform);
+  const allowBksp = TransformUtils.isBackspace(inputTransform);
+
+  // Generates raw prediction distributions for each valid input.  Can only 'correct'
+  // against the final input.
+  //
+  // This is the old, 12.0-13.0 'correction' style.
+  if(allowSpace) {
+    // Detect start of new word; prevent whitespace loss here.
+    predictionRoots = [{sample: inputTransform, p: 1.0}];
+  } else {
+    predictionRoots = transformDistribution.map((alt) => {
+      let transform = alt.sample;
+
+      // Filter out special keys unless they're expected.
+      if(TransformUtils.isWhitespace(transform) && !allowSpace) {
+        return null;
+      } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
+        return null;
+      }
+
+      return alt;
+    });
+  }
+
+  // Remove `null` entries.
+  predictionRoots = predictionRoots.filter(tuple => !!tuple);
+
+  // Running in bulk over all suggestions, duplicate entries may be possible.
+  rawPredictions = predictFromCorrections(lexicalModel, predictionRoots, context);
+  if(allowSpace) {
+    rawPredictions.forEach((entry) => entry.preservationTransform = inputTransform);
+  }
+
+  return {
+    postContextState: null,
+    rawPredictions: rawPredictions
+  };
+}
+
 /**
  * This method performs the correction-search and model-lookup operations for
  * prediction generation by using the user's context state and potential
@@ -186,14 +257,6 @@ export async function correctAndEnumerate(
    */
   revertableTransitionId?: number
 }> {
-  const wordbreak = determineModelWordbreaker(lexicalModel);
-
-  // Assertion / pre-condition:  `transformDistribution` should be sorted!
-  const inputTransform = transformDistribution[0].sample;
-
-  const postContext = models.applyTransform(inputTransform, context);
-  let rawPredictions: CorrectionPredictionTuple[] = [];
-
   // If `this.contextTracker` does not exist, we don't have the
   // `LexiconTraversal` pattern available to us.  We're unable to efficiently
   // iterate through the lexicon as a result, so we use a far lazier pattern -
@@ -202,47 +265,7 @@ export async function correctAndEnumerate(
   // It's mostly here to support models compiled before Keyman 14.0, which was
   // when the `LexiconTraversal` pattern was established.
   if(!contextTracker) {
-    let predictionRoots: ProbabilityMass<Transform>[];
-
-    // Only allow new-word suggestions if space was the most likely keypress.
-    const allowSpace = TransformUtils.isWhitespace(inputTransform);
-    const allowBksp = TransformUtils.isBackspace(inputTransform);
-
-    // Generates raw prediction distributions for each valid input.  Can only 'correct'
-    // against the final input.
-    //
-    // This is the old, 12.0-13.0 'correction' style.
-    if(allowSpace) {
-      // Detect start of new word; prevent whitespace loss here.
-      predictionRoots = [{sample: inputTransform, p: 1.0}];
-    } else {
-      predictionRoots = transformDistribution.map((alt) => {
-        let transform = alt.sample;
-
-        // Filter out special keys unless they're expected.
-        if(TransformUtils.isWhitespace(transform) && !allowSpace) {
-          return null;
-        } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
-          return null;
-        }
-
-        return alt;
-      });
-    }
-
-    // Remove `null` entries.
-    predictionRoots = predictionRoots.filter(tuple => !!tuple);
-
-    // Running in bulk over all suggestions, duplicate entries may be possible.
-    rawPredictions = predictFromCorrections(lexicalModel, predictionRoots, context);
-    if(allowSpace) {
-      rawPredictions.forEach((entry) => entry.preservationTransform = inputTransform);
-    }
-
-    return {
-      postContextState: null,
-      rawPredictions: rawPredictions
-    };
+    return correctAndEnumerateWithoutTraversals(lexicalModel, transformDistribution, context);
   }
 
   // 'else':  the current, 14.0+ pattern, which is able to leverage
@@ -267,7 +290,6 @@ export async function correctAndEnumerate(
       // If both are smaller than the threshold, the text should match exactly.
       return a.left == b.left;
     }
-
   };
 
   const lastTransition = contextTracker.latest;
@@ -280,6 +302,7 @@ export async function correctAndEnumerate(
     contextState = lastTransition.base;
   }
 
+  const inputTransform = transformDistribution[0].sample;
   if(!contextState){
     console.warn("Unexpected context state occurred as prediction base context");
     contextTracker.reset(context, inputTransform.id);
@@ -289,6 +312,7 @@ export async function correctAndEnumerate(
   // Corrections and predictions are based upon the post-context state, though.
   let transition = contextTracker.latest;
   const inputIsEmpty = TransformUtils.isEmpty(inputTransform) && transformDistribution.length == 1;
+  const postContext = models.applyTransform(inputTransform, context);
 
   // Don't replace any applied-suggestion data if we have a request to trigger with
   // the current context state.
@@ -348,6 +372,7 @@ export async function correctAndEnumerate(
   const alignment = postContextState.tokenization.alignment;
 
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
+  const wordbreak = determineModelWordbreaker(lexicalModel);
   if(transition.preservationTransform && alignment?.canAlign && alignment.tailTokenShift > 0) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
     // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
@@ -423,6 +448,7 @@ export async function correctAndEnumerate(
   }
 
   // Only run the correction search when corrections are enabled.
+  let rawPredictions: CorrectionPredictionTuple[] = [];
   for await(let match of searchSpace.getBestMatches(timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
