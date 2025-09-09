@@ -1,9 +1,12 @@
-name: "Build, test, and publish Docker images"
-run-name: "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
-
 # This workflow runs the build, test and publish steps for the
 # Keyman build Docker images.
 # It is triggered by a schedule and repository_dispatch event.
+
+name: "Build, test, and publish Docker images"
+run-name: "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+defaults:
+  run:
+    shell: bash
 
 on:
   schedule:
@@ -19,21 +22,28 @@ env:
   PASSWORD: "${{ github.token }}"
 
 jobs:
+
   message:
+    name: Print message
     runs-on: ubuntu-latest
     if: ${{ github.event.act }}
 
     steps:
       - name: Print message
+        id: print-message
         run: |
           echo "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+
   build:
+    name: Build Docker images
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v4
       - name: Build Docker images
+        id: build
         run: |
           if [ -z "${{ env.USERNAME }}" ]; then
             resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }}
@@ -42,14 +52,17 @@ jobs:
           fi
 
   publish:
+    name: Publish Docker images
     runs-on: ubuntu-latest
     needs: build
 
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v4
 
       - name: Publish Docker images
+        id: publish
         run: |
           if [ -z "${{ env.USERNAME }}" ]; then
             resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }}
@@ -58,14 +71,17 @@ jobs:
           fi
 
   test:
+    name: Test Docker images
     runs-on: ubuntu-latest
     needs: publish
 
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v4
 
       - name: Test Docker images
+        id: test
         run: |
           if [ -z "${{ env.USERNAME }}" ]; then
             resources/docker-images/build.sh test: --registry ${{ env.REGISTRY }}
