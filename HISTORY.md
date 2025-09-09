@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.115 alpha 2025-09-09
+
+* fix(linux): don't crash if `kmp.json` is missing `keyboards` section (#14708)
+
 ## 19.0.114 alpha 2025-09-08
 
 * docs(web): Improve empty What's New page for Web (#14660)
