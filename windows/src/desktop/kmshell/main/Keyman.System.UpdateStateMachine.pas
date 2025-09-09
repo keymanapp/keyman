@@ -574,7 +574,7 @@ begin
   // Verify conditions since entering WaitingRestartState:
   // If the cache is not valid or automatic updates have
   // been disabled clear the cache and return to the idle state.
-  if not (TUpdateCheckStorage.CheckMetaDataForUpdate and Self.GetAutomaticUpdates) then
+  if not TUpdateCheckStorage.CheckMetaDataForUpdate or not Self.GetAutomaticUpdates then
   begin
     HandleAbort;
     Exit(False);
