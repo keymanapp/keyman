@@ -262,7 +262,15 @@ export class ModelCompositor {
     }
 
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
-    if(this.contextTracker) {
+    if(!this.contextTracker) {
+      if(suggestion.appendedTransform) {
+        reversion.appendedTransform = {
+          insert: '',
+          deleteLeft: suggestion.appendedTransform.insert.length,
+          id: suggestion.appendedTransform.id
+        }
+      }
+    } else {
       let originalTransition = this.contextTracker.latest;
       if(originalTransition.transitionId != suggestion.transformId) {
         originalTransition = this.contextTracker.findAndRevert(suggestion.transformId);
