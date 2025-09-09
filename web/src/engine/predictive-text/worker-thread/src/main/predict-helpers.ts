@@ -223,6 +223,119 @@ export async function correctAndEnumerateWithoutTraversals(
 }
 
 /**
+ * Determines the most recent ContextState corresponding to the incoming
+ * Context, assuming no context-reset operations have occurred.  Their contents
+ * may not match perfectly, but they should be alignable with no edits not
+ * caused by the sliding context window.
+ *
+ * If no contexts align, this will trigger a warning and a context reset.
+ * @param contextTracker  The cache for previously-analyzed context states
+ * @param context The incoming context
+ * @param inputTransform The ID for the incoming context transition (only used
+ * if a context reset is necessary)
+ * @returns
+ */
+export function matchBaseContextState(
+  contextTracker: ContextTracker,
+  context: Context,
+  transitionId: number
+): ContextState {
+  const lengthThreshold = contextTracker.configuration?.leftContextCodePoints ?? Number.POSITIVE_INFINITY;
+
+  const contextsMatch = (a: Context, b: Context) => {
+    // If either context's window is equal to or greater than the threshold
+    // length, there's a good chance something slid into or out of range.
+    if(a.left.length >= lengthThreshold || b.left.length >= lengthThreshold) {
+      return isSubstitutionAlignable(a.left, b.left);
+    } else {
+      // If both are smaller than the threshold, the text should match exactly.
+      return a.left == b.left;
+    }
+  };
+
+  const lastTransition = contextTracker.latest;
+  let contextState: ContextState;
+
+  // Note that the "final" context from the last operation will have any
+  // characters substituted - only insert (if context window was shortened) or
+  // delete (if lengthened).  No substitutions possible, as no rules will have
+  // occurred - the ONLY change is the amount of known text vs the context
+  // window's range.
+  if(contextsMatch(lastTransition.final.context, context)) {
+    contextState = lastTransition.final;
+  } else if(contextsMatch(lastTransition.base.context, context)) {
+    // Multitap case:  if we reverted back to the original underlying context,
+    // rather than using the previous output context.
+    //
+    // This may also arise for text input that triggers auto-correct, as the
+    // incoming text should be processed after applying the suggestion, as
+    // applying the suggestion also appends the incoming text.
+    contextState = lastTransition.base;
+  }
+
+  if(!contextState){
+    console.warn("Unexpected context state occurred as prediction base context");
+    contextTracker.reset(context, transitionId);
+    contextState = contextTracker.latest.base;
+  }
+
+  return contextState;
+}
+
+/**
+ * Determines the tokenization for the context after any incoming edits are
+ * applied.  The tokenization(s) then determine(s) what word/token is the root
+ * for any corrections or predictions to be generated.
+ *
+ * Any incoming fat-finger data is applied to its corresponding token(s) here.
+ * @param contextTracker
+ * @param baseContextState
+ * @param context
+ * @param transformDistribution
+ * @returns
+ */
+export function determineContextTransition(
+  contextTracker: ContextTracker,
+  baseContextState: ContextState,
+  context: Context,
+  transformDistribution: Distribution<Transform>
+): ContextTransition {
+  const inputTransform = transformDistribution[0].sample;
+
+  // Corrections and predictions are based upon the post-context state, though.  -- MOVE THIS COMMENT! **
+  let transition = contextTracker.latest;
+  const inputIsEmpty = TransformUtils.isEmpty(inputTransform) && transformDistribution.length == 1;
+  const postContext = models.applyTransform(inputTransform, context);
+
+  // Don't replace any applied-suggestion data if we have a request to trigger with
+  // the current context state.
+  if(inputIsEmpty) {
+    // Directly build a simple empty transition that duplicates the last seen state.
+    const priorState = contextTracker.latest.final;
+    transition = new ContextTransition(priorState, inputTransform.id);
+    transition.finalize(priorState, transformDistribution);
+  } else if(
+    // If the input matches something we've already seen (say, a ' ' or '.'
+    // that auto-applied a suggestion).
+    transition.transitionId == inputTransform.id &&
+    transition.final.context.left == postContext.left
+  ) {
+    // Retrieve the already-performed transition and abort.
+    transition.inputDistribution = transformDistribution;
+    return transition;
+  } else {
+    transition = baseContextState.analyzeTransition(context, transformDistribution);
+    if(!transition) {
+      console.warn("Unexpected failure when computing context-state transition");
+      // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
+      transition = contextTracker.analyzeState(contextTracker.model, context, transformDistribution);
+    }
+  }
+
+  return transition;
+}
+
+/**
  * This method performs the correction-search and model-lookup operations for
  * prediction generation by using the user's context state and potential
  * inputs (according to fat-finger distributions).
@@ -271,67 +384,15 @@ export async function correctAndEnumerate(
   // 'else':  the current, 14.0+ pattern, which is able to leverage
   // `LexiconTraversal`s for greater search efficiency.  This pattern
   // facilitates a more thorough correction-search pattern.
-
-  // Token replacement benefits greatly from knowledge of the prior context state.
-  // Note:  not long-term viable - context is a sliding window, after all!
-  // What we actually need is a sliding-window comparison.
-  //
-  // Note that the "final" context from the last operation will not substitute any
-  // characters - only insert (if context window was shortened) or delete (if
-  // lengthened).  No substitutions possible, as no rules will have occurred - the
-  // ONLY change is the amount of known text vs the context window's range.
-  const lengthThreshold = contextTracker.configuration?.leftContextCodePoints ?? Number.POSITIVE_INFINITY;
-  const contextsMatch = (a: Context, b: Context) => {
-    // If either context's window is equal to or greater than the threshold length, there's a good
-    // chance something slid into or out of range.
-    if(a.left.length >= lengthThreshold || b.left.length >= lengthThreshold) {
-      return isSubstitutionAlignable(a.left, b.left);
-    } else {
-      // If both are smaller than the threshold, the text should match exactly.
-      return a.left == b.left;
-    }
-  };
-
-  const lastTransition = contextTracker.latest;
-  let contextState: ContextState;
-  if(contextsMatch(lastTransition.final.context, context)) {
-    contextState = lastTransition.final;
-  } else if(contextsMatch(lastTransition.base.context, context)) {
-    // Multitap case:  if we reverted back to the original underlying context,
-    // rather than using the previous output context.
-    contextState = lastTransition.base;
-  }
-
   const inputTransform = transformDistribution[0].sample;
-  if(!contextState){
-    console.warn("Unexpected context state occurred as prediction base context");
-    contextTracker.reset(context, inputTransform.id);
-    contextState = contextTracker.latest.base;
-  }
+  let contextState = matchBaseContextState(contextTracker, context, inputTransform.id);
 
   // Corrections and predictions are based upon the post-context state, though.
-  let transition = contextTracker.latest;
-  const inputIsEmpty = TransformUtils.isEmpty(inputTransform) && transformDistribution.length == 1;
+  const baseTransition = contextTracker.latest;
   const postContext = models.applyTransform(inputTransform, context);
 
-  // Don't replace any applied-suggestion data if we have a request to trigger with
-  // the current context state.
-  if(inputIsEmpty) {
-    // Directly build a simple empty transition that duplicates the last seen state.
-    const priorState = contextTracker.latest.final;
-    transition = new ContextTransition(priorState, inputTransform.id);
-    transition.finalize(priorState, transformDistribution);
-  } else if(
-    // If the input matches something we've already seen (say, a ' ' or '.'
-    // that auto-applied a suggestion).
-    transition.transitionId == inputTransform.id &&
-    transition.final.context.left == postContext.left
-  ) {
-    // Retrieve the already-performed transition and re-predict based
-    // on its values.
-    transition.inputDistribution = transformDistribution;
-    contextState = transition.final;
-
+  const transition = determineContextTransition(contextTracker, contextState, context, transformDistribution);
+  if(transition == baseTransition) {
     // Not yet done; we may want to consider saving the fat-finger distribution of
     // incoming text for this case for correction-search - we didn't get it
     // when applying a prior suggestion.
@@ -340,13 +401,6 @@ export async function correctAndEnumerate(
     return {
       rawPredictions: [],
       postContextState: transition.final
-    };
-  } else {
-    transition = contextState.analyzeTransition(context, transformDistribution);
-    if(!transition) {
-      console.warn("Unexpected failure when computing context-state transition");
-      // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
-      transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
     }
   }
 
@@ -356,9 +410,6 @@ export async function correctAndEnumerate(
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
-  // Rather than go "full hog" and make a priority queue out of the eventual, future competing search spaces...
-  // let's just note that right now, there will only ever be one.
-  //
   // The 'eventual' logic will be significantly more complex, though still manageable.
   const searchSpace = postContextState.tokenization.tail.searchSpace;
 
