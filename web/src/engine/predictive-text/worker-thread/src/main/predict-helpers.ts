@@ -240,12 +240,10 @@ export function matchBaseContextState(
   context: Context,
   transitionId: number
 ): ContextState {
-  const lengthThreshold = contextTracker.configuration?.leftContextCodePoints ?? Number.POSITIVE_INFINITY;
-
   const contextsMatch = (a: Context, b: Context) => {
     // If either context's window is equal to or greater than the threshold
     // length, there's a good chance something slid into or out of range.
-    if(a.left.length >= lengthThreshold || b.left.length >= lengthThreshold) {
+    if(!a.startOfBuffer || !b.startOfBuffer) {
       return isSubstitutionAlignable(a.left, b.left);
     } else {
       // If both are smaller than the threshold, the text should match exactly.
