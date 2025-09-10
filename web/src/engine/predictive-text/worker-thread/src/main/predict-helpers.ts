@@ -340,7 +340,7 @@ export async function correctAndEnumerate(
   const alignment = postContextState.tokenization.alignment;
 
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  if(transition.preservationTransform) {
+  if(transition.preservationTransform && alignment?.canAlign && alignment.tailTokenShift > 0) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
     // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
     deleteLeft = 0;
@@ -911,7 +911,13 @@ export function finalizeSuggestions(
     //
     // Note:  may need adjustment if/when supporting phrase-level correction.
     if(tuple.preservationTransform) {
-      let mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
+      const presDL = tuple.preservationTransform.deleteLeft;
+      const mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
+      // Any preserved delete-left is applied early because it directly affects the suggestion
+      // root; we need to remove that preserved delete-left here.
+      if(presDL > 0) {
+        mergedTransform.deleteLeft -= presDL;
+      }
       mergedTransform.id = prediction.sample.transformId;
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.

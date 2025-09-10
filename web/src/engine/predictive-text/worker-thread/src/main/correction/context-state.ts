@@ -20,7 +20,7 @@ import { ContextTokenization } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
 import { determineModelTokenizer } from '#./model-helpers.js';
 import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
-import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
+import { applyTransform } from '@keymanapp/models-templates';
 
 /**
  * Represents a state of the active context at some point in time along with the
@@ -267,7 +267,12 @@ export class ContextState {
 
       for(let i of transformKeys) {
         const primaryInput = transformSequenceDistribution[0].sample.get(i);
-        preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput): primaryInput;
+        if(!preservationTransform) {
+          preservationTransform = primaryInput;
+        } else {
+          preservationTransform.insert += primaryInput.insert;
+          preservationTransform.deleteLeft += primaryInput.deleteLeft;
+        }
       }
     }
 
