@@ -57,7 +57,7 @@ function __do_upload_to_testflight() {
     export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
 
-    APP_IPA_DST="$4-ios-${KEYMAN_VERSION_FOR_PR_FILENAME}.ipa"
+    APP_IPA_DST="$4-ios-${KEYMAN_VERSION_FOR_FILENAME}.ipa"
 
     cd "upload/${KEYMAN_VERSION}"
     command -v fastlane
