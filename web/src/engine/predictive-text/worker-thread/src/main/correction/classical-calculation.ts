@@ -120,7 +120,9 @@ export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalcu
           break;
         case 'substitute':
         case 'match':
-          const op = edit.op == 'substitute' ? '=>' : '==';
+        case 'split':
+        case 'merge':
+          const op = edit.op == 'match' ? '==' : '=>';
           tokenText = tokenText || `'${edit.input}' ${op} '${edit.match}'`;
           break;
         // transpose-start, transpose-end
@@ -129,9 +131,16 @@ export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalcu
       }
       return `${edit.op}(${tokenText})`;
     }
+
+    let lastEdit: string;
     do {
-      edits.push(printEdit(path.shift()));
-    } while(path.length > 0 && edits[edits.length-1].indexOf('insert') != -1);
+      if(lastEdit && lastEdit.indexOf('split') != -1 && path[0].op != 'split') {
+        break;
+      }
+
+      lastEdit = printEdit(path.shift());
+      edits.push(lastEdit);
+    } while(path.length > 0 && (lastEdit.indexOf('insert') != -1 || lastEdit.indexOf('split') != -1));
     // If final row, dump the rest of the edit path into the current row.
     if(i == calc.inputSequence.length - 1) {
       // Capture final 'insert's!
