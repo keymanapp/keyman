@@ -1,4 +1,4 @@
-import { ClassicalDistanceCalculation, EditOperation, EditTuple, forNewIndices, PathBuilder } from './classical-calculation.js';
+import { ClassicalDistanceCalculation, DistanceCalcOptions, EditOperation, EditTuple, forNewIndices, PathBuilder } from './classical-calculation.js';
 
 /**
  * The human-readable names for legal edit-operation edges on a merge-split
@@ -32,12 +32,16 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
    */
   constructor();
   /**
+   * Constructs a new calculation object instance with the specified options.
+   */
+  constructor(options: DistanceCalcOptions);
+  /**
    * Clones an already-existing instance, aliasing old data only where safe.
    * @param other
    */
   constructor(other: SegmentableDistanceCalculation);
-  constructor(other?: SegmentableDistanceCalculation) {
-    super(other);
+  constructor(param1?: DistanceCalcOptions | SegmentableDistanceCalculation) {
+    super(param1);
   }
 
   private static selectInitialCostAt(

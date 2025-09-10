@@ -19,16 +19,12 @@ export function prettyPrintMatrix(matrix: number[][]) {
 }
 
 function compute(input: string, match: string, mode?: string, bandSize?: number) {
-  let buffer = new ClassicalDistanceCalculation();
+  let buffer = new ClassicalDistanceCalculation({diagonalWidth: bandSize || 1});
 
   /* SUPPORTED MODES:
    * "InputThenMatch"  // adds all input chars, then all match chars.
    * "MatchThenInput"  // adds all match chars, then all input chars.
    */
-
-  // TEMP:  once diagonal expansion is implemented, do this LATER, AFTER adding the chars.
-  bandSize = bandSize || 1;
-  buffer.diagonalWidth = bandSize;
 
   switch(mode || "InputThenMatch") {
     case "InputThenMatch":
@@ -58,10 +54,9 @@ function compute(input: string, match: string, mode?: string, bandSize?: number)
 
 describe('forNewIndices', () => {
   it('iterates extended row properly (small calc)', () => {
-    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
-    mockedCalc.diagonalWidth = 2;
-    mockedCalc.inputSequence = new Array(2);
-    mockedCalc.matchSequence = new Array(3);
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 2});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(2));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(3));
 
     const fake = sinon.fake();
     forNewIndices(mockedCalc, true, fake);
@@ -80,10 +75,9 @@ describe('forNewIndices', () => {
   });
 
   it('iterates extended row properly (large calc)', () => {
-    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
-    mockedCalc.diagonalWidth = 2;
-    mockedCalc.inputSequence = new Array(8);
-    mockedCalc.matchSequence = new Array(9);
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 2});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(8));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(9));
 
     const fake = sinon.fake();
     forNewIndices(mockedCalc, true, fake);
@@ -103,10 +97,9 @@ describe('forNewIndices', () => {
   });
 
   it('iterates extended column properly (small calc)', () => {
-    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
-    mockedCalc.diagonalWidth = 2;
-    mockedCalc.inputSequence = new Array(3);
-    mockedCalc.matchSequence = new Array(2);
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 2});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(3));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(2));
 
     const fake = sinon.fake();
     forNewIndices(mockedCalc, false, fake);
@@ -127,10 +120,9 @@ describe('forNewIndices', () => {
   });
 
   it('iterates extended column properly (large calc) (1)', () => {
-    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
-    mockedCalc.diagonalWidth = 3;
-    mockedCalc.inputSequence = new Array(8);
-    mockedCalc.matchSequence = new Array(9);
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 3});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(8));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(9));
 
     const fake = sinon.fake();
     forNewIndices(mockedCalc, false, fake);
@@ -151,10 +143,9 @@ describe('forNewIndices', () => {
   });
 
   it('iterates extended column properly (large calc) (2)', () => {
-    const mockedCalc = sinon.createStubInstance(ClassicalDistanceCalculation);
-    mockedCalc.diagonalWidth = 3;
-    mockedCalc.inputSequence = new Array(9);
-    mockedCalc.matchSequence = new Array(9);
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 3});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(9));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(9));
 
     const fake = sinon.fake();
     forNewIndices(mockedCalc, false, fake);

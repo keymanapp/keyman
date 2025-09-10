@@ -158,6 +158,16 @@ export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalcu
 }
 
 /**
+ * Initialization options for ClassicalDistanceCalculation
+ */
+export interface DistanceCalcOptions {
+  /**
+   * Sets the initial diagonal width to use for calculations.
+   */
+  diagonalWidth?: number
+}
+
+/**
  * A semi-optimized 'online'/iterative Damerau-Levenshtein calculator with the
  * following features:
  * - may add new character to the 'input' string or to the 'match' string,
@@ -209,24 +219,36 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
    * Otherwise, this object represents a heuristic that _may_ overestimate the true edit distance.  Note that it will
    * never underestimate.
    */
-  diagonalWidth: number = 2; // TODO: Ideally, should start at 1... but we'll start at 2 for now
-                              // as a naive workaround for multi-char transform limitations.
+  private _diagonalWidth: number;
 
   // The sequence of characters input so far.
-  inputSequence: TUnit[] = [];
-  matchSequence: TUnit[] = [];
+  private readonly _inputSequence: TUnit[] = [];
+  private readonly _matchSequence: TUnit[] = [];
+
+  public get inputSequence(): Readonly<TUnit[]> {
+    return this._inputSequence;
+  }
+
+  public get matchSequence(): Readonly<TUnit[]> {
+    return this._matchSequence;
+  }
 
   /**
-   * Constructs a new calculation object instance.
+   * Constructs a new calculation object instance with default options.
    */
   constructor();
+  /**
+   * Constructs a new calculation object instance with the specified options.
+   */
+  constructor(options: DistanceCalcOptions);
   /**
    * Clones an already-existing instance, aliasing old data only where safe.
    * @param other
    */
   constructor(other: ClassicalDistanceCalculation<TUnit, TOpSet>);
-  constructor(other?: ClassicalDistanceCalculation<TUnit, TOpSet>) {
-    if(other) {
+  constructor(param1?: DistanceCalcOptions | ClassicalDistanceCalculation<TUnit, TOpSet>) {
+    if(param1 instanceof ClassicalDistanceCalculation) {
+      const other = param1;
       // Clone class properties.
       let rowCount = other.resolvedDistances.length;
       this.resolvedDistances = Array(rowCount);
@@ -235,12 +257,21 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
         this.resolvedDistances[r] = other.resolvedDistances[r].slice(0);
       }
 
-      this.inputSequence = other.inputSequence.slice(0);
-      this.matchSequence = other.matchSequence.slice(0);
-      this.diagonalWidth = other.diagonalWidth;
+      this._inputSequence = other._inputSequence.slice(0);
+      this._matchSequence = other._matchSequence.slice(0);
+      this._diagonalWidth = other._diagonalWidth;
     } else {
+      const options = param1 ?? { };
+      // We start at 2 as default for now as a naive workaround for multi-char
+      // transform limitations; we don't want to dynamically change this a lot
+      // during calculations.
+      this._diagonalWidth = options.diagonalWidth ?? 2;
       this.resolvedDistances = [];
     }
+  }
+
+  public get diagonalWidth() {
+    return this._diagonalWidth;
   }
 
   private getTrueIndex(r: number, c: number, width: number): {row: number, col: number, sparse: boolean} {
@@ -465,8 +496,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
       throw "Invalid dimensions specified for trim operation";
     }
     // Trim our tracked input & match sequences.
-    trimmedInstance.inputSequence.splice(inputLength);
-    trimmedInstance.matchSequence.splice(matchLength);
+    trimmedInstance._inputSequence.splice(inputLength);
+    trimmedInstance._matchSequence.splice(matchLength);
 
     // Major index corresponds to input length.
     trimmedInstance.resolvedDistances.splice(inputLength);
@@ -506,7 +537,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
     // Initialize all entries with Number.MAX_VALUE, as `undefined` use leads to JS math issues.
     const row = Array(2 * this.diagonalWidth + 1).fill(Number.MAX_VALUE);
     this.resolvedDistances[this.inputSequence.length] = row;
-    this.inputSequence.push(token);
+    this._inputSequence.push(token);
 
     // If there isn't a 'match' entry yet, there are no values to compute.  Exit immediately.
     if(this.matchSequence.length == 0) {
@@ -527,7 +558,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
   }
 
   protected _addMatchChar(token: TUnit) {
-    this.matchSequence.push(token);
+    this._matchSequence.push(token);
 
     // If there isn't a 'match' entry yet, there are no values to compute.  Exit immediately.
     if(this.inputSequence.length == 0) {
@@ -545,14 +576,14 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
 
   public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit, TOpSet> {
     let returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
-    returnBuffer.diagonalWidth++;
+    returnBuffer._diagonalWidth++;
 
     if(returnBuffer.inputSequence.length < 1 || returnBuffer.matchSequence.length < 1) {
       return returnBuffer;
     }
 
     // An abstraction of the common aspects of transposition handling during diagonal extensions.
-    function forPossibleTranspositionsInDiagonal(startPos: number, fixedChar: TUnit, lookupString: TUnit[], closure: (axisIndex: number, diagIndex: number) => void) {
+    function forPossibleTranspositionsInDiagonal(startPos: number, fixedChar: TUnit, lookupString: Readonly<TUnit[]>, closure: (axisIndex: number, diagIndex: number) => void) {
       let diagonalCap = 2 * (returnBuffer.diagonalWidth - 1);  // The maximum diagonal index permitted
       let axisCap = lookupString.length - 1;   // The maximum index supported by the axis of iteration
 
@@ -718,14 +749,13 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
     return this.matchSequence[this.matchSequence.length-1];
   }
 
+
   static computeDistance<TUnit>(
       input: TUnit[],
       match: TUnit[],
       bandSize: number = 1) {
     // Initialize the calculation buffer, setting the diagonal width (as appropriate) in advance.
-    let buffer = new ClassicalDistanceCalculation<TUnit>();
-    bandSize = bandSize || 1;
-    buffer.diagonalWidth = bandSize;
+    let buffer = new ClassicalDistanceCalculation<TUnit>({ diagonalWidth: bandSize || 1});
 
     for(let i = 0; i < input.length; i++) {
       buffer = buffer.addInputChar(input[i]);
