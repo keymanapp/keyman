@@ -212,7 +212,7 @@ if (( DETACH_SUCCESS < 999 )); then
 fi
 
 # Step 5 - Convert image to a compressed readonly DMG image
-DMG_FILE_PATH="$DEST_DIR/keyman-$KEYMAN_VERSION_FOR_PR_FILENAME.dmg"
+DMG_FILE_PATH="$DEST_DIR/keyman-$KEYMAN_VERSION_FOR_FILENAME.dmg"
 builder_echo info "Converting/compressing image to create \"$DMG_FILE_PATH\""
 if [[ -e "$DMG_FILE_PATH" ]] ; then
     if [[ "$VERBOSITY" != "-quiet" ]] ; then

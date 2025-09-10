@@ -38,7 +38,7 @@ if builder_is_debug_build; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 
-ARTIFACT="firstvoices-${KEYMAN_VERSION_FOR_PR_FILENAME}.apk"
+ARTIFACT="firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.apk"
 
 KEYBOARD_PACKAGE_ID="fv_all"
 KEYBOARDS_TARGET="oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"

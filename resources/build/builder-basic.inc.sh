@@ -13,7 +13,7 @@
 #   KEYMAN_VERSION_GIT_TAG:  Git tag for the release, "release@$KEYMAN_VERSION_WITH_TAG", e.g. "release@14.0.1-alpha-test-1234"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
 #   KEYMAN_VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
-#   KEYMAN_VERSION_FOR_PR_FILENAME: KEYMAN_VERSION, for release builds, or KEYMAN_VERSION_WITH_TAG, for PR and local builds; see #10521
+#   KEYMAN_VERSION_FOR_FILENAME: KEYMAN_VERSION, for release builds, or KEYMAN_VERSION_WITH_TAG, for PR and local builds; see #10521
 #   UPLOAD_SENTRY:    true - if KEYMAN_VERSION_ENVIRONMENT is one of alpha, beta, stable
 #                     false - if local, test.  Indicates if debug artifacts should be uploaded to Sentry
 #   BUILDER_OS:       win|mac|linux -- current build environment
@@ -121,9 +121,9 @@ function _builder_basic_find_version() {
     # the tag but that involves changing a number of other websites as dealing with
     # the rename there too.
     if builder_is_ci_release_build; then
-      KEYMAN_VERSION_FOR_PR_FILENAME="${KEYMAN_VERSION}"
+      KEYMAN_VERSION_FOR_FILENAME="${KEYMAN_VERSION}"
     else
-      KEYMAN_VERSION_FOR_PR_FILENAME="${KEYMAN_VERSION_WITH_TAG}"
+      KEYMAN_VERSION_FOR_FILENAME="${KEYMAN_VERSION_WITH_TAG}"
     fi
 
     readonly KEYMAN_VERSION
@@ -136,7 +136,7 @@ function _builder_basic_find_version() {
     readonly KEYMAN_VERSION_WITH_TAG
     readonly KEYMAN_VERSION_ENVIRONMENT
     readonly KEYMAN_VERSION_GIT_TAG
-    readonly KEYMAN_VERSION_FOR_PR_FILENAME
+    readonly KEYMAN_VERSION_FOR_FILENAME
 
     # Export version strings so places like version.gradle can access them
     export KEYMAN_VERSION
@@ -149,7 +149,7 @@ function _builder_basic_find_version() {
     export KEYMAN_VERSION_WITH_TAG
     export KEYMAN_VERSION_ENVIRONMENT
     export KEYMAN_VERSION_GIT_TAG
-    export KEYMAN_VERSION_FOR_PR_FILENAME
+    export KEYMAN_VERSION_FOR_FILENAME
 }
 
 function _builder_basic_find_tier() {
@@ -188,7 +188,7 @@ function _builder_basic_print_version_utils_debug() {
     echo "KEYMAN_VERSION_WITH_TAG:        $KEYMAN_VERSION_WITH_TAG"
     echo "KEYMAN_VERSION_GIT_TAG:         $KEYMAN_VERSION_GIT_TAG"
     echo "KEYMAN_VERSION_ENVIRONMENT:     $KEYMAN_VERSION_ENVIRONMENT"
-    echo "KEYMAN_VERSION_FOR_PR_FILENAME: $KEYMAN_VERSION_FOR_PR_FILENAME"
+    echo "KEYMAN_VERSION_FOR_FILENAME: $KEYMAN_VERSION_FOR_FILENAME"
 }
 
 # TODO: consolidate with buildLevel, see #14285
@@ -223,7 +223,7 @@ replaceVersionStrings() {
     s/\$KEYMAN_VERSION_GIT_TAG/$KEYMAN_VERSION_GIT_TAG/g;
     s/\$KEYMAN_VERSION_ENVIRONMENT/$KEYMAN_VERSION_ENVIRONMENT/g;
     s/\$KEYMAN_VERSION/$KEYMAN_VERSION/g;
-    s/\$KEYMAN_VERSION_FOR_PR_FILENAME/$KEYMAN_VERSION_FOR_PR_FILENAME/g;
+    s/\$KEYMAN_VERSION_FOR_FILENAME/$KEYMAN_VERSION_FOR_FILENAME/g;
     " "$infile" > "$outfile"
 }
 
@@ -264,7 +264,7 @@ replaceVersionStrings_Mkver() {
     s/\$KEYMAN_VERSION_WITH_TAG/$KEYMAN_VERSION_WITH_TAG/g;
     s/\$KEYMAN_VERSION_GIT_TAG/$KEYMAN_VERSION_GIT_TAG/g;
     s/\$KEYMAN_VERSION_ENVIRONMENT/$KEYMAN_VERSION_ENVIRONMENT/g;
-    s/\$KEYMAN_VERSION_FOR_PR_FILENAME/$KEYMAN_VERSION_FOR_PR_FILENAME/g;
+    s/\$KEYMAN_VERSION_FOR_FILENAME/$KEYMAN_VERSION_FOR_FILENAME/g;
 
     s/\$KEYMAN_VERSION/$KEYMAN_VERSION_WIN/g;
 

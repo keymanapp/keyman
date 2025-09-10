@@ -46,7 +46,7 @@ MODEL_PACKAGE_ID="nrc.en.mtnt"
 MODELS_TARGET="android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
 builder_describe_outputs \
   configure     "/${MODELS_TARGET}" \
-  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION_FOR_PR_FILENAME}.apk
+  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION_FOR_FILENAME}.apk
 
 #### Build
 
@@ -84,7 +84,7 @@ if builder_start_action build; then
   echo "BUILD_FLAGS $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
-  mv "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk" "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION_FOR_PR_FILENAME}.apk"
+  mv "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk" "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION_FOR_FILENAME}.apk"
 
   builder_finish_action success build
 fi

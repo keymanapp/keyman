@@ -66,8 +66,8 @@ function archive_artifacts() {
 
   UPLOAD_PATH="${KEYMAN_ROOT}/android/upload/${KEYMAN_VERSION}"
   KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
-  KEYMAN_APK="keyman-${KEYMAN_VERSION_FOR_PR_FILENAME}.apk"
-  FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION_FOR_PR_FILENAME}.apk"
+  KEYMAN_APK="keyman-${KEYMAN_VERSION_FOR_FILENAME}.apk"
+  FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.apk"
 
   rm -rf "${UPLOAD_PATH}"
   mkdir -p "${UPLOAD_PATH}"
