@@ -12,21 +12,11 @@ builder_describe "Installation files for FirstVoices Keyboards" \
   @/common/windows/data \
   clean configure build test publish
 
-# For local builds, and for PR builds, we will use a filename including the tag
-# but for release builds, we omit the tag for now. In the future, we may include
-# the tag but that involves changing a number of other websites as dealing with
-# the rename there too.
-if builder_is_ci_release_build; then
-  FILENAME_VERSION="${KEYMAN_VERSION}"
-else
-  FILENAME_VERSION="${KEYMAN_VERSION_WITH_TAG}"
-fi
-
 # NOTE: not using deps here because we will only do this in the 'publish' phase
 # after all other builds complete
 
 builder_if_release_build_level builder_describe_outputs \
-  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${FILENAME_VERSION}.exe
+  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_PR_FILENAME}.exe
 
 builder_parse "$@"
 
@@ -113,7 +103,7 @@ function copy-installer() {
 
   mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
   cp firstvoices.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices.msi"
-  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${FILENAME_VERSION}.exe"
+  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_PR_FILENAME}.exe"
 
   verify-installer-signatures
 }
