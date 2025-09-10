@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { ClassicalDistanceCalculation, EditTuple, forNewIndices } from '@keymanapp/lm-worker/test-index';
+import { ClassicalDistanceCalculation, EditOperation, EditTuple, forNewIndices } from '@keymanapp/lm-worker/test-index';
 import sinon from 'sinon';
 
 // Very useful for diagnosing unit test issues when path inspection is needed.
@@ -596,30 +596,30 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
       // While the two 'm's are interchangable, the path will favor
       // a result with the longest contiguous set of matches.
-      let editSequences: EditTuple<string>[][] = [[
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'match', input: 'c', match: 'c'},
-        { op: 'match', input: 'c', match: 'c'},
-        { op: 'match', input: 'o', match: 'o'},
-        { op: 'insert', match: 'm'},  // insert is earlier
-        { op: 'match', input: 'm', match: 'm'}, // longer contiguous match sequence
-        { op: 'match', input: 'o', match: 'o'},
-        { op: 'match', input: 'd', match: 'd'},
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'match', input: 't', match: 't'},
-        { op: 'match', input: 'e', match: 'e'},
+      let editSequences: EditTuple<EditOperation>[][] = [[
+        { op: 'match', input: 0 /* 'a' */, match: 0 /* 'a' */},
+        { op: 'match', input: 1 /* 'c' */, match: 1 /* 'c' */},
+        { op: 'match', input: 2 /* 'c' */, match: 2 /* 'c' */},
+        { op: 'match', input: 3 /* 'o' */, match: 3 /* 'o' */},
+        { op: 'insert', match: 4 /* 'm' */},  // insert is earlier
+        { op: 'match', input: 4 /* 'm' */, match: 5 /* 'm' */}, // longer contiguous match sequence
+        { op: 'match', input: 5 /* 'o' */, match: 6 /* 'o' */},
+        { op: 'match', input: 6 /* 'd' */, match: 7 /* 'd' */},
+        { op: 'match', input: 7 /* 'a' */, match: 8 /* 'a' */},
+        { op: 'match', input: 8 /* 't' */, match: 9 /* 't' */},
+        { op: 'match', input: 9 /* 'e' */, match: 10 /* 'e' */}
       ], [
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'match', input: 'c', match: 'c'},
-        { op: 'match', input: 'c', match: 'c'},
-        { op: 'match', input: 'o', match: 'o'},
-        { op: 'match', input: 'm', match: 'm'},
-        { op: 'insert', match: 'm'}, // now inserting later.
-        { op: 'match', input: 'o', match: 'o'},
-        { op: 'match', input: 'd', match: 'd'},
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'match', input: 't', match: 't'},
-        { op: 'match', input: 'e', match: 'e'},
+        { op: 'match', input: 0 /* 'a' */, match: 0 /* 'a' */},
+        { op: 'match', input: 1 /* 'c' */, match: 1 /* 'c' */},
+        { op: 'match', input: 2 /* 'c' */, match: 2 /* 'c' */},
+        { op: 'match', input: 3 /* 'o' */, match: 3 /* 'o' */},
+        { op: 'match', input: 4 /* 'm' */, match: 4 /* 'm' */},
+        { op: 'insert', match: 5 /* 'm' */}, // now inserting later.
+        { op: 'match', input: 5 /* 'o' */, match: 6 /* 'o' */},
+        { op: 'match', input: 6 /* 'd' */, match: 7 /* 'd' */},
+        { op: 'match', input: 7 /* 'a' */, match: 8 /* 'a' */},
+        { op: 'match', input: 8 /* 't' */, match: 9 /* 't' */},
+        { op: 'match', input: 9 /* 'e' */, match: 10 /* 'e' */}
       ]];
 
       assert.sameDeepOrderedMembers(buffer.editPath(), editSequences);
@@ -629,22 +629,22 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       let buffer = compute("harras", "harass", "InputThenMatch");
 
       let bestEditSequence: EditTuple<string>[] = [
-        { op: 'match', input: 'h', match: 'h'},
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'match', input: 'r', match: 'r'},
-        { op: 'substitute', input: 'r', match: 'a'},
-        { op: 'substitute', input: 'a', match: 's'},
-        { op: 'match', input: 's', match: 's'}
+        { op: 'match', input: 0, match: 0}, // h, h
+        { op: 'match', input: 1, match: 1}, // a, a
+        { op: 'match', input: 2, match: 2}, // r, r
+        { op: 'substitute', input: 3, match: 3}, // r => a
+        { op: 'substitute', input: 4, match: 4}, // a => s
+        { op: 'match', input: 5, match: 5}
       ];
 
       let altSequence: EditTuple<string>[] = [
-        { op: 'match', input: 'h', match: 'h'},
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'match', input: 'r', match: 'r'},
-        { op: 'delete', input: 'r'},
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'match', input: 's', match: 's'},
-        { op: 'insert', match: 's'}
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1},
+        { op: 'match', input: 2, match: 2},
+        { op: 'delete', input: 3},
+        { op: 'match', input: 4, match: 3},
+        { op: 'match', input: 5, match: 4},
+        { op: 'insert', match: 5}
       ];
 
       const viablePaths = buffer.editPath();
@@ -660,12 +660,12 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       let buffer = compute("access", "assess", "InputThenMatch");
 
       let editSequence: EditTuple<string>[] = [
-        { op: 'match', input: 'a', match: 'a'},
-        { op: 'substitute', input: 'c', match: 's'},
-        { op: 'substitute', input: 'c', match: 's'},
-        { op: 'match', input: 'e', match: 'e'},
-        { op: 'match', input: 's', match: 's'},
-        { op: 'match', input: 's', match: 's'}
+        { op: 'match', input: 0, match: 0},
+        { op: 'substitute', input: 1, match: 1},
+        { op: 'substitute', input: 2, match: 2},
+        { op: 'match', input: 3, match: 3},
+        { op: 'match', input: 4, match: 4},
+        { op: 'match', input: 5, match: 5}
       ];
 
       const viablePaths = buffer.editPath();
@@ -677,10 +677,10 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       let buffer = compute("ifhs", "fish");
 
       let editSequence: EditTuple<string>[] = [
-        { op: 'transpose-start', input: 'i', match: 'f'},
-        { op: 'transpose-end', input: 'f', match: 'i'},
-        { op: 'transpose-start', input: 'h', match: 's'},
-        { op: 'transpose-end', input: 's', match: 'h'}
+        { op: 'transpose-start', input: 0, match: 0},
+        { op: 'transpose-end', input: 1, match: 1},
+        { op: 'transpose-start', input: 2, match: 2},
+        { op: 'transpose-end', input: 3, match: 3}
       ];
 
       const viablePaths = buffer.editPath();
@@ -692,19 +692,19 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       let buffer = compute("then", "their");
 
       let editSequence: EditTuple<string>[] = [
-        { op: 'match', input: 't', match: 't'},
-        { op: 'match', input: 'h', match: 'h'}, // best sequence:  continguous matches
-        { op: 'match', input: 'e', match: 'e'}, // + adjacent substitutes
-        { op: 'substitute', input: 'n', match: 'i'},
-        { op: 'insert', match: 'r'},
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1}, // best sequence:  continguous matches
+        { op: 'match', input: 2, match: 2}, // + adjacent substitutes
+        { op: 'substitute', input: 3, match: 3},
+        { op: 'insert', match: 4},
       ];
 
       let altSequence: EditTuple<string>[] = [
-        { op: 'match', input: 't', match: 't'},
-        { op: 'match', input: 'h', match: 'h'},
-        { op: 'match', input: 'e', match: 'e'},
-        { op: 'insert', match: 'i'},
-        { op: 'substitute', input: 'n', match: 'r'},
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1},
+        { op: 'match', input: 2, match: 2},
+        { op: 'insert', match: 3},
+        { op: 'substitute', input: 3, match: 4},
       ];
 
       const viablePaths = buffer.editPath();
@@ -718,16 +718,16 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       let buffer = compute("abczdefig", "cazefghi", "InputThenMatch", 2);
 
       let editSequence: EditTuple<string>[] = [
-        { op: 'transpose-start', input: 'a', match: 'c'},
-        { op: 'transpose-delete', input: 'b'},
-        { op: 'transpose-end', input: 'c', match: 'a'},
-        { op: 'match', input: 'z', match: 'z'},
-        { op: 'delete', input: 'd'},
-        { op: 'match', input: 'e', match: 'e'},
-        { op: 'match', input: 'f', match: 'f'},
-        { op: 'transpose-start', input: 'i', match: 'g'},
-        { op: 'transpose-insert', match: 'h'},
-        { op: 'transpose-end', input: 'g', match: 'i'}
+        { op: 'transpose-start', input: 0, match: 0},
+        { op: 'transpose-delete', input: 1},
+        { op: 'transpose-end', input: 2, match: 1},
+        { op: 'match', input: 3, match: 2},
+        { op: 'delete', input: 4},
+        { op: 'match', input: 5, match: 3},
+        { op: 'match', input: 6, match: 4},
+        { op: 'transpose-start', input: 7, match: 5},
+        { op: 'transpose-insert', match: 6},
+        { op: 'transpose-end', input: 8, match: 7}
       ];
 
       const viablePaths = buffer.editPath();
@@ -744,39 +744,39 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       const buffer = compute(src, dst, "InputThenMatch", 4);
 
       let editSequence: EditTuple<string>[] = [
-        { op: 'delete', input: 'a'},
-        { op: 'delete', input: ' '},
-        { op: 'substitute', input: 'b', match: 'q'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'c', match: 'c'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'd', match: 'd'},
-        { op: 'match', input: '?', match: '?'},
-        { op: 'match', input: ';', match: ';'},
-        { op: 'match', input: 'e', match: 'e'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'f', match: 'f'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'g', match: 'g'},
-        { op: 'match', input: ',', match: ','},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'h', match: 'h'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'i', match: 'i'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'j', match: 'j'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'k', match: 'k'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'l', match: 'l'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'm', match: 'm'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'n', match: 'n'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'match', input: 'o', match: 'o'},
-        { op: 'match', input: ' ', match: ' '},
-        { op: 'substitute', input: 'p', match: 'r'},
+        { op: 'delete', input: 0},
+        { op: 'delete', input: 1},
+        { op: 'substitute', input: 2, match: 0},
+        { op: 'match', input: 3, match: 1},
+        { op: 'match', input: 4, match: 2},
+        { op: 'match', input: 5, match: 3},
+        { op: 'match', input: 6, match: 4},
+        { op: 'match', input: 7, match: 5},
+        { op: 'match', input: 8, match: 6},
+        { op: 'match', input: 9, match: 7},
+        { op: 'match', input: 10, match: 8},
+        { op: 'match', input: 11, match: 9},
+        { op: 'match', input: 12, match: 10},
+        { op: 'match', input: 13, match: 11},
+        { op: 'match', input: 14, match: 12},
+        { op: 'match', input: 15, match: 13},
+        { op: 'match', input: 16, match: 14},
+        { op: 'match', input: 17, match: 15},
+        { op: 'match', input: 18, match: 16},
+        { op: 'match', input: 19, match: 17},
+        { op: 'match', input: 20, match: 18},
+        { op: 'match', input: 21, match: 19},
+        { op: 'match', input: 22, match: 20},
+        { op: 'match', input: 23, match: 21},
+        { op: 'match', input: 24, match: 22},
+        { op: 'match', input: 25, match: 23},
+        { op: 'match', input: 26, match: 24},
+        { op: 'match', input: 27, match: 25},
+        { op: 'match', input: 28, match: 26},
+        { op: 'match', input: 29, match: 27},
+        { op: 'match', input: 30, match: 28},
+        { op: 'match', input: 31, match: 29},
+        { op: 'substitute', input: 32, match: 30},
       ];
 
       const viablePaths = buffer.editPath();
