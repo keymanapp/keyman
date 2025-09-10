@@ -12,7 +12,8 @@ import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
 export class ContextTracker {
-  private readonly cache = new RewindableCache<ContextTransition>(5);
+  // Size:  transitions for three applied suggestions + their appended whitespace
+  private readonly cache = new RewindableCache<ContextTransition>(6);
   /**
    * Tracks the most recent transition handled by the context-tracking engine.
    */
@@ -152,6 +153,10 @@ export class ContextTracker {
       },
       p: 0
     }]);
+  }
+
+  peek(id: number) {
+    return this.cache.get(id);
   }
 
   findAndRevert(id: number) {

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 
 import { assert } from 'chai';
+import * as sinon from 'sinon';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KeyboardTest, RecordedPhysicalKeystroke, RecordedSequenceTestSet } from '@keymanapp/recorder-core';
@@ -269,6 +270,11 @@ describe('InputProcessor', function() {
         }
       ]
     ]);
+    const simpleTrieModel = {
+      id: 'simple-trie',
+      languages: ['en'],
+      path: `${KEYMAN_ROOT}/common/test/resources/models/simple-trie.js`
+    };
 
     before(async () => {
       // Load the keyboard.
@@ -316,14 +322,17 @@ describe('InputProcessor', function() {
         const pred_testing = testiPredictions.find((s) => s.displayAs == 'testing')
         assert.isOk(pred_testing);
 
-        const acceptResults = predContext.accept(pred_testing);
+        const applySpy = sinon.spy(langProcessor, 'applySuggestion');
+        predContext.accept(pred_testing);
         assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
-        await acceptResults.reversion;
+        // Intercept the return value that holds a reference to the reversion promise.
+        await applySpy.firstCall.returnValue.reversion;
+
         // The reversion should be available on the prediction context and should have
         // an appended transform component.
-        assert.isOk(predContext.revertSuggestion, "no reversion was returned by the model")
+        assert.isOk(predContext.immediateReversion, "no reversion was returned by the model")
         assert.isOk(
-          predContext.revertSuggestion?.appendedTransform,
+          predContext.immediateReversion?.appendedTransform,
           "the reversion returned by the model did not include an appended transform"
         );
 
@@ -343,11 +352,7 @@ describe('InputProcessor', function() {
       const langProcessor = core.languageProcessor;
 
       try {
-        await langProcessor.loadModel({
-          id: 'simple-trie',
-          languages: ['en'],
-          path: `${KEYMAN_ROOT}/common/test/resources/models/simple-trie.js`
-        });
+        await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
@@ -372,18 +377,22 @@ describe('InputProcessor', function() {
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
         assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
         assert.isOk(ruleBehavior);
-        const testiPredictions = await ruleBehavior.predictionPromise;
-        const pred_testing = testiPredictions.find((s) => s.displayAs == 'technical')
+        const techPredictions = await ruleBehavior.predictionPromise;
+        const pred_testing = techPredictions.find((s) => s.displayAs == 'technical')
         assert.isOk(pred_testing);
 
-        const acceptResults = predContext.accept(pred_testing);
+        const applySpy = sinon.spy(langProcessor, 'applySuggestion');
+        predContext.accept(pred_testing);
         assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
-        await acceptResults.reversion;
+        // Intercept the return value that holds a reference to the reversion promise.
+        await applySpy.firstCall.returnValue.reversion;
+        applySpy.restore();
+
         // The reversion should be available on the prediction context and should have
         // an appended transform component.
-        assert.isOk(predContext.revertSuggestion, "no reversion was returned by the model")
+        assert.isOk(predContext.immediateReversion, "no reversion was returned by the model")
         assert.isOk(
-          predContext.revertSuggestion?.appendedTransform,
+          predContext.immediateReversion?.appendedTransform,
           "the reversion returned by the model did not include an appended transform"
         );
 
@@ -446,6 +455,428 @@ describe('InputProcessor', function() {
         // Verify that the second period is emitted properly.
         core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
         assert.equal(mock.getTextBeforeCaret(), contexts[4].left);
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it('displays a reversion after manually applying a suggestion and immediately backspacing', async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        // This feature only activates with 14.0+ models.
+        await langProcessor.loadModel(simpleTrieModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tec', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical ', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
+        assert.isOk(ruleBehavior);
+        const techPredictions = await ruleBehavior.predictionPromise;
+        const pred_technical = techPredictions.find((s) => s.displayAs == 'technical')
+        assert.isOk(pred_technical);
+        assert.isTrue(pred_technical.autoAccept);
+
+        const applySpy = sinon.spy(langProcessor, 'applySuggestion');
+        predContext.accept(pred_technical);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        // Intercept the return value that holds a reference to the reversion promise.
+        await applySpy.firstCall.returnValue.reversion;
+        applySpy.restore();
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        // Is after the suggestion still, but with the appended space removed!
+
+        // Verify that the second period is emitted properly.
+        const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[2].left);
+        const finalSuggestions = await behavior3.predictionPromise;
+
+        assert.isOk(finalSuggestions.find(s => s.tag == 'revert'));
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it('displays a reversion after returning to the whitespace after a manually-applied suggestion', async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        // This feature only activates with 14.0+ models.
+        await langProcessor.loadModel(simpleTrieModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tec', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical ', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical det', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
+        const techPredictions = await ruleBehavior.predictionPromise;
+        const pred_technical = techPredictions.find((s) => s.displayAs == 'technical')
+        const applySpy = sinon.spy(langProcessor, 'applySuggestion');
+        predContext.accept(pred_technical);
+
+        // Intercept the return value that holds a reference to the reversion promise.
+        await applySpy.firstCall.returnValue.reversion;
+        applySpy.restore();
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        // Is after the suggestion still, but with the appended space removed!
+
+        // Verify that the second period is emitted properly.
+        core.processKeyEvent(new KeyEvent(getEventFor('K_D')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_E')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_T')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[4].left);
+
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+
+        const finalSuggestions = await behavior3.predictionPromise;
+
+        assert.isOk(finalSuggestions.find(s => s.tag == 'revert'));
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it("displays a reversion after returning to the end of a manually-applied suggestion's body", async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        // This feature only activates with 14.0+ models.
+        await langProcessor.loadModel(simpleTrieModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tec', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical ', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical det', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
+        const techPredictions = await ruleBehavior.predictionPromise;
+        const pred_technical = techPredictions.find((s) => s.displayAs == 'technical')
+        const applySpy = sinon.spy(langProcessor, 'applySuggestion');
+        predContext.accept(pred_technical);
+
+        // Intercept the return value that holds a reference to the reversion promise.
+        await applySpy.firstCall.returnValue.reversion;
+        applySpy.restore();
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        // Is after the suggestion still, but with the appended space removed!
+
+        // Verify that the second period is emitted properly.
+        core.processKeyEvent(new KeyEvent(getEventFor('K_D')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_E')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_T')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[4].left);
+
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[2].left);
+
+        const finalSuggestions = await behavior3.predictionPromise;
+
+        assert.isOk(finalSuggestions.find(s => s.tag == 'revert'));
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it("does not display a reversion after backspacing part of an applied suggestion", async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        // This feature only activates with 14.0+ models.
+        await langProcessor.loadModel(simpleTrieModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tec', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical ', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical det', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technica', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
+        const techPredictions = await ruleBehavior.predictionPromise;
+        const pred_technical = techPredictions.find((s) => s.displayAs == 'technical')
+        const applySpy = sinon.spy(langProcessor, 'applySuggestion');
+        predContext.accept(pred_technical);
+
+        // Intercept the return value that holds a reference to the reversion promise.
+        await applySpy.firstCall.returnValue.reversion;
+        applySpy.restore();
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        // Is after the suggestion still, but with the appended space removed!
+
+        // Verify that the second period is emitted properly.
+        core.processKeyEvent(new KeyEvent(getEventFor('K_D')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_E')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_T')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[4].left);
+
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[5].left);
+
+        const finalSuggestions = await behavior3.predictionPromise;
+
+        assert.isNotOk(finalSuggestions.find(s => s.tag == 'revert'));
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it('displays a reversion after auto-applying a suggestion and immediately backspacing', async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        // This feature only activates with 14.0+ models.
+        await langProcessor.loadModel(simpleTrieModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for techn', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical.', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_N')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
+        assert.isOk(ruleBehavior);
+        const techPredictions = await ruleBehavior.predictionPromise;
+        const pred_technical = techPredictions.find((s) => s.displayAs == 'technical')
+        assert.isOk(pred_technical);
+        assert.isTrue(pred_technical.autoAccept);
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        const behavior2 = core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        assert.isOk(behavior2);
+        // Is after the suggestion still, but with the appended space removed!
+        assert.equal(behavior2.transcription.preInput.getTextBeforeCaret(), contexts[2].left);
+
+        await behavior2.predictionPromise;
+
+        // Verify that the second period is emitted properly.
+        const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[2].left);
+        const finalSuggestions = await behavior3.predictionPromise;
+
+        assert.isOk(finalSuggestions.find(s => s.tag == 'revert'));
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it('displays a reversion after returning to the whitespace after a auto-applied suggestion', async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        // This feature only activates with 14.0+ models.
+        await langProcessor.loadModel(simpleTrieModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for techn', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical.', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical... ', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_N')), mock, predContext);
+        await ruleBehavior.predictionPromise;
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        const behavior2 = core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+
+        await behavior2.predictionPromise;
+
+        core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_SPACE')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[4].left);
+
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+        const finalSuggestions = await behavior3.predictionPromise;
+
+        assert.isOk(finalSuggestions.find(s => s.tag == 'revert'));
+      } finally {
+        langProcessor.shutdown();
+      }
+    });
+
+    it("displays a reversion after returning to the end of an auto-applied suggestion's body", async () => {
+      // @ts-ignore
+      const core = new InputProcessor(device, Worker);
+      const langProcessor = core.languageProcessor;
+
+      try {
+        // This feature only activates with 14.0+ models.
+        await langProcessor.loadModel(simpleTrieModel);
+        const predContext = new PredictionContext(core.languageProcessor, () => 'default');
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        const keyboard = keyboardWithHarness.activeKeyboard;
+
+        const getEventFor = (keyId: string) => {
+          const key = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').getKey(keyId);
+          return keyboard.constructKeyEvent(
+            key, device, baseStates
+          );
+        }
+
+        const contexts: Context[] = [
+          { left: 'this context is for tech', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for techn', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical.', startOfBuffer: true, endOfBuffer: true },
+          { left: 'this context is for technical... ', startOfBuffer: true, endOfBuffer: true }
+        ];
+
+        const mock = new Mock(contexts[0].left);
+        predContext.setCurrentTarget(mock);
+
+        const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_N')), mock, predContext);
+        await ruleBehavior.predictionPromise;
+
+        // Note:  `.`, `,`, and ` ` are among the default set of supported marks.
+        const behavior2 = core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[3].left);
+
+        await behavior2.predictionPromise;
+
+        core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_PERIOD')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_SPACE')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[4].left);
+
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        const behavior3 = core.processKeyEvent(new KeyEvent(getEventFor('K_BKSP')), mock, predContext);
+        assert.equal(mock.getTextBeforeCaret(), contexts[2].left);
+        const finalSuggestions = await behavior3.predictionPromise;
+
+        assert.isOk(finalSuggestions.find(s => s.tag == 'revert'));
       } finally {
         langProcessor.shutdown();
       }
