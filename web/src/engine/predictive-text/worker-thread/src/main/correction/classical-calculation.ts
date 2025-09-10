@@ -355,7 +355,13 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
       let ms = 0;
       let mst = 0;
 
+      let totalId = 0; // insert / delete total count
+
       for(let edit of result) {
+        if(edit.op == 'insert' || edit.op == 'delete') {
+          totalId++;
+        }
+
         if(edit.op == 'match') {
           m++;
           ms++;
@@ -366,7 +372,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
         maxM = Math.max(maxM, m);
         m = 0;
 
-        if(edit.op == 'substitute') {
+        if(edit.op == 'substitute' || edit.op == 'merge' || edit.op == 'split') {
           ms++;
           mst++;
           continue;
@@ -392,7 +398,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
         result,
         maxM,
         maxMS,
-        maxMST
+        maxMST,
+        totalId
       }
     });
 
@@ -405,7 +412,12 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
       if(tier1 != 0) {
         return tier1;
       }
-      return b.maxMST - a.maxMST;
+      const tier2 =  b.maxMST - a.maxMST;
+      if(tier2 != 0) {
+        return tier2;
+      }
+      // We want a smaller number of total inserts and deletes when possible.
+      return a.totalId - b.totalId;
     });
 
     return properties.map((p) => p.result);
