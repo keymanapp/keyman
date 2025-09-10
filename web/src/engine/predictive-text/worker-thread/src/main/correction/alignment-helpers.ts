@@ -9,7 +9,7 @@
  */
 
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
-import { ClassicalDistanceCalculation, EditTuple } from "./classical-calculation.js";
+import { ClassicalDistanceCalculation, computeDistance, EditTuple } from "./classical-calculation.js";
 import { ExtendedEditOperation } from './segmentable-calculation.js';
 
 /**
@@ -138,12 +138,12 @@ export function isSubstitutionAlignable(
   forNearCaret?: boolean
 ): boolean {
   // 1 - Determine the edit path for the word.
-  let subEditCalc = ClassicalDistanceCalculation.computeDistance(
-    [...matchingToken],
-    [...incomingToken],
+  const subEditCalc = computeDistance(
     // Use max length in case the word is actually already partly out of
     // the sliding context window.
-    Math.max(incomingToken.length, matchingToken.length)
+    new ClassicalDistanceCalculation({ diagonalWidth: Math.max(incomingToken.length, matchingToken.length) }),
+    [...matchingToken],
+    [...incomingToken],
   );
   let subEditPath = subEditCalc.editPath()[0].map(t => t.op);
 
@@ -251,13 +251,13 @@ export function computeAlignment(
   }
 
   // Inverted order, since 'match' existed before our new context.
-  let mapping = ClassicalDistanceCalculation.computeDistance(
-    src,
-    dst,
+  const mapping = computeDistance(
     // Diagonal width allows asymmetric edits and is also needed to cover
     // difference in length for the inputs.  We should try to cover at least 2
     // edits on one side in addition to potential length asymmetry.
-    Math.abs(src.length - dst.length) + 3
+    new ClassicalDistanceCalculation({diagonalWidth: Math.abs(src.length - dst.length) + 3}),
+    src,
+    dst
   );
 
   // Later iteration:  we could return this itself directly for use in alignment
