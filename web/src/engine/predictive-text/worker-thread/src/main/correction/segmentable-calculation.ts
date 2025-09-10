@@ -60,13 +60,13 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
     return Math.min(baseCost, mergeCost, splitCost);
   }
 
-  addInputChar(token: string): SegmentableDistanceCalculation {
+  addInputChar(token: string): this {
     const returnBuffer = new SegmentableDistanceCalculation(this);
     returnBuffer._addInputChar(token);
 
     // If there isn't a 'match' entry yet, there are no values to compute.  Exit immediately.
     if(this.matchSequence.length == 0) {
-      return returnBuffer;
+      return returnBuffer as this;
     }
 
     // Also do new edit types!
@@ -76,16 +76,16 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
       row[diagIndex] = SegmentableDistanceCalculation.selectInitialCostAt(returnBuffer, r, c);
     });
 
-    return returnBuffer;
+    return returnBuffer as this;
   }
 
-  addMatchChar(token: string): SegmentableDistanceCalculation {
+  addMatchChar(token: string): this {
     const returnBuffer = new SegmentableDistanceCalculation(this);
     returnBuffer._addMatchChar(token);
 
     // If there isn't an 'input' entry yet, there are no values to compute.  Exit immediately.
     if(this.matchSequence.length == 0) {
-      return returnBuffer;
+      return returnBuffer as this;
     }
 
     // Also do new edit types!
@@ -95,10 +95,10 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
       row[diagIndex] = SegmentableDistanceCalculation.selectInitialCostAt(returnBuffer, r, c);
     });
 
-    return returnBuffer;
+    return returnBuffer as this;
   }
 
-  public increaseMaxDistance(): ClassicalDistanceCalculation<string, ExtendedEditOperation> {
+  public increaseMaxDistance(): this {
     // TODO:  diagonal expansion
     // But it's not particularly needed for our use cases.
     throw new Error("Not yet supported for this edit-distance calculation type.");
