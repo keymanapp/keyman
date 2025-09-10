@@ -188,7 +188,7 @@ function _builder_basic_print_version_utils_debug() {
     echo "KEYMAN_VERSION_WITH_TAG:        $KEYMAN_VERSION_WITH_TAG"
     echo "KEYMAN_VERSION_GIT_TAG:         $KEYMAN_VERSION_GIT_TAG"
     echo "KEYMAN_VERSION_ENVIRONMENT:     $KEYMAN_VERSION_ENVIRONMENT"
-    echo "KEYMAN_VERSION_FOR_FILENAME: $KEYMAN_VERSION_FOR_FILENAME"
+    echo "KEYMAN_VERSION_FOR_FILENAME:    $KEYMAN_VERSION_FOR_FILENAME"
 }
 
 # TODO: consolidate with buildLevel, see #14285
