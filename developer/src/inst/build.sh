@@ -12,11 +12,21 @@ builder_describe "Installation files for Keyman Developer" \
   @/common/windows/data \
   clean configure build test publish
 
+# For local builds, and for PR builds, we will use a filename including the tag
+# but for release builds, we omit the tag for now. In the future, we may include
+# the tag but that involves changing a number of other websites as dealing with
+# the rename there too.
+if builder_is_ci_release_build; then
+  FILENAME_VERSION="${KEYMAN_VERSION}"
+else
+  FILENAME_VERSION="${KEYMAN_VERSION_WITH_TAG}"
+fi
+
 # NOTE: not using deps here because we will only do this in the 'publish' phase
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /developer/src/inst/keymandeveloper-${KEYMAN_VERSION}.exe
+  publish       /developer/src/inst/keymandeveloper-${FILENAME_VERSION}.exe
 
 builder_parse "$@"
 
@@ -78,7 +88,7 @@ function do_publish() {
   # Copy the installation archive
   #
 
-  copy-kmdev
+  copy-keymandeveloper-installer-to-artifacts
 
   builder_if_release_build_level verify-installer-signatures
 }
@@ -87,8 +97,8 @@ function do_test() {
   verify-node-installer-version
 }
 
-function copy-kmdev() {
-  builder_heading copy-kmdev
+function copy-keymandeveloper-installer-to-artifacts() {
+  builder_heading copy-keymandeveloper-installer-to-artifacts
 
   mkdir -p "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}"
 
@@ -96,7 +106,7 @@ function copy-kmdev() {
   make-kmc-install-zip
 
   cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper.msi" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper.msi"
-  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper-${KEYMAN_VERSION}.exe" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper-${KEYMAN_VERSION}.exe"
+  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper-${FILENAME_VERSION}.exe" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper-${FILENAME_VERSION}.exe"
 }
 
 function verify-program-signatures() {
@@ -234,8 +244,8 @@ function make-installer() {
   echo "MSIFileName=keymandeveloper.msi" >> setup.inf
   echo "Title=Keyman Developer ${KEYMAN_VERSION_WITH_TAG}" >>setup.inf
   add_zip_files setup.zip keymandeveloper.msi setup.inf
-  cat "$DEVELOPER_PROGRAM/setup.exe" setup.zip > "keymandeveloper-$KEYMAN_VERSION.exe"
-  wrap-signcode //d "Keyman Developer" "keymandeveloper-$KEYMAN_VERSION.exe"
+  cat "$DEVELOPER_PROGRAM/setup.exe" setup.zip > "keymandeveloper-$FILENAME_VERSION.exe"
+  wrap-signcode //d "Keyman Developer" "keymandeveloper-$FILENAME_VERSION.exe"
 
   #
   # Zip the files we distribute as part of the standalone kmc distro into release\$Version\kmcomp-$Version.zip
@@ -251,7 +261,7 @@ function make-kmc-install-zip() {
     cd "${DEVELOPER_ROOT}/bin"
 
     # TODO: rename this to keyman-developer-cli-$Version.zip
-    local KMCOMP_ZIP="${DEVELOPER_ROOT}/release/${KEYMAN_VERSION}/kmcomp-${KEYMAN_VERSION}.zip"
+    local KMCOMP_ZIP="${DEVELOPER_ROOT}/release/${KEYMAN_VERSION}/kmcomp-${FILENAME_VERSION}.zip"
 
     add_zip_files "${KMCOMP_ZIP}" -q -r \
       kmconvert.exe \
