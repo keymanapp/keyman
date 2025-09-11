@@ -35,7 +35,7 @@ env:
 jobs:
   sourcepackage:
     name: Build source package
-    if: github.repository == 'keymanapp/keyman'
+    if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
     runs-on: ubuntu-24.04
     outputs:
       KEYMAN_VERSION: ${{ steps.version_step.outputs.KEYMAN_VERSION }}
