@@ -198,6 +198,8 @@ jobs:
               const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
               const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
 
+              console.log(`updateCheck: status:'${status}', description:'${description}'', summary:'${summary}'`);
+
               await github.rest.checks.update({
                 owner,
                 repo,
