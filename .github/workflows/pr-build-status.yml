@@ -108,7 +108,7 @@ jobs:
                 if(type == 'unknown') {
                   // We special-case for unknown status checks, and never permit them
                   return [
-                    'error', `An unknown context ${context} was found, cannot calculate build status.`
+                    'error', `An unknown context ${context} was found, cannot calculate build status.`, summary
                   ];
                 }
                 if(type == 'build') {
@@ -119,7 +119,7 @@ jobs:
 
               // If we do not have any statuses yet, we wait
               if(Object.keys(filtered_statuses).length == 0 || !hasBuilds) {
-                return ['pending', 'Builds have not yet been triggered ⌛'];
+                return ['pending', 'Builds have not yet been triggered ⌛', summary];
               }
 
               const state =
@@ -172,9 +172,7 @@ jobs:
               }
 
               const { filtered_statuses, summary } = reduceStatuses(statuses);
-
-              const result = calculateFinalStatus(filtered_statuses, summary);
-              return result;
+              return calculateFinalStatus(filtered_statuses, summary);
             }
 
             async function test(github, owner, repo, sha) {
@@ -197,8 +195,6 @@ jobs:
             async function updateCheck(github, owner, repo, checkRunId, status, description, summary) {
               const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
               const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
-
-              console.log(`updateCheck: status:'${status}', description:'${description}'', summary:'${summary}'`);
 
               await github.rest.checks.update({
                 owner,

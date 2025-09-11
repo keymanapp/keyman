@@ -80,7 +80,7 @@
                 if(type == 'unknown') {
                   // We special-case for unknown status checks, and never permit them
                   return [
-                    'error', `An unknown context ${context} was found, cannot calculate build status.`
+                    'error', `An unknown context ${context} was found, cannot calculate build status.`, summary
                   ];
                 }
                 if(type == 'build') {
@@ -91,7 +91,7 @@
 
               // If we do not have any statuses yet, we wait
               if(Object.keys(filtered_statuses).length == 0 || !hasBuilds) {
-                return ['pending', 'Builds have not yet been triggered ⌛'];
+                return ['pending', 'Builds have not yet been triggered ⌛', summary];
               }
 
               const state =
@@ -144,9 +144,7 @@
               }
 
               const { filtered_statuses, summary } = reduceStatuses(statuses);
-
-              const result = calculateFinalStatus(filtered_statuses, summary);
-              return result;
+              return calculateFinalStatus(filtered_statuses, summary);
             }
 
             async function test(github, owner, repo, sha) {
