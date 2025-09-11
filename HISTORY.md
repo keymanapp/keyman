@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.117 alpha 2025-09-11
+
+* fix(resources): ignore KEYMAN_VERSION_FOR_FILENAME in test (#14730)
+* fix(resources): pr build status - find 'failure' state in status checks and log (#14732)
+
 ## 19.0.116 alpha 2025-09-10
 
 * fix(windows): kmshell continues when sm is in waitingrestart  and returns to idle (#14644)
