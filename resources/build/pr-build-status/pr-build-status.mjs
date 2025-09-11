@@ -79,6 +79,7 @@
                 const { state, type } = filtered_statuses[context];
                 if(type == 'unknown') {
                   // We special-case for unknown status checks, and never permit them
+                  console.error(`An unknown context ${context} was found, cannot calculate build status.`);
                   return [
                     'error', `An unknown context ${context} was found, cannot calculate build status.`, summary
                   ];
@@ -91,6 +92,7 @@
 
               // If we do not have any statuses yet, we wait
               if(Object.keys(filtered_statuses).length == 0 || !hasBuilds) {
+                console.log(`Builds not yet triggered`);
                 return ['pending', 'Builds have not yet been triggered ⌛', summary];
               }
 
@@ -111,10 +113,12 @@
               appendDescription(counts.pending, 'pending ⌛');
               appendDescription(counts.success, 'completed successfully ✅');
 
+              console.log(`Finished filtering and reviewing status checks: ${state}: ${description}`);
               return [ state, description, summary ];
             }
 
             async function getCommitStatuses(github, owner, repo, sha) {
+              console.log(`Getting commit statuses for ${sha}`);
               const statuses = await github.paginate('GET /repos/{owner}/{repo}/commits/{sha}/statuses', {
                 owner,
                 repo,
@@ -127,6 +131,7 @@
             }
 
             async function getCommitCheckRuns(github, owner, repo, sha) {
+              console.log(`Getting commit check runs for ${sha}`);
               const statuses = await github.paginate('GET /repos/{owner}/{repo}/commits/{sha}/check-runs', {
                 owner,
                 repo,
@@ -140,7 +145,7 @@
 
             function calculateCheckResult(statuses) {
               if(!Array.isArray(statuses)) {
-                return ['error', 'Failed to retrieve status checks from GitHub ❌'];
+                return ['error', 'Failed to retrieve status checks from GitHub ❌', 'statuses is not an array'];
               }
 
               const { filtered_statuses, summary } = reduceStatuses(statuses);
