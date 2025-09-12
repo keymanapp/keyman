@@ -19,7 +19,7 @@ function do_build() {
   local YML_PREFIX=$(cat "$YML_PREFIX_FILE")
   local SCRIPT_CLONE=$(sed -n '/CLONE:START/,/CLONE:END/{//!p}' < "$MJS_FILE")
   local SCRIPT_SUFFIX=$(sed -n '/CLONE-COMMENTED:START/,/CLONE-COMMENTED:END/{//!p}' < "$MJS_FILE" | sed 's/\/\/ //g')
-  echo -e "# GENERATED FILE - DO NOT EDIT!\n$YML_PREFIX\n$SCRIPT_CLONE\n$SCRIPT_SUFFIX\n" > "$YML_FILE"
+  echo $'# GENERATED FILE - DO NOT EDIT!\n'"$YML_PREFIX"$'\n'"$SCRIPT_CLONE"$'\n'"$SCRIPT_SUFFIX"$'\n' > "$YML_FILE"
 }
 
 builder_run_action build  do_build

@@ -23,6 +23,7 @@ on:
 # baseRef:     The ref of the previous commit. For a PR the same as `baseBranch`.
 # user:        The user that triggered the build or created the PR
 # isTestBuild: false for Releases, otherwise true
+# skipApiCheck: true to skip the API check, otherwise false
 
 env:
   COLOR_GREEN: "\e[32m"
@@ -332,6 +333,7 @@ jobs:
         echo "GIT_BRANCH=${{ github.event.client_payload.branch }}" >> artifacts/env
         echo "GIT_BASE_BRANCH=${{ github.event.client_payload.baseBranch }}" >> artifacts/env
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
+        echo "SKIP_API_CHECK=${{ github.event.client_payload.skipApiCheck }}" >> artifacts/env
 
     - name: Cache artifacts
       uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3

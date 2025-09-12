@@ -32,28 +32,20 @@ function compute(input: string, match: string, mode?: string, bandSize?: number)
   switch(mode || "InputThenMatch") {
     case "InputThenMatch":
       for(let i = 0; i < input.length; i++) {
-        buffer = buffer.addInputChar({
-          key: input.charAt(i)
-        });
+        buffer = buffer.addInputChar(input.charAt(i));
       }
 
       for(let j = 0; j < match.length; j++) {
-        buffer = buffer.addMatchChar({
-          key: match.charAt(j)
-        });
+        buffer = buffer.addMatchChar(match.charAt(j));
       }
       break;
     case "MatchThenInput":
       for(let j = 0; j < match.length; j++) {
-        buffer = buffer.addMatchChar({
-          key: match.charAt(j)
-        });
+        buffer = buffer.addMatchChar(match.charAt(j));
       }
 
       for(let i = 0; i < input.length; i++) {
-        buffer = buffer.addInputChar({
-          key: input.charAt(i)
-        });
+        buffer = buffer.addInputChar(input.charAt(i));
       }
       break;
     default:
@@ -163,6 +155,26 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       // If diagonal set to '1', cost is reported as 4.
       assert.equal(compute("aadddres", "address", "InputThenMatch").getFinalCost(), 3); // Error - is returning 5, not 4 (which would be correct for current implementation state)
       assert.equal(compute("aadddres", "address", "MatchThenInput").getFinalCost(), 3);
+    });
+
+    it("handles empty-char inputs / matches appropriately", () => {
+      let buffer = new ClassicalDistanceCalculation();
+
+      // One transpose ('' vs 'b'), one insert ('' at end)
+      const input = ['a', '', 'b', 'c', 'd'];
+      const match = ['a', 'b', '', 'c', 'd', ''];
+
+      for(let i = 0; i < input.length; i++) {
+        buffer = buffer.addInputChar(input[i]);
+      }
+
+      for(let j = 0; j < match.length; j++) {
+        buffer = buffer.addMatchChar(match[j]);
+      }
+
+      assert.equal(buffer.getFinalCost(), 2);
+      const path = buffer.editPath();
+      assert.includeMembers(path, ['transpose-start', 'transpose-end', 'insert']);
     });
 
     describe("Intermediate cost tests", function() {
@@ -402,12 +414,12 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
       let expectedInput = ['t', 'e', 'a'];
       for(let i=0; i < expectedInput.length; i++) {
-        assert.equal(trimmedBuffer.inputSequence[i].key, expectedInput[i]);
+        assert.equal(trimmedBuffer.inputSequence[i], expectedInput[i]);
       }
 
       let expectedMatch = ['t', 'h', 'e'];
       for(let i=0; i < expectedMatch.length; i++) {
-        assert.equal(trimmedBuffer.matchSequence[i].key, expectedMatch[i]);
+        assert.equal(trimmedBuffer.matchSequence[i], expectedMatch[i]);
       }
     });
 
