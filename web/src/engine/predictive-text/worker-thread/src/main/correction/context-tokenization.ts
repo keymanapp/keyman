@@ -7,16 +7,17 @@
  * the sliding context window for one specific instance of context state.
  */
 
-import { ContextToken } from './context-token.js';
-import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
 import { Token } from '@keymanapp/models-templates';
-
 import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { ContextToken } from './context-token.js';
+import TransformUtils from '../transformUtils.js';
+import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
+
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
-import TransformUtils from '../transformUtils.js';
 
 /**
  * This class represents the sequence of tokens (words and whitespace blocks)
@@ -48,6 +49,16 @@ export class ContextTokenization {
   }
 
   /**
+   * Returns plain-text strings representing the most probable representation for all
+   * tokens represented by this tokenization instance.
+   */
+  get sourceText() {
+    return this.tokens
+      .filter(token => token.sourceText !== null)
+      .map(token => token.sourceText);
+  }
+
+  /**
    * Returns a plain-text string representing the most probable representation for all
    * tokens represented by this tokenization instance.
    */
@@ -69,7 +80,7 @@ export class ContextTokenization {
    * the tokenization modeled by this instance.
    */
   computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
-    return computeAlignment(this.exampleInput, incomingTokenization, isSliding, noSubVerify);
+    return computeAlignment(this.sourceText, incomingTokenization, isSliding, noSubVerify);
   }
 
   /**
@@ -143,7 +154,7 @@ export class ContextTokenization {
     // If a word is being slid out of context-window range, start trimming it - we should
     // no longer need to worry about reusing its original correction-search results.
     for(let i = 0; i < leadEditLength; i++) {
-      if(this.tokens[matchingOffset+i].exampleInput != tokenizedContext[incomingOffset+i].text) {
+      if(this.tokens[matchingOffset+i].sourceText != tokenizedContext[incomingOffset+i].text) {
         //this.tokens[matchingOffset]'s clone is at tokenization[incomingOffset]
         //after the splice call in a previous block.
         tokenization[incomingOffset+i] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset+i].text);
@@ -162,6 +173,10 @@ export class ContextTokenization {
 
     // The assumed input from the input distribution is always at index 0.
     const tokenizedPrimaryInput = hasDistribution ? alignedTransformDistribution[0].sample : null;
+
+    // now that we've identified the 'primary input', sort the distributions.
+    alignedTransformDistribution.sort((a, b) => b.p - a.p);
+
     // first index:  original sample's tokenization
     // second index:  token index within original sample
     const tokenDistribution = alignedTransformDistribution.map((entry) => {
@@ -203,9 +218,12 @@ export class ContextTokenization {
         // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
         // (May not be valid with epic/dict-breaker or with complex, word-boundary crossing transforms)
         token = new ContextToken(matchedToken);
+
         // Erase any applied-suggestion transition ID; it is no longer valid.
         token.appliedTransitionId = undefined;
-        token.searchSpace.addInput(tokenDistribution.map((seq) => seq.get(tailIndex) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1 }));
+        const emptySample: ProbabilityMass<Transform> = { sample: { insert: '', deleteLeft: 0 }, p: 1 };
+        token.addSourceInput(primaryInput ?? emptySample.sample);
+        token.searchSpace.addInput(tokenDistribution.map((seq) => seq.get(tailIndex) ?? emptySample));
       }
 
       tokenization[incomingIndex] = token;
@@ -265,6 +283,7 @@ export class ContextTokenization {
           // If there are no entries in our would-be distribution, there's no
           // reason to pass in what amounts to a no-op.
           if(transformDistribution) {
+            pushedToken.addSourceInput(primaryInput);
             // If we ever stop filtering tokenized transform distributions, it may
             // be worth adding an empty transform here with weight to balance
             // the distribution back to a cumulative prob sum of 1.
