@@ -89,3 +89,31 @@ setup_docker() {
     DOCKER_RUN_ARGS=
   fi
 }
+
+setup_container_registry() {
+  registry=${REGISTRY:-ghcr.io}
+  local username=${REGISTRY_USERNAME:-}
+  local password=${REGISTRY_PASSWORD:-}
+  registry_slash=''
+
+  builder_echo debug "Setting up container registry '${registry}'."
+
+  registry_slash="${registry}/"
+  registry_parameters="--registry ${registry}"
+  build_args+=("--build-arg=REGISTRY=${registry_slash}")
+
+  if [[ -n ${username:-} ]] ; then
+    if [[ -z ${password:-} ]] ; then
+      builder_echo debug "No password specified for container registry user '${username}'. Waiting for password on stdin."
+      read -r password
+    fi
+    docker_wrapper login "${registry}" -u "${username}" --password-stdin << EOF
+${password}
+EOF
+    registry_parameters="${registry_parameters} --username ${username} --password ${password}"
+  else
+    builder_echo debug "No username specified for container registry '${registry}'."
+  fi
+
+}
+

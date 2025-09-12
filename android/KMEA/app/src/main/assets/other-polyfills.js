@@ -15,3 +15,9 @@ if(!Array.prototype.includes){
    return !!~this.indexOf(search);
  }
 }
+
+// This file is only referenced by the main Web engine; its "global" object is `window`.
+// `globalThis` is defined in Chrome 71+.
+if(typeof globalThis == 'undefined') {
+  var globalThis = window;
+}
