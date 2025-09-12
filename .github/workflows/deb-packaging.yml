@@ -185,28 +185,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Download Artifacts
-    #   uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-    #   with:
-    #     path: artifacts
-    #     merge-multiple: true
+    - name: Download Source Artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        name: keyman-srcpkg
+        path: artifacts
 
-    # - name: Install dependencies
-    #   run: |
-    #     sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
+    - name: Download Binary Artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        path: artifacts
+        pattern: keyman-binarypkgs-*
+        merge-multiple: true
 
-    # - name: Build test image
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest-buildvm-ubuntu-cloud -v --release=jammy
-
-    # - name: Run tests
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
-    - name: Ignore
+    - name: Install dependencies
       run: |
-        echo "Ignored for now - until working solution is in place (#13777)"
+        sudo apt update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
+
+    - name: Build test image
+      run: |
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        sudo chown ${USER} /dev/kvm
+        autopkgtest-buildvm-ubuntu-cloud -v --release=$(lsb_release -c -s)
+
+    - name: Run tests
+      run: |
+        # Tests are defined in linux/debian/tests/test-build
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        DIST="$(lsb_release -c -s)"
+        autopkgtest -B *${DIST}*.deb keyman_*.dsc -- qemu autopkgtest-${DIST}-amd64.img
 
   deb_signing:
     name: Sign source and binary packages
