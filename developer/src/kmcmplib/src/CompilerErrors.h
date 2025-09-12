@@ -9,11 +9,14 @@ class CompilerMessage {
 public:
   virtual void report(enum KmnCompilerMessages::KmnCompilerMessages msg, const std::vector<std::string>& parameters) = 0;
   virtual void report(enum KmnCompilerMessages::KmnCompilerMessages msg) = 0;
+  virtual ~CompilerMessage() = default;
 };
 
 class DefaultCompilerMessage : public CompilerMessage {
+public:
   virtual void report(enum KmnCompilerMessages::KmnCompilerMessages msg, const std::vector<std::string>& parameters) ;
   virtual void report(enum KmnCompilerMessages::KmnCompilerMessages msg);
+  virtual ~DefaultCompilerMessage() = default;
 };
 
 namespace kmcmp {

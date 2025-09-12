@@ -17,6 +17,7 @@ public:
   Validation(CompilerMessage &compilerMessage) : compilerMessage(compilerMessage) {
   }
 
+  virtual ~Validation() = default;
   virtual KMX_BOOL ValidateIdentifier(KMX_WCHAR const *p, size_t maxLength);
 };
 
