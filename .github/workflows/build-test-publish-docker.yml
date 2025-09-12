@@ -50,17 +50,6 @@ jobs:
           else
             echo ${{ env.PASSWORD }} | resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
           fi
-
-  publish:
-    name: Publish Docker images
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout repository
-        id: checkout
-        uses: actions/checkout@v4
-
       - name: Publish Docker images
         id: publish
         run: |
@@ -73,7 +62,7 @@ jobs:
   test:
     name: Test Docker images
     runs-on: ubuntu-latest
-    needs: publish
+    needs: build
 
     steps:
       - name: Checkout repository
