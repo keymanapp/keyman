@@ -14,6 +14,9 @@ import { KMWString } from '@keymanapp/web-utils';
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
 import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
+import { computeDistance } from './classical-calculation.js';
+import { determineModelTokenizer } from '../model-helpers.js';
+import { SegmentableDistanceCalculation } from './segmentable-calculation.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -90,6 +93,153 @@ export class ContextTokenization {
   }
 
   /**
+   * Applies the specified Transform to the _left-hand_ side of the context in
+   * order to update and match the current contents of the sliding context
+   * window.
+   *
+   * Cached tokenizations reflect the state of context after the most recent
+   * edit but before any subsequent context-window slide.  This operation should
+   * return a tokenization matching the state _after_ the subsequent slide,
+   * which is provided on subsequent inputs based on the resulting context
+   * state.
+   * @param lexicalModel The active lexical model
+   * @param transform Specifies _either_ an `.insert` string to extend the
+   * context (if the last edit deleted chars) _or_ a `.deleteLeft` (to shrink
+   * the context if the last edit added chars).
+   * @returns
+   */
+  applyContextSlide(lexicalModel: LexicalModel, transform: Transform & { deleteRight: number }): ContextTokenization {
+    // Assertion: the current (sliding) context window is alignable and
+    // valid deltas have been computed.
+
+    // Assertion:  the transform will EITHER have an insert OR a deleteRight.  Not both.
+    // Assertion:  deleteLeft is always empty.  (There's nothing to the left; we apply on that side.)
+    if(TransformUtils.isEmpty(transform)) {
+      // No edits needed?  Why retokenize?
+      return new ContextTokenization(this);
+    }
+
+    // Step 1: build a window for window-start retokenization in case the context-window slid.
+    const currentTokens = this.tokens;
+    const {
+      retokenizationText,
+      editBoundary,
+      sliceIndex: edgeSliceIndex
+    } = buildEdgeWindow(currentTokens, transform, true);
+
+    // If we deleted content, we can go ahead and end now; there's no need
+    // to process any sort of prepended text that doesn't exist.
+    if(transform.deleteRight > 0) {
+      // Slice off the token at the boundary and all those left of it.
+      const preservedTokens = currentTokens.slice(editBoundary.tokenIndex+1);
+      // If the token at the boundary had remaining text, rebuild a simple
+      // token for it, but don't try to preserve its fat-finger data any more.
+      // (To do so may be a complex problem for little return.)
+      if(editBoundary.text) {
+        preservedTokens.unshift(new ContextToken(lexicalModel, editBoundary.text, editBoundary.isPartial));
+      }
+
+      // And done.  Why retokenize?  We already had a proper tokenization;
+      // preserve any boundaries that remain within the context window.
+      return new ContextTokenization(preservedTokens, null);
+    }
+
+    // Step 2:  adjust current represented tokens based on actual context
+    // window - all before applying any input transforms.
+
+    // If we made it here, we have new text at the context window's start. The
+    // goal is to reasonably process it in case of large scale repeated
+    // deletions.
+    const sectionToRetokenize = currentTokens.slice(0, edgeSliceIndex).map(t => t.exampleInput);
+    // Avoid having the edit path merge empty tail tokens to their predecessor.
+    if(sectionToRetokenize[sectionToRetokenize.length - 1] == '') {
+      sectionToRetokenize.pop();
+    }
+
+    // Step 3:  align this text and update tokens as needed.
+
+    // Just take the best tokenization; it slid out of view and no longer has
+    // associated fat-finger keystroke data.
+    //
+    // Maaaaybe consider alternate tokenizations if reasonably likely for
+    // epic/dict-breaker. But probably not.  Also, note #14753 in regard to
+    // epic/dict-breaker for other notes of impact for this method.
+    const tokenize = determineModelTokenizer(lexicalModel);
+    const slidAndRetokenized = tokenize({ left: transform.insert + retokenizationText, startOfBuffer: false, endOfBuffer: false }).left.map(t => t.text);
+
+    const calc = computeDistance(
+      new SegmentableDistanceCalculation({diagonalWidth: sectionToRetokenize.length+2, noTransposes: true}),
+      sectionToRetokenize,
+      slidAndRetokenized
+    );
+
+    // Rebuild early tokenization from this.
+    const editPaths = calc.editPath();
+
+    // We don't expect anything but a match for the last token; it had been stable.
+    // We'll accept a 'substitute' if necessary over other edits - splits and merges
+    // should only happen on the sliding context window's boundary.
+
+    // 'match':  ideal
+    const editPath = editPaths.find((path) => path[path.length-1].op == 'match')
+    // 'substitute':  may happen if best suggestions for a token don't actually
+    // match the original context.  May happen on occasion.
+      || editPaths.find((path) => path[path.length-1].op == 'substitute')
+    // failsafe - completely reconstruct from scratch if needed.
+      || editPaths[0];
+
+    const tokensToPrefix: ContextToken[] = [];
+    for(let i = 0; i < editPath.length; i++) {
+      const { op, input, match } = editPath[i];
+      let mergeOffset = 0;
+
+      switch(op) {
+        case 'match':
+          currentTokens[input].isPartial = false;
+          tokensToPrefix.push(currentTokens[input]);
+          break;
+        case 'merge':
+          const mergeTarget = slidAndRetokenized[match];
+          let text = currentTokens[input].exampleInput;
+          // Consume all but the last component of the merge; it shouldn't be
+          // duplicated in the resulting tokenization.
+          mergeOffset = 1;
+          let nextText = text + currentTokens[input + mergeOffset].exampleInput;
+          for(; mergeTarget.indexOf(nextText) != -1; nextText = text + currentTokens[input + 1 + mergeOffset++]) {
+            i++;
+          }
+          // We incremented one too many times; adjust the value back down.
+          mergeOffset--;
+          // fallthrough; // the common `tokensToPrefix.push()` applies here just as well.
+        case 'split':
+          // We'll keep it simple here; we probably lack fat-finger data, so
+          // just rebuild each from scratch.  We could do something more with
+          // merge (if _later_ components still have fat-finger data), but it's
+          // likely not worth the trouble.
+
+          // Also, each split entry is a valid token - it's the source token
+          // that'd show up multiple times in the stream, unlike with 'merge'.
+
+          // fallthrough;
+        case 'insert':
+        case 'substitute':
+          tokensToPrefix.push(new ContextToken(lexicalModel, slidAndRetokenized[match], i - mergeOffset == 0));
+          break;
+        default:
+          // do nothing.
+      }
+    }
+
+    // These won't be altered; we're going to trust this tokenization is best,
+    // as we determined it to be so in prior iterations.
+    const preservedTokens = currentTokens.slice(edgeSliceIndex);
+
+    // TODO:  determine alignment values to store, if any, re: context alignment.
+    // ... maybe allow saving the slide transform as its own thing?
+    return new ContextTokenization(tokensToPrefix.concat(preservedTokens), null);
+  }
+
+  /**
    * Given an alignment between an incoming tokenization context and the current tokenization
    * instance, this method will produce a new ContextTokenization instance for the incoming context
    * that reuses as many correction-search intermediate results as possible.
@@ -160,7 +310,7 @@ export class ContextTokenization {
     // If a word is being slid out of context-window range, start trimming it - we should
     // no longer need to worry about reusing its original correction-search results.
     for(let i = 0; i < leadEditLength; i++) {
-      if(this.tokens[matchingOffset+i].sourceText != tokenizedContext[incomingOffset+i].text) {
+      if(this.tokens[matchingOffset+i].exampleInput != tokenizedContext[incomingOffset+i].text) {
         //this.tokens[matchingOffset]'s clone is at tokenization[incomingOffset]
         //after the splice call in a previous block.
         tokenization[incomingOffset+i] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset+i].text);
