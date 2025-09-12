@@ -5,6 +5,10 @@ store(&NAME) 'error_name_contains_invalid_character-deadkey'
 begin unicode > use(main)
 
 group(main) using keys
+
+  c the character between `test` and `test` below is a U+007F DEL, which may not
+  c be visible in all contexts.
+
   deadkey(testtest) + [K_A] > 'a'
 
 

@@ -22,6 +22,8 @@ KMX_BOOL Uni_IsControlCharacter(KMX_WCHAR ch);
 /*
   Unicode version 16.0; GC=Zs.
 
+  List of all space characters in Unicode 16.0, by General Category Zs:
+
   0020;SPACE;Zs;0;WS;;;;;N;;;;;
   00A0;NO-BREAK SPACE;Zs;0;CS;<noBreak> 0020;;;;N;NON-BREAKING SPACE;;;;
   1680;OGHAM SPACE MARK;Zs;0;WS;;;;;N;;;;;
@@ -74,17 +76,17 @@ KMX_BOOL Uni_IsControlCharacter(KMX_WCHAR ch) {
     (ch >= 0x007F && ch <= 0x009F);
 }
 
-KMX_BOOL Validation::ValidateIdentifier(KMX_WCHAR const *p, size_t maxLength) {
+KMX_BOOL Validation::ValidateIdentifier(KMX_WCHAR const *name, size_t maxLength) {
   // whitespace already trimmed from start and end
 
-  // length of group name > 0
-  if(*p == 0) {
+  // length of name > 0
+  if(*name == 0) {
     this->compilerMessage.report(KmnCompilerMessages::ERROR_NameMustBeAtLeastOneCharLong);
     return FALSE;
   }
 
-  // length of group name within bounds, cater for terminating \0
-  if(u16len(p) >= maxLength) {
+  // length of name within bounds, cater for terminating \0
+  if(u16len(name) >= maxLength) {
     this->compilerMessage.report(KmnCompilerMessages::ERROR_NameMustBeAtMostNCharsLong, {std::to_string(maxLength - 1)});
     return FALSE;
   }
@@ -93,7 +95,7 @@ KMX_BOOL Validation::ValidateIdentifier(KMX_WCHAR const *p, size_t maxLength) {
   // close paren automatically impossible due to earlier phases in parser, but
   // including here for completeness.
   // TODO: incxstr should be `KMX_WCHAR const *`
-  for(auto q = p; *q; q = incxstr(const_cast<KMX_WCHAR *>(q))) {
+  for(auto q = name; *q; q = incxstr(const_cast<KMX_WCHAR *>(q))) {
     if(!Uni_IsValidCharacter(q)) {
       this->compilerMessage.report(KmnCompilerMessages::ERROR_NameContainsInvalidCharacter);
       return FALSE;
