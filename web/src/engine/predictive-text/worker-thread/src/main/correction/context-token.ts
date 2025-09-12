@@ -59,6 +59,13 @@ export class ContextToken {
   appliedTransitionId?: number;
 
   /**
+   * Represents the original, 'true' input transforms (tokenized, as necessary)
+   * applied to the actual context for the set of keystrokes contributing to
+   * this token.
+   */
+  private _inputRange: Transform[];
+
+  /**
    * Constructs a new, empty instance for use with the specified LexicalModel.
    * @param model
    */
@@ -84,6 +91,7 @@ export class ContextToken {
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
       this.searchSpace = new SearchSpace(priorToken.searchSpace);
+      this._inputRange = priorToken._inputRange.slice();
 
       // Preserve any annotated applied-suggestion transition ID data; it's useful
       // for delayed reversion operations.
@@ -96,6 +104,7 @@ export class ContextToken {
       // May be altered outside of the constructor.
       this.isWhitespace = false;
       this.searchSpace = new SearchSpace(model);
+      this._inputRange = [];
 
       rawText ||= '';
 
@@ -103,15 +112,55 @@ export class ContextToken {
       const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
         return [{sample: transform, p: 1.0}];
       });
-      rawTransformDistributions.forEach((entry) => this.searchSpace.addInput(entry));
+      rawTransformDistributions.forEach((entry) => {
+        this._inputRange.push(entry[0].sample);
+        this.searchSpace.addInput(entry);
+      });
     }
   }
 
   /**
-   * Displays text corresponding to the net effects of the most likely inputs received
-   * that can correspond to the current instance.
+   * Call this to record the original keystroke Transforms for the context range
+   * corresponding to this token.
+   */
+  addSourceInput(transform: Transform) {
+    this._inputRange.push(transform);
+  }
+
+  /**
+   * Denotes the original keystroke Transforms comprising the range corresponding
+   * to this token.
+   */
+  get inputRange(): Readonly<Transform[]> {
+    return this._inputRange;
+  }
+
+  /**
+   * Gets a simple, human-readable representation of `inputRange`.
+   *
+   * Should not actually be used in code - its use is intended only for
+   * debugging.
+   */
+  get sourceText(): string {
+    const composite = this._inputRange.reduce((accum, current) => buildMergedTransform(accum, current), { insert: '', deleteLeft: 0 });
+    const prefix = '\u{2421}'.repeat(composite.deleteLeft);
+    return prefix + composite.insert;
+  }
+
+  /**
+   * Generates text corresponding to the net effects of the most likely inputs
+   * received that can correspond to the current instance.
    */
   get exampleInput(): string {
+    /*
+     * TODO:  with clear limits (strict cost minimization?) / prior calculation
+     * attempts, return the best _suggestion_ for this token.  This is
+     * especially relevant for epic/dict-breaker - we want to best model the token
+     * as it would apply within the word-breaking algorithm.
+     *
+     * If not possible, find the best of the deepest search paths and append the
+     * most likely keystroke data afterward.
+     */
     const transforms = this.searchSpace.inputSequence.map((dist) => dist[0].sample)
     const composite = transforms.reduce((accum, current) => buildMergedTransform(accum, current), { insert: '', deleteLeft: 0});
     return composite.insert;
