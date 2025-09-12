@@ -57,13 +57,9 @@ See also [ldml-keyboards/readme.md](ldml-keyboards/readme.md).
 
 ### unicode-character-database
 
-Data from <https://www.unicode.org/Public/15.1.0/ucd/>:
+Data from <https://www.unicode.org/Public/17.0.0/ucd/>:
 
-```bash
-UNICODE_VERSION=15.1.0
-wget https://www.unicode.org/Public/${UNICODE_VERSION}/ucd/Blocks.txt -O unicode-character-database/Blocks.txt
-wget https://www.unicode.org/Public/${UNICODE_VERSION}/ucd/UnicodeData.txt -O unicode-character-database/UnicodeData.txt
-```
+See [download.sh](./unicode-character-database/download.sh)
 
 ### windows-lcid-to-bcp-47
 
