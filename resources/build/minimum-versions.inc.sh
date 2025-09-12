@@ -3,7 +3,7 @@
 # This is a list of minimum, maximum, and specific versions of any external
 # components or dependencies found in Keyman.
 #
-# Original (outdated) reference 
+# Original (outdated) reference
 # https://docs.google.com/document/d/1Uy3U2YXeA4rCEbUbT7O6QzUGJDZBeViFecL8fjUOLkE/edit?usp=sharing
 
 # NOTE: After changing any values, you should run publish-minimum-versions.sh.
@@ -50,4 +50,4 @@ KEYMAN_VERSION_CLDR=46                              # LDML Keyboards version
 KEYMAN_VERSION_ISO639_3=2024-05-22                  # Date of last import
 KEYMAN_VERSION_LANGTAGS=2025-02-18                  # _version value
 KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY=2025-03-10  # Date from first line of language-subtag-registry
-KEYMAN_VERSION_UNICODE=16.0.0                       # UCD + related data
+KEYMAN_VERSION_UNICODE=17.0.0                       # UCD + related data
