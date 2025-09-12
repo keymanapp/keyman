@@ -120,8 +120,8 @@
   </LanguageReference>
 
   <LanguageReference Name="beep" Title="beep">
-    <p>The beep statement produces a beep with the system speaker when the rule is matched. 
-    In Keyman Desktop, beep will produce the sound specified by "Asterisk" in Windows Sounds 
+    <p>The beep statement produces a beep with the system speaker when the rule is matched.
+    In Keyman for Windows, beep will produce the sound specified by "Asterisk" in Windows Sounds
     configuration.</p><br></br>
     <p>Syntax</p>
     <div class="code">
