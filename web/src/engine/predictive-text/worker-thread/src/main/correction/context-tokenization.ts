@@ -9,15 +9,22 @@
 
 import { Token } from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { KMWString } from '@keymanapp/web-utils';
 
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
 import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
+import { computeDistance } from './classical-calculation.js';
+import { determineModelTokenizer } from '../model-helpers.js';
+import { SegmentableDistanceCalculation } from './segmentable-calculation.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
+
+const MIN_TOKENS_TO_RECONSIDER_FOR_TOKENIZATION = 3;
+const MIN_CHARS_TO_RECONSIDER_FOR_TOKENIZATION = 15;
 
 /**
  * This class represents the sequence of tokens (words and whitespace blocks)
@@ -81,6 +88,128 @@ export class ContextTokenization {
    */
   computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
     return computeAlignment(this.sourceText, incomingTokenization, isSliding, noSubVerify);
+  }
+
+  syncToSourceWindow(lexicalModel: LexicalModel, slideDeltas: {prefix: string, deleteCnt: number}): ContextTokenization {
+    // Assertion: the current (sliding) context window is alignable and
+    // valid deltas have been computed.
+
+    // Step 1:  adjust current represented tokens based on actual context
+    // window - all before applying any input transforms.
+    const prefix = slideDeltas.prefix;
+    let deleteCnt = slideDeltas.deleteCnt;
+
+    if(prefix == '' && deleteCnt == 0) {
+      return this;
+    }
+
+    const tokenize = determineModelTokenizer(lexicalModel);
+
+    let tokenizationText = prefix;
+    let tokenizeLength = KMWString.length(prefix);
+    let tokenCount = 0;
+    let tokenIndex = 0;
+
+    let alteredToken: ContextToken;
+    const currentTokens = this.tokens;
+    for(
+      let i = 0;
+      i < currentTokens.length && (tokenCount < MIN_TOKENS_TO_RECONSIDER_FOR_TOKENIZATION
+        || tokenizeLength < MIN_CHARS_TO_RECONSIDER_FOR_TOKENIZATION);
+      i++
+    ) {
+      const token = currentTokens[i].exampleInput;
+      const tokenLen = KMWString.length(token);
+
+      // Do not consider partial tokens as part of the prefix area to use for tokenization.
+      if(!currentTokens[i].isPartial) {
+        tokenCount += (deleteCnt == 0) ? 1 : 0;
+      }
+
+      if(!alteredToken && slideDeltas.deleteCnt > 0) {
+        if(!deleteCnt) {
+          alteredToken = currentTokens[i];
+          tokenizationText = token;
+        } else if(deleteCnt < tokenLen) {
+          tokenizationText = token.slice(deleteCnt);
+          tokenizeLength += tokenLen - deleteCnt;
+          alteredToken = new ContextToken(lexicalModel, tokenizationText, true);
+        }
+        deleteCnt = Math.max(0, deleteCnt - tokenLen);
+      } else {
+        tokenizationText += token;
+      }
+      tokenIndex++;
+    }
+
+    // These won't be altered; we're going to trust this tokenization is best,
+    // as we determined it to be so in prior iterations.
+    const preservedTokens = currentTokens.slice(tokenIndex);
+
+    // If we deleted content, we can go ahead and end now; there's no need
+    // to process any sort of prepended text that doesn't exist.
+    if(slideDeltas.deleteCnt > 0) {
+      if(alteredToken) {
+        preservedTokens.unshift(alteredToken);
+      }
+
+      return new ContextTokenization(preservedTokens, null);
+    }
+
+    // If we made it here, we have new text at the context window's start. The
+    // goal is to reasonably process it in case of large scale repeated
+    // deletions.
+    const retokenizing = currentTokens.slice(0, tokenIndex).map(t => t.exampleInput);
+
+    // Step 2:  align this text and update tokens as needed.
+
+    // Just take the best tokenization; it's not recent, so we'll have forgotten
+    // fat-finger stuff here.
+    //
+    // Maaaaybe consider alternate tokenizations if reasonably likely for
+    // epic/dict-breaker. But probably not.  Also, note #14753 in regard to
+    // epic/dict-breaker for other notes of impact for this method.
+    const initialTokenization = tokenize({ left: tokenizationText, startOfBuffer: false, endOfBuffer: false }).left.map(t => t.text);
+
+    const calc = computeDistance(
+      new SegmentableDistanceCalculation({diagonalWidth: retokenizing.length+2, noTransposes: true}),
+      retokenizing,
+      initialTokenization
+    );
+
+    // Rebuild early tokenization from this.
+    const editPaths = calc.editPath();
+
+    // We don't expect anything but a match for the last token; it had been stable.
+    // We'll accept a 'substitute' if necessary over other edits - splits and merges
+    // should only happen on the sliding context window's boundary.
+
+    // 'match':  ideal
+    const editPath = editPaths.find((path) => path[path.length-1].op == 'match')
+    // 'substitute':  may happen if best suggestions for a token don't actually
+    // match the original context.  May happen on occasion.
+      || editPaths.find((path) => path[path.length-1].op == 'substitute')
+    // failsafe - completely reconstruct from scratch if needed.
+      || editPaths[0];
+
+    const tokensToPrefix: ContextToken[] = [];
+    for(let i = 0; i < editPath.length; i++) {
+      const { op, input, match } = editPath[i];
+
+      switch(op) {
+        case 'match':
+          currentTokens[input].isPartial = false;
+          tokensToPrefix.push(currentTokens[input]);
+          break;
+        case 'insert':
+        case 'substitute':
+          tokensToPrefix.push(new ContextToken(lexicalModel, initialTokenization[match], i == 0));
+        default:
+          // do nothing.
+      }
+    }
+
+    return new ContextTokenization(tokensToPrefix.concat(preservedTokens), null);
   }
 
   /**
@@ -154,7 +283,7 @@ export class ContextTokenization {
     // If a word is being slid out of context-window range, start trimming it - we should
     // no longer need to worry about reusing its original correction-search results.
     for(let i = 0; i < leadEditLength; i++) {
-      if(this.tokens[matchingOffset+i].sourceText != tokenizedContext[incomingOffset+i].text) {
+      if(this.tokens[matchingOffset+i].exampleInput != tokenizedContext[incomingOffset+i].text) {
         //this.tokens[matchingOffset]'s clone is at tokenization[incomingOffset]
         //after the splice call in a previous block.
         tokenization[incomingOffset+i] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset+i].text);

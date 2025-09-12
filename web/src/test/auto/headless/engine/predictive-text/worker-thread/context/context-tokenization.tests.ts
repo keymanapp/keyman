@@ -634,4 +634,78 @@ describe('ContextTokenization', function() {
       assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
     });
   });
+
+  describe('syncToSourceWindow', () => {
+    it('makes no changes when context does not slide', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      assert.isFalse(baseTokenization.tokens[0].isPartial);
+
+      const resultTokenization = baseTokenization.syncToSourceWindow(plainModel, { prefix: '', deleteCnt: 0});
+
+      assert.strictEqual(resultTokenization, baseTokenization);
+      assert.isFalse(resultTokenization.tokens[0].isPartial);
+    });
+
+
+    it('preserves tokenization patterns when word slides partially out of window', () => {
+      const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.syncToSourceWindow(plainModel, { prefix: '', deleteCnt: 2});
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.equal(resultTokenization.tokens[0].exampleInput, 'ples');
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+    });
+
+    it('does not preserve deleted tokens', () => {
+      const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.syncToSourceWindow(plainModel, { prefix: '', deleteCnt: 7});
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.equal(resultTokenization.tokens[0].exampleInput, 'and');
+      // preserves the entirety of what is now the first token
+      assert.isFalse(resultTokenization.tokens[0].isPartial);
+    });
+
+    it('creates new lead tokens as needed', () => {
+      const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.syncToSourceWindow(plainModel, { prefix: 'I like ', deleteCnt: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['I', ' ', 'like', ' ', ...baseTokens]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+      resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+
+    it('creates new lead tokens and edits others as needed', () => {
+      const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.syncToSourceWindow(plainModel, { prefix: 'I like pine', deleteCnt: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      // preserves the entirety of what is now the first token
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['I', ' ', 'like', ' ', 'pineapples', ...baseTokens.slice(1)]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+      resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+
+    it('updates internal tracking when backward slide adds word boundary', () => {
+      const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.syncToSourceWindow(plainModel, { prefix: ' ', deleteCnt: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, [' ', ...baseTokens]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+      resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+  });
 });
