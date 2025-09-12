@@ -597,6 +597,7 @@
             <Form>frmCloneKeymanCloudProjectParameters</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="main\Keyman.Developer.UI.FormValidation.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

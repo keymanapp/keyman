@@ -1,45 +1,43 @@
-<com.google.android.material.appbar.AppBarLayout
+<?xml version="1.0" encoding="utf-8"?>
+    <com.google.android.material.appbar.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/list_appbar"
     app:theme="@style/AppTheme.ToolbarBackArrow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
     app:elevation="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/list_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/list_toolbar"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/bar_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/title_add_keyboard"
+            android:textSize="@dimen/titlebar_label_textsize"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/bar_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:text="@string/title_add_keyboard"
-                android:textSize="@dimen/titlebar_label_textsize"
-                android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
 
-        </androidx.appcompat.widget.Toolbar>
+    <!-- optional accent -->
+    <View
+        android:id="@+id/bar_accent"
+        style="@style/AppTheme.Divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:layout_constraintTop_toBottomOf="@id/list_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- optional accent -->
-        <View
-            android:id="@+id/bar_accent"
-            style="@style/AppTheme.Divider"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            app:layout_constraintTop_toBottomOf="@id/list_toolbar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.appbar.AppBarLayout>
