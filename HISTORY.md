@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.118 alpha 2025-09-12
+
+* chore(common): Update to Unicode 17.0 (#14728)
+* fix(resources): match cr to lf change in pr-build-status.mjs (#14734)
+* fix(common): merging build and publish step for docker (#14747)
+* chore(developer): use icons.res to verify that configure is done (#14733)
+
 ## 19.0.117 alpha 2025-09-11
 
 * fix(resources): ignore KEYMAN_VERSION_FOR_FILENAME in test (#14730)
