@@ -14,7 +14,7 @@ class Validation {
 private:
   CompilerMessage &compilerMessage;
 public:
-  Validation(CompilerMessage &compilerMessage) : compilerMessage(compilerMessage) {
+  Validation(CompilerMessage &cm) : compilerMessage(cm) {
   }
 
   virtual ~Validation() = default;
