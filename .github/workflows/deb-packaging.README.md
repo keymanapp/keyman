@@ -36,6 +36,7 @@ You can manually trigger a deb-packaging action on GitHub, e.g. to test changes:
       \"baseBranch\": \"master\",
       \"baseRef\": \"$(git rev-parse refs/heads/master)\",
       \"user\": \"${USER}\",
-      \"isTestBuild\": \"true\"}" \
+      \"isTestBuild\": \"true\",
+      \"force\": \"true\"}" \
     https://api.github.com/repos/<yourgithubname>/keyman/dispatches
   ```
