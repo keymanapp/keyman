@@ -252,15 +252,15 @@ describe('KmpCompiler', function () {
   //
   // Test some invalid package metadata
   //
-  it(`should load a package with missing keyboard ID metadata`, function () {
-    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_id.kps'));
-    assert.isNull(kmpJson); // with a missing keyboard_id, the package shouldn't load, but it shouldn't crash either
+  it(`should load a package with missing keyboard ID metadata`, async function () {
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_id.kps'));
+    assert.isNull(kmpJsonData); // with a missing keyboard_id, the package shouldn't load, but it shouldn't crash either
     assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_MissingKeyboardId);
   });
 
-  it(`should load a package with missing model ID metadata`, function () {
-    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_model_id.kps'));
-    assert.isNull(kmpJson); // with a missing model_id, the package shouldn't load, but it shouldn't crash either
+  it(`should load a package with missing model ID metadata`, async function () {
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_model_id.kps'));
+    assert.isNull(kmpJsonData); // with a missing model_id, the package shouldn't load, but it shouldn't crash either
     assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_MissingModelId);
   });
 
