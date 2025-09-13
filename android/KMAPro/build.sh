@@ -46,7 +46,7 @@ MODEL_PACKAGE_ID="nrc.en.mtnt"
 MODELS_TARGET="android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
 builder_describe_outputs \
   configure     "/${MODELS_TARGET}" \
-  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk
+  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION_FOR_FILENAME}.apk
 
 #### Build
 
@@ -77,12 +77,14 @@ if builder_start_action build; then
 
   # Copy Keyman Engine for Android
   cp "${KEYMAN_ROOT}/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs/keyman-engine.aar"
-  
+
   # Convert markdown to html for offline help
   build_help_html android KMAPro/kMAPro/src/main/assets/info
 
   echo "BUILD_FLAGS $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+
+  mv "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk" "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION_FOR_FILENAME}.apk"
 
   builder_finish_action success build
 fi

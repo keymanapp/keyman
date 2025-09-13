@@ -602,7 +602,7 @@ Open source, build, and project folder
 
 ### Windows, macOS, and Linux Targets
 
-If your keyboard is designed to target Windows and macOS, then the
+If your keyboard is designed to target Windows, Linux, and macOS, then the
 following buttons will also be visible:
 
 Install

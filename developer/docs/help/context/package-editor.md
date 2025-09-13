@@ -123,7 +123,7 @@ be displayed before the package is installed as information about the package.
 
 : Version numbers should be in the form `major.minor[.patch]`. Patch is optional
 but is helpful for small bug fix releases. Each of the sections of the version
-should be an integer. Keyman Desktop does integer comparisons on the version
+should be an integer. Keyman for Windows does integer comparisons on the version
 number components, so, for example, version 2.04 is regarded as newer than
 version 2.1. Alphabetic or date formats should be avoided as the installer for
 the keyboard cannot determine which version is older reliably.
@@ -134,7 +134,11 @@ version" to have the package version automatically track the keyboard version.
 **Copyright**
 
 : The Copyright indicates the overall copyright of the package and all its
-contents.
+contents. It should be included here without the copyright year(s).
+
+**Full Copyright**
+
+: The same copyright string for the keyboard, including copyright year.
 
 **Author, E-mail address**
 
@@ -155,16 +159,32 @@ then selected from the list here.
 
 **Description**
 
-: The first paragraph of the description appears in the keyboard search result on keyman.com, the full description will be shown in the keyboard page. Writing in the right syntax will ensure your keyboard displays correctly in keyman.com. **"[Markdown](https://www.markdownguide.org/basic-syntax) accepted, no embedded HTML description"**.
+:   This field should describe your keyboard to people who find it online. It
+    should explain the purpose of the keyboard in a friendly, descriptive way.
+    The description could include details that will help users to decide if this
+    keyboard is the appropriate choice for their needs.
 
-: To add images to the description, use the image syntax from Markdown. As long as you know where the images will be, you could specify the path before merging the PR. The URL starts https://raw.githubusercontent.com/keymanapp/keyboards/master/ + the path to the image within the repository. 
+:   The first paragraph of the description will appear in the keyboard search
+    result on keyman.com; the full description will be shown in the keyboard
+    details page on keyman.com. Use
+    [Markdown](https://www.markdownguide.org/basic-syntax) to include basic
+    formatting, but not embedded HTML is not allowed.
 
-  ```md
-  ![GFF Mesobe Fidelat keyboard](https://raw.githubusercontent.com/keymanapp/keyboards/master/release/gff/gff_mesobe_fidelat/source/help/images/gff_mesobe_fidelat-default-1.jpeg)
-  ```
+:   To add images to the description, you will need to reference an image on a
+    server accessible online. For example, to use images from the Keyman
+    keyboard repository where this keyboard can be uploaded, you can use the
+    GitHub source. The URL starts with
+    https://raw.githubusercontent.com/keymanapp/keyboards/master/ + the path to
+    the image within the repository. For example:
 
-  > [!IMPORTANT]
-  > Images should not be included in the first paragraph.
+    ```md
+    ![GFF Mesobe Fidelat keyboard](https://raw.githubusercontent.com/keymanapp/keyboards/master/release/gff/gff_mesobe_fidelat/source/help/images/gff_mesobe_fidelat-default-1.jpeg)
+    ```
+
+    > [!IMPORTANT]
+    > Images should not be included in the first paragraph.
+
+    * Learn more about the [keyboard repository](https://help.keyman.com/developer/keyboards/)
 
 **Related packages**
 
