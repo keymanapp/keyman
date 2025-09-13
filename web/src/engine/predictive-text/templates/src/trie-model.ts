@@ -32,7 +32,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 import { SearchKey, Wordform2Key } from "./common.js";
-import { Node, Trie } from './trie.js';
+import { Node, Trie, TrieTraversal } from './trie.js';
 import { TraversalModel } from './traversal-model.js';
 
 /**
@@ -97,6 +97,10 @@ export default class TrieModel extends TraversalModel implements LexicalModel {
 
     super(trie.traverseFromRoot(), options);
     this.trie = trie;
+  }
+
+  public traverseFromRoot(): TrieTraversal {
+    return super.traverseFromRoot() as TrieTraversal;
   }
 };
 

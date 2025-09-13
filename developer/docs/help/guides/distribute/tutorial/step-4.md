@@ -10,7 +10,7 @@ many details as you can on this page.
 Package Name
 
 :   The Package Name will be displayed in the package install dialog,
-    and within Keyman Desktop Configuration, wherever the package is
+    and within Keyman Configuration, wherever the package is
     referred to.
 
 Readme File
@@ -31,7 +31,7 @@ Version
 Version numbers should be in the form `major.minor[.subversion]`.
     Subversion is optional but is helpful for small bug fix releases.
     Each of the sections of the version should be an integer. Keyman
-    Desktop does integer comparisons on the version numbers, so, for
+    for Windows does integer comparisons on the version numbers, so, for
     example, version `2.01` is regarded as older than version `2.2`.
     Alphabetic or date formats should be avoided as the installer for
     the keyboard cannot determine which version is older reliably.

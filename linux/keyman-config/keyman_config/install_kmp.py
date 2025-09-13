@@ -178,9 +178,9 @@ class InstallKmp():
                 logging.info("Converting %s to LDML and installing both as as keyman file",
                              f['name'])
                 name, ext = os.path.splitext(f['name'])
-                ldml = convert_kvk_to_ldml(name, fpath)
-                ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
-                output_ldml(ldmlfile, ldml)
+                if ldml := convert_kvk_to_ldml(name, fpath):
+                    ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
+                    output_ldml(ldmlfile, ldml)
             elif ftype == KMFileTypes.KM_ICON:
                 # Special handling of icon to convert to PNG
                 logging.info("Converting %s to PNG and installing both as keyman files",

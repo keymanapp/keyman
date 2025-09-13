@@ -356,8 +356,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // Inverted order, since 'match' existed before our new context.
     let mapping = ClassicalDistanceCalculation.computeDistance(
-      matchContext.map(value => ({key: value})),
-      tokenizedContext.map(value => ({key: value.text})),
+      matchContext,
+      tokenizedContext.map(value => value.text),
       // Must be at least 2, as adding a single whitespace after a token tends
       // to add two tokens: one for whitespace, one for the empty token to
       // follow it.

@@ -89,7 +89,7 @@ export class TrieTraversal implements LexiconTraversal {
   /**
    * The lexical prefix corresponding to the current traversal state.
    */
-  prefix: String;
+  readonly prefix: string;
 
   /**
    * The current traversal node.  Serves as the 'root' of its own sub-Trie,
@@ -101,7 +101,7 @@ export class TrieTraversal implements LexiconTraversal {
    * The max weight for the Trie being 'traversed'.  Needed for probability
    * calculations.
    */
-  totalWeight: number;
+  readonly totalWeight: number;
 
   constructor(root: Node, prefix: string, totalWeight: number) {
     this.root = root;
