@@ -3,7 +3,7 @@
    Copyright 2019 SIL International
 ***/
 
-import type KeyEvent from "./keyEvent.js";
+import { KeyEvent } from "./keyEvent.js";
 import { KeyEventSpec } from "./keyEvent.js";
 
 class KeyMap {
