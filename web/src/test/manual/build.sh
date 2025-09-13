@@ -28,28 +28,34 @@ builder_parse "$@"
 DEST="web/build/test-resources"
 
 builder_describe_outputs \
-  build       "/$DEST/sentry-manager.js"
+  build       "/${DEST}/sentry-manager.js"
 
 #### Resource paths ####
 
-SENTRY_MANAGER_SRC="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"
-SENTRY_MANAGER_MAP="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js.map"
+SENTRY_MANAGER_SRC="${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/index.js"
+SENTRY_MANAGER_MAP="${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/index.js.map"
+SENTRY_SRC="${KEYMAN_ROOT}/node_modules/@sentry/browser/build/bundle.min.js"
+SENTRY_MAP="${KEYMAN_ROOT}/node_modules/@sentry/browser/build/bundle.min.js.map"
 
 #### Build action definitions ####
 
-GESTURE_PROCESSOR_BUILD="$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build/lib/."
-GESTURE_PROCESSOR_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-processor/lib/"
+GESTURE_PROCESSOR_BUILD="${KEYMAN_ROOT}/web/src/engine/osk/gesture-processor/build/lib/."
+GESTURE_PROCESSOR_TARGET="${KEYMAN_ROOT}/web/build/engine/gesture-processor/lib/"
 
 function do_copy() {
-  mkdir -p "$KEYMAN_ROOT/$DEST"
+  mkdir -p "${KEYMAN_ROOT}/${DEST}"
 
   # The next four lines are needed for the sentry-integration manual test page.
-  cp "$SENTRY_MANAGER_SRC"  "$KEYMAN_ROOT/$DEST/sentry-manager.js"
-  cp "$SENTRY_MANAGER_MAP"  "$KEYMAN_ROOT/$DEST/sentry-manager.js.map"
+  cp "${SENTRY_MANAGER_SRC}"  "${KEYMAN_ROOT}/${DEST}/sentry-manager.js"
+  cp "${SENTRY_MANAGER_MAP}"  "${KEYMAN_ROOT}/${DEST}/sentry-manager.js.map"
+  cp "${SENTRY_SRC}"          "${KEYMAN_ROOT}/${DEST}/sentry-bundle.min.js"
+  cp "${SENTRY_MAP}"          "${KEYMAN_ROOT}/${DEST}/sentry-bundle.min.js.map"
 
-  mkdir -p "$GESTURE_PROCESSOR_TARGET"
-  cp -a "$GESTURE_PROCESSOR_BUILD" "$GESTURE_PROCESSOR_TARGET"
+  cp "${KEYMAN_ROOT}/common/web/types/tests/fixtures/kmx/khmer_angkor.kmx" "${KEYMAN_ROOT}/${DEST}/"
+
+  mkdir -p "${GESTURE_PROCESSOR_TARGET}"
+  cp -a "${GESTURE_PROCESSOR_BUILD}" "${GESTURE_PROCESSOR_TARGET}"
 }
 
-builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST" && rm -rf "$GESTURE_PROCESSOR_TARGET"
+builder_run_action clean rm -rf "${KEYMAN_ROOT}/${DEST}" && rm -rf "${GESTURE_PROCESSOR_TARGET}"
 builder_run_action build do_copy

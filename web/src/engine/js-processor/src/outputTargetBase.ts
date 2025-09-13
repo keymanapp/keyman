@@ -108,7 +108,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
    * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
    * @param original An `OutputTarget` (usually a `Mock`).
    */
-  restoreTo(original: OutputTargetBase) {
+  restoreTo(original: OutputTargetInterface) {
     this.clearSelection();
     // We currently do not restore selected text; the mechanism isn't supported at present for
     // all output target types - especially in regard to re-selecting the text if restored.
@@ -121,7 +121,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
     this.setTextAfterCaret(original.getTextAfterCaret());
 
     // Also, restore the deadkeys!
-    this._dks = original._dks.clone();
+    this._dks = (original as OutputTargetBase)._dks.clone();
   }
 
   apply(transform: LexicalModelTypes.Transform) {

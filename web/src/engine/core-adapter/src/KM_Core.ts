@@ -20,6 +20,23 @@ export enum KM_CORE_STATUS {
   OS_ERROR = 0x80000000
 }
 
+export enum KM_CORE_OPTION_SCOPE {
+  OPT_UNKNOWN = 0,
+  OPT_KEYBOARD = 1,
+  OPT_ENVIRONMENT = 2,
+  OPT_MAX_SCOPES
+}
+
+export enum KM_CORE_KMX_ENV {
+  PLATFORM = "platform",
+  BASELAYOUT = "baseLayout",
+  BASELAYOUTALT = "baseLayoutAlt",
+  SIMULATEALTGR = "simulateAltgr",
+  CAPSLOCK = "capsLock",
+  BASELAYOUTGIVESCTRLRALTFORRALT = "baseLayoutGivesCtrlRAltForRAlt",
+}
+
+
 export class KM_Core {
   private static km_core: KMXCoreModule = null;
 
