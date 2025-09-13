@@ -29,7 +29,7 @@ import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, SearchKey, transformToSuggestion, Wordform2Key } from "./common.js";
-import { Node, Trie } from './trie.js';
+import { Node, Trie, TrieTraversal } from './trie.js';
 import { getLastPreCaretToken } from "./tokenization.js";
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import Capabilities = LexicalModelTypes.Capabilities;
@@ -182,7 +182,7 @@ export default class TrieModel implements LexicalModel {
     return this.breakWords;
   }
 
-  public traverseFromRoot(): LexiconTraversal {
+  public traverseFromRoot(): TrieTraversal {
     return this._trie.traverseFromRoot();
   }
 

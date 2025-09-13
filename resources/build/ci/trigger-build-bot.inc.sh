@@ -40,6 +40,34 @@ function test_bot_check_pr_body() {
 }
 
 #
+# Check the Keyman-Api-Check command whether or not to run API checks.
+# Any value other than 'skip' or no Keyman-Api-Check command will run
+# the API checks.
+#
+# Parameters:
+#   1: PR number (not currently used)
+#   2: PR JSON data from api.github.com/repos/keymanapp/keyman/pulls/#
+#
+function is_skip_keyman_api_check() {
+  local PRNUM=$1
+  local prinfo="$2"
+  local prbody prApiCheck
+
+  set -o noglob
+  IFS=$'\n'
+  prbody="$(echo "${prinfo}" | "${JQ}" -r '.body')"
+  prApiCheck="$(echo -e "${prbody}" | grep '^Keyman-Api-Check:' | cut -d: -f 2 - | tr -d '[:space:]')"
+  unset IFS
+  set +o noglob
+
+  if [[ "${prApiCheck}" == "skip" ]]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+#
 # Check PR commit messages for Build-bot commands. Later commands override
 # earlier ones. Also checks PR body for any overriding commands. Note, only
 # checks the first 250 commits, so later build commands will be ignored; in this
