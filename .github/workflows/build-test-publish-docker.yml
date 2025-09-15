@@ -2,8 +2,8 @@
 # Keyman build Docker images.
 # It is triggered by a schedule and repository_dispatch event.
 
-name: "Build, test, and publish Docker images"
-run-name: "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+name: "Docker images: Build, publish and test "
+run-name: "Docker images: Build, publish and test (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
 defaults:
   run:
     shell: bash
@@ -19,7 +19,7 @@ on:
 env:
   REGISTRY: ghcr.io
   USERNAME: "${{ github.actor }}"
-  PASSWORD: "${{ github.token }}"
+  PASSWORD: "${{ secrets.KEYMAN_SERVER_REPO_ACCESS_PAT }}"
 
 jobs:
 
@@ -32,7 +32,7 @@ jobs:
       - name: Print message
         id: print-message
         run: |
-          echo "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+          echo "Docker images: Build, publish and test (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
 
   build:
     name: Build Docker images
