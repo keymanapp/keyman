@@ -19,7 +19,7 @@ on:
 env:
   REGISTRY: ghcr.io
   USERNAME: "${{ github.actor }}"
-  PASSWORD: "${{ github.token }}"
+  PASSWORD: "${{ secrets.KEYMAN_SERVER_REPO_ACCESS_PAT }}"
 
 jobs:
 

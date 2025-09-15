@@ -42,4 +42,4 @@ jobs:
           expand-packages: true
           packages: keyman-*-ci
           delete-untagged: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.KEYMAN_SERVER_REPO_ACCESS_PAT }}
