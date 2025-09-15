@@ -9,10 +9,12 @@ defaults:
     shell: bash
 
 on:
+
   schedule:
     #run every Fri, 6 pm UTC
     - cron: '0 18 * * 5' #
 
+  workflow_dispatch:
 jobs:
   message:
     name: Print message
@@ -38,3 +40,4 @@ jobs:
           expand-packages: true
           packages: keyman-*-ci
           delete-untagged: true
+          token: ${{ secrets.GITHUB_TOKEN }}
