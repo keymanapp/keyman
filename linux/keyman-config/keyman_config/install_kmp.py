@@ -178,7 +178,8 @@ class InstallKmp():
                 logging.info("Converting %s to LDML and installing both as as keyman file",
                              f['name'])
                 name, ext = os.path.splitext(f['name'])
-                if ldml := convert_kvk_to_ldml(name, fpath):
+                ldml = convert_kvk_to_ldml(name, fpath)
+                if ldml is not None and len(ldml) > 0:
                     ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
                     output_ldml(ldmlfile, ldml)
             elif ftype == KMFileTypes.KM_ICON:
@@ -308,7 +309,8 @@ def extract_kmp(kmpfile, directory):
 
 
 def process_keyboard_data(keyboardID, packageDir) -> bool:
-    if not (kbdata := get_keyboard_data(keyboardID)):
+    kbdata = get_keyboard_data(keyboardID)
+    if not kbdata or len(kbdata) <= 0:
         return False
     if not os.path.isdir(packageDir) and os.access(os.path.join(packageDir, os.pardir), os.X_OK | os.W_OK):
         try:
