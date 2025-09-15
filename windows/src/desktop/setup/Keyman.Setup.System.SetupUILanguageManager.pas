@@ -225,7 +225,7 @@ begin
         Result := CompareText(Left.Value.LanguageName4Sort, Right.Value.LanguageName4Sort);
       end
     )
-                  );
+  );
   FreeAndNil(FSortedValues);
   FSortedValues := sortedPairA;
   i := 0;
