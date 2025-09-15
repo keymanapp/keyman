@@ -128,22 +128,6 @@ begin
   Result := FSortedValues;
 end;
 
-(*
-
-  Returns the list of key-value pairs where the keys have the same order as the list returned by SortedValues. For non-latin based languages the values are composed of the non-latin based named with the English name in parentheses.
-  This list is regenerated in Reorder.
-  @returns A list of sorted locale pairs (Key = xxxxx, Value = yyyyy)
-*)
-class function TSetupUILanguageManager.SortedDisplayValues: TList< TPair<string,string>>;
-begin
-  if FHasChanged then
-  begin
-    Reorder;
-    FHasChanged := False;
-  end;
-  Result := FSortedDisplayValues;
-end;
-
 class procedure TSetupUILanguageManager.DestroyStatic;
 begin
   FreeAndNil(FStrings);
