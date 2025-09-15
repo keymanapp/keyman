@@ -204,7 +204,11 @@ begin
   FLocales.Add(tag, languageTriple);
   FHasChanged := True;
 end;
-
+(**
+ * Rebuilds and sorts FSortedValues based on the LanguageName4Sort field.
+ * By using this field, the sort order will be by the original language names for latin script  
+ * languages, and the English name for non- Latin script languages.
+ *)
 class procedure TSetupUILanguageManager.Reorder;
 var
   item: TPair<string,TLanguageName>;
