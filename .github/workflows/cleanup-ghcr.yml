@@ -1,6 +1,6 @@
 # This workflow removes all untagged Docker images from the
 # GitHub Container Registry.
-# It is triggered by a schedule event.
+# It is triggered by a schedule event or a manual workflow dispatch event.
 
 name: "Docker images: Cleanup GitHub Container Registry"
 run-name: "Docker images: Cleanup GitHub Container Registry (branch ${{ github.ref_name }} on ${{ github.event_name }} by ${{ github.actor }})"
