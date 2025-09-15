@@ -28,7 +28,6 @@ type
     FIndexMapping: TDictionary<Integer,Integer>;
     FHasChanged: Boolean;
     FSortedValues: TList< TPair<string,TLanguageName>>;
-    FSortedDisplayValues: TList< TPair<string,string>>;
   private
     class procedure CreateStatic;
     class procedure DestroyStatic;
@@ -40,7 +39,6 @@ type
     class function Locales: TSetupLocales; static;
     class function IndexMapping: TDictionary<Integer,Integer>; static;
     class function SortedValues: TList< TPair<string,TLanguageName>>; static;
-    class function SortedDisplayValues: TList< TPair<string,string>>; static;
     class property ActiveLocale: string read FActiveLocale write FActiveLocale;
     class procedure RegisterSetupStrings(const tag: string; const locale: TLocaleArray);
     class procedure Reorder;
@@ -134,7 +132,6 @@ begin
   FreeAndNil(FLocales);
   FreeAndNil(FIndexMapping);
   FreeAndNil(FSortedValues);
-  FreeAndNil(FSortedDisplayValues);
 end;
 
 /// Sets the Setup UI language to the first matching user preferred UI language, if any found.
