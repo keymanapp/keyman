@@ -104,12 +104,12 @@ begin
   Result := FIndexMapping;
 end;
 
-(*
-
-  Returns the list of locale key-value pairs sorted by their locale names (i.e. value).
-  This list is regenerated in Reorder.
-  @returns A list of sorted locale pairs (Key = xxxxx, Value = yyyyy)
-*)
+(**
+ * Returns the list of locale key-value pairs where 
+ * Key = BCP 47 locale tag, and Value = TLanguageName record)
+ * This list is regenerated in Reorder.
+ *  @returns A list of sorted locale pairs (Key = xxxxx, Value = yyyyy)
+ *)
 class function TSetupUILanguageManager.SortedValues: TList< TPair<string,TLanguageName>>;
 begin
   if FHasChanged then
