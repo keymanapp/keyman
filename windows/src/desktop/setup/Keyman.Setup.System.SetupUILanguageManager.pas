@@ -52,13 +52,21 @@ uses
   System.SysUtils,
   Winapi.Windows;
 
-  // checks a string for non latin based characters
-  // Only ranges [$0000,$007F] (Basic Latin) and
-  //  [$0080, $00FF] (Latin-1 Supplement) are considered as Latin Based
-  //  Latin Extended-A ([$0100,$017F]), Latin Extended-B ([$0180,$024F])
-  //  and Latin Extended Additional ([$1E00,$1EFF]) are not considered
-  // True: all characters are latin based
-  // False: otherwise
+ (** 
+ * Checks whether a string contains only Latin-based characters.
+ *
+ *  The following Unicode ranges are considered Latin-based:
+ *  [$0000,$007F] (Basic Latin)
+ *  [$0080,$00FF] (Latin-1 Supplement)
+ *
+ *  The following ranges are **not** considered Latin-based:
+ *  [$0100,$017F] (Latin Extended-A)
+ *  [$0180,$024F] (Latin Extended-B)
+ *  [$1E00,$1EFF] (Latin Extended Additional)
+ *
+ * @param  name  The string to check.
+ * @return True  if all characters are Latin-based; False otherwise.
+ *)
   function isLatinBasedOnly(name: string): Boolean;
   var
     ch: Char;
