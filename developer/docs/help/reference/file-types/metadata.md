@@ -88,9 +88,11 @@ The `System` object is used by Keyman Desktop to install keyboards
   The version of Keyman Developer used to create the package file. If undefined,
   use `'0.0.0.0'`
 
-`fileVersion,`
+`fileVersion`
 
 : `string`
+
+  The minimum version of Keyman required to use the package.
 
 ### The Options object
 
