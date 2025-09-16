@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.120 alpha 2025-09-16
+
+* refactor(linux): remove warning (#14761)
+* fix(linux): don't crash on invalid languages in keyboard (#14760)
+
 ## 19.0.119 alpha 2025-09-15
 
 * fix(developer): transform slashes to backslashes in paths in Package Editor (#14721)
