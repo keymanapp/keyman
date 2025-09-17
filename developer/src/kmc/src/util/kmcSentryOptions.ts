@@ -1,6 +1,6 @@
 import Sentry from "@sentry/node";
 import * as process from "node:process";
-import { SentryNodeOptions } from "@keymanapp/developer-utils";
+import { SentryNodeOptions } from "./KeymanSentry.js";
 
 Sentry.setContext('Command Line', {
   // obfusate parameters with longer paths e.g. from 'c:/users/name/a/b' to

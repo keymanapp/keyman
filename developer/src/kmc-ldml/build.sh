@@ -5,10 +5,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 
 builder_describe "Keyman kmc Keyboard Compiler module" \
   "@/common/web/keyman-version" \
@@ -38,7 +40,7 @@ function do_clean() {
 }
 
 function do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
   do_build_abnf
 }
 
@@ -47,7 +49,7 @@ function do_build() {
 }
 
 function do_build_abnf() {
-  # we convert over all abnf files found. 
+  # we convert over all abnf files found.
   local file
   for file in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards"/*/abnf/*.abnf; do
     local cldrver="$(basename $(dirname $(dirname "$file")))"
@@ -75,6 +77,11 @@ function do_build_fixtures() {
 
   # Generate a binary file from basic.txt for comparison purposes
   node ../../../common/tools/hextobin/build/hextobin.js ./test/fixtures/basic.txt ./build/test/fixtures/basic-txt.kmx
+  if ! cmp ./build/test/fixtures/basic-xml.kmx ./build/test/fixtures/basic-txt.kmx; then
+    builder_die "basic-xml.kmx (compiled from basic.xml) and basic-txt.kmx (see basic.txt) are different!"
+  else
+    builder_echo grey "basic-xml.kmx and basic-txt.kmx are identical"
+  fi
 }
 
 builder_run_action clean           do_clean
@@ -82,10 +89,10 @@ builder_run_action configure       do_configure
 builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
-builder_run_action test            builder_do_typescript_tests
+builder_run_action test            typescript_run_eslint_mocha_tests  90
 
 #-------------------------------------------------------------------------------------------------------------------
 
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
-builder_run_action publish     builder_publish_npm
+builder_run_action publish     ci_publish_npm

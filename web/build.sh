@@ -5,10 +5,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # ################################ Main script ################################
 
@@ -26,6 +26,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
   ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
+  ":engine/common/web-utils  Low-level, headless utility methods and classes used across multiple modules" \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
@@ -35,13 +36,12 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/keyboard-storage  Subset used to collate keyboards and request them from the cloud" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
-  ":engine/predictive-text=src/engine/predictive-text/worker-main     Builds KMW's predictive text module" \
+  ":engine/predictive-text   Builds KMW's predictive text module" \
   ":help                     Online documentation" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
-  ":_all                     (Meta build target used when targets are not specified)" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  ":_all                     (Meta build target used when targets are not specified)"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -70,6 +70,7 @@ builder_describe_outputs \
   build:engine/main             "/web/build/engine/main/lib/index.mjs" \
   build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
   build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
+  build:engine/common/web-utils "/web/src/engine/common/web-utils/build/lib/index.mjs" \
   build:samples                 "/web/src/samples/simplest/keymanweb.js" \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"
@@ -81,6 +82,8 @@ BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mj
 ##################### TODO:  call child action, verify things work as expected!
 
 # We can run all clean & configure actions at once without much issue.
+
+builder_run_action clean:_all rm -rf build/
 
 builder_run_child_actions clean
 
@@ -131,24 +134,31 @@ build_action() {
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 
-test_action() {
-  TEST_OPTS=
-  if builder_has_option --ci; then
-    TEST_OPTS=--ci
-  fi
-  ./test.sh "${TEST_OPTS}"
-}
-
 coverage_action() {
   builder_echo "Creating coverage report..."
-  cd "$KEYMAN_ROOT"
-  mkdir -p web/build/coverage/tmp
-  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t web/build/coverage/tmp
-  c8 report --config web/.c8rc.json ---reporter html --clean=false --reports-dir=web/build/coverage
-  rm -rf web/build/coverage/tmp
-  cd web
+
+  # Always ensure our collation folder is clean, just in case something went wrong on a prior run.
+  rm -rf build/coverage/tmp
+
+  # Also clean out the sub-report directories + main index.html; don't keep old ones if we fail!
+  rm -rf build/coverage/app
+  rm -rf build/coverage/engine
+  rm -f  build/coverage/index.html
+
+  # Collate the results into a single folder
+  mkdir build/coverage/tmp
+  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t build/coverage/tmp
+
+  # Note for maintainers:  the .c8rc.json config needs to be written from the perspective of
+  # the working directory - including its `include` and `exclude` entries.  All ignores and
+  # such must be redefined in whatever that top-level .c8rc.json is.
+  c8 report --reporter html
+
+  # No need to keep the collation folder around afterward; we can always redo that work.
+  rm -rf build/coverage/tmp
 }
 
+builder_run_child_actions build:engine/common/web-utils
 builder_run_child_actions build:engine/dom-utils
 
 builder_run_child_actions build:engine/keyboard
@@ -194,7 +204,7 @@ builder_run_action build:_all build_action
 
 # Run tests
 builder_run_child_actions test
-builder_run_action test:_all test_action
+builder_run_action test:_all ./test.sh
 
 function do_test_help() {
   check-markdown  "$KEYMAN_ROOT/web/docs/engine"

@@ -43,7 +43,9 @@ import com.keyman.android.DownloadIntentService;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMPLink;
 import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils;
 import com.keyman.engine.util.WebViewUtils.EngineWebViewVersionStatus;
+import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -65,6 +67,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -83,7 +86,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.provider.Settings;
 import android.text.Html;
@@ -96,8 +98,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -116,6 +116,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private static final String TAG = "MainActivity";
 
+  private ConstraintLayout constraintLayout;
   private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
@@ -142,8 +143,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
         options.setEnableAutoSessionTracking(false);
-        options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
-        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
+        options.setRelease(com.tavultesoft.kmapro.BuildConfig.KEYMAN_VERSION_GIT_TAG);
+        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.KEYMAN_VERSION_ENVIRONMENT);
       });
     }
 
@@ -153,7 +154,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.setDebugMode(true);
     }
 
+    // Verify WebView installed and enabled before attempting to initialize KMManager
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
+
     KMManager.executeResourceUpdate(this);
 
     DefaultLanguageResource.install(context);
@@ -165,6 +168,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkHapticFeedback();
 
     setContentView(R.layout.activity_main);
+
+    constraintLayout = (ConstraintLayout)findViewById(R.id.constraintLayout);
+    setupEdgeToEdge(R.id.constraintLayout);
+    setupStatusBarColors(android.R.color.white, R.color.neutral_2);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -181,8 +188,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
-    // Use in-app keyboard WebView to check the Chrome version
-    checkChromeVersion(KMManager.getKMKeyboard(KeyboardType.KEYBOARD_TYPE_INAPP));
+    // Check WebView enabled and Chrome version
+    SystemWebViewStatus webViewStatus = WebViewUtils.getSystemWebViewStatus(context);
+    EngineWebViewVersionStatus chromeStatus = KMManager.getEngineWebViewVersionStatus();
+    updateWebViewIfNeeded(chromeStatus, webViewStatus);
+
     CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
     checkGetStarted();
   }
@@ -237,8 +247,17 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   protected void onResume() {
     super.onResume();
+
+    if (textView != null) {
+      // Reset inAppPredictionsSuspendedForSensitiveInput flag
+      KMManager.setPredictionsSuspended(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
+    }
+
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
+
+    // Reset keyboard picker Activity Task flag
+    KMManager.closeParentAppOnShowKeyboardPicker();
 
     // onConfigurationChanged() only triggers when device is rotated while app is in foreground
     // This handles when device is rotated while app is in background
@@ -424,41 +443,41 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case R.id.action_info:
-        showInfo();
-        return true;
-      case R.id.action_share:
-        showShareDialog();
-        return true;
+    // Android Gradle 8.0 no longer declares resources final, so can't use switch statement here
+    if (item.getItemId() == R.id.action_info) {
+      showInfo();
+      return true;
+    } else if (item.getItemId() == R.id.action_share) {
+      showShareDialog();
+      return true;
       /* Disable Web Browser to investigate Google sign-in
-      case R.id.action_web:
+    } else if ((item.getItemId() == R.id.action_web) {
         showWebBrowser();
         return true;*/
-      case R.id.action_text_size:
-        showTextSizeDialog();
-        return true;
-      case R.id.action_clear_text:
-        showClearTextDialog();
-        return true;
-      case R.id.action_get_started:
-        showGetStarted();
-        return true;
-      case R.id.action_settings:
-        showSettings();
-        return true;
-      case R.id.action_update_keyboards:
-        KMManager.getUpdateTool().executeOpenUpdates();
-        // Dismiss icon
-        updateUpdateCountIndicator(0);
-        final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-        if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
-          _keyboardupdate.setVisible(false);
-        }
+    } else if (item.getItemId() == R.id.action_text_size) {
+      showTextSizeDialog();
+      return true;
+    } else if (item.getItemId() == R.id.action_clear_text){
+      showClearTextDialog();
+      return true;
+    } else if (item.getItemId() == R.id.action_get_started) {
+      showGetStarted();
+      return true;
+    } else if (item.getItemId() == R.id.action_settings) {
+      showSettings();
+      return true;
+    } else if (item.getItemId() == R.id.action_update_keyboards) {
+      KMManager.getUpdateTool().executeOpenUpdates();
+      // Dismiss icon
+      updateUpdateCountIndicator(0);
+      final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+      if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
+        _keyboardupdate.setVisible(false);
+      }
 
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
+      return true;
+    } else {
+      return super.onOptionsItemSelected(item);
     }
   }
 
@@ -475,8 +494,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    // Initialize keyboard options
-    KMManager.sendOptionsToKeyboard();
+    // Do nothing
   }
 
   @Override
@@ -607,17 +625,25 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (resourceId > 0)
       statusBarHeight = getResources().getDimensionPixelSize(resourceId);
 
+    // Navigation bar height
+    int navigationBarHeight = 0;
+    resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      navigationBarHeight = getResources().getDimensionPixelSize(resourceId);
+    }
+
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
-    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
+    textView.setHeight(
+      screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
   }
 
   private void showInfo() {
     Intent i = new Intent(this, InfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     startActivity(i);
-    overridePendingTransition(android.R.anim.fade_in, R.anim.hold);
+    overridePendingTransition(android.R.anim.fade_in, com.keyman.engine.R.anim.hold);
   }
 
   private void showWebBrowser() {
@@ -628,7 +654,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     Intent i = new Intent(this, WebBrowserActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     startActivity(i);
-    overridePendingTransition(android.R.anim.fade_in, R.anim.hold);
+    overridePendingTransition(android.R.anim.fade_in, com.keyman.engine.R.anim.hold);
   }
 
   private void showShareDialog() {
@@ -770,39 +796,117 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
   }
 
-  private void checkChromeVersion(WebView webView) {
-    if (KMManager.getEngineWebViewVersionStatus() != EngineWebViewVersionStatus.FULL) {
-      LinearLayout updateChromeLayout = (LinearLayout) findViewById(R.id.updateChromeLayout);
-      updateChromeLayout.setVisibility(View.VISIBLE);
-
-      Button updateChromeButton = (Button)findViewById(R.id.updateChromeButton);
-      updateChromeButton.setOnClickListener(new View.OnClickListener() {
-        public void onClick(View v) {
-          // Launch PlayStore to update Chrome
-          try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
-            if (intent.resolveActivity(getPackageManager()) != null) {
-              startActivity(intent);
-            } else {
-              intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
-              if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
-              } else {
-                Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
-              }
-            }
-          } catch (android.content.ActivityNotFoundException e) {
-            // Link to Chrome if user is not signed in to Play Store
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
-            if (intent.resolveActivity(getPackageManager()) != null) {
-              startActivity(intent);
-            } else {
-              Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
-            }
-          }
-        }
-      });
+  /**
+   * Based on whether Chrome and WebView are installed & enabled,
+   * display the corresponding update panel
+   * @param chromeStatus
+   * @param webViewStatus
+   */
+  private void updateWebViewIfNeeded(EngineWebViewVersionStatus chromeStatus, SystemWebViewStatus webViewStatus) {
+    if (chromeStatus == EngineWebViewVersionStatus.FULL && webViewStatus == SystemWebViewStatus.FULL) {
+      return;
     }
+
+    if (webViewStatus == SystemWebViewStatus.NOT_INSTALLED) {
+      displayInstallWebView();
+    } else if (webViewStatus == SystemWebViewStatus.DISABLED) {
+      displayEnableWebView();
+    } else {
+      // Otherwise, display update Chrome
+      displayUpdateChrome();
+    }
+  }
+
+  private void displayInstallWebView() {
+    TextView textView = (TextView)findViewById((R.id.kmWebViewChromeTextView));
+    textView.setText(getString(R.string.body_install_webview));
+
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
+    button.setText(getString(R.string.label_install_webview));
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Play Store link to install WebView
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview"));
+
+        // Launch intent
+        try {
+          PackageManager packageManager = context.getPackageManager();
+          if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent);
+          }
+        } catch (android.content.ActivityNotFoundException e) {
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+
+    LinearLayout webViewChromeLayout = (LinearLayout) findViewById(R.id.checkWebViewChromeLayout);
+    webViewChromeLayout.setVisibility(View.VISIBLE);
+  }
+
+  private void displayEnableWebView() {
+    TextView textView = (TextView)findViewById((R.id.kmWebViewChromeTextView));
+    textView.setText(getString(R.string.body_enable_webview));
+
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
+    button.setText(getString(R.string.label_enable_webview));
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Application settings to enable WebView
+        Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS",
+          Uri.parse("package:com.google.android.webview"));
+
+        // Launch intent
+        try {
+          PackageManager packageManager = context.getPackageManager();
+          if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent);
+          }
+        } catch (android.content.ActivityNotFoundException e) {
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+
+    LinearLayout webViewChromeLayout = (LinearLayout) findViewById(R.id.checkWebViewChromeLayout);
+    webViewChromeLayout.setVisibility(View.VISIBLE);
+  }
+
+  private void displayUpdateChrome() {
+    // TextView's default string is to update Chrome
+    TextView textView = (TextView)findViewById(R.id.kmWebViewChromeTextView);
+    textView.setText(String.format(getString(R.string.text_require_chrome_version),
+      WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME));
+
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
+    button.setText(getString(R.string.button_update_chrome));
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Primary Play Store link to install/update Chrome
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+          Uri.parse("market://details?id=com.android.chrome"));
+
+        try {
+          PackageManager packageManager = context.getPackageManager();
+          if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent);
+          } else {
+            // (alternate Play Store link to install/update Chrome)
+            intent = new Intent(Intent.ACTION_VIEW,
+              Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
+
+            intent.resolveActivity(packageManager);
+            startActivity(intent);
+          }
+        } catch (android.content.ActivityNotFoundException e) {
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+
+    LinearLayout webViewChromeLayout = (LinearLayout) findViewById(R.id.checkWebViewChromeLayout);
+    webViewChromeLayout.setVisibility(View.VISIBLE);
   }
 
   private Uri requestPermissionIntentUri;

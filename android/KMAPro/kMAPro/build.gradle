@@ -9,8 +9,16 @@ plugins {
 ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
+String tier = new File('../../TIER.md').getText('UTF-8').trim();
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -18,20 +26,24 @@ android {
         noCompress "kmp"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
         //println "===END DUMP==="
 
-        // VERSION strings from version.gradle
-        versionCode VERSION_CODE as Integer
-        versionName VERSION_NAME
-        buildConfigField 'String', 'VERSION_ENVIRONMENT', '"'+VERSION_ENVIRONMENT+'"'
-        buildConfigField 'String', 'VERSION_GIT_TAG', '"'+VERSION_GIT_TAG+'"'
+        // KEYMAN_VERSION strings from version.gradle
+        versionCode KEYMAN_VERSION_CODE as Integer
+        versionName KEYMAN_VERSION_NAME
+        buildConfigField 'String', 'KEYMAN_VERSION_ENVIRONMENT', '"'+KEYMAN_VERSION_ENVIRONMENT+'"'
+        buildConfigField 'String', 'KEYMAN_VERSION_GIT_TAG', '"'+KEYMAN_VERSION_GIT_TAG+'"'
     }
 
     String env_release_store_file = System.getenv("release_store_file")
@@ -75,7 +87,7 @@ android {
         //  - PR builds also have "-test-1234" suffix (where 1234 is PR#)
         // Gradle sync will nullify these values, so have a fallback
         String appSuffix = ''
-        String tag = VERSION_TAG ? VERSION_TAG : '-' + new File('../../TIER.md').getText('UTF-8');
+        String tag = KEYMAN_VERSION_TAG ? KEYMAN_VERSION_TAG : '-' + tier;
         if (tag.startsWithAny("-beta", "beta")) {
             appSuffix = ' Beta';
         } else if (tag.startsWithAny("-alpha", "alpha")) {
@@ -86,21 +98,27 @@ android {
             // -test-PR_NUMBER
             appSuffix = appSuffix + match.group(1)
         } else {
-            String environment = VERSION_ENVIRONMENT ? VERSION_ENVIRONMENT : 'local';
+            String environment = KEYMAN_VERSION_ENVIRONMENT ? KEYMAN_VERSION_ENVIRONMENT : 'local';
             if (environment.matches("local")) {
                 appSuffix = appSuffix + '-' + environment;
             }
         }
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
 
-        // Adjust output name to "keyman-${VERSION_MD}.apk"
+        // Adjust output name to "keyman-${KEYMAN_VERSION_MD}.apk"
         variant.outputs.all {
-            outputFileName = "keyman-" + VERSION_MD + ".apk"
+            outputFileName = "keyman-" + KEYMAN_VERSION_MD + ".apk"
         }
     }
     lintOptions {
         disable 'MissingQuantity', 'MissingTranslation'
         lintConfig file("lint.xml")
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
     }
 }
 
@@ -127,7 +145,7 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
-        switch (System.env.TIER) {
+        switch (tier) {
             case 'beta':
                 track.set("beta")
                 println "TIER set to beta"
@@ -146,19 +164,17 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 }
 
 repositories {
-    flatDir {
-        dirs 'libs'
-    }
     google()
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
-    api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:7.8.0'
+    implementation files('libs/keyman-engine.aar')
+    implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
     implementation "com.android.installreferrer:installreferrer:2.2"
 

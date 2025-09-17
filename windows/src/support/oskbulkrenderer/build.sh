@@ -2,11 +2,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "oskbuildrenderer" \
-  clean configure build test
+  clean configure build test edit
 
 builder_parse "$@"
 
@@ -37,3 +37,4 @@ builder_run_action clean:project        do_clean
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
+builder_run_action edit:project         start oskbulkrenderer.dproj

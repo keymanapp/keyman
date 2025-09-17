@@ -3,10 +3,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # Imports common Web build-script definitions & functions
 . "$KEYMAN_ROOT/web/common.inc.sh"
@@ -19,8 +19,7 @@ builder_describe "Builds the Keyman Engine for Web's sample page setups." \
   "configure           Does nothing for this project" \
   "clean" \
   "build" \
-  "test                Does nothing for this project" \
-  "--ci                Does nothing for this project"
+  "test                Does nothing for this project"
 
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \

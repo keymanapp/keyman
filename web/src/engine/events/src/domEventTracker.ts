@@ -61,7 +61,7 @@ export class DomEventTracker {
     Pelem.addEventListener(Peventname, Phandler, PuseCapture ? true : false);
 
     // Since we're attaching to the DOM, these events should be tracked for detachment during shutdown.
-    var event = new DomEventTracking(Pelem, Peventname, Phandler, PuseCapture);
+    const event = new DomEventTracking(Pelem, Peventname, Phandler, PuseCapture);
     this.domEvents.push(event);
   }
 
@@ -96,8 +96,8 @@ export class DomEventTracker {
     Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
 
     // Since we're detaching, we should drop the tracking data from the old event.
-    var event = new DomEventTracking(Pelem, Peventname, Phandler, PuseCapture);
-    for(var i = 0; i < this.domEvents.length; i++) {
+    const event = new DomEventTracking(Pelem, Peventname, Phandler, PuseCapture);
+    for(let i = 0; i < this.domEvents.length; i++) {
       if(this.domEvents[i].equals(event)) {
         this.domEvents.splice(i, 1);
         break;
@@ -109,7 +109,7 @@ export class DomEventTracker {
     // Remove all events linking to elements of the original, unaltered page.
     // This should sever any still-existing page ties to this instance of KMW,
     // allowing browser GC to do its thing.
-    for(let event of this.domEvents) {
+    for(const event of this.domEvents) {
       // @ts-ignore // since it's simpler this way and doesn't earn us much to re-check types.
       this.detachDOMEvent(event.Pelem, event.Peventname, event.Phandler, event.PuseCapture);
     }

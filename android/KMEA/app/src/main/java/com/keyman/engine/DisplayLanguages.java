@@ -66,9 +66,10 @@ public class DisplayLanguages {
       new DisplayLanguageType("el", "Polytonic Greek"),
       new DisplayLanguageType("pt-PT", "Português de Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
-      new DisplayLanguageType("ru-RU", "Pyccĸий (Russian)"),
+      new DisplayLanguageType("ru-RU", "Русский (Russian)"),
       new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
       new DisplayLanguageType("sv-SE", "svenska (Swedish)"),
+      new DisplayLanguageType("vi-VN", "Tiếng Việt (Vietnamese)"),
       new DisplayLanguageType("uk-UA", "Українська (Ukrainian)"),
       new DisplayLanguageType("hia-NG", "Waha"),
       new DisplayLanguageType("zh-CN", "中文(简体) (Simplified Chinese)")

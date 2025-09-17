@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman resources module" clean configure build test
@@ -15,5 +15,8 @@ builder_parse "$@"
 
 if builder_start_action test; then
   ./build/test/test.sh
+  ./build/test/build-bot/trigger-build-bot.test.sh
+  ./build/pr-build-status/build.sh test
+  ./build/publish-minimum-versions.sh test
   builder_finish_action success test
 fi

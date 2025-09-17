@@ -35,7 +35,7 @@ import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.
 
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
-import { type KeyElement, getKeyFrom } from './keyElement.js';
+import { type KeyElement } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
 import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
@@ -315,7 +315,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this._fixedHeightScaling = this.device.touchable && !this.isStatic;
 
     // Create the collection of HTML elements from the device-dependent layout object
-    var Lkbd = document.createElement('div');
+    const Lkbd = document.createElement('div');
     this.config.styleSheetManager = config.styleSheetManager || new StylesheetManager(Lkbd);
 
     let layout: ActiveLayout;
@@ -329,7 +329,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       //
       // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
       // even if it's "hollow".
-      let rawLayout = Layouts.buildDefaultLayout(null, null, config.device.formFactor);
+      const rawLayout = Layouts.buildDefaultLayout(null, null, config.device.formFactor);
       layout = this.kbdLayout = ActiveLayout.polyfill(rawLayout, null, config.device.formFactor);
       // null will probably need to be replaced with a defined value.
       this.layoutKeyboardProperties = null;
@@ -353,11 +353,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     this.layerGroup = new OSKLayerGroup(this, this.layoutKeyboard, formFactor);
-
-    // Now that we've properly processed the keyboard's layout, mark it as calibrated.
-    // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
-    // need for it.  (Is no longer really used, so the drop ought be clean.)
-    this.layoutKeyboard.markLayoutCalibrated(formFactor);
 
     // Append the OSK layer group container element to the containing element
     //osk.keyMap = divLayerContainer;
@@ -536,7 +531,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // Do cleanup - we'll no longer be tracking these, but that's only confirmed now.
         // Multitouch does reference tracking data for a source after its completion,
         // but only while still permitting new touches.  If we're here, that time is over.
-        for(let id of gestureSequence.allSourceIds) {
+        for(const id of gestureSequence.allSourceIds) {
           // If the original preview host lives on, ensure it's cancelled now.
           if(sourceTrackingMap[id]?.previewHost) {
             this.gesturePreviewHost = null;
@@ -567,7 +562,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         let trackingEntry: typeof sourceTrackingMap[string];
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
-        for(let id of gestureStage.allSourceIds) {
+        for(const id of gestureStage.allSourceIds) {
           const clearRoaming = (trackingEntry: typeof sourceTrackingMap['']) => {
             if(trackingEntry.key) {
               this.highlightKey(trackingEntry.key, false);
@@ -597,9 +592,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
-
         const coordSource = gestureStage.sources[0];
-        const coord: InputSample<KeyElement, string> = coordSource ? coordSource.currentSample : null;
 
         let keyResult: KeyRuleEffects = null;
 
@@ -628,7 +621,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           try {
             shouldLockLayer && this.lockLayer(true);
             // Once the best coord to use for fat-finger calculations has been determined:
-            keyResult = this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
+            keyResult = this.modelKeyClick(gestureSequence, correctionKeyDistribution); // second spot for modelKeyClick
           } finally {
             shouldLockLayer && this.lockLayer(false);
           }
@@ -660,7 +653,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             //
             // Merely constructing the instance is enough; it'll link into the sequence's events and
             // handle everything that remains for the backspace from here.
-            handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
+            handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureSequence))]; // site 1 for modelKeyClick
           } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
             gestureSequence.on('complete', () => {
               gestureKey.key.highlight(false);
@@ -804,6 +797,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (this.usesFixedWidthScaling) {
       let baseWidth = this.width;
       baseWidth -= this._borderWidth * 2;
+      baseWidth = (isNaN(baseWidth) || baseWidth < 0) ? 0 : baseWidth;
       return ParsedLengthStyle.inPixels(baseWidth);
     } else {
       return ParsedLengthStyle.forScalar(1);
@@ -811,9 +805,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   get layoutHeight(): ParsedLengthStyle {
+    // currently:  equivalent to if(is touch keyboard)
     if (this.usesFixedHeightScaling) {
-      let baseHeight = this.height;
+      let baseHeight = this.height; // initially undefined!
       baseHeight -= this._borderWidth * 2;
+      // For robustness, as there are legal cases where this.height may be undefined.
+      baseHeight = (isNaN(baseHeight) || baseHeight < 0) ? 0 : baseHeight;
       return ParsedLengthStyle.inPixels(baseHeight);
     } else {
       return ParsedLengthStyle.forScalar(1);
@@ -825,7 +822,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // Touch OSKs may apply internal padding to prevent row cropping at the edges.
       // ... why not precompute both, rather than recalculate each time?
       // - appears to contribute to layout reflow costs on layer swaps!
-      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this._borderWidth * 2 - this.layerGroup.verticalPadding);
+      let baseHeight = this.layoutHeight.val - this._borderWidth * 2 - this.layerGroup.verticalPadding;
+      baseHeight = (isNaN(baseHeight) || baseHeight < 0) ? 0 : baseHeight;
+      return ParsedLengthStyle.inPixels(baseHeight);
     } else {
       return ParsedLengthStyle.forScalar(1);
     }
@@ -912,7 +911,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //#region VisualKeyboard - OSK touch handlers
   getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
     // `input` is already in keyboard-local coordinates.  It's not scaled, though.
-    let offsetCoords = { x: input.targetX, y: input.targetY };
+    const offsetCoords = { x: input.targetX, y: input.targetY };
 
     // The layer group's element always has the proper width setting, unlike kbdDiv itself.
     offsetCoords.x /= this.layerGroup.element.offsetWidth;
@@ -930,8 +929,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    */
   getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): Map<ActiveKeyBase, number> {
     // Note:  if subkeys are active, they will still be displayed at this time.
-    let touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
-    let layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.
+    const touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
+    const layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.
     const width = layerGroup.offsetWidth, height = this.kbdDiv.offsetHeight;
 
     // Prevent NaN breakages.
@@ -939,62 +938,27 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return new Map();
     }
 
-    let kbdAspectRatio = width / height;
+    const kbdAspectRatio = width / height;
 
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
     return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
-
-  /**
-   * Get the current key target from the touch point element within the key
-   *
-   * @param   {Object}  t   element at touch point
-   * @return  {Object}      the key element (or null)
-   **/
-  keyTarget(target: HTMLElement | EventTarget): KeyElement {
-    let t = <HTMLElement>target;
-
-    try {
-      if (t) {
-        if (t.classList.contains('kmw-key')) {
-          return getKeyFrom(t);
-        }
-        if (t.parentNode && (t.parentNode as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.parentNode);
-        }
-        if (t.firstChild && (t.firstChild as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.firstChild);
-        }
-      }
-    } catch (ex) { }
-    return null;
-  }
-
-  /**
-   *  Repeat backspace as long as the backspace key is held down
-   **/
-  repeatDelete: () => void = function (this: VisualKeyboard) {
-    if (this.deleting) {
-      this.modelKeyClick(this.deleteKey);
-      this.deleting = window.setTimeout(this.repeatDelete, 100);
-    }
-  }.bind(this);
-
-  /**
-   * Cancels any active repeatDelete() timeouts, ensuring that
-   * repeating backspace operations are properly terminated.
-   */
-  cancelDelete() {
-    // Clears the delete-repeating timeout.
-    if (this.deleting) {
-      window.clearTimeout(this.deleting);
-    }
-    this.deleting = 0;
-  }
   //#endregion
 
-  modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>, keyDistribution?: KeyDistribution) {
-    let keyEvent = this.initKeyEvent(e);
+  // Retool:  take in `gestureStage` (or its index?) and the SEQUENCE; the latter lets us log gesture breadcrumbs.
+  modelKeyClick(sequence: GestureSequence<KeyElement>, keyDistribution?: KeyDistribution) {
+    if(!sequence) {
+      throw new Error("cannot model key event without its gesture");
+    }
+    const stage = sequence.stageReports[sequence.stageReports.length-1];
+    const e = stage.item;
+    const input = stage.sources[0]?.currentSample;
+
+    if(!e) {
+      throw new Error(`Cannot model keypress without a selected key: \n${sequence.trace()}`);
+    }
+
+    const keyEvent = this.initKeyEvent(e);
 
     if (input) {
       keyEvent.source = input;
@@ -1003,6 +967,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       keyEvent.keyDistribution = keyDistribution;
     }
 
+    keyEvent.inputBreadcrumb = sequence.trace();
     return this.raiseKeyEvent(keyEvent, e);
   }
 
@@ -1016,7 +981,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     //
     // Would avoid the type shenanigans needed here because of our current type-abuse setup
     // for key spec tracking.
-    let keySpec = (e['key'] ? e['key'].spec : null) as unknown as ActiveKey;
+    const keySpec = (e['key'] ? e['key'].spec : null) as unknown as ActiveKey;
     if (!keySpec) {
       return null;
     }
@@ -1026,13 +991,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   keyEventFromSpec(keySpec: ActiveKey | ActiveSubKey) {
-    //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
-
     // Start:  mirrors _GetKeyEventProperties
 
     // First check the virtual key, and process shift, control, alt or function keys
-    //let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device);
-    let Lkc = this.layoutKeyboard.constructKeyEvent(keySpec, this.device, this.stateKeys);
+    const Lkc = this.layoutKeyboard.constructKeyEvent(keySpec, this.device, this.stateKeys);
 
     /* In case of "fun" edge cases caused by JS's single-threadedness & event processing queue.
       *
@@ -1059,8 +1021,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * Description  Updates the OSK's visual style for any toggled state keys
    */
   _UpdateVKShiftStyle(layerId?: string) {
-    var i;
-    //let core = com.keyman.singleton.core;
+    let i;
 
     if (!layerId) {
       layerId = this.layerId;
@@ -1101,7 +1062,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   updateStateKeys(stateKeys: StateKeyMap) {
-    for(let key of Object.keys(this.stateKeys)) {
+    for(const key of Object.keys(this.stateKeys)) {
       this.stateKeys[key as keyof StateKeyMap] = stateKeys[key as keyof StateKeyMap];
     }
 
@@ -1150,12 +1111,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * This function allows us to calculate the font size in those situations.
    */
   getKeyEmFontSize(): ParsedLengthStyle {
-    if (!this.fontSize) {
-      return new ParsedLengthStyle('0px');
-    }
-
     if (this.device.formFactor == 'desktop') {
-      let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
+      const keySquareScale = 0.8; // Set in kmwosk.css, is relative.
       return this.fontSize.scaledBy(keySquareScale);
     } else {
       const emSizeStr = getComputedStyle(document.body).fontSize;
@@ -1210,9 +1167,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       (A single, initial reflow may happen depending on DOM manipulations before this method...,
       but no extras until phase 2.)
     */
-    let device = this.device;
+    const device = this.device;
 
-    var fs = 1.0;
+    let fs = 1.0;
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
     if (device.OS == DeviceSpec.OperatingSystem.iOS && !this.isEmbedded) {
       fs = fs / getViewportScale(this.device.formFactor);
@@ -1221,7 +1178,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     /*
       Phase 2:  first self-triggered reflow - locking in the keyboard's base property styling.
     */
-    let gs = this.kbdDiv.style;
+    const gs = this.kbdDiv.style;
     if (this.usesFixedHeightScaling && this.height) {
       // Sets the layer group to the correct height.
       gs.height = gs.maxHeight = this.height + 'px';
@@ -1305,50 +1262,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     };
   }
 
-  // Appears to be abandoned now - candidate for removal in future.
-  /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
-    if (!this.layerGroup) {
-      return allottedHeight;
-    }
-
-    /*
-      Note:  these may not be fully preprocessed yet!
-
-      However, any "empty row bug" preprocessing has been applied, and that's
-      what we care about here.
-    */
-    const layers = this.layerGroup.spec.layer;
-    let oskHeight = 0;
-
-    // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
-    for (const layerID in layers) {
-      const layer = layers[layerID];
-      let nRows = layer.row.length;
-      let rowHeight = Math.floor(allottedHeight / (nRows == 0 ? 1 : nRows));
-      let layerHeight = nRows * rowHeight;
-
-      if (layerHeight > oskHeight) {
-        oskHeight = layerHeight;
-      }
-    }
-
-    // This isn't set anywhere else; it's a legacy part of the original methods.
-    const oskPad = 0;
-    let oskPaddedHeight = oskHeight + oskPad;
-
-    return oskPaddedHeight;
-  }
-
   /**
    *  Append a style sheet for the current keyboard if needed for specifying an embedded font
    *  or to re-apply the default element font
    *
    **/
   appendStyleSheet() {
-    //let util = com.keyman.singleton.util;
-
-    var activeKeyboard = this.layoutKeyboard;
-    var activeStub = this.layoutKeyboardProperties;
+    const activeKeyboard = this.layoutKeyboard;
+    const activeStub = this.layoutKeyboardProperties;
 
     // First remove any existing keyboard style sheet
     if (this.styleSheet && this.styleSheet.parentNode) {
@@ -1358,7 +1279,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // For help.keyman.com, sometimes we aren't given a stub for the keyboard.
     // We can't get the keyboard's fonts correct in that case, but we can
     // at least proceed safely.
-    var kfd = activeStub?.textFont, ofd = activeStub?.oskFont;
+    const kfd = activeStub?.textFont, ofd = activeStub?.oskFont;
 
     // Add and define style sheets for embedded fonts if necessary (each font-face style will only be added once)
     this.styleSheetManager.addStyleSheetForFont(kfd, this.fontRootPath, this.device.OS);
@@ -1372,7 +1293,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Note: Some browsers do not download the font-face font until it is applied,
     //       so must apply style before testing for font availability
     // Extended to allow keyboard-specific custom styles for Build 360
-    var customStyle = this.addFontStyle(kfd, ofd);
+    let customStyle = this.addFontStyle(kfd, ofd);
     if (activeKeyboard != null && typeof (activeKeyboard.oskStyling) == 'string')  // KMEW-129
       customStyle = customStyle + activeKeyboard.oskStyling;
 
@@ -1386,7 +1307,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // All existing font-precalculations will need to be reset, as the font
       // was previously unavailable.
       this.layerGroup.resetPrecalcFontSizes();
-      this.refreshLayout()
+      // Can trigger when we're not actually layout-ready!
+      this.refreshLayout();
     });
   }
 
@@ -1401,7 +1323,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   addFontStyle(kfd: InternalKeyboardFont, ofd: InternalKeyboardFont): string {
     let s: string = '';
 
-    let family = (fd: InternalKeyboardFont) => fd.family.replace(/\u0022/g, '').replace(/,/g, '","');
+    const family = (fd: InternalKeyboardFont) => fd.family.replace(/\u0022/g, '').replace(/,/g, '","');
 
     // Set font family for OSK text, suggestion text
     if (kfd || ofd) {
@@ -1445,7 +1367,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return null;
     }
 
-    var formFactor = (typeof (argFormFactor) == 'undefined' ? 'desktop' : argFormFactor) as DeviceSpec.FormFactor,
+    const formFactor = (typeof (argFormFactor) == 'undefined' ? 'desktop' : argFormFactor) as DeviceSpec.FormFactor,
       layerId = (typeof (argLayerId) == 'undefined' ? 'default' : argLayerId),
       device: {
         formFactor?: DeviceSpec.FormFactor,
@@ -1463,10 +1385,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       device.touchable = false;
     }
 
-    let layout = PKbd.layout(formFactor);
+    const layout = PKbd.layout(formFactor);
 
     const deviceSpec = new DeviceSpec('other', device.formFactor, device.OS, device.touchable);
-    let kbdObj = new VisualKeyboard({
+    const kbdObj = new VisualKeyboard({
       keyboard: PKbd,
       keyboardMetadata: kbdProperties,
       hostDevice: deviceSpec,
@@ -1484,14 +1406,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className; // may contain multiple classes
     kbdObj.layerGroup.element.classList.add(device.formFactor + '-static');
 
-    let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
+    const kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
     // Models CSS classes hosted on the OSKView in normal operation.  We can't do this on the main
     // layer-group element because of the CSS rule structure for keyboard styling.
     //
     // For example, `.ios .kmw-keyboard-sil_cameroon_azerty` requires the element with the keyboard
     // ID to be in a child of an element with the .ios class.
-    let classWrapper = document.createElement('div');
+    const classWrapper = document.createElement('div');
     classWrapper.classList.add(device.OS.toLowerCase(), device.formFactor);
 
     // Select the layer to display, and adjust sizes
@@ -1548,7 +1470,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
            * - https://stackoverflow.com/q/63710162
            * - https://github.com/mdn/interactive-examples/issues/887#issuecomment-432418008
            */
-          for(let sheet of sheets) {
+          for(const sheet of sheets) {
             if(sheet == mainSheet) {
               // Don't need to relocate the custom stylesheet.
               continue;
@@ -1587,7 +1509,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     classWrapper.append(kbd);
 
     // Ensure that the OSK's style-sheet is included by the top-level div standing in for the OSKView.
-    for(let sheetFile of OSKView.STYLESHEET_FILES) {
+    for(const sheetFile of OSKView.STYLESHEET_FILES) {
       const sheetHref = `${pathConfig.resources}/osk/${sheetFile}`;
       const sheet = kbdObj.styleSheetManager.linkExternalSheet(sheetHref, true);
       sheet.parentNode.removeChild(sheet);
@@ -1663,7 +1585,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (this.keytip == null) {
       if(this.device.formFactor == 'phone') {
         // For now, should only be true (in production) when keyman.isEmbedded == true.
-        let constrainPopup = this.isEmbedded;
+        const constrainPopup = this.isEmbedded;
         this.keytip = new PhoneKeyTip(this, constrainPopup);
       } else {
         this.keytip = new TabletKeyTip(this);
@@ -1714,7 +1636,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return {};
     }
 
-    let callbackData: KeyRuleEffects = {};
+    const callbackData: KeyRuleEffects = {};
 
     const keyEventCallback: KeyEventResultCallback = (result, error) => {
       callbackData.contextToken = result?.transcription?.token;

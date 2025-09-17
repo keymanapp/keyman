@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/checkWebViewChromeLayout"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="@android:color/white"
+  android:orientation="horizontal">
+
+  <!-- Banner to display if WebView is not installed/enabled or old version of Chrome installed -->
+  <TextView
+    android:id="@+id/kmWebViewChromeTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:background="@android:color/white"
+    android:gravity="start"
+    android:layout_gravity="center_vertical"
+    android:text="@string/text_require_chrome_version"
+    android:layout_marginStart="@dimen/button_playstore_margin"
+    android:textSize="@dimen/update_chrome_label_textsize" />
+
+  <Button
+    android:id="@+id/webViewChromeButton"
+    style="@style/Widget.AppCompat.Button.Colored"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="end|center_vertical"
+    android:layout_marginStart="@dimen/button_playstore_margin"
+    android:layout_marginEnd="@dimen/button_playstore_margin"
+    android:layout_marginTop="@dimen/button_playstore_margin"
+    android:layout_marginBottom="@dimen/button_playstore_margin"
+    android:paddingStart="@dimen/button_playstore_padding"
+    android:paddingEnd="@dimen/button_playstore_padding"
+    android:background="@color/ms_material_blue_500"
+    android:elevation="1dp"
+    android:singleLine="true"
+    android:text="@string/button_update_chrome"
+    android:textColor="@android:color/white"/>
+
+</LinearLayout>

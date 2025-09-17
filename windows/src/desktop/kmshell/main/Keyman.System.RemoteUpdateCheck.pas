@@ -21,7 +21,15 @@ const
 type
   ERemoteUpdateCheck = class(Exception);
 
-  TRemoteUpdateCheckResult = (wucUnknown, wucSuccess, wucNoUpdates, wucFailure, wucOffline);
+  (**
+   * wucUnknown: The result of the check is unknown.
+   * wucUpdateAvailable: The check was successful and a keyboard package or Keyman Installer file is available.
+   * wucNotChecked: The check was not performed, due to time between check value
+   * wucNoUpdates: The check was successful but no updates are available.
+   * wucFailure: The check failed due to an error.
+   * wucOffline: The user is offline, so the check could not be performed.
+   *)
+  TRemoteUpdateCheckResult = (wucUnknown, wucUpdateAvailable, wucNotChecked, wucNoUpdates, wucFailure, wucOffline);
 
   TRemoteUpdateCheckDownloadParams = record
     TotalSize: Integer;
@@ -103,7 +111,7 @@ destructor TRemoteUpdateCheck.Destroy;
 begin
   if (FErrorMessage <> '') and FShowErrors then
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      '"+FErrorMessage+"');
+      'TRemoteUpdateCheck.Destroy: FErrorMessage = ' + FErrorMessage);
 
   KL.Log('TRemoteUpdateCheck.Destroy: FErrorMessage = ' + FErrorMessage);
   KL.Log('TRemoteUpdateCheck.Destroy: FRemoteResult = ' +
@@ -141,7 +149,7 @@ begin
   proceed := ConfigCheckContinue;
   if not proceed and not FForce then
   begin
-    Result := wucNoUpdates;
+    Result := wucNotChecked;
     Exit;
   end;
 
@@ -184,7 +192,10 @@ begin
         if ucr.Parse(http.Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
         begin
           TUpdateCheckStorage.SaveUpdateCacheData(ucr);
-          Result := wucSuccess;
+          if TUpdateCheckStorage.HasKeyboardPackages(ucr) or TUpdateCheckStorage.HasKeymanInstallFileUpdate(ucr) then
+            Result := wucUpdateAvailable
+          else
+            Result := wucNoUpdates;
         end
         else
         begin
@@ -216,7 +227,7 @@ begin
 
   Registry := TRegistryErrorControlled.Create; // I2890
   try
-    if Registry.OpenKey(SRegKey_KeymanDesktop_CU, True) then
+    if Registry.OpenKey(SRegKey_KeymanEngine_CU, True) then
       Registry.WriteDateTime(SRegValue_LastUpdateCheckTime, Now);
   finally
     Registry.Free;
@@ -232,7 +243,7 @@ begin
   try
     Registry := TRegistryErrorControlled.Create; // I2890
     try
-      if Registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
       begin
         if Registry.ValueExists(SRegValue_CheckForUpdates) and
           not Registry.ReadBool(SRegValue_CheckForUpdates) then

@@ -33,6 +33,9 @@ export class GestureStageReport<Type, StateToken = any> {
    */
   public readonly sources: GestureSourceSubview<Type>[];
 
+  public get currentSourceIds(): string[] {
+    return this.sources.map((entry) => entry.identifier);
+  }
   public readonly allSourceIds: string[];
 
   constructor(selection: MatcherSelection<Type, StateToken>, gestureSetId: string) {
@@ -66,6 +69,32 @@ export class GestureStageReport<Type, StateToken = any> {
 
     this.allSourceIds = matcher?.allSourceIds || [];
   }
+
+  /**
+   * Returns the time interval covered by recorded touch events during this stage and its
+   * matched gesture model.
+   *
+   * May return `undefined` if no actual touches occurred during this time.
+   */
+  public get interval() {
+    if(this.sources.length == 0) {
+      return undefined;
+    }
+
+    const timestamps = this.sources.map((entry => {
+      return {
+        start: entry.path.stats.initialSample.t,
+        end: entry.path.stats.lastTimestamp
+      }
+    }));
+
+    return timestamps.reduce((prior, current) => {
+      return {
+        start: prior.start > current.start ? current.start : prior.start,
+        end: prior.end < current.end ? current.end : prior.end
+      }
+    }, { start: Number.POSITIVE_INFINITY, end: Number.NEGATIVE_INFINITY });
+  }
 }
 
 interface PushConfig<Type> {
@@ -83,10 +112,30 @@ interface PopConfig {
 export type ConfigChangeClosure<Type> = (configStackCommand: PushConfig<Type> | PopConfig) => void;
 
 interface EventMap<Type, StateToken> {
+  /**
+   * This event is raised when a new, valid gesture component for the sequence has been matched and
+   * committed.
+   *
+   * It is always called synchronously with the match, before any further matches are possible.
+   * - The sole exception to the "synchronous" aspect is if this gesture enacted a 'pushed' state
+   *   that has active 'nested' gestures that need to be sustained.
+   * - Even in the case above, no further 'stage' events for this GestureSequence will occur.
+   * @param stageReport
+   * @param changeConfiguration
+   * @returns
+   */
   stage: (
     stageReport: GestureStageReport<Type, StateToken>,
     changeConfiguration: ConfigChangeClosure<Type>
   ) => void;
+  /**
+   * This event is raised when the sequence of connected gesture components has reached its end,
+   * with no further continuation possible.
+   *
+   * It is called synchronously with the end of the gesture sequence, though it may be 'kept alive'
+   * when sustaining 'nested' gestures dependent upon a 'pushed' state.
+   * @returns
+   */
   complete: () => void;
 }
 
@@ -104,7 +153,10 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
   private pushedSelector?: MatcherSelector<Type, StateToken>;
 
   private gestureConfig: GestureModelDefs<Type, StateToken>;
-  private markedComplete: boolean = false;
+  private completionTime: number;
+  private get markedComplete(): boolean {
+    return this.completionTime !== undefined;
+  }
 
   // Note:  the first stage will be available under `stageReports` after awaiting a simple Promise.resolve().
   constructor(
@@ -119,6 +171,8 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     this.selector = selector;
     this.selector.on('rejectionwithaction', this.modelResetHandler);
     this.once('complete', () => {
+      this.completionTime = performance.now();
+
       if(this.pushedSelector) {
         // The `popSelector` method is responsible for triggering cascading cancellations if
         // there are nested GestureSequences.
@@ -189,7 +243,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
         )
       }).reduce((flattened, arr) => flattened.concat(arr))
       .reduce((deduplicated, arr) => {
-        for(let entry of arr) {
+        for(const entry of arr) {
           if(deduplicated.indexOf(entry) == -1) {
             deduplicated.push(entry);
           }
@@ -200,6 +254,18 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       return potentialMatches;
     }
 
+  /**
+   * Processes newly-matched gesture stages and ensures that the corresponding state machines are
+   * set in motion.  Also processes the case where there is no longer a possible matching gesture stage.
+   * - The gesture sources (touchpoints) will no longer be tracked and signal their paths' `complete` events.
+   * - The gesture models for any potential followups to the completed stage will be initialized.
+   *   - If there are none, the `complete` event will be triggered.
+   * - The `stage` event (when there is a matched stage) will be triggered before the corresponding `complete`.
+   *   - It will occur synchronously unless this sequence is kept alive, with no further stages possible and
+   *     pending completion, to 'sustain' nested gestures.
+   * @param selection Data about the matching gesture and match type.
+   * @returns
+   */
   private readonly selectionHandler = async (selection: MatcherSelection<Type, StateToken>) => {
     const gestureSet = this.pushedSelector?.baseGestureSetId || this.selector?.baseGestureSetId;
     const matchReport = new GestureStageReport<Type, StateToken>(selection, gestureSet);
@@ -222,13 +288,13 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
 
       if(!selection.result.matched) {
         if(!this.markedComplete) {
-          this.markedComplete = true;
           this.emit('complete');
         }
         return;
       }
     }
 
+    // Only source of async:  actually completing a gesture that caused an alt-state.
     if(actionType == 'complete' && this.touchpointCoordinator && this.pushedSelector) {
       // Cascade-terminade all nested selectors, but don't remove / pop them yet.
       // Their selection mode remains valid while their gestures are sustained.
@@ -349,7 +415,6 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     } else {
       // Any extra finalization stuff should go here, before the event, if needed.
       if(!this.markedComplete) {
-        this.markedComplete = true;
         this.emit('complete');
       }
     }
@@ -385,13 +450,54 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     const sources = this.stageReports[this.stageReports.length - 1].sources;
     sources.forEach((src) => src.baseSource.isPathComplete || src.baseSource.terminate(true));
     if(!this.markedComplete) {
-      this.markedComplete = true;
       this.emit('complete');
     }
   }
 
   public toJSON(): any {
     return this.stageReports;
+  }
+
+  /**
+   * Prints out a 'trace' of the gesture sequence in reverse chronological order.  Each frame includes:
+   * - the unique touch-identifiers active for each stage
+   * - the matched gesture ID
+   * - the time interval spanned by the frame (if at least one touch was active during it)
+   * @returns
+   */
+  public trace(padding?: string): string {
+    padding ||= '  ';
+
+    const logTouches = (idArr: string[]) => {
+      if(idArr.length == 0) {
+        return `<empty>`;
+      } else if(idArr.length == 1) {
+        return idArr[0];
+      } else {
+        return idArr.join(', ');
+      }
+    }
+
+    const logInterval = (interval: {start: number, end: number}) => {
+      if(!interval) {
+        return '';
+      }
+
+      if(interval.start == interval.end) {
+        return `@ ${interval.start.toFixed(2)} ms`;
+      } else {
+        return `from ${interval.start.toFixed(2)} ms - ${interval.end.toFixed(2)} ms`
+      }
+    };
+
+    // Sanitizes the actual keystrokes involved but preserves a decent amount of gesture diagnostic information.
+    const logs = this.stageReports.map((entry) => padding + `${logTouches(entry.currentSourceIds)} - ${entry.matchedId} ${logInterval(entry.interval)}`)
+      // Orders each stage from most recent to least recent
+      .reverse();
+    if(this.markedComplete) {
+      logs.unshift(padding + `complete @ ${this.completionTime}`);
+    }
+    return logs.join('\n');
   }
 }
 

@@ -87,7 +87,7 @@ describe('KeymanWeb Compiler', function() {
   it('should determine the minimum version correctly with U_xxxx_yyyy touch ids', async function() {
     const filenames = generateTestFilenames('version_u_xxxx_yyyy');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
@@ -100,7 +100,7 @@ describe('KeymanWeb Compiler', function() {
   it('should give an error if the minimum version specified in the keyboard does not support U_xxxx_yyyy touch ids', async function() {
     const filenames = generateTestFilenames('version_u_xxxx_yyyy_14');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNull(result);
     assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
     assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
@@ -111,7 +111,7 @@ describe('KeymanWeb Compiler', function() {
     it(`should give warning WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb for v9 keyboards if ${mode} found`, async function() {
       const filenames = generateTestFilenames(`version_9_${mode}`);
 
-      let result = await kmnCompiler.run(filenames.source, null);
+      const result = await kmnCompiler.run(filenames.source, null);
       assert.isNotNull(result); // only a warning, so output is generated
       assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
       assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
@@ -121,7 +121,7 @@ describe('KeymanWeb Compiler', function() {
     it(`should select version 10 automatically if ${mode} found`, async function() {
       const filenames = generateTestFilenames(`version_auto_${mode}`);
 
-      let result = await kmnCompiler.run(filenames.source, null);
+      const result = await kmnCompiler.run(filenames.source, null);
       assert.isNotNull(result);
 
       // we expect only 1 of the info messages -- for the .kmx target (not 2)
@@ -138,7 +138,7 @@ describe('KeymanWeb Compiler', function() {
     // Note that the logic being tested here is in kmx compiler.cpp, not kmw compiler
     const filenames = generateTestFilenames('version_notany');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
@@ -152,7 +152,7 @@ describe('KeymanWeb Compiler', function() {
     // Note that the logic being tested here is in kmx compiler.cpp, not kmw compiler
     const filenames = generateTestFilenames('version_notany_10');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNull(result);
     assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
     assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
@@ -162,7 +162,7 @@ describe('KeymanWeb Compiler', function() {
   it('should determine the minimum version correctly with special key caps on normal keys', async function() {
     const filenames = generateTestFilenames('version_special_key_caps');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
@@ -175,7 +175,7 @@ describe('KeymanWeb Compiler', function() {
   it('should give warning WARN_TouchLayoutSpecialLabelOnNormalKey if the minimum version specified in the keyboard does not support special key caps on normal keys', async function() {
     const filenames = generateTestFilenames('version_special_key_caps_14');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
     assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
     assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
@@ -185,7 +185,7 @@ describe('KeymanWeb Compiler', function() {
   it('should determine the minimum version correctly with v17 gestures', async function() {
     const filenames = generateTestFilenames('version_gestures');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
@@ -198,7 +198,7 @@ describe('KeymanWeb Compiler', function() {
   it('should give warning HINT_TouchLayoutUsesUnsupportedGesturesDownlevel if the minimum version specified in the keyboard does not support special key caps on normal keys', async function() {
     const filenames = generateTestFilenames('version_gestures_16');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
     assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
     assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
@@ -209,7 +209,7 @@ describe('KeymanWeb Compiler', function() {
     // #12870
     const filenames = generateTestFilenames('error_touch_layout_invalid_identifier');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNull(result);
     assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
     assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
@@ -218,29 +218,56 @@ describe('KeymanWeb Compiler', function() {
     assert.lengthOf(callbacks.messages, 2);
   });
 
-  it('should generate correct index offsets (#12980) for context and context(n) when building a KMW keyboard', async function() {
-    const filenames = generateTestFilenames('test_index_12980');
 
-    let result = await kmnCompiler.run(filenames.source, null);
+  function doMatchKIO(data: string, s: string, offset: number) {
+    const regex = new RegExp('k\\.KIO\\(-1,this\\.'+s+',(.+?),t\\);');
+    const m = regex.exec(data);
+    assert.isNotNull(m, `Could not find match for ${s}`);
+    assert.equal(m[1], offset.toString(), `Expected '${s}' usage to have an index parameter == 1`);
+  }
+
+  it('should generate correct index offsets (#12980) for context and context(n) when building a KMW keyboard with v9 target', async function() {
+    const filenames = generateTestFilenames('test_index_12980_v9');
+
+    const result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
     const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
 
-    function doMatchKIO(s: string) {
-      const regex = new RegExp('k\\.KIO\\(-1,this\\.'+s+',(.+?),t\\);');
-      const m = regex.exec(data);
-      assert.isNotNull(m, `Could not find match for ${s}`);
-      assert.equal(m[1], '1', `Expected '${s}' usage to have an index parameter == 1`);
+    if(debug) {
+      console.log(result.artifacts.js.filename);
+      await kmnCompiler.write(result.artifacts);
     }
 
-    doMatchKIO('s_a_6');
-    doMatchKIO('s_b_7');
+    // v9 targets should match
+    assert.match(data, /k\.KO\(-1,t,"A"\);/);
+    assert.match(data, /k\.KIO\(1,this.s_b_7,1,t\);/);
+    assert.match(data, /k\.KO\(-1,t,"E"\);/);
+    assert.match(data, /k\.KIO\(1,this.s_f_9,1,t\);/);
+  });
 
-    // matches the 4 notany() rules
-    const matches = [...data.matchAll(/k\.KCXO\(-1,t,1,1\);/g)];
-    assert.lengthOf(matches, 4);
+  it('should generate correct index offsets (#12980) for context and context(n) when building a KMW keyboard with v10+ target', async function() {
+    const filenames = generateTestFilenames('test_index_12980_v10');
 
-    doMatchKIO('s_e_10');
-    doMatchKIO('s_f_11');
+    const result = await kmnCompiler.run(filenames.source, null);
+    assert.isNotNull(result);
+    const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
+
+    if(debug) {
+      console.log(result.artifacts.js.filename);
+      await kmnCompiler.write(result.artifacts);
+    }
+
+    doMatchKIO(data, 's_a_6', 1); //if() has index 1
+    doMatchKIO(data, 's_b_7', 1); //if() has index 1
+
+    // matches the 2 notany() rules for if() and 2 for nul
+    const matches_if = [...data.matchAll(/k\.KCXO\(-1,t,1,1\);/g)];
+    assert.lengthOf(matches_if, 2);
+    const matches_nul = [...data.matchAll(/k\.KCXO\(-1,t,2,2\);/g)];
+    assert.lengthOf(matches_nul, 2);
+
+    doMatchKIO(data, 's_e_10', 2);
+    doMatchKIO(data, 's_f_11', 2);
   });
 });
 
@@ -248,10 +275,10 @@ async function run_test_keyboard(kmnCompiler: KmnCompiler, id: string):
   Promise<{ result: KmnCompilerResult, actualCode: string, actual: ETLResult, expectedCode: string, expected: ETLResult }> {
   const filenames = generateTestFilenames(id);
 
-  let result = await kmnCompiler.run(filenames.source, null);
+  const result = await kmnCompiler.run(filenames.source, null);
   assert.isNotNull(result);
 
-  let value = {
+  const value = {
     result,
     actualCode: new TextDecoder().decode(result.artifacts.js.data),
     expectedCode: fs.readFileSync(filenames.fixture, 'utf8'),

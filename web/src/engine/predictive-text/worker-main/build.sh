@@ -8,10 +8,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
 
@@ -25,8 +26,7 @@ builder_describe "Builds the lm-layer module" \
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
+  "test"
 
 builder_describe_outputs \
   configure  /node_modules \
@@ -35,7 +35,7 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
 
   # Configure Web browser-engine testing environments.  As is, this should only
   # make changes when we update the dependency, even on our CI build agents.
@@ -55,15 +55,7 @@ function do_build() {
 # Note - the actual test setup is done in a separate test script, but it's easy
 # enough to route the calls through.
 function do_test() {
-  local TEST_OPTIONS=
-  if builder_has_option --ci; then
-    # We'll test the included libraries here for now.  At some point, we may wish
-    # to establish a ci.sh script for predictive-text to handle this instead.
-    ./unit_tests/test.sh test:libraries test:headless test:browser --ci
-  else
-    # If we're not in --ci mode, then this doesn't need to trigger the sibling projects' tests.
-    ./unit_tests/test.sh test:headless test:browser
-  fi
+  ./unit_tests/test.sh test:headless test:browser
 }
 
 builder_run_action configure  do_configure

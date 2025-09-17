@@ -32,6 +32,8 @@
 #include <keyman/keyman_core_api.h>
 #include <keyman/keyman_core_api_consts.h>
 
+#include <km_linux_common.h>
+
 #include "config.h"
 #include "keymanutil.h"
 #include "keyman-service.h"
@@ -50,7 +52,6 @@
 #define KEYMAN_LALT   56 // 0x38
 #define KEYMAN_RCTRL  97 // 0x61
 #define KEYMAN_RALT  100 // 0x64
-#define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL  194 // 0xC2
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
@@ -229,7 +230,7 @@ get_context_debug(IBusEngine *engine) {
 static gchar *
 debug_utf8_with_codepoints(const gchar *utf8) {
   GString *output = g_string_new("");
-  g_string_append_printf(output, "|%s| len:%ld) [", utf8, g_utf8_strlen(utf8, -1));
+  g_string_append_printf(output, "|%s| (len:%ld) [", utf8, g_utf8_strlen(utf8, -1));
   gunichar2 *utf16 = g_utf8_to_utf16(utf8, -1, NULL, NULL, NULL);
   for (int i = 0; utf16[i] != '\0'; i++) {
     g_string_append_printf(output, "U+%04x ", utf16[i]);
@@ -287,7 +288,7 @@ set_context_if_needed(IBusEngine *engine) {
 }
 
 static void
-initialize_queue(IBusKeymanEngine *keyman, int index, int count) {
+initialize_queue_items(IBusKeymanEngine *keyman, int index, int count) {
   g_assert(keyman != NULL);
   g_assert(index >= 0 && index < MAX_QUEUE_SIZE);
   g_assert(count > 0 && count <= MAX_QUEUE_SIZE);
@@ -305,6 +306,7 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   ibus_prop_list_append(keyman->prop_list, keyman->status_prop);
 
   keyman->state = NULL;
+  initialize_keyman_system_service_client();
 }
 
 static km_core_cu* get_base_layout()
@@ -459,7 +461,7 @@ ibus_keyman_engine_constructor(
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
     keyman->rctrl_pressed = FALSE;
-    initialize_queue(keyman, 0, MAX_QUEUE_SIZE);
+    initialize_queue_items(keyman, 0, MAX_QUEUE_SIZE);
     keyman->commit_item    = &keyman->commit_queue[0];
     gchar **split_name     = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
@@ -604,6 +606,14 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
+/**
+ * Set text on the client
+ *
+ * Called by the Keyman service from the handler of the `SendText` method.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ * @param text    The text to be set on the client
+ */
 void ibus_keyman_set_text(IBusEngine *engine, const gchar *text)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
@@ -641,17 +651,18 @@ process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   gchar *output_utf8 = g_ucs4_to_utf8(output_utf32, -1, NULL, NULL, NULL);
   g_autofree gchar *debug  = NULL;
-  if (!client_supports_surrounding_text(engine)) {
+
+  if (client_supports_surrounding_text(engine)) {
+    // compliant app
+    g_message("%s: compliant app: Outputing %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
+    commit_string(keyman, output_utf8);
+    g_free(output_utf8);
+  } else {
     // non-compliant app
-    g_message("%s: Adding to commit queue: %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
+    g_message("%s: non-compliant app: Adding to commit queue: %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
     g_assert(keyman->commit_item->char_buffer == NULL);
     keyman->commit_item->char_buffer = output_utf8;
     // don't free output_utf8 - assigned to char_buffer!
-  } else {
-    // compliant app
-    g_message("%s: Outputing %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
-    commit_string(keyman, output_utf8);
-    g_free(output_utf8);
   }
 }
 
@@ -696,20 +707,25 @@ process_persist_action(IBusEngine *engine, km_core_option_item *persist_options)
   }
 }
 
-static void
+/**
+ * Process the emit_keystroke action
+ *
+ * @param engine          A pointer to the IBusEngine instance.
+ * @param emit_keystroke  A boolean indicating whether to emit a keystroke.
+ *
+ * @returns TRUE if Keyman handled the event, FALSE otherwise.
+ */
+static gboolean
 process_emit_keystroke_action(IBusEngine *engine, km_core_bool emit_keystroke) {
-  if (!emit_keystroke) {
-    return;
-  }
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   if (client_supports_surrounding_text(engine)) {
     // compliant app
-    ibus_engine_forward_key_event(engine, keyman->commit_item->keyval,
-      keyman->commit_item->keycode, keyman->commit_item->state);
-    return;
+    return !emit_keystroke;
   }
+
   // non-compliant app
-  keyman->commit_item->emitting_keystroke = TRUE;
+  keyman->commit_item->emitting_keystroke = emit_keystroke;
+  return TRUE;
 }
 
 static void
@@ -763,7 +779,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
   }
   keyman->commit_item--;
   memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * MAX_QUEUE_SIZE - 1);
-  initialize_queue(keyman, MAX_QUEUE_SIZE - 1, 1);
+  initialize_queue_items(keyman, MAX_QUEUE_SIZE - 1, 1);
 }
 
 static void
@@ -807,7 +823,15 @@ finish_process_actions(IBusEngine *engine) {
   }
 }
 
-static void
+/**
+ * Process the actions from Keyman Core
+ *
+ * @param engine   A pointer to the IBusEngine instance.
+ * @param actions  A pointer to the km_core_actions structure containing the actions to process.
+ *
+ * @returns TRUE if Keyman handled the event, FALSE otherwise.
+ */
+static gboolean
 process_actions(
   IBusEngine *engine,
   km_core_actions const *actions
@@ -816,11 +840,29 @@ process_actions(
   process_output_action(engine, actions->output);
   process_persist_action(engine, actions->persist_options);
   process_alert_action(actions->do_alert);
-  process_emit_keystroke_action(engine, actions->emit_keystroke);
+  gboolean result = process_emit_keystroke_action(engine, actions->emit_keystroke);
   process_capslock_action(actions->new_caps_lock_state);
   finish_process_actions(engine);
+  return result;
 }
 
+/**
+ * Handler for the IBus `process-key-event` signal
+ *
+ * Called by IBus when the user presses a key. Called twice for each
+ * keypress: once when the key is pressed down and once when it is
+ * released.
+ *
+ * @param engine   A pointer to the IBusEngine instance
+ * @param keyval   The key value of the keypress
+ * @param keycode  The key code of the keypress
+ * @param state    Modifier flags
+ *
+ * @return TRUE if we processed the key event, i.e. if there were
+ * matching rules in the keyboard. No further processing of this key event
+ * will be done. Otherwise FALSE, allowing other interested parties to
+ * respond to the key event.
+ */
 static gboolean
 ibus_keyman_engine_process_key_event(
   IBusEngine *engine,
@@ -843,6 +885,7 @@ ibus_keyman_engine_process_key_event(
   // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
   // correct output order of backspace and text.
   if (!client_supports_surrounding_text(engine) && keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL) {
+    // non-compliant app
     if (!isKeyDown) {
       g_message("%s: got F24 Sentinel, ignore keyup", __FUNCTION__);
       return TRUE;
@@ -950,25 +993,41 @@ ibus_keyman_engine_process_key_event(
   keyman->commit_item->char_buffer = NULL;
   const km_core_actions *core_actions = km_core_state_get_actions(keyman->state);
 
-  process_actions(engine, core_actions);
+  gboolean result = process_actions(engine, core_actions);
 
   // If we have a non-compliant client, i.e. a client that doesn't support
   // surrounding text (e.g. Chromium as of v104) we sent the key event
   // to the system service and now stop further processing by returning TRUE.
-  // With a compliant client (i.e. it does support surrounding text), we return
-  // TRUE because we completely processed the event and no further
-  // processing should happen.
-  g_message("%s: after processing all actions: %s", __FUNCTION__, debug_context2 = get_context_debug(engine));
+  //
+  // With a compliant client (i.e. supports surrounding text), it
+  // depends whether or not we handled the event. We return TRUE if we
+  // completely processed the event and no further processing should happen,
+  // or FALSE if someone else should handle the event (e.g. for a left-arrow
+  // key event).
+  g_message("%s: after processing all actions: %s, returning %s", __FUNCTION__,
+    debug_context2 = get_context_debug(engine), result ? "TRUE" : "FALSE");
 
-  return TRUE;
+  return result;
 }
 
+/**
+ * Handler for the IBus `set-surrounding-text` signal
+ *
+ * Called by IBus to let us know the surrounding text and the cursor position
+ * (and selection) in the text. This is used by Keyman as context.
+ *
+ * @param engine      A pointer to the IBusEngine instance
+ * @param text        The surrounding text
+ * @param cursor_pos  The position of the cursor in the text
+ * @param anchor_pos  The position of the anchor in the text
+ */
 static void
-ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
-                                            IBusText    *text,
-                                            guint       cursor_pos,
-                                            guint       anchor_pos)
-{
+ibus_keyman_engine_set_surrounding_text(
+  IBusEngine *engine,
+  IBusText    *text,
+  guint       cursor_pos,
+  guint       anchor_pos
+){
     parent_class->set_surrounding_text(engine, text, cursor_pos, anchor_pos);
     set_context_if_needed(engine);
 }
@@ -984,6 +1043,13 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
 //     parent_class->set_cursor_location (engine, x, y, w, h);
 // }
 
+/**
+ * Handler for the IBus `focus-in` signal
+ *
+ * Called by ibus when the client application receives focus
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_focus_in (IBusEngine *engine)
 {
@@ -996,6 +1062,13 @@ ibus_keyman_engine_focus_in (IBusEngine *engine)
     parent_class->focus_in (engine);
 }
 
+/**
+ * Handler for the IBus `focus-out` signal
+ *
+ * Called by ibus when the client application loses focus
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_focus_out (IBusEngine *engine)
 {
@@ -1006,6 +1079,13 @@ ibus_keyman_engine_focus_out (IBusEngine *engine)
     parent_class->focus_out (engine);
 }
 
+/**
+ * Handler for the IBus `reset` signal
+ *
+ * Called by ibus when the IME is reset.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_reset (IBusEngine *engine)
 {
@@ -1014,8 +1094,13 @@ ibus_keyman_engine_reset (IBusEngine *engine)
     set_context_if_needed(engine);
 }
 
-
-
+/**
+ * Handler for the IBus `enable` signal
+ *
+ * Called by ibus when the IME is enabled.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_enable (IBusEngine *engine)
 {
@@ -1037,6 +1122,13 @@ ibus_keyman_engine_enable (IBusEngine *engine)
     parent_class->enable (engine);
 }
 
+/**
+ * Handler for the IBus `disable` signal
+ *
+ * Called by ibus when the IME is disabled.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_disable (IBusEngine *engine)
 {

@@ -20,7 +20,7 @@ export class StylesheetManager {
 
   public constructor(linkNode?: Node, doCacheBusting?: boolean) {
     if(!linkNode) {
-      let _ElemHead=document.getElementsByTagName('HEAD');
+      const _ElemHead=document.getElementsByTagName('HEAD');
       if(_ElemHead.length > 0) {
         linkNode = _ElemHead[0];
       } else {
@@ -138,7 +138,7 @@ export class StylesheetManager {
     // Build the font-face definition according to the browser being used
     // The OSK will similarly remove double-quotes from font-family names and double-quote
     // the name itself. (#13018, #13022)
-    var s='@font-face {\nfont-family:"'
+    let s='@font-face {\nfont-family:"'
       + fd.family.replace(/\u0022/g, '') + '";\nfont-style:normal;\nfont-weight:normal;\n';
 
     // Build the font source string according to the browser,
@@ -191,7 +191,7 @@ export class StylesheetManager {
      */
     const fontFace = new FontFace(fd.family, source);
 
-    let loadPromise = fontFace.load();
+    const loadPromise = fontFace.load();
     const clearPromise = () => {
       this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
     }
@@ -248,7 +248,7 @@ export class StylesheetManager {
   }
 
   public unlinkAll() {
-    for(let tuple of this.linkedSheets) {
+    for(const tuple of this.linkedSheets) {
       const sheet = tuple.sheet;
       if(sheet.parentNode) {
         sheet.parentNode.removeChild(sheet);
@@ -268,7 +268,7 @@ export class StylesheetManager {
  * @return      {Object}                      returns the object reference
  **/
 export function createStyleSheet(styleString: string): HTMLStyleElement {
-  var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style');
+  const _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style');
 
   _ElemStyle.type = 'text/css';
   _ElemStyle.appendChild(document.createTextNode(styleString));

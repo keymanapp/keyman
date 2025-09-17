@@ -49,7 +49,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
    *                    false if no VK was generated for this keyboard
    */
   public compile(source: KMXPlus.KMXPlusData, keyboardId: string): VisualKeyboard.VisualKeyboard | boolean | null {
-    let result = new VisualKeyboard.VisualKeyboard();
+    const result = new VisualKeyboard.VisualKeyboard();
 
     /* TODO-LDML: consider VisualKeyboardHeaderFlags.kvkhUseUnderlying kvkhDisplayUnderlying kvkhAltGr kvkh102 */
     result.header.flags = 0;
@@ -60,13 +60,13 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
     let hasVisualKeyboard = false;
 
-    for(let layersList of source.layr.lists) {
+    for(const layersList of source.layr.lists) {
       const formId = layersList.hardware.value;
       if(formId == 'touch') {
         continue;
       }
 
-      for(let layer of layersList.layers) {
+      for(const layer of layersList.layers) {
         const res = this.compileHardwareLayer(source, result, layer, formId);
         if(res === false) {
           // failed to compile the layer
@@ -105,10 +105,10 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
     let result = true;
     let y = -1;
-    for(let row of layer.rows) {
+    for(const row of layer.rows) {
       y++;
       let x = -1;
-      for(let key of row.keys) {
+      for(const key of row.keys) {
         x++;
 
         const keydef: KMXPlus.KeysKeys = findLast(source.keys?.keys, (kd: KMXPlus.KeysKeys) => kd.id.value == key.value);
@@ -117,7 +117,9 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
         if (!keydef || !kmap || text === null) {
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({ keyId: key.value, layer: layerId, row: y, col: x, form: hardware })
+            LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({
+              keyId: key.value, layer: layerId, row: y, col: x, form: hardware
+            }, row)
           );
           result = false;
         } else {
@@ -135,7 +137,9 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
   private getDisplayFromKey(keydef: KMXPlus.KeysKeys, source: KMXPlus.KMXPlusData) {
     const display = source.disp?.disps?.find(d => d.id.value == keydef.id.value || d.to.value == keydef.to.value);
-    return display?.display.value ?? keydef.to.value;
+    const value = display?.display.value ?? keydef.to.value;
+    // strip markers from the output (these are valid in keydef.to, but not in display.display, nor in kvk)
+    return value.replaceAll(/\uffff\u0008./g, '');
   }
 
   private translateLayerModifiersToVisualKeyboardShift(modifiers: number): VisualKeyboard.VisualKeyboardShiftState {

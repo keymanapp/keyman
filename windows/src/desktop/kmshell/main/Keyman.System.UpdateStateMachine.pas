@@ -38,8 +38,8 @@ type
 
   public
     constructor Create(Context: TUpdateStateMachine);
-    procedure Enter; virtual; abstract;
-    procedure Exit; virtual; abstract;
+    procedure EnterState; virtual; abstract;
+    procedure ExitState; virtual; abstract;
     procedure HandleCheck; virtual; abstract;
     function  HandleKmShell: Integer; virtual; abstract;
     procedure HandleDownload; virtual; abstract;
@@ -55,8 +55,6 @@ type
   private
     FForce: Boolean;
     FAutomaticUpdate: Boolean;
-    FErrorMessage: string;
-    FShowErrors: Boolean;
 
     CurrentState: TState;
     // State object for performance (could lazy create?)
@@ -71,7 +69,6 @@ type
     procedure RemoveCachedFiles;
 
     function SetRegistryState(Update: TUpdateState): Boolean;
-    function GetAutomaticUpdates: Boolean;
     function SetApplyNow(Value: Boolean): Boolean;
     function GetApplyNow: Boolean;
 
@@ -91,17 +88,22 @@ type
     procedure HandleFirstRun;
     function CurrentStateName: string;
     (**
-     * Checks if Keyman is the WaitingRestartState and that
-     * Keyman has not run in this Windows session.
-     * The sole purpose is for the calling code then produce
-     * a UI to confirm the user wants to continue install.
+     * Checks if Keyman is the WaitingRestartState, the cache is valid
+     * and that Keyman has not run in this Windows session. It also confirms
+     * that automatic updates are still enabled #14295.
+     * The purpose is for the calling code can choose to produce
+     * a UI to confirm the user wants to install an update,
+     * if everything is ready to start a update.
+     *
+     * NOTE: If it finds the cache is invalid it will abort causing
+     * the State Machine to change state, returning to idle.
      *
      * @returns True  if the Keyman is ready to install.
      *)
-    function ReadyToInstall: Boolean;
+    function ValidateReadyToInstall: Boolean;
     function IsInstallingState: Boolean;
 
-    property ShowErrors: Boolean read FShowErrors write FShowErrors;
+    function GetAutomaticUpdates: Boolean;
     function CheckRegistryState: TUpdateState;
 
   end;
@@ -126,6 +128,7 @@ uses
   KLog,
   RegistryKeys,
   utilexecute,
+  UtilCheckOnline,
   utiluac;
 
 const
@@ -152,21 +155,22 @@ type
   // Derived classes for each state
   IdleState = class(TState)
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
+    procedure HandleFirstRun; override;
   end;
 
   UpdateAvailableState = class(TState)
   private
     procedure StartDownloadProcess;
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -177,8 +181,8 @@ type
   DownloadingState = class(TState)
   private
     function DownloadUpdatesBackground: Boolean;
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -188,8 +192,8 @@ type
 
   WaitingRestartState = class(TState)
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -223,8 +227,8 @@ type
     procedure LaunchInstallPackageProcess;
 
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -239,7 +243,6 @@ type
 constructor TUpdateStateMachine.Create(AForce: Boolean);
 begin
   inherited Create;
-  FShowErrors := True;
 
   FForce := AForce;
   FAutomaticUpdate := GetAutomaticUpdates;
@@ -258,16 +261,10 @@ destructor TUpdateStateMachine.Destroy;
 var
   lpState: TUpdateState;
 begin
-  if (FErrorMessage <> '') and FShowErrors then
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      '"+FErrorMessage+"');
-
   for lpState := Low(TUpdateState) to High(TUpdateState) do
   begin
     FreeAndNil(FStateInstance[lpState]);
   end;
-
-  // TODO: #10210 TODO: epic-windows-update remove debugging comments throughout this Unit.
 
   inherited Destroy;
 end;
@@ -445,14 +442,14 @@ procedure TUpdateStateMachine.SetState(const Value: TStateClass);
 begin
   if Assigned(CurrentState) then
   begin
-    CurrentState.Exit;
+    CurrentState.ExitState;
   end;
 
   SetStateOnly(ConvertStateToEnum(Value));
 
   if Assigned(CurrentState) then
   begin
-    CurrentState.Enter;
+    CurrentState.EnterState;
   end
   else
   begin
@@ -566,14 +563,27 @@ begin
   Result := CurrentState.ClassName;
 end;
 
-function TUpdateStateMachine.ReadyToInstall: Boolean;
+function TUpdateStateMachine.ValidateReadyToInstall: Boolean;
 begin
   if not IsCurrentStateAssigned then
     Exit(False);
-  if (CurrentState is WaitingRestartState) and not HasKeymanRun then
-    Result := True
-  else
-    Result := False;
+
+  if not (CurrentState is WaitingRestartState) then
+    Exit(False);
+
+  // Verify conditions since entering WaitingRestartState:
+  // If the cache is not valid or automatic updates have
+  // been disabled clear the cache and return to the idle state.
+  if not TUpdateCheckStorage.CheckMetaDataForUpdate or not Self.GetAutomaticUpdates then
+  begin
+    HandleAbort;
+    Exit(False);
+  end;
+
+  if not HasKeymanRun then
+    Exit(True);
+
+  Result := False;
 end;
 
 function TUpdateStateMachine.IsInstallingState: Boolean;
@@ -590,23 +600,25 @@ end;
 
 procedure TState.HandleFirstRun;
 begin
-  // If Handle First run hits base implementation
-  // something is wrong.
-  TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-    'Handle first run called in state:"' + Self.ClassName + '"');
+  // A Keyman install file can be downloaded and installed directly therefore
+  // the state machine could be in a "unexpected" state such as UpdateAvailable.
+  // It will still be good to record the breadcrumb of the state incase there is a error
+  // during the first run.
+  TKeymanSentryClient.Breadcrumb('info',
+    'TState.HandleFirstRun first run called in state:"' + Self.ClassName + '"', 'update');
   bucStateContext.RemoveCachedFiles;
   ChangeState(IdleState);
 end;
 
 { IdleState }
 
-procedure IdleState.Enter;
+procedure IdleState.EnterState;
 begin
   // Enter UpdateAvailableState
   bucStateContext.SetRegistryState(usIdle);
 end;
 
-procedure IdleState.Exit;
+procedure IdleState.ExitState;
 begin
 
 end;
@@ -624,12 +636,11 @@ begin
     CheckForUpdates.Free;
   end;
 
-  { Response OK and Update is available }
-  if Result = wucSuccess then
+  if (Result = wucUpdateAvailable) then
   begin
     ChangeState(UpdateAvailableState);
   end;
-  // else staty in idle state
+  // else stay in idle state
 end;
 
 function IdleState.HandleKmShell;
@@ -647,7 +658,7 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and Update is available }
-  if UpdateCheckResult = wucSuccess then
+  if UpdateCheckResult = wucUpdateAvailable then
   begin
     ChangeState(UpdateAvailableState);
   end;
@@ -669,6 +680,14 @@ begin
   // Do Nothing
 end;
 
+procedure IdleState.HandleFirstRun;
+begin
+  // This would be the case if it was a clean first time install of Keyman
+  // and not an update. However, incase it was some sort of failed update
+  // clean any cached files.
+  bucStateContext.RemoveCachedFiles;
+end;
+
 { UpdateAvailableState }
 
 procedure UpdateAvailableState.StartDownloadProcess;
@@ -676,6 +695,12 @@ var
   FResult: Boolean;
   RootPath: string;
 begin
+  // check if online
+  if not IsOnline then
+  begin
+    TKeymanSentryClient.Breadcrumb('default', 'Not Online, cant execute download process.', 'update');
+    Exit;
+  end;
   // call separate process
   RootPath := ExtractFilePath(ParamStr(0));
   FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0),
@@ -688,7 +713,7 @@ begin
   end;
 end;
 
-procedure UpdateAvailableState.Enter;
+procedure UpdateAvailableState.EnterState;
 begin
   // Enter UpdateAvailableState
   bucStateContext.SetRegistryState(usUpdateAvailable);
@@ -698,7 +723,7 @@ begin
   end;
 end;
 
-procedure UpdateAvailableState.Exit;
+procedure UpdateAvailableState.ExitState;
 begin
   // Exit UpdateAvailableState
 end;
@@ -715,7 +740,7 @@ begin
   finally
     CheckForUpdates.Free;
   end;
-  if Result <> wucSuccess then
+  if Result = wucFailure then
     begin
       KL.Log('UpdateAvailableState.HandleCheck CheckForUpdates not successful: '+
         GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
@@ -740,7 +765,8 @@ end;
 
 procedure UpdateAvailableState.HandleAbort;
 begin
-
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 procedure UpdateAvailableState.HandleInstallNow;
@@ -751,10 +777,9 @@ end;
 
 { DownloadingState }
 
-procedure DownloadingState.Enter;
+procedure DownloadingState.EnterState;
 var
   DownloadResult: Boolean;
-  RetryCount: Integer;
   FMutex: TKeymanMutex;
 begin
   // Enter DownloadingState
@@ -767,14 +792,19 @@ begin
     // downloading process finish.
     if not FMutex.TakeOwnership then
     begin
+      TKeymanSentryClient.Breadcrumb('default', 'DownloadingState.EnterState: Unable to get Mutex download process exists', 'update');
+      Exit;
+    end;
+    // verify there is an update available
+    if not TUpdateCheckStorage.CheckMetaDataForUpdate then
+    begin
+      // Return to Idle state
+      bucStateContext.RemoveCachedFiles;
+      ChangeState(IdleState);
       Exit;
     end;
 
-    RetryCount := 0;
-    repeat
-      DownloadResult := DownloadUpdatesBackground;
-      Inc(RetryCount);
-    until DownloadResult or (RetryCount >= 3);
+    DownloadResult := DownloadUpdatesBackground;
     FMutex.ReleaseOwnership;
   finally
     FreeAndNil(FMutex);
@@ -782,10 +812,10 @@ begin
 
   if (not DownloadResult) then
   begin
-    // Failed three times in this process; return to the
+    // Failed download; return to the
     // IdleState to wait 'CheckPeriod' before trying again
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-    'Error Updates not downloaded after 3 attempts');
+    'Error Updates not downloaded');
     bucStateContext.RemoveCachedFiles;
     ChangeState(IdleState);
   end
@@ -807,7 +837,7 @@ begin
 
 end;
 
-procedure DownloadingState.Exit;
+procedure DownloadingState.ExitState;
 begin
   // Exit DownloadingState
 end;
@@ -861,7 +891,7 @@ end;
 
 procedure DownloadingState.HandleAbort;
 begin
-  // To abort during the downloading
+  // don't abort during the downloading which is executing in a separate process
 end;
 
 procedure DownloadingState.HandleInstallNow;
@@ -886,13 +916,23 @@ end;
 
 { WaitingRestartState }
 
-procedure WaitingRestartState.Enter;
+procedure WaitingRestartState.EnterState;
 begin
+  // Entering this state means that it was not an 'apply now' update
+  // It should be then a automatic update. However, the automatic update
+  // may have been set to disable after the idle state. Is so abort
+  if not bucStateContext.FAutomaticUpdate then
+  begin
+    bucStateContext.RemoveCachedFiles;
+    ChangeState(IdleState);
+    Exit;
+  end;
+
   // Enter WaitingRestartState
   bucStateContext.SetRegistryState(usWaitingRestart);
 end;
 
-procedure WaitingRestartState.Exit;
+procedure WaitingRestartState.ExitState;
 begin
   // Exit DownloadingState
 end;
@@ -910,16 +950,15 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and go back to update available so files can be downloaded }
-  if Result = wucSuccess then
+  // TODO: This actually needs to check if the updates available are newer than the already downloaded updates
+
+  if Result = wucUpdateAvailable then
   begin
     ChangeState(UpdateAvailableState);
   end;
 end;
 
 function WaitingRestartState.HandleKmShell;
-var
-  ucr: TUpdateCheckResponse;
-  hasPackages, hasKeymanInstall: Boolean;
 begin
   // Still can't go if keyman has run
   if HasKeymanRun then
@@ -928,19 +967,13 @@ begin
   end
   else
   begin
-    hasPackages := False;
-    hasKeymanInstall := False;
-    if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
-    begin
-      hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
-      hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
-    end;
-    if not (hasPackages Or hasKeymanInstall) then
+    if not (TUpdateCheckStorage.CheckMetaDataForUpdate) or
+      not bucStateContext.FAutomaticUpdate then // set by user after idle state
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
       bucStateContext.CurrentState.HandleCheck;
-      Result := kmShellExit;
+      Result := kmShellContinue;
     end
     else
     begin
@@ -957,7 +990,8 @@ end;
 
 procedure WaitingRestartState.HandleAbort;
 begin
-   ChangeState(UpdateAvailableState);
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 procedure WaitingRestartState.HandleInstallNow;
@@ -978,10 +1012,11 @@ begin
       executeResult := WaitForElevatedConfiguration(0, '-ikp');
       if (executeResult <> 0) then
       begin
-        TKeymanSentryClient.Client.MessageEvent
-          (Sentry.Client.SENTRY_LEVEL_ERROR,
-          'Executing kmshell process to install keyboard packages failed:"' +
-          IntToStr(Ord(executeResult)) + '"');
+        TKeymanSentryClient.Breadcrumb('error',
+          'Executing kmshell process to install keyboard packages failed"' +
+           IntToStr(Ord(executeResult)) + '"', 'update');
+        KL.Log('InstallingState.LaunchInstallPackageProcess failed executing kmshell ' +
+          'process to install keyboard packages: "' + IntToStr(Ord(executeResult)) + '"');
         ChangeState(IdleState);
       end;
     end
@@ -1001,19 +1036,20 @@ function InstallingState.DoInstallKeyman: Boolean;
 var
   FResult: Boolean;
   SavePath: String;
-  fileExt: String;
   FileName: String;
   FileNames: TStringDynArray;
+  ucr: TUpdateCheckResponse;
+  ucrFileName: String;
   found: Boolean;
 begin
-
+  TUpdateCheckStorage.LoadUpdateCacheData(ucr);
+  ucrFileName := ucr.FileName;
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   GetFileNamesInDirectory(SavePath, FileNames);
   found := False;
   for FileName in FileNames do
   begin
-    fileExt := LowerCase(ExtractFileExt(FileName));
-    if fileExt = '.exe' then
+    if SameText(ucrFileName, ExtractFileName(FileName)) then
     begin
       found := True;
       break;
@@ -1032,9 +1068,10 @@ begin
   if not FResult then
   begin
     bucStateContext.RemoveCachedFiles;
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      'Executing kmshell process to install failed:"' +
-      IntToStr(Ord(FResult)) + '"');
+    TKeymanSentryClient.Breadcrumb('error',
+    'InstallingState.DoInstallKeyman: failed executing kmshell or file not found', 'update');
+    KL.Log('InstallingState.DoInstallKeyman failed executing kmshell ' +
+           'or the update was not found in the cache');
     ChangeState(IdleState);
   end;
 
@@ -1095,7 +1132,7 @@ begin
   Result := True;
 end;
 
-procedure InstallingState.Enter;
+procedure InstallingState.EnterState;
 var
   ucr: TUpdateCheckResponse;
   hasPackages, hasKeymanInstall: Boolean;
@@ -1108,7 +1145,7 @@ begin
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
     hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
-    hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+    hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFileUpdate(ucr);
   end;
   { Notes: The reason packages (keyboards) is installed first is
   because we are trying to reduce the number of times the user has
@@ -1132,7 +1169,7 @@ begin
   ChangeState(IdleState);
 end;
 
-procedure InstallingState.Exit;
+procedure InstallingState.ExitState;
 begin
 
 end;
@@ -1172,7 +1209,7 @@ var
   hasKeymanInstall : Boolean;
 begin
   TUpdateCheckStorage.LoadUpdateCacheData(ucr);
-  hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+  hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFileUpdate(ucr);
   // This event should only be reached in elevated process if not then
   // move on to just installing Keyman
   if not kmcom.SystemInfo.IsAdministrator then
@@ -1188,7 +1225,15 @@ begin
   end;
 
   if hasKeymanInstall then
+  begin
     DoInstallKeyman;
+  end
+  else
+  begin
+    // There is no Keyman installer we can return to the IdleState
+    bucStateContext.RemoveCachedFiles;
+    ChangeState(IdleState);
+  end;
 end;
 
 procedure InstallingState.HandleFirstRun;

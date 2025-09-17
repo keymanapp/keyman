@@ -67,7 +67,7 @@ namespace CompilerErrorSeverity {
 // code).
 
 namespace KmnCompilerMessages {
-  enum {
+  enum KmnCompilerMessages {
     FATAL_BadCallParams =                                 SevFatal | 0x002,
     FATAL_CannotAllocateMemory =                          SevFatal | 0x004,
     ERROR_InfileNotExist =                                SevError | 0x005,   // #10678: reduced from fatal to error in 17.0
@@ -272,8 +272,21 @@ namespace KmnCompilerMessages {
 
     HINT_IndexStoreLong =                               SevHint | 0x0B0,
 
-    FATAL_BufferOverflow =                                SevFatal | 0x0C0
-//    FATAL_Break =                                         SevFatal | 0x0C1,      unused
+    ERROR_ContextExCannotReferenceIf =                  SevError | 0x0B1,
+    ERROR_ContextExCannotReferenceNul =                 SevError | 0x0B2,
+
+    ERROR_TextBeforeOrAfterNulInOutput =                SevError | 0x0B3,
+
+    ERROR_NameMustBeAtLeastOneCharLong =                SevError | 0x0B4,
+    ERROR_NameMustBeAtMostNCharsLong =                  SevError | 0x0B5,
+    ERROR_NameContainsInvalidCharacter =                SevError | 0x0B6,
+    ERROR_NameMustNotContainSpaces =                    SevError | 0x0B7,
+    ERROR_NameMustNotContainComma =                     SevError | 0x0B8,
+    ERROR_NameMustNotContainParentheses =               SevError | 0x0B9,
+    ERROR_NameMustNotContainSquareBrackets =            SevError | 0x0BA,
+
+    FATAL_BufferOverflow =                              SevFatal | 0x0C0
+//    FATAL_Break =                                       SevFatal | 0x0C1,      unused
   };
 }
 

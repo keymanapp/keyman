@@ -14,7 +14,8 @@ import { makePathToFixture } from '../helpers/index.js';
 
 import { KpsFileReader } from "../../src/types/kps/kps-file-reader.js";
 import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
-import { CommonTypesMessages } from '../../src/common-messages.js';
+import { SymbolUtils } from '../../src/symbol-utils.js';
+import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -47,8 +48,6 @@ describe('kps-file-reader', function () {
 
     assert.lengthOf(kps.Package.Keyboards.Keyboard, 1);
     assert.equal(kps.Package.Keyboards.Keyboard[0].ID, 'khmer_angkor');
-    assert.equal(kps.Package.Keyboards.Keyboard[0].Name, 'Khmer Angkor');
-    assert.equal(kps.Package.Keyboards.Keyboard[0].Version, '1.3');
 
     assert.lengthOf(kps.Package.Keyboards.Keyboard[0].Languages.Language, 1);
     assert.equal(kps.Package.Keyboards.Keyboard[0].Languages.Language[0]._, 'Central Khmer (Khmer, Cambodia)');
@@ -61,13 +60,15 @@ describe('kps-file-reader', function () {
   it('kps-file-reader should round-trip with kps-file-writer', function() {
     const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
     const reader = new KpsFileReader(callbacks);
-    const kps = reader.read(input);
+    // Remove XML metadata symbols to reduce clutter for testing purposes
+    const kps = SymbolUtils.removeSymbols(reader.read(input));
 
     const writer = new KpsFileWriter();
     const output = writer.write(kps);
 
     // Round Trip
-    const kps2 = reader.read(new TextEncoder().encode(output));
+    // Remove XML metadata symbols to reduce clutter for testing purposes
+    const kps2 = SymbolUtils.removeSymbols(reader.read(new TextEncoder().encode(output)));
     assert.deepEqual(kps2, kps);
   });
 
@@ -80,6 +81,6 @@ describe('kps-file-reader', function () {
 
     assert.isNull(kps);
     assert.lengthOf(callbacks.messages, 1);
-    assert.isTrue(callbacks.hasMessage(CommonTypesMessages.ERROR_InvalidPackageFile));
+    assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_InvalidPackageFile));
   });
 });

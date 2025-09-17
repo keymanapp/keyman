@@ -18,7 +18,7 @@ export class InfrastructureMessages {
 
   static ERROR_FileDoesNotExist = SevError | 0x0003;
   static Error_FileDoesNotExist = (o:{filename:string}) => m(this.ERROR_FileDoesNotExist,
-    `File ${def(o.filename)} does not exist`);
+    `File or folder '${def(o.filename)}' does not exist`);
 
   static ERROR_FileTypeNotRecognized = SevError | 0x0004;
   static Error_FileTypeNotRecognized = (o:{filename: string, extensions: string}) => m(this.ERROR_FileTypeNotRecognized,
@@ -38,9 +38,7 @@ export class InfrastructureMessages {
   static Info_FileNotBuiltSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(this.INFO_FileNotBuiltSuccessfully,
     `${def(o.relativeFilename)} failed to build.`)});
 
-  static ERROR_InvalidProjectFile = SevError | 0x0008;
-  static Error_InvalidProjectFile = (o:{message:string}) => m(this.ERROR_InvalidProjectFile,
-    `Project file is not valid: ${def(o.message)}`);
+  // 0x0008: ERROR_InvalidProjectFile moved to DeveloperUtilsMessages
 
   static HINT_FilenameHasDifferingCase = SevHint | 0x0009;
   static Hint_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(this.HINT_FilenameHasDifferingCase,
@@ -84,9 +82,7 @@ export class InfrastructureMessages {
   static Error_InvalidProjectFolder = (o:{folderName:string}) => m(this.ERROR_InvalidProjectFolder,
     `The folder ${def(o.folderName)} does not appear to be a Keyman Developer project.`);
 
-  static ERROR_UnsupportedProjectVersion = SevError | 0x0013;
-  static Error_UnsupportedProjectVersion = (o:{version:string}) => m(this.ERROR_UnsupportedProjectVersion,
-    `Project version ${def(o.version)} is not supported by this version of Keyman Developer.`);
+  // 0x0013: ERROR_UnsupportedProjectVersion moved to developer-utils-messages
 
   static HINT_ProjectIsVersion10 = SevHint | 0x0014;
   static Hint_ProjectIsVersion10 = () => m(this.HINT_ProjectIsVersion10,
@@ -158,5 +154,48 @@ export class InfrastructureMessages {
     this.ERROR_CopyRequiresOutPath,
     `The copy command requires the --out-path, -o parameter`
   );
- }
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_CopyingProject = SevInfo | 0x0023;
+  static Info_CopyingProject = (o:{source:string,dest:string}) => ({filename:o.source, ...m(
+    this.INFO_CopyingProject,
+    `Copying project '${def(o.source)}' to '${def(o.dest)}'`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectCopiedSuccessfully = SevInfo | 0x0024;
+  static Info_ProjectCopiedSuccessfully = (o:{source:string, dest:string}) => ({filename:o.source, ...m(
+    this.INFO_ProjectCopiedSuccessfully,
+    `'${def(o.source)}' copied to '${def(o.dest)}' successfully.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectNotCopiedSuccessfully = SevInfo | 0x0025;
+  static Info_ProjectNotCopiedSuccessfully = (o:{source:string, dest:string}) => ({filename:o.source, ...m(
+    this.INFO_ProjectNotCopiedSuccessfully,
+    `Failed to copy '${def(o.source)}' to '${def(o.dest)}'.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_GeneratingProject = SevInfo | 0x0026;
+  static Info_GeneratingProject = (o:{id:string, outPath: string}) => ({filename:o.id, ...m(
+    this.INFO_GeneratingProject,
+    `Generating new project '${def(o.id)}' in '${def(o.outPath)}'.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectGeneratedSuccessfully = SevInfo | 0x0027;
+  static Info_ProjectGeneratedSuccessfully = (o:{id:string}) => ({filename:o.id, ...m(
+    this.INFO_ProjectGeneratedSuccessfully,
+    `New project '${def(o.id)}' generated successfully.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectNotGeneratedSuccessfully = SevInfo | 0x0028;
+  static Info_ProjectNotGeneratedSuccessfully = (o:{id:string}) => ({filename:o.id, ...m(
+    this.INFO_ProjectNotGeneratedSuccessfully,
+    `Failed to generate new project '${def(o.id)}'.`,
+  )});
+
+}
 

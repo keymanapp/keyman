@@ -3,12 +3,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=app/webview
 . "$KEYMAN_ROOT/web/common.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # ################################ Main script ################################
 
@@ -18,8 +19,7 @@ builder_describe "Builds the Keyman Engine for Web's puppetable version designed
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  "test"
 
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -81,6 +81,6 @@ compile_and_copy() {
   "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
 }
 
-builder_run_action configure verify_npm_setup
+builder_run_action configure node_select_version_and_npm_ci
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
 builder_run_action build compile_and_copy

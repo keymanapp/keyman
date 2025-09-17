@@ -2,13 +2,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman installation helper module" \
   @/common/include \
   @/common/windows/delphi \
-  clean configure build test publish
+  clean configure build test publish edit
 
 builder_parse "$@"
 
@@ -33,7 +33,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  cp "$WIN32_TARGET_PATH/insthelp.dbg" "$WINDOWS_DEBUGPATH_APP/insthelp.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/insthelp.dbg" "$WINDOWS_DEBUGPATH_APP/insthelp.dbg"
 }
 
 function do_publish() {
@@ -51,3 +51,4 @@ builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
+builder_run_action edit:project         start insthelp.dproj

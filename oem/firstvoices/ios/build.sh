@@ -4,17 +4,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 # ################################ Main script ################################
-
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
 
 export TARGET=FirstVoices
 
@@ -26,6 +23,8 @@ builder_describe "Builds the $TARGET app for use on iOS devices - iPhone and iPa
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
+
+mac_verify_on_mac
 
 KMEI_BUILD_DIR="$KEYMAN_ROOT/ios/build"
 DERIVED_DATA="$THIS_SCRIPT_PATH/build"
@@ -101,43 +100,44 @@ function do_build() {
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .ipa file for deployment to real devices."
-    run_xcodebuild $XCODEFLAGS_EXT \
+    mac_xcodebuild $XCODEFLAGS_EXT \
             -scheme $TARGET \
             -archivePath "$ARCHIVE_PATH" \
             archive \
             -allowProvisioningUpdates \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
 
-    assertDirExists "$ARCHIVE_PATH"
-
+    if ! [[ -d "${ARCHIVE_PATH}" ]]; then
+      builder_die "Build failed: directory '${ARCHIVE_PATH}' missing"
+    fi
 
     # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
     # Xcode to generate a build error.
-    run_xcodebuild $XCODEFLAGS \
+    mac_xcodebuild $XCODEFLAGS \
             -exportArchive \
             -archivePath "$ARCHIVE_PATH" \
             -exportOptionsPlist exportAppStore.plist \
             -exportPath "$BUILD_PATH/${CONFIG}-iphoneos" \
             -allowProvisioningUpdates \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
   else
-    run_xcodebuild $CODE_SIGN \
+    mac_xcodebuild $CODE_SIGN \
             $XCODEFLAGS_EXT \
             -scheme "$TARGET" \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
   fi
 
   if builder_has_option --sim-artifact; then
     echo "Preparing .app file as Simulator-targeted build artifact."
-    run_xcodebuild $CODE_SIGN \
+    mac_xcodebuild $CODE_SIGN \
             $XCODEFLAGS_EXT \
             -scheme "$TARGET" \
             -sdk iphonesimulator \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
   fi
 }
 

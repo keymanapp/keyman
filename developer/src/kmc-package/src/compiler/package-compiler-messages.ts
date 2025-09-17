@@ -144,7 +144,7 @@ export class PackageCompilerMessages {
     `The source file '${def(o.filename)}' should not be included in the package; instead include the compiled result.`
   );
 
-  // 0x001E was ERROR_InvalidPackageFile, now CommonTypesMessages.Error_InvalidPackageFile
+  // 0x001E was ERROR_InvalidPackageFile, now DeveloperUtilsMessages.Error_InvalidPackageFile
 
   static ERROR_FileRecordIsMissingName = SevError | 0x001F;
   static Error_FileRecordIsMissingName = (o:{description:string}) => m(this.ERROR_FileRecordIsMissingName,
@@ -191,7 +191,7 @@ export class PackageCompilerMessages {
     `The format for version numbers should be number[.number[.number]]. Each
     number component should be an integer, without leading zeroes.`
   );
-  
+
   static ERROR_PackageMustNotContainItself = SevError | 0x0028;
   static Error_PackageMustNotContainItself = (o:{outputFilename: string}) => m(
     this.ERROR_PackageMustNotContainItself, `The package may not include a .kmp file of the same name '${def(o.outputFilename)}'.`, `
@@ -205,6 +205,22 @@ export class PackageCompilerMessages {
 
     **Note**: Nested packages are not checked for validity or whether or not they
     may violate this rule transitively.
+  `);
+
+  static ERROR_MissingModelId = SevError | 0x0029;
+  static Error_MissingModelId = (o:{index:number}) => m(
+    this.ERROR_MissingModelId, `The lexical model at index ${def(o.index)} has a missing or empty ID field.`, `
+    Each LexicalModel element must have an ID sub-element and a Languages
+    sub-element. The content of the ID sub-element must correspond to the basename
+    of a .model.js file inside the Files element.
+  `);
+
+  static ERROR_MissingKeyboardId = SevError | 0x002A;
+  static Error_MissingKeyboardId = (o:{index:number}) => m(
+    this.ERROR_MissingKeyboardId, `The keyboard at index ${def(o.index)} has a missing or empty ID field.`, `
+    Each Keyboard element must have an ID sub-element sub-element. The content of
+    the ID sub-element must correspond to the basename of a keyboard .kmx or .js
+    file inside the Files element.
   `);
 
   //------------------------------------------------------------------------------|

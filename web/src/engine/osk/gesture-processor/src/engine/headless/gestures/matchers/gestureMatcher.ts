@@ -227,7 +227,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       }
 
       // Do actual resolution now that we can convert the spec into a proper resolution object.
-      let resolveObj: MatchResult<Type> = {
+      const resolveObj: MatchResult<Type> = {
         matched: matched,
         action: {
           ...action,
@@ -305,7 +305,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
   public get primaryPath(): GestureSource<Type> {
     let bestMatcher: PathMatcher<Type>;
     let highestPriority = Number.NEGATIVE_INFINITY;
-    for(let matcher of this.pathMatchers) {
+    for(const matcher of this.pathMatchers) {
       if(matcher.model.itemPriority > highestPriority) {
         highestPriority = matcher.model.itemPriority;
         bestMatcher = matcher;

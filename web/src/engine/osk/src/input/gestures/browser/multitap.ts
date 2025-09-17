@@ -26,6 +26,8 @@ export default class Multitap implements GestureHandler {
   public readonly hasModalVisualization = false;
 
   private readonly originalLayer: string;
+  // Used solely for error & warning messages.
+  private readonly keyboardId: string;
 
   private readonly multitaps: ActiveSubKey[];
   private tapIndex = 0;
@@ -56,6 +58,7 @@ export default class Multitap implements GestureHandler {
     }
 
     this.originalLayer = vkbd.layerId;
+    this.keyboardId = vkbd.layoutKeyboard.id;
 
     const tapLookahead = (offset: number) => (this.tapIndex + offset) % this.multitaps.length;
 
@@ -93,7 +96,7 @@ export default class Multitap implements GestureHandler {
         case 'multitap-start':
           break;
         default:
-          throw new Error(`Unsupported gesture state encountered during multitap: ${tap.matchedId}`);
+          throw new Error(`Unsupported gesture state encountered during multitap: \n${this.sequence.trace()}`);
       }
 
       // For rota-style behavior
@@ -103,6 +106,10 @@ export default class Multitap implements GestureHandler {
 
       const keyEvent = vkbd.keyEventFromSpec(selection);
       keyEvent.baseTranscriptionToken = this.baseContextToken;
+
+      if(this.baseContextToken == null) {
+        console.warn('Multitap init warning:  no associated base context (with base key '+ e.key.spec.coreID + ')');
+      }
 
       const coord = tap.sources[0].currentSample;
 
@@ -120,7 +127,7 @@ export default class Multitap implements GestureHandler {
           // with the multitap base key.
           const p = baseDistances.get(matchKey.key.spec);
           if(p == null) {
-            console.warn("Could not find current layer's key")
+            console.warn(`Could not find fat-finger probability for current layer's key:  current key = ${matchKey.key.spec.elementID}, current layer = ${vkbd.layerId}, keyboard = ${this.keyboardId}`);
           } else {
             baseDistances.delete(matchKey.key.spec);
             baseDistances.set(coord.item.key.spec, p);
@@ -140,6 +147,7 @@ export default class Multitap implements GestureHandler {
       // if no such 'nextLayer' is specified by default.
       keyEvent.kNextLayer ||= this.originalLayer;
 
+      keyEvent.inputBreadcrumb = this.sequence.trace();
       vkbd.raiseKeyEvent(keyEvent, null);
 
       // Now that the key has been processed, with a layer possibly changed as a result...
@@ -182,7 +190,7 @@ export default class Multitap implements GestureHandler {
     if(keyIndex == -1) { // also covers undefined, but does not include 0.
       // Modipress keys generally get left out of the key-correction calculations.
       if(!keySupportsModipress(this.baseKey)) {
-        console.warn("Could not find base key's probability for multitap correction");
+        console.warn(`Could not find base key's probability for multitap correction adjustments: ${this.baseKey.key.spec.elementID}, keyboard = ${this.keyboardId}`);
       }
 
       // Decently recoverable; just use the simple-tap distances instead.
@@ -192,7 +200,7 @@ export default class Multitap implements GestureHandler {
     const baseProb = baseDistribution.splice(keyIndex, 1)[0].p;
 
     let totalWeight = 0;
-    let multitapEntries: {keySpec: ActiveKeyBase, p: number}[] = [];
+    const multitapEntries: {keySpec: ActiveKeyBase, p: number}[] = [];
     for(let i = 0; i < this.multitaps.length; i++) {
       const key = this.multitaps[i];
       // 'standard distance', no real modular effects needed.

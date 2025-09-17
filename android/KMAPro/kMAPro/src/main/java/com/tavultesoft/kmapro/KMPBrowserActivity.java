@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,16 @@ public class KMPBrowserActivity extends BaseActivity {
       }
     }
 
-    setContentView(R.layout.activity_kmp_browser);
+    try {
+      setContentView(R.layout.activity_kmp_browser);
+    } catch (AndroidRuntimeException e) {
+      // WebView not enabled
+      finish();
+      return;
+    }
+
+    setupEdgeToEdge(R.id.kmp_browser_layout);
+    setupStatusBarColors(R.color.complementary_5, android.R.color.white);
 
     webView = (WebView) findViewById(R.id.kmpBrowserWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
@@ -107,7 +117,14 @@ public class KMPBrowserActivity extends BaseActivity {
           Intent intent = new Intent(context, MainActivity.class);
           intent.setData(downloadURI);
           KMLog.LogBreadcrumb(TAG, "Successful keyboard search now triggering package install", true);
-          startActivity(intent);
+
+          // Verify network access before trying to download
+          if (KMManager.hasConnection(context)) {
+            startActivity(intent);
+          } else {
+            Toast.makeText(context, getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
+            return true;
+          }
 
           // Finish activity
           finish();

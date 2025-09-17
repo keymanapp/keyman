@@ -3,5 +3,5 @@
 
 [D-BUS Service]
 Name=com.keyman.SystemService1
-Exec=/usr/libexec/systemd-keyman.service
+Exec=@LIBEXECDIR@/systemd-keyman.service
 User=root

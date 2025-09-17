@@ -6,7 +6,11 @@
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 import type { FloatingOSKViewCookie } from 'keyman/engine/osk';
 
-declare var keyman: KeymanEngine
+declare global {
+  interface Window {
+    keyman: KeymanEngine
+  }
+}
 
 type KeyboardMenuEntry = {
   _InternalName: string,
@@ -18,10 +22,14 @@ interface Owned<T> {
   _owningObject?: T;
 }
 
+const keymanweb=window.keyman;
+
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!keyman?.ui?.name) {
+if(!keymanweb) {
+  throw new Error("`keyman` global is missing; Keyman Engine for Web script has not been loaded");
+} else if(!keymanweb.ui?.name) {
   /********************************/
   /*                              */
   /* Toggle User Interface Code   */
@@ -39,7 +47,6 @@ if(!keyman?.ui?.name) {
 
   try {
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
-    const keymanweb = keyman;
     //var dbg=keymanweb['debug'];
     const util = keymanweb.util;
 
@@ -111,7 +118,7 @@ if(!keyman?.ui?.name) {
         let x = p.x;
         let y = p.y;
 
-        var ownerDoc = someElement.ownerDocument;
+        const ownerDoc = someElement.ownerDocument;
         if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
           w = ownerDoc.defaultView.frameElement.clientWidth;
           h = ownerDoc.defaultView.frameElement.clientHeight;
@@ -138,7 +145,7 @@ if(!keyman?.ui?.name) {
       }
 
       registerEvents() {
-        let osk = keymanweb.osk;
+        const osk = keymanweb.osk;
 
         if(!osk) {
           return;
@@ -180,7 +187,7 @@ if(!keyman?.ui?.name) {
       /**
        * Toggle a single keyboard on or off - KMW button control event
        **/
-      readonly switchSingleKbd = () => {
+      readonly switchSingleKbd = async () => {
         const _v = keymanweb.getActiveKeyboard() == '';
         let nLastKbd=0, kbdName='', lgCode='';
 
@@ -195,10 +202,10 @@ if(!keyman?.ui?.name) {
 
           kbdName = this.keyboards[nLastKbd]._InternalName;
           lgCode = this.keyboards[nLastKbd]._LanguageCode;
-          keymanweb.setActiveKeyboard(kbdName,lgCode);
+          await keymanweb.setActiveKeyboard(kbdName,lgCode);
           this.lastActiveKeyboard = nLastKbd;
         } else {
-          keymanweb.setActiveKeyboard('');
+          await keymanweb.setActiveKeyboard('');
         }
 
         if(this.kbdButton) {
@@ -209,7 +216,7 @@ if(!keyman?.ui?.name) {
       /**
        * Switch to the next keyboard in the list - KMW button control event
        **/
-      readonly switchNextKbd = () => {
+      readonly switchNextKbd = async () => {
         let _v = (keymanweb.getActiveKeyboard() == '');
         let kbdName='', lgCode='';
 
@@ -220,16 +227,16 @@ if(!keyman?.ui?.name) {
 
           kbdName = this.keyboards[0]._InternalName;
           lgCode = this.keyboards[0]._LanguageCode;
-          keymanweb.setActiveKeyboard(kbdName,lgCode);
+          await keymanweb.setActiveKeyboard(kbdName,lgCode);
           this.lastActiveKeyboard = 0;
         } else {
           if(this.lastActiveKeyboard == this.keyboards.length-1) {
-            keymanweb.setActiveKeyboard('');
+            await keymanweb.setActiveKeyboard('');
             _v = false;
           } else {
             kbdName = this.keyboards[++this.lastActiveKeyboard]._InternalName;
             lgCode = this.keyboards[this.lastActiveKeyboard]._LanguageCode;
-            keymanweb.setActiveKeyboard(kbdName,lgCode);
+            await keymanweb.setActiveKeyboard(kbdName,lgCode);
             _v = true;
           }
         }
@@ -281,7 +288,7 @@ if(!keyman?.ui?.name) {
           };
 
           private __updatestyle() {
-            var ss=this._elem.style;
+            const ss=this._elem.style;
             if(this._over) {
               ss.margin = '0px';
               if(this._selected) {
@@ -363,8 +370,8 @@ if(!keyman?.ui?.name) {
           constructor(/* TODO: put wrapping method's params HERE instead upon class-extraction */) {
             this._selected = _selected;
 
-            let imgPath=util.getOption('resources') + 'ui/toggle/';
-            let _elemImg = util.createElement('img') as HTMLImageElement & Owned<Button>;
+            const imgPath=util.getOption('resources') + 'ui/toggle/';
+            const _elemImg = util.createElement('img') as HTMLImageElement & Owned<Button>;
             this._elem = util.createElement('div');
             this._elem['_owningObject'] = this;
             _elemImg.style.display = 'block';
@@ -468,7 +475,7 @@ if(!keyman?.ui?.name) {
       }
 
       shutdown() {
-        var root = this.controller;
+        const root = this.controller;
 
         if(root) {
           root.parentNode.removeChild(root);
@@ -517,8 +524,8 @@ if(!keyman?.ui?.name) {
           this.kbdButton.getElem().id = 'kmwico';
           this.kbdButton.getElem().style.width = '24px';
 
-          var Lki=_kbds[0].InternalName;
-          var Lklc=_kbds[0].LanguageCode;
+          const Lki=_kbds[0].InternalName;
+          const Lklc=_kbds[0].LanguageCode;
           this.controller.style.background = 'url('+imgPath+'kmwcontroller2.gif)';
           this.keyboards.push({_InternalName: Lki, _LanguageCode: Lklc, _Index: 0});
           this.kbdButton._onclick = this.switchSingleKbd;
@@ -535,7 +542,7 @@ if(!keyman?.ui?.name) {
         }
 
         // Highlight the last active keyboard
-        var sk=keymanweb.getSavedKeyboard().split(':');
+        const sk=keymanweb.getSavedKeyboard().split(':');
         this.updateMenu(sk[0],sk[1]);
       }
 
@@ -551,7 +558,7 @@ if(!keyman?.ui?.name) {
        * @param       {number}  _kbd
        * Description  Select a keyboard from the drop down menu
        **/
-      selectKbd(_kbd: number) {
+      private async selectKbd(_kbd: number): Promise<boolean> {
         let _name,_lgCode;
         if(_kbd < 0) {
           _name = '';
@@ -561,7 +568,7 @@ if(!keyman?.ui?.name) {
           _lgCode = this.keyboards[_kbd]._LanguageCode;
         }
 
-        keymanweb.setActiveKeyboard(_name,_lgCode);
+        await keymanweb.setActiveKeyboard(_name,_lgCode);
         keymanweb.focusLastActiveElement();
         this.kbdButton._setSelected(_name != '');
         if(_kbd >= 0) {
@@ -694,8 +701,8 @@ if(!keyman?.ui?.name) {
           this.keyboardMenu.innerHTML = '';  // I2403 - Allow toggle design to be loaded twice
         }
 
-        var _li = util.createElement('li');
-        var _a = util.createElement('a');
+        const _li = util.createElement('li');
+        const _a = util.createElement('a');
         _a.innerHTML='(System keyboard)';
         _a.href="#";
         _a.onclick = () => {
@@ -710,14 +717,14 @@ if(!keyman?.ui?.name) {
 
         const _kbds=keymanweb.getKeyboards(), _added: Record<string, number> = {};
         this.keyboards = [];
-        for(var _kbd = 0; _kbd < _kbds.length; _kbd++) {
-          var _li1=util.createElement('li');
-          var _a1=util.createElement('a');
+        for(let _kbd = 0; _kbd < _kbds.length; _kbd++) {
+          const _li1=util.createElement('li');
+          const _a1=util.createElement('a');
           _a1.innerHTML=_kbds[_kbd].LanguageName + ' - ' + _kbds[_kbd].Name;
           if(!_added[_kbds[_kbd].InternalName]) _added[_kbds[_kbd].InternalName]=0;
           _added[_kbds[_kbd].InternalName]++;
 
-          var _n=_added[_kbds[_kbd].InternalName];
+          const _n=_added[_kbds[_kbd].InternalName];
           this.keyboards.push({_InternalName: _kbds[_kbd].InternalName, _LanguageCode:_kbds[_kbd].LanguageCode, _Index: _n});
 
           _a1.href="#";

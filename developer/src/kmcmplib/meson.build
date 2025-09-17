@@ -5,10 +5,10 @@
 #
 
 project('kmcmplib', 'cpp', 'c',
-        version: run_command(find_program('getversion.bat', 'getversion.sh'), check: true).stdout().strip(),
+        version: files('../../../VERSION.md'),
         license: 'MIT',
         default_options : ['buildtype=release',
-                           'cpp_std=c++14',
+                           'cpp_std=c++17',
                            'b_vscrt=static_from_buildtype',
                            'default_library=static',
                            'debug=true'])

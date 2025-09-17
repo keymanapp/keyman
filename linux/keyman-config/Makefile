@@ -15,15 +15,17 @@ clean:
 check:
 	./build.sh test
 
-devdist: version
-	python3 setup.py egg_info -b.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M` sdist
-
 dist: clean version
-	python3 setup.py sdist
+	# TODO: remove this if when we no longer support Ubuntu 22.04 Jammy
+	if dpkg --compare-versions "$(lsb_release -r -s)" lt 24.04; then \
+		python3 setup.py sdist ; \
+	else \
+		python3 -m build --outdir build --sdist ; \
+	fi
 
 deb: dist
-	@VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
-	@echo VERSION is $(shell cat /tmp/keyman_version)
+	@KEYMAN_VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
+	@echo KEYMAN_VERSION is $(shell cat /tmp/keyman_version)
 	@mkdir -p make_deb
 	cd make_deb && tar xf ../dist/keyman_config-$(shell cat /tmp/keyman_version).tar.gz && \
 		mv keyman_config-$(shell cat /tmp/keyman_version) keyman-config-$(shell cat /tmp/keyman_version) && \
@@ -39,7 +41,7 @@ version_reconf:
 	cd .. && ./scripts/reconf.sh
 
 version: version_reconf
-	$(eval VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
+	$(eval KEYMAN_VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
 
 # i18n
 
@@ -47,7 +49,7 @@ POFILES := $(shell find locale -name \*.po)
 MOFILES := $(POFILES:.po=/LC_MESSAGES/keyman-config.mo)
 
 update-template: version
-	xgettext --package-name "keyman" --package-version "$(VERSION)" \
+	xgettext --package-name "keyman" --package-version "$(KEYMAN_VERSION)" \
 		--msgid-bugs-address "<support@keyman.com>" --copyright-holder "SIL Global" \
 		--language=Python --directory=. --output-dir=locale --output=keyman-config.pot \
 		--add-comments=i18n: --sort-by-file --width=98 \

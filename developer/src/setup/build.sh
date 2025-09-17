@@ -2,14 +2,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
   "Keyman Developer Setup bootstrap executable" \
   @/common/include \
   @/common/windows/delphi \
-  clean configure build test publish
+  clean configure build test publish edit
 
 builder_parse "$@"
 
@@ -33,13 +33,8 @@ function do_build() {
   sentrytool_delphiprep "$WIN32_TARGET" setup.dpr
   tds2dbg "$WIN32_TARGET"
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  if [[ -f "$WIN32_TARGET_PATH/setup.dbg" ]]; then
-    cp "$WIN32_TARGET_PATH/setup.dbg" "$DEVELOPER_DEBUGPATH/devsetup.dbg"
-  fi
-  rm -f "$WIN32_TARGET_PATH/devsetup.dbg"
-  if [[ -f "$WIN32_TARGET_PATH/setup.dbg" ]]; then
-    mv "$WIN32_TARGET_PATH/setup.dbg" "$WIN32_TARGET_PATH/devsetup.dbg"
-  fi
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/setup.dbg" "$DEVELOPER_DEBUGPATH/devsetup.dbg"
+  builder_if_release_build_level mv "$WIN32_TARGET_PATH/setup.dbg" "$WIN32_TARGET_PATH/devsetup.dbg"
 }
 
 function do_publish() {
@@ -55,3 +50,4 @@ builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 builder_run_action publish:project      do_publish
 # builder_run_action test:project         do_test
+builder_run_action edit:project         start setup.dproj

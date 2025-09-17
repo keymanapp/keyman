@@ -1,3 +1,14 @@
+#
+# This workflow builds the source package for Keyman for Linux, and then builds
+# the binary packages for the released versions of Ubuntu. It also signs the
+# packages. Released Keyman versions get uploaded to the LLSO repository.
+# It is triggered by a repository_dispatch event with the
+# types `deb-release-packaging:*` and `deb-pr-packaging:*`.
+#
+# We use the filename `deb-packaging.yml` even though we only do Ubuntu
+# packaging here, because we're packaging the .deb format, and because it's shorter.
+#
+
 name: "Ubuntu packaging"
 run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}, testbuild: ${{ github.event.client_payload.isTestBuild }}"
 on:
@@ -12,11 +23,12 @@ on:
 # baseRef:     The ref of the previous commit. For a PR the same as `baseBranch`.
 # user:        The user that triggered the build or created the PR
 # isTestBuild: false for Releases, otherwise true
+# skipApiCheck: true to skip the API check, otherwise false
 
 env:
   COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
-  STATUS_CONTEXT: 'Debian Packaging'
+  STATUS_CONTEXT: 'Ubuntu Packaging'
   DEBFULLNAME: 'Keyman GHA packager'
   DEBEMAIL: 'support@keyman.com'
 
@@ -26,11 +38,11 @@ jobs:
     if: github.repository == 'keymanapp/keyman'
     runs-on: ubuntu-24.04
     outputs:
-      VERSION: ${{ steps.version_step.outputs.VERSION }}
+      KEYMAN_VERSION: ${{ steps.version_step.outputs.KEYMAN_VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
     steps:
     - name: Checkout
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
@@ -45,7 +57,7 @@ jobs:
           /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-          -f description='Debian packaging started' \
+          -f description='Ubuntu packaging started' \
           -f context="$STATUS_CONTEXT"
 
     - name: Install devscripts
@@ -61,10 +73,10 @@ jobs:
     - name: Build source package
       id: build_source_package
       run: |
-        export TIER=$(cat TIER.md)
+        export KEYMAN_TIER=$(cat TIER.md)
         export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
         export GHA_BRANCH="${{ github.event.client_payload.branch }}"
-        echo "TIER=$TIER" >> $GITHUB_ENV
+        echo "KEYMAN_TIER=$KEYMAN_TIER" >> $GITHUB_ENV
         echo "GHA_TEST_BUILD=${GHA_TEST_BUILD}" >> $GITHUB_ENV
         echo "GHA_BRANCH=${GHA_BRANCH}" >> $GITHUB_ENV
         cd linux
@@ -75,8 +87,15 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
-        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh" ]]; then
+          . "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
+        else
+          # TODO: remove following block post v19 release (file was renamed in v19 alpha)
+          if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh" ]]; then
+            . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+          fi
+        fi
+        echo "KEYMAN_VERSION=${KEYMAN_VERSION:-${VERSION}}" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
       id: prerelease_tag
@@ -92,16 +111,16 @@ jobs:
     - name: Output which branch or PR we're building plus name of .dsc file
       run: |
         if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
-          echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
+          echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.KEYMAN_VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
         else
-          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.branch}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.branch}}), version ${{ steps.version_step.outputs.KEYMAN_VERSION }}**" >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
         echo ":gift: Generated source package:" >> $GITHUB_STEP_SUMMARY
         echo "- $(find . -name keyman_\*.dsc)" >> $GITHUB_STEP_SUMMARY
 
     - name: Store source package
-      uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: keyman-srcpkg
         path: |
@@ -116,11 +135,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [jammy, noble, oracular]
+        dist: [jammy, noble, plucky]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -129,7 +148,7 @@ jobs:
       uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
-        version: ${{ needs.sourcepackage.outputs.VERSION }}
+        version: ${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}
         prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
         deb_fullname: ${{env.DEBFULLNAME}}
         deb_email: ${{env.DEBEMAIL}}
@@ -142,11 +161,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [plucky]
+        dist: [questing]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -155,7 +174,7 @@ jobs:
       uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
-        version: ${{ needs.sourcepackage.outputs.VERSION }}
+        version: ${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}
         prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
         deb_fullname: ${{env.DEBFULLNAME}}
         deb_email: ${{env.DEBEMAIL}}
@@ -167,7 +186,7 @@ jobs:
 
     steps:
     # - name: Download Artifacts
-    #   uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+    #   uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
     #   with:
     #     path: artifacts
     #     merge-multiple: true
@@ -187,7 +206,7 @@ jobs:
     #     autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
     - name: Ignore
       run: |
-        echo "Ignored for now - until working solution is in place"
+        echo "Ignored for now - until working solution is in place (#13777)"
 
   deb_signing:
     name: Sign source and binary packages
@@ -200,8 +219,8 @@ jobs:
       - name: Sign packages
         uses: sillsdev/gha-deb-signing@a38dbde6bc9afabede5e07609105acc83c760ad4 # v0.6
         with:
-          src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1_source.changes"
-          bin-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+"
+          src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}-1_source.changes"
+          bin-pkg-name: "keyman_${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+"
           artifacts-prefix: "keyman-"
           artifacts-result-name: "keyman-signedpkgs"
           gpg-signing-key: "${{ secrets.GPG_SIGNING_KEY }}"
@@ -236,7 +255,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Download Artifacts
-      uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
         name: keyman-signedpkgs
 
@@ -282,7 +301,7 @@ jobs:
         echo "::endgroup::"
 
         echo -e "::group::${COLOR_GREEN}Uploading binary packages"
-        pattern="keyman_${{ needs.sourcepackage.outputs.VERSION }}.+\+(.*)[0-9]_[^.]+.changes"
+        pattern="keyman_${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}.+\+(.*)[0-9]_[^.]+.changes"
         for f in *_amd64.changes; do
           if [[ $f =~ $pattern ]]; then
             dist=${BASH_REMATCH[1]}
@@ -292,20 +311,21 @@ jobs:
         echo "::endgroup::"
 
   prepare_api_verification:
-    name: Verify API for libkeymancore.so
+    name: Prepare API verification
     needs: [sourcepackage, binary_packages_released]
     runs-on: ubuntu-latest
 
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
         path: artifacts
+        pattern: keyman-*
         merge-multiple: true
 
     - name: Save environment
       run: |
-        echo "VERSION=${{ needs.sourcepackage.outputs.VERSION }}" > artifacts/env
+        echo "KEYMAN_VERSION=${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}" > artifacts/env
         echo "PRERELEASE_TAG=${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}" >> artifacts/env
         echo "GIT_SHA=${{ github.event.client_payload.buildSha }}" >> artifacts/env
         echo "GIT_BASE=${{ github.event.client_payload.baseRef }}" >> artifacts/env
@@ -313,9 +333,10 @@ jobs:
         echo "GIT_BRANCH=${{ github.event.client_payload.branch }}" >> artifacts/env
         echo "GIT_BASE_BRANCH=${{ github.event.client_payload.baseBranch }}" >> artifacts/env
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
+        echo "SKIP_API_CHECK=${{ github.event.client_payload.skipApiCheck }}" >> artifacts/env
 
     - name: Cache artifacts
-      uses: actions/cache/save@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       with:
         path: |
           artifacts

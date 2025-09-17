@@ -1,5 +1,5 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
-import { KeymanEngine as KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
+import { KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
@@ -27,8 +27,9 @@ import { UIModule } from './uiModuleInterface.js';
 import { HotkeyManager } from './hotkeyManager.js';
 import { BeepHandler } from './beepHandler.js';
 import KeyboardInterface from './keyboardInterface.js';
+import { WorkerFactory } from '@keymanapp/lexical-model-layer/web';
 
-export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
+export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
   private pageIntegration: PageIntegrationHandlers;
 
@@ -55,10 +56,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.contextManager.restoreLastActiveTarget();
   }
 
-  constructor(worker: Worker, sourceUri: string) {
+  constructor(workerFactory: WorkerFactory, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
-    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
+    super(workerFactory, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
       return {
         // The `engine` parameter cannot be supplied with the constructing instance before calling
         // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
@@ -157,8 +158,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @returns A Promise that only resolves once the engine is fully initialized.
    */
   public async init(options: Required<BrowserInitOptionSpec>) {
-    let deviceDetector = new DeviceDetector();
-    let device = deviceDetector.detect();
+    const deviceDetector = new DeviceDetector();
+    const device = deviceDetector.detect();
 
     const totalOptions = {...BrowserInitOptionDefaults, ...options};
 
@@ -203,7 +204,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Capture the saved-keyboard string now, before we load any keyboards/stubs
     // or do anything that would mutate the value.
-    const savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
+    let savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
 
     if(device.touchable) {
       this.osk = new views.AnchoredOSKView(this);
@@ -228,12 +229,17 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Let any deferred, pre-init stubs complete registration
     await Promise.resolve();
 
-    // Attempt to restore the user's last-used keyboard from their previous session.
-    //
-    // Note:  any cloud stubs will probably not be available yet.
-    // If we tracked cloud requests and awaited a Promise.all on pending queries,
-    // we could handle that too.
-    this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+    // If there's no value here, we should check to see if `Keyboard_us:en`
+    // is one of the available stubs; we default to that if it's available.
+    savedKeyboardStr ||= this.contextManager.getSavedKeyboard();
+    if(savedKeyboardStr) {
+      // Attempt to restore the user's last-used keyboard from their previous session.
+      //
+      // Note:  any cloud stubs will probably not be available yet.
+      // If we tracked cloud requests and awaited a Promise.all on pending queries,
+      // we could handle that too.
+      this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+    }
 
     await Promise.resolve();
   }
@@ -391,7 +397,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    */
   private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: Keyboard) { // I2078 - Full keyboard detail
-    let Lr = {
+    const Lr = {
       Name: Lstub.KN,
       InternalName: Lstub.KI,
       LanguageName: Lstub.KL,  // I1300 - Add support for language names
@@ -427,7 +433,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   public isCJK(k0?: KeyboardObject | ReturnType<KeymanEngine['_GetKeyboardDetail']> /* [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
     if(k0) {
-      let kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
+      const kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
       if(kbdDetail.KeyboardID){
         kbd = this.keyboardRequisitioner.cache.getKeyboard(kbdDetail.KeyboardID);
       } else {
@@ -676,7 +682,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     PKbd = PKbd || this.core.activeKeyboard;
-    let Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
+    const Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
 
     // help.keyman.com will set this function in place to specify the desired
     // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
@@ -685,7 +691,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Note that the main intended use of that function is for embedded KMW on the mobile apps...
     // but they never call `BuildVisualKeyboard`, so it's all good.
     const getOskHeight = this['getOskHeight'];
-    let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
+    const targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
 
     return VisualKeyboard.buildDocumentationKeyboard(
       PKbd,

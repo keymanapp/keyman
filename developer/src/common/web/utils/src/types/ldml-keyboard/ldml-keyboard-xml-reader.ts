@@ -4,13 +4,15 @@
  * Reads a LDML XML keyboard file into JS object tree and resolves imports
  */
 import { SchemaValidators, util } from '@keymanapp/common-types';
-import { CommonTypesMessages } from '../../common-messages.js';
-import { CompilerCallbacks } from "../../compiler-callbacks.js";
+import { DeveloperUtilsMessages } from '../../developer-utils-messages.js';
+import { CompilerCallbacks, EventResolver } from "../../compiler-callbacks.js";
+import { CompilerEvent } from "../../compiler-interfaces.js";
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
+import { LineFinderEventResolver } from '../../line-utils.js';
+import { XML_FILENAME_SYMBOL, KeymanXMLReader, findInstanceObject } from '../../xml-utils.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -25,28 +27,44 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
   localImportsPaths: string[];
 };
 
-export class LDMLKeyboardXMLSourceFileReader {
+export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
+  /** for resolving messages involving line numbers */
+  private eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
+
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
+  }
+  resolve(event: CompilerEvent): void {
+    this.eventResolver.resolve(event);
   }
 
   static get defaultImportsURL(): [string,string] {
     return ['../import/', import.meta.url];
   }
 
-  readImportFile(version: string, subpath: string): Uint8Array {
-    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
-    return this.callbacks.loadFile(importPath);
+  /** bottleneck for reading keyboard XML files */
+  readFile(path: string): Uint8Array {
+    const data = this.callbacks.loadFile(path);
+    if (data) {
+      this.eventResolver.addFile(path, new TextDecoder().decode(data));
+    }
+    return data;
   }
 
-  readLocalImportFile(path: string): Uint8Array {
+  /** @returns [data, filename] */
+  readImportFile(version: string, subpath: string): [Uint8Array, string] {
+    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
+    return [this.readFile(importPath), importPath];
+  }
+
+  readLocalImportFile(path: string): [Uint8Array, string] {
     // try each of the local imports paths
     for (const localPath of this.options.localImportsPaths) {
       const importPath = this.callbacks.path.join(localPath, path);
       if(this.callbacks.fs.existsSync(importPath)) {
-        return this.callbacks.loadFile(importPath);
+        return [this.readFile(importPath), importPath];
       }
     }
-    return null; // was not able to load from any of the paths
+    return [null, null]; // was not able to load from any of the paths
   }
 
   /**
@@ -219,37 +237,39 @@ export class LDMLKeyboardXMLSourceFileReader {
     const { base, path } = asImport;
     // If base is not an empty string (or null/undefined), then it must be 'cldr'
     if (base && base !== constants.cldr_import_base) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportInvalidBase({base, path, subtag}));
       return false;
     }
     let importData: Uint8Array;
+    let importPath: string;
 
     if (base === constants.cldr_import_base) {
       // CLDR import
       const paths = path.split('/');
       if (paths[0] == '' || paths[1] == '' || paths.length !== 2) {
-        this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportInvalidPath({base, path, subtag}));
         return false;
       }
       if (constants.treatAsLatest(paths[0])) {
         /** There's no data or DTD change in 45, 46, 46.1, 47 so map them all to 46 at present. */
         paths[0] = constants.cldr_version_latest;
       }
-      importData = this.readImportFile(paths[0], paths[1]);
+      [importData, importPath] = this.readImportFile(paths[0], paths[1]);
     } else {
       // local import
-      importData = this.readLocalImportFile(path);
+      [importData, importPath] = this.readLocalImportFile(path);
     }
     if (!importData || !importData.length) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportReadFail({base, path, subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportReadFail({base, path, subtag}));
       return false;
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
     const importRootNode = importXml[subtag]; // e.g. <keys/>
+    this.eventResolver.addFile(importPath, new TextDecoder().decode(importData)); // TODO: double decode
 
     // importXml will have one property: the root element.
     if (!importRootNode) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportWrongRoot({base, path, subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportWrongRoot({base, path, subtag}));
       return false;
     }
     // pull all children of importXml[subtag] into obj
@@ -259,11 +279,15 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!Array.isArray(subsubval)) {
         // This is somewhat of an internal error, indicating that a non-mergeable XML file was imported
         // Not exercisable with the standard LDML imports.
-        this.callbacks.reportMessage(CommonTypesMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
         return false;
       }
       // Mark all children as an import
-      subsubval.forEach(o => o[ImportStatus.import] = basePath);
+      subsubval.forEach(o => {
+        o[ImportStatus.import] = basePath;
+        KeymanXMLReader.setMetaData(o, {[XML_FILENAME_SYMBOL as any]: importPath}); // mark overriding import path
+      });
+
       if (implied) {
         // mark all children as an implied import
         subsubval.forEach(o => o[ImportStatus.impliedImport] = basePath);
@@ -286,12 +310,13 @@ export class LDMLKeyboardXMLSourceFileReader {
   public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
     if(!SchemaValidators.default.ldmlKeyboard3(source)) {
       for (const err of (<any>SchemaValidators.default.ldmlKeyboard3).errors) {
-        this.callbacks.reportMessage(CommonTypesMessages.Error_SchemaValidationError({
+        const context = findInstanceObject(source, err?.instancePath?.split('/'));
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,
           message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
           params: Object.entries(err.params || {}).sort().map(([k,v])=>`${k}="${v}"`).join(' '),
-        }));
+        }, context));
       }
       return false;
     }
@@ -318,7 +343,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     try {
       source = this.loadUnboxed(file);
     } catch(e) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXml({e}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e}));
       return null;
     }
 
@@ -359,7 +384,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     } else if (r.length === 1) {
       return r[0];
     } else {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_TestDataUnexpectedArray({subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_TestDataUnexpectedArray({subtag}));
       return null; // ERROR
     }
   }

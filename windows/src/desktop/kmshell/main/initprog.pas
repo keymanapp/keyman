@@ -433,6 +433,9 @@ begin
   Application.HelpFile := GetCHMPath; // may change if language changes
   Application.Title := MsgFromId(SKApplicationTitle);
 
+  if (FMode in [fmStart, fmBoot]) then FIcon := 'appicon.ico'
+  else FIcon := 'cfgicon.ico';
+
   if GetOS in [osOther] then
   begin
     ShowMessage(MsgFromId(SKOSNotSupported));
@@ -459,9 +462,6 @@ begin
   end;
 
   // I1818 - remove start mode change
-
-  if (FMode in [fmStart, fmBoot]) then FIcon := 'appicon.ico'
-  else FIcon := 'cfgicon.ico';
 
   FIcon := GetDebugPath(FIcon, ExtractFilePath(ParamStr(0)) + FIcon, False);
   if FileExists(FIcon) then
@@ -533,8 +533,8 @@ begin
     fmTextEditor:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanTextEditor');
-        if FMutex.TakeOwnership 
-          then OpenTextEditor 
+        if FMutex.TakeOwnership
+          then OpenTextEditor
           else FocusTextEditor;
       end;
 
@@ -662,11 +662,37 @@ begin
     end;
 end;
 
+function ShouldSendToBUpdateSM(FSilent: Boolean; BUpdateSM: TUpdateStateMachine; FMode: TKMShellMode): Boolean;
+// The following logic around the WaitingRestartState should be
+// encapsulated in the state machine however as we want separation of
+// UI elements from the state machine we have bring some of logic here.
+var
+  frmStartInstall: TfrmStartInstall;
+  ValidateReadyToInstall: Boolean;
+begin
+  ValidateReadyToInstall := BUpdateSM.ValidateReadyToInstall;
+
+  if not FSilent and ValidateReadyToInstall and
+     (FMode in [fmStart, fmSplash, fmMain, fmAbout,
+                fmHelp, fmShowHelp, fmSettings, fmBoot]) then
+  begin
+    frmStartInstall := TfrmStartInstall.Create(nil, false);
+    try
+      Result := frmStartInstall.ShowModal = mrOk;
+    finally
+      frmStartInstall.Free;
+    end;
+  end
+  else if FSilent and ValidateReadyToInstall then
+    Result := False
+  else
+    Result := True;
+end;
+
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
 var
   BUpdateSM : TUpdateStateMachine;
-  frmStartInstall: TfrmStartInstall;
-  UserCanceled : Boolean;
+  SendToBUpdateSM: Boolean;
   SkipBUpdate : Boolean;
 begin
   BUpdateSM := TUpdateStateMachine.Create(False);
@@ -699,30 +725,17 @@ begin
       else
       begin
         // Since Package upgrade and Keyman upgrade share the installing state
-        // the following package related switches are valid in the installing
-        // state.
-        SkipBUpdate := (BUpdateSM.IsInstallingState and (FMode in [fmInstallTip,
-        fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
-        fmUpgradeMnemonicLayout]));
-        // The following logic around the WaitingRestartState should be
-        // encapsulated in the state machine however as we want separation of
-        // UI elements from the state machine we have bring some of logic here.
-        UserCanceled := False;
-        if BUpdateSM.ReadyToInstall and
-          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout,
-          fmHelp, fmShowHelp, fmSettings, fmBoot])) then
-        begin
-          frmStartInstall := TfrmStartInstall.Create(nil);
-          try
-            if frmStartInstall.ShowModal = mrOk then
-              UserCanceled := False
-            else
-              UserCanceled := True
-          finally
-            frmStartInstall.Free;
-          end;
-        end;
-        if not UserCanceled and not SkipBUpdate and (BUpdateSM.HandleKmShell = 1) then
+        // the presence of the following package related switches means we
+        // should skip running the update state machine HandleKmShell event
+        SkipBUpdate := (FMode in [
+          fmInstallTip, fmInstallTipsForPackages,
+          fmRegisterTip, fmUpgradeKeyboards,
+          fmUpgradeMnemonicLayout
+        ]);
+
+        SendToBUpdateSM := ShouldSendToBUpdateSM(FSilent, BUpdateSM, FMode);
+
+        if SendToBUpdateSM and not SkipBUpdate and (BUpdateSM.HandleKmShell = 1) then
         begin
           Result := True;
           Exit;

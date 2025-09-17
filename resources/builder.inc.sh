@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
+# shellcheck disable=SC2310
 
 # Note: these two lines can be uncommented for debugging and profiling build
 # scripts:
@@ -18,7 +19,7 @@
 # * _builder_ functions and variables are internal use only for builder.inc.sh, and
 #   subject to change at any time. Do not use them in other scripts.
 # * Note: the running script is the top-level script that includes either
-#   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
+#   builder.inc.sh directly, or, just in the Keyman repo, via builder-basic.inc.sh.
 #
 
 # Exit on command failure and when using unset variables:
@@ -32,6 +33,7 @@ SHLVL=0
 # _builder_init is called internally at the bottom of this file after we have
 # all function declarations in place.
 function _builder_init() {
+  _builder_get_operating_system
   _builder_findRepoRoot
   _builder_setBuildScriptIdentifiers
 
@@ -49,9 +51,7 @@ function _builder_init() {
 }
 
 function _builder_findRepoRoot() {
-    # We don't need readlink here because our standard script prolog does a
-    # readlink -f already so we will have already escaped from any symlinks
-    REPO_ROOT="${BASH_SOURCE[0]%/*/*}"
+    REPO_ROOT="$(readlink -f "${BASH_SOURCE[0]%/*/*}")"
     readonly REPO_ROOT
 }
 
@@ -142,14 +142,25 @@ function builder_term() {
 }
 
 function builder_die() {
-  echo
+  _builder_error_echo
   if [[ $# -eq 0 ]]; then
     builder_echo error "Unspecified error, aborting script"
   else
     builder_echo error "$*"
   fi
-  echo
+  _builder_error_echo
   exit 1
+}
+
+# Emit message to stderr instead of stdout
+function _builder_error_echo() {
+  # we only need to support -e flag
+  if [[ $# -gt 0 ]] && [[ $1 == -e ]]; then
+    shift
+    2>&1 echo -e "$*"
+  else
+    2>&1 echo "$*"
+  fi
 }
 
 function builder_warn() {
@@ -169,35 +180,77 @@ function builder_heading() {
 
 
 builder_echo() {
-  local color=white message= mark=
-  if [[ $# -gt 1 && $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
-    color="$1"
-    shift
+  local color=white message= mark= block= action= do_output=true test=
+  local echo_target=echo
+
+  if [[ $# -gt 1 ]]; then
+    if [[ $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
+      color="$1"
+      shift
+    elif [[ $1 == "start" ]] || [[ $1 == "startTest" ]]; then
+      # builder_echo start block message
+      test="$1"
+      block="$2"
+      shift 2
+      action="start"
+      color="heading"
+      if ! builder_is_running_on_teamcity && builder_is_child_build; then
+        do_output=${_builder_debug_internal:-false}
+      fi
+    elif [[ $1 == "end" ]] || [[ $1 == "endTest" ]]; then
+      # builder_echo end block status message
+      test="$1"
+      block="$2"
+      color="$3"
+      shift 3
+      action="end"
+      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity && builder_is_child_build; then
+        do_output=${_builder_debug_internal:-false}
+      fi
+    fi
   fi
   message="$*"
 
-  if [[ ! -z ${COLOR_RED+x} ]]; then
-    case $color in
-      white) color="$COLOR_WHITE" ;;
-      grey) color="$COLOR_GREY" ;;
-      green|success) color="$COLOR_GREEN" ;;
-      blue|heading) color="$COLOR_BLUE" ;;
-      yellow|warning) color="$COLOR_YELLOW" ;;
-      red|error) color="$COLOR_RED" ;;
-      purple) color="$COLOR_PURPLE" ;;
-      brightwhite) color="$COLOR_BRIGHTWHITE" ;;
-      teal|debug) color="$COLOR_TEAL" ;;
-      setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
-    esac
-
-    if builder_is_dep_build; then
-      echo -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+  if [[ "${action}" == "start" ]] && builder_is_running_on_teamcity; then
+    if [[ "${test}" == "startTest" ]]; then
+      $echo_target -e "##teamcity[testSuiteStarted name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
     else
-      echo -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+      $echo_target -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
     fi
-  else
-    # Cope with the case of pre-init message and just emit plain text
-    echo -e "$message"
+  fi
+
+  if ${do_output}; then
+    if [[ ! -z ${COLOR_RED+x} ]]; then
+      case $color in
+        white) color="$COLOR_WHITE" ;;
+        grey) color="$COLOR_GREY" ;;
+        green|success) color="$COLOR_GREEN" ;;
+        blue|heading) color="$COLOR_BLUE" ;;
+        yellow|warning) color="$COLOR_YELLOW" ;;
+        red|error) color="$COLOR_RED"; echo_target=_builder_error_echo ;;
+        purple) color="$COLOR_PURPLE" ;;
+        brightwhite) color="$COLOR_BRIGHTWHITE" ;;
+        teal|debug) color="$COLOR_TEAL" ;;
+        setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
+      esac
+
+      if builder_is_dep_build; then
+        $echo_target -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+      else
+        $echo_target -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+      fi
+    else
+      # Cope with the case of pre-init message and just emit plain text
+      $echo_target -e "$message"
+    fi
+  fi
+
+  if [[ "${action}" == "end" ]] && builder_is_running_on_teamcity; then
+    if [[ "${test}" == "endTest" ]]; then
+      $echo_target -e "##teamcity[testSuiteFinished name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    else
+      $echo_target -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    fi
   fi
 }
 
@@ -393,9 +446,7 @@ _builder_execute_child() {
 
   local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
 
-  if $_builder_debug_internal; then
-    builder_echo heading "## $action$target starting..."
-  fi
+  builder_echo start "$action$target" "## $action$target starting..."
 
   # Build array of specified inheritable options
   local child_options=()
@@ -424,12 +475,10 @@ _builder_execute_child() {
     $builder_debug \
     $_builder_offline \
   && (
-    if $_builder_debug_internal; then
-      builder_echo success "## $action$target completed successfully"
-    fi
+    builder_echo end "$action$target" success "## $action$target completed successfully"
   ) || (
     result=$?
-    builder_echo error "## $action$target failed with exit code $result"
+    builder_echo end "$action$target" error "## $action$target failed with exit code $result"
     exit $result
   ) || exit $? # Required due to above subshell masking exit
 }
@@ -576,7 +625,7 @@ builder_has_action() {
 #   }
 #
 #   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
-#   builder_run_action configure    verify_npm_setup
+#   builder_run_action configure    node_select_version_and_npm_ci
 #   builder_run_action build        do_build
 # ```
 #
@@ -619,19 +668,19 @@ builder_start_action() {
     # verify whether a target output is present.
     if builder_is_dep_build &&
         ! builder_is_full_dep_build &&
-        _builder_dep_output_exists $_builder_matched_action; then
-      builder_echo "skipping $_builder_matched_action_name, up-to-date"
+        _builder_dep_output_exists "${_builder_matched_action}"; then
+      builder_echo "skipping ${_builder_matched_action_name}, up-to-date"
       return 1
     fi
 
-    builder_echo blue "## $_builder_matched_action_name starting..."
-    if [ -n "${_builder_current_action}" ]; then
+    builder_echo start "${_builder_matched_action_name}" "## ${_builder_matched_action_name} starting..."
+    if [[ -n "${_builder_current_action}" ]]; then
       _builder_warn_if_incomplete
     fi
-    _builder_current_action="$_builder_matched_action"
+    _builder_current_action="${_builder_matched_action}"
 
     # Build dependencies as required
-    _builder_do_build_deps "$_builder_matched_action"
+    _builder_do_build_deps "${_builder_matched_action}"
     return 0
   else
     return 1
@@ -1048,6 +1097,7 @@ _builder_get_default_description() {
     :module)   description="this module" ;;
     :tools)    description="build tools for this project" ;;
     --debug)   description="debug build" ;;
+    --release) description="release build (prevents --debug in local-env builds)" ;;
   esac
   echo "$description"
 }
@@ -1269,12 +1319,15 @@ _builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
+  local is_release=false
   local _params=($@)
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_action=
   _builder_is_child=1
   _builder_offline=
+  _builder_ignore_unknown_options=1
+  builder_ignored_options=()
 
   local n=0
 
@@ -1385,9 +1438,14 @@ _builder_parse_expanded_parameters() {
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
           ;;
-        --debug|-d)
+        --debug)
           _builder_chosen_options+=(--debug)
           builder_debug=--debug
+          ;;
+        --release)
+          _builder_chosen_options+=(--release)
+          # As of #13827, this is only checked when detecting if --debug should be auto-applied.
+          is_release=true
           ;;
         --deps|--no-deps|--force-deps)
           _builder_build_deps=$key
@@ -1414,6 +1472,9 @@ _builder_parse_expanded_parameters() {
         --offline)
           _builder_offline=--offline
           ;;
+        --builder-ignore-unknown-options)
+          _builder_ignore_unknown_options=0
+          ;;
         *)
           # script does not recognize anything of action or target form at this point.
           if [[ $key =~ ^: ]]; then
@@ -1430,6 +1491,9 @@ _builder_parse_expanded_parameters() {
             # For child builds, don't fail the build when pass inheritable
             # parameters (#11408)
             builder_echo_debug "Parameter '$key' is not supported, ignoring"
+          elif [[ $key =~ ^- ]] && builder_ignore_unknown_options; then
+            builder_echo warning "Ignoring unknown option $key"
+            builder_ignored_options+=("$key")
           else
             _builder_parameter_error "$0" parameter "$key"
           fi
@@ -1438,10 +1502,13 @@ _builder_parse_expanded_parameters() {
     shift # past the processed argument
   done
 
+  # Add default action if not specified, but not for child builds
   if (( ! ${#_builder_chosen_action_targets[@]} )); then
-    for e in "${_builder_targets[@]}"; do
-      _builder_chosen_action_targets+=("$_builder_default_action$e")
-    done
+    if ! builder_is_child_build; then
+      for e in "${_builder_targets[@]}"; do
+        _builder_chosen_action_targets+=("$_builder_default_action$e")
+      done
+    fi
   fi
 
   # We only want to define internal dependencies after both builder_parse and builder_describe_outputs have been called
@@ -1472,11 +1539,21 @@ _builder_parse_expanded_parameters() {
   else
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
+    export _builder_deps_built=`mktemp`
+
+    # Per #11106, local builds use --debug by default.
+    # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
+    if [[ ${KEYMAN_VERSION_ENVIRONMENT:-} == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
+      builder_echo grey "Local build environment detected:  setting --debug"
+      _params+=(--debug)
+      _builder_chosen_options+=(--debug)
+      builder_debug=--debug
+    fi
+
     builder_echo setmark "$(basename "$0") parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
       builder_echo grey "$(basename "$0") extra parameters: <${builder_extra_params[@]}>"
     fi
-    export _builder_deps_built=`mktemp`
   fi
 
   if builder_is_debug_build; then
@@ -1496,6 +1573,14 @@ _builder_parse_expanded_parameters() {
     # not running in bashdb
     trap _builder_failure_trap err exit
   fi
+}
+
+#
+# Returns 0 (true) if --builder-ignore-unknown-options flag has been specified
+# in the command line
+#
+function builder_ignore_unknown_options() {
+  return $_builder_ignore_unknown_options
 }
 
 _builder_pad() {
@@ -1660,14 +1745,14 @@ builder_finish_action() {
       # file or directory exist now?
       if _builder_dep_output_defined $matched_action && ! _builder_dep_output_exists "$matched_action"; then
         builder_echo warning "Expected output: '${_builder_dep_path[$matched_action]}'."
-        builder_echo warning "## $action_name completed successfully, but output does not exist"
+        builder_echo end "$action_name" warning "## $action_name completed successfully, but output does not exist"
       else
-        builder_echo success "## $action_name completed successfully"
+        builder_echo end "$action_name" success "## $action_name completed successfully"
       fi
     elif [[ $result == failure ]]; then
-      builder_echo error "## $action_name failed"
+      builder_echo end "$action_name" error "## $action_name failed"
     else
-      builder_echo error "## $action_name failed with message: $result"
+      builder_echo end "$action_name" error "## $action_name failed with message: $result"
     fi
 
     # Remove $action$target from the array; it is no longer a current action
@@ -2007,27 +2092,14 @@ builder_describe_platform() {
 
   local builder_platforms=(linux mac win)
   local builder_tools=(android-studio delphi)
-
-  # --- Detect platform ---
-
-  # Default value, since it's the most general case/configuration to detect.
-  local builder_platform=linux
-
-  # This is copied from build-utils.sh to avoid creating a dependency on it
-  if [[ $OSTYPE == darwin* ]]; then
-    builder_platform=mac
-  elif [[ $OSTYPE == msys ]]; then
-    builder_platform=win
-  elif [[ $OSTYPE == cygwin ]]; then
-    builder_platform=win
-  fi
+  local builder_platform="${BUILDER_OS}"
 
   # --- Detect tools ---
 
   local builder_installed_tools=()
 
   # Detect delphi compiler (see also delphi_environment.inc.sh)
-  if [[ $builder_platform == win ]]; then
+  if builder_is_windows; then
     local ProgramFilesx86="$(cygpath -w -F 42)"
     if [[ -x "$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\20.0\\bin\\dcc32.exe")" ]]; then
       builder_installed_tools+=(delphi)
@@ -2093,6 +2165,151 @@ builder_is_target_excluded_by_platform() {
     return 0
   fi
   return 1
+}
+
+# Returns 0 if the script is running in a Docker container
+builder_is_running_on_docker() {
+  if [[ -z ${DOCKER_RUNNING:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Returns 0 if the script is running in a GitHub Actions environment
+builder_is_running_on_gha() {
+  if [[ -z ${GITHUB_ACTIONS:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Returns 0 if the script is running on TeamCity
+builder_is_running_on_teamcity() {
+  if [[ -z "${TEAMCITY_GIT_PATH:-}" ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+#
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test, or as a release build
+#
+builder_is_ci_build() {
+  if builder_is_ci_release_build || builder_is_ci_test_build; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running as a release build in CI
+#
+builder_is_ci_release_build() {
+  if [[ "${KEYMAN_VERSION_ENVIRONMENT:-}" =~ ^alpha|beta|stable$ ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test
+#
+builder_is_ci_test_build() {
+  if [[ "${KEYMAN_VERSION_ENVIRONMENT:-}" == test ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current ci build is a release-level build. Do not use for non-ci
+# builds.
+#
+builder_is_ci_build_level_release() {
+  if builder_is_ci_release_build; then
+    return 0
+  fi
+  if [[ "${KEYMAN_BUILD_LEVEL:-}" == release ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current ci build is a build-level build. Do not use for non-ci
+# builds.
+#
+builder_is_ci_build_level_build() {
+  if builder_is_ci_release_build; then
+    return 1
+  fi
+  if builder_is_ci_build_level_release; then
+    # KEYMAN_BUILD_LEVEL == release, i.e. not build
+    return 1
+  fi
+  return 0
+}
+
+#
+# Executes statement if a ci build level of 'release', and for local builds, but
+# not for a ci build level of 'build'
+#
+builder_if_release_build_level() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping - buildLevel=build: $@"
+    return 0
+  fi
+  "$@"
+}
+
+# Returns 0 if we're running on Windows, i.e. if the environment variable
+# `OSTYPE` is set to "msys" or "cygwin".
+builder_is_windows() {
+  if [[ "${OSTYPE:-}" == "msys" ]] || [[ "${OSTYPE:-}" == "cygwin" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Returns 0 if we're running on macOS.
+builder_is_macos() {
+  if [[ "${OSTYPE:-}" == darwin* ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Returns 0 if we're running on Linux (or rather if we're not running
+# on Windows or macOS).
+builder_is_linux() {
+  if builder_is_windows || builder_is_macos; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Sets the BUILDER_OS environment variable to linux|mac|win
+#
+_builder_get_operating_system() {
+  declare -g BUILDER_OS
+
+  if builder_is_macos; then
+    BUILDER_OS=mac
+  elif builder_is_windows; then
+    BUILDER_OS=win
+  else
+    BUILDER_OS=linux
+  fi
+
+  readonly BUILDER_OS
 }
 
 ################################################################################

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2154 # (variables are set in build-utils.sh)
+# shellcheck disable=SC2154 # (variables are set in builder-basic.inc.sh)
 # Actions for creating a Debian source package and verifying the API.
 # Used by deb-packaging.yml and api-verification.yml GHAs.
 
@@ -9,7 +9,7 @@ shopt -s inherit_errexit
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/linux/scripts/verify_api.inc.sh"
@@ -39,6 +39,8 @@ fi
 
 dependencies_action() {
   sudo mk-build-deps --install --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' debian/control
+  sudo rm keyman-build-deps_*_all.deb
+  sudo rm keyman-build-deps_*_amd64.*
   # Additionally we need quilt to be able to create the source package.
   # Since this is not needed to build the binary package, it is not
   # (and should not be) included in `build-depends` in `debian/control`.
@@ -46,19 +48,19 @@ dependencies_action() {
 }
 
 source_action() {
-  echo "${START_STEP}Make source package for keyman${COLOR_RESET}"
+  builder_echo "${START_STEP}Make source package for keyman${COLOR_RESET}"
 
-  echo "${START_STEP}reconfigure${COLOR_RESET}"
+  builder_echo "${START_STEP}reconfigure${COLOR_RESET}"
   ./scripts/reconf.sh
-  echo "${END_STEP}"
+  builder_echo "${END_STEP}"
 
-  echo "${START_STEP}Make origdist${COLOR_RESET}"
+  builder_echo "${START_STEP}Make origdist${COLOR_RESET}"
   ./scripts/dist.sh origdist
-  echo "${END_STEP}"
+  builder_echo "${END_STEP}"
 
-  echo "${START_STEP}Make deb source${COLOR_RESET}"
+  builder_echo "${START_STEP}Make deb source${COLOR_RESET}"
   ./scripts/deb.sh
-  echo "${END_STEP}"
+  builder_echo "${END_STEP}"
 
   mv builddebs/* "${OUTPUT_PATH:-..}"
 }

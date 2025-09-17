@@ -7,7 +7,7 @@ Uploaders:
  Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  bash-completion,
- debhelper-compat (= 12),
+ debhelper-compat (= 13),
  dh-python,
  gawk,
  gir1.2-webkit2-4.1,
@@ -25,6 +25,7 @@ Build-Depends:
  perl,
  pkgconf,
  python3-all (>= 3.5),
+ python3-build,
  python3-dbus,
  python3-fonttools,
  python3-gi,
@@ -39,10 +40,11 @@ Build-Depends:
  python3-requests,
  python3-sentry-sdk (>= 1.1),
  python3-setuptools,
+ python3-venv,
  python3-xdg,
  xserver-xephyr,
  xvfb,
-Standards-Version: 4.7.0
+Standards-Version: 4.7.2
 Vcs-Git: https://github.com/keymanapp/keyman.git -b beta [linux/debian]
 Vcs-Browser: https://github.com/keymanapp/keyman/tree/beta/linux/debian
 Homepage: https://www.keyman.com
@@ -94,6 +96,7 @@ Depends:
  python3-fonttools,
  python3-gi,
  python3-packaging,
+ python3-pkg-resources,
  python3-sentry-sdk (>= 1.1),
  python3-xdg,
  ${misc:Depends},

@@ -2,14 +2,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Build Keyman Developer IDE" \
   @/common/include \
   @/core:x86 \
   @/common/windows/delphi \
-  clean configure build test publish install
+  clean configure build test publish install edit
 
 builder_parse "$@"
 
@@ -19,7 +19,7 @@ source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/tike.exe"
 
 builder_describe_outputs \
-  configure:project    /developer/src/tike/xml/layoutbuilder/keymanweb-osk.ttf \
+  configure:project    /developer/src/tike/icons.res \
   build:project        /developer/src/tike/$WIN32_TARGET
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -76,11 +76,10 @@ function do_build() {
   cp kmlmp.cmd "$DEVELOPER_PROGRAM"
   cp kmc.cmd "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$DEVELOPER_PROGRAM"
-  if [[ -f "$WIN32_TARGET_PATH/tike.dbg" ]]; then
-    cp "$WIN32_TARGET_PATH/tike.dbg" "$DEVELOPER_DEBUGPATH"
-  fi
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/tike.dbg" "$DEVELOPER_DEBUGPATH"
+
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$WIN32_TARGET_PATH"
-  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_PDB" "$WIN32_TARGET_PATH"
+  builder_if_release_build_level cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_PDB" "$WIN32_TARGET_PATH"
 
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" "$DEVELOPER_PROGRAM/"
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.x64.dll" "$DEVELOPER_PROGRAM/"
@@ -113,6 +112,7 @@ builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
 builder_run_action install:project      do_install
+builder_run_action edit:project         start tike.dproj
 
 # Note: generating monaco installer:
 # @echo *******************************************************************************************

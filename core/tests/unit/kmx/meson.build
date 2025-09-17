@@ -80,7 +80,12 @@ tests = [
   'k_046___deadkey_and_contextex',
   'k_047___caps_always_off_initially_on',
   'k_048___modifier_keys_keep_context',
-  'k_049___enter_invalidates_context'
+  'k_049___enter_invalidates_context',
+  'k_050___nul_and_context',
+  'k_051___if_and_context',
+  'k_052___nul_and_index',
+  'k_053___if_and_index',
+  'k_054___nul_and_contextex',
 ]
 
 node = find_program('node', required: true)
@@ -94,13 +99,14 @@ else
   cat_cmd = [find_program('cat', required: true)]
 endif
 
-test_keyboards = ''
+test_keyboards_kpj = ''
+test_keyboards_kmp_json = ''
 foreach kbd : tests
-  if test_keyboards.startswith('{')
-    test_keyboards += ''',
+  if test_keyboards_kmp_json.startswith('{')
+    test_keyboards_kmp_json += ''',
   '''
   endif
-  test_keyboards +=  '''{
+  test_keyboards_kmp_json +=  '''{
     "name": "''' + kbd + '''",
     "id": "''' + kbd + '''",
     "version": "0.0",
@@ -111,14 +117,44 @@ foreach kbd : tests
       }
     ]
   }'''
+
+  test_keyboards_kpj += '''
+    <File>
+      <ID>keyboard_'''+kbd+'''</ID>
+      <Filename>'''+kbd+'''.kmn</Filename>
+      <Filepath>'''+kbd+'''.kmn</Filepath>
+    </File>
+    <File>
+      <ID>package_'''+kbd+'''</ID>
+      <Filename>'''+kbd+'''.kps</Filename>
+      <Filepath>'''+kbd+'''.kps</Filepath>
+    </File>
+  '''
 endforeach
 
 cfg = configuration_data()
-cfg.set('keyboards', test_keyboards)
+cfg.set('keyboards', test_keyboards_kmp_json)
+cfg.set('keyboards_kpj', test_keyboards_kpj)
+
+# Build a single kmp.json which lists all compiled keyboards
 configure_file(
   configuration: cfg,
   input: 'kmp.json.in',
   output: 'kmp.json'
+)
+
+# Build a single keyboards.kpj which lists all keyboard + package sources
+keyboards_kpj = configure_file(
+  configuration: cfg,
+  input: 'keyboards.kpj.in',
+  output: 'keyboards.kpj'
+)
+
+all_keyboards = custom_target('all_keyboards',
+  input: keyboards_kpj,
+  output: [tests[0]+'.kmp'],
+  depfile: 'keyboards.dep',
+  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@']
 )
 
 foreach kbd : tests
@@ -146,24 +182,15 @@ foreach kbd : tests
     input: kbd_src_path,
     output: kbd + '.kmn'
   )
-  kbd_kpj = configure_file(
-    configuration: cfg,
-    input: join_paths('template', 'keyboard.kpj.in'),
-    output: kbd + '.kpj'
-  )
   kbd_kps = configure_file(
     configuration: cfg,
     input: join_paths('template', 'keyboard.kps.in'),
     output: kbd + '.kps'
   )
-  kbd_kmp = custom_target(kbd + '.kmp',
-    input: kbd_kpj,
-    output: [kbd + '.kmp', kbd + '.kmx'],
-    depend_files: [kbd_kps, kbd_kmn],
-    depfile: kbd + '.dep',
-    command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@'])
+endforeach
 
-  test(kbd, kmx, depends: [kbd_kmp], args: [test_path / kbd + '.kmn', test_path / kbd + '.kmx'])
+foreach kbd : tests
+  test(kbd, kmx, depends: [all_keyboards], args: [test_path / kbd + '.kmn', test_path / kbd + '.kmx'])
 endforeach
 
 # binary file unit tests

@@ -34,10 +34,10 @@ analytics for Debug are associated with an App Bundle ID
 ### Compiling From Command Line
 
 1. Launch a command prompt and cd to the directory **keyman/android**
-2. Run the top level build script `./build.sh configure build:engine build:app --debug` which will:
-    * Compile KMEA (and its KMW dependency)
+2. Run the top level build script `./build.sh configure build:engine build:app` which will:
+    * Compile debug version of KMEA (and its KMW dependency)
     * Download default keyboard and dictionary resources as needed
-    * Compile KMAPro
+    * Compile debug version of KMAPro
 3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/keyman-\${version}.apk**
    where `${version}` is the current version number.
 
@@ -98,10 +98,10 @@ There are two included sample projects that can be modified to test a keyboard.
 **android/Samples/KMSample2** app provides prompts for setting KMSample2 as a system level keyboard.
 Both sample apps include a default Tamil keyboard and sample dictionary.
 
-Building these projects follow the same steps as KMAPro:
+Building the debug versions of these projects follow the same steps as KMAPro:
 
 1. cd to the desired KMSample directory
-2. `./build.sh configure build --debug`
+2. `./build.sh configure build`
 3. Open Android Studio to run the app
 
 ### Tests: KeyboardHarness
@@ -114,14 +114,14 @@ Building these projects follow the same steps as KMAPro:
   * Build the keyboardharness.kmp keyboard package
 3. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
 4. cd to android/Tests/KeyboardHarness/
-5. `./build.sh configure build --debug`
+5. `./build.sh configure build`
 6. Open Android Studio to run the app
 
 --------------------------------------------------------------
 
 ## How to Build Keyman Engine for Android
 1. Open a terminal or Git Bash prompt and go to the Android project folder (e.g. `cd ~/keyman/android/`)
-2. Run `./build.sh build:engine --debug`
+2. Run `./build.sh build:engine`
 
 Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imported in any project.
 
@@ -135,11 +135,15 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
 4. Check that the `android{}` object, includes the following:
 ```gradle
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
         noCompress "kmp"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 ```
 5. After the `android {}` object, include the following:
@@ -154,7 +158,8 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
     api (name:'keyman-engine', ext:'aar')
     implementation 'androidx.preference:preference:1.2.1'

@@ -25,8 +25,7 @@
 // Worth noting:  we're starting to get quite a 'library' of common model/LMLayer functionality.
 // Should probably make a 'lm-utils' submodule.
 
-// Allows the kmwstring bindings to resolve.
-import { extendString, PriorityQueue } from "@keymanapp/web-utils";
+import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
@@ -43,11 +42,8 @@ import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import Suggestion = LexicalModelTypes.Suggestion;
 import TextWithProbability = LexicalModelTypes.TextWithProbability;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 import WithOutcome = LexicalModelTypes.WithOutcome;
 import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
-
-extendString();
 
 /**
  * @file trie-model.ts
@@ -88,23 +84,23 @@ export interface TrieModelOptions {
   punctuation?: LexicalModelPunctuation;
 }
 
-class Traversal implements LexiconTraversal {
+export class Traversal implements LexiconTraversal {
   /**
    * The lexical prefix corresponding to the current traversal state.
    */
-  prefix: String;
+  readonly prefix: string;
 
   /**
    * The current traversal node.  Serves as the 'root' of its own sub-Trie,
    * and we cannot navigate back to its parent.
    */
-  root: Node;
+  readonly root: Node;
 
   /**
    * The max weight for the Trie being 'traversed'.  Needed for probability
    * calculations.
    */
-  totalWeight: number;
+  readonly totalWeight: number;
 
   constructor(root: Node, prefix: string, totalWeight: number) {
     this.root = root;
@@ -112,7 +108,7 @@ class Traversal implements LexiconTraversal {
     this.totalWeight = totalWeight;
   }
 
-  child(char: USVString): LexiconTraversal | undefined {
+  child(char: string): Traversal | undefined {
     // May result for blank tokens resulting immediately after whitespace.
     if(char == '') {
       return this;
@@ -131,7 +127,7 @@ class Traversal implements LexiconTraversal {
   }
 
   // Handles one code unit at a time.
-  private _child(char: USVString): Traversal | undefined {
+  private _child(char: string): Traversal | undefined {
     const root = this.root;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
@@ -157,7 +153,7 @@ class Traversal implements LexiconTraversal {
     }
   }
 
-  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
+  *children(): Generator<{char: string, traversal: () => Traversal}> {
     let root = this.root;
 
     // We refer to the field multiple times in this method, and it doesn't change.
@@ -302,11 +298,21 @@ export default class TrieModel implements LexicalModel {
     };
   }
 
-  toKey(text: USVString): USVString {
+  toKey(text: string): string {
     return this._trie.toKey(text);
   }
 
   predict(transform: Transform, context: Context): Distribution<Suggestion> {
+    const makeDistribution = function(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
+      const distribution: Distribution<Suggestion> = [];
+
+      for (const s of suggestions) {
+        distribution.push({ sample: s, p: s.p });
+      }
+
+      return distribution;
+    }
+
     // Special-case the empty buffer/transform: return the top suggestions.
     if (!transform.insert && !context.left && !context.right && context.startOfBuffer && context.endOfBuffer) {
       return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
@@ -320,45 +326,33 @@ export default class TrieModel implements LexicalModel {
     }
 
     // Compute the results of the keystroke:
-    let newContext = applyTransform(transform, context);
+    const newContext = applyTransform(transform, context);
 
     // Computes the different in word length after applying the transform above.
-    let leftDelOffset = transform.deleteLeft - transform.insert.kmwLength();
+    const leftDelOffset = transform.deleteLeft - KMWString.length(transform.insert);
 
     // All text to the left of the cursor INCLUDING anything that has
     // just been typed.
-    let prefix = getLastPreCaretToken(this.breakWords, newContext);
+    const prefix = getLastPreCaretToken(this.breakWords, newContext);
 
     // Return suggestions from the trie.
     return makeDistribution(this._trie.lookup(prefix).map(({text, p}) =>
       transformToSuggestion({
         insert: text,
         // Delete whatever the prefix that the user wrote.
-        deleteLeft: leftDelOffset + prefix.kmwLength()
+        deleteLeft: leftDelOffset + KMWString.length(prefix)
         // Note: a separate capitalization/orthography engine can take this
         // result and transform it as needed.
       },
       p
     )));
-
-    /* Helper */
-
-    function makeDistribution(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
-      let distribution: Distribution<Suggestion> = [];
-
-      for(let s of suggestions) {
-        distribution.push({sample: s, p: s.p});
-      }
-
-      return distribution;
-    }
   }
 
   get wordbreaker(): WordBreakingFunction {
     return this.breakWords;
   }
 
-  public traverseFromRoot(): LexiconTraversal {
+  public traverseFromRoot(): Traversal {
     return this._trie.traverseFromRoot();
   }
 };
@@ -454,7 +448,7 @@ class Trie {
     this.totalWeight = totalWeight;
   }
 
-  public traverseFromRoot(): LexiconTraversal {
+  public traverseFromRoot(): Traversal {
     return new Traversal(this.root, '', this.totalWeight);
   }
 

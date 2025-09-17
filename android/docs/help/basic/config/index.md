@@ -49,6 +49,9 @@ Click on this to [adjust the keyboard height](adjust-keyboard-height).
 
 Click on this to [adjust the delay time](adjust-longpress-delay) for a longpress gesture.
 
+## Show On-Screen Keyboard
+By default, Android 16 (Baklava) and later versions won't display the On-Screen keyboard if a physical keyboard is connected. When enabled, show the Keyman system keyboard even if a physical keyboard is connected.
+
 ## Spacebar Caption
 Click on this to [change the displayed keyboard name](spacebar-caption) on the spacebar.
 
@@ -59,4 +62,4 @@ When enabled, the Keyman keyboard will provide haptic feedback (vibrate) when th
 When enabled, the Keyman app will display the 'Get Started' screen on app startup.
 
 ## Allow sending crash reports over network
-When enabled, the Keyman app will send crash reporting information to https://sentry.keyman.com. No personally identifiable information or keyboard strokes are recorded.
+When enabled, the Keyman app will send crash reporting information to [Sentry](https://keyman.sentry.io). No personally identifiable information or keyboard strokes are recorded.

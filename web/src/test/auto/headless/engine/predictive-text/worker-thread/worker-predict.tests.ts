@@ -1,0 +1,88 @@
+
+import { createRequire } from 'node:module';
+import sinon from 'sinon';
+
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import { configWorker, createMessageEventWithData, emptyContext, iGotDistractedByHazel,
+         importScriptsWith, randomToken, zeroTransform } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { timedPromise } from '@keymanapp/web-utils';
+
+import { LMLayerWorker } from '@keymanapp/lm-worker/test-index';
+import { OutgoingMessage } from '@keymanapp/lm-message-types';
+
+import Suggestion = LexicalModelTypes.Suggestion;
+
+const require = createRequire(import.meta.url);
+
+interface MockedContext {
+  onmessage?: () => void;
+  importScripts?: () => void;
+  postMessage: (e: any) => void;
+}
+
+describe('LMLayerWorker', function () {
+  describe('#predict()', function () {
+    it('should send back suggestions', async function () {
+      // Initialize the worker with a model that will produce one suggestion.
+      var fakePostMessage = sinon.fake();
+      var filteredFakePostMessage = function(event: OutgoingMessage) {
+        if(event.message == 'suggestions') {
+          let suggestions = event.suggestions;
+
+          // Strip any IDs set by the model compositor.
+          suggestions.forEach(function(suggestion: Suggestion) {
+            delete suggestion.id;
+          });
+        }
+
+        fakePostMessage(event);
+      }
+      var context: MockedContext = {
+        postMessage: filteredFakePostMessage
+      };
+      context.importScripts = importScriptsWith(context);
+
+      var worker = LMLayerWorker.install(context);
+      configWorker(worker);
+
+      worker.onMessage(createMessageEventWithData({
+        message: 'load',
+        source: {
+          type: 'file',
+          file: require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")
+        }
+      }));
+      sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
+        message: 'ready',
+      });
+
+      var token = randomToken();
+
+      // Now predict! We should get the suggestions back.
+      worker.onMessage(createMessageEventWithData({
+        message: 'predict',
+        token: token,
+        transform: zeroTransform(),
+        context: emptyContext()
+      }));
+
+      // predict() is async, so we need to relinquish control flow temporarily
+      // in order for a return message to become available.
+      await timedPromise(500);
+
+      // Retrieve the internal 'dummy' suggestions for comparison.
+      var hazel = iGotDistractedByHazel();
+
+      sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
+        message: 'suggestions',
+        token: token,
+        suggestions: hazel[0]
+      });
+    });
+
+    afterEach(function () {
+      // Restore all fakes.
+      sinon.restore();
+    });
+  });
+});

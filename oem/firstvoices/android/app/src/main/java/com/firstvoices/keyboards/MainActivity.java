@@ -13,11 +13,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import io.sentry.android.core.SentryAndroid;
 
 import com.keyman.engine.*;
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.util.BCP47;
 import com.keyman.engine.util.DownloadFileUtils;
@@ -28,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
+public class MainActivity extends BaseActivity implements OnKeyboardDownloadEventListener {
     public Context context;
 
     FVDownloadResultReceiver resultReceiver;
@@ -41,13 +40,17 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
 
         SentryAndroid.init(context, options -> {
             options.setEnableAutoSessionTracking(false);
-            options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
-            options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+            options.setRelease(com.firstvoices.keyboards.BuildConfig.KEYMAN_VERSION_GIT_TAG);
+            options.setEnvironment(com.firstvoices.keyboards.BuildConfig.KEYMAN_VERSION_ENVIRONMENT);
         });
 
         resultReceiver = new FVDownloadResultReceiver(new Handler(), context);
 
         setContentView(R.layout.activity_main);
+        setupEdgeToEdge(R.id.constraintLayout);
+        setupStatusBarColors(
+          R.color.firstvoices_gold,     // Color of top status bar
+          android.R.color.darker_gray); // Color of bottom navigation bar
 
         if (BuildConfig.DEBUG) {
           KMManager.setDebugMode(true);

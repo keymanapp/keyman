@@ -30,13 +30,11 @@
  */
 
 /// <reference types="@keymanapp/lm-message-types" />
-import { extendString } from "@keymanapp/web-utils";
-
-extendString();
 
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
+import { KMWString } from "@keymanapp/web-utils";
 
 import ModelCompositor from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
@@ -102,15 +100,23 @@ export default class LMLayerWorker {
   private _currentModelSource: ModelSourceSpec;
 
   constructor(options: {
-    importScripts: typeof importScripts,
-    postMessage: typeof postMessage
+    importScripts: (...urls: string[]) => void,
+    postMessage: (message: any, extra?: any) => void
   } = {
     importScripts: null,
     postMessage: null
   }) {
+    // Within the worker, we can't infer this from the keyboard.
+    // Additionally, we always work with small text windows, so it's not _too_ expensive to keep on.
+    KMWString.enableSupplementaryPlane(true);
     this._postMessage = options.postMessage || postMessage;
     this._importScripts = options.importScripts || importScripts;
     this.setupConfigState();
+  }
+
+  /** @internal */
+  public readonly unitTestEndPoints = {
+    getStateName: () => this.state.name
   }
 
   public error(message: string, error?: any) {
@@ -402,7 +408,7 @@ export default class LMLayerWorker {
    *
    * @param scope A global scope to install upon.
    */
-  static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
+  static install(scope: any /*DedicatedWorkerGlobalScope*/): LMLayerWorker {
     let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
     worker.self = scope;

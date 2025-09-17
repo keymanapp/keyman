@@ -3,7 +3,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 ################################ Main script ################################
@@ -62,14 +62,14 @@ build_action() {
   builder_echo "Create version.py"
   pushd keyman_config
   sed \
-      -e "s/_VERSION_/${VERSION}/g" \
-      -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" \
-      -e "s/_VERSIONGITTAG_/${VERSION_GIT_TAG}/g" \
-      -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" \
-      -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" \
-      -e "s/_TIER_/${TIER}/g" \
-      -e "s/_ENVIRONMENT_/${VERSION_ENVIRONMENT}/g" \
-      -e "s/_UPLOADSENTRY_/${UPLOAD_SENTRY}/g" \
+      -e "s/__KEYMAN_VERSION__/${KEYMAN_VERSION}/g" \
+      -e "s/__KEYMAN_VERSION_WITH_TAG__/${KEYMAN_VERSION_WITH_TAG}/g" \
+      -e "s/__KEYMAN_VERSION_GIT_TAG__/${KEYMAN_VERSION_GIT_TAG}/g" \
+      -e "s/__KEYMAN_VERSION_MAJOR__/${KEYMAN_VERSION_MAJOR}/g" \
+      -e "s/__KEYMAN_VERSION_RELEASE__/${KEYMAN_VERSION_RELEASE}/g" \
+      -e "s/__KEYMAN_TIER__/${KEYMAN_TIER}/g" \
+      -e "s/__KEYMAN_VERSION_ENVIRONMENT__/${KEYMAN_VERSION_ENVIRONMENT}/g" \
+      -e "s/__UPLOAD_SENTRY__/${UPLOAD_SENTRY}/g" \
       version.py.in > version.py
   popd
   pushd buildtools
@@ -83,7 +83,14 @@ build_action() {
   builder_echo "Building man and help pages"
   build_man_and_help_pages
   builder_echo "Building keyman-config"
-  python3 setup.py build
+  # we use `dpkg --compare-versions` to compare the current Ubuntu version
+  if dpkg --compare-versions "$(lsb_release -r -s)" lt 24.04; then
+    # Ubuntu 22.04 Jammy has a buggy version of python3-build which doesn't work
+    # TODO: remove once we drop support for Ubuntu 22.04 Jammy
+    python3 setup.py build
+  else
+    python3 -m build --outdir build .
+  fi
 }
 
 test_action() {
@@ -106,8 +113,7 @@ install_action() {
   if [ -n "${SUDO_USER:-}" ]; then
     # with sudo install into /usr/local
     pip3 install qrcode sentry-sdk
-    # eventually change this to: pip3 install .
-    python3 setup.py install
+    pip3 install .
     # install icons
     mkdir -p /usr/local/share/keyman/icons
     cp keyman_config/icons/* /usr/local/share/keyman/icons
@@ -117,9 +123,7 @@ install_action() {
   else
     # without sudo install into /tmp/keyman (or $DESTDIR)
     mkdir -p "/tmp/keyman/$(python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')"
-    # when we no longer have to support old pip version (python > 3.6) change this to:
-    # pip3 install --prefix /tmp/keyman .
-    PYTHONUSERBASE=${DESTDIR:-/tmp/keyman} python3 setup.py install --user
+    pip3 install --prefix /tmp/keyman .
   fi
 }
 

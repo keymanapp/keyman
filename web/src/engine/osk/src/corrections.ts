@@ -11,7 +11,7 @@ import { CorrectionLayout } from "./correctionLayout.js";
  * @returns A mapping of key IDs to the 'squared pseudo-distance' of the touchpoint to each key.
  */
 export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiveLayout: CorrectionLayout): Map<ActiveKeyBase, number> {
-  let keyDists: Map<ActiveKeyBase, number> = new Map<ActiveKeyBase, number>();
+  const keyDists: Map<ActiveKeyBase, number> = new Map<ActiveKeyBase, number>();
 
   // This loop computes a pseudo-distance for the touch from each key. Quite useful for
   // generating a probability distribution.
@@ -74,10 +74,10 @@ export function distributionFromDistanceMaps(squaredDistMaps: Map<ActiveKeyBase,
     squaredDistMaps = [squaredDistMaps];
   }
 
-  for(let squaredDistMap of squaredDistMaps) {
+  for(const squaredDistMap of squaredDistMaps) {
     // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
     // of the formula in the loop below.
-    for(let key of squaredDistMap.keys()) {
+    for(const key of squaredDistMap.keys()) {
       // We've found that in practice, dist^-4 seems to work pretty well.  (Our input has dist^2.)
       // (Note:  our rule of thumb here has only been tested for layout-based distances.)
       //
@@ -95,7 +95,7 @@ export function distributionFromDistanceMaps(squaredDistMaps: Map<ActiveKeyBase,
 
   const list: {keySpec: ActiveKeyBase, p: number}[] = [];
 
-  for(let key of keyProbs.keys()) {
+  for(const key of keyProbs.keys()) {
     list.push({keySpec: key, p: keyProbs.get(key) / totalMass});
   }
 

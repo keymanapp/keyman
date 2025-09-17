@@ -8,6 +8,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 import Layr = KMXPlus.Layr;
 import LayrRow = KMXPlus.LayrRow;
+import { withOffset } from '@keymanapp/developer-utils';
 
 function allKeysOk(row : LayrRow, str : string, msg? : string) {
   const split = str.split(' ');
@@ -96,8 +97,7 @@ describe('layr', function () {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
         LdmlCompilerMessages.Error_InvalidModifier({
-          layer: 'base',
-          modifiers: 'altR-shift'
+          modifiers: 'altR-shift',
         }),
       ],
     },
@@ -108,7 +108,14 @@ describe('layr', function () {
     {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
-      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(40))],
+      retainOffsetInMessages: true,
+    },
+    {
+      // missing layer element
+      subpath: 'sections/layr/invalid-missing-layer2.xml',
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(40))],
+      retainOffsetInMessages: true,
     },
     {
       // keep in sync with similar test in test-keys.ts
@@ -132,7 +139,7 @@ describe('layr', function () {
     {
       subpath: 'sections/layr/error-bogus-modifiers.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({ layer: '', modifiers: 'caps bogus'}),
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers: 'caps bogus' }),
       ]
     },
     {
@@ -160,5 +167,18 @@ describe('layr', function () {
         }
       },
     },
+    {
+      subpath: 'sections/layr/error-dup-width.xml',
+      errors: [
+        LdmlCompilerMessages.Error_DuplicateLayerWidth({ minDeviceWidth: 120}),
+      ]
+    },
+    ...[0, 1024, 1500, `x` as unknown as number].map(minDeviceWidth => ({
+      subpath: `sections/layr/error-bad-width-${minDeviceWidth}.xml`,
+      errors: [
+        //
+        LdmlCompilerMessages.Error_InvalidLayerWidth({ minDeviceWidth }),
+      ]
+    })),
   ]);
 });

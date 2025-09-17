@@ -3,10 +3,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 builder_describe "Build Keyman Developer Server" \
@@ -49,9 +50,10 @@ function clean_server() {
 }
 
 function configure_server() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   # TODO: this is horrible; is there a way we can avoid this?
+  rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok
   rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok.exe
 }
 
@@ -128,6 +130,7 @@ function installer_server() {
   pushd "$PRODBUILDTEMP"
   npm install --omit=dev --omit=optional
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
+  rm -f node_modules/ngrok/bin/ngrok
   rm -f node_modules/ngrok/bin/ngrok.exe
   popd
 

@@ -1,11 +1,10 @@
-#!/usr/bin/python3
-import os
-import tempfile
+#!/usr/bin/env python3
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+
 from keyman_config.get_kmp import InstallLocation
 
-from keyman_config.uninstall_kmp import _uninstall_keyboards_from_gnome, _uninstall_keyboards_from_ibus, _uninstall_kmp_common
+from keyman_config.uninstall_kmp import _uninstall_keyboards_from_gnome, _uninstall_keyboards_from_ibus, _uninstall_kmp_common, uninstall_kmp
 
 
 class UninstallKmpGnomeTests(unittest.TestCase):
@@ -118,6 +117,7 @@ class UninstallKmpGnomeTests(unittest.TestCase):
 class UninstallKmpIbusTests(unittest.TestCase):
 
     def setUp(self):
+        self.mockIsDir = self._setupMock('os.path.isdir')
         self.mockIbusUtilClass = self._setupMock('keyman_config.uninstall_kmp.IbusUtil')
         self.mockRestartIbus = self._setupMock('keyman_config.uninstall_kmp.restart_ibus')
         self.mockGetIbusBus = self._setupMock('keyman_config.uninstall_kmp.get_ibus_bus')
@@ -237,35 +237,24 @@ class UninstallKmpIbusTests(unittest.TestCase):
 
 class UninstallKmpCommonTests(unittest.TestCase):
     def setUp(self):
-        patcher1 = patch('keyman_config.uninstall_kmp.get_keyboard_dir')
-        self.mockGetKeyboardDir = patcher1.start()
-        self.addCleanup(patcher1.stop)
-        patcher2 = patch('keyman_config.uninstall_kmp.get_keyman_doc_dir')
-        self.mockGetKeymanDocDir = patcher2.start()
-        self.addCleanup(patcher2.stop)
-        patcher3 = patch('keyman_config.uninstall_kmp.get_keyman_font_dir')
-        self.mockGetKeymanFontDir = patcher3.start()
-        self.addCleanup(patcher3.stop)
-        patcher4 = patch('keyman_config.uninstall_kmp.is_gnome_desktop')
-        self.mockIsGnomeShell = patcher4.start()
-        self.addCleanup(patcher4.stop)
+        self.mockIsDir = self._setupMock('os.path.isdir')
+        self.mockGetKeyboardDir = self._setupMock('keyman_config.uninstall_kmp.get_keyboard_dir')
+        self.mockGetKeymanDocDir = self._setupMock('keyman_config.uninstall_kmp.get_keyman_doc_dir')
+        self.mockGetKeymanFontDir = self._setupMock('keyman_config.uninstall_kmp.get_keyman_font_dir')
+        self.mockIsGnomeShell = self._setupMock('keyman_config.uninstall_kmp.is_gnome_desktop')
         self.mockIsGnomeShell.return_value = False
-        patcher5 = patch('keyman_config.uninstall_kmp.is_fcitx_running')
-        self.mockIsFcitxRunning = patcher5.start()
-        self.addCleanup(patcher5.stop)
+        self.mockIsFcitxRunning = self._setupMock('keyman_config.uninstall_kmp.is_fcitx_running')
         self.mockIsFcitxRunning.return_value = False
-        patcher6 = patch('keyman_config.uninstall_kmp._uninstall_keyboards_from_ibus')
-        self.mockUninstallKeyboardsFromIbus = patcher6.start()
-        self.addCleanup(patcher6.stop)
-        patcher7 = patch('keyman_config.uninstall_kmp._uninstall_dir')
-        self.mockUninstallDir = patcher7.start()
-        self.addCleanup(patcher7.stop)
-        patcher8 = patch('keyman_config.uninstall_kmp.get_metadata')
-        self.mockGetMetaData = patcher8.start()
-        self.addCleanup(patcher8.stop)
-        patcher9 = patch('keyman_config.uninstall_kmp.CustomKeyboards')
-        self.mockCustomKeyboardsClass = patcher9.start()
-        self.addCleanup(patcher9.stop)
+        self.mockUninstallKeyboardsFromIbus = self._setupMock('keyman_config.uninstall_kmp._uninstall_keyboards_from_ibus')
+        self.mockUninstallDir = self._setupMock('keyman_config.uninstall_kmp._uninstall_dir')
+        self.mockGetMetaData = self._setupMock('keyman_config.uninstall_kmp.get_metadata')
+        self.mockCustomKeyboardsClass = self._setupMock('keyman_config.uninstall_kmp.CustomKeyboards')
+
+    def _setupMock(self, arg0):
+        patcher = patch(arg0)
+        result = patcher.start()
+        self.addCleanup(patcher.stop)
+        return result
 
     def test_UninstallKmpCommon_NoRemoveLanguage(self):
         # Setup
@@ -318,3 +307,49 @@ class UninstallKmpCommonTests(unittest.TestCase):
         self.mockUninstallKeyboardsFromIbus.assert_called_once_with(keyboards, '/tmp/foo')
         self.mockUninstallDir.assert_called()
         self.assertEqual(mockCustomKeyboardsInstance.remove.call_count, 2)
+
+
+class UninstallKmpTests(unittest.TestCase):
+    def setUp(self):
+        self.mockIsDir = self._setupMock('os.path.isdir')
+        self.mockGetKeyboardDir = self._setupMock('keyman_config.uninstall_kmp.get_keyboard_dir')
+        self.mockGetKeyboardDir.return_value = '/tmp/foo'
+        self.mockGetKeymanDocDir = self._setupMock('keyman_config.uninstall_kmp.get_keyman_doc_dir')
+        self.mockGetKeymanFontDir = self._setupMock('keyman_config.uninstall_kmp.get_keyman_font_dir')
+        self.mockIsGnomeShell = self._setupMock('keyman_config.uninstall_kmp.is_gnome_desktop')
+        self.mockIsGnomeShell.return_value = False
+        self.mockIsFcitxRunning = self._setupMock('keyman_config.uninstall_kmp.is_fcitx_running')
+        self.mockIsFcitxRunning.return_value = False
+        self.mockUninstallKeyboardsFromIbus = self._setupMock(
+            'keyman_config.uninstall_kmp._uninstall_keyboards_from_ibus')
+        self.mockUninstallDir = self._setupMock('keyman_config.uninstall_kmp._uninstall_dir')
+        self.mockGetMetaData = self._setupMock('keyman_config.uninstall_kmp.get_metadata')
+        self.mockCustomKeyboardsClass = self._setupMock('keyman_config.uninstall_kmp.CustomKeyboards')
+        self.mockGetKeymanConfigService = self._setupMock('keyman_config.uninstall_kmp.get_keyman_config_service')
+        self.mockKeymanConfigServiceManager = Mock()
+        self.mockGetKeymanConfigService.return_value = self.mockKeymanConfigServiceManager
+
+    def _setupMock(self, arg0):
+        patcher = patch(arg0)
+        result = patcher.start()
+        self.addCleanup(patcher.stop)
+        return result
+
+    def test_UninstallKmp_HappyPath(self):
+        # Setup
+        mockCustomKeyboardsInstance = self.mockCustomKeyboardsClass.return_value
+        keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}]}, {'id': 'bar2', 'languages': [{'id': 'fr'}]}]
+        self.mockGetMetaData.return_value = (None, None, None, keyboards, None)
+
+        keyboardListChangedMock = Mock()
+        self.mockKeymanConfigServiceManager.keyboard_list_changed = keyboardListChangedMock
+
+        # Execute
+        uninstall_kmp('foo', False, True)
+
+        # Verify
+        self.mockUninstallKeyboardsFromIbus.assert_called_once_with(keyboards, '/tmp/foo')
+        self.mockUninstallDir.assert_called()
+        self.assertEqual(mockCustomKeyboardsInstance.remove.call_count, 2)
+        self.assertEqual(keyboardListChangedMock.call_count, 1)
+

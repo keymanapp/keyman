@@ -2,11 +2,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 ################################ Main script ################################
 
@@ -33,16 +34,16 @@ function do_build() {
 // Note:  does not use the 'default' keyword so that the export name is
 // correct when converted to a CommonJS module with \`esbuild\`.
 export class KEYMAN_VERSION {
-  static readonly VERSION = \"$VERSION\";
-  static readonly VERSION_RELEASE =\"$VERSION_RELEASE\";
-  static readonly VERSION_MAJOR = \"$VERSION_MAJOR\";
-  static readonly VERSION_MINOR = \"$VERSION_MINOR\";
-  static readonly VERSION_PATCH = \"$VERSION_PATCH\";
-  static readonly TIER =\"$TIER\";
-  static readonly VERSION_TAG = \"$VERSION_TAG\";
-  static readonly VERSION_WITH_TAG = \"$VERSION_WITH_TAG\";
-  static readonly VERSION_ENVIRONMENT = \"$VERSION_ENVIRONMENT\";
-  static readonly VERSION_GIT_TAG = \"$VERSION_GIT_TAG\";
+  static readonly VERSION = \"$KEYMAN_VERSION\";
+  static readonly VERSION_RELEASE =\"$KEYMAN_VERSION_RELEASE\";
+  static readonly VERSION_MAJOR = \"$KEYMAN_VERSION_MAJOR\";
+  static readonly VERSION_MINOR = \"$KEYMAN_VERSION_MINOR\";
+  static readonly VERSION_PATCH = \"$KEYMAN_VERSION_PATCH\";
+  static readonly TIER =\"$KEYMAN_TIER\";
+  static readonly VERSION_TAG = \"$KEYMAN_VERSION_TAG\";
+  static readonly VERSION_WITH_TAG = \"$KEYMAN_VERSION_WITH_TAG\";
+  static readonly VERSION_ENVIRONMENT = \"$KEYMAN_VERSION_ENVIRONMENT\";
+  static readonly VERSION_GIT_TAG = \"$KEYMAN_VERSION_GIT_TAG\";
 }
 
 // Also provides it as a 'default' export.
@@ -53,6 +54,6 @@ export default KEYMAN_VERSION;
 }
 
 builder_run_action clean        rm -rf version.inc.ts keyman-version.mts build/
-builder_run_action configure    verify_npm_setup
+builder_run_action configure    node_select_version_and_npm_ci
 builder_run_action build        do_build
-builder_run_action publish      builder_publish_npm
+builder_run_action publish      ci_publish_npm

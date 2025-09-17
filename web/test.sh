@@ -5,11 +5,10 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
@@ -21,7 +20,7 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "test+" \
   ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
   ":integrated           Runs KMW's integration test suite" \
-  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)."
+  "--inspect             Runs browser-based unit tests in an inspectable mode"
 
 builder_parse "$@"
 
@@ -29,18 +28,18 @@ builder_parse "$@"
 
 # Select the right CONFIG file.
 WTR_CONFIG=
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   WTR_CONFIG=.CI
 fi
 
 # Prepare the flags for the karma command.
-WTR_DEBUG=
-if builder_is_debug_build; then
-  WTR_DEBUG="--manual"
+WTR_INSPECT=
+if builder_has_option --inspect; then
+  WTR_INSPECT="--manual"
 fi
 
 # End common configs.
 
-builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
+builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
 
-builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
+builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}

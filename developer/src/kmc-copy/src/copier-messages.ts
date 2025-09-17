@@ -25,11 +25,7 @@ export class CopierMessages {
     o.e ?? 'unknown error'
   );
 
-  static INFO_CopyingProject = SevInfo | 0x0002;
-  static Info_CopyingProject = (o:{type: string, id: string}) => m(
-    this.INFO_CopyingProject,
-    `Copying project of type ${def(o.type)} with id ${def(o.id)}`
-  );
+  // unused 0x0002 (was INFO_CopyingProject, now in InfrastructureMessages)
 
   static ERROR_CannotCreateFolder = SevError | 0x0003;
   static Error_CannotCreateFolder = (o:{folderName:string, e: any}) => CompilerMessageSpecWithException(
@@ -96,22 +92,9 @@ export class CopierMessages {
     `The package source file '${def(o.filename)}' could not be loaded. The file may have an invalid format`
   );
 
-  static ERROR_UnsupportedProjectVersion = SevError | 0x000D;
-  static Error_UnsupportedProjectVersion = (o:{filename: string, version: string}) => m(this.ERROR_UnsupportedProjectVersion,
-    `Project version ${def(o.version)} for '${def(o.filename)}' is not supported by this version of Keyman Developer`
-  );
-
-  static ERROR_InvalidProjectFile = SevError | 0x000E;
-  static Error_InvalidProjectFile = (o:{filename: string, message: string}) => m(
-    this.ERROR_InvalidProjectFile,
-    `Project file '${def(o.filename)}' is not valid: ${def(o.message)}`
-  );
-
-  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x000F;
-  static Error_ProjectFileCouldNotBeRead = (o:{filename: string}) => m(
-    this.ERROR_ProjectFileCouldNotBeRead,
-    `Project file '${def(o.filename)}' could not be read`
-  );
+  // 0x000D ERROR_UnsupportedProjectVersion: moved to developer-utils-messages
+  // 0x000E ERROR_InvalidProjectFile: moved to developer-utils-messages
+  // 0x000F ERROR_ProjectFileCouldNotBeRead: moved to developer-utils-messages
 
   static INFO_DryRun = SevInfo | 0x0010;
   static Info_DryRun = (o:{outPath: string}) => m(

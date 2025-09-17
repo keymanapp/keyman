@@ -1,7 +1,9 @@
+# syntax=docker/dockerfile:1.4
 # Keyman is copyright (C) SIL Global. MIT License.
 
 ARG BASE_VERSION=default
-FROM keymanapp/keyman-base-ci:${BASE_VERSION}
+ARG REGISTRY=
+FROM ${REGISTRY}keymanapp/keyman-base-ci:${BASE_VERSION}
 LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Linux Build Image"
@@ -10,7 +12,7 @@ LABEL org.opencontainers.image.title="Keyman Linux Build Image"
 ADD control /tmp/control
 # Answer 'yes' to install questions
 RUN apt-get update && \
-  apt-get install -qy python3 python3-setuptools python3-coverage \
+  apt-get install -qy python3 python3-setuptools python3-coverage jq \
       devscripts equivs libdatetime-perl lcov gcovr xvfb \
       xserver-xephyr metacity mutter dbus-x11 weston xwayland && \
   (yes | mk-build-deps --install /tmp/control) || true && \

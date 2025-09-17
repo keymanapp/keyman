@@ -2,8 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
 
 targets=()
 # Build list of available targets from subfolders, if none specified
@@ -29,7 +31,7 @@ builder_parse "$@"
 function zipsource() {
   local target="$1"
   pushd "$1" > /dev/null
-  7z a -r -x!build -x"!$target.kpj.user" "${target}_source.zip" .
+  add_zip_files "${target}_source.zip" -x@../zip-excludes -q -r . # -q quiet, -r recursive
   popd > /dev/null
 }
 
@@ -40,10 +42,10 @@ function build_index() {
 <html>
   <head>
     <meta charset='utf-8'>
-    <title>Test Keyboards - $VERSION_WITH_TAG</title>
+    <title>Test Keyboards - $KEYMAN_VERSION_WITH_TAG</title>
   </head>
   <body>
-    <h1>Test Keyboards - $VERSION_WITH_TAG</h1>
+    <h1>Test Keyboards - $KEYMAN_VERSION_WITH_TAG</h1>
     <ul>
 EOF
 

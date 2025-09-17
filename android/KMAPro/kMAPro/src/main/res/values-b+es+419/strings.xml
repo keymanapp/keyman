@@ -68,7 +68,7 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Ajustar la altura del teclado</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Adjust longpress delay</string>
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Ajustar demora de pulsación larga</string>
   <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Leyenda de barra espaciadora</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
@@ -126,13 +126,13 @@
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Restaurar valores predeterminados</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Delay Time: %1$.1f seconds</string>
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Tiempo de retraso: %1$.1f segundos</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="ic_delay_time_up" comment="Make longpress delay longer">Delay time longer</string>
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Tiempo de retraso más largo</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Delay time shorter</string>
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Tiempo de retraso más corto</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Longpress delay time slider</string>
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Ajustador del tiempo de retraso de pulsación larga</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Buscar o escribir una dirección web</string>
   <!-- Context: Keyman Web Browser -->

@@ -7,20 +7,30 @@ plugins {
 ext.rootPath = '../../../../android'
 apply from: "$rootPath/version.gradle"
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.firstvoices.keyboards"
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
-        // VERSION_CODE and VERSION_NAME from version.gradle
-        versionCode VERSION_CODE as Integer
-        versionName VERSION_NAME
-        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
-        buildConfigField "String", "VERSION_GIT_TAG", "\""+VERSION_GIT_TAG+"\""
+        // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle
+        versionCode KEYMAN_VERSION_CODE as Integer
+        versionName KEYMAN_VERSION_NAME
+        buildConfigField "String", "KEYMAN_VERSION_ENVIRONMENT", "\""+KEYMAN_VERSION_ENVIRONMENT+"\""
+        buildConfigField "String", "KEYMAN_VERSION_GIT_TAG", "\""+KEYMAN_VERSION_GIT_TAG+"\""
     }
 
     String env_release_store_file = System.getenv("oem_firstvoices_release_store_file")
@@ -55,20 +65,20 @@ android {
     }
 
     applicationVariants.all { variant ->
-        // Adjust output name to "firstvoices-${VERSION_MD}.apk"
+        // Adjust output name to "firstvoices-${KEYMAN_VERSION_MD}.apk"
         variant.outputs.all {
-            outputFileName = "firstvoices-" + VERSION_MD + ".apk"
+            outputFileName = "firstvoices-" + KEYMAN_VERSION_MD + ".apk"
         }
     }
     lintOptions {
         disable 'MissingTranslation'
         lintConfig file("lint.xml")
     }
-}
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
     }
 }
 
@@ -95,7 +105,8 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
-        switch (System.env.TIER) {
+        String tier = new File('../../../TIER.md').getText('UTF-8').trim();
+        switch (tier) {
             case 'beta':
                 track.set("beta")
                 println "TIER set to beta"
@@ -114,19 +125,17 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 }
 
 repositories {
-    flatDir {
-        dirs 'libs'
-    }
     google()
     mavenCentral()
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
-    api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:6.9.2'
+    implementation files('libs/keyman-engine.aar')
+    implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
 }
 

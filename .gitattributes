@@ -1,0 +1,10 @@
+# Always use LF for Dockerfile - otherwise HEREDOCs in Dockerfile
+# will not work on Windows - we end up with a filename `foo\r` for
+# the command
+# ```Dockerfile
+# RUN <<EOF cat > foo
+# echo "Hello world"
+# EOF
+# ```
+Dockerfile    text eol=lf
+*.sh          text eol=lf

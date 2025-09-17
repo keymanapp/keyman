@@ -3,17 +3,17 @@
 /// <reference path="../worker-interface.d.ts" />
 
 // Defines types related to Node workers.
-import * as worker from 'worker_threads';
-import { Buffer } from 'buffer';
-import { URL } from 'url';
+import * as worker from 'node:worker_threads';
+import { Buffer } from 'node:buffer';
+import { URL } from 'node:url';
 
 /**
  * Defines mappings from Node Worker signatures to WebWorker signatures
  */
 const nodeWorkerToWebWorkerMappingSource = `
-import { parentPort } from 'worker_threads';
-import fs from 'fs';
-import vm from 'vm';
+import { parentPort } from 'node:worker_threads';
+import fs from 'node:fs';
+import vm from 'node:vm';
 
 function postMessage(...args) {
   parentPort.postMessage.call(parentPort, args);

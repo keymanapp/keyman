@@ -53,7 +53,7 @@ export function buildFlickScroller(
     const lockedAngle = lockedAngleForDir(lockedDir);
 
     const maxProgressDist = gestureParams.flick.triggerDist - gestureParams.flick.dirLockDist;
-    let progressDist =  Math.max(0, calcLockedDistance(source.path.stats, lockedDir) - gestureParams.flick.dirLockDist);
+    const progressDist =  Math.max(0, calcLockedDistance(source.path.stats, lockedDir) - gestureParams.flick.dirLockDist);
 
     // Make progress appear slightly less than it really is; 'near complete' slides thus actually are, so
     // the user doesn't get aggrevated by 'near misses' in that regard.
@@ -62,7 +62,7 @@ export function buildFlickScroller(
     // This is about when the flick's key-cap preview starts becoming "mostly visible".
     const FUDGE_SCALE_FACTOR = 0.7;
     // Prevent overshoot
-    let slidePc = Math.min(1, FUDGE_SCALE_FACTOR * progressDist / maxProgressDist);
+    const slidePc = Math.min(1, FUDGE_SCALE_FACTOR * progressDist / maxProgressDist);
 
     const previewX =  Math.sin(lockedAngle) * slidePc;
     const previewY = -Math.cos(lockedAngle) * slidePc;
@@ -119,7 +119,8 @@ export default class Flick implements GestureHandler {
     let source: GestureSource<KeyElement> = baseSource;
 
     sequence.on('complete', () => {
-      previewHost?.cancel()
+      previewHost?.cancel();
+      this.baseSpec;
     });
 
     this.sequence.on('stage', (result) => {
@@ -206,6 +207,7 @@ export default class Flick implements GestureHandler {
     }
 
     keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);
+    keyEvent.inputBreadcrumb = this.sequence.trace();
 
     // emit the keystroke
     vkbd.raiseKeyEvent(keyEvent, null);

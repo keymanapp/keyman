@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # Keyman is copyright (C) SIL Global. MIT License.
 
 ARG DISTRO=ubuntu
@@ -7,6 +8,8 @@ FROM ${DISTRO}:${DISTRO_VERSION}
 LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Build Base Image"
+
+SHELL ["/bin/bash", "-c"]
 
 # We will switch to a build user after some installation
 USER root
@@ -34,6 +37,15 @@ RUN echo "build ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 RUN <<EOF cat > /usr/bin/bashwrapper
 #!/bin/bash
+set -eu
+if [[ "${DOCKER_RUN_AS_ROOT:-}" == "1" ]] && [[ "$(id -u)" != "0" ]] ; then
+  # On Windows run as root so that the permissions are correct
+  # (root in Docker container is mapped to current user on Windows,
+  # whereas when Docker is run on Linux root is mapped to root)
+  sudo -u root -i "$0" "$@"
+  exit $?
+fi
+
 export KEYMAN_USE_NVM=1
 export DOCKER_RUNNING=true
 EOF

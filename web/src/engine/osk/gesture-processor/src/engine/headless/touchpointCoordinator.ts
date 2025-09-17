@@ -50,7 +50,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     this.gestureModelDefinitions = gestureModelDefinitions;
     this.inputEngines = [];
     if(inputEngines) {
-      for(let engine of inputEngines) {
+      for(const engine of inputEngines) {
         this.addEngine(engine);
       }
     }
@@ -195,8 +195,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
       *
       * This, in turn, can affect what the initial 'item' for the new gesture will be.
       */
-      const modelingSpinupPromise = potentialSelector.matchGesture(touchpoint, getGestureModelSet(modelDefs, potentialSelector.baseGestureSetId));
-      const modelingSpinupResults = await modelingSpinupPromise;
+      const modelingSpinupResults = await potentialSelector.matchGesture(touchpoint, getGestureModelSet(modelDefs, potentialSelector.baseGestureSetId));
 
       if(modelingSpinupResults.sustainModeWithoutMatch) {
 
@@ -282,7 +281,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     // For multitouch gestures, only report the gesture **once**.
     const sourceIDs = selection.matcher.allSourceIds;
-    for(let sequence of this._activeGestures) {
+    for(const sequence of this._activeGestures) {
       if(!!sequence.allSourceIds.find((id1) => !!sourceIDs.find((id2) => id1 == id2))) {
         // We've already established (and thus, already reported) a GestureSequence for this selection.
         return;
@@ -373,12 +372,12 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
       // Currently, we're going with the latter.
 
       // Also mark the touchpoint as no longer active.
-      let i = this._activeSources.indexOf(touchpoint);
+      const i = this._activeSources.indexOf(touchpoint);
       this._activeSources = this._activeSources.splice(i, 1);
     });
     touchpoint.path.on('complete', () => {
       // Also mark the touchpoint as no longer active.
-      let i = this._activeSources.indexOf(touchpoint);
+      const i = this._activeSources.indexOf(touchpoint);
       this._activeSources = this._activeSources.splice(i, 1);
     });
   }

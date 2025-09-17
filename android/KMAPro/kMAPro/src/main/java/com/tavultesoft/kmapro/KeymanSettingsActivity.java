@@ -3,8 +3,8 @@ package com.tavultesoft.kmapro;
 import android.os.Bundle;
 
 import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMManager;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public class KeymanSettingsActivity extends BaseActivity {
@@ -13,6 +13,7 @@ public class KeymanSettingsActivity extends BaseActivity {
   protected static final String sendCrashReport = "SendCrashReport";
   public static final String spacebarTextKey = "SpacebarText";
   public static final String hapticFeedbackKey = "HapticFeedback";
+  public static final String oskWithPhysicalKeyboardKey = "ShowOSK";
 
   protected KeymanSettingsFragment innerFragment;
 
@@ -21,6 +22,10 @@ public class KeymanSettingsActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.keyman_settings_layout);
+
+    setupEdgeToEdge(R.id.keyman_settings_layout);
+    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.keyman_settings_toolbar);
     toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
     toolbar.setTitle(R.string.keyman_settings);
@@ -32,6 +37,9 @@ public class KeymanSettingsActivity extends BaseActivity {
     }
 
     innerFragment = (KeymanSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.keyman_settings_fragment);
+
+    // For Keyman sites, disable keyboard picker task flag so keyboard picker doesn't dismiss Keyman app
+    KMManager.dontCloseParentAppOnShowKeyboardPicker();
   }
 
   @Override

@@ -37,7 +37,7 @@ describe('KmpCompiler', function () {
     callbacks.clear();
   });
 
-  for (let modelID of MODELS) {
+  for (const modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?
       makePathToFixture(modelID, 'source', `${modelID}.model.kps`) : makePathToFixture(modelID, `${modelID}.model.kps`);
     const jsPath = modelID.includes('withfolders') ?
@@ -86,7 +86,7 @@ describe('KmpCompiler', function () {
               assert.deepEqual(kmpJsonOutput, kmpJsonZippedFixture);
             }),
             zipFile.file(`${modelID}.model.js`).async('uint8array').then(modelJsFile => {
-              assert.deepEqual(modelJsFile, fs.readFileSync(jsPath));
+              assert.deepEqual(modelJsFile, new Uint8Array(fs.readFileSync(jsPath)));
             })
           ]);
         });
@@ -119,7 +119,7 @@ describe('KmpCompiler', function () {
 
     const zip = JSZip();
 
-    let jszip = await zip.loadAsync(kmpData);
+    const jszip = await zip.loadAsync(kmpData);
     assert.isNotNull(jszip.file('kmp.json')); // kmp.json should be present
     // kmp file should contain the following files
     const expectedFiles = [
@@ -135,7 +135,7 @@ describe('KmpCompiler', function () {
       expectedFiles.sort(),
       'khmer_angkor.kmp file should have exactly the expected files');
 
-    let kmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
+    const kmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
   });
 
@@ -149,12 +149,12 @@ describe('KmpCompiler', function () {
     const kpsPath = makePathToFixture('kmp.json', 'ahom_star.kps');
     const kmpJsonRefPath = makePathToFixture('kmp.json', 'kmp.json');
 
-    let kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    const kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJsonActual == null) {
       callbacks.printMessages();
       assert.isNotNull(kmpJsonActual);
     }
-    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
     assert.isNotNull(kmpJsonFixture);
 
     // Blank out system.keymanDeveloperVersion which will vary
@@ -178,12 +178,12 @@ describe('KmpCompiler', function () {
 
     debugger;
 
-    let kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    const kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJsonActual == null) {
       callbacks.printMessages();
       assert.isNotNull(kmpJsonActual);
     }
-    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
     assert.isNotNull(kmpJsonFixture);
 
     // Blank out system.keymanDeveloperVersion which will vary
@@ -278,8 +278,13 @@ describe('KmpCompiler', function () {
   it(`should load a package with missing keyboard ID metadata`, function () {
     const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_id.kps'));
     assert.isNull(kmpJson); // with a missing keyboard_id, the package shouldn't load, but it shouldn't crash either
-    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_KeyboardContentFileNotFound);
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_MissingKeyboardId);
+  });
 
+  it(`should load a package with missing model ID metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_model_id.kps'));
+    assert.isNull(kmpJson); // with a missing model_id, the package shouldn't load, but it shouldn't crash either
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_MissingModelId);
   });
 
   it(`should load a package with missing keyboard name metadata`, function () {

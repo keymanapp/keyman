@@ -26,6 +26,9 @@ const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
 
 const BANNER_VERT_ROAMING_HEIGHT_RATIO = 0.666;
 
+// .85 is seen in kmwosk.css on `.kmw-banner-bar .kmw-suggest-option`.
+const SUGGESTION_HEIGHT_IN_BANNER_RATIO = 0.85;
+
 /**
  * The style to temporarily apply when updating suggestion text in order to prevent
  * fade transitions at that time.
@@ -67,7 +70,13 @@ interface BannerSuggestionFormatSpec {
    * Sets a target width to use when 'collapsing' suggestions.  Only affects those long
    * enough to need said 'collapsing'.
    */
-  collapsedWidth?: number
+  collapsedWidth?: number;
+
+  /**
+   * The height allotted to each suggestion; needed to support font scaling if the
+   * font would otherwise be too large.
+   */
+  height?: number
 }
 
 export class BannerSuggestion {
@@ -96,7 +105,7 @@ export class BannerSuggestion {
 
     // Provides an empty, base SPAN for text display.  We'll swap these out regularly;
     // `Suggestion`s will have varying length and may need different styling.
-    let display = this.display = createUnselectableElement('span');
+    const display = this.display = createUnselectableElement('span');
     display.className = 'kmw-suggestion-text';
     this.container.appendChild(display);
   }
@@ -107,20 +116,20 @@ export class BannerSuggestion {
 
   private constructRoot() {
     // Add OSK suggestion labels
-    let div = this.div = createUnselectableElement('div');
+    const div = this.div = createUnselectableElement('div');
     div.className = "kmw-suggest-option";
     div.id = BannerSuggestion.BASE_ID + this.index;
 
     // @ts-ignore // Tags the element with its backing object.
     this.div['suggestion'] = this;
 
-    let container = this.container = document.createElement('div');
+    const container = this.container = document.createElement('div');
     container.className = "kmw-suggestion-container";
 
     // Ensures that a reasonable default width, based on % is set. (Since it's not yet in the DOM, we may not yet have actual width info.)
-    let usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT - 1);
+    const usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT - 1);
 
-    let widthpc = usableWidth / (SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT);
+    const widthpc = usableWidth / (SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT);
     container.style.minWidth = widthpc + '%';
 
     div.appendChild(container);
@@ -135,7 +144,7 @@ export class BannerSuggestion {
       }
 
       // Establish base font settings
-      let font = keyboardProperties['KFont'];
+      const font = keyboardProperties['KFont'];
       if(font && font.family && font.family != '') {
         div.style.fontFamily = font.family;
       }
@@ -156,7 +165,7 @@ export class BannerSuggestion {
   public update(suggestion: LexicalModelTypes.Suggestion, format: BannerSuggestionFormatSpec) {
     this._suggestion = suggestion;
 
-    let display = this.generateSuggestionText(this.rtl);
+    const display = this.generateSuggestionText(this.rtl);
     this.container.replaceChild(display, this.display);
     this.display = display;
 
@@ -170,7 +179,20 @@ export class BannerSuggestion {
 
     if(suggestion && suggestion.displayAs) {
       const rawMetrics = getTextMetrics(suggestion.displayAs, format.emSize, format.styleForFont);
-      this._textWidth = rawMetrics.width;
+      const projectedHeight = rawMetrics.fontBoundingBoxAscent
+        ? rawMetrics.fontBoundingBoxAscent + rawMetrics.fontBoundingBoxDescent
+        : 1;
+      const ratio = Math.min(1, format.height / projectedHeight);
+
+      // do we need font-height scaling?
+      this._textWidth = rawMetrics.width * ratio;
+      // Apply styling to the container element so that it does not override CSS styling on the
+      // display element (for tablets)
+      if(ratio < 1) {
+        this.container.style.fontSize = ParsedLengthStyle.forScalar(ratio).styleString;
+      } else {
+        delete this.container.style.fontSize;
+      }
     } else {
       this._textWidth = 0;
     }
@@ -288,9 +310,9 @@ export class BannerSuggestion {
    */
   public get collapsedWidth(): number {
     // Allow shrinking a suggestion's width if it has excess whitespace.
-    let utilizedWidth = this.spanWidth < this.targetCollapsedWidth ? this.spanWidth : this.targetCollapsedWidth;
+    const utilizedWidth = this.spanWidth < this.targetCollapsedWidth ? this.spanWidth : this.targetCollapsedWidth;
     // If a minimum width has been specified, enforce that minimum.
-    let maxWidth = utilizedWidth < this.expandedWidth ? utilizedWidth : this.expandedWidth;
+    const maxWidth = utilizedWidth < this.expandedWidth ? utilizedWidth : this.expandedWidth;
 
     // Will return maxWidth if this.minWidth is undefined.
     return (this.minWidth > maxWidth ? this.minWidth : maxWidth);
@@ -344,10 +366,10 @@ export class BannerSuggestion {
    */
   //
   public generateSuggestionText(rtl: boolean): HTMLSpanElement {
-    let suggestion = this._suggestion;
-    var suggestionText: string;
+    const suggestion = this._suggestion;
+    let suggestionText: string;
 
-    var s=createUnselectableElement('span');
+    const s=createUnselectableElement('span');
     s.className = 'kmw-suggestion-text';
 
     if(suggestion == null) {
@@ -358,7 +380,7 @@ export class BannerSuggestion {
       suggestionText = '\xa0';  // default:  nbsp.
     } else {
       // Default the LTR ordering to match that of the active keyboard.
-      let orderCode = rtl ? 0x202e /* RTL */ : 0x202d /* LTR */;
+      const orderCode = rtl ? 0x202e /* RTL */ : 0x202d /* LTR */;
       suggestionText = String.fromCharCode(orderCode) + suggestion.displayAs;
     }
 
@@ -426,8 +448,8 @@ export class SuggestionBanner extends Banner {
       this.separators = [];
     }
 
-    for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-      let d = new BannerSuggestion(i, rtl);
+    for (let i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+      const d = new BannerSuggestion(i, rtl);
       this.options[i] = d;
     }
 
@@ -438,8 +460,8 @@ export class SuggestionBanner extends Banner {
       * the elements are inserted for RTL.  This allows the banner to be RTL
       * for visuals/UI while still being internally LTR.
       */
-    for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-      let indexToInsert = rtl ? SuggestionBanner.SUGGESTION_LIMIT - i - 1 : i;
+    for (let i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+      const indexToInsert = rtl ? SuggestionBanner.SUGGESTION_LIMIT - i - 1 : i;
       this.container.appendChild(this.options[indexToInsert].div);
 
       // RTL should start right-aligned, thus @ max scroll.
@@ -449,10 +471,10 @@ export class SuggestionBanner extends Banner {
 
       if(i != SuggestionBanner.SUGGESTION_LIMIT - 1) {
         // Adds a 'separator' div element for UI purposes.
-        let separatorDiv = createUnselectableElement('div');
+        const separatorDiv = createUnselectableElement('div');
         separatorDiv.className = 'kmw-banner-separator';
 
-        let ds = separatorDiv.style;
+        const ds = separatorDiv.style;
         ds.marginLeft = `calc(${(SuggestionBanner.MARGIN / 2)}% - 0.5px)`;
         ds.marginRight = `calc(${(SuggestionBanner.MARGIN / 2)}% - 0.5px)`;
 
@@ -609,7 +631,7 @@ export class SuggestionBanner extends Banner {
           // auto-correct suggestion and its highlighting.
           this._predictionContext.selected = autoselection;
           if(autoselection) {
-            for(let entry of this.options) {
+            for(const entry of this.options) {
               if(entry.suggestion == autoselection) {
                 entry.highlight(true);
                 break;
@@ -726,21 +748,23 @@ export class SuggestionBanner extends Banner {
     const emSizeStr = getComputedStyle(document.body).fontSize;
     const emSize    = getFontSizeStyle(emSizeStr).val;
 
-    const textStyle = getComputedStyle(this.options[0].container.firstChild as HTMLSpanElement);
+    const textElementStyle = getComputedStyle(this.options[0].container.firstChild as HTMLSpanElement);
 
     const targetWidth = this.width / SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT;
+    const height = this.height * SUGGESTION_HEIGHT_IN_BANNER_RATIO;
 
     // computedStyle will fail if the element's not in the DOM yet.
     // Seeks to get the values specified within kmwosk.css.
-    const textLeftPad = new ParsedLengthStyle(textStyle.paddingLeft   || '4px');
-    const textRightPad = new ParsedLengthStyle(textStyle.paddingRight || '4px');
+    const textLeftPad = new ParsedLengthStyle(textElementStyle.paddingLeft   || '4px');
+    const textRightPad = new ParsedLengthStyle(textElementStyle.paddingRight || '4px');
 
-    let optionFormat: BannerSuggestionFormatSpec = {
+    const optionFormat: BannerSuggestionFormatSpec = {
       paddingWidth: textLeftPad.val + textRightPad.val, // Assumes fixed px padding.
       emSize: emSize,
       styleForFont: fontStyle,
       collapsedWidth: targetWidth,
       minWidth: 0,
+      height: height
     }
 
     for (let i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
@@ -761,7 +785,7 @@ export class SuggestionBanner extends Banner {
   }
 
   readonly refreshLayout = () => {
-    let collapsedOptions: BannerSuggestion[] = [];
+    const collapsedOptions: BannerSuggestion[] = [];
     let totalWidth = 0;
 
     let displayCount = Math.min(this.currentSuggestions.length, 8);
@@ -783,17 +807,17 @@ export class SuggestionBanner extends Banner {
     displayCount = displayCount || 1;
 
     if(totalWidth < this.width) {
-      let separatorWidth = (this.width * 0.01 * (displayCount-1));
+      const separatorWidth = (this.width * 0.01 * (displayCount-1));
       // Prioritize adding padding to suggestions that actually need it.
       // Use equal measure for each so long as it still could use extra display space.
       while(totalWidth < this.width && collapsedOptions.length > 0) {
-        let maxFillPadding = (this.width - totalWidth - separatorWidth) / collapsedOptions.length;
+        const maxFillPadding = (this.width - totalWidth - separatorWidth) / collapsedOptions.length;
         collapsedOptions.sort((a, b) => a.expandedWidth - b.expandedWidth);
 
-        let shortestCollapsed = collapsedOptions[0];
-        let neededWidth = shortestCollapsed.expandedWidth - shortestCollapsed.collapsedWidth;
+        const shortestCollapsed = collapsedOptions[0];
+        const neededWidth = shortestCollapsed.expandedWidth - shortestCollapsed.collapsedWidth;
 
-        let padding = Math.min(neededWidth, maxFillPadding);
+        const padding = Math.min(neededWidth, maxFillPadding);
 
         // Check: it is possible that two elements were matched for equal length, thus the second loop's takes no additional padding.
         // No need to trigger re-layout ops for that case.
@@ -806,7 +830,7 @@ export class SuggestionBanner extends Banner {
       }
 
       // If there's STILL leftover padding to distribute, let's do that now.
-      let fillPadding = (this.width - totalWidth - separatorWidth) / displayCount;
+      const fillPadding = (this.width - totalWidth - separatorWidth) / displayCount;
 
       for(let i=0; i < displayCount; i++) {
         const d = this.options[i];
@@ -981,8 +1005,8 @@ class SuggestionExpandContractAnimation {
     // set timestamp, adjusting the current time based on intermediate progress
     this.startTimestamp = performance.now();
 
-    let progress = this.option.currentWidth - this.option.collapsedWidth;
-    let expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
+    const progress = this.option.currentWidth - this.option.collapsedWidth;
+    const expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
 
     if(progress != 0) {
       // Offset the timestamp by noting what start time would have given rise to
@@ -999,15 +1023,15 @@ class SuggestionExpandContractAnimation {
     }
 
     let progressTime = timestamp - this.startTimestamp;
-    let fin = progressTime > SuggestionExpandContractAnimation.TRANSITION_TIME;
+    const fin = progressTime > SuggestionExpandContractAnimation.TRANSITION_TIME;
 
     if(fin) {
       progressTime = SuggestionExpandContractAnimation.TRANSITION_TIME;
     }
 
     // -- Part 1:  handle option expand / collapse state --
-    let expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
-    let expansionRatio = progressTime / SuggestionExpandContractAnimation.TRANSITION_TIME;
+    const expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
+    const expansionRatio = progressTime / SuggestionExpandContractAnimation.TRANSITION_TIME;
 
     // expansionDiff * expansionRatio:  the total adjustment from 'collapsed' width, in px.
     const expansionPx = expansionDiff * expansionRatio;
@@ -1032,8 +1056,8 @@ class SuggestionExpandContractAnimation {
     // set timestamp, adjusting the current time based on intermediate progress
     this.startTimestamp = performance.now();
 
-    let progress = this.option.expandedWidth - this.option.currentWidth;
-    let expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
+    const progress = this.option.expandedWidth - this.option.currentWidth;
+    const expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
 
     if(progress != 0) {
       // Offset the timestamp by noting what start time would have given rise to
@@ -1050,14 +1074,14 @@ class SuggestionExpandContractAnimation {
     }
 
     let progressTime = timestamp - this.startTimestamp;
-    let fin = progressTime > SuggestionExpandContractAnimation.TRANSITION_TIME;
+    const fin = progressTime > SuggestionExpandContractAnimation.TRANSITION_TIME;
     if(fin) {
       progressTime = SuggestionExpandContractAnimation.TRANSITION_TIME;
     }
 
     // -- Part 1:  handle option expand / collapse state --
-    let expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
-    let expansionRatio = 1 - progressTime / SuggestionExpandContractAnimation.TRANSITION_TIME;
+    const expansionDiff = this.option.expandedWidth - this.option.collapsedWidth;
+    const expansionRatio = 1 - progressTime / SuggestionExpandContractAnimation.TRANSITION_TIME;
 
     // expansionDiff * expansionRatio:  the total adjustment from 'collapsed' width, in px.
     const expansionPx = expansionDiff * expansionRatio;

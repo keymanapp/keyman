@@ -5,4 +5,5 @@
 
   <keys />
   <!-- invalid: need a layer! -->
+  <!-- this keyboard doesn't even have a <layers/> element - no offset will be generated -->
 </keyboard3>

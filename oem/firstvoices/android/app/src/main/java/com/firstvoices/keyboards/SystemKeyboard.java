@@ -50,8 +50,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             Log.d(TAG, "Initializing Sentry");
             SentryAndroid.init(getApplicationContext(), options -> {
                 options.setEnableAutoSessionTracking(false);
-                options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
-                options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+                options.setRelease(com.firstvoices.keyboards.BuildConfig.KEYMAN_VERSION_GIT_TAG);
+                options.setEnvironment(com.firstvoices.keyboards.BuildConfig.KEYMAN_VERSION_ENVIRONMENT);
             });
         }
 
@@ -85,9 +85,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     @Override
     public void onInitializeInterface() {
       super.onInitializeInterface();
-
-      // KeymanWeb reloaded, so we have to pass the banner again
-      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     /** Called by the framework when your view for creating input needs to
@@ -135,9 +132,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         }
 
-        // Temporarily disable predictions if entering a hidden password field
-        KMManager.setMayPredictOverride(inputType);
-        if (KMManager.getMayPredictOverride()) {
+        // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
+        KMManager.setPredictionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
             KMManager.setBannerOptions(false);
         } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
           // Check if predictions needs to be re-enabled per Settings preference
@@ -169,9 +166,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
                 }
             }
         }
-
-        if (KMManager.getCurrentKeyboardIndex(this) < 0)
-            KMManager.setKeyboard(this, 0);
     }
 
     @Override
@@ -234,12 +228,29 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     @Override
     public void onKeyboardShown() {
-        // Handle Keyman keyboard shown event here if needed
+      // Refresh banner theme
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     @Override
     public void onKeyboardDismissed() {
         // Handle Keyman keyboard dismissed event here if needed
+    }
+
+    @Override
+    public boolean onEvaluateInputViewShown() {
+      // On Android API 36+, the OSK defaults to not appearing when a physical keyboard is connected.
+      // If the default implementation returns true, recommend honoring it
+      // Reference: https://android.googlesource.com/platform/frameworks/base/+/7b739a8%5E%21/
+      if (super.onEvaluateInputViewShown()) {
+        return true;
+      };
+
+      SharedPreferences prefs = this.getSharedPreferences(
+        PreferencesManager.fv_prefs_name, Context.MODE_PRIVATE);
+      boolean showOSK = prefs.getBoolean(
+        PreferencesManager.oskWithPhysicalKeyboardKey, false);
+      return showOSK;
     }
 
     @Override

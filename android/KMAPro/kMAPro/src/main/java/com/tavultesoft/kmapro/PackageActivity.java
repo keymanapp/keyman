@@ -4,7 +4,6 @@
 package com.tavultesoft.kmapro;
 
 import android.annotation.SuppressLint;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -18,6 +17,7 @@ import android.widget.Toast;
 
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KeyboardEventHandler;
 import com.keyman.engine.KmpInstallMode;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PackageActivity extends AppCompatActivity implements
+public class PackageActivity extends BaseActivity implements
     StepperLayout.StepperListener, WebViewFragment.OnInstallClickedListener,
     SelectLanguageFragment.OnLanguagesSelectedListener {
   private final static String TAG = "PackageActivity";
@@ -52,6 +52,7 @@ public class PackageActivity extends AppCompatActivity implements
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_package_installer);
+    setupEdgeToEdge(R.id.package_installer_layout);
 
     KmpInstallMode installMode = KmpInstallMode.Full;
     String languageID = null;
@@ -116,12 +117,14 @@ public class PackageActivity extends AppCompatActivity implements
       kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0) : 0;
 
     // Sanity check for keyboard packages
+    // Not using showErrorToast to avoid cluttering Sentry with noise
     if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
       if (keyboardCount == 0) {
         showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
         return;
       } else if (languageCount == 0) {
-        showErrorToast(getString(R.string.no_associated_languages));
+        showErrorDialog(context, pkgId, getString(R.string.no_associated_languages));
+        return;
       }
     }
 

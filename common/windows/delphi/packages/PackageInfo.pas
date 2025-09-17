@@ -315,14 +315,11 @@ type
 
   TPackageKeyboard = class(TPackageBaseObject)
   private
-    FName: string;
     FOSKFont: TPackageContentFile;
     FID: string;
-    FRTL: Boolean;
     FDisplayFont: TPackageContentFile;
     FLanguages: TPackageKeyboardLanguageList;
     FExamples: TPackageKeyboardExampleList;
-    FVersion: string;
     FMinKeymanVersion: string;
     FWebOSKFonts: TPackageContentFileReferenceList;
     FWebDisplayFonts: TPackageContentFileReferenceList;
@@ -336,10 +333,7 @@ type
     constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure Assign(Source: TPackageKeyboard); virtual;
-    property Name: string read FName write FName;
     property ID: string read FID write FID;
-    property RTL: Boolean read FRTL write FRTL;
-    property Version: string read FVersion write FVersion;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
     property Examples: TPackageKeyboardExampleList read FExamples;
     property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
@@ -407,17 +401,13 @@ type
 
   TPackageLexicalModel = class(TPackageBaseObject)
   private
-    FName: string;
     FID: string;
     FLanguages: TPackageKeyboardLanguageList;
-    FRTL: Boolean;
   public
     constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure Assign(Source: TPackageLexicalModel); virtual;
-    property Name: string read FName write FName;
     property ID: string read FID write FID;
-    property RTL: Boolean read FRTL write FRTL;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
   end;
 
@@ -528,10 +518,7 @@ const
 const
   SXML_PackageKeyboards = 'Keyboards';
   SXML_PackageKeyboard = 'Keyboard';
-  SXML_PackageKeyboard_Name = 'Name';
   SXML_PackageKeyboard_ID = 'ID';
-  SXML_PackageKeyboard_Version = 'Version';
-  SXML_PackageKeyboard_RTL = 'RTL';
   SXML_PackageKeyboard_OSKFont = 'OSKFont';
   SXML_PackageKeyboard_DisplayFont = 'DisplayFont';
   SXML_PackageKeyboard_Languages = 'Languages';
@@ -554,9 +541,7 @@ const
 
   SXML_PackageLexicalModels = 'LexicalModels';
   SXML_PackageLexicalModel = 'LexicalModel';
-  SXML_PackageLexicalModel_Name = 'Name';
   SXML_PackageLexicalModel_ID = 'ID';
-  SXML_PackageLexicalModel_RTL = 'RTL';
   SXML_PackageLexicalModel_Languages = 'Languages';
 
   SXML_PackageRelatedPackages = 'RelatedPackages';
@@ -620,10 +605,7 @@ const
   SJSON_Files_CopyLocation = 'copyLocation';
 
   SJSON_Keyboards = 'keyboards';
-  SJSON_Keyboard_Name = 'name';
   SJSON_Keyboard_ID = 'id';
-  SJSON_Keyboard_RTL = 'rtl';
-  SJSON_Keyboard_Version = 'version';
   SJSON_Keyboard_OSKFont = 'oskFont';
   SJSON_Keyboard_DisplayFont = 'displayFont';
 
@@ -641,9 +623,7 @@ const
   SJSON_Keyboard_WebDisplayFonts = 'webDisplayFonts';
 
   SJSON_LexicalModels = 'lexicalModels';
-  SJSON_LexicalModel_Name = 'name';
   SJSON_LexicalModel_ID = 'id';
-  SJSON_LexicalModel_RTL = 'rtl';
   SJSON_LexicalModel_Languages = 'languages';
 
   SJSON_RelatedPackages = 'relatedPackages';
@@ -653,6 +633,11 @@ const
 function XmlVarToStr(v: OleVariant): string;
 begin
   Result := ReplaceStr(ReplaceStr(Trim(VarToStr(v)), #$D#$A, #$A), #$A, #$D#$A);
+end;
+
+function TransformSlashes(filename: string): string;
+begin
+  Result := ReplaceStr(filename, '/', '\');
 end;
 
 {-------------------------------------------------------------------------------
@@ -717,10 +702,10 @@ procedure TPackageOptions.LoadXML(ARoot: IXMLNode);
 begin
   FileVersion :=                XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
   ExecuteProgram :=             XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ExecuteProgram'].NodeValue);
-  ReadmeFile :=                 Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
-  GraphicFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
-  LicenseFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue));
-  WelcomeFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue));
+  ReadmeFile :=                 Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue)));
+  GraphicFile :=                Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue)));
+  LicenseFile :=                Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue)));
+  WelcomeFile :=                Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue)));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
   if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
@@ -1445,7 +1430,7 @@ begin
     with ANode.ChildNodes[i] do
     begin
       subfile := TPackageContentFile.Create(Package);
-      subfile.FileName := XmlVarToStr(ChildNodes['Name'].NodeValue);
+      subfile.FileName := TransformSlashes(XmlVarToStr(ChildNodes['Name'].NodeValue));
       subfile.Description := XmlVarToStr(ChildNodes['Description'].NodeValue);
       subfile.FCopyLocation := TPackageFileCopyLocation(StrToIntDef(XmlVarToStr(ChildNodes['Location'].NodeValue), 0));
       Add(subfile);
@@ -2023,11 +2008,8 @@ var
   FLanguage: TPackageKeyboardLanguage;
   FExample: TPackageKeyboardExample;
 begin
-  FName := Source.Name;
   FID := Source.ID;
-  FVersion := Source.Version;
   FMinKeymanVersion := Source.FMinKeymanVersion;
-  FRTL := Source.RTL;
   if Assigned(Source.OSKFont)
     then FOSKFont := Package.Files.FromFileNameEx(Source.OSKFont.FileName)
     else FOSKFont := nil;
@@ -2186,10 +2168,7 @@ begin
         Break;
 
       keyboard := TPackageKeyboard.Create(Package);
-      keyboard.Name := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Name, '');
       keyboard.ID := AIni.ReadString(FSectionName, SXML_PackageKeyboard_ID, '');
-      keyboard.Version := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Version, '1.0');
-      keyboard.RTL := AIni.ReadBool(FSectionName, SXML_PackageKeyboard_RTL, False);
       keyboard.OSKFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_OSKFont, ''));
       keyboard.DisplayFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_DisplayFont, ''));
 
@@ -2231,10 +2210,7 @@ begin
     AKeyboard := ANode.Items[i] as TJSONObject;
 
     keyboard := TPackageKeyboard.Create(Package);
-    keyboard.Name := GetJsonValueString(AKeyboard, SJSON_Keyboard_Name);
     keyboard.ID := GetJsonValueString(AKeyboard,SJSON_Keyboard_ID);
-    keyboard.Version := GetJsonValueString(AKeyboard, SJSON_Keyboard_Version);
-    keyboard.RTL := GetJsonValueBool(AKeyboard, SJSON_Keyboard_RTL);
     keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
     keyboard.DisplayFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_DisplayFont));
     keyboard.Languages.LoadJSON(AKeyboard);
@@ -2266,12 +2242,9 @@ begin
     AKeyboard := ANode.ChildNodes[i];
 
     keyboard := TPackageKeyboard.Create(Package);
-    keyboard.Name := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Name]);
     keyboard.ID := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_ID]);
-    keyboard.Version := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Version]);
-    keyboard.RTL := ANode.ChildNodes.IndexOf(SXML_PackageKeyboard_RTL) >= 0;
-    keyboard.OSKFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont]));
-    keyboard.DisplayFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont]));
+    keyboard.OSKFont := Package.Files.FromFileNameEx(TransformSlashes(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont])));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(TransformSlashes(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont])));
 
     keyboard.Languages.LoadXML(AKeyboard);
     keyboard.Examples.LoadXML(AKeyboard);
@@ -2300,10 +2273,7 @@ begin
   for i := 0 to Count-1 do
   begin
     FSectionName := 'Keyboard'+IntToStr(i);
-    AIni.WriteString(FSectionName, SXML_PackageKeyboard_Name, Items[i].Name);
     AIni.WriteString(FSectionName, SXML_PackageKeyboard_ID, Items[i].ID);
-    AIni.WriteString(FSectionName, SXML_PackageKeyboard_Version, Items[i].Version);
-    if Items[i].RTL then AIni.WriteBool(FSectionName, SXML_PackageKeyboard_RTL, True);
     if Assigned(Items[i].OSKFont) then
       AIni.WriteString(FSectionName, SXML_PackageKeyboard_OSKFont, Items[i].OSKFont.RelativeFileName);
     if Assigned(Items[i].DisplayFont) then
@@ -2335,10 +2305,7 @@ begin
     AKeyboard := TJSONObject.Create;
     AKeyboards.Add(AKeyboard);
 
-    AKeyboard.AddPair(SJSON_Keyboard_Name, Items[i].Name);
     AKeyboard.AddPair(SJSON_Keyboard_ID, Items[i].ID);
-    AKeyboard.AddPair(SJSON_Keyboard_Version, Items[i].Version);
-    if Items[i].RTL then AKeyboard.AddPair(SJSON_Keyboard_RTL, TJSONTrue.Create);
     if Assigned(Items[i].OSKFont) then
       AKeyboard.AddPair(SJSON_Keyboard_OSKFont, Items[i].OSKFont.RelativeFileName);
     if Assigned(Items[i].DisplayFont) then
@@ -2372,11 +2339,7 @@ begin
   begin
     AKeyboard := ANode.AddChild(SXML_PackageKeyboard);
 
-    AKeyboard.ChildNodes[SXML_PackageKeyboard_Name].NodeValue := Items[i].Name;
     AKeyboard.ChildNodes[SXML_PackageKeyboard_ID].NodeValue := Items[i].ID;
-    AKeyboard.ChildNodes[SXML_PackageKeyboard_Version].NodeValue := Items[i].Version;
-    if Items[i].RTL then
-      AKeyboard.ChildNodes[SXML_PackageKeyboard_RTL].NodeValue := True;
     if Assigned(Items[i].OSKFont) then
       AKeyboard.ChildNodes[SXML_PackageKeyboard_OSKFont].NodeValue := Items[i].OSKFont.RelativeFileName;
     if Assigned(Items[i].DisplayFont) then
@@ -2420,9 +2383,7 @@ var
   i: Integer;
   FLanguage: TPackageKeyboardLanguage;
 begin
-  FName := Source.Name;
   FID := Source.ID;
-  FRTL := Source.RTL;
   FLanguages.Clear;
   for i := 0 to Source.Languages.Count - 1 do
   begin
@@ -2487,9 +2448,7 @@ begin
     ALexicalModel := ANode.Items[i] as TJSONObject;
 
     lexicalModel := TPackageLexicalModel.Create(Package);
-    lexicalModel.Name := GetJsonValueString(ALexicalModel, SJSON_LexicalModel_Name);
     lexicalModel.ID := GetJsonValueString(ALexicalModel,SJSON_LexicalModel_ID);
-    lexicalModel.RTL := GetJsonValueBool(ALexicalModel, SJSON_LexicalModel_RTL);
     lexicalModel.Languages.LoadJSON(ALexicalModel);
 
     Add(lexicalModel);
@@ -2510,9 +2469,7 @@ begin
     ALexicalModel := ANode.ChildNodes[i];
 
     lexicalModel := TPackageLexicalModel.Create(Package);
-    lexicalModel.Name := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Name]);
     lexicalModel.ID := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_ID]);
-    lexicalModel.RTL := ALexicalModel.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
     lexicalModel.Languages.LoadXML(ALexicalModel);
     Add(lexicalModel);
   end;
@@ -2535,9 +2492,7 @@ begin
     ALexicalModel := TJSONObject.Create;
     ALexicalModels.Add(ALexicalModel);
 
-    ALexicalModel.AddPair(SJSON_LexicalModel_Name, Items[i].Name);
     ALexicalModel.AddPair(SJSON_LexicalModel_ID, Items[i].ID);
-    if Items[i].RTL then ALexicalModel.AddPair(SJSON_LexicalModel_RTL, TJSONTrue.Create);
     Items[i].Languages.SaveJSON(ALexicalModel);
   end;
 end;
@@ -2552,10 +2507,7 @@ begin
   begin
     ALexicalModel := ANode.AddChild(SXML_PackageLexicalModel);
 
-    ALexicalModel.ChildNodes[SXML_PackageLexicalModel_Name].NodeValue := Items[i].Name;
     ALexicalModel.ChildNodes[SXML_PackageLexicalModel_ID].NodeValue := Items[i].ID;
-    if Items[i].RTL then
-      ALexicalModel.ChildNodes[SXML_PackageLexicalModel_RTL].NodeValue := True;
 
     Items[i].Languages.SaveXML(ALexicalModel);
   end;
@@ -2930,7 +2882,7 @@ begin
   for i := 0 to ARoot.ChildNodes.Count - 1 do
   begin
     ANode := ARoot.ChildNodes[i];
-    f := Package.Files.FromFileNameEx(ANode.Attributes[SXML_PackageKeyboardFont_Filename]);
+    f := Package.Files.FromFileNameEx(TransformSlashes(XmlVarToStr(ANode.Attributes[SXML_PackageKeyboardFont_Filename])));
     if Assigned(f) then
       Add(f);
   end;

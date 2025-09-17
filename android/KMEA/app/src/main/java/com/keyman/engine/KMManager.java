@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -33,6 +34,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -73,6 +75,7 @@ import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
 import com.keyman.engine.util.MapCompat;
 import com.keyman.engine.util.WebViewUtils;
+import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -255,10 +258,13 @@ public final class KMManager {
   // haptic feedback disabled for hardware keystrokes
   private static boolean mayHaveHapticFeedback = false;
 
-  // Special override for when keyboard is entering a password text field.
-  // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
+  // Special flags to temporarily disable predictions when editing a password field.
+  // These are maintained independently for inapp keyboard and system keyboard.
+  // When true, the suggestion banner passes the option {'mayPredict' = false} to KeymanWeb in the lm-layer
   // regardless what the Settings preference is.
-  private static boolean mayPredictOverride = false;
+  // API added Keyman 18.0
+  private static boolean inAppPredictionsSuspendedForSensitiveInput = false;
+  private static boolean systemPredictionsSuspendedForSensitiveInput = false;
 
   // Determine how system keyboard handles ENTER key
   public static EnterModeType enterMode = EnterModeType.DEFAULT;
@@ -267,6 +273,8 @@ public final class KMManager {
   // When maySendCrashReport is false, KMW will still attempt to send crash reports, but it
   // will be blocked.
   private static boolean maySendCrashReport = true;
+
+  private final static String KMEngine_PrefsKey = "KMAPreferences";
 
   // Keyman public keys
   public static final String KMKey_ID = "id";
@@ -290,8 +298,8 @@ public final class KMManager {
   public static final String KMKey_KMPInstall_Mode = "kmpInstallMode";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
-  public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
-  public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
+  private static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
+  private static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
   public static final String KMKey_LongpressDelay = "longpressDelay";
 
@@ -340,14 +348,21 @@ public final class KMManager {
   public static final int KMMinimum_LongpressDelay = 300;
   public static final int KMMaximum_LongpressDelay = 1500;
 
+  // Default keyboard heights
+  public static final int KeyboardHeight_Reset = 0; // To reset to default, applyKeyboardHeight
+  public static final int KeyboardHeight_Invalid = -1; // If invalid orientation passed to functions
+  public static int KeyboardHeight_Context_Portrait_Default = 0; // Default portrait height
+  public static int KeyboardHeight_Context_Landscape_Default = 0; // Default landscape height
+  public static int KeyboardHeight_Context_Portrait_Current = 0; // Current portrait height
+  public static int KeyboardHeight_Context_Landscape_Current = 0; // Current landscape height
+
   // Default prediction/correction setting
   public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSSentry = "sentry.min.js";
-  protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
+  protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
@@ -479,6 +494,11 @@ public final class KMManager {
       // UpdateOldKeyboardsList() handled with KeyboardController later
       didCopyAssets = true;
     }
+
+    calculateDefaultKeyboardHeights(context);
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
+    KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
 
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
       String msg = "Cannot initialize: Invalid keyboard type";
@@ -671,15 +691,63 @@ public final class KMManager {
   /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
+   *
+   * Android API 35+ enforces edge-to-edge so we need to determine the navigation bar height (if visible)
+   * so the keyboard isn't covered up by the navigation bar.
+   * In portrait orientation, this affects the keyboard bottom margin.
+   * On phones in landscape orientation, this affects the left/right side of the keyboard
    * @return RelativeLayout.LayoutParams
    */
   public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
+    int navigationHeight = getNavigationBarHeight(appContext);
+    int orientation = getOrientation(appContext);
+    FormFactor formFactor = getFormFactor();
+
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-   return params;
+	return params;
+   }
+
+  /**
+   * Applies padding to the keyboard so it's not covered by system insets
+   * @param left int padding to account for notch/navigation bar on left side of screen
+   * @param right int padding to account for notch/navigation bar on right side of screen
+   * @param bottom int padding to account for navigation bar on bottom of screen
+   */
+  public static void applyInsetsToKeyboard(int left, int right, int bottom) {
+    // Only applies to In-App keyboard #14619
+    if (InAppKeyboard != null) {
+      applyInsetsPaddingToKeyboardView(InAppKeyboard, left, right, bottom);
+    }
+  }
+
+  private static void applyInsetsPaddingToKeyboardView(KMKeyboard keyboard, int left, int right, int bottom) {
+    View parent = (View) keyboard.getParent();
+
+    if (parent != null) {
+      // Keep existing top padding, add bottom padding for the inset
+      parent.setPadding(
+        left,
+        parent.getPaddingTop(),
+        right,
+        bottom
+      );
+      // No need to change WebView margins; keep height as-is
+      parent.requestLayout();
+    }
+    else {
+      // Fallback: apply on the WebView itself
+      keyboard.setPadding(
+        left,
+        keyboard.getPaddingTop(),
+        right,
+        bottom
+      );
+      keyboard.requestLayout();
+    }
   }
 
   private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
@@ -687,12 +755,33 @@ public final class KMManager {
     KMKeyboardWebViewClient webViewClient = null;
 
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
-      InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      try {
+        InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      } catch (AndroidRuntimeException e) {
+        // Catch fatal error when WebView not installed/enabled
+        // Only log exceptions unrelated to WebView
+        if (e != null && !e.getMessage().contains("MissingWebViewPackageException")) {
+          KMLog.LogException(TAG, "initKeyboard for INAPP" , e);
+        }
+        return;
+      }
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = InAppKeyboard;
       webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
-      SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      try {
+        SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      } catch (AndroidRuntimeException e) {
+        // Catch fatal error when WebView not installed/enabled
+        // Only log exceptions unrelated to WebView
+        if (e != null && !e.getMessage().contains("MissingWebViewPackageException")) {
+          KMLog.LogException(TAG, "initKeyboard for SYSTEM", e);
+        }
+        // Direct user to pick another system keyboard
+        InputMethodManager imManager = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imManager.showInputMethodPicker();
+        return;
+      }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = SystemKeyboard;
       webViewClient = SystemKeyboardWebViewClient;
@@ -722,6 +811,7 @@ public final class KMManager {
       }
       keyboard.setBanner(KMManager.BannerType.HTML);
       keyboard.showBanner(true);
+      sendLongpressDelay();
     }
     setEngineWebViewVersionStatus(appContext, keyboard);
   }
@@ -768,6 +858,24 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function keeps the parent app running in the background
+   */
+  public static void dontCloseParentAppOnShowKeyboardPicker() {
+    KeyboardPickerActivity.dontCloseParentAppOnShowKeyboardPicker();
+  }
+
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function restores this default behavior
+   */
+  public static void closeParentAppOnShowKeyboardPicker() {
+    KeyboardPickerActivity.closeParentAppOnShowKeyboardPicker();
+  }
+
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
     //final Context context = appContext;
@@ -775,6 +883,10 @@ public final class KMManager {
     Context appContext = IMService.getApplicationContext();
     final FrameLayout mainLayout = new FrameLayout(appContext);
     mainLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+    if (SystemKeyboard == null) {
+      return mainLayout;
+    }
 
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
     keyboardLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -916,12 +1028,11 @@ public final class KMManager {
 
       copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
-      copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
-      
+
       // Needed until our minimum version of Chrome is 61.0+.
       copyAsset(context, KMFilename_JSPolyfill2, "", true);
 
@@ -1363,25 +1474,49 @@ public final class KMManager {
   }
 
   /**
-   * Sets mayPredictOverride true if the InputType field is a hidden password text field
-   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
-   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * Determine the predictions should be suspended for a given InputType field: hidden password text field
+   * (but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD).
    * Also true for numeric text fields
    * @param inputType android.text.InputType
+   * @return boolean
    */
-  public static void setMayPredictOverride(int inputType) {
-    mayPredictOverride =
-      ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
-       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
-       isNumericField(inputType));
+  private static boolean shouldSuspendPredictions(int inputType) {
+    return ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
+      (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
+      isNumericField(inputType));
   }
 
   /**
-   * Get the value of mayPredictOverride
-   * @return boolean
+   * Sets PredictionsSuspended true if the given InputType field for the keyboard is a hidden password text field
+   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * Also true for numeric text fields.
+   * This is to temporarily disable suggestions in these text fields.
+   * API added Keyman 18.0
+   * @param inputType android.text.InputType
+   * @param {KeyboardType} keyboard
    */
-  public static boolean getMayPredictOverride() {
-    return mayPredictOverride;
+  public static void setPredictionsSuspended(int inputType, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      inAppPredictionsSuspendedForSensitiveInput = shouldSuspendPredictions(inputType);
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      systemPredictionsSuspendedForSensitiveInput = shouldSuspendPredictions(inputType);
+    }
+  }
+
+  /**
+   * Get the value of PredictionsSuspendedForSensitiveInput based on KeyboardType.
+   * API added in Keyman 18.0
+   * @param {KeyboardType} keyboard
+   * @return boolean of inAppPredictionsSuspendedForSensitiveInput or systemPredictionsSuspendedForSensitiveInput
+   */
+  public static boolean getPredictionsSuspended(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return inAppPredictionsSuspendedForSensitiveInput;
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return systemPredictionsSuspendedForSensitiveInput;
+    }
+    return false;
   }
 
   /**
@@ -1390,7 +1525,7 @@ public final class KMManager {
    * @param suggestType SuggestionType
    */
   public static void setMaySuggest(String languageID, SuggestionType suggestType) {
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMManager.getLanguageAutoCorrectionPreferenceKey(languageID), suggestType.toInt());
     editor.commit();
@@ -1509,21 +1644,24 @@ public final class KMManager {
     model = model.replaceAll("\"", "'");
 
     // When entering password field, maySuggest should override to disabled
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int maySuggest = mayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
-      prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    int suggestionPreference = prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
 
     RelativeLayout.LayoutParams params;
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
+      int inappMaySuggest = inAppPredictionsSuspendedForSensitiveInput ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+        suggestionPreference;
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, inappMaySuggest));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
+      int maySuggest = systemPredictionsSuspendedForSensitiveInput ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+        suggestionPreference;
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
     }
     return true;
@@ -1575,6 +1713,25 @@ public final class KMManager {
     return true;
   }
 
+  /**
+   * setBannerOptions - Update KMW for inapp/system keyboard whether to generate predictions.
+   *                    For now, also display banner
+   * @param mayPredict - boolean whether KMW should generate predictions
+   * @param {KeyboardType} keyboard
+   * @return boolean - Success
+   */
+  public static boolean setBannerOptions(boolean mayPredict, KeyboardType keyboard) {
+    String url = KMString.format("setBannerOptions(%s)", mayPredict);
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      InAppKeyboard.loadJavascript(url);
+    }
+
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      SystemKeyboard.loadJavascript(url);
+    }
+
+    return true;
+  }
   /**
    * Update KeymanWeb banner type
    * @param {KeyboardType} keyboard
@@ -2118,13 +2275,13 @@ public final class KMManager {
    */
   public static int getLongpressDelay() {
     SharedPreferences prefs = appContext.getSharedPreferences(
-      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
 
     return prefs.getInt(KMKey_LongpressDelay, KMDefault_LongpressDelay);
   }
 
   /**
-   * Set the longpress delay (in milliseconds) as a stored preference.
+   * Set the longpress delay (in milliseconds) as a stored preference and sends to KeymanWeb.
    * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
    * @param longpressDelay - int longpress delay in milliseconds
    * @return boolean
@@ -2135,22 +2292,24 @@ public final class KMManager {
     }
 
     SharedPreferences prefs = appContext.getSharedPreferences(
-      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
+
+    // Send longpress delay to KeymanWeb
+    sendLongpressDelay();
 
     return true;
   }
 
   /**
-   * Sends options to the KeymanWeb keyboard.
+   * Sends longpress delay to the KeymanWeb keyboard.
    * 1. number of milliseconds to trigger a longpress gesture.
-   * This method requires a keyboard to be loaded for the value to take effect.
    */
-  public static void sendOptionsToKeyboard() {
+  private static void sendLongpressDelay() {
     int longpressDelay = getLongpressDelay();
-    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+    if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
     }
 
@@ -2169,21 +2328,87 @@ public final class KMManager {
     return bannerHeight;
   }
 
+  /**
+   * Returns the current keyboard height in dp for the current device orientation
+   */
   public static int getKeyboardHeight(Context context) {
-    int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-
     int orientation = getOrientation(context);
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
-    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
-    }
-
-    return defaultHeight;
+    return getKeyboardHeight(context, orientation);
   }
 
+  /**
+   * Returns the current keyboard height in dp for the specified device
+   * orientation
+   */
+  public static int getKeyboardHeight(Context context, int orientation) {
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        return KMManager.KeyboardHeight_Context_Portrait_Current;
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        return KMManager.KeyboardHeight_Context_Landscape_Current;
+    } else {
+      return KMManager.KeyboardHeight_Invalid; // Invalid orientation
+    }
+  }
+
+  /**
+   * Apply the keyboard height for the current orientation and store it in SharedPreferences.
+   * If height is KMManager.KeyboardHeight_Reset, remove the stored height for that
+   * orientation, resetting to the default height for the device/orientation.
+   * @param context Context
+   * @param height int - keyboard height in dp
+   */
   public static void applyKeyboardHeight(Context context, int height) {
+    int orientation = getOrientation(context);
+    applyKeyboardHeight(context, height, orientation);
+  }
+
+  /**
+   * Apply the keyboard height for the specified orientation and store it in SharedPreferences.
+   * If height is KMManager.KeyboardHeight_Reset, remove the stored height for that orientation.
+   * @param context Context
+   * @param height int - keyboard height in dp
+   * @param orientation int - Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE
+   */
+  public static void applyKeyboardHeight(Context context, int height, int orientation) {
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    int defaultHeightForContext = getDefaultKeyboardHeight(orientation);
+    if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
+      return; // Invalid orientation, do nothing
+    }
+    if (height == KMManager.KeyboardHeight_Reset) {
+      // Passing 0 will reset the stored height for this orientation.
+      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
+      } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */{
+        editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
+      }
+      height = defaultHeightForContext;
+    } else {
+      // Applying gating to 50%-200% of default height (following Keyman)
+      if (height < (defaultHeightForContext / 2)) {
+        height = (int) (defaultHeightForContext / 2);
+      } else if (height > (defaultHeightForContext * 2)) {
+        height = (int) (defaultHeightForContext * 2);
+      }
+
+      // Store the new height based on the current orientation
+      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
+      } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */ {
+        editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
+      }
+    }
+
+    // Update the height based on the current orientation
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      KeyboardHeight_Context_Landscape_Current = height;
+    } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */ {
+      KeyboardHeight_Context_Portrait_Current = height;
+    }
+    editor.commit();
+    // Confirm new LayoutParams for in-app or system keyboards
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
@@ -2194,6 +2419,68 @@ public final class KMManager {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
+  }
+
+  /**
+   * Returns the default keyboard height in dp for the current device
+   * and orientation
+   */
+  public static int getDefaultKeyboardHeight(Context context) {
+    int orientation = getOrientation(context);
+    return getDefaultKeyboardHeight(orientation);
+  }
+
+  /**
+   * Returns the current keyboard height in dp for the specified orientation
+   * for the current device
+   */
+  public static int getDefaultKeyboardHeight(int orientation) {
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return KMManager.KeyboardHeight_Context_Portrait_Default;
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return KMManager.KeyboardHeight_Context_Landscape_Default;
+    } else {
+      return KMManager.KeyboardHeight_Invalid; // Invalid orientation
+    }
+  }
+
+  private static void calculateDefaultKeyboardHeights(Context context) {
+    if (isTestMode()) {
+      // Keyboard height not needed for unit tests  #13578
+      KeyboardHeight_Context_Portrait_Default = 0;
+      KeyboardHeight_Context_Landscape_Default = 0;
+      return;
+    }
+
+    Resources resources = context.getResources();
+    Configuration originalConfig = resources.getConfiguration();
+
+    Configuration newConfig = new Configuration(originalConfig);
+    newConfig.orientation = Configuration.ORIENTATION_PORTRAIT;
+    Context newContext = context.createConfigurationContext(newConfig);
+    Resources newResources = newContext.getResources();
+    KeyboardHeight_Context_Portrait_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
+
+    newConfig = new Configuration(originalConfig);
+    newConfig.orientation = Configuration.ORIENTATION_LANDSCAPE;
+    newContext = context.createConfigurationContext(newConfig);
+    newResources = newContext.getResources();
+    KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
+  }
+
+  // Get the navigation bar height (if visible) in pixels
+  private static int getNavigationBarHeight(Context context) {
+    // Determine if navigation bar is visible
+    int resourceId = context.getResources().getIdentifier(
+      "config_showNavigationBar", "bool", "android");
+    if (resourceId <= 0) {
+      return 0;
+    }
+
+    // Navigation bar visible so get the height
+    resourceId = context.getResources().getIdentifier(
+      "navigation_bar_height", "dimen", "android");
+    return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
   }
 
   /**
@@ -2225,7 +2512,7 @@ public final class KMManager {
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, flag);
     editor.commit();
@@ -2270,7 +2557,10 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      if (KeyboardPickerActivity.getCanCloseParentAppOnShowKeyboardPicker()) {
+        // Keyboard Picker Activity becomes root activity and clears Keyman app
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      }
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
@@ -2301,9 +2591,9 @@ public final class KMManager {
   public static boolean updateText(KeyboardType kbType, String text) {
     boolean result = false;
 
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       return InAppKeyboard.updateText(text);
-    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       return SystemKeyboard.updateText(text);
     }
 
@@ -2335,13 +2625,13 @@ public final class KMManager {
   public static boolean updateSelectionRange(KeyboardType kbType) {
     boolean result = false;
 
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
         result = InAppKeyboard.updateSelectionRange();
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
-    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
         result = SystemKeyboard.updateSelectionRange();
       }
@@ -2354,11 +2644,11 @@ public final class KMManager {
 
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && InAppKeyboard != null) {
         InAppKeyboard.loadJavascript("resetContext()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && SystemKeyboard != null) {
         SystemKeyboard.loadJavascript("resetContext()");
       }
     }

@@ -203,7 +203,7 @@ interface LayoutGestureSupportFlags {
 // Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
 let dummy: ActiveLayout;
 // @ts-ignore // so that we don't trigger "unused local" warnings.
-let dummy2: LayoutGestureSupportFlags = dummy;
+const dummy2: LayoutGestureSupportFlags = dummy;
 
 /**
  * Defines the set of gestures appropriate for use with the specified Keyman
@@ -522,7 +522,7 @@ export function longpressContactModel(params: FullGestureParams, enabledFlicks: 
          * The 'indexOf' allows 'n', 'nw', and 'ne' - approx 67.5 degrees on
          * each side of due N in total.
          */
-        if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
+        if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && ((stats.cardinalDirection ?? '').indexOf('n') != -1)) {
           const baseDistance = stats.netDistance;
           const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
           const verticalDistance = baseDistance * Math.cos(angle);
@@ -675,6 +675,9 @@ export function specialKeyEndModel(params: FullGestureParams): GestureModel<any>
           itemChangeAction: 'resolve'
         },
         endOnResolve: true,
+      }, {
+        model: instantContactResolutionModel(),
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {
@@ -862,14 +865,9 @@ export function flickRestartModel(params: FullGestureParams): GestureModel<KeyEl
       }
     ],
     id: 'flick-restart',
-    sustainWhenNested: true,
-    rejectionActions: {
-      // Only 'rejects' in this form if the path is completed before direction-locking state.
-      path: {
-        type: 'replace',
-        replace: 'flick-reset-end'
-      }
-    },
+    sustainWhenNested: true
+    // Do not emit a key if we're still in the 'restart' phase; the user unlocked the flick,
+    // so they want a cancel if they 'let up' in this state.
   }
 }
 

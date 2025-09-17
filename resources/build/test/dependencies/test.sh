@@ -5,7 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-basic.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 cd "$THIS_SCRIPT_PATH"
@@ -43,4 +43,4 @@ echo ------------------------------------------------------------------
     fi
   ) || exit $?
 
-echo "PASS: all dependency tests ran as expected"
+builder_echo green "  ✓ PASS: all dependency tests ran as expected"

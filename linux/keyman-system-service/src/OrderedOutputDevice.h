@@ -1,5 +1,5 @@
 #ifndef __ORDEREDOUTPUTDEVICE_H__
-#define __ORDEROUTPUTDEVICE_H__
+#define __ORDEREDOUTPUTDEVICE_H__
 
 #include <libevdev/libevdev-uinput.h>
 
@@ -13,12 +13,14 @@ public:
   OrderedOutputDevice();
   virtual ~OrderedOutputDevice();
 
-  bool Initialize();
-  bool PressSentinelKey();
+  virtual bool Initialize();
+  virtual bool PressSentinelKey();
 
-private:
-  void Close();
+protected:
+  virtual void Close();
   struct libevdev_uinput *uinput_dev;
 };
 
-#endif // __ORDEROUTPUTDEVICE_H__
+OrderedOutputDevice* CreateOrderedOutputDevice();
+
+#endif // __ORDEREDOUTPUTDEVICE_H__

@@ -4,10 +4,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 ################################ Main script ################################
 
@@ -22,8 +22,7 @@ builder_describe "Build KeyboardHarness test app for Android." \
   "configure" \
   "build" \
   "test" \
-  ":app                   KeyboardHarness" \
-  "--ci                   Don't start the Gradle daemon. Use for CI"
+  ":app                   KeyboardHarness"
 
 # parse before describe outputs to check debug flags
 builder_parse "$@"
@@ -33,14 +32,13 @@ ARTIFACT="app-release-unsigned.apk"
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
-  BUILD_FLAGS="assembleDebug -x lint -x test"
+  BUILD_FLAGS="assembleDebug -x lintDebug -x testDebug"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
   ARTIFACT="app-$CONFIG.apk"
 fi
 
 
 builder_describe_outputs \
-  configure    /android/Tests/KeyboardHarness/app/libs/keyman-engine.aar \
   build:app    /android/Tests/KeyboardHarness/app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
@@ -55,7 +53,7 @@ SHLVL=0
 # Parse args
 
 # Build flags that apply to all targets
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   BUILD_FLAGS="$BUILD_FLAGS -no-daemon"
   TEST_FLAGS="$TEST_FLAGS -no-daemon"
 fi

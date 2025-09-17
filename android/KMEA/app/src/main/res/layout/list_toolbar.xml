@@ -1,16 +1,20 @@
-<com.google.android.material.appbar.AppBarLayout
+<?xml version="1.0" encoding="utf-8"?>
+    <com.google.android.material.appbar.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/list_appbar"
     app:theme="@style/AppTheme.ToolbarBackArrow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
     app:elevation="0dp">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/list_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/bar_title"
@@ -32,6 +36,8 @@
         style="@style/AppTheme.Divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_alignParentBottom="true"/>
+        app:layout_constraintTop_toBottomOf="@id/list_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </com.google.android.material.appbar.AppBarLayout>

@@ -6,7 +6,13 @@
  * Abstraction for XML reading and writing
  */
 
-import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions } from 'fast-xml-parser';
+import { SymbolUtils } from "./symbol-utils.js";
+
+/** Symbol giving the start offset, in chars, of the node */
+const XML_META_DATA_SYMBOL = XMLParser.getMetaDataSymbol();
+/** Symbol giving an override which file a node came from */
+export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
 
 export type KeymanXMLType =
   'keyboard3'           // LDML <keyboard3>
@@ -17,102 +23,88 @@ export type KeymanXMLType =
   ;
 
 /** Bag of options, maximally one for each KeymanXMLType */
-type KeymanXMLOptionsBag = {
-  [key in KeymanXMLType]?: any
+type KeymanXMLParserOptionsBag = {
+  [key in KeymanXMLType]?: X2jOptions;
+};
+
+const PARSER_COMMON_OPTIONS: X2jOptions = {
+  attributeNamePrefix: '$', // causes remapping into $: { … } objects
+  htmlEntities: true,
+  ignoreAttributes: false,
+  ignorePiTags: true,
+  numberParseOptions: { // TODO: query is this option really necessary?
+    eNotation: null,
+    hex: null,
+    leadingZeros: null,
+    skipLike: /(?:)/, // parse numbers as strings
+  },
+  textNodeName: '_',
 };
 
 /** map of options for the XML parser */
-const PARSER_OPTIONS: KeymanXMLOptionsBag = {
+const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
   'keyboard3': {
-    ignoreAttributes: false, // We'd like attributes, please
     attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
-    trimValues: false, // preserve spaces, but:
     htmlEntities: true,
-    tagValueProcessor: (tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+    ignoreAttributes: false, // We'd like attributes, please
+    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
       // currently, the LDML spec doesn't have any element values, but this
       // future-proofs us a little in that element values are allowed, just trimmed.
       // if we do need elements in the future, we'd check the preserve-space attribute here.
       return tagValue?.trim();
     },
+    captureMetaData: true,
+    trimValues: false, // preserve spaces, but see tagValueProcessor
   },
   'keyboardTest3': {
-    ignorePiTags: true,
+    attributeNamePrefix: '', // avoid @_
     htmlEntities: true,
     ignoreAttributes: false, // We'd like attributes, please
-    attributeNamePrefix: '', // avoid @_
+    ignorePiTags: true,
     preserveOrder: true,     // Gives us a 'special' format
   },
   'kps': {
-    ignorePiTags: true,
-    ignoreAttributes: false,
-    htmlEntities: true,
-    attributeNamePrefix: '$', // causes remapping into $: { … } objects
-    textNodeName: '_',
-    numberParseOptions: {
-      skipLike: /(?:)/, // parse numbers as strings
-      hex: null,
-      leadingZeros: null,
-      eNotation: null,
-    },
+    ...PARSER_COMMON_OPTIONS,
   },
   'kpj': {
-    ignorePiTags: true,
-    textNodeName: '_',
-    htmlEntities: true,
-    ignoreAttributes: false, // We'd like attributes, please
+    ...PARSER_COMMON_OPTIONS,
     attributeNamePrefix: '', // to avoid '@_' prefixes
-    numberParseOptions: {
-      skipLike: /(?:)/, // parse numbers as strings
-      hex: null,
-      leadingZeros: null,
-      eNotation: null,
-    },
   },
   'kvks': {
-    ignorePiTags: true,
-    textNodeName: '_',
-    htmlEntities: true,
-    ignoreAttributes: false, // We'd like attributes, please
-    attributeNamePrefix: '$', // causes remapping into $: { … } objects
-    numberParseOptions: {
-      skipLike: /(?:)/, // parse numbers as strings
-      hex: null,
-      leadingZeros: null,
-      eNotation: null,
-    },
-    trimValues: false, // preserve spaces, but:
-    tagValueProcessor: (tagName: string, tagValue: string, jPath: string, hasAttributes: string, isLeafNode: boolean) : string | undefined => {
+    ...PARSER_COMMON_OPTIONS,
+    tagValueProcessor: (_tagName: string, tagValue: string, _jPath: string, _hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
         return null;  // no change to leaf nodes
       }
     },
+    trimValues: false, // preserve spaces
   },
 };
 
-const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
+type KeymanXMLGeneratorOptionsBag = {
+  [key in KeymanXMLType]?: XmlBuilderOptions
+};
+
+const GENERATOR_COMMON_OPTIONS: XmlBuilderOptions = {
+  attributeNamePrefix: '$',
+  ignoreAttributes: false,
+  format: true,
+  textNodeName: '_',
+  suppressEmptyNode: true,
+};
+
+const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   kvks: {
-    attributeNamePrefix: '$',
-    ignoreAttributes: false,
-    format: true,
-    textNodeName: '_',
-    suppressEmptyNode: true,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   kpj: {
-    attributeNamePrefix: '$',
-    ignoreAttributes: false,
-    format: true,
-    textNodeName: '_',
-    suppressEmptyNode: true,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   kps: {
-    attributeNamePrefix: '$',
-    ignoreAttributes: false,
-    format: true,
-    textNodeName: '_',
-    suppressEmptyNode: true,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   keyboard3: {
     attributeNamePrefix: '$',
@@ -123,9 +115,52 @@ const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
   },
 };
 
+export interface KeymanXMLMetadata extends XMLMetaData {
+  /** override of name of XML file */
+  [XML_FILENAME_SYMBOL]?: string;
+}
+
 /** wrapper for XML parsing support */
 export class KeymanXMLReader {
   public constructor(public type: KeymanXMLType) {
+  }
+
+  /** Get metadata on a node if not already set */
+  static getMetaData(o: any) : KeymanXMLMetadata {
+    if(!o) return o;
+    const metadata : KeymanXMLMetadata = o[XML_META_DATA_SYMBOL as any];
+    return metadata;
+  }
+
+  /** Set metadata if not already set */
+  public static setMetaData(o: any, metadata: KeymanXMLMetadata) : KeymanXMLMetadata {
+    let m : KeymanXMLMetadata = KeymanXMLReader.getMetaData(o);
+    if (!m) {
+      m = {};
+    }
+    // copy non-symbols
+    m = {...metadata, ...m};
+    // copy symbols
+    SymbolUtils.copySymbols(m, metadata);
+    o[XML_META_DATA_SYMBOL as any] = m;
+    return m;
+  }
+
+  /** set metadata on this and children with the default filename - if not already set */
+  public static setDefaultFilename(data: any, filename: string) {
+    if (!data || !filename) return;
+    if (typeof data === 'object') {
+      const m = KeymanXMLReader.getMetaData(data) || {};
+      if (!m[XML_FILENAME_SYMBOL]) {
+        (m as any)[XML_FILENAME_SYMBOL] = filename;
+        KeymanXMLReader.setMetaData(data, m);
+      }
+      if (Array.isArray(data)) {
+        data.forEach(e => KeymanXMLReader.setDefaultFilename(e, filename));
+      } else for(const k of Object.keys(data)) {
+        KeymanXMLReader.setDefaultFilename(data[k], filename);
+      }
+    }
   }
 
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
@@ -146,9 +181,9 @@ export class KeymanXMLReader {
         }
       });
       if (attrs.length) {
-        e.push(['$', Object.fromEntries(attrs)]);
+        e.push(['$', SymbolUtils.copySymbols(Object.fromEntries(attrs), data)]);
       }
-      return Object.fromEntries(e);
+      return SymbolUtils.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -184,7 +219,7 @@ export class KeymanXMLReader {
           }
         }
       });
-      return Object.fromEntries(e);
+      return SymbolUtils.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -264,14 +299,10 @@ export class KeymanXMLReader {
   }
 
   public parser() {
-    let options = PARSER_OPTIONS[this.type];
+    const options = PARSER_OPTIONS[this.type];
     if (!options) {
       /* c8 ignore next 1 */
       throw Error(`Internal error: unhandled XML type ${this.type}`);
-    }
-    options = Object.assign({}, options); // TODO: xml2js likes to mutate the options here. Shallow clone the object.
-    if (options.emptyTag) {
-        options.emptyTag = {}; // TODO: xml2js likes to mutate the options here. Reset it.
     }
     return new XMLParser(options);
   }
@@ -329,3 +360,40 @@ export class KeymanXMLWriter {
   }
 }
 
+/**
+ * traverse an AJV instancePath and map to an object if possible
+ * @param source object tree root (contains the root object)
+ * @param path ajv split instancePath, such as '/keyboard3/layers/0'.split('/')
+ * @returns undefined if the path was not present, null if path went to something that wasn't an object, otherwise the compileContext object is returned.
+ */
+export function findInstanceObject(source: any, path: string[]) : any {
+  if(!path || !source || path.length == 0) {
+    return source;
+  } else if(path[0] == '') {
+    return findInstanceObject(source, path.slice(1));
+  } else if(Array.isArray(source) || typeof source == 'object') {
+    const child = source[path[0]];
+    if (child == undefined) return child; // nothing here
+    if (!child || typeof child == 'string') {
+      return source; // return the *parent* object if the child is empty (could be a property)
+    }
+    return findInstanceObject(child, path.slice(1));
+  } else {
+    return null;
+  }
+}
+
+/**
+ * Return an object simulating an XML object with an offset number
+ * For use in calling message functions
+ * @param c number for the offset setting
+ * @param x if set, this object will be used as the base object instead of {}
+ */
+export function withOffset(c: number, compileContext?: any) : KeymanXMLMetadata {
+  // set metadata on an empty object
+  const o = Object.assign({}, compileContext);
+  KeymanXMLReader.setMetaData(o, {
+    startIndex: c
+  });
+  return o;
+}

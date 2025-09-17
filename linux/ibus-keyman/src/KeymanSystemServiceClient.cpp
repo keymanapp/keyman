@@ -5,11 +5,9 @@
 #else
 #include <basu/sd-bus.h>
 #endif
+#include <km_linux_common.h>
 #include "KeymanSystemServiceClient.h"
 
-#define KEYMAN_BUS_NAME "com.keyman.SystemService1"
-#define KEYMAN_INTERFACE_NAME "com.keyman.SystemService1.System"
-#define KEYMAN_OBJECT_PATH "/com/keyman/SystemService1/System"
 
 extern gboolean testing;
 
@@ -17,10 +15,14 @@ class KeymanSystemServiceClient {
 private:
   sd_bus_message *msg = NULL;
   sd_bus *bus         = NULL;
+  bool initialized    = false;
 
 public:
   KeymanSystemServiceClient();
   ~KeymanSystemServiceClient();
+
+  void Init();
+  bool IsInitialized() { return initialized; }
 
   void SetCapsLockIndicator(guint32 capsLock);
   gint32 GetCapsLockIndicator();
@@ -28,21 +30,27 @@ public:
   void Ping();
 };
 
+static KeymanSystemServiceClient _KeymanSystemServiceClient;
+
 KeymanSystemServiceClient::KeymanSystemServiceClient() {
+}
+
+KeymanSystemServiceClient::~KeymanSystemServiceClient() {
+  if (msg)   { sd_bus_message_unref(msg); }
+  if (bus)   { sd_bus_unref(bus); }
+}
+
+void KeymanSystemServiceClient::Init() {
   int result;
   if (testing) {
-    result = sd_bus_open_user(&bus);
+    result = sd_bus_default(&bus);
   } else {
     result = sd_bus_default_system(&bus);
   }
   if (result < 0) {
     g_error("%s: Can't get connection: %s", __FUNCTION__, strerror(-result));
   }
-}
-
-KeymanSystemServiceClient::~KeymanSystemServiceClient() {
-  if (msg)   { sd_bus_message_unref(msg); }
-  if (bus)   { sd_bus_unref(bus); }
+  initialized = true;
 }
 
 void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
@@ -51,14 +59,9 @@ void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
     return;
   }
 
-  if (capsLock > 1) {
-    g_error("%s: Invalid value '%d' for parameter capsLock", __FUNCTION__, capsLock);
-    return;
-  }
-
   sd_bus_error *error = NULL;
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
-    KEYMAN_INTERFACE_NAME, "SetCapsLockIndicator", error, &msg, "b", capsLock);
+    KEYMAN_INTERFACE_NAME, "SetCapsLockIndicator", error, &msg, "b", capsLock != 0);
   if (result < 0) {
     g_error("%s: Failed to call method SetCapsLockIndicator: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
@@ -129,27 +132,31 @@ void KeymanSystemServiceClient::Ping() {
   }
 }
 
+void initialize_keyman_system_service_client() {
+  if (!_KeymanSystemServiceClient.IsInitialized()) {
+    _KeymanSystemServiceClient.Init();
+  }
+}
+
 void
 set_capslock_indicator(guint32 capsLock) {
-  KeymanSystemServiceClient client;
-  client.SetCapsLockIndicator(capsLock);
+  assert(_KeymanSystemServiceClient.IsInitialized());
+  _KeymanSystemServiceClient.SetCapsLockIndicator(capsLock);
 }
 
 gint32 get_capslock_indicator() {
-  KeymanSystemServiceClient client;
-  return client.GetCapsLockIndicator();
+  assert(_KeymanSystemServiceClient.IsInitialized());
+  return _KeymanSystemServiceClient.GetCapsLockIndicator();
 }
 
 void
 call_ordered_output_sentinel() {
-  g_message("%s: Calling order output sentinel on keyman-system-service", __FUNCTION__);
-  KeymanSystemServiceClient client;
-  client.CallOrderedOutputSentinel();
+  assert(_KeymanSystemServiceClient.IsInitialized());
+  _KeymanSystemServiceClient.CallOrderedOutputSentinel();
 }
 
 void
 ping_keyman_system_service() {
-  g_message("%s: Pinging keyman-system-service", __FUNCTION__);
-  KeymanSystemServiceClient client;
-  client.Ping();
+  assert(_KeymanSystemServiceClient.IsInitialized());
+  _KeymanSystemServiceClient.Ping();
 }

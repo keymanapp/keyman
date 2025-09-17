@@ -103,6 +103,7 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "km_u16.h"
+#include "validation.h"
 
 /* These macros are adapted from winnt.h and legacy use only */
 #define MAKELANGID(p, s)       ((((uint16_t)(s)) << 10) | (uint16_t)(p))
@@ -238,6 +239,9 @@ kmcmp_LoadFileProc kmcmp::loadfileproc = NULL;
 int kmcmp::currentLine = 0;
 
 kmcmp::NamedCodeConstants *kmcmp::CodeConstants = NULL;
+
+DefaultCompilerMessage compilerMessage;
+Validation validation(compilerMessage);
 
 PKMX_WCHAR strtowstr(PKMX_STR in)
 {
@@ -675,6 +679,10 @@ KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
       gp->fUsingKeys = TRUE;
   }
 
+  if(!validation.ValidateIdentifier(q, SZMAX_GROUPNAME)) {
+    return FALSE;
+  }
+
   safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
   gp->Line = kmcmp::currentLine;
@@ -793,6 +801,10 @@ KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   sp->fIsStore = FALSE;
   sp->fIsDebug = FALSE;
   sp->fIsCall = FALSE;
+
+  if(!validation.ValidateIdentifier(q, SZMAX_STORENAME)) {
+    return FALSE;
+  }
 
   safe_wcsncpy(sp->szName, q, SZMAX_STORENAME);
   {
@@ -1458,13 +1470,23 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
-        if (contextOffset > xstrlen(context))
+        if (contextOffset > xstrlen(context)) {
           return KmnCompilerMessages::ERROR_ContextExHasInvalidOffset;
+        }
+
+        // contextOffset <= 0 is tested in parse stage
+
+        for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
+        if(*q == UC_SENTINEL && (*(q + 1) == CODE_IFOPT || *(q + 1) == CODE_IFSYSTEMSTORE)) {
+          return KmnCompilerMessages::ERROR_ContextExCannotReferenceIf;
+        }
+        if(*q == UC_SENTINEL && *(q + 1) == CODE_NUL) {
+          return KmnCompilerMessages::ERROR_ContextExCannotReferenceNul;
+        }
 
         // Due to a limitation in earlier versions of KeymanWeb, the minimum version
         // for context() referring to notany() is 14.0. See #917 for details.
         if (kmcmp::CompileTarget == CKF_KEYMANWEB) {
-          for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
           if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
             if(!VerifyKeyboardVersion(fk, VERSION_140)) {
               return KmnCompilerMessages::ERROR_140FeatureOnlyContextAndNotAnyWeb;
@@ -1543,6 +1565,71 @@ KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output) {
       break;
     }
   }
+  return STATUS_Success;
+}
+
+const KMX_BOOL CODE__IS_TEXTUAL[] = {
+  -1,     // undefined                0x00
+  TRUE,   // CODE_ANY                 0x01
+  TRUE,   // CODE_INDEX               0x02
+  TRUE,   // CODE_CONTEXT             0x03
+  FALSE,  // CODE_NUL                 0x04
+  FALSE,  // CODE_USE                 0x05 // may trigger text effects but indirectly
+  FALSE,  // CODE_RETURN              0x06
+  FALSE,  // CODE_BEEP                0x07
+  TRUE,   // CODE_DEADKEY             0x08
+  -1,     // unused                   0x09
+  TRUE,   // CODE_EXTENDED            0x0A
+  -1,     // CODE_EXTENDEDEND         0x0B (unused)
+  FALSE,  // CODE_SWITCH              0x0C
+  -1,     // CODE_KEY                 0x0D (never used)
+  FALSE,  // CODE_CLEARCONTEXT        0x0E
+  FALSE,  // CODE_CALL                0x0F // may trigger text effects but indirectly
+  -1,     // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
+  TRUE,   // CODE_CONTEXTEX           0x11
+  TRUE,   // CODE_NOTANY              0x12
+  FALSE,  // CODE_SETOPT              0x13
+  FALSE,  // CODE_IFOPT               0x14
+  FALSE,  // CODE_SAVEOPT             0x15
+  FALSE,  // CODE_RESETOPT            0x16
+  FALSE,  // CODE_IFSYSTEMSTORE       0x17
+  FALSE   // CODE_SETSYSTEMSTORE      0x18
+};
+
+static_assert(sizeof(CODE__IS_TEXTUAL) / sizeof(CODE__IS_TEXTUAL[0]) == (CODE_LASTCODE + 1), "Size of array CODE__EMITS_TEXT not correct");
+
+KMX_BOOL IsTextualCode(KMX_WORD code) {
+  assert(code >= CODE_ANY && code <= CODE_LASTCODE);
+  if(!(code >= CODE_ANY && code <= CODE_LASTCODE)) {
+    return FALSE;
+  }
+  return CODE__IS_TEXTUAL[code];
+}
+
+/**
+ * Warn if output has text before or after a nul statement, which
+ * doesn't make sense -- if nul is used, it indicates no output
+ */
+KMX_DWORD CheckNulUsageInOutput(PKMX_WCHAR output) {
+  PKMX_WCHAR p;
+  KMX_BOOL hasNul = FALSE, hasOther = FALSE;
+  for (p = output; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      auto code = *(p+1);
+      if(code == CODE_NUL) {
+        hasNul = TRUE;
+      } else if(IsTextualCode(code)) {
+        hasOther = TRUE;
+      }
+    } else {
+      hasOther = TRUE;
+    }
+  }
+
+  if(hasNul && hasOther) {
+    return KmnCompilerMessages::ERROR_TextBeforeOrAfterNulInOutput;
+  }
+
   return STATUS_Success;
 }
 
@@ -1681,6 +1768,10 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
   // Warn if virtual keys are used in the output, as they are unsupported by Core
   if ((msg = CheckVirtualKeysInOutput(pklOut)) != STATUS_Success) {
+    return msg;
+  }
+
+  if ((msg = CheckNulUsageInOutput(pklOut)) != STATUS_Success) {
     return msg;
   }
 
@@ -2003,9 +2094,6 @@ int LineTokenType(PKMX_WCHAR *str)
   return T_UNKNOWN;
 }
 
-KMX_WCHAR const * DeadKeyChars =
-u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-
 KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 {
   for (; *q; q++)
@@ -2106,7 +2194,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_DEADKEY;
-        if (!StrValidChrs(q, DeadKeyChars)) return KmnCompilerMessages::ERROR_InvalidDeadkey;
+
+        if(!validation.ValidateIdentifier(q, SZMAX_DEADKEYNAME)) {
+          // Note, this means 2 messages will be generated for invalid deadkey names
+          return KmnCompilerMessages::ERROR_InvalidDeadkey;
+        }
+
         tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
         tstr[mx] = 0;
       }
@@ -2267,7 +2360,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           }
           int n1b;
           n1b = atoiW(q);
-          if (n1b < 1 || n1b >= 0xF000) return KmnCompilerMessages::ERROR_InvalidToken;
+          if (n1b < 1 || n1b >= 0xF000) {
+            return KmnCompilerMessages::ERROR_ContextExHasInvalidOffset;
+          }
           tstr[mx++] = UC_SENTINEL;
           tstr[mx++] = CODE_CONTEXTEX;
           tstr[mx++] = n1b;
@@ -3782,17 +3877,68 @@ bool hasPreamble(std::u16string result) {
   return result.size() > 0 && result[0] == 0xFEFF;
 }
 
+bool isValidUtf8(KMX_BYTE* str, int sz) {
+  int i = 0;
+  while (i < sz) {
+    int remaining = sz - i;
+    if (str[i] <= 0x7F) {
+      // ASCII
+      i++;
+    } else if ((str[i] & 0xE0) == 0xC0) {
+      // 2-byte sequence
+      if (remaining < 2 ||
+          (str[i + 1] & 0xC0) != 0x80 ||
+          str[i] == 0xC0 || // C0 and C1 are illegal values
+          str[i] == 0xC1) {
+        return false;
+      }
+      i += 2;
+    } else if ((str[i] & 0xF0) == 0xE0) {
+      // 3-byte sequence
+      if (remaining < 3 ||
+          (str[i+1] & 0xC0) != 0x80 ||
+          (str[i+2] & 0xC0) != 0x80) {
+        return false;
+      }
+      if (str[i] == 0xE0 && (str[i + 1] & 0xE0) == 0x80) {
+        return false;
+      }
+      if (str[i] == 0xED && (str[i + 1] & 0xE0) == 0xA0) {
+        return false;
+      }
+      i += 3;
+    } else if ((str[i] & 0xF8) == 0xF0) {
+      // 4-byte sequence
+      if (remaining < 4 ||
+          (str[i+1] & 0xC0) != 0x80 ||
+          (str[i+2] & 0xC0) != 0x80 ||
+          (str[i+3] & 0xC0) != 0x80) {
+        return false;
+      }
+      if (str[i] == 0xF0 && (str[i + 1] & 0xF0) == 0x80) {
+        return false;
+      }
+      if (str[i] > 0xF4 || (str[i] == 0xF4 && str[i + 1] > 0x8F)) {
+        return false;
+      }
+      i += 4;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16) {
   if(sz == 0) {
     return FALSE;
   }
 
   std::u16string result;
-
-  try {
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-    result = converter.from_bytes((char*)infile, (char*)infile+sz);
-  } catch(std::range_error& e) {
+  if (isValidUtf8(infile, sz)) {
+    std::string infileStr(reinterpret_cast<const char*>(infile), sz);
+    result = u16string_from_string(infileStr);
+  } else {
     ReportCompilerMessage(KmnCompilerMessages::HINT_NonUnicodeFile);
     result.resize(sz);
     for(int i = 0; i < sz; i++) {

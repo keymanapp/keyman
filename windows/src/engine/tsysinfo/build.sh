@@ -2,14 +2,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Diagnostics (32-bit)" \
   @/common/include \
   @/common/windows/delphi \
   @/windows/src/engine/tsysinfox64 \
-  clean configure build test publish install
+  clean configure build test publish install edit
 
 builder_parse "$@"
 
@@ -47,7 +47,7 @@ function do_build() {
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   cp *.xslt "$WINDOWS_PROGRAM_ENGINE/"
-  cp "$WIN32_TARGET_PATH/tsysinfo.dbg" "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/tsysinfo.dbg" "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg"
 }
 
 function do_publish() {
@@ -71,4 +71,5 @@ builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
 builder_run_action install:project      do_install
+builder_run_action edit:project         start tsysinfo.dproj
 

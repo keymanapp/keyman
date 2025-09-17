@@ -38,17 +38,21 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
-  _keySender = [[KeySender alloc] init];
-  _clientApplicationId = clientAppId;
-  _generatedBackspaceCount = 0;
-  _lowLevelBackspaceCount = 0;
-  _queuedText = nil;
+  self = [super init];
+  if(self) {
+    _keySender = [[KeySender alloc] init];
+    _clientApplicationId = clientAppId;
+    _generatedBackspaceCount = 0;
+    _lowLevelBackspaceCount = 0;
+    _queuedText = nil;
+ 
+    os_log_debug([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient [client: %p] [clientAppId: %{public}@]", sender, clientAppId);
+    [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
 
-  _apiCompliance = [[TextApiCompliance alloc]initWithClient:sender applicationId:clientAppId];
-  os_log_info([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient, clientAppId: %{public}@", clientAppId);
-  [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
-
-  [KMSentryHelper addClientAppIdTag:clientAppId];
+    _apiCompliance = [[TextApiCompliance alloc]initWithClient:sender applicationId:clientAppId];
+    
+    [KMSentryHelper addClientAppIdTag:clientAppId];
+  }
   return self;
 }
 
@@ -191,32 +195,34 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   // If the TextApiCompliance object is stale, create a new one for the current application and context.
   // The text api compliance may vary from one text field to another of the same app.
   
-  if ([self textApiComplianceIsStale]) {
+  if ([self textApiComplianceIsStale:client]) {
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
     os_log_debug([KMLogs complianceLog], "KMInputMethodHandler initWithClient checkTextApiCompliance: %{public}@", _apiCompliance);
   } else if (self.apiCompliance.isComplianceUncertain) {
     // We have a valid TextApiCompliance object, but compliance is uncertain, so test it
-    [self.apiCompliance checkCompliance:client];
+    [self.apiCompliance checkCompliance];
   }
 }
 
-- (BOOL)textApiComplianceIsStale {
+- (BOOL)textApiComplianceIsStale:(id)client {
   BOOL stale = false;
   NSString *complianceAppId = nil;
   TextApiCompliance *currentApiCompliance = self.apiCompliance;
   
   // test for three scenarios in which the api compliance is stale
   if (currentApiCompliance == nil) { // if we have no previous api compliance object
+    os_log_debug([KMLogs complianceLog], "*** stale: currentApiCompliance == nil");
     stale = true;
   } else { // if we have one but for a different client
-    complianceAppId = self.apiCompliance.clientApplicationId;
-    if ([complianceAppId isNotEqualTo:self.clientApplicationId]) {
-      stale = true;
-    } else {
-      stale = false;
+    stale = ![currentApiCompliance isMatchingClient:client applicationId:self.clientApplicationId];
+    if (stale){
+      os_log_debug([KMLogs complianceLog], "*** stale: due to failed isMatchingClient");
     }
   }
   if (self.contextChanged) { // if the context has changed
+    if(!stale) {
+      os_log_debug([KMLogs complianceLog], "*** stale: due to contextChanged");
+    }
     stale = true;
   }
 
@@ -227,10 +233,14 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   return stale;
 }
 
+/**
+ * Handle the flag set in the eventTap when we detect events that cause a change in context.
+ * This includes mouse movement, arrow keys, page up and page down, function keys, and others.
+ */
 - (void) handleContextChangedByLowLevelEvent {
   if (self.appDelegate.contextChangedByLowLevelEvent) {
     if (!self.contextChanged) {
-      os_log_debug([KMLogs complianceLog], "Low-level event has changed the context.");
+      os_log_debug([KMLogs complianceLog], "Handling context change due to low-level event.");
       self.contextChanged = YES;
     }
     self.appDelegate.contextChangedByLowLevelEvent = NO;
@@ -242,10 +252,9 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   BOOL handled = NO;
   os_log_debug([KMLogs eventsLog], "handleEvent፡ event = %{public}@", event);
 
-  [self checkTextApiCompliance:sender];
-  
-  // mouse movement requires that the context be invalidated
   [self handleContextChangedByLowLevelEvent];
+
+  [self checkTextApiCompliance:sender];
   
   if (event.type == NSEventTypeKeyDown) {
     [KMSentryHelper addDebugBreadCrumb:@"event" message:@"handling keydown event"];
@@ -318,7 +327,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   // we do this whether the context has changed or not
   if (self.apiCompliance.canReadText) {
     contextString = [self readContext:event forClient:client];
-    os_log_debug([KMLogs eventsLog], "reportContext, setting new context='%{public}@' for compliant app (if needed)", contextString);
+    os_log_debug([KMLogs eventsLog], "reportContext, setting new context for compliant app (if needed)");
     [self.kme setCoreContextIfNeeded:contextString];
   } else if (self.contextChanged) {
     // we cannot read the text but know the context has changed, so we must clear it
@@ -337,22 +346,27 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   // if we can read the text, then get the context for up to kMaxContext characters
   if (self.apiCompliance.canReadText) {
     NSRange selectionRange = [client selectedRange];
+    os_log_debug([KMLogs eventsLog], "InputMethodEventHandler readContext, canReadText: true selectionRange %{public}@: ", NSStringFromRange(selectionRange));
+    
     NSUInteger contextLength = MIN(kMaxContext, selectionRange.location);
     NSUInteger contextStart = selectionRange.location - contextLength;
     
     if (contextLength > 0) {
-      os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler readContext, %lu characters", (unsigned long)contextLength);
       NSRange contextRange = NSMakeRange(contextStart, contextLength);
+      os_log_debug([KMLogs eventsLog], " contextRange %{public}@: client: %p", NSStringFromRange(contextRange), client);
       attributedString = [client attributedSubstringFromRange:contextRange];
       
       // adjust string in case that we receive half of a surrogate pair at context start
       // the API appears to always return a full code point, but this could vary by app
       if (attributedString.length > 0) {
         if (CFStringIsSurrogateLowCharacter([attributedString.string characterAtIndex:0])) {
-          os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler readContext, first char is low surrogate, reducing context by one character");
+          os_log_debug([KMLogs eventsLog], " first char is low surrogate, reducing context by one character");
           contextString = [attributedString.string substringFromIndex:1];
         } else {
           contextString = attributedString.string;
+          
+          //only uncomment for testing as we do not want to write context in logs
+          //os_log_debug([KMLogs testLog], " length: %lu result: %{public}@", contextString.length, contextString);
         }
       }
     }
@@ -384,15 +398,21 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   BOOL handledEvent = YES;
   
   if (output.isInsertOnlyScenario) {
-    os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, insert only scenario");
+    NSString *message = @"applyOutputToTextInputClient, insert only scenario";
+    os_log_debug([KMLogs keyLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
     if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
       // let the delete pass through in the original event rather than sending a new delete
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete only scenario with passthrough");
+      NSString *message = @"applyOutputToTextInputClient, delete only scenario with passthrough";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       handledEvent = NO;
     } else {
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete only scenario");
+      NSString *message = @"applyOutputToTextInputClient, delete only scenario";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       [self sendEvents:event forOutput:output];
     }
   } else if (output.isDeleteAndInsertScenario) {
@@ -414,10 +434,14 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
      */
     
     if (self.apiCompliance.mustBackspaceUsingEvents) {
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete and insert scenario with events");
+      NSString *message = @"applyOutputToTextInputClient, delete and insert scenario with events";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       [self sendEvents:event forOutput:output];
     } else {
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete and insert scenario with insert API");
+      NSString *message = @"applyOutputToTextInputClient, delete and insert scenario with insert API";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       // directly insert text and handle backspaces by using replace
       [self insertAndReplaceTextForOutput:output client:client];
     }
@@ -474,13 +498,13 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  * this method can only be used if approved by TextApiCompliance
  */
 -(void)insertAndReplaceText:(NSString *)text deleteCount:(int) replacementCount toReplace:(NSString*)textToDelete client:(id) client {
-  os_log_debug([KMLogs keyLog], "insertAndReplaceText, insert: %{public}@, delete: %{public}@, replacementCount: %d", text, textToDelete, replacementCount);
   NSRange selectionRange = [client selectedRange];
   NSRange replacementRange = [self calculateInsertRangeForDeletedText:textToDelete selectionRange:selectionRange];
   
   [client insertText:text replacementRange:replacementRange];
-  if (self.apiCompliance.isComplianceUncertain) {
-    [self.apiCompliance checkComplianceAfterInsert:client delete:textToDelete insert:text];
+  
+  if ((self.apiCompliance.isComplianceUncertain) && (text != nil)) {
+    [self.apiCompliance checkComplianceAfterInsert:text deleted:textToDelete];
   }
 }
 
@@ -531,7 +555,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 -(void)insertQueuedText: (NSEvent *)event client:(id) client  {
   if (self.queuedText.length> 0) {
     os_log_debug([KMLogs keyLog], "insertQueuedText, inserting %{public}@", self.queuedText);
-    [self insertAndReplaceText:self.queuedText deleteCount:0 toReplace:nil client:client];
+    [self insertAndReplaceText:self.queuedText deleteCount:0 toReplace:@"" client:client];
     self.queuedText = nil;
   } else {
     os_log_debug([KMLogs keyLog], "insertQueuedText called but no text to insert");

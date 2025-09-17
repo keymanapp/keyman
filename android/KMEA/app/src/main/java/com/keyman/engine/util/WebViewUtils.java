@@ -4,9 +4,11 @@
 package com.keyman.engine.util;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.util.AndroidRuntimeException;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
-import com.keyman.engine.util.KMLog;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +23,21 @@ public final class WebViewUtils {
     DEGRADED,     // WebView supports touch keyboards but not LDML keyboards
     FULL;         // WebView supports touch keyboards and LDML keyboards
   }
+
+  // System WebView status
+  public enum SystemWebViewStatus {
+    UNDETERMINED,  // Functionality not determined yet
+    NOT_INSTALLED, // WebView not installed
+    DISABLED,      // WebView installed, but disabled
+    FULL;          // WebView installed and enabled
+  }
+
+  // Min version of Chrome for Keyman for Android for EngineWebViewVersionStatus.DEGRADED
+  public static final String KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME = "37.0";
+
+  // Min version of Chrome for Keyman for Android (EngineWebViewVersionStatus.FULL)
+  // TODO: Keep this version in sync with resources/build/minimum-versions.inc.sh
+  public static final String KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME = "95.0";
 
   private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d.]+).*$";
   private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
@@ -42,13 +59,43 @@ public final class WebViewUtils {
       chromeVersion = getChromeVersion(context, webView);
     }
 
-    if (FileUtils.compareVersions("37.0", chromeVersion) == FileUtils.VERSION_GREATER) {
+    if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME, chromeVersion)
+        == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DISABLED;
-    } else if (FileUtils.compareVersions("57.0", chromeVersion) == FileUtils.VERSION_GREATER) {
+    } else if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME, chromeVersion)
+        == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DEGRADED;
     }
 
     return EngineWebViewVersionStatus.FULL;
+  }
+
+  /**
+   * Determine the state of the system WebView (required for Keyman)
+   * @param context
+   * @return {SystemWebViewStatus}
+   */
+  public static SystemWebViewStatus getSystemWebViewStatus(
+      Context context) {
+    // Check whether WebView is installed
+    // If the package is installed but disabled, hasSystemFeature() still returns true
+    PackageManager packageManager = context.getPackageManager();
+    if (!packageManager.hasSystemFeature("android.software.webview")) {
+      return SystemWebViewStatus.NOT_INSTALLED;
+    }
+
+    // Use CookieManager to check if WebView is really enabled
+    // https://stackoverflow.com/a/70354583
+    try {
+      CookieManager.getInstance();
+    } catch (AndroidRuntimeException e) {
+      // WebView installed but not enabled
+      return SystemWebViewStatus.DISABLED;
+    } catch (Exception e) {
+      return SystemWebViewStatus.DISABLED;
+    }
+
+    return SystemWebViewStatus.FULL;
   }
 
   // Inject a meta viewport tag into the head of the file if it doesn't exist

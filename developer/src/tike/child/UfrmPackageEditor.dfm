@@ -184,7 +184,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageDetails
+    ActivePage = pageLexicalModels
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -261,7 +261,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object lblFileType: TLabel
           Left = 256
           Top = 107
-          Width = 47
+          Width = 46
           Height = 13
           Caption = 'File Type:'
           FocusControl = editFilePath
@@ -390,30 +390,11 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblKeyboardFiles: TLabel
           Left = 15
-          Top = 516
+          Top = 492
           Width = 26
           Height = 13
           Anchors = [akLeft, akBottom]
           Caption = 'Files:'
-          ExplicitTop = 341
-        end
-        object lblKeyboardDescription: TLabel
-          Left = 15
-          Top = 489
-          Width = 62
-          Height = 13
-          Anchors = [akLeft, akBottom]
-          Caption = 'Description:'
-          ExplicitTop = 314
-        end
-        object lblKeyboardVersion: TLabel
-          Left = 15
-          Top = 568
-          Width = 41
-          Height = 13
-          Anchors = [akLeft, akBottom]
-          Caption = 'Version:'
-          ExplicitTop = 393
         end
         object lblKeyboardOSKFont: TLabel
           Left = 260
@@ -436,15 +417,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 13
           Caption = 'Languages'
           FocusControl = gridKeyboardLanguages
-        end
-        object lblKeyboardRTL: TLabel
-          Left = 15
-          Top = 595
-          Width = 75
-          Height = 13
-          Anchors = [akLeft, akBottom]
-          Caption = 'Is right-to-left:'
-          ExplicitTop = 420
         end
         object lblKeyboardExamples: TLabel
           Left = 260
@@ -478,38 +450,16 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 0
           OnClick = lbKeyboardsClick
         end
-        object editKeyboardDescription: TEdit
+        object memoKeyboardFiles: TMemo
           Left = 96
-          Top = 486
+          Top = 489
           Width = 148
-          Height = 21
+          Height = 70
           TabStop = False
           Anchors = [akLeft, akBottom]
           ParentColor = True
           ReadOnly = True
           TabOrder = 1
-        end
-        object memoKeyboardFiles: TMemo
-          Left = 96
-          Top = 513
-          Width = 148
-          Height = 46
-          TabStop = False
-          Anchors = [akLeft, akBottom]
-          ParentColor = True
-          ReadOnly = True
-          TabOrder = 2
-        end
-        object editKeyboardVersion: TEdit
-          Left = 96
-          Top = 565
-          Width = 148
-          Height = 21
-          TabStop = False
-          Anchors = [akLeft, akBottom]
-          ParentColor = True
-          ReadOnly = True
-          TabOrder = 3
         end
         object cbKeyboardOSKFont: TComboBox
           Left = 339
@@ -517,7 +467,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 174
           Height = 21
           Style = csDropDownList
-          TabOrder = 5
+          TabOrder = 2
           OnClick = cbKeyboardOSKFontClick
         end
         object cbKeyboardDisplayFont: TComboBox
@@ -526,7 +476,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 174
           Height = 21
           Style = csDropDownList
-          TabOrder = 6
+          TabOrder = 3
           OnClick = cbKeyboardDisplayFontClick
         end
         object gridKeyboardLanguages: TStringGrid
@@ -540,7 +490,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           FixedCols = 0
           RowCount = 9
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-          TabOrder = 7
+          TabOrder = 4
           OnClick = gridKeyboardLanguagesClick
           OnDblClick = gridKeyboardLanguagesDblClick
           ColWidths = (
@@ -553,7 +503,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 73
           Height = 25
           Caption = '&Add...'
-          TabOrder = 8
+          TabOrder = 5
           OnClick = cmdKeyboardAddLanguageClick
         end
         object cmdKeyboardRemoveLanguage: TButton
@@ -562,19 +512,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 72
           Height = 25
           Caption = '&Remove'
-          TabOrder = 10
+          TabOrder = 7
           OnClick = cmdKeyboardRemoveLanguageClick
-        end
-        object editKeyboardRTL: TEdit
-          Left = 96
-          Top = 592
-          Width = 148
-          Height = 21
-          TabStop = False
-          Anchors = [akLeft, akBottom]
-          ParentColor = True
-          ReadOnly = True
-          TabOrder = 4
         end
         object cmdKeyboardEditLanguage: TButton
           Left = 339
@@ -582,7 +521,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 73
           Height = 25
           Caption = 'Ed&it...'
-          TabOrder = 9
+          TabOrder = 6
           OnClick = cmdKeyboardEditLanguageClick
         end
         object gridKeyboardExamples: TStringGrid
@@ -596,7 +535,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           FixedCols = 0
           RowCount = 9
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-          TabOrder = 11
+          TabOrder = 8
           OnClick = gridKeyboardExamplesClick
           OnDblClick = gridKeyboardExamplesDblClick
           ColWidths = (
@@ -612,7 +551,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Add...'
-          TabOrder = 12
+          TabOrder = 9
           OnClick = cmdKeyboardAddExampleClick
         end
         object cmdKeyboardEditExample: TButton
@@ -622,7 +561,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Ed&it...'
-          TabOrder = 13
+          TabOrder = 10
           OnClick = cmdKeyboardEditExampleClick
         end
         object cmdKeyboardRemoveExample: TButton
@@ -632,7 +571,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Remove'
-          TabOrder = 14
+          TabOrder = 11
           OnClick = cmdKeyboardRemoveExampleClick
         end
         object cmdKeyboardWebOSKFonts: TButton
@@ -641,7 +580,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 75
           Height = 25
           Caption = 'Web fonts...'
-          TabOrder = 15
+          TabOrder = 12
           OnClick = cmdKeyboardWebOSKFontsClick
         end
         object cmdKeyboardWebDisplayFonts: TButton
@@ -650,7 +589,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 75
           Height = 25
           Caption = 'Web fonts...'
-          TabOrder = 16
+          TabOrder = 13
           OnClick = cmdKeyboardWebDisplayFontsClick
         end
       end
@@ -700,16 +639,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 13
           Caption = 'Filename:'
         end
-        object lblLexicalModelDescription: TLabel
-          Left = 261
-          Top = 102
-          Width = 62
-          Height = 13
-          Caption = 'Description:'
-        end
         object lblLexicalModelLanguages: TLabel
-          Left = 260
-          Top = 181
+          Left = 261
+          Top = 101
           Width = 59
           Height = 13
           Caption = 'Languages:'
@@ -724,27 +656,18 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 0
           OnClick = lbLexicalModelsClick
         end
-        object editLexicalModelDescription: TEdit
-          Left = 342
-          Top = 99
-          Width = 275
-          Height = 21
-          TabStop = False
-          TabOrder = 1
-          OnChange = editLexicalModelDescriptionChange
-        end
         object gridLexicalModelLanguages: TStringGrid
           Left = 260
-          Top = 200
+          Top = 120
           Width = 593
-          Height = 376
+          Height = 456
           Anchors = [akLeft, akTop, akRight, akBottom]
           ColCount = 2
           DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 9
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-          TabOrder = 2
+          TabOrder = 1
           OnClick = gridLexicalModelLanguagesClick
           OnDblClick = gridLexicalModelLanguagesDblClick
           ColWidths = (
@@ -758,7 +681,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Add...'
-          TabOrder = 3
+          TabOrder = 2
           OnClick = cmdLexicalModelLanguageAddClick
         end
         object cmdLexicalModelLanguageRemove: TButton
@@ -768,7 +691,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Remove'
-          TabOrder = 4
+          TabOrder = 3
           OnClick = cmdLexicalModelLanguageRemoveClick
         end
         object cmdLexicalModelLanguageEdit: TButton
@@ -778,17 +701,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Ed&it...'
-          TabOrder = 5
+          TabOrder = 4
           OnClick = cmdLexicalModelLanguageEditClick
-        end
-        object chkLexicalModelRTL: TCheckBox
-          Left = 342
-          Top = 126
-          Width = 97
-          Height = 17
-          Caption = 'Is Right-to-left'
-          TabOrder = 6
-          OnClick = chkLexicalModelRTLClick
         end
         object editLexicalModelFilename: TEdit
           Left = 342
@@ -798,7 +712,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabStop = False
           ParentColor = True
           ReadOnly = True
-          TabOrder = 7
+          TabOrder = 5
         end
       end
     end
@@ -944,7 +858,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object lblDescriptionMarkdown: TLabel
           Left = 114
           Top = 497
-          Width = 215
+          Width = 214
           Height = 13
           Caption = 'Markdown accepted, no embedded HTML'
           Transparent = True
@@ -1575,7 +1489,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           object Label5: TLabel
             Left = 9
             Top = 73
-            Width = 82
+            Width = 81
             Height = 13
             Caption = 'Target filename:'
           end
@@ -1616,12 +1530,5 @@ inherited frmPackageEditor: TfrmPackageEditor
     Title = 'Add Files'
     Left = 32
     Top = 492
-  end
-  object dlgNewCustomisation: TSaveDialog
-    DefaultExt = 'kct'
-    Filter = 'Customisation file (*.kct)|*.kct|All files (*.*)|*.*'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Left = 32
-    Top = 532
   end
 end

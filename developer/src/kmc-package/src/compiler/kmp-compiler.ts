@@ -13,7 +13,7 @@ import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
-import { MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-version-validator.js';
+import { DEFAULT_KEYBOARD_VERSION, MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-version-validator.js';
 import { PackageKeyboardTargetValidator } from './package-keyboard-target-validator.js';
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
 import { markdownToHTML } from './markdown.js';
@@ -289,13 +289,17 @@ export class KmpCompiler implements KeymanCompiler {
     //
 
     if(kps.Keyboards?.Keyboard?.length) {
+      if(!this.validateKeyboards(kps.Keyboards.Keyboard)) {
+        // error reported by validateKeyboards
+        return null;
+      }
       kmp.keyboards = kps.Keyboards.Keyboard.map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
         oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
-        name:keyboard.Name?.trim(),
-        id:keyboard.ID?.trim(),
-        version:keyboard.Version?.trim(),
-        rtl:keyboard.RTL == 'True' ? true : undefined,
+        name: '', // filled by PackageMetadataUpdater
+        id:keyboard.ID.trim(),
+        version: DEFAULT_KEYBOARD_VERSION,  // filled by PackageMetadataUpdater
+        rtl: false, // filled by PackageMetadataUpdater
         languages: keyboard.Languages?.Language?.length ?
           this.kpsLanguagesToKmpLanguages(keyboard.Languages.Language) :
           [],
@@ -322,8 +326,12 @@ export class KmpCompiler implements KeymanCompiler {
     //
 
     if(kps.LexicalModels?.LexicalModel?.length) {
+      if(!this.validateLexicalModels(kps.LexicalModels.LexicalModel)) {
+        // error reported by validateLexicalModels
+        return null;
+      }
       kmp.lexicalModels = kps.LexicalModels.LexicalModel.map((model: KpsFile.KpsFileLexicalModel) => ({
-        name:model.Name.trim(),
+        name:model.ID.trim(),
         id:model.ID.trim(),
         languages: model.Languages?.Language?.length ?
           this.kpsLanguagesToKmpLanguages(model.Languages.Language) : []
@@ -389,7 +397,7 @@ export class KmpCompiler implements KeymanCompiler {
         }));
 
         // Remove default values
-        for(let item of kmp.startMenu.items) {
+        for(const item of kmp.startMenu.items) {
           if(item.icon == '') delete item.icon;
           if(item.location == 'psmelStartMenu') delete item.location;
           if(item.arguments == '') delete item.arguments;
@@ -407,7 +415,7 @@ export class KmpCompiler implements KeymanCompiler {
     // Helper functions
 
   private kpsInfoToKmpInfo(kpsInfo: KpsFile.KpsFileInfo): KmpJsonFile.KmpJsonFileInfo {
-    let kmpInfo: KmpJsonFile.KmpJsonFileInfo = {};
+    const kmpInfo: KmpJsonFile.KmpJsonFileInfo = {};
 
     const keys: [(keyof KpsFile.KpsFileInfo), (keyof KmpJsonFile.KmpJsonFileInfo), boolean][] = [
       ['Author','author',false],
@@ -418,7 +426,7 @@ export class KmpCompiler implements KeymanCompiler {
       ['Description','description',true],
     ];
 
-    for (let [src,dst,isMarkdown] of keys) {
+    for (const [src,dst,isMarkdown] of keys) {
       if (kpsInfo[src]?._ && (kpsInfo[src]._.trim() || kpsInfo[src].$?.URL)) {
         kmpInfo[dst] = {
           description: (kpsInfo[src]._ ?? '').trim()
@@ -451,6 +459,30 @@ export class KmpCompiler implements KeymanCompiler {
       }
     }
     return o;
+  }
+
+  private validateKeyboards(keyboards: KpsFile.KpsFileKeyboard[]): boolean {
+    let index = 1;
+    for(const keyboard of keyboards) {
+      if(!keyboard.ID || keyboard.ID.trim() == '') {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_MissingKeyboardId({index}));
+        return false;
+      }
+      index++;
+    }
+    return true;
+  }
+
+  private validateLexicalModels(models: KpsFile.KpsFileLexicalModel[]): boolean {
+    let index = 1;
+    for(const model of models) {
+      if(!model.ID || model.ID.trim() == '') {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_MissingModelId({index}));
+        return false;
+      }
+      index++;
+    }
+    return true;
   }
 
   /**

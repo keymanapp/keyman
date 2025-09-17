@@ -10,8 +10,9 @@ frequently asked questions, tutorials, and videos.
 * [Installing a keyboard](start/download-and-install-keyboard)
 
 ## [Common Questions](common/)
-* [Which operating systems does Keyman for Windows work with?](common/requirements)
-* [Does Keyman for Windows run on Mac?](common/mac)
+* [What are the hardware requirements for running Keyman for Windows?](common/requirements)
+* [Does Keyman run on Mac?](common/mac)
+* [Does Keyman run on Linux?](common/linux)
 
 ## Ask for Help
 [Ask other users in the SIL Keyman Community](https://community.software.sil.org/c/keyman)

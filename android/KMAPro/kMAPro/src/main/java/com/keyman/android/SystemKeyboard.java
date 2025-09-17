@@ -4,10 +4,11 @@
 
 package com.keyman.android;
 
-import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;
+import com.keyman.engine.util.DownloadFileUtils;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
+import com.tavultesoft.kmapro.PreferencesManager;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -29,7 +30,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -44,6 +44,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static View inputView = null;
   private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
+  private int inputType = InputType.TYPE_NULL;
   private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
 
   private static final String TAG = "SystemKeyboard";
@@ -60,8 +61,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       Log.d(TAG, "Initializing Sentry");
       SentryAndroid.init(getApplicationContext(), options -> {
         options.setEnableAutoSessionTracking(false);
-        options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
-        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
+        options.setRelease(com.tavultesoft.kmapro.BuildConfig.KEYMAN_VERSION_GIT_TAG);
+        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.KEYMAN_VERSION_ENVIRONMENT);
       });
     }
     if (BuildConfig.DEBUG) {
@@ -84,7 +85,12 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
-    KMManager.executeResourceUpdate(this);
+    // Checking for updates should never be allowed to crash the keyboard.
+    // Just silently fail if this occurs.
+    if(DownloadFileUtils.getDownloadManager(this) != null) {
+      // Will try to emit a toast if it fails - i.e., is not silent.
+      KMManager.executeResourceUpdate(this);
+    }
   }
 
   @Override
@@ -103,9 +109,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onInitializeInterface() {
     super.onInitializeInterface();
-
-    // KeymanWeb reloaded, so we have to pass the banner again
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   /**
@@ -149,21 +152,14 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
-    // making it an important time to detect orientation changes.
     Context appContext = getApplicationContext();
-    int newOrientation = KMManager.getOrientation(appContext);
-    if(newOrientation != lastOrientation) {
-      lastOrientation = newOrientation;
-      Configuration newConfig = this.getResources().getConfiguration();
-      KMManager.onConfigurationChanged(newConfig);
-    }
-
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
-    int inputType = attribute.inputType;
-    KMManager.setMayPredictOverride(inputType);
-    if (KMManager.getMayPredictOverride()) {
+    inputType = attribute.inputType;
+    KMManager.setPredictionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       KMManager.setBannerOptions(false);
+      // Set the system keyboard HTML banner
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
       // Check if predictions needs to be re-enabled per Settings preference
       Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
@@ -207,6 +203,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   public void onStartInputView(EditorInfo attribute, boolean restarting) {
     super.onStartInputView(attribute, restarting);
     setInputView(onCreateInputView());
+
+    // Update the input type
+    inputType = attribute.inputType;
   }
 
   @Override
@@ -227,6 +226,16 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onComputeInsets(InputMethodService.Insets outInsets) {
     super.onComputeInsets(outInsets);
+
+    // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
+    // making it an important time to detect orientation changes.
+    Context appContext = getApplicationContext();
+    int newOrientation = KMManager.getOrientation(appContext);
+    if(newOrientation != lastOrientation) {
+      lastOrientation = newOrientation;
+      Configuration newConfig = this.getResources().getConfiguration();
+      KMManager.onConfigurationChanged(newConfig);
+    }
 
     // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
     Point size = KMManager.getWindowSize(getApplicationContext());
@@ -250,8 +259,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (exText != null)
         exText = null;
     }
-    // Initialize keyboard options
-    KMManager.sendOptionsToKeyboard();
   }
 
   @Override
@@ -261,7 +268,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardShown() {
-    // Do nothing
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   @Override
@@ -270,7 +278,27 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   }
 
   @Override
+  public boolean onEvaluateInputViewShown() {
+    // On Android API 36+, the OSK defaults to not appearing when a physical keyboard is connected.
+    // If the default implementation returns true, recommend honoring it
+    // Reference: https://android.googlesource.com/platform/frameworks/base/+/7b739a8%5E%21/
+    if (super.onEvaluateInputViewShown()) {
+      return true;
+    };
+
+    Context context = getApplicationContext();
+    SharedPreferences prefs = context.getSharedPreferences(PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
+    boolean showOSK = prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    return showOSK;
+  }
+
+  @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
+    // Determine if Physical keystroke should be passed off
+    if (inputType == InputType.TYPE_NULL) {
+      return false; // Revert to default handling
+    }
+
     if (event.getAction() == KeyEvent.ACTION_DOWN) {
       switch (keyCode) {
         case KeyEvent.KEYCODE_BACK:

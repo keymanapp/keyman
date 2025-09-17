@@ -5,10 +5,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # ################################ Main script ################################
 
@@ -21,8 +21,7 @@ builder_describe "Builds predictive-text components used within Keyman Engine fo
   ":wordbreakers             Builds the wordbreakers provided for lexical model use" \
   ":worker-main              Builds the predictive-text worker interface module" \
   ":worker-thread            Builds the predictive-text worker" \
-  ":_all                     (Meta build target used when targets are not specified)" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  ":_all                     (Meta build target used when targets are not specified)"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -53,13 +52,8 @@ builder_run_child_actions configure
 ## Build actions
 
 builder_run_child_actions build:wordbreakers
-
 builder_run_child_actions build:templates
 builder_run_child_actions build:worker-thread
 builder_run_child_actions build:worker-main
 
-# If doing CI testing, the predictive-text child actions have their own build configuration.
-# For local testing, though, we can allow them to proceed.
-if ! builder_has_option --ci; then
-  builder_run_child_actions test
-fi
+builder_run_child_actions test

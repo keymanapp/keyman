@@ -4,15 +4,16 @@
 # building the Keyman Engine for Web.
 #
 
-# set -x
+# TODO: merge this with resources/teamcity/web scripts
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/ci/pull-requests.inc.sh"
 
 # This script runs from its own folder
@@ -37,7 +38,7 @@ builder_parse "$@"
 
 ####
 
-TIER=$(cat ../TIER.md)
+KEYMAN_TIER=$(cat ../TIER.md)
 BUILD_NUMBER=$(cat ../VERSION.md)
 
 function web_sentry_upload () {
@@ -50,7 +51,7 @@ function web_sentry_upload () {
 
   # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
   # the most common prefix instead.
-  sentry-cli releases files "${VERSION_GIT_TAG}" upload-sourcemaps --strip-common-prefix "$1" \
+  sentry-cli releases files "${KEYMAN_VERSION_GIT_TAG}" upload-sourcemaps --strip-common-prefix "$1" \
     --rewrite --ext js --ext map --ext ts
   echo "Upload successful."
 }
@@ -63,35 +64,24 @@ function build_action() {
   #               - also useful when validating this script on a local dev machine!
   # - build:      then do the ACTUAL build.
   # one option:
-  # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
-  ./build.sh configure clean build --ci
+  ./build.sh configure clean build
 
-  # Upload the sentry-configuration engine used by the mobile apps to sentry
-  # Also, clean 'em first.
-  for sourcemap in "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"*.map; do
-    node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
-  done
-  web_sentry_upload "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    # Upload the sentry-configuration engine used by the mobile apps to sentry
+    # Also, clean 'em first.
+    for sourcemap in "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"*.map; do
+      node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
+    done
+    web_sentry_upload "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"
 
-  # And, of course, the main build-products too
-  web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"
-  web_sentry_upload "${KEYMAN_ROOT}/web/build/publish/release/"
+    # And, of course, the main build-products too
+    web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"
+    web_sentry_upload "${KEYMAN_ROOT}/web/build/publish/release/"
+  fi
 }
 
 function test_action() {
-  # Testing step:  run ALL unit tests, including those of the submodules.
-
-  OPTIONS=
-  if ! builder_is_debug_build; then
-    OPTIONS=--ci
-  fi
-
-  # No --reporter option exists yet for the headless modules.
-
-  "${KEYMAN_ROOT}/web/src/engine/keyboard/build.sh" test ${OPTIONS}
-  "${KEYMAN_ROOT}/web/src/engine/osk/gesture-processor/build.sh" test ${OPTIONS}
-
-  ./build.sh test ${OPTIONS}
+  ./build.sh test
 }
 
 function post_test_action() {
@@ -132,7 +122,7 @@ function prepare_s_keyman_com_action() {
   # Second phase:  copy the artifacts over
 
   # The main build products are expected to reside at the root of this folder.
-  BASE_PUBLISH_FOLDER="${S_KEYMAN_COM}/kmw/engine/${VERSION}"
+  BASE_PUBLISH_FOLDER="${S_KEYMAN_COM}/kmw/engine/${KEYMAN_VERSION}"
   echo "FOLDER: ${BASE_PUBLISH_FOLDER}"
   mkdir -p "${BASE_PUBLISH_FOLDER}"
 
@@ -143,56 +133,36 @@ function prepare_s_keyman_com_action() {
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
   for sourcemap in "${BASE_PUBLISH_FOLDER}/"*.map; do
-    node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --sourceRoot "https://s.keyman.com/kmw/engine/${VERSION}/src"
+    node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --sourceRoot "https://s.keyman.com/kmw/engine/${KEYMAN_VERSION}/src"
   done
 
   # Construct the PR
-  echo "Committing and pushing KeymanWeb release ${VERSION} to s.keyman.com"
+  echo "Committing and pushing KeymanWeb release ${KEYMAN_VERSION} to s.keyman.com"
 
-  ci_add_files "${S_KEYMAN_COM}" "kmw/engine/${VERSION}"
+  ci_add_files "${S_KEYMAN_COM}" "kmw/engine/${KEYMAN_VERSION}"
   if ! ci_repo_has_cached_changes "${S_KEYMAN_COM}"; then
     builder_die "No release was added to s.keyman.com, something went wrong"
   fi
 
-  ci_open_pull_request "${S_KEYMAN_COM}" auto/keymanweb/release "auto: KeymanWeb release ${VERSION}"
+  ci_open_pull_request "${S_KEYMAN_COM}" auto/keymanweb/release "auto: KeymanWeb release ${KEYMAN_VERSION}"
 }
 
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
 function prepare_downloads_keyman_com_action() {
-  UPLOAD_PATH="${KEYMAN_ROOT}/web/build/upload/${VERSION}"
+  UPLOAD_PATH="${KEYMAN_ROOT}/web/build/upload/${KEYMAN_VERSION}"
 
   # --- First action artifact - the KMW zip file ---
-  ZIP="${UPLOAD_PATH}/keymanweb-${VERSION}.zip"
+  ZIP="${UPLOAD_PATH}/keymanweb-${KEYMAN_VERSION}.zip"
 
   mkdir -p "${UPLOAD_PATH}"
 
-  # On Windows, we use 7-zip (SEVEN_Z_HOME env var).  On other platforms, we use zip.
-
-  COMPRESS_CMD=
-  COMPRESS_ADD=
-
-  # Marc's preference; use $SEVEN_Z_HOME and have the BAs set up with THAT as an env var.
-  if [[ ! -z "${SEVEN_Z_HOME+x}" ]]; then
-    COMPRESS_CMD="${SEVEN_Z_HOME}/7z"
-    COMPRESS_ADD="a -bd -bb0 -r" # add, hide progress, log level 0, recursive
-  fi
-
-  if [[ -z "${COMPRESS_CMD}" ]] ; then
-    if command -v zip &> /dev/null; then
-      # Note:  does not support within-archive renames!
-      COMPRESS_CMD=zip
-      COMPRESS_ADD="-r"
-    else
-      builder_die "7z and zip commands are both unavailable"
-    fi
-  fi
-
-  pushd build/publish
-  # Zip both the 'debug' and 'release' configurations together.
-  # shellcheck disable=SC2086
-  "${COMPRESS_CMD}" ${COMPRESS_ADD} "${ZIP}" ./*
-  popd
+  (
+    # shellcheck disable=2164
+    cd build/publish
+    # Zip both the 'debug' and 'release' configurations together.
+    add_zip_files -q -r "${ZIP}" ./*
+  )
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---
 
@@ -202,9 +172,10 @@ function prepare_downloads_keyman_com_action() {
   mkdir -p "${STATIC}"
 
   mkdir -p "${STATIC}/build"
-  cp -rf build/app    "${STATIC}/build/app"
-  cp -rf build/engine "${STATIC}/build/engine"
-  cp -rf build/tools  "${STATIC}/build/tools"
+  cp -rf build/app     "${STATIC}/build/app"
+  cp -rf build/engine  "${STATIC}/build/engine"
+  cp -rf build/publish "${STATIC}/build/publish"
+  cp -rf build/tools   "${STATIC}/build/tools"
   # avoid build/upload, since that's the folder we're building!
 
   cp -f index.html "${STATIC}/index.html"

@@ -179,8 +179,9 @@ class InstallKmp():
                              f['name'])
                 name, ext = os.path.splitext(f['name'])
                 ldml = convert_kvk_to_ldml(name, fpath)
-                ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
-                output_ldml(ldmlfile, ldml)
+                if ldml is not None and len(ldml) > 0:
+                    ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
+                    output_ldml(ldmlfile, ldml)
             elif ftype == KMFileTypes.KM_ICON:
                 # Special handling of icon to convert to PNG
                 logging.info("Converting %s to PNG and installing both as keyman files",
@@ -252,7 +253,7 @@ class InstallKmp():
         # TODO: add other keyboards as well (#9757)
         firstKeyboard = keyboards[0]
         if secure_lookup(firstKeyboard, 'languages') and firstKeyboard['languages']:
-            language = self._normalize_language(firstKeyboard['languages'], language)
+            language = CanonicalLanguageCodeUtils.normalize_language(firstKeyboard['languages'], language)
 
         if not language:
             language = self._add_custom_keyboard(firstKeyboard, packageDir, requested_language)
@@ -308,7 +309,8 @@ def extract_kmp(kmpfile, directory):
 
 
 def process_keyboard_data(keyboardID, packageDir) -> bool:
-    if not (kbdata := get_keyboard_data(keyboardID)):
+    kbdata = get_keyboard_data(keyboardID)
+    if not kbdata or len(kbdata) <= 0:
         return False
     if not os.path.isdir(packageDir) and os.access(os.path.join(packageDir, os.pardir), os.X_OK | os.W_OK):
         try:

@@ -1,4 +1,4 @@
-import KeymanEngine from './keymanEngine.js'
+import { KeymanEngine } from './keymanEngine.js'
 import { SourcemappedWorker } from '@keymanapp/lexical-model-layer/web'
 
  /**
@@ -13,4 +13,4 @@ const ss = scripts[scripts.length-1].src;
 const sPath = ss.substring(0,ss.lastIndexOf('/')+1);
 
 // @ts-ignore
-window['keyman'] = new KeymanEngine(SourcemappedWorker.constructInstance(), sPath);
+window['keyman'] = new KeymanEngine(SourcemappedWorker, sPath);

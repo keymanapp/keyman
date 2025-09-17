@@ -2,14 +2,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman main host process (32-bit)" \
   @/common/include \
   @/common/windows/delphi \
   @/windows/src/global/delphi \
-  clean configure build test publish install debug-manifest
+  clean configure build test publish install debug-manifest edit
 
 builder_parse "$@"
 
@@ -42,7 +42,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/keyman.dbg" "$WINDOWS_DEBUGPATH_ENGINE/keyman.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/keyman.dbg" "$WINDOWS_DEBUGPATH_ENGINE/keyman.dbg"
 
   # Also copy sentry files here
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" \
@@ -85,3 +85,4 @@ builder_run_action publish:project      do_publish
 builder_run_action install:project      cp "$WINDOWS_PROGRAM_ENGINE/keyman.exe" "$INSTALLPATH_KEYMANENGINE/keyman.exe"
 
 builder_run_action debug-manifest:project  do_build_debug_manifest
+builder_run_action edit:project         start keyman.dproj

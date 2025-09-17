@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # Keyman is copyright (C) SIL Global. MIT License.
 #
 # ARGS used in this file:
@@ -5,7 +6,8 @@
 # - ARG REQUIRED_EMSCRIPTEN_VERSION
 
 ARG BASE_VERSION=default
-FROM keymanapp/keyman-base-ci:${BASE_VERSION}
+ARG REGISTRY=
+FROM ${REGISTRY}keymanapp/keyman-base-ci:${BASE_VERSION}
 
 LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"

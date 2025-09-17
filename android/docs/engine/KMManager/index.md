@@ -50,6 +50,9 @@ The KMManager is the core class which provides most of the methods and constants
 [`canRemoveKeyboard()`](canRemoveKeyboard)
 : returns whether removing a keyboard is enabled, like in the keyboard picker menu
 
+[`closeParentAppOnShowKeyboardPicker()`](closeParentAppOnShowKeyboardPicker)
+: restores keyboard picker task flag so keyboard picker dismisses the parent app
+
 [`copyHTMLBannerAssets()`](copyHTMLBannerAssets)
 : copies a folder of HTML banner assets so it's available for your keyboard app's resources
 
@@ -58,6 +61,9 @@ The KMManager is the core class which provides most of the methods and constants
 
 [`deregisterLexicalModel()`](deregisterLexicalModel)
 : deregisters the specified lexical model from the LMLayer so it isn't used
+
+[`dontCloseParentAppOnShowKeyboardPicker()`](dontCloseParentAppOnShowKeyboardPicker)
+: disables keyboard picker task flag so keyboard picker doesn't dismiss the parent app
 
 [`executeHardwareKeystroke()`](executeHardwareKeystroke)
 : process the keystroke generated from a physical keyboard
@@ -141,10 +147,13 @@ The KMManager is the core class which provides most of the methods and constants
 : returns from stored preference the number of milliseconds to trigger a longpress gesture
 
 [`getMaySendCrashReport()`](getMaySendCrashReport)
-: returns whether Keyman Engine is allowed to send crash reports over the network to sentry.keyman.com
+: returns whether Keyman Engine is allowed to send crash reports over the network to Sentry
 
 [`getOrientation()`](getOrientation)
 : returns the device's current orientation (Portrait vs Landscape)
+
+[`getPredictionsSuspended()`](getPredictionsSuspended)
+: returns whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field. 
 
 [`getSpacebarText()`](getSpacebarText)
 : returns the current text display pattern for the spacebar
@@ -212,9 +221,6 @@ The KMManager is the core class which provides most of the methods and constants
 [`removeKeyboardEventListener()`](removeKeyboardEventListener)
 : removes the specified listener from the list of keyboard event listeners
 
-[`sendOptionsToKeyboard()`](sendOptionsToKeyboard)
-: sends options like longpress delay to the KeymanWeb keyboard
-
 [`setCanAddNewKeyboard()`](setCanAddNewKeyboard)
 : sets whether adding a new keyboard is allowed
 
@@ -252,7 +258,10 @@ The KMManager is the core class which provides most of the methods and constants
 : stores the longpress delay in milliseconds as a preference.
 
 [`setMaySendCrashReport()`](setMaySendCrashReport)
-: sets whether Keyman Engine can send crash reports over the network to sentry.keyman.com
+: sets whether Keyman Engine can send crash reports over the network to Sentry
+
+[`setPredictionsSuspended()`](setPredictionsSuspended)
+: sets whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field. 
 
 [`setShouldAllowSetKeyboard()`](setShouldAllowSetKeyboard)
 : sets whether Keyman Engine allows setting a keyboard other than the default keyboard

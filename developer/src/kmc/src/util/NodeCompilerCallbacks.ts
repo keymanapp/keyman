@@ -13,7 +13,7 @@ import { CompilerCallbacks, CompilerEvent,
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry } from './KeymanSentry.js';
 import { fileURLToPath } from 'url';
 
 const color = chalk.default;
@@ -45,6 +45,8 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
   messageCount = 0;
   messageFilename: string = '';
+  /** cache of the contentes of the text */
+  messageFiletext: string = '';
   maxLogMessages = MaxMessagesDefault;
 
   constructor(private options: CompilerCallbackOptions) {
@@ -55,6 +57,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     this.messages = [];
     this.messageCount = 0;
     this.messageFilename = '';
+    this.messageFiletext = '';
   }
 
   /**
@@ -154,6 +157,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // Reset max message limit when a new file is being processed
       this.messageFilename = event.filename;
       this.messageCount = 0;
+      this.messageFiletext = '';
     }
 
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
@@ -242,12 +246,18 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messageSpecialColor(event: CompilerEvent) {
     switch(event.code) {
       case InfrastructureMessages.INFO_BuildingFile:
+      case InfrastructureMessages.INFO_CopyingProject:
+      case InfrastructureMessages.INFO_GeneratingProject:
         return color.whiteBright;
       case InfrastructureMessages.INFO_FileNotBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully:
+      case InfrastructureMessages.INFO_ProjectNotCopiedSuccessfully:
+      case InfrastructureMessages.INFO_ProjectNotGeneratedSuccessfully:
         return color.red;
       case InfrastructureMessages.INFO_FileBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectBuiltSuccessfully:
+      case InfrastructureMessages.INFO_ProjectCopiedSuccessfully:
+      case InfrastructureMessages.INFO_ProjectGeneratedSuccessfully:
         return color.green;
     }
     return null;
