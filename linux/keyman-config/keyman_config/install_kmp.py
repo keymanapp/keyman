@@ -23,6 +23,7 @@ from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
 from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, restart_ibus
 from keyman_config.kmpmetadata import KMFileTypes, get_metadata
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
+from keyman_config.sentry_handling import SentryErrorHandling
 
 # TODO userdir install
 # special processing for kmn if needed
@@ -104,6 +105,9 @@ class InstallKmp():
         self.packageDir = get_keyboard_dir(area, self.packageID)
         self.kmpdocdir = get_keyman_doc_dir(area, self.packageID)
         self.kmpfontdir = get_keyman_font_dir(area, self.packageID)
+
+        sentry = SentryErrorHandling()
+        sentry.add_breadcrumb(category='install', message=f'Installing kmp: {self.packageID} from "{inputfile}" for lang: {language}; area: {"OS" if area == 1 else "Shared" if area == 2 else "User" if area == 3 else "Unknown"}')
 
         if not os.path.isfile(inputfile):
             message = _("File {kmpfile} doesn't exist").format(kmpfile=inputfile)
@@ -257,6 +261,9 @@ class InstallKmp():
 
         if not language:
             language = self._add_custom_keyboard(firstKeyboard, packageDir, requested_language)
+
+        sentry = SentryErrorHandling()
+        sentry.add_breadcrumb(category='install', message=f'Installing keyboards for lang: {language}')
 
         if is_fcitx_running():
             return self._install_keyboards_to_fcitx()
