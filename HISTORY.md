@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.121 alpha 2025-09-17
+
+* docs(developer): document `fileVersion` (#14766)
+* maint(linux): allow to force package build on non-Keyman repo (#14749)
+* feat(linux): add breadcrumbs and system information to Sentry error reports (#14765)
+* maint(resources): fix broken test build trigger for `master` branch (#14770)
+* chore(linux): remove automatic installation of `onboard-keyman` (#14772)
+
 ## 19.0.120 alpha 2025-09-16
 
 * refactor(linux): remove warning (#14761)
