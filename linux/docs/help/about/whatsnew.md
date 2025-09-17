@@ -11,3 +11,11 @@ Here are some significant changes to Keyman for Linux 18.0:
 - Keyman no longer requires a patched version of ibus as Keyman now uses
   a system service to manage keystroke order (#11535).
 - Added support for simulation of AltGr (right Alt) with Ctrl+Alt (#11852)
+
+Keyman for Linux 18.0.241:
+
+- `onboard-keyman` package no longer gets installed automatically when
+  installing `keyman`. The reason is that it doesn't work properly with
+  Wayland and is not available in the official Debian/Ubuntu repos
+  (#14769). It is still possible to install it manually in your package
+  manager, or in a terminal window with `sudo apt install onboard-keyman`.
