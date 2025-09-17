@@ -263,6 +263,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardChanged(String newKeyboard) {
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.showSystemKeyboard();
   }
 
