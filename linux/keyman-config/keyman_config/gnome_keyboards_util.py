@@ -59,6 +59,8 @@ def get_ibus_keyboard_id(keyboard, packageDir, language=None, ignore_language=Fa
         logging.debug(language)
         return f"{language}:{kmx_file}"
     if "languages" in keyboard and len(keyboard["languages"]) > 0:
-        logging.debug(keyboard["languages"][0])
-        return f"{keyboard['languages'][0]['id']}:{kmx_file}"
+        firstLanguage = keyboard["languages"][0]
+        logging.debug(firstLanguage)
+        if 'id' in firstLanguage:
+            return f"{firstLanguage['id']}:{kmx_file}"
     return kmx_file
