@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.122 alpha 2025-09-18
+
+* fix(android): Refresh the banner theme when system keyboard is changed (#14768)
+* maint(common): update HISTORY.md for 18.0.241 (#14780)
+
 ## 19.0.121 alpha 2025-09-17
 
 * docs(developer): document `fileVersion` (#14766)
