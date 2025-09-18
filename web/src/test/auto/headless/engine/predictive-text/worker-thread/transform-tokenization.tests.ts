@@ -380,6 +380,37 @@ describe('tokenizeTransform', () => {
       assert.equal(result.size, 2);
       assert.deepEqual(result, expectedMap);
     });
+
+    it('properly aligns degenerate input cases (1)', () => {
+      const context = {
+        left: 'quick brown fox', // 'quick', ' ', 'brown', ' ', 'fox'
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      const editTransform = {
+        insert: 'fox and brown fox',  // => quick fox and brown fox
+        deleteLeft: 9
+      };
+
+      const result = tokenizeTransform(
+        defaultTokenize,
+        context,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-2, { insert: 'fox', deleteLeft: 5 });
+      expectedMap.set(-1, { insert: ' ', deleteLeft: 1 });
+      expectedMap.set(0, { insert: 'and', deleteLeft: 3 });
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(2, { insert: 'brown', deleteLeft: 0 });
+      expectedMap.set(3, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(4, { insert: 'fox', deleteLeft: 0 });
+      assert.equal(result.size, 7);
+      assert.deepEqual(result, expectedMap);
+    });
   });
 
   describe('with mocked dictionary-based wordbreaking', () => {
