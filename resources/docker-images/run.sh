@@ -42,21 +42,21 @@ else
 fi
 
 run_android() {
-  docker_wrapper run ${DOCKER_RUN_ARGS} -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run ${DOCKER_RUN_ARGS} -i --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "${registry_slash}keymanapp/keyman-android-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_core() {
-  docker_wrapper run ${DOCKER_RUN_ARGS} -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run ${DOCKER_RUN_ARGS} -i --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "${registry_slash}keymanapp/keyman-core-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_developer() {
-  docker_wrapper run ${DOCKER_RUN_ARGS} -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run ${DOCKER_RUN_ARGS} -i --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "${registry_slash}keymanapp/keyman-developer-ci:${image_version}" \
     "${builder_extra_params[@]}"
@@ -65,7 +65,8 @@ run_developer() {
 run_linux() {
   mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}"
   mkdir -p "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}"
-  docker_wrapper run ${DOCKER_RUN_ARGS} -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run ${DOCKER_RUN_ARGS} -i --privileged --network host \
+    -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     -v "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}":/home/build/build/linux/build \
     -v "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}":/home/build/build/linux/keyman-system-service/build \
@@ -75,7 +76,7 @@ run_linux() {
 }
 
 run_web() {
-  docker_wrapper run ${DOCKER_RUN_ARGS} -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run ${DOCKER_RUN_ARGS} -i --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "${registry_slash}keymanapp/keyman-web-ci:${image_version}" \
     "${builder_extra_params[@]}"
