@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 18.0.241 stable 2025-09-18
+
+* maint(resources): use correct version for PR title for history cherry-pick (#14614)
+* chore(linux): Update debian changelog (#14589)
+* fix(android): Update: Android Target API to 35, Java to 21, and Gradle dependencies (#14584)
+* fix(android): Convert Keyman app layouts for edge to edge (#14597)
+* fix(android): Fix insets for in-app vs system keyboard (#14642)
+* maint(linux): create temporary worktree for packaging (#14599)
+* fix(android): Cleanup layouts for Engine, Sample apps, and FirstVoices apps for edge to edge (#14663)
+* fix(web): fix error trying to calculate style scaling effects (#14696)
+* fix(linux): don't crash if `kmp.json` is missing `keyboards` section (#14714)
+* fix(developer): transform slashes to backslashes in paths in Package Editor (#14722)
+* chore(linux): remove automatic installation of `onboard-keyman` (#14773)
+* docs(linux): update release notes for stable release (#14774)
+* fix(linux): don't crash on invalid languages in keyboard (#14771)
+
 ## 18.0.240 stable 2025-08-27
 
 * maint(resources): automatically cherry-pick history updates to master (#14596)
