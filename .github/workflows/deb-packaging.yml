@@ -127,7 +127,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [jammy, noble, oracular]
+        dist: [jammy, noble, plucky]
 
     steps:
     - name: Checkout
@@ -153,7 +153,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [plucky]
+        dist: [questing]
 
     steps:
     - name: Checkout
