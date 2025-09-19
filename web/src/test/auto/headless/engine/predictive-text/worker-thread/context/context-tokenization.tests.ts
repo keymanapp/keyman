@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { analyzePathMergesAndSplits, buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
+import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -1069,6 +1069,77 @@ describe('ContextTokenization', function() {
         editPath,
         mappedPath
       });
+    });
+  });
+
+  describe('assembleTransforms', () => {
+    it('handles common single-char insert cases', () => {
+      const results = assembleTransforms(['a'], [0], 0);
+
+      const expectedMap: Map<number, Transform> = new Map();
+      expectedMap.set(0, { insert: 'a', deleteLeft: 0 });
+      assert.deepEqual(results, expectedMap);
+    });
+
+    it('handles single-char insert cases at adjusted indices', () => {
+      const results = assembleTransforms(['a'], [0], 2);
+
+      const expectedMap: Map<number, Transform> = new Map();
+      expectedMap.set(2, { insert: 'a', deleteLeft: 0 });
+      assert.deepEqual(results, expectedMap);
+    });
+
+    it('handles common backspace cases (1)', () => {
+      const results = assembleTransforms([''], [1], 0);
+
+      const expectedMap: Map<number, Transform> = new Map();
+      expectedMap.set(0, { insert: '', deleteLeft: 1 });
+      assert.deepEqual(results, expectedMap);
+    });
+
+    it('handles common backspace cases (2)', () => {
+      // Emulates backspacing over whitespace immediately before the
+      // text-insertion point
+      const results = assembleTransforms(['', ''], [0, 1], 0);
+
+      const expectedMap: Map<number, Transform> = new Map();
+      expectedMap.set(0, { insert: '', deleteLeft: 1 });
+      expectedMap.set(1, { insert: '', deleteLeft: 0 });
+      assert.deepEqual(results, expectedMap);
+    });
+
+    it('handles cases with equal inserts and deletes', () => {
+      const results = assembleTransforms(['day', ' ', 'a'], [2, 1, 2], -2);
+
+      const expectedMap: Map<number, Transform> = new Map();
+      expectedMap.set(-2, { insert: 'a', deleteLeft: 2 });
+      expectedMap.set(-1, { insert: ' ', deleteLeft: 1 });
+      expectedMap.set( 0, { insert: 'day', deleteLeft: 2 });
+      assert.deepEqual(results, expectedMap);
+    });
+
+    it('handles cases with many inserts and few deletes', () => {
+      const results = assembleTransforms(['day', ' ', 'a', ' ', 'apple'], [0, 2, 1], 1);
+
+      const expectedMap: Map<number, Transform> = new Map();
+      expectedMap.set(1, { insert: 'apple', deleteLeft: 1 });
+      expectedMap.set(2, { insert: ' ', deleteLeft: 2 });
+      expectedMap.set(3, { insert: 'a', deleteLeft: 0 });
+      expectedMap.set(4, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(5, { insert: 'day', deleteLeft: 0 });
+      assert.deepEqual(results, expectedMap);
+    });
+
+    it('handles cases with few inserts and many deletes', () => {
+      const results = assembleTransforms(['day', ' '], [0, 2, 3, 1, 2], -4);
+
+      const expectedMap: Map<number, Transform> = new Map();
+      expectedMap.set(-4, { insert: ' ', deleteLeft: 2 });
+      expectedMap.set(-3, { insert: 'day', deleteLeft: 1 });
+      expectedMap.set(-2, { insert: '', deleteLeft: 3 });
+      expectedMap.set(-1, { insert: '', deleteLeft: 2 });
+      expectedMap.set( 0, { insert: '', deleteLeft: 0 });
+      assert.deepEqual(results, expectedMap);
     });
   });
 });
