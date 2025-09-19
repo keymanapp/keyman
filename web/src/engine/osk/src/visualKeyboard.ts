@@ -17,7 +17,7 @@ import {
 } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from 'keyman/engine/js-processor';
 
-import { buildCorrectiveLayout } from './correctionLayout.js';
+import { buildCorrectiveLayout, correctionKeyFilter } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
 
 import {
@@ -968,7 +968,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     keyEvent.inputBreadcrumb = sequence.trace();
-    return this.raiseKeyEvent(keyEvent, e);
+    return this.raiseKeyEvent(keyEvent, e.key.spec, e);
   }
 
   initKeyEvent(e: KeyElement) {
@@ -1629,11 +1629,28 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this.layerLocked = enable;
   }
 
-  raiseKeyEvent(keyEvent: KeyEvent, e: KeyElement): KeyRuleEffects {
+  raiseKeyEvent(keyEvent: KeyEvent, keySpec: ActiveKeyBase, e: KeyElement): KeyRuleEffects {
     // Exclude menu and OSK hide keys from normal click processing
     if(keyEvent.kName == 'K_LOPT' || keyEvent.kName == 'K_ROPT') {
       this.optionKey(e, keyEvent.kName, true);
       return {};
+    }
+
+    // Ensure that no matter what, the first key in the distribution matches the "true" key
+    // that the user actually touched.  Even if it's not the most likely key.
+    const keyDistribution = keyEvent.keyDistribution;
+    if(keyDistribution && keyDistribution.length > 1) {
+      const matchIndex = keyDistribution.findIndex(keySample => keySample.keySpec == keySpec);
+      if(matchIndex < 0 && correctionKeyFilter(keySpec)) {
+        console.error("Could not find and prioritize output key in its fat-finger distribution");
+      } else if(matchIndex > 0) {
+        // Possibly not ideal for easy reading during inspection, but it's
+        // low-cost to just swap the entry with the most likely entry and call
+        // it a day.  Better than full-on re-sorting.
+        const trueEntry = keyDistribution[matchIndex];
+        keyDistribution[matchIndex] = keyDistribution[0];
+        keyDistribution[0] = trueEntry;
+      }
     }
 
     const callbackData: KeyRuleEffects = {};

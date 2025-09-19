@@ -21,7 +21,7 @@ builder_describe "Builds the Keyman Engine for Web's common top-level base class
   "@/web/src/engine/keyboard-storage build" \
   "@/web/src/engine/osk build" \
   "@/web/src/engine/predictive-text/worker-main" \
-  "@/developer/src/kmc-model test" \
+  "@/developer/src/kmc-model" \
   "clean" \
   "configure" \
   "build" \
@@ -49,4 +49,4 @@ do_build () {
 builder_run_action configure node_select_version_and_npm_ci
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
 builder_run_action build do_build
-builder_run_action test test-headless "${SUBPROJECT_NAME}"
+builder_run_action test test-headless-typescript "${SUBPROJECT_NAME}"
