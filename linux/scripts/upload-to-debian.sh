@@ -108,9 +108,9 @@ function push_to_github_and_create_pr() {
     if [[ -n ${PR_NUMBER} ]]; then
       builder_echo "PR #${PR_NUMBER} already exists"
     else
-      ${NOOP} gh pr create --draft --base "${BASE}" --title "${PR_TITLE}" --body "${PR_BODY}"
-      sleep 2s
-      PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+      local PR_URL
+      PR_URL=$(gh pr create --draft --base "${BASE}" --title "${PR_TITLE}" --body "${PR_BODY}")
+      PR_NUMBER="${PR_URL##*/}"
     fi
   else
     PR_NUMBER=""
@@ -191,13 +191,15 @@ cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
 COMMIT_MESSAGE="chore(linux): Update debian changelog"
 git commit -m "${COMMIT_MESSAGE}"
-push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH#origin/}" "${COMMIT_MESSAGE} 🏠" "Test-bot: skip"
+push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH#origin/}" "${COMMIT_MESSAGE} 🏠" "Build-bot: skip
+Test-bot: skip"
 
 # Create cherry-pick on master branch
 git checkout -B chore/linux/cherry-pick/changelog origin/master
 git cherry-pick -x chore/linux/changelog
 push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_MESSAGE} 🍒" \
   "Cherry-pick-of: #${PR_NUMBER}
+Build-bot: skip
 Test-bot: skip"
 
 builder_heading "Finishing"
