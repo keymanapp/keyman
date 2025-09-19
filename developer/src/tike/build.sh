@@ -70,8 +70,11 @@ function do_build() {
   delphi_msbuild tike.dproj "//p:Platform=Win32"
   sentrytool_delphiprep "$WIN32_TARGET" tike.dpr
   tds2dbg "$WIN32_TARGET"
+  do_map2pdb "$WIN32_TARGET_PATH/tike.map" "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
+  cp_if_exists "$WIN32_TARGET_PATH/tike.pdb" "$DEVELOPER_PROGRAM"
+
   cp kmlmc.cmd "$DEVELOPER_PROGRAM"
   cp kmlmp.cmd "$DEVELOPER_PROGRAM"
   cp kmc.cmd "$DEVELOPER_PROGRAM"
@@ -103,6 +106,7 @@ function do_publish() {
 
 function do_install() {
   cp "$DEVELOPER_PROGRAM/tike.exe" "$INSTALLPATH_KEYMANDEVELOPER/tike.exe"
+  cp_if_exists "$DEVELOPER_PROGRAM/tike.pdb" "$INSTALLPATH_KEYMANDEVELOPER/tike.pdb"
   cp "$DEVELOPER_PROGRAM/$KEYMANCORE_DLL" "$INSTALLPATH_KEYMANDEVELOPER/$KEYMANCORE_DLL"
 }
 
