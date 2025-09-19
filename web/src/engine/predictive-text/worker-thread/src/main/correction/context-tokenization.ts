@@ -506,7 +506,8 @@ export function buildEdgeWindow(
     }
   }
 
-  if(totalDelete == 0) {
+  // Second half of the condition:  handles cases with bad Transforms that try to overdelete.
+  if(totalDelete == 0 || deleteCnt != 0) {
     deleteLengths.push(0);
   }
 

@@ -642,6 +642,42 @@ describe('ContextTokenization', function() {
         minChars: 8
       }
 
+      it('handles empty contexts', () => {
+        const baseTokens = [''];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: '',
+          editBoundary: {
+            isPartial: false,
+            omitsEmptyToken: false,
+            text: '',
+            tokenIndex: 0
+          },
+          deleteLengths: [0],
+          edgeSliceIndex: 1
+        });
+      });
+
+      it('handles empty contexts and invalid Transforms', () => {
+        const baseTokens = [''];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: '',
+          editBoundary: {
+            isPartial: true,
+            omitsEmptyToken: false,
+            text: '',
+            tokenIndex: 0
+          },
+          deleteLengths: [0],
+          edgeSliceIndex: 1
+        });
+      });
+
       it('builds edge windows for the start of context with no edits', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
