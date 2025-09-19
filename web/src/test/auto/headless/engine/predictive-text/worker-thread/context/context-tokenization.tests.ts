@@ -772,6 +772,17 @@ describe('ContextTokenization', function() {
   });
 
   describe('applyContextSlide', () => {
+    it('handles empty contexts', () => {
+      const baseTokens = [''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['']);
+      assert.isFalse(resultTokenization.tokens[0].isPartial);
+    });
+
     it('makes no changes when context does not slide', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
