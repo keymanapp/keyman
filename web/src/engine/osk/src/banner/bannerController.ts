@@ -6,7 +6,7 @@ import { BannerView } from './bannerView.js';
 import { Banner } from './banner.js';
 import { BlankBanner } from './blankBanner.js';
 import { HTMLBanner } from './htmlBanner.js';
-import { Keyboard, KeyboardProperties } from 'keyman/engine/keyboard';
+import { JSKeyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 
 export class BannerController {
   private container: BannerView;
@@ -17,7 +17,7 @@ export class BannerController {
 
   private _inactiveBanner: Banner;
 
-  private keyboard: Keyboard;
+  private keyboard: JSKeyboard;
   private keyboardStub: KeyboardProperties;
 
   /**
@@ -105,7 +105,7 @@ export class BannerController {
    * @param keyboard
    * @param keyboardProperties
    */
-  public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) {
+  public configureForKeyboard(keyboard: JSKeyboard, keyboardProperties: KeyboardProperties) {
     this.keyboard = keyboard;
     this.keyboardStub = keyboardProperties;
 

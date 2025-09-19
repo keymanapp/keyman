@@ -65,8 +65,8 @@ A cache of recent context-state transitions is stored at `keyman.core.contextCac
 
 For JS-keyboard keystroke processing, a `Mock` clone of the context is generated before any actual keyboard rule checks are applied.  This provides a clear "before" state (eventually saved at `Transcription.preInput`) useful for determining the scope of the keystroke's changes once processing is completed via `buildTranscriptionFrom`.
 
-Once keystroke processing is completed by a JS-keyboard, the JS-processor constructs a `RuleBehavior` object describing all primary and side effects of the keystroke.  Defined at [web/src/engine/js-processor/src/ruleBehavior.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/js-processor/src/ruleBehavior.ts), all of its fields aside from `transcription` are specific to JS-keyboard side effects, some of which do need special handling and support outside of the keystroke processor.  None of these side effects apply for common-case keystrokes and so have default handling in place within the engine for cases where they are not needed.
+Once keystroke processing is completed by a JS-keyboard, the JS-processor constructs a `ProcessorAction` object describing all primary and side effects of the keystroke.  Defined at [web/src/engine/keyboard/src/keyboards/processorAction.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/keyboards/processorAction.ts), all of its fields aside from `transcription` are specific to JS-keyboard side effects, some of which do need special handling and support outside of the keystroke processor.  None of these side effects apply for common-case keystrokes and so have default handling in place within the engine for cases where they are not needed.
 
 ---
 
-In case referenced classes/files have moved:  this doc was last updated in 18.0-beta, based upon commit d1e45a0df49f81597887577a8c83af36d4a85283
+In case referenced classes/files have moved:  this doc was last updated in 19.0-alpha, based upon PR #14001.
