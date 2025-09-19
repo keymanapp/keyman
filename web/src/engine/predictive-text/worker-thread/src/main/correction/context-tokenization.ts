@@ -685,3 +685,51 @@ export function buildEdgeWindow(
     sliceIndex: i + (applyAtFront ? 0 : 1)
   }
 }
+
+/**
+ * Using the post-application tokenization of a context, traces where the
+ * components of a transform land among its tokens and computes relevant
+ * metadata for tokenization-transition analysis.
+ * @param tokens The tokenized form of the context after being edited by the
+ * transform
+ * @param transform  The edit applied to a context
+ * @returns
+ */
+export function traceInsertEdits(tokens: string[], transform: Transform): {
+  /**
+   * a tokenization of the Transform's `insert` string, in stack form.
+   */
+  stackedInserts: string[],
+  /**
+   * The index of the earliest post-application token to which the `Transform`'s
+   * `.insert` component was applied.
+   */
+  firstInsertPostIndex: number
+} {
+  let insert = transform.insert;
+  const stackedInserts: string[] = [];
+  let firstInsertPostIndex: number;
+
+  if(insert.length > 0) {
+    for(let index = tokens.length - 1; index >= 0; index--) {
+      const currentToken = tokens[index];
+      if(KMWString.length(currentToken) >= KMWString.length(insert)) {
+        stackedInserts.push(insert);
+        firstInsertPostIndex = index;
+        break;
+      }
+
+      insert = insert.substring(0, insert.length - currentToken.length);
+      stackedInserts.push(currentToken);
+      firstInsertPostIndex = index;
+    }
+  } else {
+    firstInsertPostIndex = tokens.length - 1
+    stackedInserts.push('');
+  }
+
+  return {
+    stackedInserts,
+    firstInsertPostIndex
+  };
+}
