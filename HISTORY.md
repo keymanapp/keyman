@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.123 alpha 2025-09-19
+
+* chore(linux): Update debian changelog (#14783)
+
 ## 19.0.122 alpha 2025-09-18
 
 * fix(android): Refresh the banner theme when system keyboard is changed (#14768)
