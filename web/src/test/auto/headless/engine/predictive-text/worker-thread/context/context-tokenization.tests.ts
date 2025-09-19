@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextStateAlignment, ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
+import { buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -633,5 +633,105 @@ describe('ContextTokenization', function() {
       assert.equal(tokenization.tail.searchSpace.inputSequence.length, "".length);
       assert.sameOrderedMembers(tokenization.tokens.map(t => t.exampleInput), targetTexts);
     });
+  });
+
+  describe('buildEdgeWindow', () => {
+    describe('with min token count 3, char count 8', () => {
+      const editWindowSpec = {
+        minTokens: 3,
+        minChars: 8
+      }
+
+      it('builds edge windows for the start of context with no edits', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: 'an apple',
+          editBoundary: {
+            isPartial: false,
+            omitsEmptyToken: false,
+            text: 'an',
+            tokenIndex: 0
+          },
+          deleteLengths: [0],
+          edgeSliceIndex: 3
+        });
+      });
+
+      it('builds edge windows for the start of context with deletion edits (1)', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: ' apple a',
+          editBoundary: {
+            isPartial: false,
+            omitsEmptyToken: false,
+            text: ' ',
+            tokenIndex: 1
+          },
+          deleteLengths: [2, 0],
+          edgeSliceIndex: 5
+        });
+      });
+
+      it('builds edge windows for the start of context with deletion edits (2)', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 4 }, true, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: 'pple a day',
+          editBoundary: {
+            isPartial: true,
+            omitsEmptyToken: false,
+            text: 'pple',
+            tokenIndex: 2
+          },
+          deleteLengths: [2, 1, 1],
+          edgeSliceIndex: 7
+        });
+      });
+
+      it('builds edge windows for the end of context with no edits', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        baseTokenization.tail.isPartial = true;
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: 'apple a day',
+          editBoundary: {
+            isPartial: true,
+            omitsEmptyToken: false,
+            text: 'day',
+            tokenIndex: 6
+          },
+          deleteLengths: [0],
+          edgeSliceIndex: 2
+        });
+      });
+
+      it('builds edge windows for the end of context with no edits, trailing whitespace', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: 'apple a day ',
+          editBoundary: {
+            isPartial: true,
+            omitsEmptyToken: true,
+            text: ' ',
+            tokenIndex: 7
+          },
+          deleteLengths: [0],
+          edgeSliceIndex: 2
+        });
+      });
+    })
   });
 });

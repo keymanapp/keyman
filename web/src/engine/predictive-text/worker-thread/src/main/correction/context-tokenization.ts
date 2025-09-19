@@ -9,6 +9,7 @@
 
 import { Token } from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { KMWString } from '@keymanapp/web-utils';
 
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
@@ -18,6 +19,11 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
+
+// May be able to "get away" with 2 & 5 or so, but having extra will likely help
+// with edit path stability.
+const MIN_TOKENS_TO_RECONSIDER_FOR_TOKENIZATION = 3;
+const MIN_CHARS_TO_RECONSIDER_FOR_TOKENIZATION = 8;
 
 /**
  * This class represents the sequence of tokens (words and whitespace blocks)
@@ -303,5 +309,216 @@ export class ContextTokenization {
     }
 
     return new ContextTokenization(tokenization, alignment);
+  }
+}
+
+const appendText = (full: string, current: string) => full + current;
+const prependText = (full: string, current: string) => current + full;
+
+/**
+ * Represents data about the token edited by an incoming Transform on the context's
+ * edge that existed before the edit and remains within context after the edit -
+ * the "edit boundary" token.
+ */
+interface EdgeEditBoundaryTokenData {
+  /**
+   * The text remaining in the token after the edit's deletions are applied,
+   * before applying any inserts.
+   */
+  text: string;
+  /**
+   * The affected token's index in its source array.
+   */
+  tokenIndex: number;
+  /**
+   * Notes if the token was edited, thus potentially incomplete.
+   */
+  isPartial: boolean;
+  /**
+   * Notes if the boundary is ambiguous due to an empty token.
+   *
+   * The empty token may be immediately before the text insertion point or the
+   * result of completely deleting a prior token.
+   */
+  omitsEmptyToken?: boolean
+}
+
+interface EdgeWindowOptions {
+  /**
+   * Specifies a minimum number of unaffected Tokens to include within the edge window.
+   */
+  minTokens: number,
+
+  /**
+   * Specifies a minimum number of non-inserted characters to include within the edge window.
+   */
+  minChars: number
+}
+
+/**
+ * Constructs a window on one side of the represented context that is aligned to
+ * existing tokenization.
+ * @param currentTokens  Tokens from an existing ContextTokenization
+ * @param transform  A Transform specifying edits to apply to the represented
+ * Context
+ * @param applyAtFront  If true, applies the Transform and builds the window at
+ * the start of the represented Context.
+ *
+ * If false, does both actions at the end
+ * of the represented Context.
+ * @returns
+ */
+export function buildEdgeWindow(
+  currentTokens: ContextToken[],
+  // Requires deleteRight be explicitly set.
+  transform: Transform & { deleteRight: number },
+  applyAtFront: boolean,
+  windowOptions?: EdgeWindowOptions
+): {
+  /**
+   * The constructed edge window's text, intended for retokenization to detect tokenization shifts
+   */
+  retokenizationText: string,
+  /**
+   * Data about the token at the boundary of applied deletions
+   */
+  editBoundary: EdgeEditBoundaryTokenData,
+  /**
+   * Indicates the number of codepoints deleted per token encountered.
+   *
+   * The entries are ordered based on their distance from the specified edge, thus
+   * will be in reverse index order when `applyAtFront == false`.
+   */
+  deleteLengths: number[],
+  /**
+   * Indicates the index that best defines the boundary for tokens included
+   * within the edge window.
+   *
+   * When `applyAtFront == true`, the actual value is (last token index + 1).
+   * - To retrieve tokens in the edge window:  `.slice(0,
+   *   retokenizationEndIndex)
+   * - To retrieve tokens not included: `.slice(retokenizationEndIndex);
+   *
+   * When `applyAtFront == false`, the actual value is (first token index).
+   * - To retrieve tokens in the edge window: `.slice(retokenizationEndIndex)`
+   * - To retrieve tokens not included: `.slice(0, retokenizationEndIndex)`.
+   */
+  edgeSliceIndex: number
+} {
+  const insert = transform.insert;
+  const totalDelete = applyAtFront ? transform.deleteRight : transform.deleteLeft;
+  const directionSign = applyAtFront ? 1 : -1;
+
+  // applyAtFront == true:   iterates forward
+  // applyAtFront == false:  iterates backward
+  const concatText: (full: string, current: string) => string = applyAtFront ? appendText : prependText;
+
+  let retokenizationText = insert;
+  let deleteCnt = totalDelete;
+
+  const deleteLengths: number[] = [];
+  // Ensure any constructed edges (of the same deleteLeft value) for a given
+  // tokenization always use the same window in their calculations.  May vary
+  // for different deleteLeft values, but that's it.
+  let tokenizeLength = 0;
+  let tokenCount = 0;
+
+  let editBoundary: EdgeEditBoundaryTokenData;
+
+  let i: number;
+  const endIndex = applyAtFront ? currentTokens.length - 1 : 0;
+  const MIN_TOKENS = windowOptions?.minTokens ?? MIN_TOKENS_TO_RECONSIDER_FOR_TOKENIZATION;
+  const MIN_CHARS  = windowOptions?.minChars ?? MIN_CHARS_TO_RECONSIDER_FOR_TOKENIZATION;
+  for(
+    i = applyAtFront ? 0 : currentTokens.length - 1;
+    // Alternatively, applyAtFront ? i <= currentTokens.length - 1 : i >= 0;
+    i != endIndex + directionSign; // stop @ 1 past
+    i += directionSign
+  ) {
+    // Rather than have a monster end-condition in the loop's main definition,
+    // we'll check these conditions here.  It seems more readable this way.
+    if(tokenCount >= MIN_TOKENS && tokenizeLength >= MIN_CHARS) {
+      break;
+    }
+
+    // True loop body - start
+    const token = currentTokens[i].exampleInput;
+    const tokenLen = KMWString.length(token);
+    const tokenIsPartial = currentTokens[i].isPartial;
+
+    // Do not consider partial tokens as part of the prefix area to use for tokenization.
+    if(!tokenIsPartial) {
+      tokenCount += (deleteCnt == 0) ? 1 : 0;
+    }
+
+    // if(editBoundaryToken) then all deletes have been applied.
+    if(!editBoundary && totalDelete > 0) {
+      const tokenDeleteLength = Math.min(deleteCnt, tokenLen);
+      // Skip context-final empty tokens.
+      if(tokenDeleteLength != 0 || deleteLengths.length != 0) {
+        deleteLengths.push(tokenDeleteLength);
+      }
+      deleteCnt = Math.max(0, deleteCnt - tokenDeleteLength);
+      // If the new remaining delete-count is zero, and we didn't delete a full
+      // token, we hit the boundary; note the boundary text.
+      if(deleteCnt == 0 && tokenDeleteLength != tokenLen) {
+        editBoundary = {
+          text: applyAtFront ? KMWString.slice(token, tokenDeleteLength) : KMWString.slice(token, 0, tokenLen - tokenDeleteLength),
+          tokenIndex: i,
+          isPartial: tokenDeleteLength != 0 || tokenIsPartial
+        }
+      }
+
+      retokenizationText = concatText(retokenizationText, editBoundary?.text ?? '');
+      tokenizeLength += tokenLen - tokenDeleteLength;
+    } else {
+      // if totalDeletes = 0, ensure we still construct an editBoundaryToken.
+      if(!editBoundary) {
+        editBoundary = {
+          text: token,
+          tokenIndex: i,
+          isPartial: tokenIsPartial
+        };
+      }
+      retokenizationText = concatText(retokenizationText, token);
+      tokenizeLength += tokenLen;
+    }
+  }
+
+  // Covers cases with full context deletion; the loop ends before this is built
+  // for such cases.
+  if(!editBoundary) {
+    editBoundary = {
+      text: '',
+      tokenIndex: i - directionSign,
+      isPartial: true
+    }
+  }
+
+  // If the 'boundary token' is an empty token, shift it by one token - we might actually
+  // be editing the token one index further.
+  let shouldOmitEmptyToken = editBoundary.tokenIndex != 0 && editBoundary.tokenIndex == currentTokens.length - 1 && editBoundary.text == '';
+  if(shouldOmitEmptyToken) {
+    editBoundary = {
+      text: currentTokens[editBoundary.tokenIndex-1].exampleInput,
+      tokenIndex: editBoundary.tokenIndex + directionSign,
+      isPartial: true
+    }
+  }
+
+  if(totalDelete == 0) {
+    deleteLengths.push(0);
+  }
+
+  editBoundary.omitsEmptyToken = shouldOmitEmptyToken;
+
+  return {
+    retokenizationText,
+    editBoundary,
+    deleteLengths,
+    // Is used for slicing and should reflect the last token considered.
+    // Forward:  the value indicates the interval's end (one past it, per typical indexing)
+    // Backward:  the value indicates the interval's start (precisely, not past it)
+    edgeSliceIndex: i + (applyAtFront ? 0 : 1)
   }
 }
