@@ -254,6 +254,169 @@ export class ContextTokenization {
     return new ContextTokenization(tokensToPrefix.concat(preservedTokens), null);
   }
 
+  // For languages NOT using epic/dict-breaker.  Is designed around the
+  // properties and limitations of the Unicode-based word-boundary algorithm.
+  /*
+   * Should both:
+   * 1. Tokenize the input transform (but NOT update tokens!), adjusting indices
+   *    as necessary.
+   *   - For 'split' and 'merge' edits near the caret, index 0 refers to the
+   *     final pre-insertion point token after either edit, with -1 the final
+   *     token before that, etc.
+   * 2. Determine the tokenization effects (ranges?) imposed by the update
+   *   - what parts are safe to reuse, what parts get edited, etc
+   *     - for the tokenization:
+   *       - what tokens are deleted, if any?  (determinable via transform
+   *         delete-left?)
+   *       - where does the lead token start?
+   *         - transitionID
+   *         - total num of chars
+   *     - for the transform:
+   *       - ranges of application to tokens
+   *       - source tokenization
+   *       - did it edit @ index 0?  If only index 1+, we may be able to batch
+   *         tokenizations.
+   *   - aim to provide info that facilitates efficient + valid batch
+   *     construction
+   */
+  analyzeTransformApplication(lexicalModel: LexicalModel, transform: Transform) {
+    // Step 4:  now that our window's been properly updated, determine what the
+    // input's effects on the context is.
+    //
+    // Context does not slide within this function.
+    //
+    // Assertion:  this alignment cannot fail; we KNOW there's a solid
+    // before-and-after relationship here, and we can base it on the results of
+    // a prior syncToSourceWindow call.
+    //
+    // We don't wish to do the full tokenization here - we only want to check
+    // over the last few tokens that might reasonably shift.  We also want to
+    // batch effects.
+
+    // Do not mutate the original transform; it can cause unexpected assertion
+    // effects in unit tests.
+    const edgeTransform = {...transform, deleteRight: transform.deleteRight || 0};
+    const edgeWindow = buildEdgeWindow(this.tokens, edgeTransform, false);
+    const {
+      retokenizationText,
+      editBoundary,
+      deleteLengths: stackedDeletes,
+      edgeSliceIndex
+    } = edgeWindow;
+
+    const tokenize = determineModelTokenizer(lexicalModel);
+    const postTokenization = tokenize({left: retokenizationText, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
+    if(postTokenization.length == 0) {
+      postTokenization.push('');
+    }
+    const { stackedInserts, firstInsertPostIndex } = traceInsertEdits(postTokenization, transform);
+
+    // We've found the root token within the root context state to which deletes (and inserts)
+    // may be applied.
+    // We've also found the last post-application token to which transform changes contributed.
+    // How do these indices line up - we need to properly construct and index our transforms,
+    // but 'merge' and 'split' edits can mess up that indexing.
+
+    const currentTokens = this.tokens;
+    const preTokenization = currentTokens
+      .slice(edgeSliceIndex, editBoundary.tokenIndex+1)
+      .map(t => t.exampleInput);
+
+    // Determine the effects of splits & merges as applied to the original
+    // cached context state.
+    const { mergeOffset, splitOffset, editPath, merges, splits } = analyzePathMergesAndSplits(preTokenization, postTokenization.slice(0, firstInsertPostIndex+1));
+
+    /*
+     * Final steps:  We can now safely index the transforms.  Let's do it!
+     * 1. Determine the first index a Transform may align to
+     * 2. Build the transforms
+     *
+     * Notes:
+     * - text applied to the end of a 'merged' token at the tail:  should have
+     *   index 0, not -1.
+     *   - pretokenization index will mismatch by -1: -SUM(merge size - 1)
+     *   - Ex: can + ' + t => can't
+     *          -1   0          0
+     * - text applied to the end of a 'split' token at the tail:  should also
+     *   have index 0, not 1.
+     *   - posttokenization index will mismatch by +1: SUM(split size - 1)
+     *   - new token after 'split':  index 1
+     *   - Ex: can' + ? => can + ' + ?
+     *          0          -1    0   1
+     *
+     * The first transform applies at the end of the retokenized zone and its
+     * associated index.  The question:  were there deletes that occurred?
+     */
+
+    const lastEditedPreTokenIndex = editBoundary.tokenIndex - edgeSliceIndex;
+    const shiftDeletes =
+      // first popped entry == 0
+      stackedDeletes[stackedDeletes.length - 1] == 0
+      // the boundary indices found by both methods above differ
+      && (lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset);
+    if(shiftDeletes) {
+      // Do not add a zero-length delete if we're not actually altering the
+      // corresponding token at all.
+      stackedDeletes.pop();
+    }
+    // The first delete always applies to index 0. If the built edge window
+    // omits a context-final empty-string, adjust the tokenization indices
+    // accordingly.
+    const tailIndex = 0 - (stackedDeletes.length - 1) + (editBoundary.omitsEmptyToken ? -1 : 0);
+    const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
+
+    // Final step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
+    // and not caused by transforms.  All transforms always apply in sequence at the end.
+    const unmappedEdits: EditTuple<EditOperation>[] = [];
+    for(let i = 0; i < editPath.length - transformMap.size; i++) {
+      const op = editPath[i].op;
+      switch(op) {
+        case 'merge':
+        case 'split':
+          // already calculated
+          // can fall through to the `continue;` line.
+        case 'match':
+          continue;
+        default:
+          // Should only be substitutions here.
+          // We may wish to add extra analysis in the future when supporting
+          // prediction from multiple competing tokenizations.
+          unmappedEdits.push(editPath[i] as EditTuple<EditOperation>);
+      }
+    }
+
+    return {
+      merges,
+      splits,
+      transformMap,
+      unmappedEdits
+    };
+
+    /*
+     * A **follow-up** should:
+     * 1. Perform the batching:
+     *    - if new token, all tokenizations that complete a word before + start
+     *      a new token here
+     *    - else, continue existing token for the source tokenization
+     *    - batch all transforms with similar (enough?) edit properties that
+     *      maintain the token, etc.
+     * 2. Transition the relevant tokenization(s).
+     *    - including any tokenization weighting, etc
+     *    - forward text (merging tokenizations): maybe just use the 'best'
+     *      tokenization weighting that led to the new token, if starting new
+     *      one.
+     *    - backward text (text deletion, splitting tokenizations) that delete a
+     *      token:  the fun question
+     *      - may require reconstruction of prior tokenization from scratch?
+     *      - or is a way to keep bits of the lead-in paths around without
+     *        memory bloat?
+     *        - less bloat:  incoming tokenization RANGES that can be used to
+     *          reconstruct from current entries
+     *        - and discard that after a set # of tokens, locking in a single
+     *          lead-in.
+     */
+  }
+
   /**
    * Given an alignment between an incoming tokenization context and the current tokenization
    * instance, this method will produce a new ContextTokenization instance for the incoming context
