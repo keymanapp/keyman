@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, models, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
+import { analyzePathMergesAndSplits, buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -940,6 +940,134 @@ describe('ContextTokenization', function() {
       assert.deepEqual(result, {
         stackedInserts: ['', ' ', 'day', ' ', 'a', ' ', 'ple'],
         firstInsertPostIndex: 2
+      });
+    });
+  });
+
+  describe('analyzePathMergesAndSplits', () => {
+    it('handles empty tokenizations', () => {
+      const results = analyzePathMergesAndSplits([], []);
+
+      assert.deepEqual(results, {
+        merges: [],
+        splits: [],
+        mergeOffset: 0,
+        splitOffset: 0,
+        editPath: [],
+        mappedPath: []
+      });
+    });
+
+    it('returns unadjusted edit path when no merges or splits are found', () => {
+      const results = analyzePathMergesAndSplits(
+        ['an', ' ', 'apple', ' ', 'a', ' ', 'da'],
+        ['an', ' ', 'apple', ' ', 'a', ' ', 'day']
+      );
+
+      const editPath: EditTuple<EditOperation>[] = [
+        { op: 'match', input: 0, match: 0 },
+        { op: 'match', input: 1, match: 1 },
+        { op: 'match', input: 2, match: 2 },
+        { op: 'match', input: 3, match: 3 },
+        { op: 'match', input: 4, match: 4 },
+        { op: 'match', input: 5, match: 5 },
+        { op: 'substitute', input: 6, match: 6 },
+      ];
+
+      assert.deepEqual(results, {
+        merges: [],
+        splits: [],
+        mergeOffset: 0,
+        splitOffset: 0,
+        editPath: editPath,
+        mappedPath: editPath
+      });
+    });
+
+    it('returns adjusted path when merges are found', () => {
+      const results = analyzePathMergesAndSplits(
+        ['she', ' ', 'said', ' ', 'I', ' ', 'can', '\''],
+        ['she', ' ', 'said', ' ', 'I', ' ', 'can\'t']
+      );
+
+      const editPath: EditTuple<ExtendedEditOperation>[] = [
+        { op: 'match', input: 0, match: 0 },
+        { op: 'match', input: 1, match: 1 },
+        { op: 'match', input: 2, match: 2 },
+        { op: 'match', input: 3, match: 3 },
+        { op: 'match', input: 4, match: 4 },
+        { op: 'match', input: 5, match: 5 },
+        { op: 'merge', input: 6, match: 6 }, // gets the 'can'
+        { op: 'merge', input: 7, match: 6 }, // gets the \', appends the t
+      ];
+
+      const mappedPath: EditTuple<EditOperation>[] = [
+        { op: 'match', input: 0, match: 0 },
+        { op: 'match', input: 1, match: 1 },
+        { op: 'match', input: 2, match: 2 },
+        { op: 'match', input: 3, match: 3 },
+        { op: 'match', input: 4, match: 4 },
+        { op: 'match', input: 5, match: 5 },
+        { op: 'substitute', input: 6, match: 6 }, // gets all pieces + the new input `t`.
+      ];
+
+      assert.deepEqual(results, {
+        merges: [ {
+          inputs: [ { text: 'can', index: 6 }, { text: '\'', index: 7 }],
+          match: { text: 'can\'t', index: 6 }
+        } ],
+        splits: [],
+        mergeOffset: -1,
+        splitOffset: 0,
+        editPath,
+        mappedPath
+      });
+    });
+
+    it('returns adjusted path when splits are found', () => {
+      const results = analyzePathMergesAndSplits(
+        ['\'', 'she', ' ', 'said', ' ', 'I', ' ', 'can\''],
+        ['\'', 'she', ' ', 'said', ' ', 'I', ' ', 'can' , '\'', '!']
+      );
+
+      const editPath: EditTuple<ExtendedEditOperation>[] = [
+        { op: 'match', input: 0, match: 0 },
+        { op: 'match', input: 1, match: 1 },
+        { op: 'match', input: 2, match: 2 },
+        { op: 'match', input: 3, match: 3 },
+        { op: 'match', input: 4, match: 4 },
+        { op: 'match', input: 5, match: 5 },
+        { op: 'match', input: 6, match: 6 },
+        { op: 'split', input: 7, match: 7 }, // gets the 'can'
+        { op: 'split', input: 7, match: 8 }, // gets the \'
+        { op: 'insert', match: 9 }, // gets the t
+      ];
+
+      const mappedPath: EditTuple<EditOperation>[] = [
+        { op: 'match', input: 0, match: 0 },
+        { op: 'match', input: 1, match: 1 },
+        { op: 'match', input: 2, match: 2 },
+        { op: 'match', input: 3, match: 3 },
+        { op: 'match', input: 4, match: 4 },
+        { op: 'match', input: 5, match: 5 },
+        { op: 'match', input: 6, match: 6 },
+        { op: 'match', input: 7, match: 7 }, // gets the 'can'
+        { op: 'match', input: 8, match: 8 }, // gets the \'
+        // gets the t, which wasn't available as part of the original token
+        // being split
+        { op: 'insert', match: 9 },
+      ];
+
+      assert.deepEqual(results, {
+        merges: [],
+        splits: [ {
+          input: { text: 'can\'', index: 7 },
+          matches: [ { text: 'can', index: 7 }, { text: '\'', index: 8 }]
+        } ],
+        mergeOffset: 0,
+        splitOffset: -1,
+        editPath,
+        mappedPath
       });
     });
   });
