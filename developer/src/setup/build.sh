@@ -32,7 +32,11 @@ function do_build() {
   delphi_msbuild setup.dproj "//p:Platform=Win32"
   sentrytool_delphiprep "$WIN32_TARGET" setup.dpr
   tds2dbg "$WIN32_TARGET"
+  do_map2pdb "$WIN32_TARGET_PATH/setup.map" "$WIN32_TARGET"
+
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
+  cp_if_exists "$WIN32_TARGET_PATH/setup.pdb" "$DEVELOPER_PROGRAM"
+
   builder_if_release_build_level cp "$WIN32_TARGET_PATH/setup.dbg" "$DEVELOPER_DEBUGPATH/devsetup.dbg"
   builder_if_release_build_level mv "$WIN32_TARGET_PATH/setup.dbg" "$WIN32_TARGET_PATH/devsetup.dbg"
 }
