@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">Ἑλληνικά Πολυτονικά</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Greek Polytonic</string>
   <string name="ssApplicationTitle">Ἐγκατάσταση $APPNAME $VERSION</string>
   <string name="ssTitle">Ἐγκαταστῆστε $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">Τὸ $APPNAME $VERSION ἐγκατεστάθη ἐπιτυχῶς.</string>
