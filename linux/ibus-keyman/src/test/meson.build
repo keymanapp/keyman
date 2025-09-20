@@ -9,7 +9,7 @@ test_env = [
   'G_TEST_SRCDIR=' + meson.current_source_dir(),
   'G_TEST_BUILDDIR=' + meson.current_build_dir(),
   'TOP_SRCDIR=' + meson.global_source_root(),
-  'TOP_BINDIR=' + meson.build_root(),
+  'TOP_BINDIR=' + meson.global_build_root(),
 ]
 
 test_include_dirs = [
