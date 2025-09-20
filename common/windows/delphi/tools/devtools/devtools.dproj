@@ -78,8 +78,8 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_CWD></Debugger_CWD>
-        <Debugger_RunParams>-buildsetupstrings ..\..\..\..\..\windows\src\desktop\setup\locale ..\..\..\..\..\windows\src\desktop\setup</Debugger_RunParams>
+        <Debugger_CWD>D:\Projects\Keyman\app\windows\src</Debugger_CWD>
+        <Debugger_RunParams>-buildlocaleindex desktop\kmshell\locale desktop\kmshell\locale\index.xml</Debugger_RunParams>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>None</Manifest_File>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -102,17 +102,18 @@
         <DCCReference Include="DevUtils.pas"/>
         <DCCReference Include="DevReleaseBuildCheck.pas"/>
         <DCCReference Include="DevCheckGitStatus.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\general\utilsystem.pas"/>
+        <DCCReference Include="..\..\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\general\Unicode.pas"/>
+        <DCCReference Include="..\..\general\GetOsVersion.pas"/>
         <DCCReference Include="SourceRootPath.pas"/>
         <DCCReference Include="Keyman.System.DevTools.BuildMessageConstants.pas"/>
         <DCCReference Include="Keyman.System.DevTools.BuildSetupStringTranslations.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\desktop\setup\SetupStrings.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas"/>
+        <DCCReference Include="..\..\general\Keyman.System.AndroidStringToKeymanLocaleString.pas"/>
+        <DCCReference Include="Keyman.System.DevTools.BuildLocaleIndex.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -166,7 +167,7 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="devtools.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="bin\Win32\Debug\devtools.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>devtools.exe</RemoteName>
                         <Overwrite>true</Overwrite>
