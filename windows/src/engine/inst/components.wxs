@@ -212,7 +212,7 @@
 
         <RegistryValue KeyPath="yes" Id="registry_win8_keypath" Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="win8 tip install" Value="installed" Type="string" />
 
-        <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\CTF\TIP\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\CTF\TIP\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" ForceDeleteOnUninstall="yes">
           <RegistryKey Key="Category">
             <RegistryKey Key="Category">
               <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Key="{13A016DF-560B-46CD-947A-4C3AF1E0E35D}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_IMMERSIVESUPPORT -->
