@@ -355,26 +355,7 @@ interface EdgeWindowOptions {
   minChars: number
 }
 
-/**
- * Constructs a window on one side of the represented context that is aligned to
- * existing tokenization.
- * @param currentTokens  Tokens from an existing ContextTokenization
- * @param transform  A Transform specifying edits to apply to the represented
- * Context
- * @param applyAtFront  If true, applies the Transform and builds the window at
- * the start of the represented Context.
- *
- * If false, does both actions at the end
- * of the represented Context.
- * @returns
- */
-export function buildEdgeWindow(
-  currentTokens: ContextToken[],
-  // Requires deleteRight be explicitly set.
-  transform: Transform & { deleteRight: number },
-  applyAtFront: boolean,
-  windowOptions?: EdgeWindowOptions
-): {
+interface EdgeWindow {
   /**
    * The constructed edge window's text, intended for retokenization to detect tokenization shifts
    */
@@ -404,8 +385,28 @@ export function buildEdgeWindow(
    * - To retrieve tokens not included: `.slice(0, retokenizationEndIndex)`.
    */
   edgeSliceIndex: number
-} {
-  const insert = transform.insert;
+}
+
+/**
+ * Constructs a window on one side of the represented context that is aligned to
+ * existing tokenization.
+ * @param currentTokens  Tokens from an existing ContextTokenization
+ * @param transform  A Transform specifying edits to apply to the represented
+ * Context
+ * @param applyAtFront  If true, applies the Transform and builds the window at
+ * the start of the represented Context.
+ *
+ * If false, does both actions at the end
+ * of the represented Context.
+ * @returns
+ */
+export function buildEdgeWindow(
+  currentTokens: ContextToken[],
+  // Requires deleteRight be explicitly set.
+  transform: Transform & { deleteRight: number },
+  applyAtFront: boolean,
+  windowOptions?: EdgeWindowOptions
+): EdgeWindow {
   const totalDelete = applyAtFront ? transform.deleteRight : transform.deleteLeft;
   const directionSign = applyAtFront ? 1 : -1;
 
@@ -413,7 +414,7 @@ export function buildEdgeWindow(
   // applyAtFront == false:  iterates backward
   const concatText: (full: string, current: string) => string = applyAtFront ? appendText : prependText;
 
-  let retokenizationText = insert;
+  let retokenizationText = '';
   let deleteCnt = totalDelete;
 
   const deleteLengths: number[] = [];
