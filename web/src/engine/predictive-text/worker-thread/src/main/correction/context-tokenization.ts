@@ -395,7 +395,7 @@ interface EdgeWindow {
    * - To retrieve tokens in the edge window: `.slice(retokenizationEndIndex)`
    * - To retrieve tokens not included: `.slice(0, retokenizationEndIndex)`.
    */
-  edgeSliceIndex: number
+  sliceIndex: number
 }
 
 /**
@@ -532,6 +532,6 @@ export function buildEdgeWindow(
     // Is used for slicing and should reflect the last token considered.
     // Forward:  the value indicates the interval's end (one past it, per typical indexing)
     // Backward:  the value indicates the interval's start (precisely, not past it)
-    edgeSliceIndex: i + (applyAtFront ? 0 : 1)
+    sliceIndex: i + (applyAtFront ? 0 : 1)
   }
 }

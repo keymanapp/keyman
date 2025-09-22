@@ -656,7 +656,7 @@ describe('ContextTokenization', function() {
             tokenIndex: 0
           },
           deleteLengths: [0],
-          edgeSliceIndex: 1
+          sliceIndex: 1
         });
       });
 
@@ -674,7 +674,7 @@ describe('ContextTokenization', function() {
             tokenIndex: 0
           },
           deleteLengths: [0],
-          edgeSliceIndex: 1
+          sliceIndex: 1
         });
       });
 
@@ -692,7 +692,7 @@ describe('ContextTokenization', function() {
             tokenIndex: 0
           },
           deleteLengths: [0],
-          edgeSliceIndex: 3
+          sliceIndex: 3
         });
       });
 
@@ -710,7 +710,7 @@ describe('ContextTokenization', function() {
             tokenIndex: 1
           },
           deleteLengths: [2, 0],
-          edgeSliceIndex: 5
+          sliceIndex: 5
         });
       });
 
@@ -728,7 +728,7 @@ describe('ContextTokenization', function() {
             tokenIndex: 2
           },
           deleteLengths: [2, 1, 1],
-          edgeSliceIndex: 7
+          sliceIndex: 7
         });
       });
 
@@ -747,7 +747,7 @@ describe('ContextTokenization', function() {
             tokenIndex: 6
           },
           deleteLengths: [0],
-          edgeSliceIndex: 2
+          sliceIndex: 2
         });
       });
 
@@ -765,7 +765,7 @@ describe('ContextTokenization', function() {
             tokenIndex: 7
           },
           deleteLengths: [0],
-          edgeSliceIndex: 2
+          sliceIndex: 2
         });
       });
     })
