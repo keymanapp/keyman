@@ -83,10 +83,12 @@ docker_wrapper() {
 }
 
 setup_docker() {
+  DOCKER_RUN_ARGS=()
   if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
-    DOCKER_RUN_ARGS="--env DOCKER_RUN_AS_ROOT=1"
-  else
-    DOCKER_RUN_ARGS=
+    DOCKER_RUN_ARGS+=(--env DOCKER_RUN_AS_ROOT=1)
+  fi
+  if [[ -z ${DOCKER_RUNNING:-} ]] ; then
+    DOCKER_RUN_ARGS+=(-t)
   fi
 }
 
