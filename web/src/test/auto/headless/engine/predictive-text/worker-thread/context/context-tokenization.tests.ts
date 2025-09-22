@@ -1296,9 +1296,10 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.tokenMapping.edgeWindow, windowResults);
+      assert.deepEqual(results.tokenMapping.edgeWindow, {...windowResults, retokenization: results.tokenMapping.edgeWindow.retokenization});
       assert.deepEqual(results.tokenMapping.edgeWindow, {
         retokenizationText: 'brown fox',
+        retokenization: ['brown', ' ', 'fox'],
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,
@@ -1327,9 +1328,10 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.tokenMapping.edgeWindow, windowResults);
+      assert.deepEqual(results.tokenMapping.edgeWindow, {...windowResults, retokenization: results.tokenMapping.edgeWindow.retokenization});
       assert.deepEqual(results.tokenMapping.edgeWindow, {
         retokenizationText: 'brown fox ',
+        retokenization: ['brown', ' ', 'fox', ' '], // no final '' token
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,
@@ -1359,9 +1361,10 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.tokenMapping.edgeWindow, windowResults);
+      assert.deepEqual(results.tokenMapping.edgeWindow, {...windowResults, retokenization: results.tokenMapping.edgeWindow.retokenization});
       assert.deepEqual(results.tokenMapping.edgeWindow, {
         retokenizationText: 'brown fox',
+        retokenization: ['brown', ' ', 'fox'],
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,
@@ -1390,9 +1393,10 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.tokenMapping.edgeWindow, windowResults);
+      assert.deepEqual(results.tokenMapping.edgeWindow, {...windowResults, retokenization: results.tokenMapping.edgeWindow.retokenization});
       assert.deepEqual(results.tokenMapping.edgeWindow, {
         retokenizationText: ' brown f',
+        retokenization: [' ', 'brown', ' ', 'f'],
         editBoundary: {
           isPartial: true,
           omitsEmptyToken: false,
@@ -1421,9 +1425,10 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.tokenMapping.edgeWindow, windowResults);
+      assert.deepEqual(results.tokenMapping.edgeWindow, {...windowResults, retokenization: results.tokenMapping.edgeWindow.retokenization});
       assert.deepEqual(results.tokenMapping.edgeWindow, {
         retokenizationText: 'quick ',
+        retokenization: ['quick', ' '],
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,

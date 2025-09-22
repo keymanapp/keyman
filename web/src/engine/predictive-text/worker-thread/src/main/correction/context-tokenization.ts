@@ -72,7 +72,7 @@ interface PrecomputedTokenizationTransition {
      * The edge window defining the potential range of tokenization adjustments
      * needed after applying the Transform
      */
-    edgeWindow: EdgeWindow
+    edgeWindow: RetokenizedEdgeWindow
   }
 
   /**
@@ -343,6 +343,17 @@ export class ContextTokenization {
     }
     const { stackedInserts, firstInsertPostIndex } = traceInsertEdits(postTokenization, transform);
 
+    // What does the edge's retokenization look like when we remove the inserted portions?
+    const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
+    const insertBoundaryToken = postTokenization[firstInsertPostIndex];
+    // Note:  requires that helpers have not mutated `stackedInserts`.
+    const uninsertedBoundaryToken = insertBoundaryToken.slice(0, insertBoundaryToken.lastIndexOf(stackedInserts[0]));
+    // Do not preserve empty tokens here, even if tokenization normally would produce one.
+    // It's redundant and replaceable for tokenization batching efforts.
+    if(uninsertedBoundaryToken != '') {
+      retokenizedEdge.push(uninsertedBoundaryToken);
+    }
+
     // We've found the root token within the root context state to which deletes (and inserts)
     // may be applied.
     // We've also found the last post-application token to which transform changes contributed.
@@ -395,6 +406,7 @@ export class ContextTokenization {
     // omits a context-final empty-string, adjust the tokenization indices
     // accordingly.
     const tailIndex = 0 - (stackedDeletes.length - 1) + (editBoundary.omitsEmptyToken ? -1 : 0);
+    // Mutates stackedInserts, stackedDeletes.
     const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
 
     // Final step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
@@ -419,12 +431,12 @@ export class ContextTokenization {
 
     return {
       tokenMapping: {
+        edgeWindow: {...edgeWindow, retokenization: retokenizedEdge},
         merges,
         splits,
-        unmappedEdits,
-        edgeWindow: edgeWindow
+        unmappedEdits
       },
-      transformMap
+      transformMap,
     };
   }
 
@@ -735,6 +747,18 @@ interface EdgeWindow {
    * - To retrieve tokens not included: `.slice(0, retokenizationEndIndex)`.
    */
   sliceIndex: number
+}
+
+/**
+ * Represents the context edge to which an incoming `Transform` will be applied
+ * and how it is retokenized given the `Transform` as input.
+ */
+interface RetokenizedEdgeWindow extends EdgeWindow {
+  /**
+   * The new tokenization (and its implied boundaries) for the edge window's
+   * represented text.
+   */
+  retokenization: string[];
 }
 
 /**
