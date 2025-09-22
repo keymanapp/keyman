@@ -261,9 +261,10 @@
 
     <!-- Actions -->
 
-    <CustomAction Id="RollbackPostInstallCU" Execute="rollback" Impersonate="yes" ExeCommand='-rcu' BinaryKey='insthelp.exe' />
+    <!-- <CustomAction Id="RollbackPostInstallCU" Execute="rollback" Impersonate="yes" ExeCommand='-rcu' BinaryKey='insthelp.exe' />
     <CustomAction Id="RollbackPostInstallLM" Execute="rollback" Impersonate="no" ExeCommand='-rlm' BinaryKey='insthelp.exe' />
-    <CustomAction Id="PreUninstallUser" Execute="deferred" Impersonate="yes" ExeCommand='-uu' BinaryKey="insthelp.exe" />
+    <CustomAction Id="PreUninstallUser" Execute="deferred" Impersonate="yes" ExeCommand='-uu' BinaryKey="insthelp.exe" /> -->
+
     <CustomAction Id='AlreadyUpdated' Error='[ProductName] has already been updated to [ProductVersion] or newer.' />
     <CustomAction Id='NoDowngrade' Error='A later version of [ProductName] or a related edition is already installed.' />
 
@@ -289,10 +290,10 @@
            But we cannot have RemoveExistingProducts in two places in the installer! -->
       <RemoveExistingProducts After='InstallFinalize'>VERSION11FOUND</RemoveExistingProducts>
 
-      <Custom Action='RollbackPostInstallLM' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>
+      <!-- <Custom Action='RollbackPostInstallLM' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>
       <Custom Action='RollbackPostInstallCU' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>
 
-      <Custom Action="PreUninstallUser" After="InstallInitialize"><![CDATA[REMOVE="ALL" And Not REINSTALL And Not UPGRADINGPRODUCTCODE]]></Custom>
+      <Custom Action="PreUninstallUser" After="InstallInitialize"><![CDATA[REMOVE="ALL" And Not REINSTALL And Not UPGRADINGPRODUCTCODE]]></Custom> -->
 
       <Custom Action='SaveARPInstallLocation' After='InstallValidate'><![CDATA[Not Installed Or REINSTALL]]></Custom>
     </InstallExecuteSequence>
