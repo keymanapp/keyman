@@ -83,15 +83,15 @@
       </Directory>
     </Directory>
 
-    <!-- <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="PreUninstall" />
-    <CustomAction Id="EnginePostInstall" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="EnginePostInstall" /> -->
+    <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="PreUninstall" />
+    <!-- <CustomAction Id="EnginePostInstall" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="EnginePostInstall" /> -->
 
-    <!-- <InstallExecuteSequence>
+    <InstallExecuteSequence>
       <Custom Action="PreUninstallA" After="InstallInitialize"><![CDATA[REMOVE="ALL" And Not REINSTALL And Not UPGRADINGPRODUCTCODE]]></Custom>
-      <Custom Action="EnginePostInstall" Before="InstallFinalize"><![CDATA[NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL]]></Custom>
+      <!-- <Custom Action="EnginePostInstall" Before="InstallFinalize"><![CDATA[NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL]]></Custom> -->
     </InstallExecuteSequence>
 
-    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" /> -->
+    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" />
 
   </Module>
 </Wix>

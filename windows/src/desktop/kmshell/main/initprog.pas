@@ -115,10 +115,12 @@ uses
   help,
   HTMLHelpViewer,
   Keyman.Configuration.UI.InstallFile,
+  Keyman.Configuration.System.AllApplicationPackagePermissions,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
   Keyman.Configuration.UI.UfrmSettingsManager,
   Keyman.Configuration.UI.UfrmStartInstall,
+  Keyman.System.KeymanSentryClient,
   Keyman.System.KeymanStartTask,
   KeymanPaths,
   KLog,
@@ -626,7 +628,19 @@ begin
   Result := True;
   DoAdmin := kmcom.SystemInfo.IsAdministrator;
 
-  if not DoAdmin then
+  if DoAdmin then
+  begin
+    try
+      Result := GrantPermissionToAllApplicationPackagesToKeymanProgramData;
+    except
+      on E:EAppPackagePermissions do
+      begin
+        TKeymanSentryClient.ReportHandledException(E);
+        ShowMessage(E.Message);
+      end;
+    end;
+  end
+  else
   begin
     // I2651 - options not matching, case sensitivity, 8.0.309.0
     Result := FirstRunInstallDefaults(

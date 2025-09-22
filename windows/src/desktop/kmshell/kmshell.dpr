@@ -182,7 +182,10 @@ uses
   Keyman.System.UpdateStateMachine in 'main\Keyman.System.UpdateStateMachine.pas',
   Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
   Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas',
-  Keyman.Configuration.UI.UfrmStartInstall in 'main\Keyman.Configuration.UI.UfrmStartInstall.pas' {frmStartInstall};
+  Keyman.Configuration.UI.UfrmStartInstall in 'main\Keyman.Configuration.UI.UfrmStartInstall.pas' {frmStartInstall},
+  Keyman.Configuration.System.AllApplicationPackagePermissions in 'main\Keyman.Configuration.System.AllApplicationPackagePermissions.pas',
+  Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
+  Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
