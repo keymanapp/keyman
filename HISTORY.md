@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.124 alpha 2025-09-22
+
+* maint(linux): improve `upload-to-debian` script (#14798)
+* refactor(linux): remove a meson deprecation warning (#14801)
+* refactor(linux): remove shellcheck warnings (#14802)
+* refactor(resources): use array for Docker arguments (#14803)
+
 ## 19.0.123 alpha 2025-09-19
 
 * chore(linux): Update debian changelog (#14783)
