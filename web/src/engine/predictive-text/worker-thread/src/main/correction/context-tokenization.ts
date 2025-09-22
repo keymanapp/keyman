@@ -343,6 +343,12 @@ interface EdgeEditBoundaryTokenData {
   omitsEmptyToken?: boolean
 }
 
+/**
+ * Options that may be used to parameterize the range and scope of `buildEdgeWindow`.
+ *
+ * This is currently intended for use with unit-testing, allowing existing tests to
+ * continue unimpeded even if we change the values for our related defined constants.
+ */
 interface EdgeWindowOptions {
   /**
    * Specifies a minimum number of unaffected Tokens to include within the edge window.
@@ -355,13 +361,18 @@ interface EdgeWindowOptions {
   minChars: number
 }
 
+/**
+ * Represents data about the context edge to which an incoming `Transform` will be applied.
+ */
 interface EdgeWindow {
   /**
-   * The constructed edge window's text, intended for retokenization to detect tokenization shifts
+   * The portion of text represented by the current tokenization that should be
+   * made available for retokenization when applying the `Transform`.
    */
   retokenizationText: string,
   /**
-   * Data about the token at the boundary of applied deletions
+   * Data about the token at the boundary of deleteLeft operations specified by the
+   * `Transform`.
    */
   editBoundary: EdgeEditBoundaryTokenData,
   /**
