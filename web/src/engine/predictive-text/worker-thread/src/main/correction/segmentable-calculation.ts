@@ -1,4 +1,4 @@
-import { ClassicalDistanceCalculation, EditOperation, forNewIndices } from './classical-calculation.js';
+import { ClassicalDistanceCalculation, EditOperation, EditTuple, forNewIndices, PathBuilder } from './classical-calculation.js';
 
 /**
  * The human-readable names for legal edit-operation edges on a merge-split
@@ -83,18 +83,22 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
     return returnBuffer;
   }
 
-  public increaseMaxDistance(): ClassicalDistanceCalculation<string> {
+  public increaseMaxDistance(): ClassicalDistanceCalculation<string, ExtendedEditOperation> {
     // TODO:  diagonal expansion
     // But it's not particularly needed for our use cases.
     throw new Error("Not yet supported for this edit-distance calculation type.");
   }
 
-  // TODO:  edit path with 'split', 'merge' handling  // progress:  infrastructure is likely prepped?
-  // TODO:  visualization
+  protected _buildPath(pathBuilder?: PathBuilder<string, ExtendedEditOperation>): EditTuple<string, ExtendedEditOperation>[][] {
+    pathBuilder = pathBuilder ?? new PathBuilder<string, ExtendedEditOperation>(this, []);
+    pathBuilder.addEdgeFinder(findSplitMergeEdges);
+    super._buildPath(pathBuilder); // actually evaluates the edit-path.
+    return pathBuilder.validPaths;
+  }
 }
 
-function getMergeSplitParent<TOpSet> (
-  buffer: ClassicalDistanceCalculation<string, TOpSet>,
+function getMergeSplitParent<TOpEdit> (
+  buffer: ClassicalDistanceCalculation<string, TOpEdit>,
   r: number,
   c: number
 ): [number, number] {
@@ -135,4 +139,43 @@ function getMergeSplitParent<TOpSet> (
   }
 
   return [lastMergeIndex, lastSplitIndex];
+}
+
+/**
+ * Determines the edit path used to obtain the optimal cost, distinguishing between zero-cost
+ * substitutions ('match' operations) and actual substitutions.
+ * @param row
+ * @param col
+ */
+export function findSplitMergeEdges<TOpSet>(
+  pathBuilder: PathBuilder<string, TOpSet | ExtendedEditOperation>,
+  row: number,
+  col: number
+): void {
+  const calc = pathBuilder.calc;
+  const currentCost = calc.getCostAt(row, col);
+  if(currentCost == Number.MAX_VALUE) {
+    // We're too far off the main diagonal - a proper edit distance is not viable!
+    throw new Error("Cannot find path - diagonal width is not large enough.")
+  }
+
+  const input = calc.inputSequence[row];
+  const match = calc.matchSequence[col];
+
+  const [lastMergeIndex, lastSplitIndex] = getMergeSplitParent(calc, row, col);
+  if(lastMergeIndex != -1) {
+    const ops: EditTuple<string, ExtendedEditOperation>[] = [];
+    for(let r = lastMergeIndex; r <= row; r++) {
+      ops.push({ input: calc.inputSequence[r], match, op: 'merge' });
+    }
+    pathBuilder.backtracePath(lastMergeIndex - 1, col - 1, ops);
+  }
+
+  if(lastSplitIndex != -1) {
+    const ops: EditTuple<string, ExtendedEditOperation>[] = [];
+    for(let c = lastSplitIndex; c <= col; c++) {
+      ops.push({ input, match: calc.matchSequence[c], op: 'split' });
+    }
+    pathBuilder.backtracePath(row - 1, lastSplitIndex - 1, ops);
+  }
 }
