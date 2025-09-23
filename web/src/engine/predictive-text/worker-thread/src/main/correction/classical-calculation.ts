@@ -621,43 +621,51 @@ export class ClassicalDistanceCalculation<TUnit = string> {
 
   // Inputs add an extra row / first index entry.
   addInputChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
-    const returnBuffer = new ClassicalDistanceCalculation(this);
+    const returnBuffer = new ClassicalDistanceCalculation<TUnit>(this);
+    returnBuffer._addInputChar(token);
+    return returnBuffer;
+  }
 
+  protected _addInputChar(token: TUnit) {
     // Insert a row, even if we don't actually do anything with it yet.
     // Initialize all entries with Number.MAX_VALUE, as `undefined` use leads to JS math issues.
-    const row = Array(2 * returnBuffer.diagonalWidth + 1).fill(Number.MAX_VALUE);
-    returnBuffer.resolvedDistances[returnBuffer.inputSequence.length] = row;
-
-    returnBuffer.inputSequence.push(token);
+    const row = Array(2 * this.diagonalWidth + 1).fill(Number.MAX_VALUE);
+    this.resolvedDistances[this.inputSequence.length] = row;
+    this.inputSequence.push(token);
 
     // If there isn't a 'match' entry yet, there are no values to compute.  Exit immediately.
-    if(returnBuffer.matchSequence.length == 0) {
-      return returnBuffer;
+    if(this.matchSequence.length == 0) {
+      return;
     }
 
-    forNewIndices(returnBuffer, true, function(r, c, diagIndex) {
-      row[diagIndex] = ClassicalDistanceCalculation.initialCostAt(returnBuffer, r, c);
+    forNewIndices(this, true, (r, c, diagIndex) => {
+      row[diagIndex] = ClassicalDistanceCalculation.initialCostAt(this, r, c);
     });
 
-    return returnBuffer;
+    return;
   }
 
   addMatchChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
     const returnBuffer = new ClassicalDistanceCalculation(this);
-    returnBuffer.matchSequence.push(token);
+    returnBuffer._addMatchChar(token);
+    return returnBuffer;
+  }
+
+  protected _addMatchChar(token: TUnit) {
+    this.matchSequence.push(token);
 
     // If there isn't a 'match' entry yet, there are no values to compute.  Exit immediately.
-    if(returnBuffer.inputSequence.length == 0) {
-      return returnBuffer;
+    if(this.inputSequence.length == 0) {
+      return;
     }
 
-    forNewIndices(returnBuffer, false, (r, c, diagIndex) => {
-      const row = returnBuffer.resolvedDistances[r];
+    forNewIndices(this, false, (r, c, diagIndex) => {
+      var row = this.resolvedDistances[r];
       // Since diagIndex is from the perspective of the row, it must be inverted to properly index the column.
-      row[diagIndex] = ClassicalDistanceCalculation.initialCostAt(returnBuffer, r, c);
+      row[diagIndex] = ClassicalDistanceCalculation.initialCostAt(this, r, c);
     });
 
-    return returnBuffer;
+    return;
   }
 
   public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit> {
