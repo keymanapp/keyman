@@ -713,19 +713,19 @@ public final class KMManager {
 
   /**
    * Applies padding to the keyboard so it's not covered by system insets
+   * @param {KeyboardType} keyboard
    * @param left int padding to account for notch/navigation bar on left side of screen
    * @param right int padding to account for notch/navigation bar on right side of screen
    * @param bottom int padding to account for navigation bar on bottom of screen
    */
-  public static void applyInsetsToKeyboard(int left, int right, int bottom) {
-    if (InAppKeyboard != null) {
+  public static void applyInsetsToKeyboard(KeyboardType keyboardType, int left, int right, int bottom) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       applyInsetsPaddingToKeyboardView(InAppKeyboard, left, right, bottom);
     }
 
-    if (SystemKeyboard != null) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       applyInsetsPaddingToKeyboardView(SystemKeyboard, left, right, bottom);
     }
-
   }
 
   private static void applyInsetsPaddingToKeyboardView(KMKeyboard keyboard, int left, int right, int bottom) {
@@ -741,8 +741,7 @@ public final class KMManager {
       );
       // No need to change WebView margins; keep height as-is
       parent.requestLayout();
-    }
-    else {
+    } else {
       // Fallback: apply on the WebView itself
       keyboard.setPadding(
         left,

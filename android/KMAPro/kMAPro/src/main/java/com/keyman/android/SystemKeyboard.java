@@ -35,6 +35,8 @@ import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
@@ -126,6 +128,25 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     ViewGroup parent = (ViewGroup) inputView.getParent();
     if (parent != null)
       parent.removeView(inputView);
+
+    if (inputView != null) {
+      // Update insets
+      ViewCompat.setOnApplyWindowInsetsListener(inputView,
+        (view, windowInsets) -> {
+          // Allocate insets for system bars and display cutout (notch)
+          androidx.core.graphics.Insets insets = windowInsets.getInsets(
+            WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+
+          view.setPadding(
+            insets.left,
+            insets.top,
+            insets.right,
+            insets.bottom/20); // This still doesn't fix suggestion banner
+
+          KMManager.applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, insets.left, insets.right, insets.bottom);
+          return windowInsets;
+        });
+    }
 
     return inputView;
   }
