@@ -9,13 +9,13 @@ export type EditOperation = 'insert' | 'delete' | 'match' | 'substitute' | 'tran
  * Represents individual nodes on calculated edit paths and the relevant
  * edited value(s) at each step.
  */
-export interface EditTuple<TUnit, TOpSet = EditOperation> {
+export interface EditTuple<TOpSet = EditOperation> {
   /** The edit operation taking place at this position in the edit path */
   op: TOpSet | EditOperation,
-  /** The value for the `input` source at this position in the edit path */
-  input?: TUnit,
-  /** The value for the `match` source at this position in the edit path */
-  match?: TUnit
+  /** The index for the `input` source at this position in the edit path */
+  input?: number,
+  /** The index for the `match` source at this position in the edit path */
+  match?: number
 }
 
 // Implemented externally from the class so that it may be more easily
@@ -53,7 +53,7 @@ export interface EditTuple<TUnit, TOpSet = EditOperation> {
  * visualization
  * @returns
  */
-export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalculation<TUnit, TOpSet>, path?: EditTuple<TUnit, TOpSet>[]) {
+export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalculation<TUnit, TOpSet>, path?: EditTuple<TOpSet>[]) {
   path = (path ?? calc.editPath()[0]).slice();
 
   const inputs = calc.inputSequence.map(i => '' + i);
@@ -107,27 +107,29 @@ export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalcu
     rowStr += " ".repeat(sparseCount > 0 ? sparseCount : 1);
 
     let edits: string[] = [];
-    const printEdit = (edit: EditTuple<TUnit, TOpSet>) => {
+    const printEdit = (edit: EditTuple<TOpSet>) => {
       let tokenText: string;
+      const input = calc.inputSequence[edit.input];
+      const match = calc.matchSequence[edit.match];
       switch(edit.op) {
         case 'delete':
         case 'transpose-delete':
-          tokenText = `'${edit.input}'`;
+          tokenText = `'${input}'`;
           break;
         case 'insert':
         case 'transpose-insert':
-          tokenText = `'${edit.match}'`;
+          tokenText = `'${match}'`;
           break;
         case 'substitute':
         case 'match':
         case 'split':
         case 'merge':
           const op = edit.op == 'match' ? '==' : '=>';
-          tokenText = tokenText || `'${edit.input}' ${op} '${edit.match}'`;
+          tokenText = tokenText || `'${input}' ${op} '${match}'`;
           break;
         // transpose-start, transpose-end
         default:
-          tokenText = `'${edit.input}' vs '${edit.match}'`;
+          tokenText = `'${input}' vs '${match}'`;
       }
       return `${edit.op}(${tokenText})`;
     }
@@ -337,7 +339,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
    * @param row
    * @param col
    */
-  public editPath(): EditTuple<TUnit, TOpSet>[][] {
+  public editPath(): EditTuple<TOpSet>[][] {
     const results = this._buildPath();
 
     if(results.length <= 1) {
@@ -415,7 +417,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
    * @param row
    * @param col
    */
-  protected _buildPath(pathBuilder?: PathBuilder<TUnit, TOpSet>): EditTuple<TUnit, TOpSet>[][] {
+  protected _buildPath(pathBuilder?: PathBuilder<TUnit, TOpSet>): EditTuple<TOpSet>[][] {
     pathBuilder = pathBuilder ?? new PathBuilder(this, []);
     pathBuilder.addEdgeFinder(findBaseEdges);
     pathBuilder.addEdgeFinder(findTransposeEdges);
@@ -825,21 +827,21 @@ export function findTransposeEdges<TUnit, TOpSet>(
     // This transposition includes either 'transpose-insert' or 'transpose-delete' operations.
     let i = row;
     let m = col;
-    let ops: EditTuple<TUnit, TOpSet>[] = [];
+    let ops: EditTuple<TOpSet>[] = [];
 
     if(lastInputIndex != row-1) {
       let count = row - lastInputIndex;
       ops.push({
         op: 'transpose-start',
-        input: calc.inputSequence[i-count],
-        match: calc.matchSequence[lastMatchIndex]
+        input: i-count,
+        match: lastMatchIndex
       });
       // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
       // after the if-else.
       for(let x=count-1; x > 0; x--) {
         ops.push({
           op: 'transpose-delete',
-          input: calc.inputSequence[i-x]
+          input: i-x
         });
       }
       expectedCost += count-1;
@@ -847,15 +849,15 @@ export function findTransposeEdges<TUnit, TOpSet>(
       let count = col - lastMatchIndex;
       ops.push({
         op: 'transpose-start',
-        input: calc.inputSequence[lastInputIndex],
-        match: calc.matchSequence[m-count]
+        input: lastInputIndex,
+        match: m-count
       });
       // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
       // after the if-else.
       for(let y=count-1; y > 0; y--) {
         ops.push({
           op: 'transpose-insert',
-          match: calc.matchSequence[m-y]
+          match: m-y
         });
       }
       expectedCost += count - 1;
@@ -863,8 +865,8 @@ export function findTransposeEdges<TUnit, TOpSet>(
 
     ops.push({
       op: 'transpose-end',
-      input: calc.inputSequence[i],
-      match: calc.matchSequence[m]
+      input: i,
+      match: m
     });
 
     // Double-check our expectations.
@@ -899,28 +901,28 @@ export function findBaseEdges<TUnit, TOpSet>(
 
   const insertParentCost = calc.getCostAt(row, col-1);
   if(insertParentCost == currentCost - 1) {
-    pathBuilder.backtracePath(row, col-1, [{op: 'insert', match}]);
+    pathBuilder.backtracePath(row, col-1, [{op: 'insert', match: col}]);
   }
 
   const deleteParentCost = calc.getCostAt(row-1, col);
   if(deleteParentCost == currentCost - 1) {
-    pathBuilder.backtracePath(row-1, col, [{op: 'delete', input}]);
+    pathBuilder.backtracePath(row-1, col, [{op: 'delete', input: row}]);
   }
 
   const substitutionParentCost = calc.getCostAt(row-1, col-1);
   if(substitutionParentCost == currentCost - 1) {
-    pathBuilder.backtracePath(row-1, col-1, [{op: 'substitute', input, match}]);
+    pathBuilder.backtracePath(row-1, col-1, [{op: 'substitute', input: row, match: col}]);
     // VERY IMPORTANT:  validate the match.  The path can go "off the rails" if
     // we don't validate this!
   } else if(substitutionParentCost == currentCost && input == match) {
-    pathBuilder.backtracePath(row-1, col-1, [{op: 'match', input, match}]);
+    pathBuilder.backtracePath(row-1, col-1, [{op: 'match', input: row, match: col}]);
   }
 }
 
 export class PathBuilder<TUnit, TOpSet = EditOperation> {
   readonly calc: ClassicalDistanceCalculation<TUnit, TOpSet>;
   readonly edgeFinders: (EdgeFinder<TUnit, TOpSet>)[];
-  readonly validPaths: EditTuple<TUnit, TOpSet>[][] = [];
+  readonly validPaths: EditTuple<TOpSet>[][] = [];
 
   constructor(calc: ClassicalDistanceCalculation<TUnit, TOpSet>, edgeFinders: (EdgeFinder<TUnit, TOpSet>)[]) {
     this.calc = calc;
@@ -931,11 +933,11 @@ export class PathBuilder<TUnit, TOpSet = EditOperation> {
     this.edgeFinders.push(finder);
   }
 
-  backtracePath(row: number, col: number, recentEdge: EditTuple<TUnit, TOpSet>[]) {
+  backtracePath(row: number, col: number, recentEdge: EditTuple<TOpSet>[]) {
     const calc = this.calc;
 
     // Recursively build the edit path.
-    let results: EditTuple<TUnit, TOpSet>[][];
+    let results: EditTuple<TOpSet>[][];
     if(row >= 0 && col >= 0) {
       const parentBuilder = new PathBuilder<TUnit, TOpSet>(calc, this.edgeFinders);
       if(calc.getCostAt(row, col) == Number.MAX_VALUE) {
@@ -951,14 +953,14 @@ export class PathBuilder<TUnit, TOpSet = EditOperation> {
         // There are initial deletions.
         result.push({
           op: 'delete',
-          input: calc.inputSequence[r]
+          input: r
         });
       }
       for(let c = 0; c <= col; c++) {
         // There are initial insertions.
         result.push({
           op: 'insert',
-          match: calc.matchSequence[c]
+          match: c
         });
       }
     }

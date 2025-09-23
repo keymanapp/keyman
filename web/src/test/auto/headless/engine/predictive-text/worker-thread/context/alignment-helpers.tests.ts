@@ -133,6 +133,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4}
+      ],
       leadTokenShift: 0,
       leadEditLength: 0,
       matchLength: 5,
@@ -151,6 +158,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'substitute', input: 4, match: 4}
+      ],
       leadTokenShift: 0,
       leadEditLength: 0,
       matchLength: 4,
@@ -172,6 +186,11 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false, true);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'insert',               match: 1},
+        {op: 'insert',               match: 2}
+      ],
       leadTokenShift: 0,
       leadEditLength: 0,
       matchLength: 0,
@@ -189,7 +208,16 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'substitute', 'substitute', 'substitute', 'substitute']});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        { op: 'substitute', input: 0, match: 0 },
+        { op: 'substitute', input: 1, match: 1 },
+        { op: 'substitute', input: 2, match: 2 },
+        { op: 'substitute', input: 3, match: 3 },
+        { op: 'substitute', input: 4, match: 4 }
+      ]
+    });
   });
 
   it("detects unalignable contexts - too many mismatching tokens", () => {
@@ -201,7 +229,16 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'substitute', 'match', 'match', 'match']});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'substitute', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4}
+      ],
+    });
   });
 
   it("fails alignment for leading-edge word substitutions", () => {
@@ -213,7 +250,16 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'match', 'match', 'match', 'match']});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4}
+      ]
+    });
   });
 
   it("fails alignment for small leading-edge word substitutions", () => {
@@ -225,7 +271,16 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'match', 'match', 'match', 'match']});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4}
+      ]
+    });
   });
 
   it("properly matches and aligns when lead token is modified", () => {
@@ -239,6 +294,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4}
+      ],
       leadTokenShift: 0,
       leadEditLength: 1,
       matchLength: 4,
@@ -258,6 +320,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'delete', input: 0},
+        {op: 'match', input: 1, match: 0},
+        {op: 'match', input: 2, match: 1},
+        {op: 'match', input: 3, match: 2},
+        {op: 'match', input: 4, match: 3}
+      ],
       leadTokenShift: -1,
       leadEditLength: 0,
       matchLength: 4,
@@ -277,6 +346,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'insert',          match: 0},
+        {op: 'match', input: 0, match: 1},
+        {op: 'match', input: 1, match: 2},
+        {op: 'match', input: 2, match: 3},
+        {op: 'match', input: 3, match: 4}
+      ],
       leadTokenShift: 1,
       leadEditLength: 0,
       matchLength: 4,
@@ -296,6 +372,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'delete', input: 0},
+        {op: 'delete', input: 1},
+        {op: 'substitute', input: 2, match: 0},
+        {op: 'match', input: 3, match: 1},
+        {op: 'match', input: 4, match: 2},
+      ],
       leadTokenShift: -2,
       leadEditLength: 1,
       matchLength: 2,
@@ -315,6 +398,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'insert',          match: 0},
+        {op: 'substitute', input: 0, match: 1},
+        {op: 'match', input: 1, match: 2},
+        {op: 'match', input: 2, match: 3},
+        {op: 'match', input: 3, match: 4},
+      ],
       leadTokenShift: 1,
       leadEditLength: 1,
       matchLength: 3,
@@ -334,6 +424,14 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'delete', input: 0},
+        {op: 'match', input: 1, match: 0},
+        {op: 'match', input: 2, match: 1},
+        {op: 'match', input: 3, match: 2},
+        {op: 'match', input: 4, match: 3},
+        {op: 'insert',          match: 4}
+      ],
       leadTokenShift: -1,
       leadEditLength: 0,
       matchLength: 4,
@@ -353,6 +451,13 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'substitute', input: 4, match: 4}
+      ],
       leadTokenShift: 0,
       leadEditLength: 1,
       matchLength: 3,
@@ -372,6 +477,14 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'substitute', input: 4, match: 4},
+        {op: 'insert',               match: 5}
+      ],
       leadTokenShift: 0,
       leadEditLength: 1,
       matchLength: 3,
@@ -391,9 +504,17 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'insert',          match: 0},
+        {op: 'match', input: 0, match: 1},
+        {op: 'match', input: 1, match: 2},
+        {op: 'match', input: 2, match: 3},
+        {op: 'match', input: 3, match: 4},
+        {op: 'substitute', input: 4, match: 5}
+      ],
       leadTokenShift: 1,
       leadEditLength: 0,
-      matchLength: 4, // we treat 'quick' and 'uick' as the same
+      matchLength: 4,
       tailEditLength: 1,
       tailTokenShift: 0
     });
@@ -410,9 +531,17 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'insert',          match: 0},
+        {op: 'match', input: 0, match: 1},
+        {op: 'match', input: 1, match: 2},
+        {op: 'match', input: 2, match: 3},
+        {op: 'match', input: 3, match: 4},
+        {op: 'delete', input: 4}
+      ],
       leadTokenShift: 1,
       leadEditLength: 0,
-      matchLength: 4, // we treat 'quick' and 'uick' as the same
+      matchLength: 4,
       tailEditLength: 0,
       tailTokenShift: -1
     });
@@ -429,9 +558,17 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'insert',          match: 0},
+        {op: 'match', input: 0, match: 1},
+        {op: 'match', input: 1, match: 2},
+        {op: 'match', input: 2, match: 3},
+        {op: 'substitute', input: 3, match: 4},
+        {op: 'delete', input: 4}
+      ],
       leadTokenShift: 1,
       leadEditLength: 0,
-      matchLength: 3, // we treat 'quick' and 'uick' as the same
+      matchLength: 3,
       tailEditLength: 1,
       tailTokenShift: -1
     });
@@ -446,7 +583,16 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "delete", "match", "match", "match"]});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'delete', input: 1},
+        {op: 'match', input: 2, match: 1},
+        {op: 'match', input: 3, match: 2},
+        {op: 'match', input: 4, match: 3}
+      ]
+    });
   });
 
   it("fails alignment for mid-head insertion", () => {
@@ -458,7 +604,16 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "insert", "match", "match", "match"]});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'insert',          match: 1},
+        {op: 'match', input: 1, match: 2},
+        {op: 'match', input: 2, match: 3},
+        {op: 'match', input: 3, match: 4}
+      ]
+    });
   });
 
   it("fails alignment for mid-tail deletion", () => {
@@ -470,7 +625,16 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "match", "match", "delete", "match"]});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'delete', input: 3},
+        {op: 'match', input: 4, match: 3}
+      ]
+    });
   });
 
   it("fails alignment for mid-tail insertion", () => {
@@ -482,7 +646,17 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "match", "match", "match", "insert", "match"]});
+    assert.deepEqual(computedAlignment, {
+      canAlign: false,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'insert',          match: 4},
+        {op: 'match', input: 4, match: 5}
+      ]
+    });
   });
 
   it("handles late-context suggestion application after backspace", () => {
@@ -496,6 +670,19 @@ describe('computeAlignment', () => {
     const computedAlignment = computeAlignment(baseContext, newContext, false);
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4},
+        {op: 'match', input: 5, match: 5},
+        {op: 'match', input: 6, match: 6},
+        {op: 'match', input: 7, match: 7},
+        {op: 'substitute', input: 8, match: 8},
+        {op: 'match', input: 9, match: 9},
+        {op: 'match', input: 10, match: 10}
+      ],
       leadTokenShift: 0,
       leadEditLength: 0,
       matchLength: 8,
@@ -516,6 +703,21 @@ describe('computeAlignment', () => {
 
     assert.deepEqual(computedAlignment, {
       canAlign: true,
+      editPath: [
+        {op: 'match', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4},
+        {op: 'match', input: 5, match: 5},
+        {op: 'match', input: 6, match: 6},
+        {op: 'match', input: 7, match: 7},
+        {op: 'match', input: 8, match: 8},
+        {op: 'match', input: 9, match: 9},
+        {op: 'substitute', input: 10, match: 10},
+        {op: 'insert',                match: 11},
+        {op: 'insert',                match: 12}
+      ],
       leadTokenShift: 0,
       leadEditLength: 0,
       matchLength: 10,
@@ -549,6 +751,31 @@ describe('computeAlignment', () => {
 
     assert.deepEqual(computeAlignment(baseContext1, incomingContext1, true), {
       canAlign: true,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4},
+        {op: 'match', input: 5, match: 5},
+        {op: 'match', input: 6, match: 6},
+        {op: 'match', input: 7, match: 7},
+        {op: 'match', input: 8, match: 8},
+        {op: 'match', input: 9, match: 9},
+        {op: 'match', input: 10, match: 10},
+        {op: 'match', input: 11, match: 11},
+        {op: 'match', input: 12, match: 12},
+        {op: 'match', input: 13, match: 13},
+        {op: 'match', input: 14, match: 14},
+        {op: 'match', input: 15, match: 15},
+        {op: 'match', input: 16, match: 16},
+        {op: 'match', input: 17, match: 17},
+        {op: 'match', input: 18, match: 18},
+        {op: 'match', input: 19, match: 19},
+        {op: 'match', input: 20, match: 20},
+        {op: 'match', input: 21, match: 21},
+        {op: 'substitute', input: 22, match: 22}
+      ],
       leadTokenShift: 0,
       leadEditLength: 1,
       matchLength: 21,
@@ -577,6 +804,33 @@ describe('computeAlignment', () => {
 
     assert.deepEqual(computeAlignment(baseContext2, incomingContext2, true), {
       canAlign: true,
+      editPath: [
+        {op: 'substitute', input: 0, match: 0},
+        {op: 'match', input: 1, match: 1},
+        {op: 'match', input: 2, match: 2},
+        {op: 'match', input: 3, match: 3},
+        {op: 'match', input: 4, match: 4},
+        {op: 'match', input: 5, match: 5},
+        {op: 'match', input: 6, match: 6},
+        {op: 'match', input: 7, match: 7},
+        {op: 'match', input: 8, match: 8},
+        {op: 'match', input: 9, match: 9},
+        {op: 'match', input: 10, match: 10},
+        {op: 'match', input: 11, match: 11},
+        {op: 'match', input: 12, match: 12},
+        {op: 'match', input: 13, match: 13},
+        {op: 'match', input: 14, match: 14},
+        {op: 'match', input: 15, match: 15},
+        {op: 'match', input: 16, match: 16},
+        {op: 'match', input: 17, match: 17},
+        {op: 'match', input: 18, match: 18},
+        {op: 'match', input: 19, match: 19},
+        {op: 'match', input: 20, match: 20},
+        {op: 'match', input: 21, match: 21},
+        {op: 'match', input: 22, match: 22},
+        {op: 'match', input: 23, match: 23},
+        {op: 'substitute', input: 24, match: 24}
+      ],
       leadTokenShift: 0,
       leadEditLength: 1,
       matchLength: 23,
@@ -601,6 +855,33 @@ describe('computeAlignment', () => {
 
     assert.deepEqual(computeAlignment(baseContext3, incomingContext3, true), {
       canAlign: true,
+      editPath: [
+        {op: 'delete', input: 0},
+        {op: 'match', input: 1, match: 0},
+        {op: 'match', input: 2, match: 1},
+        {op: 'match', input: 3, match: 2},
+        {op: 'match', input: 4, match: 3},
+        {op: 'match', input: 5, match: 4},
+        {op: 'match', input: 6, match: 5},
+        {op: 'match', input: 7, match: 6},
+        {op: 'match', input: 8, match: 7},
+        {op: 'match', input: 9, match: 8},
+        {op: 'match', input: 10, match: 9},
+        {op: 'match', input: 11, match: 10},
+        {op: 'match', input: 12, match: 11},
+        {op: 'match', input: 13, match: 12},
+        {op: 'match', input: 14, match: 13},
+        {op: 'match', input: 15, match: 14},
+        {op: 'match', input: 16, match: 15},
+        {op: 'match', input: 17, match: 16},
+        {op: 'match', input: 18, match: 17},
+        {op: 'match', input: 19, match: 18},
+        {op: 'match', input: 20, match: 19},
+        {op: 'match', input: 21, match: 20},
+        {op: 'match', input: 22, match: 21},
+        {op: 'match', input: 23, match: 22},
+        {op: 'substitute', input: 24, match: 23}
+      ],
       leadTokenShift: -1,
       leadEditLength: 0,
       matchLength: 23,
