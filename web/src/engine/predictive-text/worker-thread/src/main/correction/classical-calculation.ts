@@ -620,7 +620,6 @@ export class ClassicalDistanceCalculation<TUnit = string> {
   }
 
   // Inputs add an extra row / first index entry.
-  // Inputs add an extra row / first index entry.
   addInputChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
     const returnBuffer = new ClassicalDistanceCalculation<TUnit>(this);
     returnBuffer._addInputChar(token);
@@ -647,7 +646,7 @@ export class ClassicalDistanceCalculation<TUnit = string> {
   }
 
   addMatchChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
-    let returnBuffer = new ClassicalDistanceCalculation(this);
+    const returnBuffer = new ClassicalDistanceCalculation(this);
     returnBuffer._addMatchChar(token);
     return returnBuffer;
   }
