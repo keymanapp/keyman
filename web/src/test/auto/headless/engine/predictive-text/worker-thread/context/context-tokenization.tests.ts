@@ -653,7 +653,8 @@ describe('ContextTokenization', function() {
             isPartial: false,
             omitsEmptyToken: false,
             text: '',
-            tokenIndex: 0
+            tokenIndex: 0,
+            sourceText: ''
           },
           deleteLengths: [0],
           sliceIndex: 1
@@ -671,7 +672,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: false,
             text: '',
-            tokenIndex: 0
+            tokenIndex: 0,
+            sourceText: ''
           },
           deleteLengths: [0],
           sliceIndex: 1
@@ -689,7 +691,8 @@ describe('ContextTokenization', function() {
             isPartial: false,
             omitsEmptyToken: false,
             text: 'an',
-            tokenIndex: 0
+            tokenIndex: 0,
+            sourceText: 'an'
           },
           deleteLengths: [0],
           sliceIndex: 3
@@ -707,7 +710,8 @@ describe('ContextTokenization', function() {
             isPartial: false,
             omitsEmptyToken: false,
             text: ' ',
-            tokenIndex: 1
+            tokenIndex: 1,
+            sourceText: ' '
           },
           deleteLengths: [2, 0],
           sliceIndex: 5
@@ -725,7 +729,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: false,
             text: 'pple',
-            tokenIndex: 2
+            tokenIndex: 2,
+            sourceText: 'apple'
           },
           deleteLengths: [2, 1, 1],
           sliceIndex: 7
@@ -744,7 +749,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: false,
             text: 'day',
-            tokenIndex: 6
+            tokenIndex: 6,
+            sourceText: 'day'
           },
           deleteLengths: [0],
           sliceIndex: 2
@@ -762,7 +768,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: true,
             text: ' ',
-            tokenIndex: 7
+            tokenIndex: 7,
+            sourceText: ' '
           },
           deleteLengths: [0],
           sliceIndex: 2
@@ -1304,7 +1311,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: 'fox',
-          tokenIndex: 4
+          tokenIndex: 4,
+          sourceText: 'fox'
         },
         deleteLengths: [0],
         sliceIndex: 2
@@ -1336,7 +1344,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: ' ',
-          tokenIndex: 5
+          tokenIndex: 5,
+          sourceText: ' '
         },
         deleteLengths: [0],
         sliceIndex: 2
@@ -1369,7 +1378,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: 'fox',
-          tokenIndex: 4
+          tokenIndex: 4,
+          sourceText: 'fox'
         },
         deleteLengths: [0],
         sliceIndex: 2
@@ -1401,7 +1411,8 @@ describe('ContextTokenization', function() {
           isPartial: true,
           omitsEmptyToken: false,
           text: 'f',
-          tokenIndex: 4
+          tokenIndex: 4,
+          sourceText: 'fox' // deleted 2, but we ignore that for sourceText here.
         },
         deleteLengths: [2],
         sliceIndex: 1
@@ -1433,7 +1444,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: ' ',
-          tokenIndex: 1
+          tokenIndex: 1,
+          sourceText: ' '
         },
         deleteLengths: [3, 1, 5, 0],
         sliceIndex: 0
