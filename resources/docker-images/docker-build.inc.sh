@@ -87,8 +87,14 @@ setup_docker() {
   if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
     DOCKER_RUN_ARGS+=(--env DOCKER_RUN_AS_ROOT=1)
   fi
+
   if [[ -z ${DOCKER_RUNNING:-} ]] ; then
+    # Not running in docker
     DOCKER_RUN_ARGS+=(-t)
+  fi
+
+  if builder_has_option --remote-debug; then
+    DOCKER_RUN_ARGS+=(-p 2345:2345)
   fi
 }
 

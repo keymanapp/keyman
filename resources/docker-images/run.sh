@@ -27,6 +27,7 @@ builder_describe \
   "--registry=REGISTRY              The container registry to keep the images (default: ghcr.io/keymanapp)" \
   "--username=REGISTRY_USERNAME     The user for the container registry (default: keymanapp)" \
   "--password=REGISTRY_PASSWORD     The password for the container registry user (default: password)" \
+  "--remote-debug                   Expose the container's port 2345 for remote debugging"
 
 builder_parse "$@"
 
