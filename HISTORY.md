@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.125 alpha 2025-09-23
+
+* fix(common): some more tests running successfully in a container (#14784)
+
 ## 19.0.124 alpha 2025-09-22
 
 * maint(linux): improve `upload-to-debian` script (#14798)
