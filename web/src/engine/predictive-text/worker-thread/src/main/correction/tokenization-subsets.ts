@@ -38,6 +38,12 @@ export function precomputationSubsetKeyer(precomputation: PrecomputedTokenizatio
   // the precomputation's represented keystroke.
   for(const {0: relativeIndex, 1: transform} of transformMap.entries()) {
     const insertLen = KMWString.length(transform.insert);
+    if(relativeIndex > 0) {
+      // The true boundary lie before the insert if the value is non-zero;
+      // don't differentiate here!
+      boundaryTextLen = 0;
+    }
+
     if(boundaryTextLen) {
       // transform.deleteLeft was already handled during boundary computation -
       // do not include it here!
