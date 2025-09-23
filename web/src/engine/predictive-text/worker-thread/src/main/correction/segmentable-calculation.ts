@@ -15,7 +15,7 @@ export type ExtendedEditOperation = 'merge' | 'split' | EditOperation;
  * - 'split' allows one input token to be directly split, with no further edits, into
  * two or more match tokens.
  */
-export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation<string> {
+export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation<string, ExtendedEditOperation> {
   /**
    * Constructs a new calculation object instance.
    */
@@ -93,8 +93,8 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
   // TODO:  visualization
 }
 
-function getMergeSplitParent (
-  buffer: ClassicalDistanceCalculation<string>,
+function getMergeSplitParent<TOpSet> (
+  buffer: ClassicalDistanceCalculation<string, TOpSet>,
   r: number,
   c: number
 ): [number, number] {

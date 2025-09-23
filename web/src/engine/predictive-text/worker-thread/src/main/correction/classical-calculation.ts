@@ -9,9 +9,9 @@ export type EditOperation = 'insert' | 'delete' | 'match' | 'substitute' | 'tran
  * Represents individual nodes on calculated edit paths and the relevant
  * edited value(s) at each step.
  */
-export interface EditTuple<TUnit> {
+export interface EditTuple<TUnit, TOpSet = EditOperation> {
   /** The edit operation taking place at this position in the edit path */
-  op: EditOperation,
+  op: TOpSet | EditOperation,
   /** The value for the `input` source at this position in the edit path */
   input?: TUnit,
   /** The value for the `match` source at this position in the edit path */
@@ -53,7 +53,7 @@ export interface EditTuple<TUnit> {
  * visualization
  * @returns
  */
-export function visualizeCalculation<TUnit>(calc: ClassicalDistanceCalculation<TUnit>, path?: EditTuple<TUnit>[]) {
+export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalculation<TUnit, TOpSet>, path?: EditTuple<TUnit, TOpSet>[]) {
   path = (path ?? calc.editPath()[0]).slice();
 
   const inputs = calc.inputSequence.map(i => '' + i);
@@ -107,7 +107,7 @@ export function visualizeCalculation<TUnit>(calc: ClassicalDistanceCalculation<T
     rowStr += " ".repeat(sparseCount > 0 ? sparseCount : 1);
 
     let edits: string[] = [];
-    const printEdit = (edit: EditTuple<TUnit>) => {
+    const printEdit = (edit: EditTuple<TUnit, TOpSet>) => {
       let tokenText: string;
       switch(edit.op) {
         case 'delete':
@@ -168,7 +168,7 @@ export function visualizeCalculation<TUnit>(calc: ClassicalDistanceCalculation<T
  *    - Motivating statement:  "if we are only interested in the distance if it
  *      is smaller than a threshold..."
  */
-export class ClassicalDistanceCalculation<TUnit = string> {
+export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation> {
   /**
    * Stores ONLY the computed diagonal elements, nothing else.
    *
@@ -213,8 +213,8 @@ export class ClassicalDistanceCalculation<TUnit = string> {
    * Clones an already-existing instance, aliasing old data only where safe.
    * @param other
    */
-  constructor(other: ClassicalDistanceCalculation<TUnit>);
-  constructor(other?: ClassicalDistanceCalculation<TUnit>) {
+  constructor(other: ClassicalDistanceCalculation<TUnit, TOpSet>);
+  constructor(other?: ClassicalDistanceCalculation<TUnit, TOpSet>) {
     if(other) {
       // Clone class properties.
       let rowCount = other.resolvedDistances.length;
@@ -270,7 +270,7 @@ export class ClassicalDistanceCalculation<TUnit = string> {
    * Does not actually mutate the instance.
    */
   getFinalCost(): number {
-    let buffer = this as ClassicalDistanceCalculation<TUnit>;
+    let buffer = this as ClassicalDistanceCalculation<TUnit, TOpSet>;
     let val = buffer.getHeuristicFinalCost();
 
     while(val > buffer.diagonalWidth) {
@@ -297,7 +297,7 @@ export class ClassicalDistanceCalculation<TUnit = string> {
    * @param threshold
    */
   hasFinalCostWithin(threshold: number): boolean {
-    let buffer = this as ClassicalDistanceCalculation<TUnit>;
+    let buffer = this as ClassicalDistanceCalculation<TUnit, TOpSet>;
     let val = buffer.getHeuristicFinalCost();
     let guaranteedBound = this.diagonalWidth;
 
@@ -328,8 +328,8 @@ export class ClassicalDistanceCalculation<TUnit = string> {
    * @param row
    * @param col
    */
-  public editPath(): EditTuple<TUnit>[][] {
-    const results = this._editPath();
+  public editPath(): EditTuple<TUnit, TOpSet>[][] {
+    const results = this._buildPath();
 
     if(results.length <= 1) {
       return results;
@@ -364,7 +364,7 @@ export class ClassicalDistanceCalculation<TUnit = string> {
         maxMS = Math.max(maxMS, ms);
         ms = 0;
 
-        if(edit.op.indexOf('transpose') > -1) {
+        if((edit.op as string).indexOf('transpose') > -1) {
           mst++;
           continue;
         }
@@ -406,170 +406,21 @@ export class ClassicalDistanceCalculation<TUnit = string> {
    * @param row
    * @param col
    */
-  private _editPath(
-    row: number = this.inputSequence.length - 1,
-    col: number = this.matchSequence.length - 1
-  ): EditTuple<TUnit>[][] {
-    const currentCost = this.getCostAt(row, col);
-    if(currentCost == Number.MAX_VALUE) {
-      // We're too far off the main diagonal - a proper edit distance is not viable!
-      throw new Error("Cannot find path - diagonal width is not large enough.")
-    }
-
-    const validPaths: EditTuple<TUnit>[][] = [];
-
-    const tryPath = (row: number, col: number, ops: EditTuple<TUnit>[]) => {
-      // Recursively build the edit path.
-      let results: EditTuple<TUnit>[][];
-      if(row >= 0 && col >= 0) {
-        results = this._editPath(row, col);
-      } else {
-        results = [[]];
-        const result = results[0];
-        for(let r = 0; r <= row; r++) {
-          // There are initial deletions.
-          result.push({
-            op: 'delete',
-            input: this.inputSequence[r]
-          });
-        }
-        for(let c = 0; c <= col; c++) {
-          // There are initial insertions.
-          result.push({
-            op: 'insert',
-            match: this.matchSequence[c]
-          });
-        }
-      }
-
-      // If null, there must not be any valid results
-      if(results) {
-        // ... also, if the array's empty.
-        results.forEach(r => validPaths.push(r.concat(ops)));
-      }
-    }
-
-    const [lastInputIndex, lastMatchIndex] = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
-    if(lastInputIndex >= 0 && lastMatchIndex >= 0) {
-      // OK, a transposition source is quite possible.  Still need to do more vetting, to be sure.
-      let expectedCost = 1;
-
-      // This transposition includes either 'transpose-insert' or 'transpose-delete' operations.
-      let i = row;
-      let m = col;
-      let ops: EditTuple<TUnit>[] = [];
-
-      if(lastInputIndex != row-1) {
-        let count = row - lastInputIndex;
-        ops.push({
-          op: 'transpose-start',
-          input: this.inputSequence[i-count],
-          match: this.matchSequence[lastMatchIndex]
-        });
-        // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
-        // after the if-else.
-        for(let x=count-1; x > 0; x--) {
-          ops.push({
-            op: 'transpose-delete',
-            input: this.inputSequence[i-x]
-          });
-        }
-        expectedCost += count-1;
-      } else {
-        let count = col - lastMatchIndex;
-        ops.push({
-          op: 'transpose-start',
-          input: this.inputSequence[lastInputIndex],
-          match: this.matchSequence[m-count]
-        });
-        // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
-        // after the if-else.
-        for(let y=count-1; y > 0; y--) {
-          ops.push({
-            op: 'transpose-insert',
-            match: this.matchSequence[m-y]
-          });
-        }
-        expectedCost += count - 1;
-      }
-
-      ops.push({
-        op: 'transpose-end',
-        input: this.inputSequence[i],
-        match: this.matchSequence[m]
-      });
-
-      // Double-check our expectations.
-      if(this.getCostAt(lastInputIndex-1, lastMatchIndex-1) == currentCost - expectedCost) {
-        tryPath(lastInputIndex - 1, lastMatchIndex -1, ops);
-      }
-    }
-
-    // Could rework to evaluate whether the selected path actually resolves...
-    // But there would likely be edge cases that still wouldn't be handled
-    // properly.
-    const input = this.inputSequence[row];
-    const match = this.matchSequence[col];
-
-    const insertParentCost = this.getCostAt(row, col-1);
-    if(insertParentCost == currentCost - 1) {
-      tryPath(row, col-1, [{op: 'insert', match}]);
-    }
-
-    const deleteParentCost = this.getCostAt(row-1, col);
-    if(deleteParentCost == currentCost - 1) {
-      tryPath(row-1, col, [{op: 'delete', input}]);
-    }
-
-    const substitutionParentCost = this.getCostAt(row-1, col-1);
-    if(substitutionParentCost == currentCost - 1) {
-      tryPath(row-1, col-1, [{op: 'substitute', input, match}]);
-      // VERY IMPORTANT:  validate the match.  The path can go "off the rails" if
-      // we don't validate this!
-    } else if(substitutionParentCost == currentCost && input == match) {
-      tryPath(row-1, col-1, [{op: 'match', input, match}]);
-    }
-
-    return validPaths;
+  protected _buildPath(pathBuilder?: PathBuilder<TUnit, TOpSet>): EditTuple<TUnit, TOpSet>[][] {
+    pathBuilder = pathBuilder ?? new PathBuilder(this, []);
+    pathBuilder.addEdgeFinder(findBaseEdges);
+    pathBuilder.addEdgeFinder(findTransposeEdges);
+    pathBuilder.backtracePath(this.inputSequence.length - 1, this.matchSequence.length - 1, []);
+    return pathBuilder.validPaths;
   }
 
-  private static getTransposeParent<TUnit>(
-      buffer: ClassicalDistanceCalculation<TUnit>,
-      r: number,
-      c: number
-  ): [number, number] {
-    // Block any transpositions where the tokens are identical.
-    // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
-    if(r < 0 || c < 0 || buffer.inputSequence[r] == buffer.matchSequence[c]) {
-      return [-1, -1];
-    }
-
-    // Transposition checks
-    let lastInputIndex = -1;
-    for(let i = r-1; i >= 0; i--) {
-      if(buffer.inputSequence[i] == buffer.matchSequence[c]) {
-        lastInputIndex = i;
-        break;
-      }
-    }
-
-    let lastMatchIndex = -1;
-    for(let i = c-1; i >= 0; i--) {
-      if(buffer.matchSequence[i] == buffer.inputSequence[r]) {
-        lastMatchIndex = i;
-        break;
-      }
-    }
-
-    return [lastInputIndex, lastMatchIndex];
-  }
-
-  private static initialCostAt<TUnit>(
-      buffer: ClassicalDistanceCalculation<TUnit>,
-      r: number,
-      c: number,
-      insertCost?: number,
-      deleteCost?: number) {
+  private static initialCostAt<TUnit, TOpSet>(
+    buffer: ClassicalDistanceCalculation<TUnit, TOpSet>,
+    r: number,
+    c: number,
+    insertCost?: number,
+    deleteCost?: number
+  ) {
     var baseSubstitutionCost = buffer.inputSequence[r] == buffer.matchSequence[c] ? 0 : 1;
     var substitutionCost: number = buffer.getCostAt(r-1, c-1) + baseSubstitutionCost;
     var insertionCost: number = insertCost || buffer.getCostAt(r, c-1) + 1; // If set meaningfully, will never equal zero.
@@ -577,15 +428,15 @@ export class ClassicalDistanceCalculation<TUnit = string> {
     var transpositionCost: number = Number.MAX_VALUE
 
     if(r > 0 && c > 0) { // bypass when transpositions are known to be impossible.
-      let [lastInputIndex, lastMatchIndex] = ClassicalDistanceCalculation.getTransposeParent(buffer, r, c);
+      let [lastInputIndex, lastMatchIndex] = getTransposeParent(buffer, r, c);
       transpositionCost = buffer.getCostAt(lastInputIndex-1, lastMatchIndex-1) + (r - lastInputIndex - 1) + 1 + (c - lastMatchIndex - 1);
     }
 
     return Math.min(substitutionCost, deletionCost, insertionCost, transpositionCost);
   }
 
-  getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation<TUnit> {
-    let trimmedInstance = new ClassicalDistanceCalculation(this);
+  getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation<TUnit, TOpSet> {
+    let trimmedInstance = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
 
     if(inputLength > this.inputSequence.length || matchLength > this.matchSequence.length) {
       throw "Invalid dimensions specified for trim operation";
@@ -620,8 +471,8 @@ export class ClassicalDistanceCalculation<TUnit = string> {
   }
 
   // Inputs add an extra row / first index entry.
-  addInputChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
-    const returnBuffer = new ClassicalDistanceCalculation<TUnit>(this);
+  addInputChar(token: TUnit): ClassicalDistanceCalculation<TUnit, TOpSet> {
+    const returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._addInputChar(token);
     return returnBuffer;
   }
@@ -645,8 +496,8 @@ export class ClassicalDistanceCalculation<TUnit = string> {
     return;
   }
 
-  addMatchChar(token: TUnit): ClassicalDistanceCalculation<TUnit> {
-    const returnBuffer = new ClassicalDistanceCalculation(this);
+  addMatchChar(token: TUnit): ClassicalDistanceCalculation<TUnit, TOpSet> {
+    const returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._addMatchChar(token);
     return returnBuffer;
   }
@@ -668,8 +519,8 @@ export class ClassicalDistanceCalculation<TUnit = string> {
     return;
   }
 
-  public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit> {
-    let returnBuffer = new ClassicalDistanceCalculation(this);
+  public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit, TOpSet> {
+    let returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer.diagonalWidth++;
 
     if(returnBuffer.inputSequence.length < 1 || returnBuffer.matchSequence.length < 1) {
@@ -769,8 +620,8 @@ export class ClassicalDistanceCalculation<TUnit = string> {
     return returnBuffer;
   }
 
-  private static propagateUpdateFrom<TUnit>(
-    buffer: ClassicalDistanceCalculation<TUnit>,
+  private static propagateUpdateFrom<TUnit, TOpSet>(
+    buffer: ClassicalDistanceCalculation<TUnit, TOpSet>,
     r: number,
     c: number,
     value: number,
@@ -874,7 +725,7 @@ export class ClassicalDistanceCalculation<TUnit = string> {
   //  * @param path
   //  * @returns
   //  */
-  // public visualize(path?: EditTuple<TUnit>[]) {
+  // public visualize(path?: EditTuple<TUnit, TOpSet>[]) {
   //   return visualizeCalculation(this, path);
   // }
 }
@@ -890,8 +741,8 @@ export class ClassicalDistanceCalculation<TUnit = string> {
  * @param extendingIsRow  Set to true if the extending axis is the row.
  * @param closure
  */
-export function forNewIndices<TUnit>(
-  calc: ClassicalDistanceCalculation<TUnit>,
+export function forNewIndices<TUnit, TOpSet>(
+  calc: ClassicalDistanceCalculation<TUnit, TOpSet>,
   extendingIsRow: boolean,
   /**
    * The closure will be called with two values for indexing
@@ -915,6 +766,198 @@ export function forNewIndices<TUnit>(
     } else {
       // Invert 'diagonalIndex' direction for columns.
       closure(startOffset + diagonalIndex, extendingAxisCap, 2 * diagonalWidth - diagonalIndex);
+    }
+  }
+}
+
+function getTransposeParent<TUnit, TOpSet>(
+    buffer: ClassicalDistanceCalculation<TUnit, TOpSet>,
+    r: number,
+    c: number
+): [number, number] {
+  // Block any transpositions where the tokens are identical.
+  // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
+  if(r < 0 || c < 0 || buffer.inputSequence[r] == buffer.matchSequence[c]) {
+    return [-1, -1];
+  }
+
+  // Transposition checks
+  let lastInputIndex = -1;
+  for(let i = r-1; i >= 0; i--) {
+    if(buffer.inputSequence[i] == buffer.matchSequence[c]) {
+      lastInputIndex = i;
+      break;
+    }
+  }
+
+  let lastMatchIndex = -1;
+  for(let i = c-1; i >= 0; i--) {
+    if(buffer.matchSequence[i] == buffer.inputSequence[r]) {
+      lastMatchIndex = i;
+      break;
+    }
+  }
+
+  return [lastInputIndex, lastMatchIndex];
+}
+
+export function findTransposeEdges<TUnit, TOpSet>(
+  pathBuilder: PathBuilder<TUnit, TOpSet>,
+  row: number,
+  col: number
+): void {
+  const calc = pathBuilder.calc;
+  const currentCost = calc.getCostAt(row, col);
+  const [lastInputIndex, lastMatchIndex] = getTransposeParent(calc, row, col);
+  if(lastInputIndex >= 0 && lastMatchIndex >= 0) {
+    // OK, a transposition source is quite possible.  Still need to do more vetting, to be sure.
+    let expectedCost = 1;
+
+    // This transposition includes either 'transpose-insert' or 'transpose-delete' operations.
+    let i = row;
+    let m = col;
+    let ops: EditTuple<TUnit, TOpSet>[] = [];
+
+    if(lastInputIndex != row-1) {
+      let count = row - lastInputIndex;
+      ops.push({
+        op: 'transpose-start',
+        input: calc.inputSequence[i-count],
+        match: calc.matchSequence[lastMatchIndex]
+      });
+      // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
+      // after the if-else.
+      for(let x=count-1; x > 0; x--) {
+        ops.push({
+          op: 'transpose-delete',
+          input: calc.inputSequence[i-x]
+        });
+      }
+      expectedCost += count-1;
+    } else {
+      let count = col - lastMatchIndex;
+      ops.push({
+        op: 'transpose-start',
+        input: calc.inputSequence[lastInputIndex],
+        match: calc.matchSequence[m-count]
+      });
+      // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
+      // after the if-else.
+      for(let y=count-1; y > 0; y--) {
+        ops.push({
+          op: 'transpose-insert',
+          match: calc.matchSequence[m-y]
+        });
+      }
+      expectedCost += count - 1;
+    }
+
+    ops.push({
+      op: 'transpose-end',
+      input: calc.inputSequence[i],
+      match: calc.matchSequence[m]
+    });
+
+    // Double-check our expectations.
+    if(calc.getCostAt(lastInputIndex-1, lastMatchIndex-1) == currentCost - expectedCost) {
+      pathBuilder.backtracePath(lastInputIndex - 1, lastMatchIndex -1, ops);
+    }
+  }
+}
+
+type EdgeFinder<TUnit, TOpSet> = (
+  pathBuilder: PathBuilder<TUnit, TOpSet>,
+  row: number,
+  col: number
+) => void
+
+/**
+ * Determines the edit path used to obtain the optimal cost, distinguishing between zero-cost
+ * substitutions ('match' operations) and actual substitutions.
+ * @param row
+ * @param col
+ */
+export function findBaseEdges<TUnit, TOpSet>(
+  pathBuilder: PathBuilder<TUnit, TOpSet>,
+  row: number,
+  col: number
+): void {
+  const calc = pathBuilder.calc;
+  const currentCost = calc.getCostAt(row, col);
+
+  const input = calc.inputSequence[row];
+  const match = calc.matchSequence[col];
+
+  const insertParentCost = calc.getCostAt(row, col-1);
+  if(insertParentCost == currentCost - 1) {
+    pathBuilder.backtracePath(row, col-1, [{op: 'insert', match}]);
+  }
+
+  const deleteParentCost = calc.getCostAt(row-1, col);
+  if(deleteParentCost == currentCost - 1) {
+    pathBuilder.backtracePath(row-1, col, [{op: 'delete', input}]);
+  }
+
+  const substitutionParentCost = calc.getCostAt(row-1, col-1);
+  if(substitutionParentCost == currentCost - 1) {
+    pathBuilder.backtracePath(row-1, col-1, [{op: 'substitute', input, match}]);
+    // VERY IMPORTANT:  validate the match.  The path can go "off the rails" if
+    // we don't validate this!
+  } else if(substitutionParentCost == currentCost && input == match) {
+    pathBuilder.backtracePath(row-1, col-1, [{op: 'match', input, match}]);
+  }
+}
+
+export class PathBuilder<TUnit, TOpSet = EditOperation> {
+  readonly calc: ClassicalDistanceCalculation<TUnit, TOpSet>;
+  readonly edgeFinders: (EdgeFinder<TUnit, TOpSet>)[];
+  readonly validPaths: EditTuple<TUnit, TOpSet>[][] = [];
+
+  constructor(calc: ClassicalDistanceCalculation<TUnit, TOpSet>, edgeFinders: (EdgeFinder<TUnit, TOpSet>)[]) {
+    this.calc = calc;
+    this.edgeFinders = edgeFinders;
+  }
+
+  addEdgeFinder(finder: EdgeFinder<TUnit, TOpSet>) {
+    this.edgeFinders.push(finder);
+  }
+
+  backtracePath(row: number, col: number, recentEdge: EditTuple<TUnit, TOpSet>[]) {
+    const calc = this.calc;
+
+    // Recursively build the edit path.
+    let results: EditTuple<TUnit, TOpSet>[][];
+    if(row >= 0 && col >= 0) {
+      const parentBuilder = new PathBuilder<TUnit, TOpSet>(calc, this.edgeFinders);
+      if(calc.getCostAt(row, col) == Number.MAX_VALUE) {
+        // We're too far off the main diagonal - a proper edit distance is not viable!
+        throw new Error("Cannot find path - diagonal width is not large enough.")
+      }
+      this.edgeFinders.forEach(finder => finder(parentBuilder, row, col));
+      results = parentBuilder.validPaths;
+    } else {
+      results = [[]];
+      const result = results[0];
+      for(let r = 0; r <= row; r++) {
+        // There are initial deletions.
+        result.push({
+          op: 'delete',
+          input: calc.inputSequence[r]
+        });
+      }
+      for(let c = 0; c <= col; c++) {
+        // There are initial insertions.
+        result.push({
+          op: 'insert',
+          match: calc.matchSequence[c]
+        });
+      }
+    }
+
+    // If null, there must not be any valid results
+    if(results) {
+      // ... also, if the array's empty.
+      results.forEach(r => this.validPaths.push(r.concat(recentEdge)));
     }
   }
 }
