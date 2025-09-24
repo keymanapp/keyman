@@ -10,10 +10,21 @@ export type ExtendedEditOperation = 'merge' | 'split' | EditOperation;
  * This is an optimized edit-distance calculation engine that supports two
  * additional edit-distance operations on strings:  'merge' and 'split'.
  *
- * - 'merge' allows two or more input tokens to be directly combined, with no further
- * edits, into a single match token.
- * - 'split' allows one input token to be directly split, with no further edits, into
- * two or more match tokens.
+ * - 'merge' allows two or more input tokens to be directly combined into a
+ *   single match token.
+ *   - if the tokens perfectly combine, the edit cost is 1.
+ *   - if additional text is prepended or appended, the edit cost is 2.
+ * - 'split' allows one input token to be directly split into two or more match
+ *   tokens.
+ *   - if the tokens perfectly split, with no portion missing from the split
+ *     results, the edit cost is 1.
+ *   - if part of the original text is missing from the split results, the edit
+ *     cost is 2.
+ *
+ * Both the 'merge' and 'split' operations require that all merged / split text
+ * be continguous - other edits are not permitted within the portion appearing
+ * in both the input and match sequences.
+ *
  */
 export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation<string, ExtendedEditOperation> {
   /**
@@ -38,9 +49,9 @@ export class SegmentableDistanceCalculation extends ClassicalDistanceCalculation
     let mergeCost = Number.MAX_VALUE;
     let splitCost = Number.MAX_VALUE;
 
-    const [lastMergeIndex, lastSplitIndex] = getMergeSplitParent(buffer, r, c);
-    mergeCost = lastMergeIndex == -1 ? mergeCost : (buffer.getCostAt(lastMergeIndex-1, c-1) + 1);
-    splitCost = lastSplitIndex == -1 ? splitCost : (buffer.getCostAt(r-1, lastSplitIndex-1) + 1);
+    const {merge, split} = getMergeSplitParent(buffer, r, c);
+    mergeCost = merge ? (buffer.getCostAt(merge.index-1, c-1) + 1 + (merge.match ? 0 : 1)) : mergeCost;
+    splitCost = split ? (buffer.getCostAt(r-1, split.index-1) + 1 + (split.match ? 0 : 1)) : splitCost;
 
     return Math.min(baseCost, mergeCost, splitCost);
   }
@@ -101,44 +112,74 @@ function getMergeSplitParent<TOpEdit> (
   buffer: ClassicalDistanceCalculation<string, TOpEdit>,
   r: number,
   c: number
-): [number, number] {
+): {merge?: { index: number, match: boolean }, split?: { index: number, match: boolean}} {
   const mergeTarget = buffer.matchSequence[c];
   const splitTarget = buffer.inputSequence[r];
 
   // Block any operations where the initial tokens are identical.
   // Other operations will be cheaper.  Also, block cases where 'parents' are impossible.
   if(r < 0 || c < 0 || splitTarget == mergeTarget) {
-    return [-1, -1];
+    return {};
   }
-
 
   // Merge checks
   let mergedInputs = '';
-  let lastMergeIndex = -1;
+  let mergeResult: { index: number, match: boolean };
   for(let i = r; i >= 0; i--) {
     mergedInputs = buffer.inputSequence[i] + mergedInputs;
-    if(mergedInputs == mergeTarget) {
-      lastMergeIndex = i;
+
+    // If merged input length exceeds the merge target, abort.
+    const lenDiff = mergeTarget.length - mergedInputs.length;
+    if(lenDiff < 0) {
       break;
-    } else if(mergedInputs.length > mergeTarget.length) {
+    }
+
+    // If merged input isn't a substring of the merge target, abort.
+    const substrIndex = mergeTarget.indexOf(mergedInputs);
+    if(substrIndex == -1) {
       break;
+    }
+
+    if(i != r) {
+      // If we made it here, it's at least a partial match.
+      mergeResult = {
+        index: i,
+        match: lenDiff == 0 // required for a full, perfect match.
+      };
     }
   }
 
   // Split checks
   let mergedMatches = '';
-  let lastSplitIndex = -1;
+  let splitResult: { index: number, match: boolean };
   for(let i = c; i >= 0; i--) {
     mergedMatches = buffer.matchSequence[i] + mergedMatches;
-    if(mergedMatches == splitTarget) {
-      lastSplitIndex = i;
+
+    // If merged match length exceeds the split target, abort.
+    const lenDiff = splitTarget.length - mergedMatches.length;
+    if(lenDiff < 0) {
       break;
-    } else if(mergedMatches.length > splitTarget.length) {
+    }
+
+    // If merged match isn't a substring of the split target, abort.
+    const substrIndex = splitTarget.indexOf(mergedMatches);
+    if(substrIndex == -1) {
       break;
+    }
+
+    if(i != c) {
+      // If we made it here, it's at least a partial split.
+      splitResult = {
+        index: i,
+        match: lenDiff == 0 // required for a full, perfect split.
+      };
     }
   }
 
-  return [lastMergeIndex, lastSplitIndex];
+  return {
+    merge: mergeResult,
+    split: splitResult
+  };
 }
 
 /**
@@ -159,20 +200,20 @@ export function findSplitMergeEdges<TOpSet>(
     throw new Error("Cannot find path - diagonal width is not large enough.")
   }
 
-  const [lastMergeIndex, lastSplitIndex] = getMergeSplitParent(calc, row, col);
-  if(lastMergeIndex != -1) {
+  const {merge, split} = getMergeSplitParent(calc, row, col);
+  if(merge) {
     const ops: EditTuple<ExtendedEditOperation>[] = [];
-    for(let r = lastMergeIndex; r <= row; r++) {
+    for(let r = merge.index; r <= row; r++) {
       ops.push({ input: r, match: col, op: 'merge' });
     }
-    pathBuilder.backtracePath(lastMergeIndex - 1, col - 1, ops);
+    pathBuilder.backtracePath(merge.index - 1, col - 1, ops);
   }
 
-  if(lastSplitIndex != -1) {
+  if(split) {
     const ops: EditTuple<ExtendedEditOperation>[] = [];
-    for(let c = lastSplitIndex; c <= col; c++) {
+    for(let c = split.index; c <= col; c++) {
       ops.push({ input: row, match: c, op: 'split' });
     }
-    pathBuilder.backtracePath(row - 1, lastSplitIndex - 1, ops);
+    pathBuilder.backtracePath(row - 1, split.index - 1, ops);
   }
 }
