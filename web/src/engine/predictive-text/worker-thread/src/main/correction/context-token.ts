@@ -136,10 +136,7 @@ export class ContextToken {
   }
 
   /**
-   * Gets a simple, human-readable representation of `inputRange`.
-   *
-   * Should not actually be used in code - its use is intended only for
-   * debugging.
+   * Gets a simple, compact string-based representation of `inputRange`.
    */
   get sourceText(): string {
     const composite = this._inputRange.reduce((accum, current) => buildMergedTransform(accum, current), { insert: '', deleteLeft: 0 });
