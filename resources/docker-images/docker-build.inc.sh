@@ -96,16 +96,11 @@ setup_container_registry() {
   local password=${REGISTRY_PASSWORD:-}
   registry_slash=''
 
-  builder_echo debug "Setting up container registry."
+  builder_echo debug "Setting up container registry '${registry}'."
 
-  if [[ "${registry:-}" == "docker.io" ]]; then
-    builder_echo debug "Container registry is 'docker.io'."
-    registry=
-  else
-    registry_slash="${registry}/"
-    registry_parameters="--registry ${registry}"
-    build_args+=("--build-arg=REGISTRY=${registry_slash}")
-  fi
+  registry_slash="${registry}/"
+  registry_parameters="--registry ${registry}"
+  build_args+=("--build-arg=REGISTRY=${registry_slash}")
 
   if [[ -n ${username:-} ]] ; then
     if [[ -z ${password:-} ]] ; then

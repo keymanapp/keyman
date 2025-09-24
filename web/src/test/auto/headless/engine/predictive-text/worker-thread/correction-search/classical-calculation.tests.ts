@@ -592,7 +592,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         { op: 'match', input: 1 /* 'c' */, match: 1 /* 'c' */},
         { op: 'match', input: 2 /* 'c' */, match: 2 /* 'c' */},
         { op: 'match', input: 3 /* 'o' */, match: 3 /* 'o' */},
-        { op: 'insert', match: 4 /* 'm' */},  // insert is earlier
+        { op: 'insert',                    match: 4 /* 'm' */},  // insert is earlier
         { op: 'match', input: 4 /* 'm' */, match: 5 /* 'm' */}, // longer contiguous match sequence
         { op: 'match', input: 5 /* 'o' */, match: 6 /* 'o' */},
         { op: 'match', input: 6 /* 'd' */, match: 7 /* 'd' */},
@@ -605,7 +605,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         { op: 'match', input: 2 /* 'c' */, match: 2 /* 'c' */},
         { op: 'match', input: 3 /* 'o' */, match: 3 /* 'o' */},
         { op: 'match', input: 4 /* 'm' */, match: 4 /* 'm' */},
-        { op: 'insert', match: 5 /* 'm' */}, // now inserting later.
+        { op: 'insert',                    match: 5 /* 'm' */}, // now inserting later.
         { op: 'match', input: 5 /* 'o' */, match: 6 /* 'o' */},
         { op: 'match', input: 6 /* 'd' */, match: 7 /* 'd' */},
         { op: 'match', input: 7 /* 'a' */, match: 8 /* 'a' */},
@@ -635,7 +635,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         { op: 'delete', input: 3},
         { op: 'match', input: 4, match: 3},
         { op: 'match', input: 5, match: 4},
-        { op: 'insert', match: 5}
+        { op: 'insert',          match: 5}
       ];
 
       const viablePaths = buffer.editPath();
@@ -687,14 +687,14 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         { op: 'match', input: 1, match: 1}, // best sequence:  continguous matches
         { op: 'match', input: 2, match: 2}, // + adjacent substitutes
         { op: 'substitute', input: 3, match: 3},
-        { op: 'insert', match: 4},
+        { op: 'insert',               match: 4},
       ];
 
       let altSequence: EditTuple<string>[] = [
         { op: 'match', input: 0, match: 0},
         { op: 'match', input: 1, match: 1},
         { op: 'match', input: 2, match: 2},
-        { op: 'insert', match: 3},
+        { op: 'insert',          match: 3},
         { op: 'substitute', input: 3, match: 4},
       ];
 
@@ -717,7 +717,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         { op: 'match', input: 5, match: 3},
         { op: 'match', input: 6, match: 4},
         { op: 'transpose-start', input: 7, match: 5},
-        { op: 'transpose-insert', match: 6},
+        { op: 'transpose-insert',          match: 6},
         { op: 'transpose-end', input: 8, match: 7}
       ];
 

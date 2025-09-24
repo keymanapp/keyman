@@ -147,7 +147,6 @@ describe('Split/merge aware edit-distance calculation', () => {
     assert.equal(calc.getFinalCost(), 4);
 
     const editPaths = calc.editPath();
-    assert.isAbove(editPaths.length, 3);
     assert.sameDeepOrderedMembers(editPaths[0], [
       { op: 'split', input: 0, match: 0 },
       { op: 'split', input: 0, match: 1 },
@@ -156,6 +155,26 @@ describe('Split/merge aware edit-distance calculation', () => {
       { op: 'merge', input: 3, match: 4 },
       { op: 'merge', input: 4, match: 4 }
     ]);
+
+    // ('insert', 'substitute') can be reordered
+    // ('substitute', 'delete') can be reordered
+    // There also exist cases where one pair or the other, but not both,
+    // are considered for the edit path.
+    assert.includeDeepMembers(editPaths, [[
+      { op: 'insert',               match: 0 }, //       -> 'b'
+      { op: 'substitute', input: 0, match: 1 }, // 'abc' -> 'c'
+      { op: 'match',      input: 1, match: 2 }, // 'd'   == 'd'
+      { op: 'match',      input: 2, match: 3 }, // 'e'   == 'e'
+      { op: 'substitute', input: 3, match: 4 }, // 'f'   -> 'fgh'
+      { op: 'delete',     input: 4 }            // 'g'   ->
+    ]]);
+
+    // both split and merge:  1 variation
+    // split, but not merge:  2 variations
+    // merge, but not split:  2 variations
+    // neither:         2x2 = 4 variations
+    // sum: 9
+    assert.equal(editPaths.length, 9);
   });
 
   it("abcd,e,f,g -> b,c,d,efgh = 4", () => {
@@ -180,10 +199,10 @@ describe('Split/merge aware edit-distance calculation', () => {
     ]);
 
     assert.sameDeepOrderedMembers(editPaths[1], [
-      { op: 'substitute', input: 0, match: 0 },
-      { op: 'substitute', input: 1, match: 1 },
-      { op: 'substitute', input: 2, match: 2 },
-      { op: 'substitute', input: 3, match: 3 }
+      { op: 'substitute', input: 0, match: 0 }, // 'abcd' -> 'b'
+      { op: 'substitute', input: 1, match: 1 }, // 'e' -> 'c'
+      { op: 'substitute', input: 2, match: 2 }, // 'f' -> 'd'
+      { op: 'substitute', input: 3, match: 3 }  // 'g' -> 'efgh'
     ]);
   });
 });

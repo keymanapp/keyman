@@ -38,7 +38,7 @@ if builder_is_debug_build; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 
-ARTIFACT="firstvoices-$KEYMAN_VERSION.apk"
+ARTIFACT="firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.apk"
 
 KEYBOARD_PACKAGE_ID="fv_all"
 KEYBOARDS_TARGET="oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
@@ -75,6 +75,8 @@ if builder_start_action build; then
 
   echo "BUILD_FLAGS: $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+
+  mv "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/$CONFIG/firstvoices-${KEYMAN_VERSION}.apk" "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/$CONFIG/${ARTIFACT}"
 
   builder_finish_action success build
 fi

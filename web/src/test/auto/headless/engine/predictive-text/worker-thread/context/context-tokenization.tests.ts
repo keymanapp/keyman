@@ -138,8 +138,8 @@ describe('ContextTokenization', function() {
             {op: 'match', input: 4, match: 4},
             {op: 'match', input: 5, match: 5},
             {op: 'match', input: 6, match: 6},
-            {op: 'insert', match: 7},
-            {op: 'insert', match: 8}
+            {op: 'insert',          match: 7},
+            {op: 'insert',          match: 8}
           ],
           leadTokenShift: 0,
           leadEditLength: 0,
@@ -436,8 +436,8 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           editPath: [
-            {op: 'insert', match: 0},
-            {op: 'insert', match: 1},
+            {op: 'insert',          match: 0},
+            {op: 'insert',          match: 1},
             {op: 'match', input: 0, match: 2},
             {op: 'match', input: 1, match: 3},
             {op: 'match', input: 2, match: 4},
@@ -614,8 +614,8 @@ describe('ContextTokenization', function() {
             {op: 'match', input: 10, match: 9},
             {op: 'match', input: 11, match: 10},
             {op: 'match', input: 12, match: 11},
-            {op: 'insert', match: 12},
-            {op: 'insert', match: 13}
+            {op: 'insert',           match: 12},
+            {op: 'insert',           match: 13}
           ],
           leadTokenShift: 1, // "'",
           leadEditLength: 1, // "n't" / "t"

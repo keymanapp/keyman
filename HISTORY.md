@@ -1,5 +1,50 @@
 # Keyman Version History
 
+## 19.0.117 alpha 2025-09-11
+
+* fix(resources): ignore KEYMAN_VERSION_FOR_FILENAME in test (#14730)
+* fix(resources): pr build status - find 'failure' state in status checks and log (#14732)
+
+## 19.0.116 alpha 2025-09-10
+
+* fix(windows): kmshell continues when sm is in waitingrestart  and returns to idle (#14644)
+* maint(linux): allow to skip API check (#14699)
+* maint(resources): adding GitHub actions workflow for Docker builds (#14674)
+* maint(developer): use versioned filenames for PR artifacts (#14701)
+* maint(windows): use versioned filenames for PR artifacts (#14702)
+* maint(android): use versioned filenames for PR artifacts (#14703)
+* maint(ios): use versioned filenames for PR artifacts (#14704)
+* maint(mac): use versioned filenames for PR artifacts (#14705)
+* maint(resources): rename KEYMAN_VERSION_FOR_PR_FILENAME (#14720)
+
+## 19.0.115 alpha 2025-09-09
+
+* fix(linux): don't crash if `kmp.json` is missing `keyboards` section (#14708)
+
+## 19.0.114 alpha 2025-09-08
+
+* docs(web): Improve empty What's New page for Web (#14660)
+* maint(linux): remove obsolete Makefile (#14694)
+* maint(resources): honor configure comment character in commit message (#14695)
+* fix(web): fix error trying to calculate style scaling effects (#14684)
+* refactor(resources): remove shellcheck warnings (#14698)
+
+## 19.0.113 alpha 2025-09-04
+
+* fix(android): Update KMSample1 layout when changing orientation (#14678)
+
+## 19.0.112 alpha 2025-09-03
+
+* fix(developer): add clear messages about validation failures to New LM Project Parameters form (#14659)
+* docs(developer): tweak get-started for kmc and add entry to HISTORY.md (#14667)
+* fix(android): Cleanup list layout in Engine and FirstVoices for edge to edge (#14655)
+* docs(common): update license date and owner (#14668)
+* maint(linux): skip tarball creation for `Build-bot: build` buildLevel (#14671)
+* docs(common): update docs Keyman Desktop → Keyman for Windows (#14669)
+* feat(web): adds transform cataloging methods to predictive-text worker (#14581)
+* feat(web): batch correction-search paths by related subsets (#14592)
+* refactor(web): simplify edit-distance calculation-object inputs (#14618)
+
 ## 19.0.111 alpha 2025-09-02
 
 * change(developer): update SIL logo (#14656)

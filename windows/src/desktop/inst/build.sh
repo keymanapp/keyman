@@ -15,7 +15,7 @@ builder_describe "Installation files for Keyman for Windows" \
 # after all other builds complete
 
 builder_if_release_build_level builder_describe_outputs \
-  publish       /windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe
+  publish       /windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION_FOR_FILENAME}.exe
 
 builder_parse "$@"
 
@@ -104,7 +104,7 @@ function copy-installer() {
 
   mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
   cp keymandesktop.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keymandesktop.msi"
-  cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe"
+  cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION_FOR_FILENAME}.exe"
   cp "$WINDOWS_PROGRAM_APP/setup.exe" "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup.exe"
 
   verify-installer-signatures
