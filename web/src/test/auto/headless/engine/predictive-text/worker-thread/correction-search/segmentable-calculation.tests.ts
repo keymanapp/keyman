@@ -3,8 +3,7 @@ import { SegmentableDistanceCalculation } from '@keymanapp/lm-worker/test-index'
 
 describe('Split/merge aware edit-distance calculation', () => {
   it("a,b,c -> a,b,d = 1", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 2;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 2});
 
     ['a', 'b', 'c'].forEach(c => calc = calc.addInputChar(c));
     ['a', 'b', 'd'].forEach(c => calc = calc.addMatchChar(c));
@@ -13,8 +12,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("a,b,c -> a,bc = 1", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 2;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 2});
 
     ['a', 'b', 'c'].forEach(c => calc = calc.addInputChar(c));
     ['a', 'bc'].forEach(c => calc = calc.addMatchChar(c));
@@ -23,8 +21,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("ab,c,d -> a,b,cd = 2", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 2;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 2});
 
     ['ab', 'c', 'd'].forEach(c => calc = calc.addInputChar(c));
     ['a', 'b', 'cd'].forEach(c => calc = calc.addMatchChar(c));
@@ -33,8 +30,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("a,bc,d -> a,b,c,d = 1", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 2;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 2});
 
     ['a', 'bc', 'd'].forEach(c => calc = calc.addInputChar(c));
     ['a', 'b', 'c', 'd'].forEach(c => calc = calc.addMatchChar(c));
@@ -43,8 +39,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("a,b,c,d -> a,bc,d = 1", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 2;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 2});
 
     ['a', 'b', 'c', 'd'].forEach(c => calc = calc.addInputChar(c));
     ['a', 'bc', 'd'].forEach(c => calc = calc.addMatchChar(c));
@@ -53,8 +48,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("ab,d,c,e,g,h -> a,b,c,d,f,gh = 4", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 4;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 4});
 
     // 'ab' => 'a', 'b'
     // d,c transposed
@@ -80,8 +74,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("abc,d,f,g,h -> a,b,c,d,fgh = 2", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 4;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 4});
 
     ['abc', 'd', 'f', 'g', 'h'].forEach(c => calc = calc.addInputChar(c));
     ['a', 'b', 'c', 'd', 'fgh'].forEach(c => calc = calc.addMatchChar(c));
@@ -102,8 +95,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("abcde,f -> b,c,d,e,f = 2", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 4;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 4});
 
     // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
     // (The 'a' doesn't land.)
@@ -124,8 +116,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("a,b,c,d,e -> a, bcdef = 2", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 4;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 4});
 
     // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
     // (The 'a' doesn't land.)
@@ -146,8 +137,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("abc,d,e,f,g -> b,c,d,e,fgh = 4", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 4;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 4});
 
     // Partial merge = cost of 2:  1 for merging, 1 for being incomplete.
     // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
@@ -188,8 +178,7 @@ describe('Split/merge aware edit-distance calculation', () => {
   });
 
   it("abcd,e,f,g -> b,c,d,efgh = 4", () => {
-    let calc = new SegmentableDistanceCalculation();
-    calc.diagonalWidth = 4;
+    let calc = new SegmentableDistanceCalculation({diagonalWidth: 4});
 
     // Partial merge = cost of 2:  1 for merging, 1 for being incomplete.
     // Partial split = cost of 2:  1 for splitting, 1 for being incomplete.
