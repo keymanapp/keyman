@@ -731,7 +731,7 @@ public final class KMManager {
   private static void applyInsetsPaddingToKeyboardView(KMKeyboard keyboard, int left, int right, int bottom) {
     View parent = (View) keyboard.getParent();
 
-    if (parent != null) {
+    if (keyboard.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && parent != null) {
       // Keep existing top padding, add bottom padding for the inset
       parent.setPadding(
         left,

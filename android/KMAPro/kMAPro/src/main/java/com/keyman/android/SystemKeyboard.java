@@ -141,7 +141,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             insets.left,
             insets.top,
             insets.right,
-            insets.bottom/20); // This still doesn't fix suggestion banner
+            insets.bottom);
 
           KMManager.applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, insets.left, insets.right, insets.bottom);
           return windowInsets;
