@@ -120,7 +120,18 @@ while (( $# )); do
     --no-x11) USE_X11=0;;
     --verbose|-v) ARG_VERBOSE=--verbose;;
     --debug) ARG_DEBUG=--debug-log;;
-    --remote-debug) REMOTE_HOST="$(ip route get 8.8.8.8 | sed -E 's/.*src (\S+) .*/\1/;t;d'):2345" && REMOTE_DEBUG="gdbserver ${REMOTE_HOST}";;
+    --remote-debug)
+      if [[ -z "${DOCKER_RUNNING:-}" ]]; then
+        REMOTE_HOST="$(ip route get 8.8.8.8 | sed -E 's/.*src (\S+) .*/\1/;t;d'):2345"
+      else
+        REMOTE_HOST="localhost:2345"
+        if ! dpkg -l gdbserver &> /dev/null; then
+          echo "Installing gdbserver..."
+          sudo apt update && sudo apt install -y gdbserver
+        fi
+      fi
+      REMOTE_DEBUG="gdbserver ${REMOTE_HOST}"
+      ;;
     --) shift && break ;;
     *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
