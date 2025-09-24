@@ -52,6 +52,9 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
@@ -889,6 +892,25 @@ public final class KMManager {
 
     if (SystemKeyboard == null) {
       return mainLayout;
+    }
+
+    if (mainLayout != null) {
+      // Update insets
+      ViewCompat.setOnApplyWindowInsetsListener(mainLayout,
+        (view, windowInsets) -> {
+          // Allocate insets for system bars and display cutout (notch)
+          Insets insets = windowInsets.getInsets(
+            WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+
+          view.setPadding(
+            insets.left,
+            insets.top,
+            insets.right,
+            insets.bottom);
+
+          applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, insets.left, insets.right, insets.bottom);
+          return windowInsets;
+        });
     }
 
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
