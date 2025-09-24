@@ -11,12 +11,14 @@
 import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { buildEdgeWindow, ContextToken, ContextTokenization, models, precomputationSubsetKeyer, TokenizationTransitionEdits } from '@keymanapp/lm-worker/test-index';
+import { buildEdgeWindow, ContextToken, ContextTokenization, models, precomputationSubsetKeyer, TokenizationTransitionEdits, TokenizationSubsetBuilder } from '@keymanapp/lm-worker/test-index';
 
+import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
@@ -509,5 +511,283 @@ describe('precomputationSubsetKeyer', function() {
     const key2 = precomputationSubsetKeyer(precomputation2);
 
     assert.notEqual(key2, key1);
+  });
+
+  it("generates a key without boundary-mutation marker on simple whitespace input after text", () => {
+    const rawTextTokens = ['she', ' ', 'says', ' ', 'I', ' ', 'can'];
+    let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+
+    const precomputation1: TokenizationTransitionEdits = {
+      alignment: {
+        merges: [],
+        splits: [],
+        unmappedEdits: [],
+        edgeWindow: {
+          ...buildEdgeWindow(
+            tokenization.tokens,
+            { insert: ' ', deleteLeft: 0, deleteRight: 0 },
+            false
+          ),
+          retokenization: [...rawTextTokens]
+        }
+      },
+      tokenizedTransform: (() => {
+        const map = new Map<number, Transform>();
+        // Creates a `'.` token.  The two chars should technically be separate
+        // tokens, but... we should still get a distinct key if they're combined
+        // this way.
+        map.set(1, { insert: ' ', deleteLeft: 0 });
+        map.set(2, { insert: '', deleteLeft: 0 });
+        return map;
+      })()
+    };
+
+    const key1 = precomputationSubsetKeyer(precomputation1);
+
+    // A very "whitebox" check, but it's the clearest way to validate this.
+    assert.isFalse(key1.indexOf(SENTINEL_CODE_UNIT + 'BI@') > -1, "Key contains marker indicating boundary-token mutation");
+  });
+});
+
+describe('TokenizationSubsetBuilder', function() {
+  // Include a few tests related to precomputationSubsetKeyer
+  //
+  // Also do some tests that mimic intended use upon receiving an incoming
+  // fat-finger distribution.
+  it("builds a single subset when all keys are non-whitespace single-char inserts", () => {
+    const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
+    const baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+
+    const inputChars = ['b', 'd', 'i', 'm', 'n', 'p', 's', 't', 'y'];
+    const totalMass = inputChars.reduce((accum, curr) => accum + curr.charCodeAt(0), 0);
+    const inputDistribution = inputChars.map((c) => ({sample: { insert: c, deleteLeft: 0 }, p: c.charCodeAt(0) / totalMass}));
+
+    const subsetBuilder = new TokenizationSubsetBuilder();
+
+    inputChars.forEach((c) => {
+      const {sample: transform, p} = inputDistribution.find(s => s.sample.insert == c);
+
+      const precomputation = baseTokenization.precomputeTokenizationAfterInput(plainModel, transform);
+      subsetBuilder.addPrecomputation(baseTokenization, precomputation, p);
+    });
+
+    assert.equal(subsetBuilder.subsets.size, 1); // All transforms have similar impacts.
+    const subset = [...subsetBuilder.subsets.values()][0];
+    assert.equal(subset.pendingSet.size, 1); // Built from only one tokenization
+    assert.deepEqual(subset.pendingSet.get(baseTokenization).tokenizedInputs,
+      inputDistribution.map((sample) => {
+        const map = new Map<number, Transform>();
+        map.set(0, sample.sample);
+        return { sample: map, p: sample.p };
+    }));
+  });
+
+  it("builds two subsets when all but one keys are non-whitespace single-char inserts", () => {
+    const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
+    const baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+
+    const inputChars = ['b', 'd', 'i', 'm', 'n', 'p', 's', 't', 'y', ' '];
+    const totalMass = inputChars.reduce((accum, curr) => accum + curr.charCodeAt(0), 0);
+    const inputDistribution = inputChars.map((c) => ({sample: { insert: c, deleteLeft: 0 }, p: c.charCodeAt(0) / totalMass}));
+
+    const subsetBuilder = new TokenizationSubsetBuilder();
+
+    inputChars.forEach((c) => {
+      const {sample: transform, p} = inputDistribution.find(s => s.sample.insert == c);
+
+      const precomputation = baseTokenization.precomputeTokenizationAfterInput(plainModel, transform);
+      subsetBuilder.addPrecomputation(baseTokenization, precomputation, p);
+    });
+
+    assert.equal(subsetBuilder.subsets.size, 2); // All transforms have similar impacts.
+    const subsets = [...subsetBuilder.subsets.values()];
+    subsets.forEach((subset) => assert.equal(subset.pendingSet.size, 1));  // Built from only one tokenization
+
+    const distributionWithoutWhitespace = inputDistribution.slice(0, inputDistribution.length-1);
+    const extendingSubset = subsets.find((subset) => subset.pendingSet.get(baseTokenization).tokenizedInputs.length > 1);
+    assert.deepEqual(extendingSubset.pendingSet.get(baseTokenization).tokenizedInputs,
+      distributionWithoutWhitespace.map((sample) => {
+        const map = new Map<number, Transform>();
+        map.set(0, sample.sample);
+        return { sample: map, p: sample.p };
+    }));
+
+    const whitespaceSubset = subsets.find((subset) => subset.pendingSet.get(baseTokenization).tokenizedInputs.length == 1);
+    const whitespaceSample = inputDistribution[inputDistribution.length - 1];
+    const expectedWhitespaceTransformTokenization = {
+      sample: (() => {
+        const map = new Map<number, Transform>();
+        // Whitespace creates a new, appended token...
+        map.set(1, whitespaceSample.sample);
+        // ... and a following blank token with empty root text.
+        map.set(2, { insert: '', deleteLeft: 0 });
+        return map;
+      })(),
+      p: whitespaceSample.p
+    };
+    assert.deepEqual(whitespaceSubset.pendingSet.get(baseTokenization).tokenizedInputs, [expectedWhitespaceTransformTokenization]);
+  });
+
+  it("builds different subsets for transforms resulting in different total lengths and token count", () => {
+    const rawTextTokens = ['drink', ' ', 'coffee', ' ', 'at', ' ', 'a', ' ', 'cafe'];
+    const baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+
+    const inputDistribution: Distribution<Transform> = [
+      { sample: { insert: 'é', deleteLeft: 1 }, p: .35 }, // café (length 4)
+      { sample: { insert: 't', deleteLeft: 0 }, p: .2 }, // cafet (length 5) (as in 'cafeteria')
+      { sample: { insert: 's', deleteLeft: 0 }, p: .15 }, // cafes (length 4)
+      { sample: { insert: '', deleteLeft: 1 }, p: .1 },  // caf (length 3)
+      { sample: { insert: '', deleteLeft: 0 }, p: .1 },  // cafe (length 4)
+      { sample: { insert: '.', deleteLeft: 0 }, p: .08 }, // cafe,. (lengths 4, 1)
+      { sample: { insert: ' ', deleteLeft: 0 }, p: .12 }  // cafe, , (lengths 4, 1, 0)
+    ];
+
+    const subsetBuilder = new TokenizationSubsetBuilder();
+
+    inputDistribution.forEach((entry) => {
+      const precomputation = baseTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      subsetBuilder.addPrecomputation(baseTokenization, precomputation, entry.p);
+    });
+
+    assert.equal(subsetBuilder.subsets.size, 5); // All transforms have similar impacts.
+
+    const subsets = [...subsetBuilder.subsets.values()];
+    const sameTokenLen4Subset = subsets.find((subset) => {
+      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const totalMass = dataForSet.tokenizedInputs.reduce((accum, curr) => accum + curr.p, 0);
+      // Thanks, floating-point precision.
+      // Should land both the 'é' (delete 1) and empty-string transform (that lacks deletes)
+      return Math.abs(totalMass - .45) < 1e-8;
+    });
+    assert.isOk(sameTokenLen4Subset);
+    assert.equal(sameTokenLen4Subset.pendingSet.get(baseTokenization).tokenizedInputs.length, 2);
+
+    const sameTokenLen5Subset = subsets.find((subset) => {
+      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const totalMass = dataForSet.tokenizedInputs.reduce((accum, curr) => accum + curr.p, 0);
+      // Thanks, floating-point precision.
+      // Should land both the 't' and 's' transforms:  adds 1 char, deletes none
+      return Math.abs(totalMass - .35) < 1e-8;
+    });
+    assert.isOk(sameTokenLen5Subset);
+    assert.equal(sameTokenLen5Subset.pendingSet.get(baseTokenization).tokenizedInputs.length, 2);
+
+    const sameTokenLen3Subset = subsets.find((subset) => {
+      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const totalMass = dataForSet.tokenizedInputs.reduce((accum, curr) => accum + curr.p, 0);
+      // Thanks, floating-point precision.
+      // Should land the backspace transform.
+      return Math.abs(totalMass - .1) < 1e-8;
+    });
+    assert.isOk(sameTokenLen3Subset);
+    assert.equal(sameTokenLen3Subset.pendingSet.get(baseTokenization).tokenizedInputs.length, 1);
+
+    const plusOneTokenSubset = subsets.find((subset) => {
+      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const totalMass = dataForSet.tokenizedInputs.reduce((accum, curr) => accum + curr.p, 0);
+      // Thanks, floating-point precision.
+      // Should land the backspace transform.
+      return Math.abs(totalMass - .08) < 1e-8;
+    });
+    assert.isOk(plusOneTokenSubset);
+    assert.equal(plusOneTokenSubset.pendingSet.get(baseTokenization).tokenizedInputs.length, 1);
+
+    const plusTwoTokensSubset = subsets.find((subset) => {
+      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const totalMass = dataForSet.tokenizedInputs.reduce((accum, curr) => accum + curr.p, 0);
+      // Thanks, floating-point precision.
+      // Should land the backspace transform.
+      return Math.abs(totalMass - .12) < 1e-8;
+    });
+    assert.isOk(plusTwoTokensSubset);
+    assert.equal(plusTwoTokensSubset.pendingSet.get(baseTokenization).tokenizedInputs.length, 1);
+  });
+
+  it("places compatible results from separate tokenizations in the same subset after whitespace", () => {
+    const baseRawTextTokens = ['drink', ' ', 'coffee', ' ', 'at', ' ', 'a', ' ', 'cafe'];
+    const baseTokenization = new ContextTokenization(baseRawTextTokens.map((text => toToken(text))));
+
+    const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1 };
+
+    const fourCharTailToken = new ContextToken(baseTokenization.tail);
+    fourCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: trueSourceTransform, p: .6 }]
+    );
+
+    const fiveCharTailToken = new ContextToken(baseTokenization.tail);
+    fiveCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: { insert: 's', deleteLeft: 0 }, p: .4 }]
+    );
+
+    const subsetBuilder = new TokenizationSubsetBuilder();
+    const fourCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), fourCharTailToken]);
+    const fiveCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), fiveCharTailToken]);
+
+    const inputDistribution = [{sample: { insert: ' ', deleteLeft: 0 }, p: 1}];
+    inputDistribution.forEach((entry) => {
+      const precomputation1 = fourCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      subsetBuilder.addPrecomputation(fourCharTokenization, precomputation1, entry.p);
+
+      const precomputation2 = fiveCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      subsetBuilder.addPrecomputation(fiveCharTokenization, precomputation2, entry.p);
+    });
+
+    // Both transition to a new token at the same time - there's no need to
+    // consider their paths separately after the transition.
+    assert.equal(subsetBuilder.subsets.size, 1);
+    // Has entries from two different base tokenizations.
+    assert.equal([...subsetBuilder.subsets.values()][0].pendingSet.size, 2);
+  });
+
+  it("places compatible results from separate tokenizations in the same subset (mid-token)", () => {
+    const baseRawTextTokens = ['i', ' ', 'have', ' ', 'never', ' ' , 'been', ' ', 'to', ' ', 'a', ' ', 'se'];
+    // target accented word:  séance
+    const baseTokenization = new ContextTokenization(baseRawTextTokens.map((text => toToken(text))));
+
+    const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1 };
+
+    const twoCharTailToken = new ContextToken(baseTokenization.tail);
+    twoCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: trueSourceTransform, p: .6 }]
+    );
+
+    const threeCharTailToken = new ContextToken(baseTokenization.tail);
+    threeCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: { insert: 'a', deleteLeft: 0 }, p: .4 }]
+    );
+
+    const subsetBuilder = new TokenizationSubsetBuilder();
+    const twoCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), twoCharTailToken]);
+    const threeCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), threeCharTailToken]);
+
+    const inputDistribution = [
+      // ... ok, yeah, it's kinda forced on this aspect.
+      {sample: { insert: 'an', deleteLeft: 0 }, p: 0.2},
+      {sample: { insert: 'n',  deleteLeft: 0}, p: 0.8}
+    ];
+
+    inputDistribution.forEach((entry) => {
+      const precomputation1 = twoCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      subsetBuilder.addPrecomputation(twoCharTokenization, precomputation1, entry.p);
+
+      const precomputation2 = threeCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      subsetBuilder.addPrecomputation(threeCharTokenization, precomputation2, entry.p);
+    });
+
+    // Both transition to a new token at the same time - there's no need to
+    // consider their paths separately after the transition.
+    assert.equal(subsetBuilder.subsets.size, 3);
+    const subsets = [...subsetBuilder.subsets.values()];
+
+    // sé + an, sea + n:  both result in a four-char long token starting at the same point.
+    // Same total amount of .deleteLeft is supported for both variations.
+    const mergedSubset = subsets.find((subset) => subset.pendingSet.size);
+    assert.isOk(mergedSubset);
+    assert.isTrue(mergedSubset.pendingSet.has(twoCharTokenization));
+    assert.isTrue(mergedSubset.pendingSet.has(threeCharTokenization));
   });
 });
