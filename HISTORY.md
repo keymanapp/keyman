@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.126 alpha 2025-09-24
+
+* maint(linux): remove several shellcheck directives (#14819)
+
 ## 19.0.125 alpha 2025-09-23
 
 * fix(common): some more tests running successfully in a container (#14784)
