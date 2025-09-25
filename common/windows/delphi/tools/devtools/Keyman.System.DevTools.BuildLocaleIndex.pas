@@ -32,9 +32,20 @@ uses
   System.TypInfo,
   System.Variants;
 
-{ TBuildSetupStringTranslations }
+{ TBuildLocaleIndex }
 
-
+(**
+  * Processes a single `strings.xml` file.
+  *
+  * Extracts the values of `SKUILanguageName` and
+  * `SKUILanguageNameWithEnglish`, and appends a `<locale>` entry to the
+  * given XML node.
+  *
+  * @param SourceFile    Full path to the `strings.xml` file to process.
+  * @param LocalesNode   The `<locales>` XML node to append to.
+  * @param BCP47         The BCP-47 language tag.
+  * @return True if successful; False if required strings were missing.
+  *)
 class function TBuildLocaleIndex.ProcessFile(const SourceFile: string; LocalesNode: IXmlNode;
   const BCP47: string): Boolean;
 var
@@ -70,6 +81,15 @@ begin
   Result := True;
 end;
 
+(**
+  * Finds all localizations and generates an index.xml of the names and
+  * language codes for each localization, for performance purposes.
+  *
+  * @param SourcePath   Full path to the locale folder with subfolders
+                        for each localization.
+  * @param Index        Path to the index.xml file to write.
+  * @return True if successful; False if required strings were missing.
+  *)
 class function TBuildLocaleIndex.Run(SourcePath, Index: string): Boolean;
 var
   f: TSearchRec;

@@ -237,6 +237,14 @@ begin
     FDefaultLocaleDoc.load(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml');
 end;
 
+(**
+  * Look up a localized string for the currently active localization. If
+  * not found, looks up the string from the default (i.e. en)
+  * localization, and finally falls back to the ID itself on failure.
+  *
+  * @param ID            ID of string to lookup.
+  * @return Localized string value.
+  *)
 function TCustomisationMessageManager.MessageFromID(ID: WideString): WideString;
 var
   node: IXMLDOMNode;
@@ -253,6 +261,16 @@ begin
   end;
 end;
 
+(**
+  * Look up a localized string for a specific localization. This function
+  * can return values for only `SKLanguageCode`, `SKUILanguageName`
+  * and `SKUILanguageNameWithEnglish`. Other strings will be returned
+  * from the currently active localization.
+  *
+  * @param ID            ID of string to lookup.
+  * @param LanguageCode  The BCP-47 language tag.
+  * @return Localized string value.
+  *)
 function TCustomisationMessageManager.MessageFromID(ID,
   LanguageCode: WideString): WideString;
 var
