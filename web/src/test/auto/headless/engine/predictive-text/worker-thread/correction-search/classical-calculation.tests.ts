@@ -18,8 +18,8 @@ export function prettyPrintMatrix(matrix: number[][]) {
   }
 }
 
-function compute(input: string, match: string, mode?: string, bandSize?: number) {
-  let buffer = new ClassicalDistanceCalculation({diagonalWidth: bandSize || 1});
+function compute(input: string, match: string, mode?: string, bandSize?: number, allowTransposes: boolean = true) {
+  let buffer = new ClassicalDistanceCalculation({noTransposes: !allowTransposes, diagonalWidth: bandSize || 1});
 
   /* SUPPORTED MODES:
    * "InputThenMatch"  // adds all input chars, then all match chars.
@@ -260,6 +260,15 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
     it("'jellyifhs' -> 'jellyfish' = 2", function() {
       assert.equal(compute("jellyifhs", "jellyfish", "InputThenMatch").getFinalCost(), 2);
       assert.equal(compute("jellyifhs", "jellyfish", "MatchThenInput").getFinalCost(), 2);
+    });
+
+    it("'jellyifhs' -> 'jellyfish' = 2 (no transposes)", function() {
+      // edits when without transposes:
+      // delete i           (jellyfhs)
+      // substitute h -> i  (jellyfis)
+      // insert h at end    (jellyfish)
+      assert.equal(compute("jellyifhs", "jellyfish", "InputThenMatch", 3, false).getFinalCost(), 3);
+      assert.equal(compute("jellyifhs", "jellyfish", "MatchThenInput", 3, false).getFinalCost(), 3);
     });
 
     it("'aadddres' -> 'address' = 3", function() {
@@ -677,6 +686,31 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       const viablePaths = buffer.editPath();
       assert.equal(viablePaths.length, 1);
       assert.deepEqual(viablePaths[0], editSequence);
+    });
+
+    it("'jellyifhs' -> 'jellyfish' (no transposes)", function() {
+      // edits when without transposes:
+      // delete i           (jellyfhs)
+      // substitute h -> i  (jellyfis)
+      // insert h at end    (jellyfish)
+      const buffer = compute("jellyifhs", "jellyfish", "InputThenMatch", 3, false);
+
+      const viablePaths = buffer.editPath();
+      assert.isAtLeast(viablePaths.length, 1);
+
+      // Assert:  the following path exists as one option.
+      assert.includeDeepMembers(viablePaths, [[
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1},
+        { op: 'match', input: 2, match: 2},
+        { op: 'match', input: 3, match: 3},
+        { op: 'match', input: 4, match: 4},
+        { op: 'delete', input: 5},
+        { op: 'match', input: 6, match: 5},
+        { op: 'substitute', input: 7, match: 6},
+        { op: 'match', input: 8, match: 7},
+        { op: 'insert', match: 8}
+      ]]);
     });
 
     it("'then' -> 'their'", function() {

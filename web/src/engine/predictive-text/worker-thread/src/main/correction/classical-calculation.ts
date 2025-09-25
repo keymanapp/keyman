@@ -171,19 +171,16 @@ export function computeDistance<TUnit, TOpSet, TDistanceCalc extends ClassicalDi
   match: TUnit[]
 ): TDistanceCalc {
   for(let i = 0; i < input.length; i++) {
-    buffer = buffer.addInputChar(input[i]);
+    buffer = buffer.addInputChar(input[i]) as TDistanceCalc;
   }
 
   for(let j = 0; j < match.length; j++) {
-    buffer = buffer.addMatchChar(match[j]);
+    buffer = buffer.addMatchChar(match[j]) as TDistanceCalc;
   }
 
   return buffer;
 }
 
-/**
- * Initialization options for ClassicalDistanceCalculation
- */
 export interface DistanceCalcOptions {
   /**
    * When set to true, transpose edits will not be considered.
@@ -252,6 +249,8 @@ export class ClassicalDistanceCalculation<
    */
   private _diagonalWidth: number;
 
+  readonly allowsTransposes: boolean;
+
   // The sequence of characters input so far.
   private readonly _inputSequence: TUnit[] = [];
   private readonly _matchSequence: TUnit[] = [];
@@ -291,12 +290,14 @@ export class ClassicalDistanceCalculation<
       this._inputSequence = other._inputSequence.slice(0);
       this._matchSequence = other._matchSequence.slice(0);
       this._diagonalWidth = other._diagonalWidth;
+      this.allowsTransposes = other.allowsTransposes;
     } else {
       const options = param1 ?? { };
       // We start at 2 as default for now as a naive workaround for multi-char
       // transform limitations; we don't want to dynamically change this a lot
       // during calculations.
       this._diagonalWidth = options.diagonalWidth ?? 2;
+      this.allowsTransposes = !options.noTransposes;
       this.resolvedDistances = [];
     }
   }
@@ -494,7 +495,9 @@ export class ClassicalDistanceCalculation<
   protected _buildPath(pathBuilder?: PathBuilder<TUnit, TOpSet>): EditTuple<TOpSet>[][] {
     pathBuilder = pathBuilder ?? new PathBuilder(this, []);
     pathBuilder.addEdgeFinder(findBaseEdges);
-    pathBuilder.addEdgeFinder(findTransposeEdges);
+    if(pathBuilder.calc.allowsTransposes) {
+      pathBuilder.addEdgeFinder(findTransposeEdges);
+    }
     pathBuilder.backtracePath(this.inputSequence.length - 1, this.matchSequence.length - 1, []);
     return pathBuilder.validPaths;
   }
@@ -512,7 +515,7 @@ export class ClassicalDistanceCalculation<
     var deletionCost: number = deleteCost || buffer.getCostAt(r-1, c) + 1;  // If set meaningfully, will never equal zero.
     var transpositionCost: number = Number.MAX_VALUE
 
-    if(r > 0 && c > 0) { // bypass when transpositions are known to be impossible.
+    if(buffer.allowsTransposes && r > 0 && c > 0) { // bypass when transpositions are known to be impossible.
       let [lastInputIndex, lastMatchIndex] = getTransposeParent(buffer, r, c);
       transpositionCost = buffer.getCostAt(lastInputIndex-1, lastMatchIndex-1) + (r - lastInputIndex - 1) + 1 + (c - lastMatchIndex - 1);
     }
@@ -646,17 +649,19 @@ export class ClassicalDistanceCalculation<
           // We propagate the new added cost (via insertion) to the old left-most cell, which is one to our right.
           ClassicalDistanceCalculation.propagateUpdateFrom(returnBuffer, r, c+1, addedCost+1, 0);
 
-          // Only possible if insertions are also possible AND more conditions are met.
-          // cells (r+2, * > c+2):  new transposition source
-          let transposeRow = r+2;
-          if(r+2 < this.inputSequence.length) { // Row to check for transposes must exist.
-            let rowChar = returnBuffer.inputSequence[r+1];
-            // First possible match in input could be at index c + 2, which adjusts col c+2's cost.  Except that entry in r+2
-            // doesn't exist yet - so we start with c+3 instead.
-            forPossibleTranspositionsInDiagonal(c + 3, rowChar, returnBuffer.matchSequence, function(axisIndex, diagIndex) {
-              // Because (r+2, c+3) is root, not (r+2, c+2).  Min cost of 2.
-              ClassicalDistanceCalculation.propagateUpdateFrom(returnBuffer, transposeRow, axisIndex, addedCost + diagIndex + 2, diagIndex);
-            });
+          if(this.allowsTransposes) {
+            // Only possible if insertions are also possible AND more conditions are met.
+            // cells (r+2, * > c+2):  new transposition source
+            let transposeRow = r+2;
+            if(r+2 < this.inputSequence.length) { // Row to check for transposes must exist.
+              let rowChar = returnBuffer.inputSequence[r+1];
+              // First possible match in input could be at index c + 2, which adjusts col c+2's cost.  Except that entry in r+2
+              // doesn't exist yet - so we start with c+3 instead.
+              forPossibleTranspositionsInDiagonal(c + 3, rowChar, returnBuffer.matchSequence, function(axisIndex, diagIndex) {
+                // Because (r+2, c+3) is root, not (r+2, c+2).  Min cost of 2.
+                ClassicalDistanceCalculation.propagateUpdateFrom(returnBuffer, transposeRow, axisIndex, addedCost + diagIndex + 2, diagIndex);
+              });
+            }
           }
         }
       }
@@ -682,18 +687,20 @@ export class ClassicalDistanceCalculation<
           // We propagate the new added cost (via deletion) to the old right-most cell, which is one to our right.
           ClassicalDistanceCalculation.propagateUpdateFrom(returnBuffer, r+1, c, addedCost + 1, 2 * this.diagonalWidth);
 
-          // Only possible if deletions are also possible AND more conditions are met.
-          // cells(* > r+2, c+2): new transposition source
-          let transposeCol = c+2;
-          if(c+2 < this.matchSequence.length) { // Row to check for transposes must exist.
-            let colChar = returnBuffer.matchSequence[r+1];
-            // First possible match in input could be at index r + 2, which adjusts row r+2's cost.  Except that entry in c+2
-            // doesn't exist yet - so we start with r+3 instead.
-            forPossibleTranspositionsInDiagonal(r+3, colChar, returnBuffer.inputSequence, function(axisIndex, diagIndex) {
-              let diagColIndex = 2 * (returnBuffer.diagonalWidth - 1) - diagIndex;
-              // Because (r+3, c+2) is root, not (r+2, c+2).  Min cost of 2.
-              ClassicalDistanceCalculation.propagateUpdateFrom(returnBuffer, axisIndex, transposeCol, addedCost + diagIndex + 2, diagColIndex);
-            });
+          if(this.allowsTransposes) {
+            // Only possible if deletions are also possible AND more conditions are met.
+            // cells(* > r+2, c+2): new transposition source
+            let transposeCol = c+2;
+            if(c+2 < this.matchSequence.length) { // Row to check for transposes must exist.
+              let colChar = returnBuffer.matchSequence[r+1];
+              // First possible match in input could be at index r + 2, which adjusts row r+2's cost.  Except that entry in c+2
+              // doesn't exist yet - so we start with r+3 instead.
+              forPossibleTranspositionsInDiagonal(r+3, colChar, returnBuffer.inputSequence, function(axisIndex, diagIndex) {
+                let diagColIndex = 2 * (returnBuffer.diagonalWidth - 1) - diagIndex;
+                // Because (r+3, c+2) is root, not (r+2, c+2).  Min cost of 2.
+                ClassicalDistanceCalculation.propagateUpdateFrom(returnBuffer, axisIndex, transposeCol, addedCost + diagIndex + 2, diagColIndex);
+              });
+            }
           }
         }
       }
