@@ -301,6 +301,7 @@ function _setup_ibus() {
   echo "Starting ibus-daemon..."
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
+
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
   if [[ "${STANDALONE}" == "--standalone" ]] && [[ "${DOCKER_RUNNING:-false}" != "true" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]];  then
     # manual test run
@@ -384,6 +385,19 @@ function cleanup() {
     [[ -f /tmp/ibus-daemon.log ]] && mv /tmp/ibus-daemon.log "${BUILD_TMP}/ibus-daemon${DISPLAY_SERVER}.log"
     [[ -f /tmp/km-test-server.log ]] && mv /tmp/km-test-server.log "${BUILD_TMP}/km-test-server${DISPLAY_SERVER}.log"
     echo "# Finished copying log files"
+  fi
+
+  if [[ -z "${DOCKER_RUNNING:-}" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]] && ! pgrep -f jetbrains.buildServer.agent.AgentMain > /dev/null; then
+    # Not running in Docker or TeamCity:
+    # Killing the ibus-daemon that we started for testing might have caused
+    # some other ibus processes that belong to the real ibus daemon to
+    # be killed as well, leaving us with no way to type.
+    # So we kill the remaining lonely ibus-daemon and start ibus again.
+    if [[ "$(ibus engine)" == ""  ]]; then
+      echo "# Killing and restarting ibus-daemon"
+      kill -9 "$(pgrep -u "${USER:-$(whoami)}" ibus-daemon)"
+      ibus start -d
+    fi
   fi
 }
 
