@@ -114,7 +114,7 @@ end;
  * Returns the list of locale key-value pairs where 
  * Key = BCP 47 locale tag, and Value = TLanguageName record)
  * This list is regenerated in Reorder.
- *  @returns A list of sorted locale pairs (Key = xxxxx, Value = yyyyy)
+ *  @returns A list of sorted locale pairs.
  *)
 class function TSetupUILanguageManager.SortedValues: TList< TPair<string,TLanguageName>>;
 begin
