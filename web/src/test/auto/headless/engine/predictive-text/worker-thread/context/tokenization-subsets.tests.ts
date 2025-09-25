@@ -166,7 +166,15 @@ describe('precomputationSubsetKeyer', function() {
         unmappedEdits: [],
         edgeWindow: {
           ...buildEdgeWindow(
-            [...tokenization.tokens, new ContextToken(plainModel, 'date')],
+            [...tokenization.tokens, (() => {
+            const token = new ContextToken(plainModel, 'da');
+            // source text:  'date'
+            token.addInput(
+              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0},
+              [{sample: {insert: 'te', deleteLeft: 0}, p: 1}]
+            );
+            return token;
+          })()],
             { insert: 's', deleteLeft: 0, deleteRight: 0 },
             false
           ),
@@ -187,8 +195,10 @@ describe('precomputationSubsetKeyer', function() {
           [...tokenization.tokens, (() => {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
-            token.addSourceInput({insert: 'te', deleteLeft: 0});
-            token.searchSpace.addInput([{sample: {insert: 't', deleteLeft: 0}, p: 1}]);
+            token.addInput(
+              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0},
+              [{sample: {insert: 't', deleteLeft: 0}, p: 1}]
+            );
             return token;
           })()],
         { insert: 'es', deleteLeft: 0, deleteRight: 0 },
@@ -226,8 +236,10 @@ describe('precomputationSubsetKeyer', function() {
               const token = new ContextToken(plainModel, 'da');
               token.isPartial = true;
               // source text:  'dat'
-              token.addSourceInput({insert: 't', deleteLeft: 0});
-              token.searchSpace.addInput([{sample: {insert: 'ts', deleteLeft: 0}, p: 1}]);
+              token.addInput(
+                {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0},
+                [{sample: {insert: 'ts', deleteLeft: 0}, p: 1}]
+              );
               return token;
             })()],
             { insert: 'e', deleteLeft: 1, deleteRight: 0 },
@@ -251,8 +263,10 @@ describe('precomputationSubsetKeyer', function() {
           const token = new ContextToken(plainModel, 'da');
           token.isPartial = true;
           // source text:  'dat'
-          token.addSourceInput({insert: 't', deleteLeft: 0});
-          token.searchSpace.addInput([{sample: {insert: 't', deleteLeft: 0}, p: 1}]);
+          token.addInput(
+            {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0},
+            [{sample: {insert: 't', deleteLeft: 0}, p: 1}]
+          );
           return token;
         })()],
         { insert: 'e', deleteLeft: 0, deleteRight: 0 },
@@ -401,8 +415,8 @@ describe('precomputationSubsetKeyer', function() {
             text: 'can\'',
             index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex
           }, matches: [
-            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex },
-            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex }
+            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex, textOffset: 0 },
+            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex, textOffset: 3 }
           ]
         }],
         unmappedEdits: [],
@@ -453,8 +467,8 @@ describe('precomputationSubsetKeyer', function() {
             text: 'can\'',
             index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex
           }, matches: [
-            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex },
-            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex }
+            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex, textOffset: 0 },
+            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex, textOffset: 3 }
           ]
         }],
         unmappedEdits: [],

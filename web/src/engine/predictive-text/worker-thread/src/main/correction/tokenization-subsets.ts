@@ -45,12 +45,12 @@ export function precomputationSubsetKeyer(precomputation: PrecomputedTokenizatio
   const editBoundary = edgeWindow.editBoundary;
 
   // It's not about the boundary text - we just need to ensure it's the 'same'
-  // token - comprised of the same keystrokes.  `sourceText` reflects the actual
-  // input for the source keystrokes.  We might have deleted part of it in this
-  // tokenization, but that doesn't matter here - we want to imply the
+  // token - comprised of the same keystrokes.  `sourceRangeKey` reflects the
+  // actual input for the source keystrokes.  We might have deleted part of it
+  // in this tokenization, but that doesn't matter here - we want to imply the
   // represented keystroke range.
   const boundaryEdgeIndex = editBoundary.tokenIndex - edgeWindow.sliceIndex;
-  const boundaryComponent = `B${editBoundary.tokenIndex}=${editBoundary.sourceText}`;
+  const boundaryComponent = `B${editBoundary.tokenIndex}=${editBoundary.sourceRangeKey}`;
 
   components.push(boundaryComponent);
 
