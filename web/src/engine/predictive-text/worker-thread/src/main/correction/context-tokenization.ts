@@ -57,11 +57,11 @@ export class ContextTokenization {
   /**
    * Returns plain-text strings representing the most probable representation for all
    * tokens represented by this tokenization instance.
+   *
+   * Intended for debugging use only.
    */
   get sourceText() {
-    return this.tokens
-      .filter(token => token.sourceText !== null)
-      .map(token => token.sourceText);
+    return this.tokens.map(token => token.sourceText);
   }
 
   /**
@@ -69,10 +69,7 @@ export class ContextTokenization {
    * tokens represented by this tokenization instance.
    */
   get exampleInput(): string[] {
-    return this.tokens
-      // Hide any tokens representing invisible wordbreaks.  (Thinking ahead to phrase-level possibilities)
-      .filter(token => token.exampleInput !== null)
-      .map(token => token.exampleInput);
+    return this.tokens.map(token => token.exampleInput);
   }
 
   /**
@@ -86,7 +83,7 @@ export class ContextTokenization {
    * the tokenization modeled by this instance.
    */
   computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
-    return computeAlignment(this.sourceText, incomingTokenization, isSliding, noSubVerify);
+    return computeAlignment(this.exampleInput, incomingTokenization, isSliding, noSubVerify);
   }
 
   /**
@@ -160,7 +157,7 @@ export class ContextTokenization {
     // If a word is being slid out of context-window range, start trimming it - we should
     // no longer need to worry about reusing its original correction-search results.
     for(let i = 0; i < leadEditLength; i++) {
-      if(this.tokens[matchingOffset+i].sourceText != tokenizedContext[incomingOffset+i].text) {
+      if(this.tokens[matchingOffset+i].exampleInput != tokenizedContext[incomingOffset+i].text) {
         //this.tokens[matchingOffset]'s clone is at tokenization[incomingOffset]
         //after the splice call in a previous block.
         tokenization[incomingOffset+i] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset+i].text);
@@ -203,6 +200,7 @@ export class ContextTokenization {
     // edited, those edits occur to the left as well - and further left of whatever
     // the new tail token is *if* tokens were removed.
     const firstTailEditIndex = Math.min((1 - tailEditLength), 0) + Math.min(tailTokenShift, 0);
+    let primaryInputAppliedLen = 0;
     for(let i = 0; i < tailEditLength; i++) {
       const tailIndex = firstTailEditIndex + i;
 
@@ -228,11 +226,12 @@ export class ContextTokenization {
         // Erase any applied-suggestion transition ID; it is no longer valid.
         token.appliedTransitionId = undefined;
         const emptySample: ProbabilityMass<Transform> = { sample: { insert: '', deleteLeft: 0 }, p: 1 };
-        token.addSourceInput(primaryInput ?? emptySample.sample);
-        token.searchSpace.addInput(tokenDistribution.map((seq) => seq.get(tailIndex) ?? emptySample));
+        const dist = tokenDistribution.map((seq) => seq.get(tailIndex) ?? emptySample);
+        token.addInput({trueTransform: primaryInput ?? emptySample.sample, inputStartIndex: primaryInputAppliedLen}, dist);
       }
 
       tokenization[incomingIndex] = token;
+      primaryInputAppliedLen += KMWString.length(primaryInput?.insert ?? '');
     }
 
     if(tailTokenShift < 0) {
@@ -289,11 +288,10 @@ export class ContextTokenization {
           // If there are no entries in our would-be distribution, there's no
           // reason to pass in what amounts to a no-op.
           if(transformDistribution) {
-            pushedToken.addSourceInput(primaryInput);
             // If we ever stop filtering tokenized transform distributions, it may
             // be worth adding an empty transform here with weight to balance
             // the distribution back to a cumulative prob sum of 1.
-            pushedToken.searchSpace.addInput(transformDistribution);
+            pushedToken.addInput({ trueTransform: primaryInput, inputStartIndex: primaryInputAppliedLen }, transformDistribution);
           }
         } else if(incomingToken.text) {
           // We have no transform data to match against an inserted token with text; abort!
@@ -305,6 +303,7 @@ export class ContextTokenization {
 
         // Auto-replaces the search space to correspond with the new token.
         tokenization.push(pushedToken);
+        primaryInputAppliedLen += KMWString.length(primaryInput.insert);
       }
     }
 
