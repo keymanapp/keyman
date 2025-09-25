@@ -216,7 +216,25 @@ _do_test_test_bot_check_pr_body() {
 
 #----------------------------------------------------------------------------------------------------
 
+test_is_skip_keyman_api_check() {
+  builder_echo start test_is_skip_keyman_api_check 'START TEST: test_is_skip_keyman_api_check'
+  result=$(is_skip_keyman_api_check 1 '{ "body": "Keyman-Api-Check: skip" }')
+  assert-equal "${result}" "true" "PR #1: 'Keyman-Api-Check: skip' should return true"
+  result=$(is_skip_keyman_api_check 2 '{ "body": "PR message" }')
+  assert-equal "${result}" "false" "PR #2: omitted 'Keyman-Api-Check' should return false"
+  result=$(is_skip_keyman_api_check 3 '{ "body": "Keyman-Api-Check: invalid" }')
+  assert-equal "${result}" "false" "PR #3: invalid data for 'Keyman-Api-Check' should return false"
+  result=$(is_skip_keyman_api_check 4 '{ "body": "Some message\nKeyman-Api-Check: skip" }')
+  assert-equal "${result}" "true" "PR #4: 'Keyman-Api-Check: skip' at start of line should return true"
+  result=$(is_skip_keyman_api_check 5 '{ "body": "Here Keyman-Api-Check: skip\nis in the middle of the line" }')
+  assert-equal "${result}" "false" "PR #5: 'Keyman-Api-Check: skip' in the middle of the line should return false"
+  builder_echo end test_is_skip_keyman_api_check success 'SUCCESS: test_is_skip_keyman_api_check'
+}
+
+#----------------------------------------------------------------------------------------------------
+
 test_build_bot_verify_platforms
 test_build_bot_update_commands
 test_build_bot_check_messages
 test_test_bot_check_pr_body
+test_is_skip_keyman_api_check
