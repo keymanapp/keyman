@@ -40,7 +40,7 @@ interface TokenMergeMap {
 
 interface TokenSplitMap {
   input: EditTokenMap,
-  matches: EditTokenMap[]
+  matches: (EditTokenMap & { textOffset: number })[]
 };
 
 /**
@@ -114,11 +114,11 @@ export class ContextTokenization {
   /**
    * Returns plain-text strings representing the most probable representation for all
    * tokens represented by this tokenization instance.
+   *
+   * Intended for debugging use only.
    */
   get sourceText() {
-    return this.tokens
-      .filter(token => token.sourceText !== null)
-      .map(token => token.sourceText);
+    return this.tokens.map(token => token.sourceText);
   }
 
   /**
@@ -126,10 +126,7 @@ export class ContextTokenization {
    * tokens represented by this tokenization instance.
    */
   get exampleInput(): string[] {
-    return this.tokens
-      // Hide any tokens representing invisible wordbreaks.  (Thinking ahead to phrase-level possibilities)
-      .filter(token => token.exampleInput !== null)
-      .map(token => token.exampleInput);
+    return this.tokens.map(token => token.exampleInput);
   }
 
   /**
@@ -143,7 +140,7 @@ export class ContextTokenization {
    * the tokenization modeled by this instance.
    */
   computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
-    return computeAlignment(this.sourceText, incomingTokenization, isSliding, noSubVerify);
+    return computeAlignment(this.exampleInput, incomingTokenization, isSliding, noSubVerify);
   }
 
   /**
@@ -554,6 +551,7 @@ export class ContextTokenization {
     // edited, those edits occur to the left as well - and further left of whatever
     // the new tail token is *if* tokens were removed.
     const firstTailEditIndex = Math.min((1 - tailEditLength), 0) + Math.min(tailTokenShift, 0);
+    let primaryInputAppliedLen = 0;
     for(let i = 0; i < tailEditLength; i++) {
       const tailIndex = firstTailEditIndex + i;
 
@@ -579,11 +577,12 @@ export class ContextTokenization {
         // Erase any applied-suggestion transition ID; it is no longer valid.
         token.appliedTransitionId = undefined;
         const emptySample: ProbabilityMass<Transform> = { sample: { insert: '', deleteLeft: 0 }, p: 1 };
-        token.addSourceInput(primaryInput ?? emptySample.sample);
-        token.searchSpace.addInput(tokenDistribution.map((seq) => seq.get(tailIndex) ?? emptySample));
+        const dist = tokenDistribution.map((seq) => seq.get(tailIndex) ?? emptySample);
+        token.addInput({trueTransform: primaryInput ?? emptySample.sample, inputStartIndex: primaryInputAppliedLen}, dist);
       }
 
       tokenization[incomingIndex] = token;
+      primaryInputAppliedLen += KMWString.length(primaryInput?.insert ?? '');
     }
 
     if(tailTokenShift < 0) {
@@ -640,11 +639,10 @@ export class ContextTokenization {
           // If there are no entries in our would-be distribution, there's no
           // reason to pass in what amounts to a no-op.
           if(transformDistribution) {
-            pushedToken.addSourceInput(primaryInput);
             // If we ever stop filtering tokenized transform distributions, it may
             // be worth adding an empty transform here with weight to balance
             // the distribution back to a cumulative prob sum of 1.
-            pushedToken.searchSpace.addInput(transformDistribution);
+            pushedToken.addInput({ trueTransform: primaryInput, inputStartIndex: primaryInputAppliedLen }, transformDistribution);
           }
         } else if(incomingToken.text) {
           // We have no transform data to match against an inserted token with text; abort!
@@ -656,6 +654,7 @@ export class ContextTokenization {
 
         // Auto-replaces the search space to correspond with the new token.
         tokenization.push(pushedToken);
+        primaryInputAppliedLen += KMWString.length(primaryInput.insert);
       }
     }
 
@@ -1046,12 +1045,12 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
           text: preTokenization[input]
         }]
       };
-      let currentMerge: string;
+      let currentMerge = preTokenization[input];
       let inputLookahead = 1;
       // Look-ahead 1
-      let nextMerge = preTokenization[input] + preTokenization[input + inputLookahead++];
+      let nextMerge = currentMerge + preTokenization[input + inputLookahead++];
       // Conditional validates if look-ahead 1 passes (which it should)
-      for(/* next line */; mergeTarget.indexOf(nextMerge) == 0; nextMerge = preTokenization[input + inputLookahead++]) {
+      for(/* next line */; mergeTarget.indexOf(nextMerge) == 0; nextMerge = currentMerge + preTokenization[input + inputLookahead++]) {
         merge.inputs.push({
           index: input + inputLookahead - 1,
           text: preTokenization[input + inputLookahead-1]
@@ -1074,18 +1073,21 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
         },
         matches: [ {
           index: match,
-          text: resultTokenization[match]
+          text: resultTokenization[match],
+          textOffset: 0
         }],
       };
-      let currentMerge: string;
+      let currentMerge = resultTokenization[match];
       matchOffset = 1;
       // Look-ahead 1
-      let nextMerge = resultTokenization[match] + resultTokenization[match + matchOffset++];
-      for(/* next line */; splitTarget.indexOf(nextMerge) == 0; nextMerge = preTokenization[match + matchOffset++]) {
+      let nextMerge = currentMerge + resultTokenization[match + matchOffset++];
+      for(/* next line */; splitTarget.indexOf(nextMerge) == 0; nextMerge = currentMerge + preTokenization[match + matchOffset++]) {
+        const textOffset = KMWString.length(currentMerge);
         currentMerge = nextMerge;
         split.matches.push({
           index: match + matchOffset - 1,
-          text: resultTokenization[match + matchOffset-1]
+          text: resultTokenization[match + matchOffset-1],
+          textOffset
         });
         // Each time we 'pass' the condition, we've successfully processed an associated edit.
 

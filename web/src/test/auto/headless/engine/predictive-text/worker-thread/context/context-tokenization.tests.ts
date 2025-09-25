@@ -1721,7 +1721,7 @@ describe('ContextTokenization', function() {
         merges: [],
         splits: [ {
           input: { text: 'can\'', index: 7 },
-          matches: [ { text: 'can', index: 7 }, { text: '\'', index: 8 }]
+          matches: [ { text: 'can', index: 7, textOffset: 0 }, { text: '\'', index: 8, textOffset: 3 }]
         } ],
         mergeOffset: 0,
         splitOffset: -1,
