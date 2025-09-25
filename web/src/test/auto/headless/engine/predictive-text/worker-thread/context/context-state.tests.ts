@@ -13,8 +13,9 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextState, models } from '@keymanapp/lm-worker/test-index';
+import { ContextState, determineContextSlideTransform, models } from '@keymanapp/lm-worker/test-index';
 
+import Context = LexicalModelTypes.Context;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
@@ -457,5 +458,92 @@ describe('ContextState', () => {
       let problemContextMatch = baseState.analyzeTransition({left: "text'", startOfBuffer: true, endOfBuffer: true}, [{sample: transform, p: 1}]);
       assert.isNull(problemContextMatch);
     });
+  });
+});
+
+describe('determineContextSlideDeltas', () => {
+  it('finds prefixed text for backward sliding context window', () => {
+    const before: Context = {
+      left: 'ples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    };
+
+    const after: Context = {
+      left: 'apples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    }
+
+    const results = determineContextSlideTransform(before, after);
+    assert.deepEqual(results, {insert: 'ap', deleteLeft: 0, deleteRight: 0});
+  });
+
+  it('finds prefixed text for large backward sliding context window jump', () => {
+    const before: Context = {
+      left: 'nanas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    };
+
+    const after: Context = {
+      left: 'apples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    }
+
+    const results = determineContextSlideTransform(before, after);
+    assert.deepEqual(results, {insert: 'apples and ba', deleteLeft: 0, deleteRight: 0});
+  });
+
+  it('properly handles cases with unaltered context', () => {
+    const before: Context = {
+      left: 'apples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    };
+
+    const after: Context = {
+      left: 'apples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    }
+
+    const results = determineContextSlideTransform(before, after);
+    assert.deepEqual(results, {insert: '', deleteLeft: 0, deleteRight: 0});
+  });
+
+  it('computes dropped-char count for forward sliding context window', () => {
+    const before: Context = {
+      left: 'apples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    };
+
+    const after: Context = {
+      left: 'ples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    }
+
+    const results = determineContextSlideTransform(before, after);
+    assert.deepEqual(results, {insert: '', deleteLeft: 0, deleteRight: 2});
+  });
+
+  it('computes dropped-char count for large forward sliding context window jump', () => {
+    const before: Context = {
+      left: 'apples and bananas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    };
+
+    const after: Context = {
+      left: 'nanas',
+      startOfBuffer: false,
+      endOfBuffer: false
+    }
+
+    const results = determineContextSlideTransform(before, after);
+    assert.deepEqual(results, {insert: '', deleteLeft: 0, deleteRight: 'apples and ba'.length});
   });
 });
