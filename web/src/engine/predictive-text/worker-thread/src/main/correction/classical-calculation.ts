@@ -158,9 +158,37 @@ export function visualizeCalculation<TUnit, TOpSet>(calc: ClassicalDistanceCalcu
 }
 
 /**
+ * This helper function allows streamlined edit-distance calculations for cases where
+ * multiple input and match tokens are already known.
+ * @param buffer Should be set to a new instance of the desired edit-distance calculation type
+ * @param input The desired sequence of input tokens
+ * @param match The desired sequence of tokens to match against
+ * @returns
+ */
+export function computeDistance<TUnit, TOpSet, TDistanceCalc extends ClassicalDistanceCalculation<TUnit, TOpSet>>(
+  buffer: TDistanceCalc,
+  input: TUnit[],
+  match: TUnit[]
+): TDistanceCalc {
+  for(let i = 0; i < input.length; i++) {
+    buffer = buffer.addInputChar(input[i]);
+  }
+
+  for(let j = 0; j < match.length; j++) {
+    buffer = buffer.addMatchChar(match[j]);
+  }
+
+  return buffer;
+}
+
+/**
  * Initialization options for ClassicalDistanceCalculation
  */
 export interface DistanceCalcOptions {
+  /**
+   * When set to true, transpose edits will not be considered.
+   */
+  noTransposes?: boolean,
   /**
    * Sets the initial diagonal width to use for calculations.
    */
@@ -189,7 +217,10 @@ export interface DistanceCalcOptions {
  *    - Motivating statement:  "if we are only interested in the distance if it
  *      is smaller than a threshold..."
  */
-export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation> {
+export class ClassicalDistanceCalculation<
+  TUnit = string,
+  TOpSet = EditOperation
+> {
   /**
    * Stores ONLY the computed diagonal elements, nothing else.
    *
@@ -525,10 +556,10 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
   }
 
   // Inputs add an extra row / first index entry.
-  addInputChar(token: TUnit): ClassicalDistanceCalculation<TUnit, TOpSet> {
+  addInputChar(token: TUnit): this {
     const returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._addInputChar(token);
-    return returnBuffer;
+    return returnBuffer as this;
   }
 
   protected _addInputChar(token: TUnit) {
@@ -550,10 +581,10 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
     return;
   }
 
-  addMatchChar(token: TUnit): ClassicalDistanceCalculation<TUnit, TOpSet> {
+  addMatchChar(token: TUnit): this {
     const returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._addMatchChar(token);
-    return returnBuffer;
+    return returnBuffer as this;
   }
 
   protected _addMatchChar(token: TUnit) {
@@ -573,12 +604,12 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
     return;
   }
 
-  public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit, TOpSet> {
+  public increaseMaxDistance(): this {
     let returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._diagonalWidth++;
 
     if(returnBuffer.inputSequence.length < 1 || returnBuffer.matchSequence.length < 1) {
-      return returnBuffer;
+      return returnBuffer as this;
     }
 
     // An abstraction of the common aspects of transposition handling during diagonal extensions.
@@ -671,7 +702,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
       returnBuffer.resolvedDistances[r] = [leftCell].concat(returnBuffer.resolvedDistances[r], rightCell);
     }
 
-    return returnBuffer;
+    return returnBuffer as this;
   }
 
   private static propagateUpdateFrom<TUnit, TOpSet>(
@@ -746,25 +777,6 @@ export class ClassicalDistanceCalculation<TUnit = string, TOpSet = EditOperation
 
   get lastMatchEntry(): TUnit {
     return this.matchSequence[this.matchSequence.length-1];
-  }
-
-
-  static computeDistance<TUnit>(
-      input: TUnit[],
-      match: TUnit[],
-      bandSize: number = 1) {
-    // Initialize the calculation buffer, setting the diagonal width (as appropriate) in advance.
-    let buffer = new ClassicalDistanceCalculation<TUnit>({ diagonalWidth: bandSize || 1});
-
-    for(let i = 0; i < input.length; i++) {
-      buffer = buffer.addInputChar(input[i]);
-    }
-
-    for(let j = 0; j < match.length; j++) {
-      buffer = buffer.addMatchChar(match[j]);
-    }
-
-    return buffer;
   }
 
   // /**
