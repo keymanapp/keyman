@@ -2493,8 +2493,12 @@ public final class KMManager {
     KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
   }
 
-  // Get the navigation bar height (if visible) in pixels
-  private static int getNavigationBarHeight(Context context) {
+  /**
+   * Get the navigation bar height (if visible) in pixels
+   * @param context - the context
+   * @return int - navigation bar height in pixels
+   */
+  public static int getNavigationBarHeight(Context context) {
     // Determine if navigation bar is visible
     int resourceId = context.getResources().getIdentifier(
       "config_showNavigationBar", "bool", "android");
