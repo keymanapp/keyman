@@ -17,6 +17,14 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
 /**
+ * Notes critical properties of the inputs comprising each ContextToken.
+ */
+export interface TokenInputSource {
+  trueTransform: Transform;
+  inputStartIndex: number;
+}
+
+/**
  * Breaks apart a raw text string into individual, single-codepoint
  * transforms, all set with the specified transform ID.
  *
@@ -65,7 +73,7 @@ export class ContextToken {
    * applied to the actual context for the set of keystrokes contributing to
    * this token.
    */
-  private _inputRange: Transform[];
+  private _inputRange: TokenInputSource[];
 
   /**
    * Constructs a new, empty instance for use with the specified LexicalModel.
@@ -117,7 +125,10 @@ export class ContextToken {
         return [{sample: transform, p: 1.0}];
       });
       rawTransformDistributions.forEach((entry) => {
-        this._inputRange.push(entry[0].sample);
+        this._inputRange.push({
+          trueTransform: entry[0].sample,
+          inputStartIndex: 0
+        });
         this.searchSpace.addInput(entry);
       });
     }
@@ -127,26 +138,52 @@ export class ContextToken {
    * Call this to record the original keystroke Transforms for the context range
    * corresponding to this token.
    */
-  addSourceInput(transform: Transform) {
-    this._inputRange.push(transform);
+  addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
+    this._inputRange.push(inputSource);
+    this.searchSpace.addInput(distribution);
   }
 
   /**
    * Denotes the original keystroke Transforms comprising the range corresponding
    * to this token.
    */
-  get inputRange(): Readonly<Transform[]> {
+  get inputRange(): Readonly<TokenInputSource[]> {
     return this._inputRange;
   }
 
   /**
-   * Gets a simple, human-readable representation of `inputRange`.
+   * Indicates whether or not this ContextToken likely represents an empty token.
+   */
+  get isEmptyToken(): boolean {
+    return this.exampleInput == '';
+  }
+
+  /**
+   * Gets a compact string-based representation of `inputRange` that
+   * maps compatible token source ranges to each other.
+   */
+  get sourceRangeKey(): string {
+    const components: string[] = [];
+
+    for(const source of this.inputRange) {
+      const i = source.inputStartIndex;
+      components.push(`T${source.trueTransform.id}${i != 0 ? '@' + i : ''}`);
+    }
+
+    return components.join('+');
+  }
+
+  /**
+   * Gets a simple, compact string-based representation of `inputRange`.
    *
-   * Should not actually be used in code - its use is intended only for
-   * debugging.
+   * This should only ever be used for debugging purposes.
    */
   get sourceText(): string {
-    const composite = this._inputRange.reduce((accum, current) => buildMergedTransform(accum, current), { insert: '', deleteLeft: 0 });
+    const composite = this._inputRange.reduce((accum, current) => {
+      const alteredTransform = {...current.trueTransform};
+      alteredTransform.insert = alteredTransform.insert.slice(current.inputStartIndex);
+      return buildMergedTransform(accum, current.trueTransform)
+    }, { insert: '', deleteLeft: 0 });
     const prefix = '\u{2421}'.repeat(composite.deleteLeft);
     return prefix + composite.insert;
   }
@@ -166,7 +203,7 @@ export class ContextToken {
      * most likely keystroke data afterward.
      */
     const transforms = this.searchSpace.inputSequence.map((dist) => dist[0].sample)
-    const composite = transforms.reduce((accum, current) => buildMergedTransform(accum, current), { insert: '', deleteLeft: 0});
+    const composite = transforms.reduce((accum, current) => buildMergedTransform(accum, current), {insert: '', deleteLeft: 0});
     return composite.insert;
   }
 }
