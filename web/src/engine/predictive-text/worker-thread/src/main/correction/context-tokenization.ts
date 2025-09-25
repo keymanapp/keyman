@@ -847,12 +847,12 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
           text: preTokenization[input]
         }]
       };
-      let currentMerge: string;
+      let currentMerge = preTokenization[input];
       let inputLookahead = 1;
       // Look-ahead 1
-      let nextMerge = preTokenization[input] + preTokenization[input + inputLookahead++];
+      let nextMerge = currentMerge + preTokenization[input + inputLookahead++];
       // Conditional validates if look-ahead 1 passes (which it should)
-      for(/* next line */; mergeTarget.indexOf(nextMerge) == 0; nextMerge = preTokenization[input + inputLookahead++]) {
+      for(/* next line */; mergeTarget.indexOf(nextMerge) == 0; nextMerge = currentMerge + preTokenization[input + inputLookahead++]) {
         merge.inputs.push({
           index: input + inputLookahead - 1,
           text: preTokenization[input + inputLookahead-1]
@@ -878,11 +878,11 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
           text: resultTokenization[match]
         }],
       };
-      let currentMerge: string;
+      let currentMerge = resultTokenization[match];
       matchOffset = 1;
       // Look-ahead 1
-      let nextMerge = resultTokenization[match] + resultTokenization[match + matchOffset++];
-      for(/* next line */; splitTarget.indexOf(nextMerge) == 0; nextMerge = preTokenization[match + matchOffset++]) {
+      let nextMerge = currentMerge + resultTokenization[match + matchOffset++];
+      for(/* next line */; splitTarget.indexOf(nextMerge) == 0; nextMerge = currentMerge + preTokenization[match + matchOffset++]) {
         currentMerge = nextMerge;
         split.matches.push({
           index: match + matchOffset - 1,
