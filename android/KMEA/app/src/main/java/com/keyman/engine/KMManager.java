@@ -52,6 +52,9 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
@@ -714,21 +717,25 @@ public final class KMManager {
 
   /**
    * Applies padding to the keyboard so it's not covered by system insets
+   * @param {KeyboardType} keyboard
    * @param left int padding to account for notch/navigation bar on left side of screen
    * @param right int padding to account for notch/navigation bar on right side of screen
    * @param bottom int padding to account for navigation bar on bottom of screen
    */
-  public static void applyInsetsToKeyboard(int left, int right, int bottom) {
-    // Only applies to In-App keyboard #14619
-    if (InAppKeyboard != null) {
+  public static void applyInsetsToKeyboard(KeyboardType keyboardType, int left, int right, int bottom) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       applyInsetsPaddingToKeyboardView(InAppKeyboard, left, right, bottom);
+    }
+
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      applyInsetsPaddingToKeyboardView(SystemKeyboard, left, right, bottom);
     }
   }
 
   private static void applyInsetsPaddingToKeyboardView(KMKeyboard keyboard, int left, int right, int bottom) {
     View parent = (View) keyboard.getParent();
 
-    if (parent != null) {
+    if (keyboard.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && parent != null) {
       // Keep existing top padding, add bottom padding for the inset
       parent.setPadding(
         left,
@@ -738,8 +745,7 @@ public final class KMManager {
       );
       // No need to change WebView margins; keep height as-is
       parent.requestLayout();
-    }
-    else {
+    } else {
       // Fallback: apply on the WebView itself
       keyboard.setPadding(
         left,
@@ -887,6 +893,25 @@ public final class KMManager {
 
     if (SystemKeyboard == null) {
       return mainLayout;
+    }
+
+    if (mainLayout != null) {
+      // Update insets
+      ViewCompat.setOnApplyWindowInsetsListener(mainLayout,
+        (view, windowInsets) -> {
+          // Allocate insets for system bars and display cutout (notch)
+          Insets insets = windowInsets.getInsets(
+            WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+
+          view.setPadding(
+            insets.left,
+            insets.top,
+            insets.right,
+            insets.bottom);
+
+          applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, insets.left, insets.right, insets.bottom);
+          return windowInsets;
+        });
     }
 
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
@@ -2470,8 +2495,12 @@ public final class KMManager {
     KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
   }
 
-  // Get the navigation bar height (if visible) in pixels
-  private static int getNavigationBarHeight(Context context) {
+  /**
+   * Get the navigation bar height (if visible) in pixels
+   * @param context - the context
+   * @return int - navigation bar height in pixels
+   */
+  public static int getNavigationBarHeight(Context context) {
     // Determine if navigation bar is visible
     int resourceId = context.getResources().getIdentifier(
       "config_showNavigationBar", "bool", "android");
