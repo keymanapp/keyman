@@ -29,6 +29,17 @@ function toToken(text: string) {
   return token;
 }
 
+let TOKEN_TRANSFORM_SEED = 0;
+function toTransformToken(text: string, transformId?: number) {
+  let idSeed = transformId === undefined ? TOKEN_TRANSFORM_SEED++ : transformId;
+  let isWhitespace = text == ' ';
+  let token = new ContextToken(plainModel);
+  const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
+  token.addInput({trueTransform: textAsTransform, inputStartIndex: 0}, [ { sample: textAsTransform, p: 1 } ]);
+  token.isWhitespace = isWhitespace;
+  return token;
+}
+
 describe('ContextTokenization', function() {
   describe("<constructor>", () => {
     it("constructs from just a token array", () => {
@@ -644,7 +655,8 @@ describe('ContextTokenization', function() {
 
       it('handles empty contexts', () => {
         const baseTokens = [''];
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -653,7 +665,8 @@ describe('ContextTokenization', function() {
             isPartial: false,
             omitsEmptyToken: false,
             text: '',
-            tokenIndex: 0
+            tokenIndex: 0,
+            sourceRangeKey: `T${idSeed}`
           },
           deleteLengths: [0],
           sliceIndex: 1
@@ -662,7 +675,8 @@ describe('ContextTokenization', function() {
 
       it('handles empty contexts and invalid Transforms', () => {
         const baseTokens = [''];
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -671,7 +685,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: false,
             text: '',
-            tokenIndex: 0
+            tokenIndex: 0,
+            sourceRangeKey: `T${idSeed}`
           },
           deleteLengths: [0],
           sliceIndex: 1
@@ -680,7 +695,8 @@ describe('ContextTokenization', function() {
 
       it('builds edge windows for the start of context with no edits', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -689,7 +705,8 @@ describe('ContextTokenization', function() {
             isPartial: false,
             omitsEmptyToken: false,
             text: 'an',
-            tokenIndex: 0
+            tokenIndex: 0,
+            sourceRangeKey: `T${idSeed + 0}`
           },
           deleteLengths: [0],
           sliceIndex: 3
@@ -698,7 +715,8 @@ describe('ContextTokenization', function() {
 
       it('builds edge windows for the start of context with deletion edits (1)', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -707,7 +725,8 @@ describe('ContextTokenization', function() {
             isPartial: false,
             omitsEmptyToken: false,
             text: ' ',
-            tokenIndex: 1
+            tokenIndex: 1,
+            sourceRangeKey: `T${idSeed + 1}`
           },
           deleteLengths: [2, 0],
           sliceIndex: 5
@@ -716,7 +735,8 @@ describe('ContextTokenization', function() {
 
       it('builds edge windows for the start of context with deletion edits (2)', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 4 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -725,7 +745,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: false,
             text: 'pple',
-            tokenIndex: 2
+            tokenIndex: 2,
+            sourceRangeKey: `T${idSeed + 2}`
           },
           deleteLengths: [2, 1, 1],
           sliceIndex: 7
@@ -734,7 +755,8 @@ describe('ContextTokenization', function() {
 
       it('builds edge windows for the end of context with no edits', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
         baseTokenization.tail.isPartial = true;
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
@@ -744,7 +766,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: false,
             text: 'day',
-            tokenIndex: 6
+            tokenIndex: 6,
+            sourceRangeKey: `T${idSeed + 6}`
           },
           deleteLengths: [0],
           sliceIndex: 2
@@ -753,7 +776,8 @@ describe('ContextTokenization', function() {
 
       it('builds edge windows for the end of context with no edits, trailing whitespace', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
         assert.deepEqual(results, {
@@ -762,7 +786,8 @@ describe('ContextTokenization', function() {
             isPartial: true,
             omitsEmptyToken: true,
             text: ' ',
-            tokenIndex: 7
+            tokenIndex: 7,
+            sourceRangeKey: `T${idSeed + 7}`
           },
           deleteLengths: [0],
           sliceIndex: 2
@@ -1281,7 +1306,8 @@ describe('ContextTokenization', function() {
 
     it('returns the standard edge window for empty transform inputs', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const idSeed = TOKEN_TRANSFORM_SEED;
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
       const editTransform = {
         insert: '',
@@ -1304,7 +1330,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: 'fox',
-          tokenIndex: 4
+          tokenIndex: 4,
+          sourceRangeKey: `T${idSeed + 4}`
         },
         deleteLengths: [0],
         sliceIndex: 2
@@ -1313,7 +1340,8 @@ describe('ContextTokenization', function() {
 
     it('returns the standard edge window for empty transforms with context-final whitespace', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox', ' '];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const idSeed = TOKEN_TRANSFORM_SEED;
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
       const editTransform = {
         insert: '',
@@ -1336,7 +1364,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: ' ',
-          tokenIndex: 5
+          tokenIndex: 5,
+          sourceRangeKey: `T${idSeed + 5}`
         },
         deleteLengths: [0],
         sliceIndex: 2
@@ -1346,7 +1375,8 @@ describe('ContextTokenization', function() {
 
     it('returns the standard edge window for pure transform w insert inputs', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const idSeed = TOKEN_TRANSFORM_SEED;
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
       const editTransform = {
         insert: ' jumped',
@@ -1369,7 +1399,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: 'fox',
-          tokenIndex: 4
+          tokenIndex: 4,
+          sourceRangeKey: `T${idSeed + 4}`
         },
         deleteLengths: [0],
         sliceIndex: 2
@@ -1378,7 +1409,8 @@ describe('ContextTokenization', function() {
 
     it('returns the proper edge window for transforms w deleteLeft inputs (1)', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const idSeed = TOKEN_TRANSFORM_SEED;
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
       const editTransform = {
         insert: 'rog',
@@ -1401,7 +1433,9 @@ describe('ContextTokenization', function() {
           isPartial: true,
           omitsEmptyToken: false,
           text: 'f',
-          tokenIndex: 4
+          tokenIndex: 4,
+          // not yet altered by deleteLeft bits or the newly-incoming transform
+          sourceRangeKey: `T${idSeed + 4}`
         },
         deleteLengths: [2],
         sliceIndex: 1
@@ -1410,7 +1444,8 @@ describe('ContextTokenization', function() {
 
     it('returns the proper edge window for transforms w deleteLeft inputs (2)', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const idSeed = TOKEN_TRANSFORM_SEED;
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
 
       const editTransform = {
         insert: 'fox and brown fox',  // => quick fox and brown fox
@@ -1433,7 +1468,8 @@ describe('ContextTokenization', function() {
           isPartial: false,
           omitsEmptyToken: false,
           text: ' ',
-          tokenIndex: 1
+          tokenIndex: 1,
+          sourceRangeKey: `T${idSeed + 1}`
         },
         deleteLengths: [3, 1, 5, 0],
         sliceIndex: 0

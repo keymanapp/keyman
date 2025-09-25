@@ -48,7 +48,7 @@ interface TokenSplitMap {
  * that would result from applying a transform to the state underlying an existing
  * context tokenization.
  */
-interface PrecomputedTokenizationTransition {
+export interface PrecomputedTokenizationTransition {
   /**
    * Metadata about how the existing tokenization and its contents correspond to
    * their counterparts within the input `Transform`'s target tokenization.
@@ -671,6 +671,11 @@ const prependText = (full: string, current: string) => current + full;
  * the "edit boundary" token.
  */
 interface EdgeEditBoundaryTokenData {
+
+  /**
+   * Indicates the ContextToken sourceRangeKey corresponding to the boundary token.
+   */
+  sourceRangeKey: string;
   /**
    * The text remaining in the token after the edit's deletions are applied,
    * before applying any inserts.
@@ -837,6 +842,7 @@ export function buildEdgeWindow(
       // token, we hit the boundary; note the boundary text.
       if(deleteCnt == 0 && tokenDeleteLength != tokenLen) {
         editBoundary = {
+          sourceRangeKey: currentTokens[i].sourceRangeKey,
           text: applyAtFront ? KMWString.slice(token, tokenDeleteLength) : KMWString.slice(token, 0, tokenLen - tokenDeleteLength),
           tokenIndex: i,
           isPartial: tokenDeleteLength != 0 || tokenIsPartial
@@ -849,6 +855,7 @@ export function buildEdgeWindow(
       // if totalDeletes = 0, ensure we still construct an editBoundaryToken.
       if(!editBoundary) {
         editBoundary = {
+          sourceRangeKey: currentTokens[i].sourceRangeKey,
           text: token,
           tokenIndex: i,
           isPartial: tokenIsPartial
@@ -863,6 +870,7 @@ export function buildEdgeWindow(
   // for such cases.
   if(!editBoundary) {
     editBoundary = {
+      sourceRangeKey: currentTokens[0].sourceRangeKey,
       text: '',
       tokenIndex: i - directionSign,
       isPartial: true
@@ -873,8 +881,10 @@ export function buildEdgeWindow(
   // be editing the token one index further.
   let shouldOmitEmptyToken = editBoundary.tokenIndex != 0 && editBoundary.tokenIndex == currentTokens.length - 1 && editBoundary.text == '';
   if(shouldOmitEmptyToken) {
+    const effectiveTail = currentTokens[editBoundary.tokenIndex-1];
     editBoundary = {
-      text: currentTokens[editBoundary.tokenIndex-1].exampleInput,
+      sourceRangeKey: effectiveTail.sourceRangeKey,
+      text: effectiveTail.exampleInput,
       tokenIndex: editBoundary.tokenIndex + directionSign,
       isPartial: true
     }
