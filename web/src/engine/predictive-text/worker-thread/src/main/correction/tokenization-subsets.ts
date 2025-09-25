@@ -76,11 +76,8 @@ export function legacySubsetKeyer(precomputation: PrecomputedTokenizationTransit
   // boundary?  We need to apply to the same token and portion thereof.
   const editBoundary = edgeWindow.editBoundary;
 
-  // It's not about the boundary text - we just need to ensure it's the 'same'
-  // token - comprised of the same keystrokes.  `sourceText` reflects the actual
-  // input for the source keystrokes.  We might have deleted part of it in this
-  // tokenization, but that doesn't matter here - we want to imply the
-  // represented keystroke range.
+  // For the legacy keyer, all we care about is that we land within the same
+  // token. We simply note the boundary token's index within the edge window.
   const boundaryEdgeIndex = editBoundary.tokenIndex - edgeWindow.sliceIndex;
 
   // Identify the new boundary token's length - as it appears after any related
