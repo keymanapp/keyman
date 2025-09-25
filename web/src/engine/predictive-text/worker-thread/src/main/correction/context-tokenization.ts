@@ -673,10 +673,9 @@ const prependText = (full: string, current: string) => current + full;
 interface EdgeEditBoundaryTokenData {
 
   /**
-   * Indicates the portion of true, user-visible context corresponding to input
-   * keystrokes that comprise the token
+   * Indicates the ContextToken sourceRangeKey corresponding to the boundary token.
    */
-  sourceText: string;
+  sourceRangeKey: string;
   /**
    * The text remaining in the token after the edit's deletions are applied,
    * before applying any inserts.
@@ -843,7 +842,7 @@ export function buildEdgeWindow(
       // token, we hit the boundary; note the boundary text.
       if(deleteCnt == 0 && tokenDeleteLength != tokenLen) {
         editBoundary = {
-          sourceText: currentTokens[i].sourceText,
+          sourceRangeKey: currentTokens[i].sourceRangeKey,
           text: applyAtFront ? KMWString.slice(token, tokenDeleteLength) : KMWString.slice(token, 0, tokenLen - tokenDeleteLength),
           tokenIndex: i,
           isPartial: tokenDeleteLength != 0 || tokenIsPartial
@@ -856,7 +855,7 @@ export function buildEdgeWindow(
       // if totalDeletes = 0, ensure we still construct an editBoundaryToken.
       if(!editBoundary) {
         editBoundary = {
-          sourceText: currentTokens[i].sourceText,
+          sourceRangeKey: currentTokens[i].sourceRangeKey,
           text: token,
           tokenIndex: i,
           isPartial: tokenIsPartial
@@ -871,7 +870,7 @@ export function buildEdgeWindow(
   // for such cases.
   if(!editBoundary) {
     editBoundary = {
-      sourceText: '',
+      sourceRangeKey: currentTokens[0].sourceRangeKey,
       text: '',
       tokenIndex: i - directionSign,
       isPartial: true
@@ -884,7 +883,7 @@ export function buildEdgeWindow(
   if(shouldOmitEmptyToken) {
     const effectiveTail = currentTokens[editBoundary.tokenIndex-1];
     editBoundary = {
-      sourceText: effectiveTail.sourceText,
+      sourceRangeKey: effectiveTail.sourceRangeKey,
       text: effectiveTail.exampleInput,
       tokenIndex: editBoundary.tokenIndex + directionSign,
       isPartial: true
