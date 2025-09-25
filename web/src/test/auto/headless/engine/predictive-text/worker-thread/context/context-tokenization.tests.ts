@@ -1500,8 +1500,8 @@ describe('ContextTokenization', function() {
         {
           input: { text: 'can\'', index: 2 /* + 4 */},
           matches: [
-            { text: 'can', index: 2 /* + 4 */ },
-            { text: '\'',  index: 3 /* + 4 */ }
+            { text: 'can', index: 2 /* + 4 */, textOffset: 0 },
+            { text: '\'',  index: 3 /* + 4 */, textOffset: 3 }
           ]
         }
       ]);
@@ -1532,8 +1532,8 @@ describe('ContextTokenization', function() {
         {
           input: { text: 'can\'', index: 2 /* + 4 */},
           matches: [
-            { text: 'can', index: 2 /* + 4 */ },
-            { text: '\'',  index: 3 /* + 4 */ }
+            { text: 'can', index: 2 /* + 4 */, textOffset: 0 },
+            { text: '\'',  index: 3 /* + 4 */, textOffset: 3 }
           ]
         }
       ]);
