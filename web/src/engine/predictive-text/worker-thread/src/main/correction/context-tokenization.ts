@@ -40,7 +40,7 @@ interface TokenMergeMap {
 
 interface TokenSplitMap {
   input: EditTokenMap,
-  matches: EditTokenMap[]
+  matches: (EditTokenMap & { textOffset: number })[]
 };
 
 /**
@@ -875,7 +875,8 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
         },
         matches: [ {
           index: match,
-          text: resultTokenization[match]
+          text: resultTokenization[match],
+          textOffset: 0
         }],
       };
       let currentMerge = resultTokenization[match];
@@ -883,10 +884,12 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
       // Look-ahead 1
       let nextMerge = currentMerge + resultTokenization[match + matchOffset++];
       for(/* next line */; splitTarget.indexOf(nextMerge) == 0; nextMerge = currentMerge + preTokenization[match + matchOffset++]) {
+        const textOffset = KMWString.length(currentMerge);
         currentMerge = nextMerge;
         split.matches.push({
           index: match + matchOffset - 1,
-          text: resultTokenization[match + matchOffset-1]
+          text: resultTokenization[match + matchOffset-1],
+          textOffset
         });
         // Each time we 'pass' the condition, we've successfully processed an associated edit.
 
