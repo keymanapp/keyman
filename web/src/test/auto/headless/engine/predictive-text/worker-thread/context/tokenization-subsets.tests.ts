@@ -166,7 +166,15 @@ describe('precomputationSubsetKeyer', function() {
         unmappedEdits: [],
         edgeWindow: {
           ...buildEdgeWindow(
-            [...tokenization.tokens, new ContextToken(plainModel, 'date')],
+            [...tokenization.tokens, (() => {
+            const token = new ContextToken(plainModel, 'da');
+            // source text:  'date'
+            token.addInput(
+              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0},
+              [{sample: {insert: 'te', deleteLeft: 0}, p: 1}]
+            );
+            return token;
+          })()],
             { insert: 's', deleteLeft: 0, deleteRight: 0 },
             false
           ),
@@ -187,8 +195,10 @@ describe('precomputationSubsetKeyer', function() {
           [...tokenization.tokens, (() => {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
-            token.addSourceInput({insert: 'te', deleteLeft: 0});
-            token.searchSpace.addInput([{sample: {insert: 't', deleteLeft: 0}, p: 1}]);
+            token.addInput(
+              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0},
+              [{sample: {insert: 't', deleteLeft: 0}, p: 1}]
+            );
             return token;
           })()],
         { insert: 'es', deleteLeft: 0, deleteRight: 0 },
@@ -226,8 +236,10 @@ describe('precomputationSubsetKeyer', function() {
               const token = new ContextToken(plainModel, 'da');
               token.isPartial = true;
               // source text:  'dat'
-              token.addSourceInput({insert: 't', deleteLeft: 0});
-              token.searchSpace.addInput([{sample: {insert: 'ts', deleteLeft: 0}, p: 1}]);
+              token.addInput(
+                {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0},
+                [{sample: {insert: 'ts', deleteLeft: 0}, p: 1}]
+              );
               return token;
             })()],
             { insert: 'e', deleteLeft: 1, deleteRight: 0 },
@@ -251,8 +263,10 @@ describe('precomputationSubsetKeyer', function() {
           const token = new ContextToken(plainModel, 'da');
           token.isPartial = true;
           // source text:  'dat'
-          token.addSourceInput({insert: 't', deleteLeft: 0});
-          token.searchSpace.addInput([{sample: {insert: 't', deleteLeft: 0}, p: 1}]);
+          token.addInput(
+            {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0},
+            [{sample: {insert: 't', deleteLeft: 0}, p: 1}]
+          );
           return token;
         })()],
         { insert: 'e', deleteLeft: 0, deleteRight: 0 },
@@ -401,8 +415,8 @@ describe('precomputationSubsetKeyer', function() {
             text: 'can\'',
             index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex
           }, matches: [
-            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex },
-            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex }
+            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex, textOffset: 0 },
+            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex, textOffset: 3 }
           ]
         }],
         unmappedEdits: [],
@@ -453,8 +467,8 @@ describe('precomputationSubsetKeyer', function() {
             text: 'can\'',
             index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex
           }, matches: [
-            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex },
-            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex }
+            { text: 'can', index: rawTextTokens.length - 1 - edgeWindow1.sliceIndex, textOffset: 0 },
+            { text: '\'', index: rawTextTokens.length - 0 - edgeWindow1.sliceIndex, textOffset: 3 }
           ]
         }],
         unmappedEdits: [],
@@ -696,12 +710,16 @@ describe('TokenizationSubsetBuilder', function() {
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1 };
 
     const fourCharTailToken = new ContextToken(baseTokenization.tail);
-    fourCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    fourCharTailToken.searchSpace.addInput([{ sample: trueSourceTransform, p: .6 }]);
+    fourCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: trueSourceTransform, p: .6 }]
+    );
 
     const fiveCharTailToken = new ContextToken(baseTokenization.tail);
-    fiveCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    fiveCharTailToken.searchSpace.addInput([{ sample: { insert: 's', deleteLeft: 0 }, p: .4 }]);
+    fiveCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: { insert: 's', deleteLeft: 0 }, p: .4 }]
+    );
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const fourCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), fourCharTailToken]);
@@ -731,12 +749,16 @@ describe('TokenizationSubsetBuilder', function() {
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1 };
 
     const twoCharTailToken = new ContextToken(baseTokenization.tail);
-    twoCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    twoCharTailToken.searchSpace.addInput([{ sample: trueSourceTransform, p: .6 }]);
+    twoCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: trueSourceTransform, p: .6 }]
+    );
 
     const threeCharTailToken = new ContextToken(baseTokenization.tail);
-    threeCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    threeCharTailToken.searchSpace.addInput([{ sample: { insert: 'a', deleteLeft: 0 }, p: .4 }]);
+    threeCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: { insert: 'a', deleteLeft: 0 }, p: .4 }]
+    );
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const twoCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), twoCharTailToken]);
