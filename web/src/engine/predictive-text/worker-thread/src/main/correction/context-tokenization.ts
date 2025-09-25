@@ -64,10 +64,7 @@ export class ContextTokenization {
    * tokens represented by this tokenization instance.
    */
   get exampleInput(): string[] {
-    return this.tokens
-      // Hide any tokens representing invisible wordbreaks.  (Thinking ahead to phrase-level possibilities)
-      .filter(token => token.exampleInput !== null)
-      .map(token => token.exampleInput);
+    return this.tokens.map(token => token.exampleInput);
   }
 
   /**
@@ -81,7 +78,7 @@ export class ContextTokenization {
    * the tokenization modeled by this instance.
    */
   computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
-    return computeAlignment(this.sourceText, incomingTokenization, isSliding, noSubVerify);
+    return computeAlignment(this.exampleInput, incomingTokenization, isSliding, noSubVerify);
   }
 
   /**
