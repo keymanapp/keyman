@@ -710,12 +710,16 @@ describe('TokenizationSubsetBuilder', function() {
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1 };
 
     const fourCharTailToken = new ContextToken(baseTokenization.tail);
-    fourCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    fourCharTailToken.searchSpace.addInput([{ sample: trueSourceTransform, p: .6 }]);
+    fourCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: trueSourceTransform, p: .6 }]
+    );
 
     const fiveCharTailToken = new ContextToken(baseTokenization.tail);
-    fiveCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    fiveCharTailToken.searchSpace.addInput([{ sample: { insert: 's', deleteLeft: 0 }, p: .4 }]);
+    fiveCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: { insert: 's', deleteLeft: 0 }, p: .4 }]
+    );
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const fourCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), fourCharTailToken]);
@@ -745,12 +749,16 @@ describe('TokenizationSubsetBuilder', function() {
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1 };
 
     const twoCharTailToken = new ContextToken(baseTokenization.tail);
-    twoCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    twoCharTailToken.searchSpace.addInput([{ sample: trueSourceTransform, p: .6 }]);
+    twoCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: trueSourceTransform, p: .6 }]
+    );
 
     const threeCharTailToken = new ContextToken(baseTokenization.tail);
-    threeCharTailToken.addSourceInput({ insert: 'é', deleteLeft: 1 });
-    threeCharTailToken.searchSpace.addInput([{ sample: { insert: 'a', deleteLeft: 0 }, p: .4 }]);
+    threeCharTailToken.addInput(
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      [{ sample: { insert: 'a', deleteLeft: 0 }, p: .4 }]
+    );
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const twoCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), twoCharTailToken]);
