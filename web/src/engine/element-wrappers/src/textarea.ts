@@ -1,7 +1,7 @@
-import OutputTarget from './outputTarget.js';
+import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
 import { KMWString } from '@keymanapp/web-utils';
 
-export default class TextArea extends OutputTarget<{}> {
+export class TextArea extends OutputTargetElementWrapper<{}> {
   root: HTMLTextAreaElement;
 
   /**
