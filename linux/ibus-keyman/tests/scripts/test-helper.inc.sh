@@ -149,9 +149,9 @@ function _setup_dbus_session() {
     # don't start the regular UI we don't have a session. Therefore we
     # call the setupRuntimeDir.sh script to create the directory. The
     # script should contain the following commands:
-    #  mkdir -p "/run/user/${UID:-$(id -u)}"
-    #  chmod 0700 "/run/user/${UID:-$(id -u)}"
-    #  chown "${USER:-$(whoami)}" "/run/user/${UID:-$(id -u)}"
+    #  mkdir -p "/run/user/${SUDO_UID:-$(id -u)}"
+    #  chmod 0700 "/run/user/${SUDO_UID:-$(id -u)}"
+    #  chown "${SUDO_USER:-$(whoami)}" "/run/user/${SUDO_UID:-$(id -u)}"
     if [[ -f "/usr/local/bin/setupRuntimeDir.sh" ]]; then
       echo "# Creating /run/user/${UID:-$(id -u)}..."
       sudo /usr/local/bin/setupRuntimeDir.sh
