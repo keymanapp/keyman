@@ -1,8 +1,0 @@
-# The folders XXX.dist-info/ and XXX.egg-info/ hold metadata for
-# Python modules. Those files are not documentation even though
-# some of their names carry the .txt file extension.
-keyman source: package-contains-documentation-outside-usr-share-doc
-
-# keyman-system-service gets started by dbus, therefore it should not
-# have an [INSTALL] section
-keyman source: systemd-service-file-missing-install-key
