@@ -424,9 +424,9 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       if (!normalization_disabled) {
         test_assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
       }
-      std::cout << "- check expected" << std::endl;
-      std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
-      std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+      std::wcout << "- check expected" << std::endl;
+      std::wcout << "expected  : " << convert<char, char16_t>(string_to_hex(action.string)) << " [" << action.string << "]" << std::endl;
+      std::wcout << "text store: " << convert<char, char16_t>(string_to_hex(text_store)) << " [" << text_store << "]" << std::endl;
       // Compare internal context with expected result
       if (text_store != action.string) {
         errorLine = __LINE__;
