@@ -34,18 +34,29 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.SysUtils,
   System.TypInfo,
   Winapi.msxml,
   Winapi.Windows;
 
 type
+  TCustomisationLocale = class
+    ID: string;
+    Path: string;
+    Name: string;
+    NameWithEnglish: string;
+  end;
+
+  TCustomisationLocaleList = class(TObjectDictionary<string, TCustomisationLocale>)
+  end;
+
   TCustomisationMessageManager = class(TComponent)
   private
     FLanguageCode: string;
     FLocaleDoc: IXMLDOMDocument;
     FDefaultLocaleDoc: IXMLDOMDocument;
-    FLanguages: TStringList;
+    FLanguages: TCustomisationLocaleList;
     FCustStorageFilename: string;
     procedure SetLanguageCode(Value: string);
     function GetAvailableLanguages: string;
@@ -70,6 +81,7 @@ uses
   Keyman.System.AndroidStringToKeymanLocaleString,
   KLog,
   ErrorControlledRegistry,
+  MessageIdentifierConsts,
   RegistryKeys;
 
 { TCustomisationMessageManager }
@@ -77,7 +89,7 @@ uses
 constructor TCustomisationMessageManager.Create(ACustStorageFilename: string; ALoadLocale: Boolean = True);
 begin
   inherited Create(nil);
-  FLanguages := TStringList.Create;
+  FLanguages := TCustomisationLocaleList.Create;
   FCustStorageFilename := ACustStorageFilename;
   Load(ALoadLocale);
 end;
@@ -89,44 +101,69 @@ begin
 end;
 
 function TCustomisationMessageManager.GetAvailableLanguages: string;
+var
+  FLocaleIndexDoc: IXmlDomDocument;
+  node: IXMLDOMNode;
+  locale: TCustomisationLocale;
+  FLocalePath: WideString;
 
-  function IsValidLocaleFile(const path: string): Boolean;  // I3192
+  function LoadLocaleData(node: IXMLDOMNode; locale: TCustomisationLocale): Boolean;
   var
-    FLocaleDoc: IXmlDomDocument;
+    v: IXMLDOMNode;
   begin
-    try
-      FLocaleDoc := CoDomDocument.Create;
-      FLocaleDoc.preserveWhiteSpace := True;
-      FLocaleDoc.async := False;
-      FLocaleDoc.validateOnParse := False;
-      FLocaleDoc.load(path);
-      if FLocaleDoc.documentElement <> nil
-        then Result := (FLocaleDoc.documentElement.tagName = 'resources')
-        else Result := False;
-    except
-      Result := False;
-    end;
+    v := node.attributes.getNamedItem('SKLanguageCode');
+    if v = nil then Exit(False);
+    locale.ID := v.nodeValue;
+    locale.Path := FLocalePath + locale.ID + '\strings.xml';
+
+    v := node.attributes.getNamedItem('SKUILanguageName');
+    if v = nil then Exit(False);
+    locale.Name := v.nodeValue;
+
+    v := node.attributes.getNamedItem('SKUILanguageNameWithEnglish');
+    if v = nil then Exit(False);
+    locale.NameWithEnglish := v.nodeValue;
+
+    Result := True;
   end;
 
-var
-  f: TSearchRec;
-  FLocalePath: WideString;
 begin
   Result := '';
   FLocalePath := ExtractFilePath(FCustStorageFileName)+'locale\';
   FLanguages.Clear;
-  if FindFirst(FLocalePath + '*', faDirectory, f) = 0 then
-  begin
-    repeat
-      if ((f.Attr and faDirectory) = faDirectory) and (f.Name <> '.') and (f.Name <> '..') then
+
+  try
+    FLocaleIndexDoc := CoDomDocument.Create;
+    FLocaleIndexDoc.preserveWhiteSpace := True;
+    FLocaleIndexDoc.async := False;
+    FLocaleIndexDoc.validateOnParse := False;
+    FLocaleIndexDoc.load(FLocalePath + 'index.xml');
+    if (FLocaleIndexDoc.documentElement = nil) or (FLocaleIndexDoc.documentElement.tagName <> 'locales') then
+      Exit;
+
+    node := FLocaleIndexDoc.documentElement.firstChild;
+    if not Assigned(node) then
+      Exit;
+
+    while node <> nil do
+    begin
+      if node.nodeName = 'locale' then
       begin
-        if IsValidLocaleFile(FLocalePath+f.Name+'\strings.xml') then  // I3192
-          FLanguages.Add(f.Name+'='+FLocalePath+f.Name+'\strings.xml');
-        if Result <> '' then Result := Result + #13#10;
-        Result := Result + f.Name;
+        locale := TCustomisationLocale.Create;
+        if not LoadLocaleData(node, locale) then
+          locale.Free
+        else
+        begin
+          FLanguages.Add(locale.ID, locale);
+          Result := Result + locale.ID + #13#10;
+        end;
       end;
-    until FindNext(f) <> 0;
-    System.SysUtils.FindClose(f);
+      node := node.nextSibling;
+      end;
+  except
+    // If any locale items are invalid, we will have only English
+    // Currently, we cannot report errors to Sentry from kmcomapi
+    Result := '';
   end;
 end;
 
@@ -159,10 +196,15 @@ end;
 
 function TCustomisationMessageManager.GetLocalePathForLocale(
   LocaleName: WideString): WideString;
+var
+  locale: TCustomisationLocale;
 begin
-  if LocaleName = ''
-    then Result := ExtractFilePath(FCustStorageFileName)+'locale\'
-    else Result := FLanguages.Values[LocaleName];
+  if LocaleName = '' then
+    Result := ExtractFilePath(FCustStorageFileName)+'locale\'
+  else if not FLanguages.TryGetValue(LocaleName, locale) then
+    Result := ''
+  else
+    Result := locale.Path;
 end;
 
 procedure TCustomisationMessageManager.Load(ALoadLocale: Boolean = True);
@@ -195,6 +237,14 @@ begin
     FDefaultLocaleDoc.load(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml');
 end;
 
+(**
+  * Look up a localized string for the currently active localization. If
+  * not found, looks up the string from the default (i.e. en)
+  * localization, and finally falls back to the ID itself on failure.
+  *
+  * @param ID            ID of string to lookup.
+  * @return Localized string value.
+  *)
 function TCustomisationMessageManager.MessageFromID(ID: WideString): WideString;
 var
   node: IXMLDOMNode;
@@ -211,22 +261,40 @@ begin
   end;
 end;
 
+(**
+  * Look up a localized string for a specific localization. This function
+  * can return values for only `SKLanguageCode`, `SKUILanguageName`
+  * and `SKUILanguageNameWithEnglish`. Other strings will be returned
+  * from the currently active localization.
+  *
+  * @param ID            ID of string to lookup.
+  * @param LanguageCode  The BCP-47 language tag.
+  * @return Localized string value.
+  *)
 function TCustomisationMessageManager.MessageFromID(ID,
   LanguageCode: WideString): WideString;
 var
-  mm: TCustomisationMessageManager;
+  locale: TCustomisationLocale;
 begin
-  if LanguageCode = Self.FLanguageCode then
-    Result := MessageFromID(ID)
+  if not FLanguages.TryGetValue(LanguageCode, locale) then
+    Exit(MessageFromID(ID));
+
+  if ID = StringFromMsgId(SKUILanguageName) then
+  begin
+    Result := locale.Name;
+  end
+  else if ID = StringFromMsgId(SKUILanguageNameWithEnglish) then
+  begin
+    Result := locale.NameWithEnglish;
+  end
+  else if ID = StringFromMsgId(SKLanguageCode) then
+  begin
+    Result := locale.ID;
+  end
   else
   begin
-    mm := TCustomisationMessageManager.Create(FCustStorageFilename, False);
-    try
-      mm.LanguageCode := LanguageCode;
-      Result := mm.MessageFromID(ID);
-    finally
-      mm.Free;
-    end;
+    // Other tags are no longer supported for performance reasons
+    Result := MessageFromID(ID);
   end;
 end;
 
