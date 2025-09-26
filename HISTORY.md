@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.128 alpha 2025-09-26
+
+* fix(windows): sort setup UI language selector according to language names (#13573)
+* feat(windows): improve startup time by caching locale names (#14795)
+
 ## 19.0.127 alpha 2025-09-25
 
 * fix(common): registry clean-up enabled, no terminal in github action (#14824)
