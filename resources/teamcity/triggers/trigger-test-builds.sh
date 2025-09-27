@@ -120,6 +120,39 @@ function postSkippedBuildsStatusResult() {
 }
 
 #
+# Find the platforms that have changes based on the watch_ variables in trigger-definitions.inc.sh
+#
+function find_platform_changes() {
+  builder_echo grey "# Find platforms that have changes"
+  declare -gA build_platforms
+  local platform watch
+
+  # Scan the files found
+  while IFS= read -r line; do
+    # for each platform
+    for platform in "${available_platforms[@]}"; do
+      if [[ ! " ${!build_platforms[*]} " =~ " ${platform} " ]]; then
+        # Which platform are we watching?
+        eval watch="'$'watch_${platform}"
+
+        # Add common patterns to the watch list
+        watch="^(${platform}|(oem/[^/]+/${platform})|resources/((?!teamcity|docker-images)|teamcity/(${platform}|includes)|docker-images/(${platform}|base))|${watch})"
+        # Since bash doesn't support negative look-aheads we use perl to test
+        # (grep has a --perl-regexp option, but not the version on macOS)
+        if perl -e 'exit($ARGV[0] =~ /$ARGV[1]/ ? 0 : 1)' "${line}" "${watch}"; then
+          # By default, we'll build a 'release' test build for touched platforms
+          build_platforms[${platform}]=${build_level_release}
+        fi
+      fi
+    done
+  done <<< "${prfiles}"
+
+  builder_echo blue "Default build platforms: ${!build_platforms[*]}"
+}
+
+KEYMAN_API_CHECK_SKIP="false"
+
+#
 # Following is not an error; this script can run against master/beta/stable
 # branches as well as pull requests
 #
@@ -201,46 +234,12 @@ debug_echo "Files found: ${prfiles[*]}"
 
 popd > /dev/null
 
-#
-# Find the platforms that have changes based on the watch_ variables in trigger-definitions.inc.sh
-#
-
-function find_platform_changes() {
-  builder_echo grey "# Find platforms that have changes"
-  declare -gA build_platforms
-  local platform watch
-
-  # Scan the files found
-  while IFS= read -r line; do
-    # for each platform
-    for platform in "${available_platforms[@]}"; do
-      if [[ ! " ${!build_platforms[*]} " =~ " ${platform} " ]]; then
-        # Which platform are we watching?
-        eval watch="'$'watch_${platform}"
-
-        # Add common patterns to the watch list
-        watch="^(${platform}|(oem/[^/]+/${platform})|resources/((?!teamcity|docker-images)|teamcity/(${platform}|includes)|docker-images/(${platform}|base))|${watch})"
-        # Since bash doesn't support negative look-aheads we use perl to test
-        # (grep has a --perl-regexp option, but not the version on macOS)
-        if perl -e 'exit($ARGV[0] =~ /$ARGV[1]/ ? 0 : 1)' "${line}" "${watch}"; then
-          # By default, we'll build a 'release' test build for touched platforms
-          build_platforms[${platform}]=${build_level_release}
-        fi
-      fi
-    done
-  done <<< "${prfiles}"
-
-  builder_echo blue "Default build platforms: ${!build_platforms[*]}"
-}
-
 find_platform_changes
 
 #
 # Now check PR commits for Build-bot: commands
 # This will modify the build_platforms array
 #
-
-KEYMAN_API_CHECK_SKIP="false"
 
 if [[ "${prremote}" == "origin" ]]; then
   # We only accept Build-bot commands on trusted local origin PRs
