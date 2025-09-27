@@ -19,7 +19,7 @@ const KEYMAN_ROOT = env.KEYMAN_ROOT;
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 
-// Test the KeyboardProcessor interface.
+// Test the JSKeyboardProcessor interface.
 describe('LanguageProcessor', function() {
   let languageProcessor;
   const callbacks = new TestCompilerCallbacks();
