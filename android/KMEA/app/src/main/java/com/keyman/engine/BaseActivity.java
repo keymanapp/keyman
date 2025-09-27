@@ -100,7 +100,8 @@ public class BaseActivity extends AppCompatActivity {
           insets.right,
           insets.bottom);
 
-        KMManager.applyInsetsToKeyboard(insets.left, insets.right, insets.bottom);
+        KMManager.applyInsetsToKeyboard(
+          KMManager.KeyboardType.KEYBOARD_TYPE_INAPP, insets.left, insets.right, insets.bottom);
         return windowInsets;
       });
   }
