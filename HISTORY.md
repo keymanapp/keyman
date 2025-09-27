@@ -1,5 +1,71 @@
 # Keyman Version History
 
+## 19.0.128 alpha 2025-09-26
+
+* fix(windows): sort setup UI language selector according to language names (#13573)
+* feat(windows): improve startup time by caching locale names (#14795)
+
+## 19.0.127 alpha 2025-09-25
+
+* fix(common): registry clean-up enabled, no terminal in github action (#14824)
+* maint(windows): check code signatures only in CI builds (#14815)
+* chore(deps-dev): bump tar-fs from 3.0.9 to 3.1.1 (#14827)
+* fix(windows): disable MSI shortcut advertisement (#14814)
+* maint(resources): lookup 7z on path on Windows if SEVENZ_HOME is not set (#14816)
+* fix(android): Apply bottom insets to system keyboard (#14808)
+* fix(android): Fix bottom insets for Sample and FirstVoices apps (#14828)
+* docs(android): Document getNavigationBarHeight API (#14830)
+
+## 19.0.126 alpha 2025-09-24
+
+* maint(linux): remove several shellcheck directives (#14819)
+
+## 19.0.125 alpha 2025-09-23
+
+* fix(common): some more tests running successfully in a container (#14784)
+
+## 19.0.124 alpha 2025-09-22
+
+* maint(linux): improve `upload-to-debian` script (#14798)
+* refactor(linux): remove a meson deprecation warning (#14801)
+* refactor(linux): remove shellcheck warnings (#14802)
+* refactor(resources): use array for Docker arguments (#14803)
+
+## 19.0.123 alpha 2025-09-19
+
+* chore(linux): Update debian changelog (#14783)
+
+## 19.0.122 alpha 2025-09-18
+
+* fix(android): Refresh the banner theme when system keyboard is changed (#14768)
+* maint(common): update HISTORY.md for 18.0.241 (#14780)
+
+## 19.0.121 alpha 2025-09-17
+
+* docs(developer): document `fileVersion` (#14766)
+* maint(linux): allow to force package build on non-Keyman repo (#14749)
+* feat(linux): add breadcrumbs and system information to Sentry error reports (#14765)
+* maint(resources): fix broken test build trigger for `master` branch (#14770)
+* chore(linux): remove automatic installation of `onboard-keyman` (#14772)
+
+## 19.0.120 alpha 2025-09-16
+
+* refactor(linux): remove warning (#14761)
+* fix(linux): don't crash on invalid languages in keyboard (#14760)
+
+## 19.0.119 alpha 2025-09-15
+
+* fix(developer): transform slashes to backslashes in paths in Package Editor (#14721)
+* fix(developer): restrict invalid characters in identifiers in kmcmplib (#14746)
+* fix(common): add name for cleanup ghcr (#14755)
+
+## 19.0.118 alpha 2025-09-12
+
+* chore(common): Update to Unicode 17.0 (#14728)
+* fix(resources): match cr to lf change in pr-build-status.mjs (#14734)
+* fix(common): merging build and publish step for docker (#14747)
+* chore(developer): use icons.res to verify that configure is done (#14733)
+
 ## 19.0.117 alpha 2025-09-11
 
 * fix(resources): ignore KEYMAN_VERSION_FOR_FILENAME in test (#14730)
@@ -743,6 +809,22 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.241 stable 2025-09-18
+
+* maint(resources): use correct version for PR title for history cherry-pick (#14614)
+* chore(linux): Update debian changelog (#14589)
+* fix(android): Update: Android Target API to 35, Java to 21, and Gradle dependencies (#14584)
+* fix(android): Convert Keyman app layouts for edge to edge (#14597)
+* fix(android): Fix insets for in-app vs system keyboard (#14642)
+* maint(linux): create temporary worktree for packaging (#14599)
+* fix(android): Cleanup layouts for Engine, Sample apps, and FirstVoices apps for edge to edge (#14663)
+* fix(web): fix error trying to calculate style scaling effects (#14696)
+* fix(linux): don't crash if `kmp.json` is missing `keyboards` section (#14714)
+* fix(developer): transform slashes to backslashes in paths in Package Editor (#14722)
+* chore(linux): remove automatic installation of `onboard-keyman` (#14773)
+* docs(linux): update release notes for stable release (#14774)
+* fix(linux): don't crash on invalid languages in keyboard (#14771)
 
 ## 18.0.240 stable 2025-08-27
 

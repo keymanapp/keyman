@@ -30,6 +30,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, Gtk
 
 
+is_sentry_sdk = False
+
+
 class SentryErrorHandling:
     def __init__(self) -> None:
         self.error_reporting_setting = KeymanOption('error-reporting')
@@ -78,6 +81,15 @@ class SentryErrorHandling:
         if enabled != was_enabled:
             self._handle_enabled(enabled)
 
+    def add_breadcrumb(self, category, message, level='info'):
+        global is_sentry_sdk
+        if not self.is_sentry_enabled() or not is_sentry_sdk:
+            return
+
+        # sentry_sdk = importlib.import_module('sentry_sdk')
+        import sentry_sdk
+        sentry_sdk.add_breadcrumb(category=category, message=message, level=level)
+
     def _get_environ_nosentry(self):
         keyman_nosentry = os.environ.get('KEYMAN_NOSENTRY')
         return keyman_nosentry and (int(keyman_nosentry) == 1)
@@ -114,46 +126,60 @@ class SentryErrorHandling:
 
     def _sentry_sdk_initialize(self):
         # Try new sentry-sdk first
+        global is_sentry_sdk
         sentry_sdk = importlib.import_module('sentry_sdk')
         from sentry_sdk import configure_scope, set_user
         from sentry_sdk.integrations.logging import LoggingIntegration
+
+        is_sentry_sdk = True
 
         sentry_logging = LoggingIntegration(
           level=logging.INFO,           # Capture info and above as breadcrumbs
           event_level=logging.CRITICAL  # Send critical errors as events
         )
         SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@o1005580.ingest.sentry.io/5983525"
+
+        os_release = None
+        dist = None
+        try:
+            os_release = platform.freedesktop_os_release()
+            dist = os_release['VERSION_CODENAME']
+        except OSError as e:
+            logging.debug(f'System does not have os_release file: {e.strerror}')
+        except AttributeError:
+            logging.debug('System does not have platform.freedesktop_os_release() method')
+        except Exception:
+            logging.debug(
+                'Got exception trying to access platform.freedesktop_os_release()  method or os_release information')
+
         sentry_sdk.init(
           dsn=SentryUrl,
           environment=__environment__,
           release=__versiongittag__,
           integrations=[sentry_logging],
+          dist=dist,
+          in_app_include=['keyman_config'],
           before_send=self._before_send
         )
-        hash = hashlib.md5()
-        hash.update(getpass.getuser().encode())
-        set_user({'id': hash.hexdigest()})
+        md5Hash = hashlib.md5()
+        md5Hash.update(getpass.getuser().encode())
+        set_user({'id': md5Hash.hexdigest()})
         with configure_scope() as scope:
-            scope.set_tag("app", os.path.basename(sys.argv[0]))
-            scope.set_tag("pkgversion", __pkgversion__)
-            scope.set_tag("platform", platform.platform())
-            scope.set_tag("system", platform.system())
-            scope.set_tag("tier", __tier__)
-            scope.set_tag("device", platform.node())
-            try:
-                os_release = platform.freedesktop_os_release()
-                scope.set_tag('os', os_release['PRETTY_NAME'])
-                scope.set_tag('os.name', os_release['NAME'])
-                if 'VERSION' in os_release:
-                    scope.set_tag('os.version', os_release['VERSION'])
-            except OSError as e:
-                logging.debug(f'System does not have os_release file: {e.strerror}')
-            except AttributeError:
-                logging.debug('System does not have platform.freedesktop_os_release() method')
-            except:
-                logging.debug(
-                    'Got exception trying to access platform.freedesktop_os_release()  method or os_release information')
+            self._set_system_info(scope, os_release)
         logging.info("Initialized Sentry error reporting")
+
+    def _set_system_info(self, scope, os_release):
+        scope.set_tag("app", os.path.basename(sys.argv[0]))
+        scope.set_tag("pkgversion", __pkgversion__)
+        scope.set_tag("platform", platform.platform())
+        scope.set_tag("system", platform.system())
+        scope.set_tag("tier", __tier__)
+        scope.set_tag("device", platform.node())
+        if os_release:
+            scope.set_tag('os', os_release['PRETTY_NAME'])
+            scope.set_tag('os.name', os_release['NAME'])
+            if 'VERSION' in os_release:
+                scope.set_tag('os.version', os_release['VERSION'])
 
     def _raven_initialize(self):
         # sentry-sdk is not available, so use older raven

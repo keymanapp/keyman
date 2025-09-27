@@ -1,0 +1,13 @@
+c Description: Verifies that kmc reports an error with invalid names in groups, stores, and deadkeys
+
+store(&NAME) 'error_name_contains_invalid_character-store'
+
+begin unicode > use(main)
+
+c the character between `test` and `test` below is a U+007F DEL, which may not
+c be visible in all contexts.
+
+store(testtest) 'test'
+
+group(main) using keys
+  + [K_A] > 'a'

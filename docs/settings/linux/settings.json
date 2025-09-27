@@ -104,9 +104,6 @@
   "C_Cpp.clang_format_fallbackStyle": "Google",
   "bashIde.explainshellEndpoint": "http://localhost:5000",
   "bashIde.highlightParsingErrors": true,
-  "shellcheck.customArgs": [
-    "--external-sources --source-path=resources/build/"
-  ],
   "C_Cpp.errorSquiggles": "EnabledIfIncludesResolve",
-  "shellcheck.useWorkspaceRootAsCwd": false
+  "shellcheck.useWorkspaceRootAsCwd": true
 }

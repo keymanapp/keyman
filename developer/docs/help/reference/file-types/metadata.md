@@ -88,9 +88,14 @@ The `System` object is used by Keyman Desktop to install keyboards
   The version of Keyman Developer used to create the package file. If undefined,
   use `'0.0.0.0'`
 
-`fileVersion,`
+`fileVersion`
 
 : `string`
+
+  The minimum version of Keyman required to load the package metadata. Note that 
+  the files within the package may have other version requirements. The lowest
+  version here will be `MIN_KBD_FILEVERSION_KMP_JSON` (7.0) for keyboard packages, 
+  and `MIN_LM_FILEVERSION_KMP_JSON` (12.0) for lexical model packages.
 
 ### The Options object
 
