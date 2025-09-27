@@ -376,7 +376,8 @@ def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
             continue
         if 'oskFont' in keyboard:
             fontFile = os.path.join(os.path.dirname(kmpJsonFilename), keyboard['oskFont'])
-            if font := _fontFacename(fontFile):
+            font = _fontFacename(fontFile)
+            if font is not None and len(font) > 0:
                 ldml.set('keymanFacename', font)
         break
 
