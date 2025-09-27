@@ -11,6 +11,7 @@ from json.decoder import JSONDecodeError
 import magic
 
 from keyman_config import secure_lookup
+from keyman_config.sentry_handling import SentryErrorHandling
 
 
 class KMFileTypes(Enum):
@@ -455,6 +456,7 @@ def parsemetadata(jsonfile, verbose=False):
     """
     info = system = keyboards = files = options = nonexistent = None
     extracted_dir = os.path.dirname(jsonfile)
+    sentry = SentryErrorHandling()
 
     logging.debug("parsemetadata: reading file:%s dir:%s", jsonfile, extracted_dir)
 
@@ -496,6 +498,11 @@ def parsemetadata(jsonfile, verbose=False):
                     print_options(options)
                 print_keyboards(keyboards)
                 print_files(files, extracted_dir)
+
+    if system:
+        sentry.add_breadcrumb(
+            category='keyboard', message=f'kmp.json: pkg: "{secure_lookup(info, "name", "description")}", KeymanDeveloperVersion: {secure_lookup(system, "keymanDeveloperVersion")}, dir: {os.path.basename(extracted_dir)}')
+
     return info, system, options, keyboards, files
 
 
@@ -532,18 +539,21 @@ def get_and_convert_infdata(tmpdirname):
             see kmpmetadata.parseinfdata for details
     """
     kmpinf = os.path.join(tmpdirname, "kmp.inf")
-    if os.path.isfile(kmpinf):
-        info, system, options, keyboards, files = parseinfdata(kmpinf, False)
-        j = infmetadata_to_json(info, system, options, keyboards, files)
-        kmpjson = os.path.join(tmpdirname, "kmp.json")
-        try:
-            with open(kmpjson, "w") as write_file:
-                print(j, file=write_file)
-        except Exception as e:
-            logging.warning('Exception %s writing metadata %s %s', type(e), kmpjson, e.args)
-        return info, system, options, keyboards, files
-    else:
+    if not os.path.isfile(kmpinf):
         return None, None, None, None, None
+
+    sentry = SentryErrorHandling()
+    info, system, options, keyboards, files = parseinfdata(kmpinf, False)
+    j = infmetadata_to_json(info, system, options, keyboards, files)
+    kmpjson = os.path.join(tmpdirname, "kmp.json")
+    try:
+        with open(kmpjson, "w") as write_file:
+            print(j, file=write_file)
+    except Exception as e:
+        logging.warning('Exception %s writing metadata %s %s', type(e), kmpjson, e.args)
+    sentry.add_breadcrumb(
+        category='keyboard', message=f'kmp.inf: pkg: "{secure_lookup(info, "name", "description")}", KeymanDeveloperVersion: {secure_lookup(system, "keymanDeveloperVersion")}, dir: {os.path.basename(tmpdirname)}')
+    return info, system, options, keyboards, files
 
 
 def infmetadata_to_json(info, system, options, keyboards, files):
