@@ -110,27 +110,30 @@ def _set_dbus_started_for_session(value):
 
 
 def verify_dbus_running():
-    if not 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
-        try:
-            # Seems dbus isn't running for the current user. Try to start it
-            # and set these environment variables
-            logging.info('Starting dbus with dbus-launch')
-            stdout = subprocess.run(
-                ('dbus-launch', '--exit-with-session'),
-                stdout=subprocess.PIPE, check=False).stdout
-            _set_dbus_started_for_session(True)
-            lines = stdout.decode('utf-8').splitlines()
-            for line in lines:
-                equal_sign = line.find('=')
-                if equal_sign <= 0:
-                    logging.warning('Got unexpected line from dbus-launch: %s', line)
-                    continue
-                name = line[:equal_sign]
-                value = line[equal_sign+1:]
-                logging.debug('Setting environment %s=%s', name, value)
-                os.environ[name] = value
-        except Exception as e:
-            logging.error('Starting dbus-launch failed with %s', e)
+    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+        # already running - nothing to do
+        return
+
+    try:
+        # Seems dbus isn't running for the current user. Try to start it
+        # and set these environment variables
+        logging.info('Starting dbus with dbus-launch')
+        stdout = subprocess.run(
+            ('dbus-launch', '--exit-with-session'),
+            stdout=subprocess.PIPE, check=False).stdout
+        _set_dbus_started_for_session(True)
+        lines = stdout.decode('utf-8').splitlines()
+        for line in lines:
+            equal_sign = line.find('=')
+            if equal_sign <= 0:
+                logging.warning('Got unexpected line from dbus-launch: %s', line)
+                continue
+            name = line[:equal_sign]
+            value = line[equal_sign+1:]
+            logging.debug('Setting environment %s=%s', name, value)
+            os.environ[name] = value
+    except Exception as e:
+        logging.error('Starting dbus-launch failed with %s', e)
 
 
 def add_standard_arguments(parser):

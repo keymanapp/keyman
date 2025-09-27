@@ -6,6 +6,7 @@ from zipfile import is_zipfile
 from keyman_config import KeymanComUrl, __tier__
 from keyman_config.get_kmp import download_kmp_file, get_download_folder
 from keyman_config.install_window import InstallKmpWindow
+from keyman_config.sentry_handling import SentryErrorHandling
 
 
 def download_and_install_package(url):
@@ -18,6 +19,7 @@ def download_and_install_package(url):
         url: a .kmp file, a keyman:// URL, or a file:// URL pointing to a .kmp file,
             possibly with a bcp47=<language> specified
     """
+    sentry = SentryErrorHandling()
     parsedUrl = urlparse(url)
     bcp47 = _extract_bcp47(parsedUrl.query)
 
@@ -34,11 +36,13 @@ def download_and_install_package(url):
 
         downloadFile = os.path.join(get_download_folder(), packageId)
         downloadUrl = f'{KeymanComUrl}/go/package/download/{packageId}?platform=linux&tier={__tier__}'
+        sentry.add_breadcrumb(category='download', message=f'About to download keyboard {packageId} from {downloadUrl}')
         packageFile = download_kmp_file(downloadUrl, downloadFile)
         if packageFile is None:
             return
     elif parsedUrl.scheme in ['', 'file']:
         packageFile = parsedUrl.path
+        sentry.add_breadcrumb(category='keyboard', message=f'adding keyboard from file {packageFile}')
     else:
         logging.error(f"Invalid URL: {url}")
         return

@@ -149,6 +149,9 @@ The KMManager is the core class which provides most of the methods and constants
 [`getMaySendCrashReport()`](getMaySendCrashReport)
 : returns whether Keyman Engine is allowed to send crash reports over the network to Sentry
 
+[`getNavigationBarHeight()`](getNavigationBarHeight)
+: returns the height of the navigation bar system inset
+
 [`getOrientation()`](getOrientation)
 : returns the device's current orientation (Portrait vs Landscape)
 

@@ -1,18 +1,18 @@
 (*
   Name:             UILanguages
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      25 May 2010
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          25 May 2010 - mcdurdin - I1694 - Select Keyman UI language rework
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
 *)
@@ -111,8 +111,6 @@ begin
     FLanguagesAvailableString := MsgFromId(SKDefaultLanguageCode)+#13#10+GetAvailableLanguages;
     FLanguages.Text := FLanguagesAvailableString;
 
-    // TODO: with 8 languages this takes about 1/8 second on a fast computer
-    // So as translations grow this may become a bottleneck when starting Keyman.
     for i := 0 to FLanguages.Count - 1 do
       FLanguages[i] := FLanguages[i] + '=' + MessageFromID(StringFromMsgId(SKUILanguageNameWithEnglish), FLanguages[i]);
   end;

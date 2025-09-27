@@ -29,7 +29,7 @@
 
             function addLog(message) {
               console.log(message);
-              return message + String.fromCharCode(13);
+              return message + String.fromCharCode(10);
             }
 
             function addStatus(o, type, context, state) {
