@@ -2,8 +2,8 @@
 # Keyman build Docker images.
 # It is triggered by a schedule and repository_dispatch event.
 
-name: "Build, test, and publish Docker images"
-run-name: "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+name: "Docker images: Build, publish and test "
+run-name: "Docker images: Build, publish and test (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
 defaults:
   run:
     shell: bash
@@ -19,7 +19,7 @@ on:
 env:
   REGISTRY: ghcr.io
   USERNAME: "${{ github.actor }}"
-  PASSWORD: "${{ github.token }}"
+  PASSWORD: "${{ secrets.KEYMAN_SERVER_REPO_ACCESS_PAT }}"
 
 jobs:
 
@@ -32,7 +32,7 @@ jobs:
       - name: Print message
         id: print-message
         run: |
-          echo "Build, test, and publish Docker images (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+          echo "Docker images: Build, publish and test (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
 
   build:
     name: Build Docker images
@@ -50,17 +50,6 @@ jobs:
           else
             echo ${{ env.PASSWORD }} | resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
           fi
-
-  publish:
-    name: Publish Docker images
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout repository
-        id: checkout
-        uses: actions/checkout@v4
-
       - name: Publish Docker images
         id: publish
         run: |
@@ -73,7 +62,7 @@ jobs:
   test:
     name: Test Docker images
     runs-on: ubuntu-latest
-    needs: publish
+    needs: build
 
     steps:
       - name: Checkout repository
