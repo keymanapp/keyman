@@ -11,6 +11,7 @@ await esbuild.build({
     'obj/schemas/kvks.schema.validator.cjs',
     'obj/schemas/ldml-keyboard3.schema.validator.cjs',
     'obj/schemas/ldml-keyboardtest3.schema.validator.cjs',
+    'obj/schemas/keylayout.schema.validator.cjs',
     'obj/schemas/displaymap.schema.validator.cjs',
     'obj/schemas/keyman-touch-layout.clean.spec.validator.cjs',
     'obj/schemas/keyman-touch-layout.spec.validator.cjs',
