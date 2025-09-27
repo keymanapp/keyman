@@ -103,6 +103,7 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "km_u16.h"
+#include "validation.h"
 
 /* These macros are adapted from winnt.h and legacy use only */
 #define MAKELANGID(p, s)       ((((uint16_t)(s)) << 10) | (uint16_t)(p))
@@ -238,6 +239,9 @@ kmcmp_LoadFileProc kmcmp::loadfileproc = NULL;
 int kmcmp::currentLine = 0;
 
 kmcmp::NamedCodeConstants *kmcmp::CodeConstants = NULL;
+
+DefaultCompilerMessage compilerMessage;
+Validation validation(compilerMessage);
 
 PKMX_WCHAR strtowstr(PKMX_STR in)
 {
@@ -675,6 +679,10 @@ KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
       gp->fUsingKeys = TRUE;
   }
 
+  if(!validation.ValidateIdentifier(q, SZMAX_GROUPNAME)) {
+    return FALSE;
+  }
+
   safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
   gp->Line = kmcmp::currentLine;
@@ -793,6 +801,10 @@ KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   sp->fIsStore = FALSE;
   sp->fIsDebug = FALSE;
   sp->fIsCall = FALSE;
+
+  if(!validation.ValidateIdentifier(q, SZMAX_STORENAME)) {
+    return FALSE;
+  }
 
   safe_wcsncpy(sp->szName, q, SZMAX_STORENAME);
   {
@@ -2082,9 +2094,6 @@ int LineTokenType(PKMX_WCHAR *str)
   return T_UNKNOWN;
 }
 
-KMX_WCHAR const * DeadKeyChars =
-u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-
 KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 {
   for (; *q; q++)
@@ -2185,7 +2194,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_DEADKEY;
-        if (!StrValidChrs(q, DeadKeyChars)) return KmnCompilerMessages::ERROR_InvalidDeadkey;
+
+        if(!validation.ValidateIdentifier(q, SZMAX_DEADKEYNAME)) {
+          // Note, this means 2 messages will be generated for invalid deadkey names
+          return KmnCompilerMessages::ERROR_InvalidDeadkey;
+        }
+
         tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
         tstr[mx] = 0;
       }
