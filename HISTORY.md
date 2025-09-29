@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.242 stable 2025-09-29
+
+* maint(linux): remove Oracular, add Questing (#14781)
+* maint(resources): use VERSION variable in increment-version.sh (#14779)
+* chore(linux): Update debian changelog (#14782)
+* fix(developer): remove incorrect offset for compiler error line (#14792)
+* maint(linux): improve getting PR# in `upload-to-debian.sh` (#14785)
+* chore(linux): remove no longer needed lintian overrides (#14811)
+* fix(android): Apply bottom insets to system keyboard for Keyman, KMSample2, and FirstVoices (#14833)
+* fix(windows): disable .msi shortcut advertisement (#14829)
+* feat(windows): improve startup time by caching locale names (#14832)
+
 ## 18.0.241 stable 2025-09-18
 
 * maint(resources): use correct version for PR title for history cherry-pick (#14614)
