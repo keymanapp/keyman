@@ -19,7 +19,7 @@ source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/tike.exe"
 
 builder_describe_outputs \
-  configure:project    /developer/src/tike/xml/layoutbuilder/keymanweb-osk.ttf \
+  configure:project    /developer/src/tike/icons.res \
   build:project        /developer/src/tike/$WIN32_TARGET
 
 #-------------------------------------------------------------------------------------------------------------------
