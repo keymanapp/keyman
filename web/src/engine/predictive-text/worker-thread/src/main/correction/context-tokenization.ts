@@ -474,7 +474,7 @@ export function buildEdgeWindow(
       // token, we hit the boundary; note the boundary text.
       if(deleteCnt == 0 && tokenDeleteLength != tokenLen) {
         editBoundary = {
-          text: applyAtFront ? KMWString.slice(token, tokenDeleteLength) : KMWString.slice(token, 0, tokenLen - tokenDeleteLength),
+          text: applyAtFront ? KMWString.substring(token, tokenDeleteLength) : KMWString.substring(token, 0, tokenLen - tokenDeleteLength),
           tokenIndex: i,
           isPartial: tokenDeleteLength != 0 || tokenIsPartial
         }
