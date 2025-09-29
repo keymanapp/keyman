@@ -44,42 +44,53 @@ interface TokenSplitMap {
 };
 
 /**
- * Represents the expected properties for the context and transform tokenizations
- * that would result from applying a transform to the state underlying an existing
- * context tokenization.
+ * Represents the portion of a tokenization that may be affected by incoming
+ * Transforms and how the existing components of the tokenization are affected
+ * by any word-boundary shifts in existing content that occur due incoming
+ * Transform side-effects.
  */
-interface PrecomputedTokenizationTransition {
+export interface TokenizationEdgeAlignment {
   /**
-   * Metadata about how the existing tokenization and its contents correspond to
-   * their counterparts within the input `Transform`'s target tokenization.
+   * Denotes any token merge edits needed after applying the Transform.
    */
-  tokenMapping: {
-    /**
-     * Denotes any token merge edits needed after applying the Transform.
-     */
-    merges: TokenMergeMap[];
-    /**
-     * Denotes any token split edits needed after applying the Transform.
-     */
-    splits: TokenSplitMap[];
-    /**
-     * Denotes any further token edits needed that cannot be attributed to
-     * 'merge's, 'split's, or edits from the input `Transform`.
-     */
-    unmappedEdits: EditTuple<EditOperation>[];
+  merges: TokenMergeMap[];
+  /**
+   * Denotes any token split edits needed after applying the Transform.
+   */
+  splits: TokenSplitMap[];
+  /**
+   * Denotes any further token edits needed that cannot be attributed to
+   * 'merge's, 'split's, or edits from the input `Transform`.
+   */
+  unmappedEdits: EditTuple<EditOperation>[];
 
-    /**
-     * The edge window defining the potential range of tokenization adjustments
-     * needed after applying the Transform
-     */
-    edgeWindow: RetokenizedEdgeWindow
-  }
+  /**
+   * The edge window defining the potential range of tokenization adjustments
+   * needed after applying the Transform
+   */
+  edgeWindow: RetokenizedEdgeWindow
+}
+
+/**
+ * An analysis on how an existing tokenization and its contents will be affected
+ * by applying an input `Transform`.
+ */
+export interface TokenizationTransitionEdits {
+  /**
+   * Represents the portion of the existing tokenization that may be affected by
+   * the incoming Transform.
+   *
+   * Also represents the changes needed to model any word-boundary shifts
+   * implied by the Transform but not generated within new content produced by
+   * its text edits.
+   */
+  alignment: TokenizationEdgeAlignment;
 
   /**
    * The tokenized form of the input Transform, indexed by position relative to
    * the end of the original context's tail token.
    */
-  transformMap: Map<number, Transform>
+  tokenizedTransform: Map<number, Transform>
 }
 
 /**
@@ -307,7 +318,7 @@ export class ContextTokenization {
     lexicalModel: LexicalModel,
     transform: Transform,
     edgeOptions?: EdgeWindowOptions
-  ): PrecomputedTokenizationTransition {
+  ): TokenizationTransitionEdits {
     // Step 4:  now that our window's been properly updated, determine what the
     // input's effects on the context is.
     //
@@ -432,13 +443,13 @@ export class ContextTokenization {
     }
 
     return {
-      tokenMapping: {
+      alignment: {
         edgeWindow: {...edgeWindow, retokenization: retokenizedEdge},
         merges,
         splits,
         unmappedEdits
       },
-      transformMap,
+      tokenizedTransform: transformMap,
     };
   }
 
