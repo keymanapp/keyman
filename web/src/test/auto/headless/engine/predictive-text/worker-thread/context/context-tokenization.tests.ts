@@ -868,6 +868,17 @@ describe('ContextTokenization', function() {
       assert.isTrue(resultTokenization.tokens[0].isPartial);
     });
 
+    it('preserves tokenization patterns when word slides partially out of window - SMP strings', () => {
+      const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'].map(s => toMathematicalSMP(s));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 2});
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.deepEqual(resultTokenization.exampleInput, ['ples', ' ', 'and', ' ', 'bananas'].map(s => toMathematicalSMP(s)));
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+    });
+
     it('does not preserve deleted tokens', () => {
       const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
