@@ -51,9 +51,9 @@ export default {
       files: ['web/build/test/dom/cases/browser/**/*.tests.mjs']
     },
     {
-      name: 'engine/core-processor',
+      name: 'engine/core-adapter',
       // Relative, from the containing package.json
-      files: ['web/src/test/auto/dom/cases/core-processor/*.tests.ts']
+      files: ['web/src/test/auto/dom/cases/core-adapter/*.tests.ts']
     },
     {
       name: 'engine/dom-utils',

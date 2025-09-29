@@ -1,4 +1,4 @@
-import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-processor';
+import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
 import { JSKeyboard } from "./jsKeyboard.js";
 import { KMXKeyboard } from './kmxKeyboard.js';
 import { KeyboardHarness } from "./keyboardHarness.js";
