@@ -12,11 +12,11 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchSpace } from "./distance-modeler.js";
+import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-import { TokenSplitMap } from "./context-tokenization.js";
 
 /**
  * Notes critical properties of the inputs comprising each ContextToken.
@@ -232,7 +232,6 @@ export class ContextToken {
     let transformIndex = 0;
     while(splitSpecs.length > 0) {
       const splitMatch = splitSpecs[0];
-      const wholeTokenIndex = currentText.left.indexOf(splitMatch.text);
 
       if(splitMatch.text == currentText.left) {
         tokensFromSplit.push(constructingToken);
@@ -242,7 +241,7 @@ export class ContextToken {
         currentText = {...blankContext};
         splitSpecs.shift();
         continue;
-      } else if(wholeTokenIndex > -1) {
+      } else if(currentText.left.indexOf(splitMatch.text) > -1) {
         // Oh dear - we've overshot the target! The split is awkward, in the
         // middle of a keystroke.
 
@@ -262,7 +261,7 @@ export class ContextToken {
           return {
             sample: {
               ...m.sample,
-              insert: KMWString.slice(m.sample.insert, 0, extraCharsAdded),
+              insert: KMWString.substring(m.sample.insert, 0, extraCharsAdded),
               deleteRight: 0
             }, p: m.p
           };
@@ -271,7 +270,7 @@ export class ContextToken {
           return {
             sample: {
               ...m.sample,
-              insert: KMWString.slice(m.sample.insert, extraCharsAdded),
+              insert: KMWString.substring(m.sample.insert, extraCharsAdded),
               deleteLeft: 0
             }, p: m.p
           };
@@ -292,7 +291,7 @@ export class ContextToken {
         splitSpecs.shift();
 
         committedLen += lenToCommit;
-        currentText.left = KMWString.slice(currentText.left, lenToCommit);
+        currentText.left = KMWString.substring(currentText.left, lenToCommit);
         lenBeforeLastApply = 0;
         continue; // without incrementing transformIndex - we haven't processed a new one!
       } else if(transformIndex == alteredSources.length) {
@@ -321,7 +320,7 @@ export function preprocessInputSources(inputSources: ReadonlyArray<TokenInputSou
         source.trueTransform.insert = '';
         trickledDeleteLeft -= insLen;
       } else {
-        source.trueTransform.insert = KMWString.slice(source.trueTransform.insert, 0, insLen - trickledDeleteLeft);
+        source.trueTransform.insert = KMWString.substring(source.trueTransform.insert, 0, insLen - trickledDeleteLeft);
         trickledDeleteLeft = 0;
       }
     }

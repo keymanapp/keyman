@@ -20,11 +20,36 @@ import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
+import { KMWString } from '@keymanapp/web-utils';
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
 
+// https://www.compart.com/en/unicode/block/U+1D400
+const mathBoldUpperA = 0x1D400; // Mathematical Bold Capital A
+const mathBoldLowerA = 0x1D41A; //                   Small   A
+
+function toMathematicalSMP(text: string) {
+  const chars = [...text];
+
+  const asSMP = chars.map((c) => {
+    if(c >= 'a' && c <= 'z') {
+      return String.fromCodePoint(mathBoldLowerA + (c.charCodeAt(0) - 'a'.charCodeAt(0)));
+    } else if(c >= 'A' && c <= 'Z') {
+      return String.fromCodePoint(mathBoldUpperA + (c.charCodeAt(0) - 'A'.charCodeAt(0)));
+    } else {
+      return c;
+    }
+  });
+
+  return asSMP.join('');
+}
+
 describe('ContextToken', function() {
+  before(() => {
+    KMWString.enableSupplementaryPlane(true);
+  });
+
   describe("<constructor>", () => {
     it("(model: LexicalModel)", async () => {
       let token = new ContextToken(plainModel);
@@ -260,6 +285,100 @@ describe('ContextToken', function() {
             sample: {
               ...entry.sample,
               insert: entry.sample.insert.slice('ng'.length), // drops the 'ng' portion.
+              deleteLeft: 0
+            }, p: entry.p
+          }
+        }),
+      ]);
+    });
+
+    it("handles messy mid-transform splits correctly - non-BMP text", () => {
+      // Setup phase
+      const keystrokeDistributions: Distribution<Transform>[] = [
+        [
+          { sample: { insert: toMathematicalSMP('long'), deleteLeft: 0, deleteRight: 0, id: 11 }, p: 1 }
+        ], [
+          { sample: { insert: toMathematicalSMP('argelovely'), deleteLeft: 3, deleteRight: 0, id: 12 }, p: 1 }
+        ], [
+          { sample: { insert: toMathematicalSMP('ngtransforms'), deleteLeft: 4, deleteRight: 0, id: 13 }, p: 1 }
+        ]
+      ];
+      const splitTextArray = ['large', 'long', 'transforms'].map(t => toMathematicalSMP(t));
+
+      const tokenToSplit = new ContextToken(plainModel);
+      for(let i = 0; i < keystrokeDistributions.length; i++) {
+        tokenToSplit.addInput({trueTransform: keystrokeDistributions[i][0].sample, inputStartIndex: 0}, keystrokeDistributions[i]);
+      };
+
+      assert.equal(tokenToSplit.exampleInput, toMathematicalSMP('largelongtransforms'));
+      assert.deepEqual(tokenToSplit.searchSpace.inputSequence, keystrokeDistributions);
+
+      // And now for the "fun" part.
+      const resultsOfSplit = tokenToSplit.split({
+        // Input portion here can be ignored.
+        input: {
+          text: toMathematicalSMP('largelongtransforms'),
+          index: 0
+        }, matches: [
+          // For this part, the text entries are what really matters.
+          { text: toMathematicalSMP('large'), index: 0, textOffset: 0 },
+          { text: toMathematicalSMP('long'), index: 1, textOffset: 5 },
+          { text: toMathematicalSMP('transforms'), index: 2, textOffset: 9 }
+        ]
+      }, plainModel);
+
+      assert.equal(resultsOfSplit.length, 3);
+      assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
+      assert.deepEqual(resultsOfSplit[0].inputRange, [
+        { trueTransform: keystrokeDistributions[0][0].sample, inputStartIndex: 0 },
+        { trueTransform: keystrokeDistributions[1][0].sample, inputStartIndex: 0 },
+      ]);
+      assert.deepEqual(resultsOfSplit[1].inputRange, [
+        { trueTransform: keystrokeDistributions[1][0].sample, inputStartIndex: 'arge'.length },
+        { trueTransform: keystrokeDistributions[2][0].sample, inputStartIndex: 0 },
+      ]);
+      assert.deepEqual(resultsOfSplit[2].inputRange, [
+        { trueTransform: keystrokeDistributions[2][0].sample, inputStartIndex: 'ng'.length }
+      ]);
+
+      assert.deepEqual(resultsOfSplit[0].searchSpace.inputSequence, [
+        keystrokeDistributions[0],
+        keystrokeDistributions[1].map((entry) => {
+          return {
+            sample: {
+              ...entry.sample,
+              insert: KMWString.substring(entry.sample.insert, 0, 4) // gets the 'arge' portion & the deleteLefts.
+            }, p: entry.p
+          }
+        }),
+      ]);
+
+      assert.deepEqual(resultsOfSplit[1].searchSpace.inputSequence, [
+        keystrokeDistributions[1].map((entry) => {
+          return {
+            sample: {
+              ...entry.sample,
+              insert: KMWString.substring(entry.sample.insert, 'arge'.length),
+              deleteLeft: 0
+            }, p: entry.p
+          }
+        }),
+        keystrokeDistributions[2].map((entry) => {
+          return {
+            sample: {
+              ...entry.sample,
+              insert: KMWString.substring(entry.sample.insert, 0, 'ng'.length), // gets the 'ng' portion.
+            }, p: entry.p
+          }
+        }),
+      ]);
+
+      assert.deepEqual(resultsOfSplit[2].searchSpace.inputSequence, [
+        keystrokeDistributions[2].map((entry) => {
+          return {
+            sample: {
+              ...entry.sample,
+              insert: KMWString.substring(entry.sample.insert, 'ng'.length), // drops the 'ng' portion.
               deleteLeft: 0
             }, p: entry.p
           }
