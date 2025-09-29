@@ -42,6 +42,7 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
@@ -2499,17 +2500,31 @@ public final class KMManager {
    * @return int - navigation bar height in pixels
    */
   public static int getNavigationBarHeight(Context context) {
-    // Determine if navigation bar is visible
-    int resourceId = context.getResources().getIdentifier(
-      "config_showNavigationBar", "bool", "android");
-    if (resourceId <= 0) {
-      return 0;
+    int navigationBarHeight = 0;
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+      if (windowManager != null) {
+        WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();;
+        navigationBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom; // pixels
+      }
+    } else {
+      // Determine if navigation bar is visible
+      int resourceId = context.getResources().getIdentifier(
+        "config_showNavigationBar", "bool", "android");
+      if (resourceId <= 0) {
+        return navigationBarHeight;
+      }
+
+      // Navigation bar visible so get the height
+      resourceId = context.getResources().getIdentifier(
+        "navigation_bar_height", "dimen", "android");
+      navigationBarHeight = (resourceId > 0) ?
+        context.getResources().getDimensionPixelSize(resourceId) : 0;
     }
 
-    // Navigation bar visible so get the height
-    resourceId = context.getResources().getIdentifier(
-      "navigation_bar_height", "dimen", "android");
-    return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
+    float dpToPx = context.getResources().getDisplayMetrics().density;
+    return (int)(navigationBarHeight);
   }
 
   /**
