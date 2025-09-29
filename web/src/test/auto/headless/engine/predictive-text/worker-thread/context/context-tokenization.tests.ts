@@ -1015,7 +1015,8 @@ describe('ContextTokenization', function() {
 
       const results = baseTokenization.precomputeTokenizationAfterInput(
         plainModel,
-        editTransform
+        editTransform,
+        edgeWindowSpec
       );
 
       assert.equal(results.transformMap.size, 1);
@@ -1023,6 +1024,54 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.tokenMapping.merges, []);
       assert.deepEqual(results.tokenMapping.splits, []);
       assert.deepEqual(results.tokenMapping.unmappedEdits, []);
+
+      assert.deepEqual(results.tokenMapping.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'],
+        retokenizationText: 'apple a da',
+        editBoundary: {
+          text: 'da',
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [2],
+        sliceIndex: 2
+      });
+    });
+
+    it('properly handles simple token-edit transform - smp strings', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'].map(t => toMathematicalSMP(t));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: toMathematicalSMP('y'),
+        deleteLeft: 2
+      };
+
+      const results = baseTokenization.precomputeTokenizationAfterInput(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.equal(results.transformMap.size, 1);
+      assert.deepEqual(results.transformMap.get(0), editTransform);
+      assert.deepEqual(results.tokenMapping.merges, []);
+      assert.deepEqual(results.tokenMapping.splits, []);
+      assert.deepEqual(results.tokenMapping.unmappedEdits, []);
+
+      assert.deepEqual(results.tokenMapping.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
+        retokenizationText: toMathematicalSMP('apple a da'),
+        editBoundary: {
+          text: toMathematicalSMP('da'),
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [2],
+        sliceIndex: 2
+      });
     });
 
     it('properly handles simple token-replacing transform', () => {
@@ -1185,6 +1234,60 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.tokenMapping.merges, []);
       assert.deepEqual(results.tokenMapping.splits, []);
       assert.deepEqual(results.tokenMapping.unmappedEdits, []);
+
+      assert.deepEqual(results.tokenMapping.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'],
+        retokenizationText: 'apple a da',
+        editBoundary: {
+          text: 'da',
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [1],
+        sliceIndex: 2
+      });
+    });
+
+    it('handles word-breakable transforms (case 1) - smp strings', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'dat'].map(t => toMathematicalSMP(t));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: toMathematicalSMP('y k'),
+        deleteLeft: 1
+      };
+
+      const results = baseTokenization.precomputeTokenizationAfterInput(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // dat => day
+      expectedMap.set(0, { insert: toMathematicalSMP('y'), deleteLeft: 1 });
+      // new whitespace
+      expectedMap.set(1, { insert: toMathematicalSMP(' '), deleteLeft: 0 });
+      // new 'k' token
+      expectedMap.set(2, { insert: toMathematicalSMP('k'), deleteLeft: 0 });
+      assert.equal(results.transformMap.size, expectedMap.size);
+      assert.deepEqual(results.transformMap, expectedMap);
+      assert.deepEqual(results.tokenMapping.merges, []);
+      assert.deepEqual(results.tokenMapping.splits, []);
+      assert.deepEqual(results.tokenMapping.unmappedEdits, []);
+
+      assert.deepEqual(results.tokenMapping.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
+        retokenizationText: toMathematicalSMP('apple a da'),
+        editBoundary: {
+          text: toMathematicalSMP('da'),
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [1],
+        sliceIndex: 2
+      });
     });
 
     it('handles word-breakable transforms (case 2)', () => {

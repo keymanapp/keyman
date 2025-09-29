@@ -343,8 +343,10 @@ export class ContextTokenization {
     // What does the edge's retokenization look like when we remove the inserted portions?
     const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
     const insertBoundaryToken = postTokenization[firstInsertPostIndex];
+
     // Note:  requires that helpers have not mutated `stackedInserts`.
-    const uninsertedBoundaryToken = insertBoundaryToken.slice(0, insertBoundaryToken.lastIndexOf(stackedInserts[0]));
+    const uninsertedBoundaryToken = KMWString.substring(insertBoundaryToken, 0, KMWString.lastIndexOf(insertBoundaryToken, stackedInserts[0]));
+
     // Do not preserve empty tokens here, even if tokenization normally would produce one.
     // It's redundant and replaceable for tokenization batching efforts.
     if(uninsertedBoundaryToken != '') {
@@ -364,7 +366,10 @@ export class ContextTokenization {
 
     // Determine the effects of splits & merges as applied to the original
     // cached context state.
-    const { mergeOffset, splitOffset, editPath, merges, splits } = analyzePathMergesAndSplits(preTokenization, postTokenization.slice(0, firstInsertPostIndex+1));
+    const { mergeOffset, splitOffset, editPath, merges, splits } = analyzePathMergesAndSplits(
+      preTokenization,
+      postTokenization.slice(0, firstInsertPostIndex+1)
+    );
 
     /*
      * Final steps:  We can now safely index the transforms.  Let's do it!
