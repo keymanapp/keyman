@@ -2,7 +2,6 @@
 set -eu
 TESTDIR=${XDG_DATA_HOME:-${HOME}/.local/share}/keyman/test_kmx
 
-# shellcheck source=linux/ibus-keyman/tests/scripts/test-helper.inc.sh
 . "$(dirname "$0")"/test-helper.inc.sh
 
 if [[ -v KEYMAN_PKG_BUILD ]]; then
