@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.129 alpha 2025-09-29
+
+* chore(linux): remove no longer needed lintian overrides (#14810)
+
 ## 19.0.128 alpha 2025-09-26
 
 * fix(windows): sort setup UI language selector according to language names (#13573)
