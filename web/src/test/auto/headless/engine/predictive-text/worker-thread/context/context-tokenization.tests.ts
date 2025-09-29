@@ -13,6 +13,7 @@ import { assert } from 'chai';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { KMWString } from '@keymanapp/web-utils';
 
 import { analyzePathMergesAndSplits, buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
@@ -29,7 +30,31 @@ function toToken(text: string) {
   return token;
 }
 
+// https://www.compart.com/en/unicode/block/U+1D400
+const mathBoldUpperA = 0x1D400; // Mathematical Bold Capital A
+const mathBoldLowerA = 0x1D41A; //                   Small   A
+
+function toMathematicalSMP(text: string) {
+  const chars = [...text];
+
+  const asSMP = chars.map((c) => {
+    if(c >= 'a' && c <= 'z') {
+      return String.fromCodePoint(mathBoldLowerA + (c.charCodeAt(0) - 'a'.charCodeAt(0)));
+    } else if(c >= 'A' && c <= 'Z') {
+      return String.fromCodePoint(mathBoldUpperA + (c.charCodeAt(0) - 'A'.charCodeAt(0)));
+    } else {
+      return c;
+    }
+  });
+
+  return asSMP.join('');
+}
+
 describe('ContextTokenization', function() {
+  before(() => {
+    KMWString.enableSupplementaryPlane(true);
+  });
+
   describe("<constructor>", () => {
     it("constructs from just a token array", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
@@ -696,6 +721,24 @@ describe('ContextTokenization', function() {
         });
       });
 
+      it('builds edge windows for the start of context with no edits - SMP strings', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map(s => toMathematicalSMP(s));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: toMathematicalSMP('an apple'),
+          editBoundary: {
+            isPartial: false,
+            omitsEmptyToken: false,
+            text: toMathematicalSMP('an'),
+            tokenIndex: 0
+          },
+          deleteLengths: [0],
+          sliceIndex: 3
+        });
+      });
+
       it('builds edge windows for the start of context with deletion edits (1)', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
@@ -703,6 +746,24 @@ describe('ContextTokenization', function() {
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: ' apple a',
+          editBoundary: {
+            isPartial: false,
+            omitsEmptyToken: false,
+            text: ' ',
+            tokenIndex: 1
+          },
+          deleteLengths: [2, 0],
+          sliceIndex: 5
+        });
+      });
+
+      it('builds edge windows for the start of context with deletion edits (1) - SMP strings', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map(s => toMathematicalSMP(s));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
+        assert.deepEqual(results, {
+          retokenizationText: toMathematicalSMP(' apple a'),
           editBoundary: {
             isPartial: false,
             omitsEmptyToken: false,
@@ -804,6 +865,17 @@ describe('ContextTokenization', function() {
 
       assert.notStrictEqual(resultTokenization, baseTokenization);
       assert.deepEqual(resultTokenization.exampleInput, ['ples', ' ', 'and', ' ', 'bananas']);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+    });
+
+    it('preserves tokenization patterns when word slides partially out of window - SMP strings', () => {
+      const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'].map(s => toMathematicalSMP(s));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 2});
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.deepEqual(resultTokenization.exampleInput, ['ples', ' ', 'and', ' ', 'bananas'].map(s => toMathematicalSMP(s)));
       assert.isTrue(resultTokenization.tokens[0].isPartial);
     });
 

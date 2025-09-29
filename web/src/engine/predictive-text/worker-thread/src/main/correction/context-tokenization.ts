@@ -639,7 +639,7 @@ export function buildEdgeWindow(
       // token, we hit the boundary; note the boundary text.
       if(deleteCnt == 0 && tokenDeleteLength != tokenLen) {
         editBoundary = {
-          text: applyAtFront ? KMWString.slice(token, tokenDeleteLength) : KMWString.slice(token, 0, tokenLen - tokenDeleteLength),
+          text: applyAtFront ? KMWString.substring(token, tokenDeleteLength) : KMWString.substring(token, 0, tokenLen - tokenDeleteLength),
           tokenIndex: i,
           isPartial: tokenDeleteLength != 0 || tokenIsPartial
         }
@@ -721,19 +721,23 @@ export function traceInsertEdits(tokens: string[], transform: Transform): {
   firstInsertPostIndex: number
 } {
   let insert = transform.insert;
+  let insertLen = KMWString.length(insert);
   const stackedInserts: string[] = [];
   let firstInsertPostIndex: number;
 
   if(insert.length > 0) {
     for(let index = tokens.length - 1; index >= 0; index--) {
+      const tokenLen = KMWString.length(tokens[index]);
+
       const currentToken = tokens[index];
-      if(KMWString.length(currentToken) >= KMWString.length(insert)) {
+      if(tokenLen >= insertLen) {
         stackedInserts.push(insert);
         firstInsertPostIndex = index;
         break;
       }
 
-      insert = insert.substring(0, insert.length - currentToken.length);
+      insert = KMWString.substring(insert, 0, insertLen - tokenLen);
+      insertLen -= tokenLen;
       stackedInserts.push(currentToken);
       firstInsertPostIndex = index;
     }
