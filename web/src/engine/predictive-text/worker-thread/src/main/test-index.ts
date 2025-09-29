@@ -6,6 +6,7 @@ export { ContextTracker } from './correction/context-tracker.js';
 export { ContextTransition } from './correction/context-transition.js';
 export * from './correction/alignment-helpers.js';
 export { ExtendedEditOperation, SegmentableDistanceCalculation } from './correction/segmentable-calculation.js';
+export * from './correction/tokenization-subsets.js';
 export * as correction from './correction/index.js';
 export * from './model-helpers.js';
 export * as models from './models/index.js';
