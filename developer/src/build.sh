@@ -25,6 +25,7 @@ builder_describe \
   ":kmcmplib                    Compiler - .kmn compiler" \
   ":kmc-analyze                 Compiler - Analysis Tools" \
   ":kmc-copy                    Compiler - Project Copying and Renaming Tools" \
+  ":kmc-convert                 Compiler - Keyboard Conversion Tools" \
   ":kmc-generate                Compiler - Generation Tools" \
   ":kmc-keyboard-info           Compiler - .keyboard_info Module" \
   ":kmc-kmn                     Compiler - .kmn to .kmx and .js Keyboard Module" \
