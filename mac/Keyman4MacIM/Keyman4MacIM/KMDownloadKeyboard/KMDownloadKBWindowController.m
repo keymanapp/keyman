@@ -42,7 +42,7 @@
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
   NSString* url = [[request URL] absoluteString];
-  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %@", url);
+  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %{public}@", url);
 
   // The pattern for matching links matches work in #3602
   NSString* urlPathMatchKeyboardsInstall = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/keyboards/install/([^?/]+)(?:\\?(.+))?$";
@@ -79,7 +79,7 @@
   else if([url startsWith:@"keyman:"]) {
     if ([url startsWith:@"keyman:link?url="])
     {
-      os_log_debug([KMLogs uiLog], "Opening keyman:link URL in default browser: %@", url);
+      os_log_debug([KMLogs uiLog], "Opening keyman:link URL in default browser: %{public}@", url);
       [listener ignore];
       url = [request.URL.absoluteString substringFromIndex:[@"keyman:link?url=" length]];
       [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
@@ -93,7 +93,7 @@
   else
   {
     // Open in external browser
-    os_log_debug([KMLogs uiLog], "Opening URL in default browser: %@", url);
+    os_log_debug([KMLogs uiLog], "Opening URL in default browser: %{public}@", url);
     [listener ignore];
     [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
   }
