@@ -103,8 +103,8 @@
 /windows/src/engine/keyman32/*.cod
 /windows/src/engine/keyman32/*.pdb
 
-# /engine/keymanx64/
-/windows/src/engine/keymanx64/x64
+# /engine/keymanhp/
+/windows/src/engine/keymanhp/x64
 
 # /engine/kmcomapi/
 /windows/src/engine/kmcomapi/kmcomapi.tlb
