@@ -137,8 +137,8 @@ function _setup_init() {
 
 function _setup_dbus_session() {
   local ENV_FILE CLEANUP_FILE
-  ENV_FILE=$1
-  CLEANUP_FILE=$2
+  ENV_FILE="$1"
+  CLEANUP_FILE="$2"
 
   if [[ -z "${DOCKER_RUNNING:-}" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]] && ! pgrep -f jetbrains.buildServer.agent.AgentMain > /dev/null; then
     return

@@ -48,7 +48,7 @@ in `docs/settings/linux/launch.json` for a sample configuration in
 vscode. You'll have to adjust the IP address to match the VM which the
 `run-tests.sh` script will output.
 
-## Manually runing tests in TeamCity
+## Manually running tests in TeamCity
 
 To run the tests manually in TeamCity, you'll have to set an
 environment variable `TEAMCITY_GIT_PATH` (the actual value doesn't
