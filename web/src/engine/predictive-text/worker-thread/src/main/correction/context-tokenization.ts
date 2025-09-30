@@ -819,11 +819,12 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
     * result token for either edit type, or to a token immediately after the
     * result.
     *
-    * Assertions:
+    * Preconditions:
     * - not used with epic/dict-breaker
     * - per unicode wordbreaker, no massive shifting of word boundaries for
     *   prior text.
-    *   - we can probably loosen this with work AT THIS STEP.
+    *   - we can't handle part of one token being split off and simultaneously
+    *     merged to another.
     */
 
   let queueIndex = 0;
