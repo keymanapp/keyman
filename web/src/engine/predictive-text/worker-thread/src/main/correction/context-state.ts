@@ -10,12 +10,14 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { applyTransform } from '@keymanapp/models-templates';
+import { KMWString } from '@keymanapp/web-utils';
+
 import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
-import { determineModelTokenizer } from '#./model-helpers.js';
+import { determineModelTokenizer } from '../model-helpers.js';
 import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
-import { applyTransform } from '@keymanapp/models-templates';
 
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
@@ -296,5 +298,63 @@ export class ContextState {
     transition.finalize(state, transformDistribution, preservationTransform);
     transition.revertableTransitionId = appliedSuggestionTransitionId;
     return transition;
+  }
+}
+
+/**
+ * Determines the changes in leading-edge text between two contexts with the
+ * same trailing-edge contents.
+ *
+ * This function assumes that text is only either added to or removed from the
+ * second context's data, as if due to shifting the boundaries of the sliding
+ * context window.
+ * @param srcContext A previous context, which may be computed from the prior
+ * transition and its effects.
+ * @param dstContext The current context visible through the sliding context
+ * window.
+ * @returns The substring prepended to the context (if sliding backward) or the
+ * number of codepoints removed from its start (if sliding forward)
+ */
+export function determineContextSlideTransform(srcContext: Context, dstContext: Context): Transform {
+  // Assumption: the current (sliding) context window is alignable.
+  // See `matchBaseContextState` in ../predict-helpers.ts.
+
+  // Assertion:  If the assumption above holds and both start-of-buffer flags
+  // are true, the contents must then match.
+  if(srcContext.startOfBuffer && dstContext.startOfBuffer) {
+    return { insert: '', deleteLeft: 0, deleteRight: 0 };
+  }
+
+  // Assumption:  the right-hand side of the left-context strings WILL match.
+  // The only change should be for the contents of the sliding-context window.
+  const src = srcContext.left;
+  const dst = dstContext.left;
+
+  // Assumption:  the context will always be codepoint-aligned, as the Web engine
+  // and worker both do string ops based on codepoints, not code units.
+
+  // Which way did the context window slide, if it did?  This does not
+  // vary for different tokenizations; we can determine exactly how
+  // much text was prepended (with end text deleted in last edit) or
+  // deleted (with end text added in last edit).
+  const rawDelta = dst.length - src.length;
+
+  // Validation:  does the part of both strings that should match actually match?
+  //
+  // Context operations are already code-point aligned; no need to use special
+  // non-BMP handling here.
+  const smallerIsSubstringOfOther = rawDelta > 0
+    ? dst.slice(rawDelta) == src
+    : src.slice(-rawDelta) == dst;
+  if(!smallerIsSubstringOfOther) {
+    throw new Error(`Context-slide preconditions invalidated - neither before nor after context is a substring of the other`);
+  }
+
+  return {
+    // As we're codepoint-aligned, the part not in common must also be codepoint
+    // aligned - no need to incur SMP-aware functionality overhead.
+    insert: rawDelta > 0 ? dst.slice(0, rawDelta) : '',
+    deleteLeft: 0,
+    deleteRight: rawDelta < 0 ? KMWString.length(src.slice(0, -rawDelta)) : 0
   }
 }
