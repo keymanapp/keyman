@@ -26,14 +26,19 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
 builder_parse "$@"
 
 function do_test_headless() {
-  MOCHA_FLAGS=${FLAGS}
+  MOCHA_FLAGS=(${FLAGS})
 
   if builder_is_running_on_teamcity; then
-    MOCHA_FLAGS="${MOCHA_FLAGS} --reporter mocha-teamcity-reporter"
+    MOCHA_FLAGS+=(--reporter "${KEYMAN_ROOT}/common/test/resources/mocha-teamcity-reporter/teamcity.cjs" --reporter-options parentFlowId="unit_tests")
+    echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
 
-  mocha --recursive ${MOCHA_FLAGS} ./headless/*.js ./headless/**/*.js
+  mocha --recursive "${MOCHA_FLAGS[@]}" ./headless/*.js ./headless/**/*.js
 
+  if builder_is_running_on_teamcity; then
+    # we're running in TeamCity
+    echo "##teamcity[flowFinished flowId='unit_tests']"
+  fi
 }
 
 function do_test_browser() {
