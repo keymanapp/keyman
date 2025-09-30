@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.130 alpha 2025-09-30
+
+* maint(linux): allow to remote debug integration tests in Docker (#14818)
+* maint(resources): running the container for core in privileged mode (#14867)
+
 ## 19.0.129 alpha 2025-09-29
 
 * chore(linux): remove no longer needed lintian overrides (#14810)
