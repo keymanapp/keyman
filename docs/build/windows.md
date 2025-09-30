@@ -276,7 +276,7 @@ of appropriate node versions during builds.
   * Verify required build tools are installed
     * Run `Visual Studio Installer`
     * Check the `Individual components` tab
-    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed.
+    * Verify `MSVC v142 - VS 2019 c++ x64/x86/arm64 build tools (Latest)` is installed.
       If not, install it.
 
   Recommended: configure Visual Studio to use two-space tab stops:
