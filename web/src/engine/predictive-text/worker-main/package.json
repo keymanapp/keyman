@@ -44,7 +44,6 @@
   "devDependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/resources-gosh": "*",
-    "mocha-teamcity-reporter": "^4.0.0",
     "typescript": "^5.4.5"
   },
   "dependencies": {

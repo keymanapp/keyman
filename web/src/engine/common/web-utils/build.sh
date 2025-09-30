@@ -48,13 +48,19 @@ function do_build() {
 function do_test() {
   builder_heading "Running web-utils test suite"
 
-  local FLAGS=
-  if builder_is_ci_build; then
+  local FLAGS=()
+  if builder_is_running_on_teamcity; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
-    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+    FLAGS+=(--reporter "${KEYMAN_ROOT}/common/test/resources/mocha-teamcity-reporter/teamcity.cjs" --reporter-options parentFlowId="unit_tests")
+    echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
 
-  c8 mocha --recursive $FLAGS ./src/tests/
+  c8 mocha --recursive "${FLAGS[@]}" ./src/tests/
+
+  if builder_is_running_on_teamcity; then
+    # we're running in TeamCity
+    echo "##teamcity[flowFinished flowId='unit_tests']"
+  fi
 }
 
 builder_run_action configure  node_select_version_and_npm_ci
