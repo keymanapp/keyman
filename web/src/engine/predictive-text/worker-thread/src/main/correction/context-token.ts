@@ -57,6 +57,8 @@ export class ContextToken {
    */
   readonly searchSpace: SearchSpace;
 
+  isPartial: boolean;
+
   /**
    * Tokens affected by applied suggestions will indicate the transition ID of
    * the applied suggestion here.
@@ -83,16 +85,17 @@ export class ContextToken {
    * @param model
    * @param rawText
    */
-  constructor(model: LexicalModel, rawText: string);
+  constructor(model: LexicalModel, rawText: string, isPartial?: boolean);
   /**
    * This constructor deep-copies the specified instance.
    * @param baseToken
    */
   constructor(baseToken: ContextToken);
-  constructor(param: ContextToken | LexicalModel, rawText?: string) {
+  constructor(param: ContextToken | LexicalModel, rawText?: string, isPartial?: boolean) {
     if(param instanceof ContextToken) {
       const priorToken = param;
       this.isWhitespace = priorToken.isWhitespace;
+      this.isPartial = priorToken.isPartial;
 
       // We need to construct a separate search space from other token copies.
       //
@@ -111,6 +114,7 @@ export class ContextToken {
 
       // May be altered outside of the constructor.
       this.isWhitespace = false;
+      this.isPartial = !!isPartial;
       this.searchSpace = new SearchSpace(model);
       this._inputRange = [];
 
