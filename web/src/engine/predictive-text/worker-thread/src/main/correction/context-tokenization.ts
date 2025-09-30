@@ -106,11 +106,14 @@ export class ContextTokenization {
    * @returns
    */
   applyContextSlide(lexicalModel: LexicalModel, transform: Transform & { deleteRight: number }): ContextTokenization {
-    // Assertion: the current (sliding) context window is alignable and
-    // valid deltas have been computed.
+    // Assumption: the current (sliding) context window is alignable and valid
+    // deltas have been computed.
 
-    // Assertion:  the transform will EITHER have an insert OR a deleteRight.  Not both.
-    // Assertion:  deleteLeft is always empty.  (There's nothing to the left; we apply on that side.)
+    // Assumption:  the transform will EITHER have an insert OR a deleteRight.
+    // Not both.
+
+    // Assumption:  deleteLeft is always empty.  (There's nothing to the left;
+    // we apply on that side.)
     if(TransformUtils.isEmpty(transform)) {
       // No edits needed?  Why retokenize?
       return new ContextTokenization(this);
