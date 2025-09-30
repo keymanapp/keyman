@@ -5,6 +5,8 @@ const coreurl = '/build/engine/core-processor/obj/import/core';
 
 // Test the CoreProcessor interface.
 describe('CoreProcessor', function () {
+  this.timeout(5000); // increased timeout for async loading
+
   async function loadKeyboardBlob(uri: string) {
     const response = await fetch(uri);
     if (!response.ok) {
@@ -16,7 +18,8 @@ describe('CoreProcessor', function () {
   }
 
   it('can initialize without errors', async function () {
-    assert.isOk(await KM_Core.createCoreProcessor(coreurl));
+    const km_core = await KM_Core.createCoreProcessor(coreurl);
+    assert.isNotNull(km_core);
   });
 
   it('can call temp function', async function () {

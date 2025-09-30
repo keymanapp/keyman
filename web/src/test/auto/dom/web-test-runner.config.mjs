@@ -1,5 +1,5 @@
 // @ts-check
-import { devices, playwrightLauncher } from '@web/test-runner-playwright';
+import { /*devices,*/ playwrightLauncher } from '@web/test-runner-playwright';
 import { defaultReporter, summaryReporter } from '@web/test-runner';
 import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs';
 import named from '@keymanapp/common-test-resources/test-runner-rename-browser.mjs'
@@ -7,14 +7,17 @@ import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { esbuildPlugin } from '@web/dev-server-esbuild';
+import { platform } from 'node:process';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const KEYMAN_ROOT = resolve(dir, '../../../../../');
 
-/** @type {import('@web/test-runner').TestRunnerConfig} */
-export default {
-  // debug: true,
-  browsers: [
+const allBrowsers = platform === 'win32'
+  ? [
+    new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
+    new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
+    // no testing on webkit on Windows, see #14858
+  ] : [
     new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
     new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
     new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1 })),
@@ -28,7 +31,12 @@ export default {
     //     return browser.newContext({ ...devices['Pixel 4'] })
     //   }
     // })), 'Android Phone (emulated)'),
-  ],
+  ];
+
+/** @type {import('@web/test-runner').TestRunnerConfig} */
+export default {
+  // debug: true,
+  browsers: allBrowsers,
   concurrency: 10,
   nodeResolve: true,
   // Top-level, implicit 'default' group
