@@ -3,7 +3,6 @@
 
 set -eu
 
-# shellcheck disable=SC2034
 TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/../..")}
 TESTBASEDIR=${XDG_DATA_HOME:-${HOME}/.local/share}/keyman
 TESTDIR=${TESTBASEDIR}/test_kmx
@@ -11,7 +10,6 @@ CLEANUP_FILE=/tmp/ibus-keyman-test-cleanup
 PID_FILE=/tmp/ibus-keyman-test.pids
 ENV_FILE=/tmp/keyman-env.txt
 
-# shellcheck disable=SC1091
 . "$(dirname "$0")"/test-helper.inc.sh
 
 local_cleanup() {
@@ -69,7 +67,7 @@ function run_tests() {
 
   G_TEST_BUILDDIR="$(dirname "$0")/../../../build/$(arch)/${CONFIG}/tests"
 
-  setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE" --standalone
+  setup "${DISPLAY_SERVER}" "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" --standalone
 
   if [[ "${DOCKER_RUNNING:-false}" == "true" ]]; then
     echo "# NOTE: When the tests fail check ibus-engine-keyman.log, ibus-daemon.log and km-test-server.log in build/docker-linux/tmp/!"

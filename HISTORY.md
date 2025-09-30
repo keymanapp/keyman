@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 19.0.129 alpha 2025-09-29
+
+* chore(linux): remove no longer needed lintian overrides (#14810)
+
+## 19.0.128 alpha 2025-09-26
+
+* fix(windows): sort setup UI language selector according to language names (#13573)
+* feat(windows): improve startup time by caching locale names (#14795)
+
+## 19.0.127 alpha 2025-09-25
+
+* fix(common): registry clean-up enabled, no terminal in github action (#14824)
+* maint(windows): check code signatures only in CI builds (#14815)
+* chore(deps-dev): bump tar-fs from 3.0.9 to 3.1.1 (#14827)
+* fix(windows): disable MSI shortcut advertisement (#14814)
+* maint(resources): lookup 7z on path on Windows if SEVENZ_HOME is not set (#14816)
+* fix(android): Apply bottom insets to system keyboard (#14808)
+* fix(android): Fix bottom insets for Sample and FirstVoices apps (#14828)
+* docs(android): Document getNavigationBarHeight API (#14830)
+
+## 19.0.126 alpha 2025-09-24
+
+* maint(linux): remove several shellcheck directives (#14819)
+
+## 19.0.125 alpha 2025-09-23
+
+* fix(common): some more tests running successfully in a container (#14784)
+
 ## 19.0.124 alpha 2025-09-22
 
 * maint(linux): improve `upload-to-debian` script (#14798)
@@ -785,6 +813,18 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.242 stable 2025-09-29
+
+* maint(linux): remove Oracular, add Questing (#14781)
+* maint(resources): use VERSION variable in increment-version.sh (#14779)
+* chore(linux): Update debian changelog (#14782)
+* fix(developer): remove incorrect offset for compiler error line (#14792)
+* maint(linux): improve getting PR# in `upload-to-debian.sh` (#14785)
+* chore(linux): remove no longer needed lintian overrides (#14811)
+* fix(android): Apply bottom insets to system keyboard for Keyman, KMSample2, and FirstVoices (#14833)
+* fix(windows): disable .msi shortcut advertisement (#14829)
+* feat(windows): improve startup time by caching locale names (#14832)
 
 ## 18.0.241 stable 2025-09-18
 

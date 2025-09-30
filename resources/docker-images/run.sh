@@ -3,7 +3,6 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-# shellcheck source=resources/build/builder-full.inc.sh
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
