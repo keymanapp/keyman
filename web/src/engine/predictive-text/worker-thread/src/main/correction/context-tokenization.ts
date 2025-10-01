@@ -772,12 +772,14 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
    */
   splitOffset: number,
   /**
-   * The edit operations needed to transition from the first tokenization to the second.
+   * The edit operations needed to transition from the first (prior)
+   * tokenization to the second (result) tokenization.
    */
   editPath: EditTuple<ExtendedEditOperation>[],
   /**
    * The edit operations needed _after_ applying any merge or split operations
-   * to the first tokenization in order to transition to the second.
+   * to the first (prior) tokenization in order to transition to the second
+   * (result) tokenization.
    *
    * No 'merge' or 'split' edits will appear in this version.
    */
@@ -798,7 +800,7 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
   // We've found the root token to which changes may apply.
   // We've found the last post-application token to which transform changes contributed.
   // Did anything shift at or near that intersection?
-  const preTokenization = priorTokenization
+  const preTokenization = priorTokenization;
   const calc = computeDistance(
     new SegmentableDistanceCalculation({
       diagonalWidth: Math.abs(preTokenization.length - resultTokenization.length) + 2,
