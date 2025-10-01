@@ -357,7 +357,7 @@ describe('determineContextTransition', () => {
 
       const appendDeletingTransition = determineContextTransition(
         tracker,
-        extendingTransition.final, {
+        extensionDeletingTransition.final, {
           left: 'this is for testing ',
           startOfBuffer: true,
           endOfBuffer: true,
@@ -431,7 +431,7 @@ describe('determineContextTransition', () => {
 
       const appendDeletingTransition = determineContextTransition(
         tracker,
-        extendingTransition.final, {
+        extensionDeletingTransition.final, {
           left: 'this is for testing ',
           startOfBuffer: true,
           endOfBuffer: true,
@@ -443,7 +443,7 @@ describe('determineContextTransition', () => {
 
       const editingBkspTransition = determineContextTransition(
         tracker,
-        extendingTransition.final, {
+        appendDeletingTransition.final, {
           left: 'this is for testing',
           startOfBuffer: true,
           endOfBuffer: true,

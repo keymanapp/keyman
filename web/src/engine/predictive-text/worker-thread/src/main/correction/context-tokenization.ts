@@ -537,7 +537,9 @@ export class ContextTokenization {
         throw new Error("Not yet supported.");
       }
 
-      tokenization.push(new ContextToken(baseTokenization[i]));
+      const token = new ContextToken(baseTokenization[i]);
+      token.isPartial = false;
+      tokenization.push(token);
     }
 
     // Assertion:  inputs.length > 0.
@@ -563,6 +565,9 @@ export class ContextTokenization {
         // Replace the token at the affected index with a brand-new token.
         tokenization.splice(tokenIndex, 1, affectedToken);
       }
+
+      affectedToken.isPartial = true;
+      delete affectedToken.appliedTransitionId;
 
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.

@@ -17,7 +17,8 @@ import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
 import { determineModelTokenizer } from '../model-helpers.js';
-import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
+import { legacySubsetKeyer, TokenizationSubsetBuilder } from './tokenization-subsets.js';
+import TransformUtils from '../transformUtils.js';
 
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
@@ -197,56 +198,57 @@ export class ContextState {
   ): ContextTransition {
     const lexicalModel = this.model;
 
-    // Apply all transforms to the base context state
-    const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
-    const postContext = transformDistribution?.[0] ? applyTransform(transformDistribution[0].sample, context) : context;
-
-    // Note for future:  the next line's pattern asserts that there is only one true tokenization.
-    // We may eventually allow for multiple potential tokenizations (per epic-dict-breaker)
-    const tokenizedContext = determineModelTokenizer(lexicalModel)(postContext).left;
-    if(tokenizedContext.length == 0) {
-      tokenizedContext.push({text: ''});
-    }
-    // In which case we could try need to align for each of them, starting from the most likely.
-
-    // If we're not at the start of the buffer, we're probably a sliding context.
-    const isSliding = !this.context.startOfBuffer;
-
-    // It's possible the tokenization will remember more of the initial token than is
-    // actually present in the sliding context window, which imposes a need for a wide-band
-    // computeDistance 'radius' in the called function.
-    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isSliding, isApplyingSuggestion);
-
-    if(alignmentResults.canAlign == false) { // Needs to be explicit for TS type inference.
-      if(console && console.error) {
-        console.error(`Could not align contexts with edit path ${JSON.stringify(alignmentResults.editPath)}`);
-      }
-      return null;
-    }
-
-    const resultTokenization = this.tokenization.transitionTo(
-      tokenizedContext,
-      alignmentResults,
-      lexicalModel,
-      transformSequenceDistribution
-    );
-
-    if(!resultTokenization) {
-      if(console && console.error) {
-        console.error(`Transition to alignable tokenization failed:  alignment properties ${JSON.stringify(alignmentResults)}`);
-      }
-      return null;
-    }
-
+    const trueInput = transformDistribution[0].sample;
     const transition = new ContextTransition(this, this.appliedInput?.id);
-    // Occurs on context resets & after applying suggestions/reversions
-    if(resultTokenization == this.tokenization) {
+
+    // From here on, we work toward the common-case - re-using old info when
+    // context (and its tokenization) is changed by an input Transform.
+
+    let trueInputSubsetKey: string;
+    const slideUpdateTransform = determineContextSlideTransform(this.context, context);
+
+    // Goal:  allow multiple base tokenizations.
+    const startTokenizations = [this.tokenization];
+    const startTokenizationsAfterSlide = startTokenizations.map(t => t.applyContextSlide(lexicalModel, slideUpdateTransform));
+
+    // Easy case - no net change to the tokenizations whatsoever; the actual request
+    // aims to save-state the most recent results.
+    //
+    // This behavior occurs during context resets & after applying suggestions/reversions.
+    if(TransformUtils.isEmpty(trueInput) && transformDistribution.length == 1) {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
       const state = new ContextState(this);
+      state.tokenization = startTokenizationsAfterSlide[0];
       transition.finalize(state, transformDistribution);
       return transition;
     }
+
+    const subsetBuilder = new TokenizationSubsetBuilder(legacySubsetKeyer);
+    for(let baseTokenization of startTokenizationsAfterSlide) {
+
+      for(let mass of transformDistribution) {
+        const tokenizationAnalysis = baseTokenization.precomputeTokenizationAfterInput(lexicalModel, mass.sample);
+        subsetBuilder.addPrecomputation(baseTokenization, tokenizationAnalysis, mass.p);
+
+        if(mass.sample == trueInput) {
+          trueInputSubsetKey = subsetBuilder.keyer(tokenizationAnalysis);
+        }
+      }
+    }
+
+    // And now to (partly) detransform from a multiple-tokenization paradigm.
+    const trueInputSubset = subsetBuilder.subsets.get(trueInputSubsetKey);
+    // Right now, we only have one base tokenization, so we just fetch it.
+    const baseTokenization = startTokenizationsAfterSlide[0];
+    // For multiple tokenizations, we'd retrieve each, use the "most likely" one as base,
+    // and then fold all resulting search spaces (on the final token) into one.
+    const tokenizationAnalysis = trueInputSubset.pendingSet.get(baseTokenization);
+
+    // Should gain one per subsetBuilder.subsets entry.
+    const resultTokenization = baseTokenization.evaluateTransition(tokenizationAnalysis, lexicalModel, trueInput);
+
+    // ------------
 
     // So, if we have a suggestion transition ID at the end and didn't just apply...
     // we've just returned to the end of an applied suggestion's token.
@@ -272,17 +274,31 @@ export class ContextState {
     // We expect such cases to have SOMETHING for a preservation transform here;
     // we need to ensure that any suggestions for the new token believe that
     // the token is starting fresh, without any prior text.
-    if(alignmentResults.tailTokenShift > 0) {
+    //
+    // We actually will want to build `preservationTransform`s based on the path
+    // leading to each correction/suggestion.  But, until now, we've just built
+    // it based upon the actual input transform - so we'll maintain (temporarily)
+    // as a transitional state.
+
+    const bestResultAnalysis = tokenizationAnalysis;
+    // inputTransform is the ideal transform we found.
+
+    // If tokens were inserted, emit an empty transform; this prevents
+    // suggestions from replacing the "current" token.
+    if(bestResultAnalysis.inputs[0].sample.has(1)) {
       preservationTransform = { insert: '', deleteLeft: 0 };
     }
 
-    if(transformSequenceDistribution) {
-      const transformKeys = [...transformSequenceDistribution[0].sample.keys()];
+    let transformKeys = [...bestResultAnalysis.inputs[0].sample.keys()];
+    transformKeys.pop;
+
+    // if(transformSequenceDistribution) {
+      // const transformKeys = [...transformSequenceDistribution[0].sample.keys()];
       // Leave out the final entry - that part is replaceable by suggestions.
       transformKeys.pop();
 
       for(let i of transformKeys) {
-        const primaryInput = transformSequenceDistribution[0].sample.get(i);
+        const primaryInput = bestResultAnalysis.inputs[0].sample.get(i);
         if(!preservationTransform) {
           preservationTransform = primaryInput;
         } else {
@@ -290,10 +306,33 @@ export class ContextState {
           preservationTransform.deleteLeft += primaryInput.deleteLeft;
         }
       }
-    }
+    // }
 
-    const state = new ContextState(postContext, lexicalModel);
-    state.tokenization = resultTokenization;
+
+    const postContext = transformDistribution?.[0] ? applyTransform(transformDistribution[0].sample, context) : context;
+
+    // Note for future:  the next line's pattern asserts that there is only one true tokenization.
+    // We may eventually allow for multiple potential tokenizations (per epic-dict-breaker)
+    const tokenizedContext = determineModelTokenizer(lexicalModel)(postContext).left;
+    if(tokenizedContext.length == 0) {
+      tokenizedContext.push({text: ''});
+    }
+    // In which case we could try need to align for each of them, starting from the most likely.
+
+    // If we're not at the start of the buffer, we're probably a sliding context.
+    const isSliding = !this.context.startOfBuffer;
+
+    // It's possible the tokenization will remember more of the initial token than is
+    // actually present in the sliding context window, which imposes a need for a wide-band
+    // computeDistance 'radius' in the called function.
+    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isSliding, isApplyingSuggestion);
+
+    // Stopgap:  add tokenized transformSequenceDistribution to the alignment data & use that
+    // where noted:  tagTokens() in context-transition.ts, `determineSuggestionAlignment()`.
+
+
+    const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
+    state.tokenization =  new ContextTokenization(resultTokenization.tokens, alignmentResults);
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution, preservationTransform);
     transition.revertableTransitionId = appliedSuggestionTransitionId;
@@ -315,7 +354,7 @@ export class ContextState {
  * @returns The substring prepended to the context (if sliding backward) or the
  * number of codepoints removed from its start (if sliding forward)
  */
-export function determineContextSlideTransform(srcContext: Context, dstContext: Context): Transform {
+export function determineContextSlideTransform(srcContext: Context, dstContext: Context): Transform & { deleteRight: number } {
   // Assertion: the current (sliding) context window is alignable.
   // See `matchBaseContextState` in ../predict-helpers.ts.
   if(srcContext.startOfBuffer && dstContext.startOfBuffer) {
