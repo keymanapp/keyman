@@ -6,11 +6,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/linux/linux-actions.inc.sh"
@@ -30,10 +30,14 @@ builder_parse "$@"
 cd "${KEYMAN_ROOT}/linux"
 
 function make_source_tarball_action() {
-  builder_echo start "make source tarball" "Make source tarball"
-  rm -rf dist
-  make tmpsources
-  builder_echo end "make source tarball" success "Finished making source tarball"
+  if builder_is_ci_build_level_release; then
+    builder_echo start "make source tarball" "Make source tarball"
+    rm -rf dist
+    PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" "${KEYMAN_ROOT}/linux/scripts/dist.sh"
+    builder_echo end "make source tarball" success "Finished making source tarball"
+  else
+    builder_echo "Skipping source tarball creation - not release build level"
+  fi
 }
 
 if builder_has_action all; then

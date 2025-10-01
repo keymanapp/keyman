@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
+mac_verify_on_mac
 
 cd "${THIS_SCRIPT_PATH}"
 
@@ -71,25 +71,28 @@ cp textinputsource/textinputsource "$TARGETAPP/Contents/MacOS/textinputsource"
 
 # NOW TO notarize...
 xattr -rc "$TARGETAPP"
-execCodeSign direct --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP"
 
-#
-# Notarize the app (copied from ../build.sh)
-# TODO: merge notarization into function
-#
+if ! builder_is_ci_build || ! builder_is_ci_build_level_build; then
+  mac_codesign direct --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP"
 
-TARGET_ZIP_PATH="$TARGETPATH/Install Keyman.zip"
-TARGET_APP_PATH="$TARGETAPP"
+  #
+  # Notarize the app (copied from ../build.sh)
+  # TODO: merge notarization into function
+  #
 
-builder_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
+  TARGET_ZIP_PATH="$TARGETPATH/Install Keyman.zip"
+  TARGET_APP_PATH="$TARGETAPP"
 
-/usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
+  builder_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
 
-builder_heading "Uploading Install Keyman.zip to Apple for notarization"
-mac_notarize "$TARGETPATH" "$TARGET_ZIP_PATH"
+  /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
-builder_heading "Attempting to staple notarization to Install Keyman.app"
-xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
+  builder_heading "Uploading Install Keyman.zip to Apple for notarization"
+  mac_notarize "$TARGETPATH" "$TARGET_ZIP_PATH"
+
+  builder_heading "Attempting to staple notarization to Install Keyman.app"
+  xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
+fi
 
 # Done.
 # Now, we can add "Install Keyman.app" to the .dmg for distribution!

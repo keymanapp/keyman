@@ -12,7 +12,7 @@ set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/zip.inc.sh"
@@ -27,10 +27,9 @@ fi
 
 #Include script dependency
 . $KEYMAN_ROOT/resources/build/history/history-utils.sh         #includes the following
-#. ../resources/shellHelperFunctions.sh
+#. ../resources/build/utils.inc.sh
 
-BUILD_NUMBER=`cat ../VERSION.md`
-KEYMAN_TIER=`cat ../TIER.md`
+BUILD_NUMBER="${KEYMAN_VERSION}"
 
 KEYMAN_CHANGELOG="changelog-${BUILD_NUMBER}-${KEYMAN_TIER}.txt"
 CHANGELOG_PATH="upload/$BUILD_NUMBER/$KEYMAN_CHANGELOG"
@@ -50,18 +49,16 @@ mkdir -p "${UPLOAD_DIR}"
 echo "Writing changelog to $CHANGELOG_PATH"
 get_version_notes "ios" "${BUILD_NUMBER}" "$KEYMAN_TIER" > $CHANGELOG_PATH
 echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
-assertFileExists "${CHANGELOG_PATH}"
 
 # Strip emoji as App Store does not allow emoji in changelogs
 node "$KEYMAN_ROOT/resources/tools/strip-emoji" < "$CHANGELOG_PATH" > "$CHANGELOG_PATH.1"
 mv -f "$CHANGELOG_PATH.1" "$CHANGELOG_PATH"
-assertFileExists "${CHANGELOG_PATH}"
 
 #
 # Keyman Engine
 #
 
-KMEI_DST_NAME="keyman-engine-ios-${BUILD_NUMBER}.zip"
+KMEI_DST_NAME="keyman-engine-ios-${KEYMAN_VERSION_FOR_FILENAME}.zip"
 KMEI_DST="${WORK_DIR}/${UPLOAD_DIR}/${KMEI_DST_NAME}"
 
 KMEI_FRAMEWORK_BASE="build/Build/Products/Release/"
@@ -89,14 +86,14 @@ cd "$WORK_DIR"
 #
 
 KEYMANAPP_IPA="build/Build/Products/Release-iphoneos/Keyman.ipa"
-KEYMANAPP_IPA_DST="keyman-ios-${BUILD_NUMBER}.ipa"
+KEYMANAPP_IPA_DST="keyman-ios-${KEYMAN_VERSION_FOR_FILENAME}.ipa"
 
 echo "Copying Keyman IPA ${KEYMANAPP_IPA} => ${UPLOAD_DIR}/${KEYMANAPP_IPA_DST}..."
 cp "${KEYMANAPP_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_IPA_DST}"
 
 KEYMANAPP_SIM_FOLDER="build/Build/Products/Release-iphonesimulator"
 KEYMANAPP_SIM_APP="$KEYMANAPP_SIM_FOLDER/Keyman.app"
-KEYMANAPP_SIM_APP_DST="keyman-ios-simulator-${BUILD_NUMBER}.app.zip"
+KEYMANAPP_SIM_APP_DST="keyman-ios-simulator-${KEYMAN_VERSION_FOR_FILENAME}.app.zip"
 
 echo "Zipping Keyman simulator artifact ${KEYMANAPP_SIM_APP} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}..."
 cd "${KEYMANAPP_SIM_FOLDER}"
@@ -110,14 +107,14 @@ cd "$WORK_DIR"
 
 if [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
   FIRSTVOICESAPP_IPA="../oem/firstvoices/ios/build/Build/Products/Release-iphoneos/FirstVoices.ipa"
-  FIRSTVOICESAPP_IPA_DST="firstvoices-ios-${BUILD_NUMBER}.ipa"
+  FIRSTVOICESAPP_IPA_DST="firstvoices-ios-${KEYMAN_VERSION_FOR_FILENAME}.ipa"
 
   echo "Copying FirstVoices IPA ${FIRSTVOICESAPP_IPA} => ${UPLOAD_DIR}/${FIRSTVOICESAPP_IPA_DST}..."
   cp "${FIRSTVOICESAPP_IPA}" "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_IPA_DST}"
 
   FIRSTVOICESAPP_SIM_FOLDER="../oem/firstvoices/ios/build/Build/Products/Release-iphonesimulator/"
   FIRSTVOICESAPP_SIM_APP="$FIRSTVOICESAPP_SIM_FOLDER/FirstVoices.app"
-  FIRSTVOICESAPP_SIM_APP_DST="firstvoices-ios-simulator-${BUILD_NUMBER}.app.zip"
+  FIRSTVOICESAPP_SIM_APP_DST="firstvoices-ios-simulator-${KEYMAN_VERSION_FOR_FILENAME}.app.zip"
 
   echo "Zipping FirstVoices simulator artifact ${FIRSTVOICESAPP_SIM_APP} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}..."
   cd "${FIRSTVOICESAPP_SIM_FOLDER}"

@@ -23,6 +23,7 @@ on:
 # baseRef:     The ref of the previous commit. For a PR the same as `baseBranch`.
 # user:        The user that triggered the build or created the PR
 # isTestBuild: false for Releases, otherwise true
+# skipApiCheck: true to skip the API check, otherwise false
 
 env:
   COLOR_GREEN: "\e[32m"
@@ -34,7 +35,7 @@ env:
 jobs:
   sourcepackage:
     name: Build source package
-    if: github.repository == 'keymanapp/keyman'
+    if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
     runs-on: ubuntu-24.04
     outputs:
       KEYMAN_VERSION: ${{ steps.version_step.outputs.KEYMAN_VERSION }}
@@ -86,7 +87,14 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+        if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh" ]]; then
+          . "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
+        else
+          # TODO: remove following block post v19 release (file was renamed in v19 alpha)
+          if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh" ]]; then
+            . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+          fi
+        fi
         echo "KEYMAN_VERSION=${KEYMAN_VERSION:-${VERSION}}" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
@@ -177,28 +185,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Download Artifacts
-    #   uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-    #   with:
-    #     path: artifacts
-    #     merge-multiple: true
+    - name: Download Source Artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        name: keyman-srcpkg
+        path: artifacts
 
-    # - name: Install dependencies
-    #   run: |
-    #     sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
+    - name: Download Binary Artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        path: artifacts
+        pattern: keyman-binarypkgs-*
+        merge-multiple: true
 
-    # - name: Build test image
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest-buildvm-ubuntu-cloud -v --release=jammy
-
-    # - name: Run tests
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
-    - name: Ignore
+    - name: Install dependencies
       run: |
-        echo "Ignored for now - until working solution is in place (#13777)"
+        sudo apt update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
+
+    - name: Build test image
+      run: |
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        sudo chown ${USER} /dev/kvm
+        autopkgtest-buildvm-ubuntu-cloud -v --release=$(lsb_release -c -s)
+
+    - name: Run tests
+      run: |
+        # Tests are defined in linux/debian/tests/test-build
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        DIST="$(lsb_release -c -s)"
+        autopkgtest -B *${DIST}*.deb keyman_*.dsc -- qemu autopkgtest-${DIST}-amd64.img
 
   deb_signing:
     name: Sign source and binary packages
@@ -325,6 +341,7 @@ jobs:
         echo "GIT_BRANCH=${{ github.event.client_payload.branch }}" >> artifacts/env
         echo "GIT_BASE_BRANCH=${{ github.event.client_payload.baseBranch }}" >> artifacts/env
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
+        echo "SKIP_API_CHECK=${{ github.event.client_payload.skipApiCheck }}" >> artifacts/env
 
     - name: Cache artifacts
       uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3

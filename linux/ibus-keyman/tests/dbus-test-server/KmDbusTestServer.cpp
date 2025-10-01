@@ -98,11 +98,9 @@ void KmDbusTestServer::Loop()
     return;
   }
 
-  guint exitFlag = FALSE;
-
   // Install the object
   ret = sd_bus_add_object_vtable(bus, NULL, KEYMAN_TESTSVC_OBJECT_PATH,
-    KEYMAN_TESTSVC_INTERFACE_NAME, test_service_vtable, &exitFlag);
+    KEYMAN_TESTSVC_INTERFACE_NAME, test_service_vtable, this);
   if (ret < 0) {
     g_error("Failed to issue method call: %s", strerror(-ret));
     return;
@@ -118,12 +116,12 @@ void KmDbusTestServer::Loop()
   for (;;) {
     // Process requests
     ret = sd_bus_process(bus, NULL);
-    g_debug("sd_bus_process returned %d, exitFlag=%d", ret, exitFlag);
+    g_debug("sd_bus_process returned %d, exitFlag=%d", ret, this->exitFlag);
     if (ret < 0) {
       g_error("Failed to process bus: %s", strerror(-ret));
       return;
     }
-    if (exitFlag) {
+    if (this->exitFlag) {
       // `exitFlag` can be modified by the callback function
       // `on_exit_method` which can be called by `sd_bus_process`
       g_debug("Exiting loop");

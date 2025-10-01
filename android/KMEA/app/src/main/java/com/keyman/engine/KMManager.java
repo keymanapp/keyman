@@ -52,6 +52,9 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
@@ -495,6 +498,11 @@ public final class KMManager {
       didCopyAssets = true;
     }
 
+    calculateDefaultKeyboardHeights(context);
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
+    KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
+
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
       String msg = "Cannot initialize: Invalid keyboard type";
       KMLog.LogError(TAG, msg);
@@ -508,12 +516,6 @@ public final class KMManager {
     migrateCloudKeyboards(appContext);
 
     CloudDownloadMgr.getInstance().initialize(appContext);
-
-    calculateDefaultKeyboardHeights(context);
-    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
-    KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
-    KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
-
   }
 
   public static void executeResourceUpdate(Context aContext)
@@ -692,15 +694,66 @@ public final class KMManager {
   /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
+   *
+   * Android API 35+ enforces edge-to-edge so we need to determine the navigation bar height (if visible)
+   * so the keyboard isn't covered up by the navigation bar.
+   * In portrait orientation, this affects the keyboard bottom margin.
+   * On phones in landscape orientation, this affects the left/right side of the keyboard
    * @return RelativeLayout.LayoutParams
    */
   public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
+    int navigationHeight = getNavigationBarHeight(appContext);
+    int orientation = getOrientation(appContext);
+    FormFactor formFactor = getFormFactor();
+
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-   return params;
+	return params;
+   }
+
+  /**
+   * Applies padding to the keyboard so it's not covered by system insets
+   * @param {KeyboardType} keyboard
+   * @param left int padding to account for notch/navigation bar on left side of screen
+   * @param right int padding to account for notch/navigation bar on right side of screen
+   * @param bottom int padding to account for navigation bar on bottom of screen
+   */
+  public static void applyInsetsToKeyboard(KeyboardType keyboardType, int left, int right, int bottom) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      applyInsetsPaddingToKeyboardView(InAppKeyboard, left, right, bottom);
+    }
+
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      applyInsetsPaddingToKeyboardView(SystemKeyboard, left, right, bottom);
+    }
+  }
+
+  private static void applyInsetsPaddingToKeyboardView(KMKeyboard keyboard, int left, int right, int bottom) {
+    View parent = (View) keyboard.getParent();
+
+    if (keyboard.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && parent != null) {
+      // Keep existing top padding, add bottom padding for the inset
+      parent.setPadding(
+        left,
+        parent.getPaddingTop(),
+        right,
+        bottom
+      );
+      // No need to change WebView margins; keep height as-is
+      parent.requestLayout();
+    } else {
+      // Fallback: apply on the WebView itself
+      keyboard.setPadding(
+        left,
+        keyboard.getPaddingTop(),
+        right,
+        bottom
+      );
+      keyboard.requestLayout();
+    }
   }
 
   private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
@@ -839,6 +892,25 @@ public final class KMManager {
 
     if (SystemKeyboard == null) {
       return mainLayout;
+    }
+
+    if (mainLayout != null) {
+      // Update insets
+      ViewCompat.setOnApplyWindowInsetsListener(mainLayout,
+        (view, windowInsets) -> {
+          // Allocate insets for system bars and display cutout (notch)
+          Insets insets = windowInsets.getInsets(
+            WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+
+          view.setPadding(
+            insets.left,
+            insets.top,
+            insets.right,
+            insets.bottom);
+
+          applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, insets.left, insets.right, insets.bottom);
+          return windowInsets;
+        });
     }
 
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
@@ -2419,6 +2491,25 @@ public final class KMManager {
     newContext = context.createConfigurationContext(newConfig);
     newResources = newContext.getResources();
     KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
+  }
+
+  /**
+   * Get the navigation bar height (if visible) in pixels
+   * @param context - the context
+   * @return int - navigation bar height in pixels
+   */
+  public static int getNavigationBarHeight(Context context) {
+    // Determine if navigation bar is visible
+    int resourceId = context.getResources().getIdentifier(
+      "config_showNavigationBar", "bool", "android");
+    if (resourceId <= 0) {
+      return 0;
+    }
+
+    // Navigation bar visible so get the height
+    resourceId = context.getResources().getIdentifier(
+      "navigation_bar_height", "dimen", "android");
+    return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
   }
 
   /**

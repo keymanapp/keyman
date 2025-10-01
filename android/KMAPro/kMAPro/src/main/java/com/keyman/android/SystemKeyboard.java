@@ -5,10 +5,10 @@
 package com.keyman.android;
 
 import com.keyman.engine.util.DownloadFileUtils;
-import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
+import com.tavultesoft.kmapro.PreferencesManager;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -30,7 +30,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -125,8 +124,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     }
 
     ViewGroup parent = (ViewGroup) inputView.getParent();
-    if (parent != null)
+    if (parent != null) {
       parent.removeView(inputView);
+    }
 
     return inputView;
   }
@@ -246,9 +246,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       inputViewHeight = inputView.getHeight();
     }
 
+    int navigationHeight = KMManager.getNavigationBarHeight(this);
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);
-    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight;
+    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight - navigationHeight;
     outInsets.visibleTopInsets = outInsets.contentTopInsets;
     outInsets.touchableInsets = InputMethodService.Insets.TOUCHABLE_INSETS_REGION;
     outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);
@@ -264,6 +265,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardChanged(String newKeyboard) {
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.showSystemKeyboard();
   }
 
@@ -276,6 +279,21 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onKeyboardDismissed() {
     // Do nothing
+  }
+
+  @Override
+  public boolean onEvaluateInputViewShown() {
+    // On Android API 36+, the OSK defaults to not appearing when a physical keyboard is connected.
+    // If the default implementation returns true, recommend honoring it
+    // Reference: https://android.googlesource.com/platform/frameworks/base/+/7b739a8%5E%21/
+    if (super.onEvaluateInputViewShown()) {
+      return true;
+    };
+
+    Context context = getApplicationContext();
+    SharedPreferences prefs = context.getSharedPreferences(PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
+    boolean showOSK = prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    return showOSK;
   }
 
   @Override

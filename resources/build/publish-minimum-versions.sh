@@ -8,7 +8,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
@@ -35,7 +35,7 @@ generate_table() {
     KEYMAN_VERSION | KEYMAN_VERSION_MAJOR | KEYMAN_VERSION_MINOR | \
     KEYMAN_VERSION_PATCH | KEYMAN_VERSION_RELEASE | KEYMAN_VERSION_WIN | \
     KEYMAN_VERSION_TAG | KEYMAN_VERSION_WITH_TAG | \
-    KEYMAN_VERSION_ENVIRONMENT | KEYMAN_VERSION_GIT_TAG)
+    KEYMAN_VERSION_ENVIRONMENT | KEYMAN_VERSION_GIT_TAG | KEYMAN_VERSION_FOR_FILENAME)
       # ignore the variables that contain the Keyman version
       ;;
     *)

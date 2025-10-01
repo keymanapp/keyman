@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/windows/windows-actions.inc.sh"
@@ -84,7 +84,7 @@ function _publish_to_downloads_keyman_com() {
     # TODO: is this still needed?
     if [[ -f "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
       cp "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}"
-      write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Desktop and Keyman Developer debug files" zip win
+      write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman for Windows and Keyman Developer debug files" zip win
     fi
 
     cd upload

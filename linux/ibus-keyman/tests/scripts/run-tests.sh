@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2312
+
 set -eu
 
 TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/../..")}
-TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
+TESTBASEDIR=${XDG_DATA_HOME:-${HOME}/.local/share}/keyman
 TESTDIR=${TESTBASEDIR}/test_kmx
 CLEANUP_FILE=/tmp/ibus-keyman-test-cleanup
 PID_FILE=/tmp/ibus-keyman-test.pids
@@ -11,10 +13,10 @@ ENV_FILE=/tmp/keyman-env.txt
 . "$(dirname "$0")"/test-helper.inc.sh
 
 local_cleanup() {
-  cleanup "$CLEANUP_FILE"
+  cleanup "${CLEANUP_FILE}"
 }
 
-if [ -v KEYMAN_PKG_BUILD ]; then
+if [[ -v KEYMAN_PKG_BUILD ]]; then
   # During package builds we skip these tests that require to start ibus because
   # ibus requires to find /var/lib/dbus/machine-id or /etc/machine-id, otherwise it fails with:
   # "Bail out! IBUS-FATAL-WARNING: Unable to load /var/lib/dbus/machine-id: Failed to open file
@@ -23,7 +25,7 @@ if [ -v KEYMAN_PKG_BUILD ]; then
   exit 0
 fi
 
-if ! which Xvfb > /dev/null || ! which Xephyr > /dev/null || ! which metacity > /dev/null || ! which mutter > /dev/null; then
+if ! command -v Xvfb > /dev/null || ! command -v Xephyr > /dev/null || ! command -v metacity > /dev/null || ! command -v mutter > /dev/null; then
   echo "Please install Xvfb, Xephyr, metacity and mutter before running these tests!"
   echo "sudo apt install xvfb xserver-xephyr metacity mutter"
   exit 1
@@ -54,9 +56,9 @@ function run_tests() {
   DISPLAY_SERVER=$1
   shift
 
-  if [ -d "$(dirname "$0")/../../../build/$(arch)/debug" ]; then
+  if [[ -d "$(dirname "$0")/../../../build/$(arch)/debug" ]]; then
     CONFIG=debug
-  elif [ -d "$(dirname "$0")/../../../build/$(arch)/release" ]; then
+  elif [[ -d "$(dirname "$0")/../../../build/$(arch)/release" ]]; then
     CONFIG=release
   else
     echo "Cannot find ../../../build/$(arch)/debug or ../../../build/$(arch)/release"
@@ -65,7 +67,7 @@ function run_tests() {
 
   G_TEST_BUILDDIR="$(dirname "$0")/../../../build/$(arch)/${CONFIG}/tests"
 
-  setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE" --standalone
+  setup "${DISPLAY_SERVER}" "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" --standalone
 
   if [[ "${DOCKER_RUNNING:-false}" == "true" ]]; then
     echo "# NOTE: When the tests fail check ibus-engine-keyman.log, ibus-daemon.log and km-test-server.log in build/docker-linux/tmp/!"
@@ -74,19 +76,20 @@ function run_tests() {
   fi
   echo ""
 
-  if [ $# -gt 0 ]; then
+  if [[ $# -gt 0 ]]; then
     #shellcheck disable=SC2206
     TESTFILES=($@)
   else
-    pushd "$TESTDIR" > /dev/null || exit
+    pushd "${TESTDIR}" > /dev/null || exit
     TESTFILES=(*.kmx)
     popd > /dev/null || exit
   fi
 
   echo "# Starting tests..."
   # shellcheck disable=SC1090
-  source "$ENV_FILE"
-  echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+  source "${ENV_FILE}"
+  # shellcheck disable=SC2154
+  echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}"
 
   if [[ -n ${REMOTE_DEBUG:-} ]]; then
     echo "===> Now attach debugger to ${REMOTE_HOST}"
@@ -97,10 +100,10 @@ function run_tests() {
   #shellcheck disable=SC2086
   ${REMOTE_DEBUG:-} "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
-    --directory "$TESTDIR" "${DISPLAY_SERVER}" ${TESTFILES[@]}
+    --directory "${TESTDIR}" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
-  cleanup "$CLEANUP_FILE"
+  cleanup "${CLEANUP_FILE}"
 }
 
 USE_WAYLAND=1
@@ -124,34 +127,34 @@ while (( $# )); do
   shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5
 done
 
-if ! can_run_wayland && [ "$USE_WAYLAND" == "0" ]; then
+if ! can_run_wayland && [[ "${USE_WAYLAND}" == "0" ]]; then
   # support for --headless got added in mutter 40.x
   echo "# WARNING: mutter doesn't support running headless. Skipping Wayland tests."
   USE_WAYLAND=0
-  if [ "$USE_X11" == "0" ]; then
+  if [[ "${USE_X11}" == "0" ]]; then
     echo "ERROR: no tests to run. Can't run Wayland tests, and --no-x11 is specified."
     exit 8
   fi
 fi
 
-if [ "$USE_WAYLAND" == "0" ] && [ "$USE_X11" == "0" ]; then
+if [[ "${USE_WAYLAND}" == "0" ]] && [[ "${USE_X11}" == "0" ]]; then
   echo "ERROR: I'll have to run somewhere. Specifying both --no-wayland and --no-x11 is not allowed."
   exit 6
 fi
 
 G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/debug/tests}"
-if [ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]; then
+if [[ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]]; then
   G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/release/tests}"
 fi
 
-echo > "$CLEANUP_FILE"
-echo > "$PID_FILE"
+echo > "${CLEANUP_FILE}"
+echo > "${PID_FILE}"
 trap local_cleanup EXIT SIGINT
 
-if [ "$USE_WAYLAND" == "1" ]; then
+if [[ "${USE_WAYLAND}" == "1" ]]; then
   run_tests --wayland "$@"
 fi
 
-if [ "$USE_X11" == "1" ]; then
+if [[ "${USE_X11}" == "1" ]]; then
   run_tests --x11 "$@"
 fi

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
@@ -24,11 +23,12 @@ import android.os.Bundle;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.util.MapCompat;
 
-public class KeymanSettingsInstallActivity extends AppCompatActivity {
+public class KeymanSettingsInstallActivity extends BaseActivity {
   private static final String TAG = "SettingsInstallActivity";
   private static ArrayList<HashMap<String, String>> installOptionList = null;
   private static Typeface titleFont = null;
@@ -45,6 +45,8 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
     context = this;
 
     setContentView(R.layout.activity_list_layout);
+    setupEdgeToEdge(R.id.list_toolbar);
+
     final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);

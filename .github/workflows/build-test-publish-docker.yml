@@ -1,0 +1,79 @@
+# This workflow runs the build, test and publish steps for the
+# Keyman build Docker images.
+# It is triggered by a schedule and repository_dispatch event.
+
+name: "Docker images: Build, publish and test "
+run-name: "Docker images: Build, publish and test (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+defaults:
+  run:
+    shell: bash
+
+on:
+  schedule:
+    #run every Fri, 3 pm UTC
+    - cron: '0 15 * * 5'
+
+  repository_dispatch:
+    types: ['build-test-publish-docker:*']
+
+env:
+  REGISTRY: ghcr.io
+  USERNAME: "${{ github.actor }}"
+  PASSWORD: "${{ secrets.KEYMAN_SERVER_REPO_ACCESS_PAT }}"
+
+jobs:
+
+  message:
+    name: Print message
+    runs-on: ubuntu-latest
+    if: ${{ github.event.act }}
+
+    steps:
+      - name: Print message
+        id: print-message
+        run: |
+          echo "Docker images: Build, publish and test (branch ${{ github.ref_name }} on ${{ github.event_name }}/${{ github.event.action }} by ${{ github.actor }})"
+
+  build:
+    name: Build Docker images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        id: checkout
+        uses: actions/checkout@v4
+      - name: Build Docker images
+        id: build
+        run: |
+          if [ -z "${{ env.USERNAME }}" ]; then
+            resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }}
+          else
+            echo ${{ env.PASSWORD }} | resources/docker-images/build.sh build: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
+          fi
+      - name: Publish Docker images
+        id: publish
+        run: |
+          if [ -z "${{ env.USERNAME }}" ]; then
+            resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }}
+          else
+            echo ${{ env.PASSWORD }} | resources/docker-images/build.sh publish: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
+          fi
+
+  test:
+    name: Test Docker images
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Docker images
+        id: test
+        run: |
+          if [ -z "${{ env.USERNAME }}" ]; then
+            resources/docker-images/build.sh test: --registry ${{ env.REGISTRY }}
+          else
+            echo ${{ env.PASSWORD }} | resources/docker-images/build.sh test: --registry ${{ env.REGISTRY }} --username ${{ env.USERNAME }}
+          fi
