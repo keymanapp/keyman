@@ -249,9 +249,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     int navigationHeight = KMManager.getNavigationBarHeight(this);
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);
-    Log.d(TAG, String.format("navigationHeight: %d", navigationHeight));
-    double factor = 1.0; // 2.5;
-    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight - (int)(factor*navigationHeight);
+    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight - navigationHeight;
     outInsets.visibleTopInsets = outInsets.contentTopInsets;
     outInsets.touchableInsets = InputMethodService.Insets.TOUCHABLE_INSETS_REGION;
     outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);

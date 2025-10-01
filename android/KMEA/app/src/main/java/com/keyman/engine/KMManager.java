@@ -2503,10 +2503,19 @@ public final class KMManager {
     int navigationBarHeight = 0;
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      int orientation = getOrientation(context);
+      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        // Navigation bar on the side in landscape orientation
+        return navigationBarHeight;
+      }
+
       WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
       if (windowManager != null) {
-        WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();;
-        navigationBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom; // pixels
+        WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();
+        // Get the inset dimensions for system gestures and navigation bar (bottom)
+        android.graphics.Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
+        android.graphics.Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+        navigationBarHeight = Math.max(gestureInsets.bottom, navigationInsets.bottom); // pixels
       }
     } else {
       // Determine if navigation bar is visible
@@ -2523,7 +2532,6 @@ public final class KMManager {
         context.getResources().getDimensionPixelSize(resourceId) : 0;
     }
 
-    float dpToPx = context.getResources().getDisplayMetrics().density;
     return (int)(navigationBarHeight);
   }
 
