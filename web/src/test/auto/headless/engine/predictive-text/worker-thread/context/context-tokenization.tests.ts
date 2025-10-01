@@ -1010,6 +1010,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly handles basic token-edit transform', () => {
@@ -1031,6 +1032,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly handles basic char-delete transform', () => {
@@ -1052,6 +1054,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly handles simple token-edit transform', () => {
@@ -1074,6 +1077,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenization: ['apple', ' ', 'a', ' ', 'da'],
@@ -1111,6 +1115,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
@@ -1146,6 +1151,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('handles simple token-replacing transform with cross-token deleteLeft', () => {
@@ -1182,6 +1188,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 2);
     });
 
     it('handles token-replacing transform with cross-token deleteLeft after whitespace', () => {
@@ -1226,6 +1233,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 4);
     });
 
     it('properly handles a simple appended whitespace', () => {
@@ -1254,6 +1262,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly handles a simple appended period', () => {
@@ -1279,6 +1288,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly deletes a simple appended whitespace', () => {
@@ -1305,6 +1315,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 2);
     });
 
     it('handles word-breakable transforms (case 1)', () => {
@@ -1333,6 +1344,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenization: ['apple', ' ', 'a', ' ', 'da'],
@@ -1376,6 +1388,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
@@ -1417,6 +1430,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('handles complex breakable cases', () => {
@@ -1446,6 +1460,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly aligns tokenization of transforms that match-replace existing tokens (1)', () => {
@@ -1473,6 +1488,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly aligns tokenization of transforms that match-replace existing tokens (2)', () => {
@@ -1500,6 +1516,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly places extra whitespaces on preceding whitespace token', () => {
@@ -1525,6 +1542,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly aligns degenerate input cases (1)', () => {
@@ -1555,6 +1573,7 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('returns the standard edge window for empty transform inputs', () => {
@@ -1760,6 +1779,7 @@ describe('ContextTokenization', function() {
       ]);
       assert.deepEqual(results.alignment.splits, []);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly handles English contraction transitions (2)', () => {
@@ -1795,6 +1815,7 @@ describe('ContextTokenization', function() {
         }
       ]);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
 
     it('properly handles English contraction transitions (3)', () => {
@@ -1827,6 +1848,7 @@ describe('ContextTokenization', function() {
         }
       ]);
       assert.deepEqual(results.alignment.unmappedEdits, []);
+      assert.equal(results.alignment.removedTokenCount, 0);
     });
   });
 

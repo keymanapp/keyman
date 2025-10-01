@@ -68,7 +68,12 @@ export interface TokenizationEdgeAlignment {
    * The edge window defining the potential range of tokenization adjustments
    * needed after applying the Transform
    */
-  edgeWindow: RetokenizedEdgeWindow
+  edgeWindow: RetokenizedEdgeWindow;
+
+  /**
+   * The number of tokens deleted from the end, without being erased.
+   */
+  removedTokenCount: number;
 }
 
 /**
@@ -430,7 +435,16 @@ export class ContextTokenization {
     // accordingly.
     const tailIndex = 0 - (stackedDeletes.length - 1) + (editBoundary.omitsEmptyToken ? -1 : 0);
     // Mutates stackedInserts, stackedDeletes.
+    const baseRemovedTokenCount = Math.max(0, stackedDeletes.length - stackedInserts.length);
     const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
+
+    // If there's an empty transform in the 0 position and we already know we're
+    // dropping tokens - and only deleting - we're dropping an
+    // otherwise-untracked empty token - make sure it's included!
+    const droppedFinalTransform = baseRemovedTokenCount > 0 && transform.insert == '' && TransformUtils.isEmpty(transformMap.get(0));
+    // Past that, if we have more delete entries than insert entries for our transforms, we
+    // dropped some tokens outright.
+    const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
 
     // Final step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
     // and not caused by transforms.  All transforms always apply in sequence at the end.
@@ -457,7 +471,8 @@ export class ContextTokenization {
         edgeWindow: {...edgeWindow, retokenization: retokenizedEdge},
         merges,
         splits,
-        unmappedEdits
+        unmappedEdits,
+        removedTokenCount
       },
       tokenizedTransform: transformMap,
     };
