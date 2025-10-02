@@ -31,7 +31,7 @@ export interface TokenizationSubset {
      *
      * If passed to `subsetByInterval`, the transforms should result in a single subset.
      */
-    tokenizedInputs: Distribution<Map<number, Transform>>
+    inputs: Distribution<Map<number, Transform>>
   }>;
 }
 
@@ -130,9 +130,9 @@ export class TokenizationSubsetBuilder {
     }
     const forTokenization = entry.pendingSet.get(tokenization) ?? {
       alignment: precomputation.alignment,
-      tokenizedInputs: []
+      inputs: []
     };
-    forTokenization.tokenizedInputs.push({sample: precomputation.tokenizedTransform, p});
+    forTokenization.inputs.push({sample: precomputation.tokenizedTransform, p});
     entry.pendingSet.set(tokenization, forTokenization);
     this._subsets.set(key, entry);
   }
