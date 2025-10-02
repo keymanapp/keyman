@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.131 alpha 2025-10-02
+
+* refactor(web): cleanup in test scripts (#14870)
+
 ## 19.0.130 alpha 2025-09-30
 
 * maint(linux): allow to remote debug integration tests in Docker (#14818)
