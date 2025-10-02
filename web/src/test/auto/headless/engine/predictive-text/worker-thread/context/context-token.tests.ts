@@ -102,7 +102,159 @@ describe('ContextToken', function() {
     });
   });
 
-  describe("splitToken()", () => {
+  describe("merge()", () => {
+    it("merges three tokens without previously-split transforms", () => {
+      const token1 = new ContextToken(plainModel, "can");
+      const token2 = new ContextToken(plainModel, "'");
+      const token3 = new ContextToken(plainModel, "t");
+
+      const merged = ContextToken.merge([token1, token2, token3], plainModel);
+      assert.equal(merged.exampleInput, "can't");
+      token1.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
+      token2.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
+      token3.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
+
+      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(0, 3), token1.searchSpace.inputSequence);
+      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(3, 4), token2.searchSpace.inputSequence);
+      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(4), token3.searchSpace.inputSequence);
+    });
+
+    it("merges three tokens from single previously-split transforms", () => {
+      const srcTransform = { insert: "can't", deleteLeft: 0, deleteRight: 0, id: 1 };
+
+      const token1 = new ContextToken(plainModel);
+      const token2 = new ContextToken(plainModel);
+      const token3 = new ContextToken(plainModel);
+
+      token1.addInput({
+        trueTransform: srcTransform,
+        inputStartIndex: 0
+      }, [{sample: {insert: 'can', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
+
+      token2.addInput({
+        trueTransform: srcTransform,
+        inputStartIndex: 3
+      }, [{sample: {insert: "'", deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
+
+      token3.addInput({
+        trueTransform: srcTransform,
+        inputStartIndex: 4
+      }, [{sample: {insert: 't', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
+
+      const merged = ContextToken.merge([token1, token2, token3], plainModel);
+      assert.equal(merged.exampleInput, "can't");
+      assert.deepEqual(merged.inputRange, [ { trueTransform: srcTransform, inputStartIndex: 0 } ]);
+      assert.deepEqual(merged.searchSpace.inputSequence, [[{sample: srcTransform, p: 1}]]);
+    });
+
+    it("merges four tokens with previously-split transforms", () => {
+      // TODO:  need another case - pref where there are two diff boundary transforms
+      // and where each token has multiple constituent transforms.
+      const srcTransform1 = { insert: "apple", deleteLeft: 0, deleteRight: 0, id: 1 };
+      const srcTransform2 = { insert: "sands", deleteLeft: 0, deleteRight: 0, id: 2 };
+      const srcTransform3 = { insert: "our", deleteLeft: 0, deleteRight: 0, id: 3 };
+      const srcTransform4 = { insert: "grapes", deleteLeft: 0, deleteRight: 0, id: 4 };
+      const srcTransforms = [srcTransform1, srcTransform2, srcTransform3, srcTransform4];
+
+      // apples
+      const token1 = new ContextToken(plainModel);
+      // and
+      const token2 = new ContextToken(plainModel);
+      // sour
+      const token3 = new ContextToken(plainModel);
+      // grapes
+      const token4 = new ContextToken(plainModel);
+      const tokensToMerge = [token1, token2, token3, token4]
+
+      token1.addInput({
+        trueTransform: srcTransform1,
+        inputStartIndex: 0
+      }, [{sample: srcTransform1, p: 1}]);
+      token1.addInput({
+        trueTransform: srcTransform2,
+        inputStartIndex: 0
+      }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+
+      token2.addInput({
+        trueTransform: srcTransform2,
+        inputStartIndex: 1
+      }, [{sample: {insert: "and", deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+
+      token3.addInput({
+        trueTransform: srcTransform2,
+        inputStartIndex: 4
+      }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+      token3.addInput({
+        trueTransform: srcTransform3,
+        inputStartIndex: 0
+      }, [{sample: srcTransform3, p: 1}]);
+
+      token4.addInput({
+        trueTransform: srcTransform4,
+        inputStartIndex: 0
+      }, [{sample: srcTransform4, p: 1}]);
+
+      const merged = ContextToken.merge(tokensToMerge, plainModel);
+      assert.equal(merged.exampleInput, "applesandsourgrapes");
+      assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0 }) ));
+      assert.deepEqual(merged.searchSpace.inputSequence, srcTransforms.map((t) => [{sample: t, p: 1}]));
+    });
+
+    it("merges four tokens with previously-split transforms - non-BMP text", () => {
+      // TODO:  need another case - pref where there are two diff boundary transforms
+      // and where each token has multiple constituent transforms.
+      const srcTransform1 = { insert: toMathematicalSMP("apple"), deleteLeft: 0, deleteRight: 0, id: 1 };
+      const srcTransform2 = { insert: toMathematicalSMP("sands"), deleteLeft: 0, deleteRight: 0, id: 2 };
+      const srcTransform3 = { insert: toMathematicalSMP("our"), deleteLeft: 0, deleteRight: 0, id: 3 };
+      const srcTransform4 = { insert: toMathematicalSMP("grapes"), deleteLeft: 0, deleteRight: 0, id: 4 };
+      const srcTransforms = [srcTransform1, srcTransform2, srcTransform3, srcTransform4];
+
+      // apples
+      const token1 = new ContextToken(plainModel);
+      // and
+      const token2 = new ContextToken(plainModel);
+      // sour
+      const token3 = new ContextToken(plainModel);
+      // grapes
+      const token4 = new ContextToken(plainModel);
+      const tokensToMerge = [token1, token2, token3, token4]
+
+      token1.addInput({
+        trueTransform: srcTransform1,
+        inputStartIndex: 0
+      }, [{sample: srcTransform1, p: 1}]);
+      token1.addInput({
+        trueTransform: srcTransform2,
+        inputStartIndex: 0
+      }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+
+      token2.addInput({
+        trueTransform: srcTransform2,
+        inputStartIndex: 1
+      }, [{sample: {insert: toMathematicalSMP("and"), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+
+      token3.addInput({
+        trueTransform: srcTransform2,
+        inputStartIndex: 4
+      }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+      token3.addInput({
+        trueTransform: srcTransform3,
+        inputStartIndex: 0
+      }, [{sample: srcTransform3, p: 1}]);
+
+      token4.addInput({
+        trueTransform: srcTransform4,
+        inputStartIndex: 0
+      }, [{sample: srcTransform4, p: 1}]);
+
+      const merged = ContextToken.merge(tokensToMerge, plainModel);
+      assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
+      assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0 }) ));
+      assert.deepEqual(merged.searchSpace.inputSequence, srcTransforms.map((t) => [{sample: t, p: 1}]));
+    });
+  });
+
+  describe("split()", () => {
     it("handles clean two-way split correctly", () => {
       // Setup phase
       const keystrokeDistributions: Distribution<Transform>[] = [
