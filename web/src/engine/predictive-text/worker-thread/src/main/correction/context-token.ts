@@ -7,10 +7,12 @@
  * in the context and associated correction-search progress and results.
  */
 
-import { buildMergedTransform } from "@keymanapp/models-templates";
+import { applyTransform, buildMergedTransform } from "@keymanapp/models-templates";
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchSpace } from "./distance-modeler.js";
+import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -206,4 +208,126 @@ export class ContextToken {
     const composite = transforms.reduce((accum, current) => buildMergedTransform(accum, current), {insert: '', deleteLeft: 0});
     return composite.insert;
   }
+
+  /**
+   * Splits this token into multiple tokens as defined by a `TokenSplitMap`.
+   * @param split
+   * @param lexicalModel
+   * @returns
+   */
+  split(split: TokenSplitMap, lexicalModel: LexicalModel) {
+    const tokensFromSplit: ContextToken[] = [];
+
+    // Build an alternate version of the transforms:  if we preprocess all deleteLefts,
+    // what text remains from each?
+    const alteredSources = preprocessInputSources(this.inputRange);
+
+    const blankContext = { left: '', startOfBuffer: true, endOfBuffer: true };
+    const splitSpecs = split.matches.slice();
+    let currentText = {...blankContext};
+    let lenBeforeLastApply = 0;
+    let committedLen = 0;
+    let constructingToken = new ContextToken(lexicalModel);
+    let backupToken: ContextToken;
+    let transformIndex = 0;
+    while(splitSpecs.length > 0) {
+      const splitMatch = splitSpecs[0];
+
+      if(splitMatch.text == currentText.left) {
+        tokensFromSplit.push(constructingToken);
+        constructingToken = new ContextToken(lexicalModel);
+        backupToken = null;
+        committedLen += lenBeforeLastApply;
+        currentText = {...blankContext};
+        splitSpecs.shift();
+        continue;
+      } else if(currentText.left.indexOf(splitMatch.text) > -1) {
+        // Oh dear - we've overshot the target! The split is awkward, in the
+        // middle of a keystroke.
+
+        // Restore!
+        const overextendedToken = constructingToken;
+        constructingToken = backupToken;
+
+        // We know how much of the next transform to pull in:  it's specified on
+        // the split object.  Excess on constructed token - the split 'text offset'
+        const totalLenBeforeLastApply = committedLen + lenBeforeLastApply;
+        // We read the start position for the NEXT token to know the split position.
+        const extraCharsAdded = splitSpecs[1].textOffset - totalLenBeforeLastApply;
+        const tokenSequence = overextendedToken.searchSpace.inputSequence;
+        const lastInputIndex = tokenSequence.length - 1;
+        const inputDistribution = tokenSequence[lastInputIndex];
+        const headDistribution = inputDistribution.map((m) => {
+          return {
+            sample: {
+              ...m.sample,
+              insert: KMWString.substring(m.sample.insert, 0, extraCharsAdded),
+              deleteRight: 0
+            }, p: m.p
+          };
+        });
+        const tailDistribution = inputDistribution.map((m) => {
+          return {
+            sample: {
+              ...m.sample,
+              insert: KMWString.substring(m.sample.insert, extraCharsAdded),
+              deleteLeft: 0
+            }, p: m.p
+          };
+        });
+
+        const priorSourceInput = overextendedToken.inputRange[lastInputIndex];
+        constructingToken.addInput(priorSourceInput, headDistribution);
+        tokensFromSplit.push(constructingToken);
+
+        constructingToken = new ContextToken(lexicalModel);
+        backupToken = new ContextToken(constructingToken);
+        constructingToken.addInput({
+          trueTransform: priorSourceInput.trueTransform,
+          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded
+        }, tailDistribution);
+
+        const lenToCommit = lenBeforeLastApply + extraCharsAdded;
+        splitSpecs.shift();
+
+        committedLen += lenToCommit;
+        currentText.left = KMWString.substring(currentText.left, lenToCommit);
+        lenBeforeLastApply = 0;
+        continue; // without incrementing transformIndex - we haven't processed a new one!
+      } else if(transformIndex == alteredSources.length) {
+        throw new Error("Invalid split specified!");
+      }
+
+      backupToken = new ContextToken(constructingToken);
+      lenBeforeLastApply = KMWString.length(currentText.left);
+      currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
+      constructingToken.addInput(this.inputRange[transformIndex], this.searchSpace.inputSequence[transformIndex]);
+      transformIndex++;
+    }
+
+    return tokensFromSplit;
+  }
+}
+
+export function preprocessInputSources(inputSources: ReadonlyArray<TokenInputSource>) {
+  const alteredSources = deepCopy(inputSources);
+  let trickledDeleteLeft = 0;
+  for(let i = alteredSources.length - 1; i >= 0; i--) {
+    const source = alteredSources[i];
+    if(trickledDeleteLeft) {
+      const insLen = KMWString.length(source.trueTransform.insert);
+      if(insLen <= trickledDeleteLeft) {
+        source.trueTransform.insert = '';
+        trickledDeleteLeft -= insLen;
+      } else {
+        source.trueTransform.insert = KMWString.substring(source.trueTransform.insert, 0, insLen - trickledDeleteLeft);
+        trickledDeleteLeft = 0;
+      }
+    }
+    trickledDeleteLeft += source.trueTransform.deleteLeft;
+    source.trueTransform.deleteLeft = 0;
+  }
+
+  alteredSources[0].trueTransform.deleteLeft = trickledDeleteLeft;
+  return alteredSources;
 }
