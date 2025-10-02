@@ -1,5 +1,5 @@
 /*
-  Name:             keymanx64
+  Name:             keymanhp
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
