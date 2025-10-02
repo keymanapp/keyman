@@ -143,7 +143,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <LibraryPath>$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\ARM64\$(Configuration);$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64)</LibraryPath>
     <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\include;$(IncludePath)</IncludePath>
-    <TargetName>keymana64</TargetName>
+    <TargetName>keymanarm64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
@@ -474,7 +474,7 @@
       <BaseAddress>0x140000000</BaseAddress>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <ImportLibrary>..\..\..\lib\keymana64.lib</ImportLibrary>
+      <ImportLibrary>..\..\..\lib\keymanarm64.lib</ImportLibrary>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
