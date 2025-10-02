@@ -12,7 +12,6 @@ import { KMWString } from '@keymanapp/web-utils';
 
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
-import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
@@ -105,12 +104,11 @@ export class ContextTokenization {
    * The sequence of tokens in the context represented by this instance.
    */
   readonly tokens: ContextToken[];
-
   /**
    * The tokenization-transition metadata relating this instance to the most likely
    * tokenization from a prior state.
    */
-  readonly alignment?: ContextStateAlignment;
+  readonly transitionEdits?: PendingTokenization;
 
   /**
    * The portion of edits from the true input keystroke that are not part of the
@@ -125,21 +123,21 @@ export class ContextTokenization {
 
   constructor(priorToClone: ContextTokenization);
   constructor(tokens: ContextToken[]);
-  constructor(tokens: ContextToken[], alignment: ContextStateAlignment, taillessTrueKeystroke: Transform);
+  constructor(tokens: ContextToken[], alignment: PendingTokenization, taillessTrueKeystroke: Transform);
   constructor(
     param1: ContextToken[] | ContextTokenization,
-    alignment?: ContextStateAlignment,
+    alignment?: PendingTokenization,
     taillessTrueKeystroke?: Transform
   ) {
     if(!(param1 instanceof ContextTokenization)) {
       const tokens = param1;
       this.tokens = [].concat(tokens);
-      this.alignment = alignment;
+      this.transitionEdits = alignment;
       this.taillessTrueKeystroke = taillessTrueKeystroke;
     } else {
       const priorToClone = param1;
       this.tokens = priorToClone.tokens.map((entry) => new ContextToken(entry));
-      this.alignment = {...priorToClone.alignment};
+      this.transitionEdits = {...priorToClone.transitionEdits};
       this.taillessTrueKeystroke = priorToClone.taillessTrueKeystroke;
     }
   }
@@ -167,20 +165,6 @@ export class ContextTokenization {
    */
   get exampleInput(): string[] {
     return this.tokens.map(token => token.exampleInput);
-  }
-
-  /**
-   * Determines the alignment between a new, incoming tokenization source and the
-   * tokenization modeled by the current instance.
-   * @param incomingTokenization Raw strings corresponding to the tokenization of the incoming context
-   * @param isSliding Notes if the context window is full (and sliding-alignment is particularly needed)
-   * @param noSubVerify When true, this disables inspection of 'substitute' transitions that avoids
-   * wholesale replacement of the original token.
-   * @returns Alignment data that details if and how the incoming tokenization aligns with
-   * the tokenization modeled by this instance.
-   */
-  computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
-    return computeAlignment(this.exampleInput, incomingTokenization, isSliding, noSubVerify);
   }
 
   /**
