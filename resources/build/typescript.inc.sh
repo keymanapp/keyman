@@ -11,6 +11,7 @@
 #                           defaults to 90 (percent)
 typescript_run_eslint_mocha_tests() {
   local MOCHA_FLAGS=
+  local TEST_DIR
 
   if builder_is_running_on_teamcity; then
     # we're running in TeamCity
@@ -18,13 +19,23 @@ typescript_run_eslint_mocha_tests() {
   fi
 
   eslint .
-  tsc --build test/
+
+  # TODO: Unify test directory names (#14878)
+  if [[ -d test/ ]]; then
+    TEST_DIR="test/"
+  elif [[ -d tests/ ]]; then
+    TEST_DIR="tests/"
+  else
+    builder_die "No test/ or tests/ directory found."
+  fi
+
+  tsc --build "${TEST_DIR}"
 
   local THRESHOLD_PARAMS=
   local C8_THRESHOLD=
   if [[ $# -gt 0 ]]; then
     C8_THRESHOLD=$1
-    THRESHOLD_PARAMS="--lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD"
+    THRESHOLD_PARAMS="--lines ${C8_THRESHOLD} --statements ${C8_THRESHOLD} --branches ${C8_THRESHOLD} --functions ${C8_THRESHOLD}"
   else
     # Seems like a bug in TeamCity reporter if we don't list default thresholds,
     # see #13418.
@@ -36,8 +47,8 @@ typescript_run_eslint_mocha_tests() {
 
   c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
 
-  if [[ ! -z "$C8_THRESHOLD" ]]; then
-    builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+  if [[ ! -z "${C8_THRESHOLD}" ]]; then
+    builder_echo warning "Coverage thresholds are currently ${C8_THRESHOLD}%, which is lower than ideal."
     builder_echo warning "Please increase threshold in build.sh as test coverage improves."
   fi
 }
