@@ -2512,10 +2512,16 @@ public final class KMManager {
       WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
       if (windowManager != null) {
         WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();
-        // Get the inset dimensions for system gestures and navigation bar (bottom)
+        // systemGestures or navigationBars insets determine the navigation bar height (pixels)
         android.graphics.Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
-        android.graphics.Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
-        navigationBarHeight = Math.max(gestureInsets.bottom, navigationInsets.bottom); // pixels
+        if (gestureInsets.left > 0 || gestureInsets.right > 0) {
+          // systemGestures bar visible, so use this inset
+          navigationBarHeight = gestureInsets.bottom;
+        } else {
+          // navigation button bar visible
+          android.graphics.Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+          navigationBarHeight = navigationInsets.bottom;
+        }
       }
     } else {
       // Determine if navigation bar is visible
