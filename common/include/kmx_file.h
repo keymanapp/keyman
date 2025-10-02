@@ -52,8 +52,10 @@ namespace kmx {
 #define VERSION_160 0x00001000
 #define VERSION_170 0x00001100
 
+#define VERSION_190 0x00001300
+
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_170
+#define VERSION_MAX VERSION_190
 
 //
 // Backspace types
@@ -270,14 +272,24 @@ namespace kmx {
 #define C_CODE_IFSYSTEMSTORE(store, val1, val2) U_UC_SENTINEL U_CODE_IFSYSTEMSTORE store val1 val2
 #define C_CODE_SETSYSTEMSTORE(store, val) U_UC_SENTINEL U_CODE_SETSYSTEMSTORE store val
 
+//
+// COMP_KEYBOARD.dwFlags bitfield
+//
+
 #define KF_SHIFTFREESCAPS 0x0001
 #define KF_CAPSONONLY   0x0002
 #define KF_CAPSALWAYSOFF  0x0004
 #define KF_LOGICALLAYOUT  0x0008
 #define KF_AUTOMATICVERSION 0x0010
 
-// 16.0: Support for LDML Keyboards in KMXPlus file format
-#define KF_KMXPLUS  0x0020
+/** 16.0+: A `COMP_KEYBOARD_KMXPLUSINFO` structure is present immediately after `COMP_KEYBOARD` */
+#define KF_KMXPLUS          0x0020
+
+/**
+ * 19.0+: The `COMP_KEYBOARD_KMXPLUSINFO` structure contains a v19 embedded OSK;
+ * may be used with or without KF_KMXPLUS.
+ */
+#define KF_KMXPLUSOSK       0x0040
 
 #define HK_ALT      0x00010000
 #define HK_CTRL     0x00020000
@@ -365,7 +377,7 @@ struct COMP_KEYBOARD_KMXPLUSINFO {
 };
 
 /**
- * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
+ * Only valid if comp_keyboard.dwFlags&(KF_KMXPLUS|KF_KMXPLUSOSK)
  */
 struct COMP_KEYBOARD_EX {
   struct COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
