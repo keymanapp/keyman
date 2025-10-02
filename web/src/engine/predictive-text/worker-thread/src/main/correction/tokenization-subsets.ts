@@ -37,9 +37,91 @@ export interface TokenizationSubset {
   readonly pendingSet: Map<ContextTokenization, PendingTokenization>;
 }
 
+export function editKeyer(precomputation: TokenizationTransitionEdits): string[] {
+  const { merges, splits, unmappedEdits } = precomputation.alignment;
+  const components: string[] = [];
+
+  if(merges.length > 0) {
+    components.push('M:' + merges.map((matchMap) => {
+      // Text may be more unique, but is likely unnecessary; index yields shorter,
+      // easier to process keys.
+      const inputPortion = matchMap.inputs.map(i => '' + i.index).join('+');
+      return `M:${inputPortion}=>${matchMap.match.index}`;
+    }).join(','));
+  }
+
+  if(splits.length > 0) {
+    components.push('S:' + splits.map((matchMap) => {
+      // Text may be more unique, but is likely unnecessary; index yields shorter,
+      // easier to process keys.
+      const matchPortion = matchMap.matches.map(m => '' + m.index).join('+');
+      return `${matchMap.input.index}=>${matchPortion}`;
+    }).join(','));
+  }
+
+  if(unmappedEdits.length > 0) {
+    // We really shouldn't have these, let alone often.
+    components.push('UE:' + unmappedEdits.map((edit) => {
+      return `${edit.op}(${edit.input ?? ''}-${edit.match ?? ''}`;
+    }).join(','));
+  }
+
+  return components;
+}
+
+export function legacySubsetKeyer(tokenizationEdits: TokenizationTransitionEdits): string {
+  const { alignment, tokenizedTransform } = tokenizationEdits;
+  const { edgeWindow, merges, splits } = alignment;
+  const components: string[] = [];
+
+  // First entry: based on the edge window.  The real key:  what's the edit
+  // boundary?  We need to apply to the same token and portion thereof.
+  const editBoundary = edgeWindow.editBoundary;
+
+  // For the legacy keyer, all we care about is that we land within the same
+  // token. We simply note the boundary token's index within the edge window.
+  const boundaryEdgeIndex = editBoundary.tokenIndex - edgeWindow.sliceIndex;
+
+  // Identify the new boundary token's length - as it appears after any related
+  // merges or splits.
+  let boundaryTextLen = KMWString.length(editBoundary.text);
+  const boundaryMerge = merges.find((m) => m.inputs.find(i => i.index == boundaryEdgeIndex));
+  const boundarySplit = splits.find((s) => s.input.index == boundaryEdgeIndex);
+  if(boundaryMerge) {
+    boundaryTextLen = KMWString.length(boundaryMerge.match.text);
+  } else if(boundarySplit) {
+    boundaryTextLen = KMWString.length(boundarySplit.matches[boundarySplit.matches.length - 1].text);
+  }
+
+  // Now, based on the transform tokenization. We want to force uniqueness for
+  // all variations of result length on each tokenized transform resulting from
+  // the precomputation's represented keystroke.
+  for(const {0: relativeIndex} of tokenizedTransform.entries()) {
+    if(relativeIndex > 0) {
+      // The true boundary lie before the insert if the value is non-zero;
+      // don't differentiate here!
+      boundaryTextLen = 0;
+    }
+
+    if(boundaryTextLen) {
+      // transform.deleteLeft was already handled during boundary computation -
+      // do not include it here!
+      //
+      // IMPORTANT:  update unit tests manually if the BI marker here changes
+      // or the use of SENTINEL_CODE_UNIT as a key component separator changes.
+      components.push(`BI@${relativeIndex}`);
+      boundaryTextLen = 0;
+    } else {
+      components.push(`I@${relativeIndex}`);
+    }
+  }
+
+  return components.concat(editKeyer(tokenizationEdits)).join(SENTINEL_CODE_UNIT);
+}
+
 export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransitionEdits): string {
   const { alignment, tokenizedTransform } = tokenizationEdits;
-  const { edgeWindow, merges, splits, unmappedEdits } = alignment;
+  const { edgeWindow, merges, splits } = alignment;
   const components: string[] = [];
 
   // First entry: based on the edge window.  The real key:  what's the edit
@@ -91,39 +173,19 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
     }
   }
 
-  if(merges.length > 0) {
-    components.push('M:' + merges.map((matchMap) => {
-      // Text may be more unique, but is likely unnecessary; index yields shorter,
-      // easier to process keys.
-      const inputPortion = matchMap.inputs.map(i => '' + i.index).join('+');
-      return `M:${inputPortion}=>${matchMap.match.index}`;
-    }).join(','));
-  }
-
-  if(splits.length > 0) {
-    components.push('S:' + splits.map((matchMap) => {
-      // Text may be more unique, but is likely unnecessary; index yields shorter,
-      // easier to process keys.
-      const matchPortion = matchMap.matches.map(m => '' + m.index).join('+');
-      return `${matchMap.input.index}=>${matchPortion}`;
-    }).join(','));
-  }
-
-  if(unmappedEdits.length > 0) {
-    // We really shouldn't have these, let alone often.
-    components.push('UE:' + unmappedEdits.map((edit) => {
-      return `${edit.op}(${edit.input ?? ''}-${edit.match ?? ''}`;
-    }).join(','));
-  }
-
-  return components.join(SENTINEL_CODE_UNIT);
+  return components.concat(editKeyer(tokenizationEdits)).join(SENTINEL_CODE_UNIT);
 }
 
 export class TokenizationSubsetBuilder {
   private _subsets: Map<string, TokenizationSubset> = new Map();
+  readonly keyer: typeof precomputationSubsetKeyer;
+
+  constructor(keyer?: typeof precomputationSubsetKeyer) {
+    this.keyer = precomputationSubsetKeyer;
+  }
 
   addPrecomputation(tokenization: ContextTokenization, precomputation: TokenizationTransitionEdits, p: number) {
-    const key = precomputationSubsetKeyer(precomputation);
+    const key = this.keyer(precomputation);
 
     // Should file the object and its transform data appropriately.
     const entry: TokenizationSubset = this._subsets.get(key) ?? {
