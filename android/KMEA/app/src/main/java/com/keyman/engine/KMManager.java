@@ -2503,12 +2503,6 @@ public final class KMManager {
     int navigationBarHeight = 0;
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      int orientation = getOrientation(context);
-      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        // Navigation bar on the side in landscape orientation
-        return navigationBarHeight;
-      }
-
       WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
       if (windowManager != null) {
         WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();
