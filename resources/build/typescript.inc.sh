@@ -19,13 +19,14 @@ typescript_run_eslint_mocha_tests() {
   fi
 
   eslint .
+
+  # TODO: Unify test directory names (#14878)
   if [[ -d test/ ]]; then
     TEST_DIR="test/"
   elif [[ -d tests/ ]]; then
     TEST_DIR="tests/"
   else
-    builder_echo error "No test/ or tests/ directory found."
-    return 1
+    builder_die "No test/ or tests/ directory found."
   fi
 
   tsc --build "${TEST_DIR}"
