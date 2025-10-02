@@ -286,8 +286,8 @@ namespace kmx {
 #define KF_KMXPLUS          0x0020
 
 /**
- * 19.0+: The `COMP_KEYBOARD_KMXPLUSINFO` structure contains only OSK, and not a
- * LDML keyboard; KF_KMXPLUS should not be set
+ * 19.0+: The `COMP_KEYBOARD_KMXPLUSINFO` structure contains a v19 embedded OSK;
+ * may be used with or without KF_KMXPLUS.
  */
 #define KF_KMXPLUSOSK       0x0040
 
