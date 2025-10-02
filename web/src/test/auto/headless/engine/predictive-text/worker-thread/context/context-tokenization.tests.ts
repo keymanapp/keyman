@@ -1033,6 +1033,27 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.unmappedEdits, []);
     });
 
+    it('properly handles basic char-delete transform', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'days'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: '',
+        deleteLeft: 1
+      };
+
+      const results = baseTokenization.precomputeTokenizationAfterInput(
+        plainModel,
+        editTransform
+      );
+
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform.get(0), editTransform);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
     it('properly handles simple token-edit transform', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
@@ -1163,6 +1184,50 @@ describe('ContextTokenization', function() {
       assert.deepEqual(results.alignment.unmappedEdits, []);
     });
 
+    it('handles token-replacing transform with cross-token deleteLeft after whitespace', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date', ' ', ''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      // 'an apple any'
+      const editTransform = {
+        insert: 'ny',
+        deleteLeft: 6
+      };
+
+      const results = baseTokenization.precomputeTokenizationAfterInput(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-4, {
+        insert: 'ny',
+        deleteLeft: 0
+      });
+      expectedMap.set(-3, {
+        insert: '',
+        deleteLeft: 1
+      });
+      expectedMap.set(-2, {
+        insert: '',
+        deleteLeft: 4
+      });
+      expectedMap.set(-1, {
+        insert: '',
+        deleteLeft: 1
+      });
+      expectedMap.set( 0, {
+        insert: '',
+        deleteLeft: 0
+      });
+
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
     it('properly handles a simple appended whitespace', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
@@ -1233,6 +1298,7 @@ describe('ContextTokenization', function() {
       const expectedMap = new Map<number, Transform>();
       // The whitespace belongs on the whitespace token that will be added.
       expectedMap.set(-1, editTransform);
+      expectedMap.set( 0, { insert: '', deleteLeft: 0 });
 
       assert.equal(results.tokenizedTransform.size, expectedMap.size);
       assert.deepEqual(results.tokenizedTransform, expectedMap);
