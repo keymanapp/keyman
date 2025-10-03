@@ -181,7 +181,7 @@ export class TokenizationSubsetBuilder {
   readonly keyer: typeof precomputationSubsetKeyer;
 
   constructor(keyer?: typeof precomputationSubsetKeyer) {
-    this.keyer = precomputationSubsetKeyer;
+    this.keyer = keyer ?? precomputationSubsetKeyer;
   }
 
   addPrecomputation(tokenization: ContextTokenization, precomputation: TokenizationTransitionEdits, p: number) {
