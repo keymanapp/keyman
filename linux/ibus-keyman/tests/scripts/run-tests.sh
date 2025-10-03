@@ -13,7 +13,7 @@ ENV_FILE=/tmp/keyman-env.txt
 . "$(dirname "$0")"/test-helper.inc.sh
 
 local_cleanup() {
-  cleanup "${CLEANUP_FILE}"
+  cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER:-}"
 }
 
 if [[ -v KEYMAN_PKG_BUILD ]]; then
@@ -103,7 +103,7 @@ function run_tests() {
     --directory "${TESTDIR}" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
-  cleanup "${CLEANUP_FILE}"
+  cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER:-}"
 }
 
 USE_WAYLAND=1
@@ -156,6 +156,14 @@ fi
 G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/debug/tests}"
 if [[ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]]; then
   G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/release/tests}"
+fi
+
+if [[ "${USE_WAYLAND}" == "1" ]] && [[ "${USE_X11}" == "1" ]]; then
+  # Restart script to first run Wayland tests
+  "$0" --no-x11 "$@"
+  # and now X11 tests
+  "$0" --no-wayland "$@"
+  exit 0
 fi
 
 echo > "${CLEANUP_FILE}"
