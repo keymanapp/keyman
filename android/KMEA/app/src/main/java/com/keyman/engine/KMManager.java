@@ -2507,7 +2507,6 @@ public final class KMManager {
         WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();
         android.graphics.Insets systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
         navigationBarHeight = systemBarInsets.bottom;
-        if (insets.isVisible(WindowInsetsCompat.Type.systemGestures())) {
           android.graphics.Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
       }
     } else {
