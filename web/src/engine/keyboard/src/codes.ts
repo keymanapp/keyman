@@ -6,7 +6,7 @@
 
 import { ModifierKeyConstants, USVirtualKeyCodes } from '@keymanapp/common-types';
 
-const Codes = {
+export const Codes = {
   modifierCodes: {
     // Debug-mode keyboards compiled before Keyman 18.0 referenced the `ModifierKeyConstants`
     // constants via the names established below.  We must continue to support them, as they're
@@ -143,5 +143,3 @@ const Codes = {
     return modifier;
   }
 }
-
-export default Codes;

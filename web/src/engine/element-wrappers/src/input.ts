@@ -1,4 +1,4 @@
-import OutputTarget from './outputTarget.js';
+import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
 import { KMWString } from '@keymanapp/web-utils';
 
 interface EventMap  {
@@ -22,7 +22,7 @@ interface EventMap  {
   'unhandlednewline': (element: HTMLInputElement) => void
 }
 
-export default class Input extends OutputTarget<EventMap> {
+export class Input extends OutputTargetElementWrapper<EventMap> {
   root: HTMLInputElement;
 
   /**

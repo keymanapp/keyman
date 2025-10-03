@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { JSDOM } from 'jsdom';
 
 import { VisualKeyboard } from 'keyman/engine/osk';
-import { ActiveLayout, Keyboard, KeyboardProperties } from 'keyman/engine/keyboard';
+import { ActiveLayout, JSKeyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 import { StylesheetManager } from 'keyman/engine/dom-utils';
 import { DeviceSpec } from "@keymanapp/web-utils";
 
@@ -23,7 +23,7 @@ describe('VisualKeyboard', () => {
     const mockDevice = { browser: DeviceSpec.Browser.Chrome, formFactor: DeviceSpec.FormFactor.Desktop, OS: DeviceSpec.OperatingSystem.Windows, touchable: false };
     const mockLayout = sinon.createStubInstance(ActiveLayout) as any;
 
-    const keyboard = sinon.createStubInstance(Keyboard) as any;
+    const keyboard = sinon.createStubInstance(JSKeyboard) as any;
     keyboard.layout.returns(mockLayout);
     sinon.stub(keyboard, 'isRTL').get(() => false);
     sinon.stub(keyboard, 'id').get(() => 'test');

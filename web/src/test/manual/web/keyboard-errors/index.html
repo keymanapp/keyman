@@ -65,8 +65,31 @@
     <h3>or in this input field:</h3>
     <input class='test' value='' placeholder='or here'/>
 
+    <h2>Expected error messages:</h2>
+    <ul>
+      <li><i>wrong-filename</i> keyboard: "Unable to download wrong-filename keyboard for debugging"</li>
+      <li><i>non-parsable</i> keyboard: "Error registering the non-parsable keyboard for debugging; keyboard script at ./unparsable.js may contain an error."</li>
+      <li><i>timeout</i> keyboard: "Sorry, the timeout keyboard for debugging is not currently available."</li>
+    </ul>
+
     <h3><a href="../index.html">Return to testing home page</a></h3>
   </div>
+
+    <script>
+      if (!window.location.href.startsWith('http://localhost:3000')) {
+        const body = document.getElementsByTagName('body')[0];
+        body.innerHTML = `<h1>KeymanWeb Sample Page - Error Testing page</h1>
+        <h2>Unable to load this test page!</h2>
+        <p>This page has to be loaded through the local test server.</p>
+        <p>Do the following:</p>
+        <ol>
+          <li>Open a terminal and navigate to the Keyman source root directory</li>
+          <li>Start the test server with <code>web/build.sh start</code></li>
+          <li>Open <a href="http://localhost:3000/src/test/manual/web/keyboard-errors/index.html">http://localhost:3000/src/test/manual/web/keyboard-errors/index.html</a> in a browser</li>
+        </ol>
+        `;
+      }
+    </script>
 
   </body>
 
