@@ -48,13 +48,19 @@ function do_build() {
 }
 
 function do_test() {
-  local FLAGS=
+  local FLAGS=()
 
-  if builder_is_ci_build; then
-    FLAGS="-reporter mocha-teamcity-reporter"
+  if builder_is_running_on_teamcity; then
+    FLAGS+=(--reporter "${KEYMAN_ROOT}/common/test/resources/mocha-teamcity-reporter/teamcity.cjs" --reporter-options parentFlowId="unit_tests")
+    echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
 
-  c8 mocha ${FLAGS} tests
+  c8 mocha "${FLAGS[@]}" tests
+
+  if builder_is_running_on_teamcity; then
+    # we're running in TeamCity
+    echo "##teamcity[flowFinished flowId='unit_tests']"
+  fi
 }
 
 builder_run_action configure  do_configure

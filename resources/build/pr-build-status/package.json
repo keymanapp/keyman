@@ -6,9 +6,8 @@
     "@actions/github": "^6.0.1"
   },
   "devDependencies": {
-    "mocha": "^11.2.2",
-    "mocha-teamcity-reporter": "^4.0.0",
-    "chai": "^5.1.0"
+    "chai": "^5.1.0",
+    "mocha": "^11.2.2"
   },
   "license": "MIT",
   "main": "pr-build-status.mjs",
