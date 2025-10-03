@@ -310,11 +310,6 @@ export function determineContextTransition(
     return transition;
   } else {
     transition = baseContextState.analyzeTransition(context, transformDistribution);
-    if(!transition) {
-      console.warn("Unexpected failure when computing context-state transition");
-      // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
-      transition = contextTracker.analyzeState(contextTracker.model, context, transformDistribution);
-    }
   }
 
   contextTracker.latest = transition;
