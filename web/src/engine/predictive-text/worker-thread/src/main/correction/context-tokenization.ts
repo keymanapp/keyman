@@ -12,7 +12,6 @@ import { KMWString } from '@keymanapp/web-utils';
 
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
-import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
@@ -102,19 +101,19 @@ export interface TokenizationTransitionEdits {
  */
 export class ContextTokenization {
   readonly tokens: ContextToken[];
-  readonly alignment?: ContextStateAlignment;
+  readonly transitionEdits?: PendingTokenization;
 
   constructor(priorToClone: ContextTokenization);
-  constructor(tokens: ContextToken[], alignment?: ContextStateAlignment);
-  constructor(param1: ContextToken[] | ContextTokenization, alignment?: ContextStateAlignment) {
+  constructor(tokens: ContextToken[], alignment?: PendingTokenization);
+  constructor(param1: ContextToken[] | ContextTokenization, alignment?: PendingTokenization) {
     if(!(param1 instanceof ContextTokenization)) {
       const tokens = param1;
       this.tokens = [].concat(tokens);
-      this.alignment = alignment;
+      this.transitionEdits = alignment;
     } else {
       const priorToClone = param1;
       this.tokens = priorToClone.tokens.map((entry) => new ContextToken(entry));
-      this.alignment = {...priorToClone.alignment};
+      this.transitionEdits = {...priorToClone.transitionEdits};
     }
   }
 
@@ -141,20 +140,6 @@ export class ContextTokenization {
    */
   get exampleInput(): string[] {
     return this.tokens.map(token => token.exampleInput);
-  }
-
-  /**
-   * Determines the alignment between a new, incoming tokenization source and the
-   * tokenization modeled by the current instance.
-   * @param incomingTokenization Raw strings corresponding to the tokenization of the incoming context
-   * @param isSliding Notes if the context window is full (and sliding-alignment is particularly needed)
-   * @param noSubVerify When true, this disables inspection of 'substitute' transitions that avoids
-   * wholesale replacement of the original token.
-   * @returns Alignment data that details if and how the incoming tokenization aligns with
-   * the tokenization modeled by this instance.
-   */
-  computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
-    return computeAlignment(this.exampleInput, incomingTokenization, isSliding, noSubVerify);
   }
 
   /**

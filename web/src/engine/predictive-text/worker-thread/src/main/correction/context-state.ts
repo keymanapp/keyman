@@ -290,49 +290,21 @@ export class ContextState {
     }
 
     let transformKeys = [...bestResultAnalysis.inputs[0].sample.keys()];
-    transformKeys.pop;
+    transformKeys.pop();
 
-    // if(transformSequenceDistribution) {
-      // const transformKeys = [...transformSequenceDistribution[0].sample.keys()];
-      // Leave out the final entry - that part is replaceable by suggestions.
-      transformKeys.pop();
-
-      for(let i of transformKeys) {
-        const primaryInput = bestResultAnalysis.inputs[0].sample.get(i);
-        if(!preservationTransform) {
-          preservationTransform = primaryInput;
-        } else {
-          preservationTransform.insert += primaryInput.insert;
-          preservationTransform.deleteLeft += primaryInput.deleteLeft;
-        }
+    // Leave out the final entry - that part is replaceable by suggestions.
+    for(let i of transformKeys) {
+      const primaryInput = bestResultAnalysis.inputs[0].sample.get(i);
+      if(!preservationTransform) {
+        preservationTransform = primaryInput;
+      } else {
+        preservationTransform.insert += primaryInput.insert;
+        preservationTransform.deleteLeft += primaryInput.deleteLeft;
       }
-    // }
-
-
-    const postContext = transformDistribution?.[0] ? applyTransform(transformDistribution[0].sample, context) : context;
-
-    // Note for future:  the next line's pattern asserts that there is only one true tokenization.
-    // We may eventually allow for multiple potential tokenizations (per epic-dict-breaker)
-    const tokenizedContext = determineModelTokenizer(lexicalModel)(postContext).left;
-    if(tokenizedContext.length == 0) {
-      tokenizedContext.push({text: ''});
     }
-    // In which case we could try need to align for each of them, starting from the most likely.
-
-    // If we're not at the start of the buffer, we're probably a sliding context.
-    const isSliding = !this.context.startOfBuffer;
-
-    // It's possible the tokenization will remember more of the initial token than is
-    // actually present in the sliding context window, which imposes a need for a wide-band
-    // computeDistance 'radius' in the called function.
-    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isSliding, isApplyingSuggestion);
-
-    // Stopgap:  add tokenized transformSequenceDistribution to the alignment data & use that
-    // where noted:  tagTokens() in context-transition.ts, `determineSuggestionAlignment()`.
-
 
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
-    state.tokenization =  new ContextTokenization(resultTokenization.tokens, alignmentResults);
+    state.tokenization =  new ContextTokenization(resultTokenization.tokens, tokenizationAnalysis);
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution, preservationTransform);
     transition.revertableTransitionId = appliedSuggestionTransitionId;
