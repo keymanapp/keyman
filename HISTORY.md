@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.132 alpha 2025-10-03
+
+* fix(windows): remove cached files in idle state (#14683)
+
 ## 19.0.131 alpha 2025-10-02
 
 * refactor(web): cleanup in test scripts (#14870)
