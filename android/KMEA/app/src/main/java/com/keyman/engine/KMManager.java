@@ -885,7 +885,6 @@ public final class KMManager {
 
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
-    //final Context context = appContext;
     IMService = inputMethodService;
     Context appContext = IMService.getApplicationContext();
     final FrameLayout mainLayout = new FrameLayout(appContext);
@@ -2506,15 +2505,10 @@ public final class KMManager {
       WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
       if (windowManager != null) {
         WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();
-        // Navigation bar height (pixels) depends on whether systemGestures or navigationBars insets
-        // are visible
+        android.graphics.Insets systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        navigationBarHeight = systemBarInsets.bottom;
         if (insets.isVisible(WindowInsetsCompat.Type.systemGestures())) {
           android.graphics.Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
-          navigationBarHeight = gestureInsets.bottom;
-        } else if (insets.isVisible(WindowInsetsCompat.Type.navigationBars())) {
-          android.graphics.Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
-          navigationBarHeight = navigationInsets.bottom;
-        }
       }
     } else {
       // Determine if navigation bar is visible
