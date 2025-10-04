@@ -238,7 +238,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       KMManager.onConfigurationChanged(newConfig);
     }
 
-    // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
+    // Update the touchable region of the Keyman keyboard
     Point size = KMManager.getWindowSize(getApplicationContext());
 
     int inputViewHeight = 0;
