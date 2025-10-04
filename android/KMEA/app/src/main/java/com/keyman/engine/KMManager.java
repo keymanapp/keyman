@@ -2506,10 +2506,24 @@ public final class KMManager {
       if (windowManager != null) {
         WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();
         android.graphics.Insets systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-        android.graphics.Insets displayCutoutInsets = insets.getInsets(WindowInsetsCompat.Type.displayCutout());
-          android.graphics.Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
+
+        android.graphics.Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
+        boolean gestureInsetsVisible = insets.isVisible(WindowInsetsCompat.Type.systemGestures());
+
         android.graphics.Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
-        navigationBarHeight = Math.max(gestureInsets.bottom, navigationInsets.bottom);
+        boolean navigationInsetsVisible =  insets.isVisible(WindowInsetsCompat.Type.navigationBars());
+
+        if (gestureInsets.bottom != navigationInsets.bottom) {
+          navigationBarHeight = gestureInsets.bottom;
+        } else {
+          int fudge = 1;
+          navigationBarHeight = systemBarInsets.bottom / fudge;
+        }
+
+        Log.d(TAG, String.format("gesture.visible %s, bottom: %d; navigation.visible %s, bottom: %d; systemBar.bottom %d",
+          gestureInsetsVisible, gestureInsets.bottom,
+          navigationInsetsVisible, navigationInsets.bottom,
+          systemBarInsets.bottom));
       }
     } else {
       // Determine if navigation bar is visible
