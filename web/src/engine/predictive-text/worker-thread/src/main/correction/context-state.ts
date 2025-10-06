@@ -255,7 +255,7 @@ export class ContextState {
     const tokens = resultTokenization.tokens;
     const lastIndex = tokens.length - 1;
     // Ignore a context-final empty '' token; the interesting one is what comes before.
-    const nonEmptyTail = tokens[lastIndex].exampleInput != '' ? tokens[lastIndex] : tokens[lastIndex - 1];
+    const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
     const appliedSuggestionTransitionId = nonEmptyTail?.appliedTransitionId;
 
     // Used to construct and represent the part of the incoming transform that

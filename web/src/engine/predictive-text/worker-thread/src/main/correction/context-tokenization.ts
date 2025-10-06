@@ -7,16 +7,18 @@
  * the sliding context window for one specific instance of context state.
  */
 
-import { ContextToken } from './context-token.js';
-import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
 import { Token } from '@keymanapp/models-templates';
-
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { KMWString } from '@keymanapp/web-utils';
+
+import { ContextToken } from './context-token.js';
+import TransformUtils from '../transformUtils.js';
+import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
+
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
-import TransformUtils from '../transformUtils.js';
 
 /**
  * This class represents the sequence of tokens (words and whitespace blocks)
@@ -48,14 +50,21 @@ export class ContextTokenization {
   }
 
   /**
+   * Returns plain-text strings representing the most probable representation for all
+   * tokens represented by this tokenization instance.
+   *
+   * Intended for debugging use only.
+   */
+  get sourceText() {
+    return this.tokens.map(token => token.sourceText);
+  }
+
+  /**
    * Returns a plain-text string representing the most probable representation for all
    * tokens represented by this tokenization instance.
    */
   get exampleInput(): string[] {
-    return this.tokens
-      // Hide any tokens representing invisible wordbreaks.  (Thinking ahead to phrase-level possibilities)
-      .filter(token => token.exampleInput !== null)
-      .map(token => token.exampleInput);
+    return this.tokens.map(token => token.exampleInput);
   }
 
   /**
@@ -162,6 +171,10 @@ export class ContextTokenization {
 
     // The assumed input from the input distribution is always at index 0.
     const tokenizedPrimaryInput = hasDistribution ? alignedTransformDistribution[0].sample : null;
+
+    // now that we've identified the 'primary input', sort the distributions.
+    alignedTransformDistribution.sort((a, b) => b.p - a.p);
+
     // first index:  original sample's tokenization
     // second index:  token index within original sample
     const tokenDistribution = alignedTransformDistribution.map((entry) => {
@@ -182,6 +195,7 @@ export class ContextTokenization {
     // edited, those edits occur to the left as well - and further left of whatever
     // the new tail token is *if* tokens were removed.
     const firstTailEditIndex = Math.min((1 - tailEditLength), 0) + Math.min(tailTokenShift, 0);
+    let primaryInputAppliedLen = 0;
     for(let i = 0; i < tailEditLength; i++) {
       const tailIndex = firstTailEditIndex + i;
 
@@ -203,12 +217,16 @@ export class ContextTokenization {
         // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
         // (May not be valid with epic/dict-breaker or with complex, word-boundary crossing transforms)
         token = new ContextToken(matchedToken);
+
         // Erase any applied-suggestion transition ID; it is no longer valid.
         token.appliedTransitionId = undefined;
-        token.searchSpace.addInput(tokenDistribution.map((seq) => seq.get(tailIndex) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1 }));
+        const emptySample: ProbabilityMass<Transform> = { sample: { insert: '', deleteLeft: 0 }, p: 1 };
+        const dist = tokenDistribution.map((seq) => seq.get(tailIndex) ?? emptySample);
+        token.addInput({trueTransform: primaryInput ?? emptySample.sample, inputStartIndex: primaryInputAppliedLen}, dist);
       }
 
       tokenization[incomingIndex] = token;
+      primaryInputAppliedLen += KMWString.length(primaryInput?.insert ?? '');
     }
 
     if(tailTokenShift < 0) {
@@ -268,7 +286,7 @@ export class ContextTokenization {
             // If we ever stop filtering tokenized transform distributions, it may
             // be worth adding an empty transform here with weight to balance
             // the distribution back to a cumulative prob sum of 1.
-            pushedToken.searchSpace.addInput(transformDistribution);
+            pushedToken.addInput({ trueTransform: primaryInput, inputStartIndex: primaryInputAppliedLen }, transformDistribution);
           }
         } else if(incomingToken.text) {
           // We have no transform data to match against an inserted token with text; abort!
@@ -280,6 +298,7 @@ export class ContextTokenization {
 
         // Auto-replaces the search space to correspond with the new token.
         tokenization.push(pushedToken);
+        primaryInputAppliedLen += KMWString.length(primaryInput.insert);
       }
     }
 

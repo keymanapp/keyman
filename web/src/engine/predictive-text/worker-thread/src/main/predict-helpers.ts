@@ -394,7 +394,7 @@ export function determineSuggestionAlignment(
 
   // Did the wordbreaker (or similar) append a blank token before the caret?  If so,
   // preserve that by preventing corrections from triggering left-deletion.
-  if(transition.final.tokenization.tail.exampleInput == '') {
+  if(transition.final.tokenization.tail.isEmptyToken) {
     deleteLeft = 0;
   }
 
