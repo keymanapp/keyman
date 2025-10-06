@@ -230,7 +230,8 @@ if [[ "${prremote}" != "origin" ]]; then
   git remote remove "${prremote}"
 fi
 
-debug_echo "Files found: ${prfiles[*]}"
+# Print list of all changed files in the log
+printf '%s\n' "${prfiles[@]}"
 
 popd > /dev/null
 
