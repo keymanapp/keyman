@@ -2516,14 +2516,14 @@ public final class KMManager {
         if (gestureInsets.bottom != navigationInsets.bottom) {
           navigationBarHeight = gestureInsets.bottom;
         } else {
-          int fudge = 1;
-          navigationBarHeight = systemBarInsets.bottom / fudge;
+          navigationBarHeight = systemBarInsets.bottom;
         }
 
-        Log.d(TAG, String.format("gesture.visible %s, bottom: %d; navigation.visible %s, bottom: %d; systemBar.bottom %d",
+        Log.d(TAG, String.format("gesture.visible %s, bottom: %d; navigation.visible %s, bottom: %d; systemBar.bottom %d; px density: %f",
           gestureInsetsVisible, gestureInsets.bottom,
           navigationInsetsVisible, navigationInsets.bottom,
-          systemBarInsets.bottom));
+          systemBarInsets.bottom,
+          getWindowDensity(context)));
       }
     } else {
       // Determine if navigation bar is visible
