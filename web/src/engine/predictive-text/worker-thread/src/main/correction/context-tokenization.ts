@@ -929,3 +929,37 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
 
   return { mergeOffset, splitOffset, editPath, mappedPath, merges, splits };
 }
+
+/**
+ * Constructs tokenized Transforms based on the results of prior analysis steps
+ * starting from the specified index.
+ * @param stackedInserts A stack of strings tokenized from the original applied
+ * Transform's `insert` string.
+ * @param stackedDeletes A stack of integers tokenized from the original applied
+ * Transform's `delete` string.
+ * @param tailIndex The index of the post-application tail token relative to its
+ * aligned pre-application index.
+ * @returns A map of tokenized Transforms and their associated indices relative
+ * to the position of the original tail token and where it would align within
+ * the post-application context.
+ */
+export function assembleTransforms(stackedInserts: string[], stackedDeletes: number[], tailIndex: number) {
+  const transformMap: Map<number, Transform> = new Map();
+  // 'stacked' - from late in context to early in context.
+  while(stackedInserts.length || stackedDeletes.length) {
+    // delete lefts should be set on the front-most inserts!
+    const deleteLeft = stackedDeletes.pop() ?? 0;
+    const insert = stackedInserts.pop() ?? '';
+    // If both are empty at the start, don't add an empty transform.
+    // They're fine later in the transform list, though.
+    if(transformMap.size != 0 || insert || deleteLeft) {
+      transformMap.set(tailIndex++, { insert, deleteLeft });
+    }
+  }
+
+  if(!transformMap.size) {
+    transformMap.set(tailIndex++, {insert: '', deleteLeft: 0});
+  }
+
+  return transformMap;
+}
