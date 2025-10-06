@@ -221,7 +221,7 @@ function _setup_display_server() {
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
     mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "${TMPFILE}" &
     PID=$!
-    echo "kill -9 ${PID} || true # mutter" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # mutter" >> "${CLEANUP_FILE}"
     echo "${PID} mutter" >> "${PID_FILE}"
     sleep 1s
     WAYLAND_DISPLAY=$(grep "Using Wayland display" "${TMPFILE}" | cut -d"'" -f2)
@@ -240,7 +240,7 @@ function _setup_display_server() {
         break
       fi
     done
-    echo "kill -9 ${PID} || true # Xvfb" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # Xvfb" >> "${CLEANUP_FILE}"
     echo "${PID} Xvfb" >> "${PID_FILE}"
     while true; do
       echo "Starting Xephyr..."
@@ -252,12 +252,12 @@ function _setup_display_server() {
         break
       fi
     done
-    echo "kill -9 ${PID} || true # Xephyr" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # Xephyr" >> "${CLEANUP_FILE}"
     echo "${PID} Xephyr" >> "${PID_FILE}"
     echo "Starting metacity"
     metacity --display=":${DISP_XEPHYR}" &> /dev/null &
     PID=$!
-    echo "kill -9 ${PID} || true # metacity" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # metacity" >> "${CLEANUP_FILE}"
     echo "${PID} metacity" >> "${PID_FILE}"
 
     export DISPLAY=:${DISP_XEPHYR}
@@ -305,10 +305,10 @@ function _setup_ibus() {
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
   if [[ "${STANDALONE}" == "--standalone" ]] && [[ "${DOCKER_RUNNING:-false}" != "true" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]];  then
     # manual test run
-    echo "if kill -9 ${PID}; then ibus restart || ibus start -d; fi # ibus-daemon" >> "${CLEANUP_FILE}"
+    echo "if kill -9 ${PID} &> /dev/null; then ibus restart || ibus start -d; fi # ibus-daemon" >> "${CLEANUP_FILE}"
   else
     # test run as part of the build
-    echo "kill -9 ${PID} || true # ibus-daemon" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # ibus-daemon" >> "${CLEANUP_FILE}"
   fi
   echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s
@@ -322,7 +322,7 @@ function _setup_ibus() {
   #shellcheck disable=SC2086
   "${TOP_BINDIR}/src/ibus-engine-keyman" --testing ${ARG_VERBOSE-} &> /tmp/ibus-engine-keyman.log &
   PID=$!
-  echo "kill -9 ${PID} || true # ibus-engine-keyman" >> "${CLEANUP_FILE}"
+  echo "kill -9 ${PID} &> /dev/null || true # ibus-engine-keyman" >> "${CLEANUP_FILE}"
   echo "${PID} ibus-engine-keyman" >> "${PID_FILE}"
   sleep 1s
 }
