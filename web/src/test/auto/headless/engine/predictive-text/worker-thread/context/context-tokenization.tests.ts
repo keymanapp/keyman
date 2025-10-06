@@ -15,7 +15,7 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
+import { buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, models, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -1001,6 +1001,68 @@ describe('ContextTokenization', function() {
       assert.notStrictEqual(resultTokenization, baseTokenization);
       assert.sameOrderedMembers(resultTokenization.exampleInput, ['applesauce', ' ', 'and', ...baseTexts.slice(1)]);
       assert.isTrue(resultTokenization.tokens[0].isPartial);
+    });
+  });
+
+  describe('traceInsertEdits', () => {
+    it('handles zero-length insert cases (1)', () => {
+      const tokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const result = traceInsertEdits(tokens, {insert: '', deleteLeft: 0});
+
+      assert.deepEqual(result, {
+        stackedInserts: [''],
+        firstInsertPostIndex: tokens.length - 1
+      });
+    });
+
+    it('handles zero-length insert cases (2)', () => {
+      const tokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const result = traceInsertEdits(tokens, {insert: '', deleteLeft: 0});
+
+      assert.deepEqual(result, {
+        stackedInserts: [''],
+        firstInsertPostIndex: tokens.length - 1
+      });
+    });
+
+    it('ignores deleteLefts and deleteRights', () => {
+      const tokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const result = traceInsertEdits(tokens, {insert: '', deleteLeft: 10, deleteRight: -10});
+
+      assert.deepEqual(result, {
+        stackedInserts: [''],
+        firstInsertPostIndex: tokens.length - 1
+      });
+    });
+
+    it('handles simple char output transforms', () => {
+      const tokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const result = traceInsertEdits(tokens, {insert: 'y', deleteLeft: 0});
+
+      assert.deepEqual(result, {
+        stackedInserts: ['y'],
+        firstInsertPostIndex: tokens.length - 1
+      });
+    });
+
+    it('handles standard whitespace wordbreaks', () => {
+      const tokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const result = traceInsertEdits(tokens, {insert: ' ', deleteLeft: 0});
+
+      assert.deepEqual(result, {
+        stackedInserts: ['', ' '],
+        firstInsertPostIndex: tokens.length - 2
+      });
+    });
+
+    it('handles large insert strings', () => {
+      const tokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const result = traceInsertEdits(tokens, {insert: 'ple a day ', deleteLeft: 0});
+
+      assert.deepEqual(result, {
+        stackedInserts: ['', ' ', 'day', ' ', 'a', ' ', 'ple'],
+        firstInsertPostIndex: 2
+      });
     });
   });
 });
