@@ -130,17 +130,20 @@ function find_platform_changes() {
   # Scan the files found
   while IFS= read -r line; do
     # for each platform
+    echo "$line"
     for platform in "${available_platforms[@]}"; do
       if [[ ! " ${!build_platforms[*]} " =~ " ${platform} " ]]; then
-        # Which platform are we watching?
-        eval watch="'$'watch_${platform}"
-
+        # Build a variable name for the current platform
+        watch="watch_${platform}"
+        # And then get the variable value
+        watch="${!watch}"
         # Add common patterns to the watch list
         watch="^(${platform}|(oem/[^/]+/${platform})|resources/((?!teamcity|docker-images)|teamcity/(${platform}|includes)|docker-images/(${platform}|base))|${watch})"
         # Since bash doesn't support negative look-aheads we use perl to test
         # (grep has a --perl-regexp option, but not the version on macOS)
         if perl -e 'exit($ARGV[0] =~ /$ARGV[1]/ ? 0 : 1)' "${line}" "${watch}"; then
           # By default, we'll build a 'release' test build for touched platforms
+          echo "  adding default build platform ${platform}"
           build_platforms[${platform}]=${build_level_release}
         fi
       fi
@@ -230,8 +233,7 @@ if [[ "${prremote}" != "origin" ]]; then
   git remote remove "${prremote}"
 fi
 
-# Print list of all changed files in the log
-printf '%s\n' "${prfiles[@]}"
+echo "Found $(echo "${prfiles}" | wc -l) changed file(s)"
 
 popd > /dev/null
 
