@@ -14,9 +14,9 @@ import { KMWString } from '@keymanapp/web-utils';
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
 import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js';
-import { computeDistance } from './classical-calculation.js';
+import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
-import { SegmentableDistanceCalculation } from './segmentable-calculation.js';
+import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -27,6 +27,21 @@ import Transform = LexicalModelTypes.Transform;
 // with edit path stability.
 const MIN_TOKENS_TO_RECONSIDER_FOR_TOKENIZATION = 3;
 const MIN_CHARS_TO_RECONSIDER_FOR_TOKENIZATION = 8;
+
+interface EditTokenMap {
+  index: number,
+  text: string
+};
+
+interface TokenMergeMap {
+  inputs: EditTokenMap[],
+  match: EditTokenMap
+};
+
+interface TokenSplitMap {
+  input: EditTokenMap,
+  matches: (EditTokenMap & { textOffset: number })[]
+};
 
 /**
  * This class represents the sequence of tokens (words and whitespace blocks)
@@ -738,4 +753,179 @@ export function traceInsertEdits(tokens: string[], transform: Transform): {
     stackedInserts,
     firstInsertPostIndex
   };
+}
+
+/**
+ * Given context tokenizations before and after applying an incoming transform,
+ * this method analyzes the tokenizations in order to make adjustments for any
+ * 'merge' or 'split' edits needed for the transition.
+ * @param priorTokenization
+ * @param resultTokenization
+ * @returns
+ */
+export function analyzePathMergesAndSplits(priorTokenization: string[], resultTokenization: string[]): {
+  /**
+   * Notes the shift in pre-edit token index needed to map the tail token index
+   * to its post-edit index due to 'merge' edits.
+   */
+  mergeOffset: number,
+  /**
+   * Notes the shift in post-edit token index needed to map the tail token index
+   * to its pre-edit index due to 'split' edits.
+   */
+  splitOffset: number,
+  /**
+   * The edit operations needed to transition from the first (prior)
+   * tokenization to the second (result) tokenization.
+   */
+  editPath: EditTuple<ExtendedEditOperation>[],
+  /**
+   * The edit operations needed _after_ applying any merge or split operations
+   * to the first (prior) tokenization in order to transition to the second
+   * (result) tokenization.
+   *
+   * No 'merge' or 'split' edits will appear in this version.
+   */
+  mappedPath: EditTuple<EditOperation>[],
+  /**
+   * Indicates groupings of directly related merges.  Without loss of
+   * generality, if two separate groups of tokens are merged, two groups will be
+   * defined - one for each token resulting from a merge.
+   */
+  merges: TokenMergeMap[],
+  /**
+   * Indicates groupings of directly related splits.  Without loss of
+   * generality, if two separate tokens are split, two groups will be defined -
+   * one for each source token split.
+   */
+  splits: TokenSplitMap[]
+} {
+  // We've found the root token to which changes may apply.
+  // We've found the last post-application token to which transform changes contributed.
+  // Did anything shift at or near that intersection?
+  const preTokenization = priorTokenization;
+  const calc = computeDistance(
+    new SegmentableDistanceCalculation({
+      diagonalWidth: Math.abs(preTokenization.length - resultTokenization.length) + 2,
+      noTransposes: true
+    }),
+    preTokenization,
+    resultTokenization
+  );
+
+  const editPath = calc.editPath()[0];
+
+  /*
+    * This next major block will check the edit path for splits and merges,
+    * producing a non-'extended' path that results from their application.
+    *
+    * Transform indexing is based upon the non-'extended' style results, and it
+    * can be important to determine whether the lead transform applies to the
+    * result token for either edit type, or to a token immediately after the
+    * result.
+    *
+    * Preconditions:
+    * - not used with epic/dict-breaker
+    * - per unicode wordbreaker, no massive shifting of word boundaries for
+    *   prior text.
+    *   - we can't handle part of one token being split off and simultaneously
+    *     merged to another.
+    */
+
+  let queueIndex = 0;
+  const mappedPath: EditTuple<EditOperation>[] = [];
+  let mergeOffset = 0;
+  let splitOffset = 0;
+  const merges: TokenMergeMap[] = [];
+  const splits: TokenSplitMap[] = [];
+  while(queueIndex < editPath.length) {
+    const edit = editPath[queueIndex];
+    const { input, match } = edit;
+    let op = edit.op;
+
+    let inputOffset: number = 0;
+    let matchOffset: number = 0;
+    if(op == 'merge') {
+      const mergeTarget = resultTokenization[match];
+      const merge: TokenMergeMap = {
+        match: {
+          index: match,
+          text: mergeTarget
+        },
+        inputs: [ {
+          index: input,
+          text: preTokenization[input]
+        }]
+      };
+      let currentMerge = preTokenization[input];
+      let inputLookahead = 1;
+      // Look-ahead 1
+      let nextMerge = currentMerge + preTokenization[input + inputLookahead++];
+      // Conditional validates if look-ahead 1 passes (which it should)
+      for(/* next line */; mergeTarget.indexOf(nextMerge) == 0; nextMerge = currentMerge + preTokenization[input + inputLookahead++]) {
+        merge.inputs.push({
+          index: input + inputLookahead - 1,
+          text: preTokenization[input + inputLookahead-1]
+        });
+        currentMerge = nextMerge;
+        // Each time we 'pass' the condition, we've successfully processed an associated edit.
+        queueIndex++;
+        mergeOffset--;
+        inputOffset++;
+      }
+
+      op = currentMerge == mergeTarget ? 'match' : 'substitute';
+      merges.push(merge);
+    } else if(op == 'split') {
+      const splitTarget = preTokenization[input];
+      const split: TokenSplitMap = {
+        input: {
+          index: input,
+          text: splitTarget
+        },
+        matches: [ {
+          index: match,
+          text: resultTokenization[match],
+          textOffset: 0
+        }],
+      };
+      let currentMerge = resultTokenization[match];
+      matchOffset = 1;
+      // Look-ahead 1
+      let nextMerge = currentMerge + resultTokenization[match + matchOffset++];
+      for(/* next line */; splitTarget.indexOf(nextMerge) == 0; nextMerge = currentMerge + preTokenization[match + matchOffset++]) {
+        const textOffset = KMWString.length(currentMerge);
+        currentMerge = nextMerge;
+        split.matches.push({
+          index: match + matchOffset - 1,
+          text: resultTokenization[match + matchOffset-1],
+          textOffset
+        });
+        // Each time we 'pass' the condition, we've successfully processed an associated edit.
+
+        // Add the token before the recently adjoined one.
+        mappedPath.push({op: 'match', input: input + mergeOffset - splitOffset, match: match + matchOffset - 2});
+        queueIndex++;
+        splitOffset--;
+      }
+
+      // Set up for the last split-off token.
+      op = currentMerge == splitTarget ? 'match' : 'substitute';
+      matchOffset -= 2;
+      splits.push(split);
+    }
+
+    let reprocEdit: Partial<EditTuple<EditOperation>> = { op };
+    if(input !== undefined) {
+      reprocEdit.input = input + mergeOffset - splitOffset + inputOffset;
+    }
+    if(match !== undefined) {
+      reprocEdit.match = match + matchOffset;
+    }
+    mappedPath.push(reprocEdit as EditTuple<EditOperation>);
+
+    queueIndex++;
+  }
+
+  return { mergeOffset, splitOffset, editPath, mappedPath, merges, splits };
 }
