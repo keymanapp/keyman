@@ -1,5 +1,5 @@
 export { ClassicalDistanceCalculation, EditOperation, EditTuple, forNewIndices } from './correction/classical-calculation.js';
-export { ContextState } from './correction/context-state.js';
+export * from './correction/context-state.js';
 export { ContextToken } from './correction/context-token.js';
 export { ContextTokenization } from './correction/context-tokenization.js';
 export { ContextTracker } from './correction/context-tracker.js';
