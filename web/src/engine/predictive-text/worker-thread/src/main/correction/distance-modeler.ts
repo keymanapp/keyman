@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { PathResult, QUEUE_NODE_COMPARATOR, SearchSpace } from './search-space.js';
+import { PathResult, SearchSpace } from './search-space.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -608,51 +608,41 @@ export class SearchResult {
   }
 }
 
-// The set of search spaces corresponding to the same 'context' for search.
-// Whenever a wordbreak boundary is crossed, a new instance should be made.
-// Current best guesstimate of how compositor will retrieve ideal corrections.
-export async function *getBestMatches(searchSpace: SearchSpace, timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+/**
+ * Searches for the best available corrections from among the provided
+ * SearchSpaces, ending after the configured timer has elapsed or all available
+ * corrections have been enumerated.
+ * @param searchSpaces
+ * @param timer
+ * @returns
+ */
+export async function *getBestMatches(searchSpaces: SearchSpace[], timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+  const spaceQueue = new PriorityQueue<SearchSpace>((a, b) => a.getCurrentCost() - b.getCurrentCost());
+
+  // Stage 1 - if we already have extracted results, build a queue just for them
+  // and iterate over it first.
+  //
+  // Does not get any results that another iterator pulls up after this is
+  // created - and those results won't come up later in stage 2, either.  Only
+  // intended for restarting a search, not searching twice in parallel.
+  const priorResultsQueue = new PriorityQueue<SearchResult>((a, b) => a.totalCost - b.totalCost);
+  priorResultsQueue.enqueueAll(searchSpaces.map((space) => space.previousResults()).flat());
+
+  // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
+  spaceQueue.enqueueAll(searchSpaces);
+
   let currentReturns: {[resultKey: string]: SearchNode} = {};
-
-  // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
-  const returnedValues = Object.values(searchSpace.returnedValues);
-  if(returnedValues.length > 0) {
-    let preprocessedQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
-
-    while(preprocessedQueue.count > 0) {
-      const entryFromCache = timer.time(() => {
-        let entry = preprocessedQueue.dequeue();
-
-        // Is the entry a reasonable result?
-        if(entry.isFullReplacement) {
-          // If the entry's 'match' fully replaces the input string, we consider it
-          // unreasonable and ignore it.
-          return null;
-        }
-
-        currentReturns[entry.resultKey] = entry;
-        // Do not track yielded time.
-        return new SearchResult(entry);
-      }, TimedTaskTypes.CACHED_RESULT);
-
-      if(entryFromCache) {
-        // Time yielded here is generally spent on turning corrections into predictions.
-        // It's timing a different sort of task, so... different task set ID.
-        const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
-        yield entryFromCache;
-        timeSpan.end();
-
-        if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
-          await timer.defer();
-        }
-      }
-    }
-  }
 
   // Stage 2:  the fun part; actually searching!
   do {
-    const entry = timer.time(() => {
-      let newResult: PathResult = searchSpace.handleNextNode();
+    const entry: SearchResult = timer.time(() => {
+      if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) < spaceQueue.peek().getCurrentCost()) {
+        return priorResultsQueue.dequeue();
+      }
+
+      let bestQueue = spaceQueue.dequeue();
+      let newResult: PathResult = bestQueue.handleNextNode();
+      spaceQueue.enqueue(bestQueue);
 
       if(newResult.type == 'none') {
         return null;
@@ -692,7 +682,7 @@ export async function *getBestMatches(searchSpace: SearchSpace, timer: Execution
     if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
       await timer.defer();
     }
-  } while(!timer.elapsed && searchSpace.getCurrentCost() < Number.POSITIVE_INFINITY);
+  } while(!timer.elapsed && spaceQueue.peek().getCurrentCost() < Number.POSITIVE_INFINITY);
 
   return null;
 }
