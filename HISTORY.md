@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.134 alpha 2025-10-07
+
+* maint(resources): nest unit tests under parent block (#14871)
+
 ## 19.0.133 alpha 2025-10-06
 
 * chore(linux): Update debian changelog (#14856)
