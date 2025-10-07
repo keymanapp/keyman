@@ -715,16 +715,17 @@ public final class KMManager {
 
   /**
    * Applies padding to the keyboard so it's not covered by system insets
+   * @param {KeyboardType} keyboard
    * @param left int padding to account for notch/navigation bar on left side of screen
    * @param right int padding to account for notch/navigation bar on right side of screen
    * @param bottom int padding to account for navigation bar on bottom of screen
    */
-  public static void applyInsetsToKeyboard(int left, int right, int bottom) {
-    if (InAppKeyboard != null) {
+  public static void applyInsetsToKeyboard(KeyboardType keyboardType, int left, int right, int bottom) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       applyInsetsPaddingToKeyboardView(InAppKeyboard, left, right, bottom);
     }
 
-    if (SystemKeyboard != null) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       applyInsetsPaddingToKeyboardView(SystemKeyboard, left, right, bottom);
     }
   }
@@ -753,10 +754,6 @@ public final class KMManager {
       );
       keyboard.requestLayout();
     }
-  }
-
-  public static int getBottomInset() {
-    return bottomInset;
   }
 
   private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
@@ -915,20 +912,13 @@ public final class KMManager {
   private static void installSystemKeyboardInsetsListener(View anchor) {
     ViewCompat.setOnApplyWindowInsetsListener(anchor, (v, insets) -> {
       // System bars (status bar and navigation bar)
-      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      Insets systemBarInsets = insets.getInsets(
+        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+      Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
+      Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
 
-      // Cutout (camera notch) safe insets
-      DisplayCutoutCompat cutout = insets.getDisplayCutout();
-      int safeLeft  = (cutout != null) ? cutout.getSafeInsetLeft()  : 0;
-      int safeRight = (cutout != null) ? cutout.getSafeInsetRight() : 0;
-
-      int leftInset   = Math.max(systemBars.left,  safeLeft);
-      int rightInset  = Math.max(systemBars.right, safeRight);
-
-      boolean imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-      int bottomInset = systemBars.bottom;
-
-      applyInsetsToKeyboard(leftInset, rightInset, bottomInset);
+      bottomInset = systemBarInsets.bottom;
+      applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, systemBarInsets.left, systemBarInsets.right, bottomInset);
       return insets;
     });
 
@@ -2504,56 +2494,14 @@ public final class KMManager {
     KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
   }
 
-  public static int getStatusBarHeight(Context context) {
-    int statusBarHeight = 0;
-    int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-    if (resourceId > 0) {
-      statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
-    }
-    return statusBarHeight;
-  }
-
   /**
    * Get the navigation bar height (if visible) in pixels
-   * @param context - the context
+   * @param context - The context
    * @return int - navigation bar height in pixels
    */
   public static int getNavigationBarHeight(Context context) {
-    int navigationBarHeight = 0;
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-      if (windowManager != null) {
-        WindowInsets insets = windowManager.getCurrentWindowMetrics().getWindowInsets();
-        android.graphics.Insets systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-        android.graphics.Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
-        android.graphics.Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
-
-        if (gestureInsets.bottom != navigationInsets.bottom) {
-          navigationBarHeight = gestureInsets.bottom;
-        } else {
-          navigationBarHeight = systemBarInsets.bottom;
-        }
-
-        Log.d(TAG, String.format("gesture.bottom: %d; navigation.bottom: %d; systemBar.bottom %d",
-          gestureInsets.bottom, navigationInsets.bottom, systemBarInsets.bottom));
-      }
-    } else {
-      // Determine if navigation bar is visible
-      int resourceId = context.getResources().getIdentifier(
-        "config_showNavigationBar", "bool", "android");
-      if (resourceId <= 0) {
-        return navigationBarHeight;
-      }
-
-      // Navigation bar visible so get the height
-      resourceId = context.getResources().getIdentifier(
-        "navigation_bar_height", "dimen", "android");
-      navigationBarHeight = (resourceId > 0) ?
-        context.getResources().getDimensionPixelSize(resourceId) : 0;
-    }
-
-    return navigationBarHeight;
+    // bottomInset already updated from the inset listener
+    return bottomInset;
   }
 
   /**
