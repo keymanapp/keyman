@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 19.0.133 alpha 2025-10-06
+
+* chore(linux): Update debian changelog (#14856)
+* maint(linux): fix integration tests in Docker (#14817)
+
+## 19.0.132 alpha 2025-10-03
+
+* fix(windows): remove cached files in idle state (#14683)
+
+## 19.0.131 alpha 2025-10-02
+
+* refactor(web): cleanup in test scripts (#14870)
+
 ## 19.0.130 alpha 2025-09-30
 
 * maint(linux): allow to remote debug integration tests in Docker (#14818)

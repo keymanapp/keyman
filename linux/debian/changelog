@@ -1,3 +1,9 @@
+keyman (18.0.242-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 29 Sep 2025 11:38:38 +0200
+
 keyman (18.0.241-1) unstable; urgency=medium
 
   * remove onboard-keyman recommends (closes: 1115423)
