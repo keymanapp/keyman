@@ -285,29 +285,23 @@ export class ContextState {
 
     // If tokens were inserted, emit an empty transform; this prevents
     // suggestions from replacing the "current" token.
-    if(bestResultAnalysis.inputs[0].sample.has(1)) {
+    const bestTokenizedInput = bestResultAnalysis.inputs[0].sample;
+    if(bestTokenizedInput.size > 1 || bestTokenizedInput.has(1)) {
       preservationTransform = { insert: '', deleteLeft: 0 };
     }
 
-    let transformKeys = [...bestResultAnalysis.inputs[0].sample.keys()];
-    transformKeys.pop;
+    const transformKeys = [...bestResultAnalysis.inputs[0].sample.keys()];
+    transformKeys.pop();
 
-    // if(transformSequenceDistribution) {
-      // const transformKeys = [...transformSequenceDistribution[0].sample.keys()];
-      // Leave out the final entry - that part is replaceable by suggestions.
-      transformKeys.pop();
-
-      for(let i of transformKeys) {
-        const primaryInput = bestResultAnalysis.inputs[0].sample.get(i);
-        if(!preservationTransform) {
-          preservationTransform = primaryInput;
-        } else {
-          preservationTransform.insert += primaryInput.insert;
-          preservationTransform.deleteLeft += primaryInput.deleteLeft;
-        }
+    for(let i of transformKeys) {
+      const primaryInput = bestResultAnalysis.inputs[0].sample.get(i);
+      if(!preservationTransform) {
+        preservationTransform = primaryInput;
+      } else {
+        preservationTransform.insert += primaryInput.insert;
+        preservationTransform.deleteLeft += primaryInput.deleteLeft;
       }
-    // }
-
+    }
 
     const postContext = transformDistribution?.[0] ? applyTransform(transformDistribution[0].sample, context) : context;
 
