@@ -13,7 +13,7 @@ import { PriorityQueue } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { correction, models } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, models } from '@keymanapp/lm-worker/test-index';
 
 import SENTINEL_CODE_UNIT = models.SENTINEL_CODE_UNIT;
 import Distribution = LexicalModelTypes.Distribution;
@@ -1227,7 +1227,7 @@ describe('Correction Distance Modeler', function() {
 
       let searchSpace = new correction.SearchSpace(testModel);
 
-      let iter = searchSpace.getBestMatches(buildTestTimer());
+      let iter = getBestMatches([searchSpace], buildTestTimer());
       let firstResult = await iter.next();
       assert.isFalse(firstResult.done);
     });
@@ -1259,7 +1259,7 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
+      let iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
       await checkRepeatableResults_teh(iter);
     });
 
@@ -1289,12 +1289,12 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
+      let iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
       await checkRepeatableResults_teh(iter);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
-      let iter2 = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
+      let iter2 = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
       await checkRepeatableResults_teh(iter2);
     });
 
@@ -1305,7 +1305,7 @@ describe('Correction Distance Modeler', function() {
 
       let searchSpace = new correction.SearchSpace(testModel);
       const timer = buildTestTimer();
-      let iter = searchSpace.getBestMatches(timer);
+      let iter = getBestMatches([searchSpace], timer);
 
       // While there's no input, insertion operations can produce suggestions.
       let resultState = await iter.next();
