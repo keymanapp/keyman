@@ -262,62 +262,6 @@ export class ContextState {
     const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
     const appliedSuggestionTransitionId = nonEmptyTail?.appliedTransitionId;
 
-    // Used to construct and represent the part of the incoming transform that
-    // does not land as part of the final token in the resulting context.  This
-    // component should be preserved by any suggestions that get applied.
-    //
-    // undefined by default, which asserts we're still affecting the same token.
-    let preservationTransform: Transform;
-
-    // Handling for non-whitespace word boundaries - for example,
-    // `the '` => `the 'a` - a fun word boundary shift!
-    // We expect such cases to have SOMETHING for a preservation transform here;
-    // we need to ensure that any suggestions for the new token believe that
-    // the token is starting fresh, without any prior text.
-    //
-    // We actually will want to build `preservationTransform`s based on the path
-    // leading to each correction/suggestion.  But, until now, we've just built
-    // it based upon the actual input transform - so we'll maintain (temporarily)
-    // as a transitional state.
-
-    const bestResultAnalysis = tokenizationAnalysis;
-    // inputTransform is the ideal transform we found.
-
-    // If tokens were inserted, emit an empty transform; this prevents
-    // suggestions from replacing the "current" token.
-    const bestTokenizedInput = bestResultAnalysis.inputs[0].sample;
-    if(bestTokenizedInput.size > 1 || bestTokenizedInput.has(1)) {
-      preservationTransform = { insert: '', deleteLeft: 0 };
-    }
-
-    const transformKeys = [...bestResultAnalysis.inputs[0].sample.keys()];
-    transformKeys.pop();
-
-    for(let i of transformKeys) {
-      /*
-       * Thinking ahead to multitokenization:
-       *
-       * If what we have is not on the "true" tokenization, then... we need to
-       * do multitoken effects, right?  We're basing new suggestions based on a
-       * state that does not currently exist!  We'd need to enforce THAT state,
-       * *then* do the suggestion!
-       * - Which gets fun if we auto-apply such a case, as the new "true" tokenization
-       *   no longer results directly from the true input.
-       *
-       * If we give tokens unique IDs on first creation, we could backtrace to
-       * find the most recent common ancestor.
-       * - simple cases (same 'token', but different input transform lengths/effects)
-       *   will have the same prior token ID
-       */
-      const primaryInput = bestResultAnalysis.inputs[0].sample.get(i);
-      if(!preservationTransform) {
-        preservationTransform = primaryInput;
-      } else {
-        preservationTransform.insert += primaryInput.insert;
-        preservationTransform.deleteLeft += primaryInput.deleteLeft;
-      }
-    }
-
     const postContext = transformDistribution?.[0] ? applyTransform(transformDistribution[0].sample, context) : context;
 
     // Note for future:  the next line's pattern asserts that there is only one true tokenization.
@@ -341,9 +285,9 @@ export class ContextState {
 
 
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
-    state.tokenization =  new ContextTokenization(resultTokenization.tokens, alignmentResults);
+    state.tokenization =  new ContextTokenization(resultTokenization.tokens, alignmentResults, resultTokenization.taillessTrueKeystroke);
     state.appliedInput = transformDistribution?.[0].sample;
-    transition.finalize(state, transformDistribution, preservationTransform);
+    transition.finalize(state, transformDistribution, resultTokenization.taillessTrueKeystroke);
     transition.revertableTransitionId = appliedSuggestionTransitionId;
     return transition;
   }
