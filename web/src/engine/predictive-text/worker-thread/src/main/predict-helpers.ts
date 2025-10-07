@@ -7,8 +7,10 @@ import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
+import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
+import { getBestMatches } from './correction/distance-modeler.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
 
@@ -23,7 +25,6 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
-import { ContextTransition, getBestMatches, SearchPath } from './test-index.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -494,7 +495,7 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches(searchSpaces[0] as SearchPath, timer)) {
+  for await(const match of getBestMatches(searchSpaces, timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
     const searchSpace = searchSpaces.find(s => s.spaceId == match.spaceId);
