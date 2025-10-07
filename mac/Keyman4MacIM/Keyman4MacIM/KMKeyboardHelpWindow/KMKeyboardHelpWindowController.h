@@ -7,8 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <WebKit/WebKit.h>
 
-@interface KMKeyboardHelpWindowController : NSWindowController
+@interface KMKeyboardHelpWindowController : NSWindowController<WKNavigationDelegate>
 
 @property (nonatomic, strong) NSString *packagePath;
 

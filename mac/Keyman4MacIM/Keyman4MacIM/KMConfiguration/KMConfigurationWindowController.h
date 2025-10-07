@@ -7,12 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <WebKit/WebKit.h>
 #import "KMInputMethodAppDelegate.h"
 #import "KMConfigColumn1CellView.h"
 #import "KMConfigColumn3CellView.h"
 #import "KMPackage.h"
 
-@interface KMConfigurationWindowController : NSWindowController <NSTableViewDelegate, NSTableViewDataSource>
+@interface KMConfigurationWindowController : NSWindowController <NSTableViewDelegate, NSTableViewDataSource, WKNavigationDelegate>
 
 - (void)handleRequestToInstallPackage:(KMPackage *) package;
 

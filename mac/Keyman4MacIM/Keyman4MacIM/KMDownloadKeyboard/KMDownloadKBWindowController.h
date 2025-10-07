@@ -9,6 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 
-@interface KMDownloadKBWindowController : NSWindowController
+@interface KMDownloadKBWindowController : NSWindowController<WKNavigationDelegate>
 
 @end
