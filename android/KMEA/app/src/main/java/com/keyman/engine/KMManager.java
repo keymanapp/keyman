@@ -91,7 +91,8 @@ public final class KMManager {
   private static final String TAG = "KMManager";
 
   private static ResourcesUpdateTool updateTool;
-  private static int bottomInset;
+  private static int inappBottomInset; // Bottom inset for in-app keyboard
+  private static int sysBottomInset;   // Bottom inset for system keyboard
 
   // Keyboard types
   public enum KeyboardType {
@@ -732,7 +733,11 @@ public final class KMManager {
 
   private static void applyInsetsPaddingToKeyboardView(KMKeyboard keyboard, int left, int right, int bottom) {
     View parent = (View) keyboard.getParent();
-    bottomInset = bottom;
+    if (keyboard.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      inappBottomInset = bottom;
+    } else if (keyboard.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      sysBottomInset = bottom;
+    }
 
     if (parent != null) {
       // Keep existing top padding, add bottom padding for the inset
@@ -917,8 +922,8 @@ public final class KMManager {
       Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
       Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
 
-      bottomInset = systemBarInsets.bottom;
-      applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, systemBarInsets.left, systemBarInsets.right, bottomInset);
+      sysBottomInset = systemBarInsets.bottom;
+      applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, systemBarInsets.left, systemBarInsets.right, sysBottomInset);
       return insets;
     });
 
@@ -2497,11 +2502,18 @@ public final class KMManager {
   /**
    * Get the navigation bar height (if visible) in pixels
    * @param context - The context
+   * @param {KeyboardType} - KeyboardType.KEYBOARD_TYPE_INAPP or KeyboardType.KEYBOARD_TYPE_SYSTEM
    * @return int - navigation bar height in pixels
    */
-  public static int getNavigationBarHeight(Context context) {
+  public static int getNavigationBarHeight(Context context, KeyboardType keyboardType) {
     // bottomInset already updated from the inset listener
-    return bottomInset;
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return inappBottomInset;
+    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return sysBottomInset;
+    }
+
+    return inappBottomInset;
   }
 
   /**

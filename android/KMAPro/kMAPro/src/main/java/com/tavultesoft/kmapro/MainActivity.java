@@ -625,7 +625,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (resourceId > 0) {
       statusBarHeight = getResources().getDimensionPixelSize(resourceId);
     }
-    int navigationBarHeight = KMManager.getNavigationBarHeight(context);
+    int navigationBarHeight = KMManager.getNavigationBarHeight(context, KeyboardType.KEYBOARD_TYPE_INAPP);
 
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
