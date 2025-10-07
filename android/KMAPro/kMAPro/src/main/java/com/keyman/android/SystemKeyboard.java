@@ -246,21 +246,17 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       inputViewHeight = inputView.getHeight();
     }
 
-    int navigationHeight = KMManager.getNavigationBarHeight(this);
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);
-    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight;
+    int bottomInset = KMManager.getBottomInset();
 
-    // TODO - design better way to toggle this adjustment
-    SharedPreferences prefs = this.getSharedPreferences(PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
-    boolean showOSK = prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
-    if (showOSK) {
-      outInsets.contentTopInsets -= navigationHeight;
-    }
-
+    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight - bottomInset;
     outInsets.visibleTopInsets = outInsets.contentTopInsets;
     outInsets.touchableInsets = InputMethodService.Insets.TOUCHABLE_INSETS_REGION;
     outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);
+
+    //Log.d(TAG, String.format("inputView: %d, , bannerHeight: %d, kbHeight: %d, navigationHeight: %d",
+    //  inputViewHeight, bannerHeight, kbHeight, navigationHeight));
   }
 
   @Override
