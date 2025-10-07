@@ -294,6 +294,21 @@ export class ContextState {
     transformKeys.pop();
 
     for(let i of transformKeys) {
+      /*
+       * Thinking ahead to multitokenization:
+       *
+       * If what we have is not on the "true" tokenization, then... we need to
+       * do multitoken effects, right?  We're basing new suggestions based on a
+       * state that does not currently exist!  We'd need to enforce THAT state,
+       * *then* do the suggestion!
+       * - Which gets fun if we auto-apply such a case, as the new "true" tokenization
+       *   no longer results directly from the true input.
+       *
+       * If we give tokens unique IDs on first creation, we could backtrace to
+       * find the most recent common ancestor.
+       * - simple cases (same 'token', but different input transform lengths/effects)
+       *   will have the same prior token ID
+       */
       const primaryInput = bestResultAnalysis.inputs[0].sample.get(i);
       if(!preservationTransform) {
         preservationTransform = primaryInput;
