@@ -919,8 +919,6 @@ public final class KMManager {
       // System bars (status bar and navigation bar)
       Insets systemBarInsets = insets.getInsets(
         WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-      Insets gestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures());
-      Insets navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
 
       sysBottomInset = systemBarInsets.bottom;
       applyInsetsToKeyboard(KeyboardType.KEYBOARD_TYPE_SYSTEM, systemBarInsets.left, systemBarInsets.right, sysBottomInset);
