@@ -872,13 +872,22 @@ export class SearchSpace {
     }
   }
 
+  public getCurrentCost(): number {
+    let topQueue = this.selectionQueue.peek();
+    if(topQueue && topQueue.correctionQueue.count > 0) {
+      return topQueue.correctionQueue.peek().currentCost;
+    }
+
+    return Number.POSITIVE_INFINITY;
+  }
+
   /**
    * Retrieves the lowest-cost / lowest-distance edge from the selection queue,
    * checks its validity as a correction to the input text, and reports on what
    * sort of result the edge's destination node represents.
    * @returns
    */
-  private handleNextNode(): PathResult {
+  public handleNextNode(): PathResult {
     if(!this.hasNextMatchEntry()) {
       return { type: 'none' };
     }
@@ -951,6 +960,13 @@ export class SearchSpace {
       // Since we don't modify any other tier, we may simply reinsert the removed tier.
       this.selectionQueue.enqueue(bestTier);
 
+      if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
+        this.returnedValues[currentNode.resultKey] = currentNode;
+      } else {
+        // Not a better cost, so reject it and move on to the next potential result.
+        return this.handleNextNode();
+      }
+
       return {
         type: 'complete',
         cost: currentNode.currentCost,
@@ -987,93 +1003,88 @@ export class SearchSpace {
     return unmatchedResult;
   }
 
-  // Current best guesstimate of how compositor will retrieve ideal corrections.
-  async *getBestMatches(timer: ExecutionTimer): AsyncGenerator<SearchResult> {
-    let currentReturns: {[resultKey: string]: SearchNode} = {};
+  public previousResults(): SearchResult[] {
+    return Object.values(this.returnedValues).map(v => new SearchResult(v));
+  }
+}
 
-    // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
-    let returnedValues = Object.values(this.returnedValues);
-    if(returnedValues.length > 0) {
-      let preprocessedQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
+/**
+ * Searches for the best available corrections from among the provided
+ * SearchSpaces, ending after the configured timer has elapsed or all available
+ * corrections have been enumerated.
+ * @param searchSpaces
+ * @param timer
+ * @returns
+ */
+export async function *getBestMatches(searchSpaces: SearchSpace[], timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+  const spaceQueue = new PriorityQueue<SearchSpace>((a, b) => a.getCurrentCost() - b.getCurrentCost());
 
-      while(preprocessedQueue.count > 0) {
-        const entryFromCache = timer.time(() => {
-          let entry = preprocessedQueue.dequeue();
+  // Stage 1 - if we already have extracted results, build a queue just for them
+  // and iterate over it first.
+  //
+  // Does not get any results that another iterator pulls up after this is
+  // created - and those results won't come up later in stage 2, either.  Only
+  // intended for restarting a search, not searching twice in parallel.
+  const priorResultsQueue = new PriorityQueue<SearchResult>((a, b) => a.totalCost - b.totalCost);
+  priorResultsQueue.enqueueAll(searchSpaces.map((space) => space.previousResults()).flat());
 
-          // Is the entry a reasonable result?
-          if(entry.isFullReplacement) {
-            // If the entry's 'match' fully replaces the input string, we consider it
-            // unreasonable and ignore it.
-            return null;
-          }
+  // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
+  spaceQueue.enqueueAll(searchSpaces);
 
+  let currentReturns: {[resultKey: string]: SearchNode} = {};
+
+  // Stage 2:  the fun part; actually searching!
+  do {
+    const entry = timer.time(() => {
+      if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) < spaceQueue.peek().getCurrentCost()) {
+        return priorResultsQueue.dequeue();
+      }
+
+      let bestQueue = spaceQueue.dequeue();
+      let newResult: PathResult = bestQueue.handleNextNode();
+      spaceQueue.enqueue(bestQueue);
+
+      if(newResult.type == 'none') {
+        return null;
+      } else if(newResult.type == 'complete') {
+        const node = newResult.finalNode;
+
+        // Is the entry a reasonable result?
+        if(node.isFullReplacement) {
+          // If the entry's 'match' fully replaces the input string, we consider it
+          // unreasonable and ignore it.  Also, if we've reached this point...
+          // we can(?) assume that everything thereafter is as well.
+          return null;
+        }
+
+        const entry = newResult.finalNode;
+
+        // As we can't guarantee a monotonically-increasing cost during the search -
+        // due to effects from keystrokes with deleteLeft > 0 - it's technically
+        // possible to find a lower-cost path later in such cases.
+        //
+        // If it occurs, we should re-emit it - it'll show up earlier in the
+        // suggestions that way, as it should.
+        if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
           currentReturns[entry.resultKey] = entry;
           // Do not track yielded time.
           return new SearchResult(entry);
-        }, TimedTaskTypes.CACHED_RESULT);
-
-        if(entryFromCache) {
-          // Time yielded here is generally spent on turning corrections into predictions.
-          // It's timing a different sort of task, so... different task set ID.
-          const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
-          yield entryFromCache;
-          timeSpan.end();
-
-          if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
-            await timer.defer();
-          }
         }
       }
+
+      return null;
+    }, TimedTaskTypes.CORRECTING);
+
+    if(entry) {
+      const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
+      yield entry;
+      timeSpan.end();
     }
 
-    // Stage 2:  the fun part; actually searching!
-    do {
-      const entry = timer.time(() => {
-        let newResult: PathResult = this.handleNextNode();
+    if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
+      await timer.defer();
+    }
+  } while(!timer.elapsed && spaceQueue.peek().getCurrentCost() < Number.POSITIVE_INFINITY);
 
-        if(newResult.type == 'none') {
-          return null;
-        } else if(newResult.type == 'complete') {
-          const node = newResult.finalNode;
-
-          // Is the entry a reasonable result?
-          if(node.isFullReplacement) {
-            // If the entry's 'match' fully replaces the input string, we consider it
-            // unreasonable and ignore it.  Also, if we've reached this point...
-            // we can(?) assume that everything thereafter is as well.
-            return null;
-          }
-
-          const entry = newResult.finalNode;
-
-          // As we can't guarantee a monotonically-increasing cost during the search -
-          // due to effects from keystrokes with deleteLeft > 0 - it's technically
-          // possible to find a lower-cost path later in such cases.
-          //
-          // If it occurs, we should re-emit it - it'll show up earlier in the
-          // suggestions that way, as it should.
-          if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
-            currentReturns[entry.resultKey] = entry;
-            this.returnedValues[entry.resultKey] = entry;
-            // Do not track yielded time.
-            return new SearchResult(entry);
-          }
-        }
-
-        return null;
-      }, TimedTaskTypes.CORRECTING);
-
-      if(entry) {
-        const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
-        yield entry;
-        timeSpan.end();
-      }
-
-      if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
-        await timer.defer();
-      }
-    } while(!timer.elapsed && this.hasNextMatchEntry());
-
-    return null;
-  }
+  return null;
 }
