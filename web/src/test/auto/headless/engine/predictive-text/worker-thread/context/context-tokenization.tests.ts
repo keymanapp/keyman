@@ -671,6 +671,482 @@ describe('ContextTokenization', function() {
     });
   });
 
+  describe('evaluateTransition', () => {
+    const testEdgeWindowSpec = {
+      minTokens: 3,
+      minChars: 8
+    };
+
+    it('handles simple case - new whitespace + new empty token', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set(2, { insert: '', deleteLeft: 0 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            retokenization: targetTokens.slice(edgeWindow.sliceIndex, -2).map(t => t.text)
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        inputTransform
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+      assert.includeDeepMembers(
+        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence,
+        [[{sample: inputTransformMap.get(1), p: 1}]]
+      );
+      assert.includeDeepMembers(
+        tokenization.tail.searchSpace.inputSequence,
+        [[{sample: inputTransformMap.get(2), p: 1}]]
+      );
+    });
+
+    it('handles simple case - deletion of single post-word whitespace', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: '', deleteLeft: 1, deleteRight: 0, id: 42 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(-1, { insert: '', deleteLeft: 1, id: 42 });
+      inputTransformMap.set( 0, { insert: '', deleteLeft: 0, id: 42 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            // Any adjustments on the boundary token itself are included here.
+            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text)]
+          },
+          removedTokenCount: 2
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        inputTransform
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+    });
+
+    it('handles simple case - new character added to last token', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: 'y', deleteLeft: 0, deleteRight: 0 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'y', deleteLeft: 0 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            // Any adjustments on the boundary token itself are included here.
+            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text), 'day']
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        inputTransform
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+      assert.includeDeepMembers(
+        tokenization.tail.searchSpace.inputSequence,
+        [[{sample: inputTransformMap.get(0), p: 1}]]
+      );
+    });
+
+    it('handles applied-suggestion cases - final token fully replaced by transform', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'week'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: 'week', deleteLeft: 3, deleteRight: 0 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'week', deleteLeft: 3 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            // Any adjustments on the boundary token itself are included here.
+            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text), 'week']
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        inputTransform
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+      assert.includeDeepMembers(
+        tokenization.tail.searchSpace.inputSequence,
+        // As we fully deleted the old token, the new one "starts" after the deleteLeft.
+        // The deleteLeft component should not be included here.
+        [[{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */ }, p: 1}]]
+      );
+    });
+
+    it('properly manages empty token re-inserted by complex transform', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'keeps'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'daily', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: 'ily ', deleteLeft: 1 + 1 + 5, deleteRight: 0, id: 42 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(-2, { insert: 'ily', deleteLeft: 1, id: 42 });
+      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 1, id: 42 });
+      inputTransformMap.set( 0, { insert: '', deleteLeft: 5, id: 42 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            // Any adjustments on the boundary token itself are included here.
+            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text)]
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        inputTransform
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+      const tailIndex = tokenization.tokens.length - 1;
+      for(let i of inputTransformMap.keys()) {
+        let transform = {...inputTransformMap.get(i)};
+        if(i > -2) {
+          // If of a greater index, we erased the old token; the deleteLeft
+          // was applied there, not to its replacement.
+          transform.deleteLeft = 0;
+        }
+
+        assert.includeDeepMembers(
+          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          [[{sample: transform, p: 1}]]
+        );
+      }
+    });
+
+    it('handles large delete + insert transforms properly', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'and', ' ', 'banana'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: ' day', deleteLeft: 2 + 1 + 6, deleteRight: 0, id: 42 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(-2, { insert: '', deleteLeft: 2, id: 42 });
+      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 1, id: 42 });
+      inputTransformMap.set( 0, { insert: 'day', deleteLeft: 6, id: 42 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            retokenization: targetTokens.slice(edgeWindow.sliceIndex, -2).map(t => t.text)
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        inputTransform
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      const boundaryToken = tokenization.tokens[tokenization.tokens.length-3];
+      const boundaryTailInput = boundaryToken.inputRange[boundaryToken.inputRange.length - 1];
+      assert.deepEqual(boundaryTailInput, {trueTransform: inputTransform, inputStartIndex: 0});
+
+      // The new tail tokens should not include anything from the original tail;
+      // the token should be replaced.
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].inputRange, [{trueTransform: inputTransform, inputStartIndex: 0}]);
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputRange, [{trueTransform: inputTransform, inputStartIndex: 1}]);
+
+      const tailIndex = tokenization.tokens.length - 1;
+      for(let i of inputTransformMap.keys()) {
+        let transform = {...inputTransformMap.get(i)};
+        if(i > -2) {
+          // If of a greater index, we erased the old token; the deleteLeft
+          // was applied there, not to its replacement.
+          transform.deleteLeft = 0;
+        }
+
+        assert.includeDeepMembers(
+          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          [[{sample: transform, p: 1}]]
+        );
+      }
+    });
+
+    it('merges new whitespace character added to last whitespace token if tail is empty', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', '  ', ''].map((t) => (
+        {text: t, isWhitespace: t != '' && t.trim() == ''}
+      ));
+      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set( 0, { insert: '',  deleteLeft: 0 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            retokenization: targetTokens.slice(edgeWindow.sliceIndex, -2).map(t => t.text)
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        { insert: ' ', deleteLeft: 0 }
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      const tailIndex = tokenization.tokens.length - 1;
+      for(let i of inputTransformMap.keys()) {
+        let transform = {...inputTransformMap.get(i)};
+        if(i > -1) {
+          // If of a greater index, we erased the old token; the deleteLeft
+          // was applied there, not to its replacement.
+          transform.deleteLeft = 0;
+        }
+
+        assert.includeDeepMembers(
+          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          [[{sample: transform, p: 1}]]
+        );
+      }
+    });
+
+    it('handles case that triggers a token merge:  can+\'+t', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\'t'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 't', deleteLeft: 0 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [{
+            inputs: [{
+                text: 'can',
+                index: 8 - edgeWindow.sliceIndex
+              }, {
+                text: '\'',
+                index: 9 - edgeWindow.sliceIndex
+              }
+            ],
+            match: {
+              text: 'can\'',
+              index: 8 - edgeWindow.sliceIndex
+            }
+          }],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text), 'can\'']
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        { insert: 't', deleteLeft: 0 }
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      assert.includeDeepMembers(
+        [...tokenization.tail.inputRange],
+        [...baseTokenization.tokens[baseTokenization.tokens.length - 2].inputRange]
+      );
+      assert.includeDeepMembers(
+        tokenization.tail.searchSpace.inputSequence,
+        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchSpace.inputSequence
+      );
+
+      assert.includeDeepMembers(
+        [...tokenization.tail.inputRange],
+        [...baseTokenization.tokens[baseTokenization.tokens.length - 1].inputRange]
+      );
+      assert.includeDeepMembers(
+        tokenization.tail.searchSpace.inputSequence,
+        baseTokenization.tokens[baseTokenization.tokens.length - 1].searchSpace.inputSequence
+      );
+    });
+
+    it('handles case that triggers a token split:  can\' +. => can, \', .', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\'', '.'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      // Lands after the split-off '\''.
+      inputTransformMap.set(1, { insert: '.', deleteLeft: 0 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [{
+            matches: [{
+                text: 'can',
+                index: 8 - edgeWindow.sliceIndex,
+                textOffset: 0
+              }, {
+                text: '\'',
+                index: 9 - edgeWindow.sliceIndex,
+                textOffset: 3
+              }
+            ],
+            input: {
+              text: 'can\'',
+              index: 8 - edgeWindow.sliceIndex
+            }
+          }],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text)]
+          },
+          removedTokenCount: 0
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }]
+      },
+        plainModel,
+        inputTransform
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      assert.includeDeepMembers(
+        [...baseTokenization.tail.inputRange],
+        [...tokenization.tokens[tokenization.tokens.length - 2].inputRange]
+      );
+      assert.includeDeepMembers(
+        baseTokenization.tail.searchSpace.inputSequence,
+        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence
+      );
+
+      // We've also appended a '.' to the final split-off token.  Thus, we need
+      // to account for that in the assertions below.
+      assert.includeDeepMembers(
+        [...baseTokenization.tail.inputRange, { trueTransform: inputTransform, inputStartIndex: 0 }],
+        [...tokenization.tokens[tokenization.tokens.length - 1].inputRange]
+      );
+      assert.includeDeepMembers(
+        [...baseTokenization.tail.searchSpace.inputSequence, [{sample: { insert: '.', deleteLeft: 0 }, p: 1}]],
+        tokenization.tokens[tokenization.tokens.length - 1].searchSpace.inputSequence
+      );
+    });
+  });
+
   describe('buildEdgeWindow', () => {
     describe('with min token count 3, char count 8', () => {
       const editWindowSpec = {

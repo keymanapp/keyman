@@ -7,6 +7,19 @@ import { ContextTokenization, TokenizationEdgeAlignment, TokenizationTransitionE
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 
+export interface PendingTokenization {
+  /**
+   * The edge window corresponding to the common tokenization for the subset's inputs
+   */
+  alignment: TokenizationEdgeAlignment,
+  /**
+   * A set of incoming keystrokes with compatible effects when applied.
+   *
+   * If passed to `subsetByInterval`, the transforms should result in a single subset.
+   */
+  inputs: Distribution<Map<number, Transform>>
+}
+
 /**
  * Defines a subset of pending tokenization transitions based on potential inputs.
  */
@@ -21,18 +34,7 @@ export interface TokenizationSubset {
    * them, yielding compatible search paths and tokenization effects after their
    * application.
    */
-  readonly pendingSet: Map<ContextTokenization, {
-    /**
-     * The edge window corresponding to the common tokenization for the subset's inputs
-     */
-    alignment: TokenizationEdgeAlignment,
-    /**
-     * A set of incoming keystrokes with compatible effects when applied.
-     *
-     * If passed to `subsetByInterval`, the transforms should result in a single subset.
-     */
-    inputs: Distribution<Map<number, Transform>>
-  }>;
+  readonly pendingSet: Map<ContextTokenization, PendingTokenization>;
 }
 
 export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransitionEdits): string {
