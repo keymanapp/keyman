@@ -23,7 +23,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
-import { ContextTransition, getBestMatches } from './test-index.js';
+import { ContextTransition, getBestMatches, SearchPath } from './test-index.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -460,14 +460,15 @@ export async function correctAndEnumerate(
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  const searchSpace = transition.final.tokenization.tail.searchModule;
+  const tokenizations = [transition.final.tokenization];
+  const searchModules = tokenizations.map(t => t.tail.searchModule);
 
   // If corrections are not enabled, bypass the correction search aspect
   // entirely. No need to 'search' - just do a direct lookup.
   //
   // To be clear:  this IS how we actually tell that corrections are disabled -
   // when no fat-finger data is available.
-  if(!searchSpace.correctionsEnabled) {
+  if(!searchModules.find(s => s.correctionsEnabled)) {
     const wordbreak = determineModelWordbreaker(lexicalModel);
     const predictionRoot = {
       sample: {
@@ -493,9 +494,11 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches(searchSpace, timer)) {
+  for await(const match of getBestMatches(searchModules[0] as SearchPath, timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
+    const searchSpace = searchModules.find(s => s.spaceId == match.spaceId);
+    const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
     // If our 'match' results in fully deleting the new token, reject it and try again.
     if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
@@ -553,7 +556,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], predictionContext);
-    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
+    predictions.forEach((entry) => entry.preservationTransform = tokenization.taillessTrueKeystroke);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
