@@ -319,7 +319,7 @@ export class ContextTokenization {
    * @param edgeOptions
    * @returns
    */
-  precomputeTokenizationAfterInput(
+  mapWhitespacedTokenization(
     lexicalModel: LexicalModel,
     transform: Transform,
     edgeOptions?: EdgeWindowOptions
@@ -329,7 +329,7 @@ export class ContextTokenization {
     //
     // Context does not slide within this function.
     //
-    // Assertion:  this alignment cannot fail; we KNOW there's a solid
+    // Assumption:  this alignment cannot fail; we KNOW there's a solid
     // before-and-after relationship here, and we can base it on the results of
     // a prior syncToSourceWindow call.
     //
