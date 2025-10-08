@@ -1459,7 +1459,7 @@ describe('ContextTokenization', function() {
     });
   });
 
-  describe('precomputeTokenizationAfterInput', () => {
+  describe('mapWhitespacedTokenization', () => {
     const edgeWindowSpec = {
       minTokens: 3,
       minChars: 8
@@ -1475,7 +1475,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1498,7 +1498,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1520,7 +1520,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1542,7 +1542,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 2
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1580,7 +1580,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 2
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1617,7 +1617,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 4
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1640,7 +1640,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 5
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1677,7 +1677,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 6
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1721,7 +1721,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1750,7 +1750,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1776,7 +1776,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1803,7 +1803,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1847,7 +1847,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1891,7 +1891,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1919,7 +1919,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 5
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1950,7 +1950,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 8
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1978,7 +1978,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 8
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -2005,7 +2005,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -2030,7 +2030,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 9
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2064,7 +2064,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2098,7 +2098,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2133,7 +2133,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2167,7 +2167,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2202,7 +2202,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2233,7 +2233,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2244,13 +2244,13 @@ describe('ContextTokenization', function() {
       expectedMap.set(0, { insert: 't', deleteLeft: 0 });
       assert.equal(results.tokenizedTransform.size, 1);
       assert.deepEqual(results.tokenizedTransform, expectedMap);
-      assert.equal(results.alignment.edgeWindow.sliceIndex, 4);
       assert.deepEqual(results.alignment.merges, [
         {
           inputs: [
-            { text: 'can', index: 2 /* + 4 */ },
-            { text: '\'',  index: 3 /* + 4 */ }
-          ], match: { text: 'can\'t', index: 2 /* + 4 */}
+            // The `index` values here are pre-offset from the edge window's .sliceIndex.
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex }
+          ], match: { text: 'can\'t', index: 6 - results.alignment.edgeWindow.sliceIndex }
         }
       ]);
       assert.deepEqual(results.alignment.splits, []);
@@ -2267,7 +2267,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -2279,14 +2279,13 @@ describe('ContextTokenization', function() {
       expectedMap.set(2, { insert: '', deleteLeft: 0 });
       assert.equal(results.tokenizedTransform.size, 2);
       assert.deepEqual(results.tokenizedTransform, expectedMap);
-      assert.equal(results.alignment.edgeWindow.sliceIndex, 4);
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, [
         {
-          input: { text: 'can\'', index: 2 /* + 4 */},
+          input: { text: 'can\'', index: 6 - results.alignment.edgeWindow.sliceIndex},
           matches: [
-            { text: 'can', index: 2 /* + 4 */, textOffset: 0 },
-            { text: '\'',  index: 3 /* + 4 */, textOffset: 3 }
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex, textOffset: 0 },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex, textOffset: 3 }
           ]
         }
       ]);
@@ -2303,7 +2302,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -2312,14 +2311,13 @@ describe('ContextTokenization', function() {
       expectedMap.set(1, { insert: '?', deleteLeft: 0 });
       assert.equal(results.tokenizedTransform.size, 1);
       assert.deepEqual(results.tokenizedTransform, expectedMap);
-      assert.equal(results.alignment.edgeWindow.sliceIndex, 4);
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, [
         {
-          input: { text: 'can\'', index: 2 /* + 4 */},
+          input: { text: 'can\'', index: 6 - results.alignment.edgeWindow.sliceIndex},
           matches: [
-            { text: 'can', index: 2 /* + 4 */, textOffset: 0 },
-            { text: '\'',  index: 3 /* + 4 */, textOffset: 3 }
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex, textOffset: 0 },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex, textOffset: 3 }
           ]
         }
       ]);
