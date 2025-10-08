@@ -100,8 +100,7 @@ export class ContextToken {
   constructor(param: ContextToken | LexicalModel, rawText?: string, isPartial?: boolean) {
     if(param instanceof ContextToken) {
       const priorToken = param;
-      this.isWhitespace = priorToken.isWhitespace;
-      this.isPartial = priorToken.isPartial;
+      Object.assign(this, priorToken);
 
       // We need to construct a separate search space from other token copies.
       //
@@ -109,12 +108,6 @@ export class ContextToken {
       // we need to ensure that only fully-utilized keystrokes are considered.
       this._searchModule = priorToken.searchModule;
       this._inputRange = priorToken._inputRange.slice();
-
-      // Preserve any annotated applied-suggestion transition ID data; it's useful
-      // for delayed reversion operations.
-      if(priorToken.appliedTransitionId !== undefined) {
-        this.appliedTransitionId = priorToken.appliedTransitionId
-      }
     } else {
       const model = param;
 
@@ -164,6 +157,14 @@ export class ContextToken {
    */
   get isEmptyToken(): boolean {
     return this.exampleInput == '';
+  }
+
+  /**
+   * Gets the unique identifier that may be used to match this ContextToken with
+   * a correction-search result.
+   */
+  get spaceId(): number {
+    return this.searchSpace.spaceId;
   }
 
   /**
