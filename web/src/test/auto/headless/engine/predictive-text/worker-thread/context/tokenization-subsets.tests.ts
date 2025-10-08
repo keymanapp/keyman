@@ -4,8 +4,8 @@
  * Created by jahorton on 2025-09-23
  *
  * This file contains low-level tests designed to validate the behavior of the
- * of the ContextTokenization class and its integration with the lower-level
- * classes that it utilizes.
+ * ContextTokenization class and its integration with the lower-level classes
+ * that it utilizes.
  */
 
 import { assert } from 'chai';
@@ -577,7 +577,7 @@ describe('TokenizationSubsetBuilder', function() {
     inputChars.forEach((c) => {
       const {sample: transform, p} = inputDistribution.find(s => s.sample.insert == c);
 
-      const precomputation = baseTokenization.precomputeTokenizationAfterInput(plainModel, transform);
+      const precomputation = baseTokenization.mapWhitespacedTokenization(plainModel, transform);
       subsetBuilder.addPrecomputation(baseTokenization, precomputation, p);
     });
 
@@ -605,7 +605,7 @@ describe('TokenizationSubsetBuilder', function() {
     inputChars.forEach((c) => {
       const {sample: transform, p} = inputDistribution.find(s => s.sample.insert == c);
 
-      const precomputation = baseTokenization.precomputeTokenizationAfterInput(plainModel, transform);
+      const precomputation = baseTokenization.mapWhitespacedTokenization(plainModel, transform);
       subsetBuilder.addPrecomputation(baseTokenization, precomputation, p);
     });
 
@@ -655,7 +655,7 @@ describe('TokenizationSubsetBuilder', function() {
     const subsetBuilder = new TokenizationSubsetBuilder();
 
     inputDistribution.forEach((entry) => {
-      const precomputation = baseTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      const precomputation = baseTokenization.mapWhitespacedTokenization(plainModel, entry.sample);
       subsetBuilder.addPrecomputation(baseTokenization, precomputation, entry.p);
     });
 
@@ -737,10 +737,10 @@ describe('TokenizationSubsetBuilder', function() {
 
     const inputDistribution = [{sample: { insert: ' ', deleteLeft: 0 }, p: 1}];
     inputDistribution.forEach((entry) => {
-      const precomputation1 = fourCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      const precomputation1 = fourCharTokenization.mapWhitespacedTokenization(plainModel, entry.sample);
       subsetBuilder.addPrecomputation(fourCharTokenization, precomputation1, entry.p);
 
-      const precomputation2 = fiveCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      const precomputation2 = fiveCharTokenization.mapWhitespacedTokenization(plainModel, entry.sample);
       subsetBuilder.addPrecomputation(fiveCharTokenization, precomputation2, entry.p);
     });
 
@@ -781,10 +781,10 @@ describe('TokenizationSubsetBuilder', function() {
     ];
 
     inputDistribution.forEach((entry) => {
-      const precomputation1 = twoCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      const precomputation1 = twoCharTokenization.mapWhitespacedTokenization(plainModel, entry.sample);
       subsetBuilder.addPrecomputation(twoCharTokenization, precomputation1, entry.p);
 
-      const precomputation2 = threeCharTokenization.precomputeTokenizationAfterInput(plainModel, entry.sample);
+      const precomputation2 = threeCharTokenization.mapWhitespacedTokenization(plainModel, entry.sample);
       subsetBuilder.addPrecomputation(threeCharTokenization, precomputation2, entry.p);
     });
 
