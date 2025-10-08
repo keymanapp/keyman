@@ -210,6 +210,67 @@ export class ContextToken {
   }
 
   /**
+   * Merges multiple tokens into a single composite token, checking for any previously-split
+   * Transforms at the boundaries and remerging them as appropriate.
+   * @param split
+   * @param lexicalModel
+   * @returns
+   */
+  static merge(tokensToMerge: ContextToken[], lexicalModel: LexicalModel): ContextToken {
+    const resultToken = new ContextToken(lexicalModel);
+
+    let lastSourceInput: TokenInputSource;
+    let lastInputDistrib: Distribution<Transform>;
+    for(const token of tokensToMerge) {
+      const inputCount = token.inputRange.length;
+      let startIndex = 0;
+
+      if(token.inputRange.length == 0) {
+        continue;
+      }
+
+      // Are we re-merging on a previously split transform?
+      if(lastSourceInput?.trueTransform != token.inputRange[0].trueTransform) {
+        if(lastSourceInput) {
+          resultToken.addInput(lastSourceInput, lastInputDistrib);
+        } // else:  there's nothing to add as input
+      } else {
+        // If so, re-merge it!
+        startIndex++;
+
+        lastInputDistrib = lastInputDistrib?.map((entry, index) => {
+          return {
+            sample: buildMergedTransform(entry.sample, token.searchSpace.inputSequence[0][index].sample),
+            p: entry.p
+          }
+        });
+
+        // In case there's only one input that needs merging on both ends.
+        if(inputCount == 1) {
+          // There's potential that the next incoming token needs to merge with this.
+          continue;
+        } else {
+          resultToken.addInput(lastSourceInput, lastInputDistrib);
+        }
+      }
+      lastSourceInput = null;
+      lastInputDistrib = null;
+
+      // Ignore the last entry for now - it may need to merge with a matching
+      // entry in the next token!
+      for(let i = startIndex; i < inputCount - 1; i++) {
+        resultToken.addInput(token.inputRange[i], token.searchSpace.inputSequence[i]);
+      }
+      lastSourceInput = token.inputRange[inputCount-1];
+      lastInputDistrib = token.searchSpace.inputSequence[inputCount-1];
+    }
+
+    resultToken.addInput(lastSourceInput, lastInputDistrib);
+
+    return resultToken;
+  }
+
+  /**
    * Splits this token into multiple tokens as defined by a `TokenSplitMap`.
    * @param split
    * @param lexicalModel

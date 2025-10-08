@@ -60,6 +60,10 @@ export function buildMergedTransform(first: Transform, second: Transform): Trans
     deleteLeft: first.deleteLeft + mergedSecondDelete
   }
 
+  if(first.id && first.id == second.id) {
+    returnedObj.id = first.id;
+  }
+
   if(first.deleteRight != undefined || second.deleteRight != undefined) {
     // As `first` would affect the context before `second` could take effect,
     // this is the correct way to merge `deleteRight`.
