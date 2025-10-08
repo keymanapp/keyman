@@ -954,7 +954,7 @@ describe('ContextTokenization', function() {
     });
   });
 
-  describe('precomputeTokenizationAfterInput', () => {
+  describe('mapWhitespacedTokenization', () => {
     const edgeWindowSpec = {
       minTokens: 3,
       minChars: 8
@@ -970,7 +970,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -992,7 +992,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1013,7 +1013,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 2
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1048,7 +1048,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 2
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1082,7 +1082,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 4
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1104,7 +1104,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 5
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1139,7 +1139,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1167,7 +1167,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1192,7 +1192,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1217,7 +1217,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1258,7 +1258,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1299,7 +1299,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1326,7 +1326,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 5
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1356,7 +1356,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 8
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1383,7 +1383,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 8
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1409,7 +1409,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1433,7 +1433,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 9
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1465,7 +1465,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1497,7 +1497,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1530,7 +1530,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1562,7 +1562,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1594,7 +1594,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1624,7 +1624,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1657,7 +1657,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1691,7 +1691,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );

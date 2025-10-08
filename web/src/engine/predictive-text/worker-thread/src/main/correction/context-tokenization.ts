@@ -314,7 +314,7 @@ export class ContextTokenization {
    * @param edgeOptions
    * @returns
    */
-  precomputeTokenizationAfterInput(
+  mapWhitespacedTokenization(
     lexicalModel: LexicalModel,
     transform: Transform,
     edgeOptions?: EdgeWindowOptions
