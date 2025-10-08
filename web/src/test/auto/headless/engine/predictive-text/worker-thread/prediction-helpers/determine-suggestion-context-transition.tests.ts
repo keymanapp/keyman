@@ -96,7 +96,7 @@ describe('determineContextTransition', () => {
       const transition = determineContextTransition(
         tracker,
         tracker.latest.base,
-        targetContext,
+        baseContext,
         inputDistribution
       );
 
@@ -105,6 +105,8 @@ describe('determineContextTransition', () => {
       assert.isFalse(warningEmitterSpy.called);
       assert.sameOrderedMembers(transition.final.tokenization.exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
       assert.isOk(transition.final.tokenization.alignment);
+      assert.equal(transition.final.context.left, targetContext.left);
+      assert.equal(transition.final.context.right ?? "", targetContext.right ?? "");
       assert.sameDeepOrderedMembers(transition.inputDistribution, inputDistribution);
       assert.isNotOk(transition.preservationTransform);
       assert.equal(transition.transitionId, 1);
@@ -355,7 +357,7 @@ describe('determineContextTransition', () => {
 
       const appendDeletingTransition = determineContextTransition(
         tracker,
-        extendingTransition.final, {
+        extensionDeletingTransition.final, {
           left: 'this is for testing ',
           startOfBuffer: true,
           endOfBuffer: true,
@@ -429,7 +431,7 @@ describe('determineContextTransition', () => {
 
       const appendDeletingTransition = determineContextTransition(
         tracker,
-        extendingTransition.final, {
+        extensionDeletingTransition.final, {
           left: 'this is for testing ',
           startOfBuffer: true,
           endOfBuffer: true,
@@ -441,7 +443,7 @@ describe('determineContextTransition', () => {
 
       const editingBkspTransition = determineContextTransition(
         tracker,
-        extendingTransition.final, {
+        appendDeletingTransition.final, {
           left: 'this is for testing',
           startOfBuffer: true,
           endOfBuffer: true,
