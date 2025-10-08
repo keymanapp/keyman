@@ -64,7 +64,10 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_LAYR, this.sect.layr);
     this.emitSection(file, this.file.COMP_PLUS_LIST, this.sect.list);
     this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect.loca);
-    this.emitSection(file, this.file.COMP_PLUS_META, this.sect.meta);
+
+    // always emit a v19 meta, because it is backwardly compatible
+    this.emitSection(file, this.file.COMP_PLUS_META_v19, this.sect.meta);
+
     this.emitSection(file, this.file.COMP_PLUS_STRS, this.sect.strs);
     this.emitStrings(file);
     this.emitSection(file, this.file.COMP_PLUS_TRAN, this.sect.tran);

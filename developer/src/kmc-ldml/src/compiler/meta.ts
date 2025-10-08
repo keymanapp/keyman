@@ -67,6 +67,11 @@ export class MetaCompiler extends SectionCompiler {
                                                  {compileContext: this.keyboard3.version});
     result.settings =
       (this.keyboard3.settings?.normalization == "disabled" ? KeyboardSettings.normalizationDisabled : 0);
+      // Note: KeyboardSettings.oskOnly can never be set for an LDML keyboard
+
+    // TODO-EMBED-OSK-IN-KMX: support these values in special data in LDML format
+    result.fontFaceName  = sections.strs.allocString('', /*compileContext: ...*/);
+    result.fontSizePct   = 100;
     return result;
   }
 }

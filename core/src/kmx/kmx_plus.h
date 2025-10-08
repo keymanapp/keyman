@@ -76,14 +76,14 @@ struct COMP_KMXPLUS_SECT {
   COMP_KMXPLUS_SECT_ENTRY entries[];  // 0010 section entries
   /**
    * @brief Get the offset of a section
-   * 
+   *
    * @param ident section id such as 'strs'. Never 'sect' (the sect table does not list itself!)
    * @return KMX_DWORD offset from beginning of kmxplus, or 0 if not found
    */
   KMX_DWORD find(KMX_DWORD ident) const;
   /**
    * @brief Get the pointer to a specific section
-   * 
+   *
    * @param ident section id such as 'strs'. Never 'sect' (the sect table does not list itself!)
    * @param entryLength on exit, will be set to the possible length of the section (based on the remainder of the KMX+ file)
    * @return pointer to raw bytes of requested section, or nullptr if not found
@@ -187,6 +187,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_LOCA) == LDML_LENGTH_LOCA, "mismatched 
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_META {
+  // v16
   static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_META;
   COMP_KMXPLUS_HEADER header;
   KMXPLUS_STR author;
@@ -196,18 +197,37 @@ struct COMP_KMXPLUS_META {
   KMXPLUS_STR indicator;
   KMXPLUS_STR version;
   KMX_DWORD_unaligned settings;
+
   /**
    * @brief True if section is valid.
    */
   bool valid(KMX_DWORD length) const;
 
-  /** @brief True if normalization disabled*/
+  /** @brief True if normalization disabled */
   bool normalization_disabled() const {
     return settings & LDML_META_SETTINGS_NORMALIZATION_DISABLED;
   }
 };
 
-static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");
+struct COMP_KMXPLUS_META_v19 {
+  COMP_KMXPLUS_META v16;
+  // v19
+  KMXPLUS_STR fontFaceName;
+  KMX_DWORD_unaligned fontSizePct;
+
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+
+  /** @brief True if data represents only OSK, and not a full LDML keyboard */
+  bool osk_only() const {
+    return v16.settings & LDML_META_SETTINGS_OSK_ONLY;
+  }
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META_V16, "mismatched size of section meta.16");
+static_assert(sizeof(struct COMP_KMXPLUS_META_v19) == LDML_LENGTH_META_V19, "mismatched size of section meta.19");
 
 /* ------------------------------------------------------------------
  * strs section
