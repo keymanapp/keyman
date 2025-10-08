@@ -177,11 +177,11 @@ export class ContextTokenization {
    * @returns
    */
   applyContextSlide(lexicalModel: LexicalModel, transform: Transform & { deleteRight: number }): ContextTokenization {
-    // Assertion: the current (sliding) context window is alignable and
+    // Assumption: the current (sliding) context window is alignable and
     // valid deltas have been computed.
 
-    // Assertion:  the transform will EITHER have an insert OR a deleteRight.  Not both.
-    // Assertion:  deleteLeft is always empty.  (There's nothing to the left; we apply on that side.)
+    // Assumption:  the transform will EITHER have an insert OR a deleteRight.  Not both.
+    // Assumption:  deleteLeft is always empty.  (There's nothing to the left; we apply on that side.)
     if(TransformUtils.isEmpty(transform)) {
       // No edits needed?  Why retokenize?
       return new ContextTokenization(this);
@@ -503,7 +503,7 @@ export class ContextTokenization {
 
     const tokenization: ContextToken[] = [];
 
-    // Assertion:  all three are in sorted index order.  (They're created that way.)
+    // Assumption:  all three are in sorted index order.  (They're created that way.)
     const { merges, splits, unmappedEdits } = alignment;
     // Handle merges, splits, unmapped edits.
 
@@ -514,7 +514,6 @@ export class ContextTokenization {
         const merge = merges.shift();
         const tokensToMerge = merge.inputs.map((m) => baseTokenization[m.index]);
         const mergeResult = ContextToken.merge(tokensToMerge, lexicalModel);
-        // Assertion:  if we're merging a token, it's not whitespace.
         tokenization.push(mergeResult);
         i = merge.inputs[merge.inputs.length - 1].index;
         continue;
@@ -524,7 +523,6 @@ export class ContextTokenization {
         // do a split!
         const split = splits.shift();
         const splitResults = baseTokenization[i].split(split, lexicalModel);
-        // Assertion:  if we're splitting a token, it's not whitespace.
         const resultStack = splitResults.reverse();
         while(resultStack.length > 0) {
           tokenization.push(resultStack.pop());
@@ -540,7 +538,7 @@ export class ContextTokenization {
       tokenization.push(new ContextToken(baseTokenization[i]));
     }
 
-    // Assertion:  inputs.length > 0.
+    // Assumption:  inputs.length > 0.  (There is at least one input transform.)
     const inputTransformKeys = [...inputs[0].sample.keys()];
     let removedTokenCount = alignment.removedTokenCount;
     while(removedTokenCount-- > 0) {
@@ -1169,7 +1167,7 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
     * result token for either edit type, or to a token immediately after the
     * result.
     *
-    * Assertions:
+    * Assumptions:
     * - not used with epic/dict-breaker
     * - per unicode wordbreaker, no massive shifting of word boundaries for
     *   prior text.
