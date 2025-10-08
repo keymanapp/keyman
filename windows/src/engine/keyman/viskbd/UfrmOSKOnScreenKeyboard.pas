@@ -245,7 +245,7 @@ end;
  *)
 procedure TfrmOSKOnScreenKeyboard.OskModifierEvent(VKCode, Flags: DWORD);
 var
-  extended, isUp: Boolean;
+  isUp: Boolean;
   scanCode: DWORD;
 const
   /// The normal scan code for left Control key
@@ -255,7 +255,7 @@ const
   /// Windows for compatibility reasons.
   SCAN_LEFT_CONTROL_SIMULATED = $21D;
 begin
-  extended := (Flags and KEYEVENTF_EXTENDEDKEY) <> 0;
+  // not used: extended := (Flags and KEYEVENTF_EXTENDEDKEY) <> 0;
   isUp := (Flags and KEYEVENTF_KEYUP) <> 0;
 
   // In order to identify the Windows simulated left control scan code, we need
@@ -269,7 +269,7 @@ begin
   // or injected), so that we don't end up with a stuck left control key
   if (scanCode = SCAN_LEFT_CONTROL_SIMULATED) and not isUp then
     IsSimulatedLControlDown := True
-  else if (scanCode in [SCAN_LEFT_CONTROL, SCAN_LEFT_CONTROL_SIMULATED]) and isUp then
+  else if ((scanCode = SCAN_LEFT_CONTROL) or (scanCode = SCAN_LEFT_CONTROL_SIMULATED)) and isUp then
     IsSimulatedLControlDown := False;
 
   // TODO: in the future, we might be able to eliminate tmrCheck and make all
