@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.135 alpha 2025-10-08
+
+* fix(android): Convert longpress delay menu to ConstraintLayout (#14897)
+
 ## 19.0.134 alpha 2025-10-07
 
 * maint(resources): nest unit tests under parent block (#14871)
