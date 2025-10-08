@@ -16,12 +16,11 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
-
 // Mark affected tokens with the applied-suggestion transition ID
 // for easy future reference.
 const tagTokens = (state: ContextState, suggestion: Suggestion) => {
-  const alignment = state.tokenization.alignment
-  const appliedTokenCount = (alignment.canAlign && true) && (alignment.tailEditLength + Math.max(alignment.tailTokenShift, 0));
+  const inputs = state.tokenization.transitionEdits.inputs;
+  const appliedTokenCount = inputs[0].sample.size;
   const tokens = state.tokenization.tokens;
   for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
     tokens[i].appliedTransitionId = suggestion.transformId;
