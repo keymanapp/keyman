@@ -2511,7 +2511,12 @@ public final class KMManager {
       return sysBottomInset;
     }
 
-    return inappBottomInset;
+    // Navigation bar height uninitialized, so log and revert to legacy computation.
+    // Note. Inconsistent for gesture vs 3-button navigation mode #14893
+    KMLog.LogError(TAG, "bottom inset not initialized for keyboard type: " + keyboardType);
+    int resourceId = context.getResources().getIdentifier(
+      "navigation_bar_height", "dimen", "android");
+    return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
   }
 
   /**
