@@ -4,8 +4,8 @@
  * Created by jahorton on 2025-09-23
  *
  * This file contains low-level tests designed to validate the behavior of the
- * of the ContextTokenization class and its integration with the lower-level
- * classes that it utilizes.
+ * ContextTokenization class and its integration with the lower-level classes
+ * that it utilizes.
  */
 
 import { assert } from 'chai';
