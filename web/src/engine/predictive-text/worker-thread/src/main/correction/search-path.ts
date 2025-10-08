@@ -12,7 +12,7 @@ import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keyman
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { PathResult, SearchSpace } from './search-space.js';
+import { generateSpaceSeed, PathResult, SearchSpace } from './search-space.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -33,6 +33,7 @@ export class SearchPath implements SearchSpace {
   readonly rootPath: SearchPath;
 
   private parentPath: SearchPath;
+  readonly spaceId: number;
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
   // is cheaper than iteratively building a priority queue.
@@ -75,7 +76,9 @@ export class SearchPath implements SearchSpace {
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(arg1: LexicalModel | SearchPath) {
+  constructor(arg1: SearchPath|LexicalModel) {
+    this.spaceId = generateSpaceSeed();
+
     if(arg1 instanceof SearchPath) {
       const parentSpace = arg1;
       this.lowestCostAtDepth = parentSpace.lowestCostAtDepth.slice();
@@ -90,7 +93,7 @@ export class SearchPath implements SearchSpace {
       throw new Error("The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.");
     }
 
-    const rootNode = new SearchNode(model.traverseFromRoot(), model.toKey ? model.toKey.bind(model) : null);
+    const rootNode = new SearchNode(model.traverseFromRoot(), this.spaceId, model.toKey ? model.toKey.bind(model) : null);
     this.selectionQueue.enqueue(rootNode);
     this.lowestCostAtDepth = [];
     this.rootPath = this;
@@ -164,8 +167,8 @@ export class SearchPath implements SearchSpace {
     // our previously-reached 'extractedResults' nodes.
     let newlyAvailableEdges: SearchNode[] = [];
     let batches = this.completedPaths?.map(function(node) {
-      let deletions = node.buildDeletionEdges(input);
-      let substitutions = node.buildSubstitutionEdges(input);
+      let deletions = node.buildDeletionEdges(input, childSpace.spaceId);
+      let substitutions = node.buildSubstitutionEdges(input, childSpace.spaceId);
 
       const batch = deletions.concat(substitutions);
 
@@ -206,9 +209,9 @@ export class SearchPath implements SearchSpace {
 
     let deletionEdges: SearchNode[] = [];
     if(!substitutionsOnly) {
-      deletionEdges       = currentNode.buildDeletionEdges(this.inputs);
+      deletionEdges       = currentNode.buildDeletionEdges(this.inputs, this.spaceId);
     }
-    const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputs);
+    const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputs, this.spaceId);
     let batch = deletionEdges.concat(substitutionEdges);
 
     // Skip the queue for the first pass; there will ALWAYS be at least one pass,
@@ -245,7 +248,7 @@ export class SearchPath implements SearchSpace {
       return {
         ...result,
         type: 'intermediate'
-      } as PathResult;
+      } as PathResult
     }
 
     let currentNode = this.selectionQueue.dequeue();
@@ -315,7 +318,8 @@ export class SearchPath implements SearchSpace {
     return {
       type: 'complete',
       cost: currentNode.currentCost,
-      finalNode: currentNode
+      finalNode: currentNode,
+      spaceId: this.spaceId
     };
   }
 
