@@ -43,6 +43,8 @@ function textToCharTransforms(text: string, transformId?: number): Transform[] {
     [...text].map(insert => ({insert, deleteLeft: 0}));
 }
 
+let TOKEN_INPUT_ID_SEED = 0;
+
 /**
  * Represents cached data about one token (either a word or a unit of whitespace)
  * in the context and associated correction-search progress and results.
@@ -96,8 +98,7 @@ export class ContextToken {
   constructor(param: ContextToken | LexicalModel, rawText?: string, isPartial?: boolean) {
     if(param instanceof ContextToken) {
       const priorToken = param;
-      this.isWhitespace = priorToken.isWhitespace;
-      this.isPartial = priorToken.isPartial;
+      Object.assign(this, priorToken);
 
       // We need to construct a separate search space from other token copies.
       //
@@ -105,19 +106,12 @@ export class ContextToken {
       // we need to ensure that only fully-utilized keystrokes are considered.
       this.searchSpace = new SearchSpace(priorToken.searchSpace);
       this._inputRange = priorToken._inputRange.slice();
-
-      // Preserve any annotated applied-suggestion transition ID data; it's useful
-      // for delayed reversion operations.
-      if(priorToken.appliedTransitionId !== undefined) {
-        this.appliedTransitionId = priorToken.appliedTransitionId
-      }
     } else {
       const model = param;
 
       // May be altered outside of the constructor.
       this.isWhitespace = false;
       this.isPartial = !!isPartial;
-      this.searchSpace = new SearchSpace(model);
       this._inputRange = [];
 
       rawText ||= '';
@@ -126,13 +120,21 @@ export class ContextToken {
       const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
         return [{sample: transform, p: 1.0}];
       });
+
+      const spaceId = TOKEN_INPUT_ID_SEED;
+      this.searchSpace = new SearchSpace(model, spaceId);
+
       rawTransformDistributions.forEach((entry) => {
         this._inputRange.push({
           trueTransform: entry[0].sample,
           inputStartIndex: 0
         });
-        this.searchSpace.addInput(entry);
+        this.searchSpace.addInput(entry, TOKEN_INPUT_ID_SEED++);
       });
+
+      if(!rawTransformDistributions.length) {
+        TOKEN_INPUT_ID_SEED++;
+      }
     }
   }
 
@@ -142,7 +144,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this.searchSpace.addInput(distribution);
+    this.searchSpace.addInput(distribution, TOKEN_INPUT_ID_SEED++);
   }
 
   /**
@@ -158,6 +160,10 @@ export class ContextToken {
    */
   get isEmptyToken(): boolean {
     return this.exampleInput == '';
+  }
+
+  get spaceId(): number {
+    return this.searchSpace.spaceId;
   }
 
   /**

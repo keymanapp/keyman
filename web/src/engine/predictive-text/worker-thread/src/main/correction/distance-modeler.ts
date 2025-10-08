@@ -124,13 +124,13 @@ export class SearchNode {
    */
   private _inputCost?: number;
 
-  constructor(rootTraversal: LexiconTraversal, toKey?: (arg0: string) => string);
-  constructor(node: SearchNode);
-  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (arg0: string) => string) {
-    toKey = toKey || (x => x);
+  readonly spaceId: number;
 
-    if(rootTraversal instanceof SearchNode) {
-      const priorNode = rootTraversal;
+  constructor(rootTraversal: LexiconTraversal, spaceId: number, toKey?: (arg0: string) => string);
+  constructor(node: SearchNode, spaceId?: number);
+  constructor(param1: LexiconTraversal | SearchNode, spaceId?: number, toKey?: ((arg0: string) => string)) {
+    if(param1 instanceof SearchNode) {
+      const priorNode = param1;
 
       Object.assign(this, priorNode);
       if(this.partialEdge) {
@@ -142,11 +142,16 @@ export class SearchNode {
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
       delete this._inputCost;
+
+      // This is unique at each level, though it will reuse a previous ID if no new
+      // one is provided (say, for 'insert' edits).
+      this.spaceId = spaceId ?? priorNode.spaceId;
     } else {
       this.calculation = new ClassicalDistanceCalculation();
-      this.matchedTraversals = [rootTraversal];
+      this.matchedTraversals = [param1];
       this.priorInput = [];
-      this.toKey = toKey;
+      this.toKey = toKey || (x => x);
+      this.spaceId = spaceId;
     }
   }
 
@@ -420,17 +425,17 @@ export class SearchNode {
    * represented lexicon prefix - be it due to not adding one (deletions) or
    * due to not being the same character, all mismatching cases are merged into
    * one, reducing the rate of expansion for the search graph.
-   * @param inputDistribution
+   * @param input
    * @param isSubstitution
    * @returns
    */
-  private setupSubsetProcessing(inputDistribution: Distribution<Transform>, isSubstitution: boolean ) {
+  private setupSubsetProcessing(input: {dist: Distribution<Transform>, edgeId: number}, isSubstitution: boolean ) {
     if(this.hasPartialInput) {
       throw new Error("Invalid state:  will not take new input while still processing Transform subset");
     }
 
     const edges: SearchNode[] = [];
-    const subsets = subsetByInterval(inputDistribution);
+    const subsets = subsetByInterval(input.dist);
 
     for(let dl = 0; dl < subsets.length; dl++) {
       const dlSubset = subsets[dl];
@@ -448,7 +453,7 @@ export class SearchNode {
           continue;
         }
 
-        const node = new SearchNode(this);
+        const node = new SearchNode(this, input.edgeId);
         node.calculation = edgeCalc;
         node.partialEdge = {
           doSubsetMatching: isSubstitution,
@@ -477,8 +482,8 @@ export class SearchNode {
    * @returns An array of SearchNodes corresponding to search paths that skip the next
    * input keystroke.
    */
-  buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
-    return this.setupSubsetProcessing(inputDistribution, false);
+  buildDeletionEdges(input: {dist: Distribution<Transform>, edgeId: number}): SearchNode[] {
+    return this.setupSubsetProcessing(input, false);
   }
 
   /**
@@ -490,12 +495,12 @@ export class SearchNode {
    * @returns An array of SearchNodes corresponding to search paths that match or
    * replace the next currently-unprocessed input.
    */
-  buildSubstitutionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
+  buildSubstitutionEdges(input: {dist: Distribution<Transform>, edgeId: number}): SearchNode[] {
     // Note:  due to the batching approach used via TransformSubsets,
     // substitutions are _not_ adequately represented by one 'insertion' + one
     // 'deletion' step. Explicit substitution / match-oriented processing is
     // required.
-    return this.setupSubsetProcessing(inputDistribution, true);
+    return this.setupSubsetProcessing(input, true);
   }
 
   /**
@@ -633,6 +638,10 @@ export class SearchResult {
   get finalTraversal(): LexiconTraversal {
     return this.resultNode.currentTraversal;
   }
+
+  get spaceId(): number {
+    return this.resultNode.spaceId;
+  }
 }
 
 type NullPath = {
@@ -666,7 +675,7 @@ export class SearchSpace {
 
   private tierOrdering: SearchSpaceTier[] = [];
   private selectionQueue: PriorityQueue<SearchSpaceTier>;
-  private _inputSequence: Distribution<Transform>[] = [];
+  private _inputSequence: {dist: Distribution<Transform>, edgeId: number}[] = [];
   private minInputCost: number[] = [];
   private rootNode: SearchNode;
 
@@ -703,8 +712,8 @@ export class SearchSpace {
    * and suggestion searches.
    * @param model
    */
-  constructor(model: LexicalModel);
-  constructor(arg1: SearchSpace|LexicalModel) {
+  constructor(model: LexicalModel, baseSpaceId: number);
+  constructor(arg1: SearchSpace|LexicalModel, arg2?: number) {
     // Constructs the priority-queue comparator-closure needed for determining which
     // tier should be searched next.
     this.buildQueueSpaceComparator();
@@ -731,7 +740,7 @@ export class SearchSpace {
     }
 
     this.selectionQueue = new PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
-    this.rootNode = new SearchNode(model.traverseFromRoot(), model.toKey ? model.toKey.bind(model) : null);
+    this.rootNode = new SearchNode(model.traverseFromRoot(), arg2, model.toKey ? model.toKey.bind(model) : null);
 
     this.completedPaths = [this.rootNode];
 
@@ -797,8 +806,15 @@ export class SearchSpace {
   /**
    * Retrieves the sequence of inputs
    */
-  public get inputSequence() {
-    return [...this._inputSequence];
+  public get inputSequence(): ReadonlyArray<Distribution<Transform>> {
+    return [...this._inputSequence.map(e => e.dist)];
+  }
+
+  /**
+   * Returns an identifier uniquely matching the ContextToken owning this search space.
+   */
+  public get spaceId(): number {
+    return this._inputSequence[this._inputSequence.length - 1].edgeId;
   }
 
   increaseMaxEditDistance() {
@@ -808,7 +824,7 @@ export class SearchSpace {
   get correctionsEnabled() {
     // When corrections are disabled, the Web engine will only provide individual Transforms
     // for an input, not a distribution.  No distributions means we shouldn't do corrections.
-    return !!this._inputSequence.find((distribution) => distribution.length > 1);
+    return !!this._inputSequence.find((entry) => entry.dist.length > 1);
   }
 
   /**
@@ -817,8 +833,9 @@ export class SearchSpace {
    * @param inputDistribution The fat-finger distribution for the incoming keystroke (or
    * just the raw keystroke if corrections are disabled)
    */
-  addInput(inputDistribution: Distribution<Transform>) {
-    this._inputSequence.push(inputDistribution);
+  addInput(inputDistribution: Distribution<Transform>, tokenId: number) {
+    const input = {dist: inputDistribution, edgeId: tokenId};
+    this._inputSequence.push(input);
 
     // Assumes that `inputDistribution` is already sorted.
     this.minInputCost.push(-Math.log(inputDistribution[0].p));
@@ -827,8 +844,8 @@ export class SearchSpace {
     // our previously-reached 'extractedResults' nodes.
     let newlyAvailableEdges: SearchNode[] = [];
     let batches = this.completedPaths.map(function(node) {
-      let deletions = node.buildDeletionEdges(inputDistribution);
-      let substitutions = node.buildSubstitutionEdges(inputDistribution);
+      let deletions = node.buildDeletionEdges(input);
+      let substitutions = node.buildSubstitutionEdges(input);
 
       const batch = deletions.concat(substitutions);
 

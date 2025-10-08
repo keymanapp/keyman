@@ -34,6 +34,8 @@ const toKey = (s: string) => testModel.toKey(s);
  */
 const FIRST_CHAR_VARIANTS = 24;
 
+let SEARCH_EDGE_SEED = 0;
+
 function buildTestTimer() {
   return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
@@ -51,7 +53,7 @@ function edgeHasChars(edge: correction.SearchNode, input: string, match: string)
 }
 
 function findEdgesWithChars(edgeArray: correction.SearchNode[], match: string) {
-  let results = edgeArray.filter(function(value) {
+  const results = edgeArray.filter((value) => {
     return value.calculation.lastMatchEntry == match;
   });
 
@@ -60,7 +62,8 @@ function findEdgesWithChars(edgeArray: correction.SearchNode[], match: string) {
 }
 
 function fetchCommonTENode() {
-  const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+  const rootSeed = SEARCH_EDGE_SEED++;
+  const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
 
   // Establish desired source node:  prefix 'te'.
   const firstLayerTransforms: Distribution<Transform> = [{
@@ -76,14 +79,16 @@ function fetchCommonTENode() {
     },
     p: 0.25
   }];
+  const firstLayerSeed = SEARCH_EDGE_SEED++;
   const firstLayerNodes = rootNode
-    .buildSubstitutionEdges(firstLayerTransforms)
+    .buildSubstitutionEdges({dist: firstLayerTransforms, edgeId: firstLayerSeed })
     .flatMap(node => node.processSubsetEdge());
   assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
   firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
 
   const tNode = firstLayerNodes[0];
   assert.equal(tNode.resultKey, 't');
+  assert.equal(tNode.spaceId, firstLayerSeed);
   assert.sameDeepMembers(tNode.priorInput, [firstLayerTransforms[0]]);
   assert.isFalse(tNode.hasPartialInput);
 
@@ -100,8 +105,9 @@ function fetchCommonTENode() {
     },
     p: 0.2
   }];
+  const secondLayerSeed = SEARCH_EDGE_SEED++;
   const secondLayerNodes = tNode
-    .buildSubstitutionEdges(secondLayerTransforms)
+    .buildSubstitutionEdges({dist: secondLayerTransforms, edgeId: secondLayerSeed})
     .flatMap(node => node.processSubsetEdge());
   // The field narrows down at this point, but still has a decent number
   // of variants (11).
@@ -112,14 +118,25 @@ function fetchCommonTENode() {
 
   assert.equal(teNode.resultKey, 'te');
   assert.equal(teNode.editCount, 0);
+  assert.equal(teNode.spaceId, secondLayerSeed);
 
   return teNode;
 }
 
-describe('Correction Distance Modeler', function() {
-  describe('SearchNode', function() {
+// TEMP:  to prevent build warnings while in process.
+PriorityQueue;
+getBestMatches;
+SENTINEL_CODE_UNIT;
+SearchResult;
+buildTestTimer;
+assertEdgeChars;
+findEdgesWithChars;
+
+describe('Correction Distance Modeler', () => {
+  describe('SearchNode', () => {
     it('constructs a fresh instance from a traversal + keyingFunction', () => {
-      const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+      const rootSeed = SEARCH_EDGE_SEED++;
+      const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
       assert.equal(rootNode.resultKey, '');
 
       assert.equal(rootNode.editCount, 0);
@@ -132,11 +149,12 @@ describe('Correction Distance Modeler', function() {
       assert.isUndefined(rootNode.calculation.lastInputEntry);
       assert.isUndefined(rootNode.calculation.lastMatchEntry);
       assert.equal(rootNode.toKey, toKey);
+      assert.equal(rootNode.spaceId, rootSeed);
     });
 
     describe('supports the cloning constructor pattern', () => {
       it('properly deep-copies the root node', () => {
-        const originalNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+        const originalNode = new SearchNode(testModel.traverseFromRoot(), SEARCH_EDGE_SEED++, toKey);
         const clonedNode = new SearchNode(originalNode);
 
         // Root node properties; may as well re-assert 'em.
@@ -152,6 +170,7 @@ describe('Correction Distance Modeler', function() {
         assert.isUndefined(clonedNode.calculation.lastInputEntry);
         assert.isUndefined(clonedNode.calculation.lastMatchEntry);
         assert.equal(clonedNode.toKey, toKey);
+        assert.equal(clonedNode.spaceId, originalNode.spaceId);
 
         // Avoid aliasing for properties holding mutable objects
         assert.notEqual(clonedNode.priorInput, originalNode.priorInput);
@@ -162,7 +181,8 @@ describe('Correction Distance Modeler', function() {
       });
 
       it('properly deep-copies fully-processed nodes later in the search path', () => {
-        const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
 
         // Establish desired source node:  prefix 'te'.
         const firstLayerTransforms: Distribution<Transform> = [{
@@ -179,7 +199,7 @@ describe('Correction Distance Modeler', function() {
           p: 0.25
         }];
         const firstLayerNodes = rootNode
-          .buildSubstitutionEdges(firstLayerTransforms)
+          .buildSubstitutionEdges({dist: firstLayerTransforms, edgeId: SEARCH_EDGE_SEED++})
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
         firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -202,8 +222,9 @@ describe('Correction Distance Modeler', function() {
           },
           p: 0.2
         }];
+        const secondSpaceId = SEARCH_EDGE_SEED++;
         const secondLayerNodes = tNode
-          .buildSubstitutionEdges(secondLayerTransforms)
+          .buildSubstitutionEdges({dist: secondLayerTransforms, edgeId: secondSpaceId})
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(secondLayerNodes.length, 10);
         secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -225,6 +246,7 @@ describe('Correction Distance Modeler', function() {
           assert.equal(node.calculation.lastMatchEntry, 'e');
           assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
           assert.equal(node.toKey, toKey);
+          assert.equal(node.spaceId, secondSpaceId);
         }
 
         assertSourceNodeProps(teNode);
@@ -243,7 +265,8 @@ describe('Correction Distance Modeler', function() {
       });
 
       it('properly deep-copies partially-processed edges later in the search path', () => {
-        const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
 
         // Establish desired source node:  prefix 'te', with 'e' the first letter of
         // a multi-char insert Transform.
@@ -261,7 +284,7 @@ describe('Correction Distance Modeler', function() {
           p: 0.25
         }];
         const firstLayerNodes = rootNode
-          .buildSubstitutionEdges(firstLayerTransforms)
+          .buildSubstitutionEdges({dist: firstLayerTransforms, edgeId: SEARCH_EDGE_SEED++})
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
         firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -284,8 +307,10 @@ describe('Correction Distance Modeler', function() {
           },
           p: 0.2
         }];
+
+        const secondLayerId = SEARCH_EDGE_SEED++;
         const secondLayerNodes = tNode
-          .buildSubstitutionEdges(secondLayerTransforms)
+          .buildSubstitutionEdges({dist: secondLayerTransforms, edgeId: secondLayerId})
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(secondLayerNodes.length, 10);
         secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -307,6 +332,7 @@ describe('Correction Distance Modeler', function() {
           assert.equal(node.calculation.lastMatchEntry, 'e');
           assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
           assert.equal(node.toKey, toKey);
+          assert.equal(node.spaceId, secondLayerId);
         }
 
         assertSourceNodeProps(teNode);
@@ -326,25 +352,27 @@ describe('Correction Distance Modeler', function() {
     });
 
     // Consider adding more, deeper?
-    it('builds insertion edges based on lexicon, from root', function() {
-      let rootTraversal = testModel.traverseFromRoot();
+    it('builds insertion edges based on lexicon, from root', () => {
+      const rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let rootNode = new correction.SearchNode(rootTraversal);
+      const rootSeed = SEARCH_EDGE_SEED++;
+      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
       assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-      let edges = rootNode.buildInsertionEdges();
+      const edges = rootNode.buildInsertionEdges();
       assert.isAbove(edges.length, 0);
 
       let expectedChildCount = 0;
-      for(let child of rootTraversal.children()) {
+      for(const child of rootTraversal.children()) {
         expectedChildCount++;
 
-        let childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
+        const childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
         assert.isOk(childEdge);
         assert.isEmpty(childEdge.priorInput);
         assert.isEmpty(childEdge.calculation.inputSequence);
         assert.isAbove(childEdge.currentCost, 0);
+        assert.equal(childEdge.spaceId, rootSeed);
       }
 
       assert.equal(edges.length, expectedChildCount);
@@ -368,13 +396,15 @@ describe('Correction Distance Modeler', function() {
       ];
 
       it('step 1: batches deletion edge(s) for input transforms', () => {
-        let rootTraversal = testModel.traverseFromRoot();
+        const rootTraversal = testModel.traverseFromRoot();
         assert.isNotEmpty(rootTraversal);
 
-        let rootNode = new correction.SearchNode(rootTraversal);
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildDeletionEdges({dist: synthDistribution, edgeId: subsetSeed});
         assert.equal(subsetNodes.length, 4);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
         const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x))
@@ -383,6 +413,7 @@ describe('Correction Distance Modeler', function() {
           assert.isTrue(subsetNodes[i].hasPartialInput);
           // From root: the deleteLeft 1 entries have nothing to delete.
           assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, '');
+          assert.equal(subsetNodes[i].spaceId, subsetSeed);
 
           // Allow a little value wiggle due to double-precision limitations.
           assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
@@ -393,15 +424,18 @@ describe('Correction Distance Modeler', function() {
 
       it('step 2: first processing layer resolves zero + one char inserts', () => {
         // From "step 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution);
+        const rootTraversal = testModel.traverseFromRoot();
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildDeletionEdges({dist: synthDistribution, edgeId: subsetSeed});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         const processedNodes = subsetNodes.flatMap(n => n.processSubsetEdge());
         // All delete-oriented Transform subsets condense down to a single
         // transform (and edge) each.
         assert.equal(processedNodes.length, 4);
+        processedNodes.forEach((n) => assert.equal(n.spaceId, subsetSeed));
 
         // Sorted index 0:  1 insert - should be processed already, in a single
         // step.
@@ -436,9 +470,11 @@ describe('Correction Distance Modeler', function() {
 
       it('step 3: second processing layer resolves two char inserts', () => {
         // From "steps 0, 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution);
+        const rootTraversal = testModel.traverseFromRoot();
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildDeletionEdges({dist: synthDistribution, edgeId: subsetSeed});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         // Two nodes were unprocessed at the end of the last step; we handle
@@ -455,6 +491,7 @@ describe('Correction Distance Modeler', function() {
           assert.isFalse(processedNode.hasPartialInput);
           assert.isFalse(processedNode.hasPartialInput);
           assert.equal(processedNode.editCount, 2);
+          assert.equal(processedNode.spaceId, subsetSeed);
           assert.equal(processedNode.calculation.inputSequence.length, 2);
           assert.equal(processedNode.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
           assert.equal(processedNode.inputSamplingCost, step2Nodes[index].inputSamplingCost);
@@ -486,7 +523,8 @@ describe('Correction Distance Modeler', function() {
         const teNode = fetchCommonTENode();
         assert.equal(teNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = teNode.buildDeletionEdges({dist: synthDistribution, edgeId: subsetSeed});
         assert.equal(subsetNodes.length, 4);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
@@ -497,6 +535,8 @@ describe('Correction Distance Modeler', function() {
           assert.isTrue(subsetNodes[i].hasPartialInput);
           // From a 'te' prefix, the deleteLeft 1 entries do have something to delete.
           assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, (i == 0 || i == 2) ? 'te' : 't');
+          assert.notEqual(subsetNodes[i].spaceId, teNode.spaceId);
+          assert.equal(subsetNodes[i].spaceId, subsetSeed);
 
           // Allow a little value wiggle due to double-precision limitations.
           assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
@@ -508,13 +548,16 @@ describe('Correction Distance Modeler', function() {
       it('step 2: first processing layer resolves zero + one char inserts', () => {
         // From "step 1" above, assertions removed
         const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = teNode.buildDeletionEdges({dist: synthDistribution, edgeId: subsetSeed});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         const processedNodes = subsetNodes.flatMap(n => n.processSubsetEdge());
         // All delete-oriented Transform subsets condense down to a single
         // transform (and edge) each.
         assert.equal(processedNodes.length, 4);
+        processedNodes.forEach(n => assert.notEqual(n.spaceId, teNode.spaceId));
+        processedNodes.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         // Sorted index 0:  1 insert - should be processed already, in a single
         // step.
@@ -550,7 +593,8 @@ describe('Correction Distance Modeler', function() {
 
       it('step 3: second processing layer resolves two char inserts', () => {
         const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = teNode.buildDeletionEdges({dist: synthDistribution, edgeId: subsetSeed});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         // Two nodes were unprocessed at the end of the last step; we handle
@@ -567,6 +611,8 @@ describe('Correction Distance Modeler', function() {
             assert.isFalse(processedNode.hasPartialInput);
             assert.isFalse(processedNode.hasPartialInput);
             assert.equal(processedNode.editCount, 2);
+            assert.notEqual(processedNode.spaceId, teNode.spaceId);
+            assert.equal(processedNode.spaceId, subsetSeed);
             assert.equal(processedNode.calculation.inputSequence.length, 4 - dl);
             assert.equal(processedNode.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
             assert.equal(processedNode.inputSamplingCost, baseNode.inputSamplingCost);
@@ -597,13 +643,14 @@ describe('Correction Distance Modeler', function() {
       ];
 
       it('step 1: batches substitution edge(s) for input transforms', () => {
-        let rootTraversal = testModel.traverseFromRoot();
+        const rootTraversal = testModel.traverseFromRoot();
         assert.isNotEmpty(rootTraversal);
 
-        let rootNode = new correction.SearchNode(rootTraversal);
+        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildSubstitutionEdges({dist: synthDistribution, edgeId: subsetSeed});
         assert.equal(subsetNodes.length, 4);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
         const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x))
@@ -612,6 +659,7 @@ describe('Correction Distance Modeler', function() {
           assert.isTrue(subsetNodes[i].hasPartialInput);
           // From root: the deleteLeft 1 entries have nothing to insert.
           assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, '');
+          assert.equal(subsetNodes[i].spaceId, subsetSeed);
 
           // Allow a little value wiggle due to double-precision limitations.
           assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
@@ -622,15 +670,18 @@ describe('Correction Distance Modeler', function() {
 
       it('step 2: first processing layer resolves zero + one char inserts', () => {
         // From "step 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution);
+        const rootTraversal = testModel.traverseFromRoot();
+        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildSubstitutionEdges({dist: synthDistribution, edgeId: subsetSeed});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         // Set 0:  set for ins 1, dl 0
         const ins1_dl0 = subsetNodes[0].processSubsetEdge();
         // 3 transforms went in... but 1 ('x') had no lexical match.
         assert.equal(ins1_dl0.length, FIRST_CHAR_VARIANTS + 3 - 1);
+        ins1_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         ins1_dl0.sort((a, b) => a.currentCost - b.currentCost);
         ins1_dl0.forEach(n => assert.isFalse(n.hasPartialInput)); // all fully-processed.
@@ -678,6 +729,7 @@ describe('Correction Distance Modeler', function() {
 
         // No inserts, so no insert variants are possible.
         assert.equal(ins0_dl1.length, 1);
+        ins0_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
         assert.isFalse(ins0_dl1[0].hasPartialInput);
 
         // No insert string => no sentinel char to delete.
@@ -696,6 +748,7 @@ describe('Correction Distance Modeler', function() {
         ins2_dl1.sort((a, b) => a.currentCost - b.currentCost);
         // only one char is processed at this stage.
         ins2_dl1.forEach(n => assert.isTrue(n.hasPartialInput));
+        ins2_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         assert.equal(ins2_dl1[0].calculation.lastInputEntry, 't');
         assert.equal(ins2_dl1[0].calculation.lastMatchEntry, 't');
@@ -727,6 +780,7 @@ describe('Correction Distance Modeler', function() {
         ins2_dl0.sort((a, b) => a.currentCost - b.currentCost);
         // only one char is processed at this stage.
         ins2_dl0.forEach(n => assert.isTrue(n.hasPartialInput));
+        ins2_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         assert.equal(ins2_dl0[0].calculation.lastInputEntry, 'c');
         assert.equal(ins2_dl0[0].calculation.lastMatchEntry, 'c');
@@ -750,9 +804,10 @@ describe('Correction Distance Modeler', function() {
 
       it('step 3: second processing layer resolves two char inserts', () => {
         // From "steps 0, 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution);
+        const rootTraversal = testModel.traverseFromRoot();
+        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildSubstitutionEdges({dist: synthDistribution, edgeId: subsetSeed});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
 
@@ -766,6 +821,9 @@ describe('Correction Distance Modeler', function() {
 
         // All should be finished now!
         fin_in2_dl1.forEach(n => assert.isFalse(n.hasPartialInput));
+
+        fin_in2_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
+        fin_in2_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         fin_in2_dl1.sort((a, b) => a.currentCost - b.currentCost);
         fin_in2_dl0.sort((a, b) => a.currentCost - b.currentCost);
@@ -842,7 +900,7 @@ describe('Correction Distance Modeler', function() {
         const teNode = fetchCommonTENode();
         assert.equal(teNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution);
+        const subsetNodes = teNode.buildSubstitutionEdges({dist: synthDistribution, edgeId: SEARCH_EDGE_SEED++});
         assert.equal(subsetNodes.length, 4);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
         const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x) + teNode.currentCost);
@@ -862,7 +920,7 @@ describe('Correction Distance Modeler', function() {
       it('step 2: first processing layer resolves zero + one char inserts', () => {
         // From "step 1" above, assertions removed
         const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution);
+        const subsetNodes = teNode.buildSubstitutionEdges({dist: synthDistribution, edgeId: SEARCH_EDGE_SEED++});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         // Set 0:  set for ins 1, dl 0
@@ -991,7 +1049,7 @@ describe('Correction Distance Modeler', function() {
       it('step 3: second processing layer resolves two char inserts', () => {
         // From "steps 0, 1" above, assertions removed
         const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution);
+        const subsetNodes = teNode.buildSubstitutionEdges({dist: synthDistribution, edgeId: SEARCH_EDGE_SEED++});
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         // ************
@@ -1059,62 +1117,69 @@ describe('Correction Distance Modeler', function() {
       });
     });
 
-    it('Small integration test:  "teh" => "ten", "the"', function() {
+    it('Small integration test:  "teh" => "ten", "the"', () => {
       // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
+      const rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let rootNode = new correction.SearchNode(rootTraversal);
+      const rootSeed = SEARCH_EDGE_SEED++;
+      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
       assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
       // VERY artificial distributions.
-      let synthDistribution1 = [
+      const synthDistribution1 = [
         {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
       ];
 
-      let synthDistribution2 = [
+      const synthDistribution2 = [
         {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
         {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
       ];
 
-      let synthDistribution3 = [
+      const synthDistribution3 = [
         {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
         {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
       ];
 
-      let layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1)
+      const layer1Id = SEARCH_EDGE_SEED++;
+      const layer1Edges = rootNode.buildSubstitutionEdges({dist: synthDistribution1, edgeId: layer1Id})
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      let layer1Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
+      const layer1Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
 
-      let tEdge = layer1Queue.dequeue();
+      const tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
+      assert.equal(tEdge.spaceId, layer1Id); // would be obtained by the token after one input.
 
-      let layer2Edges = tEdge.buildSubstitutionEdges(synthDistribution2)
+      const layer2Id = SEARCH_EDGE_SEED++;
+      const layer2Edges = tEdge.buildSubstitutionEdges({dist: synthDistribution2, edgeId: layer2Id})
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      let layer2Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
+      const layer2Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
 
-      let eEdge = layer2Queue.dequeue();
+      const eEdge = layer2Queue.dequeue();
       assertEdgeChars(eEdge, 'e', 'e');
+      assert.equal(eEdge.spaceId, layer2Id);
 
-      let hEdge = layer2Queue.dequeue();
+      const hEdge = layer2Queue.dequeue();
       assertEdgeChars(hEdge, 'h', 'h');
+      assert.equal(hEdge.spaceId, layer2Id);
 
       // Needed for a proper e <-> h transposition.
-      let ehEdge = findEdgesWithChars(layer2Edges, 'h')[0];
+      const ehEdge = findEdgesWithChars(layer2Edges, 'h')[0];
 
       assert.isOk(ehEdge);
 
       // Final round:  we'll use three nodes and throw all of their results into the same priority queue.
-      let layer3eEdges  = eEdge.buildSubstitutionEdges(synthDistribution3)
+      const layer3Input = {dist: synthDistribution3, edgeId: SEARCH_EDGE_SEED++};
+      const layer3eEdges  = eEdge.buildSubstitutionEdges(layer3Input)
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      let layer3hEdges  = hEdge.buildSubstitutionEdges(synthDistribution3)
+      const layer3hEdges  = hEdge.buildSubstitutionEdges(layer3Input)
         .flatMap(e => e.processSubsetEdge());
-      let layer3ehEdges = ehEdge.buildSubstitutionEdges(synthDistribution3)
+      const layer3ehEdges = ehEdge.buildSubstitutionEdges(layer3Input)
         .flatMap(e => e.processSubsetEdge());
-      let layer3Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
+      const layer3Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
       let bestEdge;
@@ -1123,12 +1188,14 @@ describe('Correction Distance Modeler', function() {
       } while(bestEdge.currentTraversal.entries.length == 0);
 
       assertEdgeChars(bestEdge, 'n', 'n'); // 'ten' - perfect edit distance of 0, though less-likely input sequence.
+      assert.equal(bestEdge.spaceId, layer3Input.edgeId);
       // No cost assumptions here.
 
       var sibling1;
       do {
         sibling1 = layer3Queue.dequeue();
       } while(sibling1.currentTraversal.entries.length == 0);
+      assert.equal(sibling1.spaceId, layer3Input.edgeId);
 
       // Both have a raw edit distance of 1 while using the same input-sequence root. ('th')
       let tenFlag = edgeHasChars(sibling1, SENTINEL_CODE_UNIT, 'n'); // subs out the 'h' entirely.  Could also occur with 'a', but is too unlikely.
@@ -1141,6 +1208,7 @@ describe('Correction Distance Modeler', function() {
       do {
         sibling2 = layer3Queue.dequeue();
       } while(sibling2.currentTraversal.entries.length == 0);
+      assert.equal(sibling2.spaceId, layer3Input.edgeId);
 
       tenFlag = tenFlag || edgeHasChars(sibling2, SENTINEL_CODE_UNIT, 'n');
       theFlag = theFlag || edgeHasChars(sibling2, SENTINEL_CODE_UNIT, 'e');
@@ -1150,18 +1218,19 @@ describe('Correction Distance Modeler', function() {
     });
   });
 
-  describe('SearchSpaceTier + SearchSpace', function() {
-    let checkRepeatableResults_teh = async function(iter: AsyncGenerator<correction.SearchResult, any, any>) {
-      let firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
+  describe('SearchSpaceTier + SearchSpace', () => {
+    const checkRepeatableResults_teh = async (iter: AsyncGenerator<correction.SearchResult, any, any>, expectedSpaceId: number) => {
+      const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(firstIterResult.done);
 
       const firstResult: correction.SearchResult = firstIterResult.value; // Retrieves <actual value>
       // No checks on the first set's cost.
       assert.equal(firstResult.matchString, "ten");
+      assert.equal(firstResult.spaceId, expectedSpaceId);
 
       // All start with 'te' but one, and invoke one edit of the same cost.
       // 'th' has an 'h' at the same cost (input 3) of the 'e' (input 2).
-      let secondBatch = [
+      const secondBatch = [
         'tec', 'tel', 'tem',
         'ter', 'tes', 'th',
         'te'
@@ -1180,6 +1249,7 @@ describe('Correction Distance Modeler', function() {
           } else {
             cost = result.totalCost;
           }
+          assert.equal(result.spaceId, expectedSpaceId);
 
           const matchIndex = batch.findIndex((entry) => entry == result.matchString);
           assert.notEqual(matchIndex, -1, `'${result.matchString}' received as prediction too early`);
@@ -1192,7 +1262,7 @@ describe('Correction Distance Modeler', function() {
       const secondCost = await checkBatch(secondBatch, firstResult.totalCost);
 
       // Single hard edit, all other input probability aspects are equal
-      let thirdBatch = [
+      const thirdBatch = [
         // 't' -> 'b' (sub)
         'beh',
         // '' -> 'c' (insertion)
@@ -1202,7 +1272,7 @@ describe('Correction Distance Modeler', function() {
       await checkBatch(thirdBatch, secondCost);
 
       // All replace the low-likelihood case for the third input.
-      let fourthBatch = [
+      const fourthBatch = [
         'the', 'thi', 'tho', 'thr',
         'thu', 'tha'
       ];
@@ -1211,7 +1281,7 @@ describe('Correction Distance Modeler', function() {
 
       // Replace the _first_ input's char OR insert an extra char,
       // also matching the low-likelihood third-char option.
-      let fifthBatch = [
+      const fifthBatch = [
         'cen', 'en',  'gen',
         'ken', 'len', 'men',
         'sen', 'then', 'wen'
@@ -1220,96 +1290,116 @@ describe('Correction Distance Modeler', function() {
       await checkBatch(fifthBatch, secondCost);
     }
 
-    it('Simple search without input', async function() {
+    it('Simple search without input', async () => {
       // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
+      const rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(testModel);
+      const rootSpaceId = SEARCH_EDGE_SEED++;
+      const searchSpace = new correction.SearchSpace(testModel, rootSpaceId);
 
-      let iter = getBestMatches([searchSpace], buildTestTimer());
-      let firstResult = await iter.next();
+      const iter = getBestMatches([searchSpace], buildTestTimer());
+      const firstResult = await iter.next();
       assert.isFalse(firstResult.done);
+      assert.equal((firstResult.value as SearchResult).spaceId, rootSpaceId);
     });
 
     // Hmm... how best to update this...
-    it('Simple search (paralleling "Small integration test")', async function() {
+    it('Simple search (paralleling "Small integration test")', async () => {
       // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
+      const rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(testModel);
+      const searchSpace = new correction.SearchSpace(testModel, SEARCH_EDGE_SEED++);
 
       // VERY artificial distributions.
-      let synthDistribution1 = [
-        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
-      ];
+      const synthInput1 = {
+        dist: [
+          {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+        ],
+        edgeId: SEARCH_EDGE_SEED++
+      };
 
-      let synthDistribution2 = [
-        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
-      ];
+      const synthInput2 = {
+        dist: [
+          {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+          {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+        ],
+        edgeId: SEARCH_EDGE_SEED++
+      };
 
-      let synthDistribution3 = [
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
-      ];
+      const synthInput3 = {
+        dist: [
+          {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+          {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+        ],
+        edgeId: SEARCH_EDGE_SEED++
+      };
 
-      searchSpace.addInput(synthDistribution1);
-      searchSpace.addInput(synthDistribution2);
-      searchSpace.addInput(synthDistribution3);
+      searchSpace.addInput(synthInput1.dist, synthInput1.edgeId);
+      searchSpace.addInput(synthInput2.dist, synthInput2.edgeId);
+      searchSpace.addInput(synthInput3.dist, synthInput3.edgeId);
 
-      let iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
-      await checkRepeatableResults_teh(iter);
+      const iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
+      await checkRepeatableResults_teh(iter, synthInput3.edgeId);
     });
 
-    it('Allows reiteration (sequentially)', async function() {
+    it('Allows reiteration (sequentially)', async () => {
       // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
+      const rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(testModel);
+      const searchSpace = new correction.SearchSpace(testModel, SEARCH_EDGE_SEED++);
 
       // VERY artificial distributions.
-      let synthDistribution1 = [
-        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
-      ];
+      const synthInput1 = {
+        dist: [
+          {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+        ],
+        edgeId: SEARCH_EDGE_SEED++
+      };
 
-      let synthDistribution2 = [
-        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
-      ];
+      const synthInput2 = {
+        dist: [
+          {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+          {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+        ],
+        edgeId: SEARCH_EDGE_SEED++
+      };
 
-      let synthDistribution3 = [
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
-      ];
+      const synthInput3 = {
+        dist: [
+          {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+          {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+        ],
+        edgeId: SEARCH_EDGE_SEED++
+      };
 
-      searchSpace.addInput(synthDistribution1);
-      searchSpace.addInput(synthDistribution2);
-      searchSpace.addInput(synthDistribution3);
+      searchSpace.addInput(synthInput1.dist, synthInput1.edgeId);
+      searchSpace.addInput(synthInput2.dist, synthInput2.edgeId);
+      searchSpace.addInput(synthInput3.dist, synthInput3.edgeId);
 
-      let iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
-      await checkRepeatableResults_teh(iter);
+      const iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
+      await checkRepeatableResults_teh(iter, synthInput3.edgeId);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
-      let iter2 = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
-      await checkRepeatableResults_teh(iter2);
+      const iter2 = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
+      await checkRepeatableResults_teh(iter2, synthInput3.edgeId);
     });
 
-    it('Empty search space, loaded model', async function() {
+    it('Empty search space, loaded model', async () => {
       // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
+      const rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let searchSpace = new correction.SearchSpace(testModel);
+      const searchSpace = new correction.SearchSpace(testModel, SEARCH_EDGE_SEED++);
       const timer = buildTestTimer();
-      let iter = getBestMatches([searchSpace], timer);
+      const iter = getBestMatches([searchSpace], timer);
 
       // While there's no input, insertion operations can produce suggestions.
-      let resultState = await iter.next();
-      let result: SearchResult = resultState.value;
+      const resultState = await iter.next();
+      const result: SearchResult = resultState.value;
 
       // Just one suggestion root should be returned as the first result.
       assert.equal(result.totalCost, 0);             // Gives a perfect match
@@ -1318,8 +1408,8 @@ describe('Correction Distance Modeler', function() {
       assert.isFalse(resultState.done);
 
       // Should be able to reach more, though.
-      let laterResultState = await iter.next();
-      let laterResult: SearchResult = laterResultState.value;
+      const laterResultState = await iter.next();
+      const laterResult: SearchResult = laterResultState.value;
 
       // Edit required:  an 'insertion' edge (no input matched, but char pulled
       // from lexicon)
