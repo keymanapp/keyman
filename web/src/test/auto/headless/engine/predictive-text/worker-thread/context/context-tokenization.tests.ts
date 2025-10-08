@@ -1042,7 +1042,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1194,7 +1194,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 6
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
