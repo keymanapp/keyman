@@ -150,6 +150,13 @@ export class ContextTokenization {
   }
 
   /**
+   * Returns the unique correction-search space identifier corresponding to this tokenization.
+   */
+  get spaceId(): number {
+    return this.tail.spaceId;
+  }
+
+  /**
    * Returns plain-text strings representing the most probable representation for all
    * tokens represented by this tokenization instance.
    *

@@ -17,6 +17,8 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
+let SPACE_ID_SEED = 0;
+
 export const DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL = 33; // in milliseconds.
 
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
@@ -49,6 +51,7 @@ export class SearchSpace {
   readonly rootSpace: SearchSpace;
 
   private parentSpace: SearchSpace;
+  readonly spaceId: number;
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
   // is cheaper than iteratively building a priority queue.
@@ -92,6 +95,8 @@ export class SearchSpace {
    */
   constructor(model?: LexicalModel);
   constructor(arg1?: LexicalModel | SearchSpace) {
+    this.spaceId = SPACE_ID_SEED++;
+
     if(arg1 instanceof SearchSpace) {
       const parentSpace = arg1;
       this.lowestCostAtDepth = parentSpace.lowestCostAtDepth.slice();
@@ -106,7 +111,7 @@ export class SearchSpace {
       throw new Error("The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.");
     }
 
-    const rootNode = new SearchNode(model.traverseFromRoot(), model.toKey ? model.toKey.bind(model) : null);
+    const rootNode = new SearchNode(model.traverseFromRoot(), this.spaceId, model.toKey ? model.toKey.bind(model) : null);
     this.selectionQueue.enqueue(rootNode);
     this.lowestCostAtDepth = [];
     this.rootSpace = this;
@@ -166,8 +171,8 @@ export class SearchSpace {
     // our previously-reached 'extractedResults' nodes.
     let newlyAvailableEdges: SearchNode[] = [];
     let batches = this.completedPaths?.map(function(node) {
-      let deletions = node.buildDeletionEdges(input);
-      let substitutions = node.buildSubstitutionEdges(input);
+      let deletions = node.buildDeletionEdges({dist: input, edgeId: childSpace.spaceId});
+      let substitutions = node.buildSubstitutionEdges({dist: input, edgeId: childSpace.spaceId});
 
       const batch = deletions.concat(substitutions);
 
@@ -202,9 +207,9 @@ export class SearchSpace {
 
     let deletionEdges: SearchNode[] = [];
     if(!substitutionsOnly) {
-      deletionEdges       = currentNode.buildDeletionEdges(this.inputs);
+      deletionEdges       = currentNode.buildDeletionEdges({dist: this.inputs, edgeId: this.spaceId});
     }
-    const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputs);
+    const substitutionEdges = currentNode.buildSubstitutionEdges({dist: this.inputs, edgeId: this.spaceId});
     let batch = deletionEdges.concat(substitutionEdges);
 
     // Skip the queue for the first pass; there will ALWAYS be at least one pass,

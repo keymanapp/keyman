@@ -114,9 +114,9 @@ describe('ContextToken', function() {
       token2.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
       token3.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
 
-      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(0, 3), token1.searchSpace.inputSequence);
-      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(3, 4), token2.searchSpace.inputSequence);
-      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(4), token3.searchSpace.inputSequence);
+      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(0, 3), token1.searchSpace.inputSequence.slice());
+      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(3, 4), token2.searchSpace.inputSequence.slice());
+      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(4), token3.searchSpace.inputSequence.slice());
     });
 
     it("merges three tokens from single previously-split transforms", () => {

@@ -126,13 +126,13 @@ export class SearchNode {
    */
   private _inputCost?: number;
 
-  constructor(rootTraversal: LexiconTraversal, toKey?: (arg0: string) => string);
-  constructor(node: SearchNode);
-  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (arg0: string) => string) {
-    toKey = toKey || (x => x);
+  readonly spaceId: number;
 
-    if(rootTraversal instanceof SearchNode) {
-      const priorNode = rootTraversal;
+  constructor(rootTraversal: LexiconTraversal, spaceId: number, toKey?: (arg0: string) => string);
+  constructor(node: SearchNode, spaceId?: number);
+  constructor(param1: LexiconTraversal | SearchNode, spaceId?: number, toKey?: ((arg0: string) => string)) {
+    if(param1 instanceof SearchNode) {
+      const priorNode = param1;
 
       Object.assign(this, priorNode);
       if(this.partialEdge) {
@@ -144,11 +144,16 @@ export class SearchNode {
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
       delete this._inputCost;
+
+      // This is unique at each level, though it will reuse a previous ID if no new
+      // one is provided (say, for 'insert' edits).
+      this.spaceId = spaceId ?? priorNode.spaceId;
     } else {
       this.calculation = new ClassicalDistanceCalculation();
-      this.matchedTraversals = [rootTraversal];
+      this.matchedTraversals = [param1];
       this.priorInput = [];
-      this.toKey = toKey;
+      this.toKey = toKey || (x => x);
+      this.spaceId = spaceId;
     }
   }
 
@@ -422,17 +427,17 @@ export class SearchNode {
    * represented lexicon prefix - be it due to not adding one (deletions) or
    * due to not being the same character, all mismatching cases are merged into
    * one, reducing the rate of expansion for the search graph.
-   * @param inputDistribution
+   * @param input
    * @param isSubstitution
    * @returns
    */
-  private setupSubsetProcessing(inputDistribution: Distribution<Transform>, isSubstitution: boolean ) {
+  private setupSubsetProcessing(input: {dist: Distribution<Transform>, edgeId: number}, isSubstitution: boolean ) {
     if(this.hasPartialInput) {
       throw new Error("Invalid state:  will not take new input while still processing Transform subset");
     }
 
     const edges: SearchNode[] = [];
-    const subsets = subsetByInterval(inputDistribution);
+    const subsets = subsetByInterval(input.dist);
 
     for(let dl = 0; dl < subsets.length; dl++) {
       const dlSubset = subsets[dl];
@@ -450,7 +455,7 @@ export class SearchNode {
           continue;
         }
 
-        const node = new SearchNode(this);
+        const node = new SearchNode(this, input.edgeId);
         node.calculation = edgeCalc;
         node.partialEdge = {
           doSubsetMatching: isSubstitution,
@@ -479,8 +484,8 @@ export class SearchNode {
    * @returns An array of SearchNodes corresponding to search paths that skip the next
    * input keystroke.
    */
-  buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
-    return this.setupSubsetProcessing(inputDistribution, false);
+  buildDeletionEdges(input: {dist: Distribution<Transform>, edgeId: number}): SearchNode[] {
+    return this.setupSubsetProcessing(input, false);
   }
 
   /**
@@ -492,12 +497,12 @@ export class SearchNode {
    * @returns An array of SearchNodes corresponding to search paths that match or
    * replace the next currently-unprocessed input.
    */
-  buildSubstitutionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
+  buildSubstitutionEdges(input: {dist: Distribution<Transform>, edgeId: number}): SearchNode[] {
     // Note:  due to the batching approach used via TransformSubsets,
     // substitutions are _not_ adequately represented by one 'insertion' + one
     // 'deletion' step. Explicit substitution / match-oriented processing is
     // required.
-    return this.setupSubsetProcessing(inputDistribution, true);
+    return this.setupSubsetProcessing(input, true);
   }
 
   /**
@@ -596,6 +601,10 @@ export class SearchResult {
 
   get finalTraversal(): LexiconTraversal {
     return this.resultNode.currentTraversal;
+  }
+
+  get spaceId(): number {
+    return this.resultNode.spaceId;
   }
 }
 

@@ -254,7 +254,7 @@ describe('ContextState', () => {
       let state = newContextMatch?.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
       assert.sameDeepMembers(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence.slice(),
         [[{sample: { insert: '', deleteLeft: 0 }, p: 1}]]
       );
 
