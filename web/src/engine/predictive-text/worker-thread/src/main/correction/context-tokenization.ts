@@ -38,7 +38,7 @@ interface TokenMergeMap {
   match: EditTokenMap
 };
 
-interface TokenSplitMap {
+export interface TokenSplitMap {
   input: EditTokenMap,
   matches: (EditTokenMap & { textOffset: number })[]
 };
