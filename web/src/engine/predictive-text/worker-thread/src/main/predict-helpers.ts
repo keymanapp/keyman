@@ -5,9 +5,8 @@ import { defaultWordbreaker, WordBreakProperty } from '@keymanapp/models-wordbre
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { isSubstitutionAlignable } from './correction/alignment-helpers.js';
 import { ContextTracker } from './correction/context-tracker.js';
-import { ContextState } from './correction/context-state.js';
+import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 
@@ -240,17 +239,6 @@ export function matchBaseContextState(
   context: Context,
   transitionId: number
 ): ContextState {
-  const contextsMatch = (a: Context, b: Context) => {
-    // If either context's window is equal to or greater than the threshold
-    // length, there's a good chance something slid into or out of range.
-    if(!a.startOfBuffer || !b.startOfBuffer) {
-      return isSubstitutionAlignable(a.left, b.left);
-    } else {
-      // If both are smaller than the threshold, the text should match exactly.
-      return a.left == b.left;
-    }
-  };
-
   const lastTransition = contextTracker.latest;
   let contextState: ContextState;
 
@@ -259,9 +247,9 @@ export function matchBaseContextState(
   // delete (if lengthened).  No substitutions possible, as no rules will have
   // occurred - the ONLY change is the amount of known text vs the context
   // window's range.
-  if(contextsMatch(lastTransition.final.context, context)) {
+  if(determineContextSlideTransform(lastTransition.final.context, context)) {
     contextState = lastTransition.final;
-  } else if(contextsMatch(lastTransition.base.context, context)) {
+  } else if(determineContextSlideTransform(lastTransition.base.context, context)) {
     // Multitap case:  if we reverted back to the original underlying context,
     // rather than using the previous output context.
     //

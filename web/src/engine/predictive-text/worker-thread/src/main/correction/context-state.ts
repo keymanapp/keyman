@@ -319,7 +319,13 @@ export function determineContextSlideTransform(srcContext: Context, dstContext: 
   // Assertion: the current (sliding) context window is alignable.
   // See `matchBaseContextState` in ../predict-helpers.ts.
   if(srcContext.startOfBuffer && dstContext.startOfBuffer) {
-    return { insert: '', deleteLeft: 0, deleteRight: 0 };
+    // Validate that they actually match.
+    // If not, the contexts shouldn't equal.
+    if(srcContext.left == dstContext.left) {
+      return { insert: '', deleteLeft: 0, deleteRight: 0 };
+    } else {
+      return null;
+    }
   }
 
   // Assertion:  the right-hand side of the left-context strings WILL match.
@@ -338,7 +344,7 @@ export function determineContextSlideTransform(srcContext: Context, dstContext: 
 
   // Validation:  does the part of both strings that should match actually match?
   if(rawDelta > 0 ? dst.slice(rawDelta) != src : src.slice(-rawDelta) != dst) {
-    throw new Error("Invalid base context");
+    return null;
   }
 
   return {
