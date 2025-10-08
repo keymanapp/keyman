@@ -1004,6 +1004,766 @@ describe('ContextTokenization', function() {
     });
   });
 
+  describe('mapWhitespacedTokenization', () => {
+    const edgeWindowSpec = {
+      minTokens: 3,
+      minChars: 8
+    }
+
+    // TODO: deduplicate from `tokenizeTransform`; migrate away from that to this in due time.
+    it('detects a single empty transform at index 0 when an empty transform is input', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: '',
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      // for tokenization.
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform.get(0), editTransform);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly handles basic token-edit transform', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 'y',
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform.get(0), editTransform);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly handles simple token-edit transform', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 'y',
+        deleteLeft: 2
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform.get(0), editTransform);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'],
+        retokenizationText: 'apple a da',
+        editBoundary: {
+          text: 'da',
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [2],
+        sliceIndex: 2
+      });
+    });
+
+    it('properly handles simple token-edit transform - smp strings', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'].map(t => toMathematicalSMP(t));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: toMathematicalSMP('y'),
+        deleteLeft: 2
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform.get(0), editTransform);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
+        retokenizationText: toMathematicalSMP('apple a da'),
+        editBoundary: {
+          text: toMathematicalSMP('da'),
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [2],
+        sliceIndex: 2
+      });
+    });
+
+    it('properly handles simple token-replacing transform', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const editTransform = {
+        insert: 'week',
+        deleteLeft: 4
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform.get(0), editTransform);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('handles simple token-replacing transform with cross-token deleteLeft', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      // 'an apple any'
+      const editTransform = {
+        insert: 'ny',
+        deleteLeft: 5
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-2, {
+        insert: 'ny',
+        deleteLeft: 0
+      });
+      expectedMap.set(-1, {
+        insert: '',
+        deleteLeft: 1
+      });
+      expectedMap.set(0, {
+        insert: '',
+        deleteLeft: 4
+      });
+
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly handles a simple appended whitespace', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: ' ',
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // The whitespace belongs on the whitespace token that will be added.
+      expectedMap.set(1, editTransform);
+      // The default-breaker adds an empty token after whitespace, hence this
+      // empty transform.
+      expectedMap.set(2, { insert: '', deleteLeft: 0 });
+
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly handles a simple appended period', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: '.',
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      // The default wordbreaker does not (currently) append a blank token
+      // after standard English punctuation.
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(1, editTransform);
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly deletes a simple appended whitespace', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: '',
+        deleteLeft: 1
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // The whitespace belongs on the whitespace token that will be added.
+      expectedMap.set(-1, editTransform);
+
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('handles word-breakable transforms (case 1)', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'dat'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 'y k',
+        deleteLeft: 1
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // dat => day
+      expectedMap.set(0, { insert: 'y', deleteLeft: 1 });
+      // new whitespace
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      // new 'k' token
+      expectedMap.set(2, { insert: 'k', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'],
+        retokenizationText: 'apple a da',
+        editBoundary: {
+          text: 'da',
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [1],
+        sliceIndex: 2
+      });
+    });
+
+    it('handles word-breakable transforms (case 1) - smp strings', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'dat'].map(t => toMathematicalSMP(t));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: toMathematicalSMP('y k'),
+        deleteLeft: 1
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // dat => day
+      expectedMap.set(0, { insert: toMathematicalSMP('y'), deleteLeft: 1 });
+      // new whitespace
+      expectedMap.set(1, { insert: toMathematicalSMP(' '), deleteLeft: 0 });
+      // new 'k' token
+      expectedMap.set(2, { insert: toMathematicalSMP('k'), deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
+        retokenizationText: toMathematicalSMP('apple a da'),
+        editBoundary: {
+          text: toMathematicalSMP('da'),
+          tokenIndex: 6,
+          isPartial: true,
+          omitsEmptyToken: false
+        },
+        deleteLengths: [1],
+        sliceIndex: 2
+      });
+    });
+
+    it('handles word-breakable transforms (case 2)', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'dat'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 'y. ',
+        deleteLeft: 1
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'y', deleteLeft: 1 });
+      expectedMap.set(1, { insert: '.', deleteLeft: 0 });
+      expectedMap.set(2, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(3, { insert: '', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 4);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('handles complex breakable cases', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      // 'an apple any'
+      const editTransform = {
+        insert: 'ny day',
+        deleteLeft: 5
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // as => any
+      expectedMap.set(-2, { insert: 'ny', deleteLeft: 0 }); // 2 back from the last token before the text insertion point.
+      // ' ' replaced with another ' ' (but still edited)
+      expectedMap.set(-1, { insert: ' ', deleteLeft: 1 });
+      // date => day, but with full replacement due to the large deleteLeft.
+      expectedMap.set( 0, { insert: 'day', deleteLeft: 4 }); // The original token before the text insertion point.
+      assert.equal(results.tokenizedTransform.size, expectedMap.size);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly aligns tokenization of transforms that match-replace existing tokens (1)', () => {
+      const baseTokens = ['properly'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      // Case:  the user had input a backspace and then selected a suggestion that restored
+      // the original word (which also appended whitespace).
+      const editTransform = {
+        insert: 'properly ',
+        deleteLeft: 8
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'properly', deleteLeft: 8 });
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(2, { insert: '', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 3);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly aligns tokenization of transforms that match-replace existing tokens (2)', () => {
+      const baseTokens = ['do', ' ', 'it', ' ', 'properly'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      // Case:  the user had input a backspace and then selected a suggestion that restored
+      // the original word (which also appended whitespace).
+      const editTransform = {
+        insert: 'properly ',
+        deleteLeft: 8
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'properly', deleteLeft: 8 });
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(2, { insert: '', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 3);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly places extra whitespaces on preceding whitespace token', () => {
+      const baseTokens = ['do', ' ', 'it', ' ', 'properly', ' ', ''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      // Adjacent whitespace entries are generally merged into a single blob.
+      const editTransform = {
+        insert: ' ',  // Should be combined with the final ' ', not the tail ''.
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(0, { insert: '', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 2);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly aligns degenerate input cases (1)', () => {
+      const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 'fox and brown fox',  // => quick fox and brown fox
+        deleteLeft: 9
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-2, { insert: 'fox', deleteLeft: 5 });
+      expectedMap.set(-1, { insert: ' ', deleteLeft: 1 });
+      expectedMap.set(0, { insert: 'and', deleteLeft: 3 });
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(2, { insert: 'brown', deleteLeft: 0 });
+      expectedMap.set(3, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(4, { insert: 'fox', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 7);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('returns the standard edge window for empty transform inputs', () => {
+      const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: '',
+        deleteLeft: 0
+      };
+
+      const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenizationText: 'brown fox',
+        retokenization: ['brown', ' ', 'fox'],
+        editBoundary: {
+          isPartial: false,
+          omitsEmptyToken: false,
+          text: 'fox',
+          tokenIndex: 4
+        },
+        deleteLengths: [0],
+        sliceIndex: 2
+      });
+    });
+
+    it('returns the standard edge window for empty transforms with context-final whitespace', () => {
+      const baseTokens = ['quick', ' ', 'brown', ' ', 'fox', ' '];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: '',
+        deleteLeft: 0
+      };
+
+      const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenizationText: 'brown fox ',
+        retokenization: ['brown', ' ', 'fox', ' '], // no final '' token
+        editBoundary: {
+          isPartial: false,
+          omitsEmptyToken: false,
+          text: ' ',
+          tokenIndex: 5
+        },
+        deleteLengths: [0],
+        sliceIndex: 2
+      });
+    });
+
+
+    it('returns the standard edge window for pure transform w insert inputs', () => {
+      const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: ' jumped',
+        deleteLeft: 0
+      };
+
+      const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenizationText: 'brown fox',
+        retokenization: ['brown', ' ', 'fox'],
+        editBoundary: {
+          isPartial: false,
+          omitsEmptyToken: false,
+          text: 'fox',
+          tokenIndex: 4
+        },
+        deleteLengths: [0],
+        sliceIndex: 2
+      });
+    });
+
+    it('returns the proper edge window for transforms w deleteLeft inputs (1)', () => {
+      const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 'rog',
+        deleteLeft: 2
+      };
+
+      const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenizationText: ' brown f',
+        retokenization: [' ', 'brown', ' ', 'f'],
+        editBoundary: {
+          isPartial: true,
+          omitsEmptyToken: false,
+          text: 'f',
+          tokenIndex: 4
+        },
+        deleteLengths: [2],
+        sliceIndex: 1
+      });
+    });
+
+    it('returns the proper edge window for transforms w deleteLeft inputs (2)', () => {
+      const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 'fox and brown fox',  // => quick fox and brown fox
+        deleteLeft: 9
+      };
+
+      const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, {
+        retokenizationText: 'quick ',
+        retokenization: ['quick', ' '],
+        editBoundary: {
+          isPartial: false,
+          omitsEmptyToken: false,
+          text: ' ',
+          tokenIndex: 1
+        },
+        deleteLengths: [3, 1, 5, 0],
+        sliceIndex: 0
+      });
+    });
+
+    it('properly handles English contraction transitions (1)', () => {
+      const baseTokens = ['she', ' ', 'said', ' ', 'she', ' ', 'can', '\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: 't',  // => can, ' => can't
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // index 0:  the merged `can'` token
+      expectedMap.set(0, { insert: 't', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, [
+        {
+          inputs: [
+            // The `index` values here are pre-offset from the edge window's .sliceIndex.
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex }
+          ], match: { text: 'can\'t', index: 6 - results.alignment.edgeWindow.sliceIndex }
+        }
+      ]);
+      assert.deepEqual(results.alignment.splits, []);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly handles English contraction transitions (2)', () => {
+      const baseTokens = ['she', ' ', 'said', ' ', 'she', ' ', 'can\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: ' ',  // => can' => can, ', \u0020
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform,
+        edgeWindowSpec
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // index 0:  the split-off `'` token.
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(2, { insert: '', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 2);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, [
+        {
+          input: { text: 'can\'', index: 6 - results.alignment.edgeWindow.sliceIndex},
+          matches: [
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex, textOffset: 0 },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex, textOffset: 3 }
+          ]
+        }
+      ]);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+
+    it('properly handles English contraction transitions (3)', () => {
+      const baseTokens = ['she', ' ', 'said', ' ', 'she', ' ', 'can\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+
+      const editTransform = {
+        insert: '?',  // => can' => can, ', ?
+        deleteLeft: 0
+      };
+
+      const results = baseTokenization.mapWhitespacedTokenization(
+        plainModel,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(1, { insert: '?', deleteLeft: 0 });
+      assert.equal(results.tokenizedTransform.size, 1);
+      assert.deepEqual(results.tokenizedTransform, expectedMap);
+      assert.deepEqual(results.alignment.merges, []);
+      assert.deepEqual(results.alignment.splits, [
+        {
+          input: { text: 'can\'', index: 6 - results.alignment.edgeWindow.sliceIndex},
+          matches: [
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex, textOffset: 0 },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex, textOffset: 3 }
+          ]
+        }
+      ]);
+      assert.deepEqual(results.alignment.unmappedEdits, []);
+    });
+  });
+
   describe('traceInsertEdits', () => {
     it('handles zero-length insert cases (1)', () => {
       const tokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
