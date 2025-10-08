@@ -9,6 +9,8 @@ import { writeFileSync } from 'node:fs';
 import { LdmlCompilerMessages } from '../src/main.js';
 import { util } from '@keymanapp/common-types';
 
+const debug=true;
+
 /** Overall compiler tests */
 describe('compiler-tests', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
@@ -28,6 +30,10 @@ describe('compiler-tests', function() {
     // Compare output
     const expected = await hextobin(binaryFilename, undefined, {silent:true});
 
+    if(debug) {
+      writeFileSync(makePathToFixture('basic-xml-expected.kmx'), expected);
+    }
+
     // now compare it to use with run()
     // Let's build basic.xml
     // It should match basic.kmx (built from basic.txt)
@@ -38,6 +44,11 @@ describe('compiler-tests', function() {
     assert.isNotNull(artifacts);
     const { kmx, kvk  } = artifacts;
     assert.isNotNull(kmx);
+
+    if(debug) {
+      writeFileSync(makePathToFixture('basic-xml-actual.kmx'), kmx?.data);
+    }
+
     assert.deepEqual<Uint8Array>(kmx?.data, expected);
 
     // TODO-LDML: compare the .kvk file to something else?

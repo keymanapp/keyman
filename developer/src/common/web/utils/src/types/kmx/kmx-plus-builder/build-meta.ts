@@ -14,6 +14,7 @@ import KMXPlusData = KMXPlus.KMXPlusData;
  * Builder for the 'meta' section
  */
 export interface BUILDER_META extends BUILDER_SECTION {
+  // v16
   author: BUILDER_STR_REF; //str
   conform: BUILDER_STR_REF; //str
   layout: BUILDER_STR_REF; //str
@@ -21,12 +22,15 @@ export interface BUILDER_META extends BUILDER_SECTION {
   indicator: BUILDER_STR_REF; //str
   version: BUILDER_STR_REF; //str
   settings: number; //bitfield
+  // v19
+  fontFaceName: BUILDER_STR_REF; // str
+  fontSizePct: number;
 };
 
 export function build_meta(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILDER_META {
   return {
     ident: constants.hex_section_id(constants.section.meta),
-    size: constants.length_meta,
+    size: constants.length_meta_v19,
     _offset: 0,
     author: build_strs_index(sect_strs, kmxplus.meta.author),
     conform: build_strs_index(sect_strs, kmxplus.meta.conform),
@@ -35,5 +39,7 @@ export function build_meta(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     indicator: build_strs_index(sect_strs, kmxplus.meta.indicator),
     version: build_strs_index(sect_strs, kmxplus.meta.version),
     settings: kmxplus.meta.settings ?? 0,
+    fontFaceName: build_strs_index(sect_strs, kmxplus.meta.fontFaceName),
+    fontSizePct: kmxplus.meta.fontSizePct,
   };
 }

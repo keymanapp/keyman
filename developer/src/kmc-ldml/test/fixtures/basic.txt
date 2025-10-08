@@ -469,7 +469,7 @@ block(loca)                         # struct COMP_KMXPLUS_LOCA {
 # meta
 # ----------------------------------------------------------------------------------------------------
 
-block(meta)                         # struct COMP_KMXPLUS_META {
+block(meta)                         # struct COMP_KMXPLUS_META_v19 {
   6d 65 74 61                       #   KMX_DWORD header.ident;   // 0000 Section name - meta
   sizeof(meta)                      #   KMX_DWORD header.size;    // 0004 Section length
   index(strNull,strAuthor,2)        #   KMXPLUS_STR author;
@@ -479,6 +479,8 @@ block(meta)                         # struct COMP_KMXPLUS_META {
   index(strNull,strIndicator,2)     #   KMXPLUS_STR indicator;
   index(strNull,strVersion,2)       #   KMXPLUS_STR version;
   00 00 00 00                       #   KMX_DWORD settings;
+  00 00 00 00                       #   KMXPLUS_STR fontFaceName; // v19
+  64 00 00 00                       #   KMX_DWORD fontSizePct;    // v19, '100%'
                                     # };
 
 # ----------------------------------------------------------------------------------------------------

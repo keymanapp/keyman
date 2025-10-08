@@ -82,8 +82,8 @@ class Constants {
   readonly length_header = 8;
 
   /* ------------------------------------------------------------------
-    * sect section
-      ------------------------------------------------------------------ */
+   * sect section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'sect' section, not including entries
@@ -95,8 +95,8 @@ class Constants {
   readonly length_sect_item = 8;
 
   /* ------------------------------------------------------------------
-    * bksp section
-      ------------------------------------------------------------------ */
+   * bksp section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'bksp' section, not including entries
@@ -112,8 +112,8 @@ class Constants {
   readonly bksp_flags_error = 0x0001;
 
   /* ------------------------------------------------------------------
-    * disp section
-      ------------------------------------------------------------------ */
+   * disp section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'disp' section, not including entries
@@ -125,8 +125,8 @@ class Constants {
    readonly length_disp_item = 12;
 
   /* ------------------------------------------------------------------
-    * elem section
-      ------------------------------------------------------------------ */
+   * elem section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'elem' section, not including entries
@@ -214,7 +214,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * finl section
-     ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'finl' section, not including entries
@@ -230,8 +230,8 @@ class Constants {
   readonly finl_flags_error = 0x0001;
 
   /* ------------------------------------------------------------------
-    * keys section is now keys.kmap
-      ------------------------------------------------------------------ */
+   * keys section is now keys.kmap
+   * ------------------------------------------------------------------ */
 
   /**
    * Constant for no modifiers
@@ -300,7 +300,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * keys section
-    ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'keys' section not including variable parts
@@ -335,7 +335,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * layr section
-     ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'layr' section not including variable parts
@@ -374,7 +374,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * list section
-      ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'list' section not including variable parts
@@ -391,7 +391,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * loca section
-   ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'loca' section not including variable parts
@@ -403,21 +403,27 @@ class Constants {
   readonly length_loca_item = 4;
 
   /* ------------------------------------------------------------------
-    * meta section
-      ------------------------------------------------------------------ */
+   * meta section
+   ------------------------------------------------------------------ */
 
   /**
-   * length of the 'meta' section
+   * length of the 'meta' section, depending on release version
    */
-  readonly length_meta = 36;
+  readonly length_meta_v16 = 36;
+  readonly length_meta_v19 = 44;
   /**
    * bitwise or value for normalization=disabled in meta.settings
    */
   readonly meta_settings_normalization_disabled = 1;
+  /**
+   * bitwise or value denoting that KMX+ data represents only on screen keyboard
+   * data, and is not functional as a keyboard
+   */
+  readonly meta_settings_osk_only = 2;
 
   /* ------------------------------------------------------------------
-    * strs section
-      ------------------------------------------------------------------ */
+   * strs section
+   ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'strs' section not including variable parts
@@ -429,8 +435,8 @@ class Constants {
   readonly length_strs_item = 8;
 
   /* ------------------------------------------------------------------
-    * tran section
-      ------------------------------------------------------------------ */
+   * tran section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'tran' section, not including entries

@@ -72,9 +72,10 @@ export class Loca extends Section {
 export enum KeyboardSettings {
   none = 0,
   normalizationDisabled = constants.meta_settings_normalization_disabled,
+  oskOnly = constants.meta_settings_osk_only,
 };
 
-export class Meta extends Section {
+export class Meta_v16 extends Section {
   author: StrsItem;
   conform: StrsItem;
   layout: StrsItem;
@@ -88,6 +89,20 @@ export class Meta extends Section {
     return this?.settings & KeyboardSettings.normalizationDisabled;
   }
 };
+
+export class Meta_v19 extends Meta_v16 {
+  /** v19: face name of OSK font */
+  fontFaceName: StrsItem;
+  /** v19: size of OSK font as percentage of default */
+  fontSizePct: number;
+
+  /** convenience for checking settings */
+  get oskOnly() {
+    return this?.settings & KeyboardSettings.oskOnly;
+  }
+};
+
+export class Meta extends Meta_v19 {};
 
 // 'strs'
 
@@ -668,7 +683,8 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_LOCA_ITEM: any;
   public readonly COMP_PLUS_LOCA: any;
 
-  public readonly COMP_PLUS_META: any;
+  public readonly COMP_PLUS_META_v16: any;
+  public readonly COMP_PLUS_META_v19: any;
 
   public readonly COMP_PLUS_STRS_ITEM: any;
   public readonly COMP_PLUS_STRS: any;
@@ -873,7 +889,7 @@ export class KMXPlusFile extends KMXFile {
 
     // 'meta'
 
-    this.COMP_PLUS_META = new r.Struct({
+    this.COMP_PLUS_META_v16 = new r.Struct({
       ident: IDENT,
       size: r.uint32le,
       author: STR_REF, //str
@@ -883,6 +899,20 @@ export class KMXPlusFile extends KMXFile {
       indicator: STR_REF, //str
       version: STR_REF, //str
       settings: r.uint32le, //new r.Bitfield(r.uint32le, ['normalizationDisabled'])
+    });
+
+    this.COMP_PLUS_META_v19 = new r.Struct({
+      ident: IDENT,
+      size: r.uint32le,
+      author: STR_REF, //str
+      conform: STR_REF, //str
+      layout: STR_REF, //str
+      name: STR_REF, //str
+      indicator: STR_REF, //str
+      version: STR_REF, //str
+      settings: r.uint32le,
+      fontFaceName: STR_REF, //str
+      fontSizePct: r.uint32le,
     });
 
     // 'name' is gone

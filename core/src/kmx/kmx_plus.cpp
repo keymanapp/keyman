@@ -221,12 +221,33 @@ COMP_KMXPLUS_META::valid(KMX_DWORD _kmn_unused(length)) const {
     assert(false);
     return false;
   }
+  if (header.ident != IDENT) {
+    DebugLog("meta.ident != IDENT");
+    assert(false);
+    return false;
+  }
+
   DebugLog(" author:\t#0x%X\n", author);
   DebugLog(" conform:\t#0x%X\n", conform);
   DebugLog(" layout:\t#0x%X\n", layout);
   DebugLog(" name:\t#0x%X\n", name);
   DebugLog(" indicator:\t#0x%X\n", indicator);
   DebugLog(" settings:\t0x%X\n", settings);
+  return true;
+}
+
+bool
+COMP_KMXPLUS_META_v19::valid(KMX_DWORD length) const {
+  if(!v16.valid(length)) {
+    return false;
+  }
+  if (v16.header.size < sizeof(*this) && v16.header.size != sizeof(COMP_KMXPLUS_META)) {
+    DebugLog("header.size < expected size and not at a size breakpoint");
+    assert(false);
+    return false;
+  }
+  DebugLog(" fontFaceName:\t#0x%X\n", fontFaceName);
+  DebugLog(" fontSizePct:\t#0x%X\n", fontSizePct);
   return true;
 }
 
@@ -330,7 +351,7 @@ bool COMP_KMXPLUS_STRS::valid_string(const KMX_WCHAR* start, KMX_DWORD length) {
       // else OK (good marker)
     } else if(!Uni_IsValid(ch)) {
       DebugLog("String of length 0x%x @ 0x%x: Char U+%04X is illegal char", length, n, ch);
-      return false;    
+      return false;
     } // else OK (other char)
   }
   return true;
@@ -1318,14 +1339,14 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     // Note: all of these setters will be passed 'nullptr'
     //  if any section had failed validation, or was missing.
     //  A missing section does not invalidate the kmxplus.
-    // we attempt to initialize each one 
+    // we attempt to initialize each one
 
     valid = bkspHelper.setTran(bksp) && valid;    // bksp handled by …TRAN_Helper
     valid = key2Helper.setKeys(key2) && valid;
     valid = layrHelper.setLayr(layr) && valid;
     valid = listHelper.setList(list) && valid;
     valid = tranHelper.setTran(tran) && valid;
-    valid = usetHelper.setUset(uset) && valid;    
+    valid = usetHelper.setUset(uset) && valid;
   }
 }
 

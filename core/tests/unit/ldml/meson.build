@@ -95,6 +95,16 @@ e = executable('kmx_plus_tests', 'kmx_plus.tests.cpp',
     objects: lib.extract_all_objects(recursive: false))
 test('kmx_plus_tests', e, suite: 'ldml')
 
+e = executable('kmx_plus_meta_tests', 'kmx_plus_meta.tests.cpp',
+    # 'ldml_test_utils.cpp',
+    common_test_files,
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n, gtest_dep, gmock_dep],
+    objects: lib.extract_all_objects(recursive: false))
+test('kmx_plus_meta_tests', e, suite: 'ldml')
+
 # run transforms / ldml utilities unit test
 
 t = executable('transforms_tests', 'transforms.tests.cpp',
