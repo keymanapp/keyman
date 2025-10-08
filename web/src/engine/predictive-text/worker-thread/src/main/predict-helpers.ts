@@ -460,14 +460,15 @@ export async function correctAndEnumerate(
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  const searchPath = transition.final.tokenization.tail.searchPath;
+  const tokenizations = [transition.final.tokenization];
+  const searchSpaces = tokenizations.map(t => t.tail.searchPath);
 
   // If corrections are not enabled, bypass the correction search aspect
   // entirely. No need to 'search' - just do a direct lookup.
   //
   // To be clear:  this IS how we actually tell that corrections are disabled -
   // when no fat-finger data is available.
-  if(!searchPath.correctionsEnabled) {
+  if(!searchSpaces.find(s => s.correctionsEnabled)) {
     const wordbreak = determineModelWordbreaker(lexicalModel);
     const predictionRoot = {
       sample: {
@@ -493,9 +494,11 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches(searchPath, timer)) {
+  for await(const match of getBestMatches(searchSpaces[0], timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
+    const searchSpace = searchSpaces.find(s => s.spaceId == match.spaceId);
+    const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
     // If our 'match' results in fully deleting the new token, reject it and try again.
     if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
@@ -532,7 +535,7 @@ export async function correctAndEnumerate(
      * Worst-case, it's possible to temporarily add normalization if a code deep-dive
      * is needed in the future.
      */
-    if(searchPath.inputSequence.length <= 1) {
+    if(searchSpace.inputSequence.length <= 1) {
       /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
        * ambiguous case that would only arise very near the center of the boundary between two keys.
        * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
@@ -553,7 +556,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], predictionContext);
-    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
+    predictions.forEach((entry) => entry.preservationTransform = tokenization.taillessTrueKeystroke);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
