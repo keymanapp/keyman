@@ -58,7 +58,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  readonly searchSpace: SearchSpace;
+  public get searchSpace(): SearchSpace {
+    return this._searchSpace;
+  }
+  private _searchSpace: SearchSpace;
 
   isPartial: boolean;
 
@@ -104,7 +107,7 @@ export class ContextToken {
       //
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
-      this.searchSpace = new SearchSpace(priorToken.searchSpace);
+      this._searchSpace = priorToken.searchSpace;
       this._inputRange = priorToken._inputRange.slice();
 
       // Preserve any annotated applied-suggestion transition ID data; it's useful
@@ -118,7 +121,6 @@ export class ContextToken {
       // May be altered outside of the constructor.
       this.isWhitespace = false;
       this.isPartial = !!isPartial;
-      this.searchSpace = new SearchSpace(model);
       this._inputRange = [];
 
       rawText ||= '';
@@ -127,14 +129,21 @@ export class ContextToken {
       const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
         return [{sample: transform, p: 1.0}];
       });
+
+      let searchSpace = new SearchSpace(model);
+
       rawTransformDistributions.forEach((entry) => {
         this._inputRange.push({
           trueTransform: entry[0].sample,
           inputStartIndex: 0,
           bestProbFromSet: 1
         });
-        this.searchSpace.addInput(entry, 1);
+        const priorSpace = searchSpace;
+        searchSpace = searchSpace.addInput(entry, 1);
+        priorSpace.stopTrackingResults();
       });
+
+      this._searchSpace = searchSpace;
     }
   }
 
@@ -144,7 +153,9 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this.searchSpace.addInput(distribution, inputSource.bestProbFromSet);
+    const priorSpace = this._searchSpace;
+    this._searchSpace = this._searchSpace.addInput(distribution, inputSource.bestProbFromSet);
+    priorSpace.stopTrackingResults();
   }
 
   /**
