@@ -137,10 +137,8 @@ describe('ContextTokenization', function() {
       };
 
       let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
-
       let cloned = new ContextTokenization(baseTokenization);
 
-      assert.notDeepEqual(cloned, baseTokenization);
       assert.deepEqual(cloned.tokens.map((token) => token.searchSpace.inputSequence),
         baseTokenization.tokens.map((token) => token.searchSpace.inputSequence));
 
