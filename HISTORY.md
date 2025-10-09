@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.136 alpha 2025-10-09
+
+* fix(android): Refactor bottom inset calculations for in-app and system keyboard (#14873)
+* fix(linux): replace `dbus-x11` dependency (#14895)
+* chore(ios): renew certificate (#14914)
+
 ## 19.0.135 alpha 2025-10-08
 
 * fix(android): Convert longpress delay menu to ConstraintLayout (#14897)
