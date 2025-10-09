@@ -24,6 +24,7 @@ import Transform = LexicalModelTypes.Transform;
 export interface TokenInputSource {
   trueTransform: Transform;
   inputStartIndex: number;
+  bestProbFromSet: number;
 }
 
 /**
@@ -129,9 +130,10 @@ export class ContextToken {
       rawTransformDistributions.forEach((entry) => {
         this._inputRange.push({
           trueTransform: entry[0].sample,
-          inputStartIndex: 0
+          inputStartIndex: 0,
+          bestProbFromSet: 1
         });
-        this.searchSpace.addInput(entry);
+        this.searchSpace.addInput(entry, 1);
       });
     }
   }
@@ -142,7 +144,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this.searchSpace.addInput(distribution);
+    this.searchSpace.addInput(distribution, inputSource.bestProbFromSet);
   }
 
   /**
@@ -350,7 +352,8 @@ export class ContextToken {
         backupToken = new ContextToken(constructingToken);
         constructingToken.addInput({
           trueTransform: priorSourceInput.trueTransform,
-          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded
+          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded,
+          bestProbFromSet: priorSourceInput.bestProbFromSet
         }, tailDistribution);
 
         const lenToCommit = lenBeforeLastApply + extraCharsAdded;

@@ -173,7 +173,7 @@ describe('precomputationSubsetKeyer', function() {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
             token.addInput(
-              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0},
+              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0, bestProbFromSet: 1},
               [{sample: {insert: 'te', deleteLeft: 0}, p: 1}]
             );
             return token;
@@ -200,7 +200,7 @@ describe('precomputationSubsetKeyer', function() {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
             token.addInput(
-              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0},
+              {trueTransform: {insert: 'te', deleteLeft: 0}, inputStartIndex: 0, bestProbFromSet: 1},
               [{sample: {insert: 't', deleteLeft: 0}, p: 1}]
             );
             return token;
@@ -241,7 +241,7 @@ describe('precomputationSubsetKeyer', function() {
               token.isPartial = true;
               // source text:  'dat'
               token.addInput(
-                {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0},
+                {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0, bestProbFromSet: 1},
                 [{sample: {insert: 'ts', deleteLeft: 0}, p: 1}]
               );
               return token;
@@ -269,7 +269,7 @@ describe('precomputationSubsetKeyer', function() {
           token.isPartial = true;
           // source text:  'dat'
           token.addInput(
-            {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0},
+            {trueTransform: {insert: 't', deleteLeft: 0}, inputStartIndex: 0, bestProbFromSet: 1},
             [{sample: {insert: 't', deleteLeft: 0}, p: 1}]
           );
           return token;
@@ -721,13 +721,13 @@ describe('TokenizationSubsetBuilder', function() {
 
     const fourCharTailToken = new ContextToken(baseTokenization.tail);
     fourCharTailToken.addInput(
-      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0, bestProbFromSet: 1},
       [{ sample: trueSourceTransform, p: .6 }]
     );
 
     const fiveCharTailToken = new ContextToken(baseTokenization.tail);
     fiveCharTailToken.addInput(
-      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0, bestProbFromSet: 1},
       [{ sample: { insert: 's', deleteLeft: 0 }, p: .4 }]
     );
 
@@ -760,13 +760,13 @@ describe('TokenizationSubsetBuilder', function() {
 
     const twoCharTailToken = new ContextToken(baseTokenization.tail);
     twoCharTailToken.addInput(
-      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0, bestProbFromSet: .6},
       [{ sample: trueSourceTransform, p: .6 }]
     );
 
     const threeCharTailToken = new ContextToken(baseTokenization.tail);
     threeCharTailToken.addInput(
-      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0},
+      {trueTransform: { insert: 'é', deleteLeft: 1 }, inputStartIndex: 0, bestProbFromSet: .6},
       [{ sample: { insert: 'a', deleteLeft: 0 }, p: .4 }]
     );
 

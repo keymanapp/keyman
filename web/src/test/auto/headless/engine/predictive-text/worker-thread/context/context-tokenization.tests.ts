@@ -36,7 +36,7 @@ function toTransformToken(text: string, transformId?: number) {
   let isWhitespace = text == ' ';
   let token = new ContextToken(plainModel);
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
-  token.addInput({trueTransform: textAsTransform, inputStartIndex: 0}, [ { sample: textAsTransform, p: 1 } ]);
+  token.addInput({trueTransform: textAsTransform, inputStartIndex: 0, bestProbFromSet: 1}, [ { sample: textAsTransform, p: 1 } ]);
   token.isWhitespace = isWhitespace;
   return token;
 }
@@ -185,10 +185,11 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
       },
         plainModel,
-        inputTransform
+        inputTransform,
+        1
       );
 
       assert.isOk(tokenization);
@@ -234,7 +235,8 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }]
       },
         plainModel,
-        inputTransform
+        inputTransform,
+        1
       );
 
       assert.isOk(tokenization);
@@ -267,10 +269,11 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
       },
         plainModel,
-        inputTransform
+        inputTransform,
+        1
       );
 
       assert.isOk(tokenization);
@@ -310,7 +313,8 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }]
       },
         plainModel,
-        inputTransform
+        inputTransform,
+        1
       );
 
       assert.isOk(tokenization);
@@ -354,7 +358,8 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }]
       },
         plainModel,
-        inputTransform
+        inputTransform,
+        1
       );
 
       assert.isOk(tokenization);
@@ -405,7 +410,8 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }]
       },
         plainModel,
-        inputTransform
+        inputTransform,
+        1
       );
 
       assert.isOk(tokenization);
@@ -416,12 +422,12 @@ describe('ContextTokenization', function() {
 
       const boundaryToken = tokenization.tokens[tokenization.tokens.length-3];
       const boundaryTailInput = boundaryToken.inputRange[boundaryToken.inputRange.length - 1];
-      assert.deepEqual(boundaryTailInput, {trueTransform: inputTransform, inputStartIndex: 0});
+      assert.deepEqual(boundaryTailInput, {trueTransform: inputTransform, inputStartIndex: 0, bestProbFromSet: 1});
 
       // The new tail tokens should not include anything from the original tail;
       // the token should be replaced.
-      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].inputRange, [{trueTransform: inputTransform, inputStartIndex: 0}]);
-      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputRange, [{trueTransform: inputTransform, inputStartIndex: 1}]);
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].inputRange, [{trueTransform: inputTransform, inputStartIndex: 0, bestProbFromSet: 1}]);
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputRange, [{trueTransform: inputTransform, inputStartIndex: 1, bestProbFromSet: 1}]);
 
       const tailIndex = tokenization.tokens.length - 1;
       for(let i of inputTransformMap.keys()) {
@@ -467,7 +473,8 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }]
       },
         plainModel,
-        { insert: ' ', deleteLeft: 0 }
+        { insert: ' ', deleteLeft: 0 },
+        1
       );
 
       assert.isOk(tokenization);
@@ -530,7 +537,8 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }]
       },
         plainModel,
-        { insert: 't', deleteLeft: 0 }
+        { insert: 't', deleteLeft: 0 },
+        1
       );
 
       assert.isOk(tokenization);
@@ -600,7 +608,8 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }]
       },
         plainModel,
-        inputTransform
+        inputTransform,
+        1
       );
 
       assert.isOk(tokenization);
@@ -622,7 +631,7 @@ describe('ContextTokenization', function() {
       // We've also appended a '.' to the final split-off token.  Thus, we need
       // to account for that in the assertions below.
       assert.includeDeepMembers(
-        [...baseTokenization.tail.inputRange, { trueTransform: inputTransform, inputStartIndex: 0 }],
+        [...baseTokenization.tail.inputRange, { trueTransform: inputTransform, inputStartIndex: 0, bestProbFromSet: 1 }],
         [...tokenization.tokens[tokenization.tokens.length - 1].inputRange]
       );
       assert.includeDeepMembers(
