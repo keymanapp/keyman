@@ -662,6 +662,12 @@ export class SearchSpace {
   private processedEdgeSet: {[pathKey: string]: boolean} = {};
 
   /**
+   * Provides a heuristic for the base cost at each depth if the best
+   * individual input were taken at that level.
+   */
+  private lowestCostAtDepth: number[];
+
+  /**
    * Clone constructor.  Deep-copies its internal queues, but not search nodes.
    * @param instance
    */
@@ -679,6 +685,7 @@ export class SearchSpace {
       this.rootNode = arg1.rootNode;
       // Re-use already-checked Nodes.
       this.completedPaths = [].concat(arg1.completedPaths);
+      this.lowestCostAtDepth = arg1.lowestCostAtDepth.slice();
       this.returnedValues = {...arg1.returnedValues};
       this.processedEdgeSet = {...arg1.processedEdgeSet};
 
@@ -697,6 +704,7 @@ export class SearchSpace {
     this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR);
     this.rootNode = new SearchNode(model.traverseFromRoot(), arg2, model.toKey ? model.toKey.bind(model) : null);
     this.selectionQueue.enqueue(this.rootNode);
+    this.lowestCostAtDepth = [];
 
     this.completedPaths = [];
   }
@@ -738,9 +746,12 @@ export class SearchSpace {
    * @param inputDistribution The fat-finger distribution for the incoming keystroke (or
    * just the raw keystroke if corrections are disabled)
    */
-  addInput(inputDistribution: Distribution<Transform>, tokenId: number) {
+  addInput(inputDistribution: Distribution<Transform>, tokenId: number, bestProbFromSet: number) {
     const input = {dist: inputDistribution, edgeId: tokenId};
     this._inputSequence.push(input);
+    const lastDepthCost = this.lowestCostAtDepth[this.lowestCostAtDepth.length - 1] ?? 0;
+    const logTierCost = -Math.log(bestProbFromSet);
+    this.lowestCostAtDepth.push(lastDepthCost + logTierCost);
 
     // Assumes that `inputDistribution` is already sorted.
     this.minInputCost.push(-Math.log(inputDistribution[0].p));
@@ -839,7 +850,8 @@ export class SearchSpace {
     // ... or even just not the then-current layer of the keyboard.
     //
     // TODO:  still consider the lowest-cost individual edges for THIS specific criterion.
-    if(currentNode.currentCost > /* tierMinCost */ + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
+    const tierMinCost = this.lowestCostAtDepth[currentNode.priorInput.length-1];
+    if(currentNode.currentCost > tierMinCost + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
       return unmatchedResult;
     }
 

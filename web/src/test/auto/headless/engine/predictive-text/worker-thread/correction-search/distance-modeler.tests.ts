@@ -1336,9 +1336,9 @@ describe('Correction Distance Modeler', () => {
         edgeId: SEARCH_EDGE_SEED++
       };
 
-      searchSpace.addInput(synthInput1.dist, synthInput1.edgeId);
-      searchSpace.addInput(synthInput2.dist, synthInput2.edgeId);
-      searchSpace.addInput(synthInput3.dist, synthInput3.edgeId);
+      searchSpace.addInput(synthInput1.dist, synthInput1.edgeId, 1);
+      searchSpace.addInput(synthInput2.dist, synthInput2.edgeId, .75);
+      searchSpace.addInput(synthInput3.dist, synthInput3.edgeId, .75);
 
       const iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
       await checkRepeatableResults_teh(iter, synthInput3.edgeId);
@@ -1375,9 +1375,9 @@ describe('Correction Distance Modeler', () => {
         edgeId: SEARCH_EDGE_SEED++
       };
 
-      searchSpace.addInput(synthInput1.dist, synthInput1.edgeId);
-      searchSpace.addInput(synthInput2.dist, synthInput2.edgeId);
-      searchSpace.addInput(synthInput3.dist, synthInput3.edgeId);
+      searchSpace.addInput(synthInput1.dist, synthInput1.edgeId, 1);
+      searchSpace.addInput(synthInput2.dist, synthInput2.edgeId, .75);
+      searchSpace.addInput(synthInput3.dist, synthInput3.edgeId, .25);
 
       const iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
       await checkRepeatableResults_teh(iter, synthInput3.edgeId);
