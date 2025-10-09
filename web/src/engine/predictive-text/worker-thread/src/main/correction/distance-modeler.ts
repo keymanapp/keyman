@@ -15,6 +15,12 @@ import Transform = LexicalModelTypes.Transform;
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
+// p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
+// p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
+// Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
+export const EDIT_DISTANCE_COST_SCALE = 5;
+export const MIN_KEYSTROKE_PROBABILITY = 0.0001;
+
 export type TraversableToken<TUnit> = {
   key: TUnit,
   traversal: LexiconTraversal
@@ -180,7 +186,7 @@ export class SearchNode {
     if(this._inputCost !== undefined) {
       return this._inputCost;
     } else {
-      let MIN_P = SearchQuotientSpur.MIN_KEYSTROKE_PROBABILITY;
+      let MIN_P = MIN_KEYSTROKE_PROBABILITY;
       // Should technically re-normalize the sampling distribution.
       // -ln(p) is smaller for larger probabilities, as ln(p) is always <= 0.  Approaches infinity as p => 0.
 
@@ -214,7 +220,7 @@ export class SearchNode {
     // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
     // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
     // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
-    return SearchQuotientSpur.EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
+    return EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
   }
 
   /**
@@ -667,19 +673,16 @@ export async function *getBestMatches(searchSpace: SearchQuotientSpur, timer: Ex
           return null;
         }
 
-        const entry = newResult.finalNode;
-
         // As we can't guarantee a monotonically-increasing cost during the search -
         // due to effects from keystrokes with deleteLeft > 0 - it's technically
         // possible to find a lower-cost path later in such cases.
         //
         // If it occurs, we should re-emit it - it'll show up earlier in the
         // suggestions that way, as it should.
-        if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
-          currentReturns[entry.resultKey] = entry;
-          searchSpace.returnedValues[entry.resultKey] = entry;
+        if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
+          currentReturns[node.resultKey] = node;
           // Do not track yielded time.
-          return new SearchResult(entry);
+          return new SearchResult(node);
         }
       }
 
@@ -695,7 +698,7 @@ export async function *getBestMatches(searchSpace: SearchQuotientSpur, timer: Ex
     if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
       await timer.defer();
     }
-  } while(!timer.elapsed && searchSpace.hasNextMatchEntry());
+  } while(!timer.elapsed && searchSpace.currentCost < Number.POSITIVE_INFINITY);
 
   return null;
 }
