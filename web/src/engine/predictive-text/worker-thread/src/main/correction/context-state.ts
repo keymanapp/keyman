@@ -192,7 +192,7 @@ export class ContextState {
    */
   analyzeTransition(
     context: Context,
-    transformDistribution?: Distribution<Transform>,
+    transformDistribution: Distribution<Transform>,
     // overrides checks for token substitution that can fail for large applied suggestions.
     isApplyingSuggestion?: boolean
   ): ContextTransition {
@@ -245,8 +245,11 @@ export class ContextState {
     // and then fold all resulting search spaces (on the final token) into one.
     const tokenizationAnalysis = trueInputSubset.pendingSet.get(baseTokenization);
 
+    // Determine the best probability from among ALL available inputs, before they're split
+    // into subsets.
+    const bestProb = transformDistribution.reduce((best, curr) => Math.max(best, curr.p), 0);
     // Should gain one per subsetBuilder.subsets entry.
-    const resultTokenization = baseTokenization.evaluateTransition(tokenizationAnalysis, lexicalModel, trueInput);
+    const resultTokenization = baseTokenization.evaluateTransition(tokenizationAnalysis, lexicalModel, trueInput, bestProb);
 
     // ------------
 
