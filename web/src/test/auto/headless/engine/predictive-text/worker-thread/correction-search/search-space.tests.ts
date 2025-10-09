@@ -101,7 +101,7 @@ describe('SearchSpace', () => {
     assert.isNotEmpty(rootTraversal);
 
     const rootSpaceId = SEARCH_EDGE_SEED++;
-    const searchSpace = new SearchSpace(testModel, rootSpaceId);
+    const searchSpace = new SearchSpace(rootSpaceId, testModel);
 
     const iter = getBestMatches([searchSpace], buildTestTimer());
     const firstResult = await iter.next();
@@ -115,7 +115,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel, SEARCH_EDGE_SEED++);
+    let searchSpace = new SearchSpace(SEARCH_EDGE_SEED++, testModel);
 
     // VERY artificial distributions.
     const synthInput1 = {
@@ -141,9 +141,9 @@ describe('SearchSpace', () => {
       edgeId: SEARCH_EDGE_SEED++
     };
 
-    searchSpace.addInput(synthInput1.dist, synthInput1.edgeId, 1);
-    searchSpace.addInput(synthInput2.dist, synthInput2.edgeId, .75);
-    searchSpace.addInput(synthInput3.dist, synthInput3.edgeId, .75);
+    searchSpace = searchSpace.addInput(synthInput1.dist, synthInput1.edgeId, 1);
+    searchSpace = searchSpace.addInput(synthInput2.dist, synthInput2.edgeId, .75);
+    searchSpace = searchSpace.addInput(synthInput3.dist, synthInput3.edgeId, .75);
 
     const iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter, synthInput3.edgeId);
@@ -154,7 +154,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel, SEARCH_EDGE_SEED++);
+    let searchSpace = new SearchSpace(SEARCH_EDGE_SEED++, testModel);
 
     // VERY artificial distributions.
     const synthInput1 = {
@@ -180,9 +180,9 @@ describe('SearchSpace', () => {
       edgeId: SEARCH_EDGE_SEED++
     };
 
-    searchSpace.addInput(synthInput1.dist, synthInput1.edgeId, 1);
-    searchSpace.addInput(synthInput2.dist, synthInput2.edgeId, .75);
-    searchSpace.addInput(synthInput3.dist, synthInput3.edgeId, .25);
+    searchSpace = searchSpace.addInput(synthInput1.dist, synthInput1.edgeId, 1);
+    searchSpace = searchSpace.addInput(synthInput2.dist, synthInput2.edgeId, .75);
+    searchSpace = searchSpace.addInput(synthInput3.dist, synthInput3.edgeId, .25);
 
     const iter = getBestMatches([searchSpace], buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter, synthInput3.edgeId);
@@ -198,7 +198,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel, SEARCH_EDGE_SEED++);
+    const searchSpace = new SearchSpace(SEARCH_EDGE_SEED++, testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches([searchSpace], timer);
 

@@ -60,7 +60,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  readonly searchSpace: SearchSpace;
+  public get searchSpace(): SearchSpace {
+    return this._searchSpace;
+  }
+  private _searchSpace: SearchSpace;
 
   isPartial: boolean;
 
@@ -105,7 +108,7 @@ export class ContextToken {
       //
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
-      this.searchSpace = new SearchSpace(priorToken.searchSpace);
+      this._searchSpace = priorToken.searchSpace;
       this._inputRange = priorToken._inputRange.slice();
     } else {
       const model = param;
@@ -123,7 +126,7 @@ export class ContextToken {
       });
 
       const spaceId = TOKEN_INPUT_ID_SEED;
-      this.searchSpace = new SearchSpace(model, spaceId);
+      let searchSpace = new SearchSpace(spaceId, model);
 
       rawTransformDistributions.forEach((entry) => {
         this._inputRange.push({
@@ -131,8 +134,12 @@ export class ContextToken {
           inputStartIndex: 0,
           bestProbFromSet: 1
         });
-        this.searchSpace.addInput(entry, TOKEN_INPUT_ID_SEED++, 1);
+        const priorSpace = searchSpace;
+        searchSpace = searchSpace.addInput(entry, TOKEN_INPUT_ID_SEED++, 1);
+        priorSpace.stopTrackingResults();
       });
+
+      this._searchSpace = searchSpace;
 
       if(!rawTransformDistributions.length) {
         TOKEN_INPUT_ID_SEED++;
@@ -146,7 +153,9 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this.searchSpace.addInput(distribution, TOKEN_INPUT_ID_SEED++, inputSource.bestProbFromSet);
+    const priorSpace = this._searchSpace;
+    this._searchSpace = this._searchSpace.addInput(distribution, TOKEN_INPUT_ID_SEED++, inputSource.bestProbFromSet);
+    priorSpace.stopTrackingResults();
   }
 
   /**

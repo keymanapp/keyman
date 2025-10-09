@@ -15,6 +15,12 @@ import Transform = LexicalModelTypes.Transform;
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
+// p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
+// p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
+// Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
+export const EDIT_DISTANCE_COST_SCALE = 5;
+export const MIN_KEYSTROKE_PROBABILITY = 0.0001;
+
 export type TraversableToken<TUnit> = {
   key: TUnit,
   traversal: LexiconTraversal
@@ -185,7 +191,7 @@ export class SearchNode {
     if(this._inputCost !== undefined) {
       return this._inputCost;
     } else {
-      let MIN_P = SearchSpace.MIN_KEYSTROKE_PROBABILITY;
+      let MIN_P = MIN_KEYSTROKE_PROBABILITY;
       // Should technically re-normalize the sampling distribution.
       // -ln(p) is smaller for larger probabilities, as ln(p) is always <= 0.  Approaches infinity as p => 0.
 
@@ -219,7 +225,7 @@ export class SearchNode {
     // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
     // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
     // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
-    return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
+    return EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
   }
 
   /**
