@@ -1,5 +1,5 @@
 /*
-  Name:             keymanx64
+  Name:             keymanhp
   Copyright:        Copyright (C) SIL International.
   Documentation:
   Description:
@@ -21,7 +21,7 @@
                     17 Jan 2013 - mcdurdin - I3758 - V9.0 - keymanx64 can find incorrect window handle for keyman.exe
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
-#include "keymanx64.h"   // I5136
+#include "keymanhp.h"   // I5136
 #include "../../../../common/windows/cpp/include/keymansentry.h"
 
 // Forward declarations of functions included in this code module
@@ -64,8 +64,8 @@ BOOL KeymanStarted = FALSE;
 // Global strings
 
 const PWSTR
-  szWindowClass = L"Keymanx64", // Do not localize
-  szWindowTitle = L"Keymanx64", // Do not localize
+  szWindowClass = L"Keymanhp", // Do not localize
+  szWindowTitle = L"Keymanhp", // Do not localize
 
   szTitle = L"Keyman Engine x64",
   szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanx64.exe -- it must be started by Keyman Engine x86",
