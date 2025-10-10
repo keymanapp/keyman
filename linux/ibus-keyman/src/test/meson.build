@@ -75,7 +75,7 @@ test(
 test(
   'teardown-src-test',
   teardown_tests,
-  args: [cleanup_file],
+  args: [cleanup_file, '--x11'],
   priority: -9,
   is_parallel: false,
   protocol: 'exitcode'
