@@ -1,5 +1,41 @@
 # Keyman Version History
 
+## 19.0.136 alpha 2025-10-09
+
+* fix(android): Refactor bottom inset calculations for in-app and system keyboard (#14873)
+* fix(linux): replace `dbus-x11` dependency (#14895)
+* chore(ios): renew certificate (#14914)
+
+## 19.0.135 alpha 2025-10-08
+
+* fix(android): Convert longpress delay menu to ConstraintLayout (#14897)
+
+## 19.0.134 alpha 2025-10-07
+
+* maint(resources): nest unit tests under parent block (#14871)
+
+## 19.0.133 alpha 2025-10-06
+
+* chore(linux): Update debian changelog (#14856)
+* maint(linux): fix integration tests in Docker (#14817)
+
+## 19.0.132 alpha 2025-10-03
+
+* fix(windows): remove cached files in idle state (#14683)
+
+## 19.0.131 alpha 2025-10-02
+
+* refactor(web): cleanup in test scripts (#14870)
+
+## 19.0.130 alpha 2025-09-30
+
+* maint(linux): allow to remote debug integration tests in Docker (#14818)
+* maint(resources): running the container for core in privileged mode (#14867)
+
+## 19.0.129 alpha 2025-09-29
+
+* chore(linux): remove no longer needed lintian overrides (#14810)
+
 ## 19.0.128 alpha 2025-09-26
 
 * fix(windows): sort setup UI language selector according to language names (#13573)
@@ -809,6 +845,18 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.242 stable 2025-09-29
+
+* maint(linux): remove Oracular, add Questing (#14781)
+* maint(resources): use VERSION variable in increment-version.sh (#14779)
+* chore(linux): Update debian changelog (#14782)
+* fix(developer): remove incorrect offset for compiler error line (#14792)
+* maint(linux): improve getting PR# in `upload-to-debian.sh` (#14785)
+* chore(linux): remove no longer needed lintian overrides (#14811)
+* fix(android): Apply bottom insets to system keyboard for Keyman, KMSample2, and FirstVoices (#14833)
+* fix(windows): disable .msi shortcut advertisement (#14829)
+* feat(windows): improve startup time by caching locale names (#14832)
 
 ## 18.0.241 stable 2025-09-18
 
