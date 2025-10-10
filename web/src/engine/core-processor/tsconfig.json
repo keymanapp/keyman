@@ -1,0 +1,13 @@
+{
+  // While the actual references themselves are headless, it compiles against the DOM-reliant OSK module.
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/core-processor/obj/",
+    "tsBuildInfoFile": "../../../build/engine/core-processor/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "**/*.ts", "src/import/core/km-core.js" ],
+}
