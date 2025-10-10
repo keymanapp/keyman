@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <km_types.h>
+#include "km_types.h"
 
 #ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
@@ -61,6 +61,9 @@ namespace kmx {
 
 #define BK_DEFAULT    0
 #define BK_DEADKEY    1
+
+// Next character to delete is a Unicode surrogate pair
+#define BK_SURROGATE  4
 
 // Different begin types
 #define BEGIN_ANSI    0
@@ -365,14 +368,14 @@ struct COMP_KEYBOARD_KMXPLUSINFO {
  * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  */
 struct COMP_KEYBOARD_EX {
-  COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
-  COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
+  struct COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
+  struct COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
 };
 
-typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
-typedef COMP_STORE *PCOMP_STORE;
-typedef COMP_KEY *PCOMP_KEY;
-typedef COMP_GROUP *PCOMP_GROUP;
+typedef struct COMP_KEYBOARD *PCOMP_KEYBOARD;
+typedef struct COMP_STORE *PCOMP_STORE;
+typedef struct COMP_KEY *PCOMP_KEY;
+typedef struct COMP_GROUP *PCOMP_GROUP;
 
 extern const int CODE__SIZE[];
 #define CODE__SIZE_MAX 5
@@ -382,10 +385,10 @@ extern const int CODE__SIZE[];
 #define KEYBOARDFILEGROUP_SIZE  24
 #define KEYBOARDFILEKEY_SIZE    20
 
-static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
-static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
-static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
-static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
+static_assert(sizeof(struct COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
+static_assert(sizeof(struct COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
+static_assert(sizeof(struct COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
+static_assert(sizeof(struct COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
 #ifdef KM_CORE_LIBRARY
 } // namespace kmx
