@@ -25,24 +25,23 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
 
 builder_parse "$@"
 
-if builder_start_action configure; then
-  node_select_version_and_npm_ci
-  builder_finish_action success configure
-fi
+function do_test_headless() {
+  MOCHA_FLAGS=(${FLAGS})
 
-if builder_start_action test:headless; then
-  MOCHA_FLAGS=$FLAGS
-
-  if builder_is_ci_build; then
-    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+  if builder_is_running_on_teamcity; then
+    MOCHA_FLAGS+=(--reporter "${KEYMAN_ROOT}/common/test/resources/mocha-teamcity-reporter/teamcity.cjs" --reporter-options parentFlowId="unit_tests")
+    echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
 
-  mocha --recursive $MOCHA_FLAGS ./headless/*.js ./headless/**/*.js
+  mocha --recursive "${MOCHA_FLAGS[@]}" ./headless/*.js ./headless/**/*.js
 
-  builder_finish_action success test:headless
-fi
+  if builder_is_running_on_teamcity; then
+    # we're running in TeamCity
+    echo "##teamcity[flowFinished flowId='unit_tests']"
+  fi
+}
 
-if builder_start_action test:browser; then
+function do_test_browser() {
   WTR_CONFIG=
   WTR_INSPECT=
 
@@ -55,6 +54,8 @@ if builder_start_action test:browser; then
   fi
 
   web-test-runner --config in_browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_INSPECT}
+}
 
-  builder_finish_action success test:browser
-fi
+builder_run_action configure      node_select_version_and_npm_ci
+builder_run_action test:headless  do_test_headless
+builder_run_action test:browser   do_test_browser

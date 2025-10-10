@@ -142,3 +142,19 @@ act repository_dispatch \
 
 rm -f ${tempfile}
 ```
+
+## Remote Debugging in Docker Container
+
+It is possible to remote debug in the Docker container by passing `--remote-debug`
+to the `run.sh` script.
+
+For example to debug the integration tests in Docker:
+
+* Run Docker container with:
+
+  ```bash
+  resources/docker-images/run.sh --remote-debug :linux -- linux/ibus-keyman/tests/scripts/run-tests.sh \
+    --no-x11 --remote-debug -- --directory /home/build/.local/share/keyman/test_kmx k_001___basic_input_unicodei
+  ```
+
+* then attach debugger in vscode

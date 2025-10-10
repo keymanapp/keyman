@@ -56,7 +56,7 @@ watch_ios='web|common/web'
 watch_linux='core|common/test/keyboards/baseline'
 watch_mac='core'
 watch_web='common/web|core'
-watch_windows='common|core|web'
+watch_windows='common|core'
 watch_developer='common|core|web'
 
 # Note, currently common_web build is a no-op because we rely on running the web

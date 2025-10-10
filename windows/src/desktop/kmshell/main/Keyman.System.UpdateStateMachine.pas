@@ -648,6 +648,8 @@ var
   CheckForUpdates: TRemoteUpdateCheck;
   UpdateCheckResult: TRemoteUpdateCheckResult;
 begin
+  // ensure the cache is empty
+  bucStateContext.RemoveCachedFiles;
   // Remote manages the last check time therefore
   // we will allow it to return early if it hasn't reached
   // the configured time between checks.

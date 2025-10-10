@@ -86,7 +86,7 @@ Package: python3-keyman-config
 Section: python
 Architecture: all
 Depends:
- dbus-x11,
+ default-dbus-session-bus | dbus-session-bus,
  dconf-cli,
  gir1.2-webkit2-4.1,
  keyman-engine,

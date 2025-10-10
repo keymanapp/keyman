@@ -13,7 +13,7 @@ ENV_FILE=/tmp/keyman-env.txt
 . "$(dirname "$0")"/test-helper.inc.sh
 
 local_cleanup() {
-  cleanup "${CLEANUP_FILE}"
+  cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER:-}"
 }
 
 if [[ -v KEYMAN_PKG_BUILD ]]; then
@@ -103,7 +103,7 @@ function run_tests() {
     --directory "${TESTDIR}" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
-  cleanup "${CLEANUP_FILE}"
+  cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER:-}"
 }
 
 USE_WAYLAND=1
@@ -120,7 +120,18 @@ while (( $# )); do
     --no-x11) USE_X11=0;;
     --verbose|-v) ARG_VERBOSE=--verbose;;
     --debug) ARG_DEBUG=--debug-log;;
-    --remote-debug) REMOTE_HOST="$(ip route get 8.8.8.8 | sed -E 's/.*src (\S+) .*/\1/;t;d'):2345" && REMOTE_DEBUG="gdbserver ${REMOTE_HOST}";;
+    --remote-debug)
+      if [[ -z "${DOCKER_RUNNING:-}" ]]; then
+        REMOTE_HOST="$(ip route get 8.8.8.8 | sed -E 's/.*src (\S+) .*/\1/;t;d'):2345"
+      else
+        REMOTE_HOST="localhost:2345"
+        if ! dpkg -l gdbserver &> /dev/null; then
+          echo "Installing gdbserver..."
+          sudo apt update && sudo apt install -y gdbserver
+        fi
+      fi
+      REMOTE_DEBUG="gdbserver ${REMOTE_HOST}"
+      ;;
     --) shift && break ;;
     *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
@@ -145,6 +156,14 @@ fi
 G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/debug/tests}"
 if [[ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]]; then
   G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/release/tests}"
+fi
+
+if [[ "${USE_WAYLAND}" == "1" ]] && [[ "${USE_X11}" == "1" ]]; then
+  # Restart script to first run Wayland tests
+  "$0" --no-x11 "$@"
+  # and now X11 tests
+  "$0" --no-wayland "$@"
+  exit 0
 fi
 
 echo > "${CLEANUP_FILE}"

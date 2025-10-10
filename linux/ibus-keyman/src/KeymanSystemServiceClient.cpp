@@ -43,7 +43,7 @@ KeymanSystemServiceClient::~KeymanSystemServiceClient() {
 void KeymanSystemServiceClient::Init() {
   int result;
   if (testing) {
-    result = sd_bus_default(&bus);
+    result = sd_bus_default_user(&bus);
   } else {
     result = sd_bus_default_system(&bus);
   }
