@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.137 alpha 2025-10-10
+
+* chore(common): Update crowdin strings for Vietnamese (#14915)
+* maint(resources): fix watch bug for common files, and add more logging for triggering builds (#14893)
+* docs(developer): Update keyboard-editor.md to clarify when entire row will be deleted (#14919)
+
 ## 19.0.136 alpha 2025-10-09
 
 * fix(android): Refactor bottom inset calculations for in-app and system keyboard (#14873)
