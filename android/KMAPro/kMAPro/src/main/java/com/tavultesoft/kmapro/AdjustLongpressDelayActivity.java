@@ -57,6 +57,10 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     final Context context = this;
 
     setContentView(R.layout.activity_adjust_longpress_delay);
+
+    setupEdgeToEdge(R.id.adjust_longpress_layout);
+    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     ActionBar actionBar = getSupportActionBar();
