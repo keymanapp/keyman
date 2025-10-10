@@ -90,6 +90,10 @@ setup_docker() {
   if ! builder_is_running_on_gha ; then
     DOCKER_RUN_ARGS+=(-t)
   fi
+
+  if builder_has_option --remote-debug; then
+    DOCKER_RUN_ARGS+=(-p 2345:2345)
+  fi
 }
 
 setup_container_registry() {
