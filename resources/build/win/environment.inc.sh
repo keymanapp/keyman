@@ -91,6 +91,27 @@ tds2dbg() {
   builder_if_release_build_level "$TDS2DBG" "$@"
 }
 
+#
+# If map2pdb is on the path, then run it. Note: we do not include it in the repo
+# because it can have false positives in malware scans. map2pdb is used to
+# generate .pdb files for Delphi-generated executables, which can then be used
+# in debuggers such as WinDbg, or profilers such as VTune.
+#
+do_map2pdb() {
+  if hash map2pdb 2>/dev/null; then
+    map2pdb "$1" -bind:"$2"
+  fi
+}
+
+#
+# If the first parameter is a file that exists, do the copy, otherwise, no-op.
+#
+cp_if_exists() {
+  if [[ -f "$1" ]]; then
+    cp "$@"
+  fi
+}
+
 delphi_msbuild() {
   run_in_delphi_env msbuild.exe "$@" "$DELPHI_MSBUILD_FLAG_DEBUG"
 }
