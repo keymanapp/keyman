@@ -29,6 +29,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/developer/src/kmc-model" \
   "@/developer/src/kmc-model-info" \
   "@/developer/src/kmc-package" \
+  "@/developer/src/kmc-test" \
   "configure                 runs 'npm ci' on root folder" \
   "build                     (default) builds kmc to build/" \
   "clean                     cleans build/ folder" \
