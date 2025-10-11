@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.138 alpha 2025-10-11
+
+* fix(android): Update Sample1 text field to resize (#14922)
+
 ## 19.0.137 alpha 2025-10-10
 
 * chore(common): Update crowdin strings for Vietnamese (#14915)
