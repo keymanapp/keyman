@@ -165,6 +165,10 @@ builder_run_child_actions build:engine/keyboard
 builder_run_child_actions build:engine/js-processor
 builder_run_child_actions build:engine/element-wrappers
 builder_run_child_actions build:engine/events
+
+# Builds the predictive-text components
+builder_run_child_actions build:engine/predictive-text
+
 builder_run_child_actions build:engine/interfaces
 
 # Uses engine/dom-utils and engine/interfaces
@@ -175,9 +179,6 @@ builder_run_child_actions build:engine/attachment
 
 # Uses engine/interfaces (due to resource-path config interface)
 builder_run_child_actions build:engine/keyboard-storage
-
-# Builds the predictive-text components
-builder_run_child_actions build:engine/predictive-text
 
 # Uses engine/interfaces, engine/keyboard-storage, engine/predictive-text, & engine/osk
 builder_run_child_actions build:engine/main
