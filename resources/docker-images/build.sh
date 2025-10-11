@@ -87,7 +87,7 @@ test_action() {
 
   builder_echo debug "Testing image for ${platform}"
   ./run.sh --distro "${DISTRO}" --distro-version "${DISTRO_VERSION}" \
-    ":${platform}"  "${registry_parameters:-}" -- ./build.sh configure,build,test:"${platform}"
+    ":${platform}"  "${registry_parameters:-}" -- /home/build/build/build.sh configure,build,test:"${platform}"
 }
 
 check_buildx_available
