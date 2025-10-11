@@ -404,9 +404,9 @@ end;
 procedure TframeCEFHost.Handle_CEF_AFTERCREATE(var Message: TMessage);
 begin
   AssertVclThread;
-  Navigate;
   if Assigned(FOnAfterCreated) then
     FOnAfterCreated(Self);
+  Navigate;
 end;
 
 procedure TframeCEFHost.cefAfterCreated(Sender: TObject;
