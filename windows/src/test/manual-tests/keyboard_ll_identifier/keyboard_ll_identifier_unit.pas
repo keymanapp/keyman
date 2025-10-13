@@ -57,7 +57,9 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
+//  Uncomment to monitor WM_KEY* and WM_SYSKEY* messages 
 //  Application.OnMessage := AppOnMessage;
+
 
   hh := SetWindowsHookEx(WH_KEYBOARD_LL, kbdll, GetModuleHandle(nil), 0);
 end;

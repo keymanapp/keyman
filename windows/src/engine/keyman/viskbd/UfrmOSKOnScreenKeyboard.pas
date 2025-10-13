@@ -225,7 +225,7 @@ begin
 end;
 
 (**
- * Handlers OSK modifier events received from
+ * Handles OSK modifier events received from
  * keyman32:PostVisualKeyboardModifierEvent in k32_visualkeyboardinterface.cpp.
  *
  * This takes the chiral VK_LCONTROL / VK_RCONTROL / VK_LMENU / VK_RMENU virtual
