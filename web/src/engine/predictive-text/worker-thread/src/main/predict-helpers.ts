@@ -460,7 +460,7 @@ export async function correctAndEnumerate(
 
   // The 'eventual' logic will be significantly more complex, though still manageable.
   const tokenizations = [transition.final.tokenization];
-  const searchSpaces = tokenizations.map(t => t.tail.searchPath);
+  const searchSpaces = tokenizations.map(t => t.tail.searchSpace);
 
   // If corrections are not enabled, bypass the correction search aspect
   // entirely. No need to 'search' - just do a direct lookup.

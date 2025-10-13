@@ -7,12 +7,14 @@
  * in the context and associated correction-search progress and results.
  */
 
-import { applyTransform, buildMergedTransform } from "@keymanapp/models-templates";
+import { buildMergedTransform } from "@keymanapp/models-templates";
+// import { applyTransform, buildMergedTransform } from "@keymanapp/models-templates";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
+import { SearchCluster } from "./search-cluster.js";
 import { SearchPath } from "./search-path.js";
-import { SearchSpace } from "./search-space.js";
+import { SearchSpace } from './search-space.js';
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -59,10 +61,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  public get searchPath(): SearchSpace {
-    return this._searchPath;
+  public get searchSpace(): SearchSpace {
+    return this._searchSpace;
   }
-  private _searchPath: SearchSpace;
+  private _searchSpace: SearchSpace;
 
   isPartial: boolean;
 
@@ -107,7 +109,7 @@ export class ContextToken {
       //
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
-      this._searchPath = priorToken.searchPath;
+      this._searchSpace = priorToken._searchSpace;
       this._inputRange = priorToken._inputRange.slice();
     } else {
       const model = param;
@@ -137,7 +139,7 @@ export class ContextToken {
         priorSpace.stopTrackingResults();
       });
 
-      this._searchPath = searchSpace;
+      this._searchSpace = searchSpace;
     }
   }
 
@@ -147,8 +149,8 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    const priorSpace = this._searchPath;
-    this._searchPath = new SearchPath(this._searchPath, distribution, inputSource.bestProbFromSet);
+    const priorSpace = this._searchSpace;
+    this._searchSpace = new SearchCluster([new SearchPath(this._searchSpace, distribution, inputSource.bestProbFromSet)]);
     priorSpace.stopTrackingResults();
   }
 
@@ -172,7 +174,7 @@ export class ContextToken {
    * a correction-search result.
    */
   get spaceId(): number {
-    return this.searchPath.spaceId;
+    return this.searchSpace.spaceId;
   }
 
   /**
@@ -210,7 +212,7 @@ export class ContextToken {
    * received that can correspond to the current instance.
    */
   get exampleInput(): string {
-    return this.searchPath.bestExample.text;
+    return this.searchSpace.bestExample.text;
   }
 
   /**
@@ -223,57 +225,58 @@ export class ContextToken {
   static merge(tokensToMerge: ContextToken[], lexicalModel: LexicalModel): ContextToken {
     // Assumption:  if we're merging a token, it's not whitespace.
     // Thus, we don't set the .isWhitespace flag field.
-    const resultToken = new ContextToken(lexicalModel);
+    throw new Error("Temporarily unimplemented");
+    // const resultToken = new ContextToken(lexicalModel);
 
-    let lastSourceInput: TokenInputSource;
-    let lastInputDistrib: Distribution<Transform>;
-    for(const token of tokensToMerge) {
-      const inputCount = token.inputRange.length;
-      let startIndex = 0;
+    // let lastSourceInput: TokenInputSource;
+    // let lastInputDistrib: Distribution<Transform>;
+    // for(const token of tokensToMerge) {
+    //   const inputCount = token.inputRange.length;
+    //   let startIndex = 0;
 
-      if(token.inputRange.length == 0) {
-        continue;
-      }
+    //   if(token.inputRange.length == 0) {
+    //     continue;
+    //   }
 
-      // Are we re-merging on a previously split transform?
-      if(lastSourceInput?.trueTransform != token.inputRange[0].trueTransform) {
-        if(lastSourceInput) {
-          resultToken.addInput(lastSourceInput, lastInputDistrib);
-        } // else:  there's nothing to add as input
-      } else {
-        // If so, re-merge it!
-        startIndex++;
+    //   // Are we re-merging on a previously split transform?
+    //   if(lastSourceInput?.trueTransform != token.inputRange[0].trueTransform) {
+    //     if(lastSourceInput) {
+    //       resultToken.addInput(lastSourceInput, lastInputDistrib);
+    //     } // else:  there's nothing to add as input
+    //   } else {
+    //     // If so, re-merge it!
+    //     startIndex++;
 
-        lastInputDistrib = lastInputDistrib?.map((entry, index) => {
-          return {
-            sample: buildMergedTransform(entry.sample, token.searchPath.inputSequences[0][0][index].sample),
-            p: entry.p
-          }
-        });
+    //     lastInputDistrib = lastInputDistrib?.map((entry, index) => {
+    //       return {
+    //         sample: buildMergedTransform(entry.sample, token.searchSpace.inputSequence[0][index].sample),
+    //         p: entry.p
+    //       }
+    //     });
 
-        // In case there's only one input that needs merging on both ends.
-        if(inputCount == 1) {
-          // There's potential that the next incoming token needs to merge with this.
-          continue;
-        } else {
-          resultToken.addInput(lastSourceInput, lastInputDistrib);
-        }
-      }
-      lastSourceInput = null;
-      lastInputDistrib = null;
+    //     // In case there's only one input that needs merging on both ends.
+    //     if(inputCount == 1) {
+    //       // There's potential that the next incoming token needs to merge with this.
+    //       continue;
+    //     } else {
+    //       resultToken.addInput(lastSourceInput, lastInputDistrib);
+    //     }
+    //   }
+    //   lastSourceInput = null;
+    //   lastInputDistrib = null;
 
-      // Ignore the last entry for now - it may need to merge with a matching
-      // entry in the next token!
-      for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.inputRange[i], token.searchPath.inputSequences[0][i]);
-      }
-      lastSourceInput = token.inputRange[inputCount-1];
-      lastInputDistrib = token.searchPath.inputSequences[0][inputCount-1];
-    }
+    //   // Ignore the last entry for now - it may need to merge with a matching
+    //   // entry in the next token!
+    //   for(let i = startIndex; i < inputCount - 1; i++) {
+    //     resultToken.addInput(token.inputRange[i], token.searchSpace.inputSequence[i]);
+    //   }
+    //   lastSourceInput = token.inputRange[inputCount-1];
+    //   lastInputDistrib = token.searchSpace.inputSequence[inputCount-1];
+    // }
 
-    resultToken.addInput(lastSourceInput, lastInputDistrib);
+    // resultToken.addInput(lastSourceInput, lastInputDistrib);
 
-    return resultToken;
+    // return resultToken;
   }
 
   /**
@@ -282,101 +285,102 @@ export class ContextToken {
    * @param lexicalModel
    * @returns
    */
-  split(split: TokenSplitMap, lexicalModel: LexicalModel) {
+  split(split: TokenSplitMap, lexicalModel: LexicalModel): ContextToken[] {
     // Assumption:  if we're splitting a token, it's not whitespace - and
     // neither are the spun-off tokens.  Thus, we don't set the .isWhitespace
     // flag field.
-    const tokensFromSplit: ContextToken[] = [];
+    throw new Error("Temporarily unimplemented");
+    // const tokensFromSplit: ContextToken[] = [];
 
-    // Build an alternate version of the transforms:  if we preprocess all deleteLefts,
-    // what text remains from each?
-    const alteredSources = preprocessInputSources(this.inputRange);
+    // // Build an alternate version of the transforms:  if we preprocess all deleteLefts,
+    // // what text remains from each?
+    // const alteredSources = preprocessInputSources(this.inputRange);
 
-    const blankContext = { left: '', startOfBuffer: true, endOfBuffer: true };
-    const splitSpecs = split.matches.slice();
-    let currentText = {...blankContext};
-    let lenBeforeLastApply = 0;
-    let committedLen = 0;
-    let constructingToken = new ContextToken(lexicalModel);
-    let backupToken: ContextToken;
-    let transformIndex = 0;
-    while(splitSpecs.length > 0) {
-      const splitMatch = splitSpecs[0];
+    // const blankContext = { left: '', startOfBuffer: true, endOfBuffer: true };
+    // const splitSpecs = split.matches.slice();
+    // let currentText = {...blankContext};
+    // let lenBeforeLastApply = 0;
+    // let committedLen = 0;
+    // let constructingToken = new ContextToken(lexicalModel);
+    // let backupToken: ContextToken;
+    // let transformIndex = 0;
+    // while(splitSpecs.length > 0) {
+    //   const splitMatch = splitSpecs[0];
 
-      if(splitMatch.text == currentText.left) {
-        tokensFromSplit.push(constructingToken);
-        constructingToken = new ContextToken(lexicalModel);
-        backupToken = null;
-        committedLen += lenBeforeLastApply;
-        currentText = {...blankContext};
-        splitSpecs.shift();
-        continue;
-      } else if(currentText.left.indexOf(splitMatch.text) > -1) {
-        // Oh dear - we've overshot the target! The split is awkward, in the
-        // middle of a keystroke.
+    //   if(splitMatch.text == currentText.left) {
+    //     tokensFromSplit.push(constructingToken);
+    //     constructingToken = new ContextToken(lexicalModel);
+    //     backupToken = null;
+    //     committedLen += lenBeforeLastApply;
+    //     currentText = {...blankContext};
+    //     splitSpecs.shift();
+    //     continue;
+    //   } else if(currentText.left.indexOf(splitMatch.text) > -1) {
+    //     // Oh dear - we've overshot the target! The split is awkward, in the
+    //     // middle of a keystroke.
 
-        // Restore!
-        const overextendedToken = constructingToken;
-        constructingToken = backupToken;
+    //     // Restore!
+    //     const overextendedToken = constructingToken;
+    //     constructingToken = backupToken;
 
-        // We know how much of the next transform to pull in:  it's specified on
-        // the split object.  Excess on constructed token - the split 'text offset'
-        const totalLenBeforeLastApply = committedLen + lenBeforeLastApply;
-        // We read the start position for the NEXT token to know the split position.
-        const extraCharsAdded = splitSpecs[1].textOffset - totalLenBeforeLastApply;
-        const tokenSequence = overextendedToken.searchPath.inputSequences[0];
-        const lastInputIndex = tokenSequence.length - 1;
-        const inputDistribution = tokenSequence[lastInputIndex];
-        const headDistribution = inputDistribution.map((m) => {
-          return {
-            sample: {
-              ...m.sample,
-              insert: KMWString.substring(m.sample.insert, 0, extraCharsAdded),
-              deleteRight: 0
-            }, p: m.p
-          };
-        });
-        const tailDistribution = inputDistribution.map((m) => {
-          return {
-            sample: {
-              ...m.sample,
-              insert: KMWString.substring(m.sample.insert, extraCharsAdded),
-              deleteLeft: 0
-            }, p: m.p
-          };
-        });
+    //     // We know how much of the next transform to pull in:  it's specified on
+    //     // the split object.  Excess on constructed token - the split 'text offset'
+    //     const totalLenBeforeLastApply = committedLen + lenBeforeLastApply;
+    //     // We read the start position for the NEXT token to know the split position.
+    //     const extraCharsAdded = splitSpecs[1].textOffset - totalLenBeforeLastApply;
+    //     const tokenSequence = overextendedToken.searchSpace.inputSequence;
+    //     const lastInputIndex = tokenSequence.length - 1;
+    //     const inputDistribution = tokenSequence[lastInputIndex];
+    //     const headDistribution = inputDistribution.map((m) => {
+    //       return {
+    //         sample: {
+    //           ...m.sample,
+    //           insert: KMWString.substring(m.sample.insert, 0, extraCharsAdded),
+    //           deleteRight: 0
+    //         }, p: m.p
+    //       };
+    //     });
+    //     const tailDistribution = inputDistribution.map((m) => {
+    //       return {
+    //         sample: {
+    //           ...m.sample,
+    //           insert: KMWString.substring(m.sample.insert, extraCharsAdded),
+    //           deleteLeft: 0
+    //         }, p: m.p
+    //       };
+    //     });
 
-        const priorSourceInput = overextendedToken.inputRange[lastInputIndex];
-        constructingToken.addInput(priorSourceInput, headDistribution);
-        tokensFromSplit.push(constructingToken);
+    //     const priorSourceInput = overextendedToken.inputRange[lastInputIndex];
+    //     constructingToken.addInput(priorSourceInput, headDistribution);
+    //     tokensFromSplit.push(constructingToken);
 
-        constructingToken = new ContextToken(lexicalModel);
-        backupToken = new ContextToken(constructingToken);
-        constructingToken.addInput({
-          trueTransform: priorSourceInput.trueTransform,
-          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded,
-          bestProbFromSet: priorSourceInput.bestProbFromSet
-        }, tailDistribution);
+    //     constructingToken = new ContextToken(lexicalModel);
+    //     backupToken = new ContextToken(constructingToken);
+    //     constructingToken.addInput({
+    //       trueTransform: priorSourceInput.trueTransform,
+    //       inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded,
+    //       bestProbFromSet: priorSourceInput.bestProbFromSet
+    //     }, tailDistribution);
 
-        const lenToCommit = lenBeforeLastApply + extraCharsAdded;
-        splitSpecs.shift();
+    //     const lenToCommit = lenBeforeLastApply + extraCharsAdded;
+    //     splitSpecs.shift();
 
-        committedLen += lenToCommit;
-        currentText.left = KMWString.substring(currentText.left, lenToCommit);
-        lenBeforeLastApply = 0;
-        continue; // without incrementing transformIndex - we haven't processed a new one!
-      } else if(transformIndex == alteredSources.length) {
-        throw new Error("Invalid split specified!");
-      }
+    //     committedLen += lenToCommit;
+    //     currentText.left = KMWString.substring(currentText.left, lenToCommit);
+    //     lenBeforeLastApply = 0;
+    //     continue; // without incrementing transformIndex - we haven't processed a new one!
+    //   } else if(transformIndex == alteredSources.length) {
+    //     throw new Error("Invalid split specified!");
+    //   }
 
-      backupToken = new ContextToken(constructingToken);
-      lenBeforeLastApply = KMWString.length(currentText.left);
-      currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
-      constructingToken.addInput(this.inputRange[transformIndex], this.searchPath.inputSequences[0][transformIndex]);
-      transformIndex++;
-    }
+    //   backupToken = new ContextToken(constructingToken);
+    //   lenBeforeLastApply = KMWString.length(currentText.left);
+    //   currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
+    //   constructingToken.addInput(this.inputRange[transformIndex], this.searchSpace.inputSequence[transformIndex]);
+    //   transformIndex++;
+    // }
 
-    return tokensFromSplit;
+    // return tokensFromSplit;
   }
 }
 

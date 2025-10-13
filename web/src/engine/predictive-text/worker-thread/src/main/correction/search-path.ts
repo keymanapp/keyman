@@ -12,6 +12,7 @@ import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keyman
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchCluster } from './search-cluster.js';
 import { generateSpaceSeed, PathResult, SearchSpace } from './search-space.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -26,7 +27,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchPath implements SearchSpace {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  private _inputs?: Distribution<Readonly<Transform>>;
+  private inputs?: Distribution<Transform>;
 
   readonly rootPath: SearchPath;
 
@@ -52,6 +53,10 @@ export class SearchPath implements SearchSpace {
 
   private _processedEdgeSet?: {[pathKey: string]: boolean} = {};
 
+  /**
+   * Provides a heuristic for the base cost at this path's depth if the best
+   * individual input were taken here, regardless of whether or not that's possible.
+   */
   readonly lowestPossibleSingleCost: number;
 
   /**
@@ -65,14 +70,14 @@ export class SearchPath implements SearchSpace {
   constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, bestProbFromSet?: number) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
-    const isExtending = (arg1 instanceof SearchPath);
+    const isExtending = (arg1 instanceof SearchPath || arg1 instanceof SearchCluster);
     this.spaceId = generateSpaceSeed();
 
     if(isExtending) {
       const parentSpace = arg1 as SearchSpace;
       const logTierCost = -Math.log(bestProbFromSet);
 
-      this._inputs = inputs;
+      this.inputs = inputs;
       this.lowestPossibleSingleCost = parentSpace.lowestPossibleSingleCost + logTierCost;
       this.rootPath = parentSpace.rootPath;
       this.parentSpace = parentSpace;
@@ -95,9 +100,9 @@ export class SearchPath implements SearchSpace {
     const parentSequences = this.parentSpace?.inputSequences ?? [];
 
     if(parentSequences.length == 0) {
-      return this._inputs ? [[this._inputs]] : [];
+      return this.inputs ? [[this.inputs]] : [];
     } else {
-      return parentSequences.map(s => [...s, this._inputs]);
+      return parentSequences.map(s => [...s, this.inputs]);
     }
   }
 
@@ -146,7 +151,7 @@ export class SearchPath implements SearchSpace {
   public get lastInput(): Distribution<Readonly<Transform>> {
     // Shallow-copies the array to prevent external modification; the Transforms
     // are marked Readonly to prevent their modification as well.
-    return [...this._inputs];
+    return [...this.inputs];
   }
 
   public get inputCount(): number {
@@ -159,7 +164,7 @@ export class SearchPath implements SearchSpace {
 
   public get bestExample(): {text: string, p: number} {
     const bestPrefix = this.parentSpace?.bestExample ?? { text: '', p: 1 };
-    const bestLocalInput = this._inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
+    const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
       text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
@@ -188,7 +193,7 @@ export class SearchPath implements SearchSpace {
   get correctionsEnabled(): boolean {
     // When corrections are disabled, the Web engine will only provide individual Transforms
     // for an input, not a distribution.  No distributions means we shouldn't do corrections.
-    return this.parentSpace?.correctionsEnabled || this._inputs?.length > 1;
+    return this.parentSpace?.correctionsEnabled || this.inputs?.length > 1;
   }
 
   public get currentCost(): number {
@@ -202,8 +207,8 @@ export class SearchPath implements SearchSpace {
     // With a newly-available input, we can extend new input-dependent paths from
     // our previously-reached 'extractedResults' nodes.
     let outboundNodes = baseNodes.map((node) => {
-      let deletions = node.buildDeletionEdges(this._inputs, this.spaceId);
-      let substitutions = node.buildSubstitutionEdges(this._inputs, this.spaceId);
+      let deletions = node.buildDeletionEdges(this.inputs, this.spaceId);
+      let substitutions = node.buildSubstitutionEdges(this.inputs, this.spaceId);
 
       const batch = deletions.concat(substitutions);
 

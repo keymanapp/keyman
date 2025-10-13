@@ -29,8 +29,8 @@ export default class PriorityQueue<Type> {
    * the first parameter should precede the second parameter.
    * @param initialEntries
    */
-  constructor(comparator: QueueComparator<Type>, initialEntries?: Type[]);
-  constructor(arg1: QueueComparator<Type> | PriorityQueue<Type>, initialEntries?: Type[]) {
+  constructor(comparator: QueueComparator<Type>, initialEntries?: ReadonlyArray<Type>);
+  constructor(arg1: QueueComparator<Type> | PriorityQueue<Type>, initialEntries?: ReadonlyArray<Type>) {
     if(typeof arg1 != 'function') {
       this.comparator = arg1.comparator;
       // Shallow-copies are fine.
@@ -151,7 +151,7 @@ export default class PriorityQueue<Type> {
    * - O(`elements.count` * log(`heap.count`)) - logarithmic when elements.count << heap.count
    * @param elements A group of elements to enqueue simultaneously.
    */
-  enqueueAll(elements: Type[]) {
+  enqueueAll(elements: ReadonlyArray<Type>) {
     if(elements.length == 0) {
       return;
     }
@@ -227,7 +227,7 @@ export default class PriorityQueue<Type> {
    * This function makes no guarantees on the ordering of the returned elements;
    * they will almost certainly be unsorted.
    */
-  toArray(): Type[] {
-    return this.heap.slice(0);
+  toArray(): ReadonlyArray<Type> {
+    return this.heap;
   }
 }

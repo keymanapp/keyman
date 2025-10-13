@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, models, SearchPath } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, models, SearchCluster, SearchPath } from '@keymanapp/lm-worker/test-index';
 
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
@@ -96,7 +96,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchCluster(testModel);
 
     const iter = getBestMatches([searchSpace], buildTestTimer());
     const firstResult = await iter.next();
@@ -182,7 +182,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchCluster(testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches([searchSpace], timer);
 

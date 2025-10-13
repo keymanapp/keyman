@@ -10,10 +10,10 @@
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchNode, SearchResult } from "./distance-modeler.js";
+import { SearchPath } from "./search-path.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
-import { SearchPath } from "./search-path.js";
 
 export let SPACE_ID_SEED = 0;
 
@@ -139,4 +139,10 @@ export interface SearchSpace {
    * the correction-search graph and its paths.
    */
   readonly bestExample: { text: string, p: number };
+
+  /**
+   * Increases the editing range that will be considered for determining
+   * correction distances.
+   */
+  increaseMaxEditDistance(): void;
 }
