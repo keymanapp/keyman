@@ -8,8 +8,8 @@
 #include "targetver.h"
 
 #include <Windows.h>
+#include "../../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "mcompile.h"
-#include "mc_kmxfile.h"
 #include "mc_syskbd.h"
 #include "../../../../common/windows/cpp/include/crc32.h"
 #include "../../../../common/include/kmx_file.h"
