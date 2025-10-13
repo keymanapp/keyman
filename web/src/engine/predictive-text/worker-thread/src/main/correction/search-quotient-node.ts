@@ -16,6 +16,7 @@ import { SearchQuotientRoot } from "./search-quotient-root.js";
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
+import { SearchQuotientCluster } from "./search-quotient-cluster.js";
 
 let SPACE_ID_SEED = 0;
 
@@ -292,6 +293,8 @@ function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistributions:
 function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[][] {
   if(node instanceof SearchQuotientRoot) {
     return [];
+  } else if(node instanceof SearchQuotientCluster) {
+    return node.parents.flatMap((p) => constituentPaths(p));
   } else if(node instanceof SearchQuotientSpur) {
     const parentPaths = constituentPaths(node.parents[0]);
     if(parentPaths.length > 0) {
