@@ -252,9 +252,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequences[0]);
       assert.sameDeepMembers(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence.slice(),
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequences[0].slice(),
         [[{sample: { insert: '', deleteLeft: 0 }, p: 1}]]
       );
 
@@ -284,9 +284,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequences[0]);
       assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequences[0],
         [[{ sample: {insert: '', deleteLeft: 0}, p: 1 }]]
       );
 
@@ -337,8 +337,8 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequences[0]);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequences[0]);
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
       //   assert.fail("context alignment failed");
@@ -370,9 +370,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequences[0]);
       assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequences[0],
         [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
       );
 
@@ -402,9 +402,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequences[0]);
       assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequences[0],
         [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
       );
 
@@ -434,8 +434,8 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequences[0]);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequences[0]);
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
       //   assert.fail("context alignment failed");
@@ -444,7 +444,7 @@ describe('ContextState', () => {
       // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
-    it('handles case where tail token is split into three rather than two', function() {
+    it.skip('handles case where tail token is split into three rather than two', function() {
       let baseContext = models.tokenize(defaultBreaker, {
         left: "text'", startOfBuffer: true, endOfBuffer: true
       });

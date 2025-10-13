@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { PathResult, SearchBatcher } from './search-batcher.js';
+import { SearchBatcher } from './search-batcher.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -552,22 +552,25 @@ export class SearchNode {
 }
 
 export class SearchResult {
-  private resultNode: SearchNode;
+  readonly node: SearchNode;
+  // Supports SearchPath -> SearchSpace remapping.
+  readonly spaceId: number;
 
-  constructor(node: SearchNode) {
-    this.resultNode = node;
+  constructor(node: SearchNode, spaceId?: number) {
+    this.node = node;
+    this.spaceId = spaceId ?? node.spaceId;
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
-    return this.resultNode.priorInput;
+    return this.node.priorInput;
   }
 
   get matchSequence(): TraversableToken<string>[] {
-    return this.resultNode.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.resultNode.matchedTraversals[i+1]}));
+    return this.node.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.node.matchedTraversals[i+1]}));
   };
 
   get matchString(): string {
-    return this.resultNode.resultKey;
+    return this.node.resultKey;
   }
 
   /**
@@ -578,7 +581,7 @@ export class SearchResult {
    * `totalCost`.)
    */
   get knownCost(): number {
-    return this.resultNode.editCount;
+    return this.node.editCount;
   }
 
   /**
@@ -586,7 +589,7 @@ export class SearchResult {
    * negative log-likelihood of the input path taken to reach the node.
    */
   get inputSamplingCost(): number {
-    return this.resultNode.inputSamplingCost;
+    return this.node.inputSamplingCost;
   }
 
   /**
@@ -596,15 +599,11 @@ export class SearchResult {
    * to the resulting output.
    */
   get totalCost(): number {
-    return this.resultNode.currentCost;
+    return this.node.currentCost;
   }
 
   get finalTraversal(): LexiconTraversal {
-    return this.resultNode.currentTraversal;
-  }
-
-  get spaceId(): number {
-    return this.resultNode.spaceId;
+    return this.node.currentTraversal;
   }
 }
 
@@ -635,13 +634,13 @@ export async function *getBestMatches(searchSpaces: SearchBatcher[], timer: Exec
 
   // Stage 2:  the fun part; actually searching!
   do {
-    const entry: SearchResult = timer.time(() => {
-      if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) < spaceQueue.peek().currentCost) {
+    const entry = timer.time(() => {
+      if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         return priorResultsQueue.dequeue();
       }
 
       let bestQueue = spaceQueue.dequeue();
-      let newResult: PathResult = bestQueue.handleNextNode();
+      const newResult = bestQueue.handleNextNode();
       spaceQueue.enqueue(bestQueue);
 
       if(newResult.type == 'none') {
@@ -666,7 +665,7 @@ export async function *getBestMatches(searchSpaces: SearchBatcher[], timer: Exec
         if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
           currentReturns[node.resultKey] = node;
           // Do not track yielded time.
-          return new SearchResult(node);
+          return new SearchResult(node, newResult.spaceId);
         }
       }
 

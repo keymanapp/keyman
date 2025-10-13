@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, models, SearchPath } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, models, SearchSpace } from '@keymanapp/lm-worker/test-index';
 
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
@@ -96,7 +96,7 @@ describe('SearchPath', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchSpace(testModel);
 
     const iter = getBestMatches([searchSpace], buildTestTimer());
     const firstResult = await iter.next();
@@ -109,7 +109,7 @@ describe('SearchPath', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchSpace(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -126,9 +126,9 @@ describe('SearchPath', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchSpace1 = searchSpace.addInput(synthInput1, 1);
-    const searchSpace2 = searchSpace1.addInput(synthInput2, .75);
-    const searchSpace3 = searchSpace2.addInput(synthInput3, .75);
+    const searchSpace1 = new SearchSpace([searchSpace.addInput(synthInput1, 1)]);
+    const searchSpace2 = new SearchSpace([searchSpace1.addInput(synthInput2, .75)]);
+    const searchSpace3 = new SearchSpace([searchSpace2.addInput(synthInput3, .75)]);
 
     assert.notEqual(searchSpace1.spaceId, searchSpace.spaceId);
     assert.notEqual(searchSpace2.spaceId, searchSpace1.spaceId);
@@ -143,7 +143,7 @@ describe('SearchPath', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    let searchSpace = new SearchPath(testModel);
+    let searchSpace = new SearchSpace(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -160,9 +160,9 @@ describe('SearchPath', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchSpace1 = searchSpace.addInput(synthInput1, 1);
-    const searchSpace2 = searchSpace1.addInput(synthInput2, .75);
-    const searchSpace3 = searchSpace2.addInput(synthInput3, .75);
+    const searchSpace1 = new SearchSpace([searchSpace.addInput(synthInput1, 1)]);
+    const searchSpace2 = new SearchSpace([searchSpace1.addInput(synthInput2, .75)]);
+    const searchSpace3 = new SearchSpace([searchSpace2.addInput(synthInput3, .75)]);
 
     assert.notEqual(searchSpace1.spaceId, searchSpace.spaceId);
     assert.notEqual(searchSpace2.spaceId, searchSpace1.spaceId);
@@ -182,7 +182,7 @@ describe('SearchPath', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchSpace(testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches([searchSpace], timer);
 
