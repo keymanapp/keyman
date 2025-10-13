@@ -71,6 +71,8 @@ class GSettings():
     def get(self, key):
         if self.is_sudo:
             args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                    f'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus',
+                    f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}',
                     'gsettings', 'get', self.schema_id, key]
             if sys.version_info.major <= 3 and sys.version_info.minor < 7:
                 # capture_output got added in Python 3.7
@@ -121,9 +123,11 @@ class GSettings():
     def set(self, key, value, type_string) -> None:
         if self.is_sudo:
             variant = str(value)
-            subprocess.run(
-              ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-               'gsettings', 'set', self.schema_id, key, variant], check=False)
+            args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                    f'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus',
+                    f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}',
+                    'gsettings', 'set', self.schema_id, key, variant]
+            subprocess.run(args, check=False)
         elif get_dbus_started_for_session():
             self._set_key_file(key, value, type_string)
         else:

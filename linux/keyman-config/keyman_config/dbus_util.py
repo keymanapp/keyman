@@ -2,6 +2,7 @@
 import contextlib
 import logging
 import os
+import subprocess
 
 import dbus
 import dbus.bus
@@ -34,6 +35,16 @@ class KeymanConfigService(dbus.service.Object):
         if self.__keyboard_list_changed_handler:
             self.__keyboard_list_changed_handler()
         self.KeyboardListChangedSignal()
+
+
+def keyboard_list_changed():
+    if os.environ.get('SUDO_USER'):
+        args = ['sudo', '-u', os.environ.get('SUDO_USER'), 'dbus-send',
+                f'--bus=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus',
+                '/com/Keyman/Config', 'com.Keyman.Config.keyboard_list_changed']
+        subprocess.run(args)
+    else:
+        get_keyman_config_service().keyboard_list_changed()
 
 
 class KeymanConfigServiceManager:

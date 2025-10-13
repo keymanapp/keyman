@@ -114,10 +114,8 @@ def verify_ibus_daemon(start):
         return IbusDaemon.ERROR_USER
 
     try:
-        ps_output = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'),
-                                   check=False, stdout=subprocess.PIPE).stdout
-        ibus_daemons = re.findall(r'^[^ZT] (/[^ ]+/|)ibus-daemon( .*|$)',
-                                  ps_output.decode('utf-8'), re.MULTILINE)
+        ibus_daemons = subprocess.run(('pgrep', '-u', user, 'ibus-daemon'),
+                                      check=False, stdout=subprocess.PIPE).stdout.split()
         if len(ibus_daemons) <= 0:
             if start:
                 _start_ibus_daemon(realuser)
@@ -171,21 +169,27 @@ def _start_ibus_daemon(realuser):
 
         if realuser:
             # we have been called with `sudo`. Start ibus-daemon for the real user.
-            logging.info('starting ibus-daemon for user %s', realuser)
-            subprocess.run(['sudo', '-u', realuser].extend(args), check=True)
+            args = ['sudo', '-u', realuser,
+                    f'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus',
+                    f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}', *args]
+            logging.info(f'starting ibus-daemon for user {realuser} with args: {args}')
         else:
             logging.info('ibus-daemon not running. Starting it...')
-            subprocess.run(args, check=True)
-    except Exception:
-        logging.warning('Failed to start ibus-daemon')
+            logging.debug(f'Starting ibus-daemon with args: {args}')
+        subprocess.run(args, check=True)
+        logging.info('ibus-daemon started successfully')
+    except Exception as e:
+        logging.warning(f'Failed to start ibus-daemon: {e}')
 
 
 def restart_ibus(bus=None):
     verify_ibus_daemon(False)
     if realuser := os.environ.get('SUDO_USER'):
         # we have been called with `sudo`. Restart ibus for the real user.
-        logging.info('restarting IBus by subprocess for user %s', realuser)
-        subprocess.run(['sudo', '-u', realuser, 'ibus', 'restart'], check=False)
+        logging.info(f'restarting IBus by subprocess for user {realuser}')
+        subprocess.run(['sudo', '-u', realuser,
+                        f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}',
+                        'ibus', 'restart'], check=False)
     else:
         logging.info('restarting IBus through API')
         try:
