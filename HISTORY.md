@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.139 alpha 2025-10-13
+
+* fix(windows): osk: handle simulated left Control event when AltGr pressed (#14909)
+
 ## 19.0.138 alpha 2025-10-11
 
 * fix(android): Update Sample1 text field to resize (#14922)
