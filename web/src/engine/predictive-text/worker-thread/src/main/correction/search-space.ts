@@ -130,14 +130,6 @@ export interface SearchSpace {
   readonly inputCount: number;
 
   /**
-   * Retrieves the sequence of inputs that led to this SearchSpace.
-   *
-   * THIS WILL BE REMOVED SHORTLY.  (Once SearchPath takes on merging &
-   * splitting)
-   */
-  readonly inputSequence: Distribution<Transform>[];
-
-  /**
    * Reports the length in codepoints of corrected text represented by completed
    * paths from this instance.
    */

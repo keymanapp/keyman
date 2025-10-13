@@ -13,6 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchCluster } from './search-cluster.js';
 import { generateSpaceSeed, PathResult, SearchSpace, TokenInputSource } from './search-space.js';
 
 import Context = LexicalModelTypes.Context;
@@ -64,7 +65,7 @@ export class SearchPath implements SearchSpace {
   constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: TokenInputSource) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
-    const isExtending = (arg1 instanceof SearchPath);
+    const isExtending = (arg1 instanceof SearchPath || arg1 instanceof SearchCluster);
     this.spaceId = generateSpaceSeed();
 
     if(isExtending) {
@@ -88,19 +89,6 @@ export class SearchPath implements SearchSpace {
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestPossibleSingleCost = 0;
     this.bestProbInEdge = 1;
-  }
-
-  /**
-   * Retrieves the sequences of inputs that led to this SearchPath.
-   */
-  public get inputSequence(): Distribution<Transform>[] {
-    if(this.parents[0]) {
-      return [...this.parents[0].inputSequence, this.inputs];
-    } else if(this.inputs) {
-      return [this.inputs];
-    } else {
-      return [];
-    }
   }
 
   public hasInputs(keystrokeDistributions: Distribution<Transform>[]): boolean {
