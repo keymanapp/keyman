@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
-import { SearchQuotientNode, SearchQuotientRoot, SearchQuotientSpur } from "@keymanapp/lm-worker/test-index";
+import { SearchQuotientCluster, SearchQuotientNode, SearchQuotientRoot, SearchQuotientSpur } from "@keymanapp/lm-worker/test-index";
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -84,6 +84,8 @@ export function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistrib
 export function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[][] {
   if(node instanceof SearchQuotientRoot) {
     return [];
+  } else if(node instanceof SearchQuotientCluster) {
+    return node.parents.flatMap((p) => constituentPaths(p));
   } else if(node instanceof SearchQuotientSpur) {
     const parentPaths = constituentPaths(node.parents[0]);
     if(parentPaths.length > 0) {
