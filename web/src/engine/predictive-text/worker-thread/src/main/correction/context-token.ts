@@ -49,10 +49,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  public get searchPath(): SearchSpace {
-    return this._searchPath;
+  public get searchSpace(): SearchSpace {
+    return this._searchSpace;
   }
-  private _searchPath: SearchSpace;
+  private _searchSpace: SearchSpace;
 
   isPartial: boolean;
 
@@ -90,7 +90,7 @@ export class ContextToken {
       //
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
-      this._searchPath = priorToken.searchPath;
+      this._searchSpace = priorToken._searchSpace;
     } else {
       const model = param;
 
@@ -117,7 +117,7 @@ export class ContextToken {
         priorSpace.stopTrackingResults();
       });
 
-      this._searchPath = searchSpace;
+      this._searchSpace = searchSpace;
     }
   }
 
@@ -126,13 +126,13 @@ export class ContextToken {
    * corresponding to this token.
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
-    const priorSpace = this._searchPath;
-    this._searchPath = new SearchPath(this._searchPath, distribution, inputSource);
+    const priorSpace = this._searchSpace;
+    this._searchSpace = new SearchPath(this._searchSpace, distribution, inputSource);
     priorSpace.stopTrackingResults();
   }
 
   get inputCount() {
-    return this._searchPath.inputCount;
+    return this.searchSpace.inputCount;
   }
 
   /**
@@ -147,7 +147,7 @@ export class ContextToken {
    * to this token.
    */
   get inputRange() {
-    return this.searchPath.sourceIdentifiers;
+    return this.searchSpace.sourceIdentifiers;
   }
 
   /**
@@ -155,7 +155,7 @@ export class ContextToken {
    * a correction-search result.
    */
   get spaceId(): number {
-    return this.searchPath.spaceId;
+    return this.searchSpace.spaceId;
   }
 
   /**
@@ -164,7 +164,7 @@ export class ContextToken {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.searchPath.sourceIdentifiers;
+    const sources = this.searchSpace.sourceIdentifiers;
 
     for(const source of sources) {
       const i = source.inputStartIndex;
@@ -180,7 +180,7 @@ export class ContextToken {
    * This should only ever be used for debugging purposes.
    */
   get sourceText(): string {
-    return this.searchPath.likeliestSourceText;
+    return this.searchSpace.likeliestSourceText;
   }
 
   /**
@@ -188,7 +188,7 @@ export class ContextToken {
    * received that can correspond to the current instance.
    */
   get exampleInput(): string {
-    return this.searchPath.bestExample.text;
+    return this.searchSpace.bestExample.text;
   }
 
   /**
@@ -208,7 +208,7 @@ export class ContextToken {
     const resultToken = new ContextToken(tokensToMerge.shift());
     while(tokensToMerge.length > 0) {
       const next = tokensToMerge.shift();
-      resultToken._searchPath = resultToken._searchPath.merge(next._searchPath);
+      resultToken._searchSpace = resultToken._searchSpace.merge(next._searchSpace);
     }
 
     return resultToken;
@@ -224,7 +224,7 @@ export class ContextToken {
     // Split from tail to head - leave as much 'head' intact as possible at each
     // step, rather than needing to reconstruct the tail multiple times.
     const splitSpecs = split.matches.slice();
-    let searchSpace = this.searchPath;
+    let searchSpace = this.searchSpace;
     let searchSplits: SearchSpace[] = [];
     while(splitSpecs.length > 0) {
       const spec = splitSpecs.pop();
@@ -246,7 +246,7 @@ export class ContextToken {
 
     const tokensFromSplit = searchSplits.map((path) => {
       const token = new ContextToken(this);
-      token._searchPath = path;
+      token._searchSpace = path;
       return token;
     });
 
