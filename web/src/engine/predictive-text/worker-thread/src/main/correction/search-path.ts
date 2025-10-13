@@ -13,6 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchCluster } from './search-cluster.js';
 import { generateSpaceSeed, PathResult, SearchSpace, PathInputProperties, InputSegment } from './search-space.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 
@@ -90,7 +91,7 @@ export class SearchPath implements SearchSpace {
   constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: PathInputProperties | ProbabilityMass<Transform>) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
-    const isExtending = (arg1 instanceof SearchPath);
+    const isExtending = (arg1 instanceof SearchPath || arg1 instanceof SearchCluster);
     this.spaceId = generateSpaceSeed();
 
     // Coerce inputSource to TokenInputSource format.
