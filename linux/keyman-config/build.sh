@@ -39,18 +39,25 @@ clean_action() {
   fi
 }
 
+install_schema() {
+  local SCHEMA_DIR="$1"
+  mkdir -p "${SCHEMA_DIR}"
+  cp resources/com.keyman.gschema.xml "${SCHEMA_DIR}"/
+  glib-compile-schemas "${SCHEMA_DIR}"
+}
+
 execute_with_temp_schema() {
   local TEMP_DATA_DIR SCHEMA_DIR
   TEMP_DATA_DIR=$(mktemp -d)
   SCHEMA_DIR="${TEMP_DATA_DIR}/glib-2.0/schemas"
   export XDG_DATA_DIRS="${TEMP_DATA_DIR}":${XDG_DATA_DIRS-}
   export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}:/usr/share/glib-2.0/schemas/:${GSETTINGS_SCHEMA_DIR-}"
-  mkdir -p "${SCHEMA_DIR}"
-  cp resources/com.keyman.gschema.xml "${SCHEMA_DIR}"/
-  glib-compile-schemas "${SCHEMA_DIR}"
+
+  install_schema "${SCHEMA_DIR}"
   "$@"
-  export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
+
   unset GSETTINGS_SCHEMA_DIR
+  export XDG_DATA_DIRS=${XDG_DATA_DIRS#*:}
   rm -rf "${TEMP_DATA_DIR}"
 }
 
@@ -110,8 +117,8 @@ test_action() {
 }
 
 install_action() {
-  if [ -n "${SUDO_USER:-}" ]; then
-    # with sudo install into /usr/local
+  if [[ -n "${SUDO_USER:-}" ]] || [[ "$(id -u)" == "0" ]]; then
+    # as root install into /usr/local
     pip3 install qrcode sentry-sdk
     pip3 install .
     # install icons
@@ -120,10 +127,14 @@ install_action() {
     # install man pages
     mkdir -p /usr/local/share/man/man1
     cp ../../debian/man/*.1 /usr/local/share/man/man1
+    # install schema
+    install_schema "/usr/local/share/glib-2.0/schemas"
   else
     # without sudo install into /tmp/keyman (or $DESTDIR)
     mkdir -p "/tmp/keyman/$(python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')"
     pip3 install --prefix /tmp/keyman .
+    # install schema
+    install_schema "/tmp/keyman/local/share/glib-2.0/schemas"
   fi
 }
 
