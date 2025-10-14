@@ -112,15 +112,27 @@ test_action() {
 
   if builder_has_option --report; then
     builder_echo "Creating coverage report"
-    python3 -m coverage html --directory="$THIS_SCRIPT_PATH/build/coveragereport/" --data-file=build/.coverage
+    python3 -m coverage html --directory="${THIS_SCRIPT_PATH}/build/coveragereport/" --data-file=build/.coverage
   fi
 }
 
 install_action() {
-  if [[ -n "${SUDO_USER:-}" ]] || [[ "$(id -u)" == "0" ]]; then
+  if [[ -v VIRTUAL_ENV ]]; then
+    # Running in a virtual environment
+    pip3 install qrcode sentry-sdk fonttools setuptools
+    pip3 install .
+    # install icons
+    mkdir -p "${VIRTUAL_ENV}/share/keyman/icons"
+    cp keyman_config/icons/* "${VIRTUAL_ENV}/share/keyman/icons"
+    # install man pages
+    mkdir -p "${VIRTUAL_ENV}/share/man/man1"
+    cp ../../debian/man/*.1 "${VIRTUAL_ENV}/share/man/man1"
+    # install schema
+    install_schema "${VIRTUAL_ENV}/share/glib-2.0/schemas"
+  elif [[ -n "${SUDO_USER:-}" ]] || [[ "$(id -u)" == "0" ]]; then
     # as root install into /usr/local
     pip3 install qrcode sentry-sdk
-    pip3 install .
+    pip3 install --prefix /usr/local .
     # install icons
     mkdir -p /usr/local/share/keyman/icons
     cp keyman_config/icons/* /usr/local/share/keyman/icons
@@ -131,7 +143,8 @@ install_action() {
     install_schema "/usr/local/share/glib-2.0/schemas"
   else
     # without sudo install into /tmp/keyman (or $DESTDIR)
-    mkdir -p "/tmp/keyman/$(python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')"
+    python_version=$(python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')
+    mkdir -p "/tmp/keyman/${python_version}"
     pip3 install --prefix /tmp/keyman .
     # install schema
     install_schema "/tmp/keyman/local/share/glib-2.0/schemas"
