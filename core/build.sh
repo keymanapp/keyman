@@ -98,7 +98,7 @@ builder_describe_internal_dependency \
   build:mac build:mac-arm64 \
   build:win build:x86 \
   build:win build:x64 \
-  build:arch build:arm64 \
+  build:win build:arm64 \
 
 builder_describe_outputs \
   configure:win             /core/build/win/$BUILDER_CONFIGURATION/ \

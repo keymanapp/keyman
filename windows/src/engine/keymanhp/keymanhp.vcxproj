@@ -100,10 +100,10 @@
     <ExtensionsToDeleteOnClean Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">*.cdf;*.cache;*.obj;*.ilk;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.metagen;*.bi</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>keymanx64</TargetName>
+    <TargetName>keymanhp.x64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>keymanx64</TargetName>
+    <TargetName>keymanhp.x64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <TargetName>keymanhp.arm64</TargetName>
