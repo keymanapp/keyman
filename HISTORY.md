@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.140 alpha 2025-10-15
+
+* fix(mac): add Microsoft Word to non-compliant app list (#14940)
+
 ## 19.0.139 alpha 2025-10-13
 
 * fix(windows): osk: handle simulated left Control event when AltGr pressed (#14909)
