@@ -322,7 +322,7 @@ begin
         prog := Trim(inf.Options.ExecuteProgram);
         if prog <> '' then
         begin
-          prog := StringReplace(prog, '$keyman', ExtractFileDir(GetKeymanInstallPath), [rfIgnoreCase, rfReplaceAll]);
+          prog := StringReplace(prog, '$keyman', TKeymanPaths.KeymanEngineInstallDir, [rfIgnoreCase, rfReplaceAll]);
           if not ExecuteProgram(prog, PChar(ExtractFileDir(dest)), errmsg) then
             WarnFmt(KMN_W_InstallPackage_CannotRunExternalProgram, VarArrayOf([prog, errmsg]));
         end;
