@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.243 stable 2025-10-15
+
+* chore(linux): Update debian changelog (#14855)
+* fix(android): Convert longpress delay menu to ConstraintLayout (#14906)
+* fix(linux): replace `dbus-x11` dependency (#14898)
+* chore(ios): renew certificate (#14917)
+* fix(android): Refactor bottom inset calculations for inapp and system keyboard (#14913)
+* fix(mac): add Microsoft Word to non-compliant app list (#14951)
+
 ## 18.0.242 stable 2025-09-29
 
 * maint(linux): remove Oracular, add Questing (#14781)
