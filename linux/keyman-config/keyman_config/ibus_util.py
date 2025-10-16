@@ -191,20 +191,8 @@ def restart_ibus(bus=None):
                         DBusSessionBusAddress, XdgRuntimeDir,
                         'ibus', 'restart'], check=False)
     else:
-        logging.info('restarting IBus through API')
-        try:
-            if not bus:
-                bus = get_ibus_bus()
-            if bus:
-                logging.info("restarting IBus")
-                # we no longer try to restart since we sometimes ended up with more than one
-                # ibus-daemon process (#6237). Instead we only exit ibus here, and start
-                # ibus again below.
-                bus.exit(False)
-                bus.destroy()
-        except Exception as e:
-            logging.warning("Failed to restart IBus")
-            logging.warning(e)
+        logging.info('restarting IBus by subprocess')
+        subprocess.run(['ibus', 'restart'], check=False)
     # give ibus a chance to shutdown (#6237)
     time.sleep(1)  # 1s
     verify_ibus_daemon(True)
