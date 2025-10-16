@@ -200,11 +200,14 @@ export class ContextTokenization {
    * @returns
    */
   applyContextSlide(lexicalModel: LexicalModel, transform: Transform & { deleteRight: number }): ContextTokenization {
-    // Assertion: the current (sliding) context window is alignable and
-    // valid deltas have been computed.
+    // Assumption: the current (sliding) context window is alignable and valid
+    // deltas have been computed.
 
-    // Assertion:  the transform will EITHER have an insert OR a deleteRight.  Not both.
-    // Assertion:  deleteLeft is always empty.  (There's nothing to the left; we apply on that side.)
+    // Assumption:  the transform will EITHER have an insert OR a deleteRight.
+    // Not both.
+
+    // Assumption:  deleteLeft is always empty.  (There's nothing to the left;
+    // we apply on that side.)
     if(TransformUtils.isEmpty(transform)) {
       // No edits needed?  Why retokenize?
       return new ContextTokenization(this);
@@ -341,7 +344,7 @@ export class ContextTokenization {
    * @param edgeOptions
    * @returns
    */
-  precomputeTokenizationAfterInput(
+  mapWhitespacedTokenization(
     lexicalModel: LexicalModel,
     transform: Transform,
     edgeOptions?: EdgeWindowOptions
@@ -351,7 +354,7 @@ export class ContextTokenization {
     //
     // Context does not slide within this function.
     //
-    // Assertion:  this alignment cannot fail; we KNOW there's a solid
+    // Assumption:  this alignment cannot fail; we KNOW there's a solid
     // before-and-after relationship here, and we can base it on the results of
     // a prior syncToSourceWindow call.
     //
@@ -524,7 +527,7 @@ export class ContextTokenization {
 
     const tokenization: ContextToken[] = [];
 
-    // Assertion:  all three are in sorted index order.  (They're created that way.)
+    // Assumption:  all three are in sorted index order.  (They're created that way.)
     const { merges, splits, unmappedEdits } = alignment;
     // Handle merges, splits, unmapped edits.
 
@@ -535,7 +538,6 @@ export class ContextTokenization {
         const merge = merges.shift();
         const tokensToMerge = merge.inputs.map((m) => baseTokenization[m.index]);
         const mergeResult = ContextToken.merge(tokensToMerge, lexicalModel);
-        // Assertion:  if we're merging a token, it's not whitespace.
         tokenization.push(mergeResult);
         i = merge.inputs[merge.inputs.length - 1].index;
         continue;
@@ -545,7 +547,6 @@ export class ContextTokenization {
         // do a split!
         const split = splits.shift();
         const splitResults = baseTokenization[i].split(split, lexicalModel);
-        // Assertion:  if we're splitting a token, it's not whitespace.
         const resultStack = splitResults.reverse();
         while(resultStack.length > 0) {
           tokenization.push(resultStack.pop());
@@ -563,7 +564,7 @@ export class ContextTokenization {
       tokenization.push(token);
     }
 
-    // Assertion:  inputs.length > 0.
+    // Assumption:  inputs.length > 0.  (There is at least one input transform.)
     const inputTransformKeys = [...inputs[0].sample.keys()];
     let removedTokenCount = alignment.removedTokenCount;
     while(removedTokenCount-- > 0) {
@@ -928,12 +929,14 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
    */
   splitOffset: number,
   /**
-   * The edit operations needed to transition from the first tokenization to the second.
+   * The edit operations needed to transition from the first (prior)
+   * tokenization to the second (result) tokenization.
    */
   editPath: EditTuple<ExtendedEditOperation>[],
   /**
    * The edit operations needed _after_ applying any merge or split operations
-   * to the first tokenization in order to transition to the second.
+   * to the first (prior) tokenization in order to transition to the second
+   * (result) tokenization.
    *
    * No 'merge' or 'split' edits will appear in this version.
    */
@@ -954,7 +957,7 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
   // We've found the root token to which changes may apply.
   // We've found the last post-application token to which transform changes contributed.
   // Did anything shift at or near that intersection?
-  const preTokenization = priorTokenization
+  const preTokenization = priorTokenization;
   const calc = computeDistance(
     new SegmentableDistanceCalculation({
       diagonalWidth: Math.abs(preTokenization.length - resultTokenization.length) + 2,
@@ -975,11 +978,12 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
     * result token for either edit type, or to a token immediately after the
     * result.
     *
-    * Assertions:
+    * Preconditions:
     * - not used with epic/dict-breaker
     * - per unicode wordbreaker, no massive shifting of word boundaries for
     *   prior text.
-    *   - we can probably loosen this with work AT THIS STEP.
+    *   - we can't handle part of one token being split off and simultaneously
+    *     merged to another.
     */
 
   let queueIndex = 0;

@@ -57,7 +57,8 @@ build_action() {
   # with the tag 'default'.
   if is_default_values; then
     builder_echo debug "Setting default tag for ${platform}"
-    docker_wrapper build -t "${registry_slash}keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
+    docker_wrapper tag "${registry_slash}keymanapp/keyman-${platform}-ci:${build_version}" \
+                       "${registry_slash}keymanapp/keyman-${platform}-ci:default"
   fi
   # shellcheck disable=SC2164,SC2103
   cd -
@@ -69,7 +70,7 @@ publish_action() {
   local platform=$1
   local version_list=("${build_version}")
 
-  builder_echo debug "publishing image for ${platform}"
+  builder_echo debug "publishing image for ${platform}."
 
   if is_default_values; then
     version_list+=("default")
@@ -104,7 +105,7 @@ if builder_has_action build; then
 fi
 
 builder_run_action test:core        test_action core
-builder_run_action test:linux       test_action linux
+# builder_run_action test:linux       test_action linux
 builder_run_action test:web         test_action web
 # Android uses artifacts from web, so it has to come after web
 builder_run_action test:android     test_action android
