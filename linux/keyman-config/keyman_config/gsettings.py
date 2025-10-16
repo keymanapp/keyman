@@ -72,28 +72,17 @@ class GSettings():
         if self.is_sudo:
             args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
                     'gsettings', 'get', self.schema_id, key]
-            if sys.version_info.major <= 3 and sys.version_info.minor < 7:
-                # capture_output got added in Python 3.7
-                try:
-                    output = subprocess.check_output(args)
-                    value = eval(output)
-                except subprocess.CalledProcessError:
-                    value = None
-                    logging.warning('Could not convert to sources')
-            else:
-                process = subprocess.run(args, capture_output=True)
-                if process.returncode == 0:
-                    output = process.stdout
-                    if output.decode('utf-8').startswith('['):
-                        value = eval(output)
-                        return value
+            process = subprocess.run(args, capture_output=True)
+            if process.returncode == 0:
+                output = process.stdout
+                if output.decode('utf-8').startswith('['):
+                    return eval(output)
 
-                logging.debug('Could not convert to sources')
-                return None
+            logging.debug('Could not convert to sources')
+            return None
         else:
             variant = self.schema.get_value(key)
-            value = self._convert_variant_to_array(variant)
-        return value
+            return self._convert_variant_to_array(variant)
 
     def _get_schema_path(self):
         return self.schema_id.replace('.', '/')
