@@ -16,7 +16,7 @@ builder_describe "Installation files for FirstVoices Keyboards" \
 # after all other builds complete
 
 builder_if_release_build_level builder_describe_outputs \
-  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe
+  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.exe
 
 builder_parse "$@"
 
@@ -103,7 +103,7 @@ function copy-installer() {
 
   mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
   cp firstvoices.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices.msi"
-  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe"
+  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.exe"
 
   verify-installer-signatures
 }

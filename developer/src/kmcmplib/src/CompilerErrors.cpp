@@ -29,3 +29,11 @@ void ReportCompilerMessage(KMX_DWORD msg, const std::vector<std::string>& parame
 
   kmcmp::ErrChr = 0;
 }
+
+void DefaultCompilerMessage::report(enum KmnCompilerMessages::KmnCompilerMessages msg, const std::vector<std::string>& parameters) {
+  ::ReportCompilerMessage(msg, parameters);
+}
+
+void DefaultCompilerMessage::report(enum KmnCompilerMessages::KmnCompilerMessages msg) {
+  ::ReportCompilerMessage(msg);
+}

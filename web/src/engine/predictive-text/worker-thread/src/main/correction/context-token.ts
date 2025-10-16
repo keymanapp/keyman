@@ -217,6 +217,8 @@ export class ContextToken {
    * @returns
    */
   static merge(tokensToMerge: ContextToken[], lexicalModel: LexicalModel): ContextToken {
+    // Assumption:  if we're merging a token, it's not whitespace.
+    // Thus, we don't set the .isWhitespace flag field.
     const resultToken = new ContextToken(lexicalModel);
 
     let lastSourceInput: TokenInputSource;
@@ -277,6 +279,9 @@ export class ContextToken {
    * @returns
    */
   split(split: TokenSplitMap, lexicalModel: LexicalModel) {
+    // Assumption:  if we're splitting a token, it's not whitespace - and
+    // neither are the spun-off tokens.  Thus, we don't set the .isWhitespace
+    // flag field.
     const tokensFromSplit: ContextToken[] = [];
 
     // Build an alternate version of the transforms:  if we preprocess all deleteLefts,
