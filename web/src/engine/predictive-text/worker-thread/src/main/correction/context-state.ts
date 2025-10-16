@@ -322,7 +322,13 @@ export function determineContextSlideTransform(srcContext: Context, dstContext: 
   // Assertion:  If the assumption above holds and both start-of-buffer flags
   // are true, the contents must then match.
   if(srcContext.startOfBuffer && dstContext.startOfBuffer) {
-    return { insert: '', deleteLeft: 0, deleteRight: 0 };
+    // Validate that they actually match.
+    // If not, the contexts shouldn't equal.
+    if(srcContext.left == dstContext.left) {
+      return { insert: '', deleteLeft: 0, deleteRight: 0 };
+    } else {
+      return null;
+    }
   }
 
   // Assumption:  the right-hand side of the left-context strings WILL match.
@@ -343,11 +349,8 @@ export function determineContextSlideTransform(srcContext: Context, dstContext: 
   //
   // Context operations are already code-point aligned; no need to use special
   // non-BMP handling here.
-  const smallerIsSubstringOfOther = rawDelta > 0
-    ? dst.slice(rawDelta) == src
-    : src.slice(-rawDelta) == dst;
-  if(!smallerIsSubstringOfOther) {
-    throw new Error(`Context-slide preconditions invalidated - neither before nor after context is a substring of the other`);
+  if(rawDelta > 0 ? dst.slice(rawDelta) != src : src.slice(-rawDelta) != dst) {
+    return null;
   }
 
   return {

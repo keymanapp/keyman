@@ -41,14 +41,16 @@ describe('ModelCompositor', function() {
         assert.isEmpty(suggestions1.filter((entry) => entry.tag != 'keep'));
         assert.isOk(suggestions1.find((entry) => entry.tag == 'keep'));
 
+        const context2 = {
+          left: "the apl", startOfBuffer: true, endOfBuffer: true
+        };
+        compositor.resetContext(context2, 2);
+        // Context + insert needs to match a word in the model; there is no matching word here.
+        // Invalid due to the existing context root.
         const suggestions2 = await compositor.predict({
           insert: "l",
           deleteLeft: 0
-        }, {
-          // Context + insert needs to match a word in the model; there is no matching word here.
-          // Invalid due to the existing context root.
-          left: "the apl", startOfBuffer: true, endOfBuffer: true
-        });
+        }, context2);
 
         assert.isEmpty(suggestions2.filter((entry) => entry.tag != 'keep'));
         assert.isOk(suggestions2.find((entry) => entry.tag == 'keep'));
@@ -69,6 +71,41 @@ describe('ModelCompositor', function() {
         assert.isNotEmpty(suggestions.filter((entry) => entry.tag != 'keep'));
         assert.isOk(suggestions.find((entry) => entry.tag == 'keep'));
         assert.isOk(suggestions.find((entry) => entry.displayAs == 'applied'));
+      });
+
+      it('generates suggestions from an empty context', async function() {
+        let compositor = new ModelCompositor(plainModel, true);
+        let context = {
+          left: '', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: '',
+          deleteLeft: 0
+        };
+
+        let suggestions = await compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // Suggstions are built based on the context state BEFORE the triggering
+          // input, replacing the prediction's root with the complete word.
+          //
+          // This is necessary, in part, for proper display-string construction.
+          assert.equal(suggestion.transform.deleteLeft, 0);
+        });
+
+        let keep = suggestions.find(function(suggestion) {
+          return suggestion.tag == 'keep';
+        });
+
+        assert.isUndefined(keep);
+
+        // Expect an appended space.
+        let expectedEntries = ['the', 'and', 'of', 'it'];
+        expectedEntries.forEach(function(entry) {
+          assert.isDefined(suggestions.find(function(suggestion) {
+            return suggestion.transform.insert == entry && suggestion.appendedTransform?.insert == ' ';
+          }));
+        });
       });
 
       it('generates suggestions with expected properties', async function() {
