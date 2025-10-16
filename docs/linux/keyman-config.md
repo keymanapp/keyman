@@ -13,37 +13,10 @@ then you will need to:
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil \
     python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.1 dconf-cli \
     python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl \
-    python3-build python3-fonttools
+    python3-build python3-fonttools python3-sentry-sdk
 ```
 
-Either `python3-raven` or `python3-sentry-sdk` (>= 1.4) is required as well.
-On Ubuntu 22.04 and later run:
-
-```bash
-sudo apt install python3-sentry-sdk
-```
-
-<details>
-<summary>Expand for older Ubuntu versions</summary>
-
-To install it on Ubuntu 18.04 and earlier run:
-
-```bash
-sudo apt install python3-raven
-```
-
-For Ubuntu versions that don't provide `python3-raven` but instead provide
-`python3-sentry-sdk` in a too old version (i.e. Ubuntu 20.04):
-Install `python3-sentry-sdk` from `packages.sil.org`,
-or install it with pip:
-
-```bash
-pip3 install sentry-sdk
-```
-
-</details>
-
-Newer Ubuntu versions don't allow to modify the environment and directly
+Newer Ubuntu versions (>= 24.04) don't allow to modify the environment and directly
 install non-Debian-packaged Python packages. Instead you'll have to
 run the commands in a virtual environment.
 
@@ -54,8 +27,8 @@ sudo apt install python3-venv libglib2.0-dev libdbus-1-dev pkg-config
 libcairo2-dev libgirepository-2.0-dev
 ```
 
-Then create the virtual environment with `python3 -m venv venv` and activate it with
-`source venv/bin/activate`.
+Then create the virtual environment with `python3 -m venv km-venv` and activate
+it with `source km-venv/bin/activate`.
 
 ### Prepare code
 
@@ -151,7 +124,7 @@ Secondary-click gives you a menu including 'Back' to go back a page.
 ### km-kvk2ldml
 
 `km-kvk2ldml [-p] [-k] [-o LDMLFILE] <kvk file>` Convert a Keyman kvk on-screen
-keyboard fileto an LDML file. Optionally print the details of the kvk file
+keyboard file to an LDML file. Optionally print the details of the kvk file
 (`-p`) optionally with all keys (`-k`).
 
 This command is run automatically when installing a keyboard package to create
@@ -159,29 +132,8 @@ the necessary files for the onboard onscreen keyboard.
 
 ## Building the Debian package
 
-You will need the build dependencies as well as the runtime dependencies above.
-All required dependencies can be installed with:
-
-```bash
-sudo apt install dh-python python3-all debhelper help2man devscripts \
-  equivs jq quilt
-sudo mk-build-deps --install linux/debian/control
-```
-
-Then you can build the Debian package with:
-
-```bash
-KEYMAN_TIER=$(cat TIER.md)
-export KEYMAN_TIER
-cd linux
-./scripts/deb-packaging.sh source
-mkdir -p make_deb
-cd make_deb
-dpkg-source --extract ../../keyman_*.dsc
-cd keyman-*
-dch -v$(cat VERSION.md)-1 ""
-debuild -us -uc
-```
+See the [packaging.md](https://github.com/keymanapp/keyman/blob/master/docs/linux/packaging.md#L26)
+document.
 
 ## Internationalization
 
