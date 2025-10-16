@@ -83,10 +83,16 @@ docker_wrapper() {
 }
 
 setup_docker() {
+  DOCKER_RUN_ARGS=()
   if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
-    DOCKER_RUN_ARGS="--env DOCKER_RUN_AS_ROOT=1"
-  else
-    DOCKER_RUN_ARGS=
+    DOCKER_RUN_ARGS+=(--env DOCKER_RUN_AS_ROOT=1)
+  fi
+  if ! builder_is_running_on_gha ; then
+    DOCKER_RUN_ARGS+=(-t)
+  fi
+
+  if builder_has_option --remote-debug; then
+    DOCKER_RUN_ARGS+=(-p 2345:2345)
   fi
 }
 
@@ -96,16 +102,11 @@ setup_container_registry() {
   local password=${REGISTRY_PASSWORD:-}
   registry_slash=''
 
-  builder_echo debug "Setting up container registry."
+  builder_echo debug "Setting up container registry '${registry}'."
 
-  if [[ "${registry:-}" == "docker.io" ]]; then
-    builder_echo debug "Container registry is 'docker.io'."
-    registry=
-  else
-    registry_slash="${registry}/"
-    registry_parameters="--registry ${registry}"
-    build_args+=("--build-arg=REGISTRY=${registry_slash}")
-  fi
+  registry_slash="${registry}/"
+  registry_parameters="--registry ${registry}"
+  build_args+=("--build-arg=REGISTRY=${registry_slash}")
 
   if [[ -n ${username:-} ]] ; then
     if [[ -z ${password:-} ]] ; then

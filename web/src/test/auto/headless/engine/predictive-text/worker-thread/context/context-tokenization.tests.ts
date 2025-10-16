@@ -174,8 +174,8 @@ describe('ContextTokenization', function() {
             {op: 'match', input: 4, match: 4},
             {op: 'match', input: 5, match: 5},
             {op: 'match', input: 6, match: 6},
-            {op: 'insert', match: 7},
-            {op: 'insert', match: 8}
+            {op: 'insert',          match: 7},
+            {op: 'insert',          match: 8}
           ],
           leadTokenShift: 0,
           leadEditLength: 0,
@@ -472,8 +472,8 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           editPath: [
-            {op: 'insert', match: 0},
-            {op: 'insert', match: 1},
+            {op: 'insert',          match: 0},
+            {op: 'insert',          match: 1},
             {op: 'match', input: 0, match: 2},
             {op: 'match', input: 1, match: 3},
             {op: 'match', input: 2, match: 4},
@@ -650,8 +650,8 @@ describe('ContextTokenization', function() {
             {op: 'match', input: 10, match: 9},
             {op: 'match', input: 11, match: 10},
             {op: 'match', input: 12, match: 11},
-            {op: 'insert', match: 12},
-            {op: 'insert', match: 13}
+            {op: 'insert',           match: 12},
+            {op: 'insert',           match: 13}
           ],
           leadTokenShift: 1, // "'",
           leadEditLength: 1, // "n't" / "t"
@@ -1456,6 +1456,56 @@ describe('ContextTokenization', function() {
       assert.sameOrderedMembers(resultTokenization.exampleInput, ['n\'t', ...baseTokens.slice(2)]);
       assert.isTrue(resultTokenization.tokens[0].isPartial);
       resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+
+    it('maintains token when deleting majority of it via forward slide', () => {
+      // string length: 73
+      const baseTexts = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "brea"
+      ];
+      assert.equal(baseTexts.join('').length, 73);
+
+      assert.equal(baseTexts.length, 25);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: ' ', deleteLeft: 0, deleteRight: 9 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['e', ...baseTexts.slice(1)]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+      resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+
+    it('maintains token when extending it via backward context-window slide', () => {
+      const baseTexts = [
+        "sauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'apple', deleteLeft: 0, deleteRight: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['applesauce', ...baseTexts.slice(1)]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+      resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+
+    it('properly handles large backward context-window slide jumps', () => {
+      // Note:  this is not the actual pathway used for reverting suggestions,
+      // though the scenario is somewhat analogous.
+      const baseTexts = [
+        "nd", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ", "breakfast"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'applesauce a', deleteLeft: 0, deleteRight: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['applesauce', ' ', 'and', ...baseTexts.slice(1)]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
     });
   });
 

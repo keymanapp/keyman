@@ -316,8 +316,11 @@ export class ContextState {
  * number of codepoints removed from its start (if sliding forward)
  */
 export function determineContextSlideTransform(srcContext: Context, dstContext: Context): Transform {
-  // Assertion: the current (sliding) context window is alignable.
+  // Assumption: the current (sliding) context window is alignable.
   // See `matchBaseContextState` in ../predict-helpers.ts.
+
+  // Assertion:  If the assumption above holds and both start-of-buffer flags
+  // are true, the contents must then match.
   if(srcContext.startOfBuffer && dstContext.startOfBuffer) {
     // Validate that they actually match.
     // If not, the contexts shouldn't equal.
@@ -328,12 +331,12 @@ export function determineContextSlideTransform(srcContext: Context, dstContext: 
     }
   }
 
-  // Assertion:  the right-hand side of the left-context strings WILL match.
+  // Assumption:  the right-hand side of the left-context strings WILL match.
   // The only change should be for the contents of the sliding-context window.
   const src = srcContext.left;
   const dst = dstContext.left;
 
-  // Assertion:  the context will always be codepoint-aligned, as the Web engine
+  // Assumption:  the context will always be codepoint-aligned, as the Web engine
   // and worker both do string ops based on codepoints, not code units.
 
   // Which way did the context window slide, if it did?  This does not
@@ -343,6 +346,9 @@ export function determineContextSlideTransform(srcContext: Context, dstContext: 
   const rawDelta = dst.length - src.length;
 
   // Validation:  does the part of both strings that should match actually match?
+  //
+  // Context operations are already code-point aligned; no need to use special
+  // non-BMP handling here.
   if(rawDelta > 0 ? dst.slice(rawDelta) != src : src.slice(-rawDelta) != dst) {
     return null;
   }

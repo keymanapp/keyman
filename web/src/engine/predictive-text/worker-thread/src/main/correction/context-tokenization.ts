@@ -177,11 +177,14 @@ export class ContextTokenization {
    * @returns
    */
   applyContextSlide(lexicalModel: LexicalModel, transform: Transform & { deleteRight: number }): ContextTokenization {
-    // Assumption: the current (sliding) context window is alignable and
-    // valid deltas have been computed.
+    // Assumption: the current (sliding) context window is alignable and valid
+    // deltas have been computed.
 
-    // Assumption:  the transform will EITHER have an insert OR a deleteRight.  Not both.
-    // Assumption:  deleteLeft is always empty.  (There's nothing to the left; we apply on that side.)
+    // Assumption:  the transform will EITHER have an insert OR a deleteRight.
+    // Not both.
+
+    // Assumption:  deleteLeft is always empty.  (There's nothing to the left;
+    // we apply on that side.)
     if(TransformUtils.isEmpty(transform)) {
       // No edits needed?  Why retokenize?
       return new ContextTokenization(this);
@@ -1120,12 +1123,14 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
    */
   splitOffset: number,
   /**
-   * The edit operations needed to transition from the first tokenization to the second.
+   * The edit operations needed to transition from the first (prior)
+   * tokenization to the second (result) tokenization.
    */
   editPath: EditTuple<ExtendedEditOperation>[],
   /**
    * The edit operations needed _after_ applying any merge or split operations
-   * to the first tokenization in order to transition to the second.
+   * to the first (prior) tokenization in order to transition to the second
+   * (result) tokenization.
    *
    * No 'merge' or 'split' edits will appear in this version.
    */
@@ -1146,7 +1151,7 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
   // We've found the root token to which changes may apply.
   // We've found the last post-application token to which transform changes contributed.
   // Did anything shift at or near that intersection?
-  const preTokenization = priorTokenization
+  const preTokenization = priorTokenization;
   const calc = computeDistance(
     new SegmentableDistanceCalculation({
       diagonalWidth: Math.abs(preTokenization.length - resultTokenization.length) + 2,
@@ -1167,11 +1172,12 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
     * result token for either edit type, or to a token immediately after the
     * result.
     *
-    * Assumptions:
+    * Preconditions:
     * - not used with epic/dict-breaker
     * - per unicode wordbreaker, no massive shifting of word boundaries for
     *   prior text.
-    *   - we can probably loosen this with work AT THIS STEP.
+    *   - we can't handle part of one token being split off and simultaneously
+    *     merged to another.
     */
 
   let queueIndex = 0;

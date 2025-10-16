@@ -56,7 +56,7 @@ watch_ios='web|common/web'
 watch_linux='core|common/test/keyboards/baseline'
 watch_mac='core'
 watch_web='common/web|core'
-watch_windows='common|core|web'
+watch_windows='common|core'
 watch_developer='common|core|web'
 
 # Note, currently common_web build is a no-op because we rely on running the web
@@ -112,7 +112,7 @@ vcs_test=HttpsGithubComKeymanappKeymanPRs
 
 bc_master_android=(KeymanAndroid_Build)
 bc_master_ios=(Keyman_iOS_Master)
-bc_master_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
+bc_master_linux=(KeymanLinux_Master deb-release-packaging_GitHub build-test-publish-docker_GitHub)
 bc_master_mac=(KeymanMac_Master)
 bc_master_windows=(Keyman_Build)
 bc_master_web=(Keymanweb_Build)
