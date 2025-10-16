@@ -408,16 +408,26 @@ export class ContextTokenization {
      */
 
     const lastEditedPreTokenIndex = editBoundary.tokenIndex - edgeSliceIndex;
-    const shiftDeletes =
-      // first popped entry == 0
-      stackedDeletes[stackedDeletes.length - 1] == 0
+    let shiftDeletes = false;
+    // first popped entry == 0 - a delete no-op.
+    if(stackedDeletes[stackedDeletes.length - 1] == 0) {
       // the boundary indices found by both methods above differ
-      && (lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset);
+      if(lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset) {
+        shiftDeletes = true;
+      }
+
+      // there are no inserts, so we don't affect the boundary token we landed on.
+      if(stackedDeletes.length > 1 && transform.insert == '') {
+        shiftDeletes = true;
+      }
+    }
+
     if(shiftDeletes) {
       // Do not add a zero-length delete if we're not actually altering the
       // corresponding token at all.
       stackedDeletes.pop();
     }
+
     // The first delete always applies to index 0. If the built edge window
     // omits a context-final empty-string, adjust the tokenization indices
     // accordingly.
@@ -852,10 +862,7 @@ export function buildEdgeWindow(
     // if(editBoundaryToken) then all deletes have been applied.
     if(!editBoundary && totalDelete > 0) {
       const tokenDeleteLength = Math.min(deleteCnt, tokenLen);
-      // Skip context-final empty tokens.
-      if(tokenDeleteLength != 0 || deleteLengths.length != 0) {
-        deleteLengths.push(tokenDeleteLength);
-      }
+      deleteLengths.push(tokenDeleteLength);
       deleteCnt = Math.max(0, deleteCnt - tokenDeleteLength);
       // If the new remaining delete-count is zero, and we didn't delete a full
       // token, we hit the boundary; note the boundary text.
@@ -909,8 +916,8 @@ export function buildEdgeWindow(
     }
   }
 
-  // Second half of the condition:  handles cases with bad Transforms that try to overdelete.
-  if(totalDelete == 0 || deleteCnt != 0) {
+  // If there was no specified delete length, still emit a single delete 0.
+  if(totalDelete == 0) {
     deleteLengths.push(0);
   }
 
@@ -1174,11 +1181,12 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
     // delete lefts should be set on the front-most inserts!
     const deleteLeft = stackedDeletes.pop() ?? 0;
     const insert = stackedInserts.pop() ?? '';
-    // If both are empty at the start, don't add an empty transform.
-    // They're fine later in the transform list, though.
+    // If both are empty at the start, don't add an empty transform. Delete
+    // detection may have overshot and added an entry for a word we shouldn't
+    // edit (that is not at this index!).  They're fine later in the transform list, though.
     if(transformMap.size != 0 || insert || deleteLeft) {
       transformMap.set(tailIndex++, { insert, deleteLeft });
-    }
+    } // else bypass - without incrementing the index!
   }
 
   if(!transformMap.size) {
