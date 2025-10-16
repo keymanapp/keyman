@@ -13,7 +13,8 @@ from dbus import DBusException
 
 BUS_NAME = 'com.Keyman.Config'
 OBJECT_PATH = '/com/Keyman/Config'
-DBusSessionBusAddress = f'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus'
+DBusSessionBusAddressValue = f'unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus'
+DBusSessionBusAddress = f'DBUS_SESSION_BUS_ADDRESS={DBusSessionBusAddressValue}'
 XdgRuntimeDir = f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}'
 
 
@@ -42,7 +43,7 @@ class KeymanConfigService(dbus.service.Object):
 def keyboard_list_changed():
     if os.environ.get('SUDO_USER'):
         args = ['sudo', '-u', os.environ.get('SUDO_USER'), 'dbus-send',
-                f'--bus=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus',
+                f'--bus={DBusSessionBusAddressValue}',
                 '/com/Keyman/Config', 'com.Keyman.Config.keyboard_list_changed']
         subprocess.run(args)
     else:
