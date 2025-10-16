@@ -171,7 +171,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  Core for processing, as it is already the result of processing.
  */
 - (void)handleBackspace:(NSEvent *)event {
-  os_log_debug([KMLogs eventsLog], "KMInputMethodEventHandler handleBackspace, event = %{public}@", event);
+  os_log_debug([KMLogs keyTraceLog], "KMInputMethodEventHandler handleBackspace, event = %{public}@", event);
   [KMSentryHelper addInfoBreadCrumb:@"user" message:@"handle backspace for non-compliant app"];
 
   if (self.generatedBackspaceCount > 0) {

@@ -329,7 +329,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
     // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
     // un-commented when needed.
-    //    os_log_debug([KMLogs eventsLog], "System Event: %@", sysEvent);
+    os_log_debug([KMLogs keyTraceLog], "System Event: %{public}@", sysEvent);
     
     switch (type) {
       case kCGEventFlagsChanged:
@@ -350,7 +350,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         
       case kCGEventKeyDown:
         appDelegate.receivedKeyDownFromOsk = NO;
-        os_log_debug([KMLogs keyTraceLog], "** EVENT **");
+        os_log_debug([KMLogs keyTraceLog], "** KEY DOWN Event **");
         os_log_debug([KMLogs keyTraceLog], "** event tap keydown event, keyCode: 0x%X (%d)", sysEvent.keyCode, sysEvent.keyCode);
         // Pass back low-level backspace events to the input method event handler
         // because some non-compliant apps do not allow us to see backspace events
@@ -1293,6 +1293,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)handleKeyEvent:(NSEvent *)event {
+  os_log_debug([KMLogs keyTraceLog], "handleKeyEvent: %{public}@", event);
+
+  NSArray *stackSymbols = [NSThread callStackSymbols];
+  os_log_debug([KMLogs keyTraceLog], "call stack: %{public}@", stackSymbols);
+
   if (_oskWindow == nil)
     return;
   
