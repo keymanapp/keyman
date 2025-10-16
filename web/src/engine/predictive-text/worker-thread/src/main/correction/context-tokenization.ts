@@ -17,6 +17,7 @@ import { computeAlignment, ContextStateAlignment } from './alignment-helpers.js'
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
+import { PendingTokenization } from './tokenization-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -479,6 +480,107 @@ export class ContextTokenization {
       },
       tokenizedTransform: transformMap,
     };
+  }
+
+  /**
+   * Given results from `precomputeTokenizationAfterInput`, this method will
+   * evaluate the pending transition in tokenization for all associated inputs
+   * while reusing as many correction-search intermediate results as possible.
+   * @param pendingTokenization Batched results from one or more
+   * `precomputeTokenizationAfterInput` calls on this instance, all with the
+   * same alignment values.
+   * @param lexicalModel The active lexical model
+   * @param sourceInput The Transform associated with the keystroke triggering
+   * the transition.
+   * @returns
+   */
+  evaluateTransition(
+    pendingTokenization: PendingTokenization,
+    lexicalModel: LexicalModel,
+    sourceInput: Transform
+  ): ContextTokenization {
+    const { alignment: alignment, inputs } = pendingTokenization;
+    const sliceIndex = alignment.edgeWindow.sliceIndex;
+    const baseTokenization = this.tokens.slice(sliceIndex);
+    let affectedToken: ContextToken;
+
+    const tokenization: ContextToken[] = [];
+
+    // Assumption:  all three are in sorted index order.  (They're created that way.)
+    const { merges, splits, unmappedEdits } = alignment;
+    // Handle merges, splits, unmapped edits.
+
+    for(let i = 0; i < baseTokenization.length; i++) {
+      if(merges[0]?.inputs[0].index == i) {
+        // do a merge!  Also, note that we've matched the first index of the merge.
+        // consider:  move to ContextToken as class method.  (static?)
+        const merge = merges.shift();
+        const tokensToMerge = merge.inputs.map((m) => baseTokenization[m.index]);
+        const mergeResult = ContextToken.merge(tokensToMerge, lexicalModel);
+        tokenization.push(mergeResult);
+        i = merge.inputs[merge.inputs.length - 1].index;
+        continue;
+      }
+
+      if(splits[0]?.input.index == i) {
+        // do a split!
+        const split = splits.shift();
+        const splitResults = baseTokenization[i].split(split, lexicalModel);
+        const resultStack = splitResults.reverse();
+        while(resultStack.length > 0) {
+          tokenization.push(resultStack.pop());
+        }
+        continue;
+      }
+
+      if(unmappedEdits[0]?.input == i) {
+        // fix things up
+        throw new Error("Not yet supported.");
+      }
+
+      tokenization.push(new ContextToken(baseTokenization[i]));
+    }
+
+    // Assumption:  inputs.length > 0.  (There is at least one input transform.)
+    const inputTransformKeys = [...inputs[0].sample.keys()];
+    let removedTokenCount = alignment.removedTokenCount;
+    while(removedTokenCount-- > 0) {
+      inputTransformKeys.pop();
+      tokenization.pop();
+    }
+
+    let appliedLength = 0;
+    for(let tailRelativeIndex of inputTransformKeys) {
+      let distribution = inputs.map((i) => ({sample: i.sample.get(tailRelativeIndex), p: i.p}));
+      const tokenIndex = (tokenization.length - 1) + tailRelativeIndex;
+
+      affectedToken = tokenization[tokenIndex];
+      if(!affectedToken) {
+        affectedToken = new ContextToken(lexicalModel);
+        tokenization.push(affectedToken);
+      } else if(KMWString.length(affectedToken.exampleInput) == distribution[0].sample.deleteLeft) {
+        // If the entire token will be replaced, throw out the old one and start anew.
+        affectedToken = new ContextToken(lexicalModel);
+        // Replace the token at the affected index with a brand-new token.
+        tokenization.splice(tokenIndex, 1, affectedToken);
+      }
+
+      // If we are completely replacing a token via delete left, erase the deleteLeft;
+      // that part applied to a _previous_ token that no longer exists.
+      // We start at index 0 in the insert string for the "new" token.
+      if(affectedToken.inputRange.length == 0 && distribution[0].sample.deleteLeft != 0) {
+        distribution = distribution.map((mass) => ({sample: { ...mass.sample, deleteLeft: 0 }, p: mass.p }));
+      }
+      affectedToken.addInput({trueTransform: sourceInput, inputStartIndex: appliedLength}, distribution);
+      appliedLength += KMWString.length(distribution[0].sample.insert);
+
+      const tokenize = determineModelTokenizer(lexicalModel);
+      affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
+
+      affectedToken = null;
+    }
+
+    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tokenization), null /* tokenMapping */);
   }
 
   /**
