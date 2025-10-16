@@ -156,6 +156,7 @@ uninstall_action() {
   clean_action
   rm -rf /usr/local/share/keyman/icons
   rm -f /usr/local/share/man/man1/km-*.1
+  rm -f /usr/local/share/glib-2.0/schemas/com.keyman.gschema.xml
   pip3 uninstall keyman_config
   rm -f /usr/local/bin/km-config
   rm -f /usr/local/bin/km-kvk2ldml
