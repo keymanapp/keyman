@@ -49,7 +49,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -78,7 +79,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -124,7 +126,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -179,7 +182,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -246,7 +250,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -321,7 +326,8 @@ describe('precomputationSubsetKeyer', function() {
         }],
         splits: [],
         unmappedEdits: [],
-        edgeWindow: edgeWindow1
+        edgeWindow: edgeWindow1,
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -363,7 +369,8 @@ describe('precomputationSubsetKeyer', function() {
         }],
         splits: [],
         unmappedEdits: [],
-        edgeWindow: edgeWindow1
+        edgeWindow: edgeWindow1,
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -427,7 +434,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -479,7 +487,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
@@ -529,7 +538,8 @@ describe('precomputationSubsetKeyer', function() {
             false
           ),
           retokenization: [...rawTextTokens]
-        }
+        },
+        removedTokenCount: 0
       },
       tokenizedTransform: (() => {
         const map = new Map<number, Transform>();
