@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.141 alpha 2025-10-16
+
+* refactor(linux): extract functions (#14937)
+* refactor(linux): remove no-longer-needed Python 3.7 code (#14956)
+* chore(linux): don't report errors to Sentry when running autopkgtests (#14938)
+* fix(linux): fix installing keyboard in shared area (#14953)
+* fix(linux): install schema during `keyman-config/build.sh install` (#14962)
+* test(linux): add regression tests for cli tools to autopkgtests (#14950)
+
 ## 19.0.140 alpha 2025-10-15
 
 * fix(mac): add Microsoft Word to non-compliant app list (#14940)
