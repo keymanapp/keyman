@@ -350,26 +350,27 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         
       case kCGEventKeyDown:
         appDelegate.receivedKeyDownFromOsk = NO;
-        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: 0x%X (%d)", sysEvent.keyCode, sysEvent.keyCode);
+        os_log_debug([KMLogs keyTraceLog], "** EVENT **");
+        os_log_debug([KMLogs keyTraceLog], "** event tap keydown event, keyCode: 0x%X (%d)", sysEvent.keyCode, sysEvent.keyCode);
         // Pass back low-level backspace events to the input method event handler
         // because some non-compliant apps do not allow us to see backspace events
         // that we have generated (and we need to see them, for serialization
         // of events)
         if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
-          os_log_debug([KMLogs eventsLog], "Event tap handling kVK_Delete.");
+          os_log_debug([KMLogs keyTraceLog], "** event tap handling kVK_Delete");
           [appDelegate.inputController handleBackspace:sysEvent];
         } else if(sysEvent.keyCode == kVK_Delete) {
-          os_log_debug([KMLogs eventsLog], "Event tap not handling kVK_Delete, appDelegate.inputController = %{public}@", appDelegate.inputController);
+          os_log_debug([KMLogs eventsLog], "** event tap cannot handle kVK_Delete, appDelegate.inputController = %{public}@", appDelegate.inputController);
         }
         if(sysEvent.keyCode == 255) {
-          os_log_debug([KMLogs eventsLog], "*** kKeymanEventKeyCode = 0xFF");
+          os_log_debug([KMLogs eventsLog], "** event tap received kKeymanEventKeyCode = 0xFF");
         } else {
           if ([OSKView isOskKeyDownEvent:event]) {
             [KMSentryHelper addInfoBreadCrumb:@"event" message:@"processing OSK-generated keydown event"];
             NSEventModifierFlags oskEventModifiers = [OSKView extractModifierFlagsFromOskEvent:event];
             appDelegate.receivedKeyDownFromOsk = YES;
             appDelegate.oskEventModifiers = oskEventModifiers;
-            os_log_debug([KMLogs eventsLog], "*** keydown event received from OSK, modifiers: 0x%lX",(unsigned long)oskEventModifiers);
+            os_log_debug([KMLogs eventsLog], "*** event tap received event from OSK, modifiers: 0x%lX",(unsigned long)oskEventModifiers);
           }
         }
         
