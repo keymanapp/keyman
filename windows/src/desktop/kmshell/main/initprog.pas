@@ -668,20 +668,11 @@ function ShouldSendToBUpdateSM(FSilent: Boolean; BUpdateSM: TUpdateStateMachine;
 // UI elements from the state machine we have bring some of logic here.
 var
   frmStartInstall: TfrmStartInstall;
-  ReadyToInstall: Boolean;
+  ValidateReadyToInstall: Boolean;
 begin
-  ReadyToInstall := BUpdateSM.ReadyToInstall;
-  // The setting for automatic updates may have been set to disable
-  // after updates were checked and downloaded. The user should
-  // not be prompted for an update in this case and the update should
-  // abort.
-  if not BUpdateSM.GetAutomaticUpdates and ReadyToInstall then
-  begin
-    BUpdateSM.HandleAbort;
-    Exit(False);
-  end;
+  ValidateReadyToInstall := BUpdateSM.ValidateReadyToInstall;
 
-  if not FSilent and ReadyToInstall and
+  if not FSilent and ValidateReadyToInstall and
      (FMode in [fmStart, fmSplash, fmMain, fmAbout,
                 fmHelp, fmShowHelp, fmSettings, fmBoot]) then
   begin
@@ -692,7 +683,7 @@ begin
       frmStartInstall.Free;
     end;
   end
-  else if FSilent and ReadyToInstall then
+  else if FSilent and ValidateReadyToInstall then
     Result := False
   else
     Result := True;
