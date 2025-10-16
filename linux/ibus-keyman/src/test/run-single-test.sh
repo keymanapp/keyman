@@ -43,6 +43,6 @@ while (( $# )); do
 done
 
 # shellcheck source=/dev/null
-. "$ARG_ENV"
+. "${ARG_ENV}"
 
 run_tests "$@"

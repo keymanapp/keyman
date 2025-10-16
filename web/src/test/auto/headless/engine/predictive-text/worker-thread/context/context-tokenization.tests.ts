@@ -939,9 +939,59 @@ describe('ContextTokenization', function() {
       assert.isTrue(resultTokenization.tokens[0].isPartial);
       resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
     });
+
+    it('maintains token when deleting majority of it via forward slide', () => {
+      // string length: 73
+      const baseTexts = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "brea"
+      ];
+      assert.equal(baseTexts.join('').length, 73);
+
+      assert.equal(baseTexts.length, 25);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: ' ', deleteLeft: 0, deleteRight: 9 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['e', ...baseTexts.slice(1)]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+      resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+
+    it('maintains token when extending it via backward context-window slide', () => {
+      const baseTexts = [
+        "sauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'apple', deleteLeft: 0, deleteRight: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['applesauce', ...baseTexts.slice(1)]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+      resultTokenization.tokens.slice(1).forEach((token, index) => assert.isFalse(token.isPartial, `token ${index} (${token.exampleInput}) still marked partial`));
+    });
+
+    it('properly handles large backward context-window slide jumps', () => {
+      // Note:  this is not the actual pathway used for reverting suggestions,
+      // though the scenario is somewhat analogous.
+      const baseTexts = [
+        "nd", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ", "breakfast"
+      ];
+
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'applesauce a', deleteLeft: 0, deleteRight: 0 });
+
+      assert.notStrictEqual(resultTokenization, baseTokenization);
+      assert.sameOrderedMembers(resultTokenization.exampleInput, ['applesauce', ' ', 'and', ...baseTexts.slice(1)]);
+      assert.isTrue(resultTokenization.tokens[0].isPartial);
+    });
   });
 
-  describe('precomputeTokenizationAfterInput', () => {
+  describe('mapWhitespacedTokenization', () => {
     const edgeWindowSpec = {
       minTokens: 3,
       minChars: 8
@@ -957,7 +1007,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -980,7 +1030,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1002,7 +1052,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1024,7 +1074,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 2
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1062,7 +1112,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 2
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1099,7 +1149,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 4
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1122,7 +1172,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 5
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1159,7 +1209,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 6
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1203,7 +1253,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1232,7 +1282,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1258,7 +1308,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1285,7 +1335,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1329,7 +1379,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1373,7 +1423,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 1
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1401,7 +1451,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 5
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1432,7 +1482,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 8
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1460,7 +1510,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 8
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1487,7 +1537,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1512,7 +1562,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 9
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1546,7 +1596,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1580,7 +1630,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1615,7 +1665,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1649,7 +1699,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1684,7 +1734,7 @@ describe('ContextTokenization', function() {
 
       const windowResults = buildEdgeWindow(baseTokenization.tokens, {...editTransform, deleteRight: 0}, false, edgeWindowSpec);
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1715,7 +1765,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1726,13 +1776,13 @@ describe('ContextTokenization', function() {
       expectedMap.set(0, { insert: 't', deleteLeft: 0 });
       assert.equal(results.tokenizedTransform.size, 1);
       assert.deepEqual(results.tokenizedTransform, expectedMap);
-      assert.equal(results.alignment.edgeWindow.sliceIndex, 4);
       assert.deepEqual(results.alignment.merges, [
         {
           inputs: [
-            { text: 'can', index: 2 /* + 4 */ },
-            { text: '\'',  index: 3 /* + 4 */ }
-          ], match: { text: 'can\'t', index: 2 /* + 4 */}
+            // The `index` values here are pre-offset from the edge window's .sliceIndex.
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex }
+          ], match: { text: 'can\'t', index: 6 - results.alignment.edgeWindow.sliceIndex }
         }
       ]);
       assert.deepEqual(results.alignment.splits, []);
@@ -1749,7 +1799,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform,
         edgeWindowSpec
@@ -1761,14 +1811,13 @@ describe('ContextTokenization', function() {
       expectedMap.set(2, { insert: '', deleteLeft: 0 });
       assert.equal(results.tokenizedTransform.size, 2);
       assert.deepEqual(results.tokenizedTransform, expectedMap);
-      assert.equal(results.alignment.edgeWindow.sliceIndex, 4);
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, [
         {
-          input: { text: 'can\'', index: 2 /* + 4 */},
+          input: { text: 'can\'', index: 6 - results.alignment.edgeWindow.sliceIndex},
           matches: [
-            { text: 'can', index: 2 /* + 4 */, textOffset: 0 },
-            { text: '\'',  index: 3 /* + 4 */, textOffset: 3 }
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex, textOffset: 0 },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex, textOffset: 3 }
           ]
         }
       ]);
@@ -1785,7 +1834,7 @@ describe('ContextTokenization', function() {
         deleteLeft: 0
       };
 
-      const results = baseTokenization.precomputeTokenizationAfterInput(
+      const results = baseTokenization.mapWhitespacedTokenization(
         plainModel,
         editTransform
       );
@@ -1794,14 +1843,13 @@ describe('ContextTokenization', function() {
       expectedMap.set(1, { insert: '?', deleteLeft: 0 });
       assert.equal(results.tokenizedTransform.size, 1);
       assert.deepEqual(results.tokenizedTransform, expectedMap);
-      assert.equal(results.alignment.edgeWindow.sliceIndex, 4);
       assert.deepEqual(results.alignment.merges, []);
       assert.deepEqual(results.alignment.splits, [
         {
-          input: { text: 'can\'', index: 2 /* + 4 */},
+          input: { text: 'can\'', index: 6 - results.alignment.edgeWindow.sliceIndex},
           matches: [
-            { text: 'can', index: 2 /* + 4 */, textOffset: 0 },
-            { text: '\'',  index: 3 /* + 4 */, textOffset: 3 }
+            { text: 'can', index: 6 - results.alignment.edgeWindow.sliceIndex, textOffset: 0 },
+            { text: '\'',  index: 7 - results.alignment.edgeWindow.sliceIndex, textOffset: 3 }
           ]
         }
       ]);

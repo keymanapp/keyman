@@ -1,4 +1,5 @@
 import atexit
+import dbus
 import gettext
 import importlib
 import logging
@@ -110,7 +111,16 @@ def _set_dbus_started_for_session(value):
 
 
 def verify_dbus_running():
-    if not 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+        # already running - nothing to do
+        return
+
+    try:
+        # This might already be enough to start dbus
+        bus = dbus.SessionBus()
+        bus.close()
+        return
+    except dbus.exceptions.DBusException:
         try:
             # Seems dbus isn't running for the current user. Try to start it
             # and set these environment variables

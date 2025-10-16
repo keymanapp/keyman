@@ -58,7 +58,6 @@
     "@keymanapp/resources-gosh": "*",
     "@types/mocha": "^7.0.2",
     "c8": "^7.12.0",
-    "mocha-teamcity-reporter": "^4.0.0",
     "typescript": "^5.4.5"
   },
   "type": "module"

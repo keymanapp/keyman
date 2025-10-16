@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">Azərbaycanca (Azəricə)</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Azerbaijani</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION Quraşdırma</string>
   <string name="ssTitle">$APPNAME $VERSION quraşdırmaq</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION uğurla quraşdırıldı.</string>

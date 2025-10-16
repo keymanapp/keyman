@@ -188,8 +188,8 @@ describe('computeAlignment', () => {
       canAlign: true,
       editPath: [
         {op: 'substitute', input: 0, match: 0},
-        {op: 'insert', match: 1},
-        {op: 'insert', match: 2}
+        {op: 'insert',               match: 1},
+        {op: 'insert',               match: 2}
       ],
       leadTokenShift: 0,
       leadEditLength: 0,
@@ -347,7 +347,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       editPath: [
-        {op: 'insert', match: 0},
+        {op: 'insert',          match: 0},
         {op: 'match', input: 0, match: 1},
         {op: 'match', input: 1, match: 2},
         {op: 'match', input: 2, match: 3},
@@ -399,7 +399,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       editPath: [
-        {op: 'insert', match: 0},
+        {op: 'insert',          match: 0},
         {op: 'substitute', input: 0, match: 1},
         {op: 'match', input: 1, match: 2},
         {op: 'match', input: 2, match: 3},
@@ -430,7 +430,7 @@ describe('computeAlignment', () => {
         {op: 'match', input: 2, match: 1},
         {op: 'match', input: 3, match: 2},
         {op: 'match', input: 4, match: 3},
-        {op: 'insert', match: 4}
+        {op: 'insert',          match: 4}
       ],
       leadTokenShift: -1,
       leadEditLength: 0,
@@ -483,7 +483,7 @@ describe('computeAlignment', () => {
         {op: 'match', input: 2, match: 2},
         {op: 'match', input: 3, match: 3},
         {op: 'substitute', input: 4, match: 4},
-        {op: 'insert', match: 5}
+        {op: 'insert',               match: 5}
       ],
       leadTokenShift: 0,
       leadEditLength: 1,
@@ -505,7 +505,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       editPath: [
-        {op: 'insert', match: 0},
+        {op: 'insert',          match: 0},
         {op: 'match', input: 0, match: 1},
         {op: 'match', input: 1, match: 2},
         {op: 'match', input: 2, match: 3},
@@ -532,7 +532,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       editPath: [
-        {op: 'insert', match: 0},
+        {op: 'insert',          match: 0},
         {op: 'match', input: 0, match: 1},
         {op: 'match', input: 1, match: 2},
         {op: 'match', input: 2, match: 3},
@@ -559,7 +559,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       editPath: [
-        {op: 'insert', match: 0},
+        {op: 'insert',          match: 0},
         {op: 'match', input: 0, match: 1},
         {op: 'match', input: 1, match: 2},
         {op: 'match', input: 2, match: 3},
@@ -608,7 +608,7 @@ describe('computeAlignment', () => {
       canAlign: false,
       editPath: [
         {op: 'match', input: 0, match: 0},
-        {op: 'insert', match: 1},
+        {op: 'insert',          match: 1},
         {op: 'match', input: 1, match: 2},
         {op: 'match', input: 2, match: 3},
         {op: 'match', input: 3, match: 4}
@@ -653,7 +653,7 @@ describe('computeAlignment', () => {
         {op: 'match', input: 1, match: 1},
         {op: 'match', input: 2, match: 2},
         {op: 'match', input: 3, match: 3},
-        {op: 'insert', match: 4},
+        {op: 'insert',          match: 4},
         {op: 'match', input: 4, match: 5}
       ]
     });
@@ -715,8 +715,8 @@ describe('computeAlignment', () => {
         {op: 'match', input: 8, match: 8},
         {op: 'match', input: 9, match: 9},
         {op: 'substitute', input: 10, match: 10},
-        {op: 'insert', match: 11},
-        {op: 'insert', match: 12}
+        {op: 'insert',                match: 11},
+        {op: 'insert',                match: 12}
       ],
       leadTokenShift: 0,
       leadEditLength: 0,
