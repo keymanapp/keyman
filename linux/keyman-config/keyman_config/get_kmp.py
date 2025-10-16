@@ -23,15 +23,10 @@ class InstallLocation(GObject.GEnum):
     Unknown = 99
 
 
-def check_if_use_cache():
-    # When running under sudo, we don't want to use the cache
-    # since that stores files with root permissions so that they
-    # can't be deleted/replaced by the user later.
-    global can_use_cache
-    can_use_cache = not os.environ.get('SUDO_USER')
-
-
-can_use_cache = check_if_use_cache()
+# When running under sudo, we don't want to use the cache
+# since that stores files with root permissions so that they
+# can't be deleted/replaced by the user later.
+can_use_cache = not os.environ.get('SUDO_USER')
 
 
 def get_install_area_string(area):

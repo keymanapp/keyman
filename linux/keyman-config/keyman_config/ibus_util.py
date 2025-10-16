@@ -10,6 +10,8 @@ import time
 
 import gi
 
+from keyman_config.dbus_util import DBusSessionBusAddress, XdgRuntimeDir
+
 gi.require_version('IBus', '1.0')
 from gi.repository import IBus
 from pkg_resources import parse_version
@@ -170,12 +172,10 @@ def _start_ibus_daemon(realuser):
         if realuser:
             # we have been called with `sudo`. Start ibus-daemon for the real user.
             args = ['sudo', '-u', realuser,
-                    f'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus',
-                    f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}', *args]
+                    DBusSessionBusAddress, XdgRuntimeDir, *args]
             logging.info(f'starting ibus-daemon for user {realuser} with args: {args}')
         else:
-            logging.info('ibus-daemon not running. Starting it...')
-            logging.debug(f'Starting ibus-daemon with args: {args}')
+            logging.info(f'ibus-daemon not running. Starting it with args: {args}...')
         subprocess.run(args, check=True)
         logging.info('ibus-daemon started successfully')
     except Exception as e:
@@ -188,7 +188,7 @@ def restart_ibus(bus=None):
         # we have been called with `sudo`. Restart ibus for the real user.
         logging.info(f'restarting IBus by subprocess for user {realuser}')
         subprocess.run(['sudo', '-u', realuser,
-                        f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}',
+                        DBusSessionBusAddress, XdgRuntimeDir,
                         'ibus', 'restart'], check=False)
     else:
         logging.info('restarting IBus through API')

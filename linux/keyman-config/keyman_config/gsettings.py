@@ -8,6 +8,8 @@ import sys
 from gi.repository import Gio  # needs to come before gi.overrides.GLib!
 from gi.overrides.GLib import Variant
 
+from keyman_config.dbus_util import DBusSessionBusAddress, XdgRuntimeDir
+
 # The xdg module got renamed to xdg_base_dirs, but the package
 # (python3-xdg) on Ubuntu still ships xdg. So we support both.
 try:
@@ -124,8 +126,7 @@ class GSettings():
         if self.is_sudo:
             variant = str(value)
             args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-                    f'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus',
-                    f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}',
+                    DBusSessionBusAddress, XdgRuntimeDir,
                     'gsettings', 'set', self.schema_id, key, variant]
             subprocess.run(args, check=False)
         elif get_dbus_started_for_session():

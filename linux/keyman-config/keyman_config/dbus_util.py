@@ -13,6 +13,8 @@ from dbus import DBusException
 
 BUS_NAME = 'com.Keyman.Config'
 OBJECT_PATH = '/com/Keyman/Config'
+DBusSessionBusAddress = f'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus'
+XdgRuntimeDir = f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}'
 
 
 __keyman_config_service = None
