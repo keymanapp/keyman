@@ -14,7 +14,6 @@
   Todo:
   Notes:
   History:          03 Aug 2014 - mcdurdin - I4353 - V9.0 - mnemonic layout recompiler mixes up deadkey rules
-
 */
 #include <vector>
 

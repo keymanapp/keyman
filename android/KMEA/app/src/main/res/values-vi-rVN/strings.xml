@@ -80,6 +80,14 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">Lỗi bàn phím nghiêm trọng với %1$s: %2$s cho ngôn ngữ %3$s. Đang tải bàn phím mặc định.</string>
     <!-- Context: Fatal keyboard error.  -->
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">Lỗi trong bàn phím %1$s:%2$s cho ngôn ngữ %3$s.</string>
+    <!-- Context: Alert Dialog body: System WebView not installed -->
+    <string name="body_install_webview" comment="Notification when WebView not installed">        Keyman yêu cầu phải cài đặt WebView\".</string>
+    <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">        Keyman yêu cầu phải bật WebView\".</string>
+    <!-- Context Button label: Install WebView -->
+    <string name="label_install_webview" comment="Button label to install webview">Cài đặt WebView</string>
+    <!-- Context Button label: Enable WebView -->
+    <string name="label_enable_webview" comment="Button label to enable webview">Bật WebView</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Kiểm tra từ điển liên quan để tải về</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">Không thể kết nối với server của Keyman để kiểm tra từ điển được liên kết để tải xuống</string>
@@ -113,6 +121,8 @@
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Không thể thu hồi file đã tải về</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Không thể kết nối với máy chủ!</string>
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">DownloadManager đâ bị vô hiệu hoá - không thể kiểm tra các bản cập nhật</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"Toàn bộ kho dữ liệu đã được cập nhật!"</string>
     <!-- Context: General Updates -->
