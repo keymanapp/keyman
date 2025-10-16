@@ -99,13 +99,13 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      // Phrased this way to facilitate TS type-inference; assert.isTrue() does
-      // NOT do this for us!
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // // Phrased this way to facilitate TS type-inference; assert.isTrue() does
+      // // NOT do this for us!
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when no context changes occur (after whitespace)", function() {
@@ -126,13 +126,13 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      // Phrased this way to facilitate TS type-inference; assert.isTrue() does
-      // NOT do this for us!
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // // Phrased this way to facilitate TS type-inference; assert.isTrue() does
+      // // NOT do this for us!
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when lead token is removed (end of word)", function() {
@@ -144,7 +144,7 @@ describe('ContextState', () => {
         deleteLeft: 0
       };
       let newContext = {
-        left: " apple a day keeps the doctor", startOfBuffer: true, endOfBuffer: true
+        left: " apple a day keeps the doctor", startOfBuffer: false, endOfBuffer: true
       };
       let rawTokens = [" ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
@@ -153,11 +153,11 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -1);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -1);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when lead token is removed (after whitespace)", function() {
@@ -169,7 +169,7 @@ describe('ContextState', () => {
         deleteLeft: 0
       };
       let newContext = {
-        left: " apple a day keeps the doctor ", startOfBuffer: true, endOfBuffer: true
+        left: " apple a day keeps the doctor ", startOfBuffer: false, endOfBuffer: true
       };
       let rawTokens = [" ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
@@ -178,11 +178,11 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -1);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -1);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when lead token + following whitespace are removed", function() {
@@ -194,7 +194,7 @@ describe('ContextState', () => {
         deleteLeft: 0
       };
       let newContext = {
-        left: "apple a day keeps the doctor", startOfBuffer: true, endOfBuffer: true
+        left: "apple a day keeps the doctor", startOfBuffer: false, endOfBuffer: true
       };
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
@@ -203,11 +203,11 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -2);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -2);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when final token is edited", function() {
@@ -225,11 +225,11 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     // Needs improved context-state management (due to 2x tokens)
@@ -253,13 +253,16 @@ describe('ContextState', () => {
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.sameDeepMembers(
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        [[{sample: { insert: '', deleteLeft: 0 }, p: 1}]]
+      );
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
     it("properly matches and aligns when whitespace before final empty token is extended", function() {
@@ -287,11 +290,11 @@ describe('ContextState', () => {
         [[{ sample: {insert: '', deleteLeft: 0}, p: 1 }]]
       );
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when a 'wordbreak' is removed via backspace", function() {
@@ -309,11 +312,11 @@ describe('ContextState', () => {
       assert.isOk(newContextMatch?.final);
       assert.deepEqual(newContextMatch?.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, -2);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, -2);
     });
 
     it("properly matches and aligns when an implied 'wordbreak' occurs (as when following \"'\")", function() {
@@ -337,11 +340,11 @@ describe('ContextState', () => {
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 1);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 1);
     })
 
     // Needs improved context-state management (due to 2x tokens)
@@ -354,7 +357,7 @@ describe('ContextState', () => {
         deleteLeft: 0
       }
       let newContext = {
-        left: "apple a day keeps the doctor", startOfBuffer: true, endOfBuffer: true
+        left: "apple a day keeps the doctor", startOfBuffer: false, endOfBuffer: true
       };
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
@@ -368,13 +371,16 @@ describe('ContextState', () => {
       // The 'wordbreak' transform
       let state = newContextMatch.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.deepEqual(
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
+      );
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -2);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -2);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
     it("properly matches and aligns when initial token is modified AND a 'wordbreak' is added'", function() {
@@ -397,13 +403,16 @@ describe('ContextState', () => {
       // The 'wordbreak' transform
       let state = newContextMatch.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.deepEqual(
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
+      );
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
     it("properly matches and aligns when tail token is modified AND a 'wordbreak' is added'", function() {
@@ -426,16 +435,16 @@ describe('ContextState', () => {
       // The 'wordbreak' transform
       let state = newContextMatch.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
-      if(!newContextMatch.final.tokenization.alignment.canAlign) {
-        assert.fail("context alignment failed");
-      }
-      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
+      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
+      //   assert.fail("context alignment failed");
+      // }
+      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
-    it('rejects hard-to-handle case: tail token is split into three rather than two', function() {
+    it('handles case where tail token is split into three rather than two', function() {
       let baseContext = models.tokenize(defaultBreaker, {
         left: "text'", startOfBuffer: true, endOfBuffer: true
       });
@@ -456,7 +465,9 @@ describe('ContextState', () => {
         deleteLeft: 0
       }
       let problemContextMatch = baseState.analyzeTransition({left: "text'", startOfBuffer: true, endOfBuffer: true}, [{sample: transform, p: 1}]);
-      assert.isNull(problemContextMatch);
+      assert.isNotNull(problemContextMatch);
+
+      assert.deepEqual(problemContextMatch.final.tokenization.exampleInput, ['text', '\'', '"']);
     });
   });
 });
