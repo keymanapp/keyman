@@ -460,15 +460,14 @@ export async function correctAndEnumerate(
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  const tokenizations = [transition.final.tokenization];
-  const searchSpaces = tokenizations.map(t => t.tail.searchSpace);
+  const searchSpace = transition.final.tokenization.tail.searchSpace;
 
   // If corrections are not enabled, bypass the correction search aspect
   // entirely. No need to 'search' - just do a direct lookup.
   //
   // To be clear:  this IS how we actually tell that corrections are disabled -
   // when no fat-finger data is available.
-  if(!searchSpaces.find(s => s.correctionsEnabled)) {
+  if(!searchSpace.correctionsEnabled) {
     const wordbreak = determineModelWordbreaker(lexicalModel);
     const predictionRoot = {
       sample: {
@@ -494,11 +493,9 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches(searchSpaces[0], timer)) {
+  for await(const match of getBestMatches(searchSpace, timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
-    const searchSpace = searchSpaces.find(s => s.spaceId == match.spaceId);
-    const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
     // If our 'match' results in fully deleting the new token, reject it and try again.
     if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
@@ -556,7 +553,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], predictionContext);
-    predictions.forEach((entry) => entry.preservationTransform = tokenization.taillessTrueKeystroke);
+    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
