@@ -683,7 +683,7 @@ export async function *getBestMatches(searchSpace: SearchSpace, timer: Execution
     if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
       await timer.defer();
     }
-  } while(!timer.elapsed && searchSpace.getCurrentCost() < Number.POSITIVE_INFINITY);
+  } while(!timer.elapsed && searchSpace.currentCost < Number.POSITIVE_INFINITY);
 
   return null;
 }
