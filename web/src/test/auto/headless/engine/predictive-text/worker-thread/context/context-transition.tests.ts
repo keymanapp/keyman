@@ -56,7 +56,6 @@ describe('ContextTransition', () => {
       assert.equal(transition.transitionId, 1);
       assert.isNotOk(transition.final);
       assert.isNotOk(transition.inputDistribution);
-      assert.isNotOk(transition.preservationTransform);
     });
 
     it('deep-copies when given a previous ContextState instance (no `final`)', () => {
