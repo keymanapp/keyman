@@ -171,8 +171,8 @@ export class SearchSpace {
     // our previously-reached 'extractedResults' nodes.
     let newlyAvailableEdges: SearchNode[] = [];
     let batches = this.completedPaths?.map(function(node) {
-      let deletions = node.buildDeletionEdges({dist: input, edgeId: childSpace.spaceId});
-      let substitutions = node.buildSubstitutionEdges({dist: input, edgeId: childSpace.spaceId});
+      let deletions = node.buildDeletionEdges(input, childSpace.spaceId);
+      let substitutions = node.buildSubstitutionEdges(input, childSpace.spaceId);
 
       const batch = deletions.concat(substitutions);
 
@@ -207,9 +207,9 @@ export class SearchSpace {
 
     let deletionEdges: SearchNode[] = [];
     if(!substitutionsOnly) {
-      deletionEdges       = currentNode.buildDeletionEdges({dist: this.inputs, edgeId: this.spaceId});
+      deletionEdges       = currentNode.buildDeletionEdges(this.inputs, this.spaceId);
     }
-    const substitutionEdges = currentNode.buildSubstitutionEdges({dist: this.inputs, edgeId: this.spaceId});
+    const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputs, this.spaceId);
     let batch = deletionEdges.concat(substitutionEdges);
 
     // Skip the queue for the first pass; there will ALWAYS be at least one pass,

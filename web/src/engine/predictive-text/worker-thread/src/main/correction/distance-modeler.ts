@@ -431,13 +431,13 @@ export class SearchNode {
    * @param isSubstitution
    * @returns
    */
-  private setupSubsetProcessing(input: {dist: Distribution<Transform>, edgeId: number}, isSubstitution: boolean ) {
+  private setupSubsetProcessing(dist: Distribution<Transform>, isSubstitution: boolean, edgeId: number) {
     if(this.hasPartialInput) {
       throw new Error("Invalid state:  will not take new input while still processing Transform subset");
     }
 
     const edges: SearchNode[] = [];
-    const subsets = subsetByInterval(input.dist);
+    const subsets = subsetByInterval(dist);
 
     for(let dl = 0; dl < subsets.length; dl++) {
       const dlSubset = subsets[dl];
@@ -455,7 +455,7 @@ export class SearchNode {
           continue;
         }
 
-        const node = new SearchNode(this, input.edgeId);
+        const node = new SearchNode(this, edgeId);
         node.calculation = edgeCalc;
         node.partialEdge = {
           doSubsetMatching: isSubstitution,
@@ -484,8 +484,8 @@ export class SearchNode {
    * @returns An array of SearchNodes corresponding to search paths that skip the next
    * input keystroke.
    */
-  buildDeletionEdges(input: {dist: Distribution<Transform>, edgeId: number}): SearchNode[] {
-    return this.setupSubsetProcessing(input, false);
+  buildDeletionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
+    return this.setupSubsetProcessing(dist, false, edgeId);
   }
 
   /**
@@ -497,12 +497,12 @@ export class SearchNode {
    * @returns An array of SearchNodes corresponding to search paths that match or
    * replace the next currently-unprocessed input.
    */
-  buildSubstitutionEdges(input: {dist: Distribution<Transform>, edgeId: number}): SearchNode[] {
+  buildSubstitutionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
     // Note:  due to the batching approach used via TransformSubsets,
     // substitutions are _not_ adequately represented by one 'insertion' + one
     // 'deletion' step. Explicit substitution / match-oriented processing is
     // required.
-    return this.setupSubsetProcessing(input, true);
+    return this.setupSubsetProcessing(dist, true, edgeId);
   }
 
   /**
