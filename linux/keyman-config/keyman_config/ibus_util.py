@@ -14,7 +14,7 @@ from keyman_config.dbus_util import DBusSessionBusAddress, XdgRuntimeDir
 
 gi.require_version('IBus', '1.0')
 from gi.repository import IBus
-from pkg_resources import parse_version
+from packaging import version
 
 from keyman_config.gnome_keyboards_util import is_gnome_desktop
 from keyman_config.gsettings import GSettings
@@ -156,7 +156,7 @@ def _get_ibus_version():
 
 def _start_ibus_daemon(realuser):
     try:
-        if parse_version(_get_ibus_version()) >= parse_version('1.5.28'):
+        if version.parse(_get_ibus_version()) >= version.parse('1.5.28'):
             # IBus ~1.5.28 added the `start` command, so we use that if possible
             # and let IBus deal with the necessary parameters
             args = ['ibus', 'start', '-d']
