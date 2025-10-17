@@ -1,5 +1,6 @@
-import { type Keyboard  } from 'keyman/engine/keyboard';
-import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/js-processor';
+import { JSKeyboard, Keyboard, OutputTargetInterface, Transcription, TextTransform } from 'keyman/engine/keyboard';
+// TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
+import { Mock, findCommonSubstringEndIndex, isEmptyTransform, OutputTargetBase } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -30,7 +31,8 @@ export class ContextHost extends Mock {
       let transform: TextTransform = null;
 
       if(transcription) {
-        const preInput = transcription.preInput;
+        //TODO-web-core: shouldn't need cast in the future?
+        const preInput = transcription.preInput as Mock;
         // If our saved state matches the `preInput` from the incoming transcription, just reuse its transform.
         // Will generally not match during multitap operations, though.
         //
@@ -58,9 +60,10 @@ export class ContextHost extends Mock {
     this.savedState = Mock.from(this);
   }
 
-  restoreTo(original: OutputTarget): void {
+  restoreTo(original: OutputTargetInterface): void {
     this.savedState = Mock.from(this);
-    super.restoreTo(original);
+    // TODO-web-core
+    super.restoreTo(original as OutputTargetBase);
   }
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
@@ -117,7 +120,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   // yet to be modularized at this time, though.)
   private _rawContext: ContextHost;
 
-  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
 
   constructor(engineConfig: WebviewConfiguration) {
     super(engineConfig);
@@ -137,7 +140,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget) {
+  activateKeyboardForTarget(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, target: OutputTargetInterface) {
     // `target` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.
@@ -204,7 +207,10 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     // That said, it's best to keep it around for now and verify later.
     if(originalKeyboard?.metadata?.id == activatingKeyboard?.metadata?.id) {
       activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
-        kbd.refreshLayouts()
+        // TODO-web-core: Do we need to refresh layouts for KMX keyboards also?
+        if (kbd instanceof JSKeyboard) {
+          kbd.refreshLayouts();
+        }
         return kbd;
       });
     }
