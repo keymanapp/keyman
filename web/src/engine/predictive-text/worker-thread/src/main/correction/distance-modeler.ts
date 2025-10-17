@@ -5,8 +5,9 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { PathResult, QUEUE_NODE_COMPARATOR, SearchPath } from './search-path.js';
+import { PathResult } from './search-space.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
+import { QUEUE_NODE_COMPARATOR, SearchPath } from './search-path.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;

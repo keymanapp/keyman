@@ -8,16 +8,15 @@
  * engine.
  */
 
-import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
+import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { generateSpaceSeed, PathResult, SearchSpace } from './search-space.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-
-let SPACE_ID_SEED = 0;
 
 export const DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL = 33; // in milliseconds.
 
@@ -25,26 +24,9 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
   return arg1.currentCost - arg2.currentCost;
 }
 
-type NullPath = {
-  type: 'none'
-}
-
-type IntermediateSearchPath = {
-  type: 'intermediate',
-  cost: number
-}
-
-type CompleteSearchPath = {
-  type: 'complete',
-  cost: number,
-  finalNode: SearchNode
-}
-
-export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
-
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchPath {
+export class SearchPath implements SearchSpace {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   private inputs: Distribution<Transform>;
 
@@ -94,8 +76,8 @@ export class SearchPath {
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(arg1: LexicalModel | SearchPath) {
-    this.spaceId = SPACE_ID_SEED++;
+  constructor(arg1: SearchPath|LexicalModel) {
+    this.spaceId = generateSpaceSeed();
 
     if(arg1 instanceof SearchPath) {
       const parentSpace = arg1;
@@ -129,6 +111,20 @@ export class SearchPath {
       return [this.inputs];
     } else {
       return [];
+    }
+  }
+
+  public get inputCount(): number {
+    return (this.parentPath?.inputCount ?? 0) + (this.inputs ? 1 : 0);
+  }
+
+  public get bestExample(): {text: string, p: number} {
+    const bestPrefix = this.parentPath?.bestExample ?? { text: '', p: 1 };
+    const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
+
+    return {
+      text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      p: bestPrefix.p * bestLocalInput.p
     }
   }
 
@@ -243,7 +239,7 @@ export class SearchPath {
         };
       }
 
-      const result = this.parentPath.handleNextNode() as IntermediateSearchPath | CompleteSearchPath;
+      const result = this.parentPath.handleNextNode();
 
       if(result.type == 'complete' && !this.processedEdgeSet[result.finalNode.pathKey]) {
         this.addEdgesForNodes(result.finalNode);
@@ -252,12 +248,12 @@ export class SearchPath {
       return {
         ...result,
         type: 'intermediate'
-      }
+      } as PathResult
     }
 
     let currentNode = this.selectionQueue.dequeue();
 
-    let unmatchedResult: IntermediateSearchPath = {
+    let unmatchedResult: PathResult = {
       type: 'intermediate',
       cost: currentNode.currentCost
     }
@@ -322,11 +318,12 @@ export class SearchPath {
     return {
       type: 'complete',
       cost: currentNode.currentCost,
-      finalNode: currentNode
+      finalNode: currentNode,
+      spaceId: this.spaceId
     };
   }
 
-  public previousResults(): SearchResult[] {
+  public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues).map(v => new SearchResult(v));
   }
 
