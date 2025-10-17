@@ -248,7 +248,7 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
+      assert.deepEqual(newContextMatch.final.tokenization.taillessTrueKeystroke, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
@@ -280,7 +280,7 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
+      assert.deepEqual(newContextMatch.final.tokenization.taillessTrueKeystroke, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
@@ -333,7 +333,7 @@ describe('ContextState', () => {
       let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: '', deleteLeft: 0 });
+      assert.deepEqual(newContextMatch.final.tokenization.taillessTrueKeystroke, { insert: '', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
@@ -366,7 +366,7 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
+      assert.deepEqual(newContextMatch.final.tokenization.taillessTrueKeystroke, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
@@ -398,7 +398,7 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0});
+      assert.deepEqual(newContextMatch.final.tokenization.taillessTrueKeystroke, { insert: 'd ', deleteLeft: 0});
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
@@ -430,7 +430,7 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0 });
+      assert.deepEqual(newContextMatch.final.tokenization.taillessTrueKeystroke, { insert: 'tor ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
