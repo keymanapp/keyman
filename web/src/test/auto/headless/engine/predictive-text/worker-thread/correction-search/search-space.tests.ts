@@ -3,14 +3,14 @@
  *
  * Created by jahorton on 2025-10-09
  *
- * This file defines tests for the SearchSpace class of the
+ * This file defines tests for the SearchPath class of the
  * predictive-text correction-search engine.
  */
 
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, models, SearchSpace } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, models, SearchPath } from '@keymanapp/lm-worker/test-index';
 
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
@@ -21,7 +21,7 @@ function buildTestTimer() {
   return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
 
-describe('SearchSpace', () => {
+describe('SearchPath', () => {
   const checkRepeatableResults_teh = async (iter: AsyncGenerator<correction.SearchResult, any, any>) => {
     const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
     assert.isFalse(firstIterResult.done);
@@ -96,7 +96,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchPath(testModel);
 
     const iter = getBestMatches([searchSpace], buildTestTimer());
     const firstResult = await iter.next();
@@ -109,7 +109,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchPath(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -143,7 +143,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    let searchSpace = new SearchSpace(testModel);
+    let searchSpace = new SearchPath(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -182,7 +182,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchPath(testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches([searchSpace], timer);
 

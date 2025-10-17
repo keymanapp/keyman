@@ -26,14 +26,14 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchSpace implements SearchBatcher {
+export class SearchPath implements SearchBatcher {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   private inputs: Distribution<Transform>;
 
-  readonly rootSpace: SearchSpace;
-
-  private parentSpace: SearchSpace;
+  readonly rootSpace: SearchPath;
   readonly spaceId: number;
+
+  private parentSpace: SearchPath;
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
   // is cheaper than iteratively building a priority queue.
@@ -68,7 +68,7 @@ export class SearchSpace implements SearchBatcher {
    */
   private lowestCostAtDepth: number[];
 
-  constructor(space: SearchSpace);
+  constructor(space: SearchPath);
   /**
    * Constructs a fresh SearchSpace instance for used in predictive-text correction
    * and suggestion searches.
@@ -76,10 +76,10 @@ export class SearchSpace implements SearchBatcher {
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(arg1: SearchSpace|LexicalModel) {
+  constructor(arg1: SearchPath|LexicalModel) {
     this.spaceId = generateSpaceSeed();
 
-    if(arg1 instanceof SearchSpace) {
+    if(arg1 instanceof SearchPath) {
       const parentSpace = arg1;
       this.lowestCostAtDepth = parentSpace.lowestCostAtDepth.slice();
       this.rootSpace = parentSpace.rootSpace;
@@ -158,10 +158,10 @@ export class SearchSpace implements SearchBatcher {
    * @param inputDistribution The fat-finger distribution for the incoming keystroke (or
    * just the raw keystroke if corrections are disabled)
    */
-  addInput(inputDistribution: Distribution<Transform>, bestProbFromSet: number): SearchSpace {
+  addInput(inputDistribution: Distribution<Transform>, bestProbFromSet: number): SearchPath {
     const input = inputDistribution;
 
-    const childSpace = new SearchSpace(this);
+    const childSpace = new SearchPath(this);
 
     childSpace.inputs = inputDistribution;
     const lastDepthCost = this.lowestCostAtDepth[this.lowestCostAtDepth.length - 1] ?? 0;

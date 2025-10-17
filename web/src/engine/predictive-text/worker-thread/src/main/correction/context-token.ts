@@ -11,7 +11,7 @@ import { applyTransform, buildMergedTransform } from "@keymanapp/models-template
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
-import { SearchSpace } from "./search-space.js";
+import { SearchPath } from "./search-path.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -58,10 +58,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  public get searchSpace(): SearchSpace {
+  public get searchSpace(): SearchPath {
     return this._searchSpace;
   }
-  private _searchSpace: SearchSpace;
+  private _searchSpace: SearchPath;
 
   isPartial: boolean;
 
@@ -123,7 +123,7 @@ export class ContextToken {
         return [{sample: transform, p: 1.0}];
       });
 
-      let searchSpace = new SearchSpace(model);
+      let searchSpace = new SearchPath(model);
 
       rawTransformDistributions.forEach((entry) => {
         this._inputRange.push({
