@@ -61,6 +61,8 @@ export class KMXPlusFileFormat extends KMXFile {
   public readonly COMP_PLUS_VARS: any;
   public readonly COMP_PLUS_VARS_ITEM: any;
 
+  private readonly COMP_PLUS_SectionHeader: any;
+
   constructor() {
     super();
     // Binary-correct structures matching kmx_plus.h
@@ -73,6 +75,14 @@ export class KMXPlusFileFormat extends KMXFile {
     const CHAR32        = r.uint32le;
     const STR_OR_CHAR32_OR_USET = r.uint32le;
     const IDENT         = r.uint32le;
+
+    // Section header - version dependent
+
+    this.COMP_PLUS_SectionHeader = new r.Struct({
+      ident: IDENT,
+      size: r.uint32le,
+    });
+
     // 'sect'
 
     this.COMP_PLUS_SECT_ITEM = new r.Struct({
@@ -81,8 +91,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_SECT = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       total: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_SECT_ITEM, 'count')
@@ -98,8 +107,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_DISP = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       count: r.uint32le,
       baseCharacter: CHAR32,
       items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
@@ -118,8 +126,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_ELEM = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       count: r.uint32le,
       strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
       // + variable subtable: Element data (see KMXPlusBuilder.emitElements())
@@ -155,8 +162,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       listCount: r.uint32le,
       layerCount: r.uint32le,
       rowCount: r.uint32le,
@@ -199,8 +205,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_KEYS = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       keyCount: r.uint32le,
       flicksCount: r.uint32le,
       flickCount: r.uint32le,
@@ -223,8 +228,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_LIST = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       listCount: r.uint32le,
       indexCount: r.uint32le,
       lists: new r.Array(this.COMP_PLUS_LIST_LIST, 'listCount'),
@@ -236,8 +240,7 @@ export class KMXPlusFileFormat extends KMXFile {
     this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
 
     this.COMP_PLUS_LOCA = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
     });
@@ -245,8 +248,7 @@ export class KMXPlusFileFormat extends KMXFile {
     // 'meta'
 
     this.COMP_PLUS_META = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       author: STR_REF, //str
       conform: STR_REF, //str
       layout: STR_REF, //str
@@ -270,8 +272,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_STRS = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
       // + variable subtable: String data (see KMXPlusBuilder.emitStrings())
@@ -298,8 +299,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_TRAN = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       groupCount: r.uint32le,
       transformCount: r.uint32le,
       reorderCount: r.uint32le,
@@ -322,8 +322,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_USET = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       usetCount: r.uint32le,
       rangeCount: r.uint32le,
       usets: new r.Array(this.COMP_PLUS_USET_USET, 'usetCount'),
@@ -340,8 +339,7 @@ export class KMXPlusFileFormat extends KMXFile {
     });
 
     this.COMP_PLUS_VARS = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
+      header: this.COMP_PLUS_SectionHeader,
       markers: LIST_REF,
       varCount: r.uint32le,
       varEntries: new r.Array(this.COMP_PLUS_VARS_ITEM, 'varCount'),

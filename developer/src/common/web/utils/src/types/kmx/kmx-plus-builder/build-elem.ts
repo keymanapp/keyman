@@ -48,8 +48,10 @@ function binaryElemCompare(a: BUILDER_ELEM_STRING, b: BUILDER_ELEM_STRING): numb
 
 export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset: BUILDER_USET): BUILDER_ELEM {
   const result: BUILDER_ELEM = {
-    ident: constants.hex_section_id(constants.section.elem),
-    size: 0,  // finalized below
+    header: {
+      ident: constants.hex_section_id(constants.section.elem),
+      size: 0,  // finalized below
+    },
     _offset: 0,
     count: source_elem.strings.length,
     strings: [], // finalized below
@@ -98,7 +100,7 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset
     }
   }
 
-  result.size = offset;
+  result.header.size = offset;
   return result;
 }
 

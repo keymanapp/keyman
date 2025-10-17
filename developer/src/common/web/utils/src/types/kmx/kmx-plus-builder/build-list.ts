@@ -44,8 +44,10 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
   }
 
   const result: BUILDER_LIST = {
-    ident: constants.hex_section_id(constants.section.list),
-    size: 0,
+    header: {
+      ident: constants.hex_section_id(constants.section.list),
+      size: 0,
+    },
     _offset: 0,
     listCount: source_list.lists.length,
     indexCount: 0,
@@ -77,7 +79,7 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
   const offset = constants.length_list +
     (constants.length_list_item * result.listCount) +
     (constants.length_list_index * result.indexCount);
-  result.size = offset;
+  result.header.size = offset;
 
   return result;
 }
