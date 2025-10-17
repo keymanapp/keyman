@@ -5,8 +5,9 @@ import { defaultWordbreaker, WordBreakProperty } from '@keymanapp/models-wordbre
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
+import { ContextTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
+import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
@@ -326,6 +327,7 @@ export function determineContextTransition(
  */
 export function determineSuggestionAlignment(
   transition: ContextTransition,
+  tokenization: ContextTokenization,
   lexicalModel: LexicalModel
 ): {
   /**
@@ -338,7 +340,7 @@ export function determineSuggestionAlignment(
    */
   deleteLeft: number
 } {
-  const transitionEdits = transition.final.tokenization.transitionEdits;
+  const transitionEdits = tokenization.transitionEdits;
   const context = transition.base.context;
   const postContext = transition.final.context;
   const inputTransform = transition.inputDistribution[0].sample;
@@ -349,13 +351,13 @@ export function determineSuggestionAlignment(
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
   // Is the token under construction newly-constructed / is there no pre-existing root?
-  if(transition.preservationTransform && inputTransformMap?.has(1)) {
+  if(tokenization.taillessTrueKeystroke && inputTransformMap?.has(1)) {
     return {
       // If the new token is due to whitespace or due to a different input type
       // that would likely imply a tokenization boundary, infer 'new word' mode.
       // Apply any part of the context change that is not considered to be up
       // for correction.
-      predictionContext: models.applyTransform(transition.preservationTransform, context),
+      predictionContext: models.applyTransform(tokenization.taillessTrueKeystroke, context),
       // As the word/token being corrected/predicted didn't originally exist,
       // there's no part of it to 'replace'.  (Suggestions are applied to the
       // pre-transform state.)
@@ -379,7 +381,7 @@ export function determineSuggestionAlignment(
 
   // Did the wordbreaker (or similar) append a blank token before the caret?  If so,
   // preserve that by preventing corrections from triggering left-deletion.
-  if(transition.final.tokenization.tail.isEmptyToken) {
+  if(tokenization.tail.isEmptyToken) {
     deleteLeft = 0;
   }
 
@@ -453,10 +455,6 @@ export async function correctAndEnumerate(
     }
   }
 
-  // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
-  // same amount of text.  We can handle this before the big 'prediction root' loop.
-  const { predictionContext: predictionContext, deleteLeft } = determineSuggestionAlignment(transition, lexicalModel);
-
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
@@ -471,6 +469,13 @@ export async function correctAndEnumerate(
   // when no fat-finger data is available.
   if(!searchModules.find(s => s.correctionsEnabled)) {
     const wordbreak = determineModelWordbreaker(lexicalModel);
+    // The one true tokenization:  no corrections permitted.
+    const tokenization = transition.final.tokenization;
+
+    // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
+    // same amount of text.  We can handle this before the big 'prediction root' loop.
+    const { predictionContext: predictionContext, deleteLeft } = determineSuggestionAlignment(transition, tokenization, lexicalModel);
+
     const predictionRoot = {
       sample: {
         insert: wordbreak(transition.final.context),
@@ -481,7 +486,7 @@ export async function correctAndEnumerate(
     };
 
     const predictions = predictFromCorrections(lexicalModel, [predictionRoot], predictionContext);
-    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
+    predictions.forEach((entry) => entry.preservationTransform = tokenization.taillessTrueKeystroke);
 
     // Only one 'correction' / prediction root is allowed - the actual text.
     return {
@@ -500,6 +505,11 @@ export async function correctAndEnumerate(
     const correction = match.matchString;
     const searchSpace = searchModules.find(s => s.spaceId == match.spaceId);
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
+
+    // No matter the prediction, once we know the root of the prediction, we'll
+    // always 'replace' the same amount of text.  We can handle this before the
+    // big 'prediction root' loop.
+    const { predictionContext, deleteLeft } = determineSuggestionAlignment(transition, tokenization, lexicalModel);
 
     // If our 'match' results in fully deleting the new token, reject it and try again.
     if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
