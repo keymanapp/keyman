@@ -145,6 +145,11 @@ export class SearchSpace {
     this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
   }
 
+  /**
+   * When true, this indicates that the currently-represented portion of context
+   * has fat-finger data available, which itself indicates that the user has
+   * corrections enabled.
+   */
   get correctionsEnabled(): boolean {
     // When corrections are disabled, the Web engine will only provide individual Transforms
     // for an input, not a distribution.  No distributions means we shouldn't do corrections.
