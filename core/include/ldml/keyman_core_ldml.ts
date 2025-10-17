@@ -43,6 +43,11 @@ type SectionMap = {
   [id in SectionIdent]: SectionIdent;
 }
 
+export enum KMXPlusVersion {
+  Version17 = 0x1100, // == KMXFile.VERSION_170,
+  Version19 = 0x1300, // == KMXFile.VERSION_190,
+};
+
 // TODO-LDML: namespace com.keyman.core.ldml {
 /**
  * Constants for the KMXPlus data format
@@ -80,6 +85,18 @@ class Constants {
    * Length of a raw section header, in bytes
    */
   readonly length_header = 8;
+
+  /**
+   * Version number 17 for KMX+ file format, initial release version,
+   * corresponds to Keyman 17.0
+   */
+  readonly kmxplus_version_17: KMXPlusVersion = KMXPlusVersion.Version17;
+
+  /**
+   * Version number 19 for KMX+ file format, new SEC2 section and version
+   * header, corresponds to Keyman 19.0
+   */
+  readonly kmxplus_version_19: KMXPlusVersion = KMXPlusVersion.Version19;
 
   /* ------------------------------------------------------------------
     * sect section
@@ -528,6 +545,9 @@ class Constants {
       vars: 'vars',
   };
 
+  // v19+: special case for 'sect' override with 'sec2'
+  readonly section_sec2 = 'sec2';
+
   /**
    * Use to convert 4-char string into hex
    * @param id section id such as 'sect'
@@ -579,6 +599,17 @@ class Constants {
    */
   treatAsLatest(version: string): boolean {
     return cldrTreatAsLatest.has(version);
+  }
+
+  /**
+   * Difference in section header size from default v17 size
+   */
+  headerSizeDelta(version: KMXPlusVersion): number {
+    if(version == KMXPlusVersion.Version17) {
+      return 0;
+    }
+
+    return 4; /* KMXPlusVersion.Version19, additional version uint32le field */
   }
 };
 

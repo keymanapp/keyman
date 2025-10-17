@@ -1,6 +1,6 @@
 import * as r from 'restructure';
 import { KMXPlus } from "@keymanapp/common-types";
-import { constants, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 import { BUILDER_SECTION } from './builder-section.js';
 import { BUILDER_SECT, build_sect } from './build-sect.js';
 import { BUILDER_DISP, build_disp } from './build-disp.js';
@@ -79,10 +79,10 @@ export default class KMXPlusBuilder {
 
     // We must prepare the strs, list, and elem sections early so that other sections can
     // reference them. However, they will be emitted in alpha order.
-    this.sect.strs = build_strs(this.file.kmxplus.strs);
+    this.sect.strs = build_strs(this.file.kmxplus.strs, this.file.version);
     this.sect.list = build_list(this.file.kmxplus.list, this.sect.strs);
     this.sect.uset = build_uset(this.file.kmxplus, this.sect.strs);
-    this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs, this.sect.uset);
+    this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs, this.sect.uset, this.file.version);
 
     const build_bksp = build_tran;
 
@@ -98,7 +98,7 @@ export default class KMXPlusBuilder {
 
     // Finalize the sect (index) section
 
-    this.sect.sect = build_sect();
+    this.sect.sect = build_sect(this.file.version);
     this.finalize_sect(); // must be done last
     return this.sect.sect.total;
   }
@@ -115,7 +115,7 @@ export default class KMXPlusBuilder {
       }
     });
 
-    this.sect.sect.header.size = constants.length_sect + constants.length_sect_item * this.sect.sect.count;
+    this.sect.sect.header.size = constants.length_sect + constants.length_sect_item * this.sect.sect.count + constants.headerSizeDelta(this.file.version);
 
     let offset = this.sect.sect.header.size;
     // Note: in order! Everyone's here except 'sect' which is at offset 0
@@ -140,6 +140,11 @@ export default class KMXPlusBuilder {
       // Don't include null sections
       return offset;
     }
+    // in order to avoid changing size calculation in every section builder,
+    // we adjust the size here before writing. We'd need to pass version info
+    // into each builder, otherwise, and make this call in each header, which
+    // we could choose to do in the future if it makes other things easier.
+    sect.header.size += constants.headerSizeDelta(this.file.version);
     sect._offset = offset;
     this.sect.sect.items.push({sect: sect.header.ident, offset: offset});
     return offset + sect.header.size;
@@ -147,6 +152,8 @@ export default class KMXPlusBuilder {
 
   private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION) {
     if(sect) {
+      sect.header.version = sect.header.version ?? KMXPlusVersion.Version17;
+
       const buf = comp.toBuffer(sect);
       if (buf.length > sect.header.size) {
         // buf.length may be < sect.size if there is a variable part (i.e. elem)

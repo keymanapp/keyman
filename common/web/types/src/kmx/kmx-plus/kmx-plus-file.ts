@@ -1,6 +1,7 @@
 import * as KMX from '../kmx.js';
 import * as r from 'restructure';
 import KMXFile = KMX.KMXFile;
+import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
 export class KMXPlusFileFormat extends KMXFile {
 
@@ -63,9 +64,13 @@ export class KMXPlusFileFormat extends KMXFile {
 
   private readonly COMP_PLUS_SectionHeader: any;
 
-  constructor() {
+  constructor(public version: KMXPlusVersion) {
     super();
     // Binary-correct structures matching kmx_plus.h
+
+    if(![KMXPlusVersion.Version17, KMXPlusVersion.Version19].includes(version)) {
+      throw new Error(`Support for version ${version} not implemented`);
+    }
 
     // helpers
     const STR_REF       = r.uint32le;
@@ -78,10 +83,18 @@ export class KMXPlusFileFormat extends KMXFile {
 
     // Section header - version dependent
 
-    this.COMP_PLUS_SectionHeader = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-    });
+    if(version == KMXPlusVersion.Version17) {
+      this.COMP_PLUS_SectionHeader = new r.Struct({
+        ident: IDENT,
+        size: r.uint32le,
+      });
+    } else {
+      this.COMP_PLUS_SectionHeader = new r.Struct({
+        ident: IDENT,
+        size: r.uint32le,
+        version: r.uint32le,
+      });
+    }
 
     // 'sect'
 

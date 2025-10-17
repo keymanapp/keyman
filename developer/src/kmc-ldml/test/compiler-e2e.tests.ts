@@ -1,3 +1,4 @@
+import * as fs from 'node:fs';
 import 'mocha';
 import {assert} from 'chai';
 import hextobin from '@keymanapp/hextobin';
@@ -8,40 +9,59 @@ import { kmxToXml } from '../src/util/serialize.js';
 import { writeFileSync } from 'node:fs';
 import { LdmlCompilerMessages } from '../src/main.js';
 import { util } from '@keymanapp/common-types';
+import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
+
+const debug=false;
 
 /** Overall compiler tests */
 describe('compiler-tests', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-  before(function() {
+  beforeEach(function() {
     compilerTestCallbacks.clear();
   });
 
-  it('should-build-fixtures', async function() {
-    this.timeout(4000);
-    // Let's build basic.xml
-    // It should match basic.kmx (built from basic.txt)
+  afterEach(function() {
+    if (this.currentTest.state !== 'passed') {
+      compilerTestCallbacks.printMessages();
+    }
+  });
 
-    const inputFilename = makePathToFixture('basic.xml');
-    const binaryFilename = makePathToFixture('basic.txt');
+  [
+    [17, KMXPlusVersion.Version17],
+    [19, KMXPlusVersion.Version19],
+  ].forEach(([vernum, version]) => {
+    it(`should-build-fixtures for ${vernum}`, async function() {
+      this.timeout(4000);
+      // Let's build basic.xml
+      // It should match basic.kmx (built from basic.txt)
 
-    // Compare output
-    const expected = await hextobin(binaryFilename, undefined, {silent:true});
+      const inputFilename = makePathToFixture('basic.xml');
+      const binaryFilename = makePathToFixture(`basic-${vernum}.txt`);
 
-    // now compare it to use with run()
-    // Let's build basic.xml
-    // It should match basic.kmx (built from basic.txt)
-    const k = new LdmlKeyboardCompiler();
-    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+      // Compare output
+      const expected = await hextobin(binaryFilename, undefined, {silent:true});
 
-    const { artifacts } = await k.run(inputFilename, "basic-xml.kmx"); // need the exact name passed to build-fixtures
-    assert.isNotNull(artifacts);
-    const { kmx, kvk  } = artifacts;
-    assert.isNotNull(kmx);
-    assert.deepEqual<Uint8Array>(kmx?.data, expected);
+      // now compare it to use with run()
+      // Let's build basic.xml
+      // It should match basic-vv.kmx (built from basic.txt)
+      const k = new LdmlKeyboardCompiler();
+      await k.init(compilerTestCallbacks, { ...compilerTestOptions, version, saveDebug: true, shouldAddCompilerVersion: false });
 
-    // TODO-LDML: compare the .kvk file to something else?
-    assert.isNotNull(kvk?.data);
+      const { artifacts } = await k.run(inputFilename, "basic-xml.kmx"); // need the exact name passed to build-fixtures
+      assert.isNotNull(artifacts);
+      const { kmx, kvk  } = artifacts;
+      assert.isNotNull(kmx);
+      assert.isNotNull(kmx.data);
+      if(debug) {
+        fs.writeFileSync(makePathToFixture(`basic-${vernum}-actual.kmx`), kmx.data);
+        fs.writeFileSync(makePathToFixture(`basic-${vernum}-expected.kmx`), expected);
+      }
+      assert.deepEqual<Uint8Array>(kmx.data, expected);
+
+      // TODO-LDML: compare the .kvk file to something else?
+      assert.isNotNull(kvk?.data);
+    });
   });
 
   it('should-validate-on-run compiling sections/strs/invalid-illegal.xml', async function() {
