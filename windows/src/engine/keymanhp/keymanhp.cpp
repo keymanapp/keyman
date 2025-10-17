@@ -62,25 +62,32 @@ HANDLE hWatcherThreadTerminateEvent = NULL;
 BOOL KeymanStarted = FALSE;
 
 // Global strings
+#if defined(_M_X64)
+  #define WINDOW_TITLE  L"Keymanhp-x64"
+#elif defined(_M_ARM64)
+  #define WINDOW_TITLE  L"Keymanhp-arm64"
+#else
+  #error Unknown architecture
+#endif
 
 const PWSTR
   szWindowClass = L"Keymanhp", // Do not localize
   szWindowTitle = L"Keymanhp", // Do not localize
 
   szTitle = L"Keyman Engine x64",
-  szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanx64.exe -- it must be started by Keyman Engine x86",
-  szError_Keymanx86NotFound_Comms = L"Keyman Engine x86 has closed unexpectedly.  Closing down Keyman Engine x64",
+  szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanhp.*.exe -- it must be started by Keyman Engine x86",
+  szError_Keymanx86NotFound_Comms = L"Keyman Engine x86 has closed unexpectedly.  Closing down Keyman Engine hp64",
   szError_FailedToRegisterController = L"Failed to register controller window",
-  szError_FailedToInitialise = L"Failed to initialise Keyman Engine x64",
+  szError_FailedToInitialise = L"Failed to initialise Keyman Engine hp",
   szError_FailedToFindParentProcess = L"Unable to open parent process; it may have disappeared",
 
   szError_ChangeWindowMessageFilter = L"Failed to prepare message filters",
 
-  szError_CannotRunMultipleInstances = L"Only one instance of Keyman Engine x64 can run at a time",
+  szError_CannotRunMultipleInstances = L"Only one instance of Keyman Engine hp can run at a time",
   szError_FailedToRegister = L"Failed to register window class",
   szError_FailedToInitInstance = L"Failed to initialise application",
 
-  szError_InvalidCommandline = L"Incorrect command line for Keyman Engine x64; should be passed handle of Keyman Engine x86",
+  szError_InvalidCommandline = L"Incorrect command line for Keyman Engine hp; should be passed handle of Keyman Engine x86",
   szError_WatcherThreadFailed = L"Failed to create watcher thread",
 
   szFail_UnknownError = L"Unknown error %d",
