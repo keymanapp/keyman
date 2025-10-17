@@ -11,7 +11,7 @@ import { applyTransform, buildMergedTransform } from "@keymanapp/models-template
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
-import { SearchSpace } from "./distance-modeler.js";
+import { SearchSpace } from "./search-space.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
