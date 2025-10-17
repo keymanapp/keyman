@@ -94,6 +94,10 @@ export class LayrCompiler extends SectionCompiler {
         hardware,
         minDeviceWidth: layers.minDeviceWidth || 0,
         layers: layerEntries,
+        baseLayout: null, // TODO-EMBED-OSK-IN-KMX
+        flags: 0,  // TODO-EMBED-OSK-IN-KMX
+        fontFaceName: null,  // TODO-EMBED-OSK-IN-KMX
+        fontSizePct: 100,  // TODO-EMBED-OSK-IN-KMX
       };
       return list;
     });

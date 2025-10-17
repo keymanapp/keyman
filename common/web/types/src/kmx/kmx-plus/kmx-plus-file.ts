@@ -1,3 +1,8 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Binary file format Restructure structs for KMX+
+ */
 import * as KMX from '../kmx.js';
 import * as r from 'restructure';
 import KMXFile = KMX.KMXFile;
@@ -13,8 +18,15 @@ export class KMXPlusFileFormat extends KMXFile {
   public readonly COMP_PLUS_BKSP_ITEM: any;
   public readonly COMP_PLUS_BKSP: any;
 
+  // DISP: v17
+
   public readonly COMP_PLUS_DISP_ITEM: any;
   public readonly COMP_PLUS_DISP: any;
+
+  // DISP2: v19, replaces DISP
+
+  public readonly COMP_PLUS_DIS2_ITEM: any;
+  public readonly COMP_PLUS_DIS2: any;
 
   public readonly COMP_PLUS_ELEM_ELEMENT: any;
   public readonly COMP_PLUS_ELEM_STRING: any;
@@ -27,6 +39,16 @@ export class KMXPlusFileFormat extends KMXFile {
   public readonly COMP_PLUS_LAYR_LIST: any;
   public readonly COMP_PLUS_LAYR_ROW: any;
   public readonly COMP_PLUS_LAYR: any;
+
+  // LAY2: v19, replaces LAYR
+
+  public readonly COMP_PLUS_LAY2_ENTRY: any;
+  public readonly COMP_PLUS_LAY2_KEY: any;
+  public readonly COMP_PLUS_LAY2_FORM: any;
+  public readonly COMP_PLUS_LAY2_ROW: any;
+  public readonly COMP_PLUS_LAY2: any;
+
+  // KEYS
 
   public readonly COMP_PLUS_KEYS_FLICK: any;
   public readonly COMP_PLUS_KEYS_FLICKS: any;
@@ -90,7 +112,8 @@ export class KMXPlusFileFormat extends KMXFile {
 
     // 'bksp' - see 'tran'
 
-    // 'disp'
+    // 'disp' (v17)
+
     this.COMP_PLUS_DISP_ITEM = new r.Struct({
       to: STR_REF,
       id: STR_REF,
@@ -103,6 +126,22 @@ export class KMXPlusFileFormat extends KMXFile {
       count: r.uint32le,
       baseCharacter: CHAR32,
       items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
+    });
+
+    // 'dis2' (v19, replaces 'disp')
+
+    this.COMP_PLUS_DIS2_ITEM = new r.Struct({
+      id: STR_REF,
+      display: STR_REF,
+      flags: r.uint32le,
+    });
+
+    this.COMP_PLUS_DIS2 = new r.Struct({
+      ident: IDENT,
+      size: r.uint32le,
+      count: r.uint32le,
+      baseCharacter: CHAR32,
+      items: new r.Array(this.COMP_PLUS_DIS2_ITEM, 'count'),
     });
 
     // 'elem'
@@ -129,7 +168,7 @@ export class KMXPlusFileFormat extends KMXFile {
 
     // 'keys' - see 'keys.kmap'
 
-    // 'layr'
+    // 'layr' (v17)
 
     this.COMP_PLUS_LAYR_ENTRY = new r.Struct({
       id: r.uint32le, // str
@@ -165,6 +204,48 @@ export class KMXPlusFileFormat extends KMXFile {
       layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
       rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
       keys: new r.Array(this.COMP_PLUS_LAYR_KEY, 'keyCount'),
+    });
+
+    // 'lay2' (v19, replaces 'layr')
+
+    this.COMP_PLUS_LAY2_ENTRY = new r.Struct({
+      id: r.uint32le, // str
+      mod: r.uint32le, // bitfield
+      row: r.uint32le, // index into rows
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAY2_KEY = new r.Struct({
+      key: r.uint32le, // str: key id
+    });
+
+    this.COMP_PLUS_LAY2_FORM = new r.Struct({
+      hardware: STR_REF,          // str: hardware name
+      layer: r.uint32le,          // index into layers
+      count: r.uint32le,
+      minDeviceWidth: r.uint32le, // integer: millimeters
+      baseLayout: STR_REF,        // str: identifier for base layout (reserved)
+      fontFaceName: STR_REF,      // str: font face name
+      fontSizePct: r.uint32le,    // font size in % of default size
+      flags: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAY2_ROW = new r.Struct({
+      key: r.uint32le,
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAY2 = new r.Struct({
+      ident: IDENT,
+      size: r.uint32le,
+      formCount: r.uint32le,
+      layerCount: r.uint32le,
+      rowCount: r.uint32le,
+      keyCount: r.uint32le,
+      forms: new r.Array(this.COMP_PLUS_LAY2_FORM, 'formCount'),
+      layers: new r.Array(this.COMP_PLUS_LAY2_ENTRY, 'layerCount'),
+      rows: new r.Array(this.COMP_PLUS_LAY2_ROW, 'rowCount'),
+      keys: new r.Array(this.COMP_PLUS_LAY2_KEY, 'keyCount'),
     });
 
     // 'keys'

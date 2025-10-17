@@ -330,7 +330,7 @@ bool COMP_KMXPLUS_STRS::valid_string(const KMX_WCHAR* start, KMX_DWORD length) {
       // else OK (good marker)
     } else if(!Uni_IsValid(ch)) {
       DebugLog("String of length 0x%x @ 0x%x: Char U+%04X is illegal char", length, n, ch);
-      return false;    
+      return false;
     } // else OK (other char)
   }
   return true;
@@ -371,6 +371,7 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
       overall_valid = false;
       continue;
     }
+    // todo: validate no overlap
     const uint8_t* data = reinterpret_cast<const uint8_t *>(this);
     const uint8_t* entrydata = data + entry.offset;
     KMX_DWORD entrylength = length - entry.offset;
@@ -404,7 +405,7 @@ const uint8_t *COMP_KMXPLUS_SECT::get(KMX_DWORD ident, KMX_DWORD &entryLength) c
     assert(false);
     return nullptr;
   }
-  // lookup the offset from teh table
+  // lookup the offset from the table
   KMX_DWORD offset = find(ident);
   if (!offset) {
     DebugLog("section_from_sect() - not found. section %c%c%c%c (0x%X)", DEBUG_IDENT(ident), ident);
@@ -1285,7 +1286,11 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     assert(valid);
     return;
   }
-  if ( ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
+  // check individual components to avoid overflow on sum (we'll never get even
+  // a 2GB file so if both components are < length then we are okay to sum)
+  if (ex->kmxplus.dpKMXPlus > length ||
+      ex->kmxplus.dwKMXPlusSize > length ||
+      ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
     DebugLog("dpKMXPlus + dwKMXPlusSize is past the end of the file");
     valid = false;
     assert(valid);
@@ -1318,14 +1323,14 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     // Note: all of these setters will be passed 'nullptr'
     //  if any section had failed validation, or was missing.
     //  A missing section does not invalidate the kmxplus.
-    // we attempt to initialize each one 
+    // we attempt to initialize each one
 
     valid = bkspHelper.setTran(bksp) && valid;    // bksp handled by …TRAN_Helper
     valid = key2Helper.setKeys(key2) && valid;
     valid = layrHelper.setLayr(layr) && valid;
     valid = listHelper.setList(list) && valid;
     valid = tranHelper.setTran(tran) && valid;
-    valid = usetHelper.setUset(uset) && valid;    
+    valid = usetHelper.setUset(uset) && valid;
   }
 }
 

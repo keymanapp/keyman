@@ -5,7 +5,6 @@
   to be shared between TypeScript and C++ via the generator (below)
 */
 
-
 // NOTICE!
 //
 // If you update this file, you *must* be sure to re-run
@@ -26,9 +25,11 @@ export type SectionIdent =
 // Keep this sorted, but with `sect` as the first entry.
   'sect' |
   'bksp' |
+  'dis2' | // v19
   'disp' |
   'elem' |
   'keys' |
+  'lay2' | // v19
   'layr' |
   'list' |
   'loca' |
@@ -42,6 +43,11 @@ export type SectionIdent =
 type SectionMap = {
   [id in SectionIdent]: SectionIdent;
 }
+
+export enum KMXPlusVersion {
+  Version17 = 0x1100, // == KMXFile.VERSION_170,
+  Version19 = 0x1300, // == KMXFile.VERSION_190,
+};
 
 // TODO-LDML: namespace com.keyman.core.ldml {
 /**
@@ -81,9 +87,15 @@ class Constants {
    */
   readonly length_header = 8;
 
+  /**
+   * Version numbers for KMX+ file format
+   */
+  readonly kmxplus_version_17: KMXPlusVersion = KMXPlusVersion.Version17;
+  readonly kmxplus_version_19: KMXPlusVersion = KMXPlusVersion.Version19;
+
   /* ------------------------------------------------------------------
-    * sect section
-      ------------------------------------------------------------------ */
+   * sect section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'sect' section, not including entries
@@ -95,8 +107,8 @@ class Constants {
   readonly length_sect_item = 8;
 
   /* ------------------------------------------------------------------
-    * bksp section
-      ------------------------------------------------------------------ */
+   * bksp section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'bksp' section, not including entries
@@ -112,21 +124,154 @@ class Constants {
   readonly bksp_flags_error = 0x0001;
 
   /* ------------------------------------------------------------------
-    * disp section
-      ------------------------------------------------------------------ */
+   * disp/dis2 section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'disp' section, not including entries
    */
-   readonly length_disp = 16;
-   /**
-    *  Length of each entry in the 'disp' variable part
-    */
-   readonly length_disp_item = 12;
+  readonly length_disp = 16;
+  /**
+   * Minimum length of the 'dis2' section, not including entries
+   */
+  readonly length_dis2 = 16;
+
+  /**
+   *  Length of each entry in the 'disp' variable part
+   */
+  readonly length_disp_item = 12;
+  /**
+   *  Length of each entry in the 'dis2' variable part
+   */
+  readonly length_dis2_item = 12;
+
+  // dis2.item.flags
+
+  /**
+   * in dis2.item.flags, if set, then item toId value is an id.
+   */
+  readonly dis2_item_flags_is_id              = 0x00000001;
+
+  /**
+   * in dis2.item.flags, if set, then item display string is an SVG file.
+   */
+  readonly dis2_item_flags_is_svg             = 0x00000002;
+
+  /**
+   * in dis2.item.flags, mask for hint position
+   */
+  readonly dis2_item_flags_mask_hint          = 0x000000F0;
+
+  /**
+   * in dis2.item.flags, right shift value for masked hint position
+   */
+  readonly dis2_item_flags_shift_hint         = 4;
+
+  /** hint position for primary key cap */
+  readonly dis2_item_hint_primary  = 0;
+  /** hint position for north-west (top left) hint */
+  readonly dis2_item_hint_nw       = 1;
+  /** hint position for north (top) hint */
+  readonly dis2_item_hint_n        = 2;
+  /** hint position for north-east (top right) hint */
+  readonly dis2_item_hint_ne       = 3;
+  /** hint position for west (left) hint */
+  readonly dis2_item_hint_w        = 4;
+  /** hint position for east (right) hint */
+  readonly dis2_item_hint_e        = 5;
+  /** hint position for south west (bottom left) hint */
+  readonly dis2_item_hint_sw       = 6;
+  /** hint position for south (bottom) hint */
+  readonly dis2_item_hint_s        = 7;
+  /** hint position for south east (bottom right) hint */
+  readonly dis2_item_hint_se       = 8;
+
+  /**
+   * in dis2.item.flags, mask for key cap type.
+   */
+  readonly dis2_item_flags_mask_key_cap_type  = 0x00FFFF00;
+
+  /**
+   * in dis2.item.flags, right shift value for key cap type.
+   */
+  readonly dis2_item_flags_shift_key_cap_type = 8;
+
+  // The following values match web/.../specialCharacters.ts; see
+  // developer/src/kmc-kmn/test/kmw/constants.tests.ts for more information.
+
+  /**
+   * dis2.item.flags key cap type, sync with specialCharacters.ts
+   */
+  readonly dis2_key_cap_shift =    8;
+  readonly dis2_key_cap_enter =    5;
+  readonly dis2_key_cap_tab =      6;
+  readonly dis2_key_cap_bksp =     4;
+  readonly dis2_key_cap_menu =     11;
+  readonly dis2_key_cap_hide =     10;
+  readonly dis2_key_cap_alt =      25;
+  readonly dis2_key_cap_ctrl =     1;
+  readonly dis2_key_cap_caps =     3;
+  readonly dis2_key_cap_abc_upper = 16; // differentiate '*ABC*' and '*abc*'
+  readonly dis2_key_cap_abc_lower = 17; // differentiate '*ABC*' and '*abc*'
+  readonly dis2_key_cap_123 =      19;
+  readonly dis2_key_cap_symbol =   21;
+  readonly dis2_key_cap_currency = 20;
+  readonly dis2_key_cap_shifted =  9;
+  readonly dis2_key_cap_altgr =    2;
+  readonly dis2_key_cap_tableft =  7;
+  readonly dis2_key_cap_lalt =     0x56;
+  readonly dis2_key_cap_ralt =     0x57;
+  readonly dis2_key_cap_lctrl =    0x58;
+  readonly dis2_key_cap_rctrl =    0x59;
+  readonly dis2_key_cap_laltctrl =       0x60;
+  readonly dis2_key_cap_raltctrl =       0x61;
+  readonly dis2_key_cap_laltctrlshift =  0x62;
+  readonly dis2_key_cap_raltctrlshift =  0x63;
+  readonly dis2_key_cap_altshift =       0x64;
+  readonly dis2_key_cap_ctrlshift =      0x65;
+  readonly dis2_key_cap_altctrlshift =   0x66;
+  readonly dis2_key_cap_laltshift =      0x67;
+  readonly dis2_key_cap_raltshift =      0x68;
+  readonly dis2_key_cap_lctrlshift =     0x69;
+  readonly dis2_key_cap_rctrlshift =     0x70;
+  // Added in Keyman 14.0.
+  readonly dis2_key_cap_ltrenter =       0x05; // Default alias of '*Enter*'.
+  readonly dis2_key_cap_ltrbksp =        0x04; // Default alias of '*BkSp*'.
+  readonly dis2_key_cap_rtlenter =       0x71;
+  readonly dis2_key_cap_rtlbksp =        0x72;
+  readonly dis2_key_cap_shiftlock =      0x73;
+  readonly dis2_key_cap_shiftedlock =    0x74;
+  readonly dis2_key_cap_zwnj =           0x75; // If this one is specified, auto-detection will kick in.
+  readonly dis2_key_cap_zwnjios =        0x75; // The iOS version will be used by default, but the
+  readonly dis2_key_cap_zwnjandroid =    0x76; // Android platform has its own default glyph.
+  // Added in Keyman 17.0.
+  // Reference: https://github.com/silnrsi/font-symchar/blob/v4.000/documentation/encoding.md
+  readonly dis2_key_cap_zwnjgeneric =    0x79; // Generic version of ZWNJ (no override)
+  readonly dis2_key_cap_sp =             0x80; // Space
+  readonly dis2_key_cap_nbsp =           0x82; // No-break Space
+  readonly dis2_key_cap_narnbsp =        0x83; // Narrow No-break Space
+  readonly dis2_key_cap_enq =            0x84; // En Quad
+  readonly dis2_key_cap_emq =            0x85; // Em Quad
+  readonly dis2_key_cap_ensp =           0x86; // En Space
+  readonly dis2_key_cap_emsp =           0x87; // Em Space
+  // TODO: Skipping #-per-em-space
+  readonly dis2_key_cap_punctsp =        0x8c; // Punctuation Space
+  readonly dis2_key_cap_thsp =           0x8d; // Thin Space
+  readonly dis2_key_cap_hsp =            0x8e; // Hair Space
+  readonly dis2_key_cap_zwsp =           0x81; // Zero Width Space
+  readonly dis2_key_cap_zwj =            0x77; // Zero Width Joiner
+  readonly dis2_key_cap_wj =             0x78; // Word Joiner
+  readonly dis2_key_cap_cgj =            0x7a; // Combining Grapheme Joiner
+  readonly dis2_key_cap_ltrm =           0x90; // Left-to-right Mark
+  readonly dis2_key_cap_rtlm =           0x91; // Right-to-left Mark
+  readonly dis2_key_cap_sh =             0xa1; // Soft Hyphen
+  readonly dis2_key_cap_htab =           0xa2; // Horizontal Tabulation
+  // TODO: Skipping size references
+
 
   /* ------------------------------------------------------------------
-    * elem section
-      ------------------------------------------------------------------ */
+   * elem section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'elem' section, not including entries
@@ -214,7 +359,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * finl section
-     ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'finl' section, not including entries
@@ -230,8 +375,8 @@ class Constants {
   readonly finl_flags_error = 0x0001;
 
   /* ------------------------------------------------------------------
-    * keys section is now keys.kmap
-      ------------------------------------------------------------------ */
+   * keys section is now keys.kmap
+   * ------------------------------------------------------------------ */
 
   /**
    * Constant for no modifiers
@@ -300,7 +445,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * keys section
-    ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'keys' section not including variable parts
@@ -334,17 +479,25 @@ class Constants {
   readonly keys_key_flags_gap         = 0x00000002;
 
   /* ------------------------------------------------------------------
-   * layr section
-     ------------------------------------------------------------------ */
+   * layr/lay2 section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'layr' section not including variable parts
    */
   readonly length_layr = 24;
   /**
+   * Minimum length of the 'lay2' section not including variable parts
+   */
+  readonly length_lay2 = 24;
+  /**
    *  Length of each layer list in the 'layr' section variable part
    */
   readonly length_layr_list = 16;
+  /**
+   *  Length of each layer form (aka list) in the 'layr' section variable part
+   */
+  readonly length_lay2_form = 32;
   /**
    * for the 'hardware' field indicating a touch keyboard, non-hardware
    */
@@ -354,13 +507,25 @@ class Constants {
    */
   readonly length_layr_entry = 16;
   /**
+   * Length of each layer entry in the 'lay2' section variable part
+   */
+  readonly length_lay2_entry = 16;
+  /**
    * Length of each row entry in the 'layr' section variable part
    */
   readonly length_layr_row = 8;
   /**
+   * Length of each row entry in the 'lay2' section variable part
+   */
+  readonly length_lay2_row = 8;
+  /**
    * Length of each key entry in the 'layr' section variable part
    */
   readonly length_layr_key = 4;
+  /**
+   * Length of each key entry in the 'lay2' section variable part
+   */
+  readonly length_lay2_key = 4;
 
   /**
    * Minimum allowed minDeviceWidth for a layer list
@@ -374,7 +539,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * list section
-      ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'list' section not including variable parts
@@ -391,7 +556,7 @@ class Constants {
 
   /* ------------------------------------------------------------------
    * loca section
-   ------------------------------------------------------------------ */
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'loca' section not including variable parts
@@ -403,8 +568,8 @@ class Constants {
   readonly length_loca_item = 4;
 
   /* ------------------------------------------------------------------
-    * meta section
-      ------------------------------------------------------------------ */
+   * meta section
+   ------------------------------------------------------------------ */
 
   /**
    * length of the 'meta' section
@@ -416,8 +581,8 @@ class Constants {
   readonly meta_settings_normalization_disabled = 1;
 
   /* ------------------------------------------------------------------
-    * strs section
-      ------------------------------------------------------------------ */
+   * strs section
+   ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'strs' section not including variable parts
@@ -429,8 +594,8 @@ class Constants {
   readonly length_strs_item = 8;
 
   /* ------------------------------------------------------------------
-    * tran section
-      ------------------------------------------------------------------ */
+   * tran section
+   * ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'tran' section, not including entries
@@ -514,9 +679,11 @@ class Constants {
   readonly section: SectionMap = {
   // keep this sorted
       bksp: 'bksp',
+      dis2: 'dis2', // v19
       disp: 'disp',
       elem: 'elem',
       keys: 'keys',
+      lay2: 'lay2', // v19
       layr: 'layr',
       list: 'list',
       loca: 'loca',
