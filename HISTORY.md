@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.142 alpha 2025-10-17
+
+* chore(common): add .model_info schema (#14967)
+* chore(web): update helpURL documentation and float ui link (#14960)
+* fix(linux): use `ibus` command to restart ibus (#14971)
+* chore(linux): replace deprecated `parse_version` (#14973)
+
 ## 19.0.141 alpha 2025-10-16
 
 * refactor(linux): extract functions (#14937)
