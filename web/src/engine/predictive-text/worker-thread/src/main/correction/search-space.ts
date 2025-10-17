@@ -93,8 +93,8 @@ export class SearchSpace {
    * @param baseSpaceId
    * @param model
    */
-  constructor(model?: LexicalModel);
-  constructor(arg1?: LexicalModel | SearchSpace) {
+  constructor(model: LexicalModel);
+  constructor(arg1: SearchSpace|LexicalModel) {
     this.spaceId = SPACE_ID_SEED++;
 
     if(arg1 instanceof SearchSpace) {
@@ -193,8 +193,8 @@ export class SearchSpace {
     return childSpace;
   }
 
-  public getCurrentCost(): number {
-    const parentCost = this.parentSpace?.getCurrentCost() ?? Number.POSITIVE_INFINITY;
+  public get currentCost(): number {
+    const parentCost = this.parentSpace?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
     return Math.min(localCost, parentCost);
@@ -228,7 +228,7 @@ export class SearchSpace {
    * @returns
    */
   public handleNextNode(): PathResult {
-    const parentCost = this.parentSpace?.getCurrentCost() ?? Number.POSITIVE_INFINITY;
+    const parentCost = this.parentSpace?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
     if(parentCost <= localCost) {
