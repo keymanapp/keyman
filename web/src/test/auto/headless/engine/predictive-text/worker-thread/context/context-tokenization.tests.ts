@@ -97,7 +97,7 @@ describe('ContextTokenization', function() {
         tailTokenShift: 0
       };
 
-      let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), alignment);
+      let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), alignment, null /* dummy val */);
 
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
@@ -126,7 +126,7 @@ describe('ContextTokenization', function() {
         matchLength: 6,
         tailEditLength: 1,
         tailTokenShift: 0
-      });
+      }, null /* dummy val */);
 
       let cloned = new ContextTokenization(baseTokenization);
 
@@ -161,7 +161,7 @@ describe('ContextTokenization', function() {
 
     it('handles simple case - new whitespace + new empty token', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0 };
@@ -206,7 +206,7 @@ describe('ContextTokenization', function() {
 
     it('handles simple case - deletion of single post-word whitespace', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: '', deleteLeft: 1, deleteRight: 0, id: 42 };
@@ -243,7 +243,7 @@ describe('ContextTokenization', function() {
 
     it('handles simple case - new character added to last token', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: 'y', deleteLeft: 0, deleteRight: 0 };
@@ -283,7 +283,7 @@ describe('ContextTokenization', function() {
 
     it('handles applied-suggestion cases - final token fully replaced by transform', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'week'].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: 'week', deleteLeft: 3, deleteRight: 0 };
@@ -325,7 +325,7 @@ describe('ContextTokenization', function() {
 
     it('properly manages empty token re-inserted by complex transform', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'keeps'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'daily', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: 'ily ', deleteLeft: 1 + 1 + 5, deleteRight: 0, id: 42 };
@@ -377,7 +377,7 @@ describe('ContextTokenization', function() {
 
     it('handles large delete + insert transforms properly', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'and', ' ', 'banana'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: ' day', deleteLeft: 2 + 1 + 6, deleteRight: 0, id: 42 };
@@ -438,7 +438,7 @@ describe('ContextTokenization', function() {
 
     it('merges new whitespace character added to last whitespace token if tail is empty', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', '  ', ''].map((t) => (
         {text: t, isWhitespace: t != '' && t.trim() == ''}
@@ -491,7 +491,7 @@ describe('ContextTokenization', function() {
 
     it('handles case that triggers a token merge:  can+\'+t', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\'t'].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0 };
@@ -558,7 +558,7 @@ describe('ContextTokenization', function() {
 
     it('handles case that triggers a token split:  can\' +. => can, \', .', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\'', '.'].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0 };
@@ -639,7 +639,7 @@ describe('ContextTokenization', function() {
       it('handles empty contexts', () => {
         const baseTokens = [''];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -659,7 +659,7 @@ describe('ContextTokenization', function() {
       it('handles empty contexts and invalid Transforms', () => {
         const baseTokens = [''];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -679,7 +679,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the start of context with no edits', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -698,7 +698,7 @@ describe('ContextTokenization', function() {
 
       it('builds edge windows for the start of context with no edits - SMP strings', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map(s => toMathematicalSMP(s));
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -719,7 +719,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the start of context with deletion edits (1)', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -738,7 +738,7 @@ describe('ContextTokenization', function() {
 
       it('builds edge windows for the start of context with deletion edits (1) - SMP strings', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map(s => toMathematicalSMP(s));
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -759,7 +759,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the start of context with deletion edits (2)', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 4 }, true, editWindowSpec);
         assert.deepEqual(results, {
@@ -779,7 +779,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the end of context with no edits', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
         baseTokenization.tail.isPartial = true;
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
@@ -800,7 +800,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the end of context with no edits, trailing whitespace', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
         assert.deepEqual(results, {
@@ -822,7 +822,7 @@ describe('ContextTokenization', function() {
   describe('applyContextSlide', () => {
     it('handles empty contexts', () => {
       const baseTokens = [''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 0 });
 
@@ -833,7 +833,7 @@ describe('ContextTokenization', function() {
 
     it('makes no changes when context does not slide', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
       assert.isFalse(baseTokenization.tokens[0].isPartial);
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 0});
@@ -846,7 +846,7 @@ describe('ContextTokenization', function() {
 
     it('preserves tokenization patterns when word slides partially out of window', () => {
       const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 2});
 
@@ -857,7 +857,7 @@ describe('ContextTokenization', function() {
 
     it('preserves tokenization patterns when word slides partially out of window - SMP strings', () => {
       const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'].map(s => toMathematicalSMP(s));
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 2});
 
@@ -868,7 +868,7 @@ describe('ContextTokenization', function() {
 
     it('does not preserve deleted tokens', () => {
       const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: '', deleteLeft: 0, deleteRight: 7});
 
@@ -881,7 +881,7 @@ describe('ContextTokenization', function() {
 
     it('creates new lead tokens as needed', () => {
       const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'I like ', deleteLeft: 0, deleteRight: 0 });
 
@@ -893,7 +893,7 @@ describe('ContextTokenization', function() {
 
     it('creates new lead tokens and edits others as needed', () => {
       const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'I like pine', deleteLeft: 0, deleteRight: 0 });
 
@@ -906,7 +906,7 @@ describe('ContextTokenization', function() {
 
     it('updates internal tracking when backward slide adds word boundary', () => {
       const baseTokens = ['apples', ' ', 'and', ' ', 'bananas'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: ' ', deleteLeft: 0, deleteRight: 0 });
 
@@ -918,7 +918,7 @@ describe('ContextTokenization', function() {
 
     it('handles tokenization shift (from split) when text inserted at start', () => {
       const baseTokens = ['\'t', ' ', 'talk'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: ' ', deleteLeft: 0, deleteRight: 0 });
 
@@ -930,7 +930,7 @@ describe('ContextTokenization', function() {
 
     it('handles tokenization shift (from merge) when text inserted at start', () => {
       const baseTokens = ['\'', 't', ' ', 'talk'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'n', deleteLeft: 0, deleteRight: 0 });
 
@@ -949,7 +949,7 @@ describe('ContextTokenization', function() {
       assert.equal(baseTexts.join('').length, 73);
 
       assert.equal(baseTexts.length, 25);
-      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: ' ', deleteLeft: 0, deleteRight: 9 });
 
@@ -964,7 +964,7 @@ describe('ContextTokenization', function() {
         "sauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
       ];
 
-      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'apple', deleteLeft: 0, deleteRight: 0 });
 
@@ -981,7 +981,7 @@ describe('ContextTokenization', function() {
         "nd", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ", "breakfast"
       ];
 
-      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'applesauce a', deleteLeft: 0, deleteRight: 0 });
 
@@ -1000,7 +1000,7 @@ describe('ContextTokenization', function() {
     // TODO: deduplicate from `tokenizeTransform`; migrate away from that to this in due time.
     it('detects a single empty transform at index 0 when an empty transform is input', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: '',
@@ -1023,7 +1023,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles basic token-edit transform', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: 'y',
@@ -1045,7 +1045,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles basic char-delete transform', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'days'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: '',
@@ -1067,7 +1067,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles simple token-edit transform', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: 'y',
@@ -1105,7 +1105,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles simple token-edit transform - smp strings', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'].map(t => toMathematicalSMP(t));
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: toMathematicalSMP('y'),
@@ -1143,7 +1143,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles simple token-replacing transform', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
       const editTransform = {
         insert: 'week',
         deleteLeft: 4
@@ -1164,7 +1164,7 @@ describe('ContextTokenization', function() {
 
     it('handles simple token-replacing transform with cross-token deleteLeft', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       // 'an apple any'
       const editTransform = {
@@ -1201,7 +1201,7 @@ describe('ContextTokenization', function() {
 
     it('handles token-replacing transform with cross-token deleteLeft after whitespace', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date', ' ', ''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       // 'an apple any'
       const editTransform = {
@@ -1246,7 +1246,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles a simple appended whitespace', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: ' ',
@@ -1275,7 +1275,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles a simple appended period', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: '.',
@@ -1301,7 +1301,7 @@ describe('ContextTokenization', function() {
 
     it('properly deletes a simple appended whitespace', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: '',
@@ -1328,7 +1328,7 @@ describe('ContextTokenization', function() {
 
     it('handles word-breakable transforms (case 1)', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'dat'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: 'y k',
@@ -1372,7 +1372,7 @@ describe('ContextTokenization', function() {
 
     it('handles word-breakable transforms (case 1) - smp strings', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'dat'].map(t => toMathematicalSMP(t));
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: toMathematicalSMP('y k'),
@@ -1416,7 +1416,7 @@ describe('ContextTokenization', function() {
 
     it('handles word-breakable transforms (case 2)', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'dat'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: 'y. ',
@@ -1443,7 +1443,7 @@ describe('ContextTokenization', function() {
 
     it('handles complex breakable cases', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'date'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       // 'an apple any'
       const editTransform = {
@@ -1473,7 +1473,7 @@ describe('ContextTokenization', function() {
 
     it('properly aligns tokenization of transforms that match-replace existing tokens (1)', () => {
       const baseTokens = ['properly'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       // Case:  the user had input a backspace and then selected a suggestion that restored
       // the original word (which also appended whitespace).
@@ -1501,7 +1501,7 @@ describe('ContextTokenization', function() {
 
     it('properly aligns tokenization of transforms that match-replace existing tokens (2)', () => {
       const baseTokens = ['do', ' ', 'it', ' ', 'properly'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       // Case:  the user had input a backspace and then selected a suggestion that restored
       // the original word (which also appended whitespace).
@@ -1529,7 +1529,7 @@ describe('ContextTokenization', function() {
 
     it('properly places extra whitespaces on preceding whitespace token', () => {
       const baseTokens = ['do', ' ', 'it', ' ', 'properly', ' ', ''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       // Adjacent whitespace entries are generally merged into a single blob.
       const editTransform = {
@@ -1555,7 +1555,7 @@ describe('ContextTokenization', function() {
 
     it('properly aligns degenerate input cases (1)', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: 'fox and brown fox',  // => quick fox and brown fox
@@ -1587,7 +1587,7 @@ describe('ContextTokenization', function() {
     it('returns the standard edge window for empty transform inputs', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
       const editTransform = {
         insert: '',
@@ -1621,7 +1621,7 @@ describe('ContextTokenization', function() {
     it('returns the standard edge window for empty transforms with context-final whitespace', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox', ' '];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
       const editTransform = {
         insert: '',
@@ -1656,7 +1656,7 @@ describe('ContextTokenization', function() {
     it('returns the standard edge window for pure transform w insert inputs', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
       const editTransform = {
         insert: ' jumped',
@@ -1690,7 +1690,7 @@ describe('ContextTokenization', function() {
     it('returns the proper edge window for transforms w deleteLeft inputs (1)', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
       const editTransform = {
         insert: 'rog',
@@ -1725,7 +1725,7 @@ describe('ContextTokenization', function() {
     it('returns the proper edge window for transforms w deleteLeft inputs (2)', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
       const editTransform = {
         insert: 'fox and brown fox',  // => quick fox and brown fox
@@ -1758,7 +1758,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles English contraction transitions (1)', () => {
       const baseTokens = ['she', ' ', 'said', ' ', 'she', ' ', 'can', '\''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: 't',  // => can, ' => can't
@@ -1792,7 +1792,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles English contraction transitions (2)', () => {
       const baseTokens = ['she', ' ', 'said', ' ', 'she', ' ', 'can\''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: ' ',  // => can' => can, ', \u0020
@@ -1827,7 +1827,7 @@ describe('ContextTokenization', function() {
 
     it('properly handles English contraction transitions (3)', () => {
       const baseTokens = ['she', ' ', 'said', ' ', 'she', ' ', 'can\''];
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const editTransform = {
         insert: '?',  // => can' => can, ', ?

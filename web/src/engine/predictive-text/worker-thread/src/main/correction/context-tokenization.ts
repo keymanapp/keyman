@@ -93,7 +93,7 @@ export interface TokenizationTransitionEdits {
    * The tokenized form of the input Transform, indexed by position relative to
    * the end of the original context's tail token.
    */
-  tokenizedTransform: Map<number, Transform>
+  tokenizedTransform: Map<number, Transform>;
 }
 
 /**
@@ -101,20 +101,46 @@ export interface TokenizationTransitionEdits {
  * held within the active sliding context-window at a single point in time.
  */
 export class ContextTokenization {
+  /**
+   * The sequence of tokens in the context represented by this instance.
+   */
   readonly tokens: ContextToken[];
+
+  /**
+   * The tokenization-transition metadata relating this instance to the most likely
+   * tokenization from a prior state.
+   */
   readonly alignment?: ContextStateAlignment;
 
+  /**
+   * The portion of edits from the true input keystroke that are not part of the
+   * final entry in `token`.  If `null`, all edits are considered part of the
+   * final token's contents.
+   *
+   * If the final token is new due to a newly-introduced wordboundary traversed
+   * by the keystroke, this will generally be set to an empty transform that
+   * 'finalizes' the previous tail token.
+   */
+  readonly taillessTrueKeystroke: Transform;
+
   constructor(priorToClone: ContextTokenization);
-  constructor(tokens: ContextToken[], alignment?: ContextStateAlignment);
-  constructor(param1: ContextToken[] | ContextTokenization, alignment?: ContextStateAlignment) {
+  constructor(tokens: ContextToken[]);
+  constructor(tokens: ContextToken[], alignment: ContextStateAlignment, taillessTrueKeystroke: Transform);
+  constructor(
+    param1: ContextToken[] | ContextTokenization,
+    alignment?: ContextStateAlignment,
+    taillessTrueKeystroke?: Transform
+  ) {
     if(!(param1 instanceof ContextTokenization)) {
       const tokens = param1;
       this.tokens = [].concat(tokens);
       this.alignment = alignment;
+      this.taillessTrueKeystroke = taillessTrueKeystroke;
     } else {
       const priorToClone = param1;
       this.tokens = priorToClone.tokens.map((entry) => new ContextToken(entry));
       this.alignment = {...priorToClone.alignment};
+      this.taillessTrueKeystroke = priorToClone.taillessTrueKeystroke;
     }
   }
 
@@ -209,7 +235,7 @@ export class ContextTokenization {
 
       // And done.  Why retokenize?  We already had a proper tokenization;
       // preserve any boundaries that remain within the context window.
-      return new ContextTokenization(preservedTokens, null);
+      return new ContextTokenization(preservedTokens);
     }
 
     // Step 2:  adjust current represented tokens based on actual context
@@ -302,9 +328,7 @@ export class ContextTokenization {
     // as we determined it to be so in prior iterations.
     const preservedTokens = currentTokens.slice(edgeSliceIndex);
 
-    // TODO:  determine alignment values to store, if any, re: context alignment.
-    // ... maybe allow saving the slide transform as its own thing?
-    return new ContextTokenization(tokensToPrefix.concat(preservedTokens), null);
+    return new ContextTokenization(tokensToPrefix.concat(preservedTokens));
   }
 
   /**
@@ -582,7 +606,11 @@ export class ContextTokenization {
       affectedToken = null;
     }
 
-    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tokenization), null /* tokenMapping */);
+    return new ContextTokenization(
+      this.tokens.slice(0, sliceIndex).concat(tokenization),
+      null /* tokenMapping */,
+      determineTaillessTrueKeystroke(pendingTokenization)
+    );
   }
 }
 
@@ -1089,4 +1117,59 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
   }
 
   return transformMap;
+}
+
+/**
+ * Used to construct and represent the part of the incoming transform that does
+ * not land as part of the final token in the resulting context.  This component
+ * should be preserved by any suggestions that get applied.
+ * @param tokenizationAnalysis
+ * @returns
+ */
+export function determineTaillessTrueKeystroke(tokenizationAnalysis: PendingTokenization) {
+  // undefined by default; we haven't yet determined if we're still affecting
+  // the same token that was the tail in the previous tokenization state.
+  let taillessTrueKeystroke: Transform;
+
+  // If tokens were inserted, emit an empty transform; this prevents
+  // suggestions from replacing the "current" token.
+  const bestTokenizedInput = tokenizationAnalysis.inputs[0].sample;
+  if(bestTokenizedInput.has(1)) {
+    // Sets a default transform that will be returned even if the main
+    // transform body lies entirely within a new token.
+    taillessTrueKeystroke = { insert: '', deleteLeft: 0 };
+
+    // While the .size() > 1 case could also land here, it is ALSO covered
+    // by the loop that follows, without fail.
+  }
+
+  const transformKeys = [...tokenizationAnalysis.inputs[0].sample.keys()];
+  transformKeys.pop();
+
+  for(let i of transformKeys) {
+    /*
+      * Thinking ahead to multitokenization:
+      *
+      * If what we have is not on the "true" tokenization, then... we need to
+      * do multitoken effects, right?  We're basing new suggestions based on a
+      * state that does not currently exist!  We'd need to enforce THAT state,
+      * *then* do the suggestion!
+      * - Which gets fun if we auto-apply such a case, as the new "true" tokenization
+      *   no longer results directly from the true input.
+      *
+      * If we give tokens unique IDs on first creation, we could backtrace to
+      * find the most recent common ancestor.
+      * - simple cases (same 'token', but different input transform lengths/effects)
+      *   will have the same prior token ID
+      */
+    const primaryInput = tokenizationAnalysis.inputs[0].sample.get(i);
+    if(!taillessTrueKeystroke) {
+      taillessTrueKeystroke = {...primaryInput};
+    } else {
+      taillessTrueKeystroke.insert += primaryInput.insert;
+      taillessTrueKeystroke.deleteLeft += primaryInput.deleteLeft;
+    }
+  }
+
+  return taillessTrueKeystroke;
 }
