@@ -201,18 +201,7 @@ export class ContextToken {
    * received that can correspond to the current instance.
    */
   get exampleInput(): string {
-    /*
-     * TODO:  with clear limits (strict cost minimization?) / prior calculation
-     * attempts, return the best _suggestion_ for this token.  This is
-     * especially relevant for epic/dict-breaker - we want to best model the token
-     * as it would apply within the word-breaking algorithm.
-     *
-     * If not possible, find the best of the deepest search paths and append the
-     * most likely keystroke data afterward.
-     */
-    const transforms = this.searchModule.inputSequence.map((dist) => dist[0].sample)
-    const composite = transforms.reduce((accum, current) => buildMergedTransform(accum, current), {insert: '', deleteLeft: 0});
-    return composite.insert;
+    return this.searchModule.bestExample.text;
   }
 
   /**

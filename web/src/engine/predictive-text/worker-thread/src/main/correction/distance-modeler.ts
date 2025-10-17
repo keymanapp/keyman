@@ -6,6 +6,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { QUEUE_NODE_COMPARATOR, SearchQuotientSpur } from './search-quotient-spur.js';
+import { PathResult } from './search-quotient-node.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -598,23 +599,6 @@ export class SearchResult {
     return this.resultNode.currentTraversal;
   }
 }
-
-type NullPath = {
-  type: 'none'
-}
-
-type IntermediateSearchPath = {
-  type: 'intermediate',
-  cost: number
-}
-
-type CompleteSearchPath = {
-  type: 'complete',
-  cost: number,
-  finalNode: SearchNode
-}
-
-export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 // Current best guesstimate of how compositor will retrieve ideal corrections.
 export async function *getBestMatches(searchSpace: SearchQuotientSpur, timer: ExecutionTimer): AsyncGenerator<SearchResult> {
