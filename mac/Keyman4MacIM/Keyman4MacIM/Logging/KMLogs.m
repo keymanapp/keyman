@@ -35,6 +35,7 @@ char *const eventsCategory = "events";
 char *const keyboardCategory = "keyboard";
 char *const keyCategory = "key";
 char *const oskCategory = "osk";
+char *const keyTraceCategory = "keytrace";
 char *const testCategory = "test";
 
 + (void)reportLogStatus {
@@ -86,6 +87,10 @@ char *const testCategory = "test";
 
 + (os_log_t)oskLog {
   return os_log_create(keymanSubsystem, oskCategory);
+}
+
++ (os_log_t)keyTraceLog {
+  return os_log_create(keymanSubsystem, keyTraceCategory);
 }
 
 + (os_log_t)testLog {
