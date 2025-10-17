@@ -90,7 +90,7 @@ describe('ContextToken', function() {
       let baseToken = new ContextToken(plainModel, "and");
       let clonedToken = new ContextToken(baseToken);
 
-      assert.notEqual(clonedToken.searchSpace, baseToken.searchSpace);
+      assert.equal(clonedToken.searchSpace, baseToken.searchSpace);
       // Deep equality on .searchSpace can't be directly checked due to the internal complexities involved.
       // We CAN check for the most important members, though.
       assert.notEqual(clonedToken.searchSpace.inputSequence, baseToken.searchSpace.inputSequence);
