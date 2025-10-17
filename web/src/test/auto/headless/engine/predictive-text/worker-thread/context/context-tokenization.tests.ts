@@ -949,7 +949,7 @@ describe('ContextTokenization', function() {
       assert.equal(baseTexts.join('').length, 73);
 
       assert.equal(baseTexts.length, 25);
-      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: ' ', deleteLeft: 0, deleteRight: 9 });
 
@@ -964,7 +964,7 @@ describe('ContextTokenization', function() {
         "sauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem"
       ];
 
-      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'apple', deleteLeft: 0, deleteRight: 0 });
 
@@ -981,7 +981,7 @@ describe('ContextTokenization', function() {
         "nd", " ", "orange", " ", "juice", " ", "seem", " ", "like", " ", "breakfast"
       ];
 
-      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)));
 
       const resultTokenization = baseTokenization.applyContextSlide(plainModel, { insert: 'applesauce a', deleteLeft: 0, deleteRight: 0 });
 
