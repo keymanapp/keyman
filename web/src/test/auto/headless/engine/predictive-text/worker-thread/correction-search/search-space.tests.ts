@@ -109,7 +109,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    let searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchSpace(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -126,11 +126,15 @@ describe('SearchSpace', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    searchSpace = searchSpace.addInput(synthInput1, 1);
-    searchSpace = searchSpace.addInput(synthInput2, .75);
-    searchSpace = searchSpace.addInput(synthInput3, .75);
+    const searchSpace1 = searchSpace.addInput(synthInput1, 1);
+    const searchSpace2 = searchSpace1.addInput(synthInput2, .75);
+    const searchSpace3 = searchSpace2.addInput(synthInput3, .75);
 
-    const iter = getBestMatches(searchSpace, buildTestTimer()); // disables the correction-search timeout.
+    assert.notEqual(searchSpace1.spaceId, searchSpace.spaceId);
+    assert.notEqual(searchSpace2.spaceId, searchSpace1.spaceId);
+    assert.notEqual(searchSpace3.spaceId, searchSpace2.spaceId);
+
+    const iter = getBestMatches(searchSpace3, buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter);
   });
 
@@ -156,16 +160,20 @@ describe('SearchSpace', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    searchSpace = searchSpace.addInput(synthInput1, 1);
-    searchSpace = searchSpace.addInput(synthInput2, .75);
-    searchSpace = searchSpace.addInput(synthInput3, .75);
+    const searchSpace1 = searchSpace.addInput(synthInput1, 1);
+    const searchSpace2 = searchSpace1.addInput(synthInput2, .75);
+    const searchSpace3 = searchSpace2.addInput(synthInput3, .75);
 
-    const iter = getBestMatches(searchSpace, buildTestTimer()); // disables the correction-search timeout.
+    assert.notEqual(searchSpace1.spaceId, searchSpace.spaceId);
+    assert.notEqual(searchSpace2.spaceId, searchSpace1.spaceId);
+    assert.notEqual(searchSpace3.spaceId, searchSpace2.spaceId);
+
+    const iter = getBestMatches(searchSpace3, buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter);
 
     // The key: do we get the same results the second time?
     // Reset the iterator first...
-    const iter2 = getBestMatches(searchSpace, buildTestTimer()); // disables the correction-search timeout.
+    const iter2 = getBestMatches(searchSpace3, buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter2);
   });
 

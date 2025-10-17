@@ -199,11 +199,11 @@ describe('ContextTokenization', function() {
         targetTokens
       );
       assert.includeDeepMembers(
-        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence,
+        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence.slice(),
         [[{sample: inputTransformMap.get(1), p: 1}]]
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
+        tokenization.tail.searchSpace.inputSequence.slice(),
         [[{sample: inputTransformMap.get(2), p: 1}]]
       );
     });
@@ -282,7 +282,7 @@ describe('ContextTokenization', function() {
         targetTokens
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
+        tokenization.tail.searchSpace.inputSequence.slice(),
         [[{sample: inputTransformMap.get(0), p: 1}]]
       );
     });
@@ -323,7 +323,7 @@ describe('ContextTokenization', function() {
         targetTokens
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
+        tokenization.tail.searchSpace.inputSequence.slice(),
         // As we fully deleted the old token, the new one "starts" after the deleteLeft.
         // The deleteLeft component should not be included here.
         [[{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */ }, p: 1}]]
@@ -377,7 +377,7 @@ describe('ContextTokenization', function() {
         }
 
         assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          tokenization.tokens[tailIndex + i].searchSpace.inputSequence.slice(),
           [[{sample: transform, p: 1}]]
         );
       }
@@ -439,7 +439,7 @@ describe('ContextTokenization', function() {
         }
 
         assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          tokenization.tokens[tailIndex + i].searchSpace.inputSequence.slice(),
           [[{sample: transform, p: 1}]]
         );
       }
@@ -493,7 +493,7 @@ describe('ContextTokenization', function() {
         }
 
         assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          tokenization.tokens[tailIndex + i].searchSpace.inputSequence.slice(),
           [[{sample: transform, p: 1}]]
         );
       }
@@ -553,8 +553,8 @@ describe('ContextTokenization', function() {
         [...baseTokenization.tokens[baseTokenization.tokens.length - 2].inputRange]
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchSpace.inputSequence
+        tokenization.tail.searchSpace.inputSequence.slice(),
+        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchSpace.inputSequence.slice()
       );
 
       assert.includeDeepMembers(
@@ -562,8 +562,8 @@ describe('ContextTokenization', function() {
         [...baseTokenization.tokens[baseTokenization.tokens.length - 1].inputRange]
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        baseTokenization.tokens[baseTokenization.tokens.length - 1].searchSpace.inputSequence
+        tokenization.tail.searchSpace.inputSequence.slice(),
+        baseTokenization.tokens[baseTokenization.tokens.length - 1].searchSpace.inputSequence.slice()
       );
     });
 
@@ -624,8 +624,8 @@ describe('ContextTokenization', function() {
         [...tokenization.tokens[tokenization.tokens.length - 2].inputRange]
       );
       assert.includeDeepMembers(
-        baseTokenization.tail.searchSpace.inputSequence,
-        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence
+        baseTokenization.tail.searchSpace.inputSequence.slice(),
+        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence.slice()
       );
 
       // We've also appended a '.' to the final split-off token.  Thus, we need
@@ -636,7 +636,7 @@ describe('ContextTokenization', function() {
       );
       assert.includeDeepMembers(
         [...baseTokenization.tail.searchSpace.inputSequence, [{sample: { insert: '.', deleteLeft: 0 }, p: 1}]],
-        tokenization.tokens[tokenization.tokens.length - 1].searchSpace.inputSequence
+        tokenization.tokens[tokenization.tokens.length - 1].searchSpace.inputSequence.slice()
       );
     });
   });
