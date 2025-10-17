@@ -268,7 +268,7 @@ export class ContextState {
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
     state.tokenization =  new ContextTokenization(resultTokenization.tokens, tokenizationAnalysis, resultTokenization.taillessTrueKeystroke);
     state.appliedInput = transformDistribution?.[0].sample;
-    transition.finalize(state, transformDistribution, resultTokenization.taillessTrueKeystroke);
+    transition.finalize(state, transformDistribution);
     transition.revertableTransitionId = appliedSuggestionTransitionId;
     return transition;
   }

@@ -118,6 +118,8 @@ export class ContextTokenization {
    * If the final token is new due to a newly-introduced wordboundary traversed
    * by the keystroke, this will generally be set to an empty transform that
    * 'finalizes' the previous tail token.
+   *
+   * (Refer to #12494 for an example case.)
    */
   readonly taillessTrueKeystroke: Transform;
 

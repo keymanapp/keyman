@@ -48,21 +48,6 @@ export class ContextTransition {
   private _transitionId?: number;
 
   /**
-   * Indicates the portion of the incoming keystroke data, if any, that applies to
-   * tokens before the last pre-caret token and thus should not be replaced by predictions
-   * based upon `state`.  If the provided context state + the incoming transform do not
-   * adequately match the current context, the match attempt will fail with a `null` result.
-   *
-   * Should generally be non-null if the token before the caret did not previously exist.
-   *
-   * The result may be null if it does not match the prior context state or if bookkeeping
-   * based upon it is problematic - say, if wordbreaking effects shift due to new input,
-   * causing a mismatch with the prior state's tokenization.
-   * (Refer to #12494 for an example case.)
-   */
-  preservationTransform?: Transform;
-
-  /**
    * When set, indicates that the text insertion point has returned to the endpoint of a
    * token last edited by application of a Suggestion.  This is not set immediately after
    * it is applied; there must be at least one intermediate edit.
@@ -133,13 +118,12 @@ export class ContextTransition {
    * @param preservationTransform Portions of the most likely input that do not contribute to the final token
    * in the final context's tokenization.
    */
-  finalize(state: ContextState, inputDistribution: Distribution<Transform>, preservationTransform?: Transform) {
+  finalize(state: ContextState, inputDistribution: Distribution<Transform>) {
     this._final = state;
     this.inputDistribution = inputDistribution;
     // Long-term, this should never be null... but we need to allow it at this point
     // in the refactoring process.
     this._transitionId = inputDistribution?.find((entry) => entry.sample.id !== undefined)?.sample.id;
-    this.preservationTransform = preservationTransform;
   }
 
   /**
