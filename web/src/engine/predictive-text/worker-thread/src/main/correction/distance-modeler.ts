@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { PathResult, SearchSpace } from './search-space.js';
+import { PathResult, SearchBatcher } from './search-batcher.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -616,8 +616,8 @@ export class SearchResult {
  * @param timer
  * @returns
  */
-export async function *getBestMatches(searchSpaces: SearchSpace[], timer: ExecutionTimer): AsyncGenerator<SearchResult> {
-  const spaceQueue = new PriorityQueue<SearchSpace>((a, b) => a.currentCost - b.currentCost);
+export async function *getBestMatches(searchSpaces: SearchBatcher[], timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+  const spaceQueue = new PriorityQueue<SearchBatcher>((a, b) => a.currentCost - b.currentCost);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
   // and iterate over it first.
@@ -626,7 +626,7 @@ export async function *getBestMatches(searchSpaces: SearchSpace[], timer: Execut
   // created - and those results won't come up later in stage 2, either.  Only
   // intended for restarting a search, not searching twice in parallel.
   const priorResultsQueue = new PriorityQueue<SearchResult>((a, b) => a.totalCost - b.totalCost);
-  priorResultsQueue.enqueueAll(searchSpaces.map((space) => space.previousResults()).flat());
+  priorResultsQueue.enqueueAll(searchSpaces.map((space) => space.previousResults).flat());
 
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
   spaceQueue.enqueueAll(searchSpaces);
