@@ -78,6 +78,8 @@ export class DispCompiler extends SectionCompiler {
         unescape: true,
         compileContext: display,
       }, sections),
+      flags: 0, // TODO-EMBED-OSK-IN-KMX
+      toId: null as KMXPlus.StrsItem, // TODO-EMBED-OSK-IN-KMX
     })) || []; // TODO-LDML: need coverage for the []
 
     result.disps.sort((a: DispItem, b: DispItem) => {

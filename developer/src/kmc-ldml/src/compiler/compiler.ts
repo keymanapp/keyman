@@ -27,7 +27,7 @@ import { StrsCompiler, ElemCompiler, ListCompiler, UsetCompiler } from './empty-
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import DependencySections = KMXPlus.DependencySections;
-import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
+import { KMXPlusVersion, SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
@@ -148,7 +148,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
 
     // Use the builder to generate the binary output file
-    const kmxBuilder = new KMXBuilder(kmx, compilerOptions.saveDebug);
+    const kmxBuilder = new KMXBuilder(kmx, KMXPlusVersion.Version17, compilerOptions.saveDebug);
     const keyboardId = this.callbacks.path.basename(outputFilename, '.kmx');
     const vkCompiler = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
     const vkCompilerResult = vkCompiler.compile(kmx.kmxplus, keyboardId);

@@ -1,6 +1,6 @@
 import * as r from 'restructure';
 import { KMXPlus } from "@keymanapp/common-types";
-import { constants, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 import { BUILDER_SECTION } from './builder-section.js';
 import { BUILDER_SECT, build_sect } from './build-sect.js';
 import { BUILDER_DISP, build_disp } from './build-disp.js';
@@ -25,9 +25,11 @@ type SectionBuilders = {
   sect?: BUILDER_SECT;
   bksp?: BUILDER_BKSP;
   disp?: BUILDER_DISP;
+  dis2?: BUILDER_DISP;  // v19
   elem?: BUILDER_ELEM;
   keys?: BUILDER_KEYS;
   layr?: BUILDER_LAYR;
+  lay2?: BUILDER_LAYR;  // v19
   list?: BUILDER_LIST;
   loca?: BUILDER_LOCA;
   meta?: BUILDER_META;
@@ -38,15 +40,15 @@ type SectionBuilders = {
 };
 
 export default class KMXPlusBuilder {
-  private file: KMXPlusFile;
   //private writeDebug: boolean;
 
   sect : SectionBuilders = {
 
   };
 
-  constructor(file: KMXPlusFile, _writeDebug: boolean) {
+  constructor(private file: KMXPlusFile, version: KMXPlusVersion, _writeDebug: boolean) {
     this.file = file;
+    this.file.kmxplus.version = version;
     //this.writeDebug = _writeDebug;
   }
 
@@ -57,10 +59,12 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect.sect);
     // Keep the rest of these in order.
     this.emitSection(file, this.file.COMP_PLUS_BKSP, this.sect.bksp);
+    // this.emitSection(file, this.file.COMP_PLUS_DIS2, this.sect.disp, constants.section.dis2); // TODO-EMBED-OSK-IN-KMX - supporting hints
     this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect.disp);
     this.emitSection(file, this.file.COMP_PLUS_ELEM, this.sect.elem);
     this.emitElements(file);
     this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect.keys);
+    // this.emitSection(file, this.file.COMP_PLUS_LAY2, this.sect.layr, constants.section.lay2); // TODO-EMBED-OSK-IN-KMX - supporting fonts
     this.emitSection(file, this.file.COMP_PLUS_LAYR, this.sect.layr);
     this.emitSection(file, this.file.COMP_PLUS_LIST, this.sect.list);
     this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect.loca);
@@ -87,9 +91,23 @@ export default class KMXPlusBuilder {
     const build_bksp = build_tran;
 
     this.sect.bksp = build_bksp(this.file.kmxplus.bksp, this.sect.strs, this.sect.elem);
-    this.sect.disp = build_disp(this.file.kmxplus, this.sect.strs);
+
+    // TODO-EMBED-OSK-IN-KMX: this is a little WET - build_disp also branches on this test
+    if(this.file.kmxplus.version == KMXPlusVersion.Version17) {
+      this.sect.disp = build_disp(this.file.kmxplus, this.sect.strs);
+    } else {
+      this.sect.dis2 = build_disp(this.file.kmxplus, this.sect.strs); // TODO-EMBED-OSK-IN-KMX - to support hints
+    }
+
     this.sect.keys = build_keys(this.file.kmxplus, this.sect.strs, this.sect.list);
-    this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list);
+
+    // TODO-EMBED-OSK-IN-KMX: this is a little WET - build_layr also branches on this test
+    if(this.file.kmxplus.version == KMXPlusVersion.Version17) {
+      this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list);
+    } else {
+      this.sect.lay2 = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list); // TODO-EMBED-OSK-IN-KMX - to support fonts
+    }
+
     this.sect.loca = build_loca(this.file.kmxplus, this.sect.strs);
     this.sect.meta = build_meta(this.file.kmxplus, this.sect.strs);
     this.sect.tran = build_tran(this.file.kmxplus.tran, this.sect.strs, this.sect.elem);
@@ -145,9 +163,12 @@ export default class KMXPlusBuilder {
     return offset + sect.size;
   }
 
-  private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION) {
+  private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION, ident?: SectionIdent) {
     if(sect) {
+      const originalIdent = sect.ident;
+      sect.ident = ident ? constants.hex_section_id(ident) : sect.ident;
       const buf = comp.toBuffer(sect);
+      sect.ident = originalIdent;
       if (buf.length > sect.size) {
         // buf.length may be < sect.size if there is a variable part (i.e. elem)
         throw new RangeError(`Internal Error: Section ${constants.str_section_id(sect.ident)} claimed size ${sect.size} but produced buffer of size ${buf.length}.`);

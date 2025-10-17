@@ -1,5 +1,5 @@
 
-import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { constants, KMXPlusVersion } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_LIST } from "./build-list.js";
@@ -23,6 +23,14 @@ interface BUILDER_LAYR_LIST {
   count: number; // number of layer entries in the list
   minDeviceWidth: number; // width in millimeters
   _layers: LayrEntry[]; // original layer entry, for in-memory only
+};
+
+interface BUILDER_LAYR_FORM extends BUILDER_LAYR_LIST {
+  // v19 - renaming from LIST to FORM
+  // baseLayout: BUILDER_STR_REF;   // TODO-EMBED-OSK-IN-KMX: do we need to add this now? or to lay3?
+  fontFaceName: BUILDER_STR_REF; // face name of font for key caps
+  fontSizePct: number;           // font size in % of default size for implementation, typically 100
+  flags: number;
 };
 
 /**
@@ -64,6 +72,9 @@ export interface BUILDER_LAYR extends BUILDER_SECTION {
   layers: BUILDER_LAYR_LAYER[], // subtable of <layer> elements
   rows: BUILDER_LAYR_ROW[], // subtable of <row> elements
   keys: BUILDER_LAYR_KEY[], // subtable of key entries
+  // v19
+  formCount: number,            // number of entries in forms subtable
+  forms: BUILDER_LAYR_FORM[],   // subtable of <layers> elements, roughly same as lists[]
 };
 
 export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_LAYR {
@@ -72,8 +83,12 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   }
 
   const layr: BUILDER_LAYR = {
-    ident: constants.hex_section_id(constants.section.layr),
-    size: constants.length_layr,
+    ident: constants.hex_section_id(
+      kmxplus.version == KMXPlusVersion.Version17
+        ? constants.section.layr
+        : constants.section.lay2
+    ),
+    size: 0, // calculated below
     _offset: 0,
     listCount: kmxplus.layr.lists.length,
     layerCount: 0, // calculated below
@@ -82,7 +97,11 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     lists: [],
     layers: [],
     rows: [],
-    keys: []
+    keys: [],
+
+    // v19
+    formCount: kmxplus.layr.lists.length, // TODO-EMBED-OSK-IN-KMX, rename throughout? == listCount
+    forms: [], // superset of lists[]
   };
 
   layr.lists = kmxplus.layr.lists.map((list) => {
@@ -95,6 +114,14 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     };
     return blist;
   });
+
+  layr.forms = layr.lists.map(e => ({
+    ...e,
+    flags: 0,         // TODO-EMBED-OSK-IN-KMX
+    fontFaceName: 0,  // TODO-EMBED-OSK-IN-KMX
+    fontSizePct: 100, // TODO-EMBED-OSK-IN-KMX
+  }));
+
   // now sort the lists
   layr.lists.sort((a, b) => {
     // sort by string #
@@ -150,11 +177,17 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   layr.rowCount = layr.rows.length;
   layr.keyCount = layr.keys.length;
 
-  const offset = constants.length_layr +
-    (constants.length_layr_list * layr.listCount) +
-    (constants.length_layr_entry * layr.layerCount) +
-    (constants.length_layr_row * layr.rowCount) +
-    (constants.length_layr_key * layr.keyCount);
-  layr.size = offset;
+  layr.size = kmxplus.version == KMXPlusVersion.Version17
+    ? constants.length_layr +
+      (constants.length_layr_list * layr.listCount) +
+      (constants.length_layr_entry * layr.layerCount) +
+      (constants.length_layr_row * layr.rowCount) +
+      (constants.length_layr_key * layr.keyCount)
+    : constants.length_lay2 +
+      (constants.length_lay2_form * layr.formCount) +
+      (constants.length_lay2_entry * layr.layerCount) +
+      (constants.length_lay2_row * layr.rowCount) +
+      (constants.length_lay2_key * layr.keyCount);
   return layr;
 }
+

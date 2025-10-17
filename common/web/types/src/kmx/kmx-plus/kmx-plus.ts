@@ -1,4 +1,9 @@
-import { constants } from '@keymanapp/ldml-keyboard-constants';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * KMX+ file format structures and helper functions
+ */
+import { constants, KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 import { ElementString } from './element-string.js';
 import { ListItem } from '../../ldml-keyboard/string-list.js';
 import * as util from '../../util/util.js';
@@ -480,13 +485,16 @@ export class Bksp extends Tran {
 
 // 'disp'
 export class DispItem {
-  to: StrsItem;
-  id: StrsItem;
+  to: StrsItem;   // not used in v19
+  id: StrsItem;   // not used in v19
   display: StrsItem;
+  toId: StrsItem; // v19
+  flags: number;  // v19; TODO-EMBED-OSK-IN-KMX: can we constrain this type?
 };
 
 export class Disp extends Section {
   baseCharacter: StrsItem;
+  flags: number;  // v19; TODO-EMBED-OSK-IN-KMX: can we constrain this type?
   disps: DispItem[] = [];
 };
 
@@ -499,7 +507,14 @@ export class LayrList {
   hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
+  // v19
+  baseLayout: StrsItem;
+  fontFaceName: StrsItem;
+  fontSizePct: number;
+  flags: number;
 };
+
+export type LayrForm = LayrList;
 
 /**
  * In-memory `<layer>`
@@ -615,9 +630,11 @@ export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
     disp?: Disp;
+    dis2?: Disp; // TODO-EMBED-OSK-IN-KMX
     elem?: Elem; // elem is ignored in-memory
     keys?: Keys;
     layr?: Layr;
+    lay2?: Layr; // TODO-EMBED-OSK-IN-KMX
     list?: List; // list is ignored in-memory
     loca?: Loca;
     meta?: Meta;
@@ -625,6 +642,8 @@ export interface KMXPlusData {
     tran?: Tran;
     uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
+
+    version?: KMXPlusVersion;
 };
 
 
