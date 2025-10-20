@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.143 alpha 2025-10-20
+
+* fix(android): Set the main app background white (#14935)
+
 ## 19.0.142 alpha 2025-10-17
 
 * chore(common): add .model_info schema (#14967)
