@@ -630,7 +630,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     textView.setHeight(
-      screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
+      screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
   }
 
   private void showInfo() {
