@@ -268,7 +268,8 @@ type
     //procedure SnapToolHelp;
     procedure RecreateTaskbarIcons;
     function StartKeymanEngine: Boolean;
-    procedure StartKeymanX64;
+    procedure StartKeymanHPX64;
+    procedure StartKeymanHParm64; // TODO could combine this function
     procedure OpenTextEditor;
     //function GetCachedKeymanID(hkl: DWORD): DWORD;
     procedure ShowLanguageSwitchForm;
@@ -1325,7 +1326,8 @@ begin
   else
     kmint.KeymanEngineControl.RestartEngine; // I1486
 
-  StartKeymanX64;
+  //StartKeymanHPX64;
+  StartKeymanHPARM64
 
 end;
 
@@ -1954,7 +1956,7 @@ begin
   FLangSwitchRefreshWatcher.Start;
 end;
 
-procedure TfrmKeyman7Main.StartKeymanX64;
+procedure TfrmKeyman7Main.StartKeymanHPX64;
 var
   cmd, dir, params: string;
   sei: TShellExecuteInfoW;
@@ -1964,7 +1966,7 @@ begin
   try
     // TODO: use TKeymanPaths to find keymanx64?
     dir := ExtractFilePath(ParamStr(0));
-    cmd := dir + 'keymanx64.exe';
+    cmd := dir + 'keymanhp.x64.exe';
     params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
 
     if not FileExists(cmd) then
@@ -1988,7 +1990,47 @@ begin
     begin
       // We're going to handle any exceptions here but we'd like to know that
       // they happened
-      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanx64', True);
+      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanhp.x64', True);
+    end;
+  end;
+end;
+
+procedure TfrmKeyman7Main.StartKeymanHPARM64;
+var
+  cmd, dir, params: string;
+  sei: TShellExecuteInfoW;
+begin
+    // This will actually need to be replaced with the new of IsWow64Process2
+  //if not IsWow64 then Exit;   // I4374
+
+  try
+    // TODO: use TKeymanPaths to find keymanx64?
+    dir := ExtractFilePath(ParamStr(0));
+    cmd := dir + 'keymanhp.arm64.exe';
+    params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
+
+    if not FileExists(cmd) then
+      // We'll get notification of the issue but it won't
+      // crash the process
+      raise Exception.Create(cmd+' could not be found');
+
+    FillChar(sei, SizeOf(sei), 0);
+    sei.cbSize := SizeOf(sei);
+    sei.Wnd := Handle;
+    sei.lpVerb := 'open';
+    sei.lpFile := PWideChar(cmd);
+    sei.lpParameters := PChar(params);
+    sei.lpDirectory := PWideChar(dir);
+    sei.nShow := SW_SHOW;
+
+    if not ShellExecuteExW(@sei) then
+      RaiseLastOSError;
+  except
+    on E:Exception do
+    begin
+      // We're going to handle any exceptions here but we'd like to know that
+      // they happened
+      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanhp.x64', True);
     end;
   end;
 end;

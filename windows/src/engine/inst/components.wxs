@@ -137,6 +137,10 @@
         <File Id="keyman64.dll" Name="keyman64.dll" KeyPath="yes" Source="..\..\..\bin\engine\keyman64.dll" />
       </Component>
 
+      <Component Guid="{5D0A2A8F-5C34-4B28-A19E-62A40C7EDC12}">
+        <File Id="keymanarm64.dll" Name="keymanarm64.dll" KeyPath="yes" Source="..\..\..\bin\engine\keymanarm64.dll" />
+      </Component>
+
       <Component Guid="{6B6EF05E-E60A-4902-B5F5-EEB3F8AAB384}">
         <File Id="keymanhp.x64.exe" Name='keymanhp.x64.exe' KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.x64.exe" />
       </Component>

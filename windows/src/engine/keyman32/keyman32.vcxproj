@@ -309,7 +309,7 @@
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>keyman64.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>keymanarm64.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
@@ -319,11 +319,11 @@
       <BaseAddress>0x140000000</BaseAddress>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <ImportLibrary>..\..\..\lib\keyman64.lib</ImportLibrary>
+      <ImportLibrary>..\..\..\lib\keymanarm64.lib</ImportLibrary>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman64.bsc</OutputFile>
+      <OutputFile>./Keymanarm64.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>
@@ -467,7 +467,7 @@
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>keyman64.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>keymanarm64.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
@@ -478,7 +478,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman32.bsc</OutputFile>
+      <OutputFile>./Keymanarm64.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>
@@ -576,6 +576,14 @@
     <None Include="keyman64.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="keymanarm64.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -595,6 +603,14 @@
     <ResourceCompile Include="keyman64.rc">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
+    </ResourceCompile>
+    <ResourceCompile Include="keymanarm64.rc">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>

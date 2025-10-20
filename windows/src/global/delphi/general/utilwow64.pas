@@ -21,4 +21,8 @@ begin
   Result := FIsWow64; // not on Wow64
 end;
 
+// TODO: workout how to access IsWow64Process2
+// then we can determine if we should start ARM64
+
+
 end.

@@ -71,8 +71,8 @@ BOOL KeymanStarted = FALSE;
 #endif
 
 const PWSTR
-  szWindowClass = L"Keymanhp", // Do not localize
-  szWindowTitle = L"Keymanhp", // Do not localize
+  szWindowClass = WINDOW_TITLE, // Do not localize
+  szWindowTitle = WINDOW_TITLE, // Do not localize
 
   szTitle = L"Keyman Engine x64",
   szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanhp.*.exe -- it must be started by Keyman Engine x86",
