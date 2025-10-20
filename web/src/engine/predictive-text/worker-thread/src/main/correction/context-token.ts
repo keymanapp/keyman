@@ -58,7 +58,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  readonly searchSpace: SearchPath;
+  public get searchPath(): SearchPath {
+    return this._searchPath;
+  }
+  private _searchPath: SearchPath;
 
   isPartial: boolean;
 
@@ -104,7 +107,7 @@ export class ContextToken {
       //
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
-      this.searchSpace = new SearchPath(priorToken.searchSpace);
+      this._searchPath = priorToken.searchPath;
       this._inputRange = priorToken._inputRange.slice();
 
       // Preserve any annotated applied-suggestion transition ID data; it's useful
@@ -118,7 +121,6 @@ export class ContextToken {
       // May be altered outside of the constructor.
       this.isWhitespace = false;
       this.isPartial = !!isPartial;
-      this.searchSpace = new SearchPath(model);
       this._inputRange = [];
 
       rawText ||= '';
@@ -127,14 +129,21 @@ export class ContextToken {
       const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
         return [{sample: transform, p: 1.0}];
       });
+
+      let searchSpace = new SearchPath(model);
+
       rawTransformDistributions.forEach((entry) => {
         this._inputRange.push({
           trueTransform: entry[0].sample,
           inputStartIndex: 0,
           bestProbFromSet: 1
         });
-        this.searchSpace.addInput(entry, 1);
+        const priorSpace = searchSpace;
+        searchSpace = searchSpace.addInput(entry, 1);
+        priorSpace.stopTrackingResults();
       });
+
+      this._searchPath = searchSpace;
     }
   }
 
@@ -144,7 +153,9 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this.searchSpace.addInput(distribution, inputSource.bestProbFromSet);
+    const priorSpace = this._searchPath;
+    this._searchPath = this._searchPath.addInput(distribution, inputSource.bestProbFromSet);
+    priorSpace.stopTrackingResults();
   }
 
   /**
@@ -206,7 +217,7 @@ export class ContextToken {
      * If not possible, find the best of the deepest search paths and append the
      * most likely keystroke data afterward.
      */
-    const transforms = this.searchSpace.inputSequence.map((dist) => dist[0].sample)
+    const transforms = this.searchPath.inputSequence.map((dist) => dist[0].sample)
     const composite = transforms.reduce((accum, current) => buildMergedTransform(accum, current), {insert: '', deleteLeft: 0});
     return composite.insert;
   }
@@ -244,7 +255,7 @@ export class ContextToken {
 
         lastInputDistrib = lastInputDistrib?.map((entry, index) => {
           return {
-            sample: buildMergedTransform(entry.sample, token.searchSpace.inputSequence[0][index].sample),
+            sample: buildMergedTransform(entry.sample, token.searchPath.inputSequence[0][index].sample),
             p: entry.p
           }
         });
@@ -263,10 +274,10 @@ export class ContextToken {
       // Ignore the last entry for now - it may need to merge with a matching
       // entry in the next token!
       for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.inputRange[i], token.searchSpace.inputSequence[i]);
+        resultToken.addInput(token.inputRange[i], token.searchPath.inputSequence[i]);
       }
       lastSourceInput = token.inputRange[inputCount-1];
-      lastInputDistrib = token.searchSpace.inputSequence[inputCount-1];
+      lastInputDistrib = token.searchPath.inputSequence[inputCount-1];
     }
 
     resultToken.addInput(lastSourceInput, lastInputDistrib);
@@ -322,7 +333,7 @@ export class ContextToken {
         const totalLenBeforeLastApply = committedLen + lenBeforeLastApply;
         // We read the start position for the NEXT token to know the split position.
         const extraCharsAdded = splitSpecs[1].textOffset - totalLenBeforeLastApply;
-        const tokenSequence = overextendedToken.searchSpace.inputSequence;
+        const tokenSequence = overextendedToken.searchPath.inputSequence;
         const lastInputIndex = tokenSequence.length - 1;
         const inputDistribution = tokenSequence[lastInputIndex];
         const headDistribution = inputDistribution.map((m) => {
@@ -370,7 +381,7 @@ export class ContextToken {
       backupToken = new ContextToken(constructingToken);
       lenBeforeLastApply = KMWString.length(currentText.left);
       currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
-      constructingToken.addInput(this.inputRange[transformIndex], this.searchSpace.inputSequence[transformIndex]);
+      constructingToken.addInput(this.inputRange[transformIndex], this.searchPath.inputSequence[transformIndex]);
       transformIndex++;
     }
 

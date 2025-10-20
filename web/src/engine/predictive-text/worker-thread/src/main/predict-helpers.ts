@@ -460,14 +460,14 @@ export async function correctAndEnumerate(
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  const searchSpace = transition.final.tokenization.tail.searchSpace;
+  const searchPath = transition.final.tokenization.tail.searchPath;
 
   // If corrections are not enabled, bypass the correction search aspect
   // entirely. No need to 'search' - just do a direct lookup.
   //
   // To be clear:  this IS how we actually tell that corrections are disabled -
   // when no fat-finger data is available.
-  if(!searchSpace.correctionsEnabled) {
+  if(!searchPath.correctionsEnabled) {
     const wordbreak = determineModelWordbreaker(lexicalModel);
     const predictionRoot = {
       sample: {
@@ -493,7 +493,7 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches(searchSpace, timer)) {
+  for await(const match of getBestMatches(searchPath, timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
 
@@ -532,7 +532,7 @@ export async function correctAndEnumerate(
      * Worst-case, it's possible to temporarily add normalization if a code deep-dive
      * is needed in the future.
      */
-    if(searchSpace.inputSequence.length <= 1) {
+    if(searchPath.inputSequence.length <= 1) {
       /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
        * ambiguous case that would only arise very near the center of the boundary between two keys.
        * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
