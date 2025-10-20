@@ -15,7 +15,7 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextStateAlignment, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
+import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, PendingTokenization, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -61,6 +61,11 @@ function toMathematicalSMP(text: string) {
   return asSMP.join('');
 }
 
+const testEdgeWindowSpec = {
+  minTokens: 3,
+  minChars: 8
+};
+
 describe('ContextTokenization', function() {
   before(() => {
     KMWString.enableSupplementaryPlane(true);
@@ -72,61 +77,66 @@ describe('ContextTokenization', function() {
       let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
-      assert.isNotOk(tokenization.alignment);
+      assert.isNotOk(tokenization.transitionEdits);
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
 
     it("constructs from a token array + alignment data", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      let alignment: ContextStateAlignment = {
-        canAlign: true,
-        editPath: [
-          {op: 'match', input: 0, match: 0},
-          {op: 'match', input: 1, match: 1},
-          {op: 'match', input: 2, match: 2},
-          {op: 'match', input: 3, match: 3},
-          {op: 'match', input: 4, match: 4},
-          {op: 'match', input: 5, match: 5},
-          {op: 'match', input: 6, match: 6}
-        ],
-        leadTokenShift: 0,
-        leadEditLength: 0,
-        matchLength: 6,
-        tailEditLength: 1,
-        tailTokenShift: 0
+      const tokens = rawTextTokens.map((text => toTransformToken(text)));
+      const emptyTransform = { insert: '', deleteLeft: 0, deleteRight: 0 };
+
+      // We _could_ flesh this out a bit more... but it's not really needed for this test.
+      const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
+      let transitionEdits: PendingTokenization = {
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {...edgeWindow, retokenization: rawTextTokens.slice(edgeWindow.sliceIndex)},
+          removedTokenCount: 0
+        },
+        inputs: [{sample: (() => {
+          const map = new Map<number, Transform>();
+          map.set(0, emptyTransform);
+          return map;
+        })(), p: 1}]
       };
 
-      let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), alignment, null /* dummy val */);
+      let tokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
 
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
-      assert.isOk(tokenization.alignment);
-      assert.deepEqual(tokenization.alignment, alignment);
+      assert.isOk(tokenization.transitionEdits);
+      assert.deepEqual(tokenization.transitionEdits, transitionEdits);
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
 
     it('clones', () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      const tokens = rawTextTokens.map((text => toTransformToken(text)));
+      const emptyTransform = { insert: '', deleteLeft: 0, deleteRight: 0 };
 
-      let baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), {
-        canAlign: true,
-        editPath: [
-          {op: 'match', input: 0, match: 0},
-          {op: 'match', input: 1, match: 1},
-          {op: 'match', input: 2, match: 2},
-          {op: 'match', input: 3, match: 3},
-          {op: 'match', input: 4, match: 4},
-          {op: 'match', input: 5, match: 5},
-          {op: 'match', input: 6, match: 6}
-        ],
-        leadTokenShift: 0,
-        leadEditLength: 0,
-        matchLength: 6,
-        tailEditLength: 1,
-        tailTokenShift: 0
-      }, null /* dummy val */);
+      // We _could_ flesh this out a bit more... but it's not really needed for this test.
+      const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
+      let transitionEdits: PendingTokenization = {
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {...edgeWindow, retokenization: rawTextTokens.slice(edgeWindow.sliceIndex)},
+          removedTokenCount: 0
+        },
+        inputs: [{sample: (() => {
+          const map = new Map<number, Transform>();
+          map.set(0, emptyTransform);
+          return map;
+        })(), p: 1}]
+      };
+
+      let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
 
       let cloned = new ContextTokenization(baseTokenization);
 
@@ -154,11 +164,6 @@ describe('ContextTokenization', function() {
   });
 
   describe('evaluateTransition', () => {
-    const testEdgeWindowSpec = {
-      minTokens: 3,
-      minChars: 8
-    };
-
     it('handles simple case - new whitespace + new empty token', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
@@ -631,17 +636,12 @@ describe('ContextTokenization', function() {
 
   describe('buildEdgeWindow', () => {
     describe('with min token count 3, char count 8', () => {
-      const editWindowSpec = {
-        minTokens: 3,
-        minChars: 8
-      }
-
       it('handles empty contexts', () => {
         const baseTokens = [''];
         const idSeed = TOKEN_TRANSFORM_SEED;
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: '',
           editBoundary: {
@@ -661,7 +661,7 @@ describe('ContextTokenization', function() {
         const idSeed = TOKEN_TRANSFORM_SEED;
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: '',
           editBoundary: {
@@ -681,7 +681,7 @@ describe('ContextTokenization', function() {
         const idSeed = TOKEN_TRANSFORM_SEED;
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: 'an apple',
           editBoundary: {
@@ -700,7 +700,7 @@ describe('ContextTokenization', function() {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map(s => toMathematicalSMP(s));
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: toMathematicalSMP('an apple'),
           editBoundary: {
@@ -721,7 +721,7 @@ describe('ContextTokenization', function() {
         const idSeed = TOKEN_TRANSFORM_SEED;
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: ' apple a',
           editBoundary: {
@@ -740,7 +740,7 @@ describe('ContextTokenization', function() {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map(s => toMathematicalSMP(s));
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: toMathematicalSMP(' apple a'),
           editBoundary: {
@@ -761,7 +761,7 @@ describe('ContextTokenization', function() {
         const idSeed = TOKEN_TRANSFORM_SEED;
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 4 }, true, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 4 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: 'pple a day',
           editBoundary: {
@@ -782,7 +782,7 @@ describe('ContextTokenization', function() {
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
         baseTokenization.tail.isPartial = true;
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: 'apple a day',
           editBoundary: {
@@ -802,7 +802,7 @@ describe('ContextTokenization', function() {
         const idSeed = TOKEN_TRANSFORM_SEED;
         const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
 
-        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, editWindowSpec);
+        const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, testEdgeWindowSpec);
         assert.deepEqual(results, {
           retokenizationText: 'apple a day ',
           editBoundary: {
