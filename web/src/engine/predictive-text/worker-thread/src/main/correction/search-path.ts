@@ -40,7 +40,7 @@ export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchSpace {
+export class SearchPath {
   // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
   // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
   // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
@@ -86,15 +86,15 @@ export class SearchSpace {
    * Clone constructor.  Deep-copies its internal queues, but not search nodes.
    * @param instance
    */
-  constructor(instance: SearchSpace);
+  constructor(instance: SearchPath);
   /**
    * Constructs a fresh SearchSpace instance for used in predictive-text correction
    * and suggestion searches.
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(arg1: SearchSpace|LexicalModel) {
-    if(arg1 instanceof SearchSpace) {
+  constructor(arg1: SearchPath|LexicalModel) {
+    if(arg1 instanceof SearchPath) {
       this._inputSequence = [].concat(arg1._inputSequence);
       this.minInputCost = [].concat(arg1.minInputCost);
       this.rootNode = arg1.rootNode;
@@ -259,7 +259,7 @@ export class SearchSpace {
     //
     // TODO:  still consider the lowest-cost individual edges for THIS specific criterion.
     const tierMinCost = this.lowestCostAtDepth[currentNode.priorInput.length-1];
-    if(currentNode.currentCost > tierMinCost + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
+    if(currentNode.currentCost > tierMinCost + 2.5 * SearchPath.EDIT_DISTANCE_COST_SCALE) {
       return unmatchedResult;
     }
 

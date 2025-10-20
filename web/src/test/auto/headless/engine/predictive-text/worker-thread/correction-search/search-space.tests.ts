@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, models, SearchSpace } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, models, SearchPath } from '@keymanapp/lm-worker/test-index';
 
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
@@ -96,7 +96,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchPath(testModel);
 
     const iter = getBestMatches(searchSpace, buildTestTimer());
     const firstResult = await iter.next();
@@ -109,7 +109,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchPath(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -139,7 +139,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchPath(testModel);
 
 
     // VERY artificial distributions.
@@ -175,7 +175,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchSpace(testModel);
+    const searchSpace = new SearchPath(testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches(searchSpace, timer);
 
