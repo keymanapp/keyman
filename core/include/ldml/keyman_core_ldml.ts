@@ -84,7 +84,11 @@ class Constants {
   /**
    * Length of a raw section header, in bytes
    */
-  readonly length_header = 8;
+  readonly length_header_17 = 8;
+  /**
+   * Length of a raw section header, in bytes
+   */
+  readonly length_header_19 = 12;
 
   /**
    * Version number 17 for KMX+ file format, initial release version,
@@ -546,7 +550,8 @@ class Constants {
   };
 
   // v19+: special case for 'sect' override with 'sec2'
-  readonly section_sec2 = 'sec2';
+  readonly sectionname_sec2 = 'sec2';
+  readonly sectionid_sec2 = 0x32636573;
 
   /**
    * Use to convert 4-char string into hex
