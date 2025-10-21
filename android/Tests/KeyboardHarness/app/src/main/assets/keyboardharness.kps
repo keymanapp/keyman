@@ -20,7 +20,7 @@
   </Info>
   <Files>
     <File>
-      <Name>..\..\..\..\..\..\..\web\src\test\manual\web\chirality\chirality.js</Name>
+      <Name>../../../../../../../common/test/resources/keyboards/chirality.js</Name>
       <Description>File chirality.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
