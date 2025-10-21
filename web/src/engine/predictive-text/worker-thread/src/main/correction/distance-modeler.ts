@@ -22,6 +22,8 @@ type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they'r
 export const EDIT_DISTANCE_COST_SCALE = 5;
 export const MIN_KEYSTROKE_PROBABILITY = 0.0001;
 
+export const DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL = 33; // in milliseconds.
+
 export type TraversableToken<TUnit> = {
   key: TUnit,
   traversal: LexiconTraversal

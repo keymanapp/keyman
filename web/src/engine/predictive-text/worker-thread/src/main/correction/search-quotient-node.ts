@@ -50,12 +50,37 @@ export interface SearchQuotientNode {
   readonly spaceId: number;
 
   /**
+   * Notes the SearchQuotientNode(s) whose correction-search paths are extended
+   * by this SearchQuotientNode.
+   */
+  readonly parents: SearchQuotientNode[];
+
+  /**
    * Retrieves the lowest-cost / lowest-distance edge from the batcher's search
    * area, checks its validity as a correction to the input text, and reports on
    * what sort of result the edge's destination node represents.
    * @returns
    */
   handleNextNode(): PathResult;
+
+  /**
+   * Denotes whether or not the represented search space includes paths built from
+   * the specified set of keystroke input distributions.  The distribution count
+   * should match .inputCount - no omissions or extras are permitted.
+   *
+   * Designed explicitly for use in unit testing; it's not super-efficient, so
+   * avoid live use.
+   *
+   * @param keystrokeDistributions
+   * @internal
+   */
+  hasInputs(keystrokeDistributions: Distribution<Transform>[]): boolean;
+
+  /**
+   * Increases the editing range that will be considered for determining
+   * correction distances.
+   */
+  increaseMaxEditDistance(): void;
 
   /**
    * Reports the cost of the lowest-cost / lowest-distance edge held within the
