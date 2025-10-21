@@ -12,6 +12,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchPath } from "./search-path.js";
+import { SearchSpace } from "./search-space.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -58,10 +59,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  public get searchPath(): SearchPath {
+  public get searchPath(): SearchSpace {
     return this._searchPath;
   }
-  private _searchPath: SearchPath;
+  private _searchPath: SearchSpace;
 
   isPartial: boolean;
 
@@ -132,7 +133,7 @@ export class ContextToken {
           bestProbFromSet: 1
         });
         const priorSpace = searchSpace;
-        searchSpace = searchSpace.addInput(entry, 1);
+        searchSpace = new SearchPath(searchSpace, entry, 1);
         priorSpace.stopTrackingResults();
       });
 
@@ -147,7 +148,7 @@ export class ContextToken {
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
     const priorSpace = this._searchPath;
-    this._searchPath = this._searchPath.addInput(distribution, inputSource.bestProbFromSet);
+    this._searchPath = new SearchPath(this._searchPath, distribution, inputSource.bestProbFromSet);
     priorSpace.stopTrackingResults();
   }
 
@@ -245,7 +246,7 @@ export class ContextToken {
 
         lastInputDistrib = lastInputDistrib?.map((entry, index) => {
           return {
-            sample: buildMergedTransform(entry.sample, token.searchPath.inputSequence[0][index].sample),
+            sample: buildMergedTransform(entry.sample, token.searchPath.inputSequences[0][0][index].sample),
             p: entry.p
           }
         });
@@ -264,10 +265,10 @@ export class ContextToken {
       // Ignore the last entry for now - it may need to merge with a matching
       // entry in the next token!
       for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.inputRange[i], token.searchPath.inputSequence[i]);
+        resultToken.addInput(token.inputRange[i], token.searchPath.inputSequences[0][i]);
       }
       lastSourceInput = token.inputRange[inputCount-1];
-      lastInputDistrib = token.searchPath.inputSequence[inputCount-1];
+      lastInputDistrib = token.searchPath.inputSequences[0][inputCount-1];
     }
 
     resultToken.addInput(lastSourceInput, lastInputDistrib);
@@ -323,7 +324,7 @@ export class ContextToken {
         const totalLenBeforeLastApply = committedLen + lenBeforeLastApply;
         // We read the start position for the NEXT token to know the split position.
         const extraCharsAdded = splitSpecs[1].textOffset - totalLenBeforeLastApply;
-        const tokenSequence = overextendedToken.searchPath.inputSequence;
+        const tokenSequence = overextendedToken.searchPath.inputSequences[0];
         const lastInputIndex = tokenSequence.length - 1;
         const inputDistribution = tokenSequence[lastInputIndex];
         const headDistribution = inputDistribution.map((m) => {
@@ -371,7 +372,7 @@ export class ContextToken {
       backupToken = new ContextToken(constructingToken);
       lenBeforeLastApply = KMWString.length(currentText.left);
       currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
-      constructingToken.addInput(this.inputRange[transformIndex], this.searchPath.inputSequence[transformIndex]);
+      constructingToken.addInput(this.inputRange[transformIndex], this.searchPath.inputSequences[0][transformIndex]);
       transformIndex++;
     }
 
