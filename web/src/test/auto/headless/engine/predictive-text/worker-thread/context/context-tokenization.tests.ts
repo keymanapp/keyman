@@ -15,7 +15,7 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, PendingTokenization, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
+import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, PendingTokenization, SearchPath, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -139,8 +139,10 @@ describe('ContextTokenization', function() {
       let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
       let cloned = new ContextTokenization(baseTokenization);
 
-      assert.deepEqual(cloned.tokens.map((token) => token.searchSpace.inputSequence),
-        baseTokenization.tokens.map((token) => token.searchSpace.inputSequence));
+      assert.sameOrderedMembers(
+        cloned.tokens.map((token) => token.searchSpace),
+        baseTokenization.tokens.map((token) => token.searchSpace)
+      );
 
       // The `.searchSpace` instances will not be deep-equal; there are class properties
       // that hold functions with closures, configured at runtime.
@@ -198,13 +200,19 @@ describe('ContextTokenization', function() {
       assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
         targetTokens
       );
-      assert.includeDeepMembers(
-        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence,
-        [[{sample: inputTransformMap.get(1), p: 1}]]
+      assert.equal(
+        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputCount, 1
       );
-      assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        [[{sample: inputTransformMap.get(2), p: 1}]]
+      assert.deepEqual(
+        (tokenization.tokens[tokenization.tokens.length - 2].searchSpace as SearchPath).lastInput,
+        [{sample: inputTransformMap.get(1), p: 1}]
+      );
+      assert.equal(
+        tokenization.tail.searchSpace.inputCount, 1
+      );
+      assert.deepEqual(
+        (tokenization.tail.searchSpace as SearchPath).lastInput,
+        [{sample: inputTransformMap.get(2), p: 1}]
       );
     });
 
@@ -281,9 +289,14 @@ describe('ContextTokenization', function() {
       assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
         targetTokens
       );
-      assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        [[{sample: inputTransformMap.get(0), p: 1}]]
+      assert.equal(baseTokenization.tail.searchSpace.inputCount, 2);
+      assert.deepEqual(tokenization.tail.searchSpace.parents, [baseTokenization.tail.searchSpace]);
+      assert.equal(
+        tokenization.tail.searchSpace.inputCount, 3
+      );
+      assert.deepEqual(
+        (tokenization.tail.searchSpace as SearchPath).lastInput,
+        [{sample: inputTransformMap.get(0), p: 1}]
       );
     });
 
@@ -322,11 +335,22 @@ describe('ContextTokenization', function() {
       assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
         targetTokens
       );
-      assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
+
+      // As we fully deleted the old token, the new one "starts" after the deleteLeft.
+      // The deleteLeft component should not be included here.  Mocking may be needed!
+      assert.equal(
+        tokenization.tail.searchSpace.inputCount, 1 // is a single transform.
+      );
+      assert.equal(
+        tokenization.tokens[tokenization.tokens.length - 2].searchSpace,
+        baseTokenization.tokens[tokenization.tokens.length - 2].searchSpace
+      )
+      assert.notEqual(tokenization.tail.searchSpace.parents, [baseTokenization.tail.searchSpace]);
+      assert.deepEqual(
+        (tokenization.tail.searchSpace as SearchPath).lastInput,
         // As we fully deleted the old token, the new one "starts" after the deleteLeft.
         // The deleteLeft component should not be included here.
-        [[{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */ }, p: 1}]]
+        [{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */ }, p: 1}]
       );
     });
 
@@ -376,9 +400,8 @@ describe('ContextTokenization', function() {
           transform.deleteLeft = 0;
         }
 
-        assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
-          [[{sample: transform, p: 1}]]
+        assert.deepEqual((tokenization.tokens[tailIndex + i].searchSpace as SearchPath).lastInput,
+          [{sample: transform, p: 1}]
         );
       }
     });
@@ -438,9 +461,8 @@ describe('ContextTokenization', function() {
           transform.deleteLeft = 0;
         }
 
-        assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
-          [[{sample: transform, p: 1}]]
+        assert.deepEqual((tokenization.tokens[tailIndex + i].searchSpace as SearchPath).lastInput,
+          [{sample: transform, p: 1}]
         );
       }
     });
@@ -492,9 +514,8 @@ describe('ContextTokenization', function() {
           transform.deleteLeft = 0;
         }
 
-        assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
-          [[{sample: transform, p: 1}]]
+        assert.deepEqual((tokenization.tokens[tailIndex + i].searchSpace as SearchPath).lastInput,
+          [{sample: transform, p: 1}]
         );
       }
     });
@@ -506,7 +527,7 @@ describe('ContextTokenization', function() {
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\'t'].map((t) => ({text: t, isWhitespace: t == ' '}));
       const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(0, { insert: 't', deleteLeft: 0 });
+      inputTransformMap.set(0, inputTransform);
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -548,23 +569,18 @@ describe('ContextTokenization', function() {
         targetTokens
       );
 
-      assert.includeDeepMembers(
-        [...tokenization.tail.inputRange],
-        [...baseTokenization.tokens[baseTokenization.tokens.length - 2].inputRange]
+      const basePreTail = baseTokenization.tokens[baseTokenization.tokens.length - 2];
+      const baseTail = baseTokenization.tail;
+      assert.equal(
+        tokenization.tail.searchSpace.inputCount,
+        basePreTail.searchSpace.inputCount + baseTail.searchSpace.inputCount + 1 /* +1 - incoming transform */
       );
-      assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchSpace.inputSequence
-      );
-
-      assert.includeDeepMembers(
-        [...tokenization.tail.inputRange],
-        [...baseTokenization.tokens[baseTokenization.tokens.length - 1].inputRange]
-      );
-      assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        baseTokenization.tokens[baseTokenization.tokens.length - 1].searchSpace.inputSequence
-      );
+      assert.deepEqual((tokenization.tail.searchSpace as SearchPath).lastInput, [{ sample: inputTransform, p: 1 }]);
+      assert.equal(tokenization.tail.exampleInput, 'can\'t');
+      assert.deepEqual(tokenization.tail.searchSpace.bestExample, {
+        text: basePreTail.searchSpace.bestExample.text + baseTail.searchSpace.bestExample.text + inputTransform.insert,
+        p: basePreTail.searchSpace.bestExample.p * baseTail.searchSpace.bestExample.p * 1 /* prob of input transform */
+      });
     });
 
     it('handles case that triggers a token split:  can\' +. => can, \', .', () => {
@@ -619,25 +635,24 @@ describe('ContextTokenization', function() {
         targetTokens
       );
 
-      assert.includeDeepMembers(
-        [...baseTokenization.tail.inputRange],
-        [...tokenization.tokens[tokenization.tokens.length - 2].inputRange]
+      const prepreTail = tokenization.tokens[tokenization.tokens.length - 3];
+      const preTail = tokenization.tokens[tokenization.tokens.length - 2];
+      const tail = tokenization.tail;
+      assert.equal(
+        baseTokenization.tail.searchSpace.inputCount,
+        prepreTail.searchSpace.inputCount + preTail.searchSpace.inputCount
       );
-      assert.includeDeepMembers(
-        baseTokenization.tail.searchSpace.inputSequence,
-        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence
-      );
-
-      // We've also appended a '.' to the final split-off token.  Thus, we need
-      // to account for that in the assertions below.
-      assert.includeDeepMembers(
-        [...baseTokenization.tail.inputRange, { trueTransform: inputTransform, inputStartIndex: 0, bestProbFromSet: 1 }],
-        [...tokenization.tokens[tokenization.tokens.length - 1].inputRange]
-      );
-      assert.includeDeepMembers(
-        [...baseTokenization.tail.searchSpace.inputSequence, [{sample: { insert: '.', deleteLeft: 0 }, p: 1}]],
-        tokenization.tokens[tokenization.tokens.length - 1].searchSpace.inputSequence
-      );
+      assert.equal(tail.searchSpace.inputCount, 1);
+      // base tokenization did not include the '.' component.
+      assert.deepEqual((preTail.searchSpace as SearchPath).lastInput, (baseTokenization.tail.searchSpace as SearchPath).lastInput);
+      assert.deepEqual((tail.searchSpace as SearchPath).lastInput, [{sample: inputTransformMap.get(1), p: 1}]);
+      assert.equal(prepreTail.exampleInput, 'can');
+      assert.equal(preTail.exampleInput, '\'');
+      assert.equal(tail.exampleInput, '.');
+      assert.deepEqual({
+        text: prepreTail.searchSpace.bestExample.text + preTail.searchSpace.bestExample.text,
+        p: prepreTail.searchSpace.bestExample.p * preTail.searchSpace.bestExample.p
+      }, baseTokenization.tail.searchSpace.bestExample);
     });
   });
 
