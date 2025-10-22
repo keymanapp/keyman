@@ -77,7 +77,7 @@ ldml_processor::ldml_processor(std::u16string const& kb_name, const std::vector<
           assert(false);
           return;
         }
-        str = kplus.strs->get(keyEntry->to);
+        str = kplus.strsHelper.get(keyEntry->to);
       } else {
         str = keyEntry->get_to_string();
       }

@@ -23,7 +23,7 @@ export function build_sect(version: KMXPlusVersion): BUILDER_SECT {
   return {
     header: {
       // v19+ uses ident "sec2" to indicate that we have a `version` header field
-      ident: constants.hex_section_id(version == KMXPlusVersion.Version17 ? constants.section.sect : constants.section_sec2),
+      ident: constants.hex_section_id(version == KMXPlusVersion.Version17 ? constants.section.sect : constants.sectionname_sec2),
       size: 0, // finalized later
       version,
     },

@@ -180,7 +180,7 @@ element_list::match_end(const std::u32string &str) const {
 bool
 element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
   KMX_DWORD elementsLength;
-  auto elements = kplus.elem->getElementList(id, elementsLength); // pointer to beginning of element list
+  auto elements = kplus.elemHelper.getElementList(id, elementsLength); // pointer to beginning of element list
   assert((elementsLength == 0) || (elements != nullptr)); // it could be a 0-length list
   for (size_t i = 0; i<elementsLength; i++) {
     auto e = elements[i];
@@ -490,15 +490,15 @@ transform_entry::transform_entry(
     assert(fromVar->type == LDML_VARS_ENTRY_TYPE_SET);
     assert(toVar->type   == LDML_VARS_ENTRY_TYPE_SET);
     KMX_DWORD fromLength, toLength;
-    auto *fromList = kplus.elem->getElementList(fromVar->elem, fromLength);
-    auto *toList   = kplus.elem->getElementList(toVar->elem, toLength);
+    auto *fromList = kplus.elemHelper.getElementList(fromVar->elem, fromLength);
+    auto *toList   = kplus.elemHelper.getElementList(toVar->elem, toLength);
     assert(fromLength == toLength);
     assert(fromList != nullptr);
     assert(toList   != nullptr);
 
     // populate the deques from the lists
-    fMapFromList = fromList->loadAsStringList(fromLength, *(kplus.strs));
-    fMapToList   = toList->loadAsStringList(toLength, *(kplus.strs));
+    fMapFromList = fromList->loadAsStringList(fromLength, kplus.strsHelper);
+    fMapToList   = toList->loadAsStringList(toLength, kplus.strsHelper);
     // did we get the expected items?
     assert(fMapFromList.size() == fromLength);
     assert(fMapToList.size()   == toLength);
@@ -743,8 +743,8 @@ transforms::load(
 
       for (KMX_DWORD itemNumber = 0; itemNumber < group->count; itemNumber++) {
         const kmx::COMP_KMXPLUS_TRAN_TRANSFORM *element = tranHelper.getTransform(group->index + itemNumber);
-        const std::u32string fromStr                    = kmx::u16string_to_u32string(kplus.strs->get(element->from));
-        const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
+        const std::u32string fromStr                    = kmx::u16string_to_u32string(kplus.strsHelper.get(element->from));
+        const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strsHelper.get(element->to));
         KMX_DWORD mapFrom                               = element->mapFrom; // copy, because of alignment
         KMX_DWORD mapTo                                 = element->mapTo;   // copy, because of alignment
         assert(!fromStr.empty());
