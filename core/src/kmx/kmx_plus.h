@@ -101,16 +101,16 @@ public:
    * @param size
    * @return KMX_DWORD
    */
-  inline KMX_DWORD calculateBaseSize(KMX_DWORD size) {
-    return size - LDML_LENGTH_HEADER_17 + this->_headerSize;
+  inline KMX_DWORD calculateBaseSize(KMX_DWORD elementSize) {
+    return elementSize - LDML_LENGTH_HEADER_17 + this->_headerSize;
   }
 
-  inline void set(KMX_DWORD fileVersion, KMXPLUS_IDENT ident, KMX_DWORD size, KMX_DWORD version = LDML_KMXPLUS_VERSION_17) {
+  inline void set(KMX_DWORD fileVersion, KMXPLUS_IDENT identIn, KMX_DWORD sizeIn, KMX_DWORD versionIn = LDML_KMXPLUS_VERSION_17) {
     this->_fileVersion = fileVersion;
     this->_headerSize = fileVersion == LDML_KMXPLUS_VERSION_17 ? LDML_LENGTH_HEADER_17 : LDML_LENGTH_HEADER_19;
-    this->ident = ident;
-    this->size = size;
-    this->version = version;
+    this->ident = identIn;
+    this->size = sizeIn;
+    this->version = versionIn;
   }
 };
 
@@ -136,6 +136,7 @@ protected:
 public:
   COMP_KMXPLUS_HEADER header;
   COMP_KMXPLUS_Section_Helper() : _data(nullptr) {}
+  virtual ~COMP_KMXPLUS_Section_Helper() {}
   virtual bool set(const T* section) {
     _data = section;
     return true;
