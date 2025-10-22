@@ -39,9 +39,13 @@ RUN <<EOF cat >> /usr/bin/bashwrapper
 uid=\$(stat -c "%u" /home/build/build)
 gid=\$(stat -c "%g" /home/build/build)
 
-if [[ "\${uid}" != "\$(id -u)" || "\${gid}" != "\$(id -g)" ]]; then
-  echo "Adjusting build directory ownership to uid/gid \$(id -un):\$(id -gn)"
-  sudo chown -R build:build /home/build/build
+if [[ -v CHANGE_PERMISSIONS ]]; then
+  uid=\$(stat -c "%u" /home/build/build)
+  gid=\$(stat -c "%g" /home/build/build)
+  if [[ "\${uid}" != "\$(id -u)" || "\${gid}" != "\$(id -g)" ]]; then
+    echo "Adjusting build directory ownership to uid/gid \$(id -un):\$(id -gn)"
+    sudo chown -R build:build /home/build/build
+  fi
 fi
 
 if [[ "\$@" =~ test ]] && [ -f /usr/bin/run-tests.sh ]; then
@@ -50,9 +54,11 @@ else
   "\${@:-bash}"
 fi
 
-if [[ "\${uid}" != "\$(id -u)" || "\${gid}" != "\$(id -g)" ]]; then
-  echo "Reverting build directory ownership to uid/gid \${uid}:\${gid}"
-  sudo chown -R \${uid}:\${gid} /home/build/build
+if [[ -v CHANGE_PERMISSIONS ]]; then
+  if [[ "\${uid}" != "\$(id -u)" || "\${gid}" != "\$(id -g)" ]]; then
+    echo "Reverting build directory ownership to uid/gid \${uid}:\${gid}"
+    sudo chown -R \${uid}:\${gid} /home/build/build
+  fi
 fi
 EOF
 
