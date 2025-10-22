@@ -54,9 +54,9 @@ describe('Keyboard compiler features', function() {
   }
 
   [
-    {s:'VERSION_60',  t:undefined, e:KMX.KMXFile.VERSION_60},
-    {s:'VERSION_170', t:17,        e:KMX.KMXFile.VERSION_170},
-    {s:'VERSION_190', t:19,        e:KMX.KMXFile.VERSION_190},
+    {s:'VERSION_60',  t:undefined,               e:KMX.KMXFile.VERSION_60},
+    {s:'VERSION_170', t:KMX.KMXFile.VERSION_170, e:KMX.KMXFile.VERSION_170},
+    {s:'VERSION_190', t:KMX.KMXFile.VERSION_190, e:KMX.KMXFile.VERSION_190},
   ].forEach(function(v) {
     it(`should build a minimum version keyboard to ${v.s} with targetVersion=${v.t}`, async function() {
         const compiler = new KmnCompiler();
