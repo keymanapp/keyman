@@ -10,8 +10,8 @@
     },
   "include": [
       "**/*.tests.ts",
-      "./kmw/_imported_constants.js",
-      "./kmw/_imported_specialCharacters.ts",
+      "./kmw/_imported_layoutbuilder_constants.js",
+      "./kmw/_imported_web_osk_specialCharacters.ts",
       "./helpers/index.ts",
       "./kmw/util.ts"
   ],

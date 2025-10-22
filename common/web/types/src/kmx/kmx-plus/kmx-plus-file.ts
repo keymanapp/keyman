@@ -1,7 +1,17 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by mcdurdin on 2025-10-08
+ */
 import * as KMX from '../kmx.js';
 import * as r from 'restructure';
 import KMXFile = KMX.KMXFile;
 
+/**
+ * Binary representation of KMX+ data, using Restructure. These structures
+ * should be directly used only by KMX+ file readers and writers; in general,
+ * most things should use the in-memory `KMXPlusData` structures in kmx-plus.ts.
+ */
 export class KMXPlusFileFormat extends KMXFile {
 
   /* KMXPlus file structures */
