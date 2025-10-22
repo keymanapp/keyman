@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KeymanDeveloperProject>
-  <Options>
-    <BuildPath></BuildPath>
-    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
-    <WarnDeprecatedCode>True</WarnDeprecatedCode>
-  </Options>
+  <Options/>
   <Files>
     <File>
       <ID>id_c1593d698cb624690005787147089dab</ID>
@@ -14,6 +10,7 @@
       <FileType>.kmn</FileType>
       <Details>
         <Name>PlatformTest</Name>
+        <Copyright>© SIL Global</Copyright>
       </Details>
     </File>
     <File>
@@ -28,8 +25,8 @@
     </File>
     <File>
       <ID>id_61f04814d427ce02953436f3ea7d7a65</ID>
-      <Filename>PlatformTest.kmx</Filename>
-      <Filepath>PlatformTest.kmx</Filepath>
+      <Filename>platformtest.kmx</Filename>
+      <Filepath>platformtest.kmx</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kmx</FileType>
       <ParentFileID>id_18e336f9ad890bf821ff56e1a7764478</ParentFileID>
