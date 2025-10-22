@@ -10,7 +10,6 @@ if "%1"=="x86" goto build
 if "%1"=="x64" goto build
 if "%1"=="ARM64" goto build
 
-
 echo "Invalid parameter."
 goto help
 
@@ -38,7 +37,6 @@ cd %KEYMAN_ROOT%\core
 cmd /c build.bat x64 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
 
 cd %KEYMAN_ROOT%\core
-echo cmd /c build.bat ARM64 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
 cmd /c build.bat ARM64 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
 
 goto :eof
