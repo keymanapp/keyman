@@ -13,6 +13,7 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
+import TransformUtils from '#./transformUtils.js';
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
@@ -136,9 +137,15 @@ export class SearchNode {
    */
   readonly spaceId: number;
 
+  /**
+   * Notes if the most recent edit processed in the node's represented search path
+   * was not a deletion.  Root nodes are considered to meet this condition.
+   */
+  readonly nonDeletion: boolean;
+
   constructor(rootTraversal: LexiconTraversal, spaceId: number, toKey?: (arg0: string) => string);
-  constructor(node: SearchNode, spaceId?: number);
-  constructor(param1: LexiconTraversal | SearchNode, spaceId?: number, toKey?: ((arg0: string) => string)) {
+  constructor(node: SearchNode, spaceId?: number, isSubstitution?: boolean);
+  constructor(param1: LexiconTraversal | SearchNode, spaceId?: number, param2?: boolean | ((arg0: string) => string)) {
     if(param1 instanceof SearchNode) {
       const priorNode = param1;
 
@@ -148,6 +155,8 @@ export class SearchNode {
       }
       this.priorInput = priorNode.priorInput.slice(0);
       this.matchedTraversals = priorNode.matchedTraversals.slice();
+
+      this.nonDeletion = param2 as boolean;
 
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
@@ -160,8 +169,10 @@ export class SearchNode {
       this.calculation = new ClassicalDistanceCalculation();
       this.matchedTraversals = [param1];
       this.priorInput = [];
+      const toKey = param2 as ((arg0: string) => string);
       this.toKey = toKey || (x => x);
       this.spaceId = spaceId;
+      this.nonDeletion = true;
     }
   }
 
@@ -250,12 +261,28 @@ export class SearchNode {
       throw new Error("Invalid state:  will not take new input while still processing Transform subset");
     }
 
+    // Do not create insertion nodes after an empty transform; only before.
+    // "Before" and "after" are identical for empty transforms - why duplicate?
+    //
+    // Also, do not create insertion nodes directly after deletions; that's
+    // essentially a substitution.  We'll have an equivalent edge already built
+    // with higher-accuracy modeling.
+    //
+    // Following previous insertions is fine, as is following a proper
+    // match/substitution.
+    if(this.priorInput.length > 0) {
+      const priorInput = this.priorInput[this.priorInput.length - 1].sample;
+      if(TransformUtils.isEmpty(priorInput) || !this.nonDeletion) {
+        return [];
+      }
+    }
+
     let edges: SearchNode[] = [];
 
     for(let lexicalChild of this.currentTraversal.children()) {
       let childCalc = this.calculation.addMatchChar(lexicalChild.char);
 
-      let searchChild = new SearchNode(this);
+      let searchChild = new SearchNode(this, this.spaceId, true);
       searchChild.calculation = childCalc;
       searchChild.priorInput = this.priorInput;
       searchChild.matchedTraversals.push(lexicalChild.traversal());
@@ -367,7 +394,7 @@ export class SearchNode {
 
       keySet.add(char);
 
-      const node = new SearchNode(this);
+      const node = new SearchNode(this, this.spaceId, this.nonDeletion);
       node.calculation = calculation;
       node.partialEdge.subsetSubindex++;
       // Append the newly-processed char to the subset's `insert` string.
@@ -415,7 +442,7 @@ export class SearchNode {
       // `insert` string.
       childSubset.insert += SENTINEL_CODE_UNIT;
 
-      const node = new SearchNode(this);
+      const node = new SearchNode(this, this.spaceId, this.nonDeletion);
       node.calculation = childCalc;
       node.matchedTraversals.push(childTraversal);
       node.partialEdge.subsetSubindex++;
@@ -464,7 +491,7 @@ export class SearchNode {
           continue;
         }
 
-        const node = new SearchNode(this, edgeId);
+        const node = new SearchNode(this, edgeId, isSubstitution);
         node.calculation = edgeCalc;
         node.partialEdge = {
           doSubsetMatching: isSubstitution,
@@ -512,31 +539,6 @@ export class SearchNode {
     // 'deletion' step. Explicit substitution / match-oriented processing is
     // required.
     return this.setupSubsetProcessing(dist, true, edgeId);
-  }
-
-  /**
-   * A key uniquely identifying identical search path nodes.  Replacement of a keystroke's
-   * text in a manner that results in identical path to a different keystroke should result
-   * in both path nodes sharing the same pathKey value.
-   *
-   * This mostly matters after re-use of a SearchSpace when a token is extended; children of
-   * completed paths are possible, and so children can be re-built in such a case.
-   */
-  get pathKey(): string {
-    // Note:  deleteLefts apply before inserts, so order them that way.
-    let inputString = this.priorInput.map((value) => '-' + value.sample.deleteLeft + '+' + value.sample.insert).join('');
-    const partialEdge = this.partialEdge;
-    // Make sure the subset progress contributes to the key!
-    if(partialEdge) {
-      const subset = partialEdge.transformSubset;
-      // We need a copy of at least one insert string in the subset here.  Without that, all subsets
-      // at the same level of the search, against the same match, look identical - not cool!
-      inputString += `-${subset.entries[0].sample.deleteLeft}+<${subset.key},${partialEdge.subsetSubindex},${subset.entries[0].sample.insert}>`;
-    }
-    let matchString =  this.calculation.matchSequence.join('');
-
-    // TODO:  might should also track diagonalWidth.
-    return inputString + ' @@ ' + matchString;
   }
 
   /**
