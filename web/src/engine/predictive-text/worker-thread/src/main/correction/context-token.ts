@@ -289,6 +289,11 @@ export class ContextToken {
     // Assumption:  if we're splitting a token, it's not whitespace - and
     // neither are the spun-off tokens.  Thus, we don't set the .isWhitespace
     // flag field.
+    //
+    // Proper splitting with multi-tokenization:  may yield multiple variants of
+    // the requested token count, all of which could be seen as valid.
+    //
+    // Depends on how the SearchSpace splits.
     throw new Error("Temporarily unimplemented");
     // const tokensFromSplit: ContextToken[] = [];
 

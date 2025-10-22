@@ -544,6 +544,9 @@ export class ContextTokenization {
       if(splits[0]?.input.index == i) {
         // do a split!
         const split = splits.shift();
+        // Proper splitting with multi-tokenization:  may yield multiple
+        // variants of the requested token count, all of which could be seen as
+        // valid.
         const splitResults = baseTokenization[i].split(split, lexicalModel);
         const resultStack = splitResults.reverse();
         while(resultStack.length > 0) {

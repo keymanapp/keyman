@@ -173,4 +173,188 @@ export class SearchCluster implements SearchSpace {
   public stopTrackingResults() {
     delete this.completedPaths;
   }
+
+  public get codepointLength(): number {
+    return this.parents?.[0].codepointLength ?? 0;
+  }
+
+  // public merge(space: SearchSpace): SearchSpace {
+  //   // just... iterate through entries to construct an extended version of THIS
+  //   // search-space.
+  //   // - though... we aren't actually set up to... DO that, are we?
+  //   //   - ... .inputs?  That might actually work!
+  //   // - issue:  merging previously split inputs / input paths.  How to identify those?
+  //   //   - ** wait:  they share the same transform ID on both sides! **
+  //   //   - alternative thought:  could demark a source path spaceID on split-off paths?
+  //   //     - or... maybe just a 'split ID'?
+  //   //     - so... that's enough, right?  For our purposes?
+  //   //     - but split + split again are not technically impossible...
+  //   //     - and even then, isn't that actually overcomplicating things?
+  //   //
+  //   // Needs a new spaceID, of course - at each appended step, to be clear.
+  //   //
+  //   //
+  //   // spaceID => SearchSpace, it would seem.  Just have the token use the ID
+  //   // from SearchSpace / SearchEdge... wait.  SearchEdges with same ID... that's
+  //   // only really available from SearchSpace.  May need to brainstorm that a bit.
+  //   // - current design WAS to do the combination on the State level.
+  //   // ... what if SearchSpace re-maps the search path stateIDs to a combined stateID
+  //   // that it emits?  Then we don't need to worry about micromanaging search path
+  //   // IDs given how they'll be constructed.
+  // }
+
+  public split(charIndex: number, model: LexicalModel): [SearchSpace, SearchSpace][] {
+    return this._split(charIndex, model, new Map());
+  }
+
+  // splitCache:
+  // - key:  id of original search path being split
+  // - value's index:  the number of preserved codepoints
+  // - value's instance at the index:  the spun-off search space
+  private _split(
+    charIndex: number,
+    model: LexicalModel,
+    splitCache: Map<number, {head: SearchCluster, tail: SearchCluster} []>
+  ): [SearchCluster, SearchCluster][] {
+    if(this.codepointLength == charIndex) {
+      console.log('a');
+      // If we're splitting at the tail end of an existing space, just re-use
+      // the space and pass along an empty one for the end.
+      return [[this, new SearchCluster(model)]];
+    }
+
+    // Ensure common split-ancestors still resolve to the same entity.
+    const componentPaths = this.selectionQueue.toArray();
+    let baseResultSet: [SearchCluster, SearchCluster][] = [];
+
+    const deduplicateSplitResults = (results: [SearchCluster, SearchCluster][]) => {
+      // Re-merge paths that converge to the same point.
+      const duplicateMap: Map<number, [SearchCluster, SearchCluster][]> = new Map();
+      results.forEach(result => {
+        const headSpaceId = result[0].spaceId;
+        const arr: [SearchCluster, SearchCluster][] = duplicateMap.get(headSpaceId) ?? [];
+        arr.push(result);
+        duplicateMap.set(result[0].spaceId, arr);
+      });
+
+      const finalResults: [SearchCluster, SearchCluster][] = [];
+      for(const splits of duplicateMap.values()) {
+        const headSpace = splits[0][0];
+
+        // const uniqueTailSpaces = [...splits.reduce((set, curr) => {
+        //   if(!set.has(curr[1].spaceId)) {
+        //     set.set(curr[1].spaceId, curr[1]);
+        //   } else {
+        //     console.log('z');
+        //   }
+
+        //   return set;
+        // }, new Map<number, SearchSpace>()).values()];
+
+        const paths = splits.flatMap(split => split[1].selectionQueue.toArray());
+        const tailSpace = new SearchCluster(paths);
+        // const resultPaths: [SearchSpace, SearchSpace][] = uniqueTailSpaces.map((tailSpace) => ([headSpace, tailSpace]));
+
+        // resultPaths.forEach(entry => finalResults.push(entry));
+        finalResults.push([headSpace, tailSpace]);
+      }
+
+      return finalResults;
+    }
+
+    const pathFiltering = componentPaths.reduce((filtering, path) => {
+      if(path.codepointLength - path.edgeLength > charIndex) {
+        filtering.inParent.push(path);
+      } else {
+        filtering.inCurrent.push(path);
+      }
+
+      return filtering;
+    }, { inParent: [] as SearchPath[], inCurrent: [] as SearchPath[]})
+
+    // should filter all that meet the condition (and those that don't)
+    if(pathFiltering.inParent.length > 0) {
+      const parentResults = pathFiltering.inParent.flatMap((path) => {
+        console.log(`b - ${path.bestExample.text}`);
+        // TODO:  resolve!
+        const results = (path.parents[0] as SearchCluster)._split(charIndex, model, splitCache);
+
+        return results.map((results) => {
+          const tailSpace = new SearchCluster([results[1].addInput([...path.inputs], path.bestProbInEdge)]);
+          results[1] = tailSpace;
+          return results;
+        });
+      });
+
+      baseResultSet = parentResults;
+    }
+
+    // Re: space IDs - we can't reuse data for anything we're reconstructing
+    // after the split point. Original space IDs on the left-hand side may
+    // remain unaltered, but right-hand needs to be re-built from scratch, in
+    // new SearchPaths / SearchSpaces.
+    //
+    // We can optimize how many new spaces/paths we create for the right-hand
+    // side, though:  each starting the same count in, at the same input-offset
+    // position, should be safe to amalgamate.
+    const pathResults: [SearchCluster, SearchCluster][] = pathFiltering.inCurrent.map((path) => {
+      const parentSpace = path.parents[0] ?? new SearchCluster(model);
+      const pathStartIndex = path.codepointLength - path.edgeLength;
+      if(path.codepointLength - path.edgeLength == charIndex) {
+        console.log(`c - ${path.bestExample.text}`);
+        // yay, great case!  Splits cleanly on the boundary BEFORE this path, at
+        // its start.
+        //
+        // parentSpace is thus the END of the prior token.
+        // Start a new one with the current Path.
+        // return [parentSpace, new SearchSpace(/* new spaceId */, path /* reconstructed, now space ID */)];
+        const newPath = new SearchCluster(model).addInput([...path.inputs], path.bestProbInEdge);
+        return [
+          parentSpace instanceof SearchPath ? new SearchCluster([parentSpace]) : parentSpace,
+          new SearchCluster([newPath])
+        ] as [SearchCluster, SearchCluster];
+      } else {
+        console.log(`d - ${path.bestExample.text}`);
+        // OK, so we need to actually split this path in twain.
+        const pathCharIndex = charIndex - pathStartIndex;
+        const results = path.split(pathCharIndex, model);
+        console.log(`pathId: ${path.spaceId} - ${splitCache.has(path.spaceId) ? 'found' : 'not found'}`);
+
+        const pathSplitCacheArray = splitCache.get(path.spaceId) ?? [];
+        splitCache.set(path.spaceId, pathSplitCacheArray);
+
+        const newHeadSpace = pathSplitCacheArray[pathCharIndex]?.head ?? new SearchCluster([new SearchPath(parentSpace, [...results[0].inputs], path.bestProbInEdge)]);
+        const newTailSpace = pathSplitCacheArray[pathCharIndex]?.tail ?? new SearchCluster([new SearchCluster(model).addInput([...results[1].inputs], path.bestProbInEdge)]);
+
+        pathSplitCacheArray[pathCharIndex] = {
+          head: newHeadSpace,
+          tail: newTailSpace
+        }
+        return [newHeadSpace, newTailSpace];
+      }
+    });
+
+    baseResultSet = pathResults.concat(baseResultSet);
+
+    // From pathResults:
+    // - LHS deduplicate:  if same spaceIDs appear on left-hand side, they're the same space;
+    //   we likely split at the same pointt
+    // - RHS:  check search depth + offset position
+    //   - order by input set likelihood
+    //   - replace other path variants with that
+    //
+    // Finally, deduplicate the tuples as much as possible.
+    // ... wait.  Why do we have multiplicity in the paths?  We need to be able to reduce things
+    // down to just 1 + 1 split token, not multiple in each position.
+    //
+    // ... first stop:  we could just... take the most likely case and ignore the others?
+    // ... in which case, why evaluate ALL paths?
+    // - b/c LHS matches could show up multiple times?
+    //
+    // Can we mitigate these cases with improved output from the wordbreaker(s) - say,
+    // about "ambiguous wordbreak" scenarios?
+
+    console.log(`result count: ${baseResultSet.length}; results ${JSON.stringify(baseResultSet.map(r => ([r[0].bestExample.text, r[1].bestExample.text])))}`);
+    return deduplicateSplitResults(baseResultSet);
+  }
 }
