@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { ElementString } from './element-string.js';
 import { ListItem } from '../../ldml-keyboard/string-list.js';
@@ -611,6 +614,10 @@ export class List extends Section {
 
 export { ListItem as ListItem };
 
+/**
+ * In-memory representation of KMX+ data. See also `KMXPlusFileFormat` and
+ * `KMXPlusFile`.
+ */
 export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
@@ -626,7 +633,6 @@ export interface KMXPlusData {
     uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
 };
-
 
 export class KMXPlusFile extends KMXPlusFileFormat {
   /* File in-memory data */
