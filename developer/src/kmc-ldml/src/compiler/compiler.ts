@@ -27,7 +27,7 @@ import { StrsCompiler, ElemCompiler, ListCompiler, UsetCompiler } from './empty-
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import DependencySections = KMXPlus.DependencySections;
-import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
+import { KMXPlusVersion, SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
@@ -127,6 +127,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    */
   async run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult> {
 
+    this.options.version = this.options.version ?? KMXPlusVersion.Version17;
+
     const compilerOptions: LdmlCompilerOptions = {
       ...defaultCompilerOptions,
       ...this.options,
@@ -165,7 +167,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       });
     }
 
-    const kmxBinary = kmxBuilder.compile();
+    const kmxBinary = kmxBuilder.compile(this.options.version);
 
     const kvkWriter = new KvkFileWriter();
     const kvkBinary = vkData ? kvkWriter.write(vkData) : null;
@@ -357,10 +359,14 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns          KMXPlusFile intermediate file
    */
   public async compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile> {
+    // TODO-EMBED-OSK-IN-KMX: add a unitTestEndpoints prop and make this private
+    // unit tests may not have set a version number; so do it again here
+    this.options.version = this.options.version ?? KMXPlusVersion.Version17;
+
     const sections = this.buildSections(source);
     let passed = true;
 
-    const kmx = new KMXPlusFile();
+    const kmx = new KMXPlusFile(this.options.version);
 
     for (const section of sections) {
       if (!section.validate()) {
