@@ -7,9 +7,11 @@
 **/obj/Win32/
 **/obj/Win64/
 **/obj/x64/
+**/obj/arm64/
 **/bin/Win32/
 **/bin/Win64/
 **/bin/x64/
+**/bin/arm64/
 
 # Temporary build files for VC++
 **/*.FileListAbsolute.txt

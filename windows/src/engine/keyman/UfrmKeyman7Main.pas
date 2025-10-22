@@ -1326,7 +1326,7 @@ begin
   else
     kmint.KeymanEngineControl.RestartEngine; // I1486
 
-  //StartKeymanHPX64;
+  StartKeymanHPX64;
   StartKeymanHPARM64
 
 end;
@@ -2000,8 +2000,8 @@ var
   cmd, dir, params: string;
   sei: TShellExecuteInfoW;
 begin
-    // This will actually need to be replaced with the new of IsWow64Process2
-  //if not IsWow64 then Exit;   // I4374
+
+  if not IsNativeMachineWowArm64 then Exit;
 
   try
     // TODO: use TKeymanPaths to find keymanx64?

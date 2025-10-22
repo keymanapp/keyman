@@ -242,9 +242,11 @@
         <!-- we will register post-install? -->
       </Component>
 
-      <Component Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}">
-        <Condition>VersionNT64 AND NOT (ProcessorArchitecture="AMD64")</Condition>
-        <File Id="kmtiparm64.dll" Name="kmtiparm64.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtiparm64.dll" />
+      <Component Id="kmtiparm64.dll" Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}" SharedDllRefCount="yes" Win64="yes">
+        <Condition>VersionNT64 AND ProcessorArchitecture="ARM64"</Condition>
+        <File Id="kmtiparm64.dll" Name="kmtiparm64.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtiparm64.dll">
+          <Class Id="FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7" Context="InprocServer32" ThreadingModel="apartment" Description="Keyman Engine Text Service ARM64" />
+        </File>
       </Component>
 
       <Component Id="etw" Guid="{2AA8D519-C9B7-4995-9496-D87DD2EF2B7D}">
