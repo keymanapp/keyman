@@ -23,10 +23,10 @@ import { fileURLToPath } from 'node:url';
 import 'mocha';
 import {assert} from 'chai';
 
-import keymanWebSpecialCharacters from "./_imported_specialCharacters.js";
+import keymanWebSpecialCharacters from "./_imported_web_osk_specialCharacters.js";
 import { CSpecialText17, CSpecialText14, CSpecialText10, CSpecialText17ZWNJ } from "../../src/kmw-compiler/constants.js";
-import { builder } from "./_imported_constants.js";
-import { constants as coreConstants } from "@keymanapp/ldml-keyboard-constants";
+import { builder } from "./_imported_layoutbuilder_constants.js";
+import { constants as coreLdmlConstants } from "@keymanapp/ldml-keyboard-constants";
 
 /** Verify key cap constants across 4 modules: KMW treated as primary */
 describe('Key cap special text values from KeymanWeb', function() {
@@ -102,11 +102,11 @@ describe('Key cap special text values from KeymanWeb', function() {
     }
 
     // 3. We only want to compare the dis2_key_cap_ values from the
-    //    coreConstants object
+    //    coreLdmlConstants object
     const coreConstantsFiltered: any = {};
-    for(const key of Object.keys(coreConstants)) {
+    for(const key of Object.keys(coreLdmlConstants)) {
       if(key.match(/^dis2_key_cap_/)) {
-        coreConstantsFiltered[key] = (<any>coreConstants)[key];
+        coreConstantsFiltered[key] = (<any>coreLdmlConstants)[key];
       }
     }
 
@@ -119,16 +119,16 @@ describe('Key cap special text values from KeymanWeb', function() {
     //   web/src/engine/osk/src/specialCharacters.ts
     const helpFile =
       path.join(path.dirname(fileURLToPath(import.meta.url)), '../../../../../docs/help/reference/file-types/keyman-touch-layout.md');
-    const lines = fs.readFileSync(helpFile, 'utf-8').replaceAll(/\r\n/g, '\n').split('\n');
+    const helpLines = fs.readFileSync(helpFile, 'utf-8').replaceAll(/\r\n/g, '\n').split('\n');
 
     // Find the relevant section in the file between start:special_key_caps and
     // end:special_key_caps
-    const line0 = lines.findIndex(line => line.includes('start:special_key_caps'));
+    const line0 = helpLines.findIndex(line => line.includes('start:special_key_caps'));
     assert.notEqual(line0, -1);
-    const line1 = lines.findIndex(line => line.includes('end:special_key_caps'));
+    const line1 = helpLines.findIndex(line => line.includes('end:special_key_caps'));
     assert.notEqual(line1, -1);
 
-    const content = lines.slice(line0+1, line1);
+    const content = helpLines.slice(line0+1, line1);
 
     const markdownConstants: any = {};
 
