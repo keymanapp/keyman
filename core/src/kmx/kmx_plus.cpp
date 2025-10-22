@@ -341,24 +341,92 @@ const U* get_file_data_at_offset(const COMP_KMXPLUS_SECT *base, COMP_KMXPLUS_HEA
 /**
  * @brief Get the section data at offset, casting to desired type
  *
- * @tparam T
- * @tparam U
- * @param base    start of the section data, i.e. immedaitely after section header
+ * @tparam T      struct type of the section
+ * @tparam U      struct type of data to return
+ * @param base    start of the section data, i.e. immediately after section
+ *                header
  * @param header  header data for the section
  * @param offset  offset in bytes from the start of the section data
  * @param size    size of the data to return, for validation
- * @return U
+ * @return        pointer to data, type U
  */
 template<class T, typename U>
-U get_section_data_at_offset(const T *base, COMP_KMXPLUS_HEADER const &header, KMX_DWORD offset, KMX_DWORD size) {
+const U* get_section_data_at_offset(const T *base, COMP_KMXPLUS_HEADER const &header, KMX_DWORD offset, KMX_DWORD size) {
   if(!is_block_valid(header, offset, size)) {
     return nullptr;
   }
 
   offset -= header.headerSize();
   const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(base);
-  U start = reinterpret_cast<U>(thisptr+offset);
+  const U* start = reinterpret_cast<const U*>(thisptr+offset);
   return start;
+}
+
+/**
+ * @brief Get the section data at offset, casting to desired type, verify that
+ * the section is long enough for count * data, and update the offset to point
+ * to the next byte after the data. Allows zero-length, optional data.
+ *
+ * @tparam T      struct type of the section
+ * @tparam U      struct type of data to return
+ * @param base    start of the section data, i.e. immediately after section
+ *                header
+ * @param header  header data for the section
+ * @param count   number of U items expected
+ * @param offset  (in, out) offset in bytes from the start of the section data,
+ *                updated on return to next byte after data
+ * @param out     (out) pointer to start of data
+ * @return bool   false on error
+ */
+template<class T, typename U>
+bool get_optional_section_data_at_offset_and_increment(const T *base, COMP_KMXPLUS_HEADER const &header,
+  KMX_DWORD count, KMX_DWORD& offset, const U*& out
+) {
+  out = nullptr;
+
+  if(count == 0) {
+    return true;
+  }
+
+  KMX_DWORD size = count * sizeof(U);
+
+  out = get_section_data_at_offset<T, U>(base, header, offset, size);
+
+  if(out == nullptr) {
+    return false;
+  }
+
+  offset += size;
+
+  return true;
+}
+
+/**
+ * @brief Get the section data at offset, casting to desired type, verify that
+ * the section is long enough for count * data, and update the offset to point
+ * to the next byte after the data. Does not allow zero-length, optional data.
+ *
+ * @tparam T      struct type of the section
+ * @tparam U      struct type of data to return
+ * @param base    start of the section data, i.e. immediately after section
+ *                header
+ * @param header  header data for the section
+ * @param count   number of U items expected
+ * @param offset  (in, out) offset in bytes from the start of the section data,
+ *                updated on return to next byte after data
+ * @param out     (out) pointer to start of data
+ * @return bool   false on error or missing data
+ */
+template<class T, typename U>
+bool get_required_section_data_at_offset_and_increment(const T *base, COMP_KMXPLUS_HEADER const &header,
+  KMX_DWORD count, KMX_DWORD& offset, const U*& out
+) {
+  if(count == 0) {
+    out = nullptr;
+    return false;
+  }
+
+  return get_optional_section_data_at_offset_and_increment<T,U>(base, header, count, offset, out);
 }
 
 bool
@@ -429,7 +497,7 @@ COMP_KMXPLUS_META::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unuse
 bool
 COMP_KMXPLUS_DISP::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
   DebugLog("disp: count 0x%X\n", count);
-  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
+  if (!is_block_valid(header, header.headerSize(), sizeof(*this)+(sizeof(entries[0])*count))) {
     DebugLog("header.size < expected size");
     assert(false);
     return false;
@@ -459,7 +527,7 @@ COMP_KMXPLUS_STRS::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unuse
   for (KMX_DWORD i=0; i<count; i++) {
     const KMX_DWORD offset = entries[i].offset;
     const KMX_DWORD length = entries[i].length;
-    const KMX_WCHAR* start = get_section_data_at_offset<COMP_KMXPLUS_STRS, const KMX_WCHAR *>(this, header, offset, length);
+    const KMX_WCHAR* start = get_section_data_at_offset<COMP_KMXPLUS_STRS, KMX_WCHAR>(this, header, offset, (length+1)*sizeof(KMX_WCHAR));
     if(!start) {
       return false;
     }
@@ -655,7 +723,7 @@ COMP_KMXPLUS_ELEM::getElementList(const COMP_KMXPLUS_HEADER &header, KMX_DWORD e
   }
 
   // pointer to specified entry
-  return get_section_data_at_offset<COMP_KMXPLUS_ELEM, const COMP_KMXPLUS_ELEM_ELEMENT *>(this, header, entry.offset,
+  return get_section_data_at_offset<COMP_KMXPLUS_ELEM, COMP_KMXPLUS_ELEM_ELEMENT>(this, header, entry.offset,
     entry.length * sizeof(COMP_KMXPLUS_ELEM_ELEMENT));
 }
 
@@ -739,6 +807,11 @@ COMP_KMXPLUS_TRAN_Helper::getReorder(KMX_DWORD reorder) const {
 
 bool
 COMP_KMXPLUS_TRAN_Helper::set(const COMP_KMXPLUS_TRAN *newTran) {
+  is_valid = false;
+  groups = nullptr;
+  transforms = nullptr;
+  reorders = nullptr;
+
   if(!COMP_KMXPLUS_Section_Helper::set(newTran)) {
     return false;
   }
@@ -752,44 +825,20 @@ COMP_KMXPLUS_TRAN_Helper::set(const COMP_KMXPLUS_TRAN *newTran) {
   }
   KMX_DWORD offset = this->header.calculateBaseSize(LDML_LENGTH_TRAN);
 
-  // groups
-  if (data()->groupCount > 0) {
-    groups = get_section_data_at_offset<COMP_KMXPLUS_TRAN, const COMP_KMXPLUS_TRAN_GROUP *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_TRAN_GROUP) * data()->groupCount);
-  } else {
-    groups = nullptr;
-  }
+  // groups (required)
+  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_TRAN, COMP_KMXPLUS_TRAN_GROUP>(
+      data(), header, data()->groupCount, offset, groups);
+  assert(is_valid);
 
-  if(!groups) {
-    is_valid = false;
-    assert(is_valid);
-  }
-  offset += sizeof(COMP_KMXPLUS_TRAN_GROUP) * data()->groupCount;
+  // transforms (optional)
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_TRAN, COMP_KMXPLUS_TRAN_TRANSFORM>(
+      data(), header, data()->transformCount, offset, transforms);
+  assert(is_valid);
 
-  // transforms
-  if (data()->transformCount > 0) {
-    transforms = get_section_data_at_offset<COMP_KMXPLUS_TRAN, const COMP_KMXPLUS_TRAN_TRANSFORM *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_TRAN_TRANSFORM) * data()->transformCount);
-    if(!transforms) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    transforms = nullptr;
-  }
-  offset += sizeof(COMP_KMXPLUS_TRAN_TRANSFORM) * data()->transformCount;
-
-  // reorders
-  if (data()->reorderCount > 0) {
-    reorders = get_section_data_at_offset<COMP_KMXPLUS_TRAN, const COMP_KMXPLUS_TRAN_REORDER *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_TRAN_REORDER) * data()->reorderCount);
-    if(!reorders) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    reorders   = nullptr;
-  }
+  // reorders (optional)
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_TRAN, COMP_KMXPLUS_TRAN_REORDER>(
+      data(), header, data()->reorderCount, offset, reorders);
+  assert(is_valid);
 
   // Now, validate offsets by walking
   if (is_valid) {
@@ -873,7 +922,15 @@ COMP_KMXPLUS_LAYR_Helper::COMP_KMXPLUS_LAYR_Helper() : is_valid(false) {
 
 bool
 COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
-  COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_LAYR>::set(newLayr);
+  is_valid = false;
+  lists = nullptr;
+  entries = nullptr;
+  rows = nullptr;
+  keys = nullptr;
+
+  if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_LAYR>::set(newLayr)) {
+    return false;
+  }
   DebugLog("validating newLayr=%p", newLayr);
   is_valid = true;
   if (newLayr == nullptr) {
@@ -882,53 +939,26 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
     return true; // not invalid, just missing
   }
   KMX_DWORD offset = this->header.calculateBaseSize(LDML_LENGTH_LAYR);  // skip past non-dynamic portion
-  // lists
-  if (data()->listCount > 0) {
-    lists = get_section_data_at_offset<COMP_KMXPLUS_LAYR, const COMP_KMXPLUS_LAYR_LIST *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_LAYR_LIST) * data()->listCount);
-  } else {
-    lists    = nullptr;
-  }
-  if(!lists) {
-    is_valid = false;
-    assert(is_valid);
-  }
-  offset += sizeof(COMP_KMXPLUS_LAYR_LIST) * data()->listCount;
-  // entries
-  if (data()->layerCount > 0) {
-    entries = get_section_data_at_offset<COMP_KMXPLUS_LAYR, const COMP_KMXPLUS_LAYR_ENTRY *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_LAYR_ENTRY) * data()->layerCount);
-  } else {
-    entries  = nullptr;
-  }
-  if(!entries) {
-    is_valid = false;
-    assert(is_valid);
-  }
-  offset += sizeof(COMP_KMXPLUS_LAYR_ENTRY) * data()->layerCount;
-  // rows
-  if (data()->rowCount > 0) {
-    rows = get_section_data_at_offset<COMP_KMXPLUS_LAYR, const COMP_KMXPLUS_LAYR_ROW *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_LAYR_ROW) * data()->rowCount);
-  } else {
-    rows     = nullptr;
-  }
-  if(!rows) {
-    is_valid = false;
-    assert(is_valid);
-  }
-  offset += sizeof(COMP_KMXPLUS_LAYR_ROW) * data()->rowCount;
-  // keys
-  if (data()->keyCount > 0) {
-    keys = get_section_data_at_offset<COMP_KMXPLUS_LAYR, const COMP_KMXPLUS_LAYR_KEY *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_LAYR_KEY) * data()->keyCount);
-  } else {
-    keys     = nullptr;
-  }
-  if(!keys) {
-    is_valid = false;
-    assert(is_valid);
-  }
+
+  // lists (required)
+  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_LIST>(
+      data(), header, data()->listCount, offset, lists);
+  assert(is_valid);
+
+  // entries (required) - note, "entryCount" is called "layerCount" in COMP_KMXPLUS_LAYR
+  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_ENTRY>(
+      data(), header, data()->layerCount, offset, entries);
+  assert(is_valid);
+
+  // rows (required)
+  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_ROW>(
+      data(), header, data()->rowCount, offset, rows);
+  assert(is_valid);
+
+  // keys (required)
+  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_KEY>(
+      data(), header, data()->keyCount, offset, keys);
+  assert(is_valid);
 
   // Now, validate offsets by walking
   if (is_valid) {
@@ -1039,7 +1069,15 @@ COMP_KMXPLUS_KEYS_Helper::COMP_KMXPLUS_KEYS_Helper() : is_valid(false) {
 
 bool
 COMP_KMXPLUS_KEYS_Helper::set(const COMP_KMXPLUS_KEYS *newKeys) {
-  COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_KEYS>::set(newKeys);
+  is_valid = false;
+  keys = nullptr;
+  flickLists = nullptr;
+  flickElements = nullptr;
+  kmap = nullptr;
+
+  if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_KEYS>::set(newKeys)) {
+    return false;
+  }
   DebugLog("validating newKeys=%p", newKeys);
   is_valid = true;
   if (newKeys == nullptr) {
@@ -1047,54 +1085,28 @@ COMP_KMXPLUS_KEYS_Helper::set(const COMP_KMXPLUS_KEYS *newKeys) {
     // which validates this section's length. Will be nullptr here if invalid.
     return true; // not invalid, just missing
   }
-  // keys
+
   KMX_DWORD offset = this->header.calculateBaseSize(LDML_LENGTH_KEYS);
-  if (data()->keyCount > 0) {
-    keys = get_section_data_at_offset<COMP_KMXPLUS_KEYS, const COMP_KMXPLUS_KEYS_KEY *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_KEYS_KEY) * data()->keyCount);
-  } else {
-    keys    = nullptr;
-  }
-  if(!keys) {
-    is_valid = false;
-    assert(is_valid);
-  }
-  offset += sizeof(COMP_KMXPLUS_KEYS_KEY) * data()->keyCount;
-  // flicks
-  if (data()->flicksCount > 0) {
-    flickLists = get_section_data_at_offset<COMP_KMXPLUS_KEYS, const COMP_KMXPLUS_KEYS_FLICK_LIST *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_KEYS_FLICK_LIST) * data()->flicksCount);
-    if(!flickLists) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    flickLists  = nullptr; // not an error
-  }
-  offset += sizeof(COMP_KMXPLUS_KEYS_FLICK_LIST) * data()->flicksCount;
-  // flick
-  if (data()->flickCount > 0) {
-    flickElements = get_section_data_at_offset<COMP_KMXPLUS_KEYS, const COMP_KMXPLUS_KEYS_FLICK_ELEMENT *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_KEYS_FLICK_ELEMENT) * data()->flickCount);
-    if(!flickElements) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    flickElements = nullptr; // not an error
-  }
-  offset += sizeof(COMP_KMXPLUS_KEYS_FLICK_ELEMENT) * data()->flickCount;
-  // kmap
-  if (data()->kmapCount > 0) {
-    kmap = get_section_data_at_offset<COMP_KMXPLUS_KEYS, const COMP_KMXPLUS_KEYS_KMAP *>(data(), header, offset,
-      sizeof(COMP_KMXPLUS_KEYS_KMAP) * data()->kmapCount);
-    if(!kmap) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    kmap = nullptr; // not an error
-  }
+
+  // keys (required)
+  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_KEYS, COMP_KMXPLUS_KEYS_KEY>(
+      data(), header, data()->keyCount, offset, keys);
+  assert(is_valid);
+
+  // flicks (optional) - note tricky "flicksCount" vs "flickCount" in COMP_KMXPLUS_KEYS
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_KEYS, COMP_KMXPLUS_KEYS_FLICK_LIST>(
+      data(), header, data()->flicksCount, offset, flickLists);
+  assert(is_valid);
+
+  // flick (optional) - note tricky "flicksCount" vs "flickCount" in COMP_KMXPLUS_KEYS
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_KEYS, COMP_KMXPLUS_KEYS_FLICK_ELEMENT>(
+      data(), header, data()->flickCount, offset, flickElements);
+  assert(is_valid);
+
+  // kmap (optional)
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_KEYS, COMP_KMXPLUS_KEYS_KMAP>(
+      data(), header, data()->kmapCount, offset, kmap);
+  assert(is_valid);
 
   // Now, validate offsets by walking
   if (is_valid) {
@@ -1253,7 +1265,13 @@ COMP_KMXPLUS_LIST_Helper::COMP_KMXPLUS_LIST_Helper() : is_valid(false) {
 
 bool
 COMP_KMXPLUS_LIST_Helper::set(const COMP_KMXPLUS_LIST *newList) {
-  COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_LIST>::set(newList);
+  is_valid = false;
+  lists = nullptr;
+  indices = nullptr;
+
+  if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_LIST>::set(newList)) {
+    return false;
+  }
   DebugLog("validating newList=%p", newList);
   is_valid = true;
   if (newList == nullptr) {
@@ -1263,28 +1281,17 @@ COMP_KMXPLUS_LIST_Helper::set(const COMP_KMXPLUS_LIST *newList) {
   }
 
   KMX_DWORD offset = this->header.calculateBaseSize(LDML_LENGTH_LIST);  // skip past non-dynamic portion
-  // lists
-  if (data()->listCount > 0) {
-    lists = get_section_data_at_offset<COMP_KMXPLUS_LIST, const COMP_KMXPLUS_LIST_ITEM *>(data(), header, offset, sizeof(COMP_KMXPLUS_LIST_ITEM) * data()->listCount);
-    if(!lists) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    lists    = nullptr;
-    // not invalid, just empty.
-  }
-  offset += sizeof(COMP_KMXPLUS_LIST_ITEM) * data()->listCount;
-  // entries
-  if (data()->indexCount > 0) {
-    indices = get_section_data_at_offset<COMP_KMXPLUS_LIST, const COMP_KMXPLUS_LIST_INDEX *>(data(), header, offset, sizeof(COMP_KMXPLUS_LIST_INDEX) * data()->indexCount);
-    if(!indices) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    indices  = nullptr;
-  }
+
+  // lists (optional)
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_LIST, COMP_KMXPLUS_LIST_ITEM>(
+      data(), header, data()->listCount, offset, lists);
+  assert(is_valid);
+
+  // indices (optional)
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_LIST, COMP_KMXPLUS_LIST_INDEX>(
+      data(), header, data()->indexCount, offset, indices);
+  assert(is_valid);
+
   // Now, validate offsets by walking
   if (is_valid) {
     for (KMX_DWORD i = 0; is_valid && i < data()->listCount; i++) {
@@ -1358,7 +1365,13 @@ COMP_KMXPLUS_USET_Helper::COMP_KMXPLUS_USET_Helper() : is_valid(false), usets(nu
 
 bool
 COMP_KMXPLUS_USET_Helper::set(const COMP_KMXPLUS_USET *newUset) {
-  COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_USET>::set(newUset);
+  is_valid = false;
+  usets = nullptr;
+  ranges = nullptr;
+
+  if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_USET>::set(newUset)) {
+    return false;
+  }
   DebugLoad("validating newUset=%p", newUset);
   is_valid = true;
   if (newUset == nullptr) {
@@ -1367,28 +1380,16 @@ COMP_KMXPLUS_USET_Helper::set(const COMP_KMXPLUS_USET *newUset) {
     return true; // not invalid, just missing
   }
   KMX_DWORD offset = this->header.calculateBaseSize(LDML_LENGTH_USET);  // skip past non-dynamic portion
-  // usets
-  if (data()->usetCount > 0) {
-    usets = get_section_data_at_offset<COMP_KMXPLUS_USET, const COMP_KMXPLUS_USET_USET *>(data(), header, offset, sizeof(COMP_KMXPLUS_USET_USET) * data()->usetCount);
-    if(!usets) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    usets = nullptr;
-    // not invalid, just empty.
-  }
-  offset += sizeof(COMP_KMXPLUS_USET_USET) * data()->usetCount;
-  // entries
-  if (data()->rangeCount > 0) {
-    ranges = get_section_data_at_offset<COMP_KMXPLUS_USET, const COMP_KMXPLUS_USET_RANGE *>(data(), header, offset, sizeof(COMP_KMXPLUS_USET_RANGE) * data()->rangeCount);
-    if(!ranges) {
-      is_valid = false;
-      assert(is_valid);
-    }
-  } else {
-    ranges = nullptr;
-  }
+
+  // usets (optional)
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_USET, COMP_KMXPLUS_USET_USET>(
+      data(), header, data()->usetCount, offset, usets);
+  assert(is_valid);
+
+  // ranges (optional)
+  is_valid = is_valid && get_optional_section_data_at_offset_and_increment<COMP_KMXPLUS_USET, COMP_KMXPLUS_USET_RANGE>(
+      data(), header, data()->rangeCount, offset, ranges);
+  assert(is_valid);
 
   // Now, validate offsets by walking
   // is_valid must be true at this point.
@@ -1581,7 +1582,7 @@ COMP_KMXPLUS_STRS::get(const COMP_KMXPLUS_HEADER& header, KMX_DWORD entry) const
     const KMX_DWORD length = entries[entry].length;
 
     // the string is null terminated in the data file, thus length + 1
-    auto start = get_section_data_at_offset<COMP_KMXPLUS_STRS, const KMX_WCHAR *>(this, header, offset, (length + 1) * sizeof(KMX_WCHAR));
+    auto start = get_section_data_at_offset<COMP_KMXPLUS_STRS, KMX_WCHAR>(this, header, offset, (length + 1) * sizeof(KMX_WCHAR));
     if(!start) {
       return std::u16string();
     }
