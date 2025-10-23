@@ -98,7 +98,7 @@ describe('SearchSpace', () => {
 
     const searchSpace = new SearchPath(testModel);
 
-    const iter = getBestMatches(searchSpace, buildTestTimer());
+    const iter = getBestMatches([searchSpace], buildTestTimer());
     const firstResult = await iter.next();
     assert.isFalse(firstResult.done);
   });
@@ -134,7 +134,7 @@ describe('SearchSpace', () => {
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
     assert.notEqual(searchPath3.spaceId, searchPath2.spaceId);
 
-    const iter = getBestMatches(searchPath3, buildTestTimer()); // disables the correction-search timeout.
+    const iter = getBestMatches([searchPath3], buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter);
   });
 
@@ -168,12 +168,12 @@ describe('SearchSpace', () => {
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
     assert.notEqual(searchPath3.spaceId, searchPath2.spaceId);
 
-    const iter = getBestMatches(searchPath3, buildTestTimer()); // disables the correction-search timeout.
+    const iter = getBestMatches([searchPath3], buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter);
 
     // The key: do we get the same results the second time?
     // Reset the iterator first...
-    const iter2 = getBestMatches(searchPath3, buildTestTimer()); // disables the correction-search timeout.
+    const iter2 = getBestMatches([searchPath3], buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter2);
   });
 
@@ -184,7 +184,7 @@ describe('SearchSpace', () => {
 
     const searchSpace = new SearchPath(testModel);
     const timer = buildTestTimer();
-    const iter = getBestMatches(searchSpace, timer);
+    const iter = getBestMatches([searchSpace], timer);
 
     // While there's no input, insertion operations can produce suggestions.
     const resultState = await iter.next();
