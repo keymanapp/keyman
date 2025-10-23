@@ -24,24 +24,24 @@ export function buildSimplePathSplitFixture() {
     { sample: {insert: 'r', deleteLeft: 0, id: 11}, p: 0.4 },
     { sample: {insert: 't', deleteLeft: 0, id: 11}, p: 0.1 }
   ];
-  const path1 = new LegacyQuotientSpur(rootPath, distrib1, distrib1[0].p);
+  const path1 = new LegacyQuotientSpur(rootPath, distrib1, {trueTransform: distrib1[0].sample, inputStartIndex: 0, bestProbFromSet: distrib1[0].p});
 
   const distrib2 = [
     { sample: {insert: 'a', deleteLeft: 0, id: 12}, p: 0.7 },
     { sample: {insert: 'e', deleteLeft: 0, id: 12}, p: 0.3 }
   ];
-  const path2 = new LegacyQuotientSpur(path1, distrib2, distrib2[0].p);
+  const path2 = new LegacyQuotientSpur(path1, distrib2, {trueTransform: distrib2[0].sample, inputStartIndex: 0, bestProbFromSet: distrib2[0].p});
 
   const distrib3 = [
     { sample: {insert: 'n', deleteLeft: 0, id: 13}, p: 0.8 },
     { sample: {insert: 'r', deleteLeft: 0, id: 13}, p: 0.2 }
   ];
-  const path3 = new LegacyQuotientSpur(path2, distrib3, distrib3[0].p);
+  const path3 = new LegacyQuotientSpur(path2, distrib3, {trueTransform: distrib3[0].sample, inputStartIndex: 0, bestProbFromSet: distrib3[0].p});
 
   const distrib4 = [
     { sample: {insert: 't', deleteLeft: 0, id: 14}, p: 1 }
   ];
-  const path4 = new LegacyQuotientSpur(path3, distrib4, distrib4[0].p);
+  const path4 = new LegacyQuotientSpur(path3, distrib4, {trueTransform: distrib4[0].sample, inputStartIndex: 0, bestProbFromSet: distrib4[0].p});
 
   return {
     paths: [rootPath, path1, path2, path3, path4],
@@ -68,7 +68,7 @@ describe('SearchQuotientSpur', () => {
         {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
       ];
 
-      const extendedPath = new LegacyQuotientSpur(rootPath, leadEdgeDistribution, leadEdgeDistribution[0].p);
+      const extendedPath = new LegacyQuotientSpur(rootPath, leadEdgeDistribution, {trueTransform: leadEdgeDistribution[0].sample, inputStartIndex: 0, bestProbFromSet: leadEdgeDistribution[0].p});
 
       assert.equal(extendedPath.inputCount, 1);
       assert.isNumber(extendedPath.spaceId);
@@ -97,7 +97,7 @@ describe('SearchQuotientSpur', () => {
       const length1Path = new LegacyQuotientSpur(
         rootPath,
         leadEdgeDistribution,
-        leadEdgeDistribution[0].p
+        {trueTransform: leadEdgeDistribution[0].sample, inputStartIndex: 0, bestProbFromSet: leadEdgeDistribution[0].p}
       );
 
       const tailEdgeDistribution = [
@@ -109,7 +109,7 @@ describe('SearchQuotientSpur', () => {
       const length2Path = new LegacyQuotientSpur(
         length1Path,
         tailEdgeDistribution,
-        tailEdgeDistribution[0].p
+        {trueTransform: tailEdgeDistribution[0].sample, inputStartIndex: 0, bestProbFromSet: tailEdgeDistribution[0].p}
       );
 
       // Verify that the prior distribution remains fully unaltered.
@@ -143,7 +143,7 @@ describe('SearchQuotientSpur', () => {
       const length1Path = new LegacyQuotientSpur(
         rootPath,
         leadEdgeDistribution,
-        leadEdgeDistribution[0].p
+        {trueTransform: leadEdgeDistribution[0].sample, inputStartIndex: 0, bestProbFromSet: leadEdgeDistribution[0].p}
       );
 
       const tailEdgeDistribution = [
@@ -155,7 +155,7 @@ describe('SearchQuotientSpur', () => {
       const length2Path = new LegacyQuotientSpur(
         length1Path,
         tailEdgeDistribution,
-        tailEdgeDistribution[0].p
+        {trueTransform: tailEdgeDistribution[0].sample, inputStartIndex: 0, bestProbFromSet: tailEdgeDistribution[0].p}
       );
 
       // Verify that the prior distribution remains fully unaltered.
