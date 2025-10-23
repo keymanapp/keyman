@@ -93,6 +93,7 @@ export interface LdmlKeyboardCompilerResult extends KeymanCompilerResult {
 export class LdmlKeyboardCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: LdmlCompilerOptions;
+  private kmxPlusTargetVersion: KMXPlusVersion;
 
   // uset parser
   private usetparser?: LdmlKeyboardTypes.UnicodeSetParser = undefined;
@@ -111,6 +112,14 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     this.reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, callbacks);
     // wrap the callbacks so that the eventresolver is called
     this.callbacks = new ResolvingCompilerCallbacks(this.reader, this.options, callbacks);
+
+    // resolve and check command line parameters
+
+    this.kmxPlusTargetVersion = this.targetVersionToKmxPlusVersion(this.options.targetVersion);
+    if(!this.kmxPlusTargetVersion) {
+      return false;
+    }
+
     return true;
   }
 
@@ -126,8 +135,6 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns         Binary artifacts on success, null on failure.
    */
   async run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult> {
-
-    this.options.version = this.options.version ?? KMXPlusVersion.Version17;
 
     const compilerOptions: LdmlCompilerOptions = {
       ...defaultCompilerOptions,
@@ -167,7 +174,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       });
     }
 
-    const kmxBinary = kmxBuilder.compile(this.options.version);
+    const kmxBinary = kmxBuilder.compile(this.kmxPlusTargetVersion);
 
     const kvkWriter = new KvkFileWriter();
     const kvkBinary = vkData ? kvkWriter.write(vkData) : null;
@@ -360,13 +367,11 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    */
   public async compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile> {
     // TODO-EMBED-OSK-IN-KMX: add a unitTestEndpoints prop and make this private
-    // unit tests may not have set a version number; so do it again here
-    this.options.version = this.options.version ?? KMXPlusVersion.Version17;
 
     const sections = this.buildSections(source);
     let passed = true;
 
-    const kmx = new KMXPlusFile(this.options.version);
+    const kmx = new KMXPlusFile(this.kmxPlusTargetVersion);
 
     for (const section of sections) {
       if (!section.validate()) {
@@ -429,6 +434,21 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     }
 
     return passed ? kmx : null;
+  }
+
+  private targetVersionToKmxPlusVersion(version?: KMX.KMX_Version): KMXPlusVersion {
+    if(version === undefined || version === null) {
+      return KMXPlusVersion.Version17;
+    }
+    if(version === KMX.KMX_Version.VERSION_170) {
+      return KMXPlusVersion.Version17;
+    }
+    if(version === KMX.KMX_Version.VERSION_190) {
+      return KMXPlusVersion.Version19;
+    }
+
+    this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidTargetVersion({ version }));
+    return null;
   }
 }
 

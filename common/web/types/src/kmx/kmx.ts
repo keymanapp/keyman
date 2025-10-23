@@ -27,6 +27,42 @@ export enum KMX_Version {
   VERSION_190 = 0x00001300,
 };
 
+/**
+ * Convert a version string from 6.0 - current Keyman version into a
+ * KMX_Version value. Earlier versions are not supported
+ * @param version
+ * @returns null if not matched, otherwise a valid KMX_Version
+ */
+export function versionStringToKmxVersion(version: string): KMX_Version {
+  // We allow version strings to be 'x.y' or just 'x'
+  if(typeof version !== 'string') {
+    return null;
+  }
+  if(!/^\d+(\.0)?$/.test(version)) {
+    return null;
+  }
+
+  const major = parseInt(version, 10);
+  if(Number.isNaN(major)) {
+    return null;
+  }
+
+  // assuming a reasonable range for Keyman versions for now
+  if(major < 6 || major > 999) {
+    return null;
+  }
+
+  // Version number is 16 bit number with MINOR in lower 8 bits, 
+  // MAJOR in upper 8 bits. In practice, we now only use MAJOR 
+  // version for Keyman versions.
+  const num = major << 8;
+
+  if(Object.values(KMX_Version).includes(num)) {
+    return num;
+  }
+
+  return null;
+}
 
 export class KEYBOARD {
   fileVersion?: number;  // dwFileVersion (TSS_FILEVERSION)
