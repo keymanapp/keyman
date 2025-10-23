@@ -27,21 +27,19 @@ describe('AnalyzerMessages', function () {
     return verifyCompilerMessagesObject(AnalyzerMessages, CompilerErrorNamespace.Analyzer);
   });
 
-  // TODO: test each message
   it('should generate Warn_PreviousMapFileCouldNotBeLoaded when previous map file is missing or invalid', function () {
     const analyzer = new AnalyzeOskCharacterUse(callbacks);
 
-    //const invalidFile = makePathToFixture('projects/invalid-map/does-not-exist.json');
     const invalidFile = 'nonexistent-file.json';
 
-    // internal method; using 'as any' to access
-    (analyzer as any).loadPreviousMap(invalidFile);
+    assert.isNull(
+      analyzer.unitTestEndPoints.loadPreviousMap(invalidFile),
+      'Expected null when map file cannot be loaded'
+    );
 
     assert.isTrue(
       callbacks.hasMessage(AnalyzerMessages.WARN_PreviousMapFileCouldNotBeLoaded),
-      'Expected warning when previous map file could not be loaded'
-    );
+      'Expected warning when previous map file could not be loaded');
   });
-
 });
 
