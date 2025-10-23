@@ -10,10 +10,12 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { applyTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { generateSpaceSeed, PathResult, SearchQuotientNode, TokenInputSource } from './search-quotient-node.js';
 
+import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 
@@ -25,7 +27,8 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export abstract class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  readonly inputs?: Distribution<Readonly<Transform>>;
+  readonly inputs?: Distribution<Transform>;
+  readonly inputSource?: TokenInputSource;
 
   private parentNode: SearchQuotientNode;
   readonly spaceId: number;
@@ -50,18 +53,14 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    * @param baseSpaceId
    * @param model
    */
-  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Readonly<Transform>>, costHeuristic: number) {
+  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Readonly<Transform>>, inputSource?: TokenInputSource) {
     this.spaceId = generateSpaceSeed();
 
     this.parentNode = parentNode;
-    this.lowestPossibleSingleCost = costHeuristic;
+    this.inputSource = inputSource;
+    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSource?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
-
-    // // generate and queue up nodes.
-    // const priorResults = parentNode?.previousResults;
-    // const nodes = this.buildEdgesForNodes(!priorResults ? [] : priorResults.map(r => r.node));
-    // this.selectionQueue.enqueueAll(nodes);
   }
 
   /**
@@ -132,6 +131,23 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
+  }
+
+  get likeliestSourceText(): string {
+    let prefixContext: Context = { left: this.parentNode?.likeliestSourceText ?? '', startOfBuffer: true, endOfBuffer: true };
+    const inputTransform = this.inputSource?.trueTransform ?? { insert: '', deleteLeft: 0 };
+
+    const excessDeletes = inputTransform.deleteLeft - KMWString.length(prefixContext.left);
+    if(excessDeletes > 0) {
+      prefixContext = {
+        ...prefixContext,
+        // \u{2421} = ␡ (Unicode symbol for Delete)
+        left: '\u{2421}'.repeat(excessDeletes) + prefixContext.left
+      };
+    }
+
+    const result = applyTransform(inputTransform, prefixContext);
+    return result.left;
   }
 
   get parents() {
@@ -268,5 +284,23 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
   public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  }
+
+  public get sourceIdentifiers(): TokenInputSource[] {
+    if(!this.parentNode) {
+      return [];
+    }
+
+    const parentSources = this.parentNode.sourceIdentifiers;
+    if(this.inputSource) {
+      const inputId = this.inputSource.trueTransform.id;
+      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+        return parentSources;
+      }
+
+      parentSources.push(this.inputSource);
+    }
+
+    return parentSources;
   }
 }
