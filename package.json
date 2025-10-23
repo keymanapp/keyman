@@ -22,7 +22,7 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^11.2.2",
-    "playwright": "^1.46.1",
+    "playwright": "^1.56.1",
     "sinon": "^17.0.1",
     "source-map-support": "^0.5.21",
     "tslib": "^2.5.2",
