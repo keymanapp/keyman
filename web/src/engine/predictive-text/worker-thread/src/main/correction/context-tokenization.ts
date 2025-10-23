@@ -582,7 +582,7 @@ export class ContextTokenization {
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
       // We start at index 0 in the insert string for the "new" token.
-      if(affectedToken.inputRange.length == 0 && distribution[0].sample.deleteLeft != 0) {
+      if(affectedToken.inputCount == 0 && distribution[0].sample.deleteLeft != 0) {
         distribution = distribution.map((mass) => ({sample: { ...mass.sample, deleteLeft: 0 }, p: mass.p }));
       }
       affectedToken.addInput({trueTransform: sourceInput, inputStartIndex: appliedLength, bestProbFromSet}, distribution);

@@ -40,6 +40,15 @@ type CompleteSearchPath = {
 export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 /**
+ * Notes critical properties of the inputs comprising each ContextToken.
+ */
+export interface TokenInputSource {
+  trueTransform: Transform;
+  inputStartIndex: number;
+  bestProbFromSet: number;
+}
+
+/**
  * Represents all or a portion of the dynamically-generated graph used to search
  * for predictive-text corrections.
  */
@@ -121,6 +130,12 @@ export interface SearchQuotientNode {
    * the correction-search graph and its paths.
    */
   readonly bestExample: { text: string, p: number };
+
+  /**
+   * Gets components useful for building a string-based representation of the
+   * keystroke range corrected by this search space.
+   */
+  readonly sourceIdentifiers: TokenInputSource[];
 }
 
 /**
