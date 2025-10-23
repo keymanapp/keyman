@@ -52,6 +52,9 @@ export function versionStringToKmxVersion(version: string): KMX_Version {
     return null;
   }
 
+  // Version number is 16 bit number with MINOR in lower 8 bits, 
+  // MAJOR in upper 8 bits. In practice, we now only use MAJOR 
+  // version for Keyman versions.
   const num = major << 8;
 
   if(Object.values(KMX_Version).includes(num)) {
