@@ -10,10 +10,12 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { applyTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchSpace } from './search-space.js';
+import { generateSpaceSeed, PathResult, SearchSpace, TokenInputSource } from './search-space.js';
 
+import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
@@ -26,7 +28,8 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchPath implements SearchSpace {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  readonly inputs?: Distribution<Readonly<Transform>>;
+  readonly inputs?: Distribution<Transform>;
+  readonly inputSource?: TokenInputSource;
 
   private parentSpace: SearchSpace;
   readonly spaceId: number;
@@ -53,8 +56,8 @@ export class SearchPath implements SearchSpace {
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(space: SearchSpace, inputs: Distribution<Transform>, bestProbFromSet: number);
-  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, bestProbFromSet?: number) {
+  constructor(space: SearchSpace, inputs: Distribution<Transform>, srcKeystroke: TokenInputSource);
+  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: TokenInputSource) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
     const isExtending = (arg1 instanceof SearchPath);
@@ -62,9 +65,10 @@ export class SearchPath implements SearchSpace {
 
     if(isExtending) {
       const parentSpace = arg1 as SearchSpace;
-      const logTierCost = -Math.log(bestProbFromSet);
+      const logTierCost = -Math.log(inputSource.bestProbFromSet);
 
       this.inputs = inputs;
+      this.inputSource = inputSource;
       this.lowestPossibleSingleCost = parentSpace.lowestPossibleSingleCost + logTierCost;
       this.parentSpace = parentSpace;
 
@@ -158,6 +162,23 @@ export class SearchPath implements SearchSpace {
       text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
+  }
+
+  get likeliestSourceText(): string {
+    let prefixContext: Context = { left: this.parentSpace?.likeliestSourceText ?? '', startOfBuffer: true, endOfBuffer: true };
+    const inputTransform = this.inputSource?.trueTransform ?? { insert: '', deleteLeft: 0 };
+
+    const excessDeletes = inputTransform.deleteLeft - KMWString.length(prefixContext.left);
+    if(excessDeletes > 0) {
+      prefixContext = {
+        ...prefixContext,
+        // \u{2421} = ␡ (Unicode symbol for Delete)
+        left: '\u{2421}'.repeat(excessDeletes) + prefixContext.left
+      };
+    }
+
+    const result = applyTransform(inputTransform, prefixContext);
+    return result.left;
   }
 
   get parents() {
@@ -305,5 +326,23 @@ export class SearchPath implements SearchSpace {
 
   public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  }
+
+  public get sourceIdentifiers(): TokenInputSource[] {
+    if(!this.parentSpace) {
+      return [];
+    }
+
+    const parentSources = this.parentSpace.sourceIdentifiers;
+    if(this.inputSource) {
+      const inputId = this.inputSource.trueTransform.id;
+      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+        return parentSources;
+      }
+
+      parentSources.push(this.inputSource);
+    }
+
+    return parentSources;
   }
 }
