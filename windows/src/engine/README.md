@@ -27,10 +27,6 @@ Message library for Windows events.
 
 This is the public COM API library, used by keyman.exe, kmshell.exe, and various other Keyman and 3rd party programs.
 
-## kmrefresh - kmrefresh.x86.exe & kmrefresh.x64.exe
-
-A helper app to refresh Windows language settings, due to a bug in Windows; read ../kmrefresh/kmrefresh.cpp for details.
-
 ## kmtip - kmtip.dll | kmtip64.dll
 
 Implementation of a Text Service for the Text Services Framework (TSF). This implementation is named Keyman TIP.

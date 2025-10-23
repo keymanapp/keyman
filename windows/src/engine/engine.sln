@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmtip", "kmtip\kmtip.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mcompile", "mcompile\mcompile.vcxproj", "{5C22DDDA-CEAD-45F1-96B0-1473111156AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmrefresh", "kmrefresh\kmrefresh.vcxproj", "{A3B8F75F-E63E-434E-8A2A-034AD9B66571}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine-tests", "keyman32\tests\keyman-engine-tests\keyman-engine-tests.vcxproj", "{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine", "keyman32\keyman-engine.vcxproj", "{A7069186-5AE7-4504-8926-861B7A34BA9E}"
@@ -55,14 +53,6 @@ Global
 		{5C22DDDA-CEAD-45F1-96B0-1473111156AA}.Release|Win32.ActiveCfg = Release|Win32
 		{5C22DDDA-CEAD-45F1-96B0-1473111156AA}.Release|Win32.Build.0 = Release|Win32
 		{5C22DDDA-CEAD-45F1-96B0-1473111156AA}.Release|x64.ActiveCfg = Release|Win32
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|Win32.Build.0 = Debug|Win32
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|x64.ActiveCfg = Debug|x64
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Debug|x64.Build.0 = Debug|x64
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|Win32.ActiveCfg = Release|Win32
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|Win32.Build.0 = Release|Win32
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|x64.ActiveCfg = Release|x64
-		{A3B8F75F-E63E-434E-8A2A-034AD9B66571}.Release|x64.Build.0 = Release|x64
 		{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}.Debug|Win32.ActiveCfg = Debug|Win32
 		{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}.Debug|Win32.Build.0 = Debug|Win32
 		{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}.Debug|x64.ActiveCfg = Debug|x64

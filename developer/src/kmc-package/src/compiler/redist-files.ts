@@ -33,8 +33,6 @@ export const
     'keymanx64.exe',
     'kmcomapi.dll',
     'kmcomapi.x64.dll',
-    'kmrefresh.x64.exe',
-    'kmrefresh.x86.exe',
     'kmtip.dll',
     'kmtip64.dll',
     'mcompile.exe',
