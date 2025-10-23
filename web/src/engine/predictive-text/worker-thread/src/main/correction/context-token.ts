@@ -12,21 +12,12 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchPath } from "./search-path.js";
-import { SearchSpace } from "./search-space.js";
+import { SearchSpace, TokenInputSource } from "./search-space.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-
-/**
- * Notes critical properties of the inputs comprising each ContextToken.
- */
-export interface TokenInputSource {
-  trueTransform: Transform;
-  inputStartIndex: number;
-  bestProbFromSet: number;
-}
 
 /**
  * Breaks apart a raw text string into individual, single-codepoint
@@ -76,13 +67,6 @@ export class ContextToken {
   appliedTransitionId?: number;
 
   /**
-   * Represents the original, 'true' input transforms (tokenized, as necessary)
-   * applied to the actual context for the set of keystrokes contributing to
-   * this token.
-   */
-  private _inputRange: TokenInputSource[];
-
-  /**
    * Constructs a new, empty instance for use with the specified LexicalModel.
    * @param model
    */
@@ -108,14 +92,12 @@ export class ContextToken {
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
       this._searchPath = priorToken.searchPath;
-      this._inputRange = priorToken._inputRange.slice();
     } else {
       const model = param;
 
       // May be altered outside of the constructor.
       this.isWhitespace = false;
       this.isPartial = !!isPartial;
-      this._inputRange = [];
 
       rawText ||= '';
 
@@ -127,13 +109,12 @@ export class ContextToken {
       let searchSpace = new SearchPath(model);
 
       rawTransformDistributions.forEach((entry) => {
-        this._inputRange.push({
+        const priorSpace = searchSpace;
+        searchSpace = new SearchPath(searchSpace, entry, {
           trueTransform: entry[0].sample,
           inputStartIndex: 0,
           bestProbFromSet: 1
         });
-        const priorSpace = searchSpace;
-        searchSpace = new SearchPath(searchSpace, entry, 1);
         priorSpace.stopTrackingResults();
       });
 
@@ -146,18 +127,13 @@ export class ContextToken {
    * corresponding to this token.
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
-    this._inputRange.push(inputSource);
     const priorSpace = this._searchPath;
-    this._searchPath = new SearchPath(this._searchPath, distribution, inputSource.bestProbFromSet);
+    this._searchPath = new SearchPath(this._searchPath, distribution, inputSource);
     priorSpace.stopTrackingResults();
   }
 
-  /**
-   * Denotes the original keystroke Transforms comprising the range corresponding
-   * to this token.
-   */
-  get inputRange(): Readonly<TokenInputSource[]> {
-    return this._inputRange;
+  get inputCount() {
+    return this._searchPath.inputCount;
   }
 
   /**
@@ -165,6 +141,14 @@ export class ContextToken {
    */
   get isEmptyToken(): boolean {
     return this.exampleInput == '';
+  }
+
+  /**
+   * Denotes the original keystroke Transforms comprising the range corresponding
+   * to this token.
+   */
+  get inputRange() {
+    return this.searchPath.sourceIdentifiers;
   }
 
   /**
@@ -181,8 +165,9 @@ export class ContextToken {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
+    const sources = this.searchPath.sourceIdentifiers;
 
-    for(const source of this.inputRange) {
+    for(const source of sources) {
       const i = source.inputStartIndex;
       components.push(`T${source.trueTransform.id}${i != 0 ? '@' + i : ''}`);
     }
@@ -196,13 +181,7 @@ export class ContextToken {
    * This should only ever be used for debugging purposes.
    */
   get sourceText(): string {
-    const composite = this._inputRange.reduce((accum, current) => {
-      const alteredTransform = {...current.trueTransform};
-      alteredTransform.insert = alteredTransform.insert.slice(current.inputStartIndex);
-      return buildMergedTransform(accum, current.trueTransform)
-    }, { insert: '', deleteLeft: 0 });
-    const prefix = '\u{2421}'.repeat(composite.deleteLeft);
-    return prefix + composite.insert;
+    return this.searchPath.likeliestSourceText;
   }
 
   /**
@@ -228,10 +207,10 @@ export class ContextToken {
     let lastSourceInput: TokenInputSource;
     let lastInputDistrib: Distribution<Transform>;
     for(const token of tokensToMerge) {
-      const inputCount = token.inputRange.length;
+      const inputCount = token.inputCount;
       let startIndex = 0;
 
-      if(token.inputRange.length == 0) {
+      if(inputCount == 0) {
         continue;
       }
 
