@@ -130,7 +130,7 @@ if(!keymanweb) {
         this.outerDiv = util.createElement('div');         // Container for UI (visible when KeymanWeb is active)
         this.innerDiv = util.createElement('div');         // inner div for UI
         this.kbdIcon = util.createElement('img');
-        this.outerDiv.innerHTML = "<a href='http://keyman.com/web/' target='KeymanWebHelp'>"
+        this.outerDiv.innerHTML = "<a href='https://keyman.com/developer/keymanweb/' target='KeymanWebHelp'>"
           + "<img src='"+imgPath+"kmicon.gif' border='0' style='padding: 0px 2px 0 1px; margin:0px;' title='KeymanWeb' alt='KeymanWeb' /></a>"; /* I2081 */
 
         let s=this.outerDiv.style;
