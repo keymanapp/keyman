@@ -7,7 +7,6 @@
  * in the context and associated correction-search progress and results.
  */
 
-import { buildMergedTransform } from "@keymanapp/models-templates";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
@@ -182,58 +181,18 @@ export class ContextToken {
    * @param lexicalModel
    * @returns
    */
-  static merge(tokensToMerge: ContextToken[], lexicalModel: LexicalModel): ContextToken {
-    // Assumption:  if we're merging a token, it's not whitespace.
-    // Thus, we don't set the .isWhitespace flag field.
-    const resultToken = new ContextToken(lexicalModel);
-
-    let lastSourceInput: PathInputProperties;
-    let lastInputDistrib: Distribution<Transform>;
-    for(const token of tokensToMerge) {
-      const inputCount = token.inputCount;
-      let startIndex = 0;
-
-      if(inputCount == 0) {
-        continue;
-      }
-
-      // Are we re-merging on a previously split transform?
-      if(lastSourceInput?.segment.trueTransform != token.inputSegments[0].segment.trueTransform) {
-        if(lastSourceInput) {
-          resultToken.addInput(lastSourceInput, lastInputDistrib);
-        } // else:  there's nothing to add as input
-      } else {
-        // If so, re-merge it!
-        startIndex++;
-
-        lastInputDistrib = lastInputDistrib?.map((entry, index) => {
-          return {
-            sample: buildMergedTransform(entry.sample, token.searchModule.inputSequence[0][index].sample),
-            p: entry.p
-          }
-        });
-
-        // In case there's only one input that needs merging on both ends.
-        if(inputCount == 1) {
-          // There's potential that the next incoming token needs to merge with this.
-          continue;
-        } else {
-          resultToken.addInput(lastSourceInput, lastInputDistrib);
-        }
-      }
-      lastSourceInput = null;
-      lastInputDistrib = null;
-
-      // Ignore the last entry for now - it may need to merge with a matching
-      // entry in the next token!
-      for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.inputSegments[i], token.searchModule.inputSequence[i]);
-      }
-      lastSourceInput = token.inputSegments[inputCount-1];
-      lastInputDistrib = token.searchModule.inputSequence[inputCount-1];
+  static merge(tokensToMerge: ContextToken[]): ContextToken {
+    if(tokensToMerge.length < 1) {
+      return null;
     }
 
-    resultToken.addInput(lastSourceInput, lastInputDistrib);
+    // Assumption:  if we're merging a token, it's not whitespace.
+    // Thus, we don't set the .isWhitespace flag field.
+    const resultToken = new ContextToken(tokensToMerge.shift());
+    while(tokensToMerge.length > 0) {
+      const next = tokensToMerge.shift();
+      resultToken._searchModule = resultToken._searchModule.merge(next._searchModule);
+    }
 
     return resultToken;
   }
