@@ -385,7 +385,6 @@ const
 
   SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
   SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
-  SRegValue_Flag_SyncLanguagesToCloud = 'Flag_SyncLanguagesToCloud';
 
   SRegValue_Flag_UseKeymanCore = 'Flag_UseKeymanCore';
 

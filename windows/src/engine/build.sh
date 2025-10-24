@@ -21,7 +21,6 @@ builder_describe \
   ":keymanmc               Message library" \
   ":keymanx64              Host process (64 bit)" \
   ":kmcomapi               COM API library" \
-  ":kmrefresh              Helper app to refresh Windows language settings" \
   ":kmtip                  Text Services Framework Text Input Processor" \
   ":mcompile               Mnemonic layout recompiler" \
   ":testhost               Test application for interacting with Keyman Engine" \
