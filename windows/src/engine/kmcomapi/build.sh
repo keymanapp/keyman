@@ -38,12 +38,15 @@ function do_build() {
   delphi_msbuild kmcomapi.dproj "//p:Platform=Win32"
   sentrytool_delphiprep "$WIN32_TARGET" kmcomapi.dpr
   tds2dbg "$WIN32_TARGET"
+  do_map2pdb "$WIN32_TARGET_PATH/kmcomapi.map" "$WIN32_TARGET"
 
   delphi_msbuild kmcomapi.dproj "//p:Platform=Win64"
   # Delphi does not allow us to build to a different target filename so we rename after build
   mv -f "$WIN64_TARGET_PATH/kmcomapi.dll" "$WIN64_TARGET_PATH/kmcomapi.x64.dll"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
+  cp_if_exists "$WIN32_TARGET_PATH/kmcomapi.pdb" "$WINDOWS_PROGRAM_ENGINE"
+
   builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmcomapi.dbg" "$WINDOWS_DEBUGPATH_ENGINE/kmcomapi.dbg"
   cp "$WIN64_TARGET_PATH/kmcomapi.x64.dll" "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dll"
 
@@ -64,6 +67,8 @@ function do_install() {
   regsvr32 //s //u "$INSTALLPATH_KEYMANENGINE/kmcomapi.dll"
   cp "$WINDOWS_PROGRAM_ENGINE/kmcomapi.dll" "$INSTALLPATH_KEYMANENGINE/kmcomapi.dll"
   regsvr32 //s "$INSTALLPATH_KEYMANENGINE/kmcomapi.dll"
+
+  cp_if_exists "$WINDOWS_PROGRAM_ENGINE/kmcomapi.pdb" "$INSTALLPATH_KEYMANENGINE/kmcomapi.pdb"
 
   regsvr32 //s //u "$INSTALLPATH_KEYMANENGINE/kmcomapi.x64.dll"
   cp "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dll" "$INSTALLPATH_KEYMANENGINE/kmcomapi.x64.dll"
