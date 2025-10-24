@@ -23,7 +23,8 @@ export enum KMX_Version {
   VERSION_140 = 0x00000E00,
   VERSION_150 = 0x00000F00,
   VERSION_160 = 0x00001000,
-  VERSION_170 = 0x00001100
+  VERSION_170 = 0x00001100,
+  VERSION_190 = 0x00001300,
 };
 
 
@@ -164,9 +165,10 @@ export class KMXFile {
   public static readonly VERSION_150 = KMX_Version.VERSION_150;
   public static readonly VERSION_160 = KMX_Version.VERSION_160;
   public static readonly VERSION_170 = KMX_Version.VERSION_170;
+  public static readonly VERSION_190 = KMX_Version.VERSION_190;
 
   public static readonly VERSION_MIN = this.VERSION_50;
-  public static readonly VERSION_MAX = this.VERSION_170;
+  public static readonly VERSION_MAX = this.VERSION_190;
 
   //
   // Backspace types
@@ -337,8 +339,14 @@ export class KMXFile {
   public static readonly KF_LOGICALLAYOUT =    0x0008;
   public static readonly KF_AUTOMATICVERSION = 0x0010;
 
-  // 16.0: Support for LDML Keyboards in KMXPlus file format
-  public static readonly KF_KMXPLUS =  0x0020;
+  /** 16.0+: A `COMP_KEYBOARD_KMXPLUSINFO` structure is present immediately after `COMP_KEYBOARD` */
+  public static readonly KF_KMXPLUS =          0x0020;
+
+  /**
+   * 19.0+: The `COMP_KEYBOARD_KMXPLUSINFO` structure contains only OSK, and not a
+   * LDML keyboard; KF_KMXPLUS should not be set
+   */
+  public static readonly KF_KMXPLUSOSK =       0x0040;
 
   public static readonly HK_ALT =      0x00010000;
   public static readonly HK_CTRL =     0x00020000;
