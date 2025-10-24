@@ -35,6 +35,11 @@ convert_parameters_to_args
 setup_docker
 setup_container_registry
 
+if [[ ! ${DOCKER_RUN_ARGS[*]} =~ "DOCKER_RUN_AS_ROOT=1" ]]; then
+  echo "Runnning docker as root user inside the container."
+  DOCKER_RUN_ARGS+=(--env DOCKER_RUN_AS_ROOT=1)
+fi
+
 if is_default_values; then
   image_version=default
   build_dir=default
