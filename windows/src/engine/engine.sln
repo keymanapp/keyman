@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman32", "keyman32\Keyman32.vcxproj", "{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymanx64", "keymanx64\keymanx64.vcxproj", "{A34650EA-D6E8-4229-8091-6BF1443565B5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymanhp", "keymanhp\keymanhp.vcxproj", "{A34650EA-D6E8-4229-8091-6BF1443565B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmtip", "kmtip\kmtip.vcxproj", "{93391ECB-E2F1-4D23-B85E-6FDEB7ACF9B4}"
 EndProject

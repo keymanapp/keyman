@@ -18,12 +18,12 @@ X64_TARGET="$X64_TARGET_PATH/keymanx64.exe"
 
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
-  build:project        /windows/src/engine/keymanx64/$X64_TARGET
+  build:project        /windows/src/engine/keymanhp/$X64_TARGET
 
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_clean() {
-  vs_msbuild keymanx64.vcxproj //t:Clean
+  vs_msbuild keymanhp.vcxproj //t:Clean
   clean_windows_project_files
 }
 
@@ -31,7 +31,7 @@ function do_build() {
   create-windows-output-folders
   build_version.res
   build_manifest.res
-  vs_msbuild keymanx64.vcxproj //t:Build "//p:Platform=x64"
+  vs_msbuild keymanhp.vcxproj //t:Build "//p:Platform=x64"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   builder_if_release_build_level cp "$X64_TARGET_PATH/keymanx64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
