@@ -41,7 +41,7 @@ GESTURE_PROCESSOR_BUILD="$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build
 GESTURE_PROCESSOR_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-processor/lib/"
 
 function do_copy() {
-  mkdir -p "$KEYMAN_ROOT/$DEST"
+  mkdir -p "$KEYMAN_ROOT/$DEST/keyboards"
 
   # The next four lines are needed for the sentry-integration manual test page.
   cp "$SENTRY_MANAGER_SRC"  "$KEYMAN_ROOT/$DEST/sentry-manager.js"
