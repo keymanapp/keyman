@@ -8,6 +8,8 @@ import sys
 from gi.repository import Gio  # needs to come before gi.overrides.GLib!
 from gi.overrides.GLib import Variant
 
+from keyman_config.dbus_util import DBusSessionBusAddress, XdgRuntimeDir
+
 # The xdg module got renamed to xdg_base_dirs, but the package
 # (python3-xdg) on Ubuntu still ships xdg. So we support both.
 try:
@@ -71,29 +73,19 @@ class GSettings():
     def get(self, key):
         if self.is_sudo:
             args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                    DBusSessionBusAddress, XdgRuntimeDir,
                     'gsettings', 'get', self.schema_id, key]
-            if sys.version_info.major <= 3 and sys.version_info.minor < 7:
-                # capture_output got added in Python 3.7
-                try:
-                    output = subprocess.check_output(args)
-                    value = eval(output)
-                except subprocess.CalledProcessError:
-                    value = None
-                    logging.warning('Could not convert to sources')
-            else:
-                process = subprocess.run(args, capture_output=True)
-                if process.returncode == 0:
-                    output = process.stdout
-                    if output.decode('utf-8').startswith('['):
-                        value = eval(output)
-                        return value
+            process = subprocess.run(args, capture_output=True)
+            if process.returncode == 0:
+                output = process.stdout
+                if output.decode('utf-8').startswith('['):
+                    return eval(output)
 
-                logging.debug('Could not convert to sources')
-                return None
+            logging.debug('Could not convert to sources')
+            return None
         else:
             variant = self.schema.get_value(key)
-            value = self._convert_variant_to_array(variant)
-        return value
+            return self._convert_variant_to_array(variant)
 
     def _get_schema_path(self):
         return self.schema_id.replace('.', '/')
@@ -121,9 +113,10 @@ class GSettings():
     def set(self, key, value, type_string) -> None:
         if self.is_sudo:
             variant = str(value)
-            subprocess.run(
-              ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-               'gsettings', 'set', self.schema_id, key, variant], check=False)
+            args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                    DBusSessionBusAddress, XdgRuntimeDir,
+                    'gsettings', 'set', self.schema_id, key, variant]
+            subprocess.run(args, check=False)
         elif get_dbus_started_for_session():
             self._set_key_file(key, value, type_string)
         else:

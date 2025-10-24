@@ -406,4 +406,8 @@ export class AnalyzeOskCharacterUse {
     return result.join(' ');
   }
 
+  /** @internal */
+  public unitTestEndPoints = {
+    loadPreviousMap: this.loadPreviousMap.bind(this)
+  };
 }
