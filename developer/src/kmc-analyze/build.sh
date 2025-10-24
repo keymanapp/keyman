@@ -31,5 +31,5 @@ builder_run_action clean      rm -rf ./build/
 builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
-builder_run_action test       typescript_run_eslint_mocha_tests 70
+builder_run_action test       typescript_run_eslint_mocha_tests 75
 builder_run_action publish    ci_publish_npm
