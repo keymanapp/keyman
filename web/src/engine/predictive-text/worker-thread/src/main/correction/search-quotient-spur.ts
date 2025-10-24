@@ -10,10 +10,12 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
+import { SearchQuotientRoot } from './search-quotient-root.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -156,11 +158,69 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   /** Allows the base class to construct instances of the derived class. */
-  protected abstract construct(
+  abstract construct(
     parentNode: SearchQuotientNode,
-    inputs?: Distribution<Transform>,
-    inputSource?: PathInputProperties
+    inputs: Distribution<Transform>,
+    inputSource: PathInputProperties
   ): this;
+
+  // spaces are in sequence here.
+  // `this` = head 'space'.
+  public merge(space: SearchQuotientNode): SearchQuotientNode {
+    // Head node for the incoming path is empty, so skip it.
+    if(space.parents.length == 0 || space instanceof SearchQuotientRoot) {
+      return this;
+    }
+
+    // Merge any parents first as a baseline.  We have to come after their
+    // affects are merged in, anyway.
+    const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
+
+    // if parentMerges.length > 0, is a SearchCluster.
+    // const parentMerge = parentMerges.length > 0 ? new SearchCluster(parentMerges) : parentMerges[0];
+    const parentMerge = parentMerges[0];
+
+    // Special case:  if we've reached the head of the space to be merged, check
+    // for a split transform.
+    //  - we return `this` from the root, so if that's what we received, we're
+    //    on the first descendant - the first path component.
+    if(space instanceof SearchQuotientSpur) {
+      if(parentMerge != this) {
+        // Here, we reconstruct the child `space` on a new root.  The new
+        // instance needs to be of the same type as the original instance.
+        return space.construct(parentMerge, space.inputs, space.inputSource);
+      }
+
+      const localInputId = this.inputSource?.segment.transitionId;
+      const spaceInputId = space.inputSource?.segment.transitionId;
+      // The 'id' may be undefined in some unit tests and for tokens
+      // reconstructed after a backspace.  In either case, we consider the
+      // related results as fully separate; our reconstructions are
+      // per-codepoint.
+      if(localInputId != spaceInputId || localInputId === undefined) {
+        return space.construct(parentMerge, space.inputs, space.inputSource);
+      } else {
+        // Get the twin halves that were split.
+        // Assumption:  the two halves are in their original order, etc.
+        const localInputs = this.inputs;
+        const spaceInputs = space.inputs;
+
+        // Merge them!
+        const mergedInputs = localInputs?.map((entry, index) => {
+          return {
+            sample: buildMergedTransform(entry.sample, spaceInputs[index].sample),
+            p: entry.p
+          }
+        });
+
+        // Now to re-merge the two halves.
+        return space.construct(this.parentNode, mergedInputs, this.inputSource);
+      }
+    } else {
+      // If the parent was a cluster, the cluster itself is the merge.
+      return parentMerge;
+    }
+  }
 
   public split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
     const internalSplitIndex = charIndex - (this.codepointLength - this.insertLength);
