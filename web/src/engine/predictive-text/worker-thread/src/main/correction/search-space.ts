@@ -12,6 +12,7 @@ import { LexicalModelTypes } from "@keymanapp/common-types";
 import { SearchNode, SearchResult } from "./distance-modeler.js";
 
 import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
 export let SPACE_ID_SEED = 0;
@@ -57,6 +58,8 @@ export interface SearchSpace {
    * by correction-search results.
    */
   readonly spaceId: number;
+
+  readonly model: LexicalModel;
 
   readonly parents: SearchSpace[];
 
@@ -135,6 +138,12 @@ export interface SearchSpace {
   readonly inputSequence: Distribution<Transform>[];
 
   /**
+   * Reports the length in codepoints of corrected text represented by completed
+   * paths from this instance.
+   */
+  readonly codepointLength: number;
+
+  /**
    * Determines the best example text representable by this batcher's portion of
    * the correction-search graph and its paths.
    */
@@ -147,4 +156,6 @@ export interface SearchSpace {
    * keystroke range corrected by this search space.
    */
   readonly sourceIdentifiers: TokenInputSource[];
+
+  split(charIndex: number): [SearchSpace, SearchSpace];
 }
