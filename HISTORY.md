@@ -1,5 +1,48 @@
 # Keyman Version History
 
+## 19.0.144 alpha 2025-10-23
+
+* chore(deps-dev): bump playwright from 1.46.1 to 1.56.1 (#14984)
+* chore(web): revert "chore(deps-dev): bump playwright from 1.46.1 to 1.56.1" (#15000)
+
+## 19.0.143 alpha 2025-10-20
+
+* fix(android): Set the main app background white (#14935)
+
+## 19.0.142 alpha 2025-10-17
+
+* chore(common): add .model_info schema (#14967)
+* chore(web): update helpURL documentation and float ui link (#14960)
+* fix(linux): use `ibus` command to restart ibus (#14971)
+* chore(linux): replace deprecated `parse_version` (#14973)
+
+## 19.0.141 alpha 2025-10-16
+
+* refactor(linux): extract functions (#14937)
+* refactor(linux): remove no-longer-needed Python 3.7 code (#14956)
+* chore(linux): don't report errors to Sentry when running autopkgtests (#14938)
+* fix(linux): fix installing keyboard in shared area (#14953)
+* fix(linux): install schema during `keyman-config/build.sh install` (#14962)
+* test(linux): add regression tests for cli tools to autopkgtests (#14950)
+
+## 19.0.140 alpha 2025-10-15
+
+* fix(mac): add Microsoft Word to non-compliant app list (#14940)
+
+## 19.0.139 alpha 2025-10-13
+
+* fix(windows): osk: handle simulated left Control event when AltGr pressed (#14909)
+
+## 19.0.138 alpha 2025-10-11
+
+* fix(android): Update Sample1 text field to resize (#14922)
+
+## 19.0.137 alpha 2025-10-10
+
+* chore(common): Update crowdin strings for Vietnamese (#14915)
+* maint(resources): fix watch bug for common files, and add more logging for triggering builds (#14893)
+* docs(developer): Update keyboard-editor.md to clarify when entire row will be deleted (#14919)
+
 ## 19.0.136 alpha 2025-10-09
 
 * fix(android): Refactor bottom inset calculations for in-app and system keyboard (#14873)
@@ -845,6 +888,15 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.243 stable 2025-10-15
+
+* chore(linux): Update debian changelog (#14855)
+* fix(android): Convert longpress delay menu to ConstraintLayout (#14906)
+* fix(linux): replace `dbus-x11` dependency (#14898)
+* chore(ios): renew certificate (#14917)
+* fix(android): Refactor bottom inset calculations for inapp and system keyboard (#14913)
+* fix(mac): add Microsoft Word to non-compliant app list (#14951)
 
 ## 18.0.242 stable 2025-09-29
 

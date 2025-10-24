@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$ref": "#/definitions/ModelInfo",
+
+  "definitions": {
+    "ModelInfo": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorEmail": { "type": "string", "format": "email" },
+        "description": { "type": "string" },
+        "license": { "type": "string", "enum": ["mit"] },
+        "languages": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "lastModifiedDate": { "type": "string", "format": "date-time" },
+        "packageFilename": { "type": "string" },
+        "packageFileSize": { "type": "number" },
+        "jsFilename": { "type": "string" },
+        "jsFileSize": { "type": "number" },
+        "isRTL": { "type": "boolean" },
+        "packageIncludes": { "type": "array", "items": { "type": "string", "enum": ["fonts"] }, "additionalItems": false },
+        "version": { "type": "string" },
+        "minKeymanVersion": { "type": "string", "pattern": "^\\d+\\.0$" },
+        "helpLink": { "type": "string", "pattern": "^http(s)?://help\\.keyman(-staging)?\\.com(.localhost)?/model/" },
+        "sourcePath": { "type": "string", "pattern": "^(release|experimental)/.+/.+$" },
+        "related": { "type": "object", "patternProperties": {
+          ".": { "$ref": "#/definitions/ModelRelatedInfo" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "license", "languages"
+      ],
+      "additionalProperties": false
+    },
+
+    "ModelRelatedInfo": {
+      "type": "object",
+      "properties": {
+        "deprecates": { "type": "boolean" },
+        "deprecatedBy": { "type": "boolean" }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  }
+}
