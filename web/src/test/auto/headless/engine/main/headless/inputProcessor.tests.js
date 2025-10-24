@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { InputProcessor } from 'keyman/engine/main';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest } from '@keymanapp/recorder-core';
@@ -27,7 +27,7 @@ let device = {
 // Initialize supplementary plane string extensions
 KMWString.enableSupplementaryPlane(false);
 
-// Test the KeyboardProcessor interface.
+// Test the JSKeyboardProcessor interface.
 describe('InputProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
@@ -51,7 +51,7 @@ describe('InputProcessor', function() {
 
         // These checks are lifted from the keyboard init checks found in
         // web/src/test/auto/headless/engine/js-processor/basic-init.js.
-        assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
+        assert.equal('us', core.keyboardProcessor.baseLayout, 'JSKeyboardProcessor has unexpected base layout')
         assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
         assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
         assert.isUndefined(core.keyboardProcessor.activeKeyboard, 'Initialized with already-active keyboard');
@@ -94,7 +94,7 @@ describe('InputProcessor', function() {
       }
 
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;
@@ -184,12 +184,12 @@ describe('InputProcessor', function() {
     let keyboardWithHarness;
     let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
     // For convenience we define the key sequence in a test file although we don't use the
-    // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
+    // rest of the recorder stuff since it uses only JSKeyboardProcessor, not InputProcessor.
     let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext));
 
     before(async function () {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;

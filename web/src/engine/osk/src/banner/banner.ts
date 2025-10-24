@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardProperties } from 'keyman/engine/keyboard';
+import { JSKeyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 // Base class for a banner above the keyboard in the OSK
@@ -98,7 +98,7 @@ export abstract class Banner {
    * @param keyboard
    * @param keyboardProperties
    */
-  public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) { }
+  public configureForKeyboard(keyboard: JSKeyboard, keyboardProperties: KeyboardProperties) { }
 
   public readonly refreshLayout?: () => void;
 

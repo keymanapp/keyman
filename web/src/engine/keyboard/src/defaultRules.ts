@@ -5,9 +5,9 @@
  */
 
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import Codes from './codes.js';
-import type KeyEvent from './keyEvent.js';
-import { type OutputTarget }  from './outputTarget.interface.js';
+import { Codes } from './codes.js';
+import { type KeyEvent } from './keyEvent.js';
+import { type OutputTargetInterface }  from './outputTargetInterface.js';
 
 export enum EmulationKeystrokes {
   Enter = '\n',
@@ -77,13 +77,13 @@ export default class DefaultRules {
   }
 
   /**
-   * Used when a RuleBehavior represents a non-text "command" within the Engine.  This will generally
+   * Used when a ProcessorAction represents a non-text "command" within the Engine.  This will generally
    * trigger events that require context reset - often by moving the caret or by moving what OutputTarget
    * the caret is in.  However, we let those events perform the actual context reset.
    *
    * Note:  is extended by DOM-aware KeymanWeb code.
    */
-  public applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
+  public applyCommand(Lkc: KeyEvent, outputTarget: OutputTargetInterface): void {
     // Notes for potential default-handling extensions:
     //
     // switch(code) {
