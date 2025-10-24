@@ -1,0 +1,13 @@
+c
+c test for ERROR_InvalidBegin in kmw-compiler ('begin Unicode' is required)
+c
+
+store(&version) '9.0'
+store(&name) 'Test ANSI'
+store(&targets) 'web'
+
+begin ANSI > use(main)
+
+group(main) using keys
+
++ 'a' > 'aah'
