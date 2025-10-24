@@ -12,6 +12,7 @@ import { LexicalModelTypes } from "@keymanapp/common-types";
 import { SearchNode, SearchResult } from "./distance-modeler.js";
 
 import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
 export let SPACE_ID_SEED = 0;
@@ -102,6 +103,11 @@ export interface SearchSpace {
   readonly spaceId: number;
 
   /**
+   * The active LexicalModel for use with correction-search.
+   */
+  readonly model: LexicalModel;
+
+  /**
    * Notes the SearchSpace(s) whose correction-search paths are extended by this
    * SearchSpace.
    */
@@ -181,6 +187,12 @@ export interface SearchSpace {
   readonly inputSequence: Distribution<Transform>[];
 
   /**
+   * Reports the length in codepoints of corrected text represented by completed
+   * paths from this instance.
+   */
+  readonly codepointLength: number;
+
+  /**
    * Determines the best example text representable by this batcher's portion of
    * the correction-search graph and its paths.
    */
@@ -199,4 +211,6 @@ export interface SearchSpace {
    * maps compatible token source ranges to each other.
    */
   get sourceRangeKey(): string;
+
+  split(charIndex: number): [SearchSpace, SearchSpace];
 }

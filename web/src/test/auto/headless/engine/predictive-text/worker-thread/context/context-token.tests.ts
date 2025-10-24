@@ -415,7 +415,7 @@ describe('ContextToken', function() {
           { text: 'can', index: 0, textOffset: 0 },
           { text: '\'', index: 1, textOffset: 3 }
         ]
-      }, plainModel);
+      });
 
       assert.equal(resultsOfSplit.length, 2);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), ['can', '\'']);
@@ -460,7 +460,7 @@ describe('ContextToken', function() {
           { text: 'large', index: 1, textOffset: 3 },
           { text: 'transform', index: 2, textOffset: 8 }
         ]
-      }, plainModel);
+      });
 
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
@@ -532,7 +532,7 @@ describe('ContextToken', function() {
           { text: 'long', index: 1, textOffset: 5 },
           { text: 'transforms', index: 2, textOffset: 9 }
         ]
-      }, plainModel);
+      });
 
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
@@ -677,7 +677,7 @@ describe('ContextToken', function() {
           { text: toMathematicalSMP('long'), index: 1, textOffset: 5 },
           { text: toMathematicalSMP('transforms'), index: 2, textOffset: 9 }
         ]
-      }, plainModel);
+      });
 
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);

@@ -31,6 +31,10 @@ export class SearchPath implements SearchSpace {
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
+  readonly model: LexicalModel;
+
+  readonly bestProbInEdge: number;
+
   readonly parentSpace: SearchSpace;
   readonly spaceId: number;
 
@@ -104,6 +108,7 @@ export class SearchPath implements SearchSpace {
 
     if(isExtending) {
       const parentSpace = arg1 as SearchSpace;
+      this.bestProbInEdge = inputSrc.bestProbFromSet;
       const logTierCost = -Math.log(inputSrc.bestProbFromSet);
 
       const transitionId = (inputs?.[0].sample.id);
@@ -111,6 +116,7 @@ export class SearchPath implements SearchSpace {
         throw new Error("Input distribution and input-source transition IDs must match");
       }
 
+      this.model = parentSpace.model;
       this.inputs = inputs;
       this.inputCount = parentSpace.inputCount + 1;
       this.inputSource = inputSrc;
@@ -123,9 +129,11 @@ export class SearchPath implements SearchSpace {
     }
 
     const model = arg1 as LexicalModel;
+    this.model = model;
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestPossibleSingleCost = 0;
     this.inputCount = 0;
+    this.bestProbInEdge = 1;
   }
 
   /**
@@ -192,6 +200,25 @@ export class SearchPath implements SearchSpace {
     return [...this.inputs];
   }
 
+  public get logTierCost(): number {
+    return -Math.log(this.bestProbInEdge);
+  }
+
+  // TODO:  track as a class property; avoid the need for repeated string calculations.
+  // Or just use the subset and its pre-known length/delete values in some manner.
+  public get edgeLength(): number {
+    const insert = this.inputs?.[0].sample.insert ?? '';
+    return KMWString.length(insert);
+  }
+
+  // TODO:  consider optimizing this; we could certainly precompute these values
+  // rather than recalculating it each time.
+  public get codepointLength(): number {
+    const deleteLeft = this.inputs?.[0].sample.deleteLeft ?? 0;
+    const baseLength = this.parentSpace?.codepointLength ?? 0;
+    return baseLength + this.edgeLength - deleteLeft;
+  }
+
   public get bestExample(): {text: string, p: number} {
     const bestPrefix = this.parentSpace?.bestExample ?? { text: '', p: 1 };
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
@@ -218,6 +245,61 @@ export class SearchPath implements SearchSpace {
 
     // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
     this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
+  }
+
+  public split(charIndex: number): [SearchSpace, SearchSpace] {
+    const model = this.model;
+    const internalSplitIndex = charIndex - (this.codepointLength - this.edgeLength);
+
+    if(charIndex >= this.codepointLength) {
+      // this instance = 'first set'
+      // second instance:  empty transforms.
+      //
+      // stopgap:  maybe go ahead and check each input for any that are longer?
+      // won't matter shortly, though.
+      return [this, new SearchPath(model)];
+    } else if(internalSplitIndex < 0) {
+      const parentResults =  this.parents[0].split(charIndex);
+      return [parentResults[0], new SearchPath(parentResults[1], this.inputs, this.inputSource)]
+    } else {
+      const firstSet: Distribution<Transform> = this.inputs.map((input) => ({
+        // keep insert head
+        // keep deleteLeft
+        sample: {
+          ...input.sample,
+          insert: KMWString.substring(input.sample.insert, 0, internalSplitIndex),
+          deleteRight: 0
+        }, p: input.p
+      }));
+
+      const secondSet: Distribution<Transform> = this.inputs.map((input) => ({
+        // keep insert tail
+        // deleteLeft == 0
+        sample: {
+          ...input.sample,
+          insert: KMWString.substring(input.sample.insert, internalSplitIndex),
+          deleteLeft: 0
+        }, p: input.p
+      }));
+
+      // If the transform to be split... isn't actually split (even for delete-lefts),
+      // don't append any part of it to the parent; it's actually clean.
+      const hasActualSplit = internalSplitIndex > 0 || this.inputs?.[0].sample.deleteLeft > 0;
+      const parent = hasActualSplit
+        ? new SearchPath(this.parentSpace, firstSet, this.inputSource)
+        : this.parentSpace;
+      // construct two SearchPath instances based on the two sets!
+      return [
+        parent,
+        new SearchPath(new SearchPath(model), secondSet, {
+          ...this.inputSource,
+          segment: {
+            ...this.inputSource.segment,
+            start: this.inputSource.segment.start + internalSplitIndex
+          }
+        })
+      ];
+    }
   }
 
   get correctionsEnabled(): boolean {
