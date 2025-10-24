@@ -58,11 +58,6 @@ export class ContextHost extends Mock {
     this.savedState = Mock.from(this);
   }
 
-  restoreTo(original: OutputTarget): void {
-    this.savedState = Mock.from(this);
-    super.restoreTo(original);
-  }
-
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
     const tempMock = new Mock(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
