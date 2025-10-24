@@ -8,8 +8,8 @@ We use different channels to build and distribute the Linux packages:
 - Launchpad repo for [stable](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman),
   [beta](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-beta) and
   [alpha](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-alpha) versions
-- [pso](http://packages.sil.org/) and [llso](http://linux.lsdev.sil.org/ubuntu/)
-  for stable, beta, and alpha versions
+- [pso](http://packages.sil.org/) for stable versions
+- [llso](http://linux.lsdev.sil.org/ubuntu/) for stable, beta, and alpha versions
 - artifacts on [GitHub](https://github.com/keymanapp/keyman/actions/workflows/deb-packaging.yml)
   for pull requests
 
@@ -17,6 +17,84 @@ Packages on [llso](http://linux.lsdev.sil.org/ubuntu/) are uploaded automaticall
 intended as a staging environment for testing. Packages on [pso](http://packages.sil.org/)
 are uploaded manually after the packages received some testing. End users usually have only
 pso enabled.
+
+## Building packages locally
+
+It is possible to build packages locally. This can be done either directly on the machine,
+or in a Docker container which is more similar to the CI environment.
+
+### Building packages locally directly on the machine
+
+To build packages locally, you'll have to have the dependencies installed.
+
+The easiest way to achieve this is to use the `mk-build-deps` tool:
+
+```bash
+sudo apt install dh-python python3-all debhelper help2man devscripts \
+  equivs jq quilt
+sudo mk-build-deps --install linux/debian/control
+```
+
+Then you can build the Debian package with:
+
+```bash
+KEYMAN_TIER=$(cat TIER.md)
+export KEYMAN_TIER
+cd linux
+./scripts/deb-packaging.sh source
+mkdir -p make_deb
+cd make_deb
+dpkg-source --extract ../../keyman_*.dsc
+cd keyman-*
+dch -v$(cat VERSION.md)-1 ""
+debuild -us -uc
+```
+
+### Local package builds with Docker
+
+It is possible to use the usual Debian/Ubuntu tools to create the package locally.
+For someone who only occasionally deals with packaging it might be easier to use
+Docker and the scripts that run on GitHub actions:
+
+#### Prerequisites for local package builds with Docker
+
+You'll have to create the docker image.
+
+- clone [gha-ubuntu-packaging](https://github.com/sillsdev/gha-ubuntu-packaging)
+  repo
+- create the image:
+
+  ```bash
+  cd /path/to/gha-ubuntu-packaging
+  docker build --build-arg DIST=jammy --build-arg PLATFORM=amd64 -t sillsdev/jammy .
+  ```
+
+#### Building packages with Docker
+
+- create the source package
+
+  ```bash
+  cd $KEYMAN_ROOT
+  KEYMAN_TIER=$(cat TIER.md)
+  export KEYMAN_TIER
+  cd linux
+  ./scripts/deb-packaging.sh source
+  ```
+
+  This will create the source package in $KEYMAN_ROOT directory.
+
+- Create the binary packages with Docker:
+
+  ```bash
+  cd $KEYMAN_ROOT
+  DIST=jammy
+  docker run -v $(pwd):/source -i -t -w /source --platform=amd64 \
+    --env INPUT_DIST=$DIST --env INPUT_SOURCE_DIR=. \
+    --env INPUT_SOURCEPACKAGE=$(ls keyman_*.dsc | sort | tail -1) \
+    sillsdev/$DIST
+  ```
+
+  This will create the binary packages in `$KEYMAN_ROOT/artifacts`.
 
 ## Package builds
 
@@ -72,52 +150,6 @@ and of course the source code for the packages:
   packages to `jammy-proposed` and packages build from the stable branch
   to the main section `jammy`)
 - if the build is successful the job archives the artifacts
-
-### Local package builds with Docker
-
-It is possible to use the usual Debian/Ubuntu tools to create the package locally.
-For someone who only occasionally deals with packaging it might be easier to use
-Docker and the scripts that run on GitHub actions:
-
-#### Prerequisites for local package builds with Docker
-
-You'll have to create the docker image.
-
-- clone [gha-ubuntu-packaging](https://github.com/sillsdev/gha-ubuntu-packaging)
-  repo
-- create the image:
-
-  ```bash
-  cd /path/to/gha-ubuntu-packaging
-  docker build --build-arg DIST=jammy --build-arg PLATFORM=amd64 -t sillsdev/jammy .
-  ```
-
-#### Building packages with Docker
-
-- create the source package
-
-  ```bash
-  cd $KEYMAN_ROOT
-  KEYMAN_TIER=$(cat TIER.md)
-  export KEYMAN_TIER
-  cd linux
-  ./scripts/deb-packaging.sh source
-  ```
-
-  This will create the source package in $KEYMAN_ROOT directory.
-
-- Create the binary packages with Docker:
-
-  ```bash
-  cd $KEYMAN_ROOT
-  DIST=jammy
-  docker run -v $(pwd):/source -i -t -w /source --platform=amd64 \
-    --env INPUT_DIST=$DIST --env INPUT_SOURCE_DIR=. \
-    --env INPUT_SOURCEPACKAGE=$(ls keyman_*.dsc | sort | tail -1) \
-    sillsdev/$DIST
-  ```
-
-  This will create the binary packages in `$KEYMAN_ROOT/artifacts`.
 
 ## Package builds on Launchpad
 
