@@ -107,10 +107,14 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 
   if (kbd->StartGroup[BEGIN_UNICODE] == (KMX_DWORD) -1) {
     DebugLog("Non-Unicode keyboards are not supported.");
+    DeleteInternalDebugItems();
+    state->debug_items().push_end(m_actions.Length(), 0);
     m_core_state = nullptr;
     return FALSE;
   }
 
+  // TODO: what about debug_item state for all shortcut return paths below?
+  // TODO: this needs to be cleaned up; see #11909
   switch (vkey) {
   case KM_CORE_VKEY_CAPS:
     if (KeyCapsLockPress(modifiers, isKeyDown))

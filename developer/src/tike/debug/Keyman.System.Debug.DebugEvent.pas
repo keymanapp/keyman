@@ -342,8 +342,18 @@ var
   action_index: Integer;
 begin
   Result := True;
+
+  if not Assigned(state) then
+    raise Exception.Create('TDebugEventList.AddStateItems: expected state not to be nil');
+
   debug := km_core_state_debug_items(state, nil);
+  if not Assigned(debug) then
+    raise Exception.Create('TDebugEventList.AddStateItems: expected debug not to be nil');
+
   action := km_core_state_action_items(state, nil);
+  if not Assigned(action) then
+    raise Exception.Create('TDebugEventList.AddStateItems: expected action not to be nil');
+
   action_index := 0;
   while debug._type <> KM_CORE_DEBUG_END do
   begin
