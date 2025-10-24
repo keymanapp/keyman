@@ -30,8 +30,10 @@ export interface BUILDER_STRS extends BUILDER_SECTION {
 
 export function build_strs(source_strs: Strs): BUILDER_STRS {
   const result: BUILDER_STRS = {
-    ident: constants.hex_section_id(constants.section.strs),
-    size: 0,  // finalized later
+    header: {
+      ident: constants.hex_section_id(constants.section.strs),
+      size: 0,  // finalized later
+    },
     _offset: 0,
     count: source_strs.strings.length,
     items: [], // filled below
@@ -46,7 +48,7 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
     item.offset = offset;
     offset += item.length * 2 + 2; /* UTF-16 code units + sizeof null terminator */
   }
-  result.size = offset;
+  result.header.size = offset;
 
   return result;
 }

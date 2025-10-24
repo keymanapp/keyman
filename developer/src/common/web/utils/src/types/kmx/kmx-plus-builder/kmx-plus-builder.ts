@@ -115,9 +115,9 @@ export default class KMXPlusBuilder {
       }
     });
 
-    this.sect.sect.size = constants.length_sect + constants.length_sect_item * this.sect.sect.count;
+    this.sect.sect.header.size = constants.length_sect + constants.length_sect_item * this.sect.sect.count;
 
-    let offset = this.sect.sect.size;
+    let offset = this.sect.sect.header.size;
     // Note: in order! Everyone's here except 'sect' which is at offset 0
     offset = this.finalize_sect_item(this.sect.bksp, offset);
     offset = this.finalize_sect_item(this.sect.disp, offset);
@@ -141,16 +141,16 @@ export default class KMXPlusBuilder {
       return offset;
     }
     sect._offset = offset;
-    this.sect.sect.items.push({sect: sect.ident, offset: offset});
-    return offset + sect.size;
+    this.sect.sect.items.push({sect: sect.header.ident, offset: offset});
+    return offset + sect.header.size;
   }
 
   private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION) {
     if(sect) {
       const buf = comp.toBuffer(sect);
-      if (buf.length > sect.size) {
+      if (buf.length > sect.header.size) {
         // buf.length may be < sect.size if there is a variable part (i.e. elem)
-        throw new RangeError(`Internal Error: Section ${constants.str_section_id(sect.ident)} claimed size ${sect.size} but produced buffer of size ${buf.length}.`);
+        throw new RangeError(`Internal Error: Section ${constants.str_section_id(sect.header.ident)} claimed size ${sect.header.size} but produced buffer of size ${buf.length}.`);
       }
       file.set(buf, sect._offset);
     }
