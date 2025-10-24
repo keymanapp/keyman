@@ -7,7 +7,7 @@ function loadKeyboards()
     languages:{
       id:'en',name:'English',region:'North America'
     },
-    filename:'../../../../../../common/test/resources/keyboards/chirality.js'
+    filename:'../../../../../build/test-resources/keyboards/chirality.js'
   });
     
   // A testing keyboard using 10.0 format and the KLS layout specifier
