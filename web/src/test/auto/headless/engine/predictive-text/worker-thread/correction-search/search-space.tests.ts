@@ -208,3 +208,7 @@ describe('SearchSpace', () => {
     assert.isFalse(resultState.done);
   });
 });
+
+describe('SearchPath', () => {
+
+});
