@@ -162,5 +162,6 @@ export interface SearchSpace {
    */
   readonly sourceIdentifiers: TokenInputSource[];
 
+  merge(space: SearchSpace): SearchSpace;
   split(charIndex: number): [SearchSpace, SearchSpace];
 }
