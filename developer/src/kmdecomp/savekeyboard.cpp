@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 
-#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
+#include "../../../common/include/kmx_file.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/windows/cpp/include/vkeys.h"
 
@@ -93,6 +93,7 @@ const PWCHAR StoreTokens[] = {   // I4652
   L"", // TSS_BEGIN_POSTKEYSTROKE
   SSN__PREFIX L"NEWLAYER",
   SSN__PREFIX L"OLDLAYER",
+	SSN__PREFIX L"DISPLAYMAP",
 	NULL
 };
 
