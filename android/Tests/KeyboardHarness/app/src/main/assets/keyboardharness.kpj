@@ -1,56 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KeymanDeveloperProject>
   <Options>
+    <Version>2.0</Version>
     <BuildPath>$PROJECTPATH</BuildPath>
+    <SourcePath>$PROJECTPATH\</SourcePath>
     <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
-    <WarnDeprecatedCode>True</WarnDeprecatedCode>
     <CheckFilenameConventions>True</CheckFilenameConventions>
+    <SkipMetadataFiles>True</SkipMetadataFiles>
     <ProjectType>lexicalmodel</ProjectType>
   </Options>
-  <Files>
-    <File>
-      <ID>id_165fd1598b940efe4a973aeb6eb61aba</ID>
-      <Filename>keyboardharness.kps</Filename>
-      <Filepath>keyboardharness.kps</Filepath>
-      <FileVersion>1.0</FileVersion>
-      <FileType>.kps</FileType>
-      <Details>
-        <Name>keyboardharness</Name>
-        <Copyright>©2020 SIL International</Copyright>
-        <Version>1.0</Version>
-      </Details>
-    </File>
-    <File>
-      <ID>id_f9b1213d4e83cb32ce1ead1ee852d618</ID>
-      <Filename>chirality.js</Filename>
-      <Filepath>..\..\..\..\..\..\..\web\testing\chirality\chirality.js</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.js</FileType>
-      <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>
-    </File>
-    <File>
-      <ID>id_e01841691fa129428aea555142873f69</ID>
-      <Filename>platformtest.js</Filename>
-      <Filepath>..\..\..\..\..\..\..\web\testing\platform\platformtest.js</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.js</FileType>
-      <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>
-    </File>
-    <File>
-      <ID>id_03df89bb84a1aa6cab40dfebf3a04c5b</ID>
-      <Filename>code2001.ttf</Filename>
-      <Filepath>code2001.ttf</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.ttf</FileType>
-      <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>
-    </File>
-    <File>
-      <ID>id_2d07bd2b8c94e9600ac1a920c8cb9e0a</ID>
-      <Filename>longpress.js</Filename>
-      <Filepath>longpress.js</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.js</FileType>
-      <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>
-    </File>
-  </Files>
 </KeymanDeveloperProject>
