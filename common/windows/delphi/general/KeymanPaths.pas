@@ -37,7 +37,8 @@ type
     class function KeymanHelpPath(const HelpFile: string): string; static;
     class function KeymanUpdateCachePath(const filename: string = ''): string; static;
     class function KeymanDesktopInstallPath(const filename: string = ''): string; static;
-    class function KeymanEngineInstallPath(const filename: string = ''): string; static;
+    class function KeymanEngineInstallPath(const filename: string = ''; RaiseOnNotFound: Boolean = True): string; static;
+    class function KeymanEngineExecutablePath(const Executable: string): string; static;
     class function KeymanDesktopInstallDir: string; static;
     class function KeymanEngineInstallDir: string; static;
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
@@ -207,7 +208,7 @@ begin
   Result := ExtractFileDir(KeymanEngineInstallPath);
 end;
 
-class function TKeymanPaths.KeymanEngineInstallPath(const filename: string = ''): string;
+class function TKeymanPaths.KeymanEngineInstallPath(const filename: string = ''; RaiseOnNotFound: Boolean): string;
 begin
   with TRegistry.Create do  // I2890
   try
@@ -221,7 +222,11 @@ begin
   Result := GetDebugPath('KeymanEngine', Result);
 
   if Result = '' then
-    raise EKeymanPath.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.');
+  begin
+    if RaiseOnNotFound
+      then raise EKeymanPath.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.')
+      else Exit;
+  end;
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
 end;
@@ -341,7 +346,7 @@ begin
     begin
       Result := GetFolderPath(CSIDL_COMMON_APPDATA);
       if Result = '' then
-        Result := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_FallbackKeyboardPath)
+        Result := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_FallbackKeyboardPath, False)
       else
         Result := Result + SFolderKeymanKeyboard;
     end;
@@ -428,6 +433,30 @@ begin
   if FileExists(Result) then Exit;
 
   Result := '';
+end;
+
+class function TKeymanPaths.KeymanEngineExecutablePath(const Executable: string): string;
+var
+  keyman_root: string;
+begin
+  // On developer machines, if we are running within the source repo, then use
+  // those paths
+  if TKeymanPaths.RunningFromSource(keyman_root) then
+  begin
+    // Source repo, bin folder
+    Result := keyman_root + 'windows\bin\engine\' + Executable;
+    if FileExists(Result) then Exit;
+  end;
+
+  // For a standard installation, we should find the install path
+  Result := TKeymanPaths.KeymanEngineInstallPath(Executable, False);
+  if FileExists(Result) then Exit;
+
+  // Fall back to same folder as executable
+  Result := ExtractFilePath(ParamStr(0)) + Executable;
+  if FileExists(Result) then Exit;
+
+  raise EKeymanPath.Create('Could not find Keyman Engine executable '+Executable);
 end;
 
 class function TKeymanPaths.KeymanUpdateCachePath(const filename: string): string;
