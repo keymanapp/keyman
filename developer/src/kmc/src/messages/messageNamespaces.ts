@@ -8,6 +8,7 @@ import { LdmlCompilerMessages } from '@keymanapp/kmc-ldml';
 import { ModelCompilerMessages } from '@keymanapp/kmc-model';
 import { ModelInfoCompilerMessages } from '@keymanapp/kmc-model-info';
 import { PackageCompilerMessages } from '@keymanapp/kmc-package';
+import { TesterMessages } from '@keymanapp/kmc-test';
 import { InfrastructureMessages } from './infrastructureMessages.js';
 
 // Maps every compiler error namespace to the corresponding implementation
@@ -24,6 +25,7 @@ const messageNamespaces: Record<CompilerErrorNamespace, any> = {
   [CompilerErrorNamespace.KeyboardInfoCompiler]: KeyboardInfoCompilerMessages,
   [CompilerErrorNamespace.Copier]: CopierMessages,
   [CompilerErrorNamespace.Generator]: GeneratorMessages,
+  [CompilerErrorNamespace.Tester]: TesterMessages,
 };
 
 // This works around pain points in enumerating enum members in Typescript
@@ -49,4 +51,5 @@ export const messageSources: Record<CompilerErrorNamespace, CompilerMessageSourc
   [CompilerErrorNamespace.KmwCompiler]:          { module: 'kmc-kmn',           class: KmwCompilerMessages },
   [CompilerErrorNamespace.ModelInfoCompiler]:    { module: 'kmc-model-info',    class: ModelInfoCompilerMessages },
   [CompilerErrorNamespace.KeyboardInfoCompiler]: { module: 'kmc-keyboard-info', class: KeyboardInfoCompilerMessages },
+  [CompilerErrorNamespace.Tester]:               { module: 'kmc-tester',        class: TesterMessages },
 };

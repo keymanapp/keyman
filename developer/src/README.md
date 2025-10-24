@@ -127,6 +127,11 @@ https://github.com/keymanapp/lexical-models. Command line access through kmc.
 Compiles .kps packages into .kmp files. Works with both lexical model packages
 and keyboard packages. Command line access through kmc.
 
+### kmc-test - Keyboard regression test module
+
+Runs automated tests on keyboards. Works with both KMN and LDML projects.
+Command line access through kmc.
+
 ## samples
 
 Contains sample keyboards and sample developer projects. See readme.txt for

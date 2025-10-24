@@ -64,6 +64,7 @@ sourcemap_paths=(
   ./src/kmc-model/build
   ./src/kmc-model-info/build
   ./src/kmc-package/build
+  ./src/kmc-test/build
 )
 
 echo "Uploading symbols for developer/"
