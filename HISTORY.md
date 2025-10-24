@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.144 alpha 2025-10-23
+
+* chore(deps-dev): bump playwright from 1.46.1 to 1.56.1 (#14984)
+* chore(web): revert "chore(deps-dev): bump playwright from 1.46.1 to 1.56.1" (#15000)
+
 ## 19.0.143 alpha 2025-10-20
 
 * fix(android): Set the main app background white (#14935)
