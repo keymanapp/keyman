@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KeymanDeveloperProject>
   <Options>
-    <BuildPath>$PROJECTPATH</BuildPath>
+    <BuildPath>$PROJECTPATH/19.0</BuildPath>
     <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
     <WarnDeprecatedCode>False</WarnDeprecatedCode>
     <CheckFilenameConventions>False</CheckFilenameConventions>

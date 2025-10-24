@@ -105,14 +105,30 @@ endforeach
 cfg = configuration_data()
 cfg.set('keyboards_kpj', test_ldml_keyboards_kpj)
 
-ldml_keyboards_kpj = configure_file(
+# Build v17.0 keyboard fixtures
+
+ldml_keyboards_kpj_17 = configure_file(
   configuration: cfg,
-  input: 'keyboards.kpj.in',
-  output: 'keyboards.kpj'
+  input: 'keyboards-17.kpj.in',
+  output: 'keyboards-17.kpj'
 )
 
 configure_file(
-  input: ldml_keyboards_kpj,
+  input: ldml_keyboards_kpj_17,
   output: tests_from_cldr[0]+'.kmx',
-  command: kmc_cmd + ['build', '@INPUT@']
+  command: kmc_cmd + ['build', '--target-version', '17', '@INPUT@']
+)
+
+# Build v19.0 keyboard fixtures
+
+ldml_keyboards_kpj_19 = configure_file(
+  configuration: cfg,
+  input: 'keyboards-19.kpj.in',
+  output: 'keyboards19.kpj'
+)
+
+configure_file(
+  input: ldml_keyboards_kpj_19,
+  output: tests_from_cldr[0]+'.kmx',
+  command: kmc_cmd + ['build', '--target-version', '19', '@INPUT@']
 )

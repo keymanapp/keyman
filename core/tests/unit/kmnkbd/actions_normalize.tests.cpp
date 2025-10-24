@@ -46,7 +46,7 @@ void teardown() {
 void setup(const km_core_cu *app_context, const km_core_cu *cached_context_string, const km_core_context_item *cached_context_items, int actions_code_points_to_delete, const std::u32string actions_output) {
   teardown();
 
-  km::core::path path = km::core::path::join(arg_path, "..", "ldml", "keyboards", "k_001_tiny.kmx");
+  km::core::path path = km::core::path::join(arg_path, "..", "ldml", "keyboards", "17.0", "k_001_tiny.kmx");
   auto blob = km::tests::load_kmx_file(path.native().c_str());
   try_status(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));

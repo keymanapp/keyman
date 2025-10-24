@@ -813,8 +813,8 @@ LdmlJsonTestSourceFactory::LdmlJsonTestSourceFactory() : test_map() {
 }
 
 km::core::path
-LdmlJsonTestSourceFactory::kmx_to_test_json(const km::core::path &kmx) {
-  km::core::path p = kmx;
+LdmlJsonTestSourceFactory::source_to_test_json(const km::core::path &source) {
+  km::core::path p = source;
   p.replace_extension(TEST_JSON_SUFFIX);
   return p;
 }
