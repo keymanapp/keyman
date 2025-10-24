@@ -14,8 +14,10 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
+import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 
 import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
@@ -96,6 +98,10 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
   }
 
+  public get model(): LexicalModel {
+    return this.parentNode.model;
+  }
+
   /**
    * Retrieves the sequences of inputs that led to this SearchPath.
    */
@@ -147,6 +153,67 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
     this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
+  }
+
+  /** Allows the base class to construct instances of the derived class. */
+  protected abstract construct(
+    parentNode: SearchQuotientNode,
+    inputs?: Distribution<Transform>,
+    inputSource?: PathInputProperties
+  ): this;
+
+  public split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
+    const internalSplitIndex = charIndex - (this.codepointLength - this.insertLength);
+
+    if(charIndex >= this.codepointLength) {
+      // this instance = 'first set'
+      // second instance:  empty transforms.
+      //
+      // stopgap:  maybe go ahead and check each input for any that are longer?
+      // won't matter shortly, though.
+      return [this, new LegacyQuotientRoot(this.model)];
+    } else if(internalSplitIndex < 0) {
+      const parentResults =  this.parentNode.split(charIndex);
+      return [parentResults[0], this.construct(parentResults[1], this.inputs, this.inputSource)]
+    } else {
+      const firstSet: Distribution<Transform> = this.inputs.map((input) => ({
+        // keep insert head
+        // keep deleteLeft
+        sample: {
+          ...input.sample,
+          insert: KMWString.substring(input.sample.insert, 0, internalSplitIndex),
+          deleteRight: 0
+        }, p: input.p
+      }));
+
+      const secondSet: Distribution<Transform> = this.inputs.map((input) => ({
+        // keep insert tail
+        // deleteLeft == 0
+        sample: {
+          ...input.sample,
+          insert: KMWString.substring(input.sample.insert, internalSplitIndex),
+          deleteLeft: 0
+        }, p: input.p
+      }));
+
+      // If the transform to be split... isn't actually split (even for delete-lefts),
+      // don't append any part of it to the parent; it's actually clean.
+      const hasActualSplit = internalSplitIndex > 0 || this.inputs?.[0].sample.deleteLeft > 0;
+      const parent = hasActualSplit
+        ? this.construct(this.parentNode, firstSet, this.inputSource)
+        : this.parentNode;
+      // construct two SearchPath instances based on the two sets!
+      return [
+        parent,
+        this.construct(new LegacyQuotientRoot(this.model), secondSet, {
+          ...this.inputSource,
+          segment: {
+            ...this.inputSource.segment,
+            start: this.inputSource.segment.start + internalSplitIndex
+          }
+        })
+      ];
+    }
   }
 
   get correctionsEnabled(): boolean {
