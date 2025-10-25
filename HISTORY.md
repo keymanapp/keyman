@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.145 alpha 2025-10-24
+
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15001)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15002)
+* test(developer): add test to kmc-analyze for Warn_PreviousMapFileCouldNotBeLoaded (#14038)
+
 ## 19.0.144 alpha 2025-10-23
 
 * chore(deps-dev): bump playwright from 1.46.1 to 1.56.1 (#14984)
