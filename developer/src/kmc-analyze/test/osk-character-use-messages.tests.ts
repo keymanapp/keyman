@@ -35,8 +35,9 @@ describe('AnalyzeOskCharacterUse warnings', function() {
       includeCounts: true
     });
 
-    a.unitTestEndPoints.loadPreviousMap(MOCK_MAP_NO_COUNTS);
-
+    const result = a.unitTestEndPoints.loadPreviousMap(MOCK_MAP_NO_COUNTS);
+    assert.isNotNull(result, 'Expected map to be loaded successfully');
+    
     assert.isTrue(
       callbacks.hasMessage(AnalyzerMessages.WARN_PreviousMapDidNotIncludeCounts),
       'Expected Warn_PreviousMapDidNotIncludeCounts warning'
@@ -48,7 +49,8 @@ describe('AnalyzeOskCharacterUse warnings', function() {
       includeCounts: false
     });
 
-    a.unitTestEndPoints.loadPreviousMap(MOCK_MAP_WITH_COUNTS);
+    const result = a.unitTestEndPoints.loadPreviousMap(MOCK_MAP_WITH_COUNTS);
+    assert.isNotNull(result, 'Expected map to be loaded successfully');
 
     assert.isTrue(
       callbacks.hasMessage(AnalyzerMessages.WARN_PreviousMapDidIncludeCounts),
