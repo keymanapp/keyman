@@ -6,7 +6,7 @@ import 'mocha';
 import { AnalyzeOskCharacterUse } from '../src/osk-character-use/index.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
-describe('AnalyzeOskCharacterUse output formats', function () {
+describe('AnalyzeOskCharacterUse output formats', function() {
   const callbacks = new TestCompilerCallbacks();
 
   const dummyStrings = {
