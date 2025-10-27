@@ -337,31 +337,130 @@ describe('Correction Distance Modeler', () => {
       });
     });
 
-    // Consider adding more, deeper?
-    it('builds insertion edges based on lexicon, from root', () => {
-      const rootTraversal = testModel.traverseFromRoot();
-      assert.isNotEmpty(rootTraversal);
+    describe('buildInsertionEdges()', () => {
+      it('builds insertion edges from (empty) root', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
 
-      const rootSeed = SEARCH_EDGE_SEED++;
-      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
-      assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-      const edges = rootNode.buildInsertionEdges();
-      assert.isAbove(edges.length, 0);
+        const edges = rootNode.buildInsertionEdges();
+        assert.isAbove(edges.length, 0);
 
-      let expectedChildCount = 0;
-      for(const child of rootTraversal.children()) {
-        expectedChildCount++;
+        let expectedChildCount = 0;
+        for(const child of rootTraversal.children()) {
+          expectedChildCount++;
 
-        const childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
-        assert.isOk(childEdge);
-        assert.isEmpty(childEdge.priorInput);
-        assert.isEmpty(childEdge.calculation.inputSequence);
-        assert.isAbove(childEdge.currentCost, 0);
-        assert.equal(childEdge.spaceId, rootSeed);
-      }
+          const childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
+          assert.isOk(childEdge);
+          assert.isEmpty(childEdge.priorInput);
+          assert.isEmpty(childEdge.calculation.inputSequence);
+          assert.isAbove(childEdge.currentCost, 0);
+          assert.equal(childEdge.spaceId, rootSeed);
+        }
 
-      assert.equal(edges.length, expectedChildCount);
+        assert.equal(edges.length, expectedChildCount);
+      });
+
+      it('builds insertion edges directly after prior insertion', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const edges = rootNode.buildInsertionEdges();
+        assert.isAbove(edges.length, 0);
+
+        const firstChild = edges[0];
+        const childEdges = firstChild.buildInsertionEdges();
+
+        let expectedChildCount = 0;
+        for(const child of firstChild.currentTraversal.children()) {
+          expectedChildCount++;
+
+          const childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
+          assert.isOk(childEdge);
+          assert.isEmpty(childEdge.priorInput);
+          assert.isEmpty(childEdge.calculation.inputSequence);
+          assert.isAbove(childEdge.currentCost, 0);
+          assert.equal(childEdge.spaceId, rootSeed);
+        }
+
+        assert.equal(childEdges.length, expectedChildCount);
+      });
+
+      it('does not build insertion edges after a deletion', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const edges = rootNode.buildDeletionEdges([{
+          sample: { insert: 'd', deleteLeft: 0 },
+          p: 1
+        }], SEARCH_EDGE_SEED++).flatMap(n => n.processSubsetEdge());
+        assert.isAbove(edges.length, 0);
+        const firstChild = edges[0];
+
+        const insertEdgesAfterDelete = firstChild.buildInsertionEdges();
+        assert.equal(insertEdgesAfterDelete.length, 0);
+      });
+
+      it('does not build insertion edges after receiving an empty transform as input', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const edges = rootNode.buildSubstitutionEdges([{
+          // intentionally empty!
+          sample: { insert: '', deleteLeft: 0 },
+          p: 1
+        }], SEARCH_EDGE_SEED++).flatMap(n => n.processSubsetEdge());
+        assert.isAbove(edges.length, 0);
+        const firstChild = edges[0];
+        const insertsAfterEmpty = firstChild.buildInsertionEdges();
+
+        assert.equal(insertsAfterEmpty.length, 0);
+      });
+
+      it('builds insertion edges after a substitution', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const subSeed = SEARCH_EDGE_SEED++;
+        const edges = rootNode.buildSubstitutionEdges([{
+          sample: { insert: 't', deleteLeft: 0 },
+          p: 1
+        }], subSeed).flatMap(n => n.processSubsetEdge());
+        assert.isAbove(edges.length, 0);
+        const firstChild = edges[0];
+        const insertsAfterInput = firstChild.buildInsertionEdges();
+
+        let expectedChildCount = 0;
+        for(const child of firstChild.currentTraversal.children()) {
+          expectedChildCount++;
+
+          const childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
+          assert.isOk(childEdge);
+          assert.equal(childEdge.priorInput.length, 1);
+          assert.equal(childEdge.spaceId, subSeed);
+        }
+
+        assert.equal(insertsAfterInput.length, expectedChildCount);
+      });
     });
 
     describe('buildDeletionEdges @ token root', () => {
