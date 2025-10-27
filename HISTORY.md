@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.146 alpha 2025-10-27
+
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15008)
+* fix(developer): prevent ANSI keyboards crashing debugger (#15022)
+* test(developer): add coverage tests for warning messages in kmc-analyze/AnalyzeOskCharacterUse (#15021)
+
 ## 19.0.145 alpha 2025-10-24
 
 * fix(developer): do not treat backslash as a string escape in syntax highlighting (#15001)
