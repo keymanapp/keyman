@@ -324,8 +324,4 @@ export class SearchPath {
   public previousResults(): SearchResult[] {
     return Object.values(this.returnedValues).map(v => new SearchResult(v));
   }
-
-  public stopTrackingResults() {
-    delete this.completedPaths;
-  }
 }
