@@ -180,7 +180,7 @@ export class SearchPath implements SearchSpace {
 
   get parents() {
     // The SearchPath class may only have a single parent.
-    return [this.parentSpace];
+    return this.parentSpace ? [this.parentSpace] : [];
   }
 
   increaseMaxEditDistance() {
