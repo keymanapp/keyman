@@ -3,9 +3,9 @@
  */
 import { assert } from 'chai';
 import 'mocha';
-import { AnalyzeOskCharacterUse } from './osk-character-use/index.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { AnalyzerMessages } from './analyzer-messages.js';
+import { AnalyzeOskCharacterUse } from '../src/osk-character-use/index.js';
+import { AnalyzerMessages } from '../src/analyzer-messages.js';
 import { makePathToFixture } from './helpers/index.js';
 
 describe('AnalyzeOskCharacterUse warnings', function() {
