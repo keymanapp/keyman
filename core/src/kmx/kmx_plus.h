@@ -169,13 +169,16 @@ struct COMP_KMXPLUS_SECT {
   /**
    * @brief Get the pointer to a specific section
    *
-   * @param ident section id such as 'strs'. Never 'sect' (the sect table does not list itself!)
-   * @param entryLength on exit, will be set to the possible length of the section (based on the remainder of the KMX+ file)
+   * @param header       reference to the 'sect' section header for the file
+   * @param ident        section id such as 'strs'. Never 'sect' (the sect table does not list itself!)
+   * @param entryLength  on exit, will be set to the possible length of the section (based on the remainder of the KMX+ file)
    * @return pointer to raw bytes of requested section, or nullptr if not found
    */
   const uint8_t *get(COMP_KMXPLUS_HEADER const& header, KMX_DWORD ident, KMX_DWORD &entryLength) const;
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'sect' section header for the file
+   * @param fileLength   length of the KMX+ file data (not including KMX data, if KMX+ is embedded)
    * Does not validate the entire file.
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD fileLength) const;
@@ -224,12 +227,16 @@ struct COMP_KMXPLUS_ELEM {
 
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'elem' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 
   /**
+   * @brief
+   * @param header        reference to the 'elem' section header
    * @param elementNumber element number, 0..count-1
-   * @param length fillin: length of list
+   * @param length        fillin: length of list
    * @return pointer to first element of list of length length. or nullptr
    */
   const COMP_KMXPLUS_ELEM_ELEMENT *getElementList(
@@ -277,6 +284,8 @@ struct COMP_KMXPLUS_LOCA {
   COMP_KMXPLUS_LOCA_ENTRY entries[];
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'loca' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
@@ -301,6 +310,8 @@ struct COMP_KMXPLUS_META {
   KMX_DWORD_unaligned settings;
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'meta' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 
@@ -331,19 +342,21 @@ struct COMP_KMXPLUS_STRS {
   /**
    * @brief Get a string entry
    *
-   * @param entry entry number
-   * @param buf output buffer
-   * @param bufsiz buffer size in bytes
+   * @param header        reference to the 'strs' section header
+   * @param entry         entry number
    * @return nullptr or a pointer to the output buffer
    */
   std::u16string get(const COMP_KMXPLUS_HEADER& header, KMX_DWORD entry) const;
 
   /**
    * Slow search
+   * @param header        reference to the 'strs' section header
    */
   KMX_DWORD find(const COMP_KMXPLUS_HEADER& header, const std::u16string&) const;
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'strs' section header
+   * @param length       length of the section in bytes
    */
   bool valid(const COMP_KMXPLUS_HEADER& header, KMX_DWORD length) const;
 
@@ -395,6 +408,8 @@ struct COMP_KMXPLUS_TRAN {
   // COMP_KMXPLUS_TRAN_REORDER reorders[]
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'tran' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
@@ -464,6 +479,8 @@ struct COMP_KMXPLUS_VARS {
   COMP_KMXPLUS_VARS_ITEM varEntries[];
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'vars' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 
@@ -493,6 +510,8 @@ struct COMP_KMXPLUS_DISP {
   COMP_KMXPLUS_DISP_ENTRY entries[];
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'disp' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
@@ -553,6 +572,8 @@ struct COMP_KMXPLUS_LAYR {
   // COMP_KMXPLUS_LAYR_KEY keys[];
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'layr' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
@@ -608,6 +629,8 @@ struct COMP_KMXPLUS_KEYS {
 
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'keys' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
@@ -702,6 +725,8 @@ struct COMP_KMXPLUS_LIST {
 
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'list' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
@@ -764,6 +789,8 @@ struct COMP_KMXPLUS_USET {
 
   /**
    * @brief True if section is valid.
+   * @param header       reference to the 'uset' section header
+   * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
