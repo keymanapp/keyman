@@ -19,10 +19,8 @@ builder_describe "Build Keyman kmc Package Compiler module" \
   "build" \
   "api                       analyze API and prepare API documentation" \
   "clean" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
+
 builder_describe_outputs \
   configure     /node_modules \
   build         /developer/src/kmc-package/build/src/main.js \
@@ -37,4 +35,3 @@ builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
 builder_run_action test       builder_do_typescript_tests
-builder_run_action publish     builder_publish_npm

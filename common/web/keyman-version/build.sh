@@ -14,10 +14,7 @@ builder_describe "Build the include script for current Keyman version" \
   configure \
   clean \
   build \
-  test \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  test
 
 builder_describe_outputs \
   configure "/node_modules" \
@@ -55,4 +52,3 @@ export default KEYMAN_VERSION;
 builder_run_action clean        rm -rf version.inc.ts keyman-version.mts build/
 builder_run_action configure    verify_npm_setup
 builder_run_action build        do_build
-builder_run_action publish      builder_publish_npm

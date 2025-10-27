@@ -21,10 +21,7 @@ builder_describe "Keyman kmc Keyboard Compiler module" \
   "api                       analyze API and prepare API documentation" \
   "clean" \
   "test" \
-  "build-fixtures            builds test fixtures for manual examination" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "build-fixtures            builds test fixtures for manual examination"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -62,9 +59,3 @@ builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
 builder_run_action test            builder_do_typescript_tests
-
-#-------------------------------------------------------------------------------------------------------------------
-
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-
-builder_run_action publish     builder_publish_npm
