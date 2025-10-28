@@ -59,6 +59,9 @@ jobs:
     - name: NPM pack
       if: github.event.client_payload.isTestBuild == 'true'
       run: |
+        export KEYMAN_TIER=$(cat TIER.md)
+        export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
+        export GHA_BRANCH="${{ github.event.client_payload.branch }}"
         if [[ -f ./resources/build/ci/npm-publish.sh ]]; then
           ./resources/build/ci/npm-publish.sh pack
         else
@@ -68,6 +71,9 @@ jobs:
     - name: NPM publish
       if: github.event.client_payload.isTestBuild == 'false'
       run: |
+        export KEYMAN_TIER=$(cat TIER.md)
+        export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
+        export GHA_BRANCH="${{ github.event.client_payload.branch }}"
         if [[ -f ./resources/build/ci/npm-publish.sh ]]; then
           ./resources/build/ci/npm-publish.sh publish
         else
