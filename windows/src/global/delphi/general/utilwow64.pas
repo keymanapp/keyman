@@ -11,6 +11,7 @@ const
 {$ENDIF}
 
 function IsWow64: Boolean;
+function IsNativeMachineArm64: Boolean;
 
 implementation
 
@@ -33,7 +34,7 @@ end;
   Determines whether the current system's native architecture is ARM64.
   @returns:  True  if the native machine architecture is ARM64, False otherwise
 *)
-function IsNativeMachineWowArm64: Boolean;
+function IsNativeMachineArm64: Boolean;
 var
   processMachine: USHORT;
   nativeMachine: USHORT;

@@ -2001,7 +2001,7 @@ var
   sei: TShellExecuteInfoW;
 begin
 
-  if not IsNativeMachineWowArm64 then Exit;
+  if not IsNativeMachineArm64 then Exit;
 
   try
     // TODO: use TKeymanPaths to find keymanx64?
