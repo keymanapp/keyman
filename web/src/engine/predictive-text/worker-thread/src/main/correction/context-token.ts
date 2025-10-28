@@ -12,6 +12,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchPath } from "./search-path.js";
+import { SearchSpace } from "./search-space.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -58,10 +59,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  public get searchSpace(): SearchPath {
+  public get searchSpace(): SearchSpace {
     return this._searchSpace;
   }
-  private _searchSpace: SearchPath;
+  private _searchSpace: SearchSpace;
 
   isPartial: boolean;
 
@@ -131,7 +132,7 @@ export class ContextToken {
           inputStartIndex: 0,
           bestProbFromSet: 1
         });
-        searchSpace = searchSpace.addInput(entry, 1);
+        searchSpace = new SearchPath(searchSpace, entry, 1);
       });
 
       this._searchSpace = searchSpace;
@@ -144,7 +145,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this._searchSpace = this._searchSpace.addInput(distribution, inputSource.bestProbFromSet);
+    this._searchSpace = new SearchPath(this._searchSpace, distribution, inputSource.bestProbFromSet);
   }
 
   /**
