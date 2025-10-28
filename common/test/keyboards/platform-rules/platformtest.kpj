@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KeymanDeveloperProject>
-  <Options/>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+    <CheckFilenameConventions>True</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
   <Files>
     <File>
       <ID>id_c1593d698cb624690005787147089dab</ID>
