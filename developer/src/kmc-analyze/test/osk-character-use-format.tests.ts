@@ -54,10 +54,17 @@ describe('AnalyzeOskCharacterUse output formats', function() {
   });
 
   describe('unitTestEndPoints', function() {
-    it('converts strings to Unicode sequences correctly', function() {
+    it('converts BMP strings (U+0000–U+FFFF) correctly', function() {
       const a = new AnalyzeOskCharacterUse(callbacks);
       const seq = a.unitTestEndPoints.stringToUnicodeSequence('ab');
       assert.equal(seq, 'U+0061 U+0062');
+    });
+
+    it('converts supplementary characters (U+10000–U+10FFFF) correctly', function() {
+      const a = new AnalyzeOskCharacterUse(callbacks);
+      // 😀 (U+1F600) and 🦊 (U+1F98A)
+      const seq = a.unitTestEndPoints.stringToUnicodeSequence('😀🦊');
+      assert.equal(seq, 'U+1F600 U+1F98A');
     });
   });
 });
