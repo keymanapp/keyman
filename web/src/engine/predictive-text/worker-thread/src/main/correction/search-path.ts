@@ -98,12 +98,15 @@ export class SearchPath implements SearchSpace {
       return false;
     }
 
-    const tailInput = [...keystrokeDistributions.pop()];
+    const tailInput = [...keystrokeDistributions[keystrokeDistributions.length - 1]];
+    keystrokeDistributions = keystrokeDistributions.slice(0, keystrokeDistributions.length - 1);
     const localInput = this.lastInput;
+
+    const parentHasInput = () => !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
 
     // Actual reference match?  Easy mode.
     if(localInput == tailInput) {
-      return !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+      return parentHasInput();
     } else if(localInput.length != tailInput.length) {
       return false;
     } else {
@@ -129,7 +132,7 @@ export class SearchPath implements SearchSpace {
         }
       }
 
-      return !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+      return parentHasInput();
     }
   }
 
