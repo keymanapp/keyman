@@ -216,12 +216,19 @@ export interface SearchQuotientNode {
   get sourceRangeKey(): string;
 
   /**
+  /**
+   * Splits this SearchSpace into two halves at the specified codepoint index.
+   * The 'head' component will maximally re-use existing cached data, while the
+   * 'tail' must be reconstructed from scratch due to the new start position.
+   * @param charIndex
+   */
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode];
+
+  /**
    * Enumerates the different potential SearchQuotientSpur sequences that lead
    * to the current SearchQuotientNode.
    *
    * Intended only for use during unit testing.  Does not include the root node.
    */
   readonly constituentPaths: SearchQuotientSpur[][];
-
-  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode];
 }
