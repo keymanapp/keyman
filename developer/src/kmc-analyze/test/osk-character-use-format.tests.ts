@@ -19,23 +19,27 @@ describe('AnalyzeOskCharacterUse output formats', function() {
   });
 
   this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
+    if (this.currentTest?.isFailed()) {
       callbacks.printMessages();
     }
   });
 
   it('generates .txt format correctly', function() {
     const a = new AnalyzeOskCharacterUse(callbacks, { includeCounts: true });
-    (a as any)._strings = dummyStrings;
+    a.unitTestEndPoints.addStrings(['a', 'b'], 'testfile.kvks');
     const txt = a.getStrings('.txt');
     assert.isTrue(txt.some(line => line.includes('U+')));
+    assert.match(txt[0], /^U\+[A-F0-9]{4}/);
   });
 
   it('generates .md format correctly', function() {
     const a = new AnalyzeOskCharacterUse(callbacks, { includeCounts: true });
     (a as any)._strings = dummyStrings;
     const md = a.getStrings('.md');
-    assert.isTrue(md[0].includes('PUA') && md[2].includes('|'));
+    // test header
+    assert.match(md[0], /^PUA\s+\|\s+Code Points\s+\|\s+Key Caps$/);
+    // test data
+    assert.match(md[2], /^U\+[A-F0-9]{4}\s+\|\s+U\+[A-F0-9]{4}\s+\|\s+\S/);
   });
 
   it('generates .json format correctly', function() {
@@ -44,10 +48,16 @@ describe('AnalyzeOskCharacterUse output formats', function() {
     const json = a.getStrings('.json').join('\n');
     const parsed = JSON.parse(json);
     assert.isArray(parsed.map);
+    assert.lengthOf(parsed.map, 2);
+    assert.equal(parsed.map[0].usages[0].filename, 'file1.kvks');
+    assert.equal(parsed.map[1].usages[0].filename, 'file2.kvks');
   });
 
-  it('converts strings to Unicode sequences correctly', function() {
-    const seq = (AnalyzeOskCharacterUse as any).stringToUnicodeSequence('ab');
-    assert.equal(seq, 'U+0061 U+0062');
+  describe('unitTestEndPoints', function() {
+    it('converts strings to Unicode sequences correctly', function() {
+      const a = new AnalyzeOskCharacterUse(callbacks);
+      const seq = a.unitTestEndPoints.stringToUnicodeSequence('ab');
+      assert.equal(seq, 'U+0061 U+0062');
+    });
   });
 });
