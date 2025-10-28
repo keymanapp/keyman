@@ -18,6 +18,7 @@ import { generateSpaceSeed, PathResult, SearchSpace, TokenInputSource } from './
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
@@ -60,21 +61,53 @@ export class SearchPath implements SearchSpace {
    * @param model
    */
   constructor(model: LexicalModel);
+  /**
+   * Extends an existing SearchSpace (and its correction data) by a keystroke based
+   * on a subset of the incoming keystroke's fat-finger distribution.
+   * @param space
+   * @param inputs
+   * @param srcKeystroke The sample from the incoming distribution that represents data actually
+   * applied to the context.  It need not be included within the subset passed to `inputs`.
+   *
+   * `inputs` will be assumed to represent the full keystroke.  Use the `TokenInputSource` variant
+   * if this assumption is invalid.
+   */
+  constructor(space: SearchSpace, inputs: Distribution<Transform>, srcKeystroke: ProbabilityMass<Transform>);
+  /**
+   * Extends an existing SearchSpace (and its correction data) by a keystroke based
+   * on a subset of the incoming keystroke's fat-finger distribution.
+   * @param space
+   * @param inputs
+   * @param srcKeystroke Data about the actual context range represented by `inputs` and
+   * its underlying keystroke.
+   */
   constructor(space: SearchSpace, inputs: Distribution<Transform>, srcKeystroke: TokenInputSource);
-  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: TokenInputSource) {
+  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: TokenInputSource | ProbabilityMass<Transform>) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
     const isExtending = (arg1 instanceof SearchPath);
     this.spaceId = generateSpaceSeed();
 
+    // Coerce inputSource to TokenInputSource format.
+    if(inputSource && (inputSource as TokenInputSource).trueTransform == undefined) {
+      const keystroke = inputSource as ProbabilityMass<Transform>;
+      inputSource = {
+        trueTransform: keystroke.sample,
+        bestProbFromSet: keystroke.p,
+        inputStartIndex: 0
+      }
+    };
+
+    const inputSrc = inputSource as TokenInputSource;
+
     if(isExtending) {
       const parentSpace = arg1 as SearchSpace;
-      this.bestProbInEdge = inputSource.bestProbFromSet;
-      const logTierCost = -Math.log(inputSource.bestProbFromSet);
+      this.bestProbInEdge = inputSrc.bestProbFromSet;
+      const logTierCost = -Math.log(inputSrc.bestProbFromSet);
 
       this.model = parentSpace.model;
       this.inputs = inputs;
-      this.inputSource = inputSource;
+      this.inputSource = inputSrc;
       this.lowestPossibleSingleCost = parentSpace.lowestPossibleSingleCost + logTierCost;
       this.parentSpace = parentSpace;
 
@@ -126,9 +159,11 @@ export class SearchPath implements SearchSpace {
     keystrokeDistributions = keystrokeDistributions.slice(0, keystrokeDistributions.length - 1);
     const localInput = this.lastInput;
 
+    const parentHasInput = () => !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+
     // Actual reference match?  Easy mode.
     if(localInput == tailInput) {
-      return !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+      return parentHasInput();
     } else if(localInput.length != tailInput.length) {
       return false;
     } else {
@@ -154,7 +189,7 @@ export class SearchPath implements SearchSpace {
         }
       }
 
-      return !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+      return parentHasInput();
     }
   }
 

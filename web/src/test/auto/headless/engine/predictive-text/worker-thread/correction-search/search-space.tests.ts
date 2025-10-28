@@ -129,9 +129,9 @@ describe('Correction Searching', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new SearchPath(searchPath, synthInput1, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: 1});
-    const searchPath2 = new SearchPath(searchPath1, synthInput2, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
-    const searchPath3 = new SearchPath(searchPath2, synthInput3, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
+    const searchPath1 = new SearchPath(searchPath, synthInput1, synthInput1[0]);
+    const searchPath2 = new SearchPath(searchPath1, synthInput2, synthInput2[0]);
+    const searchPath3 = new SearchPath(searchPath2, synthInput3, synthInput3[0]);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -163,9 +163,9 @@ describe('Correction Searching', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new SearchPath(searchPath, synthInput1, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: 1});
-    const searchPath2 = new SearchPath(searchPath1, synthInput2, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
-    const searchPath3 = new SearchPath(searchPath2, synthInput3, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
+    const searchPath1 = new SearchPath(searchPath, synthInput1, synthInput1[0]);
+    const searchPath2 = new SearchPath(searchPath1, synthInput2, synthInput2[0]);
+    const searchPath3 = new SearchPath(searchPath2, synthInput3, synthInput3[0]);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -236,14 +236,7 @@ describe('Correction Searching', () => {
         {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
       ];
 
-      const extendedPath = new SearchPath(
-        rootPath,
-        leadEdgeDistribution, {
-        trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p
-        }
-      );
+      const extendedPath = new SearchPath(rootPath, leadEdgeDistribution, leadEdgeDistribution[0]);
 
       assert.equal(extendedPath.inputCount, 1);
       assert.equal(extendedPath.codepointLength, 1);
@@ -281,11 +274,8 @@ describe('Correction Searching', () => {
 
       const length1Path = new SearchPath(
         rootPath,
-        leadEdgeDistribution, {
-        trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p
-        }
+        leadEdgeDistribution,
+        leadEdgeDistribution[0]
       );
 
       const tailEdgeDistribution = [
@@ -296,11 +286,8 @@ describe('Correction Searching', () => {
 
       const length2Path = new SearchPath(
         length1Path,
-        tailEdgeDistribution, {
-        trueTransform: tailEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: tailEdgeDistribution[0].p
-        }
+        tailEdgeDistribution,
+        tailEdgeDistribution[0]
       );
 
       // Verify that the prior distribution remains fully unaltered.
@@ -347,11 +334,8 @@ describe('Correction Searching', () => {
 
       const length1Path = new SearchPath(
         rootPath,
-        leadEdgeDistribution, {
-        trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p
-        }
+        leadEdgeDistribution,
+        leadEdgeDistribution[0]
       );
 
       const tailEdgeDistribution = [
@@ -362,11 +346,8 @@ describe('Correction Searching', () => {
 
       const length2Path = new SearchPath(
         length1Path,
-        tailEdgeDistribution, {
-        trueTransform: tailEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: tailEdgeDistribution[0].p
-        }
+        tailEdgeDistribution,
+        tailEdgeDistribution[0]
       );
 
       // Verify that the prior distribution remains fully unaltered.

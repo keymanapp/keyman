@@ -300,7 +300,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.sourceText, 'can\'');
-      tokenToSplit.searchSpace.hasInputs([...keystrokeDistributions]);
+      tokenToSplit.searchSpace.hasInputs(keystrokeDistributions);
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -336,7 +336,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.sourceText, 'biglargetransform');
-      assert.isTrue(tokenToSplit.searchSpace.hasInputs([...keystrokeDistributions]));
+      assert.isTrue(tokenToSplit.searchSpace.hasInputs(keystrokeDistributions));
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -390,7 +390,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.exampleInput, 'largelongtransforms');
-      tokenToSplit.searchSpace.hasInputs([...keystrokeDistributions]);
+      tokenToSplit.searchSpace.hasInputs(keystrokeDistributions);
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -484,7 +484,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.exampleInput, toMathematicalSMP('largelongtransforms'));
-      tokenToSplit.searchSpace.hasInputs([...keystrokeDistributions]);
+      tokenToSplit.searchSpace.hasInputs(keystrokeDistributions);
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
