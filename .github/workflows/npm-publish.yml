@@ -14,8 +14,8 @@
 #   user:        The user that triggered the build or created the PR
 #   isTestBuild: false for Releases, otherwise true
 
-name: "npm publish"
-run-name: "npm publish - sha: ${{ github.event.client_payload.buildSha }}, user: @${{ github.event.client_payload.user }}, isTestBuild: ${{ github.event.client_payload.isTestBuild }}"
+name: "npm pack/publish"
+run-name: "npm pack/publish - branch: ${{ github.event.client_payload.branch }} sha: ${{ github.event.client_payload.buildSha }}, user: @${{ github.event.client_payload.user }}, isTestBuild: ${{ github.event.client_payload.isTestBuild }}"
 on:
   repository_dispatch:
     types: ['npm-publish:*']
