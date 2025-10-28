@@ -11,7 +11,7 @@
     <File>
       <ID>id_c1593d698cb624690005787147089dab</ID>
       <Filename>platformtest.kmn</Filename>
-      <Filepath>platformtest.kmn</Filepath>
+      <Filepath>source/platformtest.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
       <Details>
@@ -22,7 +22,7 @@
     <File>
       <ID>id_18e336f9ad890bf821ff56e1a7764478</ID>
       <Filename>platformtest.kps</Filename>
-      <Filepath>platformtest.kps</Filepath>
+      <Filepath>source/platformtest.kps</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kps</FileType>
       <Details>

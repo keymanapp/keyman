@@ -20,13 +20,13 @@
   </Info>
   <Files>
     <File>
-      <Name>platformtest.kmx</Name>
+      <Name>../platformtest.kmx</Name>
       <Description>Keyboard Platformtest</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
     <File>
-      <Name>platformtest.js</Name>
+      <Name>../platformtest.js</Name>
       <Description>File platformtest.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
