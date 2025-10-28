@@ -34,11 +34,14 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
+echo "Keyman root: ${KEYMAN_ROOT}"
+
 function do_pack() {
   local npm_package_path
   for npm_package_path in "${PACKAGES[@]}"; do
-    builder_heading "Packing $npm_package_path"
-    ci_publish_npm_package pack "$npm_package_path"
+    builder_heading "Building and packing ${npm_package_path}"
+    "${KEYMAN_ROOT}/${npm_package_path}/build.sh" build test
+    ci_publish_npm_package pack "${npm_package_path}"
   done
 }
 
@@ -50,8 +53,9 @@ function do_publish() {
   fi
 
   for npm_package_path in "${PACKAGES[@]}"; do
-    builder_heading "Publishing $npm_package_path"
-    ci_publish_npm_package publish "$npm_package_path"
+    builder_heading "Building and publishing ${npm_package_path}"
+    "${KEYMAN_ROOT}/${npm_package_path}/build.sh" build test
+    ci_publish_npm_package publish "${npm_package_path}"
   done
 }
 
