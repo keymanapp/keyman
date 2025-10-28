@@ -76,7 +76,6 @@ export interface SearchSpace {
    * Designed explicitly for use in unit testing; it's not super-efficient, so
    * avoid live use.
    *
-   * Note:  it will destroy the array passed into it.
    * @param keystrokeDistributions
    * @internal
    */
