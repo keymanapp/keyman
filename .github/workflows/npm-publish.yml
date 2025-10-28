@@ -29,6 +29,10 @@ env:
   GH_TOKEN: ${{ github.token }}
   STATUS_CONTEXT: 'npm pack/publish'
   IS_TEST_BUILD: ${{ github.event.client_payload.isTestBuild }}
+  # This property causes node.inc.sh to skip invocation of nvm, as otherwise, we
+  # end up downgrading to node v20 as of Keyman 19. See #15040 and corresponding
+  # change in node.inc.sh; we should be able to remove this in Keyman 20.
+  KEYMAN_CI_SKIP_NVM: true
 
 jobs:
   npm_publish:
