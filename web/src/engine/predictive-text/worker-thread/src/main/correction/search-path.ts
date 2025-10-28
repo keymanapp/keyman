@@ -149,6 +149,18 @@ export class SearchPath implements SearchSpace {
     }
   }
 
+  public get constituentPaths(): SearchPath[][] {
+    const parentPaths = this.parents[0]?.constituentPaths ?? [];
+    if(parentPaths.length > 0) {
+      return parentPaths.map(p => {
+        p.push(this);
+        return p;
+      });
+    } else {
+      return [[this]];
+    }
+  }
+
   public hasInputs(keystrokeDistributions: Distribution<Transform>[]): boolean {
     if(this.inputCount == 0) {
       return keystrokeDistributions.length == 0;
