@@ -34,6 +34,8 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
+echo "Keyman root: ${KEYMAN_ROOT}"
+
 function do_pack() {
   local npm_package_path
   for npm_package_path in "${PACKAGES[@]}"; do
