@@ -9,12 +9,9 @@
 
 import { assert } from 'chai';
 
-import { LexicalModelTypes } from '@keymanapp/common-types';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { correction, getBestMatches, models, SearchPath } from '@keymanapp/lm-worker/test-index';
 
-import Distribution = LexicalModelTypes.Distribution;
-import Transform = LexicalModelTypes.Transform;
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
 
@@ -387,43 +384,29 @@ describe('Correction Searching', () => {
         const buildPath = () => {
           let path = new SearchPath(testModel);
 
-          /*
-           * Assumptions:
-           * - The "true keystroke" data is held within the passed-in distribution,
-           *   at index 0.
-           * - None of the distributions have been split.
-           */
-          const extendPath = (path: SearchPath, distrib: Distribution<Transform>) => {
-            return new SearchPath(path, distrib, {
-              trueTransform: distrib[0].sample,
-              inputStartIndex: 0,
-              bestProbFromSet: distrib[0].p
-            });
-          }
-
           const distrib1 = [
             { sample: {insert: 'c', deleteLeft: 0}, p: 0.5 },
             { sample: {insert: 'r', deleteLeft: 0}, p: 0.4 },
             { sample: {insert: 't', deleteLeft: 0}, p: 0.1 }
           ];
-          path = extendPath(path, distrib1);
+          path = new SearchPath(path, distrib1, distrib1[0]);
 
           const distrib2 = [
             { sample: {insert: 'a', deleteLeft: 0}, p: 0.7 },
             { sample: {insert: 'e', deleteLeft: 0}, p: 0.3 }
           ];
-          path = extendPath(path, distrib2);
+          path = new SearchPath(path, distrib2, distrib2[0]);
 
           const distrib3 = [
             { sample: {insert: 'n', deleteLeft: 0}, p: 0.8 },
             { sample: {insert: 'r', deleteLeft: 0}, p: 0.2 }
           ];
-          path = extendPath(path, distrib3);
+          path = new SearchPath(path, distrib3, distrib3[0]);
 
           const distrib4 = [
             { sample: {insert: 't', deleteLeft: 0}, p: 1 }
           ];
-          path = extendPath(path, distrib4);
+          path = new SearchPath(path, distrib4, distrib4[0]);
 
           return {
             path,
