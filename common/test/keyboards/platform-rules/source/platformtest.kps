@@ -17,6 +17,7 @@
   <Info>
     <Version URL=""></Version>
     <Name URL="">PlatformTest</Name>
+    <Description URL="">Test keyboard for displaying platform information.</Description>
   </Info>
   <Files>
     <File>
