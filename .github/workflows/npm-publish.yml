@@ -39,14 +39,22 @@ jobs:
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
-    - name: Upgrade npm to 11.6.2
+
+    - name: Report initial npm/node versions
       run: |
-        echo "Initial npm version"
+        echo "Initial npm/node versions"
         npm -v
-        echo "Upgrading npm to 11.6.2"
-        npm install --global npm@11.6.2
-        echo "Current npm version"
+        node -v
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version: 24.10
+
+    - name: Report current npm/node versions
+      run: |
+        echo "Current npm/node versions"
         npm -v
+        node -v
 
     - name: Set pending status on PR builds
       id: set_status
