@@ -22,14 +22,15 @@ on:
 
 permissions:
   id-token: write  # Required for OIDC
-  contents: read
+  contents: write
+  pull-requests: write
 
 env:
   GH_TOKEN: ${{ github.token }}
-  STATUS_CONTEXT: 'NPM Pack'
+  STATUS_CONTEXT: 'npm pack'
 
 jobs:
-  npm-publish:
+  npm_publish:
     name: Publish or pack @keymanapp packages
     if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
     runs-on: ubuntu-24.04
@@ -39,6 +40,19 @@ jobs:
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
+    - name: Set pending status on PR builds
+      id: set_status
+      if: github.event.client_payload.isTestBuild == 'true'
+      shell: bash
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          -f state='pending' \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description='npm pack started' \
+          -f context="$STATUS_CONTEXT"
 
     - name: Report initial npm/node versions
       run: |
@@ -79,3 +93,39 @@ jobs:
         else
           echo WARNING: npm-publish.sh is not yet available on this branch
         fi
+
+  # We intentionally ignore the results of binary_packages_unreleased
+  set_status:
+    name: Set result status on PR builds
+    needs: [npm_publish]
+    runs-on: ubuntu-latest
+    if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
+    steps:
+    - name: Set success
+      if: needs.npm_publish.result == 'success'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=npm pack succeeded" >> $GITHUB_ENV
+
+    - name: Set cancelled
+      if: needs.npm_publish.result == 'cancelled'
+      run: |
+        echo "RESULT=error" >> $GITHUB_ENV
+        echo "MSG=npm pack cancelled" >> $GITHUB_ENV
+
+    - name: Set failure
+      if: needs.npm_publish.result == 'failure'
+      run: |
+        echo "RESULT=failure" >> $GITHUB_ENV
+        echo "MSG=npm pack failed" >> $GITHUB_ENV
+
+    - name: Set final status
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          -f state="$RESULT" \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description="$MSG" \
+          -f context="$STATUS_CONTEXT"
