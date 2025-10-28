@@ -1,4 +1,4 @@
-import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { constants, KMXPlusVersion } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from "@keymanapp/common-types";
 import { BUILDER_SECTION } from "./builder-section.js";
 
@@ -28,7 +28,7 @@ export interface BUILDER_STRS extends BUILDER_SECTION {
   items: BUILDER_STRS_ITEM[];
 };
 
-export function build_strs(source_strs: Strs): BUILDER_STRS {
+export function build_strs(source_strs: Strs, version: KMXPlusVersion): BUILDER_STRS {
   const result: BUILDER_STRS = {
     header: {
       ident: constants.hex_section_id(constants.section.strs),
@@ -45,7 +45,7 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
   let offset = constants.length_strs + constants.length_strs_item * result.count;
   // TODO: consider padding
   for(const item of result.items) {
-    item.offset = offset;
+    item.offset = offset + constants.headerSizeDelta(version);
     offset += item.length * 2 + 2; /* UTF-16 code units + sizeof null terminator */
   }
   result.header.size = offset;
