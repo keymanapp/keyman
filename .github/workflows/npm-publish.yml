@@ -1,0 +1,81 @@
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Created by mcdurdin on 2025-10-27
+#
+# This workflow publishes all our NPM packages using Trusted Publishers OIDC
+# permissions. It is triggered by a repository_dispatch event with the types
+# `npm-publish:*`, from the trigger-builds infrastructure. For test builds, this
+# does a `npm pack` only.
+#
+# Inputs:
+#   buildSha:    The SHA of the commit to build, e.g. of the branch or
+#                refs/pull/1234/head for PR
+#   user:        The user that triggered the build or created the PR
+#   isTestBuild: false for Releases, otherwise true
+
+name: "NPM publish"
+run-name: "NPM publish - sha: ${{ github.event.client_payload.buildSha }}, user: @${{ github.event.client_payload.user }}, isTestBuild: ${{ github.event.client_payload.isTestBuild }}"
+on:
+  repository_dispatch:
+    types: ['npm-publish:*']
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  STATUS_CONTEXT: 'NPM Pack'
+
+jobs:
+  npm-publish:
+    name: Publish or pack @keymanapp packages
+    if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      with:
+        ref: '${{ github.event.client_payload.buildSha }}'
+
+    - name: Upgrade npm to 11.6.2
+      run: |
+        echo "Initial npm version"
+        npm -v
+        echo "Upgrading npm to 11.6.2"
+        npm install --global npm@11.6.2
+        echo "Current npm version"
+        npm -v
+
+    - name: Set pending status on PR builds
+      id: set_status
+      if: github.event.client_payload.isTestBuild == 'true'
+      shell: bash
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          -f state='pending' \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description='NPM pack started' \
+          -f context="$STATUS_CONTEXT"
+
+    - name: NPM pack
+      if: github.event.client_payload.isTestBuild == 'true'
+      run: |
+        if [[ -f ./resources/build/ci/npm-publish.sh ]]; then
+          ./resources/build/ci/npm-publish.sh pack
+        else
+          echo WARNING: npm-publish.sh is not yet available on this branch
+        fi
+
+    - name: NPM publish
+      if: github.event.client_payload.isTestBuild == 'false'
+      run: |
+        if [[ -f ./resources/build/ci/npm-publish.sh ]]; then
+          ./resources/build/ci/npm-publish.sh publish
+        else
+          echo WARNING: npm-publish.sh is not yet available on this branch
+        fi

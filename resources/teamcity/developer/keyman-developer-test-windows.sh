@@ -55,12 +55,12 @@ function _build_testkeyboards() {
 }
 
 function publish_sentry_action() {
-  builder_echo start "publish" "Dry-run publish and api"
-  ./build.sh api publish --dry-run
-  builder_echo end "publish" "Dry-run publish and api"
+  builder_echo start "publish" "publish modules locally and prep api"
+  ./build.sh api publish
+  builder_echo end "publish" "publish modules locally and prep api"
 
   builder_echo start "publish sentry" "Publishing debug information files to Sentry"
-  # TODO: move this into build.sh publish? re-scope --dry-run into build.sh?
+  # TODO: move this into build.sh publish?
   "${KEYMAN_ROOT}/developer/src/tools/sentry-upload-difs.sh"
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
