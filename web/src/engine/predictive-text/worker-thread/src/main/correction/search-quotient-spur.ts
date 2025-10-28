@@ -15,6 +15,7 @@ import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-m
 import { generateSpaceSeed, PathResult, SearchQuotientNode, TokenInputSource } from './search-quotient-node.js';
 
 import Distribution = LexicalModelTypes.Distribution;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
@@ -51,14 +52,32 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    *
    * @param parentNode
    * @param inputs
-   * @param inputSource
+   * @param inputSource Either:
+   * 1.  Data about the actual context range represented by `inputs` and
+   * its underlying keystroke.
+   * 2.  The sample from the incoming distribution that represents data actually
+   * applied to the context.  It need not be included within the subset passed to `inputs`.
    */
-  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Readonly<Transform>>, inputSource: TokenInputSource) {
+  constructor(
+    parentNode: SearchQuotientNode,
+    inputs: Distribution<Readonly<Transform>>,
+    inputSource: TokenInputSource | ProbabilityMass<Transform>
+  ) {
     this.spaceId = generateSpaceSeed();
 
+    // Coerce inputSource to TokenInputSource format.
+    if(inputSource && (inputSource as TokenInputSource).trueTransform == undefined) {
+      const keystroke = inputSource as ProbabilityMass<Transform>;
+      inputSource = {
+        trueTransform: keystroke.sample,
+        bestProbFromSet: keystroke.p,
+        inputStartIndex: 0
+      }
+    };
+
     this.parentNode = parentNode;
-    this.inputSource = inputSource;
-    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSource?.bestProbFromSet ?? 1);
+    this.inputSource = inputSource as TokenInputSource;
+    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(this.inputSource?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
   }
