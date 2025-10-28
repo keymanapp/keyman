@@ -21,8 +21,10 @@ export interface BUILDER_SECT extends BUILDER_SECTION {
 
 export function build_sect(): BUILDER_SECT {
   return {
-    ident: constants.hex_section_id(constants.section.sect),
-    size: 0, // finalized later
+    header: {
+      ident: constants.hex_section_id(constants.section.sect),
+      size: 0, // finalized later
+    },
     _offset: 0,
     total: 0, // finalized later
     count: 0, // finalized later
