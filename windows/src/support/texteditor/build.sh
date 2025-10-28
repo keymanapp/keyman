@@ -15,6 +15,7 @@ builder_parse "$@"
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/editor32.exe"
 X64_TARGET="$X64_TARGET_PATH/editor64.exe"
+ARM64_TARGET="$ARM64_TARGET_PATH/editorarm64.exe"
 
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
@@ -32,10 +33,13 @@ function do_build() {
   # build_version.res
   vs_msbuild Editor.vcxproj //t:Build "//p:Platform=Win32"
   vs_msbuild Editor.vcxproj //t:Build "//p:Platform=x64"
+  vs_msbuild Editor.vcxproj //t:Build "//p:Platform=arm64"
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_SUPPORT"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_SUPPORT"
+  cp "$ARM64_TARGET" "$WINDOWS_PROGRAM_SUPPORT"
   builder_if_release_build_level cp "$WIN32_TARGET_PATH/editor32.pdb" "$WINDOWS_DEBUGPATH_SUPPORT"
   builder_if_release_build_level cp "$X64_TARGET_PATH/editor64.pdb" "$WINDOWS_DEBUGPATH_SUPPORT"
+  builder_if_release_build_level cp "$ARM64_TARGET_PATH/editorarm64.pdb" "$WINDOWS_DEBUGPATH_SUPPORT"
 }
 
 builder_run_action clean:project        do_clean
