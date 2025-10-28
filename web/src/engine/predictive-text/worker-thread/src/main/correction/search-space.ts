@@ -10,6 +10,7 @@
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchNode, SearchResult } from "./distance-modeler.js";
+import { SearchPath } from "./search-path.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -79,7 +80,6 @@ export interface SearchSpace {
    * Designed explicitly for use in unit testing; it's not super-efficient, so
    * avoid live use.
    *
-   * Note:  it will destroy the array passed into it.
    * @param keystrokeDistributions
    * @internal
    */
@@ -132,8 +132,9 @@ export interface SearchSpace {
   /**
    * Retrieves the sequence of inputs that led to this SearchSpace.
    *
-   * THIS WILL BE REMOVED SHORTLY.  (Once SearchPath takes on merging &
-   * splitting)
+   * THIS WILL BE REMOVED SHORTLY in favor of `constituentPaths` below, which
+   * provides an improved view into the data and models multiple paths to the
+   * space when they exist.  (Once SearchPath takes on merging & splitting)
    */
   readonly inputSequence: Distribution<Transform>[];
 
@@ -157,5 +158,19 @@ export interface SearchSpace {
    */
   readonly sourceIdentifiers: TokenInputSource[];
 
+  /**
+   * Splits this SearchSpace into two halves at the specified codepoint index.
+   * The 'head' component will maximally re-use existing cached data, while the
+   * 'tail' must be reconstructed from scratch due to the new start position.
+   * @param charIndex
+   */
   split(charIndex: number): [SearchSpace, SearchSpace];
+
+  /**
+   * Enumerates the different potential SearchPath sequences that lead to the
+   * current SearchSpace.
+   *
+   * Intended only for use during unit testing.
+   */
+  readonly constituentPaths: SearchPath[][];
 }

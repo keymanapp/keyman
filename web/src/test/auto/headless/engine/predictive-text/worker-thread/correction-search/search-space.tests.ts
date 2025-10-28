@@ -9,9 +9,12 @@
 
 import { assert } from 'chai';
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { correction, getBestMatches, models, SearchPath } from '@keymanapp/lm-worker/test-index';
 
+import Distribution = LexicalModelTypes.Distribution;
+import Transform = LexicalModelTypes.Transform;
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
 
@@ -216,7 +219,7 @@ describe('Correction Searching', () => {
     it('initializes from a lexical model', () => {
       const path = new SearchPath(testModel);
       assert.equal(path.inputCount, 0);
-      // Should have codepointLength == 0 once it's defined.
+      assert.equal(path.codepointLength, 0);
       assert.isNumber(path.spaceId);
       assert.deepEqual(path.bestExample, {text: '', p: 1});
       assert.deepEqual(path.parents, []);
@@ -243,7 +246,7 @@ describe('Correction Searching', () => {
       );
 
       assert.equal(extendedPath.inputCount, 1);
-      // Should have codepointLength == 1 once it's defined.
+      assert.equal(extendedPath.codepointLength, 1);
       assert.isNumber(extendedPath.spaceId);
       assert.notEqual(extendedPath.spaceId, rootPath.spaceId);
       assert.deepEqual(extendedPath.bestExample, {text: 't', p: 0.5});
@@ -304,7 +307,7 @@ describe('Correction Searching', () => {
       assert.deepEqual(leadEdgeDistribution, inputClone);
 
       assert.equal(length2Path.inputCount, 2);
-      // Should have codepointLength == 2 once it's defined.
+      assert.equal(length2Path.codepointLength, 2);
       assert.isNumber(length2Path.spaceId);
       assert.notEqual(length2Path.spaceId, length1Path.spaceId);
       assert.deepEqual(length2Path.bestExample, {text: 'tr', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
@@ -324,7 +327,7 @@ describe('Correction Searching', () => {
       ]);
 
       assert.equal(length1Path.inputCount, 1);
-      // Should have codepointLength == 1 once it's defined.
+      assert.equal(length1Path.codepointLength, 1);
       assert.isNumber(length1Path.spaceId);
       assert.notEqual(length1Path.spaceId, rootPath.spaceId);
       assert.deepEqual(length1Path.bestExample, {text: 't', p: 0.5});
@@ -370,7 +373,7 @@ describe('Correction Searching', () => {
       assert.deepEqual(leadEdgeDistribution, inputClone);
 
       assert.equal(length2Path.inputCount, 2);
-      // Should have codepointLength == 3 once it's defined.
+      assert.equal(length2Path.codepointLength, 3);
       assert.isNumber(length2Path.spaceId);
       assert.notEqual(length2Path.spaceId, length1Path.spaceId);
       assert.deepEqual(length2Path.bestExample, {text: 'tri', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
@@ -390,16 +393,134 @@ describe('Correction Searching', () => {
       ]);
 
       assert.equal(length1Path.inputCount, 1);
-      // Should have codepointLength == 1 once it's defined.
+      assert.equal(length1Path.codepointLength, 1);
       assert.isNumber(length1Path.spaceId);
       assert.notEqual(length1Path.spaceId, rootPath.spaceId);
       assert.deepEqual(length1Path.bestExample, {text: 't', p: 0.5});
       assert.deepEqual(length1Path.parents, [rootPath]);
       assert.deepEqual(length1Path.inputs, leadEdgeDistribution);
     });
+
+    describe('split()', () => {
+      describe(`token of single-char transforms:  [crt][ae][nr][t]`, () => {
+        const buildPath = () => {
+          let path = new SearchPath(testModel);
+
+          /*
+           * Assumptions:
+           * - The "true keystroke" data is held within the passed-in distribution,
+           *   at index 0.
+           * - None of the distributions have been split.
+           */
+          const extendPath = (path: SearchPath, distrib: Distribution<Transform>) => {
+            return new SearchPath(path, distrib, {
+              trueTransform: distrib[0].sample,
+              inputStartIndex: 0,
+              bestProbFromSet: distrib[0].p
+            });
+          }
+
+          const distrib1 = [
+            { sample: {insert: 'c', deleteLeft: 0}, p: 0.5 },
+            { sample: {insert: 'r', deleteLeft: 0}, p: 0.4 },
+            { sample: {insert: 't', deleteLeft: 0}, p: 0.1 }
+          ];
+          path = extendPath(path, distrib1);
+
+          const distrib2 = [
+            { sample: {insert: 'a', deleteLeft: 0}, p: 0.7 },
+            { sample: {insert: 'e', deleteLeft: 0}, p: 0.3 }
+          ];
+          path = extendPath(path, distrib2);
+
+          const distrib3 = [
+            { sample: {insert: 'n', deleteLeft: 0}, p: 0.8 },
+            { sample: {insert: 'r', deleteLeft: 0}, p: 0.2 }
+          ];
+          path = extendPath(path, distrib3);
+
+          const distrib4 = [
+            { sample: {insert: 't', deleteLeft: 0}, p: 1 }
+          ];
+          path = extendPath(path, distrib4);
+
+          return {
+            path,
+            distributions: [distrib1, distrib2, distrib3, distrib4]
+          };
+        }
+
+        it('setup: constructs path properly', () => {
+          const { path: pathToSplit, distributions } = buildPath();
+
+          assert.equal(pathToSplit.inputCount, 4);
+          assert.equal(distributions.length, pathToSplit.inputCount);
+          assert.equal(pathToSplit.codepointLength, 4); // one char per input, no deletions anywhere
+          // Per assertions documented in the setup above.
+          assert.deepEqual(pathToSplit.bestExample, distributions.reduce(
+            (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
+            {text: '', p: 1})
+          );
+          assert.deepEqual(pathToSplit.parents[0].bestExample, distributions.slice(0, pathToSplit.inputCount-1).reduce(
+            (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
+            {text: '', p: 1})
+          );
+          assert.isTrue(pathToSplit.hasInputs(distributions));
+          assert.equal(pathToSplit.constituentPaths.length, 1);
+        });
+
+        it('splits properly at index 0', () => {
+          const { path: pathToSplit, distributions } = buildPath();
+
+          const [head, tail] = pathToSplit.split(0);
+
+          assert.equal(head.inputCount, 0);
+          assert.equal(tail.inputCount, 4);
+          // The split operation will still reconstruct the token; the head
+          // is always built from the same root path, while the tail is not.
+          assert.notEqual(tail, pathToSplit);
+          assert.deepEqual(head.parents, []);
+          assert.equal(head, pathToSplit.constituentPaths[0][0]);
+
+          assert.isTrue(head.hasInputs([]));
+          assert.isTrue(tail.hasInputs(distributions));
+
+          assert.deepEqual(head.bestExample, [].reduce((accum, curr) => {
+            return {
+              text: accum.text + curr[0].sample.insert,
+              p: accum.p * curr[0].p
+            }
+          }, { text: '', p: 1 }));
+          assert.deepEqual(tail.bestExample, distributions.reduce((accum, curr) => {
+            return {
+              text: accum.text + curr[0].sample.insert,
+              p: accum.p * curr[0].p
+            }
+          }, { text: '', p: 1 }));
+        });
+      });
+
+      // TODO:  define split test(s):
+      // - with deleteLeft, index at base of a transform
+      // - at the end of the path
+      // - at the start of the path
+      // - clean split
+      // - simple mid-transform split
+
+      // With all of...?
+      //   - simple cases (though mid-transform not possible)
+      //     - single entry & mild distribution?
+      //   - idea:  NFD encoding?  Or maybe combining emoji?
+      //   - ca nt el ou pe (?)
+      //   - ca -1+ent -2+llar -2+o => cello, but with LOTS of edits.
+      //     - ca, cent, cellar, cello
+      //     - not exactly built for splitting a DISTRIBUTION, though.
+      //   - [bft], ax|it|ox, ed|es (for a distribution split)
+
+      // Funky synthetic cases that ought be useful:
+      // - use the 'largelongtransform' from before?
+      // - do the weird repeated-edit sequence here, to be sure.
+      //   - these latter two can have nice merge() parallels.
+    });
   });
-});
-
-describe('SearchPath', () => {
-
 });
