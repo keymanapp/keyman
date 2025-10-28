@@ -3,7 +3,7 @@
 #
 # Created by mcdurdin on 2025-10-27
 #
-# This workflow publishes all our NPM packages using Trusted Publishers OIDC
+# This workflow publishes all our npm packages using Trusted Publishers OIDC
 # permissions. It is triggered by a repository_dispatch event with the types
 # `npm-publish:*`, from the trigger-builds infrastructure. For test builds, this
 # does a `npm pack` only.
@@ -14,8 +14,8 @@
 #   user:        The user that triggered the build or created the PR
 #   isTestBuild: false for Releases, otherwise true
 
-name: "NPM publish"
-run-name: "NPM publish - sha: ${{ github.event.client_payload.buildSha }}, user: @${{ github.event.client_payload.user }}, isTestBuild: ${{ github.event.client_payload.isTestBuild }}"
+name: "npm publish"
+run-name: "npm publish - sha: ${{ github.event.client_payload.buildSha }}, user: @${{ github.event.client_payload.user }}, isTestBuild: ${{ github.event.client_payload.isTestBuild }}"
 on:
   repository_dispatch:
     types: ['npm-publish:*']
@@ -70,7 +70,7 @@ jobs:
         npm -v
         node -v
 
-    - name: NPM pack
+    - name: npm pack
       if: github.event.client_payload.isTestBuild == 'true'
       run: |
         export KEYMAN_TIER=$(cat TIER.md)
@@ -82,7 +82,7 @@ jobs:
           echo WARNING: npm-publish.sh is not yet available on this branch
         fi
 
-    - name: NPM publish
+    - name: npm publish
       if: github.event.client_payload.isTestBuild == 'false'
       run: |
         export KEYMAN_TIER=$(cat TIER.md)
