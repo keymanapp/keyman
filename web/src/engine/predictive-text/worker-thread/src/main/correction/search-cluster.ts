@@ -15,6 +15,7 @@ import { generateSpaceSeed, PathResult, SearchSpace, TokenInputSource } from './
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
+import { SearchPath } from './search-path.js';
 
 const PATH_QUEUE_COMPARATOR: Comparator<SearchSpace> = (a, b) => {
   return a.currentCost - b.currentCost;
@@ -165,5 +166,9 @@ export class SearchCluster implements SearchSpace {
 
   split(charIndex: number): [SearchSpace, SearchSpace] {
     throw new Error('Method not implemented.');
+  }
+
+  get constituentPaths(): SearchPath[][] {
+    return this.parents.flatMap((p) => p.constituentPaths);
   }
 }
