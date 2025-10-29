@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.148 alpha 2025-10-29
+
+* chore(web,android): Consolidate chirality.js test keyboard to `/common/test/resources/keyboards/` (#14989)
+* maint(resources): npm publish - build all packages first (#15042)
+
 ## 19.0.147 alpha 2025-10-28
 
 * maint(resources): move npm package publishing to GitHub Actions (#15029)
