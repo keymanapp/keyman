@@ -123,19 +123,6 @@ export class SearchPath implements SearchSpace {
     this.bestProbInEdge = 1;
   }
 
-  /**
-   * Retrieves the sequences of inputs that led to this SearchPath.
-   */
-  public get inputSequence(): Distribution<Transform>[] {
-    if(this.parents[0]) {
-      return [...this.parents[0].inputSequence, this.inputs];
-    } else if(this.inputs) {
-      return [this.inputs];
-    } else {
-      return [];
-    }
-  }
-
   public get constituentPaths(): SearchPath[][] {
     const parentPaths = this.parents[0]?.constituentPaths ?? [];
     if(parentPaths.length > 0) {
