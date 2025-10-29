@@ -242,24 +242,29 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       // related results as fully separate; our reconstructions are
       // per-codepoint.
       if(localInputId != spaceInputId || localInputId === undefined) {
-        return this.construct(parentMerge, space.inputs, space.inputSource);
-      } else {
-        // Get the twin halves that were split.
-        // Assumption:  the two halves are in their original order, etc.
-        const localInputs = this.inputs;
-        const spaceInputs = space.inputs;
-
-        // Merge them!
-        const mergedInputs = localInputs?.map((entry, index) => {
-          return {
-            sample: buildMergedTransform(entry.sample, spaceInputs[index].sample),
-            p: entry.p
-          }
-        });
-
-        // Now to re-merge the two halves.
-        return this.construct(this.parentNode, mergedInputs, this.inputSource);
+        return space.construct(parentMerge, space.inputs, space.inputSource);
       }
+      // Get the twin halves that were split.
+      // Assumption:  the two halves are in their original order, etc.
+      const localInputs = this.inputs;
+      const spaceInputs = space.inputs;
+
+      // Sanity check - ensure that the input distributions have the same length;
+      // if not, this shouldn't represent a SearchPath split!
+      if(localInputs.length != spaceInputs.length) {
+        return space.construct(parentMerge, space.inputs, space.inputSource);
+      }
+
+      // Merge them!
+      const mergedInputs = localInputs?.map((entry, index) => {
+        return {
+          sample: buildMergedTransform(entry.sample, spaceInputs[index].sample),
+          p: entry.p
+        }
+      });
+
+      // Now to re-merge the two halves.
+      return space.construct(this.parentNode, mergedInputs, this.inputSource);
     } else {
       // If the parent was a cluster, the cluster itself is the merge.
       return parentMerge;
