@@ -9,10 +9,13 @@
 
 import { assert } from 'chai';
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, LegacyQuotientRoot, unitTestEndpoints, SearchQuotientNode } from '@keymanapp/lm-worker/test-index';
+import { generateSubsetId, LegacyQuotientSpur, models, LegacyQuotientRoot, SearchQuotientNode, PathInputProperties, SearchQuotientSpur, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
 
+import Distribution = LexicalModelTypes.Distribution;
+import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
 const { constituentPaths, quotientPathHasInputs } = unitTestEndpoints;
@@ -320,7 +323,7 @@ describe('SearchQuotientSpur', () => {
       assert.sameOrderedMembers(pathSequence, paths.slice(1));
     });
 
-    // TODO:  add a test for mixed SearchPath / SearchCluster cases.
+    // TODO:  add a test for mixed SearchQuotientSpur / SearchCluster cases.
   });
 
   describe('split()', () => {
@@ -1328,6 +1331,488 @@ describe('SearchQuotientSpur', () => {
         }
       });
       assert.deepEqual((tail as LegacyQuotientSpur).inputSource, tailTarget.inputSource);
+    });
+  });
+
+  // Placed after `split()` because many cases mock a reversal of split-test results.
+  describe('merge()', () => {
+    /*
+     * To define:
+     * - merging a standard case
+     * - merging a split BMP case
+     * - merging a standard SMP case
+     * - merging a split SMP case
+     * - merging a case where the deleteLeft was split from the insert
+     *   - splitIndex = 0, but the deleteLeft is (conceptually) before that.
+     * - this (empty) + param (full)
+     * - this (full) + param (empty)
+     * - merging with distributions (no split)
+     * - merging with distributions (and a definite split)
+     *
+     * - biglargetransform for single-input multi-split remerge
+     *   - merging a three-way split should be associative (not dependent on order) so
+     *     long as the relative positions are correct
+     *
+     * - "cello" case(s) covers...
+     *   - deleteLeft split from insert
+     *   - a straight-up split (mid-insert)
+     *   - standard case (no distrib)
+     *   - with head + tail index inclusion, the empty + full versions
+     *   - SMP variant:  the SMP cases.
+     *
+     * - then we may need a "merging with distributions" coverage
+     *   - can prob make a simple BMP mocked version...
+     *   - and a simple SMP mocked version
+     *   - is actually pretty-much covered anyway... I believe.
+     */
+
+    // Covers cases where a single "input" was split into more than two fragments
+    describe(`previously-split token comprised of single titanic transform: biglargetransform`, () => {
+      const buildPath = () => {
+        const distributions = [
+          [{ sample: {insert: 'big', deleteLeft: 0, id: 11}, p: 1 }],
+          [{ sample: {insert: 'large', deleteLeft: 0, id: 11}, p: 1 }],
+          [{ sample: {insert: 'transform', deleteLeft: 0, id: 11}, p: 1 }]
+        ];
+
+        const originalInputBase: PathInputProperties = {
+          segment: {
+            trueTransform: {insert: 'biglargetransform', deleteLeft: 0, id: 11},
+            start: 0,
+            transitionId: 11
+          },
+          bestProbFromSet: 1,
+          subsetId: generateSubsetId()
+        };
+
+        const originalInputs = [0, 3, 8].map(n => ({...originalInputBase, inputStartIndex: n}));
+
+        const paths = distributions.map((d, i) => new LegacyQuotientSpur(new LegacyQuotientRoot(testModel), d, originalInputs[i]));
+
+        return {
+          paths,
+          distributions,
+          originalInputs
+        };
+      }
+
+      const checkFinalStateAssertions = (merged: SearchQuotientSpur, originalInput: PathInputProperties) => {
+        assert.equal(merged.inputCount, 1);
+        assert.isTrue(merged instanceof SearchQuotientSpur);
+        assert.deepEqual(merged.bestExample.text, "biglargetransform");
+        assert.deepEqual((merged as SearchQuotientSpur).inputs, [
+          { sample: { insert: 'biglargetransform', deleteLeft: 0, id: 11 }, p: 1 }
+        ]);
+        assert.deepEqual((merged as SearchQuotientSpur).inputSource, originalInput);
+        // TODO:  check the 'source' input data (here and in callers)
+      }
+
+      it('setup: constructs paths properly', () => {
+        const { paths, distributions, originalInputs } = buildPath();
+
+        assert.equal(paths.length, 3);
+        assert.equal(distributions.length, paths.length);
+        paths.forEach((p, i) => {
+          assert.equal(p.inputCount, 1);
+          assert.equal(distributions[i].length, p.inputCount);
+          assert.equal(p.codepointLength, KMWString.length(distributions[i][0].sample.insert));
+          assert.deepEqual(p.bestExample, {
+            text: ['big', 'large', 'transform'][i],
+            p: 1
+          });
+          assert.equal(p.parents[0].inputCount, 0);
+          assert.isTrue(quotientPathHasInputs(p, [distributions[i]]));
+        });
+
+        originalInputs.forEach((original) => {
+          assert.deepEqual({...original, inputStartIndex: 0}, {...originalInputs[0], inputStartIndex: 0});
+        });
+      });
+
+      it('merging order:  big + large, then + transform', () => {
+        const { paths, originalInputs } = buildPath();
+
+        const headMerge = paths[0].merge(paths[1]);
+
+        // Assertions
+        assert.equal(headMerge.inputCount, 1);
+        assert.isTrue(headMerge instanceof SearchQuotientSpur);
+        assert.deepEqual(headMerge.bestExample.text, "biglarge");
+        assert.deepEqual((headMerge as SearchQuotientSpur).inputs, [
+          { sample: { insert: 'biglarge', deleteLeft: 0, id: 11 }, p: 1 }
+        ]);
+        assert.deepEqual((headMerge as SearchQuotientSpur).inputSource, originalInputs[0]);
+
+        const fullMerge = headMerge.merge(paths[2]);
+        checkFinalStateAssertions(fullMerge as SearchQuotientSpur, originalInputs[0]);
+      });
+
+      it('merging order:  large + transform, then + big', () => {
+        const { paths, originalInputs } = buildPath();
+
+        const tailMerge = paths[1].merge(paths[2]);
+
+        // Assertions
+        assert.equal(tailMerge.inputCount, 1);
+        assert.isTrue(tailMerge instanceof SearchQuotientSpur);
+        assert.deepEqual(tailMerge.bestExample.text, "largetransform");
+        assert.deepEqual((tailMerge as SearchQuotientSpur).inputs, [
+          { sample: { insert: 'largetransform', deleteLeft: 0, id: 11 }, p: 1 }
+        ]);
+        assert.deepEqual((tailMerge as SearchQuotientSpur).inputSource, originalInputs[1]);
+
+        const fullMerge = paths[0].merge(tailMerge);
+        checkFinalStateAssertions(fullMerge as SearchQuotientSpur, originalInputs[0]);
+      });
+    });
+
+    // Covers many common aspects of SearchQuotientSpur merging, though not merging of
+    // multi-member distributions.
+    describe(`previously-split token comprised of complex, rewriting transforms:  cello`, () => {
+      const buildPath = (inputs: Distribution<Transform>[], sources: PathInputProperties[], root?: SearchQuotientNode) => {
+        return inputs.reduce((path, input, index) => new LegacyQuotientSpur(path, input, sources[index]), root ?? new LegacyQuotientRoot(testModel));
+      }
+
+      const buildFixtures = () => {
+        const trueDistributions = [
+          [
+            { sample: {insert: 'ca', deleteLeft: 0, id: 11}, p: 1 }
+          ], [
+            { sample: {insert: 'ent', deleteLeft: 1, id: 12}, p: 1 }
+          ], [
+            { sample: {insert: 'llar', deleteLeft: 2, id: 13}, p: 1 }
+          ], [
+            { sample: {insert: 'o', deleteLeft: 2, id: 14}, p: 1 }
+          ]
+        ];
+
+        const trueInputSources: PathInputProperties[] = trueDistributions.map((d) => {
+          return {
+            segment: {
+              start: 0,
+              trueTransform: d[0].sample,
+              transitionId: d[0].sample.id
+            },
+            bestProbFromSet: d[0].p,
+            subsetId: generateSubsetId()
+          }
+        });
+
+        const commonRoot = new LegacyQuotientRoot(testModel);
+        const mergeTarget = buildPath(trueDistributions, trueInputSources, commonRoot);
+
+        // Index:  the position of the split.
+        const splits: [SearchQuotientNode, SearchQuotientNode][] = [];
+
+        // Case 0:  bare head path, reproduced token (on different root)
+        splits.push([
+          commonRoot, buildPath(trueDistributions, trueInputSources)
+        ]);
+
+        // Case 1: the split happens in token 2 (index 1), with the deleteLeft
+        // split from the insert.
+        splits.push([
+          buildPath([
+            trueDistributions[0],
+            [{ sample: {insert: '', deleteLeft: 1, id: 12}, p: 1 }]
+          ], trueInputSources.slice(0, 2), commonRoot),
+          buildPath([
+            [{ sample: {insert: 'ent', deleteLeft: 0, id: 12}, p: 1 }],
+            ...trueDistributions.slice(2)
+          ], [
+            {...trueInputSources[1], segment: {...trueInputSources[1].segment, start: 0}},
+            ...trueInputSources.slice(2)
+          ])
+        ]);
+
+        // Case 2: the split happens in token 3 (index 2), with the deleteLeft
+        // split from the insert.
+        splits.push([
+          buildPath([
+            ...trueDistributions.slice(0, 2),
+            [{ sample: {insert: '', deleteLeft: 2, id: 13}, p: 1 }]
+          ], trueInputSources.slice(0, 3), commonRoot),
+          buildPath([
+            [{ sample: {insert: 'llar', deleteLeft: 0, id: 13}, p: 1 }],
+            ...trueDistributions.slice(3)
+          ], [
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 0}},
+            ...trueInputSources.slice(3)
+          ])
+        ]);
+
+        // Case 3: the split happens in token 3 (index 2), in the middle of the
+        // insert.
+        splits.push([
+          buildPath([
+            ...trueDistributions.slice(0, 2),
+            [{ sample: {insert: 'l', deleteLeft: 2, id: 13}, p: 1 }]
+          ], trueInputSources.slice(0, 3), commonRoot),
+          buildPath([
+            [{ sample: {insert: 'lar', deleteLeft: 0, id: 13}, p: 1 }],
+            ...trueDistributions.slice(3)
+          ], [
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 1}},
+            ...trueInputSources.slice(3)
+          ])
+        ]);
+
+        // Case 4: the split happens in token 4 (index 3), with the deleteLeft
+        // split from the insert.
+        splits.push([
+          buildPath([
+            ...trueDistributions.slice(0, 3),
+            [{ sample: {insert: '', deleteLeft: 2, id: 14}, p: 1 }]
+          ], trueInputSources.slice(), commonRoot),
+          buildPath([
+            [{ sample: {insert: 'o', deleteLeft: 0, id: 14}, p: 1 }]
+          ], [
+            {...trueInputSources[3], segment: {...trueInputSources[3].segment, start: 0}},
+          ])
+        ]);
+
+        // Case 5: the split happens at the token's end, leaving the tail
+        // as a fresh, empty token.
+        splits.push([
+          buildPath(trueDistributions, trueInputSources, commonRoot),
+          new LegacyQuotientRoot(testModel)
+        ]);
+
+        return {
+          mergeTarget,
+          splits,
+          trueDistributions
+        };
+      }
+
+      const runCommonAssertions = (splitIndex: number) => {
+        const { mergeTarget, splits, trueDistributions } = buildFixtures();
+        const splitToTest = splits[splitIndex];
+
+        const remergedPath = splitToTest[0].merge(splitToTest[1]) as SearchQuotientSpur;
+
+        assert.deepEqual(remergedPath.bestExample, mergeTarget.bestExample);
+        assert.equal(remergedPath.inputCount, mergeTarget.inputCount);
+        assert.equal(remergedPath.codepointLength, mergeTarget.codepointLength);
+        assert.sameDeepOrderedMembers(remergedPath.inputSegments, mergeTarget.inputSegments);
+        assert.isTrue(quotientPathHasInputs(remergedPath, trueDistributions));
+      }
+
+      it('setup: constructs path properly', () => {
+        const { mergeTarget, splits } = buildFixtures();
+
+        const targetText = mergeTarget.bestExample.text;
+
+        for(let i = 0; i < splits.length; i++) {
+          const splitSet = splits[i];
+
+          assert.equal(splitSet[0].codepointLength, i);
+          assert.equal(splitSet[0].bestExample.text, KMWString.substring(targetText, 0, i));
+          assert.equal(splitSet[1].codepointLength, KMWString.length(targetText) - i);
+          assert.equal(splitSet[1].bestExample.text, KMWString.substring(targetText, i));
+        }
+      });
+
+      it('splits properly at index 0', () => {
+        runCommonAssertions(0);
+      });
+
+      it('splits properly at index 1', () => {
+        runCommonAssertions(1);
+      });
+
+      it('splits properly at index 2', () => {
+        runCommonAssertions(2);
+      });
+
+      it('splits properly at index 3', () => {
+        runCommonAssertions(3);
+      });
+
+      it('splits properly at index 4', () => {
+        runCommonAssertions(4);
+      });
+
+      it('splits properly at index 5', () => {
+        runCommonAssertions(5);
+      });
+    });
+
+    // Same as the prior set, but now with non-BMP text!
+    describe(`previously-split token comprised of complex, rewriting non-BMP transforms`, () => {
+      const buildPath = (inputs: Distribution<Transform>[], sources: PathInputProperties[], root?: SearchQuotientNode) => {
+        return inputs.reduce((path, input, index) => new LegacyQuotientSpur(path, input, sources[index]), root ?? new LegacyQuotientRoot(testModel));
+      }
+
+      const buildFixtures = () => {
+        const trueDistributions = [
+          [
+            { sample: {insert: toMathematicalSMP('ca'), deleteLeft: 0, id: 11}, p: 1 }
+          ], [
+            { sample: {insert: toMathematicalSMP('ent'), deleteLeft: 1, id: 12}, p: 1 }
+          ], [
+            { sample: {insert: toMathematicalSMP('llar'), deleteLeft: 2, id: 13}, p: 1 }
+          ], [
+            { sample: {insert: toMathematicalSMP('o'), deleteLeft: 2, id: 14}, p: 1 }
+          ]
+        ];
+
+        const trueInputSources: PathInputProperties[] = trueDistributions.map((d) => {
+          return {
+            segment: {
+              start: 0,
+              trueTransform: d[0].sample,
+              transitionId: d[0].sample.id
+            },
+            bestProbFromSet: d[0].p,
+            subsetId: generateSubsetId()
+          }
+        });
+
+        const commonRoot = new LegacyQuotientRoot(testModel);
+        const mergeTarget = buildPath(trueDistributions, trueInputSources, commonRoot);
+
+        // Index:  the position of the split.
+        const splits: [SearchQuotientNode, SearchQuotientNode][] = [];
+
+        // Case 0:  bare head path, reproduced token (on different root)
+        splits.push([
+          commonRoot, buildPath(trueDistributions, trueInputSources)
+        ]);
+
+        // Case 1: the split happens in token 2 (index 1), with the deleteLeft
+        // split from the insert.
+        splits.push([
+          buildPath([
+            trueDistributions[0],
+            [{ sample: {insert: toMathematicalSMP(''), deleteLeft: 1, id: 12}, p: 1 }]
+          ], trueInputSources.slice(0, 2), commonRoot),
+          buildPath([
+            [{ sample: {insert: toMathematicalSMP('ent'), deleteLeft: 0, id: 12}, p: 1 }],
+            ...trueDistributions.slice(2)
+          ], [
+            {...trueInputSources[1], segment: {...trueInputSources[1].segment, start: 0}},
+            ...trueInputSources.slice(2)
+          ])
+        ]);
+
+        // Case 2: the split happens in token 3 (index 2), with the deleteLeft
+        // split from the insert.
+        splits.push([
+          buildPath([
+            ...trueDistributions.slice(0, 2),
+            [{ sample: {insert: toMathematicalSMP(''), deleteLeft: 2, id: 13}, p: 1 }]
+          ], trueInputSources.slice(0, 3), commonRoot),
+          buildPath([
+            [{ sample: {insert: toMathematicalSMP('llar'), deleteLeft: 0, id: 13}, p: 1 }],
+            ...trueDistributions.slice(3)
+          ], [
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 0}},
+            ...trueInputSources.slice(3)
+          ])
+        ]);
+
+        // Case 3: the split happens in token 3 (index 2), in the middle of the
+        // insert.
+        splits.push([
+          buildPath([
+            ...trueDistributions.slice(0, 2),
+            [{ sample: {insert: toMathematicalSMP('l'), deleteLeft: 2, id: 13}, p: 1 }]
+          ], trueInputSources.slice(0, 3), commonRoot),
+          buildPath([
+            [{ sample: {insert: toMathematicalSMP('lar'), deleteLeft: 0, id: 13}, p: 1 }],
+            ...trueDistributions.slice(3)
+          ], [
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 1}},
+            ...trueInputSources.slice(3)
+          ])
+        ]);
+
+        // Case 4: the split happens in token 4 (index 3), with the deleteLeft
+        // split from the insert.
+        splits.push([
+          buildPath([
+            ...trueDistributions.slice(0, 3),
+            [{ sample: {insert: toMathematicalSMP(''), deleteLeft: 2, id: 14}, p: 1 }]
+          ], trueInputSources.slice(), commonRoot),
+          buildPath([
+            [{ sample: {insert: toMathematicalSMP('o'), deleteLeft: 0, id: 14}, p: 1 }]
+          ], [
+            {...trueInputSources[3], segment: {...trueInputSources[3].segment, start: 0}},
+          ])
+        ]);
+
+        // Case 5: the split happens at the token's end, leaving the tail
+        // as a fresh, empty token.
+        splits.push([
+          buildPath(trueDistributions, trueInputSources, commonRoot),
+          new LegacyQuotientRoot(testModel)
+        ]);
+
+        return {
+          mergeTarget,
+          splits,
+          trueDistributions
+        };
+      }
+
+      const runCommonAssertions = (splitIndex: number) => {
+        const { mergeTarget, splits, trueDistributions } = buildFixtures();
+        const splitToTest = splits[splitIndex];
+
+        const remergedPath = splitToTest[0].merge(splitToTest[1]) as SearchQuotientSpur;
+
+        assert.deepEqual(remergedPath.bestExample, mergeTarget.bestExample);
+        assert.equal(remergedPath.inputCount, mergeTarget.inputCount);
+        assert.equal(remergedPath.codepointLength, mergeTarget.codepointLength);
+        assert.sameDeepOrderedMembers(remergedPath.inputSegments, mergeTarget.inputSegments);
+        assert.isTrue(quotientPathHasInputs(remergedPath, trueDistributions));
+      }
+
+      it('setup: constructs path properly', () => {
+        // Validate that an SMP-conversion has occurred.
+        assert.notEqual(toMathematicalSMP("cello"), "cello");
+        assert.equal(toMathematicalSMP("cello").length, "cello".length * 2);
+        assert.equal(KMWString.length(toMathematicalSMP("cello")), KMWString.length("cello"));
+
+        const { mergeTarget, splits } = buildFixtures();
+
+        const targetText = mergeTarget.bestExample.text;
+        assert.equal(targetText, toMathematicalSMP("cello"));
+
+        for(let i = 0; i < splits.length; i++) {
+          const splitSet = splits[i];
+
+          assert.equal(splitSet[0].codepointLength, i);
+          assert.equal(splitSet[0].bestExample.text, KMWString.substring(targetText, 0, i));
+          assert.equal(splitSet[1].codepointLength, KMWString.length(targetText) - i);
+          assert.equal(splitSet[1].bestExample.text, KMWString.substring(targetText, i));
+        }
+      });
+
+      it('splits properly at index 0', () => {
+        runCommonAssertions(0);
+      });
+
+      it('splits properly at index 1', () => {
+        runCommonAssertions(1);
+      });
+
+      it('splits properly at index 2', () => {
+        runCommonAssertions(2);
+      });
+
+      it('splits properly at index 3', () => {
+        runCommonAssertions(3);
+      });
+
+      it('splits properly at index 4', () => {
+        runCommonAssertions(4);
+      });
+
+      it('splits properly at index 5', () => {
+        runCommonAssertions(5);
+      });
     });
   });
 });
