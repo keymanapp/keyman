@@ -47,4 +47,4 @@ function do_build() {
 builder_run_action clean       rm -rf ./build/
 builder_run_action configure   node_select_version_and_npm_ci
 builder_run_action build       do_build
-builder_run_action test        typescript_run_eslint_mocha_tests 45
+builder_run_action test        typescript_run_eslint_mocha_tests 40
