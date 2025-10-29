@@ -64,7 +64,7 @@ jobs:
           /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-          -f description='npm $NPM_ACTION started' \
+          -f description="npm $NPM_ACTION started" \
           -f context="$STATUS_CONTEXT"
 
     - name: Report initial npm/node versions
@@ -82,6 +82,10 @@ jobs:
         echo "Current npm/node versions"
         npm -v
         node -v
+
+    - name: Configure build environment
+      run: |
+        ./resources/build/ci/npm-publish.sh configure
 
     - name: npm pack/publish
       run: |
