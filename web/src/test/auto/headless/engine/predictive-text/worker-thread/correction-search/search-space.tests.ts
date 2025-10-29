@@ -21,7 +21,7 @@ function buildTestTimer() {
   return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
 
-describe('SearchSpace', () => {
+describe('Correction Searching', () => {
   const checkRepeatableResults_teh = async (iter: AsyncGenerator<correction.SearchResult, any, any>) => {
     const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
     assert.isFalse(firstIterResult.done);
