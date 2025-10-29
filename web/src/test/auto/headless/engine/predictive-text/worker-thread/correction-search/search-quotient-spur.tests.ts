@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, LegacyQuotientRoot, SearchQuotientNode, PathInputProperties, SearchQuotientSpur, generateSubsetId } from '@keymanapp/lm-worker/test-index';
+import { generateSubsetId, LegacyQuotientSpur, models, LegacyQuotientRoot, SearchQuotientNode, PathInputProperties, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -1852,6 +1852,72 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 5', () => {
         runCommonAssertions(5);
       });
+    });
+
+    it('correctly merges paths previously split mid-input', () => {
+      let path: SearchQuotientNode = new LegacyQuotientRoot(testModel);
+      const startSample = {sample: { insert: 'a', deleteLeft: 0 }, p: 1}
+      path = new LegacyQuotientSpur(path, [startSample], startSample);
+
+      const inputDistribution = [
+        {sample: { insert: 'four', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'then', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'nine', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'what', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'cent', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+
+      const mergeTarget = new LegacyQuotientSpur(path, inputDistribution, inputDistribution[0]);
+      assert.equal(mergeTarget.codepointLength, 4);
+      assert.equal(mergeTarget.inputCount, 2);
+
+      // This test models a previous split at codepoint index 2, splitting
+      // the input distribution accordingly.  (Note:  deleteLeft = 1!)
+      const headDistributionSplit = [
+        {sample: { insert: 'fo', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'th', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'ni', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'wh', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'ce', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+      const headPath = new LegacyQuotientSpur(
+        path, headDistributionSplit, {
+          segment: {
+            start: 0,
+            trueTransform: inputDistribution[0].sample,
+            transitionId: inputDistribution[0].sample.id
+          },
+          bestProbFromSet: inputDistribution[0].p,
+          subsetId: mergeTarget.inputSource.subsetId
+        }
+      );
+
+      const tailDistributionSplit = [
+        {sample: { insert: 'ur', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'en', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'ne', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'at', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'nt', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+      const tailPath = new LegacyQuotientSpur(
+        new LegacyQuotientRoot(testModel), tailDistributionSplit, {
+          segment: {
+            start: 2,
+            trueTransform: inputDistribution[0].sample,
+            transitionId: inputDistribution[0].sample.id
+          },
+          bestProbFromSet: inputDistribution[0].p,
+          subsetId: mergeTarget.inputSource.subsetId
+        }
+      );
+
+      const remerged = headPath.merge(tailPath);
+
+      assert.deepEqual(remerged.bestExample, mergeTarget.bestExample);
+      assert.equal(remerged.inputCount, 2);
+      assert.isTrue(remerged instanceof SearchQuotientSpur);
+      assert.deepEqual((remerged as SearchQuotientSpur).inputs, inputDistribution);
+      assert.isTrue(remerged.hasInputs([[startSample], inputDistribution]));
     });
   });
 });
