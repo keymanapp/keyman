@@ -46,7 +46,7 @@ describe('compiler-tests', function() {
       // Let's build basic.xml
       // It should match basic-vv.kmx (built from basic.txt)
       const k = new LdmlKeyboardCompiler();
-      await k.init(compilerTestCallbacks, { ...compilerTestOptions, version, saveDebug: true, shouldAddCompilerVersion: false });
+      await k.init(compilerTestCallbacks, { ...compilerTestOptions, targetVersion: version, saveDebug: true, shouldAddCompilerVersion: false });
 
       const { artifacts } = await k.run(inputFilename, "basic-xml.kmx"); // need the exact name passed to build-fixtures
       assert.isNotNull(artifacts);
