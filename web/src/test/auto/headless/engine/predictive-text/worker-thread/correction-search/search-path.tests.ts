@@ -1192,6 +1192,65 @@ describe('SearchPath', () => {
         assert.deepEqual(head.parents[0].bestExample.text, toMathematicalSMP("cellar"));
       });
     });
+
+    it('correctly splits mid-input when necessary', () => {
+      let path = new SearchPath(testModel);
+      const startSample = {sample: { insert: 'a', deleteLeft: 0 }, p: 1}
+      path = new SearchPath(path, [startSample], startSample);
+
+      const inputDistribution = [
+        {sample: { insert: 'four', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'then', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'nine', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'what', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'cent', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+
+      const pathToSplit = new SearchPath(path, inputDistribution, inputDistribution[0]);
+      assert.equal(pathToSplit.codepointLength, 4);
+      assert.equal(pathToSplit.inputCount, 2);
+
+      // This test models a previous split at codepoint index 2, splitting
+      // the input distribution accordingly.  (Note:  deleteLeft = 1!)
+      const headDistributionSplit = [
+        {sample: { insert: 'fo', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'th', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'ni', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'wh', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'ce', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+      const headTarget = new SearchPath(
+        path, headDistributionSplit, inputDistribution[0]
+      );
+
+      const tailDistributionSplit = [
+        {sample: { insert: 'ur', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'en', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'ne', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'at', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'nt', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+      const tailTarget = new SearchPath(
+        new SearchPath(testModel), tailDistributionSplit, {
+          trueTransform: inputDistribution[0].sample,
+          bestProbFromSet: inputDistribution[0].p,
+          inputStartIndex: 2
+        }
+      );
+
+      const split = pathToSplit.split(2);
+
+      assert.deepEqual(split[0].bestExample, headTarget.bestExample);
+      assert.deepEqual(split[1].bestExample, tailTarget.bestExample);
+      assert.equal(split[0].inputCount, headTarget.inputCount);
+      assert.equal(split[1].inputCount, tailTarget.inputCount);
+      assert.isTrue(split[0] instanceof SearchPath);
+      assert.isTrue(split[1] instanceof SearchPath);
+      assert.deepEqual((split[0] as SearchPath).inputs, headTarget.inputs);
+      assert.deepEqual((split[1] as SearchPath).inputs, tailTarget.inputs);
+      assert.deepEqual((split[0] as SearchPath).inputSource, headTarget.inputSource);
+      assert.deepEqual((split[1] as SearchPath).inputSource, tailTarget.inputSource);
+    });
   });
 
   // Placed after `split()` because many cases mock a reversal of split-test results.
