@@ -47,11 +47,6 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return [];
   }
 
-  // Return a new array each time; avoid aliasing potential!
-  get inputSequence(): LexicalModelTypes.Distribution<LexicalModelTypes.Transform>[] {
-    return [];
-  }
-
   // Return a new instance each time; avoid aliasing potential!
   get bestExample(): { text: string; p: number; }  {
     return { text: '', p: 1 };
