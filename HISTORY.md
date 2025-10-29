@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.151 alpha 2025-10-29
+
+* maint(resources): add repository record for all published packages (#15049)
+
 ## 19.0.150 alpha 2025-10-29
 
 * maint(resources): set build flags for npm-publish (#15047)
