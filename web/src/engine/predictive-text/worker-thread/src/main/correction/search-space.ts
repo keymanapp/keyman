@@ -158,6 +158,13 @@ export interface SearchSpace {
    */
   readonly sourceIdentifiers: TokenInputSource[];
 
+  /**
+   * Appends this SearchSpace with the provided SearchSpace's search properties,
+   * extending the represented search range accordingly.  If this operation
+   * represents merging the result of a previous .split() call, the two halves
+   * of any split input components will be fully re-merged.
+   * @param space
+   */
   merge(space: SearchSpace): SearchSpace;
 
   /**
