@@ -1,5 +1,35 @@
 # Keyman Version History
 
+## 19.0.150 alpha 2025-10-29
+
+* maint(resources): set build flags for npm-publish (#15047)
+
+## 19.0.149 alpha 2025-10-29
+
+* maint(resources): don't report status check on release builds for npm-publish (#15045)
+
+## 19.0.148 alpha 2025-10-29
+
+* chore(web,android): Consolidate chirality.js test keyboard to `/common/test/resources/keyboards/` (#14989)
+* maint(resources): npm publish - build all packages first (#15042)
+
+## 19.0.147 alpha 2025-10-28
+
+* maint(resources): move npm package publishing to GitHub Actions (#15029)
+* maint(resources): use actions/setup-node to upgrade npm (#15035)
+* maint(resources): use a string for version, rather than number (#15036)
+* maint(resources): set env variables in npm publish GHA (#15037)
+* maint(mac): minor tweaks to mac setup, using build.sh (#15028)
+* maint(resources): add build and test for npm packaging and add status check results (#15038)
+* maint(resources): add write permission for statuses for npm-publish (#15039)
+* maint(resources): skip nvm in npm-publish script (#15041)
+
+## 19.0.146 alpha 2025-10-27
+
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15008)
+* fix(developer): prevent ANSI keyboards crashing debugger (#15022)
+* test(developer): add coverage tests for warning messages in kmc-analyze/AnalyzeOskCharacterUse (#15021)
+
 ## 19.0.145 alpha 2025-10-24
 
 * fix(developer): do not treat backslash as a string escape in syntax highlighting (#15001)
