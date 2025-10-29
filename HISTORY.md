@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.150 alpha 2025-10-29
+
+* maint(resources): set build flags for npm-publish (#15047)
+
 ## 19.0.149 alpha 2025-10-29
 
 * maint(resources): don't report status check on release builds for npm-publish (#15045)
