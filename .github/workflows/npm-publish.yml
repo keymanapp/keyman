@@ -56,6 +56,7 @@ jobs:
 
     - name: Set pending status
       id: set_status
+      if: github.event.client_payload.isTestBuild == 'true'
       shell: bash
       run: |
         gh api \
@@ -131,6 +132,7 @@ jobs:
         echo "MSG=npm $NPM_ACTION failed" >> $GITHUB_ENV
 
     - name: Set final status
+      if: github.event.client_payload.isTestBuild == 'true'
       run: |
         gh api \
           --method POST \
