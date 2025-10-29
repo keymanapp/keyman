@@ -91,7 +91,16 @@ jobs:
     - name: npm pack/publish
       run: |
         export KEYMAN_TIER=$(cat TIER.md)
+        export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
         export GHA_BRANCH="${{ github.event.client_payload.branch }}"
+        echo "KEYMAN_TIER=$KEYMAN_TIER" >> $GITHUB_ENV
+        echo "GHA_TEST_BUILD=${GHA_TEST_BUILD}" >> $GITHUB_ENV
+        echo "GHA_BRANCH=${GHA_BRANCH}" >> $GITHUB_ENV
+
+        echo "KEYMAN_TIER: $KEYMAN_TIER"
+        echo "GHA_TEST_BUILD: $GHA_TEST_BUILD"
+        echo "GHA_BRANCH: $GHA_BRANCH"
+
         if [[ -f ./resources/build/ci/npm-publish.sh ]]; then
           ./resources/build/ci/npm-publish.sh $NPM_ACTION
         else
