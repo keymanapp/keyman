@@ -1843,5 +1843,59 @@ describe('SearchPath', () => {
         runCommonAssertions(5);
       });
     });
+
+    it('correctly merges paths previously split mid-input', () => {
+      let path = new SearchPath(testModel);
+      const startSample = {sample: { insert: 'a', deleteLeft: 0 }, p: 1}
+      path = new SearchPath(path, [startSample], startSample);
+
+      const inputDistribution = [
+        {sample: { insert: 'four', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'then', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'nine', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'what', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'cent', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+
+      const mergeTarget = new SearchPath(path, inputDistribution, inputDistribution[0]);
+      assert.equal(mergeTarget.codepointLength, 4);
+      assert.equal(mergeTarget.inputCount, 2);
+
+      // This test models a previous split at codepoint index 2, splitting
+      // the input distribution accordingly.  (Note:  deleteLeft = 1!)
+      const headDistributionSplit = [
+        {sample: { insert: 'fo', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'th', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'ni', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'wh', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'ce', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+      const headPath = new SearchPath(
+        path, headDistributionSplit, inputDistribution[0]
+      );
+
+      const tailDistributionSplit = [
+        {sample: { insert: 'ur', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.4},
+        {sample: { insert: 'en', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.3},
+        {sample: { insert: 'ne', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.2},
+        {sample: { insert: 'at', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.06},
+        {sample: { insert: 'nt', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.04}
+      ];
+      const tailPath = new SearchPath(
+        new SearchPath(testModel), tailDistributionSplit, {
+          trueTransform: inputDistribution[0].sample,
+          bestProbFromSet: inputDistribution[0].p,
+          inputStartIndex: 2
+        }
+      );
+
+      const remerged = headPath.merge(tailPath);
+
+      assert.deepEqual(remerged.bestExample, mergeTarget.bestExample);
+      assert.equal(remerged.inputCount, 2);
+      assert.isTrue(remerged instanceof SearchPath);
+      assert.deepEqual((remerged as SearchPath).inputs, inputDistribution);
+      assert.isTrue(remerged.hasInputs([[startSample], inputDistribution]));
+    });
   });
 });
