@@ -21,7 +21,7 @@ function buildTestTimer() {
   return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
 
-describe('SearchSpace', () => {
+describe('Correction Searching', () => {
   const checkRepeatableResults_teh = async (iter: AsyncGenerator<correction.SearchResult, any, any>) => {
     const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
     assert.isFalse(firstIterResult.done);
@@ -126,9 +126,9 @@ describe('SearchSpace', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new SearchPath(searchPath, synthInput1, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: 1});
-    const searchPath2 = new SearchPath(searchPath1, synthInput2, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
-    const searchPath3 = new SearchPath(searchPath2, synthInput3, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
+    const searchPath1 = new SearchPath(searchPath, synthInput1, synthInput1[0]);
+    const searchPath2 = new SearchPath(searchPath1, synthInput2, synthInput2[0]);
+    const searchPath3 = new SearchPath(searchPath2, synthInput3, synthInput3[0]);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -160,9 +160,9 @@ describe('SearchSpace', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new SearchPath(searchPath, synthInput1, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: 1});
-    const searchPath2 = new SearchPath(searchPath1, synthInput2, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
-    const searchPath3 = new SearchPath(searchPath2, synthInput3, {trueTransform: synthInput1[0].sample, inputStartIndex: 0, bestProbFromSet: .75});
+    const searchPath1 = new SearchPath(searchPath, synthInput1, synthInput1[0]);
+    const searchPath2 = new SearchPath(searchPath1, synthInput2, synthInput2[0]);
+    const searchPath3 = new SearchPath(searchPath2, synthInput3, synthInput3[0]);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -207,8 +207,8 @@ describe('SearchSpace', () => {
     assert.equal(laterResult.matchString, 't');
     assert.isFalse(resultState.done);
   });
-});
 
-describe('SearchPath', () => {
-
+  // Tests for mechanics reliant upon the SearchSpace interface, rather than a specific implementation.
+  describe('SearchPath + SearchSpace', () => {
+  });
 });
