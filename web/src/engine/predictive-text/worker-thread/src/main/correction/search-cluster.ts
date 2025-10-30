@@ -89,7 +89,7 @@ export class SearchCluster implements SearchSpace {
 
     this.spaceId = generateSpaceSeed();
 
-    this.lowestPossibleSingleCost = Math.min(...inboundPaths.map(p => p.lowestPossibleSingleCost));
+    this.lowestPossibleSingleCost = lowestPossibleSingleCost;
     this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => r.node);
     this.selectionQueue.enqueueAll(inboundPaths);
 
