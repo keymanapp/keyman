@@ -1,5 +1,10 @@
 {
   "name": "@keymanapp/keyman-version",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "common/web/keyman-version"
+  },
   "description": "Keyman global version data",
   "exports": {
     ".": {

@@ -50,7 +50,7 @@ bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Linux_Test_Integration Keyman
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
 bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
-bc_test_developer=(Keyman_Developer_Test Keyman_Test_Developer_Mac Keyman_Test_Developer_Linux)
+bc_test_developer=(Keyman_Developer_Test Keyman_Test_Developer_Mac Keyman_Test_Developer_Linux npm-publish_GitHub)
 
 bc_test_common_web=(Keyman_Test_Common_Web)
 bc_test_common_windows=(Keyman_Test_Common_Windows)
@@ -70,7 +70,7 @@ bc_master_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_master_mac=(KeymanMac_Master)
 bc_master_windows=(Keyman_Build)
 bc_master_web=(Keymanweb_Build)
-bc_master_developer=(Keyman_Developer_Release)
+bc_master_developer=(Keyman_Developer_Release npm-publish_GitHub)
 
 vcs_master=HttpsGithubComKeymanappKeyman
 
@@ -82,7 +82,7 @@ bc_beta_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_beta_mac=(KeymanMac_Master)
 bc_beta_windows=(Keyman_Build)
 bc_beta_web=(Keymanweb_Build)
-bc_beta_developer=(Keyman_Developer_Release)
+bc_beta_developer=(Keyman_Developer_Release npm-publish_GitHub)
 
 vcs_beta=HttpsGithubComKeymanappKeyman
 
@@ -144,6 +144,6 @@ bc_stable_18_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_stable_18_0_mac=(KeymanMac_Master)
 bc_stable_18_0_windows=(Keyman_Build)
 bc_stable_18_0_web=(Keymanweb_Build)
-bc_stable_18_0_developer=(Keyman_Developer_Release)
+bc_stable_18_0_developer=(Keyman_Developer_Release npm-publish_GitHub)
 
 vcs_stable_18_0=HttpsGithubComKeymanappKeyman

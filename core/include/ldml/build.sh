@@ -16,10 +16,7 @@ builder_describe "Keyman ldml-keyboard-constants package" \
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -33,4 +30,3 @@ builder_run_action clean      rm -rf ./build/
 builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 # builder_run_action test       # no tests at this time
-builder_run_action publish    builder_publish_npm

@@ -16,9 +16,7 @@ builder_describe "Build Keyman kmc-copy module" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
   "@/developer/src/common/web/utils" \
-  clean configure build api test publish \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  clean configure build api test
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -40,5 +38,3 @@ builder_run_action api        api-extractor run --local --verbose
 # note: `export TEST_SAVE_FIXTURES=1` to get a copy of cloud-based fixtures saved to online/
 # TODO: -skip-full
 builder_run_action test       builder_do_typescript_tests 75
-
-builder_run_action publish    builder_publish_npm

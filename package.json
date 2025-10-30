@@ -68,6 +68,10 @@
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
     "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
   "engines": {
     "node": "20.16.0"
   }

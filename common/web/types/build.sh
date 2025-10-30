@@ -14,10 +14,7 @@ builder_describe "Build Keyman common file types module" \
   "configure" \
   "build" \
   "clean" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure   /common/web/types/src/schemas/kpj.schema.ts \
@@ -104,4 +101,3 @@ builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/schem
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
 builder_run_action test       do_test
-builder_run_action publish    builder_publish_npm
