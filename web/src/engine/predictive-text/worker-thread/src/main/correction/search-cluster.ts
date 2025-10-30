@@ -61,9 +61,32 @@ export class SearchCluster implements SearchSpace {
    * @param model
    */
   constructor(inboundPaths: ReadonlyArray<SearchSpace>) {
+    if(inboundPaths.length == 0) {
+      throw new Error("SearchCluster requires an array with at least one SearchPath");
+    }
+
+    let lowestPossibleSingleCost = Number.POSITIVE_INFINITY;
+    const inputCount = inboundPaths[0]?.inputCount;
+    const transitionIds = inboundPaths[0]?.sourceIdentifiers.map(src => src.trueTransform.id);
+    const codepointLength = inboundPaths[0]?.codepointLength;
+
+    for(let path of inboundPaths) {
+      if(path.inputCount != inputCount || path.codepointLength != codepointLength) {
+        throw new Error(`SearchPath does not share same properties as others in the cluster:  inputCount ${path.inputCount} vs ${inputCount}, codepointLength ${path.codepointLength} vs ${codepointLength}`);
+      }
+
+      const pathTransitionIds = new Set(path.sourceIdentifiers.map(src => src.trueTransform.id));
+      // If there's an ID mismatch - via mismatch in count or in actual ID, we have an error.
+      if(transitionIds.length != pathTransitionIds.size || transitionIds.find(i => !pathTransitionIds.has(i)) !== undefined) {
+        throw new Error(`SearchPath does not share the same source identifiers as others in the cluster`);
+      }
+
+      lowestPossibleSingleCost = Math.min(lowestPossibleSingleCost, path.lowestPossibleSingleCost);
+    }
+
     this.spaceId = generateSpaceSeed();
 
-    this.lowestPossibleSingleCost = Math.min(...inboundPaths.map(p => p.lowestPossibleSingleCost));
+    this.lowestPossibleSingleCost = lowestPossibleSingleCost;
     this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => r.node);
     this.selectionQueue.enqueueAll(inboundPaths);
 
