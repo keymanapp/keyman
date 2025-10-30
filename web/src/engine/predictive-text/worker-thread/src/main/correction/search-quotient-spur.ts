@@ -74,10 +74,16 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
         inputStartIndex: 0
       }
     };
+    const inputSrc = inputSource as TokenInputSource;
+
+    const transitionId = (inputs?.[0].sample.id);
+    if(transitionId !== undefined && inputSrc?.trueTransform.id != transitionId) {
+      throw new Error("Input distribution and input-source transition IDs must match");
+    }
 
     this.parentNode = parentNode;
     this.inputSource = inputSource as TokenInputSource;
-    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(this.inputSource?.bestProbFromSet ?? 1);
+    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
   }
