@@ -157,6 +157,21 @@ describe('SearchPath', () => {
     assert.deepEqual(length1Path.inputs, leadEdgeDistribution);
   });
 
+  it('throws if input and input-source transition IDs mismatch', () => {
+    const rootPath = new SearchPath(testModel);
+
+    const leadEdgeDistribution = [
+      {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
+      {sample: {insert: 'a', deleteLeft: 0, id: 13 }, p: 0.3},
+      {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
+    ];
+
+    assert.throws(() => new SearchPath(rootPath, leadEdgeDistribution, {
+      ...leadEdgeDistribution[0],
+      sample: {...leadEdgeDistribution[0].sample, id: 15}
+    }));
+  });
+
   it('may extend with a Transform inserting multiple codepoints', () => {
     const rootPath = new SearchPath(testModel);
 
