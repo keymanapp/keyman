@@ -102,7 +102,7 @@ describe('ContextToken', function() {
       const token2 = new ContextToken(plainModel, "'");
       const token3 = new ContextToken(plainModel, "t");
 
-      const merged = ContextToken.merge([token1, token2, token3], plainModel);
+      const merged = ContextToken.merge([token1, token2, token3]);
       assert.equal(merged.exampleInput, "can't");
       token1.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
       token2.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
@@ -142,7 +142,7 @@ describe('ContextToken', function() {
         bestProbFromSet: 1
       }, [{sample: {insert: 't', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
 
-      const merged = ContextToken.merge([token1, token2, token3], plainModel);
+      const merged = ContextToken.merge([token1, token2, token3]);
       assert.equal(merged.exampleInput, "can't");
       assert.deepEqual(merged.inputRange, [ { trueTransform: srcTransform, inputStartIndex: 0, bestProbFromSet: 1 } ]);
       assert.equal(merged.searchSpace.inputCount, 1);
@@ -202,7 +202,7 @@ describe('ContextToken', function() {
         bestProbFromSet: 1
       }, [{sample: srcTransform4, p: 1}]);
 
-      const merged = ContextToken.merge(tokensToMerge, plainModel);
+      const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
       assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0, bestProbFromSet: 1 }) ));
       assert.isTrue(merged.searchSpace.hasInputs(
@@ -263,7 +263,7 @@ describe('ContextToken', function() {
         bestProbFromSet: 1
       }, [{sample: srcTransform4, p: 1}]);
 
-      const merged = ContextToken.merge(tokensToMerge, plainModel);
+      const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
       assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0, bestProbFromSet: 1 }) ));
       assert.isTrue(merged.searchSpace.hasInputs(

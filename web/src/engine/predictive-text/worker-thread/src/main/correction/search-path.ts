@@ -10,7 +10,7 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { applyTransform } from '@keymanapp/models-templates';
+import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathResult, SearchSpace, TokenInputSource } from './search-space.js';
@@ -126,19 +126,6 @@ export class SearchPath implements SearchSpace {
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestPossibleSingleCost = 0;
     this.bestProbInEdge = 1;
-  }
-
-  /**
-   * Retrieves the sequences of inputs that led to this SearchPath.
-   */
-  public get inputSequence(): Distribution<Transform>[] {
-    if(this.parents[0]) {
-      return [...this.parents[0].inputSequence, this.inputs];
-    } else if(this.inputs) {
-      return [this.inputs];
-    } else {
-      return [];
-    }
   }
 
   public get constituentPaths(): SearchPath[][] {
@@ -274,6 +261,67 @@ export class SearchPath implements SearchSpace {
 
     // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
     this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
+  }
+
+  // spaces are in sequence here.
+  // `this` = head 'space'.
+  public merge(space: SearchSpace): SearchSpace {
+    // Head node for the incoming path is empty, so skip it.
+    if(space.parents.length == 0) {
+      return this;
+    }
+
+    // Merge any parents first as a baseline.  We have to come after their
+    // affects are merged in, anyway.
+    const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
+
+    // if parentMerges.length > 0, is a SearchCluster.
+    // const parentMerge = parentMerges.length > 0 ? new SearchCluster(parentMerges) : parentMerges[0];
+    const parentMerge = parentMerges[0];
+
+    // Special case:  if we've reached the head of the space to be merged, check
+    // for a split transform.
+    //  - we return `this` from the root, so if that's what we received, we're
+    //    on the first descendant - the first path component.
+    if(space instanceof SearchPath) {
+      if(parentMerge != this) {
+        return new SearchPath(parentMerge, space.inputs, space.inputSource);
+      }
+
+      const localInputId = this.inputSource?.trueTransform.id;
+      const spaceInputId = space.inputSource?.trueTransform.id;
+      // The 'id' may be undefined in some unit tests and for tokens
+      // reconstructed after a backspace.  In either case, we consider the
+      // related results as fully separate; our reconstructions are
+      // per-codepoint.
+      if(localInputId != spaceInputId || localInputId === undefined) {
+        return new SearchPath(parentMerge, space.inputs, space.inputSource);
+      }
+      // Get the twin halves that were split.
+      // Assumption:  the two halves are in their original order, etc.
+      const localInputs = this.inputs;
+      const spaceInputs = space.inputs;
+
+      // Sanity check - ensure that the input distributions have the same length;
+      // if not, this shouldn't represent a SearchPath split!
+      if(localInputs.length != spaceInputs.length) {
+        return new SearchPath(parentMerge, space.inputs, space.inputSource);
+      }
+
+      // Merge them!
+      const mergedInputs = localInputs?.map((entry, index) => {
+        return {
+          sample: buildMergedTransform(entry.sample, spaceInputs[index].sample),
+          p: entry.p
+        }
+      });
+
+      // Now to re-merge the two halves.
+      return new SearchPath(this.parentSpace, mergedInputs, this.inputSource);
+    } else {
+      // If the parent was a cluster, the cluster itself is the merge.
+      return parentMerge;
+    }
   }
 
   public split(charIndex: number): [SearchSpace, SearchSpace] {

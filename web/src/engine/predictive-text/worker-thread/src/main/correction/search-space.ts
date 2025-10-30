@@ -130,15 +130,6 @@ export interface SearchSpace {
   readonly inputCount: number;
 
   /**
-   * Retrieves the sequence of inputs that led to this SearchSpace.
-   *
-   * THIS WILL BE REMOVED SHORTLY in favor of `constituentPaths` below, which
-   * provides an improved view into the data and models multiple paths to the
-   * space when they exist.  (Once SearchPath takes on merging & splitting)
-   */
-  readonly inputSequence: Distribution<Transform>[];
-
-  /**
    * Reports the length in codepoints of corrected text represented by completed
    * paths from this instance.
    */
@@ -157,6 +148,15 @@ export interface SearchSpace {
    * keystroke range corrected by this search space.
    */
   readonly sourceIdentifiers: TokenInputSource[];
+
+  /**
+   * Appends this SearchSpace with the provided SearchSpace's search properties,
+   * extending the represented search range accordingly.  If this operation
+   * represents merging the result of a previous .split() call, the two halves
+   * of any split input components will be fully re-merged.
+   * @param space
+   */
+  merge(space: SearchSpace): SearchSpace;
 
   /**
    * Splits this SearchSpace into two halves at the specified codepoint index.
