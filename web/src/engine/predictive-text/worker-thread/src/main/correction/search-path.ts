@@ -10,12 +10,15 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { applyTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchSpace } from './search-space.js';
+import { generateSpaceSeed, PathResult, SearchSpace, TokenInputSource } from './search-space.js';
 
+import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
@@ -26,7 +29,8 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchPath implements SearchSpace {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  private inputs?: Distribution<Readonly<Transform>>;
+  readonly inputs?: Distribution<Transform>;
+  readonly inputSource?: TokenInputSource;
 
   private parentSpace: SearchSpace;
   readonly spaceId: number;
@@ -53,18 +57,56 @@ export class SearchPath implements SearchSpace {
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(space: SearchSpace, inputs: Distribution<Transform>, bestProbFromSet: number);
-  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, bestProbFromSet?: number) {
+  /**
+   * Extends an existing SearchSpace (and its correction data) by a keystroke based
+   * on a subset of the incoming keystroke's fat-finger distribution.
+   * @param space
+   * @param inputs
+   * @param srcKeystroke The sample from the incoming distribution that represents data actually
+   * applied to the context.  It need not be included within the subset passed to `inputs`.
+   *
+   * `inputs` will be assumed to represent the full keystroke.  Use the `TokenInputSource` variant
+   * if this assumption is invalid.
+   */
+  constructor(space: SearchSpace, inputs: Distribution<Transform>, srcKeystroke: ProbabilityMass<Transform>);
+  /**
+   * Extends an existing SearchSpace (and its correction data) by a keystroke based
+   * on a subset of the incoming keystroke's fat-finger distribution.
+   * @param space
+   * @param inputs
+   * @param srcKeystroke Data about the actual context range represented by `inputs` and
+   * its underlying keystroke.
+   */
+  constructor(space: SearchSpace, inputs: Distribution<Transform>, srcKeystroke: TokenInputSource);
+  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: TokenInputSource | ProbabilityMass<Transform>) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
     const isExtending = (arg1 instanceof SearchPath);
     this.spaceId = generateSpaceSeed();
 
+    // Coerce inputSource to TokenInputSource format.
+    if(inputSource && (inputSource as TokenInputSource).trueTransform == undefined) {
+      const keystroke = inputSource as ProbabilityMass<Transform>;
+      inputSource = {
+        trueTransform: keystroke.sample,
+        bestProbFromSet: keystroke.p,
+        inputStartIndex: 0
+      }
+    };
+
+    const inputSrc = inputSource as TokenInputSource;
+
     if(isExtending) {
       const parentSpace = arg1 as SearchSpace;
-      const logTierCost = -Math.log(bestProbFromSet);
+      const logTierCost = -Math.log(inputSrc.bestProbFromSet);
+
+      const transitionId = (inputs?.[0].sample.id);
+      if(transitionId !== undefined && inputSrc.trueTransform.id != transitionId) {
+        throw new Error("Input distribution and input-source transition IDs must match");
+      }
 
       this.inputs = inputs;
+      this.inputSource = inputSrc;
       this.lowestPossibleSingleCost = parentSpace.lowestPossibleSingleCost + logTierCost;
       this.parentSpace = parentSpace;
 
@@ -98,12 +140,15 @@ export class SearchPath implements SearchSpace {
       return false;
     }
 
-    const tailInput = [...keystrokeDistributions.pop()];
+    const tailInput = [...keystrokeDistributions[keystrokeDistributions.length - 1]];
+    keystrokeDistributions = keystrokeDistributions.slice(0, keystrokeDistributions.length - 1);
     const localInput = this.lastInput;
+
+    const parentHasInput = () => !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
 
     // Actual reference match?  Easy mode.
     if(localInput == tailInput) {
-      return !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+      return parentHasInput();
     } else if(localInput.length != tailInput.length) {
       return false;
     } else {
@@ -129,7 +174,7 @@ export class SearchPath implements SearchSpace {
         }
       }
 
-      return !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+      return parentHasInput();
     }
   }
 
@@ -157,9 +202,26 @@ export class SearchPath implements SearchSpace {
     }
   }
 
+  get likeliestSourceText(): string {
+    let prefixContext: Context = { left: this.parentSpace?.likeliestSourceText ?? '', startOfBuffer: true, endOfBuffer: true };
+    const inputTransform = this.inputSource?.trueTransform ?? { insert: '', deleteLeft: 0 };
+
+    const excessDeletes = inputTransform.deleteLeft - KMWString.length(prefixContext.left);
+    if(excessDeletes > 0) {
+      prefixContext = {
+        ...prefixContext,
+        // \u{2421} = ␡ (Unicode symbol for Delete)
+        left: '\u{2421}'.repeat(excessDeletes) + prefixContext.left
+      };
+    }
+
+    const result = applyTransform(inputTransform, prefixContext);
+    return result.left;
+  }
+
   get parents() {
     // The SearchPath class may only have a single parent.
-    return [this.parentSpace];
+    return this.parentSpace ? [this.parentSpace] : [];
   }
 
   increaseMaxEditDistance() {
@@ -302,5 +364,23 @@ export class SearchPath implements SearchSpace {
 
   public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  }
+
+  public get sourceIdentifiers(): TokenInputSource[] {
+    if(!this.parentSpace) {
+      return [];
+    }
+
+    const parentSources = this.parentSpace.sourceIdentifiers;
+    if(this.inputSource) {
+      const inputId = this.inputSource.trueTransform.id;
+      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+        return parentSources;
+      }
+
+      parentSources.push(this.inputSource);
+    }
+
+    return parentSources;
   }
 }
