@@ -50,7 +50,8 @@ function do_copy() {
   mkdir -p "$GESTURE_PROCESSOR_TARGET"
   cp -a "$GESTURE_PROCESSOR_BUILD" "$GESTURE_PROCESSOR_TARGET"
 
-  # copy common test resources (keyboards)
+  # copy common test (resources) keyboards
+  cp -f "$KEYMAN_ROOT/common/test/keyboards/platform-rules/platformtest.js" "$KEYMAN_ROOT/$DEST/keyboards/"
   cp -f "$KEYMAN_ROOT/common/test/resources/keyboards/"*.js "$KEYMAN_ROOT/$DEST/keyboards/"
 }
 
