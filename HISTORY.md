@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.153 alpha 2025-10-30
+
+* test(developer): add kmc-analyze tests for AnalyzeOskCharacterUse output formats (#15030)
+
 ## 19.0.152 alpha 2025-10-30
 
 * maint(resources): include sourcemaps in npm publish (#15051)
