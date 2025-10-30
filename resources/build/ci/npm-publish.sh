@@ -49,9 +49,44 @@ function do_package_builds() {
   done
 }
 
+function inject_sourcemaps() {
+  local SOURCEMAP_PATHS
+  SOURCEMAP_PATHS=( "${PACKAGES[@]}" )
+  SOURCEMAP_PATHS=( "${SOURCEMAP_PATHS[@]/%//build}" )
+
+  builder_heading "Injecting sourcemaps"
+
+  pushd "${KEYMAN_ROOT}"
+
+  sentry-cli sourcemaps inject \
+    --org keyman \
+    --project keyman-developer \
+    --release "$KEYMAN_VERSION_GIT_TAG"  \
+    "${SOURCEMAP_PATHS[@]}"
+
+  if [[ "${GHA_TEST_BUILD+x}" == false ]]; then
+    builder_heading "Uploading sourcemaps"
+
+    sentry-cli sourcemaps upload \
+      --no-dedupe \
+      --org keyman \
+      --project keyman-developer \
+      --release "$KEYMAN_VERSION_GIT_TAG"  \
+      --ext js --ext mjs --ext ts --ext map \
+      "${SOURCEMAP_PATHS[@]}"
+  else
+    builder_heading "Skipping upload of sourcemaps (test build)"
+  fi
+
+  popd
+}
+
 function do_pack_or_publish() {
   local npm_action="$1"
   local npm_package_path
+
+  inject_sourcemaps
+
   for npm_package_path in "${PACKAGES[@]}"; do
     builder_heading "npm ${npm_action} ${npm_package_path}"
     ci_publish_npm_package "${npm_action}" "${npm_package_path}"
@@ -68,6 +103,8 @@ function do_publish() {
 }
 
 function install_emscripten() {
+  builder_heading "Installing emscripten"
+
   local EMSDK_TEMP
   EMSDK_TEMP=$(mktemp -d)
   pushd "${EMSDK_TEMP}"
@@ -84,6 +121,8 @@ function install_emscripten() {
 }
 
 function install_meson() {
+  builder_heading "Installing meson"
+
   builder_echo "Starting apt-get update + install meson"
   sudo apt-get update
   sudo apt-get install meson
@@ -91,9 +130,17 @@ function install_meson() {
   meson -v
 }
 
+function install_sentry_cli() {
+  builder_heading "Installing sentry-cli"
+
+  curl -sL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION="2.57.0" sh
+  sentry-cli --version
+}
+
 function do_configure() {
   install_meson
   install_emscripten
+  install_sentry_cli
 }
 
 builder_run_action configure do_configure
