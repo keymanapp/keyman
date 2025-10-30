@@ -3,7 +3,7 @@
 #
 # Created by mcdurdin on 2025-10-27
 #
-# This workflow publishes all our NPM packages using Trusted Publishers OIDC
+# This workflow publishes all our npm packages using Trusted Publishers OIDC
 # permissions. It is triggered by a repository_dispatch event with the types
 # `npm-publish:*`, from the trigger-builds infrastructure. For test builds, this
 # does a `npm pack` only.
@@ -14,8 +14,8 @@
 #   user:        The user that triggered the build or created the PR
 #   isTestBuild: false for Releases, otherwise true
 
-name: "NPM publish"
-run-name: "NPM publish - sha: ${{ github.event.client_payload.buildSha }}, user: @${{ github.event.client_payload.user }}, isTestBuild: ${{ github.event.client_payload.isTestBuild }}"
+name: "npm pack/publish"
+run-name: "npm pack/publish - branch: ${{ github.event.client_payload.branch }} sha: ${{ github.event.client_payload.buildSha }}, user: @${{ github.event.client_payload.user }}, isTestBuild: ${{ github.event.client_payload.isTestBuild }}"
 on:
   repository_dispatch:
     types: ['npm-publish:*']
@@ -23,32 +23,38 @@ on:
 permissions:
   id-token: write  # Required for OIDC
   contents: read
+  statuses: write
 
 env:
   GH_TOKEN: ${{ github.token }}
-  STATUS_CONTEXT: 'NPM Pack'
+  STATUS_CONTEXT: 'npm pack/publish'
+  IS_TEST_BUILD: ${{ github.event.client_payload.isTestBuild }}
+  # This property causes node.inc.sh to skip invocation of nvm, as otherwise, we
+  # end up downgrading to node v20 as of Keyman 19. See #15040 and corresponding
+  # change in node.inc.sh; we should be able to remove this in Keyman 20.
+  KEYMAN_CI_SKIP_NVM: true
 
 jobs:
-  npm-publish:
+  npm_publish:
     name: Publish or pack @keymanapp packages
     if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
     runs-on: ubuntu-24.04
     steps:
+
+    - name: Set env var for pack vs publish
+      run: |
+        if [[ "$IS_TEST_BUILD" == true ]]; then
+          echo "NPM_ACTION=pack" >> $GITHUB_ENV
+        else
+          echo "NPM_ACTION=publish" >> $GITHUB_ENV
+        fi
+
     - name: Checkout
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
-    - name: Upgrade npm to 11.6.2
-      run: |
-        echo "Initial npm version"
-        npm -v
-        echo "Upgrading npm to 11.6.2"
-        npm install --global npm@11.6.2
-        echo "Current npm version"
-        npm -v
-
-    - name: Set pending status on PR builds
+    - name: Set pending status
       id: set_status
       if: github.event.client_payload.isTestBuild == 'true'
       shell: bash
@@ -59,23 +65,89 @@ jobs:
           /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-          -f description='NPM pack started' \
+          -f description="npm $NPM_ACTION started" \
           -f context="$STATUS_CONTEXT"
 
-    - name: NPM pack
-      if: github.event.client_payload.isTestBuild == 'true'
+    - name: Report initial npm/node versions
       run: |
+        echo "Initial npm/node versions"
+        npm -v
+        node -v
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version: '24.10'
+
+    - name: Report current npm/node versions
+      run: |
+        echo "Current npm/node versions"
+        npm -v
+        node -v
+
+    - name: Configure build environment
+      run: |
+        ./resources/build/ci/npm-publish.sh configure
+
+    - name: npm pack/publish
+      run: |
+        export KEYMAN_TIER=$(cat TIER.md)
+        export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
+        export GHA_BRANCH="${{ github.event.client_payload.branch }}"
+        echo "KEYMAN_TIER=$KEYMAN_TIER" >> $GITHUB_ENV
+        echo "GHA_TEST_BUILD=${GHA_TEST_BUILD}" >> $GITHUB_ENV
+        echo "GHA_BRANCH=${GHA_BRANCH}" >> $GITHUB_ENV
+
+        echo "KEYMAN_TIER: $KEYMAN_TIER"
+        echo "GHA_TEST_BUILD: $GHA_TEST_BUILD"
+        echo "GHA_BRANCH: $GHA_BRANCH"
+
         if [[ -f ./resources/build/ci/npm-publish.sh ]]; then
-          ./resources/build/ci/npm-publish.sh pack
+          ./resources/build/ci/npm-publish.sh $NPM_ACTION
         else
-          echo WARNING: npm-publish.sh is not yet available on this branch
+          echo WARNING: npm-publish.sh is not yet available
         fi
 
-    - name: NPM publish
-      if: github.event.client_payload.isTestBuild == 'false'
+  set_status:
+    name: Set result status on PR builds
+    needs: [npm_publish]
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+
+    - name: Set env var for pack vs publish
       run: |
-        if [[ -f ./resources/build/ci/npm-publish.sh ]]; then
-          ./resources/build/ci/npm-publish.sh publish
+        if [[ "$IS_TEST_BUILD" == true ]]; then
+          echo "NPM_ACTION=pack" >> $GITHUB_ENV
         else
-          echo WARNING: npm-publish.sh is not yet available on this branch
+          echo "NPM_ACTION=publish" >> $GITHUB_ENV
         fi
+
+    - name: Set success
+      if: needs.npm_publish.result == 'success'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=npm $NPM_ACTION succeeded" >> $GITHUB_ENV
+
+    - name: Set cancelled
+      if: needs.npm_publish.result == 'cancelled'
+      run: |
+        echo "RESULT=error" >> $GITHUB_ENV
+        echo "MSG=npm $NPM_ACTION cancelled" >> $GITHUB_ENV
+
+    - name: Set failure
+      if: needs.npm_publish.result == 'failure'
+      run: |
+        echo "RESULT=failure" >> $GITHUB_ENV
+        echo "MSG=npm $NPM_ACTION failed" >> $GITHUB_ENV
+
+    - name: Set final status
+      if: github.event.client_payload.isTestBuild == 'true'
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          -f state="$RESULT" \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description="$MSG" \
+          -f context="$STATUS_CONTEXT"
