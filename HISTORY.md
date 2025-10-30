@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.152 alpha 2025-10-30
+
+* maint(resources): include sourcemaps in npm publish (#15051)
+
 ## 19.0.151 alpha 2025-10-29
 
 * maint(resources): add repository record for all published packages (#15049)
