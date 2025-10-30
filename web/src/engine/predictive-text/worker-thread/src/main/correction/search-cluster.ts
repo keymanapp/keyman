@@ -16,7 +16,6 @@ import { SearchPath } from './search-path.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
-import { SearchPath } from './search-path.js';
 
 const PATH_QUEUE_COMPARATOR: Comparator<SearchSpace> = (a, b) => {
   return a.currentCost - b.currentCost;
