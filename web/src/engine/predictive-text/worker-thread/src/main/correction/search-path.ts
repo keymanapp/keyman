@@ -100,6 +100,11 @@ export class SearchPath implements SearchSpace {
       const parentSpace = arg1 as SearchSpace;
       const logTierCost = -Math.log(inputSrc.bestProbFromSet);
 
+      const transitionId = (inputs?.[0].sample.id);
+      if(transitionId !== undefined && inputSrc.trueTransform.id != transitionId) {
+        throw new Error("Input distribution and input-source transition IDs must match");
+      }
+
       this.inputs = inputs;
       this.inputSource = inputSrc;
       this.lowestPossibleSingleCost = parentSpace.lowestPossibleSingleCost + logTierCost;
