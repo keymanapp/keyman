@@ -277,7 +277,6 @@ export class SearchPath implements SearchSpace {
     const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
 
     // if parentMerges.length > 0, is a SearchCluster.
-    // const parentMerge = parentMerges.length > 0 ? new SearchCluster(parentMerges) : parentMerges[0];
     const parentMerge = parentMerges[0];
 
     // Special case:  if we've reached the head of the space to be merged, check
