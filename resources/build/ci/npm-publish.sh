@@ -61,7 +61,7 @@ function inject_sourcemaps() {
   sentry-cli sourcemaps inject \
     --org keyman \
     --project keyman-developer \
-    --release "$KEYMAN_VERSION_GIT_TAG"  \
+    --release "$VERSION_GIT_TAG"  \
     "${SOURCEMAP_PATHS[@]}"
 
   if [[ "${GHA_TEST_BUILD+x}" == false ]]; then
@@ -71,7 +71,7 @@ function inject_sourcemaps() {
       --no-dedupe \
       --org keyman \
       --project keyman-developer \
-      --release "$KEYMAN_VERSION_GIT_TAG"  \
+      --release "$VERSION_GIT_TAG"  \
       --ext js --ext mjs --ext ts --ext map \
       "${SOURCEMAP_PATHS[@]}"
   else
