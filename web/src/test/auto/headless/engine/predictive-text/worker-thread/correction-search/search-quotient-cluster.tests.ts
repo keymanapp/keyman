@@ -118,19 +118,19 @@ export const buildAlphabeticClusterFixtures = () => {
 
   return {
     distributions: {
-      0: {
+      1: {
         distrib_c1_i1d0,
         distrib_c1_i2d0
       },
-      1: {
+      2: {
         distrib_v1_i1d0
       },
-      2: {
+      3: {
         distrib_v2_i1d0,
         distrib_v2_i1d1,
         distrib_v2_i2d1
       },
-      3: {
+      4: {
         distrib_c2_i1d0,
         distrib_c2_i2d0
       }
@@ -174,7 +174,7 @@ export const buildAlphabeticClusterFixtures = () => {
 
 describe('SearchCluster', () => {
   describe('constructor()', () => {
-    it('initializes from root SearchPath', () => {
+    it('initializes from LegacySearchRoot', () => {
       const path = new LegacyQuotientRoot(testModel);
       const cluster = new SearchQuotientCluster([path]);
       assert.equal(cluster.inputCount, 0);
@@ -184,7 +184,7 @@ describe('SearchCluster', () => {
       assert.deepEqual(cluster.parents, [path]);
     });
 
-    it('initializes from arbitrary SearchPath', () => {
+    it('initializes from arbitrary SearchQuotientSpur', () => {
       const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution: Distribution<Transform> = [
@@ -230,11 +230,11 @@ describe('SearchCluster', () => {
       ]);
     });
 
-    it('throws an error when SearchPath array is empty', () => {
+    it('throws an error when constructor array parameter is empty', () => {
       assert.throws(() => new SearchQuotientCluster([]));
     });
 
-    it('throws an error if SearchPath .inputCount values don\'t match', () => {
+    it('throws an error if parent .inputCount values don\'t match', () => {
       const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution: Distribution<Transform> = [
