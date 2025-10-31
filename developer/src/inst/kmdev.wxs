@@ -263,14 +263,6 @@
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmlmc.cmd' KeyPath="yes" Source="node\kmlmc.cmd" />
-      </Component>
-
-      <Component Directory="INSTALLDIR">
-        <File Name='kmlmp.cmd' KeyPath="yes" Source="node\kmlmp.cmd" />
-      </Component>
-
-      <Component Directory="INSTALLDIR">
         <File Name='kmc.cmd' KeyPath="yes" Source="node\kmc.cmd" />
       </Component>
     </ComponentGroup>
