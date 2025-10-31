@@ -292,6 +292,7 @@ describe('SearchPath', () => {
 
       assert.equal(pathToSplit.inputCount, 4);
       assert.equal(distributions.length, pathToSplit.inputCount);
+      assert.equal(pathToSplit.codepointLength, 4); // one char per input, no deletions anywhere
       // Per assertions documented in the setup above.
       assert.deepEqual(pathToSplit.bestExample, distributions.reduce(
         (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
@@ -302,6 +303,7 @@ describe('SearchPath', () => {
         {text: '', p: 1})
       );
       assert.isTrue(pathToSplit.hasInputs(distributions));
+      assert.equal(pathToSplit.constituentPaths.length, 1);
     });
   });
 
@@ -346,43 +348,27 @@ describe('SearchPath', () => {
     });
   });
 
+  describe('constituentPaths', () => {
+    it('includes a single entry when all parents are SearchPaths', () => {
+      const { paths } = buildSimplePathSplitFixture();
+      const finalPath = paths[4];
+
+      assert.equal(finalPath.constituentPaths.length, 1);
+
+      const pathSequence = finalPath.constituentPaths[0];
+      assert.equal(pathSequence.length, 5); // 4 inputs + 1 root node
+
+      assert.sameOrderedMembers(pathSequence, paths);
+    });
+
+    // TODO:  add a test for mixed SearchPath / SearchCluster cases.
+  });
+
   describe('split()', () => {
     describe(`on token comprised of single-char transforms:  [crt][ae][nr][t]`, () => {
-      const buildPath = () => {
-        let path = new SearchPath(testModel);
-
-        const distrib1 = [
-          { sample: {insert: 'c', deleteLeft: 0, id: 11}, p: 0.5 },
-          { sample: {insert: 'r', deleteLeft: 0, id: 11}, p: 0.4 },
-          { sample: {insert: 't', deleteLeft: 0, id: 11}, p: 0.1 }
-        ];
-        path = new SearchPath(path, distrib1, distrib1[0]);
-
-        const distrib2 = [
-          { sample: {insert: 'a', deleteLeft: 0, id: 12}, p: 0.7 },
-          { sample: {insert: 'e', deleteLeft: 0, id: 12}, p: 0.3 }
-        ];
-        path = new SearchPath(path, distrib2, distrib2[0]);
-
-        const distrib3 = [
-          { sample: {insert: 'n', deleteLeft: 0, id: 13}, p: 0.8 },
-          { sample: {insert: 'r', deleteLeft: 0, id: 13}, p: 0.2 }
-        ];
-        path = new SearchPath(path, distrib3, distrib3[0]);
-
-        const distrib4 = [
-          { sample: {insert: 't', deleteLeft: 0, id: 14}, p: 1 }
-        ];
-        path = new SearchPath(path, distrib4, distrib4[0]);
-
-        return {
-          path,
-          distributions: [distrib1, distrib2, distrib3, distrib4]
-        };
-      }
-
       const runSplit = (splitIndex: number) => {
-        const { path: pathToSplit, distributions } = buildPath();
+        const { paths, distributions } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
 
         const [head, tail] = pathToSplit.split(splitIndex);
 
@@ -409,29 +395,11 @@ describe('SearchPath', () => {
         }, { text: '', p: 1 }));
       }
 
-      it('setup: constructs path properly', () => {
-        const { path: pathToSplit, distributions } = buildPath();
-
-        assert.equal(pathToSplit.inputCount, 4);
-        assert.equal(distributions.length, pathToSplit.inputCount);
-        assert.equal(pathToSplit.codepointLength, 4); // one char per input, no deletions anywhere
-        // Per assertions documented in the setup above.
-        assert.deepEqual(pathToSplit.bestExample, distributions.reduce(
-          (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
-          {text: '', p: 1})
-        );
-        assert.deepEqual(pathToSplit.parents[0].bestExample, distributions.slice(0, pathToSplit.inputCount-1).reduce(
-          (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
-          {text: '', p: 1})
-        );
-        assert.isTrue(pathToSplit.hasInputs(distributions));
-        assert.equal(pathToSplit.constituentPaths.length, 1);
-      });
-
       it('splits properly at index 0', () => {
         runSplit(0);
 
-        const { path: pathToSplit, distributions } = buildPath();
+        const { paths, distributions } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head, tail] = pathToSplit.split(0);
 
         // The split operation will still reconstruct the token; the head
@@ -447,7 +415,8 @@ describe('SearchPath', () => {
       it('splits properly at index 1', () => {
         runSplit(1);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(1);
 
         assert.equal(head, pathToSplit.parents[0].parents[0].parents[0]);
@@ -456,7 +425,8 @@ describe('SearchPath', () => {
       it('splits properly at index 2', () => {
         runSplit(2);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(2);
 
         assert.equal(head, pathToSplit.parents[0].parents[0]);
@@ -465,7 +435,8 @@ describe('SearchPath', () => {
       it('splits properly at index 3', () => {
         runSplit(3);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(3);
 
         assert.equal(head, pathToSplit.parents[0]);
@@ -474,7 +445,8 @@ describe('SearchPath', () => {
       it('splits properly at index 4', () => {
         runSplit(4);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(4);
 
         assert.equal(head, pathToSplit);
