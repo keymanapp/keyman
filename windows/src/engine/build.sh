@@ -19,7 +19,7 @@ builder_describe \
   ":keyman                 Main host process (32 bit)" \
   ":keyman32               Keystroke processing engine (all archs)" \
   ":keymanmc               Message library" \
-  ":keymanx64              Host process (64 bit)" \
+  ":keymanhp              Host process (64 bit)" \
   ":kmcomapi               COM API library" \
   ":kmrefresh              Helper app to refresh Windows language settings" \
   ":kmtip                  Text Services Framework Text Input Processor" \
