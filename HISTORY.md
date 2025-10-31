@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.154 alpha 2025-10-31
+
+* chore(developer): further debugging for assertion failure (#15056)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15058)
+* fix(developer): handle exceptions loading .keyman-touch-layout files (#15060)
+* chore(developer): fix always-false nullish coalescing (#15061)
+* chore(windows): upgrade VC++ projects to v143 (VS2022) (#15062)
+
 ## 19.0.153 alpha 2025-10-30
 
 * test(developer): add kmc-analyze tests for AnalyzeOskCharacterUse output formats (#15030)
