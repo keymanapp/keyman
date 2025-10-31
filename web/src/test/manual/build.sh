@@ -52,6 +52,7 @@ function do_copy() {
 
   # copy common test (resources) keyboards
   cp -f "$KEYMAN_ROOT/common/test/keyboards/platform-rules/platformtest.js" "$KEYMAN_ROOT/$DEST/keyboards/"
+  cp -f "$KEYMAN_ROOT/common/test/keyboards/test9469/build/test9469.js" "$KEYMAN_ROOT/$DEST/keyboards/"
   cp -f "$KEYMAN_ROOT/common/test/resources/keyboards/"*.js "$KEYMAN_ROOT/$DEST/keyboards/"
 }
 
