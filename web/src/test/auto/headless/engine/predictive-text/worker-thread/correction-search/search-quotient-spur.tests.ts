@@ -364,41 +364,9 @@ describe('SearchQuotientSpur', () => {
 
   describe('split()', () => {
     describe(`on token comprised of single-char transforms:  [crt][ae][nr][t]`, () => {
-      const buildPath = () => {
-        let path: SearchQuotientNode = new LegacyQuotientRoot(testModel);
-
-        const distrib1 = [
-          { sample: {insert: 'c', deleteLeft: 0, id: 11}, p: 0.5 },
-          { sample: {insert: 'r', deleteLeft: 0, id: 11}, p: 0.4 },
-          { sample: {insert: 't', deleteLeft: 0, id: 11}, p: 0.1 }
-        ];
-        path = new LegacyQuotientSpur(path, distrib1, distrib1[0]);
-
-        const distrib2 = [
-          { sample: {insert: 'a', deleteLeft: 0, id: 12}, p: 0.7 },
-          { sample: {insert: 'e', deleteLeft: 0, id: 12}, p: 0.3 }
-        ];
-        path = new LegacyQuotientSpur(path, distrib2, distrib2[0]);
-
-        const distrib3 = [
-          { sample: {insert: 'n', deleteLeft: 0, id: 13}, p: 0.8 },
-          { sample: {insert: 'r', deleteLeft: 0, id: 13}, p: 0.2 }
-        ];
-        path = new LegacyQuotientSpur(path, distrib3, distrib3[0]);
-
-        const distrib4 = [
-          { sample: {insert: 't', deleteLeft: 0, id: 14}, p: 1 }
-        ];
-        path = new LegacyQuotientSpur(path, distrib4, distrib4[0]);
-
-        return {
-          path,
-          distributions: [distrib1, distrib2, distrib3, distrib4]
-        };
-      }
-
       const runSplit = (splitIndex: number) => {
-        const { path: pathToSplit, distributions } = buildPath();
+        const { paths, distributions } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
 
         const [head, tail] = pathToSplit.split(splitIndex);
 
@@ -425,29 +393,11 @@ describe('SearchQuotientSpur', () => {
         }, { text: '', p: 1 }));
       }
 
-      it('setup: constructs path properly', () => {
-        const { path: pathToSplit, distributions } = buildPath();
-
-        assert.equal(pathToSplit.inputCount, 4);
-        assert.equal(distributions.length, pathToSplit.inputCount);
-        assert.equal(pathToSplit.codepointLength, 4); // one char per input, no deletions anywhere
-        // Per assertions documented in the setup above.
-        assert.deepEqual(pathToSplit.bestExample, distributions.reduce(
-          (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
-          {text: '', p: 1})
-        );
-        assert.deepEqual(pathToSplit.parents[0].bestExample, distributions.slice(0, pathToSplit.inputCount-1).reduce(
-          (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
-          {text: '', p: 1})
-        );
-        assert.isTrue(pathToSplit.hasInputs(distributions));
-        assert.equal(pathToSplit.constituentPaths.length, 1);
-      });
-
       it('splits properly at index 0', () => {
         runSplit(0);
 
-        const { path: pathToSplit, distributions } = buildPath();
+        const { paths, distributions } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head, tail] = pathToSplit.split(0);
 
         // The split operation will still reconstruct the token; the head
@@ -463,7 +413,8 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 1', () => {
         runSplit(1);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(1);
 
         assert.equal(head, pathToSplit.parents[0].parents[0].parents[0]);
@@ -472,7 +423,8 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 2', () => {
         runSplit(2);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(2);
 
         assert.equal(head, pathToSplit.parents[0].parents[0]);
@@ -481,7 +433,8 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 3', () => {
         runSplit(3);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(3);
 
         assert.equal(head, pathToSplit.parents[0]);
@@ -490,7 +443,8 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 4', () => {
         runSplit(4);
 
-        const { path: pathToSplit } = buildPath();
+        const { paths } = buildSimplePathSplitFixture();
+        const pathToSplit = paths[4];
         const [head] = pathToSplit.split(4);
 
         assert.equal(head, pathToSplit);
@@ -1339,9 +1293,9 @@ describe('SearchQuotientSpur', () => {
     });
 
     it('correctly splits mid-input when necessary', () => {
-      let path = new SearchPath(testModel);
+      let path: SearchQuotientNode = new LegacyQuotientRoot(testModel);
       const startSample = {sample: { insert: 'a', deleteLeft: 0 }, p: 1}
-      path = new SearchPath(path, [startSample], startSample);
+      path = new LegacyQuotientSpur(path, [startSample], startSample);
 
       const inputDistribution = [
         {sample: { insert: 'four', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.4},
@@ -1351,7 +1305,7 @@ describe('SearchQuotientSpur', () => {
         {sample: { insert: 'cent', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
       ];
 
-      const pathToSplit = new SearchPath(path, inputDistribution, inputDistribution[0]);
+      const pathToSplit = new LegacyQuotientSpur(path, inputDistribution, inputDistribution[0]);
       assert.equal(pathToSplit.codepointLength, 4);
       assert.equal(pathToSplit.inputCount, 2);
 
@@ -1364,8 +1318,16 @@ describe('SearchQuotientSpur', () => {
         {sample: { insert: 'wh', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.06},
         {sample: { insert: 'ce', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
       ];
-      const headTarget = new SearchPath(
-        path, headDistributionSplit, inputDistribution[0]
+      const headTarget = new LegacyQuotientSpur(
+        path, headDistributionSplit, {
+          segment: {
+            trueTransform: inputDistribution[0].sample,
+            start: 0,
+            transitionId: inputDistribution[0].sample.id
+          },
+          bestProbFromSet: inputDistribution[0].p,
+          subsetId: pathToSplit.inputSource.subsetId
+        }
       );
 
       const tailDistributionSplit = [
@@ -1375,11 +1337,15 @@ describe('SearchQuotientSpur', () => {
         {sample: { insert: 'at', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.06},
         {sample: { insert: 'nt', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 0.04}
       ];
-      const tailTarget = new SearchPath(
-        new SearchPath(testModel), tailDistributionSplit, {
-          trueTransform: inputDistribution[0].sample,
+      const tailTarget = new LegacyQuotientSpur(
+        new LegacyQuotientRoot(testModel), tailDistributionSplit, {
+          segment: {
+            trueTransform: inputDistribution[0].sample,
+            start: 2,
+            transitionId: inputDistribution[0].sample.id
+          },
           bestProbFromSet: inputDistribution[0].p,
-          inputStartIndex: 2
+          subsetId: pathToSplit.inputSource.subsetId
         }
       );
 
@@ -1389,12 +1355,12 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(split[1].bestExample, tailTarget.bestExample);
       assert.equal(split[0].inputCount, headTarget.inputCount);
       assert.equal(split[1].inputCount, tailTarget.inputCount);
-      assert.isTrue(split[0] instanceof SearchPath);
-      assert.isTrue(split[1] instanceof SearchPath);
-      assert.deepEqual((split[0] as SearchPath).inputs, headTarget.inputs);
-      assert.deepEqual((split[1] as SearchPath).inputs, tailTarget.inputs);
-      assert.deepEqual((split[0] as SearchPath).inputSource, headTarget.inputSource);
-      assert.deepEqual((split[1] as SearchPath).inputSource, tailTarget.inputSource);
+      assert.isTrue(split[0] instanceof LegacyQuotientSpur);
+      assert.isTrue(split[1] instanceof LegacyQuotientSpur);
+      assert.deepEqual((split[0] as LegacyQuotientSpur).inputs, headTarget.inputs);
+      assert.deepEqual((split[1] as LegacyQuotientSpur).inputs, tailTarget.inputs);
+      assert.deepEqual((split[0] as LegacyQuotientSpur).inputSource, headTarget.inputSource);
+      assert.deepEqual((split[1] as LegacyQuotientSpur).inputSource, tailTarget.inputSource);
     });
   });
 });
