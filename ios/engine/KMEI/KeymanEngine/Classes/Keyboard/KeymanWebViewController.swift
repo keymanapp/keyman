@@ -182,7 +182,7 @@ extension KeymanWebViewController {
     }
     view = nil
   }
-  
+
   func languageMenuPosition(_ completion: @escaping (CGRect) -> Void) {
     webView!.evaluateJavaScript("langMenuPos();") { result, _ in
       guard let result = result as? String, !result.isEmpty else {
@@ -587,6 +587,10 @@ extension KeymanWebViewController: WKNavigationDelegate {
     }
     keyboardLoaded(self)
     delegate?.keyboardLoaded(self)
+  }
+
+  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+    reloadKeyboard()
   }
 }
 
