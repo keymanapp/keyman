@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.244 stable 2025-10-31
+
+* fix(linux): use `ibus` command to restart ibus (#14975)
+* fix(android): Set the main app background white (#14982)
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15005)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15006)
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15009)
+* maint(resources): move NPM package publishing to GitHub Actions (#15054)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15059)
+* chore(developer): further debugging for assertion failure (#15057)
+
 ## 18.0.243 stable 2025-10-15
 
 * chore(linux): Update debian changelog (#14855)
