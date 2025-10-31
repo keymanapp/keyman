@@ -23,6 +23,8 @@ import {
   SearchQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
+import { buildAlphabeticClusterFixtures } from './search-quotient-cluster.tests.js';
+
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -302,7 +304,22 @@ describe('SearchQuotientSpur', () => {
       assert.sameOrderedMembers(pathSequence, paths.slice(1));
     });
 
-    // TODO:  add a test for mixed SearchQuotientSpur / SearchCluster cases.
+    it('properly enumerates child paths when encountering SearchCluster ancestors', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const finalPath = fixture.paths[4].path_k4c6;
+
+      // The longest SearchPath at the end of that fixture's set is based on a
+      // lead-in cluster; all variants of that should be included.
+      assert.equal(constituentPaths(finalPath).length, constituentPaths(fixture.clusters.cluster_k3c4).length);
+
+      // That cluster holds the different potential penultimate paths;
+      // finalPath's inputs are added directly after any variation that may be
+      // output from the cluster.
+      assert.sameDeepMembers(constituentPaths(finalPath), constituentPaths(fixture.clusters.cluster_k3c4).map((p) => {
+        p.push(finalPath);
+        return p;
+      }));
+    });
   });
 
   describe('split()', () => {
