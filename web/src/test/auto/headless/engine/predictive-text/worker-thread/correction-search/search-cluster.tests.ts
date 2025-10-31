@@ -459,7 +459,7 @@ describe('SearchCluster', () => {
         distributions[3].distrib_v2_i1d0,
         distributions[4].distrib_c2_i1d0
       ]));
-      assert.isFalse(fourCharCluster.hasInputs([
+      assert.isFalse(fiveCharCluster.hasInputs([
         distributions[1].distrib_c1_i1d0,
         distributions[2].distrib_v1_i1d0,
         distributions[3].distrib_v2_i1d0,
