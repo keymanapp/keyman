@@ -94,7 +94,7 @@ function do_pack_or_publish() {
 }
 
 function do_publish() {
-  if [[ $KEYMAN_VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
+  if [[ $VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
     builder_die "publish must use --dry-run flag for local or test builds"
   fi
 
