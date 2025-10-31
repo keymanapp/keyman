@@ -72,8 +72,10 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   }
 
   const layr: BUILDER_LAYR = {
-    ident: constants.hex_section_id(constants.section.layr),
-    size: constants.length_layr,
+    header: {
+      ident: constants.hex_section_id(constants.section.layr),
+      size: constants.length_layr,
+    },
     _offset: 0,
     listCount: kmxplus.layr.lists.length,
     layerCount: 0, // calculated below
@@ -155,6 +157,6 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     (constants.length_layr_entry * layr.layerCount) +
     (constants.length_layr_row * layr.rowCount) +
     (constants.length_layr_key * layr.keyCount);
-  layr.size = offset;
+  layr.header.size = offset;
   return layr;
 }

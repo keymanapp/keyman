@@ -48,8 +48,10 @@ export function build_tran(source_tran: Tran | Bksp, sect_strs: BUILDER_STRS, se
   }
 
   const tran: BUILDER_TRAN = {
-    ident: constants.hex_section_id(source_tran.id),
-    size: 0, // need to compute total transforms + reorders
+    header: {
+      ident: constants.hex_section_id(source_tran.id),
+      size: 0, // need to compute total transforms + reorders
+    },
     _offset: 0,
     groupCount: source_tran.groups.length,
     transformCount: 0,
@@ -94,7 +96,7 @@ export function build_tran(source_tran: Tran | Bksp, sect_strs: BUILDER_STRS, se
   tran.transformCount = tran.transforms.length;
   tran.reorderCount = tran.reorders.length;
 
-  tran.size = constants.length_tran +
+  tran.header.size = constants.length_tran +
     (constants.length_tran_group * source_tran.groups.length) +
     (constants.length_tran_transform * tran.transforms.length) +
     (constants.length_tran_reorder * tran.reorders.length);

@@ -31,6 +31,7 @@ struct KMCMP_COMPILER_OPTIONS {
   bool warnDeprecatedCode;
   bool shouldAddCompilerVersion;
   int target;                     // CKF_KEYMAN, CKF_KEYMANWEB
+  int targetVersion;              // 0 = unspecified, otherwise Keyman version
 };
 
 //
