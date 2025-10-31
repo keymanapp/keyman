@@ -116,19 +116,19 @@ export const buildAlphabeticClusterFixtures = () => {
 
   return {
     distributions: {
-      0: {
+      1: {
         distrib_c1_i1d0,
         distrib_c1_i2d0
       },
-      1: {
+      2: {
         distrib_v1_i1d0
       },
-      2: {
+      3: {
         distrib_v2_i1d0,
         distrib_v2_i1d1,
         distrib_v2_i2d1
       },
-      3: {
+      4: {
         distrib_c2_i1d0,
         distrib_c2_i2d0
       }
@@ -441,6 +441,43 @@ describe('SearchCluster', () => {
           return seq;
         })
       );
+    });
+  });
+
+  // Another unit-test utility method.  We could be more thorough, but the SearchPath
+  // tests, + this, should probably be "enough".
+  describe('hasInputs', () => {
+    it('is able to match inputs against constituent input paths', () => {
+      const { distributions, clusters } = buildAlphabeticClusterFixtures();
+
+      const fourCharCluster = clusters.cluster_k4c4;
+      const fiveCharCluster = clusters.cluster_k4c5;
+
+      assert.isTrue(fourCharCluster.hasInputs([
+        distributions[1].distrib_c1_i1d0,
+        distributions[2].distrib_v1_i1d0,
+        distributions[3].distrib_v2_i1d0,
+        distributions[4].distrib_c2_i1d0
+      ]));
+      assert.isFalse(fourCharCluster.hasInputs([
+        distributions[1].distrib_c1_i1d0,
+        distributions[2].distrib_v1_i1d0,
+        distributions[3].distrib_v2_i1d0,
+        distributions[4].distrib_c2_i1d0
+      ]));
+
+      assert.isFalse(fourCharCluster.hasInputs([
+        distributions[1].distrib_c1_i1d0,
+        distributions[2].distrib_v1_i1d0,
+        distributions[3].distrib_v2_i1d0,
+        distributions[4].distrib_c2_i2d0
+      ]));
+      assert.isTrue(fiveCharCluster.hasInputs([
+        distributions[1].distrib_c1_i1d0,
+        distributions[2].distrib_v1_i1d0,
+        distributions[3].distrib_v2_i1d0,
+        distributions[4].distrib_c2_i2d0
+      ]));
     });
   });
 });
