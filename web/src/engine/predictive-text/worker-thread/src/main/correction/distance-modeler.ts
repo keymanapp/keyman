@@ -666,7 +666,7 @@ export class SearchSpace {
 
   private tierOrdering: SearchSpaceTier[] = [];
   private selectionQueue: PriorityQueue<SearchSpaceTier>;
-  private inputSequence: Distribution<Transform>[] = [];
+  private _inputSequence: Distribution<Transform>[] = [];
   private minInputCost: number[] = [];
   private rootNode: SearchNode;
 
@@ -710,7 +710,7 @@ export class SearchSpace {
     this.buildQueueSpaceComparator();
 
     if(arg1 instanceof SearchSpace) {
-      this.inputSequence = [].concat(arg1.inputSequence);
+      this._inputSequence = [].concat(arg1._inputSequence);
       this.minInputCost = [].concat(arg1.minInputCost);
       this.rootNode = arg1.rootNode;
       // Re-use already-checked Nodes.
@@ -725,9 +725,9 @@ export class SearchSpace {
 
     const model = arg1;
     if(!model) {
-      throw "The LexicalModel parameter must not be null / undefined.";
+      throw new Error("The LexicalModel parameter must not be null / undefined.");
     } else if(!model.traverseFromRoot) {
-      throw "The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.";
+      throw new Error("The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.");
     }
 
     this.selectionQueue = new PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
@@ -794,6 +794,13 @@ export class SearchSpace {
     }
   }
 
+  /**
+   * Retrieves the sequence of inputs
+   */
+  public get inputSequence() {
+    return [...this._inputSequence];
+  }
+
   increaseMaxEditDistance() {
     this.tierOrdering.forEach(function(tier) { tier.increaseMaxEditDistance() });
   }
@@ -801,7 +808,7 @@ export class SearchSpace {
   get correctionsEnabled() {
     // When corrections are disabled, the Web engine will only provide individual Transforms
     // for an input, not a distribution.  No distributions means we shouldn't do corrections.
-    return !!this.inputSequence.find((distribution) => distribution.length > 1);
+    return !!this._inputSequence.find((distribution) => distribution.length > 1);
   }
 
   /**
@@ -811,7 +818,7 @@ export class SearchSpace {
    * just the raw keystroke if corrections are disabled)
    */
   addInput(inputDistribution: Distribution<Transform>) {
-    this.inputSequence.push(inputDistribution);
+    this._inputSequence.push(inputDistribution);
 
     // Assumes that `inputDistribution` is already sorted.
     this.minInputCost.push(-Math.log(inputDistribution[0].p));
@@ -957,9 +964,9 @@ export class SearchSpace {
 
       let deletionEdges: SearchNode[] = [];
       if(!substitutionsOnly) {
-        deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
+        deletionEdges       = currentNode.buildDeletionEdges(this._inputSequence[inputIndex-1]);
       }
-      const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
+      const substitutionEdges = currentNode.buildSubstitutionEdges(this._inputSequence[inputIndex-1]);
       let batch = deletionEdges.concat(substitutionEdges);
 
       // Skip the queue for the first pass; there will ALWAYS be at least one pass,

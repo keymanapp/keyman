@@ -1,13 +1,16 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
-import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { DeviceSpec } from 'keyman/engine/keyboard';
 import { Mock } from 'keyman/engine/js-processor';
 
-function compileDummyModel(suggestionSets) {
+import Suggestion = LexicalModelTypes.Suggestion;
+
+function compileDummyModel(suggestionSets: Suggestion[][]) {
   return `
 LMLayerWorker.loadModel(new models.DummyModel({
   futureSuggestions: ${JSON.stringify(suggestionSets, null, 2)},
@@ -15,7 +18,7 @@ LMLayerWorker.loadModel(new models.DummyModel({
 `;
 }
 
-const appleDummySuggestionSets = [[
+const appleDummySuggestionSets: Suggestion[][] = [[
   // Set 1:
   {
     transform: { insert: 'e', deleteLeft: 0},
@@ -64,9 +67,10 @@ function dummiedGetLayer() {
 }
 
 describe("PredictionContext", () => {
-  let langProcessor;
+  let langProcessor: LanguageProcessor;
 
   beforeEach(function() {
+    // @ts-ignore
     langProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
   });
 
@@ -91,7 +95,7 @@ describe("PredictionContext", () => {
     assert.isEmpty(updateFake.firstCall.args[0]); // should have no suggestions. (if convenient for testing)
 
     await promise;
-    let suggestions;
+    let suggestions: Suggestion[];
 
     // Initialization results:  our first set of dummy suggestions.
     assert.equal(updateFake.callCount, 2);
@@ -130,7 +134,7 @@ describe("PredictionContext", () => {
     assert.isEmpty(updateFake.firstCall.args[0]); // should have no suggestions. (if convenient for testing)
 
     await promise;
-    let suggestions;
+    let suggestions: Suggestion[];
 
     // Initialization results:  our first set of dummy suggestions.
     assert.equal(updateFake.callCount, 2);
@@ -159,24 +163,17 @@ describe("PredictionContext", () => {
     assert.equal(updateFake.callCount, 3);
     suggestions = updateFake.thirdCall.args[0];
 
-    // Note:  this unit test was originally written with auto-correct on!
-    // #11941 was written 2024-07-25 (added unit test for auto-correction method)
-    // #12169 was written 2024-08-14, which is what added THIS unit test.
-
     // This does re-use the apply-revert oriented mocking.
     // Should skip the (second) "apple", "apply", "apps" round, as it became outdated
     // by its following request before its response could be received.
-    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['applied']); // '“apple”' included with auto-correct enabled.
-    // Is not displayed; we only display it if auto-correct is on, as 'applied' would be automatic then.
-    assert.equal(predictiveContext.keepSuggestion.displayAs, '“apple”');
-    // assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, '“apple”'); // with auto-correct enabled.
-    assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'applied');
+    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['“apple”', 'applied']);
+    assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, '“apple”');
     // Our reused mocking doesn't directly provide the 'keep' suggestion; we
     // need to remove it before testing for set equality.
-    assert.deepEqual(suggestions /*.splice(1)*/, expected);
+    assert.deepEqual(suggestions, expected);
   });
 
-  it('sendUpdateState retrieves the most recent suggestion set', async function() {
+  it('retrieves the most recent suggestion set when sendUpdateState is called', async function() {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -194,13 +191,12 @@ describe("PredictionContext", () => {
     // Initialization results:  our first set of dummy suggestions.
     assert.isTrue(updateFake.calledOnce);
     suggestions = updateFake.firstCall.args[0];
-    assert.deepEqual(suggestions, initialSuggestions);
 
     // The array instances may be different, but their contents should be the same instances and in the same order.
-    assert.sameOrderedMembers(suggestions, initialSuggestions);
+    assert.sameDeepOrderedMembers(suggestions, initialSuggestions.filter(s => s.tag != 'keep'));
   });
 
-  it('suggestion application logic & triggered effects', async function () {
+  it('properly applies manually-selected suggestions & related effects', async function () {
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -212,7 +208,7 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let suggestions;
+    let suggestions: Suggestion[];
 
     let previousTextState = Mock.from(textState);
     textState.insertTextBeforeCaret('e'); // appl| + e = apple
@@ -232,16 +228,10 @@ describe("PredictionContext", () => {
     const suggestionApply = suggestions.find((obj) => obj.displayAs == 'apply');
     assert.isOk(suggestionApply);
 
-    // For awaiting the suggestions generated upon applying our desired suggestion.
-    // We aren't given a direct Promise for that, but we can construct one this way.
-    let postApplySuggestions = new Promise((resolve) => {
-      predictiveContext.once('update', resolve);
-    });
-
     // Apply the desired suggestion.  Also passively generates new, post-acceptance
     // suggestions, but this function itself don't provide a Promise for that...
     // hence the previous block.
-    let promiseForApplyReversion = predictiveContext.accept(suggestionApply);
+    predictiveContext.accept(suggestionApply);
 
     assert.equal(updateFake.callCount, 1); // No new 'update' has been raised yet.
 
@@ -250,109 +240,8 @@ describe("PredictionContext", () => {
     assert.notEqual(textState.getText(), previousTextState.getText());
     assert.equal(textState.getText(), 'apply ');
 
-    let reversion = await promiseForApplyReversion;
-    await postApplySuggestions;
-
-    // Check 2:  a second 'update' - post-application predictions!
-    assert.equal(updateFake.callCount, 2);
-    suggestions = updateFake.secondCall.args[0];
-    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['applied']);
-    assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
-    assert.equal(suggestions[0].transform.deleteLeft, 2);
-
-    // Check 4+:  for the returned reversion object.
-    assert.isOk(reversion);
-
-    // All other reversion details are tested in the 'reversion application logic...' section defined below.
-  });
-
-  it('reversion application logic & triggered effects', async function () {
-    await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
-
-    const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
-
-    let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
-
-    // Test setup - return to the state at the end of the prior-defined unit test ('suggestion application...')
-
-    await predictiveContext.setCurrentTarget(textState);
-
-    // This is the point in time that a reversion operation will rewind the context to.
-    const revertBaseTextState = Mock.from(textState);
-    textState.insertTextBeforeCaret('e'); // appl| + e = apple
-    let transcription = textState.buildTranscriptionFrom(revertBaseTextState, null, true);
-
-    let suggestionCaptureFake = sinon.fake();
-    predictiveContext.once('update', suggestionCaptureFake);
-    await langProcessor.predict(transcription, dummiedGetLayer());
-
-    // We need to capture the suggestion we wish to apply.  We could hardcode a forced
-    // value, but that might become brittle in the long-term.
-    const originalSuggestionSet = suggestionCaptureFake.firstCall.args[0];
-    const suggestionApply = originalSuggestionSet.find((obj) => obj.displayAs == 'apply');
-    assert.isOk(suggestionApply);
-
-    let previousTextState = Mock.from(textState);
-
-    // For awaiting the suggestions generated upon applying our desired suggestion.
-    // We aren't given a direct Promise for that, but we can construct one this way.
-    let postApplySuggestions = new Promise((resolve) => {
-      predictiveContext.once('update', resolve);
-    });
-
-    let reversion = await predictiveContext.accept(suggestionApply);
-    await postApplySuggestions;
-
-    // Test setup complete.
-
-    // Check the assertion object (from end of 'suggestion application' checks) - verify setup.
-    assert.isOk(reversion);
-
-    // Reversion IDs are inverses of the applied suggestion.
-    // This is the important link used to rewind the context when reverting suggestions.
-    assert.equal(reversion.id, -suggestionApply.id);
-    assert.equal(reversion.transformId, -suggestionApply.transformId);
-
-    // Revert display strings include quotes.
-    //
-    // We could check this more rigorously by importing from @keymanapp/models-wordbreakers for
-    // the default quotes.
-    assert.isTrue(reversion.displayAs.includes(previousTextState.getText()));
-    assert.equal(reversion.displayAs.length, previousTextState.getText().length + 2); // +2:  opening + closing quotes.
-
-    // Fire away!  Time to apply the reversion.
-    previousTextState = Mock.from(textState);
-
-    // Since the test uses a separate thread via Worker, make sure to set up any important event handlers
-    // before we request the reversion.
-    let updateFake = sinon.fake();
-    predictiveContext.on('update', updateFake);
-
-    // Now, in order to synchronize... we rely on a Promise.  The callback is indeed
-    // called synchronously.
-    let postRevertSuggestions = new Promise((resolve) => {
-      predictiveContext.once('update', resolve);
-    });
-
-    // And now, apply the reversion itself.
-    let returnValue = await predictiveContext.accept(reversion);
-
-    // 'accepting' a reversion performs a rewind; there's no need for async ops here.
-    assert.isNull(returnValue); // as per the method's spec.
-
-    // Verify that the rewind + application of reversion worked!
-    let rewoundTextStateWithInput = Mock.from(revertBaseTextState); // appl
-    rewoundTextStateWithInput.apply(reversion.transform); // + e
-    assert.equal(rewoundTextStateWithInput.getText(), 'apple'); // For visual clarity.
-
-    // Note:  no space appended.
-    assert.equal(textState.getText(), rewoundTextStateWithInput.getText());
-
-    // Re-synchronize once we've received word of the new post-reversion predictions.
-    await postRevertSuggestions;
-
+    // Check 2:  no suggestions should be automatically triggered, so no new 'update'
+    // events should occur.
     assert.equal(updateFake.callCount, 1);
-    const suggestionsPostReversion = updateFake.firstCall.args[0];
-    assert.deepEqual(suggestionsPostReversion.map((obj) => obj.displayAs), ['reverted']);
   });
 });
