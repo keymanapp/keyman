@@ -62,6 +62,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    function ToString: string; override;
     property Action: TDebugEventActionData read FAction;
     property Rule: TDebugEventRuleData read FRule;
     property EventType: TDebugEventType read FEventType write SetEventType;
@@ -94,6 +95,8 @@ type
       vk: uint16_t;
       modifier_state: uint16_t
     ): Boolean; overload;
+
+    function ToString: string; override;
   end;
 
 implementation
@@ -131,6 +134,23 @@ begin
       etAction:    FAction := TDebugEventActionData.Create;
       etRuleMatch: FRule := TDebugEventRuleData.Create;
     end;
+  end;
+end;
+
+function TDebugEvent.ToString: string;
+begin
+  // Debug string
+  if FEventType = etAction then
+  begin
+    Result := Format('A %d %d %d "%s"', [Ord(FAction.ActionType), FAction.dwData, FAction.nExpectedValue, FAction.Text]);
+  end
+  else if FEventType = etRuleMatch then
+  begin
+    Result := Format('R %d %x %x %d "%s"', [FRule.ItemType, FRule.Key.VirtualKey, FRule.Key.Modifiers, FRule.Line, FRule.Context]);
+  end
+  else
+  begin
+    Result := '?'+IntToStr(Ord(FEventType));
   end;
 end;
 
@@ -328,6 +348,15 @@ begin
     Result := Result and AddActionItem(vk, action);
     Inc(action);
   end;
+end;
+
+function TDebugEventList.ToString: string;
+var
+  I: Integer;
+begin
+  Result := '';
+  for I := 0 to Count - 1 do
+    Result := Result + '['+IntToStr(I)+': '+Items[I].ToString + '] ';
 end;
 
 function TDebugEventList.AddStateItems(
