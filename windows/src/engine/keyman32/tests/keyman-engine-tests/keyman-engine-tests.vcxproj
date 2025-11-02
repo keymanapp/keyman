@@ -29,9 +29,9 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{46399ed7-79a1-4e7e-bd96-4b1aeec838ae}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectName>keyman-engine-tests</ProjectName>
   </PropertyGroup>
