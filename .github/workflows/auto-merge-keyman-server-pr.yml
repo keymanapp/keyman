@@ -13,7 +13,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'keymanapp/keyman' && github.actor == 'keyman-server' && startsWith(github.event.pull_request.title, 'auto:') }}
+    if: ${{ github.repository == 'keymanapp/keyman' && github.actor == 'keyman-server' && startsWith(github.head_ref, 'auto/') }}
     steps:
     - name: auto approve PR from keyman-server
       shell: bash
@@ -23,7 +23,6 @@ jobs:
         gh pr review -R keymanapp/keyman --approve ${{ github.event.pull_request.number }}
     - name: mark PR for auto-merge from keyman-server
       shell: bash
-      if: contains(github.event.pull_request.labels.*.name, 'automerge')
       env:
         GH_TOKEN: "${{ secrets.AUTOINC_GITHUB_TOKEN }}"
       run: |
