@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.155 alpha 2025-11-03
+
+* maint(resources): auto merge on branch name rather than label (#15084)
+* change(developer): remove kmlmc and kmlmp (#15083)
+
 ## 19.0.154 alpha 2025-10-31
 
 * chore(developer): further debugging for assertion failure (#15056)
