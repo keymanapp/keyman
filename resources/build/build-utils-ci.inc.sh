@@ -93,40 +93,11 @@ function builder_pull_has_label() {
   return 1
 }
 
-#
-# Publishes the package in `cwd` to npm
-#
-# If the `--dry-run` option is available and specified as a command-line
-# parameter, will do a dry run
-#
-# Note that `package.json` will be dirty after this command, as the `version`
-# field will be added to it, and @keymanapp dependency versions will also be
-# modified. This change should not be committed to the repository.
-#
-# If --npm-publish is set:
-#  * then builder_publish_npm publishes to the public registry
-#  * else builder_publish_npm creates a local tarball which can be used to test
-#
-# Usage:
-# ```bash
-#   builder_publish_npm
-# ```
-#
-function builder_publish_npm() {
-  if builder_has_option --npm-publish; then
-    # Require --dry-run if local or test to avoid accidentally clobbering npm packages
-    if [[ $VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
-      builder_die "publish --npm-publish must use --dry-run flag for local or test builds"
-    fi
-    _builder_publish_npm_package publish
-  else
-    _builder_publish_npm_package pack
-  fi
-}
-
-function _builder_publish_npm_package() {
-  local action=$1
-  local dist_tag=$TIER dry_run=
+# Used only by npm-publish.sh
+function ci_publish_npm_package() {
+  local action="$1"
+  local package="$2"
+  local dist_tag=$KEYMAN_TIER dry_run=
 
   if [[ $TIER == stable ]]; then
     dist_tag=latest
@@ -135,6 +106,8 @@ function _builder_publish_npm_package() {
   if builder_has_option --dry-run; then
     dry_run=--dry-run
   fi
+
+  pushd "${KEYMAN_ROOT}/${package}" >/dev/null
 
   _builder_publish_cache_package_json
   _builder_write_npm_version
@@ -147,12 +120,14 @@ function _builder_publish_npm_package() {
   if [[ $action == pack ]]; then
     # We can use --publish-to-pack to locally test a package
     # before publishing to the package registry
-    echo "Packing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
+    echo "Packing $dry_run npm package ${package} with tag $dist_tag"
     npm pack $dry_run --access public --tag $dist_tag
   else # $action == publish
-    echo "Publishing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
+    echo "Publishing $dry_run npm package ${package} with tag $dist_tag"
     npm publish $dry_run --access public --tag $dist_tag
   fi
+
+  popd >/dev/null
 }
 
 function _builder_write_npm_version() {

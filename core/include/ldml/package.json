@@ -15,6 +15,7 @@
   "main": "build/keyman_core_ldml.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "core/include/ldml"
   }
 }

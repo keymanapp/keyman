@@ -14,10 +14,7 @@ builder_describe "Build Keyman Developer web utility module" \
   "configure" \
   "build" \
   "api                       analyze API and prepare API documentation (no-op for now)" \
-  "test" \
-  publish \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -49,5 +46,4 @@ function do_build() {
 builder_run_action clean       rm -rf ./build/
 builder_run_action configure   verify_npm_setup
 builder_run_action build       do_build
-builder_run_action test        builder_do_typescript_tests 45
-builder_run_action publish     builder_publish_npm
+builder_run_action test        builder_do_typescript_tests 40

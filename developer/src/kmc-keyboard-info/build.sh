@@ -16,10 +16,7 @@ builder_describe "Build Keyman kmc keyboard-info Compiler module" \
   "configure" \
   "build" \
   "api                       analyze API and prepare API documentation" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -37,7 +34,3 @@ builder_run_action api         api-extractor run --local --verbose
 builder_run_action test        builder_do_typescript_tests
 
 #-------------------------------------------------------------------------------------------------------------------
-
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-
-builder_run_action publish      builder_publish_npm

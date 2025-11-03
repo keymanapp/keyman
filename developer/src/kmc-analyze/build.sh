@@ -12,9 +12,7 @@ builder_describe "Keyman Developer Compiler Analysis Tools" \
   "@/common/web/types" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/common/web/utils" \
-  clean configure build api test publish \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  clean configure build api test
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -30,4 +28,3 @@ builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
 builder_run_action test       builder_do_typescript_tests 70
-builder_run_action publish    builder_publish_npm
