@@ -36,10 +36,9 @@ EOF
 # Finish bashwrapper script and adjust permissions
 RUN <<EOF cat >> /usr/bin/bashwrapper
 
-uid=\$(stat -c "%u" /home/build/build)
-gid=\$(stat -c "%g" /home/build/build)
-
 if [[ -v CHANGE_PERMISSIONS ]]; then
+  uid=\$(stat -c "%u" /home/build/build)
+  gid=\$(stat -c "%g" /home/build/build)
   if [[ "\${uid}" != "\$(id -u)" && "\${gid}" != "\$(id -g)" ]]; then
     echo "Adjusting build directory ownership to uid/gid \$(id -un):\$(id -gn)"
     sudo chown -R build:build /home/build/build
