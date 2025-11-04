@@ -1,11 +1,11 @@
 import { JSKeyboard, Keyboard, OutputTargetInterface, Transcription, TextTransform } from 'keyman/engine/keyboard';
 // TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
-import { Mock, findCommonSubstringEndIndex, isEmptyTransform, OutputTargetBase } from 'keyman/engine/js-processor';
+import { Mock, findCommonSubstringEndIndex, OutputTargetBase } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString, isEmptyTransform } from '@keymanapp/web-utils';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 

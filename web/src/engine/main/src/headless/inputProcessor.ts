@@ -3,7 +3,7 @@
 import ContextWindow from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
-import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
+import { globalObject, DeviceSpec, isEmptyTransform } from "@keymanapp/web-utils";
 
 import { KM_Core } from 'keyman/engine/core-processor';
 
@@ -20,7 +20,6 @@ import {
 } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase
 import {
-  isEmptyTransform,
   JSKeyboardProcessor,
   Mock,
   type ProcessorInitOptions,
