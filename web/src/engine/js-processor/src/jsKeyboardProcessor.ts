@@ -11,7 +11,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes, type MutableSystemStore,
-  TextStore, ProcessorAction, SystemStoreIDs, Mock
+  TextStore, ProcessorAction, SystemStoreIDs, SyntheticTextStore
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
@@ -127,7 +127,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @return  {string}
    */
   private defaultRuleBehavior(Lkc: KeyEvent, textStore: TextStore, readonly: boolean): ProcessorAction {
-    const preInput = Mock.from(textStore, readonly);
+    const preInput = SyntheticTextStore.from(textStore, readonly);
     const ruleBehavior = new ProcessorAction();
 
     let matched = false;
@@ -672,7 +672,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
     first.triggersDefaultCommand = first.triggersDefaultCommand || other.triggersDefaultCommand;
 
-    const mergingMock = Mock.from(first.transcription.preInput, false);
+    const mergingMock = SyntheticTextStore.from(first.transcription.preInput, false);
     mergingMock.apply(first.transcription.transform);
     mergingMock.apply(other.transcription.transform);
 

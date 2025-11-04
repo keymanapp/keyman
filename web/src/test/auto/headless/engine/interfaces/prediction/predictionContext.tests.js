@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { DeviceSpec, Mock } from 'keyman/engine/keyboard';
+import { DeviceSpec, SyntheticTextStore } from 'keyman/engine/keyboard';
 
 function compileDummyModel(suggestionSets) {
   return `
@@ -81,8 +81,8 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
-    const initialMock = Mock.from(mock);
+    let mock = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const initialMock = SyntheticTextStore.from(mock);
     const promise = predictiveContext.setCurrentTarget(mock);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
@@ -120,8 +120,8 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
-    const initialMock = Mock.from(mock);
+    let mock = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const initialMock = SyntheticTextStore.from(mock);
     const promise = predictiveContext.setCurrentTarget(mock);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
@@ -180,7 +180,7 @@ describe("PredictionContext", () => {
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
-    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
+    let mock = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
     const initialSuggestions = await predictiveContext.setCurrentTarget(mock);
 
     let updateFake = sinon.fake();
@@ -204,7 +204,7 @@ describe("PredictionContext", () => {
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
-    let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
+    let textState = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
 
     await predictiveContext.setCurrentTarget(textState);
 
@@ -213,7 +213,7 @@ describe("PredictionContext", () => {
 
     let suggestions;
 
-    let previousTextState = Mock.from(textState);
+    let previousTextState = SyntheticTextStore.from(textState);
     textState.insertTextBeforeCaret('e'); // appl| + e = apple
     let transcription = textState.buildTranscriptionFrom(previousTextState, null, true);
     await langProcessor.predict(transcription, dummiedGetLayer());
@@ -226,7 +226,7 @@ describe("PredictionContext", () => {
     assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'apps');
 
     // Now for the real test.
-    previousTextState = Mock.from(textState); // snapshot it!
+    previousTextState = SyntheticTextStore.from(textState); // snapshot it!
 
     const suggestionApply = suggestions.find((obj) => obj.displayAs == 'apply');
     assert.isOk(suggestionApply);
@@ -270,14 +270,14 @@ describe("PredictionContext", () => {
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
-    let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
+    let textState = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
 
     // Test setup - return to the state at the end of the prior-defined unit test ('suggestion application...')
 
     await predictiveContext.setCurrentTarget(textState);
 
     // This is the point in time that a reversion operation will rewind the context to.
-    const revertBaseTextState = Mock.from(textState);
+    const revertBaseTextState = SyntheticTextStore.from(textState);
     textState.insertTextBeforeCaret('e'); // appl| + e = apple
     let transcription = textState.buildTranscriptionFrom(revertBaseTextState, null, true);
 
@@ -291,7 +291,7 @@ describe("PredictionContext", () => {
     const suggestionApply = originalSuggestionSet.find((obj) => obj.displayAs == 'apply');
     assert.isOk(suggestionApply);
 
-    let previousTextState = Mock.from(textState);
+    let previousTextState = SyntheticTextStore.from(textState);
 
     // For awaiting the suggestions generated upon applying our desired suggestion.
     // We aren't given a direct Promise for that, but we can construct one this way.
@@ -320,7 +320,7 @@ describe("PredictionContext", () => {
     assert.equal(reversion.displayAs.length, previousTextState.getText().length + 2); // +2:  opening + closing quotes.
 
     // Fire away!  Time to apply the reversion.
-    previousTextState = Mock.from(textState);
+    previousTextState = SyntheticTextStore.from(textState);
 
     // Since the test uses a separate thread via Worker, make sure to set up any important event handlers
     // before we request the reversion.
@@ -340,7 +340,7 @@ describe("PredictionContext", () => {
     assert.isNull(returnValue); // as per the method's spec.
 
     // Verify that the rewind + application of reversion worked!
-    let rewoundTextStateWithInput = Mock.from(revertBaseTextState); // appl
+    let rewoundTextStateWithInput = SyntheticTextStore.from(revertBaseTextState); // appl
     rewoundTextStateWithInput.apply(reversion.transform); // + e
     assert.equal(rewoundTextStateWithInput.getText(), 'apple'); // For visual clarity.
 

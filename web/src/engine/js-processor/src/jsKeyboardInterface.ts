@@ -13,7 +13,7 @@ import {
   KeyboardHarness,
   KeyboardKeymanGlobal,
   KeyMapping,
-  Mock,
+  SyntheticTextStore,
   MutableSystemStore,
   ProcessorAction,
   SystemStore,
@@ -1048,7 +1048,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.resetContextCache();
 
     // Capture the initial state of the TextStore before any rules are matched.
-    const preInput = Mock.from(textStore, true);
+    const preInput = SyntheticTextStore.from(textStore, true);
 
     // Capture the initial state of any variable stores
     const cachedVariableStores = this.activeKeyboard.variableStores;

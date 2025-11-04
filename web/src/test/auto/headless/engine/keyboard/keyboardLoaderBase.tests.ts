@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardHarness, MinimalKeymanGlobal, KeyboardDownloadError, DeviceSpec, InvalidKeyboardError, JSKeyboard, Mock } from 'keyman/engine/keyboard';
+import { KeyboardHarness, MinimalKeymanGlobal, KeyboardDownloadError, DeviceSpec, InvalidKeyboardError, JSKeyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { assertThrowsAsync, assertThrows } from 'keyman/tools/testing/test-utils';
@@ -84,7 +84,7 @@ describe('Headless keyboard loading', function() {
       // 'sandboxed' keyboard loading in the DOM!)
       const ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       ruleHarness.activeKeyboard = keyboard as JSKeyboard;
-      assertThrows(() => ruleHarness.processKeystroke(new Mock(), (keyboard as JSKeyboard).constructNullKeyEvent(device)), 'k.KKM is not a function');
+      assertThrows(() => ruleHarness.processKeystroke(new SyntheticTextStore(), (keyboard as JSKeyboard).constructNullKeyEvent(device)), 'k.KKM is not a function');
     });
   });
 });

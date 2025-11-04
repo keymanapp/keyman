@@ -112,7 +112,7 @@ export default class DefaultRules {
 
   /**
    * Codes matched here generally have default implementations when in a browser but require emulation
-   * for 'synthetic' `TextStore`s like `Mock`s, which have no default text handling.
+   * for 'synthetic' `TextStore`s like `SyntheticTextStore`s, which have no default text handling.
    */
   public forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
     let code = this.codeForEvent(Lkc);

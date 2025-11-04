@@ -1,7 +1,7 @@
 import { TextStore } from './textStore.js';
 import { KMWString } from '@keymanapp/web-utils';
 
-export class Mock extends TextStore {
+export class SyntheticTextStore extends TextStore {
   text: string;
 
   selStart: number;
@@ -31,17 +31,17 @@ export class Mock extends TextStore {
     }
   }
 
-  // Clones the state of an existing EditableElement, creating a Mock version of its state.
-  static from(textStore: TextStore, readonly?: boolean): Mock {
-    let clone: Mock;
+  // Clones the state of an existing EditableElement, creating a SyntheticTextStore version of its state.
+  static from(textStore: TextStore, readonly?: boolean): SyntheticTextStore {
+    let clone: SyntheticTextStore;
 
     this.assertIsOutputTargetBase(textStore);
 
-    if (textStore instanceof Mock) {
+    if (textStore instanceof SyntheticTextStore) {
       // Avoids the need to run expensive kmwstring.ts `length()`
-      // calculations when deep-copying Mock instances.
-      const priorMock = textStore as Mock;
-      clone = new Mock(priorMock.text, priorMock.selStart, priorMock.selEnd);
+      // calculations when deep-copying SyntheticTextStore instances.
+      const priorMock = textStore as SyntheticTextStore;
+      clone = new SyntheticTextStore(priorMock.text, priorMock.selStart, priorMock.selEnd);
     } else {
       const text = textStore.getText();
       const textLen = KMWString.length(text);
@@ -57,10 +57,10 @@ export class Mock extends TextStore {
         selectionEnd = textLen - KMWString.length(afterText);
       }
 
-      // readonly group or not, the returned Mock remains the same.
+      // readonly group or not, the returned SyntheticTextStore remains the same.
       // New-context events should act as if the caret were at the earlier-in-context
       // side of the selection, same as standard keyboard rules.
-      clone = new Mock(text, selectionStart, selectionEnd);
+      clone = new SyntheticTextStore(text, selectionStart, selectionEnd);
     }
 
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
@@ -147,11 +147,11 @@ export class Mock extends TextStore {
   }
 
   /**
-   * Indicates if this Mock represents an identical context to that of another Mock.
+   * Indicates if this SyntheticTextStore represents an identical context to that of another SyntheticTextStore.
    * @param other
    * @returns
    */
-  isEqual(other: Mock) {
+  isEqual(other: SyntheticTextStore) {
     return this.text == other.text
       && this.selStart == other.selStart
       && this.selEnd == other.selEnd
@@ -159,6 +159,6 @@ export class Mock extends TextStore {
   }
 
   doInputEvent() {
-    // Mock isn't backed by an element, so it won't have any event listeners.
+    // SyntheticTextStore isn't backed by an element, so it won't have any event listeners.
   }
 }

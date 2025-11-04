@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { DeviceSpec, JSKeyboard, MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { DeviceSpec, JSKeyboard, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
@@ -43,7 +43,7 @@ describe('Headless keyboard loading', function () {
       // --  END:  Standard Recorder-based unit test loading boilerplate --
 
       // Runs a blank KeyEvent through the keyboard's rule processing.
-      harness.processKeystroke(new Mock(), (keyboard as JSKeyboard).constructNullKeyEvent(device));
+      harness.processKeystroke(new SyntheticTextStore(), (keyboard as JSKeyboard).constructNullKeyEvent(device));
     });
 
     it('does not change the active kehboard', async function () {

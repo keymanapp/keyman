@@ -2,7 +2,7 @@ import { KMWString } from "@keymanapp/web-utils";
 import { Alternate, TextTransform } from "./keyboards/textTransform.js";
 import { Transcription } from "./keyboards/transcription.js";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
-import { Mock } from "./mock.js";
+import { SyntheticTextStore } from "./syntheticTextStore.js";
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
@@ -52,7 +52,7 @@ export abstract class TextStore {
   }
 
   /**
-   * Needed to properly clone deadkeys for use with Mock element interfaces toward predictive text purposes.
+   * Needed to properly clone deadkeys for use with SyntheticTextStore element interfaces toward predictive text purposes.
    * @param {object}  dks   An existing set of deadkeys to deep-copy for use by this element interface.
    */
   protected setDeadkeys(dks: DeadkeyTracker) {
@@ -65,7 +65,7 @@ export abstract class TextStore {
    *
    * This is designed for use as a "before and after" comparison to determine the effect of a single keyboard rule at a time.
    * As such, it assumes that the caret is immediately after any inserted text.
-   * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
+   * @param from An output target (preferably a SyntheticTextStore) representing the prior state of the input/output system.
    */
   buildTransformFrom(original: TextStore): TextTransform {
     const toLeft = this.getTextBeforeCaret();
@@ -93,12 +93,12 @@ export abstract class TextStore {
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.
 
-    return new Transcription(keyEvent, transform, Mock.from(original, readonly), alternates);
+    return new Transcription(keyEvent, transform, SyntheticTextStore.from(original, readonly), alternates);
   }
 
   /**
    * Restores the `TextStore` to the indicated state.  Designed for use with `Transcription.preInput`.
-   * @param original An `TextStore` (usually a `Mock`).
+   * @param original An `TextStore` (usually a `SyntheticTextStore`).
    */
   restoreTo(original: TextStore) {
     this.clearSelection();

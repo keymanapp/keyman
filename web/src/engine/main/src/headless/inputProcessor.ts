@@ -11,7 +11,7 @@ import {
   Codes,
   JSKeyboard,
   KeyboardMinimalInterface,
-  Mock,
+  SyntheticTextStore,
   TextStore,
   ProcessorAction,
   SystemStoreIDs,
@@ -120,10 +120,10 @@ export class InputProcessor {
           // to revert it.  If not, we assume it's a layer-change multitap, in which case
           // no such reset is needed.
           // TODO-web-core
-          if(!isEmptyTransform(transcription.transform) || !(transcription.preInput as Mock).isEqual(Mock.from(textStore))) {
+          if(!isEmptyTransform(transcription.transform) || !(transcription.preInput as SyntheticTextStore).isEqual(SyntheticTextStore.from(textStore))) {
             // Restores full context, including deadkeys in their exact pre-keystroke state.
             // TODO-web-core
-            (textStore as TextStore).restoreTo(transcription.preInput as Mock);
+            (textStore as TextStore).restoreTo(transcription.preInput as SyntheticTextStore);
           }
           /*
             else:
@@ -200,7 +200,7 @@ export class InputProcessor {
     // Create a "mock" backup of the current textStore in its pre-input state.
     // Current, long-existing assumption - it's DOM-backed.
     // TODO-web-core
-    const preInputMock = Mock.from(textStore as TextStore, true);
+    const preInputMock = SyntheticTextStore.from(textStore as TextStore, true);
 
     const startingLayerId = this.keyboardProcessor.layerId;
 
@@ -292,7 +292,7 @@ export class InputProcessor {
     return keepRuleBehavior ? ruleBehavior : null;
   }
 
-  private buildAlternates(ruleBehavior: ProcessorAction, keyEvent: KeyEvent, preInputMock: Mock): Alternate[] {
+  private buildAlternates(ruleBehavior: ProcessorAction, keyEvent: KeyEvent, preInputMock: SyntheticTextStore): Alternate[] {
     let alternates: Alternate[];
 
     // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
@@ -360,7 +360,7 @@ export class InputProcessor {
             break;
           }
 
-          const mock = Mock.from(windowedMock, false);
+          const mock = SyntheticTextStore.from(windowedMock, false);
 
           const altKey = pair.keySpec;
           if(!altKey) {

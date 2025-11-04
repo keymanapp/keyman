@@ -8,7 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, KeyboardHarness, Mock, TextStore } from "keyman/engine/keyboard";
+import { KeyEvent, KeyEventSpec, KeyboardHarness, SyntheticTextStore, TextStore } from "keyman/engine/keyboard";
 import { DeviceSpec } from "@keymanapp/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
@@ -51,7 +51,7 @@ export default class NodeProctor extends Proctor {
   async simulateSequence(sequence: TestSequence<any>, target?: TextStore): Promise<string> {
     // Start with an empty TextStore and a fresh KeyboardProcessor.
     if(!target) {
-      target = new Mock();
+      target = new SyntheticTextStore();
     }
 
     // Establish a fresh processor, setting its keyboard appropriately for the test.

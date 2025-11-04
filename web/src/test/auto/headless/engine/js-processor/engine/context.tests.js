@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
@@ -61,7 +61,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new Mock();
+      var target = new SyntheticTextStore();
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
@@ -1118,7 +1118,7 @@ describe('Engine - Context Matching', function() {
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new Mock();
+      var target = new SyntheticTextStore();
       ruleSeq.test(proctor, target);
 
       // Now for the real test!

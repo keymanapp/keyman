@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
-import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard, Mock } from 'keyman/engine/keyboard';
+import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
 
@@ -82,7 +82,7 @@ describe('Keyboard loading in DOM', function() {
 
     // TODO:  verify actual rule processing.
     const nullKeyEvent = jsKeyboard.constructNullKeyEvent(device);
-    const mock = new Mock();
+    const mock = new SyntheticTextStore();
     const result = jsHarness.processKeystroke(mock, nullKeyEvent);
 
     assert.isOk(result);

@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
-import { Transcription, TextStore, Mock } from 'keyman/engine/keyboard';
+import { Transcription, TextStore, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -160,7 +160,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
 
     // TODO-web-core
-    const context = new ContextWindow(Mock.from((target as TextStore), false), this.configuration, layerId);
+    const context = new ContextWindow(SyntheticTextStore.from((target as TextStore), false), this.configuration, layerId);
     return this.lmEngine.wordbreak(context);
   }
 
@@ -216,7 +216,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       // Apply the Suggestion!
 
       // Step 1:  determine the final output text
-      const final = Mock.from(original.preInput, false);
+      const final = SyntheticTextStore.from(original.preInput, false);
       final.apply(suggestion.transform);
 
       // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
@@ -233,12 +233,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
       // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
       // replacing the suggestion transform with the original input text.
-      const preApply = Mock.from(original.preInput, false);
+      const preApply = SyntheticTextStore.from(original.preInput, false);
       preApply.apply(original.transform);
 
       // Builds the reversion option according to the loaded lexical model's known
       // syntactic properties.
-      const suggestionContext = new ContextWindow(original.preInput as Mock, this.configuration, getLayerId());
+      const suggestionContext = new ContextWindow(original.preInput as SyntheticTextStore, this.configuration, getLayerId());
 
       // We must accept the Suggestion from its original context, which was before
       // `original.transform` was applied.
@@ -291,7 +291,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Apply the Reversion!
 
     // Step 1:  determine the final output text
-    const final = Mock.from(original.preInput, false);
+    const final = SyntheticTextStore.from(original.preInput, false);
     final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
@@ -303,7 +303,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     (textStore as TextStore).apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput as Mock, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput as SyntheticTextStore, this.configuration, null))
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -331,7 +331,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    const context = new ContextWindow(transcription.preInput as Mock, this.configuration, layerId);
+    const context = new ContextWindow(transcription.preInput as SyntheticTextStore, this.configuration, layerId);
     this.recordTranscription(transcription);
 
     if(resetContext) {

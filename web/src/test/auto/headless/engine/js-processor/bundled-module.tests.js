@@ -39,9 +39,9 @@ describe('Bundled ES Module for keyboard', function () {
     });
   });
 
-  describe('Mock', () => {
+  describe('SyntheticTextStore', () => {
     it('basic functionality test', () => {
-      let target = new KeyboardPackage.Mock("aple", 2);  // ap | le
+      let target = new KeyboardPackage.SyntheticTextStore("aple", 2);  // ap | le
       target.insertTextBeforeCaret('p');
       assert.equal(target.getText(), "apple");
     });
@@ -49,7 +49,7 @@ describe('Bundled ES Module for keyboard', function () {
     it('smp test', () => {
       KMWString.enableSupplementaryPlane(true); // Declared & defined in web-utils.
       try {
-        let target = new KeyboardPackage.Mock(u(0x1d5ba) + u(0x1d5c9) + u(0x1d5c5) + u(0x1d5be), 2);  // ap | le
+        let target = new KeyboardPackage.SyntheticTextStore(u(0x1d5ba) + u(0x1d5c9) + u(0x1d5c5) + u(0x1d5be), 2);  // ap | le
         target.insertTextBeforeCaret(u(0x1d5c9));
         assert.equal(target.getText(), u(0x1d5ba) + u(0x1d5c9) + u(0x1d5c9) + u(0x1d5c5) + u(0x1d5be));
       } finally {

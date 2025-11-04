@@ -71,28 +71,30 @@ It is possible to determine the `Transform` needed to transition from
 one `TextStore` to another using `TextStore.buildTransformFrom`
 (defined on `TextStore`).
 
-### The `Mock` - representing context-state
+### The `SyntheticTextStore` - representing context-state
 
 The comparison and contrast methods mentioned above for `TextStore`
 are of particular use for predictive text, which usually operates with a
-headless implementation of the type, termed a `Mock`.  This class may be
+headless implementation of the type, termed a `SyntheticTextStore`.  This class may be
 found in
-[web/src/engine/js-processor/src/mock.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/js-processor/src/mock.ts).
+[web/src/engine/keyboard/src/syntheticTextStore.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/syntheticTextStore.ts).
 It is a fully-featured implementation of the `TextStore` interface.
 
-It is possible to make a `Mock`-based clone of any
+It is possible to make a `SyntheticTextStore`-based clone of any
 `TextStore`-derived type - a feature leveraged significantly within
 the inner workings of Keyman Engine for Web.  As JS keyboards can have
 side effects beyond text-manipulation, predictive text generally
-operates by first _cloning_ the "true" context source.   `Mock`s are
+operates by first _cloning_ the "true" context source.  `SyntheticTextStore`s are
 also used when saving context states within the engine for later
 reference and/or reuse - a feature also utilized significantly for
 multitap support.
 
-`Mock`s can also easily be constructed from scratch for a simple string.
+`SyntheticTextStore`s can also easily be constructed from scratch for a simple string.
 Optionally, caret position or selection data may be specified at
 construction time as well. `epic/web-core`: in theory, this should make
 them easy to utilize for integration with Keyman Core.
+
+- note: previously called `Mock`
 
 ### The `Transcription` - representing context-state transitions
 
@@ -144,7 +146,7 @@ multitap-generated keystrokes.
 
 ### JS-keyboard keystroke processing
 
-For JS-keyboard keystroke processing, a `Mock` clone of the context is
+For JS-keyboard keystroke processing, a `SyntheticTextStore` clone of the context is
 generated before any actual keyboard rule checks are applied.  This
 provides a clear "before" state (eventually saved at
 `Transcription.preInput`) useful for determining the scope of the

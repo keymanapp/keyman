@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 
 import { InputProcessor } from 'keyman/engine/main';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest } from '@keymanapp/recorder-core';
 
@@ -104,7 +104,7 @@ describe('InputProcessor', function() {
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
         let core = new InputProcessor(device);
-        let context = new Mock("", 0);
+        let context = new SyntheticTextStore("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
@@ -118,7 +118,7 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, no fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
+        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -141,7 +141,7 @@ describe('InputProcessor', function() {
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
         let core = new InputProcessor(device);
-        let context = new Mock("", 0);
+        let context = new SyntheticTextStore("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
@@ -156,7 +156,7 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, with fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
+        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -202,7 +202,7 @@ describe('InputProcessor', function() {
       it(testSet.msg ?? 'test', function() {
         this.timeout(32); // ms
         let core = new InputProcessor(device);
-        let context = new Mock("", 0);
+        let context = new SyntheticTextStore("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;

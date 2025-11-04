@@ -1,4 +1,4 @@
-import { KeyDistribution, KeyEvent, type TextStore, Mock } from "keyman/engine/keyboard";
+import { KeyDistribution, KeyEvent, type TextStore, SyntheticTextStore } from "keyman/engine/keyboard";
 
 import Proctor from "./proctor.js";
 
@@ -219,7 +219,7 @@ export abstract class TestSequence<KeyRecord extends RecordedKeystroke | InputEv
   async test(proctor: Proctor, target?: TextStore): Promise<{success: boolean, result: string}> {
     // Start with an empty TextStore and a fresh KeyboardProcessor.
     if(!target) {
-      target = new Mock();
+      target = new SyntheticTextStore();
     }
 
     proctor.before();

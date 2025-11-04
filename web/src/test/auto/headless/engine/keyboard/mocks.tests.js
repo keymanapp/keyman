@@ -1,13 +1,13 @@
 import { assert } from 'chai';
-import { Mock } from 'keyman/engine/keyboard';
+import { SyntheticTextStore } from 'keyman/engine/keyboard';
 
 describe('Mocks', function() {
   describe('app|les', () => {
-    const testMock = new Mock('apples', 3);
+    const testMock = new SyntheticTextStore('apples', 3);
 
     it('Cloning with .from()', () => {
-      assert.deepEqual(Mock.from(testMock), testMock);
-      assert.notStrictEqual(Mock.from(testMock), testMock);
+      assert.deepEqual(SyntheticTextStore.from(testMock), testMock);
+      assert.notStrictEqual(SyntheticTextStore.from(testMock), testMock);
     });
 
     it('getText', () => {
@@ -31,7 +31,7 @@ describe('Mocks', function() {
     });
 
     it('clearSelection', () => {
-      let editMock = Mock.from(testMock);
+      let editMock = SyntheticTextStore.from(testMock);
       editMock.clearSelection();
 
       assert.equal(editMock.getText(), testMock.getTextBeforeCaret() + testMock.getTextAfterCaret());
@@ -39,7 +39,7 @@ describe('Mocks', function() {
       assert.equal(editMock.getTextAfterCaret(), testMock.getTextAfterCaret());
       assert.isTrue(editMock.isSelectionEmpty());
 
-      let postClear = Mock.from(editMock);
+      let postClear = SyntheticTextStore.from(editMock);
       editMock.clearSelection(); // on same object; make sure its internal selection stuff updates correctly!
       assert.notStrictEqual(postClear, editMock);
       assert.deepEqual(postClear, editMock);
@@ -47,11 +47,11 @@ describe('Mocks', function() {
   });
 
   describe('app|les and ba|nanas', () => {  // selection = 'les and ba'
-    const testMock = new Mock('apples and bananas', 3, 13);
+    const testMock = new SyntheticTextStore('apples and bananas', 3, 13);
 
     it('Cloning with from()', () => {
-      assert.deepEqual(Mock.from(testMock), testMock);
-      assert.notStrictEqual(Mock.from(testMock), testMock);
+      assert.deepEqual(SyntheticTextStore.from(testMock), testMock);
+      assert.notStrictEqual(SyntheticTextStore.from(testMock), testMock);
     });
 
     it('getText', () => {
@@ -75,7 +75,7 @@ describe('Mocks', function() {
     });
 
     it('clearSelection', () => {
-      let editMock = Mock.from(testMock);
+      let editMock = SyntheticTextStore.from(testMock);
       editMock.clearSelection();
 
       assert.equal(editMock.getText(), testMock.getTextBeforeCaret() + testMock.getTextAfterCaret());
@@ -83,7 +83,7 @@ describe('Mocks', function() {
       assert.equal(editMock.getTextAfterCaret(), testMock.getTextAfterCaret());
       assert.isTrue(editMock.isSelectionEmpty());
 
-      let postClear = Mock.from(editMock);
+      let postClear = SyntheticTextStore.from(editMock);
       editMock.clearSelection(); // on same object; make sure its internal selection stuff updates correctly!
       assert.notStrictEqual(postClear, editMock);
       assert.deepEqual(postClear, editMock);

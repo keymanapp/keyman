@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
@@ -23,7 +23,7 @@ function runEngineRuleSet(ruleSet) {
     // Prepare the context!
     const ruleSeq = new RecordedKeystrokeSequence(ruleDef);
     const proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
-    const target = new Mock();
+    const target = new SyntheticTextStore();
     ruleSeq.test(proctor, target);
   }
 }

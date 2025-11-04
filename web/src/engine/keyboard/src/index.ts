@@ -32,7 +32,7 @@ export { default as KeyMapping } from "./keyMapping.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
 export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } from "./variableStore.js";
 
-export { Mock } from "./mock.js";
+export { SyntheticTextStore } from "./syntheticTextStore.js";
 export { TextStore } from "./textStore.js";
 export { findCommonSubstringEndIndex } from "./stringDivergence.js";
 export { Deadkey } from "./deadkeys.js";

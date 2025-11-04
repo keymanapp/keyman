@@ -1,4 +1,4 @@
-import { JSKeyboard, Keyboard, TextStore, Transcription, TextTransform, Mock, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
+import { JSKeyboard, Keyboard, TextStore, Transcription, TextTransform, SyntheticTextStore, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -7,9 +7,9 @@ import { KMWString, isEmptyTransform } from '@keymanapp/web-utils';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 
-export class ContextHost extends Mock {
+export class ContextHost extends SyntheticTextStore {
   readonly oninserttext?: OnInsertTextFunc;
-  private savedState: Mock;
+  private savedState: SyntheticTextStore;
 
   constructor(oninserttext: OnInsertTextFunc) {
     super();
@@ -30,7 +30,7 @@ export class ContextHost extends Mock {
 
       if(transcription) {
         //TODO-web-core: shouldn't need cast in the future?
-        const preInput = transcription.preInput as Mock;
+        const preInput = transcription.preInput as SyntheticTextStore;
         // If our saved state matches the `preInput` from the incoming transcription, just reuse its transform.
         // Will generally not match during multitap operations, though.
         //
@@ -55,18 +55,18 @@ export class ContextHost extends Mock {
   }
 
   saveState() {
-    this.savedState = Mock.from(this);
+    this.savedState = SyntheticTextStore.from(this);
   }
 
   restoreTo(original: TextStore): void {
-    this.savedState = Mock.from(this);
+    this.savedState = SyntheticTextStore.from(this);
     // TODO-web-core
     super.restoreTo(original as TextStore);
   }
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
-    const tempMock = new Mock(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
+    const tempMock = new SyntheticTextStore(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
     const newLeft = tempMock.getTextBeforeCaret();
     const oldLeft = this.getTextBeforeCaret();
 
@@ -108,12 +108,12 @@ export class ContextHost extends Mock {
     // and we want a consistent interface for context synchronization between
     // host app + app/webview KMW.
     this.setSelection(KMWString.length(this.text));
-    this.savedState = Mock.from(this);
+    this.savedState = SyntheticTextStore.from(this);
   }
 }
 
 export default class ContextManager extends ContextManagerBase<WebviewConfiguration> {
-  // Change of context?  Just replace the Mock.  Context will be ENTIRELY controlled
+  // Change of context?  Just replace the SyntheticTextStore.  Context will be ENTIRELY controlled
   // by whatever is hosting the WebView.  (Some aspects of this context replacement have
   // yet to be modularized at this time, though.)
   private _rawContext: ContextHost;
@@ -130,7 +130,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     this.resetContext();
   }
 
-  get activeTarget(): Mock {
+  get activeTarget(): SyntheticTextStore {
     return this._rawContext;
   }
 
@@ -149,7 +149,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
    * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
    * For app/webview... there's only one target, thus only a "global default" matters.
    */
-  protected currentKeyboardSrcTarget(): Mock {
+  protected currentKeyboardSrcTarget(): SyntheticTextStore {
     return null;
   }
 
