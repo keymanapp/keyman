@@ -1,4 +1,4 @@
-import { type OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { type OutputTargetElementWrapper } from 'keyman/engine/element-text-stores';
 import { FloatingOSKView } from 'keyman/engine/osk';
 import { KeyboardInterfaceBase } from 'keyman/engine/main';
 

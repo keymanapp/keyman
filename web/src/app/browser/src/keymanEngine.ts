@@ -1,7 +1,7 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
 import { KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
-import { OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { OutputTargetElementWrapper } from 'keyman/engine/element-text-stores';
 import {
   TwoStateActivator,
   VisualKeyboard

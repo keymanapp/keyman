@@ -1,4 +1,4 @@
-import { OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { OutputTargetElementWrapper } from 'keyman/engine/element-text-stores';
 
 export class AttachmentInfo {
   /**

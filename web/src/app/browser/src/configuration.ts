@@ -1,6 +1,6 @@
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
-import { OutputTargetElementWrapper as DOMOutputTarget } from 'keyman/engine/element-wrappers';
+import { OutputTargetElementWrapper as DOMOutputTarget } from 'keyman/engine/element-text-stores';
 import { TextStore, ProcessorAction } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from '@keymanapp/web-utils';
 import { AlertHost } from "./utils/alertHost.js";

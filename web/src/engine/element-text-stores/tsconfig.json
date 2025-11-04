@@ -3,8 +3,8 @@
 
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "../../../build/engine/element-wrappers/obj/",
-    "tsBuildInfoFile": "../../../build/engine/element-wrappers/obj/tsconfig.tsbuildinfo",
+    "outDir": "../../../build/engine/element-text-stores/obj/",
+    "tsBuildInfoFile": "../../../build/engine/element-text-stores/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
 

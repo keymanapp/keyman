@@ -4,7 +4,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
-import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
+import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
 
 import ContextManager from './contextManager.js';

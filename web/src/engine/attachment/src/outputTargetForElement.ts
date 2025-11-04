@@ -1,4 +1,4 @@
-import { nestedInstanceOf } from "keyman/engine/element-wrappers";
+import { nestedInstanceOf } from "keyman/engine/element-text-stores";
 
 /**
  * Given a DOM event related to an KMW-attached element, this function determines

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { KMWString, SyntheticTextStore } from 'keyman/engine/keyboard';
-import * as wrappers from 'keyman/engine/element-wrappers';
+import * as wrappers from 'keyman/engine/element-text-stores';
 
 import { DynamicElements } from '../../test_utils.js';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';

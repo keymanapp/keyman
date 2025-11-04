@@ -1,7 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 
 import { DeviceSpec, InternalKeyboardFont } from "keyman/engine/keyboard";
-import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
+import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-text-stores";
 import {
   arrayFromNodeList,
   createStyleSheet,

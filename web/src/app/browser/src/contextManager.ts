@@ -3,7 +3,7 @@ import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
-import { DesignIFrame, OutputTargetElementWrapper, nestedInstanceOf } from 'keyman/engine/element-wrappers';
+import { DesignIFrame, OutputTargetElementWrapper, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import {
   ContextManagerBase,
   type KeyboardInterfaceBase,

@@ -9,7 +9,7 @@ export { eventOutputTarget, outputTargetForElement } from './outputTargetForElem
 export { PageContextAttachment, PageAttachmentOptions } from './pageContextAttachment.js';
 
 /*
- * Following from the prior "Note:", we republish `engine/element-wrappers` here -
+ * Following from the prior "Note:", we republish `engine/element-text-stores` here -
  * this matters quite strongly for certain unit tests.
  */
-export * from 'keyman/engine/element-wrappers';
+export * from 'keyman/engine/element-text-stores';

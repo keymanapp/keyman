@@ -1,6 +1,6 @@
 import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { JSKeyboard, type KeyboardMinimalInterface } from 'keyman/engine/keyboard';
-import { DesignIFrame, OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { DesignIFrame, OutputTargetElementWrapper } from 'keyman/engine/element-text-stores';
 
 // Utility object used to handle beep (keyboard error response) operations.
 class BeepData {
