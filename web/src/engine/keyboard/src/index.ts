@@ -25,10 +25,9 @@ export { type Alternate, TextTransform } from "./keyboards/textTransform.js";
 export { Transcription } from "./keyboards/transcription.js";
 
 export { Codes } from "./codes.js";
-export { default as DefaultRules } from "./defaultRules.js";
-export * from "./defaultRules.js";
+export { EmulationKeystrokes, LogMessages, DefaultRules } from "./defaultRules.js";
 export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";
-export { default as KeyMapping } from "./keyMapping.js";
+export { KeyMapping } from "./keyMapping.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
 export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } from "./variableStore.js";
 

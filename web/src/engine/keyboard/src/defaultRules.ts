@@ -22,7 +22,7 @@ export class LogMessages {
 /**
  * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
  */
-export default class DefaultRules {
+export class DefaultRules {
   codeForEvent(Lkc: KeyEvent) {
     return Codes.keyCodes[Lkc.kName] || Lkc.Lcode;;
   }
