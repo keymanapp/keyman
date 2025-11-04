@@ -684,19 +684,19 @@ describe('SearchQuotientSpur', () => {
 
         const [head, tail] = pathToSplit.split(splitIndex);
 
-        // ca => ce in the second input - there's a deleteLeft!
-        assert.equal(head.inputCount, 2);
-        assert.equal(tail.inputCount, 3); // split transform!
+        // c in the first input, though the 'a' part is deleted later.
+        assert.equal(head.inputCount, 1);
+        assert.equal(tail.inputCount, 4); // split transform!
         // is always built from the same root path, while the tail is not.
 
-        const headDistribs = distributions.slice(0, 1);
-        const tailDistribs = distributions.slice(2);
+        const headDistribs = distributions.slice(0, 0);
+        const tailDistribs = distributions.slice(1);
 
-        const splitDistrib = distributions[1];
+        const splitDistrib = distributions[0];
         const distribHalves = splitDistrib.map((entry) => {
           return {
-            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 0)}, p: entry.p },
-            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(0), deleteLeft: 0}, p: entry.p }
+            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 1)}, p: entry.p },
+            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(1), deleteLeft: 0}, p: entry.p }
           }
         });
 
@@ -727,19 +727,19 @@ describe('SearchQuotientSpur', () => {
 
         const [head, tail] = pathToSplit.split(2);
 
-        // cen => cel in the third input - there's a deleteLeft!
-        assert.equal(head.inputCount, 3);
-        assert.equal(tail.inputCount, 2); // split transform!
+        // ce in the second input, though the n is deleted later.
+        assert.equal(head.inputCount, 2);
+        assert.equal(tail.inputCount, 3); // split transform!
         // is always built from the same root path, while the tail is not.
 
-        const headDistribs = distributions.slice(0, 2);
-        const tailDistribs = distributions.slice(3);
+        const headDistribs = distributions.slice(0, 1);
+        const tailDistribs = distributions.slice(2);
 
-        const splitDistrib = distributions[2];
+        const splitDistrib = distributions[1];
         const distribHalves = splitDistrib.map((entry) => {
           return {
-            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 0)}, p: entry.p },
-            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(0), deleteLeft: 0}, p: entry.p }
+            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 1)}, p: entry.p },
+            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(1), deleteLeft: 0}, p: entry.p }
           }
         });
 
@@ -818,18 +818,18 @@ describe('SearchQuotientSpur', () => {
 
         const [head, tail] = pathToSplit.split(4);
 
-        // cella => cello in the fourth input; there's an adjacent deleteLeft.
-        assert.equal(head.inputCount, 4);
-        assert.equal(tail.inputCount, 1); // split transform!
+        // cellar in the third input, though the -ar is deleted later.
+        assert.equal(head.inputCount, 3);
+        assert.equal(tail.inputCount, 2); // split transform!
 
-        const headDistribs = distributions.slice(0, 3);
-        const tailDistribs = distributions.slice(4);
+        const headDistribs = distributions.slice(0, 2);
+        const tailDistribs = distributions.slice(3);
 
-        const splitDistrib = distributions[3];
+        const splitDistrib = distributions[2];
         const distribHalves = splitDistrib.map((entry) => {
           return {
-            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 0)}, p: entry.p },
-            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(0), deleteLeft: 0}, p: entry.p }
+            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 2)}, p: entry.p },
+            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(2), deleteLeft: 0}, p: entry.p }
           }
         });
 
@@ -854,7 +854,7 @@ describe('SearchQuotientSpur', () => {
           )
         });
 
-        assert.deepEqual(head.parents[0].bestExample.text, "cellar");
+        assert.deepEqual(head.parents[0].bestExample.text, "cent");
       });
     });
 
@@ -1078,19 +1078,19 @@ describe('SearchQuotientSpur', () => {
 
         const [head, tail] = pathToSplit.split(splitIndex);
 
-        // ca => ce in the second input - there's a deleteLeft!
-        assert.equal(head.inputCount, 2);
-        assert.equal(tail.inputCount, 3); // split transform!
+        // c in the first input, though the 'a' part is deleted later.
+        assert.equal(head.inputCount, 1);
+        assert.equal(tail.inputCount, 4); // split transform!
         // is always built from the same root path, while the tail is not.
 
-        const headDistribs = distributions.slice(0, 1);
-        const tailDistribs = distributions.slice(2);
+        const headDistribs = distributions.slice(0, 0);
+        const tailDistribs = distributions.slice(1);
 
-        const splitDistrib = distributions[1];
+        const splitDistrib = distributions[0];
         const distribHalves = splitDistrib.map((entry) => {
           return {
-            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 0)}, p: entry.p },
-            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(0), deleteLeft: 0}, p: entry.p }
+            head: { sample: {...entry.sample, insert: KMWString.substring(entry.sample.insert, 0, 1)}, p: entry.p },
+            tail: { sample: {...entry.sample, insert: KMWString.substring(entry.sample.insert, 1), deleteLeft: 0}, p: entry.p }
           }
         });
 
@@ -1121,19 +1121,19 @@ describe('SearchQuotientSpur', () => {
 
         const [head, tail] = pathToSplit.split(2);
 
-        // cen => cel in the third input - there's a deleteLeft!
-        assert.equal(head.inputCount, 3);
-        assert.equal(tail.inputCount, 2); // split transform!
+        // ce in the second input, though the n is deleted later.
+        assert.equal(head.inputCount, 2);
+        assert.equal(tail.inputCount, 3); // split transform!
         // is always built from the same root path, while the tail is not.
 
-        const headDistribs = distributions.slice(0, 2);
-        const tailDistribs = distributions.slice(3);
+        const headDistribs = distributions.slice(0, 1);
+        const tailDistribs = distributions.slice(2);
 
-        const splitDistrib = distributions[2];
+        const splitDistrib = distributions[1];
         const distribHalves = splitDistrib.map((entry) => {
           return {
-            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 0)}, p: entry.p },
-            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(0), deleteLeft: 0}, p: entry.p }
+            head: { sample: {...entry.sample, insert: KMWString.substring(entry.sample.insert, 0, 1)}, p: entry.p },
+            tail: { sample: {...entry.sample, insert: KMWString.substring(entry.sample.insert, 1), deleteLeft: 0}, p: entry.p }
           }
         });
 
@@ -1213,18 +1213,18 @@ describe('SearchQuotientSpur', () => {
 
         const [head, tail] = pathToSplit.split(4);
 
-        // cella => cello in the fourth input; there's an adjacent deleteLeft.
-        assert.equal(head.inputCount, 4);
-        assert.equal(tail.inputCount, 1); // split transform!
+        // cellar in the third input, though the -ar is deleted later.
+        assert.equal(head.inputCount, 3);
+        assert.equal(tail.inputCount, 2); // split transform!
 
-        const headDistribs = distributions.slice(0, 3);
-        const tailDistribs = distributions.slice(4);
+        const headDistribs = distributions.slice(0, 2);
+        const tailDistribs = distributions.slice(3);
 
-        const splitDistrib = distributions[3];
+        const splitDistrib = distributions[2];
         const distribHalves = splitDistrib.map((entry) => {
           return {
-            head: { sample: {...entry.sample, insert: entry.sample.insert.slice(0, 0)}, p: entry.p },
-            tail: { sample: {...entry.sample, insert: entry.sample.insert.slice(0), deleteLeft: 0}, p: entry.p }
+            head: { sample: {...entry.sample, insert: KMWString.substring(entry.sample.insert, 0, 2)}, p: entry.p },
+            tail: { sample: {...entry.sample, insert: KMWString.substring(entry.sample.insert, 2), deleteLeft: 0}, p: entry.p }
           }
         });
 
@@ -1249,7 +1249,7 @@ describe('SearchQuotientSpur', () => {
           )
         });
 
-        assert.deepEqual(head.parents[0].bestExample.text, toMathematicalSMP("cellar"));
+        assert.deepEqual(head.parents[0].bestExample.text, toMathematicalSMP("cent"));
       });
     });
 
@@ -1310,18 +1310,18 @@ describe('SearchQuotientSpur', () => {
         }
       );
 
-      const split = pathToSplit.split(2);
+      const [head, tail] = pathToSplit.split(2);
 
-      assert.deepEqual(split[0].bestExample, headTarget.bestExample);
-      assert.deepEqual(split[1].bestExample, tailTarget.bestExample);
-      assert.equal(split[0].inputCount, headTarget.inputCount);
-      assert.equal(split[1].inputCount, tailTarget.inputCount);
-      assert.isTrue(split[0] instanceof LegacyQuotientSpur);
-      assert.isTrue(split[1] instanceof LegacyQuotientSpur);
-      assert.deepEqual((split[0] as LegacyQuotientSpur).inputs, headTarget.inputs);
-      assert.deepEqual((split[1] as LegacyQuotientSpur).inputs, tailTarget.inputs);
-      assert.deepEqual((split[0] as LegacyQuotientSpur).inputSource, headTarget.inputSource);
-      assert.deepEqual((split[1] as LegacyQuotientSpur).inputSource, tailTarget.inputSource);
+      assert.deepEqual(head.bestExample, headTarget.bestExample);
+      assert.deepEqual(tail.bestExample, tailTarget.bestExample);
+      assert.equal(head.inputCount, headTarget.inputCount);
+      assert.equal(tail.inputCount, tailTarget.inputCount);
+      assert.isTrue(head instanceof LegacyQuotientSpur);
+      assert.isTrue(tail instanceof LegacyQuotientSpur);
+      assert.deepEqual((head as LegacyQuotientSpur).inputs, headTarget.inputs);
+      assert.deepEqual((tail as LegacyQuotientSpur).inputs, tailTarget.inputs);
+      assert.deepEqual((head as LegacyQuotientSpur).inputSource, headTarget.inputSource);
+      assert.deepEqual((tail as LegacyQuotientSpur).inputSource, tailTarget.inputSource);
     });
   });
 });

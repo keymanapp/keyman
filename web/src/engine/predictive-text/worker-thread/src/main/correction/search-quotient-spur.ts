@@ -165,16 +165,16 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   public split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
     const internalSplitIndex = charIndex - (this.codepointLength - this.insertLength);
 
-    if(charIndex >= this.codepointLength) {
+    if(internalSplitIndex <= 0 && this.parents[0]) {
+      const parentResults = this.parents[0].split(charIndex);
+      return [parentResults[0], this.construct(parentResults[1], this.inputs, this.inputSource)];
+    } else if(charIndex >= this.codepointLength) {
       // this instance = 'first set'
       // second instance:  empty transforms.
       //
       // stopgap:  maybe go ahead and check each input for any that are longer?
       // won't matter shortly, though.
       return [this, new LegacyQuotientRoot(this.model)];
-    } else if(internalSplitIndex < 0) {
-      const parentResults =  this.parentNode.split(charIndex);
-      return [parentResults[0], this.construct(parentResults[1], this.inputs, this.inputSource)]
     } else {
       const firstSet: Distribution<Transform> = this.inputs.map((input) => ({
         // keep insert head
