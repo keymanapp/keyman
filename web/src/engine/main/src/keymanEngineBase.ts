@@ -1,4 +1,4 @@
-import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction, TextStore } from "keyman/engine/keyboard";
+import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
@@ -78,8 +78,7 @@ export class KeymanEngineBase<
     textStore.invalidateSelection();
     // Deadkey matching continues to be troublesome.
     // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-    // TODO-web-core
-    (textStore as TextStore).deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+    textStore.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
     if(event.isSynthetic) {
       const oskLayer = this.osk.vkbd.layerId;
@@ -277,8 +276,7 @@ export class KeymanEngineBase<
       keyboardProcessor.newLayerStore.set('');
       keyboardProcessor.oldLayerStore.set('');
       // Call the keyboard's entry point.
-      // TODO-web-core
-      const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as TextStore)
+      const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget)
       // If we have a ProcessorAction as a result, run it on the target. This should
       // only change system store and variable store values.
       if (data) {

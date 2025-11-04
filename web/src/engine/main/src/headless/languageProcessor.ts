@@ -142,8 +142,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     this.emit('invalidatesuggestions', 'context');
 
     if(textStore) {
-      // TODO-web-core
-      const transcription = (textStore as TextStore).buildTranscriptionFrom((textStore as TextStore), null, false);
+      const transcription = textStore.buildTranscriptionFrom(textStore, null, false);
       return this.predict_internal(transcription, true, layerId);
     } else {
       // if there's no active context source, there's nothing to
@@ -154,13 +153,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
   }
 
-  public wordbreak(target: TextStore, layerId: string): Promise<string> {
+  public wordbreak(textStore: TextStore, layerId: string): Promise<string> {
     if(!this.isActive) {
       return null;
     }
 
-    // TODO-web-core
-    const context = new ContextWindow(SyntheticTextStore.from((target as TextStore), false), this.configuration, layerId);
+    const context = new ContextWindow(SyntheticTextStore.from(textStore, false), this.configuration, layerId);
     return this.lmEngine.wordbreak(context);
   }
 
@@ -222,10 +220,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
       // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
       // values as needed for use with their IME interfaces.
-      // TODO-web-core
-      const transform = final.buildTransformFrom((textStore as TextStore));
-      // TODO-web-core
-      (textStore as TextStore).apply(transform);
+      const transform = final.buildTransformFrom(textStore);
+      textStore.apply(transform);
 
       // Tell the banner that a suggestion was applied, so it can call the
       // keyboard's PostKeystroke entry point as needed
@@ -297,10 +293,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
     // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
     // values as needed for use with their IME interfaces.
-    // TODO-web-core
-    const transform = final.buildTransformFrom(textStore as TextStore);
-    // TODO-web-core
-    (textStore as TextStore).apply(transform);
+    const transform = final.buildTransformFrom(textStore);
+    textStore.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
     const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput as SyntheticTextStore, this.configuration, null))
@@ -316,8 +310,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    // TODO-web-core
-    const transcription = (textStore as TextStore).buildTranscriptionFrom(textStore as TextStore, null, false);
+    const transcription = textStore.buildTranscriptionFrom(textStore, null, false);
     return this.predict(transcription, layerId);
   }
 

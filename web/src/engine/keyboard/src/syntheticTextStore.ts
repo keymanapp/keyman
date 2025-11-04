@@ -64,7 +64,7 @@ export class SyntheticTextStore extends TextStore {
     }
 
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
-    clone.setDeadkeys((textStore as TextStore).deadkeys());
+    clone.setDeadkeys(textStore.deadkeys());
 
     return clone;
   }

@@ -60,8 +60,7 @@ export class ContextHost extends SyntheticTextStore {
 
   restoreTo(original: TextStore): void {
     this.savedState = SyntheticTextStore.from(this);
-    // TODO-web-core
-    super.restoreTo(original as TextStore);
+    super.restoreTo(original);
   }
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {

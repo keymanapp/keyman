@@ -335,7 +335,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     if(cx === val) {
       return true; // I3318
     }
-    (textStore as TextStore).deadkeys().resetMatched(); // I3318
+    textStore.deadkeys().resetMatched(); // I3318
     return false;
   }
 
@@ -588,7 +588,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
       retVal = (keyCode == Lrulekey); // I3318, I3555
     }
     if(!retVal) {
-      (this.activeTargetOutput as TextStore).deadkeys().resetMatched();  // I3318
+      this.activeTargetOutput.deadkeys().resetMatched();  // I3318
     }
     return retVal; // I3318
   };
@@ -773,7 +773,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
     // We want to control exactly which deadkeys get removed.
     if(dn > 0) {
-      context = this._BuildExtendedContext(dn, dn, (textStore as TextStore));
+      context = this._BuildExtendedContext(dn, dn, textStore);
       let nulCount = 0;
 
       for(let i=0; i < context.valContext.length; i++) {
@@ -781,7 +781,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
         if(dk) {
           // Remove deadkey in context.
-          (textStore as TextStore).deadkeys().remove(dk);
+          textStore.deadkeys().remove(dk);
 
           // Reduce our reported context size.
           dn--;
@@ -800,7 +800,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     }
 
     // If a matched deadkey hasn't been deleted, we don't WANT to delete it.
-    (textStore as TextStore).deadkeys().resetMatched();
+    textStore.deadkeys().resetMatched();
 
     // Why reinvent the wheel?  Delete the remaining characters by 'inserting a blank string'.
     this.output(dn, textStore, '');
@@ -819,7 +819,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
     textStore.saveProperties();
     textStore.clearSelection();
-    (textStore as TextStore).deadkeys().deleteMatched(); // I3318
+    textStore.deadkeys().deleteMatched(); // I3318
     if(dn >= 0) {
       // Automatically manages affected deadkey positions.  Does not delete deadkeys b/c legacy behavior support.
       textStore.deleteCharsBeforeCaret(dn);
