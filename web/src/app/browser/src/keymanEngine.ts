@@ -1,7 +1,7 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
 import { KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
-import { OutputTargetElementWrapper } from 'keyman/engine/element-text-stores';
+import { AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 import {
   TwoStateActivator,
   VisualKeyboard
@@ -76,7 +76,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target) => {
-      const e = (target as OutputTargetElementWrapper<any>)?.getElement();
+      const e = (target as AbstractElementTextStore<any>)?.getElement();
       if(this.osk) {
         (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
       }

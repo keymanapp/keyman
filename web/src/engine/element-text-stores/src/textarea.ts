@@ -1,7 +1,7 @@
-import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
+import { AbstractElementTextStore } from './outputTargetElementWrapper.js';
 import { KMWString } from '@keymanapp/web-utils';
 
-export class TextArea extends OutputTargetElementWrapper<{}> {
+export class TextArea extends AbstractElementTextStore<{}> {
   root: HTMLTextAreaElement;
 
   /**

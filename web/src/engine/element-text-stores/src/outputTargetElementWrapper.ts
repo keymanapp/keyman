@@ -1,7 +1,7 @@
 import { TextStore } from "keyman/engine/keyboard";
 import { EventEmitter } from 'eventemitter3';
 
-export abstract class OutputTargetElementWrapper<EventMap extends EventEmitter.ValidEventTypes> extends TextStore {
+export abstract class AbstractElementTextStore<EventMap extends EventEmitter.ValidEventTypes> extends TextStore {
   // JS/TS can't do true multiple inheritance, so we maintain class events on a readonly field.
   public readonly events: EventEmitter<EventMap, this> = new EventEmitter<EventMap, this>();
 

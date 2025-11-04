@@ -1,6 +1,6 @@
 import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { JSKeyboard, type KeyboardMinimalInterface } from 'keyman/engine/keyboard';
-import { DesignIFrame, OutputTargetElementWrapper } from 'keyman/engine/element-text-stores';
+import { DesignIFrame, AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 
 // Utility object used to handle beep (keyboard error response) operations.
 class BeepData {
@@ -33,8 +33,8 @@ export class BeepHandler {
    * @param       {Object}      Pelem     element to flash
    * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
    */
-  beep(textStore: OutputTargetElementWrapper<any>) {
-    if (!(textStore instanceof OutputTargetElementWrapper)) {
+  beep(textStore: AbstractElementTextStore<any>) {
+    if (!(textStore instanceof AbstractElementTextStore)) {
       return;
     }
 

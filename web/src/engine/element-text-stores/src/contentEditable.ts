@@ -1,4 +1,4 @@
-import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
+import { AbstractElementTextStore } from './outputTargetElementWrapper.js';
 import { KMWString } from '@keymanapp/web-utils';
 
 class SelectionCaret {
@@ -21,7 +21,7 @@ class SelectionRange {
   }
 }
 
-export class ContentEditable extends OutputTargetElementWrapper<{}> {
+export class ContentEditable extends AbstractElementTextStore<{}> {
   root: HTMLElement;
 
   constructor(ele: HTMLElement) {
