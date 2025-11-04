@@ -7,17 +7,38 @@ import { ContextTokenization, TokenizationEdgeAlignment, TokenizationTransitionE
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 
+let SUBSET_ID_SEED = 0;
+
+export function generateSubsetId() {
+  return SUBSET_ID_SEED++;
+}
+
 export interface PendingTokenization {
   /**
    * The edge window corresponding to the common tokenization for the subset's inputs
    */
   alignment: TokenizationEdgeAlignment,
+
   /**
    * A set of incoming keystrokes with compatible effects when applied.
    *
    * If passed to `subsetByInterval`, the transforms should result in a single subset.
    */
   inputs: Distribution<Map<number, Transform>>
+
+  /**
+   * A unique identifier associated with this PendingTokenization and its
+   * transforms within `SearchSpace`s.  This ID assists with detecting when
+   * split transforms are re-merged during SearchSpace merges.  Only
+   * input-sources with matching subset ID come from the same subset, and thus
+   * only they should be candidates for re-merging a previous split.
+   *
+   * The subset ID does not necessarily match the transition ID; in fact, there
+   * may be a one-to-many relationship between transition ID and
+   * `inputSubsetId`.  Note that the original transition ID may be found within
+   * each `Transform` value entry found within the `.inputs` map if desired.
+   */
+  inputSubsetId: number;
 }
 
 /**
@@ -134,7 +155,7 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
   // in this tokenization, but that doesn't matter here - we want to imply the
   // represented keystroke range.
   const boundaryEdgeIndex = editBoundary.tokenIndex - edgeWindow.sliceIndex;
-  const boundaryComponent = `B${editBoundary.tokenIndex}=${editBoundary.sourceRangeKey}`;
+  const boundaryComponent = `B${editBoundary.tokenIndex}=${editBoundary.sourceRangeKey}`; // source range is part of it
 
   components.push(boundaryComponent);
 
@@ -155,7 +176,7 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
   for(const {0: relativeIndex, 1: transform} of tokenizedTransform.entries()) {
     const insertLen = KMWString.length(transform.insert);
     if(relativeIndex > 0) {
-      // The true boundary lie before the insert if the value is non-zero;
+      // The true boundary lies before the insert if the value is non-zero;
       // don't differentiate here!
       boundaryTextLen = 0;
     }
@@ -188,16 +209,29 @@ export class TokenizationSubsetBuilder {
     const key = this.keyer(precomputation);
 
     // Should file the object and its transform data appropriately.
+    //
+    // Maps any number of Tokenizations and their incoming alignment data to a common key
+    // for final tokenization forms.
     const entry: TokenizationSubset = this._subsets.get(key) ?? {
       pendingSet: new Map(),
       key: key
     }
-    const forTokenization = entry.pendingSet.get(tokenization) ?? {
+
+    // Finds any previously-accumulated data corresponding to both the incoming and
+    // target final tokenization form, creating an empty entry if none yet exists.
+    const forTokenization: PendingTokenization = entry.pendingSet.get(tokenization) ?? {
       alignment: precomputation.alignment,
-      inputs: []
+      inputs: [],
+      inputSubsetId: generateSubsetId()
     };
+
+    // Adds the incoming tokenized transform data for the pairing...
     forTokenization.inputs.push({sample: precomputation.tokenizedTransform, p});
+    // and ensures that the pairing's data-accumulator is in the map.
     entry.pendingSet.set(tokenization, forTokenization);
+
+    // Also ensures that the target tokenization's data (accumulating the pairings)
+    // is made available within the top-level map.
     this._subsets.set(key, entry);
   }
 
