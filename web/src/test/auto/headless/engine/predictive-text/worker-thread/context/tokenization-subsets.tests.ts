@@ -627,8 +627,8 @@ describe('TokenizationSubsetBuilder', function() {
 
     assert.equal(subsetBuilder.subsets.size, 1); // All transforms have similar impacts.
     const subset = [...subsetBuilder.subsets.values()][0];
-    assert.equal(subset.pendingSet.size, 1); // Built from only one tokenization
-    assert.deepEqual(subset.pendingSet.get(baseTokenization).inputs,
+    assert.equal(subset.transitionEdges.size, 1); // Built from only one tokenization
+    assert.deepEqual(subset.transitionEdges.get(baseTokenization).inputs,
       inputDistribution.map((sample) => {
         const map = new Map<number, Transform>();
         map.set(0, sample.sample);
@@ -655,18 +655,18 @@ describe('TokenizationSubsetBuilder', function() {
 
     assert.equal(subsetBuilder.subsets.size, 2); // All transforms have similar impacts.
     const subsets = [...subsetBuilder.subsets.values()];
-    subsets.forEach((subset) => assert.equal(subset.pendingSet.size, 1));  // Built from only one tokenization
+    subsets.forEach((subset) => assert.equal(subset.transitionEdges.size, 1));  // Built from only one tokenization
 
     const distributionWithoutWhitespace = inputDistribution.slice(0, inputDistribution.length-1);
-    const extendingSubset = subsets.find((subset) => subset.pendingSet.get(baseTokenization).inputs.length > 1);
-    assert.deepEqual(extendingSubset.pendingSet.get(baseTokenization).inputs,
+    const extendingSubset = subsets.find((subset) => subset.transitionEdges.get(baseTokenization).inputs.length > 1);
+    assert.deepEqual(extendingSubset.transitionEdges.get(baseTokenization).inputs,
       distributionWithoutWhitespace.map((sample) => {
         const map = new Map<number, Transform>();
         map.set(0, sample.sample);
         return { sample: map, p: sample.p };
     }));
 
-    const whitespaceSubset = subsets.find((subset) => subset.pendingSet.get(baseTokenization).inputs.length == 1);
+    const whitespaceSubset = subsets.find((subset) => subset.transitionEdges.get(baseTokenization).inputs.length == 1);
     const whitespaceSample = inputDistribution[inputDistribution.length - 1];
     const expectedWhitespaceTransformTokenization = {
       sample: (() => {
@@ -679,7 +679,7 @@ describe('TokenizationSubsetBuilder', function() {
       })(),
       p: whitespaceSample.p
     };
-    assert.deepEqual(whitespaceSubset.pendingSet.get(baseTokenization).inputs, [expectedWhitespaceTransformTokenization]);
+    assert.deepEqual(whitespaceSubset.transitionEdges.get(baseTokenization).inputs, [expectedWhitespaceTransformTokenization]);
   });
 
   it("builds different subsets for transforms resulting in different total lengths and token count", () => {
@@ -707,54 +707,54 @@ describe('TokenizationSubsetBuilder', function() {
 
     const subsets = [...subsetBuilder.subsets.values()];
     const sameTokenLen4Subset = subsets.find((subset) => {
-      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const dataForSet = subset.transitionEdges.get(baseTokenization);
       const totalMass = dataForSet.inputs.reduce((accum, curr) => accum + curr.p, 0);
       // Thanks, floating-point precision.
       // Should land both the 'é' (delete 1) and empty-string transform (that lacks deletes)
       return Math.abs(totalMass - .45) < 1e-8;
     });
     assert.isOk(sameTokenLen4Subset);
-    assert.equal(sameTokenLen4Subset.pendingSet.get(baseTokenization).inputs.length, 2);
+    assert.equal(sameTokenLen4Subset.transitionEdges.get(baseTokenization).inputs.length, 2);
 
     const sameTokenLen5Subset = subsets.find((subset) => {
-      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const dataForSet = subset.transitionEdges.get(baseTokenization);
       const totalMass = dataForSet.inputs.reduce((accum, curr) => accum + curr.p, 0);
       // Thanks, floating-point precision.
       // Should land both the 't' and 's' transforms:  adds 1 char, deletes none
       return Math.abs(totalMass - .35) < 1e-8;
     });
     assert.isOk(sameTokenLen5Subset);
-    assert.equal(sameTokenLen5Subset.pendingSet.get(baseTokenization).inputs.length, 2);
+    assert.equal(sameTokenLen5Subset.transitionEdges.get(baseTokenization).inputs.length, 2);
 
     const sameTokenLen3Subset = subsets.find((subset) => {
-      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const dataForSet = subset.transitionEdges.get(baseTokenization);
       const totalMass = dataForSet.inputs.reduce((accum, curr) => accum + curr.p, 0);
       // Thanks, floating-point precision.
       // Should land the backspace transform.
       return Math.abs(totalMass - .1) < 1e-8;
     });
     assert.isOk(sameTokenLen3Subset);
-    assert.equal(sameTokenLen3Subset.pendingSet.get(baseTokenization).inputs.length, 1);
+    assert.equal(sameTokenLen3Subset.transitionEdges.get(baseTokenization).inputs.length, 1);
 
     const plusOneTokenSubset = subsets.find((subset) => {
-      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const dataForSet = subset.transitionEdges.get(baseTokenization);
       const totalMass = dataForSet.inputs.reduce((accum, curr) => accum + curr.p, 0);
       // Thanks, floating-point precision.
       // Should land the backspace transform.
       return Math.abs(totalMass - .08) < 1e-8;
     });
     assert.isOk(plusOneTokenSubset);
-    assert.equal(plusOneTokenSubset.pendingSet.get(baseTokenization).inputs.length, 1);
+    assert.equal(plusOneTokenSubset.transitionEdges.get(baseTokenization).inputs.length, 1);
 
     const plusTwoTokensSubset = subsets.find((subset) => {
-      const dataForSet = subset.pendingSet.get(baseTokenization);
+      const dataForSet = subset.transitionEdges.get(baseTokenization);
       const totalMass = dataForSet.inputs.reduce((accum, curr) => accum + curr.p, 0);
       // Thanks, floating-point precision.
       // Should land the backspace transform.
       return Math.abs(totalMass - .12) < 1e-8;
     });
     assert.isOk(plusTwoTokensSubset);
-    assert.equal(plusTwoTokensSubset.pendingSet.get(baseTokenization).inputs.length, 1);
+    assert.equal(plusTwoTokensSubset.transitionEdges.get(baseTokenization).inputs.length, 1);
   });
 
   it("places compatible results from separate tokenizations in the same subset after whitespace", () => {
@@ -810,7 +810,7 @@ describe('TokenizationSubsetBuilder', function() {
     // consider their paths separately after the transition.
     assert.equal(subsetBuilder.subsets.size, 1);
     // Has entries from two different base tokenizations.
-    assert.equal([...subsetBuilder.subsets.values()][0].pendingSet.size, 2);
+    assert.equal([...subsetBuilder.subsets.values()][0].transitionEdges.size, 2);
   });
 
   it("places compatible results from separate tokenizations in the same subset (mid-token)", () => {
@@ -874,9 +874,9 @@ describe('TokenizationSubsetBuilder', function() {
 
     // sé + an, sea + n:  both result in a four-char long token starting at the same point.
     // Same total amount of .deleteLeft is supported for both variations.
-    const mergedSubset = subsets.find((subset) => subset.pendingSet.size);
+    const mergedSubset = subsets.find((subset) => subset.transitionEdges.size);
     assert.isOk(mergedSubset);
-    assert.isTrue(mergedSubset.pendingSet.has(twoCharTokenization));
-    assert.isTrue(mergedSubset.pendingSet.has(threeCharTokenization));
+    assert.isTrue(mergedSubset.transitionEdges.has(twoCharTokenization));
+    assert.isTrue(mergedSubset.transitionEdges.has(threeCharTokenization));
   });
 });

@@ -243,7 +243,7 @@ export class ContextState {
     const baseTokenization = startTokenizationsAfterSlide[0];
     // For multiple tokenizations, we'd retrieve each, use the "most likely" one as base,
     // and then fold all resulting search spaces (on the final token) into one.
-    const tokenizationAnalysis = trueInputSubset.pendingSet.get(baseTokenization);
+    const tokenizationAnalysis = trueInputSubset.transitionEdges.get(baseTokenization);
 
     // Determine the best probability from among ALL available inputs, before they're split
     // into subsets.

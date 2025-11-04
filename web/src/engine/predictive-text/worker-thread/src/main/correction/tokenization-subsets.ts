@@ -2,7 +2,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { ContextTokenization, TokenizationEdgeAlignment, TokenizationTransitionEdits } from './context-tokenization.js';
+import { ContextTokenization, TransitionEdgeAlignment, TokenizationTransitionEdits } from './context-tokenization.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -13,21 +13,29 @@ export function generateSubsetId() {
   return SUBSET_ID_SEED++;
 }
 
-export interface PendingTokenization {
+/**
+ * Tracks metadata about the input "edge" transitioning from one source
+ * ContextTokenization to a potentially-common destination ContextTokenization.
+ *
+ * Once evaluated, each entry within its `.inputs` field should have a
+ * one-to-one relationship with instances of the `SearchPath` class.
+ */
+export interface TransitionEdge {
   /**
-   * The edge window corresponding to the common tokenization for the subset's inputs
+   * The edge window corresponding to the common ContextTokenization context
+   * to which this path's inputs will be applied.
    */
-  alignment: TokenizationEdgeAlignment,
+  alignment: TransitionEdgeAlignment,
 
   /**
    * A set of incoming keystrokes with compatible effects when applied.
    *
-   * If passed to `subsetByInterval`, the transforms should result in a single subset.
+   * If passed to the`subsetByInterval`, the transforms should result in a single subset.
    */
   inputs: Distribution<Map<number, Transform>>
 
   /**
-   * A unique identifier associated with this PendingTokenization and its
+   * A unique identifier associated with this TransitionEdge and its
    * transforms within `SearchSpace`s.  This ID assists with detecting when
    * split transforms are re-merged during SearchSpace merges.  Only
    * input-sources with matching subset ID come from the same subset, and thus
@@ -42,7 +50,17 @@ export interface PendingTokenization {
 }
 
 /**
- * Defines a subset of pending tokenization transitions based on potential inputs.
+ * Defines a subset of pending tokenization transitions based on potential
+ * inputs.
+ *
+ * If more than one `transitionEdges` entry exists, this should directly
+ * correspond to a unique instance of `SearchCluster` (per affected
+ * `ContextToken`) once fully processed, each comprised of the corresponding
+ * `SearchPath` entries constructed from each `transitionEdges` entry.
+ *
+ * If only one `transitionEdges` entry exists, it should correspond to
+ * `SearchPath` instances instead; there is no need for `SearchCluster` overhead
+ * in such cases.
  */
 export interface TokenizationSubset {
   /**
@@ -55,7 +73,7 @@ export interface TokenizationSubset {
    * them, yielding compatible search paths and tokenization effects after their
    * application.
    */
-  readonly pendingSet: Map<ContextTokenization, PendingTokenization>;
+  readonly transitionEdges: Map<ContextTokenization, TransitionEdge>;
 }
 
 export function editKeyer(precomputation: TokenizationTransitionEdits): string[] {
@@ -213,13 +231,13 @@ export class TokenizationSubsetBuilder {
     // Maps any number of Tokenizations and their incoming alignment data to a common key
     // for final tokenization forms.
     const entry: TokenizationSubset = this._subsets.get(key) ?? {
-      pendingSet: new Map(),
+      transitionEdges: new Map(),
       key: key
     }
 
     // Finds any previously-accumulated data corresponding to both the incoming and
     // target final tokenization form, creating an empty entry if none yet exists.
-    const forTokenization: PendingTokenization = entry.pendingSet.get(tokenization) ?? {
+    const forTokenization: TransitionEdge = entry.transitionEdges.get(tokenization) ?? {
       alignment: precomputation.alignment,
       inputs: [],
       inputSubsetId: generateSubsetId()
@@ -228,7 +246,7 @@ export class TokenizationSubsetBuilder {
     // Adds the incoming tokenized transform data for the pairing...
     forTokenization.inputs.push({sample: precomputation.tokenizedTransform, p});
     // and ensures that the pairing's data-accumulator is in the map.
-    entry.pendingSet.set(tokenization, forTokenization);
+    entry.transitionEdges.set(tokenization, forTokenization);
 
     // Also ensures that the target tokenization's data (accumulating the pairings)
     // is made available within the top-level map.
