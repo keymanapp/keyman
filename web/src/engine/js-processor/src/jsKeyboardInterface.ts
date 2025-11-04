@@ -13,19 +13,19 @@ import {
   KeyboardHarness,
   KeyboardKeymanGlobal,
   KeyMapping,
+  Mock,
   MutableSystemStore,
+  ProcessorAction,
   SystemStore,
   SystemStoreIDs,
+  type Deadkey,
   type KeyEvent,
+  type OutputTargetBase,
   type OutputTargetInterface,
-  ProcessorAction,
   VariableStore,
   VariableStoreDictionary,
   VariableStoreSerializer,
 } from "keyman/engine/keyboard";
-import { type OutputTargetBase }  from './outputTargetBase.js';
-import { type Deadkey } from './deadkeys.js';
-import { Mock } from "./mock.js";
 import { PlatformSystemStore } from './platformSystemStore.js';
 import { ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement } from "./stores.js";
 

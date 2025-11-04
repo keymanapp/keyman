@@ -1,6 +1,5 @@
-import { JSKeyboard, Keyboard, OutputTargetInterface, Transcription, TextTransform } from 'keyman/engine/keyboard';
+import { JSKeyboard, Keyboard, OutputTargetInterface, Transcription, TextTransform, Mock, findCommonSubstringEndIndex, OutputTargetBase } from 'keyman/engine/keyboard';
 // TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
-import { Mock, findCommonSubstringEndIndex, OutputTargetBase } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';

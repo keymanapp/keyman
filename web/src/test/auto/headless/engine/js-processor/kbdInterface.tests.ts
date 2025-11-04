@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { DeviceSpec, JSKeyboard, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { DeviceSpec, JSKeyboard, MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 describe('Headless keyboard loading', function () {

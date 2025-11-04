@@ -5,8 +5,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { InputProcessor } from 'keyman/engine/main';
-import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest } from '@keymanapp/recorder-core';
 

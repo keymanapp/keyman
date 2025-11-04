@@ -1,7 +1,6 @@
 import { assert } from 'chai';
 
-import { KMWString } from 'keyman/engine/keyboard';
-import { Mock } from 'keyman/engine/js-processor';
+import { KMWString, Mock } from 'keyman/engine/keyboard';
 import * as wrappers from 'keyman/engine/element-wrappers';
 
 import { DynamicElements } from '../../test_utils.js';

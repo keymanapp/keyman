@@ -8,22 +8,22 @@ import { globalObject, DeviceSpec, isEmptyTransform } from "@keymanapp/web-utils
 import { KM_Core } from 'keyman/engine/core-processor';
 
 import {
-  type Alternate,
   Codes,
   JSKeyboard,
   KeyboardMinimalInterface,
+  Mock,
+  OutputTargetBase,
+  ProcessorAction,
+  SystemStoreIDs,
+  type Alternate,
   type Keyboard,
   type KeyEvent,
   type OutputTargetInterface,
-  ProcessorAction,
-  SystemStoreIDs
 } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase
 import {
   JSKeyboardProcessor,
-  Mock,
   type ProcessorInitOptions,
-  OutputTargetBase
 } from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";

@@ -11,10 +11,8 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes, type MutableSystemStore,
-  OutputTargetInterface, ProcessorAction, SystemStoreIDs
+  OutputTargetInterface, ProcessorAction, SystemStoreIDs, Mock, type OutputTargetBase
 } from "keyman/engine/keyboard";
-import { Mock } from "./mock.js";
-import { type OutputTargetBase }  from "./outputTargetBase.js";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 

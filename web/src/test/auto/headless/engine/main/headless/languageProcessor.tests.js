@@ -2,7 +2,7 @@ import { assert } from 'chai';
 
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { Mock } from 'keyman/engine/js-processor';
+import { Mock } from 'keyman/engine/keyboard';
 
 /*
  * Unit tests for the Dummy prediction model.

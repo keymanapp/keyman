@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/js-processor';
+import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
 import { KMWString } from '@keymanapp/web-utils';
 
 // A unicode-coding like alias for use in constructing non-BMP strings.

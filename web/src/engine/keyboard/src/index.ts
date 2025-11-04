@@ -33,6 +33,11 @@ export { OutputTargetInterface } from "./outputTargetInterface.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
 export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } from "./variableStore.js";
 
+export { Mock } from "./mock.js";
+export { OutputTargetBase } from "./outputTargetBase.js";
+export { findCommonSubstringEndIndex } from "./stringDivergence.js";
+export { Deadkey } from "./deadkeys.js";
+
 export * from "@keymanapp/web-utils";
 
 // At the top level, there should be no default export.

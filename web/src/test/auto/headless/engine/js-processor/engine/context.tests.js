@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, JSKeyboardProcessor, Mock } from 'keyman/engine/js-processor';
+import { MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
@@ -882,7 +882,7 @@ var NUL_TEST_2 = {
 /* Keyman language equivalent:
  *
  * nul nul any(abc) context(3) > 'success'
- * 
+ *
  * This one may... "stretch" what's actually allowed by Keyman language rules,
  * but we wish to ensure that the actual context management is capable of
  * handling this.
@@ -925,7 +925,7 @@ var NUL_TEST_3 = {
 /* Keyman language equivalent:
  *
  * nul nul dk(1) any(abc) > 'success'
- * 
+ *
  * This may also "stretch" what's actually allowed by Keyman language rules,
  * but we wish to ensure that the actual context management is capable of
  * handling this.

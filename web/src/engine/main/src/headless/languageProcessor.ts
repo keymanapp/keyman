@@ -1,8 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 // TODO-web-core: remove use of OutputTargetBase
-import { Mock, OutputTargetBase } from "keyman/engine/js-processor";
-import { Transcription, OutputTargetInterface } from 'keyman/engine/keyboard';
+import { Transcription, OutputTargetInterface, Mock, OutputTargetBase } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";

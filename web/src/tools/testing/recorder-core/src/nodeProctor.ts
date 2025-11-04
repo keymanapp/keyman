@@ -8,9 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, KeyboardHarness, type OutputTargetInterface } from "keyman/engine/keyboard";
-// TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
-import { Mock, OutputTargetBase } from 'keyman/engine/js-processor';
+import { KeyEvent, KeyEventSpec, KeyboardHarness, type OutputTargetInterface, Mock, OutputTargetBase } from "keyman/engine/keyboard";
 import { DeviceSpec } from "@keymanapp/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 

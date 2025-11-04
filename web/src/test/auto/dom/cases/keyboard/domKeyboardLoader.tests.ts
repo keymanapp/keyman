@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
-import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard, Mock } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
 
 declare let window: typeof globalThis;

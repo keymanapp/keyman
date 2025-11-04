@@ -1,4 +1,4 @@
-import { OutputTargetBase } from "keyman/engine/js-processor";
+import { OutputTargetBase } from "keyman/engine/keyboard";
 import { EventEmitter } from 'eventemitter3';
 
 export abstract class OutputTargetElementWrapper<EventMap extends EventEmitter.ValidEventTypes> extends OutputTargetBase {

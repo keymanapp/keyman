@@ -5,8 +5,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { KMWString } from '@keymanapp/web-utils';
-import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, JSKeyboardProcessor, Mock } from 'keyman/engine/js-processor';
+import { Codes, KeyEvent, MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
