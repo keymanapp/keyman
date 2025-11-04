@@ -11,7 +11,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes, type MutableSystemStore,
-  OutputTargetInterface, ProcessorAction, SystemStoreIDs, Mock, type OutputTargetBase
+  OutputTargetBase, ProcessorAction, SystemStoreIDs, Mock
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
@@ -20,7 +20,7 @@ import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 
 // Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
-export type BeepHandler = (outputTarget: OutputTargetInterface) => void;
+export type BeepHandler = (outputTarget: OutputTargetBase) => void;
 export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
@@ -608,7 +608,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     }
   };
 
-  public finalizeProcessorAction(data: ProcessorAction, outputTarget: OutputTargetInterface): void {
+  public finalizeProcessorAction(data: ProcessorAction, outputTarget: OutputTargetBase): void {
     if (!data.transcription) {
       throw "Cannot finalize a ProcessorAction with no transcription.";
     }

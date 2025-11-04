@@ -1,5 +1,6 @@
 import { KMWString } from "@keymanapp/web-utils";
-import { Alternate, OutputTargetInterface, TextTransform, Transcription } from 'keyman/engine/keyboard';
+import { Alternate, TextTransform } from "./keyboards/textTransform.js";
+import { Transcription } from "./keyboards/transcription.js";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
 
@@ -8,7 +9,7 @@ import { type KeyEvent } from 'keyman/engine/keyboard';
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-export abstract class OutputTargetBase implements OutputTargetInterface {
+export abstract class OutputTargetBase {
   private _dks: DeadkeyTracker;
 
   constructor() {
@@ -66,7 +67,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: OutputTargetInterface): TextTransform {
+  buildTransformFrom(original: OutputTargetBase): TextTransform {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
@@ -87,7 +88,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
     return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
-  buildTranscriptionFrom(original: OutputTargetInterface, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
+  buildTranscriptionFrom(original: OutputTargetBase, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
     const transform = this.buildTransformFrom(original);
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.

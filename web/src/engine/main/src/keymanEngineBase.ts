@@ -1,5 +1,4 @@
 import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction, OutputTargetBase } from "keyman/engine/keyboard";
-// TODO-web-core: remove usage of OutputTargetBase
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"

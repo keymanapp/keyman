@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
-import { OutputTargetInterface } from "keyman/engine/keyboard";
+import { OutputTargetBase } from "keyman/engine/keyboard";
 
 export class ReadySuggestions {
   suggestions: LexicalModelTypes.Suggestion[];
@@ -45,10 +45,10 @@ export interface LanguageProcessorEventMap {
   /**
    * Is called synchronously once suggestion application is successful and the context has been updated.
    *
-   * @param outputTarget The `OutputTargetInterface` representation of the context the suggestion was applied to.
+   * @param outputTarget The `OutputTargetBase` representation of the context the suggestion was applied to.
    * @returns
    */
-  'suggestionapplied': (outputTarget: OutputTargetInterface) => boolean
+  'suggestionapplied': (outputTarget: OutputTargetBase) => boolean
 }
 
 
@@ -56,7 +56,7 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
 
   get state(): StateChangeEnum;
 
-  invalidateContext(outputTarget: OutputTargetInterface, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
+  invalidateContext(outputTarget: OutputTargetBase, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
 
   /**
    *
@@ -66,9 +66,9 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  applySuggestion(suggestion: LexicalModelTypes.Suggestion, outputTarget: OutputTargetInterface, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
+  applySuggestion(suggestion: LexicalModelTypes.Suggestion, outputTarget: OutputTargetBase, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
 
-  applyReversion(reversion: LexicalModelTypes.Reversion, outputTarget: OutputTargetInterface): Promise<LexicalModelTypes.Suggestion[]>;
+  applyReversion(reversion: LexicalModelTypes.Reversion, outputTarget: OutputTargetBase): Promise<LexicalModelTypes.Suggestion[]>;
 
   get wordbreaksAfterSuggestions(): boolean;
 

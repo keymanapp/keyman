@@ -7,7 +7,7 @@
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import { Codes } from './codes.js';
 import { type KeyEvent } from './keyEvent.js';
-import { type OutputTargetInterface }  from './outputTargetInterface.js';
+import { type OutputTargetBase }  from './outputTargetBase.js';
 
 export enum EmulationKeystrokes {
   Enter = '\n',
@@ -83,7 +83,7 @@ export default class DefaultRules {
    *
    * Note:  is extended by DOM-aware KeymanWeb code.
    */
-  public applyCommand(Lkc: KeyEvent, outputTarget: OutputTargetInterface): void {
+  public applyCommand(Lkc: KeyEvent, outputTarget: OutputTargetBase): void {
     // Notes for potential default-handling extensions:
     //
     // switch(code) {

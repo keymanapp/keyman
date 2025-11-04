@@ -1,5 +1,4 @@
-import { JSKeyboard, Keyboard, OutputTargetInterface, Transcription, TextTransform, Mock, findCommonSubstringEndIndex, OutputTargetBase } from 'keyman/engine/keyboard';
-// TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
+import { JSKeyboard, Keyboard, OutputTargetBase, Transcription, TextTransform, Mock, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -59,7 +58,7 @@ export class ContextHost extends Mock {
     this.savedState = Mock.from(this);
   }
 
-  restoreTo(original: OutputTargetInterface): void {
+  restoreTo(original: OutputTargetBase): void {
     this.savedState = Mock.from(this);
     // TODO-web-core
     super.restoreTo(original as OutputTargetBase);
@@ -139,7 +138,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTarget(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, target: OutputTargetInterface) {
+  activateKeyboardForTarget(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, target: OutputTargetBase) {
     // `target` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.

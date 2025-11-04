@@ -8,7 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, KeyboardHarness, type OutputTargetInterface, Mock, OutputTargetBase } from "keyman/engine/keyboard";
+import { KeyEvent, KeyEventSpec, KeyboardHarness, Mock, OutputTargetBase } from "keyman/engine/keyboard";
 import { DeviceSpec } from "@keymanapp/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
@@ -48,7 +48,7 @@ export default class NodeProctor extends Proctor {
     return true;
   }
 
-  async simulateSequence(sequence: TestSequence<any>, target?: OutputTargetInterface): Promise<string> {
+  async simulateSequence(sequence: TestSequence<any>, target?: OutputTargetBase): Promise<string> {
     // Start with an empty OutputTarget and a fresh KeyboardProcessor.
     if(!target) {
       target = new Mock();

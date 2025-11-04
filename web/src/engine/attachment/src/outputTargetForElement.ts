@@ -2,7 +2,7 @@ import { nestedInstanceOf } from "keyman/engine/element-wrappers";
 
 /**
  * Given a DOM event related to an KMW-attached element, this function determines
- * the corresponding OutputTargetInterface.
+ * the corresponding OutputTargetBase.
  * @param e
  * @returns
  */
@@ -13,7 +13,7 @@ export function eventOutputTarget(e: Event) {
 
 /**
  * Given a DOM event related to an KMW-attached element, this function determines
- * the corresponding OutputTargetInterface.
+ * the corresponding OutputTargetBase.
  * @param e
  * @returns
  */
@@ -42,7 +42,7 @@ export function outputTargetForElement(Ltarg: HTMLElement) {
     }
   }
 
-  // Step 2:  With the most likely host element determined, obtain the corresponding OutputTargetInterface
+  // Step 2:  With the most likely host element determined, obtain the corresponding OutputTargetBase
   // instance.
   return Ltarg._kmwAttachment?.interface;
 }

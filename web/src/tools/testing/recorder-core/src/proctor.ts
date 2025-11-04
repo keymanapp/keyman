@@ -1,5 +1,5 @@
 import { type DeviceSpec } from "@keymanapp/web-utils";
-import { type OutputTargetInterface } from "keyman/engine/keyboard";
+import { type OutputTargetBase } from "keyman/engine/keyboard";
 
 import type { KeyboardTest, TestSet, TestSequence } from "./index.js";
 
@@ -49,5 +49,5 @@ export default abstract class Proctor {
    * Simulates the specified test sequence for use in testing.
    * @param sequence The recorded sequence, generally provided by a test set.
    */
-  abstract simulateSequence(sequence: TestSequence<any>, target?: OutputTargetInterface): Promise<string>;
+  abstract simulateSequence(sequence: TestSequence<any>, target?: OutputTargetBase): Promise<string>;
 }

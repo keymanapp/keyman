@@ -18,9 +18,7 @@ import {
   type Alternate,
   type Keyboard,
   type KeyEvent,
-  type OutputTargetInterface,
 } from "keyman/engine/keyboard";
-// TODO-web-core: remove usage of OutputTargetBase
 import {
   JSKeyboardProcessor,
   type ProcessorInitOptions,
@@ -103,7 +101,7 @@ export class InputProcessor {
    * @returns     {Object}                    A ProcessorAction object describing the cumulative effects of
    *                                          all matched keyboard rules.
    */
-  processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetInterface): ProcessorAction {
+  processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetBase): ProcessorAction {
     const kbdMismatch = keyEvent.srcKeyboard && this.activeKeyboard != keyEvent.srcKeyboard;
     const trueActiveKeyboard = this.activeKeyboard;
 
@@ -157,7 +155,7 @@ export class InputProcessor {
    * @param outputTarget
    * @returns
    */
-  private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetInterface): ProcessorAction {
+  private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetBase): ProcessorAction {
     const formFactor = keyEvent.device.formFactor;
     const fromOSK = keyEvent.isSynthetic;
 
@@ -400,7 +398,7 @@ export class InputProcessor {
     return alternates;
   }
 
-  public resetContext(outputTarget?: OutputTargetInterface) {
+  public resetContext(outputTarget?: OutputTargetBase) {
     // Also handles new-context events, which may modify the layer
     // TODO-web-core
     this.keyboardProcessor.resetContext(outputTarget as OutputTargetBase);

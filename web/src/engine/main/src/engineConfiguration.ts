@@ -1,7 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 
 import {
-  DeviceSpec, KeyboardProperties, ManagedPromise, OutputTargetInterface,
+  DeviceSpec, KeyboardProperties, ManagedPromise, OutputTargetBase,
   ProcessorAction, physicalKeyDeviceAlias, SpacebarText
 } from "keyman/engine/keyboard";
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/interfaces";
@@ -112,7 +112,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
    * @param ruleBehavior  The full effects of keystroke + postkeystroke rules from a processed keystroke.
    * @param outputTarget  The engine's current source for context
    */
-  onRuleFinalization(ruleBehavior: ProcessorAction, outputTarget: OutputTargetInterface) {};
+  onRuleFinalization(ruleBehavior: ProcessorAction, outputTarget: OutputTargetBase) {};
 }
 
 export interface InitOptionSpec extends PathOptionSpec {

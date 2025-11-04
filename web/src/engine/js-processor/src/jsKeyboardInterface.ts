@@ -21,7 +21,6 @@ import {
   type Deadkey,
   type KeyEvent,
   type OutputTargetBase,
-  type OutputTargetInterface,
   VariableStore,
   VariableStoreDictionary,
   VariableStoreSerializer,
@@ -187,7 +186,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   cachedContextEx: CachedContextEx = new CachedContextEx();
   ruleContextEx: CachedContextEx;
 
-  activeTargetOutput: OutputTargetInterface;
+  activeTargetOutput: OutputTargetBase;
   ruleBehavior: ProcessorAction;
 
   systemStores: {[storeID: number]: SystemStore};
@@ -264,7 +263,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
    */
 
-  context(n: number, ln: number, outputTarget: OutputTargetInterface): string {
+  context(n: number, ln: number, outputTarget: OutputTargetBase): string {
     const v = this.cachedContext.get(n, ln);
     if(v !== null) {
       return v;
@@ -288,7 +287,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KC(3,3,Pelem) == "def"
    *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
    */
-  private KC_(n: number, ln: number, outputTarget: OutputTargetInterface): string {
+  private KC_(n: number, ln: number, outputTarget: OutputTargetBase): string {
     let tempContext = '';
 
     // If we have a selection, we have an empty context
@@ -314,7 +313,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KN(2,Pelem) == FALSE
    *             KN(4,Pelem) == TRUE
    */
-  nul(n: number, outputTarget: OutputTargetInterface): boolean {
+  nul(n: number, outputTarget: OutputTargetBase): boolean {
     const cx=this.context(n+1, 1, outputTarget);
 
     // With #31, the result will be a replacement character if context is empty.
@@ -331,7 +330,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @return      {boolean}                   True if selected context matches val
    * Description  Test keyboard context for match
    */
-  contextMatch(n: number, outputTarget: OutputTargetInterface, val: string, ln: number): boolean {
+  contextMatch(n: number, outputTarget: OutputTargetBase, val: string, ln: number): boolean {
     const cx=this.context(n, ln, outputTarget);
     if(cx === val) {
       return true; // I3318
@@ -629,7 +628,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @return      {boolean}                   True if deadkey found selected context matches val
    * Description  Match deadkey at current cursor position
    */
-  deadkeyMatch(n: number, outputTarget: OutputTargetInterface, d: number): boolean {
+  deadkeyMatch(n: number, outputTarget: OutputTargetBase, d: number): boolean {
     return outputTarget.hasDeadkeyMatch(n, d);
   }
 
@@ -639,7 +638,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}      outputTarget  element to flash
    * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
    */
-  beep(outputTarget: OutputTargetInterface): void {
+  beep(outputTarget: OutputTargetBase): void {
     this.resetContextCache();
 
     // Denote as part of the matched rule's behavior.
@@ -732,7 +731,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}      outputTarget  element to output to
    * Description  Output a character selected from the string according to the offset in the index array
    */
-  indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, outputTarget: OutputTargetInterface): void {
+  indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, outputTarget: OutputTargetBase): void {
     this.resetContextCache();
 
     const assertNever = function(x: never): never {
@@ -769,7 +768,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}      outputTarget  element to output to
    * Description  Keyboard output
    */
-  deleteContext(dn: number, outputTarget: OutputTargetInterface): void {
+  deleteContext(dn: number, outputTarget: OutputTargetBase): void {
     let context: CachedExEntry;
 
     // We want to control exactly which deadkeys get removed.
@@ -815,7 +814,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {string}      s             string to output
    * Description  Keyboard output
    */
-  output(dn: number, outputTarget: OutputTargetInterface, s:string): void {
+  output(dn: number, outputTarget: OutputTargetBase, s:string): void {
     this.resetContextCache();
 
     outputTarget.saveProperties();
@@ -838,11 +837,11 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @alias       KCXO
    * @public
    * @param       {number}        Pdn            number of characters to delete left of cursor
-   * @param       {OutputTargetInterface}  outputTarget   target to output to
+   * @param       {OutputTargetBase}  outputTarget   target to output to
    * @param       {number}        contextLength  length of current rule context to retrieve
    * @param       {number}        contextOffset  offset from start of current rule context, 1-based
    */
-  contextExOutput(Pdn: number, outputTarget: OutputTargetInterface, contextLength: number, contextOffset: number): void {
+  contextExOutput(Pdn: number, outputTarget: OutputTargetBase, contextLength: number, contextOffset: number): void {
     this.resetContextCache();
 
     if(Pdn >= 0) {
@@ -864,11 +863,11 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function     deadkeyOutput KDO
    * Scope        Public
    * @param       {number}      Pdn           no of character to overwrite (delete)
-   * @param       {OutputTargetInterface}      outputTarget  element to output to
+   * @param       {OutputTargetBase}      outputTarget  element to output to
    * @param       {number}      Pd            deadkey id
    * Description  Record a deadkey at current cursor position, deleting Pdn characters first
    */
-  deadkeyOutput(Pdn: number, outputTarget: OutputTargetInterface, Pd: number): void {
+  deadkeyOutput(Pdn: number, outputTarget: OutputTargetBase, Pd: number): void {
     this.resetContextCache();
 
     if(Pdn >= 0) {
@@ -884,10 +883,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *
    * @param       {number}      systemId      ID of the system store to test (only TSS_LAYER currently supported)
    * @param       {string}      strValue      String value to compare to
-   * @param       {OutputTargetInterface}      outputTarget  Currently active element (may be needed by future tests)
+   * @param       {OutputTargetBase}      outputTarget  Currently active element (may be needed by future tests)
    * @return      {boolean}                   True if the test succeeds
    */
-  ifStore(systemId: number, strValue: string, outputTarget: OutputTargetInterface): boolean {
+  ifStore(systemId: number, strValue: string, outputTarget: OutputTargetBase): boolean {
     let result=true;
     const store = this.systemStores[systemId];
     if(store) {
@@ -901,14 +900,14 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *
    * @param       {number}      systemId      ID of the system store to set (only TSS_LAYER currently supported)
    * @param       {string}      strValue      String to set as the system store content
-   * @param       {OutputTargetInterface}      outputTarget  Currently active element (may be needed in future tests)
+   * @param       {OutputTargetBase}      outputTarget  Currently active element (may be needed in future tests)
    * @return      {boolean}                   True if command succeeds
    *                                          (i.e. for TSS_LAYER, if the layer is successfully selected)
    *
    * Note that option/variable stores are instead set within keyboard script code, as they only
    * affect keyboard behavior.
    */
-  setStore(systemId: number, strValue: string, outputTarget: OutputTargetInterface): boolean {
+  setStore(systemId: number, strValue: string, outputTarget: OutputTargetBase): boolean {
     this.resetContextCache();
     // Unique case:  we only allow set(&layer) ops from keyboard rules triggered by touch OSKs.
     if(systemId == SystemStoreIDs.TSS_LAYER && this.activeDevice.touchable) {
@@ -978,7 +977,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.cachedContextEx.reset();
   }
 
-  defaultBackspace(outputTarget: OutputTargetInterface) {
+  defaultBackspace(outputTarget: OutputTargetBase) {
     if(outputTarget.isSelectionEmpty()) {
       // Delete the character left of the caret
       this.output(1, outputTarget, "");
