@@ -13,6 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
+import { generateSubsetId } from './tokenization-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
@@ -74,7 +75,8 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
           transitionId: keystroke.sample.id,
           start: 0
         },
-        bestProbFromSet: keystroke.p
+        bestProbFromSet: keystroke.p,
+        subsetId: generateSubsetId()
       }
     };
     const inputSrc = inputSource as PathInputProperties;
