@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextToken, correction, getBestMatches, models, preprocessInputSources, SearchPath } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, generateSubsetId, getBestMatches, models, preprocessInputSources, SearchPath } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
@@ -119,6 +119,7 @@ describe('ContextToken', function() {
 
     it("merges three tokens from single previously-split transforms", () => {
       const srcTransform = { insert: "can't", deleteLeft: 0, deleteRight: 0, id: 1 };
+      const srcSubsetId = generateSubsetId();
 
       const token1 = new ContextToken(plainModel);
       const token2 = new ContextToken(plainModel);
@@ -130,7 +131,8 @@ describe('ContextToken', function() {
           transitionId: srcTransform.id,
           start: 0
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetId
       }, [{sample: {insert: 'can', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
 
       token2.addInput({
@@ -139,7 +141,8 @@ describe('ContextToken', function() {
           transitionId: srcTransform.id,
           start: 3
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetId
       }, [{sample: {insert: "'", deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
 
       token3.addInput({
@@ -148,12 +151,20 @@ describe('ContextToken', function() {
           transitionId: srcTransform.id,
           start: 4
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetId
       }, [{sample: {insert: 't', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
 
       const merged = ContextToken.merge([token1, token2, token3], plainModel);
       assert.equal(merged.exampleInput, "can't");
-      assert.deepEqual(merged.inputSegments, [ { segment: {trueTransform: srcTransform, transitionId: srcTransform.id, start: 0}, bestProbFromSet: 1 } ]);
+      assert.deepEqual(merged.inputSegments, [ {
+        segment: {
+          trueTransform: srcTransform,
+          transitionId: srcTransform.id,
+          start: 0
+        }, bestProbFromSet: 1,
+        subsetId: srcSubsetId
+      } ]);
       assert.equal(merged.searchSpace.inputCount, 1);
       assert.deepEqual((merged.searchSpace as SearchPath).lastInput, [{sample: srcTransform, p: 1}]);
     });
@@ -161,11 +172,18 @@ describe('ContextToken', function() {
     it("merges four tokens with previously-split transforms", () => {
       // TODO:  need another case - pref where there are two diff boundary transforms
       // and where each token has multiple constituent transforms.
-      const srcTransform1 = { insert: "apple", deleteLeft: 0, deleteRight: 0, id: 1 };
-      const srcTransform2 = { insert: "sands", deleteLeft: 0, deleteRight: 0, id: 2 };
-      const srcTransform3 = { insert: "our", deleteLeft: 0, deleteRight: 0, id: 3 };
-      const srcTransform4 = { insert: "grapes", deleteLeft: 0, deleteRight: 0, id: 4 };
-      const srcTransforms = [srcTransform1, srcTransform2, srcTransform3, srcTransform4];
+      const srcTransforms = [
+        { insert: "apple", deleteLeft: 0, deleteRight: 0, id: 1 },
+        { insert: "sands", deleteLeft: 0, deleteRight: 0, id: 2 },
+        { insert: "our", deleteLeft: 0, deleteRight: 0, id: 3 },
+        { insert: "grapes", deleteLeft: 0, deleteRight: 0, id: 4 }
+      ];
+      const srcSubsetIds = [
+        generateSubsetId(),
+        generateSubsetId(),
+        generateSubsetId(),
+        generateSubsetId()
+      ];
 
       // apples
       const token1 = new ContextToken(plainModel);
@@ -179,59 +197,72 @@ describe('ContextToken', function() {
 
       token1.addInput({
         segment: {
-          trueTransform: srcTransform1,
-          transitionId: srcTransform1.id,
+          trueTransform: srcTransforms[0],
+          transitionId: srcTransforms[0].id,
           start: 0
         },
-        bestProbFromSet: 1
-      }, [{sample: srcTransform1, p: 1}]);
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[0]
+      }, [{sample: srcTransforms[0], p: 1}]);
       token1.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 0
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[1]
       }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
 
       token2.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 1
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[1]
       }, [{sample: {insert: "and", deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
 
       token3.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 4
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[1]
       }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
       token3.addInput({
         segment: {
-          trueTransform: srcTransform3,
-          transitionId: srcTransform3.id,
+          trueTransform: srcTransforms[2],
+          transitionId: srcTransforms[2].id,
           start: 0
         },
-        bestProbFromSet: 1
-      }, [{sample: srcTransform3, p: 1}]);
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[2]
+      }, [{sample: srcTransforms[2], p: 1}]);
 
       token4.addInput({
         segment: {
-          trueTransform: srcTransform4,
-          transitionId: srcTransform4.id,
+          trueTransform: srcTransforms[3],
+          transitionId: srcTransforms[3].id,
           start: 0
         },
-        bestProbFromSet: 1
-      }, [{sample: srcTransform4, p: 1}]);
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[3]
+      }, [{sample: srcTransforms[3], p: 1}]);
 
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
-      assert.deepEqual(merged.inputSegments, srcTransforms.map((t) => ({ segment: {trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
+      assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
+        segment: {
+          trueTransform: t,
+          transitionId: t.id,
+          start: 0
+        }, bestProbFromSet: 1 ,
+        subsetId: srcSubsetIds[i]
+      }) ));
       assert.isTrue(merged.searchSpace.hasInputs(
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
       ));
@@ -240,11 +271,18 @@ describe('ContextToken', function() {
     it("merges four tokens with previously-split transforms - non-BMP text", () => {
       // TODO:  need another case - pref where there are two diff boundary transforms
       // and where each token has multiple constituent transforms.
-      const srcTransform1 = { insert: toMathematicalSMP("apple"), deleteLeft: 0, deleteRight: 0, id: 1 };
-      const srcTransform2 = { insert: toMathematicalSMP("sands"), deleteLeft: 0, deleteRight: 0, id: 2 };
-      const srcTransform3 = { insert: toMathematicalSMP("our"), deleteLeft: 0, deleteRight: 0, id: 3 };
-      const srcTransform4 = { insert: toMathematicalSMP("grapes"), deleteLeft: 0, deleteRight: 0, id: 4 };
-      const srcTransforms = [srcTransform1, srcTransform2, srcTransform3, srcTransform4];
+      const srcTransforms = [
+        { insert: toMathematicalSMP("apple"), deleteLeft: 0, deleteRight: 0, id: 1 },
+        { insert: toMathematicalSMP("sands"), deleteLeft: 0, deleteRight: 0, id: 2 },
+        { insert: toMathematicalSMP("our"), deleteLeft: 0, deleteRight: 0, id: 3 },
+        { insert: toMathematicalSMP("grapes"), deleteLeft: 0, deleteRight: 0, id: 4 }
+      ];
+      const srcSubsetIds = [
+        generateSubsetId(),
+        generateSubsetId(),
+        generateSubsetId(),
+        generateSubsetId()
+      ];
 
       // apples
       const token1 = new ContextToken(plainModel);
@@ -258,59 +296,72 @@ describe('ContextToken', function() {
 
       token1.addInput({
         segment: {
-          trueTransform: srcTransform1,
-          transitionId: srcTransform1.id,
+          trueTransform: srcTransforms[0],
+          transitionId: srcTransforms[0].id,
           start: 0
         },
-        bestProbFromSet: 1
-      }, [{sample: srcTransform1, p: 1}]);
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[0]
+      }, [{sample: srcTransforms[0], p: 1}]);
       token1.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 0
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[1]
       }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
 
       token2.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 1
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[1]
       }, [{sample: {insert: toMathematicalSMP("and"), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
 
       token3.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 4
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[1]
       }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
       token3.addInput({
         segment: {
-          trueTransform: srcTransform3,
-          transitionId: srcTransform3.id,
+          trueTransform: srcTransforms[2],
+          transitionId: srcTransforms[2].id,
           start: 0
         },
-        bestProbFromSet: 1
-      }, [{sample: srcTransform3, p: 1}]);
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[2]
+      }, [{sample: srcTransforms[2], p: 1}]);
 
       token4.addInput({
         segment: {
-          trueTransform: srcTransform4,
-          transitionId: srcTransform4.id,
+          trueTransform: srcTransforms[3],
+          transitionId: srcTransforms[3].id,
           start: 0
         },
-        bestProbFromSet: 1
-      }, [{sample: srcTransform4, p: 1}]);
+        bestProbFromSet: 1,
+        subsetId: srcSubsetIds[3]
+      }, [{sample: srcTransforms[3], p: 1}]);
 
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
-      assert.deepEqual(merged.inputSegments, srcTransforms.map((t) => ({segment: { trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
+      assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
+        segment: {
+          trueTransform: t,
+          transitionId: t.id,
+          start: 0
+        }, bestProbFromSet: 1,
+        subsetId: srcSubsetIds[i]
+      }) ));
       assert.isTrue(merged.searchSpace.hasInputs(
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
       ));
@@ -346,7 +397,8 @@ describe('ContextToken', function() {
             trueTransform: keystrokeDistributions[i][0].sample,
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
-          }, bestProbFromSet: .75
+          }, bestProbFromSet: .75,
+          subsetId: generateSubsetId()
         }, keystrokeDistributions[i]);
       };
 
@@ -379,6 +431,7 @@ describe('ContextToken', function() {
         ]
       ];
       const splitTextArray = ['big', 'large', 'transform'];
+      const subsetId = generateSubsetId();
 
       const tokenToSplit = new ContextToken(plainModel);
       for(let i = 0; i < keystrokeDistributions.length; i++) {
@@ -388,7 +441,8 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId
         }, keystrokeDistributions[i]);
       };
 
@@ -421,7 +475,8 @@ describe('ContextToken', function() {
           transitionId: 13,
           start: i
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId
       })));
 
       for(let i = 0; i < resultsOfSplit.length; i++) {
@@ -443,6 +498,11 @@ describe('ContextToken', function() {
         ]
       ];
       const splitTextArray = ['large', 'long', 'transforms'];
+      const subsetIds = [
+        generateSubsetId(),
+        generateSubsetId(),
+        generateSubsetId()
+      ];
 
       const tokenToSplit = new ContextToken(plainModel);
       for(let i = 0; i < keystrokeDistributions.length; i++) {
@@ -452,7 +512,8 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[i]
         }, keystrokeDistributions[i]);
       };
 
@@ -482,14 +543,16 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[0][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[0]
         }, {
           segment: {
             trueTransform: keystrokeDistributions[1][0].sample,
             transitionId: keystrokeDistributions[1][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[1]
         },
       ]);
       assert.deepEqual(resultsOfSplit[1].inputSegments, [
@@ -499,14 +562,16 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[1][0].sample.id,
             start: 'arge'.length
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[1]
         }, {
           segment: {
             trueTransform: keystrokeDistributions[2][0].sample,
             transitionId: keystrokeDistributions[2][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[2]
         },
       ]);
       assert.deepEqual(resultsOfSplit[2].inputSegments, [
@@ -516,7 +581,8 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[2][0].sample.id,
             start: 'ng'.length,
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[2]
         }
       ]);
 
@@ -577,6 +643,11 @@ describe('ContextToken', function() {
         ]
       ];
       const splitTextArray = ['large', 'long', 'transforms'].map(t => toMathematicalSMP(t));
+      const subsetIds = [
+        generateSubsetId(),
+        generateSubsetId(),
+        generateSubsetId()
+      ];
 
       const tokenToSplit = new ContextToken(plainModel);
       for(let i = 0; i < keystrokeDistributions.length; i++) {
@@ -586,7 +657,8 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[i]
         }, keystrokeDistributions[i]);
       };
 
@@ -615,14 +687,16 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[0][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[0]
         }, {
           segment: {
             trueTransform: keystrokeDistributions[1][0].sample,
             transitionId: keystrokeDistributions[1][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[1]
         },
       ]);
       assert.deepEqual(resultsOfSplit[1].inputSegments, [{
@@ -631,14 +705,16 @@ describe('ContextToken', function() {
             transitionId: keystrokeDistributions[1][0].sample.id,
             start: 'arge'.length
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[1]
         }, {
           segment: {
             trueTransform: keystrokeDistributions[2][0].sample,
             transitionId: keystrokeDistributions[2][0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: subsetIds[2]
         }
       ]);
       assert.deepEqual(resultsOfSplit[2].inputSegments, [{
@@ -647,7 +723,8 @@ describe('ContextToken', function() {
           transitionId: keystrokeDistributions[2][0].sample.id,
           start: 'ng'.length
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId: subsetIds[2]
       }]);
 
       assert.isTrue(resultsOfSplit[0].searchSpace.hasInputs([
@@ -705,13 +782,20 @@ describe('preprocessInputSources', () => {
       { insert: 'ngtransforms', deleteLeft: 4, deleteRight: 0, id: 13 }
     ];
 
-    const results = preprocessInputSources(transforms.map((t) => ({
+    const subsetIds = [
+      generateSubsetId(),
+      generateSubsetId(),
+      generateSubsetId()
+    ];
+
+    const results = preprocessInputSources(transforms.map((t, i) => ({
       segment: {
         trueTransform: t,
         transitionId: t.id,
         start: 0
       },
-      bestProbFromSet: 1
+      bestProbFromSet: 1,
+      subsetId: subsetIds[i]
     })));
 
     assert.equal(results.length, transforms.length);

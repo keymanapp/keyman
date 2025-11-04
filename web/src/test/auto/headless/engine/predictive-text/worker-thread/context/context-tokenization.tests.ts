@@ -15,7 +15,7 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, models, PendingTokenization, SearchPath, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
+import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, generateSubsetId, models, PendingTokenization, SearchPath, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -36,7 +36,14 @@ function toTransformToken(text: string, transformId?: number) {
   let isWhitespace = text == ' ';
   let token = new ContextToken(plainModel);
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
-  token.addInput({segment: { trueTransform: textAsTransform, transitionId: textAsTransform.id, start: 0 }, bestProbFromSet: 1}, [ { sample: textAsTransform, p: 1 } ]);
+  token.addInput({
+    segment: {
+      trueTransform: textAsTransform,
+      transitionId: textAsTransform.id,
+      start: 0
+    }, bestProbFromSet: 1,
+    subsetId: generateSubsetId()
+  }, [ { sample: textAsTransform, p: 1 } ]);
   token.isWhitespace = isWhitespace;
   return token;
 }
@@ -101,7 +108,8 @@ describe('ContextTokenization', function() {
           const map = new Map<number, Transform>();
           map.set(0, emptyTransform);
           return map;
-        })(), p: 1}]
+        })(), p: 1}],
+        inputSubsetId: generateSubsetId()
       };
 
       let tokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
@@ -133,7 +141,8 @@ describe('ContextTokenization', function() {
           const map = new Map<number, Transform>();
           map.set(0, emptyTransform);
           return map;
-        })(), p: 1}]
+        })(), p: 1}],
+        inputSubsetId: generateSubsetId()
       };
 
       let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
@@ -188,6 +197,7 @@ describe('ContextTokenization', function() {
           removedTokenCount: 0
         },
         inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -240,7 +250,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 2
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -278,6 +289,7 @@ describe('ContextTokenization', function() {
           removedTokenCount: 0
         },
         inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -323,7 +335,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -379,7 +392,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -418,6 +432,7 @@ describe('ContextTokenization', function() {
       inputTransformMap.set( 0, { insert: 'day', deleteLeft: 6, id: 42 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const subsetId = generateSubsetId();
       const tokenization = baseTokenization.evaluateTransition({
         alignment: {
           merges: [],
@@ -430,7 +445,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: subsetId
       },
         plainModel,
         inputTransform,
@@ -445,12 +461,34 @@ describe('ContextTokenization', function() {
 
       const boundaryToken = tokenization.tokens[tokenization.tokens.length-3];
       const boundaryTailInput = boundaryToken.inputSegments[boundaryToken.inputSegments.length - 1];
-      assert.deepEqual(boundaryTailInput, {segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 0}, bestProbFromSet: 1});
+      assert.deepEqual(boundaryTailInput, {
+        segment: {
+          trueTransform: inputTransform,
+          transitionId: inputTransform.id,
+          start: 0
+        }, bestProbFromSet: 1,
+        subsetId
+      });
 
       // The new tail tokens should not include anything from the original tail;
       // the token should be replaced.
-      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].inputSegments, [{segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 0}, bestProbFromSet: 1}]);
-      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputSegments, [{segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 1}, bestProbFromSet: 1}]);
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].inputSegments, [{
+        segment: {
+          trueTransform: inputTransform,
+          transitionId: inputTransform.id,
+          start: 0
+        }, bestProbFromSet: 1,
+        subsetId
+      }]);
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputSegments, [{
+        segment: {
+          trueTransform: inputTransform,
+          transitionId: inputTransform.id,
+          start: 1
+        },
+        bestProbFromSet: 1,
+        subsetId
+      }]);
 
       const tailIndex = tokenization.tokens.length - 1;
       for(let i of inputTransformMap.keys()) {
@@ -492,7 +530,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         { insert: ' ', deleteLeft: 0 },
@@ -555,7 +594,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         { insert: 't', deleteLeft: 0 },
@@ -621,7 +661,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,

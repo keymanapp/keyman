@@ -14,6 +14,7 @@ import { deepCopy, KMWString } from "@keymanapp/web-utils";
 import { SearchPath } from "./search-path.js";
 import { SearchSpace, PathInputProperties } from "./search-space.js";
 import { TokenSplitMap } from "./context-tokenization.js";
+import { generateSubsetId } from './tokenization-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -115,7 +116,8 @@ export class ContextToken {
             transitionId: entry[0].sample.id,
             start: 0
           },
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: generateSubsetId()
         });
       });
 
@@ -314,11 +316,11 @@ export class ContextToken {
         constructingToken = new ContextToken(lexicalModel);
         backupToken = new ContextToken(constructingToken);
         constructingToken.addInput({
+          ...priorSourceInput,
           segment: {
             ...priorSourceInput.segment,
             start: priorSourceInput.segment.start + extraCharsAdded
-          },
-          bestProbFromSet: priorSourceInput.bestProbFromSet
+          }
         }, tailDistribution);
 
         const lenToCommit = lenBeforeLastApply + extraCharsAdded;

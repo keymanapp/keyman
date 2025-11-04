@@ -13,6 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathResult, SearchSpace, PathInputProperties } from './search-space.js';
+import { generateSubsetId } from './tokenization-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -60,6 +61,7 @@ export class SearchPath implements SearchSpace {
   /**
    * Extends an existing SearchSpace (and its correction data) by a keystroke based
    * on a subset of the incoming keystroke's fat-finger distribution.
+   *
    * @param space
    * @param inputs
    * @param srcKeystroke The sample from the incoming distribution that represents data actually
@@ -93,7 +95,8 @@ export class SearchPath implements SearchSpace {
           transitionId: keystroke.sample.id,
           start: 0
         },
-        bestProbFromSet: keystroke.p
+        bestProbFromSet: keystroke.p,
+        subsetId: generateSubsetId()
       }
     };
 

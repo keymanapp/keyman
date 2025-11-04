@@ -591,7 +591,8 @@ export class ContextTokenization {
           transitionId: sourceInput.id,
           start: appliedLength
         },
-        bestProbFromSet: bestProbFromSet
+        bestProbFromSet: bestProbFromSet,
+        subsetId: pendingTokenization.inputSubsetId
       }, distribution);
       appliedLength += KMWString.length(distribution[0].sample.insert);
 
