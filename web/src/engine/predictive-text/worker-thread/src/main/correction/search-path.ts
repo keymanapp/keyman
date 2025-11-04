@@ -263,16 +263,16 @@ export class SearchPath implements SearchSpace {
     const model = this.model;
     const internalSplitIndex = charIndex - (this.codepointLength - this.edgeLength);
 
-    if(charIndex >= this.codepointLength) {
+    if(internalSplitIndex <= 0 && this.parents[0]) {
+      const parentResults = this.parents[0].split(charIndex);
+      return [parentResults[0], new SearchPath(parentResults[1], this.inputs, this.inputSource)];
+    } else if(charIndex >= this.codepointLength) {
       // this instance = 'first set'
       // second instance:  empty transforms.
       //
       // stopgap:  maybe go ahead and check each input for any that are longer?
       // won't matter shortly, though.
       return [this, new SearchPath(model)];
-    } else if(internalSplitIndex < 0) {
-      const parentResults =  this.parents[0].split(charIndex);
-      return [parentResults[0], new SearchPath(parentResults[1], this.inputs, this.inputSource)]
     } else {
       const firstSet: Distribution<Transform> = this.inputs.map((input) => ({
         // keep insert head
