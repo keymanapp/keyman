@@ -15,7 +15,7 @@ import TransformUtils from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
-import { PendingTokenization } from './tokenization-subsets.js';
+import { TokenizationPath } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
@@ -108,7 +108,7 @@ export class ContextTokenization {
    * The tokenization-transition metadata relating this instance to the most likely
    * tokenization from a prior state.
    */
-  readonly transitionEdits?: PendingTokenization;
+  readonly transitionEdits?: TokenizationPath;
 
   /**
    * The portion of edits from the true input keystroke that are not part of the
@@ -125,10 +125,10 @@ export class ContextTokenization {
 
   constructor(priorToClone: ContextTokenization);
   constructor(tokens: ContextToken[]);
-  constructor(tokens: ContextToken[], alignment: PendingTokenization, taillessTrueKeystroke: Transform);
+  constructor(tokens: ContextToken[], alignment: TokenizationPath, taillessTrueKeystroke: Transform);
   constructor(
     param1: ContextToken[] | ContextTokenization,
-    alignment?: PendingTokenization,
+    alignment?: TokenizationPath,
     taillessTrueKeystroke?: Transform
   ) {
     if(!(param1 instanceof ContextTokenization)) {
@@ -490,7 +490,7 @@ export class ContextTokenization {
    * Given results from `precomputeTokenizationAfterInput`, this method will
    * evaluate the pending transition in tokenization for all associated inputs
    * while reusing as many correction-search intermediate results as possible.
-   * @param pendingTokenization Batched results from one or more
+   * @param tokenizationPath Batched results from one or more
    * `precomputeTokenizationAfterInput` calls on this instance, all with the
    * same alignment values.
    * @param lexicalModel The active lexical model
@@ -499,16 +499,16 @@ export class ContextTokenization {
    * @param bestProbFromSet The probability of the single most likely input
    * transform in the overall transformDistribution associated with the
    * keystroke triggering theh transition.  It need not be represented by the
-   * pendingTokenization to be built.
+   * tokenizationPath to be built.
    * @returns
    */
   evaluateTransition(
-    pendingTokenization: PendingTokenization,
+    tokenizationPath: TokenizationPath,
     lexicalModel: LexicalModel,
     sourceInput: Transform,
     bestProbFromSet: number
   ): ContextTokenization {
-    const { alignment: alignment, inputs } = pendingTokenization;
+    const { alignment: alignment, inputs } = tokenizationPath;
     const sliceIndex = alignment.edgeWindow.sliceIndex;
     const baseTokenization = this.tokens.slice(sliceIndex);
     let affectedToken: ContextToken;
@@ -592,7 +592,7 @@ export class ContextTokenization {
           start: appliedLength
         },
         bestProbFromSet: bestProbFromSet,
-        subsetId: pendingTokenization.inputSubsetId
+        subsetId: tokenizationPath.inputSubsetId
       }, distribution);
       appliedLength += KMWString.length(distribution[0].sample.insert);
 
@@ -605,7 +605,7 @@ export class ContextTokenization {
     return new ContextTokenization(
       this.tokens.slice(0, sliceIndex).concat(tokenization),
       null /* tokenMapping */,
-      determineTaillessTrueKeystroke(pendingTokenization)
+      determineTaillessTrueKeystroke(tokenizationPath)
     );
   }
 }
@@ -1122,7 +1122,7 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
  * @param tokenizationAnalysis
  * @returns
  */
-export function determineTaillessTrueKeystroke(tokenizationAnalysis: PendingTokenization) {
+export function determineTaillessTrueKeystroke(tokenizationAnalysis: TokenizationPath) {
   // undefined by default; we haven't yet determined if we're still affecting
   // the same token that was the tail in the previous tokenization state.
   let taillessTrueKeystroke: Transform;
