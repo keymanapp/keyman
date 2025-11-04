@@ -9,7 +9,7 @@ export type ComplexKeyboardStore = (string | { t: 'd', d: number } | { ['t']: 'b
 type KeyEventStub = {};
 
 // A stub for TextStore which is properly defined in KeymanWeb
-type OutputTargetStub = {};
+type TextStoreStub = {};
 
 export interface EncodedVisualKeyboard {
   /** Represents CSS font styling to use for VisualKeyboard text */
@@ -47,7 +47,7 @@ export type KeyboardObject = {
    * @param keystroke     The full, pre-processed keystroke triggering
    * keyboard-rule application.
    */
-  gs(textStore: OutputTargetStub, keystroke: KeyEventStub): boolean;
+  gs(textStore: TextStoreStub, keystroke: KeyEventStub): boolean;
 
   /**
    * group-newcontext:  the function triggering processing for the keyboard's
@@ -56,7 +56,7 @@ export type KeyboardObject = {
    * @param textStore  The new context to be used with future keystrokes
    * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
-  gn?(textStore: OutputTargetStub, keystroke: KeyEventStub): boolean;
+  gn?(textStore: TextStoreStub, keystroke: KeyEventStub): boolean;
 
   /**
    * group-postkeystroke:  the function triggering processing for the keyboard's
@@ -67,7 +67,7 @@ export type KeyboardObject = {
    * applied.
    * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
-  gpk?(textStore: OutputTargetStub, keystroke: KeyEventStub): boolean;
+  gpk?(textStore: TextStoreStub, keystroke: KeyEventStub): boolean;
 
   /**
    * Keyboard ID:  the uniquely-identifying name for this keyboard.  Includes the standard
@@ -175,6 +175,6 @@ export type KeyboardObject = {
    * @param       {number}    _PData        1 or 0
    * @returns
    */
-  KNS?: (_PCommand: number, _PTarget: OutputTargetStub, _PData: number) => void;
+  KNS?: (_PCommand: number, _PTarget: TextStoreStub, _PData: number) => void;
 } & Record<`s${number}`, string>
 
