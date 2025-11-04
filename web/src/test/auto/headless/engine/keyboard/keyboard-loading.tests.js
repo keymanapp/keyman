@@ -5,7 +5,7 @@ const require = createRequire(import.meta.url);
 
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 
 describe('Headless keyboard loading', function() {
   const laoPath = require.resolve('@keymanapp/common-test-resources/keyboards/lao_2008_basic.js');

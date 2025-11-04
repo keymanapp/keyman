@@ -5,7 +5,7 @@ const require = createRequire(import.meta.url);
 
 import { KeyboardHarness, MinimalKeymanGlobal, KeyboardDownloadError, DeviceSpec, InvalidKeyboardError, JSKeyboard } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { assertThrowsAsync, assertThrows } from 'keyman/tools/testing/test-utils';
 
 describe('Headless keyboard loading', function() {

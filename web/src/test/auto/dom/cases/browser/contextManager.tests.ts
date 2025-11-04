@@ -6,7 +6,7 @@ import { LegacyEventEmitter } from 'keyman/engine/events';
 import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
+import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 
 import { DeviceSpec, ManagedPromise, timedPromise } from '@keymanapp/web-utils';

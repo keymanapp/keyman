@@ -4,7 +4,10 @@
     "baseUrl": "./",
     "outDir": "../../../../build/tools/testing/recorder/obj/",
     "rootDir": ".",
-    "tsBuildInfoFile": "../../../../build/tools/testing/recorder/obj/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "../../../../build/tools/testing/recorder/obj/tsconfig.tsbuildinfo",
+    "paths": {
+      "keyman/engine/*": ["../../../engine/src/*/index.js"],
+    },
   },
 
   "include": [ "*.ts" ],
@@ -15,6 +18,6 @@
     { "path": "../../../engine/predictive-text/types" },
     { "path": "../../../app/browser" },
     { "path": "../recorder-core" },
-    { "path": "../../../engine/keyboard" },
+    { "path": "../../../engine" },
   ]
 }

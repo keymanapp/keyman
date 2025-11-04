@@ -1,6 +1,6 @@
 import {
   DOMKeyboardLoader
-} from 'keyman/engine/keyboard/dom-keyboard-loader';
+} from 'keyman/engine/keyboard';
 
 import {
   JSKeyboard,

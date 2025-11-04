@@ -5,13 +5,15 @@
     "baseUrl": "./",
     "outDir": "../../../build/app/browser/obj/",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../../build/app/browser/obj/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "../../../build/app/browser/obj/tsconfig.tsbuildinfo",
+    "paths": {
+      "keyman/engine/*": [ "../../engine/src/*/index.js" ],
+    }
   },
 
   "include": [ "**/*.ts" ],
 
   "references": [
-    { "path": "../../engine/attachment" },
-    { "path": "../../engine/main" }
+    { "path": "../../engine" },
   ]
 }

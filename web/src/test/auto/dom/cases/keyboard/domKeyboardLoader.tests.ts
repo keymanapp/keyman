@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
+import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
 import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';

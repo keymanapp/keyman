@@ -55,7 +55,6 @@
     "common/tools/sourcemap-path-remapper",
     "common/tools/hextobin",
     "web",
-    "web/src/engine/osk/gesture-processor",
     "web/src/engine/predictive-text/*"
   ],
   "dependencies": {

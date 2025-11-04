@@ -4,7 +4,7 @@ import path from 'path';
 import url from 'url';
 import fs from 'fs';
 
-import { GestureDebugPath } from '@keymanapp/gesture-recognizer';
+import { GestureDebugPath } from 'keyman/engine/gesture-processor';
 import { timedPromise } from '@keymanapp/web-utils';
 import { TouchpathTurtle } from '#gesture-tools';
 

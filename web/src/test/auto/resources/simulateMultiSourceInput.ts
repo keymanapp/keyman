@@ -1,4 +1,4 @@
-import { InputSample, buildGestureMatchInspector, GestureSource, GestureSourceSubview, gestures } from '@keymanapp/gesture-recognizer';
+import { InputSample, buildGestureMatchInspector, GestureSource, GestureSourceSubview, gestures } from 'keyman/engine/gesture-processor';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 
 type GestureMatcher<Type> = gestures.matchers.GestureMatcher<Type>;
