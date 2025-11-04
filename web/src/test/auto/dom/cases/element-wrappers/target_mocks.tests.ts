@@ -10,7 +10,7 @@ document.body.appendChild(host);
 
 const u = (code: number) => String.fromCodePoint(code);
 
-// Define common interface testing functions that can be run upon the OutputTarget interface.
+// Define common interface testing functions that can be run upon the TextStore interface.
 class MockTests {
   public static Apple = {
     normal: 'apple',
@@ -62,7 +62,7 @@ class MockTests {
   //#endregion
 }
 
-describe('OutputTarget Mocking', function() {
+describe('TextStore Mocking', function() {
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(function() {
@@ -87,7 +87,7 @@ describe('OutputTarget Mocking', function() {
         assert.equal(mock.getDeadkeyCaret(), 5);
       });
 
-      it('copies an existing OutputTarget without a text selection', function() {
+      it('copies an existing TextStore without a text selection', function() {
         const base = MockTests.setupBase(4);
 
         const mock = Mock.from(base);
@@ -95,7 +95,7 @@ describe('OutputTarget Mocking', function() {
         assert.deepEqual(mock.deadkeys(), base.deadkeys());
       });
 
-      it('copies an existing OutputTarget with a text selection', function() {
+      it('copies an existing TextStore with a text selection', function() {
         const base = MockTests.setupBase(4, 5);
 
         const mock = Mock.from(base);
@@ -124,7 +124,7 @@ describe('OutputTarget Mocking', function() {
         base.deadkeys().deleteMatched();
         base.deleteCharsBeforeCaret(2);
 
-        assert.notDeepEqual(base.deadkeys(), baseInitDks, 'OutputTarget deadkey return is not a proper deep-copy');
+        assert.notDeepEqual(base.deadkeys(), baseInitDks, 'TextStore deadkey return is not a proper deep-copy');
 
         assert.equal(mock.getText(), MockTests.Apple.mixed);
         assert.deepEqual(mock.deadkeys(), baseInitDks);

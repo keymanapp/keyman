@@ -9,7 +9,7 @@ import { type KeyEvent } from 'keyman/engine/keyboard';
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-export abstract class OutputTargetBase {
+export abstract class TextStore {
   private _dks: DeadkeyTracker;
 
   constructor() {
@@ -17,7 +17,7 @@ export abstract class OutputTargetBase {
   }
 
   /**
-   * Signifies that this OutputTarget has no default key processing behaviors.  This should be false
+   * Signifies that this TextStore has no default key processing behaviors.  This should be false
    * for OutputTargets backed by web elements like HTMLInputElement or HTMLTextAreaElement.
    */
   get isSynthetic(): boolean {
@@ -60,14 +60,14 @@ export abstract class OutputTargetBase {
   }
 
   /**
-   * Determines the basic operations needed to reconstruct the current OutputTarget's text from the prior state specified
-   * by another OutputTarget based on their text and caret positions.
+   * Determines the basic operations needed to reconstruct the current TextStore's text from the prior state specified
+   * by another TextStore based on their text and caret positions.
    *
    * This is designed for use as a "before and after" comparison to determine the effect of a single keyboard rule at a time.
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: OutputTargetBase): TextTransform {
+  buildTransformFrom(original: TextStore): TextTransform {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
@@ -88,7 +88,7 @@ export abstract class OutputTargetBase {
     return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
-  buildTranscriptionFrom(original: OutputTargetBase, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
+  buildTranscriptionFrom(original: TextStore, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
     const transform = this.buildTransformFrom(original);
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.
@@ -97,10 +97,10 @@ export abstract class OutputTargetBase {
   }
 
   /**
-   * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
-   * @param original An `OutputTarget` (usually a `Mock`).
+   * Restores the `TextStore` to the indicated state.  Designed for use with `Transcription.preInput`.
+   * @param original An `TextStore` (usually a `Mock`).
    */
-  restoreTo(original: OutputTargetBase) {
+  restoreTo(original: TextStore) {
     this.clearSelection();
     // We currently do not restore selected text; the mechanism isn't supported at present for
     // all output target types - especially in regard to re-selecting the text if restored.
@@ -140,7 +140,7 @@ export abstract class OutputTargetBase {
 
   /**
    * Helper to `restoreTo` - allows directly setting the 'before' context to that of another
-   * `OutputTarget`.
+   * `TextStore`.
    * @param s
    */
   protected setTextBeforeCaret(s: string): void {
@@ -151,7 +151,7 @@ export abstract class OutputTargetBase {
 
   /**
    * Helper to `restoreTo` - allows directly setting the 'after' context to that of another
-   * `OutputTarget`.
+   * `TextStore`.
    * @param s
    */
   protected abstract setTextAfterCaret(s: string): void;

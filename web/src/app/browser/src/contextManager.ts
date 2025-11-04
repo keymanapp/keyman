@@ -350,13 +350,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     // original context element may have been lost.
     this.restoreLastActiveTarget();
 
-    let outputTarget = this.activeTarget;
+    let textStore = this.activeTarget;
 
-    if(outputTarget == null && this.mostRecentTarget) {
-      outputTarget = this.activeTarget;
+    if(textStore == null && this.mostRecentTarget) {
+      textStore = this.activeTarget;
     }
 
-    if(outputTarget != null) {
+    if(textStore != null) {
       return super.insertText(kbdInterface, Ptext, PdeadKey);
     }
     return false;
@@ -614,16 +614,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *                      The return value indicates whether (true) or not (false) the calling event handler
    *                      should be terminated immediately after the call.
    */
-  _CommonFocusHelper(outputTarget: OutputTargetElementWrapper<any>): boolean {
+  _CommonFocusHelper(textStore: OutputTargetElementWrapper<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
     const activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
-      outputTarget?.deadkeys().clear();
-      activeKeyboard?.notify(0, outputTarget, 1);  // I2187
+      textStore?.deadkeys().clear();
+      activeKeyboard?.notify(0, textStore, 1);  // I2187
     }
 
-    if(!focusAssistant.restoringFocus && this.mostRecentTarget != outputTarget) {
+    if(!focusAssistant.restoringFocus && this.mostRecentTarget != textStore) {
       focusAssistant.maintainingFocus = false;
     }
     focusAssistant.restoringFocus = false;
@@ -642,7 +642,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * Respond to KeymanWeb-aware input element receiving focus
    */
   _ControlFocus = (e: FocusEvent): boolean => {
-    // Step 1: determine the corresponding OutputTarget instance.
+    // Step 1: determine the corresponding TextStore instance.
     const target = eventOutputTarget(e);
     if(!target) {
       // Probably should also make a warning or error?
@@ -654,7 +654,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     //   // But... the following should already have been done during attachment...
     //   // attachmentEngine._AttachToIframe(Ltarg as HTMLIFrameElement);
     //   target.docRoot
-    //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the OutputTarget.
+    //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the TextStore.
     // }
 
     // Step 2:  Make the newly-focused control the active control, and thus the active context.
@@ -685,7 +685,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       return true;
     }
 
-    // Step 1: determine the corresponding OutputTarget instance.
+    // Step 1: determine the corresponding TextStore instance.
     const target = eventOutputTarget(e);
     if (target == null) {
       return true;

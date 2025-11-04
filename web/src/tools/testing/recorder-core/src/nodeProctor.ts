@@ -8,7 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, KeyboardHarness, Mock, OutputTargetBase } from "keyman/engine/keyboard";
+import { KeyEvent, KeyEventSpec, KeyboardHarness, Mock, TextStore } from "keyman/engine/keyboard";
 import { DeviceSpec } from "@keymanapp/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
@@ -48,8 +48,8 @@ export default class NodeProctor extends Proctor {
     return true;
   }
 
-  async simulateSequence(sequence: TestSequence<any>, target?: OutputTargetBase): Promise<string> {
-    // Start with an empty OutputTarget and a fresh KeyboardProcessor.
+  async simulateSequence(sequence: TestSequence<any>, target?: TextStore): Promise<string> {
+    // Start with an empty TextStore and a fresh KeyboardProcessor.
     if(!target) {
       target = new Mock();
     }
@@ -88,7 +88,7 @@ export default class NodeProctor extends Proctor {
         // ... we _could_ if we wanted to, though.  The framework is mostly in place;
         // it's a matter of actually adding the feature.
         // TODO-web-core
-        const ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), (target as OutputTargetBase));
+        const ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), (target as TextStore));
 
         if (this.debugMode) {
           console.log("Processing %d:", keyEvent.Lcode);

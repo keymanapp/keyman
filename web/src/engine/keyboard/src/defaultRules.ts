@@ -7,7 +7,7 @@
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import { Codes } from './codes.js';
 import { type KeyEvent } from './keyEvent.js';
-import { type OutputTargetBase }  from './outputTargetBase.js';
+import { type TextStore }  from './textStore.js';
 
 export enum EmulationKeystrokes {
   Enter = '\n',
@@ -78,12 +78,12 @@ export default class DefaultRules {
 
   /**
    * Used when a ProcessorAction represents a non-text "command" within the Engine.  This will generally
-   * trigger events that require context reset - often by moving the caret or by moving what OutputTarget
+   * trigger events that require context reset - often by moving the caret or by moving what TextStore
    * the caret is in.  However, we let those events perform the actual context reset.
    *
    * Note:  is extended by DOM-aware KeymanWeb code.
    */
-  public applyCommand(Lkc: KeyEvent, outputTarget: OutputTargetBase): void {
+  public applyCommand(Lkc: KeyEvent, textStore: TextStore): void {
     // Notes for potential default-handling extensions:
     //
     // switch(code) {
@@ -112,7 +112,7 @@ export default class DefaultRules {
 
   /**
    * Codes matched here generally have default implementations when in a browser but require emulation
-   * for 'synthetic' `OutputTarget`s like `Mock`s, which have no default text handling.
+   * for 'synthetic' `TextStore`s like `Mock`s, which have no default text handling.
    */
   public forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
     let code = this.codeForEvent(Lkc);

@@ -239,8 +239,8 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
-      assert.equal(outputTarget.getElement(), input, '.activeTarget does not match the newly-focused element');
+      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(textStore.getElement(), input, '.activeTarget does not match the newly-focused element');
     });
 
     it('change: null -> textarea', () => {
@@ -254,8 +254,8 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
-      assert.equal(outputTarget.getElement(), textarea, '.activeTarget does not match the newly-focused element');
+      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(textStore.getElement(), textarea, '.activeTarget does not match the newly-focused element');
     });
 
     it('change: null -> designIframe', () => {
@@ -270,7 +270,7 @@ describe('app/browser:  ContextManager', function () {
       // Either way, note that focus is handled specially for design-iframes, thus
       // we need slightly different focus-dispatch here.
       //
-      // Possible future improvement:  OutputTarget.focusElement (property)?
+      // Possible future improvement:  TextStore.focusElement (property)?
       // Though that may be affected by the Chrome vs Firefox bit noted above.
       dispatchFocus('focus', iframe.contentDocument.body);
 
@@ -278,8 +278,8 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
-      assert.equal(outputTarget.getElement(), iframe, '.activeTarget does not match the newly-focused element');
+      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(textStore.getElement(), iframe, '.activeTarget does not match the newly-focused element');
     });
 
     it('change: null -> contentEditable', () => {
@@ -293,8 +293,8 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const outputTarget = targetchange.firstCall.args[0]; // Should be an `Input` instance.
-      assert.equal(outputTarget.getElement(), editable, '.activeTarget does not match the newly-focused element');
+      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      assert.equal(textStore.getElement(), editable, '.activeTarget does not match the newly-focused element');
     });
 
     it('change: input -> null', () => {
@@ -312,8 +312,8 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledTwice, 'targetchange event not raised');
-      const outputTarget = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
-      assert.equal(outputTarget, null, 'targetchange event did not indicate clearing of .activeTarget');
+      const textStore = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
+      assert.equal(textStore, null, 'targetchange event did not indicate clearing of .activeTarget');
     });
 
     it('change: input disabled, -> null', async () => {
@@ -335,8 +335,8 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledTwice, 'targetchange event not raised');
-      const outputTarget = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
-      assert.equal(outputTarget, null, 'targetchange event did not indicate clearing of .activeTarget');
+      const textStore = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
+      assert.equal(textStore, null, 'targetchange event did not indicate clearing of .activeTarget');
     });
 
     it('change: input -> textarea', () => {
@@ -358,8 +358,8 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledThrice, 'targetchange event not raised');
-      const outputTarget = targetchange.thirdCall.args[0]; // Should be an `Input` instance.
-      assert.equal(outputTarget.getElement(), textarea, '.activeTarget does not match the newly-focused element');
+      const textStore = targetchange.thirdCall.args[0]; // Should be an `Input` instance.
+      assert.equal(textStore.getElement(), textarea, '.activeTarget does not match the newly-focused element');
     });
 
     it('restoration: input (no flags set)', () => {
@@ -1145,7 +1145,7 @@ describe('app/browser:  ContextManager', function () {
         // BUT the async load component should be resolved.
         await assertPromiseResolved(keyboardasyncload.firstCall.args[1], 0);
 
-        // Aspect 4:  swap BACK to the async-loading keyboard's OutputTarget, which should
+        // Aspect 4:  swap BACK to the async-loading keyboard's TextStore, which should
         // now be fully set to the keyboard that had been requested for activation upon it.
         dispatchFocus('blur', input);
         dispatchFocus('focus', textarea);

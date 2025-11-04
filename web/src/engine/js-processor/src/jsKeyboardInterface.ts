@@ -20,7 +20,7 @@ import {
   SystemStoreIDs,
   type Deadkey,
   type KeyEvent,
-  type OutputTargetBase,
+  type TextStore,
   VariableStore,
   VariableStoreDictionary,
   VariableStoreSerializer,
@@ -186,7 +186,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   cachedContextEx: CachedContextEx = new CachedContextEx();
   ruleContextEx: CachedContextEx;
 
-  activeTargetOutput: OutputTargetBase;
+  activeTargetOutput: TextStore;
   ruleBehavior: ProcessorAction;
 
   systemStores: {[storeID: number]: SystemStore};
@@ -229,7 +229,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * A text-insertion method used by custom OSKs for helpHTML interaction, like with sil_euro_latin.
    *
    * This function currently bypasses web-core's standard text handling control path and all predictive text processing.
-   * It also has DOM-dependencies that help ensure KMW's active OutputTarget retains focus during use.
+   * It also has DOM-dependencies that help ensure KMW's active TextStore retains focus during use.
    */
   insertText?: (Ptext: string, PdeadKey: number) => void;
 
@@ -254,7 +254,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *
    * @param       {number}      n             Number of characters to move back from caret
    * @param       {number}      ln            Number of characters to return
-   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
    * @return      {string}                    Context string
    *
    * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
@@ -263,13 +263,13 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
    */
 
-  context(n: number, ln: number, outputTarget: OutputTargetBase): string {
+  context(n: number, ln: number, textStore: TextStore): string {
     const v = this.cachedContext.get(n, ln);
     if(v !== null) {
       return v;
     }
 
-    const r = this.KC_(n, ln, outputTarget);
+    const r = this.KC_(n, ln, textStore);
     this.cachedContext.set(n, ln, r);
     return r;
   }
@@ -279,7 +279,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *
    * @param       {number}      n             Number of characters to move back from caret
    * @param       {number}      ln            Number of characters to return
-   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
    * @return      {string}                    Context string
    *
    * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
@@ -287,11 +287,11 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KC(3,3,Pelem) == "def"
    *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
    */
-  private KC_(n: number, ln: number, outputTarget: OutputTargetBase): string {
+  private KC_(n: number, ln: number, textStore: TextStore): string {
     let tempContext = '';
 
     // If we have a selection, we have an empty context
-    tempContext = outputTarget.isSelectionEmpty() ? outputTarget.getTextBeforeCaret() : "";
+    tempContext = textStore.isSelectionEmpty() ? textStore.getTextBeforeCaret() : "";
 
     if(KMWString.length(tempContext) < n) {
       tempContext = Array(n-KMWString.length(tempContext)+1).join("\uFFFE") + tempContext;
@@ -304,7 +304,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function     nul           KN
    * Scope        Public
    * @param       {number}      n             Length of context to check
-   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
    * @return      {boolean}                   True if length of context is less than or equal to n
    * Description  Test length of context, return true if the length of the context is less than or equal to n
    *
@@ -313,8 +313,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KN(2,Pelem) == FALSE
    *             KN(4,Pelem) == TRUE
    */
-  nul(n: number, outputTarget: OutputTargetBase): boolean {
-    const cx=this.context(n+1, 1, outputTarget);
+  nul(n: number, textStore: TextStore): boolean {
+    const cx=this.context(n+1, 1, textStore);
 
     // With #31, the result will be a replacement character if context is empty.
     return cx === "\uFFFE";
@@ -324,18 +324,18 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function     contextMatch  KCM
    * Scope        Public
    * @param       {number}      n             Number of characters to move back from caret
-   * @param       {Object}      outputTarget  Focused element
+   * @param       {Object}      textStore  Focused element
    * @param       {string}      val           String to match
    * @param       {number}      ln            Number of characters to return
    * @return      {boolean}                   True if selected context matches val
    * Description  Test keyboard context for match
    */
-  contextMatch(n: number, outputTarget: OutputTargetBase, val: string, ln: number): boolean {
-    const cx=this.context(n, ln, outputTarget);
+  contextMatch(n: number, textStore: TextStore, val: string, ln: number): boolean {
+    const cx=this.context(n, ln, textStore);
     if(cx === val) {
       return true; // I3318
     }
-    (outputTarget as OutputTargetBase).deadkeys().resetMatched(); // I3318
+    (textStore as TextStore).deadkeys().resetMatched(); // I3318
     return false;
   }
 
@@ -344,10 +344,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *
    * @param       {number}      n             Number of characters to move back from caret
    * @param       {number}      ln            Number of characters to return
-   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
    * @return      {Array}                     Context array (of strings and numbers)
    */
-  private _BuildExtendedContext(n: number, ln: number, outputTarget: OutputTargetBase): CachedExEntry {
+  private _BuildExtendedContext(n: number, ln: number, textStore: TextStore): CachedExEntry {
     let cache: CachedExEntry = this.cachedContextEx.get(n, ln);
     if(cache !== null) {
       return cache;
@@ -357,14 +357,14 @@ export class JSKeyboardInterface extends KeyboardHarness {
       cache = this.cachedContextEx.get(n, n);
       if(cache === null) {
         // First, let's make sure we have a cloned, sorted copy of the deadkey array.
-        const unmatchedDeadkeys = outputTarget.deadkeys().toSortedArray(); // Is reverse-order sorted for us already.
+        const unmatchedDeadkeys = textStore.deadkeys().toSortedArray(); // Is reverse-order sorted for us already.
 
         // Time to build from scratch!
         let index = 0;
         cache = { valContext: [], deadContext: []};
         while(cache.valContext.length < n) {
           // As adapted from `deadkeyMatch`.
-          const sp = outputTarget.getDeadkeyCaret();
+          const sp = textStore.getDeadkeyCaret();
           const deadPos = sp - index;
           if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p > deadPos) {
             // We have deadkeys at the right-hand side of the caret!  They don't belong in the context, so pop 'em off.
@@ -377,7 +377,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
             unmatchedDeadkeys.splice(0, 1);
           } else {
             // Take the character.  We get "\ufffe" if it doesn't exist.
-            const kc = this.context(++index, 1, outputTarget);
+            const kc = this.context(++index, 1, textStore);
             cache.valContext = ([kc] as (string|number)[]).concat(cache.valContext);
           }
         }
@@ -397,16 +397,16 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function       fullContextMatch    KFCM
    * Scope          Private
    * @param         {number}    n             Number of characters to move back from caret
-   * @param         {Object}    outputTarget  Focused element
+   * @param         {Object}    textStore  Focused element
    * @param         {Array}     rule          An array of ContextEntries to match.
    * @return        {boolean}                 True if the fully-specified rule context matches the current KMW state.
    *
    * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
    * near-directly modeling (externally) the compiled form of Desktop rules' context section.
    */
-  fullContextMatch(n: number, outputTarget: OutputTargetBase, rule: ContextEntry[]): boolean {
+  fullContextMatch(n: number, textStore: TextStore, rule: ContextEntry[]): boolean {
     // Stage one:  build the context index map.
-    const fullContext = this._BuildExtendedContext(n, rule.length, outputTarget);
+    const fullContext = this._BuildExtendedContext(n, rule.length, textStore);
     this.ruleContextEx = this.cachedContextEx.clone();
     const context = fullContext.valContext;
     const deadContext = fullContext.deadContext;
@@ -497,7 +497,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
     if(mismatch) {
       // Reset the matched 'any' indices, if any.
-      outputTarget.deadkeys().resetMatched();
+      textStore.deadkeys().resetMatched();
       this._AnyIndices = [];
     }
 
@@ -588,7 +588,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
       retVal = (keyCode == Lrulekey); // I3318, I3555
     }
     if(!retVal) {
-      (this.activeTargetOutput as OutputTargetBase).deadkeys().resetMatched();  // I3318
+      (this.activeTargetOutput as TextStore).deadkeys().resetMatched();  // I3318
     }
     return retVal; // I3318
   };
@@ -623,22 +623,22 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function     deadkeyMatch  KDM
    * Scope        Public
    * @param       {number}      n             offset from current cursor position
-   * @param       {Object}      outputTarget  target element
+   * @param       {Object}      textStore  target element
    * @param       {number}      d             deadkey
    * @return      {boolean}                   True if deadkey found selected context matches val
    * Description  Match deadkey at current cursor position
    */
-  deadkeyMatch(n: number, outputTarget: OutputTargetBase, d: number): boolean {
-    return outputTarget.hasDeadkeyMatch(n, d);
+  deadkeyMatch(n: number, textStore: TextStore, d: number): boolean {
+    return textStore.hasDeadkeyMatch(n, d);
   }
 
   /**
    * Function     beep          KB
    * Scope        Public
-   * @param       {Object}      outputTarget  element to flash
+   * @param       {Object}      textStore  element to flash
    * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
    */
-  beep(outputTarget: OutputTargetBase): void {
+  beep(textStore: TextStore): void {
     this.resetContextCache();
 
     // Denote as part of the matched rule's behavior.
@@ -728,10 +728,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {number}      Pdn           no of character to overwrite (delete)
    * @param       {string}      Ps            string
    * @param       {number}      Pn            index
-   * @param       {Object}      outputTarget  element to output to
+   * @param       {Object}      textStore  element to output to
    * Description  Output a character selected from the string according to the offset in the index array
    */
-  indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, outputTarget: OutputTargetBase): void {
+  indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, textStore: TextStore): void {
     this.resetContextCache();
 
     const assertNever = function(x: never): never {
@@ -742,20 +742,20 @@ export class JSKeyboardInterface extends KeyboardHarness {
     const indexChar = this._Index(Ps, Pn);
     if(indexChar !== "") {
       if(typeof indexChar == 'string' ) {
-        this.output(Pdn, outputTarget, indexChar);  //I3319
+        this.output(Pdn, textStore, indexChar);  //I3319
       } else if(indexChar.t) {
         switch(indexChar.t) {
           case 'b': // Beep commands may appear within stores.
-            this.beep(outputTarget);
+            this.beep(textStore);
             break;
           case 'd':
-            this.deadkeyOutput(Pdn, outputTarget, indexChar.d);
+            this.deadkeyOutput(Pdn, textStore, indexChar.d);
             break;
           default:
             assertNever(indexChar);
         }
       } else { // For keyboards developed during 10.0's alpha phase - t:'d' was assumed.
-        this.deadkeyOutput(Pdn, outputTarget, (indexChar as any).d);
+        this.deadkeyOutput(Pdn, textStore, (indexChar as any).d);
       }
     }
   }
@@ -765,15 +765,15 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function     deleteContext KDC
    * Scope        Public
    * @param       {number}      dn            number of context entries to overwrite
-   * @param       {Object}      outputTarget  element to output to
+   * @param       {Object}      textStore  element to output to
    * Description  Keyboard output
    */
-  deleteContext(dn: number, outputTarget: OutputTargetBase): void {
+  deleteContext(dn: number, textStore: TextStore): void {
     let context: CachedExEntry;
 
     // We want to control exactly which deadkeys get removed.
     if(dn > 0) {
-      context = this._BuildExtendedContext(dn, dn, (outputTarget as OutputTargetBase));
+      context = this._BuildExtendedContext(dn, dn, (textStore as TextStore));
       let nulCount = 0;
 
       for(let i=0; i < context.valContext.length; i++) {
@@ -781,7 +781,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
         if(dk) {
           // Remove deadkey in context.
-          (outputTarget as OutputTargetBase).deadkeys().remove(dk);
+          (textStore as TextStore).deadkeys().remove(dk);
 
           // Reduce our reported context size.
           dn--;
@@ -800,33 +800,33 @@ export class JSKeyboardInterface extends KeyboardHarness {
     }
 
     // If a matched deadkey hasn't been deleted, we don't WANT to delete it.
-    (outputTarget as OutputTargetBase).deadkeys().resetMatched();
+    (textStore as TextStore).deadkeys().resetMatched();
 
     // Why reinvent the wheel?  Delete the remaining characters by 'inserting a blank string'.
-    this.output(dn, outputTarget, '');
+    this.output(dn, textStore, '');
   }
 
   /**
    * Function     output        KO
    * Scope        Public
    * @param       {number}      dn            number of characters to overwrite
-   * @param       {Object}      outputTarget  element to output to
+   * @param       {Object}      textStore  element to output to
    * @param       {string}      s             string to output
    * Description  Keyboard output
    */
-  output(dn: number, outputTarget: OutputTargetBase, s:string): void {
+  output(dn: number, textStore: TextStore, s:string): void {
     this.resetContextCache();
 
-    outputTarget.saveProperties();
-    outputTarget.clearSelection();
-    (outputTarget as OutputTargetBase).deadkeys().deleteMatched(); // I3318
+    textStore.saveProperties();
+    textStore.clearSelection();
+    (textStore as TextStore).deadkeys().deleteMatched(); // I3318
     if(dn >= 0) {
       // Automatically manages affected deadkey positions.  Does not delete deadkeys b/c legacy behavior support.
-      outputTarget.deleteCharsBeforeCaret(dn);
+      textStore.deleteCharsBeforeCaret(dn);
     }
     // Automatically manages affected deadkey positions.
-    outputTarget.insertTextBeforeCaret(s);
-    outputTarget.restoreProperties();
+    textStore.insertTextBeforeCaret(s);
+    textStore.restoreProperties();
   }
 
   /**
@@ -837,23 +837,23 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @alias       KCXO
    * @public
    * @param       {number}        Pdn            number of characters to delete left of cursor
-   * @param       {OutputTargetBase}  outputTarget   target to output to
+   * @param       {TextStore}  textStore   target to output to
    * @param       {number}        contextLength  length of current rule context to retrieve
    * @param       {number}        contextOffset  offset from start of current rule context, 1-based
    */
-  contextExOutput(Pdn: number, outputTarget: OutputTargetBase, contextLength: number, contextOffset: number): void {
+  contextExOutput(Pdn: number, textStore: TextStore, contextLength: number, contextOffset: number): void {
     this.resetContextCache();
 
     if(Pdn >= 0) {
-      this.output(Pdn, outputTarget, "");
+      this.output(Pdn, textStore, "");
     }
 
     const context = this.ruleContextEx.get(contextLength, contextLength);
     const dk = context.deadContext[contextOffset-1], vc = context.valContext[contextOffset-1];
     if(dk) {
-      outputTarget.insertDeadkeyBeforeCaret(dk.d);
+      textStore.insertDeadkeyBeforeCaret(dk.d);
     } else if(typeof vc == 'string') {
-      this.output(-1, outputTarget, vc);
+      this.output(-1, textStore, vc);
     } else {
       throw new Error("contextExOutput: should never be a numeric valContext with no corresponding deadContext");
     }
@@ -863,18 +863,18 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function     deadkeyOutput KDO
    * Scope        Public
    * @param       {number}      Pdn           no of character to overwrite (delete)
-   * @param       {OutputTargetBase}      outputTarget  element to output to
+   * @param       {TextStore}      textStore  element to output to
    * @param       {number}      Pd            deadkey id
    * Description  Record a deadkey at current cursor position, deleting Pdn characters first
    */
-  deadkeyOutput(Pdn: number, outputTarget: OutputTargetBase, Pd: number): void {
+  deadkeyOutput(Pdn: number, textStore: TextStore, Pd: number): void {
     this.resetContextCache();
 
     if(Pdn >= 0) {
-      this.output(Pdn, outputTarget,"");  //I3318 corrected to >=
+      this.output(Pdn, textStore,"");  //I3318 corrected to >=
     }
 
-    outputTarget.insertDeadkeyBeforeCaret(Pd);
+    textStore.insertDeadkeyBeforeCaret(Pd);
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
   }
 
@@ -883,10 +883,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *
    * @param       {number}      systemId      ID of the system store to test (only TSS_LAYER currently supported)
    * @param       {string}      strValue      String value to compare to
-   * @param       {OutputTargetBase}      outputTarget  Currently active element (may be needed by future tests)
+   * @param       {TextStore}      textStore  Currently active element (may be needed by future tests)
    * @return      {boolean}                   True if the test succeeds
    */
-  ifStore(systemId: number, strValue: string, outputTarget: OutputTargetBase): boolean {
+  ifStore(systemId: number, strValue: string, textStore: TextStore): boolean {
     let result=true;
     const store = this.systemStores[systemId];
     if(store) {
@@ -900,14 +900,14 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *
    * @param       {number}      systemId      ID of the system store to set (only TSS_LAYER currently supported)
    * @param       {string}      strValue      String to set as the system store content
-   * @param       {OutputTargetBase}      outputTarget  Currently active element (may be needed in future tests)
+   * @param       {TextStore}      textStore  Currently active element (may be needed in future tests)
    * @return      {boolean}                   True if command succeeds
    *                                          (i.e. for TSS_LAYER, if the layer is successfully selected)
    *
    * Note that option/variable stores are instead set within keyboard script code, as they only
    * affect keyboard behavior.
    */
-  setStore(systemId: number, strValue: string, outputTarget: OutputTargetBase): boolean {
+  setStore(systemId: number, strValue: string, textStore: TextStore): boolean {
     this.resetContextCache();
     // Unique case:  we only allow set(&layer) ops from keyboard rules triggered by touch OSKs.
     if(systemId == SystemStoreIDs.TSS_LAYER && this.activeDevice.touchable) {
@@ -977,64 +977,64 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.cachedContextEx.reset();
   }
 
-  defaultBackspace(outputTarget: OutputTargetBase) {
-    if(outputTarget.isSelectionEmpty()) {
+  defaultBackspace(textStore: TextStore) {
+    if(textStore.isSelectionEmpty()) {
       // Delete the character left of the caret
-      this.output(1, outputTarget, "");
+      this.output(1, textStore, "");
     } else {
       // Delete just the selection
-      this.output(0, outputTarget, "");
+      this.output(0, textStore, "");
     }
   }
 
   /**
    * Function     processNewContextEvent
    * Scope        Private
-   * @param       {Object}        outputTarget   The target receiving input
+   * @param       {Object}        textStore   The target receiving input
    * @param       {Object}        keystroke      The input keystroke (with its properties) to be mapped by the keyboard.
    * Description  Calls the keyboard's `begin newContext` group
    * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin NewContext`
    */
-  processNewContextEvent(outputTarget: OutputTargetBase, keystroke: KeyEvent): ProcessorAction {
+  processNewContextEvent(textStore: TextStore, keystroke: KeyEvent): ProcessorAction {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
-    return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), outputTarget, keystroke, true);
+    return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), textStore, keystroke, true);
   }
 
   /**
    * Function     processPostKeystroke
    * Scope        Private
-   * @param       {Object}        outputTarget   The target receiving input
+   * @param       {Object}        textStore   The target receiving input
    * @param       {Object}        keystroke      The input keystroke with relevant properties to be mapped by the keyboard.
    * Description  Calls the keyboard's `begin postKeystroke` group
    * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin PostKeystroke`
    */
-  processPostKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): ProcessorAction {
+  processPostKeystroke(textStore: TextStore, keystroke: KeyEvent): ProcessorAction {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
-    return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), outputTarget, keystroke, true);
+    return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), textStore, keystroke, true);
   }
 
   /**
    * Function     processKeystroke
    * Scope        Private
-   * @param       {Object}        outputTarget   The target receiving input
+   * @param       {Object}        textStore   The target receiving input
    * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
    * Description  Encapsulates calls to keyboard input processing.
    * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin Unicode`
    */
-  processKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): ProcessorAction {
+  processKeystroke(textStore: TextStore, keystroke: KeyEvent): ProcessorAction {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
-    return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke, false);
+    return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), textStore, keystroke, false);
   }
 
-  private process(callee: (outputTarget: OutputTargetBase, keystroke: KeyEvent) => boolean, outputTarget: OutputTargetBase, keystroke: KeyEvent, readonly: boolean): ProcessorAction {
+  private process(callee: (textStore: TextStore, keystroke: KeyEvent) => boolean, textStore: TextStore, keystroke: KeyEvent, readonly: boolean): ProcessorAction {
     // Clear internal state tracking data from prior keystrokes.
-    if(!outputTarget) {
+    if(!textStore) {
       throw "No target specified for keyboard output!";
     } else if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
@@ -1042,13 +1042,13 @@ export class JSKeyboardInterface extends KeyboardHarness {
       throw "No callee for keystroke processing!";
     }
 
-    outputTarget.invalidateSelection();
+    textStore.invalidateSelection();
 
-    outputTarget.deadkeys().resetMatched();       // I3318
+    textStore.deadkeys().resetMatched();       // I3318
     this.resetContextCache();
 
-    // Capture the initial state of the OutputTarget before any rules are matched.
-    const preInput = Mock.from(outputTarget, true);
+    // Capture the initial state of the TextStore before any rules are matched.
+    const preInput = Mock.from(textStore, true);
 
     // Capture the initial state of any variable stores
     const cachedVariableStores = this.activeKeyboard.variableStores;
@@ -1061,12 +1061,12 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.activeDevice = keystroke.device;
 
     // Calls the start-group of the active keyboard.
-    this.activeTargetOutput = outputTarget;
-    const matched = callee(outputTarget, keystroke);
+    this.activeTargetOutput = textStore;
+    const matched = callee(textStore, keystroke);
     this.activeTargetOutput = null;
 
     // Finalize the rule's results.
-    this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke, readonly);
+    this.ruleBehavior.transcription = textStore.buildTranscriptionFrom(preInput, keystroke, readonly);
 
     // We always backup the changes to variable stores to the ProcessorAction, to
     // be applied during finalization, then restore them to the cached initial

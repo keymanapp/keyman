@@ -61,7 +61,7 @@ describe('outputTargetForElement()', function () {
     this.attacher = null;
   });
 
-  describe('standard `OutputTarget` roots', () => {
+  describe('standard `TextStore` roots', () => {
     // So, for these unit tests, attachment has already been established.  We just need to
     // ensure it meets our expectations.
 

@@ -1,7 +1,7 @@
-import { OutputTargetBase } from './outputTargetBase.js';
+import { TextStore } from './textStore.js';
 import { KMWString } from '@keymanapp/web-utils';
 
-export class Mock extends OutputTargetBase {
+export class Mock extends TextStore {
   text: string;
 
   selStart: number;
@@ -25,34 +25,34 @@ export class Mock extends OutputTargetBase {
     this.selForward = this.selEnd >= this.selStart;
   }
 
-  static assertIsOutputTargetBase(outputTarget: OutputTargetBase): asserts outputTarget is OutputTargetBase {
-    if (!(outputTarget instanceof OutputTargetBase)) {
-      throw new TypeError("outputTarget is not a OutputTargetBase");
+  static assertIsOutputTargetBase(textStore: TextStore): asserts textStore is TextStore {
+    if (!(textStore instanceof TextStore)) {
+      throw new TypeError("textStore is not a TextStore");
     }
   }
 
   // Clones the state of an existing EditableElement, creating a Mock version of its state.
-  static from(outputTarget: OutputTargetBase, readonly?: boolean): Mock {
+  static from(textStore: TextStore, readonly?: boolean): Mock {
     let clone: Mock;
 
-    this.assertIsOutputTargetBase(outputTarget);
+    this.assertIsOutputTargetBase(textStore);
 
-    if (outputTarget instanceof Mock) {
+    if (textStore instanceof Mock) {
       // Avoids the need to run expensive kmwstring.ts `length()`
       // calculations when deep-copying Mock instances.
-      const priorMock = outputTarget as Mock;
+      const priorMock = textStore as Mock;
       clone = new Mock(priorMock.text, priorMock.selStart, priorMock.selEnd);
     } else {
-      const text = outputTarget.getText();
+      const text = textStore.getText();
       const textLen = KMWString.length(text);
 
       // If !hasSelection()
       let selectionStart: number = textLen;
       let selectionEnd: number = 0;
 
-      if (outputTarget.hasSelection()) {
-        const beforeText = outputTarget.getTextBeforeCaret();
-        const afterText = outputTarget.getTextAfterCaret();
+      if (textStore.hasSelection()) {
+        const beforeText = textStore.getTextBeforeCaret();
+        const afterText = textStore.getTextAfterCaret();
         selectionStart = KMWString.length(beforeText);
         selectionEnd = textLen - KMWString.length(afterText);
       }
@@ -64,7 +64,7 @@ export class Mock extends OutputTargetBase {
     }
 
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
-    clone.setDeadkeys((outputTarget as OutputTargetBase).deadkeys());
+    clone.setDeadkeys((textStore as TextStore).deadkeys());
 
     return clone;
   }

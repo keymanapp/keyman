@@ -1,7 +1,7 @@
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
 import { OutputTargetElementWrapper as DOMOutputTarget } from 'keyman/engine/element-wrappers';
-import { OutputTargetBase, ProcessorAction } from 'keyman/engine/keyboard';
+import { TextStore, ProcessorAction } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from '@keymanapp/web-utils';
 import { AlertHost } from "./utils/alertHost.js";
 import { whenDocumentReady } from "./utils/documentReady.js";
@@ -66,14 +66,14 @@ export class BrowserConfiguration extends EngineConfiguration {
     return baseReport;
   }
 
-  onRuleFinalization(ruleBehavior: ProcessorAction, outputTarget: OutputTargetBase) {
+  onRuleFinalization(ruleBehavior: ProcessorAction, textStore: TextStore) {
     // TODO: Patch up to modularized form.  But that doesn't exist yet for some of these...
 
     // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
     const ruleTransform = ruleBehavior.transcription.transform;
     if(!isEmptyTransform(ruleTransform)) {
-      if(outputTarget instanceof DOMOutputTarget) {
-        outputTarget.changed = true;
+      if(textStore instanceof DOMOutputTarget) {
+        textStore.changed = true;
       }
     }
   }

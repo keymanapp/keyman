@@ -11,7 +11,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes, type MutableSystemStore,
-  OutputTargetBase, ProcessorAction, SystemStoreIDs, Mock
+  TextStore, ProcessorAction, SystemStoreIDs, Mock
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
@@ -20,7 +20,7 @@ import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 
 // Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
-export type BeepHandler = (outputTarget: OutputTargetBase) => void;
+export type BeepHandler = (textStore: TextStore) => void;
 export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
@@ -122,18 +122,18 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * where and when appropriate.
    *
    * @param   {object}  Lkc           The pre-analyzed KeyEvent object
-   * @param   {OutputTargetBase} outputTarget  The output target receiving the KeyEvent
+   * @param   {TextStore} textStore  The output target receiving the KeyEvent
    * @param   {boolean}  readonly      True if the target is read-only
    * @return  {string}
    */
-  private defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): ProcessorAction {
-    const preInput = Mock.from(outputTarget, readonly);
+  private defaultRuleBehavior(Lkc: KeyEvent, textStore: TextStore, readonly: boolean): ProcessorAction {
+    const preInput = Mock.from(textStore, readonly);
     const ruleBehavior = new ProcessorAction();
 
     let matched = false;
     let char = '';
     let special: EmulationKeystrokes;
-    if(Lkc.isSynthetic || outputTarget.isSynthetic) {
+    if(Lkc.isSynthetic || textStore.isSynthetic) {
       matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                         // if no match occurs.
 
@@ -146,10 +146,10 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
       } else if((special = this.defaultRules.forSpecialEmulation(Lkc)) != null) {
         switch(special) {
           case EmulationKeystrokes.Backspace:
-            this.keyboardInterface.defaultBackspace(outputTarget);
+            this.keyboardInterface.defaultBackspace(textStore);
             break;
           case EmulationKeystrokes.Enter:
-            outputTarget.handleNewlineAtCaret();
+            textStore.handleNewlineAtCaret();
             break;
           // case '\u007f': // K_DEL
             // // For (possible) future implementation.
@@ -171,13 +171,13 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
         special = this.defaultRules.forSpecialEmulation(Lkc)
         if(special == EmulationKeystrokes.Backspace) {
           // A browser's default backspace may fail to delete both parts of an SMP character.
-          this.keyboardInterface.defaultBackspace(outputTarget);
+          this.keyboardInterface.defaultBackspace(textStore);
         } else if(special || this.defaultRules.isCommand(Lkc)) { // Filters out 'commands' like TAB.
           // We only do the "for special emulation" cases under the condition above... aside from backspace
           // Let the browser handle those.
           return null;
         } else {
-          this.keyboardInterface.output(0, outputTarget, char);
+          this.keyboardInterface.output(0, textStore, char);
         }
       } else {
         // No match, no default ProcessorAction.
@@ -190,33 +190,33 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
       return ruleBehavior;
     }
 
-    const transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc, readonly);
+    const transcription = textStore.buildTranscriptionFrom(preInput, Lkc, readonly);
     ruleBehavior.transcription = transcription;
 
     return ruleBehavior;
   }
 
-  private processNewContextEvent(device: DeviceSpec, outputTarget: OutputTargetBase): ProcessorAction {
+  private processNewContextEvent(device: DeviceSpec, textStore: TextStore): ProcessorAction {
     return this.activeKeyboard ?
-      this.keyboardInterface.processNewContextEvent(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
+      this.keyboardInterface.processNewContextEvent(textStore, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  public processPostKeystroke(device: DeviceSpec, outputTarget: OutputTargetBase): ProcessorAction {
+  public processPostKeystroke(device: DeviceSpec, textStore: TextStore): ProcessorAction {
     return this.activeKeyboard ?
-      this.keyboardInterface.processPostKeystroke(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
+      this.keyboardInterface.processPostKeystroke(textStore, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  public processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetBase): ProcessorAction {
+  public processKeystroke(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
     let matchBehavior: ProcessorAction;
 
     // Before keyboard rules apply, check if the left-context is empty.
-    const nothingDeletable = KMWString.length(outputTarget.getTextBeforeCaret()) == 0 && outputTarget.isSelectionEmpty();
+    const nothingDeletable = KMWString.length(textStore.getTextBeforeCaret()) == 0 && textStore.isSelectionEmpty();
 
     // Pass this key code and state to the keyboard program
     if(this.activeKeyboard && keyEvent.Lcode != 0) {
-      matchBehavior = this.keyboardInterface.processKeystroke(outputTarget, keyEvent);
+      matchBehavior = this.keyboardInterface.processKeystroke(textStore, keyEvent);
     }
 
     // Final conditional component - if someone actually makes a keyboard rule that blocks output
@@ -226,7 +226,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     // behavior in cases where such rules actually would appear.  (Though, _that_ should be caught
     // in the keyboard-review process and heavily discouraged, so... yeah.)
     if(nothingDeletable && keyEvent.Lcode == Codes.keyCodes.K_BKSP && matchBehavior.triggerKeyDefault) {
-      matchBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
+      matchBehavior = this.defaultRuleBehavior(keyEvent, textStore, false);
       matchBehavior.triggerKeyDefault = true;
       // Force a single `deleteLeft`.
       // @ts-ignore // force value override, because deleteLeft is marked readonly.
@@ -238,11 +238,11 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
       // Handle unmapped keys, including special keys
       // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-      this.keyboardInterface.activeTargetOutput = outputTarget;
+      this.keyboardInterface.activeTargetOutput = textStore;
 
       // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
       // Many keyboards rely upon these 'implied rules'.
-      const defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
+      const defaultBehavior = this.defaultRuleBehavior(keyEvent, textStore, false);
       if(defaultBehavior) {
         if(!matchBehavior) {
           matchBehavior = defaultBehavior;
@@ -537,13 +537,13 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
   // Returns true if the key event is a modifier press, allowing keyPress to return selectively
   // in those cases.
-  public doModifierPress(Levent: KeyEvent, outputTarget: OutputTargetBase, isKeyDown: boolean): boolean {
+  public doModifierPress(Levent: KeyEvent, textStore: TextStore, isKeyDown: boolean): boolean {
     if(!this.activeKeyboard) {
       return false;
     }
 
     if(Levent.isModifier) {
-      this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
+      this.activeKeyboard.notify(Levent.Lcode, textStore, isKeyDown ? 1 : 0);
       // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
       if(!Levent.device.touchable) {
         return this._UpdateVKShift(Levent); // I2187
@@ -553,7 +553,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     }
 
     if(Levent.LmodifierChange) {
-      this.activeKeyboard.notify(0, outputTarget, 1);
+      this.activeKeyboard.notify(0, textStore, 1);
       if(!Levent.device.touchable) {
         this._UpdateVKShift(Levent);
       }
@@ -567,20 +567,20 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * Tell the currently active keyboard that a new context has been selected,
    * e.g. by focus change, selection change, keyboard change, etc.
    *
-   * @param    {Object}   outputTarget  The OutputTarget that has focus
+   * @param    {Object}   textStore  The TextStore that has focus
    * @returns  {Object}                 A ProcessorAction object describing the cumulative effects of
    *                                    all matched keyboard rules
    */
-  private performNewContextEvent(outputTarget: OutputTargetBase): ProcessorAction {
-    const ruleBehavior = this.processNewContextEvent(this.contextDevice, outputTarget);
+  private performNewContextEvent(textStore: TextStore): ProcessorAction {
+    const ruleBehavior = this.processNewContextEvent(this.contextDevice, textStore);
 
     if (ruleBehavior) {
-      this.finalizeProcessorAction(ruleBehavior, outputTarget);
+      this.finalizeProcessorAction(ruleBehavior, textStore);
     }
     return ruleBehavior;
   }
 
-  public resetContext(target?: OutputTargetBase) {
+  public resetContext(target?: TextStore) {
     this.layerId = 'default';
 
     // Make sure all deadkeys for the context get cleared properly.
@@ -608,13 +608,13 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     }
   };
 
-  public finalizeProcessorAction(data: ProcessorAction, outputTarget: OutputTargetBase): void {
+  public finalizeProcessorAction(data: ProcessorAction, textStore: TextStore): void {
     if (!data.transcription) {
       throw "Cannot finalize a ProcessorAction with no transcription.";
     }
 
     if (this.beepHandler && data.beep) {
-      this.beepHandler(outputTarget);
+      this.beepHandler(textStore);
     }
 
     for (const storeID in data.setStore) {
@@ -642,7 +642,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
     if (data.triggersDefaultCommand) {
       const keyEvent = data.transcription.keystroke;
-      this.defaultRules.applyCommand(keyEvent, outputTarget);
+      this.defaultRules.applyCommand(keyEvent, textStore);
     }
 
     if (this.warningLogger && data.warningLog) {

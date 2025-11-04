@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
-import { OutputTargetBase } from "keyman/engine/keyboard";
+import { TextStore } from "keyman/engine/keyboard";
 
 export class ReadySuggestions {
   suggestions: LexicalModelTypes.Suggestion[];
@@ -45,10 +45,10 @@ export interface LanguageProcessorEventMap {
   /**
    * Is called synchronously once suggestion application is successful and the context has been updated.
    *
-   * @param outputTarget The `OutputTargetBase` representation of the context the suggestion was applied to.
+   * @param textStore The `TextStore` representation of the context the suggestion was applied to.
    * @returns
    */
-  'suggestionapplied': (outputTarget: OutputTargetBase) => boolean
+  'suggestionapplied': (textStore: TextStore) => boolean
 }
 
 
@@ -56,19 +56,19 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
 
   get state(): StateChangeEnum;
 
-  invalidateContext(outputTarget: OutputTargetBase, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
+  invalidateContext(textStore: TextStore, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
 
   /**
    *
    * @param suggestion
-   * @param outputTarget
+   * @param textStore
    * @param getLayerId      a function that returns the current layerId,
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  applySuggestion(suggestion: LexicalModelTypes.Suggestion, outputTarget: OutputTargetBase, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
+  applySuggestion(suggestion: LexicalModelTypes.Suggestion, textStore: TextStore, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
 
-  applyReversion(reversion: LexicalModelTypes.Reversion, outputTarget: OutputTargetBase): Promise<LexicalModelTypes.Suggestion[]>;
+  applyReversion(reversion: LexicalModelTypes.Reversion, textStore: TextStore): Promise<LexicalModelTypes.Suggestion[]>;
 
   get wordbreaksAfterSuggestions(): boolean;
 

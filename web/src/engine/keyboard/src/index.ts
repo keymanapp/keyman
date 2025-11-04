@@ -33,7 +33,7 @@ export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, Syste
 export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } from "./variableStore.js";
 
 export { Mock } from "./mock.js";
-export { OutputTargetBase } from "./outputTargetBase.js";
+export { TextStore } from "./textStore.js";
 export { findCommonSubstringEndIndex } from "./stringDivergence.js";
 export { Deadkey } from "./deadkeys.js";
 
@@ -41,6 +41,6 @@ export * from "@keymanapp/web-utils";
 
 // At the top level, there should be no default export.
 
-// Without the line below... OutputTarget would likely be aliased there, as it's
+// Without the line below... TextStore would likely be aliased there, as it's
 // the last `export { default as _ }` => `export * from` pairing seen above.
 export default undefined;

@@ -399,8 +399,8 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
       return true;
     }
 
-    const outputTarget = eventOutputTarget(e);
-    return this.processor.doModifierPress(Levent, outputTarget, false);
+    const textStore = eventOutputTarget(e);
+    return this.processor.doModifierPress(Levent, textStore, false);
   }
 
   private keyPress(e: KeyboardEvent): boolean {

@@ -28,7 +28,7 @@ declare let keyman: KeymanEngine;
 //   export namespace dom {
 //     export declare var DOMEventHandlers: any;
 //     export declare class Utils {
-//       static getOutputTarget(elem: HTMLElement): any; // text.OutputTarget;
+//       static getOutputTarget(elem: HTMLElement): any; // text.TextStore;
 //     }
 //   }
 

@@ -33,15 +33,15 @@ export class BeepHandler {
    * @param       {Object}      Pelem     element to flash
    * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
    */
-  beep(outputTarget: OutputTargetElementWrapper<any>) {
-    if (!(outputTarget instanceof OutputTargetElementWrapper)) {
+  beep(textStore: OutputTargetElementWrapper<any>) {
+    if (!(textStore instanceof OutputTargetElementWrapper)) {
       return;
     }
 
     // All code after this point is DOM-based, triggered by the beep.
-    let Pelem: HTMLElement = outputTarget.getElement();
-    if(outputTarget instanceof DesignIFrame) {
-      Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
+    let Pelem: HTMLElement = textStore.getElement();
+    if(textStore instanceof DesignIFrame) {
+      Pelem = textStore.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
     }
 
     if(!Pelem) {

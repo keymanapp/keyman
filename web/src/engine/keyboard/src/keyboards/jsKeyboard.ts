@@ -2,7 +2,7 @@ import { Codes } from "../codes.js";
 import { Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import { KeyEvent } from "../keyEvent.js";
-import { type OutputTargetBase } from "../outputTargetBase.js";
+import { type TextStore } from "../textStore.js";
 import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 import { VariableStoreDictionary } from "../variableStore.js";
 
@@ -50,7 +50,7 @@ type KmwKeyboardObject = KeyboardObject & {
  */
 export class JSKeyboard {
   public static DEFAULT_SCRIPT_OBJECT: KmwKeyboardObject = {
-    'gs': function(outputTarget: OutputTargetBase, keystroke: KeyEvent) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
+    'gs': function(textStore: TextStore, keystroke: KeyEvent) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
     'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
     'KN': '',
     'KV': Layouts.DEFAULT_RAW_SPEC,
@@ -78,22 +78,22 @@ export class JSKeyboard {
   /**
    * Calls the keyboard's `gs` function, which represents the keyboard source's begin Unicode group.
    */
-  process(outputTarget: OutputTargetBase, keystroke: KeyEvent): boolean {
-    return this.scriptObject['gs'](outputTarget, keystroke);
+  process(textStore: TextStore, keystroke: KeyEvent): boolean {
+    return this.scriptObject['gs'](textStore, keystroke);
   }
 
   /**
    * Calls the keyboard's `gn` function, which represents the keyboard source's begin newContext group.
    */
-  processNewContextEvent(outputTarget: OutputTargetBase, keystroke: KeyEvent): boolean {
-    return this.scriptObject['gn'] ? this.scriptObject['gn'](outputTarget, keystroke) : false;
+  processNewContextEvent(textStore: TextStore, keystroke: KeyEvent): boolean {
+    return this.scriptObject['gn'] ? this.scriptObject['gn'](textStore, keystroke) : false;
   }
 
   /**
    * Calls the keyboard's `gpk` function, which represents the keyboard source's begin postKeystroke group.
    */
-  processPostKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): boolean {
-    return this.scriptObject['gpk'] ? this.scriptObject['gpk'](outputTarget, keystroke) : false;
+  processPostKeystroke(textStore: TextStore, keystroke: KeyEvent): boolean {
+    return this.scriptObject['gpk'] ? this.scriptObject['gpk'](textStore, keystroke) : false;
   }
 
   get isHollow(): boolean {
@@ -359,7 +359,7 @@ export class JSKeyboard {
    * @param       {number}    _PData        1 or 0
    * Notifies keyboard of keystroke or other event
    */
-  notify(_PCommand: number, _PTarget: OutputTargetBase, _PData: number) { // I2187
+  notify(_PCommand: number, _PTarget: TextStore, _PData: number) { // I2187
     // Good example use case - the Japanese CJK-picker keyboard
     if(typeof(this.scriptObject['KNS']) == 'function') {
       this.scriptObject['KNS'](_PCommand, _PTarget, _PData);

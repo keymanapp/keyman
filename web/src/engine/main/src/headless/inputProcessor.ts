@@ -12,7 +12,7 @@ import {
   JSKeyboard,
   KeyboardMinimalInterface,
   Mock,
-  OutputTargetBase,
+  TextStore,
   ProcessorAction,
   SystemStoreIDs,
   type Alternate,
@@ -97,11 +97,11 @@ export class InputProcessor {
    * Handles default output and keyboard processing for both OSK and physical keystrokes.
    *
    * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
-   * @param       {Object}      outputTarget  The OutputTarget receiving the KeyEvent
+   * @param       {Object}      textStore  The TextStore receiving the KeyEvent
    * @returns     {Object}                    A ProcessorAction object describing the cumulative effects of
    *                                          all matched keyboard rules.
    */
-  processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetBase): ProcessorAction {
+  processKeyEvent(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
     const kbdMismatch = keyEvent.srcKeyboard && this.activeKeyboard != keyEvent.srcKeyboard;
     const trueActiveKeyboard = this.activeKeyboard;
 
@@ -120,10 +120,10 @@ export class InputProcessor {
           // to revert it.  If not, we assume it's a layer-change multitap, in which case
           // no such reset is needed.
           // TODO-web-core
-          if(!isEmptyTransform(transcription.transform) || !(transcription.preInput as Mock).isEqual(Mock.from(outputTarget))) {
+          if(!isEmptyTransform(transcription.transform) || !(transcription.preInput as Mock).isEqual(Mock.from(textStore))) {
             // Restores full context, including deadkeys in their exact pre-keystroke state.
             // TODO-web-core
-            (outputTarget as OutputTargetBase).restoreTo(transcription.preInput as Mock);
+            (textStore as TextStore).restoreTo(transcription.preInput as Mock);
           }
           /*
             else:
@@ -139,7 +139,7 @@ export class InputProcessor {
         }
       }
 
-      return this._processKeyEvent(keyEvent, outputTarget);
+      return this._processKeyEvent(keyEvent, textStore);
     } finally {
       if(kbdMismatch) {
         // Restore our "current" activeKeyboard to its setting before the mismatching KeyEvent.
@@ -152,10 +152,10 @@ export class InputProcessor {
    * Acts as the core of `processKeyEvent` once we're comfortable asserting that the incoming
    * keystroke matches the current `activeKeyboard`.
    * @param keyEvent
-   * @param outputTarget
+   * @param textStore
    * @returns
    */
-  private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetBase): ProcessorAction {
+  private _processKeyEvent(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
     const formFactor = keyEvent.device.formFactor;
     const fromOSK = keyEvent.isSynthetic;
 
@@ -172,7 +172,7 @@ export class InputProcessor {
     // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
     // of state management.  `doModifierPress` must always run.
     // TODO-web-core
-    if (this.keyboardProcessor.doModifierPress(keyEvent, outputTarget as OutputTargetBase, !fromOSK)) {
+    if (this.keyboardProcessor.doModifierPress(keyEvent, textStore as TextStore, !fromOSK)) {
       // If run on a desktop platform, we know that modifier & state key presses may not
       // produce output, so we may make an immediate return safely.
       if(!fromOSK) {
@@ -197,17 +197,17 @@ export class InputProcessor {
 
     // // ...end I3363 (Build 301)
 
-    // Create a "mock" backup of the current outputTarget in its pre-input state.
+    // Create a "mock" backup of the current textStore in its pre-input state.
     // Current, long-existing assumption - it's DOM-backed.
     // TODO-web-core
-    const preInputMock = Mock.from(outputTarget as OutputTargetBase, true);
+    const preInputMock = Mock.from(textStore as TextStore, true);
 
     const startingLayerId = this.keyboardProcessor.layerId;
 
     // We presently need the true keystroke to run on the FULL context.  That index is still
     // needed for some indexing operations when comparing two different output targets.
     // TODO-web-core
-    let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget as OutputTargetBase);
+    let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, textStore as TextStore);
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -243,7 +243,7 @@ export class InputProcessor {
 
       // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
       // by the actual keystroke occur.
-      this.keyboardProcessor.finalizeProcessorAction(ruleBehavior, outputTarget);
+      this.keyboardProcessor.finalizeProcessorAction(ruleBehavior, textStore);
 
       // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
 
@@ -255,7 +255,7 @@ export class InputProcessor {
       // We need a dummy ProcessorAction for keys which have no output (e.g. Shift)
       ruleBehavior = new ProcessorAction();
       // TODO-web-core
-      ruleBehavior.transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom(outputTarget as OutputTargetBase, null, false);
+      ruleBehavior.transcription = (textStore as TextStore).buildTranscriptionFrom(textStore as TextStore, null, false);
       ruleBehavior.triggersDefaultCommand = true;
     }
 
@@ -275,9 +275,9 @@ export class InputProcessor {
     this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
     // TODO-web-core
-    const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget as OutputTargetBase);
+    const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, textStore as TextStore);
     if (postRuleBehavior) {
-      this.keyboardProcessor.finalizeProcessorAction(postRuleBehavior, outputTarget);
+      this.keyboardProcessor.finalizeProcessorAction(postRuleBehavior, textStore);
     }
 
     // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
@@ -286,7 +286,7 @@ export class InputProcessor {
     // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
     if(!ruleBehavior.triggersDefaultCommand) {
       // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
-      outputTarget.doInputEvent();
+      textStore.doInputEvent();
     }
 
     return keepRuleBehavior ? ruleBehavior : null;
@@ -398,11 +398,11 @@ export class InputProcessor {
     return alternates;
   }
 
-  public resetContext(outputTarget?: OutputTargetBase) {
+  public resetContext(textStore?: TextStore) {
     // Also handles new-context events, which may modify the layer
     // TODO-web-core
-    this.keyboardProcessor.resetContext(outputTarget as OutputTargetBase);
+    this.keyboardProcessor.resetContext(textStore as TextStore);
     // With the layer now set, we trigger new predictions.
-    this.languageProcessor.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
+    this.languageProcessor.invalidateContext(textStore, this.keyboardProcessor.layerId);
   }
 }

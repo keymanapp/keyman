@@ -1,4 +1,4 @@
-import { KeyDistribution, KeyEvent, type OutputTargetBase, Mock } from "keyman/engine/keyboard";
+import { KeyDistribution, KeyEvent, type TextStore, Mock } from "keyman/engine/keyboard";
 
 import Proctor from "./proctor.js";
 
@@ -216,8 +216,8 @@ export abstract class TestSequence<KeyRecord extends RecordedKeystroke | InputEv
 
   abstract hasOSKInteraction(): boolean;
 
-  async test(proctor: Proctor, target?: OutputTargetBase): Promise<{success: boolean, result: string}> {
-    // Start with an empty OutputTarget and a fresh KeyboardProcessor.
+  async test(proctor: Proctor, target?: TextStore): Promise<{success: boolean, result: string}> {
+    // Start with an empty TextStore and a fresh KeyboardProcessor.
     if(!target) {
       target = new Mock();
     }
