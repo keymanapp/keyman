@@ -239,7 +239,7 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
       assert.equal(textStore.getElement(), input, '.activeTarget does not match the newly-focused element');
     });
 
@@ -254,7 +254,7 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
       assert.equal(textStore.getElement(), textarea, '.activeTarget does not match the newly-focused element');
     });
 
@@ -278,7 +278,7 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
       assert.equal(textStore.getElement(), iframe, '.activeTarget does not match the newly-focused element');
     });
 
@@ -293,7 +293,7 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `Input` instance.
+      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
       assert.equal(textStore.getElement(), editable, '.activeTarget does not match the newly-focused element');
     });
 
@@ -358,7 +358,7 @@ describe('app/browser:  ContextManager', function () {
 
       // Check our expectations re: the `targetchange` event.
       assert.isTrue(targetchange.calledThrice, 'targetchange event not raised');
-      const textStore = targetchange.thirdCall.args[0]; // Should be an `Input` instance.
+      const textStore = targetchange.thirdCall.args[0]; // Should be an `InputElementTextStore` instance.
       assert.equal(textStore.getElement(), textarea, '.activeTarget does not match the newly-focused element');
     });
 

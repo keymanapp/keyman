@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { KMWString, SyntheticTextStore } from 'keyman/engine/keyboard';
-import { Input } from 'keyman/engine/element-text-stores';
+import { InputElementTextStore } from 'keyman/engine/element-text-stores';
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
@@ -24,11 +24,11 @@ class MockTests {
     { d: 0, p: 3 }   // After the normal 'p' character of Apple.mixed.
   ];
 
-  //#region Defines helpers related to HTMLInputElement / Input test setup.
+  //#region Defines helpers related to HTMLInputElement / InputElementTextStore test setup.
   public static initBase() {
     const elem = document.createElement('input');
     host.appendChild(elem);
-    const wrapper = new Input(elem);
+    const wrapper = new InputElementTextStore(elem);
 
     return wrapper;
   }

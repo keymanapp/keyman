@@ -1,7 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 
 import { DeviceSpec, InternalKeyboardFont } from "keyman/engine/keyboard";
-import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-text-stores";
+import { InputElementTextStore, nestedInstanceOf, wrapElement } from "keyman/engine/element-text-stores";
 import {
   arrayFromNodeList,
   createStyleSheet,
@@ -236,7 +236,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     if(x instanceof x.ownerDocument.defaultView.HTMLTextAreaElement) {
       return true;
     } else if(x instanceof x.ownerDocument.defaultView.HTMLInputElement) {
-      if (Input.isSupportedType(x.type)) {
+      if (InputElementTextStore.isSupportedType(x.type)) {
         return true;
       }
     } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement) {
@@ -734,7 +734,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     const t2=document.getElementsByTagName('textarea');
 
     for(let i=0; i<t1.length; i++) {
-      if (Input.isSupportedType(t1[i].type) && t1[i].className.indexOf('kmw-disabled') < 0) {
+      if (InputElementTextStore.isSupportedType(t1[i].type) && t1[i].className.indexOf('kmw-disabled') < 0) {
         eList.push({ip:t1[i], x: getAbsoluteX(t1[i]), y: getAbsoluteY(t1[i])});
       }
     }

@@ -1,9 +1,9 @@
 import {
   // Exposed within the engine/attachment bundle b/c of unit tests requiring `instanceof` relations.
-  ContentEditable,
-  DesignIFrame,
-  Input,
-  TextArea,
+  ContentEditableElementTextStore,
+  DesignIFrameElementTextStore,
+  InputElementTextStore,
+  TextAreaElementTextStore,
 
   eventOutputTarget,
   outputTargetForElement,
@@ -65,40 +65,40 @@ describe('outputTargetForElement()', function () {
     // So, for these unit tests, attachment has already been established.  We just need to
     // ensure it meets our expectations.
 
-    it('<input> => Input', () => {
+    it('<input> => InputElementTextStore', () => {
       const inputElement = document.getElementById('input');
       const inputTarget = outputTargetForElement(inputElement);
 
-      assert.isTrue(inputTarget instanceof Input);
+      assert.isTrue(inputTarget instanceof InputElementTextStore);
     });
 
-    it('<iframe>.<input> => Input', async () => {
+    it('<iframe>.<input> => InputElementTextStore', async () => {
       const iframe = document.getElementById('iframe') as HTMLIFrameElement;
       const iframeInput = iframe.contentDocument.getElementById('iframe-input');
       const inputTarget = outputTargetForElement(iframeInput);
 
-      assert.isTrue(inputTarget instanceof Input);
+      assert.isTrue(inputTarget instanceof InputElementTextStore);
     });
 
-    it('<textarea> => TextArea', () => {
+    it('<textarea> => TextAreaElementTextStore', () => {
       const textElement = document.getElementById('textarea');
       const textTarget = outputTargetForElement(textElement);
 
-      assert.isTrue(textTarget instanceof TextArea);
+      assert.isTrue(textTarget instanceof TextAreaElementTextStore);
     });
 
-    it('<iframe>.#doc.designMode = "on" => DesignIFrame', () => {
+    it('<iframe>.#doc.designMode = "on" => DesignIFrameElementTextStore', () => {
       const designElement = document.getElementById('design-iframe');
       const designTarget = outputTargetForElement(designElement);
 
-      assert.isTrue(designTarget instanceof DesignIFrame);
+      assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
     });
 
-    it('<div contenteditable="true"/> => ContentEditable', () => {
+    it('<div contenteditable="true"/> => ContentEditableElementTextStore', () => {
       const divElement = document.getElementById('editable');
       const divTarget = outputTargetForElement(divElement);
 
-      assert.isTrue(divTarget instanceof ContentEditable);
+      assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
     });
   });
 
@@ -106,25 +106,25 @@ describe('outputTargetForElement()', function () {
     // So, for these unit tests, attachment has already been established.  We just need to
     // ensure it meets our expectations.
 
-    it('DesignIFrame: from .contentDocument.body', () => {
+    it('DesignIFrameElementTextStore: from .contentDocument.body', () => {
       const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
       const designTarget = outputTargetForElement(designElement.contentDocument.body);
 
-      assert.isTrue(designTarget instanceof DesignIFrame);
+      assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
       assert.strictEqual(designTarget.getElement(), designElement);
       assert.strictEqual(designTarget, outputTargetForElement(designElement));
     });
 
-    it('DesignIFrame: from .contentDocument', () => {
+    it('DesignIFrameElementTextStore: from .contentDocument', () => {
       const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
       const designTarget = outputTargetForElement(designElement.contentDocument as any as HTMLElement);
 
-      assert.isTrue(designTarget instanceof DesignIFrame);
+      assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
       assert.strictEqual(designTarget.getElement(), designElement);
       assert.strictEqual(designTarget, outputTargetForElement(designElement));
     });
 
-    it('ContentEditable: from direct #text child', () => {
+    it('ContentEditableElementTextStore: from direct #text child', () => {
       const divElement = document.getElementById('editable');
       const textNode = divElement.firstChild as HTMLTextAreaElement;
 
@@ -133,7 +133,7 @@ describe('outputTargetForElement()', function () {
 
       const divTarget = outputTargetForElement(textNode);
 
-      assert.isTrue(divTarget instanceof ContentEditable);
+      assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
       assert.strictEqual(divTarget.getElement(), divElement);
       assert.strictEqual(divTarget, outputTargetForElement(divElement));
     });
@@ -158,7 +158,7 @@ describe('eventOutputTarget()', function () {
     this.attacher = null;
   });
 
-  it('KeyEvent on <input> => Input', () => {
+  it('KeyEvent on <input> => InputElementTextStore', () => {
     const inputElement = document.getElementById('input');
     const fake = sinon.fake();
 
@@ -180,10 +180,10 @@ describe('eventOutputTarget()', function () {
 
     const inputTarget = outputTargetForElement(inputElement);
 
-    assert.isTrue(inputTarget instanceof Input);
+    assert.isTrue(inputTarget instanceof InputElementTextStore);
   });
 
-  it('FocusEvent on <textarea> => TextArea', () => {
+  it('FocusEvent on <textarea> => TextAreaElementTextStore', () => {
     const textElement = document.getElementById('textarea');
     const fake = sinon.fake();
 
@@ -202,10 +202,10 @@ describe('eventOutputTarget()', function () {
 
     const textTarget = eventOutputTarget(fake.firstCall.args[0]);
 
-    assert.isTrue(textTarget instanceof TextArea);
+    assert.isTrue(textTarget instanceof TextAreaElementTextStore);
   });
 
-  it('FocusEvent on design iframe .contentDocument => DesignIFrame', () => {
+  it('FocusEvent on design iframe .contentDocument => DesignIFrameElementTextStore', () => {
     const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
     const fake = sinon.fake();
 
@@ -222,10 +222,10 @@ describe('eventOutputTarget()', function () {
 
     const designTarget = eventOutputTarget(fake.firstCall.args[0]);
 
-    assert.isTrue(designTarget instanceof DesignIFrame);
+    assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
   });
 
-  it('KeyEvent on ContentEditable', () => {
+  it('KeyEvent on ContentEditableElementTextStore', () => {
     const divElement = document.getElementById('editable');
     const fake = sinon.fake();
 
@@ -247,6 +247,6 @@ describe('eventOutputTarget()', function () {
 
     const divTarget = outputTargetForElement(divElement);
 
-    assert.isTrue(divTarget instanceof ContentEditable);
+    assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
   });
 });

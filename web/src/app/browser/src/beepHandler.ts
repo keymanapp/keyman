@@ -1,6 +1,6 @@
 import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { JSKeyboard, type KeyboardMinimalInterface } from 'keyman/engine/keyboard';
-import { DesignIFrame, AbstractElementTextStore } from 'keyman/engine/element-text-stores';
+import { DesignIFrameElementTextStore, AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 
 // Utility object used to handle beep (keyboard error response) operations.
 class BeepData {
@@ -40,7 +40,7 @@ export class BeepHandler {
 
     // All code after this point is DOM-based, triggered by the beep.
     let Pelem: HTMLElement = textStore.getElement();
-    if(textStore instanceof DesignIFrame) {
+    if(textStore instanceof DesignIFrameElementTextStore) {
       Pelem = textStore.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
     }
 

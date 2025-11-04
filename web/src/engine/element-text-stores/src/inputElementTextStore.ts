@@ -1,8 +1,29 @@
 import { AbstractElementTextStore } from './outputTargetElementWrapper.js';
 import { KMWString } from '@keymanapp/web-utils';
 
-export class TextArea extends AbstractElementTextStore<{}> {
-  root: HTMLTextAreaElement;
+interface EventMap  {
+  /**
+   * This event will be raised when a newline is received by wrapped elements not of
+   * the 'search' or 'submit' types.
+   *
+   * Original code this is replacing:
+   ```
+      // Allows compiling this separately from the main body of KMW.
+      // TODO:  rework class to accept a class-static 'callback' from the DOM module that this can call.
+      //        Would eliminate the need for this 'static' reference.
+      //        Only strongly matters once we better modularize KMW, with web-dom vs web-dom-targets vs web-core, etc.
+      if(com.keyman["singleton"]) {
+        com.keyman["singleton"].domManager.moveToNext(false);
+      }
+   ```
+   * This does not belong in a modularized version of this class; it must be supplied
+   * by the consuming top-level products instead.
+   */
+  'unhandlednewline': (element: HTMLInputElement) => void
+}
+
+export class InputElementTextStore extends AbstractElementTextStore<EventMap> {
+  root: HTMLInputElement;
 
   /**
    * Tracks the most recently-cached selection start index.
@@ -27,7 +48,7 @@ export class TextArea extends AbstractElementTextStore<{}> {
    */
   private _activeForcedScroll: boolean;
 
-  constructor(ele: HTMLTextAreaElement) {
+  constructor(ele: HTMLInputElement) {
     super();
 
     this.root = ele;
@@ -38,7 +59,11 @@ export class TextArea extends AbstractElementTextStore<{}> {
     return false;
   }
 
-  getElement(): HTMLTextAreaElement {
+  static isSupportedType(type: string): boolean {
+    return type == 'email' || type == 'search' || type == 'text' || type == 'url';
+  }
+
+  getElement(): HTMLInputElement {
     return this.root;
   }
 
@@ -131,6 +156,11 @@ export class TextArea extends AbstractElementTextStore<{}> {
     return KMWString.substring(this.getText(), 0, this.processedSelectionStart);
   }
 
+  getSelectedText(): string {
+    this.getCaret();
+    return KMWString.substring(this.getText(), this.processedSelectionStart, this.processedSelectionEnd);
+  }
+
   setTextBeforeCaret(text: string) {
     this.getCaret();
     const selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
@@ -153,11 +183,6 @@ export class TextArea extends AbstractElementTextStore<{}> {
     return KMWString.substring(this.getText(), this.processedSelectionEnd);
   }
 
-  getSelectedText(): string {
-    this.getCaret();
-    return KMWString.substring(this.getText(), this.processedSelectionStart, this.processedSelectionEnd);
-  }
-
   getText(): string {
     return this.root.value;
   }
@@ -172,7 +197,7 @@ export class TextArea extends AbstractElementTextStore<{}> {
       }
 
       this.adjustDeadkeys(-dn);
-      this.setTextBeforeCaret(KMWString.substr(curText, 0, caret - dn));
+      this.setTextBeforeCaret(KMWString.substring(curText, 0, caret - dn));
       this.setCaret(caret - dn);
     }
   }
@@ -192,7 +217,14 @@ export class TextArea extends AbstractElementTextStore<{}> {
   }
 
   handleNewlineAtCaret(): void {
-    this.insertTextBeforeCaret('\n');
+    const inputEle = this.root;
+    // Can't occur for Mocks - just Input types.
+    if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
+      inputEle.disabled=false;
+      inputEle.form.submit();
+    } else {
+      this.events.emit('unhandlednewline', inputEle);
+    }
   }
 
   doInputEvent() {

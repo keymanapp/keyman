@@ -1,7 +1,7 @@
 export { wrapElement } from './wrapElement.js';
-export { ContentEditable } from './contentEditable.js';
-export { DesignIFrame } from './designIFrame.js';
-export { Input } from './input.js';
+export { ContentEditableElementTextStore } from './contentEditableElementTextStore.js';
+export { DesignIFrameElementTextStore } from './designIFrameElementTextStore.js';
+export { InputElementTextStore } from './inputElementTextStore.js';
 export { AbstractElementTextStore } from './outputTargetElementWrapper.js';
-export { TextArea } from './textarea.js';
+export { TextAreaElementTextStore } from './textAreaElementTextStore.js';
 export { nestedInstanceOf } from './utils.js';

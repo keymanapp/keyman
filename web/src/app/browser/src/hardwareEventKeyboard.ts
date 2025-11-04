@@ -4,7 +4,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
-import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-text-stores';
+import { DesignIFrameElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
 
 import ContextManager from './contextManager.js';
@@ -237,7 +237,7 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
     page.on('enabled', (Pelem) => {
       const target = outputTargetForElement(Pelem);
 
-      if(!(target instanceof DesignIFrame)) {
+      if(!(target instanceof DesignIFrameElementTextStore)) {
         // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
         eventTracker.attachDOMEvent(Pelem, 'keypress', this._KeyPress);
         eventTracker.attachDOMEvent(Pelem, 'keydown', this._KeyDown);
@@ -253,7 +253,7 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
     page.on('disabled', (Pelem) => {
       const target = outputTargetForElement(Pelem);
 
-      if(!(target instanceof DesignIFrame)) {
+      if(!(target instanceof DesignIFrameElementTextStore)) {
         eventTracker.detachDOMEvent(Pelem, 'keypress', this._KeyPress);
         eventTracker.detachDOMEvent(Pelem, 'keydown', this._KeyDown);
         eventTracker.detachDOMEvent(Pelem, 'keyup', this._KeyUp);

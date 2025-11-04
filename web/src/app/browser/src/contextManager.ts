@@ -3,7 +3,7 @@ import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
-import { DesignIFrame, AbstractElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
+import { DesignIFrameElementTextStore, AbstractElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import {
   ContextManagerBase,
   type KeyboardInterfaceBase,
@@ -92,7 +92,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       // For any elements being attached, or being enabled after having been disabled...
       this.page.on('enabled', (elem) => {
-        if(!(elem._kmwAttachment.interface instanceof DesignIFrame)) {
+        if(!(elem._kmwAttachment.interface instanceof DesignIFrameElementTextStore)) {
           // For anything attached but (design-mode) iframes...
 
           // This block:  has to do with maintaining focus.
@@ -261,7 +261,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
        * and trigger a contextReset DURING keyboard rule processing without this
        * guard.
        *
-       * The #2 reason:  the `forceScroll` method used within the Input and Textarea
+       * The #2 reason:  the `forceScroll` method used within the InputElementTextStore and Textarea
        * types whenever the selection must be programatically updated.  The blur
        * is 'swallowed', preventing it from being dropped as 'active'. However, the
        * corresponding focus is not swallowed... until this if-condition's check.
@@ -290,7 +290,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Set element directionality (but only if element is empty)
     let focusedElement = target?.getElement();
-    if(target instanceof DesignIFrame) {
+    if(target instanceof DesignIFrameElementTextStore) {
       focusedElement = target.docRoot;
     }
     if(focusedElement && focusedElement.ownerDocument && focusedElement instanceof focusedElement.ownerDocument.defaultView.HTMLElement) {
@@ -304,7 +304,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     //Execute external (UI) code needed on focus if required
     if(sendEvents) {
       let blurredElement = previousTarget?.getElement();
-      if(previousTarget instanceof DesignIFrame) {
+      if(previousTarget instanceof DesignIFrameElementTextStore) {
         blurredElement = previousTarget.docRoot;
       }
 
@@ -422,7 +422,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * @param metadata
    */
   public setKeyboardForTarget(target: AbstractElementTextStore<any>, kbdId: string, langId: string) {
-    if(target instanceof DesignIFrame) {
+    if(target instanceof DesignIFrameElementTextStore) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
     }
@@ -650,7 +650,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // ???? ?: ensure it's properly active?
-    // if(target instanceof DesignIFrame) { //**TODO: check case reference
+    // if(target instanceof DesignIFrameElementTextStore) { //**TODO: check case reference
     //   // But... the following should already have been done during attachment...
     //   // attachmentEngine._AttachToIframe(Ltarg as HTMLIFrameElement);
     //   target.docRoot
