@@ -1,6 +1,6 @@
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
-import { AbstractElementTextStore as DOMOutputTarget } from 'keyman/engine/element-text-stores';
+import { AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 import { TextStore, ProcessorAction } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from '@keymanapp/web-utils';
 import { AlertHost } from "./utils/alertHost.js";
@@ -72,7 +72,7 @@ export class BrowserConfiguration extends EngineConfiguration {
     // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
     const ruleTransform = ruleBehavior.transcription.transform;
     if(!isEmptyTransform(ruleTransform)) {
-      if(textStore instanceof DOMOutputTarget) {
+      if (textStore instanceof AbstractElementTextStore) {
         textStore.changed = true;
       }
     }
