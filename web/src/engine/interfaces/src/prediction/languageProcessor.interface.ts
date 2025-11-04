@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
-import { TextStore } from "keyman/engine/keyboard";
+import { TextStore, TextStoreTranscriptionInterface } from "keyman/engine/keyboard";
 
 export class ReadySuggestions {
   suggestions: LexicalModelTypes.Suggestion[];
@@ -48,7 +48,7 @@ export interface LanguageProcessorEventMap {
    * @param textStore The `TextStore` representation of the context the suggestion was applied to.
    * @returns
    */
-  'suggestionapplied': (textStore: TextStore) => boolean
+  'suggestionapplied': (textStore: TextStoreTranscriptionInterface) => boolean
 }
 
 

@@ -33,6 +33,7 @@ export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } 
 
 export { SyntheticTextStore } from "./syntheticTextStore.js";
 export { TextStore } from "./textStore.js";
+export { TextStoreTranscriptionInterface } from "./textStoreTranscriptionInterface.js";
 export { findCommonSubstringEndIndex } from "./stringDivergence.js";
 export { Deadkey } from "./deadkeys.js";
 

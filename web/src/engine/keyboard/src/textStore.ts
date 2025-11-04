@@ -5,7 +5,8 @@ import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { SyntheticTextStore } from "./syntheticTextStore.js";
 
 // Defines deadkey management in a manner attachable to each element interface.
-import { type KeyEvent } from 'keyman/engine/keyboard';
+import { type KeyEvent } from './keyEvent.js';
+import { TextStoreTranscriptionInterface } from './textStoreTranscriptionInterface.js';
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
@@ -59,6 +60,13 @@ export abstract class TextStore {
     this._dks = dks.clone();
   }
 
+  static assertIsTextStore(textStore: TextStoreTranscriptionInterface): asserts textStore is TextStore {
+    if (!(textStore instanceof TextStore)) {
+      throw new TypeError("textStore is not a TextStore");
+    }
+  }
+
+
   /**
    * Determines the basic operations needed to reconstruct the current TextStore's text from the prior state specified
    * by another TextStore based on their text and caret positions.
@@ -67,7 +75,9 @@ export abstract class TextStore {
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a SyntheticTextStore) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: TextStore): TextTransform {
+  buildTransformFrom(original: TextStoreTranscriptionInterface): TextTransform {
+    TextStore.assertIsTextStore(original);
+
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 

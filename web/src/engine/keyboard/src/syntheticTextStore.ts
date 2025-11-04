@@ -1,4 +1,5 @@
 import { TextStore } from './textStore.js';
+import { TextStoreTranscriptionInterface } from './textStoreTranscriptionInterface.js';
 import { KMWString } from '@keymanapp/web-utils';
 
 export class SyntheticTextStore extends TextStore {
@@ -25,17 +26,11 @@ export class SyntheticTextStore extends TextStore {
     this.selForward = this.selEnd >= this.selStart;
   }
 
-  static assertIsOutputTargetBase(textStore: TextStore): asserts textStore is TextStore {
-    if (!(textStore instanceof TextStore)) {
-      throw new TypeError("textStore is not a TextStore");
-    }
-  }
-
   // Clones the state of an existing EditableElement, creating a SyntheticTextStore version of its state.
-  static from(textStore: TextStore, readonly?: boolean): SyntheticTextStore {
+  static from(textStore: TextStoreTranscriptionInterface, readonly?: boolean): SyntheticTextStore {
     let clone: SyntheticTextStore;
 
-    this.assertIsOutputTargetBase(textStore);
+    this.assertIsTextStore(textStore);
 
     if (textStore instanceof SyntheticTextStore) {
       // Avoids the need to run expensive kmwstring.ts `length()`
