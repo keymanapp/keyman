@@ -6,18 +6,7 @@ import { nestedInstanceOf } from "keyman/engine/element-text-stores";
  * @param e
  * @returns
  */
-export function eventOutputTarget(e: Event) {
-  const Ltarg: HTMLElement = e?.target as HTMLElement;
-  return outputTargetForElement(Ltarg);
-}
-
-/**
- * Given a DOM event related to an KMW-attached element, this function determines
- * the corresponding TextStore.
- * @param e
- * @returns
- */
-export function outputTargetForElement(Ltarg: HTMLElement) {
+export function textStoreForElement(Ltarg: HTMLElement) {
   if (Ltarg == null) {
     return null;
   }

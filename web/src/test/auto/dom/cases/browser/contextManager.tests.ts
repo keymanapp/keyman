@@ -1,6 +1,6 @@
 import { ContextManager } from 'keyman/app/browser';
 import {
-  outputTargetForElement
+  textStoreForElement
 } from 'keyman/engine/attachment';
 import { LegacyEventEmitter } from 'keyman/engine/events';
 import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
@@ -862,7 +862,7 @@ describe('app/browser:  ContextManager', function () {
         contextManager.on('keyboardchange', keyboardchange);
 
         const textarea = document.getElementById('textarea');
-        const target = outputTargetForElement(textarea);
+        const target = textStoreForElement(textarea);
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
 
         // As we haven't yet focused the affected target, no keyboard-change events should have triggered yet.
@@ -908,7 +908,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = outputTargetForElement(textarea);
+        const target = textStoreForElement(textarea);
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
@@ -949,7 +949,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = outputTargetForElement(textarea);
+        const target = textStoreForElement(textarea);
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
@@ -998,7 +998,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = outputTargetForElement(textarea);
+        const target = textStoreForElement(textarea);
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
@@ -1035,7 +1035,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = outputTargetForElement(textarea);
+        const target = textStoreForElement(textarea);
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
@@ -1085,7 +1085,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = outputTargetForElement(textarea);
+        const target = textStoreForElement(textarea);
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
@@ -1179,7 +1179,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = outputTargetForElement(textarea);
+        const target = textStoreForElement(textarea);
         // Matches the current global keyboard, but still sets it to independent-mode.
         contextManager.setKeyboardForTarget(target, 'khmer_angkor', 'km');
         dispatchFocus('focus', textarea);

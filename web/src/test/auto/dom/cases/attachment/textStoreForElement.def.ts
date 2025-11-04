@@ -5,8 +5,8 @@ import {
   InputElementTextStore,
   TextAreaElementTextStore,
 
-  eventOutputTarget,
-  outputTargetForElement,
+  textStoreForEvent,
+  textStoreForElement,
   PageContextAttachment,
   PageAttachmentOptions,
 } from 'keyman/engine/attachment';
@@ -42,7 +42,7 @@ function promiseForIframeLoad(iframe: HTMLIFrameElement) {
   }
 }
 
-describe('outputTargetForElement()', function () {
+describe('textStoreForElement()', function () {
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async function() {
@@ -67,7 +67,7 @@ describe('outputTargetForElement()', function () {
 
     it('<input> => InputElementTextStore', () => {
       const inputElement = document.getElementById('input');
-      const inputTarget = outputTargetForElement(inputElement);
+      const inputTarget = textStoreForElement(inputElement);
 
       assert.isTrue(inputTarget instanceof InputElementTextStore);
     });
@@ -75,28 +75,28 @@ describe('outputTargetForElement()', function () {
     it('<iframe>.<input> => InputElementTextStore', async () => {
       const iframe = document.getElementById('iframe') as HTMLIFrameElement;
       const iframeInput = iframe.contentDocument.getElementById('iframe-input');
-      const inputTarget = outputTargetForElement(iframeInput);
+      const inputTarget = textStoreForElement(iframeInput);
 
       assert.isTrue(inputTarget instanceof InputElementTextStore);
     });
 
     it('<textarea> => TextAreaElementTextStore', () => {
       const textElement = document.getElementById('textarea');
-      const textTarget = outputTargetForElement(textElement);
+      const textTarget = textStoreForElement(textElement);
 
       assert.isTrue(textTarget instanceof TextAreaElementTextStore);
     });
 
     it('<iframe>.#doc.designMode = "on" => DesignIFrameElementTextStore', () => {
       const designElement = document.getElementById('design-iframe');
-      const designTarget = outputTargetForElement(designElement);
+      const designTarget = textStoreForElement(designElement);
 
       assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
     });
 
     it('<div contenteditable="true"/> => ContentEditableElementTextStore', () => {
       const divElement = document.getElementById('editable');
-      const divTarget = outputTargetForElement(divElement);
+      const divTarget = textStoreForElement(divElement);
 
       assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
     });
@@ -108,20 +108,20 @@ describe('outputTargetForElement()', function () {
 
     it('DesignIFrameElementTextStore: from .contentDocument.body', () => {
       const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
-      const designTarget = outputTargetForElement(designElement.contentDocument.body);
+      const designTarget = textStoreForElement(designElement.contentDocument.body);
 
       assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
       assert.strictEqual(designTarget.getElement(), designElement);
-      assert.strictEqual(designTarget, outputTargetForElement(designElement));
+      assert.strictEqual(designTarget, textStoreForElement(designElement));
     });
 
     it('DesignIFrameElementTextStore: from .contentDocument', () => {
       const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
-      const designTarget = outputTargetForElement(designElement.contentDocument as any as HTMLElement);
+      const designTarget = textStoreForElement(designElement.contentDocument as any as HTMLElement);
 
       assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
       assert.strictEqual(designTarget.getElement(), designElement);
-      assert.strictEqual(designTarget, outputTargetForElement(designElement));
+      assert.strictEqual(designTarget, textStoreForElement(designElement));
     });
 
     it('ContentEditableElementTextStore: from direct #text child', () => {
@@ -131,16 +131,16 @@ describe('outputTargetForElement()', function () {
       // Text node!  Corresponds to a `// defeat Safari bug` comment in the codebase.
       assert.equal(textNode.nodeType, 3);
 
-      const divTarget = outputTargetForElement(textNode);
+      const divTarget = textStoreForElement(textNode);
 
       assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
       assert.strictEqual(divTarget.getElement(), divElement);
-      assert.strictEqual(divTarget, outputTargetForElement(divElement));
+      assert.strictEqual(divTarget, textStoreForElement(divElement));
     });
   });
 });
 
-describe('eventOutputTarget()', function () {
+describe('textStoreForEvent()', function () {
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async function() {
@@ -178,7 +178,7 @@ describe('eventOutputTarget()', function () {
       inputElement.removeEventListener('keydown', fake);
     }
 
-    const inputTarget = outputTargetForElement(inputElement);
+    const inputTarget = textStoreForElement(inputElement);
 
     assert.isTrue(inputTarget instanceof InputElementTextStore);
   });
@@ -200,7 +200,7 @@ describe('eventOutputTarget()', function () {
       textElement.blur();
     }
 
-    const textTarget = eventOutputTarget(fake.firstCall.args[0]);
+    const textTarget = textStoreForEvent(fake.firstCall.args[0]);
 
     assert.isTrue(textTarget instanceof TextAreaElementTextStore);
   });
@@ -220,7 +220,7 @@ describe('eventOutputTarget()', function () {
       designElement.contentDocument.removeEventListener('focus', fake, true);
     }
 
-    const designTarget = eventOutputTarget(fake.firstCall.args[0]);
+    const designTarget = textStoreForEvent(fake.firstCall.args[0]);
 
     assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
   });
@@ -245,7 +245,7 @@ describe('eventOutputTarget()', function () {
       divElement.removeEventListener('keydown', fake);
     }
 
-    const divTarget = outputTargetForElement(divElement);
+    const divTarget = textStoreForElement(divElement);
 
     assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
   });

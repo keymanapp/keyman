@@ -1,7 +1,7 @@
 import { JSKeyboard, type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
-import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
+import { textStoreForEvent, textStoreForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrameElementTextStore, AbstractElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import {
@@ -126,7 +126,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
         }
 
         if(elem.ownerDocument.activeElement == elem) {
-          this.setActiveTarget(outputTargetForElement(elem), true);
+          this.setActiveTarget(textStoreForElement(elem), true);
         }
       });
 
@@ -643,7 +643,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    */
   _ControlFocus = (e: FocusEvent): boolean => {
     // Step 1: determine the corresponding TextStore instance.
-    const target = eventOutputTarget(e);
+    const target = textStoreForEvent(e);
     if(!target) {
       // Probably should also make a warning or error?
       return true;
@@ -686,7 +686,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // Step 1: determine the corresponding TextStore instance.
-    const target = eventOutputTarget(e);
+    const target = textStoreForEvent(e);
     if (target == null) {
       return true;
     }

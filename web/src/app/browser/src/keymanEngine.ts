@@ -20,7 +20,7 @@ import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 import { whenDocumentReady } from './utils/documentReady.js';
-import { outputTargetForElement } from 'keyman/engine/attachment';
+import { textStoreForElement } from 'keyman/engine/attachment';
 
 import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
@@ -315,7 +315,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    */
   public getKeyboardForControl(Pelem: HTMLElement) {
-    const target = outputTargetForElement(Pelem);
+    const target = textStoreForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).id;
   }
 
@@ -329,7 +329,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *              If it is currently following the global keyboard setting, returns null instead.
    */
   getLanguageForControl(Pelem: HTMLElement) {
-    const target = outputTargetForElement(Pelem);
+    const target = textStoreForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).langId;
   }
 
@@ -570,7 +570,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    const target = outputTargetForElement(e);
+    const target = textStoreForElement(e);
     if(!target) {
       throw new Error(`KMW is not attached to the specified element (id: ${e.id}).`);
     }
