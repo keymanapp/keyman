@@ -1,4 +1,4 @@
-import { AbstractElementTextStore } from './outputTargetElementWrapper.js';
+import { AbstractElementTextStore } from './abstractElementTextStore.js';
 import { KMWString } from '@keymanapp/web-utils';
 
 interface EventMap  {

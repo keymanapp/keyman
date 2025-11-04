@@ -1,4 +1,4 @@
-import { type AbstractElementTextStore }  from './outputTargetElementWrapper.js';
+import { type AbstractElementTextStore }  from './abstractElementTextStore.js';
 import { InputElementTextStore } from './inputElementTextStore.js';
 import { TextAreaElementTextStore } from './textAreaElementTextStore.js';
 import { DesignIFrameElementTextStore } from './designIFrameElementTextStore.js';
