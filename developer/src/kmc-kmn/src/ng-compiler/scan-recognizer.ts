@@ -101,22 +101,37 @@ export const KMN_SCAN_RECOGNIZERS: ScanRecognizer[] = [
   {tokenType: TokenTypes.CAPSONONLY,          regExp: /&capsononly(?![a-z0-9_\.-])/iy,                         emit: true},
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenTypes.SHIFTFREESCAPS,      regExp: /&shiftfreescaps(?![a-z0-9_\.-])/iy,                     emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.CAPS,                regExp: /caps(?![a-z0-9_\.-])/iy,                                emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.ALWAYS,              regExp: /always(?![a-z0-9_\.-])/iy,                              emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.OFF,                 regExp: /off(?![a-z0-9_\.-])/iy,                                 emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.ON,                  regExp: /on(?![a-z0-9_\.-])/iy,                                  emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.ONLY,                regExp: /only(?![a-z0-9_\.-])/iy,                                emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.SHIFT,               regExp: /shift(?![a-z0-9_\.-])/iy,                               emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.FREES,               regExp: /frees(?![a-z0-9_\.-])/iy,                               emit: true},
   {tokenType: TokenTypes.FIX,                 regExp: /fix(?![a-z0-9_\.-])/iy,                                 emit: true},
   {tokenType: TokenTypes.CLEARCONTEXT,        regExp: /clearcontext(?![a-z0-9_\.-])/iy,                        emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.BITMAP_HEADER,       regExp: /bitmap(?=[^\S\r\n])/iy,                                 emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.COPYRIGHT_HEADER,    regExp: /copyright(?=[^\S\r\n])/iy,                              emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.HOTKEY_HEADER,       regExp: /hotkey(?=[^\S\r\n])/iy,                                 emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.LANGUAGE_HEADER,     regExp: /language(?=[^\S\r\n])/iy,                               emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.LAYOUT_HEADER,       regExp: /layout(?=[^\S\r\n])/iy,                                 emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.MESSAGE_HEADER,      regExp: /message(?=[^\S\r\n])/iy,                                emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.NAME_HEADER,         regExp: /name(?=[^\S\r\n])/iy,                                   emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.VERSION_HEADER,      regExp: /version(?=[^\S\r\n])/iy,                                emit: true},
   //https://help.keyman.com/developer/language/reference/baselayout
   {tokenType: TokenTypes.BASELAYOUT_SHORTCUT, regExp: /baselayout(?=[^\S\r\n]*\()/iy,                          emit: true},
@@ -124,14 +139,23 @@ export const KMN_SCAN_RECOGNIZERS: ScanRecognizer[] = [
   {tokenType: TokenTypes.LAYER_SHORTCUT,      regExp: /layer(?=[^\S\r\n]*\()/iy,                               emit: true},
   // https://help.keyman.com/developer/language/reference/platform
   {tokenType: TokenTypes.PLATFORM_SHORTCUT,   regExp: /platform(?=[^\S\r\n]*\()/iy,                            emit: true},
+  // https://help.keyman.com/developer/language/reference/any
   {tokenType: TokenTypes.ANY,                 regExp: /any(?=[^\S\r\n]*\()/iy,                                 emit: true},
+  // https://help.keyman.com/developer/language/reference/beep
   {tokenType: TokenTypes.BEEP,                regExp: /beep(?![a-z0-9_\.-])/iy,                                emit: true},
+  // https://help.keyman.com/developer/language/reference/begin
   {tokenType: TokenTypes.BEGIN,               regExp: /begin(?![a-z0-9_\.-])/iy,                               emit: true},
+  // https://help.keyman.com/developer/language/reference/call
   {tokenType: TokenTypes.CALL,                regExp: /call(?=[^\S\r\n]*\()/iy,                                emit: true},
+  // https://help.keyman.com/developer/language/reference/context
   {tokenType: TokenTypes.CONTEXT,             regExp: /context(?![a-z0-9_\.-])/iy,                             emit: true},
+  // https://help.keyman.com/developer/language/reference/deadkey
   {tokenType: TokenTypes.DEADKEY,             regExp: /(deadkey|dk)(?=[^\S\r\n]*\()/iy,                        emit: true},
+  // https://help.keyman.com/developer/language/reference/group
   {tokenType: TokenTypes.GROUP,               regExp: /group(?=[^\S\r\n]*\()/iy,                               emit: true},
+  // https://help.keyman.com/developer/language/reference/if
   {tokenType: TokenTypes.IF,                  regExp: /if(?=[^\S\r\n]*\()/iy,                                  emit: true},
+  // https://help.keyman.com/developer/language/reference/_index
   {tokenType: TokenTypes.INDEX,               regExp: /index(?=[^\S\r\n]*\()/iy,                               emit: true},
   {tokenType: TokenTypes.MATCH,               regExp: /match(?![a-z0-9_\.-])/iy,                               emit: true},
   {tokenType: TokenTypes.NOMATCH,             regExp: /nomatch(?![a-z0-9_\.-])/iy,                             emit: true},
@@ -144,12 +168,19 @@ export const KMN_SCAN_RECOGNIZERS: ScanRecognizer[] = [
   {tokenType: TokenTypes.SET,                 regExp: /set(?=[^\S\r\n]*\()/iy,                                 emit: true},
   {tokenType: TokenTypes.STORE,               regExp: /store(?=[^\S\r\n]*\()/iy,                               emit: true},
   {tokenType: TokenTypes.USE,                 regExp: /use(?=[^\S\r\n]*\()/iy,                                 emit: true},
+  // https://help.keyman.com/developer/language/reference/begin
   {tokenType: TokenTypes.UNICODE,             regExp: /unicode(?![a-z0-9_\.-])/iy,                             emit: true},
+  // https://help.keyman.com/developer/language/reference/begin
   {tokenType: TokenTypes.NEWCONTEXT,          regExp: /newcontext(?![a-z0-9_\.-])/iy,                          emit: true},
+  // https://help.keyman.com/developer/language/reference/begin
   {tokenType: TokenTypes.POSTKEYSTROKE,       regExp: /postkeystroke(?![a-z0-9_\.-])/iy,                       emit: true},
+  // https://help.keyman.com/developer/language/reference/begin
   {tokenType: TokenTypes.ANSI,                regExp: /ansi(?![a-z0-9_\.-])/iy,                                emit: true},
+  // https://help.keyman.com/developer/language/reference/group
   {tokenType: TokenTypes.READONLY,            regExp: /readonly(?![a-z0-9_\.-])/iy,                            emit: true},
+  // https://help.keyman.com/developer/language/reference/group
   {tokenType: TokenTypes.USING,               regExp: /using(?![a-z0-9_\.-])/iy,                               emit: true},
+  // https://help.keyman.com/developer/language/reference/group
   {tokenType: TokenTypes.KEYS,                regExp: /keys(?![a-z0-9_\.-])/iy,                                emit: true},
   {tokenType: TokenTypes.KEYMAN,              regExp: /\$keyman:/iy,                                           emit: true},
   {tokenType: TokenTypes.KEYMANONLY,          regExp: /\$keymanonly:/iy,                                       emit: true},
