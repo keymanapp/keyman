@@ -9,12 +9,12 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TokenTypes } from '../../src/ng-compiler/token-types.js';
-import { Lexer, ScanRecogniser, Token } from '../../src/ng-compiler/lexer.js'
+import { Lexer, ScanRecognizer, Token } from '../../src/ng-compiler/lexer.js'
 
 describe("Lexer Tests", () => {
-  describe("ScanRecogniser", () => {
-    it("can construct a ScanRecogniser", () => {
-      const sr = new ScanRecogniser(TokenTypes.STORE, /^store/, true);
+  describe("ScanRecognizer", () => {
+    it("can construct a ScanRecognizer", () => {
+      const sr = new ScanRecognizer(TokenTypes.STORE, /^store/, true);
       assert.deepEqual(sr.toString(), '[STORE,/^store/,true]');
     });
   });
