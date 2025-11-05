@@ -343,6 +343,12 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
       if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
+        // Fuse the input sources!
+        const tailSrc = parentSources[parentSources.length - 1];
+        tailSrc.segment.end = this.inputSource.segment.end;
+        if(tailSrc.segment.end) {
+          delete tailSrc.segment.end;
+        }
         return parentSources;
       }
 
@@ -362,7 +368,21 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     for(const source of sources) {
       const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? `@${i}` : ''}`);
+      const j = source.segment.end;
+      let component = (`T${source.segment.transitionId}`);
+
+      const parentSegs = this.parentNode.inputSegments;
+      // It is possible for an .end to be 0 after a split - if an input's
+      // left-deletions are applied without applying any of its insert string.
+      const midInputStart = i != 0 || parentSegs[parentSegs.length - 1]?.segment.end !== undefined;
+
+      // If there's an entry for end, always include the start position
+      if(j !== undefined) {
+        component = `${component}@${i}-${j}`;
+      } else if(midInputStart) {
+        component = `${component}@${i}`;
+      }
+      components.push(component);
     }
 
     return components.join('+');
