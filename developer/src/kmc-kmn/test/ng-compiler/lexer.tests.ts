@@ -9,15 +9,9 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TokenTypes } from '../../src/ng-compiler/token-types.js';
-import { Lexer, ScanRecogniser, Token } from '../../src/ng-compiler/lexer.js'
+import { Lexer, Token } from '../../src/ng-compiler/lexer.js'
 
 describe("Lexer Tests", () => {
-  describe("ScanRecogniser", () => {
-    it("can construct a ScanRecogniser", () => {
-      const sr = new ScanRecogniser(TokenTypes.STORE, /^store/, true);
-      assert.deepEqual(sr.toString(), '[STORE,/^store/,true]');
-    });
-  });
   describe("Lexer", () => {
     it("can recognise a BASELAYOUT token", () => {
       recogniseToken(TokenTypes.BASELAYOUT, '&baselayout');
@@ -132,12 +126,6 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a FREES token", () => {
       recogniseToken(TokenTypes.FREES, 'frees');
-    });
-    it("can recognise a FIX token", () => {
-      recogniseToken(TokenTypes.FIX, 'fix');
-    });
-    it("can recognise a CLEARCONTEXT token", () => {
-      recogniseToken(TokenTypes.CLEARCONTEXT, 'clearcontext');
     });
     it("can recognise a BITMAP_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenTypes.BITMAP_HEADER, 'bitmap');
