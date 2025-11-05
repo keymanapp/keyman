@@ -27,7 +27,7 @@ export class ScanRecognizer {
    */
   public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
     this.tokenType = tokenType;
-    this.regExp    = regExp;
+    this.regExp    = new RegExp(regExp);  // does not preserve lastIndex
     this.emit      = emit;
   }
 
