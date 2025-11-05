@@ -170,6 +170,12 @@ export interface SearchQuotientNode {
    * TODO: will return only the `inputSegment` part of each entry in the future.
    */
   readonly inputSegments: PathInputProperties[];
+
+  /**
+   * Gets a compact string-based representation of `inputRange` that
+   * maps compatible token source ranges to each other.
+   */
+  get sourceRangeKey(): string;
 }
 
 /**
