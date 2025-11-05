@@ -6,7 +6,7 @@ import {
   type TextStore
 } from 'keyman/engine/keyboard';
 
-import ContextManager from './contextManager.js';
+import { ContextManager } from './contextManager.js';
 
 export default class DefaultBrowserRules extends DefaultRules {
   private contextManager: ContextManager;
