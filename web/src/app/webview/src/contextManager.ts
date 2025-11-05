@@ -7,7 +7,12 @@ import { KMWString, isEmptyTransform } from '@keymanapp/web-utils';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 
-export class ContextHost extends SyntheticTextStore {
+/**
+ * WebView-specific synthetic TextStore implementation that can
+ * communicate and synchronize with the host app despite not being
+ * backed by any sort of Web element.
+ */
+export class HostTextStore extends SyntheticTextStore {
   readonly oninserttext?: OnInsertTextFunc;
   private savedState: SyntheticTextStore;
 
@@ -115,7 +120,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   // Change of context?  Just replace the SyntheticTextStore.  Context will be ENTIRELY controlled
   // by whatever is hosting the WebView.  (Some aspects of this context replacement have
   // yet to be modularized at this time, though.)
-  private _rawContext: ContextHost;
+  private _hostTextStore: HostTextStore;
 
   private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
 
@@ -124,13 +129,13 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   }
 
   initialize(): void {
-    this._rawContext = new ContextHost(this.engineConfig.oninserttext);
+    this._hostTextStore = new HostTextStore(this.engineConfig.oninserttext);
     this.predictionContext.setCurrentTarget(this.activeTarget);
     this.resetContext();
   }
 
   get activeTarget(): SyntheticTextStore {
-    return this._rawContext;
+    return this._hostTextStore;
   }
 
   get activeKeyboard() {
@@ -217,6 +222,6 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
 
   public resetContext(): void {
     super.resetContext();
-    this._rawContext.saveState();
+    this._hostTextStore.saveState();
   }
 }

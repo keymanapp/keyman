@@ -33,5 +33,5 @@ export function textStoreForElement(Ltarg: HTMLElement) {
 
   // Step 2:  With the most likely host element determined, obtain the corresponding TextStore
   // instance.
-  return Ltarg._kmwAttachment?.interface;
+  return Ltarg._kmwAttachment?.textStore;
 }

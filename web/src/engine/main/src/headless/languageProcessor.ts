@@ -190,7 +190,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    */
   public applySuggestion(suggestion: Suggestion, textStore: TextStore, getLayerId: ()=>string): Promise<Reversion> {
     if(!textStore) {
-      throw "Accepting suggestions requires a destination TextStore instance."
+      throw new Error("Accepting suggestions requires a destination TextStore instance.");
     }
 
     if(!this.isActive) {
@@ -265,7 +265,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public applyReversion(reversion: Reversion, textStore: TextStore) {
     if(!textStore) {
-      throw "Accepting suggestions requires a destination TextStore instance."
+      throw new Error("Accepting suggestions requires a destination TextStore instance.");
     }
 
     if(!this.isActive) {

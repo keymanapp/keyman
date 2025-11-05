@@ -62,7 +62,7 @@ class MockTests {
   //#endregion
 }
 
-describe('TextStore Mocking', function() {
+describe('SyntheticTextStore', function() {
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(function() {

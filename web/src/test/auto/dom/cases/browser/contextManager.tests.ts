@@ -862,8 +862,8 @@ describe('app/browser:  ContextManager', function () {
         contextManager.on('keyboardchange', keyboardchange);
 
         const textarea = document.getElementById('textarea');
-        const target = textStoreForElement(textarea);
-        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        const textStore = textStoreForElement(textarea);
+        contextManager.setKeyboardForTarget(textStore, 'lao_2008_basic', 'lo');
 
         // As we haven't yet focused the affected target, no keyboard-change events should have triggered yet.
         assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
@@ -878,7 +878,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // No need to 'keyboardchange' when the same keyboard is kept active.
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), textStore);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);

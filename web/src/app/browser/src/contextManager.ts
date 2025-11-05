@@ -92,7 +92,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       // For any elements being attached, or being enabled after having been disabled...
       this.page.on('enabled', (elem) => {
-        if(!(elem._kmwAttachment.interface instanceof DesignIFrameElementTextStore)) {
+        if(!(elem._kmwAttachment.textStore instanceof DesignIFrameElementTextStore)) {
           // For anything attached but (design-mode) iframes...
 
           // This block:  has to do with maintaining focus.
@@ -261,7 +261,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
        * and trigger a contextReset DURING keyboard rule processing without this
        * guard.
        *
-       * The #2 reason:  the `forceScroll` method used within the InputElementTextStore and Textarea
+       * The #2 reason:  the `forceScroll` method used within the InputElementTextStore and TextAreaTextStore
        * types whenever the selection must be programatically updated.  The blur
        * is 'swallowed', preventing it from being dropped as 'active'. However, the
        * corresponding focus is not swallowed... until this if-condition's check.
@@ -379,11 +379,11 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  private isTargetKeyboardIndependent(target: AbstractElementTextStore<any>): boolean {
-    const attachmentInfo = target?.getElement()._kmwAttachment;
+  private isTargetKeyboardIndependent(textStore: AbstractElementTextStore<any>): boolean {
+    const attachment = textStore?.getElement()._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
-    return !!(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '');
+    return !!(attachment?.keyboard || attachment?.keyboard === '');
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.

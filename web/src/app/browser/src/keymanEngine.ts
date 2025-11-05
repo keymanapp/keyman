@@ -302,7 +302,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
+    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.textStore, Pkbd, Plc);
   }
   /**
    * Function     getKeyboardForControl

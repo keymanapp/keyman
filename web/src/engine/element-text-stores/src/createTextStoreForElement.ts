@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 import { type AbstractElementTextStore }  from './abstractElementTextStore.js';
 import { InputElementTextStore } from './inputElementTextStore.js';
 import { TextAreaElementTextStore } from './textAreaElementTextStore.js';
@@ -5,7 +9,14 @@ import { DesignIFrameElementTextStore } from './designIFrameElementTextStore.js'
 import { ContentEditableElementTextStore } from './contentEditableElementTextStore.js';
 import { nestedInstanceOf } from './utils.js';
 
-export function wrapElement(e: HTMLElement): AbstractElementTextStore<any> {
+/**
+ * Wraps an HTMLElement in a concrete text-store implementation.
+ *
+ * @param e - The HTMLElement to create a text-store for.
+ * @returns A concrete AbstractElementTextStore for the element, or null if the element
+ *          type is not supported or no suitable store can be created.
+ */
+export function createTextStoreForElement(e: HTMLElement): AbstractElementTextStore<any> {
   // Complex type scoping is implemented here so that kmwutils.ts is not a dependency for test compilations.
 
   if(nestedInstanceOf(e, "HTMLInputElement")) {

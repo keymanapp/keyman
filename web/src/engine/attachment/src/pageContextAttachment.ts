@@ -1,7 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 
 import { DeviceSpec, InternalKeyboardFont } from "keyman/engine/keyboard";
-import { InputElementTextStore, nestedInstanceOf, wrapElement } from "keyman/engine/element-text-stores";
+import { InputElementTextStore, nestedInstanceOf, createTextStoreForElement } from "keyman/engine/element-text-stores";
 import {
   arrayFromNodeList,
   createStyleSheet,
@@ -201,14 +201,14 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       // The elements in the contained document get separately wrapped, so this doesn't need a proper wrapper.
       //
       // Its attachment process might need some work.
-      const eleInterface = wrapElement(x);
+      const textStore = createTextStoreForElement(x);
 
       // May should filter better for IFrames.
-      if(!(eleInterface || nestedInstanceOf(x, "HTMLIFrameElement"))) {
+      if(!(textStore || nestedInstanceOf(x, "HTMLIFrameElement"))) {
         console.warn("Could not create processing interface for newly-attached element!");
       }
 
-      x._kmwAttachment = new AttachmentInfo(eleInterface, null, this.device.touchable);
+      x._kmwAttachment = new AttachmentInfo(textStore, null);
     }
   }
 
