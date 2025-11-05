@@ -1,6 +1,6 @@
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
 import { DeviceDetector } from 'keyman/engine/main';
-import { type DeviceSpec } from '@keymanapp/web-utils';
+import { type DeviceSpec } from 'keyman/common/web-utils';
 
 import type { KeymanEngine } from 'keyman/app/browser';
 import { JSKeyboard, type FloatingOSKView } from 'keyman/engine/osk';

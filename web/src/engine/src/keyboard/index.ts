@@ -35,7 +35,8 @@ export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } 
 
 export { DOMKeyboardLoader } from './keyboards/loaders/domKeyboardLoader.js';
 
-export * from "@keymanapp/web-utils";
+// TODO-web-core: why do we export these here?
+export * from "keyman/common/web-utils";
 
 // At the top level, there should be no default export.
 

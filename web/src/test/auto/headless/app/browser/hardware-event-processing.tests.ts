@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { preprocessKeyboardEvent } from 'keyman/app/browser';
 import { processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { PhysicalInputEventSpec } from '@keymanapp/recorder-core';
-import { DeviceSpec } from '@keymanapp/web-utils';
+import { DeviceSpec } from 'keyman/common/web-utils';
 import { Codes, JSKeyboard, KeyEvent } from 'keyman/engine/keyboard';
 
 const ModifierCodes = Codes.modifierCodes;

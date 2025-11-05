@@ -1,5 +1,5 @@
 import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 class SelectionCaret {
   node: Node;

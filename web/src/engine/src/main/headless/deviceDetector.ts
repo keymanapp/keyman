@@ -4,7 +4,7 @@
  * Detect the user's device.
  */
 import StyleConstants from './utils/styleConstants.js';
-import { DeviceSpec, Version } from "@keymanapp/web-utils";
+import { DeviceSpec, Version } from "keyman/common/web-utils";
 
 export class DeviceDetector {
   // These correspond directly to the properties & parameters for `DeviceSpec`.

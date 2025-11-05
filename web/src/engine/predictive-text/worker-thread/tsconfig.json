@@ -2,7 +2,6 @@
   "extends": "../../../../tsconfig.base.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "build/obj",
     "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src/main",
@@ -22,7 +21,7 @@
     { "path": "../types" },
     // modules
     { "path": "../../../../../common/web/keyman-version" },
-    { "path": "../../common/web-utils" },
+    { "path": "../../../common/web-utils" },
     { "path": "../templates" },
     { "path": "../wordbreakers" },
   ],

@@ -16,7 +16,7 @@ import { HardKeyboardBase } from "./hardKeyboardBase.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { KMWString } from "@keymanapp/web-utils";
+import { KMWString } from "keyman/common/web-utils";
 
 // From https://stackoverflow.com/a/69328045
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

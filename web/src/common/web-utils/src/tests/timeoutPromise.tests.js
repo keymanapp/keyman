@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { TimeoutPromise, timedPromise } from '@keymanapp/web-utils';
+import { TimeoutPromise, timedPromise } from 'keyman/common/web-utils';
 
 // Set this long enough to allow a bit of delay from OS context-switching (often on the
 // order of ~16ms for some OSes) to occur multiple times without breaking these tests.

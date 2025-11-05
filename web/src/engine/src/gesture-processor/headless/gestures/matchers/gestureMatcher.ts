@@ -2,7 +2,7 @@ import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 
 import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefault, RejectionReplace, ResolutionItemSpec } from "../specs/gestureModel.js";
 
-import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
+import { ManagedPromise, TimeoutPromise } from "keyman/common/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 import { CumulativePathStats } from "../../cumulativePathStats.js";
 import { processSampleClientCoords } from "../../../inputEventEngine.js";

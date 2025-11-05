@@ -8,7 +8,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 // TODO: then mocha invocation is as follows:
 // TODO:     mocha -r @keymanapp/models-test-helpers test/
 
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 // The predictive-text engine always keeps these enabled.
 KMWString.enableSupplementaryPlane(true);

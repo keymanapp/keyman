@@ -13,7 +13,7 @@ const { GestureSequence, GestureStageReport } = matchers;
 type GestureSequence<Type> = gestures.matchers.GestureSequence<Type>;
 type GestureStageReport<Type> = gestures.matchers.GestureStageReport<Type>;
 
-import { ManagedPromise } from '@keymanapp/web-utils';
+import { ManagedPromise } from 'keyman/common/web-utils';
 
 export interface StageReportAssertion<Type> {
   matchedId: string,

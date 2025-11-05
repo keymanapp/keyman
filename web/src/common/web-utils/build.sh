@@ -5,15 +5,15 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder-full.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/web/common.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/node.inc.sh"
 
-SUBPROJECT_NAME=engine/common/web-utils
-BUILD_DIR="/web/src/engine/common/web-utils/build"
+SUBPROJECT_NAME=common/web-utils
+BUILD_DIR="/web/build/common/web-utils"
 
 BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 

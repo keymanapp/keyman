@@ -1,4 +1,4 @@
-import { DeviceSpec } from '@keymanapp/web-utils';
+import { DeviceSpec } from 'keyman/common/web-utils';
 import type { PredictionContext, StateChangeEnum } from 'keyman/engine/interfaces';
 import { ImageBanner } from './imageBanner.js';
 import { SuggestionBanner } from './suggestionBanner.js';

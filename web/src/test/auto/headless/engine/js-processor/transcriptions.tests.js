@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/js-processor';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 // A unicode-coding like alias for use in constructing non-BMP strings.
 const u = String.fromCodePoint;

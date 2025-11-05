@@ -1,4 +1,4 @@
-import { DeviceSpec, ManagedPromise } from '@keymanapp/web-utils';
+import { DeviceSpec, ManagedPromise } from 'keyman/common/web-utils';
 import { type InternalKeyboardFont as KeyboardFont } from 'keyman/engine/keyboard';
 
 type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
@@ -172,7 +172,7 @@ export class StylesheetManager {
       if(!source) {
         return null;
       }
-  
+
       s += 'src:'+source+';';
     }
 

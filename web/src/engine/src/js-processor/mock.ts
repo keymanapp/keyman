@@ -1,6 +1,6 @@
 import { OutputTargetInterface } from 'keyman/engine/keyboard';
 import { OutputTargetBase } from './outputTargetBase.js';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 export class Mock extends OutputTargetBase {
   text: string;

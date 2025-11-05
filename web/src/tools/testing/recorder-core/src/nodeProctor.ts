@@ -11,7 +11,7 @@ import {
 import { KeyEvent, KeyEventSpec, KeyboardHarness, type OutputTargetInterface } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
 import { Mock, OutputTargetBase } from 'keyman/engine/js-processor';
-import { DeviceSpec } from "@keymanapp/web-utils";
+import { DeviceSpec } from "keyman/common/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
 export default class NodeProctor extends Proctor {

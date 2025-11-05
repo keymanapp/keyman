@@ -1,4 +1,4 @@
-import { ManagedPromise } from "@keymanapp/web-utils";
+import { ManagedPromise } from "keyman/common/web-utils";
 
 export default class TouchEventPromiseMap {
   private map: Map<number, ManagedPromise<void>> = new Map();

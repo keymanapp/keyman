@@ -7,6 +7,11 @@
       "types": "./build/app/browser/obj/test-index.d.js",
       "import": "./build/app/browser/obj/test-index.js"
     },
+    "./common/web-utils": {
+      "es6-bundling": "./src/common/web-utils/src/index.ts",
+      "types": "./build/common/web-utils/obj/index.d.js",
+      "import": "./build/common/web-utils/obj/index.js"
+    },
     "./engine/attachment": {
       "es6-bundling": "./src/engine/src/attachment/index.ts",
       "types": "./build/engine/obj/attachment/index.d.ts",
@@ -111,7 +116,6 @@
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/common-types": "*",
     "@keymanapp/recorder-core": "*",
-    "@keymanapp/web-utils": "*",
     "core-js": "^3.34.0",
     "eventemitter3": "^5.0.0",
     "tslib": "^2.5.2"

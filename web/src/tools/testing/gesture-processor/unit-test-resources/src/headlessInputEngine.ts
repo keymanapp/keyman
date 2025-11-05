@@ -5,7 +5,7 @@ import {
 } from 'keyman/engine/gesture-processor';
 
 import { RecordedCoordSequenceSet } from './inputRecording.js';
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 
 export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
   private PATH_ID_SEED = 1;

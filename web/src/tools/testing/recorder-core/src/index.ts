@@ -6,7 +6,7 @@ import Proctor from "./proctor.js";
 export { default as Proctor } from "./proctor.js";
 export { default as NodeProctor } from "./nodeProctor.js";
 
-import * as utils from "@keymanapp/web-utils";
+import * as utils from "keyman/common/web-utils";
 
 type EventTypeTag = 'key' | 'osk';
 type TaggedEventObject = { type: EventTypeTag }

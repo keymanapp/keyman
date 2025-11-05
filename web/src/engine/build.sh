@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Builds Keyman Engine for Web (KMW)" \
   "@/core:wasm" \
   "@/web/src/engine/predictive-text" \
-  "@/web/src/engine/common/web-utils" \
+  "@/web/src/common/web-utils" \
   "clean" \
   "configure" \
   "build" \

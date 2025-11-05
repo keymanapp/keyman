@@ -5,7 +5,7 @@ import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 

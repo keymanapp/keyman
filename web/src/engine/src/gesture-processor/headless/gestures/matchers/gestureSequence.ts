@@ -6,7 +6,7 @@ import { MatchResult } from "./gestureMatcher.js";
 import { GestureModel, GestureResolution } from "../specs/gestureModel.js";
 import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";
-import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
+import { ManagedPromise, timedPromise } from "keyman/common/web-utils";
 
 export class GestureStageReport<Type, StateToken = any> {
   /**

@@ -1,4 +1,4 @@
-import { DeviceSpec } from "@keymanapp/web-utils";
+import { DeviceSpec } from "keyman/common/web-utils";
 import { ParsedLengthStyle } from "./lengthStyle.js";
 
 export function getFontSizeStyle(e: HTMLElement|string): {val: number, absolute: boolean} {

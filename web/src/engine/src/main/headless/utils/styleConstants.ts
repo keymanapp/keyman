@@ -1,4 +1,4 @@
-import { DeviceSpec } from "@keymanapp/web-utils";
+import { DeviceSpec } from "keyman/common/web-utils";
 
 /*
  * This file is intended for CSS-styling constants that see use with the OSK.

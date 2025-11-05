@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { Mock } from "keyman/engine/js-processor";
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 export default class ContextWindow implements LexicalModelTypes.Context {
   // Used to limit the range of context replicated for use of keyboard rules within

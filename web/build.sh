@@ -26,8 +26,8 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":app/browser              The form of Keyman Engine for Web for use on websites" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
+  ":common/web-utils         Shared utils" \
   ":engine                   Keyman Engine for Web" \
-  ":engine/common/web-utils  Shared utils" \
   ":engine/predictive-text   Builds KMW's predictive text module" \
   ":help                     Online documentation" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
@@ -51,19 +51,9 @@ builder_describe_outputs \
   build:app/browser             "/web/build/app/browser/lib/index.mjs" \
   build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
   build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
-  build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
-  build:engine/core-processor   "/web/build/engine/core-processor/lib/index.mjs" \
-  build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
-  build:engine/events           "/web/build/engine/events/lib/index.mjs" \
-  build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
-  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
-  build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
-  build:engine/keyboard         "/web/build/engine/keyboard/lib/index.mjs" \
-  build:engine/keyboard-storage "/web/build/engine/keyboard-storage/lib/index.mjs" \
-  build:engine/main             "/web/build/engine/main/lib/index.mjs" \
-  build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
+  build:common/web-utils        "/web/build/common/web-utils/lib/index.mjs" \
+  build:engine                  "/web/build/engine/lib/index.mjs" \
   build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
-  build:engine/common/web-utils "/web/src/engine/common/web-utils/build/lib/index.mjs" \
   build:samples                 "/web/src/samples/simplest/keymanweb.js" \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"
@@ -72,19 +62,13 @@ BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mj
 
 #### Build action definitions ####
 
-##################### TODO:  call child action, verify things work as expected!
-
 # We can run all clean & configure actions at once without much issue.
+
+## Clean actions
 
 builder_run_action clean:_all rm -rf build/
 
 builder_run_child_actions clean
-
-## Clean actions
-
-###--- Future tie-in:  if #8831 gets accepted, uncomment the next two lines. ---###
-# # If a full-on general clean was requested, we can nuke the entire build folder.
-# builder_run_action clean:project rm -rf ./build
 
 builder_run_child_actions configure
 
@@ -158,7 +142,8 @@ coverage_action() {
 
 builder_run_child_actions build:tools
 
-builder_run_child_actions build:engine/common/web-utils
+builder_run_child_actions build:common/web-utils
+
 builder_run_child_actions build:engine
 builder_run_child_actions build:engine/predictive-text
 

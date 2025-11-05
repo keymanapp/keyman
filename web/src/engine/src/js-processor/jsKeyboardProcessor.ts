@@ -16,11 +16,9 @@ import {
 import { Mock } from "./mock.js";
 import { type OutputTargetBase }  from "./outputTargetBase.js";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
-import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
+import { DeviceSpec, globalObject, KMWString } from "keyman/common/web-utils";
 
 // #endregion
-
-// Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
 export type BeepHandler = (outputTarget: OutputTargetInterface) => void;
 export type LogMessageHandler = (str: string) => void;

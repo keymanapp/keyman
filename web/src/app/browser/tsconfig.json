@@ -2,13 +2,9 @@
   "extends": "../../tsconfig.dom.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../build/app/browser/obj/",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../../build/app/browser/obj/tsconfig.tsbuildinfo",
-    "paths": {
-      "keyman/engine/*": [ "../../engine/src/*/index.js" ],
-    }
   },
 
   "include": [ "**/*.ts" ],

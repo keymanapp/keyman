@@ -1,7 +1,7 @@
 
 import { assert } from 'chai';
 
-import { deepCopy } from '@keymanapp/web-utils';
+import { deepCopy } from 'keyman/common/web-utils';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 

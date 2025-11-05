@@ -3,13 +3,9 @@
 
   "compilerOptions": {
     "types": ["node"],
-    "baseUrl": "./",
     "outDir": "./build/obj/",
     "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src",
-    "paths": {
-      "keyman/engine/*": ["../../../engine/src/*/index.js"],
-    },
   },
 
   "include": [
@@ -18,7 +14,7 @@
 
   "references": [
     { "path": "../../../../../common/web/keyman-version" },
-    { "path": "../../../engine/common/web-utils/" },
+    { "path": "../../../common/web-utils/" },
     { "path": "../../../engine/predictive-text/types" },
     { "path": "../../../engine" },
   ],

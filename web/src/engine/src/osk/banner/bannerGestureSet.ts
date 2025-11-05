@@ -1,4 +1,4 @@
-import { deepCopy } from '@keymanapp/web-utils';
+import { deepCopy } from 'keyman/common/web-utils';
 
 import {
   gestures,
