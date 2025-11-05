@@ -74,8 +74,8 @@ export class Lexer {
   private matchToken({addEOF, emitAll, handleContinuation}:{addEOF:boolean, emitAll:boolean, handleContinuation:boolean}): boolean {
     const patternIterator: Iterator<ScanRecognizer> = this.scanRecognizers.values();
     let   iterResult: IteratorResult<ScanRecognizer, any>;
-    let   tokenMatch: boolean      = false;
-    let   parseInProgress: boolean = true;
+    let   tokenMatch: boolean = false;
+
 
     // we cannot handle line continuation if emitAll is true
     // (i.e. emitAll:true => handleContinuation:false)
@@ -107,7 +107,7 @@ export class Lexer {
             this.seenContinuation = false;
           } else { // other tokens
             if (this.seenContinuation && recognizer.tokenType !== TokenTypes.WHITESPACE) {
-              // TODO: warning as non-WHITESPACE tokens between CONTINUATION and NEWLINE
+              // TODO: error as non-WHITESPACE tokens between CONTINUATION and NEWLINE
             }
             if (emitAll || recognizer.emit) {
               this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
@@ -147,10 +147,7 @@ export class Lexer {
     }
 
     // return false if there was no match or the buffer is empty
-    if (!tokenMatch || this.offset >= this.buffer.length)
-      parseInProgress = false;
-
-    return parseInProgress;
+    return tokenMatch && this.offset < this.buffer.length;
   }
 
   public toString(): string {

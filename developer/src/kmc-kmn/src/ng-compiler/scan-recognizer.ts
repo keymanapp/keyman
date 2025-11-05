@@ -14,9 +14,9 @@ import { TokenTypes } from "./token-types.js";
  * A ScanRecognizer identifies an individual Token as part of the Next Generation Lexer.
  */
 export class ScanRecognizer {
-  tokenType: TokenTypes;
-  regExp: RegExp;
-  emit: boolean;
+  private _tokenType: TokenTypes;
+  private _regExp: RegExp;
+  private _emit: boolean;
 
   /**
    * Construct a ScanRecognizer
@@ -26,19 +26,23 @@ export class ScanRecognizer {
    * @param emit      whether to emit the token or not?
    */
   public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
-    this.tokenType = tokenType;
-    this.regExp    = new RegExp(regExp);  // does not preserve lastIndex
-    this.emit      = emit;
+    this._tokenType = tokenType;
+    this._regExp    = new RegExp(regExp);  // does not preserve lastIndex
+    this._emit      = emit;
   }
 
+  public get tokenType(): TokenTypes { return this._tokenType; }
+  public get regExp(): RegExp { return this._regExp; }
+  public get emit(): boolean { return this._emit; }
+
   public toString(): string {
-    return `[${this.tokenType},${this.regExp},${this.emit}]`;
+    return `[${this._tokenType},${this._regExp},${this._emit}]`;
   }
 }
 
 // the ordering of ScanRecognizers is important, with more specific regexs appearing first
 
-export const KMN_SCAN_RECOGNIZERS: ScanRecognizer[] = [
+export const KMN_SCAN_RECOGNIZERS = [
   // https://help.keyman.com/developer/language/reference/baselayout
   {tokenType: TokenTypes.BASELAYOUT,          regExp: /&baselayout(?![a-z0-9_\.-])/iy,                         emit: true},
   // https://help.keyman.com/developer/language/reference/bitmap
