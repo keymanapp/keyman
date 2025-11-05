@@ -7,9 +7,11 @@ import { KeyEvent } from './keyEvent.js';
 import { Transcription } from './keyboards/transcription.js';
 import { Alternate } from './keyboards/textTransform.js';
 
-// Interface with the methods LanguageProcessor needs from TextStore
-// for transcription building and applying transforms.
-export interface TextStoreTranscriptionInterface {
-  buildTranscriptionFrom(original: TextStoreTranscriptionInterface, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription;
+/**
+ * Interface with the methods LanguageProcessor needs from TextStore
+ * for transcription building and applying transforms.
+ */
+export interface TextStoreLanguageProcessorInterface {
+  buildTranscriptionFrom(original: TextStoreLanguageProcessorInterface, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription;
   apply(transform: LexicalModelTypes.Transform): void;
 }

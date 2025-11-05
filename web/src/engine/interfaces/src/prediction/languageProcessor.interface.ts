@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
-import { TextStore, TextStoreTranscriptionInterface } from "keyman/engine/keyboard";
+import { TextStoreLanguageProcessorInterface } from "keyman/engine/keyboard";
 
 export class ReadySuggestions {
   suggestions: LexicalModelTypes.Suggestion[];
@@ -48,7 +48,7 @@ export interface LanguageProcessorEventMap {
    * @param textStore The `TextStore` representation of the context the suggestion was applied to.
    * @returns
    */
-  'suggestionapplied': (textStore: TextStoreTranscriptionInterface) => boolean
+  'suggestionapplied': (textStore: TextStoreLanguageProcessorInterface) => boolean
 }
 
 
@@ -56,7 +56,7 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
 
   get state(): StateChangeEnum;
 
-  invalidateContext(textStore: TextStore, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
+  invalidateContext(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
 
   /**
    *
@@ -66,9 +66,9 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  applySuggestion(suggestion: LexicalModelTypes.Suggestion, textStore: TextStore, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
+  applySuggestion(suggestion: LexicalModelTypes.Suggestion, textStore: TextStoreLanguageProcessorInterface, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
 
-  applyReversion(reversion: LexicalModelTypes.Reversion, textStore: TextStore): Promise<LexicalModelTypes.Suggestion[]>;
+  applyReversion(reversion: LexicalModelTypes.Reversion, textStore: TextStoreLanguageProcessorInterface): Promise<LexicalModelTypes.Suggestion[]>;
 
   get wordbreaksAfterSuggestions(): boolean;
 

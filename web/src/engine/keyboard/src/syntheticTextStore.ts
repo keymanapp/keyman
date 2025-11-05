@@ -1,5 +1,5 @@
 import { TextStore } from './textStore.js';
-import { TextStoreTranscriptionInterface } from './textStoreTranscriptionInterface.js';
+import { TextStoreLanguageProcessorInterface } from './textStoreLanguageProcessorInterface.js';
 import { KMWString } from '@keymanapp/web-utils';
 
 export class SyntheticTextStore extends TextStore {
@@ -27,7 +27,7 @@ export class SyntheticTextStore extends TextStore {
   }
 
   // Clones the state of an existing EditableElement, creating a SyntheticTextStore version of its state.
-  static from(textStore: TextStoreTranscriptionInterface, readonly?: boolean): SyntheticTextStore {
+  static from(textStore: TextStoreLanguageProcessorInterface, readonly?: boolean): SyntheticTextStore {
     let clone: SyntheticTextStore;
 
     this.assertIsTextStore(textStore);

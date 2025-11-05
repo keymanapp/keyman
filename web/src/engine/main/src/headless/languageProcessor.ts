@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
-import { Transcription, TextStoreTranscriptionInterface, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -125,7 +125,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     });
   }
 
-  public invalidateContext(textStore: TextStoreTranscriptionInterface, layerId: string): Promise<Suggestion[]> {
+  public invalidateContext(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<Suggestion[]> {
     // If there's no active model, there can be no predictions.
     // We'll also be missing important data needed to even properly REQUEST the predictions.
     if(!this.currentModel || !this.configuration) {
@@ -153,7 +153,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
   }
 
-  public wordbreak(textStore: TextStoreTranscriptionInterface, layerId: string): Promise<string> {
+  public wordbreak(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<string> {
     if(!this.isActive) {
       return null;
     }
@@ -188,7 +188,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  public applySuggestion(suggestion: Suggestion, textStore: TextStoreTranscriptionInterface, getLayerId: ()=>string): Promise<Reversion> {
+  public applySuggestion(suggestion: Suggestion, textStore: TextStoreLanguageProcessorInterface, getLayerId: ()=>string): Promise<Reversion> {
     if(!textStore) {
       throw "Accepting suggestions requires a destination TextStore instance."
     }
@@ -263,7 +263,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
   }
 
-  public applyReversion(reversion: Reversion, textStore: TextStoreTranscriptionInterface) {
+  public applyReversion(reversion: Reversion, textStore: TextStoreLanguageProcessorInterface) {
     if(!textStore) {
       throw "Accepting suggestions requires a destination TextStore instance."
     }
@@ -305,7 +305,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return promise;
   }
 
-  public predictFromTarget(textStore: TextStoreTranscriptionInterface, layerId: string): Promise<Suggestion[]> {
+  public predictFromTarget(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<Suggestion[]> {
     if(!this.isActive || !textStore) {
       return null;
     }

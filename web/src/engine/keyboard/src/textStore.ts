@@ -6,7 +6,7 @@ import { SyntheticTextStore } from "./syntheticTextStore.js";
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from './keyEvent.js';
-import { TextStoreTranscriptionInterface } from './textStoreTranscriptionInterface.js';
+import { TextStoreLanguageProcessorInterface } from './textStoreLanguageProcessorInterface.js';
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
@@ -60,7 +60,7 @@ export abstract class TextStore {
     this._dks = dks.clone();
   }
 
-  static assertIsTextStore(textStore: TextStoreTranscriptionInterface): asserts textStore is TextStore {
+  static assertIsTextStore(textStore: TextStoreLanguageProcessorInterface): asserts textStore is TextStore {
     if (!(textStore instanceof TextStore)) {
       throw new TypeError("textStore is not a TextStore");
     }
@@ -75,7 +75,7 @@ export abstract class TextStore {
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a SyntheticTextStore) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: TextStoreTranscriptionInterface): TextTransform {
+  buildTransformFrom(original: TextStoreLanguageProcessorInterface): TextTransform {
     TextStore.assertIsTextStore(original);
 
     const toLeft = this.getTextBeforeCaret();
