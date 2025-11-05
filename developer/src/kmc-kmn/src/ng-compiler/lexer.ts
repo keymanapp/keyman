@@ -179,8 +179,8 @@ export class Token {
   public constructor(tokenType: TokenTypes, text: string, lineNum: number=1, charNum: number=1, line: string=null, filename:string=null) {
     this.tokenType = tokenType;
     this._text     = text;
-    this._lineNum  = (lineNum < 1 )? 1 : lineNum;
-    this._charNum  = (charNum < 1 )? 1 : charNum;
+    this._lineNum  = (lineNum < 1 ) ? 1 : lineNum;
+    this._charNum  = (charNum < 1 ) ? 1 : charNum;
     this._line     = (tokenType === TokenTypes.NEWLINE || tokenType === TokenTypes.EOF) ? line : null;
     this._filename = filename;
   }
