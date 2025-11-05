@@ -16,13 +16,20 @@ import { TokenTypes } from "./token-types.js";
  */
 export class Lexer {
   private buffer: string;
-  private offset: number;            // offset into the buffer
-  private filename: string;          // the filename (for use in the Tokens)
-  private lineNum: number;           // the current line number
-  private charNum: number;           // the current character number
-  private line: string;              // the line seen so far
-  private tokenList: Token[];        // the accumulating tokens
-  private seenContinuation: boolean; // have we just seen a continuation line?
+  /** offset into the buffer */
+  private offset: number;
+  /** the filename (for use in the Tokens) */
+  private filename: string;
+  /** the current line number */
+  private lineNum: number;
+  /** the current character number */
+  private charNum: number;
+  /** the line seen so far */
+  private line: string;
+  /** the accumulating tokens */
+  private tokenList: Token[];
+  /** have we just seen a continuation line? */
+  private seenContinuation: boolean;
   private scanRecognisers: ScanRecogniser[];
 
   /**
