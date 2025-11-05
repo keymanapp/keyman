@@ -471,7 +471,12 @@ export class SearchPath implements SearchSpace {
 
     for(const source of sources) {
       const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
+      const j = source.segment.end;
+      let component = (`T${source.segment.transitionId}${i != 0 || j !== undefined  ? '@' + i : ''}`);
+      if(j) {
+        component = component + '-' + j;
+      }
+      components.push(component);
     }
 
     return components.join('+');
