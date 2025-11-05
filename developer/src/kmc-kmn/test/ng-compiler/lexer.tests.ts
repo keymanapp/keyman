@@ -10,15 +10,8 @@ import 'mocha';
 import { assert } from 'chai';
 import { TokenTypes } from '../../src/ng-compiler/token-types.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js'
-import { ScanRecognizer } from '../../src/ng-compiler/scan-recognizer.js'
 
 describe("Lexer Tests", () => {
-  describe("ScanRecognizer", () => {
-    it("can construct a ScanRecognizer", () => {
-      const sr = new ScanRecognizer(TokenTypes.STORE, /^store/, true);
-      assert.deepEqual(sr.toString(), '[STORE,/^store/,true]');
-    });
-  });
   describe("Lexer", () => {
     it("can recognise a BASELAYOUT token", () => {
       recogniseToken(TokenTypes.BASELAYOUT, '&baselayout');
