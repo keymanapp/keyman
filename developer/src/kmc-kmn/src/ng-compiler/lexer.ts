@@ -7,6 +7,7 @@
  */
 
 import { TokenTypes } from "./token-types.js";
+import { ScanRecognizer } from "./scan-recognizer.js";
 
 /**
  * The Next Generation Lexer for the Keyman Keyboard Language.
@@ -267,32 +268,6 @@ export class Lexer {
 
   public toString(): string {
     return `{${this.scanRecognizers}}`;
-  }
-}
-
-/**
- * A ScanRecognizer identifies an individual Token as part of the Next Generation Lexer.
- */
-export class ScanRecognizer {
-  tokenType: TokenTypes;
-  regExp: RegExp;
-  emit: boolean;
-
-  /**
-   * Construct a ScanRecognizer
-   *
-   * @param tokenType the token type to return if matched
-   * @param regExp    the regex to identify the token
-   * @param emit      whether to emit the token or not?
-   */
-  public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
-    this.tokenType = tokenType;
-    this.regExp    = regExp;
-    this.emit      = emit;
-  }
-
-  public toString(): string {
-    return `[${this.tokenType},${this.regExp},${this.emit}]`;
   }
 }
 

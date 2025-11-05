@@ -9,7 +9,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TokenTypes } from '../../src/ng-compiler/token-types.js';
-import { Lexer, ScanRecognizer, Token } from '../../src/ng-compiler/lexer.js'
+import { Lexer, Token } from '../../src/ng-compiler/lexer.js'
+import { ScanRecognizer } from '../../src/ng-compiler/scan-recognizer.js'
 
 describe("Lexer Tests", () => {
   describe("ScanRecognizer", () => {
