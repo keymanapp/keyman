@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.156 alpha 2025-11-05
+
+* chore(linux): Update debian changelog (#14965)
+* maint(resources): Docker container changes permissions to match the file owner uid and gid (#14900)
+* fix(developer): remove package version if FollowKeyboardVersion is set in Package Editor (#15088)
+* maint(windows): new timestamp server for test signing (#15091)
+
 ## 19.0.155 alpha 2025-11-03
 
 * maint(resources): auto merge on branch name rather than label (#15084)
