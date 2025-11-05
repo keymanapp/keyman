@@ -58,7 +58,7 @@ export class Lexer {
    * @param handleContinuation combine continuation lines into a single line
    * @return                   an array of all emitted tokens
    */
-  public parse({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): Token[]  {
+  public parse({addEOF=true, emitAll=false, handleContinuation=true}={}): Token[]  {
     while (this.matchToken({addEOF, emitAll, handleContinuation}));
     return this.tokenList;
   }
@@ -71,11 +71,9 @@ export class Lexer {
    * @param handleContinuation whether to combine continuation lines into a single line
    * @return                   whether a matching token was found
    */
-  private matchToken({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): boolean {
+  private matchToken({addEOF, emitAll, handleContinuation}:{addEOF:boolean, emitAll:boolean, handleContinuation:boolean}): boolean {
     const patternIterator: Iterator<ScanRecognizer> = this.scanRecognizers.values();
     let   iterResult: IteratorResult<ScanRecognizer, any>;
-    let   recognizer: ScanRecognizer;
-    let   match: RegExpExecArray | null;
     let   tokenMatch: boolean      = false;
     let   parseInProgress: boolean = true;
 
@@ -87,9 +85,9 @@ export class Lexer {
 
     // loop over all ScanRecognizers looking for a match at the offset into the buffer
     while (!(iterResult = patternIterator.next()).done && !tokenMatch) {
-      recognizer                  = iterResult.value;
-      recognizer.regExp.lastIndex = this.offset;
-      match                       = recognizer.regExp.exec(this.buffer);
+      const recognizer: ScanRecognizer    = iterResult.value;
+      recognizer.regExp.lastIndex         = this.offset;
+      const match: RegExpExecArray | null = recognizer.regExp.exec(this.buffer);
 
       if (match) {
         this.line = this.line.concat(match[0].toString());
