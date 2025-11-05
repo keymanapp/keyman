@@ -39,36 +39,67 @@ export class ScanRecognizer {
 // the ordering of ScanRecognizers is important, with more specific regexs appearing first
 
 export const KMN_SCAN_RECOGNIZERS: ScanRecognizer[] = [
+  // https://help.keyman.com/developer/language/reference/baselayout
   {tokenType: TokenTypes.BASELAYOUT,          regExp: /&baselayout(?![a-z0-9_\.-])/iy,                         emit: true},
+  // https://help.keyman.com/developer/language/reference/bitmap
   {tokenType: TokenTypes.BITMAP,              regExp: /&bitmap(?![a-z0-9_\.-])/iy,                             emit: true},
+  // https://help.keyman.com/developer/language/reference/casedkeys
   {tokenType: TokenTypes.CASEDKEYS,           regExp: /&casedkeys(?![a-z0-9_\.-])/iy,                          emit: true},
+  // https://help.keyman.com/developer/language/reference/copyright
   {tokenType: TokenTypes.COPYRIGHT,           regExp: /&copyright(?![a-z0-9_\.-])/iy,                          emit: true},
+  // https://help.keyman.com/developer/language/reference/displaymap
   {tokenType: TokenTypes.DISPLAYMAP,          regExp: /&displaymap(?![a-z0-9_\.-])/iy,                         emit: true},
+  // https://help.keyman.com/developer/language/reference/ethnologuecode
   {tokenType: TokenTypes.ETHNOLOGUECODE,      regExp: /&ethnologuecode(?![a-z0-9_\.-])/iy,                     emit: true},
+  // https://help.keyman.com/developer/language/reference/hotkey
   {tokenType: TokenTypes.HOTKEY,              regExp: /&hotkey(?![a-z0-9_\.-])/iy,                             emit: true},
+  // https://help.keyman.com/developer/language/reference/includecodes
   {tokenType: TokenTypes.INCLUDECODES,        regExp: /&includecodes(?![a-z0-9_\.-])/iy,                       emit: true},
+  // https://help.keyman.com/developer/language/reference/keyboardversion
   {tokenType: TokenTypes.KEYBOARDVERSION,     regExp: /&keyboardversion(?![a-z0-9_\.-])/iy,                    emit: true},
+  // https://help.keyman.com/developer/language/reference/kmw_embedcss
   {tokenType: TokenTypes.KMW_EMBEDCSS,        regExp: /&kmw_embedcss(?![a-z0-9_\.-])/iy,                       emit: true},
+  // https://help.keyman.com/developer/language/reference/kmw_embedjs
   {tokenType: TokenTypes.KMW_EMBEDJS,         regExp: /&kmw_embedjs(?![a-z0-9_\.-])/iy,                        emit: true},
+  // https://help.keyman.com/developer/language/reference/kmw_helpfile
   {tokenType: TokenTypes.KMW_HELPFILE,        regExp: /&kmw_helpfile(?![a-z0-9_\.-])/iy,                       emit: true},
+  // https://help.keyman.com/developer/language/reference/kmw_helptext
   {tokenType: TokenTypes.KMW_HELPTEXT,        regExp: /&kmw_helptext(?![a-z0-9_\.-])/iy,                       emit: true},
+  // https://help.keyman.com/developer/language/reference/kmw_rtl
   {tokenType: TokenTypes.KMW_RTL,             regExp: /&kmw_rtl(?![a-z0-9_\.-])/iy,                            emit: true},
+  // https://help.keyman.com/developer/language/reference/language
   {tokenType: TokenTypes.LANGUAGE,            regExp: /&language(?![a-z0-9_\.-])/iy,                           emit: true},
+  // https://help.keyman.com/developer/language/reference/layer
   {tokenType: TokenTypes.LAYER,               regExp: /&layer(?![a-z0-9_\.-])/iy,                              emit: true},
+  // https://help.keyman.com/developer/language/reference/layoutfile
   {tokenType: TokenTypes.LAYOUTFILE,          regExp: /&layoutfile(?![a-z0-9_\.-])/iy,                         emit: true},
+  // https://help.keyman.com/developer/language/reference/message
   {tokenType: TokenTypes.MESSAGE,             regExp: /&message(?![a-z0-9_\.-])/iy,                            emit: true},
+  // https://help.keyman.com/developer/language/reference/mnemoniclayout
   {tokenType: TokenTypes.MNEMONICLAYOUT,      regExp: /&mnemoniclayout(?![a-z0-9_\.-])/iy,                     emit: true},
+  // https://help.keyman.com/developer/language/reference/name
   {tokenType: TokenTypes.NAME,                regExp: /&name(?![a-z0-9_\.-])/iy,                               emit: true},
+  // https://help.keyman.com/developer/language/reference/newlayer
   {tokenType: TokenTypes.NEWLAYER,            regExp: /&newlayer(?![a-z0-9_\.-])/iy,                           emit: true},
+  // https://help.keyman.com/developer/language/reference/oldcharposmatching
   {tokenType: TokenTypes.OLDCHARPOSMATCHING,  regExp: /&oldcharposmatching(?![a-z0-9_\.-])/iy,                 emit: true},
+  // https://help.keyman.com/developer/language/reference/oldlayer
   {tokenType: TokenTypes.OLDLAYER,            regExp: /&oldlayer(?![a-z0-9_\.-])/iy,                           emit: true},
+  // https://help.keyman.com/developer/language/reference/platform
   {tokenType: TokenTypes.PLATFORM,            regExp: /&platform(?![a-z0-9_\.-])/iy,                           emit: true},
+  // https://help.keyman.com/developer/language/reference/targets
   {tokenType: TokenTypes.TARGETS,             regExp: /&targets(?![a-z0-9_\.-])/iy,                            emit: true},
+  // https://help.keyman.com/developer/language/reference/version
   {tokenType: TokenTypes.VERSION,             regExp: /&version(?![a-z0-9_\.-])/iy,                            emit: true},
+  // https://help.keyman.com/developer/language/reference/visualkeyboard
   {tokenType: TokenTypes.VISUALKEYBOARD,      regExp: /&visualkeyboard(?![a-z0-9_\.-])/iy,                     emit: true},
+  // https://help.keyman.com/developer/language/reference/windowslanguages
   {tokenType: TokenTypes.WINDOWSLANGUAGES,    regExp: /&windowslanguages(?![a-z0-9_\.-])/iy,                   emit: true},
+  // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenTypes.CAPSALWAYSOFF,       regExp: /&capsalwaysoff(?![a-z0-9_\.-])/iy,                      emit: true},
+  // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenTypes.CAPSONONLY,          regExp: /&capsononly(?![a-z0-9_\.-])/iy,                         emit: true},
+  // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenTypes.SHIFTFREESCAPS,      regExp: /&shiftfreescaps(?![a-z0-9_\.-])/iy,                     emit: true},
   {tokenType: TokenTypes.CAPS,                regExp: /caps(?![a-z0-9_\.-])/iy,                                emit: true},
   {tokenType: TokenTypes.ALWAYS,              regExp: /always(?![a-z0-9_\.-])/iy,                              emit: true},
@@ -87,8 +118,11 @@ export const KMN_SCAN_RECOGNIZERS: ScanRecognizer[] = [
   {tokenType: TokenTypes.MESSAGE_HEADER,      regExp: /message(?=[^\S\r\n])/iy,                                emit: true},
   {tokenType: TokenTypes.NAME_HEADER,         regExp: /name(?=[^\S\r\n])/iy,                                   emit: true},
   {tokenType: TokenTypes.VERSION_HEADER,      regExp: /version(?=[^\S\r\n])/iy,                                emit: true},
+  //https://help.keyman.com/developer/language/reference/baselayout
   {tokenType: TokenTypes.BASELAYOUT_SHORTCUT, regExp: /baselayout(?=[^\S\r\n]*\()/iy,                          emit: true},
+  // https://help.keyman.com/developer/language/reference/layer
   {tokenType: TokenTypes.LAYER_SHORTCUT,      regExp: /layer(?=[^\S\r\n]*\()/iy,                               emit: true},
+  // https://help.keyman.com/developer/language/reference/platform
   {tokenType: TokenTypes.PLATFORM_SHORTCUT,   regExp: /platform(?=[^\S\r\n]*\()/iy,                            emit: true},
   {tokenType: TokenTypes.ANY,                 regExp: /any(?=[^\S\r\n]*\()/iy,                                 emit: true},
   {tokenType: TokenTypes.BEEP,                regExp: /beep(?![a-z0-9_\.-])/iy,                                emit: true},
