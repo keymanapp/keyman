@@ -10,12 +10,12 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { TokenTypes } from '../../src/ng-compiler/token-types.js';
+import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { ScanRecognizer } from '../../src/ng-compiler/scan-recognizer.js'
 
 describe("ScanRecognizer Tests", () => {
   it("can construct a ScanRecognizer", () => {
-    const sr = new ScanRecognizer(TokenTypes.STORE, /^store/, true);
+    const sr = new ScanRecognizer(TokenType.STORE, /^store/, true);
     assert.deepEqual(sr.toString(), '[STORE,/^store/,true]');
   });
 });

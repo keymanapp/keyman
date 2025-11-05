@@ -10,7 +10,7 @@
 
 /* These have been placed in alphabetical order for ease of access */
 
-export enum TokenTypes {
+export enum TokenType {
   ALWAYS              = "ALWAYS",
   ANSI                = "ANSI",
   ANY                 = "ANY",

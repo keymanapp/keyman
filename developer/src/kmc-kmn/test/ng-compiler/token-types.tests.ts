@@ -10,17 +10,17 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { TokenTypes } from '../../src/ng-compiler/token-types.js';
+import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer } from '../../src/ng-compiler/lexer.js';
 
 describe("TokenTypes Tests", () => {
   it("is sorted in alphabetical order", () => {
-    const keys: string[]       = Object.keys(TokenTypes);
+    const keys: string[]       = Object.keys(TokenType);
     const sortedKeys: string[] = [...keys].sort();
     assert.deepEqual(keys, sortedKeys);
   });
   it("matches types actually used in the Lexer", () => {
-    const keys: string[] = Object.keys(TokenTypes).sort();
+    const keys: string[] = Object.keys(TokenType).sort();
     const lexer = new Lexer(null);
     const lexerStr = lexer.toString();
     const match = [...lexerStr.matchAll(/(?:\[)[A-Z_]{2,}/g)];
