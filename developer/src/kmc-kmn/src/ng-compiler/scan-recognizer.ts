@@ -115,8 +115,6 @@ export const KMN_SCAN_RECOGNIZERS: ScanRecognizer[] = [
   {tokenType: TokenTypes.SHIFT,               regExp: /shift(?![a-z0-9_\.-])/iy,                               emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.FREES,               regExp: /frees(?![a-z0-9_\.-])/iy,                               emit: true},
-  {tokenType: TokenTypes.FIX,                 regExp: /fix(?![a-z0-9_\.-])/iy,                                 emit: true},
-  {tokenType: TokenTypes.CLEARCONTEXT,        regExp: /clearcontext(?![a-z0-9_\.-])/iy,                        emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenTypes.BITMAP_HEADER,       regExp: /bitmap(?=[^\S\r\n])/iy,                                 emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
