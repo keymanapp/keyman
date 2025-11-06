@@ -1,6 +1,5 @@
 import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
-// TODO-web-core: remove usage of OutputTargetBase
-import { OutputTargetBase, ProcessorInitOptions } from 'keyman/engine/js-processor';
+import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 // TODO-web-core: remove alias
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
@@ -55,9 +54,9 @@ export class KeymanEngineBase<
   protected keyEventRefocus?: () => void;
 
   private keyEventListener: KeyEventFullHandler = (event, callback) => {
-    const outputTarget = this.contextManager.activeTarget;
+    const textStore = this.contextManager.activeTarget;
 
-    if(!this.contextManager.activeKeyboard || !outputTarget) {
+    if(!this.contextManager.activeKeyboard || !textStore) {
       if(callback) {
         callback(null, null);
       }
@@ -69,18 +68,17 @@ export class KeymanEngineBase<
     }
 
     if(this.keyEventRefocus) {
-      // Do anything needed to guarantee that the outputTarget stays active (`app/browser`: maintains focus).
+      // Do anything needed to guarantee that the textStore stays active (`app/browser`: maintains focus).
       // (Interaction with the OSK may have de-focused the element providing active context;
       // we want to restore it in case the user swaps back to the hardware keyboard afterward.)
       this.keyEventRefocus();
     }
 
     // Clear any cached codepoint data; we can rebuild it if it's unchanged.
-    outputTarget.invalidateSelection();
+    textStore.invalidateSelection();
     // Deadkey matching continues to be troublesome.
     // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-    // TODO-web-core
-    (outputTarget as OutputTargetBase).deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+    textStore.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
     if(event.isSynthetic) {
       const oskLayer = this.osk.vkbd.layerId;
@@ -90,7 +88,7 @@ export class KeymanEngineBase<
         this.core.keyboardProcessor.layerId = oskLayer;
       }
     }
-    const result = this.core.processKeyEvent(event, outputTarget);
+    const result = this.core.processKeyEvent(event, textStore);
 
     if(result && result.transcription?.transform) {
       this.config.onRuleFinalization(result, this.contextManager.activeTarget);
@@ -278,8 +276,7 @@ export class KeymanEngineBase<
       keyboardProcessor.newLayerStore.set('');
       keyboardProcessor.oldLayerStore.set('');
       // Call the keyboard's entry point.
-      // TODO-web-core
-      const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTargetBase)
+      const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget)
       // If we have a ProcessorAction as a result, run it on the target. This should
       // only change system store and variable store values.
       if (data) {

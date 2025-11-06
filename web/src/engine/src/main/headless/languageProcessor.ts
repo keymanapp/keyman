@@ -1,8 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
-// TODO-web-core: remove use of OutputTargetBase
-import { Mock, OutputTargetBase } from "keyman/engine/js-processor";
-import { Transcription, OutputTargetInterface } from 'keyman/engine/keyboard';
+import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -127,7 +125,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     });
   }
 
-  public invalidateContext(outputTarget: OutputTargetInterface, layerId: string): Promise<Suggestion[]> {
+  public invalidateContext(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<Suggestion[]> {
     // If there's no active model, there can be no predictions.
     // We'll also be missing important data needed to even properly REQUEST the predictions.
     if(!this.currentModel || !this.configuration) {
@@ -143,9 +141,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
     this.emit('invalidatesuggestions', 'context');
 
-    if(outputTarget) {
-      // TODO-web-core
-      const transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom((outputTarget as OutputTargetBase), null, false);
+    if(textStore) {
+      const transcription = textStore.buildTranscriptionFrom(textStore, null, false);
       return this.predict_internal(transcription, true, layerId);
     } else {
       // if there's no active context source, there's nothing to
@@ -156,13 +153,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
   }
 
-  public wordbreak(target: OutputTargetInterface, layerId: string): Promise<string> {
+  public wordbreak(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<string> {
     if(!this.isActive) {
       return null;
     }
 
-    // TODO-web-core
-    const context = new ContextWindow(Mock.from((target as OutputTargetBase), false), this.configuration, layerId);
+    const context = new ContextWindow(SyntheticTextStore.from(textStore, false), this.configuration, layerId);
     return this.lmEngine.wordbreak(context);
   }
 
@@ -187,14 +183,14 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   /**
    *
    * @param suggestion
-   * @param outputTarget
+   * @param textStore
    * @param getLayerId      a function that returns the current layerId,
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  public applySuggestion(suggestion: Suggestion, outputTarget: OutputTargetInterface, getLayerId: ()=>string): Promise<Reversion> {
-    if(!outputTarget) {
-      throw "Accepting suggestions requires a destination OutputTargetInterface instance."
+  public applySuggestion(suggestion: Suggestion, textStore: TextStoreLanguageProcessorInterface, getLayerId: ()=>string): Promise<Reversion> {
+    if(!textStore) {
+      throw new Error("Accepting suggestions requires a destination TextStore instance.");
     }
 
     if(!this.isActive) {
@@ -218,29 +214,27 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       // Apply the Suggestion!
 
       // Step 1:  determine the final output text
-      const final = Mock.from(original.preInput, false);
+      const final = SyntheticTextStore.from(original.preInput, false);
       final.apply(suggestion.transform);
 
       // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
       // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
       // values as needed for use with their IME interfaces.
-      // TODO-web-core
-      const transform = final.buildTransformFrom((outputTarget as OutputTargetBase));
-      // TODO-web-core
-      (outputTarget as OutputTargetBase).apply(transform);
+      const transform = final.buildTransformFrom(textStore);
+      textStore.apply(transform);
 
       // Tell the banner that a suggestion was applied, so it can call the
       // keyboard's PostKeystroke entry point as needed
-      this.emit('suggestionapplied', outputTarget);
+      this.emit('suggestionapplied', textStore);
 
       // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
       // replacing the suggestion transform with the original input text.
-      const preApply = Mock.from(original.preInput, false);
+      const preApply = SyntheticTextStore.from(original.preInput, false);
       preApply.apply(original.transform);
 
       // Builds the reversion option according to the loaded lexical model's known
       // syntactic properties.
-      const suggestionContext = new ContextWindow(original.preInput as Mock, this.configuration, getLayerId());
+      const suggestionContext = new ContextWindow(original.preInput as SyntheticTextStore, this.configuration, getLayerId());
 
       // We must accept the Suggestion from its original context, which was before
       // `original.transform` was applied.
@@ -261,7 +255,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
         // // If using the version from lm-layer:
         // let mappedReversion = reversion;
         // mappedReversion.transformId = reversionTranscription.token;
-        this.predictFromTarget(outputTarget, getLayerId());
+        this.predictFromTarget(textStore, getLayerId());
         return mappedReversion;
       });
 
@@ -269,9 +263,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
   }
 
-  public applyReversion(reversion: Reversion, outputTarget: OutputTargetInterface) {
-    if(!outputTarget) {
-      throw "Accepting suggestions requires a destination OutputTargetInterface instance."
+  public applyReversion(reversion: Reversion, textStore: TextStoreLanguageProcessorInterface) {
+    if(!textStore) {
+      throw new Error("Accepting suggestions requires a destination TextStore instance.");
     }
 
     if(!this.isActive) {
@@ -293,19 +287,17 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Apply the Reversion!
 
     // Step 1:  determine the final output text
-    const final = Mock.from(original.preInput, false);
+    const final = SyntheticTextStore.from(original.preInput, false);
     final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
     // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
     // values as needed for use with their IME interfaces.
-    // TODO-web-core
-    const transform = final.buildTransformFrom(outputTarget as OutputTargetBase);
-    // TODO-web-core
-    (outputTarget as OutputTargetBase).apply(transform);
+    const transform = final.buildTransformFrom(textStore);
+    textStore.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput as Mock, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput as SyntheticTextStore, this.configuration, null))
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -313,13 +305,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return promise;
   }
 
-  public predictFromTarget(outputTarget: OutputTargetInterface, layerId: string): Promise<Suggestion[]> {
-    if(!this.isActive || !outputTarget) {
+  public predictFromTarget(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<Suggestion[]> {
+    if(!this.isActive || !textStore) {
       return null;
     }
 
-    // TODO-web-core
-    const transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom(outputTarget as OutputTargetBase, null, false);
+    const transcription = textStore.buildTranscriptionFrom(textStore, null, false);
     return this.predict(transcription, layerId);
   }
 
@@ -333,7 +324,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    const context = new ContextWindow(transcription.preInput as Mock, this.configuration, layerId);
+    const context = new ContextWindow(transcription.preInput as SyntheticTextStore, this.configuration, layerId);
     this.recordTranscription(transcription);
 
     if(resetContext) {

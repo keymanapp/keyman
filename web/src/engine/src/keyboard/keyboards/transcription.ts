@@ -1,7 +1,7 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
-import { OutputTargetInterface } from '../outputTargetInterface.js';
+import { TextStore } from '../textStore.js';
 import { KeyEvent } from '../keyEvent.js';
 import { Alternate, TextTransform } from './textTransform.js';
 
@@ -10,11 +10,11 @@ export class Transcription {
   readonly keystroke: KeyEvent;
   readonly transform: TextTransform;
   alternates: Alternate[]; // constructed after the rest of the transcription.
-  readonly preInput: OutputTargetInterface;
+  readonly preInput: TextStore;
 
   private static tokenSeed: number = 0;
 
-  constructor(keystroke: KeyEvent, transform: TextTransform, preInput: OutputTargetInterface, alternates?: Alternate[]) {
+  constructor(keystroke: KeyEvent, transform: TextTransform, preInput: TextStore, alternates?: Alternate[]) {
     const token = this.token = Transcription.tokenSeed++;
 
     this.keystroke = keystroke;

@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { KeyboardHarness, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 
 describe('Headless keyboard loading', function() {
@@ -61,7 +61,7 @@ describe('Headless keyboard loading', function() {
       let ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       ruleHarness.activeKeyboard = keyboard;
       try {
-        ruleHarness.processKeystroke(new Mock(), keyboard.constructNullKeyEvent(device));
+        ruleHarness.processKeystroke(new SyntheticTextStore(), keyboard.constructNullKeyEvent(device));
         assert.fail();
       } catch (err) {
         // Drives home an important detail: the 'global' object is effectively

@@ -4,8 +4,8 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
-import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
-import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
+import { DesignIFrameElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
+import { textStoreForEvent, textStoreForElement } from 'keyman/engine/attachment';
 
 import ContextManager from './contextManager.js';
 
@@ -235,9 +235,9 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
     const eventTracker = this.domEventTracker;
 
     page.on('enabled', (Pelem) => {
-      const target = outputTargetForElement(Pelem);
+      const target = textStoreForElement(Pelem);
 
-      if(!(target instanceof DesignIFrame)) {
+      if(!(target instanceof DesignIFrameElementTextStore)) {
         // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
         eventTracker.attachDOMEvent(Pelem, 'keypress', this._KeyPress);
         eventTracker.attachDOMEvent(Pelem, 'keydown', this._KeyDown);
@@ -251,9 +251,9 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
     });
 
     page.on('disabled', (Pelem) => {
-      const target = outputTargetForElement(Pelem);
+      const target = textStoreForElement(Pelem);
 
-      if(!(target instanceof DesignIFrame)) {
+      if(!(target instanceof DesignIFrameElementTextStore)) {
         eventTracker.detachDOMEvent(Pelem, 'keypress', this._KeyPress);
         eventTracker.detachDOMEvent(Pelem, 'keydown', this._KeyDown);
         eventTracker.detachDOMEvent(Pelem, 'keyup', this._KeyUp);
@@ -277,7 +277,7 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
    */
   _KeyDown: (e: KeyboardEvent) => boolean = (e) => {
     const activeKeyboard = this.contextManager.activeKeyboard;
-    const target = eventOutputTarget(e);
+    const target = textStoreForEvent(e);
 
     if(!target || activeKeyboard == null) {
       return true;
@@ -298,7 +298,7 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
    * Description Processes keypress event (does not pass data to keyboard)
    */
   _KeyPress: (e: KeyboardEvent) => boolean = (e) => {
-    const target = eventOutputTarget(e);
+    const target = textStoreForEvent(e);
     if(!target || this.contextManager.activeKeyboard?.keyboard == null) {
       return true;
     }
@@ -312,7 +312,7 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
    * Description Processes keyup event and passes event data to keyboard
    */
   _KeyUp: (e: KeyboardEvent) => boolean = (e) => {
-    const target = eventOutputTarget(e);
+    const target = textStoreForEvent(e);
     const Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
     if(Levent == null || target == null) {
       return true;
@@ -399,8 +399,8 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
       return true;
     }
 
-    const outputTarget = eventOutputTarget(e);
-    return this.processor.doModifierPress(Levent, outputTarget, false);
+    const textStore = textStoreForEvent(e);
+    return this.processor.doModifierPress(Levent, textStore, false);
   }
 
   private keyPress(e: KeyboardEvent): boolean {

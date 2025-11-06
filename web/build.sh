@@ -46,27 +46,27 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  configure                     "/node_modules" \
-  build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.tests.html" \
-  build:app/browser             "/web/build/app/browser/lib/index.mjs" \
-  build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
-  build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
-  build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
-  build:engine/core-processor   "/web/build/engine/core-processor/lib/index.mjs" \
-  build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
-  build:engine/events           "/web/build/engine/events/lib/index.mjs" \
-  build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
-  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
-  build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
-  build:engine/keyboard         "/web/build/engine/keyboard/lib/index.mjs" \
-  build:engine/keyboard-storage "/web/build/engine/keyboard-storage/lib/index.mjs" \
-  build:engine/main             "/web/build/engine/main/lib/index.mjs" \
-  build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
-  build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
-  build:engine/common/web-utils "/web/src/engine/common/web-utils/build/lib/index.mjs" \
-  build:samples                 "/web/src/samples/simplest/keymanweb.js" \
-  build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
-  build:test-pages              "/web/build/test-resources/sentry-manager.js"
+  configure                        "/node_modules" \
+  build                            "/web/build/test/dom/cases/attachment/textStoreForElement.tests.html" \
+  build:app/browser                "/web/build/app/browser/lib/index.mjs" \
+  build:app/webview                "/web/build/app/webview/${config}/keymanweb-webview.js" \
+  build:app/ui                     "/web/build/app/ui/${config}/kmwuitoggle.js" \
+  build:engine/attachment          "/web/build/engine/attachment/lib/index.mjs" \
+  build:engine/core-processor      "/web/build/engine/core-processor/lib/index.mjs" \
+  build:engine/dom-utils           "/web/build/engine/dom-utils/obj/index.js" \
+  build:engine/events              "/web/build/engine/events/lib/index.mjs" \
+  build:engine/element-text-stores "/web/build/engine/element-text-stores/lib/index.mjs" \
+  build:engine/interfaces          "/web/build/engine/interfaces/lib/index.mjs" \
+  build:engine/js-processor        "/web/build/engine/js-processor/lib/index.mjs" \
+  build:engine/keyboard            "/web/build/engine/keyboard/lib/index.mjs" \
+  build:engine/keyboard-storage    "/web/build/engine/keyboard-storage/lib/index.mjs" \
+  build:engine/main                "/web/build/engine/main/lib/index.mjs" \
+  build:engine/osk                 "/web/build/engine/osk/lib/index.mjs" \
+  build:engine/predictive-text     "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
+  build:engine/common/web-utils    "/web/src/engine/common/web-utils/build/lib/index.mjs" \
+  build:samples                    "/web/src/samples/simplest/keymanweb.js" \
+  build:tools                      "/web/build/tools/building/sourcemap-root/index.js" \
+  build:test-pages                 "/web/build/test-resources/sentry-manager.js"
 
 BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 
@@ -128,7 +128,7 @@ build_action() {
     precompile "${dir}"
   done
 
-  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.tests.html" \
+  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/textStoreForElement.tests.html" \
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 

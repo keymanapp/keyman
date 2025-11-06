@@ -69,9 +69,9 @@ export default {
       files: ['web/build/test/dom/cases/dom-utils/**/*.tests.mjs']
     },
     {
-      name: 'engine/element-wrappers',
+      name: 'engine/element-text-stores',
       // Relative, from the containing package.json
-      files: ['web/build/test/dom/cases/element-wrappers/**/*.tests.mjs']
+      files: ['web/build/test/dom/cases/element-text-stores/**/*.tests.mjs']
     },
     {
       name: 'engine/gesture-processor',

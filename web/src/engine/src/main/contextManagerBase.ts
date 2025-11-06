@@ -1,5 +1,5 @@
 import { EventEmitter } from 'eventemitter3';
-import { ManagedPromise, type Keyboard, type OutputTargetInterface } from 'keyman/engine/keyboard';
+import { ManagedPromise, type Keyboard, type TextStore } from 'keyman/engine/keyboard';
 import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { PredictionContext } from 'keyman/engine/interfaces';
@@ -7,7 +7,7 @@ import { EngineConfiguration } from './engineConfiguration.js';
 
 interface EventMap {
   // target, then keyboard.
-  'targetchange': (target: OutputTargetInterface) => boolean;
+  'targetchange': (target: TextStore) => boolean;
 
   /**
    * This event is raised whenever a keyboard change is requested.
@@ -44,11 +44,11 @@ export interface ContextManagerConfiguration {
   /**
    * A function that resets any state-dependent keyboard key-state information such as
    * emulated modifier state and layer id.  Also purges the context cache.
-   * If an `outputTarget` is specified, it will also trigger new-context rule processing.
+   * If an `textStore` is specified, it will also trigger new-context rule processing.
    *
    * Does not reset option-stores, variable-stores, etc.
    */
-  readonly resetContext: (outputTarget?: OutputTargetInterface) => void;
+  readonly resetContext: (textStore?: TextStore) => void;
 
   /**
    * A predictive-state management object that interfaces the predictive-text banner
@@ -64,7 +64,7 @@ export interface ContextManagerConfiguration {
 }
 
 interface PendingActivation {
-  target: OutputTargetInterface,
+  target: TextStore,
   keyboard: Promise<Keyboard>,
   stub: KeyboardStub;
 }
@@ -74,11 +74,11 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
   abstract initialize(): void;
 
-  abstract get activeTarget(): OutputTargetInterface;
+  abstract get activeTarget(): TextStore;
 
   private _predictionContext: PredictionContext;
   protected keyboardCache: StubAndKeyboardCache;
-  private _resetContext: (outputTarget?: OutputTargetInterface) => void;
+  private _resetContext: (textStore?: TextStore) => void;
 
   private pendingActivations: PendingActivation[] = [];
   protected engineConfig: MainConfig;
@@ -101,18 +101,18 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
   insertText(kbdInterface: JSKeyboardInterface, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.
-    const outputTarget = this.activeTarget;
+    const textStore = this.activeTarget;
 
-    if(outputTarget != null) {
+    if(textStore != null) {
       if(Ptext != null) {
-        kbdInterface.output(0, outputTarget, Ptext);
+        kbdInterface.output(0, textStore, Ptext);
       }
 
       if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) {
-        kbdInterface.deadkeyOutput(0, outputTarget, PdeadKey);
+        kbdInterface.deadkeyOutput(0, textStore, PdeadKey);
       }
 
-      outputTarget.invalidateSelection();
+      textStore.invalidateSelection();
 
       return true;
     }
@@ -135,7 +135,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * attached elements within the app/browser target.  For `app/webview`, this should
    * always return a consistent value - likely, `null`.
    */
-  protected abstract currentKeyboardSrcTarget(): OutputTargetInterface;
+  protected abstract currentKeyboardSrcTarget(): TextStore;
 
   /**
    * Ensures that newly activated keyboards are set correctly within managed context, possibly
@@ -143,16 +143,16 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param kbd
    * @param target
    */
-  protected abstract activateKeyboardForTarget(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, target: OutputTargetInterface): void;
+  protected abstract activateKeyboardForTarget(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, target: TextStore): void;
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
-   * OutputTarget.  If found, also removes the entry for bookkeeping purposes.
-   * @param target  The specific OutputTarget affected by the pending Keyboard activation.
+   * TextStore.  If found, also removes the entry for bookkeeping purposes.
+   * @param target  The specific TextStore affected by the pending Keyboard activation.
    *                May be `null`, which corresponds to the global default Keyboard.
    * @returns `true` if pending activation is still valid, `false` otherwise.
    */
-  private findAndPopActivation(target: OutputTargetInterface): PendingActivation {
+  private findAndPopActivation(target: TextStore): PendingActivation {
     // Array.findIndex requires Chrome 45+. :(
     let activationIndex;
     for(activationIndex = 0; activationIndex < this.pendingActivations.length; activationIndex++) {
@@ -180,7 +180,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
   protected async deferredKeyboardActivation(
     kbdPromise: Promise<Keyboard>,
     metadata: KeyboardStub,
-    target: OutputTargetInterface
+    target: TextStore
   ): Promise<PendingActivation> {
     const activation: PendingActivation = {
       target: target,

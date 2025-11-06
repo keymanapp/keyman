@@ -5,8 +5,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { KMWString } from '@keymanapp/web-utils';
-import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, JSKeyboardProcessor, Mock } from 'keyman/engine/js-processor';
+import { Codes, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
@@ -128,7 +128,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty context, positional keyboard', () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -156,7 +156,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it("empty context, positional keyboard, outputless-key that's not BKSP", () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_A,
       Lmodifiers: 0,
@@ -189,7 +189,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty context, positional keyboard, but text is selected', () => {
-    let contextSource = new Mock('selected text', 0);
+    let contextSource = new SyntheticTextStore('selected text', 0);
     contextSource.setSelection(0, KMWString.length(contextSource.getText()));
 
     let event = new KeyEvent({
@@ -226,7 +226,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty left-context, positional keyboard', () => {
-    let contextSource = new Mock('post-caret text', 0);
+    let contextSource = new SyntheticTextStore('post-caret text', 0);
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -254,7 +254,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty context, mnemonic keyboard', () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -282,7 +282,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('final empty context, positional keyboard, rule-handled BKSP', () => {
-    let contextSource = new Mock('abc', 2);
+    let contextSource = new SyntheticTextStore('abc', 2);
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -317,7 +317,7 @@ describe('Engine - specialized backspace handling', function() {
 
   // Special case:  BKSP rule-matches with empty left-context.
   it("empty context, positional keyboard, outputless BKSP rule", () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,

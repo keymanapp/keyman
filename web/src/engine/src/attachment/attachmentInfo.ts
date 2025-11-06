@@ -1,16 +1,6 @@
-import { OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 
 export class AttachmentInfo {
-  /**
-   * Provides the core interface between the DOM and the actual keyboard.
-   */
-  interface: OutputTargetElementWrapper<any>;
-
-  /**
-   * Tracks the control's independent keyboard selection, when applicable.
-   */
-  keyboard:       string;
-
   /**
    * Tracks the language code corresponding to the `keyboard` field.
    */
@@ -21,8 +11,11 @@ export class AttachmentInfo {
    */
   inputMode?: string;
 
-  constructor(eleInterface: OutputTargetElementWrapper<any>, kbd: string, touch?: boolean) {
-    this.interface = eleInterface;
-    this.keyboard = kbd;
-  }
+  /**
+   * Constructor for AttachmentInfo.
+   *
+   * @param textStore - Provides the core interface between the DOM and the actual keyboard.
+   * @param keyboard  - Provides the keyboard identifier.
+   */
+  constructor(public readonly textStore: AbstractElementTextStore<any>, public keyboard: string) {}
 }
