@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.157 alpha 2025-11-06
+
+* chore(common): Consolidate platformtest.js keyboard to `/common/test/keyboards/` (#15034)
+* chore(common): Consolidate test9469.js keyboard to `/common/test/keyboards/` (#15053)
+
 ## 19.0.156 alpha 2025-11-05
 
 * chore(linux): Update debian changelog (#14965)
