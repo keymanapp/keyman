@@ -19,6 +19,7 @@ SUBPROJECT_NAME=engine/predictive-text/wordbreakers
 # Note:  the raw text files used for data.inc.ts are found within
 # /resources/standards-data/unicode-character-database.
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
+  "@/common/web/types" \
   "clean" \
   "configure" \
   "build" \

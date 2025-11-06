@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/web-utils",
-  "description": "Common utility functions used throughout other Keyman packages",
+  "description": "Common utility functions used in both Keyman Engine for Web and the predictive text worker",
   "main": "./build/obj/index.js",
   "exports": {
     ".": {

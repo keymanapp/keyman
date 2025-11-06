@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 import { KMWString } from '@keymanapp/web-utils';
 import { Codes, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 

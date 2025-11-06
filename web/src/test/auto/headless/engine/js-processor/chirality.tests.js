@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 

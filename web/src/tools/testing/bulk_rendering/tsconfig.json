@@ -5,7 +5,10 @@
     "baseUrl": "./",
     "outDir": "../../../../build/tools/testing/bulk_rendering/obj/",
     "tsBuildInfoFile": "../../../../build/tools/testing/bulk_rendering/obj/tsconfig.tsbuildinfo",
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "keyman/engine/*": ["../../../engine/src/*/index.js"],
+    },
   },
 
   "files": [
@@ -14,6 +17,6 @@
 
 	"references": [
     { "path": "../../../app/browser" },
-    { "path": "../../../engine/main" }
+    { "path": "../../../engine" }
 	]
 }

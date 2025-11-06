@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import * as PromiseStatusModule from 'promise-status-async';
 import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
-import { GestureModelDefs, buildGestureMatchInspector, gestures } from '@keymanapp/gesture-recognizer';
+import { GestureModelDefs, buildGestureMatchInspector, gestures } from 'keyman/engine/gesture-processor';
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?

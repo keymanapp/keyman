@@ -1,9 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { CloudQueryEngine, type KeyboardStub } from 'keyman/engine/keyboard-storage';
+import { CloudQueryEngine, type KeyboardStub, DOMCloudRequester } from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
-import DOMCloudRequester from 'keyman/engine/keyboard-storage/dom-requester';
 import { ManagedPromise } from '@keymanapp/web-utils';
 
 const pathConfig = new PathConfiguration({

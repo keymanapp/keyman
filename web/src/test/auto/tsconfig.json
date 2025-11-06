@@ -5,7 +5,10 @@
     "baseUrl": "./",
     "outDir": "../../../build/test",
     "tsBuildInfoFile": "../../../build/test/tsconfig.tsbuildinfo",
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "keyman/engine/*": ["../../engine/src/*/index.js"],
+    },
   },
 
   "include": [
@@ -13,6 +16,10 @@
     "headless/**/*.ts",
     "integrated/**/*.ts",
     "resources/**/*.ts",
-    "predictive-text/**/*.ts"
+    "predictive-text/**/*.ts",
+  ],
+
+  "references": [
+    { "path": "../../engine" },
   ]
 }

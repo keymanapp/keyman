@@ -6,7 +6,10 @@
     "baseUrl": "./",
     "outDir": "./build/obj/",
     "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "paths": {
+      "keyman/engine/*": ["../../../engine/src/*/index.js"],
+    },
   },
 
   "include": [
@@ -17,7 +20,6 @@
     { "path": "../../../../../common/web/keyman-version" },
     { "path": "../../../engine/common/web-utils/" },
     { "path": "../../../engine/predictive-text/types" },
-    { "path": "../../../engine/js-processor" },
-    { "path": "../../../engine/keyboard" },
+    { "path": "../../../engine" },
   ],
 }

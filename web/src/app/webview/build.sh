@@ -14,7 +14,7 @@ SUBPROJECT_NAME=app/webview
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's puppetable version designed for use within WebViews." \
-  "@/web/src/engine/main build" \
+  "@/web/src/engine build" \
   "@/web/src/tools/building/sourcemap-root" \
   "clean" \
   "configure" \

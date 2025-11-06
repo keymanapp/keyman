@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import { default as sinon, type SinonSpy } from 'sinon';
-import { AsyncClosureDispatchQueue, type QueueClosure } from '@keymanapp/gesture-recognizer';
+import { AsyncClosureDispatchQueue, type QueueClosure } from 'keyman/engine/gesture-processor';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 
 type ClosureSpy = SinonSpy<[], ReturnType<QueueClosure>>;

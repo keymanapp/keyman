@@ -43,8 +43,7 @@
     { "path": "./web/src/engine/predictive-text/wordbreakers" },
     { "path": "./web/src/engine/predictive-text/worker-main/tsconfig.all.json" },
     { "path": "./web/src/engine/predictive-text/worker-thread" },
-    { "path": "./web/src/engine/osk/gesture-processor/tsconfig.json" },
-    { "path": "./web/src/engine/osk/gesture-processor/src/tools/unit-test-resources/tsconfig.json" },
+    { "path": "./web/src/tools/testing/gesture-processor/unit-test-resources" },
     { "path": "./web/src/engine/sentry-manager/src" },
 
     { "path": "./web/src/tools/testing/recorder" },

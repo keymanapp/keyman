@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 import { InputProcessor } from 'keyman/engine/main';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { KeyboardTest } from '@keymanapp/recorder-core';
 
 import { Worker } from '@keymanapp/lexical-model-layer/node';

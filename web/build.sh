@@ -22,28 +22,18 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "build" \
   "start                     Starts the test server" \
   "test" \
-  "coverage                     Create an HTML page with code coverage" \
-  ":app/browser                 The form of Keyman Engine for Web for use on websites" \
-  ":app/webview                 A puppetable version of KMW designed for use in a host app's WebView" \
-  ":app/ui                      Builds KMW's desktop form-factor keyboard-selection UI modules" \
-  ":engine/attachment           Subset used for detecting valid page contexts for use in text editing " \
-  ":engine/core-processor       Keyman Core WASM integration" \
-  ":engine/common/web-utils     Low-level, headless utility methods and classes used across multiple modules" \
-  ":engine/dom-utils            A common subset of function used for DOM calculations, layout, etc" \
-  ":engine/events               Specialized classes utilized to support KMW API events" \
-  ":engine/element-text-stores  Subset used to integrate with website elements" \
-  ":engine/interfaces           Subset used to configure KMW" \
-  ":engine/js-processor         Build JS processor for KMW" \
-  ":engine/keyboard             Builds KMW's keyboard-loading and caching code" \
-  ":engine/keyboard-storage     Subset used to collate keyboards and request them from the cloud" \
-  ":engine/main                 Builds all common code used by KMW's app/-level targets" \
-  ":engine/osk                  Builds the Web OSK module" \
-  ":engine/predictive-text      Builds KMW's predictive text module" \
-  ":help                        Online documentation" \
-  ":samples                     Builds all needed resources for the KMW sample-page set" \
-  ":tools                       Builds engine-related development resources" \
-  ":test-pages=src/test/manual  Builds resources needed for the KMW manual testing pages" \
-  ":_all                        (Meta build target used when targets are not specified)"
+  "coverage                  Create an HTML page with code coverage" \
+  ":app/browser              The form of Keyman Engine for Web for use on websites" \
+  ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
+  ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
+  ":engine                   Keyman Engine for Web" \
+  ":engine/common/web-utils  Shared utils" \
+  ":engine/predictive-text   Builds KMW's predictive text module" \
+  ":help                     Online documentation" \
+  ":samples                  Builds all needed resources for the KMW sample-page set" \
+  ":tools                    Builds engine-related development resources" \
+  ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
+  ":_all                     (Meta build target used when targets are not specified)"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -123,10 +113,12 @@ build_action() {
   # errors when compiling against it with current tsc versions.
   rm -f "${KEYMAN_ROOT}/node_modules/promise-status-async/lib/index.d.ts"
 
-  tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+  tsc -b "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+
+  builder_echo "Copying some files"
 
   mkdir -p "${KEYMAN_ROOT}/web/build/test/dom/cases/core-processor/import/core/"
-  cp "${KEYMAN_ROOT}/web/src/engine/core-processor/src/import/core/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/test/dom/cases/core-processor/import/core/"
+  cp "${KEYMAN_ROOT}/web/src/engine/src/core-processor/import/core/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/test/dom/cases/core-processor/import/core/"
 
   for dir in \
     "${KEYMAN_ROOT}/web/build/test/dom/cases"/*/ \
@@ -164,34 +156,13 @@ coverage_action() {
   rm -rf build/coverage/tmp
 }
 
+builder_run_child_actions build:tools
+
 builder_run_child_actions build:engine/common/web-utils
-builder_run_child_actions build:engine/dom-utils
-
-builder_run_child_actions build:engine/keyboard
-builder_run_child_actions build:engine/js-processor
-builder_run_child_actions build:engine/element-text-stores
-builder_run_child_actions build:engine/events
-builder_run_child_actions build:engine/interfaces
-
-# Uses engine/dom-utils and engine/interfaces
-builder_run_child_actions build:engine/osk
-
-# Uses engine/element-text-stores
-builder_run_child_actions build:engine/attachment
-
-# Uses engine/interfaces (due to resource-path config interface)
-builder_run_child_actions build:engine/keyboard-storage
-
-# Builds the predictive-text components
+builder_run_child_actions build:engine
 builder_run_child_actions build:engine/predictive-text
 
-# Uses engine/interfaces, engine/keyboard-storage, engine/predictive-text, & engine/osk
-builder_run_child_actions build:engine/core-processor
-
-# Uses engine/interfaces, engine/keyboard-storage, & engine/osk
-builder_run_child_actions build:engine/main
-
-# Uses all but engine/element-text-stores and engine/attachment
+# Uses all but engine/element-wrappers and engine/attachment
 builder_run_child_actions build:app/webview
 
 # Uses literally everything `engine/` above
@@ -202,8 +173,6 @@ builder_run_child_actions build:app/ui
 
 # Needs both app/browser and app/ui.
 builder_run_child_actions build:samples
-
-builder_run_child_actions build:tools
 
 # Some test pages refer to KMW tools.
 builder_run_child_actions build:test-pages
