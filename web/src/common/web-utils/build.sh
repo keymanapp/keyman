@@ -15,15 +15,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 SUBPROJECT_NAME=common/web-utils
 BUILD_DIR="/web/build/common/web-utils"
 
-BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 ################################ Main script ################################
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
+  "@/common/tools/es-bundling" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
-  "@/web/src/tools/es-bundling" \
   clean configure build test
 
 builder_describe_outputs \
@@ -41,7 +39,7 @@ function do_build() {
 
   # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
   # So, to make sure it's easily-accessible for the DOM-based tests...
-  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/${BUILD_DIR}/obj/index.js" \
+  node_es_bundle "${KEYMAN_ROOT}/${BUILD_DIR}/obj/index.js" \
     --out        "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.mjs" \
     --format esm
 }

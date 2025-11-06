@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's sample page setups." \
-  "@/web/src/engine/sentry-manager build" \
+  "@/common/web/sentry-manager build" \
   "@/web/src/app/browser build" \
   "@/web/src/app/ui build" \
   "@/web/src/tools build" \
@@ -32,8 +32,8 @@ builder_describe_outputs \
 
 #### Resource paths ####
 
-SENTRY_MANAGER_SRC="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"
-SENTRY_MANAGER_MAP="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js.map"
+SENTRY_MANAGER_SRC="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"
+SENTRY_MANAGER_MAP="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js.map"
 
 #### Build action definitions ####
 
@@ -43,7 +43,7 @@ SENTRY_MANAGER_MAP="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.j
 function do_copy() {
   mkdir -p "$KEYMAN_ROOT/$DEST"
 
-  # The next four lines are needed for the sentry-integration manual test page.
+  # The next two lines are needed for the sentry-integration manual test page.
   cp "$SENTRY_MANAGER_SRC"  "$KEYMAN_ROOT/$DEST/sentry-manager.js"
   cp "$SENTRY_MANAGER_MAP"  "$KEYMAN_ROOT/$DEST/sentry-manager.js.map"
 

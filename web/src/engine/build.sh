@@ -16,6 +16,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Builds Keyman Engine for Web (KMW)" \
   "@/core:wasm" \
+  "@/common/tools/es-bundling" \
   "@/web/src/engine/predictive-text" \
   "@/web/src/common/web-utils" \
   "clean" \
@@ -57,9 +58,8 @@ do_build () {
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
   tsc --emitDeclarationOnly --outFile "${KEYMAN_ROOT}/web/build/engine/lib/index.d.ts" -p "."
 
-  node "${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs" \
-                "${KEYMAN_ROOT}/web/build/engine/obj/index.js" \
-    --out       "${KEYMAN_ROOT}/web/build/engine/lib/index.mjs" \
+  node_es_bundle "${KEYMAN_ROOT}/web/build/engine/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/web/build/engine/lib/index.mjs" \
     --format esm
 
   # TODO-web-core: should this be in test/?

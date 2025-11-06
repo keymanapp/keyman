@@ -4,6 +4,7 @@
 
     { "path": "./common/tools/hextobin/" },
 
+    { "path": "./common/web/sentry-manager" },
     { "path": "./common/web/keyman-version" },
     { "path": "./common/web/langtags" },
     { "path": "./common/web/types" },

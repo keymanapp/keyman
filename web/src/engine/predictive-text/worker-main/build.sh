@@ -14,14 +14,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 ################################ Main script ################################
 
 builder_describe "Builds the lm-layer module" \
+  "@/common/tools/es-bundling" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
-  "@/web/src/tools/es-bundling" \
   "@/web/src/engine/predictive-text/worker-thread" \
   "clean" \
   "configure" \
@@ -47,7 +45,7 @@ function do_build() {
   tsc -b ./tsconfig.all.json
 
   # esbuild-bundled products at this level are not intended to be used for anything but testing.
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/obj/web/index.js" \
+  node_es_bundle "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/obj/web/index.js" \
     --out        "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
     --format esm
 }
