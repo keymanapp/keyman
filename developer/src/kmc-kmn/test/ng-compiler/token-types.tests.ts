@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer } from '../../src/ng-compiler/lexer.js';
 
-describe("TokenTypes Tests", () => {
+describe("TokenType Tests", () => {
   it("is sorted in alphabetical order", () => {
     const keys: string[]       = Object.keys(TokenType);
     const sortedKeys: string[] = [...keys].sort();
@@ -28,5 +28,11 @@ describe("TokenTypes Tests", () => {
     lexerKeys.push('EOF');
     lexerKeys.sort();
     assert.deepEqual(keys, lexerKeys);
+  });
+  it("has enum keys that exactly match their enum values", () => {
+    type TokenTypeKey = keyof typeof TokenType;
+    for(const key of (Object.keys(TokenType) as TokenTypeKey[])) {
+      assert.equal(TokenType[key], key);
+    }
   });
 });
