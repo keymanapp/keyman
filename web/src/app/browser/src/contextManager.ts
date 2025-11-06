@@ -42,7 +42,7 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
   }
 }
 
-export default class ContextManager extends ContextManagerBase<BrowserConfiguration> {
+export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant(() => this.activeTarget?.isForcingScroll());

@@ -2,7 +2,7 @@ import { type AbstractElementTextStore } from 'keyman/engine/element-text-stores
 import { FloatingOSKView } from 'keyman/engine/osk';
 import { KeyboardInterfaceBase } from 'keyman/engine/main';
 
-import ContextManager from './contextManager.js';
+import { ContextManager }  from './contextManager.js';
 import { KeymanEngine } from './keymanEngine.js';
 
 export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
