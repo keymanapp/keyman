@@ -13,24 +13,25 @@ import { assert } from 'chai';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer } from '../../src/ng-compiler/lexer.js';
 
+type TokenTypeKey = keyof typeof TokenType;
+
 describe("TokenType Tests", () => {
   it("is sorted in alphabetical order", () => {
-    const keys: string[]       = Object.keys(TokenType);
-    const sortedKeys: string[] = [...keys].sort();
+    const keys = Object.keys(TokenType) as TokenTypeKey[];
+    const sortedKeys = [...keys].sort();
     assert.deepEqual(keys, sortedKeys);
   });
   it("matches types actually used in the Lexer", () => {
-    const keys: string[] = Object.keys(TokenType).sort();
+    const keys = (Object.keys(TokenType) as TokenTypeKey[]).sort();
     const lexer = new Lexer(null);
     const lexerStr = lexer.toString();
-    const match = [...lexerStr.matchAll(/(?:\[)[A-Z_]{2,}/g)];
-    const lexerKeys = match.map((x) => x[0].slice(1));
-    lexerKeys.push('EOF');
+    const match = [...lexerStr.matchAll(/(\[)([A-Z_]+)(,.*?,(true|false)\])/g)];
+    const lexerKeys = match.map((x) => x[2] as TokenTypeKey);
+    lexerKeys.push(TokenType.EOF);
     lexerKeys.sort();
     assert.deepEqual(keys, lexerKeys);
   });
   it("has enum keys that exactly match their enum values", () => {
-    type TokenTypeKey = keyof typeof TokenType;
     for(const key of (Object.keys(TokenType) as TokenTypeKey[])) {
       assert.equal(TokenType[key], key);
     }
