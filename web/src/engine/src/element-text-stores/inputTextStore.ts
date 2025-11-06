@@ -98,10 +98,6 @@ export class InputElementTextStore extends AbstractElementTextStore<EventMap> {
     return this.root.selectionDirection == 'forward' ? this.processedSelectionEnd : this.processedSelectionStart;
   }
 
-  getDeadkeyCaret(): number {
-    return this.getCaret();
-  }
-
   setCaret(caret: number) {
     this.setSelection(caret, caret, "none");
   }

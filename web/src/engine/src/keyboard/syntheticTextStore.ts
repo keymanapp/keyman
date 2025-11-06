@@ -82,7 +82,7 @@ export class SyntheticTextStore extends TextStore {
     return true;
   }
 
-  getDeadkeyCaret(): number {
+  getCaret(): number {
     return this.selStart;
   }
 

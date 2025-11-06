@@ -103,7 +103,7 @@ export class ContentEditableElementTextStore extends AbstractElementTextStore<{}
     }
   }
 
-  getDeadkeyCaret(): number {
+  getCaret(): number {
     return KMWString.length(this.getTextBeforeCaret());
   }
 

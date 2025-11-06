@@ -84,7 +84,7 @@ describe('SyntheticTextStore', function() {
         const mock = new SyntheticTextStore(MockTests.Apple.mixed);
 
         assert.equal(mock.getText(), MockTests.Apple.mixed);
-        assert.equal(mock.getDeadkeyCaret(), 5);
+        assert.equal(mock.getCaret(), 5);
       });
 
       it('copies an existing TextStore without a text selection', function() {

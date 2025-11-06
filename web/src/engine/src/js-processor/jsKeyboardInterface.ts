@@ -364,7 +364,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
         cache = { valContext: [], deadContext: []};
         while(cache.valContext.length < n) {
           // As adapted from `deadkeyMatch`.
-          const sp = textStore.getDeadkeyCaret();
+          const sp = textStore.getCaret();
           const deadPos = sp - index;
           if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p > deadPos) {
             // We have deadkeys at the right-hand side of the caret!  They don't belong in the context, so pop 'em off.

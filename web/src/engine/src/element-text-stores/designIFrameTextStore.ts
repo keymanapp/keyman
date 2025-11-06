@@ -125,7 +125,7 @@ export class DesignIFrameElementTextStore extends AbstractElementTextStore<{}> {
     }
   }
 
-  getDeadkeyCaret(): number {
+  getCaret(): number {
     return KMWString.length(this.getTextBeforeCaret());
   }
 

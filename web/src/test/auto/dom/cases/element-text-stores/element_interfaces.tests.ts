@@ -339,7 +339,7 @@ class MockTestHelper implements TestHelper {
 
   // Implemented for completeness and generality with other tests.
   getCaret(pair: ElementPair<any>) {
-    return pair.wrapper.getDeadkeyCaret();
+    return pair.wrapper.getCaret();
   }
 
   setSelectionRange(pair: ElementPair<any>, start: number, end: number) {
@@ -962,7 +962,7 @@ class InterfaceTests {
       pair.wrapper.deadkeys().deleteMatched();
       assert.equal(pair.wrapper.deadkeys().count(), 2, "Failed to delete 'matched' deadkey");
 
-      // Failure here likely reflects incorrect logic in .getDeadkeyCaret()!
+      // Failure here likely reflects incorrect logic in .getCaret()!
       assert.isTrue(pair.wrapper.deadkeys().isMatch(4, 0, 3), "Failed to correctly note position of deadkey after an SMP character!");
       pair.wrapper.deadkeys().resetMatched();
 
