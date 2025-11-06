@@ -22,10 +22,10 @@
       "types": "./build/engine/dom-utils/obj/index.d.ts",
       "import": "./build/engine/dom-utils/obj/index.js"
     },
-    "./engine/element-wrappers": {
-      "es6-bundling": "./src/engine/element-wrappers/src/index.ts",
-      "types": "./build/engine/element-wrappers/obj/index.d.ts",
-      "import": "./build/engine/element-wrappers/obj/index.js"
+    "./engine/element-text-stores": {
+      "es6-bundling": "./src/engine/element-text-stores/src/index.ts",
+      "types": "./build/engine/element-text-stores/obj/index.d.ts",
+      "import": "./build/engine/element-text-stores/obj/index.js"
     },
     "./engine/events": {
       "es6-bundling": "./src/engine/events/src/index.ts",

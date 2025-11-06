@@ -1,23 +1,12 @@
-import { nestedInstanceOf } from "keyman/engine/element-wrappers";
+import { nestedInstanceOf } from "keyman/engine/element-text-stores";
 
 /**
  * Given a DOM event related to an KMW-attached element, this function determines
- * the corresponding OutputTargetInterface.
+ * the corresponding TextStore.
  * @param e
  * @returns
  */
-export function eventOutputTarget(e: Event) {
-  const Ltarg: HTMLElement = e?.target as HTMLElement;
-  return outputTargetForElement(Ltarg);
-}
-
-/**
- * Given a DOM event related to an KMW-attached element, this function determines
- * the corresponding OutputTargetInterface.
- * @param e
- * @returns
- */
-export function outputTargetForElement(Ltarg: HTMLElement) {
+export function textStoreForElement(Ltarg: HTMLElement) {
   if (Ltarg == null) {
     return null;
   }
@@ -42,7 +31,7 @@ export function outputTargetForElement(Ltarg: HTMLElement) {
     }
   }
 
-  // Step 2:  With the most likely host element determined, obtain the corresponding OutputTargetInterface
+  // Step 2:  With the most likely host element determined, obtain the corresponding TextStore
   // instance.
-  return Ltarg._kmwAttachment?.interface;
+  return Ltarg._kmwAttachment?.textStore;
 }

@@ -23,6 +23,8 @@ export { default as TimeoutPromise, timedPromise } from "./timeoutPromise.js";
 
 export { default as PriorityQueue, QueueComparator } from "./priority-queue.js"
 
+export { isEmptyTransform } from './isEmptyTransform.js';
+
 // // Uncomment the following line and run the bundled output to verify successful
 // // esbuild bundling of this submodule:
 // console.log(Version.CURRENT.toString());

@@ -117,7 +117,7 @@ graph TD;
 
     subgraph ClassicWeb["`**ClassicWeb**
     Intermediate-level engine modules`"]
-        Elements["/web/src/engine/element-wrappers"];
+        Elements["/web/src/engine/element-text-stores"];
         Elements-->JSProc;
         KeyboardStorage["/web/src/engine/keyboard-storage"];
         KeyboardStorage-->Interfaces;

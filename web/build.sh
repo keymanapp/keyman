@@ -22,28 +22,28 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "build" \
   "start                     Starts the test server" \
   "test" \
-  "coverage                  Create an HTML page with code coverage" \
-  ":app/browser              The form of Keyman Engine for Web for use on websites" \
-  ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
-  ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
-  ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
-  ":engine/core-processor    Keyman Core WASM integration" \
-  ":engine/common/web-utils  Low-level, headless utility methods and classes used across multiple modules" \
-  ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
-  ":engine/events            Specialized classes utilized to support KMW API events" \
-  ":engine/element-wrappers  Subset used to integrate with website elements" \
-  ":engine/interfaces        Subset used to configure KMW" \
-  ":engine/js-processor      Build JS processor for KMW" \
-  ":engine/keyboard          Builds KMW's keyboard-loading and caching code" \
-  ":engine/keyboard-storage  Subset used to collate keyboards and request them from the cloud" \
-  ":engine/main              Builds all common code used by KMW's app/-level targets" \
-  ":engine/osk               Builds the Web OSK module" \
-  ":engine/predictive-text   Builds KMW's predictive text module" \
-  ":help                     Online documentation" \
-  ":samples                  Builds all needed resources for the KMW sample-page set" \
-  ":tools                    Builds engine-related development resources" \
-  ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
-  ":_all                     (Meta build target used when targets are not specified)"
+  "coverage                     Create an HTML page with code coverage" \
+  ":app/browser                 The form of Keyman Engine for Web for use on websites" \
+  ":app/webview                 A puppetable version of KMW designed for use in a host app's WebView" \
+  ":app/ui                      Builds KMW's desktop form-factor keyboard-selection UI modules" \
+  ":engine/attachment           Subset used for detecting valid page contexts for use in text editing " \
+  ":engine/core-processor       Keyman Core WASM integration" \
+  ":engine/common/web-utils     Low-level, headless utility methods and classes used across multiple modules" \
+  ":engine/dom-utils            A common subset of function used for DOM calculations, layout, etc" \
+  ":engine/events               Specialized classes utilized to support KMW API events" \
+  ":engine/element-text-stores  Subset used to integrate with website elements" \
+  ":engine/interfaces           Subset used to configure KMW" \
+  ":engine/js-processor         Build JS processor for KMW" \
+  ":engine/keyboard             Builds KMW's keyboard-loading and caching code" \
+  ":engine/keyboard-storage     Subset used to collate keyboards and request them from the cloud" \
+  ":engine/main                 Builds all common code used by KMW's app/-level targets" \
+  ":engine/osk                  Builds the Web OSK module" \
+  ":engine/predictive-text      Builds KMW's predictive text module" \
+  ":help                        Online documentation" \
+  ":samples                     Builds all needed resources for the KMW sample-page set" \
+  ":tools                       Builds engine-related development resources" \
+  ":test-pages=src/test/manual  Builds resources needed for the KMW manual testing pages" \
+  ":_all                        (Meta build target used when targets are not specified)"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -56,27 +56,27 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  configure                     "/node_modules" \
-  build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.tests.html" \
-  build:app/browser             "/web/build/app/browser/lib/index.mjs" \
-  build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
-  build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
-  build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
-  build:engine/core-processor   "/web/build/engine/core-processor/lib/index.mjs" \
-  build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
-  build:engine/events           "/web/build/engine/events/lib/index.mjs" \
-  build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
-  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
-  build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
-  build:engine/keyboard         "/web/build/engine/keyboard/lib/index.mjs" \
-  build:engine/keyboard-storage "/web/build/engine/keyboard-storage/lib/index.mjs" \
-  build:engine/main             "/web/build/engine/main/lib/index.mjs" \
-  build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
-  build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
-  build:engine/common/web-utils "/web/src/engine/common/web-utils/build/lib/index.mjs" \
-  build:samples                 "/web/src/samples/simplest/keymanweb.js" \
-  build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
-  build:test-pages              "/web/build/test-resources/sentry-manager.js"
+  configure                        "/node_modules" \
+  build                            "/web/build/test/dom/cases/attachment/textStoreForElement.tests.html" \
+  build:app/browser                "/web/build/app/browser/lib/index.mjs" \
+  build:app/webview                "/web/build/app/webview/${config}/keymanweb-webview.js" \
+  build:app/ui                     "/web/build/app/ui/${config}/kmwuitoggle.js" \
+  build:engine/attachment          "/web/build/engine/attachment/lib/index.mjs" \
+  build:engine/core-processor      "/web/build/engine/core-processor/lib/index.mjs" \
+  build:engine/dom-utils           "/web/build/engine/dom-utils/obj/index.js" \
+  build:engine/events              "/web/build/engine/events/lib/index.mjs" \
+  build:engine/element-text-stores "/web/build/engine/element-text-stores/lib/index.mjs" \
+  build:engine/interfaces          "/web/build/engine/interfaces/lib/index.mjs" \
+  build:engine/js-processor        "/web/build/engine/js-processor/lib/index.mjs" \
+  build:engine/keyboard            "/web/build/engine/keyboard/lib/index.mjs" \
+  build:engine/keyboard-storage    "/web/build/engine/keyboard-storage/lib/index.mjs" \
+  build:engine/main                "/web/build/engine/main/lib/index.mjs" \
+  build:engine/osk                 "/web/build/engine/osk/lib/index.mjs" \
+  build:engine/predictive-text     "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
+  build:engine/common/web-utils    "/web/src/engine/common/web-utils/build/lib/index.mjs" \
+  build:samples                    "/web/src/samples/simplest/keymanweb.js" \
+  build:tools                      "/web/build/tools/building/sourcemap-root/index.js" \
+  build:test-pages                 "/web/build/test-resources/sentry-manager.js"
 
 BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 
@@ -136,7 +136,7 @@ build_action() {
     precompile "${dir}"
   done
 
-  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.tests.html" \
+  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/textStoreForElement.tests.html" \
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 
@@ -169,14 +169,14 @@ builder_run_child_actions build:engine/dom-utils
 
 builder_run_child_actions build:engine/keyboard
 builder_run_child_actions build:engine/js-processor
-builder_run_child_actions build:engine/element-wrappers
+builder_run_child_actions build:engine/element-text-stores
 builder_run_child_actions build:engine/events
 builder_run_child_actions build:engine/interfaces
 
 # Uses engine/dom-utils and engine/interfaces
 builder_run_child_actions build:engine/osk
 
-# Uses engine/element-wrappers
+# Uses engine/element-text-stores
 builder_run_child_actions build:engine/attachment
 
 # Uses engine/interfaces (due to resource-path config interface)
@@ -191,7 +191,7 @@ builder_run_child_actions build:engine/core-processor
 # Uses engine/interfaces, engine/keyboard-storage, & engine/osk
 builder_run_child_actions build:engine/main
 
-# Uses all but engine/element-wrappers and engine/attachment
+# Uses all but engine/element-text-stores and engine/attachment
 builder_run_child_actions build:app/webview
 
 # Uses literally everything `engine/` above

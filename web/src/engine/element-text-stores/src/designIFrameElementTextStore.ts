@@ -1,4 +1,4 @@
-import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
+import { AbstractElementTextStore } from './abstractElementTextStore.js';
 import { KMWString } from '@keymanapp/web-utils';
 
 class SelectionCaret {
@@ -32,7 +32,7 @@ class StyleCommand {
   }
 }
 
-export class DesignIFrame extends OutputTargetElementWrapper<{}> {
+export class DesignIFrameElementTextStore extends AbstractElementTextStore<{}> {
   root: HTMLIFrameElement;
   doc: Document;
   docRoot: HTMLElement;

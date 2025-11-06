@@ -6,14 +6,14 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-SUBPROJECT_NAME=engine/element-wrappers
+SUBPROJECT_NAME=engine/element-text-stores
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # ################################ Main script ################################
 
-builder_describe "Builds DOM-based OutputTarget subclasses used by the Keyman Engine for Web (KMW)." \
+builder_describe "Builds DOM-based TextStore subclasses used by the Keyman Engine for Web (KMW)." \
   "@/web/src/engine/js-processor" \
   "clean" \
   "configure" \

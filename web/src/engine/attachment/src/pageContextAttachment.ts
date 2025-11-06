@@ -1,7 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 
 import { DeviceSpec, InternalKeyboardFont } from "keyman/engine/keyboard";
-import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
+import { InputElementTextStore, nestedInstanceOf, createTextStoreForElement } from "keyman/engine/element-text-stores";
 import {
   arrayFromNodeList,
   createStyleSheet,
@@ -201,14 +201,14 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       // The elements in the contained document get separately wrapped, so this doesn't need a proper wrapper.
       //
       // Its attachment process might need some work.
-      const eleInterface = wrapElement(x);
+      const textStore = createTextStoreForElement(x);
 
       // May should filter better for IFrames.
-      if(!(eleInterface || nestedInstanceOf(x, "HTMLIFrameElement"))) {
+      if(!(textStore || nestedInstanceOf(x, "HTMLIFrameElement"))) {
         console.warn("Could not create processing interface for newly-attached element!");
       }
 
-      x._kmwAttachment = new AttachmentInfo(eleInterface, null, this.device.touchable);
+      x._kmwAttachment = new AttachmentInfo(textStore, null);
     }
   }
 
@@ -236,7 +236,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     if(x instanceof x.ownerDocument.defaultView.HTMLTextAreaElement) {
       return true;
     } else if(x instanceof x.ownerDocument.defaultView.HTMLInputElement) {
-      if (Input.isSupportedType(x.type)) {
+      if (InputElementTextStore.isSupportedType(x.type)) {
         return true;
       }
     } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement) {
@@ -734,7 +734,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     const t2=document.getElementsByTagName('textarea');
 
     for(let i=0; i<t1.length; i++) {
-      if (Input.isSupportedType(t1[i].type) && t1[i].className.indexOf('kmw-disabled') < 0) {
+      if (InputElementTextStore.isSupportedType(t1[i].type) && t1[i].className.indexOf('kmw-disabled') < 0) {
         eList.push({ip:t1[i], x: getAbsoluteX(t1[i]), y: getAbsoluteY(t1[i])});
       }
     }

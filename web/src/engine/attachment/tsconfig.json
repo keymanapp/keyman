@@ -12,6 +12,6 @@
 
   "references": [
     { "path": "../dom-utils" },
-    { "path": "../element-wrappers" }
+    { "path": "../element-text-stores" }
   ]
 }

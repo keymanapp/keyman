@@ -1,23 +1,15 @@
 import { KMWString } from "@keymanapp/web-utils";
-import { Alternate, OutputTargetInterface, TextTransform, Transcription } from 'keyman/engine/keyboard';
+import { Alternate, TextTransform } from "./keyboards/textTransform.js";
+import { Transcription } from "./keyboards/transcription.js";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
-import { Mock } from "./mock.js";
+import { SyntheticTextStore } from "./syntheticTextStore.js";
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-// Also relies on string-extensions provided by the web-utils package.
-
-export function isEmptyTransform(transform: LexicalModelTypes.Transform) {
-  if(!transform) {
-    return true;
-  }
-  return transform.insert === '' && transform.deleteLeft === 0 && (transform.deleteRight ?? 0) === 0;
-}
-
-export abstract class OutputTargetBase implements OutputTargetInterface {
+export abstract class TextStore {
   private _dks: DeadkeyTracker;
 
   constructor() {
@@ -25,7 +17,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
   }
 
   /**
-   * Signifies that this OutputTarget has no default key processing behaviors.  This should be false
+   * Signifies that this TextStore has no default key processing behaviors.  This should be false
    * for OutputTargets backed by web elements like HTMLInputElement or HTMLTextAreaElement.
    */
   get isSynthetic(): boolean {
@@ -60,7 +52,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
   }
 
   /**
-   * Needed to properly clone deadkeys for use with Mock element interfaces toward predictive text purposes.
+   * Needed to properly clone deadkeys for use with SyntheticTextStore element interfaces toward predictive text purposes.
    * @param {object}  dks   An existing set of deadkeys to deep-copy for use by this element interface.
    */
   protected setDeadkeys(dks: DeadkeyTracker) {
@@ -68,14 +60,14 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
   }
 
   /**
-   * Determines the basic operations needed to reconstruct the current OutputTarget's text from the prior state specified
-   * by another OutputTarget based on their text and caret positions.
+   * Determines the basic operations needed to reconstruct the current TextStore's text from the prior state specified
+   * by another TextStore based on their text and caret positions.
    *
    * This is designed for use as a "before and after" comparison to determine the effect of a single keyboard rule at a time.
    * As such, it assumes that the caret is immediately after any inserted text.
-   * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
+   * @param from An output target (preferably a SyntheticTextStore) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: OutputTargetInterface): TextTransform {
+  buildTransformFrom(original: TextStore): TextTransform {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
@@ -96,19 +88,19 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
     return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
-  buildTranscriptionFrom(original: OutputTargetInterface, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
+  buildTranscriptionFrom(original: TextStore, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
     const transform = this.buildTransformFrom(original);
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.
 
-    return new Transcription(keyEvent, transform, Mock.from(original, readonly), alternates);
+    return new Transcription(keyEvent, transform, SyntheticTextStore.from(original, readonly), alternates);
   }
 
   /**
-   * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
-   * @param original An `OutputTarget` (usually a `Mock`).
+   * Restores the `TextStore` to the indicated state.  Designed for use with `Transcription.preInput`.
+   * @param original An `TextStore` (usually a `SyntheticTextStore`).
    */
-  restoreTo(original: OutputTargetBase) {
+  restoreTo(original: TextStore) {
     this.clearSelection();
     // We currently do not restore selected text; the mechanism isn't supported at present for
     // all output target types - especially in regard to re-selecting the text if restored.
@@ -148,7 +140,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
 
   /**
    * Helper to `restoreTo` - allows directly setting the 'before' context to that of another
-   * `OutputTarget`.
+   * `TextStore`.
    * @param s
    */
   protected setTextBeforeCaret(s: string): void {
@@ -159,7 +151,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
 
   /**
    * Helper to `restoreTo` - allows directly setting the 'after' context to that of another
-   * `OutputTarget`.
+   * `TextStore`.
    * @param s
    */
   protected abstract setTextAfterCaret(s: string): void;

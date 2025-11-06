@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, JSKeyboardProcessor, Mock } from 'keyman/engine/js-processor';
+import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
@@ -61,7 +61,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new Mock();
+      var target = new SyntheticTextStore();
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
@@ -882,7 +882,7 @@ var NUL_TEST_2 = {
 /* Keyman language equivalent:
  *
  * nul nul any(abc) context(3) > 'success'
- * 
+ *
  * This one may... "stretch" what's actually allowed by Keyman language rules,
  * but we wish to ensure that the actual context management is capable of
  * handling this.
@@ -925,7 +925,7 @@ var NUL_TEST_3 = {
 /* Keyman language equivalent:
  *
  * nul nul dk(1) any(abc) > 'success'
- * 
+ *
  * This may also "stretch" what's actually allowed by Keyman language rules,
  * but we wish to ensure that the actual context management is capable of
  * handling this.
@@ -1118,7 +1118,7 @@ describe('Engine - Context Matching', function() {
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
       // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new Mock();
+      var target = new SyntheticTextStore();
       ruleSeq.test(proctor, target);
 
       // Now for the real test!

@@ -1,6 +1,6 @@
 import { Codes } from "../codes.js";
 import { KeyEvent, KeyEventSpec } from "../keyEvent.js";
-import KeyMapping from "../keyMapping.js";
+import { KeyMapping } from "../keyMapping.js";
 import { ButtonClasses, Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import { type JSKeyboard } from "./jsKeyboard.js";

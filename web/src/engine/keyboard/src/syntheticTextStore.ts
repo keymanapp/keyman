@@ -1,8 +1,7 @@
-import { OutputTargetInterface } from 'keyman/engine/keyboard';
-import { OutputTargetBase } from './outputTargetBase.js';
+import { TextStore } from './textStore.js';
 import { KMWString } from '@keymanapp/web-utils';
 
-export class Mock extends OutputTargetBase {
+export class SyntheticTextStore extends TextStore {
   text: string;
 
   selStart: number;
@@ -26,46 +25,46 @@ export class Mock extends OutputTargetBase {
     this.selForward = this.selEnd >= this.selStart;
   }
 
-  static assertIsOutputTargetBase(outputTarget: OutputTargetInterface): asserts outputTarget is OutputTargetBase {
-    if (!(outputTarget instanceof OutputTargetBase)) {
-      throw new TypeError("outputTarget is not a OutputTargetBase");
+  static assertIsOutputTargetBase(textStore: TextStore): asserts textStore is TextStore {
+    if (!(textStore instanceof TextStore)) {
+      throw new TypeError("textStore is not a TextStore");
     }
   }
 
-  // Clones the state of an existing EditableElement, creating a Mock version of its state.
-  static from(outputTarget: OutputTargetInterface, readonly?: boolean): Mock {
-    let clone: Mock;
+  // Clones the state of an existing EditableElement, creating a SyntheticTextStore version of its state.
+  static from(textStore: TextStore, readonly?: boolean): SyntheticTextStore {
+    let clone: SyntheticTextStore;
 
-    this.assertIsOutputTargetBase(outputTarget);
+    this.assertIsOutputTargetBase(textStore);
 
-    if (outputTarget instanceof Mock) {
+    if (textStore instanceof SyntheticTextStore) {
       // Avoids the need to run expensive kmwstring.ts `length()`
-      // calculations when deep-copying Mock instances.
-      const priorMock = outputTarget as Mock;
-      clone = new Mock(priorMock.text, priorMock.selStart, priorMock.selEnd);
+      // calculations when deep-copying SyntheticTextStore instances.
+      const priorMock = textStore as SyntheticTextStore;
+      clone = new SyntheticTextStore(priorMock.text, priorMock.selStart, priorMock.selEnd);
     } else {
-      const text = outputTarget.getText();
+      const text = textStore.getText();
       const textLen = KMWString.length(text);
 
       // If !hasSelection()
       let selectionStart: number = textLen;
       let selectionEnd: number = 0;
 
-      if (outputTarget.hasSelection()) {
-        const beforeText = outputTarget.getTextBeforeCaret();
-        const afterText = outputTarget.getTextAfterCaret();
+      if (textStore.hasSelection()) {
+        const beforeText = textStore.getTextBeforeCaret();
+        const afterText = textStore.getTextAfterCaret();
         selectionStart = KMWString.length(beforeText);
         selectionEnd = textLen - KMWString.length(afterText);
       }
 
-      // readonly group or not, the returned Mock remains the same.
+      // readonly group or not, the returned SyntheticTextStore remains the same.
       // New-context events should act as if the caret were at the earlier-in-context
       // side of the selection, same as standard keyboard rules.
-      clone = new Mock(text, selectionStart, selectionEnd);
+      clone = new SyntheticTextStore(text, selectionStart, selectionEnd);
     }
 
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
-    clone.setDeadkeys((outputTarget as OutputTargetBase).deadkeys());
+    clone.setDeadkeys(textStore.deadkeys());
 
     return clone;
   }
@@ -148,11 +147,11 @@ export class Mock extends OutputTargetBase {
   }
 
   /**
-   * Indicates if this Mock represents an identical context to that of another Mock.
+   * Indicates if this SyntheticTextStore represents an identical context to that of another SyntheticTextStore.
    * @param other
    * @returns
    */
-  isEqual(other: Mock) {
+  isEqual(other: SyntheticTextStore) {
     return this.text == other.text
       && this.selStart == other.selStart
       && this.selEnd == other.selEnd
@@ -160,6 +159,6 @@ export class Mock extends OutputTargetBase {
   }
 
   doInputEvent() {
-    // Mock isn't backed by an element, so it won't have any event listeners.
+    // SyntheticTextStore isn't backed by an element, so it won't have any event listeners.
   }
 }

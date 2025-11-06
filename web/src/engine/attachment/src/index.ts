@@ -5,11 +5,12 @@ export { AttachmentInfo } from './attachmentInfo.js';
  * to match that of the actual objects within the browser when bundled, the
  * **same bundle** must contain reference points for those classes' definitions.
  */
-export { eventOutputTarget, outputTargetForElement } from './outputTargetForElement.js';
+export { textStoreForElement } from './textStoreForElement.js';
+export { textStoreForEvent } from './textStoreForEvent.js';
 export { PageContextAttachment, PageAttachmentOptions } from './pageContextAttachment.js';
 
 /*
- * Following from the prior "Note:", we republish `engine/element-wrappers` here -
+ * Following from the prior "Note:", we republish `engine/element-text-stores` here -
  * this matters quite strongly for certain unit tests.
  */
-export * from 'keyman/engine/element-wrappers';
+export * from 'keyman/engine/element-text-stores';

@@ -1,4 +1,4 @@
-import { type OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { type AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 import { FloatingOSKView } from 'keyman/engine/osk';
 import { KeyboardInterfaceBase } from 'keyman/engine/main';
 
@@ -29,7 +29,7 @@ export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
   /**
    * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
    */
-  getLastActiveElement(): OutputTargetElementWrapper<any> {
+  getLastActiveElement(): AbstractElementTextStore<any> {
     return this.engine.contextManager.lastActiveTarget;
   }
 

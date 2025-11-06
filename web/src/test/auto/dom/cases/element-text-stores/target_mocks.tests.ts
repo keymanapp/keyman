@@ -1,8 +1,7 @@
 import { assert } from 'chai';
 
-import { KMWString } from 'keyman/engine/keyboard';
-import { Mock } from 'keyman/engine/js-processor';
-import { Input } from 'keyman/engine/element-wrappers';
+import { KMWString, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { InputElementTextStore } from 'keyman/engine/element-text-stores';
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
@@ -11,7 +10,7 @@ document.body.appendChild(host);
 
 const u = (code: number) => String.fromCodePoint(code);
 
-// Define common interface testing functions that can be run upon the OutputTarget interface.
+// Define common interface testing functions that can be run upon the TextStore interface.
 class MockTests {
   public static Apple = {
     normal: 'apple',
@@ -25,11 +24,11 @@ class MockTests {
     { d: 0, p: 3 }   // After the normal 'p' character of Apple.mixed.
   ];
 
-  //#region Defines helpers related to HTMLInputElement / Input test setup.
+  //#region Defines helpers related to HTMLInputElement / InputElementTextStore test setup.
   public static initBase() {
     const elem = document.createElement('input');
     host.appendChild(elem);
-    const wrapper = new Input(elem);
+    const wrapper = new InputElementTextStore(elem);
 
     return wrapper;
   }
@@ -63,7 +62,7 @@ class MockTests {
   //#endregion
 }
 
-describe('OutputTarget Mocking', function() {
+describe('SyntheticTextStore', function() {
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(function() {
@@ -79,27 +78,27 @@ describe('OutputTarget Mocking', function() {
     KMWString.enableSupplementaryPlane(false);
   })
 
-  describe('The "Mock" output target', function() {
+  describe('The "SyntheticTextStore" output target', function() {
     describe('Initialization', function() {
       it('properly initializes from a raw string', function() {
-        const mock = new Mock(MockTests.Apple.mixed);
+        const mock = new SyntheticTextStore(MockTests.Apple.mixed);
 
         assert.equal(mock.getText(), MockTests.Apple.mixed);
         assert.equal(mock.getDeadkeyCaret(), 5);
       });
 
-      it('copies an existing OutputTarget without a text selection', function() {
+      it('copies an existing TextStore without a text selection', function() {
         const base = MockTests.setupBase(4);
 
-        const mock = Mock.from(base);
+        const mock = SyntheticTextStore.from(base);
         assert.equal(mock.getText(), MockTests.Apple.mixed);
         assert.deepEqual(mock.deadkeys(), base.deadkeys());
       });
 
-      it('copies an existing OutputTarget with a text selection', function() {
+      it('copies an existing TextStore with a text selection', function() {
         const base = MockTests.setupBase(4, 5);
 
-        const mock = Mock.from(base);
+        const mock = SyntheticTextStore.from(base);
         // The selection should appear to be automatically deleted, as any text mutation
         // by KMW would automatically erase the text anyway.
         assert.equal(mock.getTextBeforeCaret(), MockTests.Apple.mixed.substr(0, 5));
@@ -115,7 +114,7 @@ describe('OutputTarget Mocking', function() {
       it('is not affected by mutation of the source element', function() {
         // Already-verified code
         const base = MockTests.setupBase(4);
-        const mock = Mock.from(base);
+        const mock = SyntheticTextStore.from(base);
         const baseInitDks = base.deadkeys().clone();
 
         // Now for the actual test.
@@ -125,7 +124,7 @@ describe('OutputTarget Mocking', function() {
         base.deadkeys().deleteMatched();
         base.deleteCharsBeforeCaret(2);
 
-        assert.notDeepEqual(base.deadkeys(), baseInitDks, 'OutputTarget deadkey return is not a proper deep-copy');
+        assert.notDeepEqual(base.deadkeys(), baseInitDks, 'TextStore deadkey return is not a proper deep-copy');
 
         assert.equal(mock.getText(), MockTests.Apple.mixed);
         assert.deepEqual(mock.deadkeys(), baseInitDks);
@@ -134,7 +133,7 @@ describe('OutputTarget Mocking', function() {
       it('does not affect the source element when mutated', function() {
         // Already-verified code
         const base = MockTests.setupBase(4);
-        const mock = Mock.from(base);
+        const mock = SyntheticTextStore.from(base);
         const baseInitDks = base.deadkeys().clone();
 
         // Now for the actual test.
