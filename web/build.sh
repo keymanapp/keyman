@@ -112,7 +112,7 @@ build_action() {
     precompile "${dir}"
   done
 
-  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.tests.html" \
+  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/textStoreForElement.tests.html" \
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 

@@ -4,7 +4,7 @@
 
 import { type DeviceSpec } from "keyman/common/web-utils";
 
-import { type OutputTargetInterface } from "keyman/engine/keyboard";
+import { type TextStore } from "keyman/engine/keyboard";
 
 import { type KeymanEngine } from 'keyman/app/browser';
 
@@ -81,7 +81,7 @@ export class BrowserProctor extends Proctor {
 
   // Execution of a test sequence depends on the testing environment; this handles
   // the browser-specific aspects.
-  async simulateSequence(sequence: TestSequence<any>, outputTarget?: OutputTargetInterface): Promise<string> {
+  async simulateSequence(sequence: TestSequence<any>, textStore?: TextStore): Promise<string> {
     const driver = new BrowserDriver(this.target);
 
     // For the version 10.0 spec

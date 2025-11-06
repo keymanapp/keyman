@@ -1,5 +1,5 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { Mock } from "keyman/engine/js-processor";
+import { SyntheticTextStore } from "keyman/engine/keyboard";
 import { KMWString } from 'keyman/common/web-utils';
 
 export default class ContextWindow implements LexicalModelTypes.Context {
@@ -18,7 +18,7 @@ export default class ContextWindow implements LexicalModelTypes.Context {
 
   casingForm?: LexicalModelTypes.CasingForm;
 
-  constructor(mock: Mock, config: LexicalModelTypes.Configuration, layerId: string) {
+  constructor(mock: SyntheticTextStore, config: LexicalModelTypes.Configuration, layerId: string) {
     this.left = mock.getTextBeforeCaret();
     this.startOfBuffer = KMWString.length(this.left) <= config.leftContextCodePoints;
     if(!this.startOfBuffer) {
@@ -38,9 +38,9 @@ export default class ContextWindow implements LexicalModelTypes.Context {
       null;
   }
 
-  public toMock(): Mock {
+  public toMock(): SyntheticTextStore {
     const caretPos = KMWString.length(this.left);
 
-    return new Mock(this.left + (this.right || ""), caretPos);
+    return new SyntheticTextStore(this.left + (this.right || ""), caretPos);
   }
 }

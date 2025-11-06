@@ -54,7 +54,7 @@ class LanguageKeyMaps {
   }
 }
 
-export default class KeyMapping {
+export class KeyMapping {
   static readonly browserMap: BrowserKeyMaps = new BrowserKeyMaps();
   static readonly languageMap: LanguageKeyMaps = new LanguageKeyMaps();
 

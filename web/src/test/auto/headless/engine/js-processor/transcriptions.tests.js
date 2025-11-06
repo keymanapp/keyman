@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/js-processor';
+import { SyntheticTextStore, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
 import { KMWString } from 'keyman/common/web-utils';
 
 // A unicode-coding like alias for use in constructing non-BMP strings.
@@ -157,8 +157,8 @@ describe("Transcriptions and Transforms", function() {
   it("does not store an alias for related OutputTargets", function() {
     // We have other texts validating Mocks; by using them as our base 'element', this unit test file
     // could eventually run in 'headless' mode.
-    var target = new Mock("apple");
-    var original = Mock.from(target);
+    var target = new SyntheticTextStore("apple");
+    var original = SyntheticTextStore.from(target);
     target.insertTextBeforeCaret("s");
 
     /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
@@ -174,8 +174,8 @@ describe("Transcriptions and Transforms", function() {
     it("handles context-free single-char output rules", function() {
       // We have other texts validating Mocks; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
-      var target = new Mock("apple");
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("apple");
+      var original = SyntheticTextStore.from(target);
       target.insertTextBeforeCaret("s");
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
@@ -187,8 +187,8 @@ describe("Transcriptions and Transforms", function() {
       assert.equal(transcription.transform.deleteLeft, 0, "Incorrectly detected left-of-caret deletions");
       assert.equal(transcription.transform.deleteRight, 0, "Incorrectly detected right-of-caret deletions");
 
-      target = new Mock("apple", 3);
-      original = Mock.from(target);
+      target = new SyntheticTextStore("apple", 3);
+      original = SyntheticTextStore.from(target);
       target.insertTextBeforeCaret("s"); // "appsle"
 
       var transcription = target.buildTranscriptionFrom(original, null);
@@ -199,8 +199,8 @@ describe("Transcriptions and Transforms", function() {
     });
 
     it("handles operations with moderately long text", function() {
-      var target = new Mock("The quick brown cat jumped onto the lazy dog.", 19);
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("The quick brown cat jumped onto the lazy dog.", 19);
+      var original = SyntheticTextStore.from(target);
       target.setSelection(30); // 19 + 11:  moves it to after "onto".
       target.deleteCharsBeforeCaret(14); // delete:  "cat jumped onto"
       target.insertTextBeforeCaret("fox jumped over");
@@ -228,8 +228,8 @@ he did. Unfortunately, he taught his apprentice everything he knew, then his
 apprentice killed him in his sleep. It's ironic he could save others from death,
 but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
-      var target = new Mock(text, text.length);
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore(text, text.length);
+      var original = SyntheticTextStore.from(target);
       target.deleteCharsBeforeCaret(1);
       target.insertTextBeforeCaret("!");
 
@@ -244,8 +244,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     });
 
     it("handles deletions around the caret without text insertion", function() {
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("apple", 2);
+      var original = SyntheticTextStore.from(target);
       target.setSelection(3);
       target.deleteCharsBeforeCaret(2); // "ale"
 
@@ -262,8 +262,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     it("handles deletions around the caret without text insertion (non-BMP text)", function() {
       try {
         KMWString.enableSupplementaryPlane(true);
-        var target = new Mock(smpApple, 2);
-        var original = Mock.from(target);
+        var target = new SyntheticTextStore(smpApple, 2);
+        var original = SyntheticTextStore.from(target);
         target.setSelection(3);
         target.deleteCharsBeforeCaret(2); // "ale"
 
@@ -283,8 +283,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     it("handles deletions around the caret with text insertion", function() {
       // We have other texts validating Mocks; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("apple", 2);
+      var original = SyntheticTextStore.from(target);
       target.setSelection(3);
       target.deleteCharsBeforeCaret(2);
       target.insertTextBeforeCaret("PP"); // "aPPle"
@@ -300,8 +300,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       // CASE 2
 
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("apple", 2);
+      var original = SyntheticTextStore.from(target);
       target.setSelection(4);
       target.deleteCharsBeforeCaret(3);
       target.insertTextBeforeCaret("P"); // "aPe"
@@ -317,8 +317,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       // CASE 3
 
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("apple", 2);
+      var original = SyntheticTextStore.from(target);
       target.setSelection(4);
       target.deleteCharsBeforeCaret(3);
       target.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
@@ -334,8 +334,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       // CASE 4
 
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("apple", 2);
+      var original = SyntheticTextStore.from(target);
       target.setSelection(5);
       target.deleteCharsBeforeCaret(4);
       target.insertTextBeforeCaret("les"); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
@@ -357,9 +357,9 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         // We have other texts validating Mocks; by using them as our base 'element', this unit test file
         // could eventually run in 'headless' mode.
-        var target = new Mock(smpApple, 2);
+        var target = new SyntheticTextStore(smpApple, 2);
         let smpLE = u(0x1d5c5)+u(0x1d5be);
-        var original = Mock.from(target);
+        var original = SyntheticTextStore.from(target);
         target.setSelection(3);
         target.deleteCharsBeforeCaret(2);
         target.insertTextBeforeCaret(smpLE); // "alele"
@@ -377,9 +377,9 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         // CASE 2
 
-        var target = new Mock(smpApple, 2);
+        var target = new SyntheticTextStore(smpApple, 2);
         let smpB = u(0x1d5bb);
-        var original = Mock.from(target);
+        var original = SyntheticTextStore.from(target);
         target.setSelection(4);
         target.deleteCharsBeforeCaret(3);
         target.insertTextBeforeCaret(smpB); // "aPe"
@@ -395,8 +395,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         // CASE 3
 
-        var target = new Mock(smpApple, 2);
-        var original = Mock.from(target);
+        var target = new SyntheticTextStore(smpApple, 2);
+        var original = SyntheticTextStore.from(target);
         target.setSelection(4);
         target.deleteCharsBeforeCaret(3);
         target.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
@@ -412,9 +412,9 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         // CASE 4
 
-        var target = new Mock(smpApple, 2);
+        var target = new SyntheticTextStore(smpApple, 2);
         let smpLES = u(0x1d5c5)+u(0x1d5be)+u(0x1d5cb);
-        var original = Mock.from(target);
+        var original = SyntheticTextStore.from(target);
         target.setSelection(5);
         target.deleteCharsBeforeCaret(4);
         target.insertTextBeforeCaret(smpLES); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
@@ -435,9 +435,9 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
     it('from targets with existing selection', () => {
       //                              |            |
-      const target = new Mock("testing testing one two three");
+      const target = new SyntheticTextStore("testing testing one two three");
       target.setSelection(8, 20)
-      const original = Mock.from(target);
+      const original = SyntheticTextStore.from(target);
       target.clearSelection();
 
       const transform = target.buildTransformFrom(original);
@@ -451,7 +451,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
     it('to targets with existing selection', () => {
       //                              |            |
-      const target = new Mock("testing testing one two three");
+      const target = new SyntheticTextStore("testing testing one two three");
       target.setSelection(8, 20)
       const transform = {
         insert: '',
@@ -471,8 +471,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       // We have other texts validating Mocks; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
-      var target = new Mock("apple");
-      var original = Mock.from(target);
+      var target = new SyntheticTextStore("apple");
+      var original = SyntheticTextStore.from(target);
 
       target.setSelection(4);
       target.insertDeadkeyBeforeCaret(0);
@@ -481,7 +481,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       target.setSelection(2);
       target.insertDeadkeyBeforeCaret(2); // 'a' dk(1) 'p' dk(2) | 'p' 'l' dk(0) 'e'
 
-      var original = Mock.from(target);
+      var original = SyntheticTextStore.from(target);
 
       target.hasDeadkeyMatch(0, 2);
       target.deadkeys().deleteMatched();

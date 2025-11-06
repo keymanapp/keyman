@@ -1,7 +1,7 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
 import { KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
-import { OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 import {
   TwoStateActivator,
   VisualKeyboard
@@ -20,7 +20,7 @@ import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 import { whenDocumentReady } from './utils/documentReady.js';
-import { outputTargetForElement } from 'keyman/engine/attachment';
+import { textStoreForElement } from 'keyman/engine/attachment';
 
 import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
@@ -76,7 +76,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target) => {
-      const e = (target as OutputTargetElementWrapper<any>)?.getElement();
+      const e = (target as AbstractElementTextStore<any>)?.getElement();
       if(this.osk) {
         (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
       }
@@ -302,7 +302,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.interface, Pkbd, Plc);
+    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.textStore, Pkbd, Plc);
   }
   /**
    * Function     getKeyboardForControl
@@ -315,7 +315,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    */
   public getKeyboardForControl(Pelem: HTMLElement) {
-    const target = outputTargetForElement(Pelem);
+    const target = textStoreForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).id;
   }
 
@@ -329,7 +329,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *              If it is currently following the global keyboard setting, returns null instead.
    */
   getLanguageForControl(Pelem: HTMLElement) {
-    const target = outputTargetForElement(Pelem);
+    const target = textStoreForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).langId;
   }
 
@@ -570,7 +570,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    const target = outputTargetForElement(e);
+    const target = textStoreForElement(e);
     if(!target) {
       throw new Error(`KMW is not attached to the specified element (id: ${e.id}).`);
     }

@@ -5,7 +5,7 @@ import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
-import ContextManager, { ContextHost } from './contextManager.js';
+import ContextManager, { HostTextStore } from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer';
@@ -18,7 +18,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
     const config = new WebviewConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
     config.onRuleFinalization = (ruleBehavior: ProcessorAction) => {
-      (this.context as ContextHost).updateHost(ruleBehavior.transcription);
+      (this.context as HostTextStore).updateHost(ruleBehavior.transcription);
     }
 
     config.stubNamespacer = (stub) => {

@@ -8,9 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, KeyboardHarness, type OutputTargetInterface } from "keyman/engine/keyboard";
-// TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
-import { Mock, OutputTargetBase } from 'keyman/engine/js-processor';
+import { KeyEvent, KeyEventSpec, KeyboardHarness, SyntheticTextStore, TextStore } from "keyman/engine/keyboard";
 import { DeviceSpec } from "keyman/common/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
@@ -50,19 +48,19 @@ export default class NodeProctor extends Proctor {
     return true;
   }
 
-  async simulateSequence(sequence: TestSequence<any>, target?: OutputTargetInterface): Promise<string> {
-    // Start with an empty OutputTarget and a fresh KeyboardProcessor.
-    if(!target) {
-      target = new Mock();
+  async simulateSequence(sequence: TestSequence<any>, textStore?: TextStore): Promise<string> {
+    // Start with an empty TextStore and a fresh KeyboardProcessor.
+    if(!textStore) {
+      textStore = new SyntheticTextStore();
     }
 
     // Establish a fresh processor, setting its keyboard appropriately for the test.
-    let processor = new JSKeyboardProcessor(this.device);
+    const processor = new JSKeyboardProcessor(this.device);
     processor.keyboardInterface = this.keyboardWithHarness as JSKeyboardInterface;
     const keyboard = processor.activeKeyboard;
 
     if(sequence instanceof RecordedKeystrokeSequence) {
-      for(let keystroke of sequence.inputs) {
+      for(const keystroke of sequence.inputs) {
         let keyEvent: KeyEventSpec;
         if(keystroke instanceof RecordedPhysicalKeystroke) {
           // Use the keystroke's stored data to reconstruct the KeyEvent.
@@ -78,7 +76,7 @@ export default class NodeProctor extends Proctor {
             LisVirtualKey: keyboard.definesPositionalOrMnemonic // Only false for 1.0 keyboards.
           }
         } else if(keystroke instanceof RecordedSyntheticKeystroke) {
-          let key = keyboard.layout(this.device.formFactor).getLayer(keystroke.layer).getKey(keystroke.keyName);
+          const key = keyboard.layout(this.device.formFactor).getLayer(keystroke.layer).getKey(keystroke.keyName);
           keyEvent = keyboard.constructKeyEvent(key, this.device, processor.stateKeys);
         }
 
@@ -89,18 +87,17 @@ export default class NodeProctor extends Proctor {
         // We don't care too much about particularities of per-keystroke behavior yet.
         // ... we _could_ if we wanted to, though.  The framework is mostly in place;
         // it's a matter of actually adding the feature.
-        // TODO-web-core
-        const ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), (target as OutputTargetBase));
+        const ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), textStore);
 
         if (this.debugMode) {
           console.log("Processing %d:", keyEvent.Lcode);
-          console.log("target=%s", JSON.stringify(target, null, '  '));
+          console.log("target=%s", JSON.stringify(textStore, null, '  '));
           console.log("ruleBehavior=%s", JSON.stringify(ruleBehavior, null, '  '));
         }
       }
     } else {
       throw new Error("NodeProctor only supports RecordedKeystrokeSequences for testing at present.");
     }
-    return target.getText();
+    return textStore.getText();
   }
 }

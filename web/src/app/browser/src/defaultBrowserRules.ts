@@ -3,7 +3,7 @@ import {
   Codes,
   DefaultRules,
   type KeyEvent,
-  type OutputTargetInterface
+  type TextStore
 } from 'keyman/engine/keyboard';
 
 import ContextManager from './contextManager.js';
@@ -32,7 +32,7 @@ export default class DefaultBrowserRules extends DefaultRules {
   /**
    * applyCommand - used when a ProcessorAction represents a non-text "command" within the Engine.
    */
-  applyCommand(Lkc: KeyEvent, outputTarget: OutputTargetInterface): void {
+  applyCommand(Lkc: KeyEvent, textStore: TextStore): void {
     const code = this.codeForEvent(Lkc);
 
     const moveToNext = (back: boolean) => {
@@ -56,6 +56,6 @@ export default class DefaultBrowserRules extends DefaultRules {
         break;
     }
 
-    super.applyCommand(Lkc, outputTarget);
+    super.applyCommand(Lkc, textStore);
   }
 }

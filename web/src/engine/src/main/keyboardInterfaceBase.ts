@@ -112,7 +112,7 @@ export class KeyboardInterfaceBase<ContextManagerType extends ContextManagerBase
 
   insertText = (Ptext: string, PdeadKey:number): void => {
     this.resetContextCache();
-    // As this function isn't provided a handle to an active outputTarget, we rely on
+    // As this function isn't provided a handle to an active textStore, we rely on
     // the context manager to resolve said issue.
     this.engine.contextManager.insertText(this, Ptext, PdeadKey);
   }

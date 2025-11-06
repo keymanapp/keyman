@@ -22,6 +22,7 @@ BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mj
 builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/common/web/keyman-version" \
+  "@/common/web/types" \
   "@/web/src/tools/es-bundling" \
   clean configure build test
 

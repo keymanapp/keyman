@@ -25,21 +25,24 @@ export { type Alternate, TextTransform } from "./keyboards/textTransform.js";
 export { Transcription } from "./keyboards/transcription.js";
 
 export { Codes } from "./codes.js";
-export { default as DefaultRules } from "./defaultRules.js";
-export * from "./defaultRules.js";
+export { EmulationKeystrokes, LogMessages, DefaultRules } from "./defaultRules.js";
 export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";
-export { default as KeyMapping } from "./keyMapping.js";
-export { OutputTargetInterface } from "./outputTargetInterface.js";
+export { KeyMapping } from "./keyMapping.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
 export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } from "./variableStore.js";
 
 export { DOMKeyboardLoader } from './keyboards/loaders/domKeyboardLoader.js';
+export { SyntheticTextStore } from "./syntheticTextStore.js";
+export { TextStore } from "./textStore.js";
+export { TextStoreLanguageProcessorInterface } from "./textStoreLanguageProcessorInterface.js";
+export { findCommonSubstringEndIndex } from "./stringDivergence.js";
+export { Deadkey } from "./deadkeys.js";
 
 // TODO-web-core: why do we export these here?
 export * from "keyman/common/web-utils";
 
 // At the top level, there should be no default export.
 
-// Without the line below... OutputTarget would likely be aliased there, as it's
+// Without the line below... TextStore would likely be aliased there, as it's
 // the last `export { default as _ }` => `export * from` pairing seen above.
 export default undefined;

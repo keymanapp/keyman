@@ -126,7 +126,7 @@ The bulk of DOM key events trigger keystroke processing on key-down, though modi
 
 The `app/webview` version of the engine, which is designed to be used while embedded in a platform-specific host app, does not have direct access to standard hardware keystroke events, as those are handled by the host app's OS and by native code handlers run outside the host app's WebView containing the app/webview Web engine. It is the responsibility of the host app to handle hardware keystroke events and preprocess them on behalf of the Web engine, then forward them to the Web engine via JS call into the WebView.  The `PassthroughKeyboard` class within `app/webview` space provides the method `raiseKeyEvent` as an internal API for this purpose, which converts the mobile-app format for hardware keystroke into the internal `KeyEvent` format.  `raiseKeyEvent` also handles mnemonic keystroke processing and remapping.
 
-Also note that this variant does not model the user's text context with Web elements - it is entirely managed through the `Mock` type.
+Also note that this variant does not model the user's text context with Web elements - it is entirely managed through the `SyntheticTextStore` type.
 
 ### On-screen keyboard
 

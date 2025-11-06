@@ -10,7 +10,7 @@ import { type JSKeyboard } from "./keyboards/jsKeyboard.js";
 import { type DeviceSpec } from "keyman/common/web-utils";
 
 import { Codes } from './codes.js';
-import DefaultRules from "./defaultRules.js";
+import { DefaultRules } from "./defaultRules.js";
 import { ActiveKeyBase } from './keyboards/activeLayout.js';
 
 // Represents a probability distribution over a keyboard's keys.

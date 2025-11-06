@@ -15,7 +15,7 @@ import {
   timedPromise,
   ActiveKeyBase
 } from 'keyman/engine/keyboard';
-import { isEmptyTransform } from 'keyman/engine/js-processor';
+import { isEmptyTransform } from 'keyman/common/web-utils';
 
 import { buildCorrectiveLayout } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';

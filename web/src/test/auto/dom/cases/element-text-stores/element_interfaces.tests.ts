@@ -1,8 +1,7 @@
 import { assert } from 'chai';
 
-import { KMWString } from 'keyman/engine/keyboard';
-import { Mock } from 'keyman/engine/js-processor';
-import * as wrappers from 'keyman/engine/element-wrappers';
+import { KMWString, SyntheticTextStore } from 'keyman/engine/keyboard';
+import * as wrappers from 'keyman/engine/element-text-stores';
 
 import { DynamicElements } from '../../test_utils.js';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
@@ -34,12 +33,12 @@ interface TestHelper {
   setText(pair: ElementPair<any>, text: string): void;
 }
 
-//#region Defines helpers related to HTMLInputElement / Input test setup.
+//#region Defines helpers related to HTMLInputElement / InputElementTextStore test setup.
 class InputTestHelper implements TestHelper {
   setupElement(): InputElementPair {
     const id = DynamicElements.addInput();
     const elem = document.getElementById(id) as HTMLInputElement;
-    const wrapper = new wrappers.Input(elem);
+    const wrapper = new wrappers.InputElementTextStore(elem);
 
     return { elem: elem, wrapper: wrapper };
   }
@@ -80,12 +79,12 @@ class InputTestHelper implements TestHelper {
 }
 //#endregion
 
-//#region Defines helpers related to HTMLTextAreaElement / TextArea test setup.
+//#region Defines helpers related to HTMLTextAreaElement / TextAreaElementTextStore test setup.
 class TextAreaTestHelper implements TestHelper {
   setupElement(): TextElementPair {
     const id = DynamicElements.addText();
     const elem = document.getElementById(id) as HTMLTextAreaElement;
-    const wrapper = new wrappers.TextArea(elem);
+    const wrapper = new wrappers.TextAreaElementTextStore(elem);
 
     return { elem: elem, wrapper: wrapper };
   }
@@ -126,7 +125,7 @@ class TextAreaTestHelper implements TestHelper {
 }
 //#endregion
 
-//#region Defines helpers related to ContentEditable element test setup.
+//#region Defines helpers related to ContentEditableElementTextStore element test setup.
 
 // These functions simply make the basic (within a single text node) tests
 // compatible with the more advanced element types; more complex tests may
@@ -135,7 +134,7 @@ class ContentEditableTestHelper implements TestHelper {
   setupElement(): HTMLElementPair {
     const id = DynamicElements.addEditable();
     const elem = document.getElementById(id);
-    const wrapper = new wrappers.ContentEditable(elem);
+    const wrapper = new wrappers.ContentEditableElementTextStore(elem);
 
     return { elem: elem, wrapper: wrapper, node: null };
   }
@@ -143,7 +142,7 @@ class ContentEditableTestHelper implements TestHelper {
   setupDummyElement(): HTMLElementPair {
     const id = DynamicElements.addEditable();
     const elem = document.getElementById(id);
-    const wrapper = new wrappers.ContentEditable(elem);
+    const wrapper = new wrappers.ContentEditableElementTextStore(elem);
 
     return { elem: elem, wrapper: wrapper, node: null };
   }
@@ -236,8 +235,8 @@ class DesignIFrameTestHelper implements TestHelper {
         const elem1 = document.getElementById(id1) as HTMLIFrameElement;
         const elem2 = document.getElementById(id2) as HTMLIFrameElement;
 
-        obj.mainPair = { elem: elem1, wrapper: new wrappers.DesignIFrame(elem1), document: elem1.contentWindow.document };
-        obj.dummyPair = { elem: elem2, wrapper: new wrappers.DesignIFrame(elem2), document: elem1.contentWindow.document };
+        obj.mainPair = { elem: elem1, wrapper: new wrappers.DesignIFrameElementTextStore(elem1), document: elem1.contentWindow.document };
+        obj.dummyPair = { elem: elem2, wrapper: new wrappers.DesignIFrameElementTextStore(elem2), document: elem1.contentWindow.document };
 
         done();
       });
@@ -321,10 +320,10 @@ class DesignIFrameTestHelper implements TestHelper {
 }
 //#endregion
 
-//#region Defines helpers related to Mock test setup.
+//#region Defines helpers related to SyntheticTextStore test setup.
 class MockTestHelper implements TestHelper {
   setupElement(): ElementPair<any> {
-    return { elem: null, wrapper: new Mock() };
+    return { elem: null, wrapper: new SyntheticTextStore() };
   }
 
   resetWithText(pair: ElementPair<any>, string: string) {
@@ -364,15 +363,15 @@ class InterfaceTests {
     }
   };
 
-  public static Input = new InputTestHelper();
+  public static InputElementTextStore = new InputTestHelper();
 
-  public static TextArea = new TextAreaTestHelper();
+  public static TextAreaElementTextStore = new TextAreaTestHelper();
 
-  public static ContentEditable = new ContentEditableTestHelper();
+  public static ContentEditableElementTextStore = new ContentEditableTestHelper();
 
-  public static DesignIFrame = new DesignIFrameTestHelper();
+  public static DesignIFrameElementTextStore = new DesignIFrameTestHelper();
 
-  public static Mock = new MockTestHelper();
+  public static SyntheticTextStore = new MockTestHelper();
 
   //#region Defines common test patterns across element tests
   public static Tests = class {
@@ -985,7 +984,7 @@ class InterfaceTests {
   }
 }
 
-describe('Element Input/Output Interfacing', function () {
+describe('Element InputElementTextStore/Output Interfacing', function () {
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(function () {
@@ -1005,21 +1004,21 @@ describe('Element Input/Output Interfacing', function () {
     describe('Caret Handling', function () {
       describe('setCaret', function () {
         it('correctly places the caret (no prior selection)', function () {
-          InterfaceTests.Tests.setCaretNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.setCaretNoSelection(InterfaceTests.InputElementTextStore);
         });
 
         it('correctly places the caret (prior selection)', function () {
-          InterfaceTests.Tests.setCaretWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.setCaretWithSelection(InterfaceTests.InputElementTextStore);
         });
       });
 
       describe('getCaret', function () {
         it('correctly reports the position of the caret (no selection)', function () {
-          InterfaceTests.Tests.getCaretNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getCaretNoSelection(InterfaceTests.InputElementTextStore);
         });
 
         it('correctly reports the position of the caret (active selection)', function () {
-          InterfaceTests.Tests.getCaretWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getCaretWithSelection(InterfaceTests.InputElementTextStore);
         });
       });
     });
@@ -1027,35 +1026,35 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Retrieval', function () {
       describe('getText', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.InputElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.InputElementTextStore);
         });
       });
 
       describe('getTextBeforeCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.InputElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.InputElementTextStore);
         });
       });
 
       it('getSelectedText', function () {
-        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.InputElementTextStore);
       });
 
       describe('getTextAfterCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.InputElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.InputElementTextStore);
         });
       });
     });
@@ -1063,32 +1062,32 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Mutation', function () {
       describe('clearSelection', function () {
         it('properly deletes selected text', function () {
-          InterfaceTests.Tests.clearSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.clearSelection(InterfaceTests.InputElementTextStore);
         });
       });
 
       describe('deleteCharsBeforeCaret', function () {
         it("correctly deletes characters from 'context' (no active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.InputElementTextStore);
         });
 
         it("correctly deletes characters from 'context' (with active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.InputElementTextStore);
         });
       });
 
       describe('insertTextBeforeCaret', function () {
         it("correctly replaces the element's 'context' (no active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.InputElementTextStore);
         });
 
         it("correctly replaces the element's 'context' (with active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.InputElementTextStore);
         });
       });
 
       it('correctly maintains deadkeys', function () {
-        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.Input);
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.InputElementTextStore);
       });
     });
   });
@@ -1103,21 +1102,21 @@ describe('Element Input/Output Interfacing', function () {
     describe('Caret Handling', function () {
       describe('setCaret', function () {
         it('correctly places the caret (no prior selection)', function () {
-          InterfaceTests.Tests.setCaretNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.setCaretNoSelection(InterfaceTests.TextAreaElementTextStore);
         });
 
         it('correctly places the caret (prior selection)', function () {
-          InterfaceTests.Tests.setCaretWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.setCaretWithSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
 
       describe('getCaret', function () {
         it('correctly reports the position of the caret (no selection)', function () {
-          InterfaceTests.Tests.getCaretNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getCaretNoSelection(InterfaceTests.TextAreaElementTextStore);
         });
 
         it('correctly reports the position of the caret (active selection)', function () {
-          InterfaceTests.Tests.getCaretWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getCaretWithSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
     });
@@ -1125,35 +1124,35 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Retrieval', function () {
       describe('getText', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.TextAreaElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
 
       describe('getTextBeforeCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.TextAreaElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
 
       it('getSelectedText', function () {
-        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.InputElementTextStore);
       });
 
       describe('getTextAfterCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.TextAreaElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
     });
@@ -1161,32 +1160,32 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Mutation', function () {
       describe('clearSelection', function () {
         it('properly deletes selected text', function () {
-          InterfaceTests.Tests.clearSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.clearSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
 
       describe('deleteCharsBeforeCaret', function () {
         it("correctly deletes characters from 'context' (no active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.TextAreaElementTextStore);
         });
 
         it("correctly deletes characters from 'context' (with active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
 
       describe('insertTextBeforeCaret', function () {
         it("correctly replaces the element's 'context' (no active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.TextAreaElementTextStore);
         });
 
         it("correctly replaces the element's 'context' (with active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.TextAreaElementTextStore);
         });
       });
 
       it('correctly maintains deadkeys', function () {
-        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TextArea);
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TextAreaElementTextStore);
       });
     });
   });
@@ -1198,11 +1197,11 @@ describe('Element Input/Output Interfacing', function () {
     describe('Caret Handling', function () {
       describe('hasSelection', function () {
         it('correctly recognizes Selection ownership', function () {
-          InterfaceTests.Tests.getSelectionOwned(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getSelectionOwned(InterfaceTests.ContentEditableElementTextStore);
         });
 
         it('correctly rejects lack of Selection ownership', function () {
-          InterfaceTests.Tests.getSelectionUnowned(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getSelectionUnowned(InterfaceTests.ContentEditableElementTextStore);
         });
 
         // Need to design a test (and necessary helpers!) for a 'partial ownership rejection' test.
@@ -1212,35 +1211,35 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Retrieval', function () {
       describe('getText', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.ContentEditableElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.ContentEditableElementTextStore);
         });
       });
 
       describe('getTextBeforeCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.ContentEditableElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.ContentEditableElementTextStore);
         });
       });
 
       it.skip('getSelectedText', function () { // Not yet properly supported.
-        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.InputElementTextStore);
       });
 
       describe('getTextAfterCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.ContentEditableElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.ContentEditableElementTextStore);
         });
       });
     });
@@ -1248,32 +1247,32 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Mutation', function () {
       describe('clearSelection', function () {
         it('properly deletes selected text', function () {
-          InterfaceTests.Tests.clearSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.clearSelection(InterfaceTests.ContentEditableElementTextStore);
         });
       });
 
       describe('deleteCharsBeforeCaret', function () {
         it("correctly deletes characters from 'context' (no active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.ContentEditableElementTextStore);
         });
 
         it("correctly deletes characters from 'context' (with active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.ContentEditableElementTextStore);
         });
       });
 
       describe('insertTextBeforeCaret', function () {
         it("correctly replaces the element's 'context' (no active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.ContentEditableElementTextStore);
         });
 
         it("correctly replaces the element's 'context' (with active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.ContentEditable);
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.ContentEditableElementTextStore);
         });
       });
 
       it('correctly maintains deadkeys', function () {
-        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.ContentEditable);
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.ContentEditableElementTextStore);
       });
     });
   });
@@ -1289,7 +1288,7 @@ describe('Element Input/Output Interfacing', function () {
     beforeEach(function (done) {
       // Per-test creation of reg. pair and dummy elements, since IFrames are async.
       // Relies on the main-level's renewal of the overall fixture to be processed first.
-      InterfaceTests.DesignIFrame.InitAsyncElements(done);
+      InterfaceTests.DesignIFrameElementTextStore.InitAsyncElements(done);
     });
 
     /**
@@ -1300,11 +1299,11 @@ describe('Element Input/Output Interfacing', function () {
     // describe.skip('Caret Handling', function() {
     //   describe('hasSelection', function() {
     //     it('correctly recognizes Selection ownership', function () {
-    //       InterfaceTests.Tests.getSelectionOwned(InterfaceTests.DesignIFrame);
+    //       InterfaceTests.Tests.getSelectionOwned(InterfaceTests.DesignIFrameElementTextStore);
     //     });
 
     //     it('correctly rejects lack of Selection ownership', function () {
-    //       InterfaceTests.Tests.getSelectionUnowned(InterfaceTests.DesignIFrame);
+    //       InterfaceTests.Tests.getSelectionUnowned(InterfaceTests.DesignIFrameElementTextStore);
     //     });
 
     //     // Need to design a test (and necessary helpers!) for a 'partial ownership rejection' test.
@@ -1314,35 +1313,35 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Retrieval', function () {
       describe('getText', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
       });
 
       describe('getTextBeforeCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
       });
 
       it.skip('getSelectedText', function () { // Not yet properly supported.
-        InterfaceTests.Tests.getSelectedText(InterfaceTests.Input);
+        InterfaceTests.Tests.getSelectedText(InterfaceTests.InputElementTextStore);
       });
 
       describe('getTextAfterCaret', function () {
         it('correctly returns text (no active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
 
         it('correctly returns text (with active selection)', function () {
-          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
       });
     });
@@ -1350,38 +1349,38 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Mutation', function () {
       describe('clearSelection', function () {
         it('properly deletes selected text', function () {
-          InterfaceTests.Tests.clearSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.clearSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
       });
 
       describe('deleteCharsBeforeCaret', function () {
         it("correctly deletes characters from 'context' (no active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
 
         it("correctly deletes characters from 'context' (with active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
       });
 
       describe('insertTextBeforeCaret', function () {
         it("correctly replaces the element's 'context' (no active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
 
         it("correctly replaces the element's 'context' (with active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.DesignIFrame);
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.DesignIFrameElementTextStore);
         });
       });
 
       it('correctly maintains deadkeys', function () {
-        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.DesignIFrame);
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.DesignIFrameElementTextStore);
       });
     });
   });
 
-  describe('The "Mock" output target', function () {
-    // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
+  describe('The "SyntheticTextStore" output target', function () {
+    // Unique to the SyntheticTextStore type - element interface cloning tests.  Is element state properly copied?
     // As those require a very different setup, they're in the target_mocks.js test case file instead.
 
     // Basic text-retrieval unit tests are now done headlessly in keyman/engine/keyboard.
@@ -1389,26 +1388,26 @@ describe('Element Input/Output Interfacing', function () {
     describe('Text Mutation', function () {
       describe('deleteCharsBeforeCaret', function () {
         it("correctly deletes characters from 'context' (no active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.Mock);
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.SyntheticTextStore);
         });
 
         it("correctly deletes characters from 'context' (with active selection)", function () {
-          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.Mock);
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.SyntheticTextStore);
         });
       });
 
       describe('insertTextBeforeCaret', function () {
         it("correctly replaces the element's 'context' (no active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.Mock);
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.SyntheticTextStore);
         });
 
         it("correctly replaces the element's 'context' (with active selection)", function () {
-          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.Mock);
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.SyntheticTextStore);
         });
       });
 
       it('correctly maintains deadkeys', function () {
-        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.Mock);
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.SyntheticTextStore);
       });
     });
   });
