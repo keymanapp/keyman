@@ -21,7 +21,6 @@
     android:hardwareAccelerated="true"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
-    android:resizeableActivity="false"
     android:usesCleartextTraffic="true"
     android:theme="@style/AppTheme"
     android:supportsRtl="true">
@@ -64,7 +63,6 @@
       android:name=".SplashScreenActivity"
       android:exported="true"
       android:label="@string/app_name"
-      android:resizeableActivity="false"
       android:theme="@style/AppTheme.BrandedLaunch">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -77,7 +75,6 @@
       android:exported="true"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"
-      android:resizeableActivity="false"
       android:launchMode="singleTask">
 
       <!-- See http://stackoverflow.com/questions/1733195/android-intent-filter-for-a-particular-file-extension/2062112#2062112 -->
