@@ -480,6 +480,8 @@ describe("Lexer Tests", () => {
     });
     it("does not pick out tokens from inside strings", () => {
       recogniseToken(TokenType.STRING, '"store"');
+      recogniseToken(TokenType.STRING, '"\'"');
+      recogniseToken(TokenType.STRING, "'\"'");
     });
     it("can recognise a DECIMAL token", () => {
       recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'd0');
