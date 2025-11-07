@@ -168,8 +168,8 @@ export class Token {
   private _text: string;
   private _lineNum: number; // starts from 1
   private _charNum: number; // starts from 1
-  private _line: string;
-  private _filename: string;
+  private readonly _line: string;
+  private readonly _filename: string;
 
   /**
    * Construct a Token

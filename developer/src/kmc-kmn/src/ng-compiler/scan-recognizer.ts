@@ -14,9 +14,9 @@ import { TokenType } from "./token-type.js";
  * A ScanRecognizer identifies an individual Token as part of the Next Generation Lexer.
  */
 export class ScanRecognizer {
-  private _tokenType: TokenType;
-  private _regExp: RegExp;
-  private _emit: boolean;
+  private readonly _tokenType: TokenType;
+  private readonly _regExp: RegExp;
+  private readonly _emit: boolean;
 
   /**
    * Construct a ScanRecognizer
