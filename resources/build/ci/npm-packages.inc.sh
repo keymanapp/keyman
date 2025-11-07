@@ -1,7 +1,8 @@
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
 # List of all NPM packages that need to be published
 #
-# TODO: this should really be somewhere else, but right now Developer CI is
-#       responsible for pulling the publish lever
 
 readonly PACKAGES=(
   common/web/keyman-version

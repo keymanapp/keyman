@@ -20,14 +20,20 @@
   </Info>
   <Files>
     <File>
-      <Name>..\..\..\..\..\..\..\web\src\test\manual\web\chirality\chirality.js</Name>
+      <Name>../../../../../../../common/test/resources/keyboards/chirality.js</Name>
       <Description>File chirality.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>
     <File>
-      <Name>..\..\..\..\..\..\..\web\src\test\manual\web\platform\platformtest.js</Name>
+      <Name>../../../../../../../common/test/keyboards/platform-rules/platformtest.js</Name>
       <Description>File platformtest.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>../../../../../../../common/test/keyboards/test9469/build/test9469.js</Name>
+      <Description>File test9469.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>
@@ -56,6 +62,14 @@
     <Keyboard>
       <Name>PlatformTest</Name>
       <ID>platformtest</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </Keyboard>
+    <Keyboard>
+      <Name>Test9469</Name>
+      <ID>test9469</ID>
       <Version>1.0</Version>
       <Languages>
         <Language ID="en">English</Language>

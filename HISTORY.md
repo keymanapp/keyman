@@ -1,5 +1,78 @@
 # Keyman Version History
 
+## 19.0.157 alpha 2025-11-06
+
+* chore(common): Consolidate platformtest.js keyboard to `/common/test/keyboards/` (#15034)
+* chore(common): Consolidate test9469.js keyboard to `/common/test/keyboards/` (#15053)
+
+## 19.0.156 alpha 2025-11-05
+
+* chore(linux): Update debian changelog (#14965)
+* maint(resources): Docker container changes permissions to match the file owner uid and gid (#14900)
+* fix(developer): remove package version if FollowKeyboardVersion is set in Package Editor (#15088)
+* maint(windows): new timestamp server for test signing (#15091)
+
+## 19.0.155 alpha 2025-11-03
+
+* maint(resources): auto merge on branch name rather than label (#15084)
+* change(developer): remove kmlmc and kmlmp (#15083)
+
+## 19.0.154 alpha 2025-10-31
+
+* chore(developer): further debugging for assertion failure (#15056)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15058)
+* fix(developer): handle exceptions loading .keyman-touch-layout files (#15060)
+* chore(developer): fix always-false nullish coalescing (#15061)
+* chore(windows): upgrade VC++ projects to v143 (VS2022) (#15062)
+
+## 19.0.153 alpha 2025-10-30
+
+* test(developer): add kmc-analyze tests for AnalyzeOskCharacterUse output formats (#15030)
+
+## 19.0.152 alpha 2025-10-30
+
+* maint(resources): include sourcemaps in npm publish (#15051)
+
+## 19.0.151 alpha 2025-10-29
+
+* maint(resources): add repository record for all published packages (#15049)
+
+## 19.0.150 alpha 2025-10-29
+
+* maint(resources): set build flags for npm-publish (#15047)
+
+## 19.0.149 alpha 2025-10-29
+
+* maint(resources): don't report status check on release builds for npm-publish (#15045)
+
+## 19.0.148 alpha 2025-10-29
+
+* chore(web,android): Consolidate chirality.js test keyboard to `/common/test/resources/keyboards/` (#14989)
+* maint(resources): npm publish - build all packages first (#15042)
+
+## 19.0.147 alpha 2025-10-28
+
+* maint(resources): move npm package publishing to GitHub Actions (#15029)
+* maint(resources): use actions/setup-node to upgrade npm (#15035)
+* maint(resources): use a string for version, rather than number (#15036)
+* maint(resources): set env variables in npm publish GHA (#15037)
+* maint(mac): minor tweaks to mac setup, using build.sh (#15028)
+* maint(resources): add build and test for npm packaging and add status check results (#15038)
+* maint(resources): add write permission for statuses for npm-publish (#15039)
+* maint(resources): skip nvm in npm-publish script (#15041)
+
+## 19.0.146 alpha 2025-10-27
+
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15008)
+* fix(developer): prevent ANSI keyboards crashing debugger (#15022)
+* test(developer): add coverage tests for warning messages in kmc-analyze/AnalyzeOskCharacterUse (#15021)
+
+## 19.0.145 alpha 2025-10-24
+
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15001)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15002)
+* test(developer): add test to kmc-analyze for Warn_PreviousMapFileCouldNotBeLoaded (#14038)
+
 ## 19.0.144 alpha 2025-10-23
 
 * chore(deps-dev): bump playwright from 1.46.1 to 1.56.1 (#14984)
@@ -888,6 +961,17 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.244 stable 2025-10-31
+
+* fix(linux): use `ibus` command to restart ibus (#14975)
+* fix(android): Set the main app background white (#14982)
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15005)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15006)
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15009)
+* maint(resources): move NPM package publishing to GitHub Actions (#15054)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15059)
+* chore(developer): further debugging for assertion failure (#15057)
 
 ## 18.0.243 stable 2025-10-15
 

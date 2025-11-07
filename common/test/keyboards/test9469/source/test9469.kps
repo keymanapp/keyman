@@ -20,6 +20,7 @@
     <Copyright URL="">© 2023 SIL International</Copyright>
     <Author URL="">SIL International</Author>
     <Version URL=""></Version>
+    <Description URL="">Test keyboard for displaying special characters rendered with keymanweb-osk.ttf</Description>
   </Info>
   <Files>
     <File>
