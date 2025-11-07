@@ -6,7 +6,7 @@
  * KMC KMN Next Generation Parser (TokenBuffer)
  */
 
-import { TokenTypes } from "./token-types.js";
+import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 
 /**
@@ -16,7 +16,7 @@ import { Token } from "./lexer.js";
 export class TokenBuffer {
   private list: Token[];
   private _currentPosition: number; // index into the Token list
-  private eof: Token = new Token(TokenTypes.EOF, ""); // end-of-file Token
+  private eof: Token = new Token(TokenType.EOF, ""); // end-of-file Token
 
 /**
  * Construct a TokenBuffer

@@ -13,16 +13,16 @@ import { Rule, SequenceRule, parameterSequence, AlternateTokenRule } from '../..
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { NodeTypes } from "../../src/ng-compiler/node-types.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
-import { TokenTypes } from '../../src/ng-compiler/token-types.js';
+import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 
 const LIST_OF_ONE: Token[] = [
-  new Token(TokenTypes.STRING, ''),
+  new Token(TokenType.STRING, ''),
 ];
 const LIST_OF_THREE: Token[] = [
-  new Token(TokenTypes.STRING, ''),
-  new Token(TokenTypes.STRING, ''),
-  new Token(TokenTypes.STRING, ''),
+  new Token(TokenType.STRING, ''),
+  new Token(TokenType.STRING, ''),
+  new Token(TokenType.STRING, ''),
 ];
 
 class TrueRule extends Rule {
@@ -31,7 +31,7 @@ class TrueRule extends Rule {
   }
 
   public parse(node: ASTNode): boolean {
-    if (Rule.tokenBuffer.nextToken().isTokenType(TokenTypes.EOF))
+    if (Rule.tokenBuffer.nextToken().isTokenType(TokenType.EOF))
       return false;
     Rule.tokenBuffer.popToken();
     node.addChild(new ASTNode(NodeTypes.TMP));
@@ -196,11 +196,11 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (two Tokens)", () => {
       Rule.tokenBuffer = new TokenBuffer([
-        new Token(TokenTypes.STRING, ''),
-        new Token(TokenTypes.STRING, ''),
-        new Token(TokenTypes.STORE, ''),
+        new Token(TokenType.STRING, ''),
+        new Token(TokenType.STRING, ''),
+        new Token(TokenType.STORE, ''),
       ]);
-      const tokenRule: Rule = new TokenRule(TokenTypes.STRING, true);
+      const tokenRule: Rule = new TokenRule(TokenType.STRING, true);
       const oneOrMany: Rule = new OneOrManyRule(tokenRule);
       assert.isTrue(oneOrMany.parse(root));
       assert.isTrue(root.hasChild());
@@ -217,59 +217,59 @@ describe("Recursive Descent Tests", () => {
   });
   describe("TokenRule Tests", () => {
     it("can construct a TokenRule", () => {
-      const tokenRule: Rule = new TokenRule(TokenTypes.STRING);
+      const tokenRule: Rule = new TokenRule(TokenType.STRING);
       assert.isNotNull(tokenRule);
     });
     it("can parse with a successful child Rule (addNode false)", () => {
-      const tokenRule: Rule = new TokenRule(TokenTypes.STRING);
+      const tokenRule: Rule = new TokenRule(TokenType.STRING);
       assert.isTrue(tokenRule.parse(root));
       assert.isFalse(root.hasChild());
       assert.equal(Rule.tokenBuffer.currentPosition, 1);
     });
     it("can parse with a successful child Rule (addNode true)", () => {
-      const tokenRule: Rule = new TokenRule(TokenTypes.STRING, true);
+      const tokenRule: Rule = new TokenRule(TokenType.STRING, true);
       assert.isTrue(tokenRule.parse(root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasSoleChildOfType(NodeTypes.STRING));
       assert.equal(Rule.tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule", () => {
-      const tokenRule: Rule = new TokenRule(TokenTypes.STORE);
+      const tokenRule: Rule = new TokenRule(TokenType.STORE);
       assert.isFalse(tokenRule.parse(root));
       assert.equal(Rule.tokenBuffer.currentPosition, 0);
     });
   });
   describe("AlternateTokenRule Tests", () => {
     it("can construct an AlternateTokenRule", () => {
-      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.STRING]);
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenType.STRING]);
       assert.isNotNull(alternateTokenRule);
     });
     it("can parse a matched token (from a list of one)", () => {
-      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.STRING]);
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenType.STRING]);
       assert.isTrue(alternateTokenRule.parse(root));
       assert.equal(Rule.tokenBuffer.currentPosition, 1);
     });
     it("can parse an unmatched token (from a list of one)", () => {
-      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.PARAMETER]);
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenType.PARAMETER]);
       assert.isFalse(alternateTokenRule.parse(root));
       assert.equal(Rule.tokenBuffer.currentPosition, 0);
     });
     it("can parse a matched token (from a list of three)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([
-        TokenTypes.BITMAP, TokenTypes.STRING, TokenTypes.PARAMETER,
+        TokenType.BITMAP, TokenType.STRING, TokenType.PARAMETER,
       ]);
       assert.isTrue(alternateTokenRule.parse(root));
       assert.equal(Rule.tokenBuffer.currentPosition, 1);
     });
     it("can parse an unmatched token (from a list of three)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([
-        TokenTypes.BITMAP, TokenTypes.COPYRIGHT, TokenTypes.PARAMETER,
+        TokenType.BITMAP, TokenType.COPYRIGHT, TokenType.PARAMETER,
       ]);
       assert.isFalse(alternateTokenRule.parse(root));
       assert.equal(Rule.tokenBuffer.currentPosition, 0);
     });
     it("can parse a matched token (from a list of one, addNode is true)", () => {
-      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.STRING], true);
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenType.STRING], true);
       assert.isTrue(alternateTokenRule.parse(root));
       assert.equal(Rule.tokenBuffer.currentPosition, 1);
       assert.isTrue(root.hasChildOfType(NodeTypes.STRING));
@@ -288,7 +288,7 @@ describe("Recursive Descent Tests", () => {
   describe("parameterSequence() Tests", () => {
     it("can parse a single parameter", () => {
       const tokens = [
-        new Token(TokenTypes.PARAMETER, ''),
+        new Token(TokenType.PARAMETER, ''),
       ];
       Rule.tokenBuffer = new TokenBuffer(tokens);
       assert.isTrue(parameterSequence(parameters, 1));
@@ -297,9 +297,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse three parameters", () => {
       const tokens = [
-        new Token(TokenTypes.PARAMETER, ''),
-        new Token(TokenTypes.PARAMETER, ''),
-        new Token(TokenTypes.PARAMETER, ''),
+        new Token(TokenType.PARAMETER, ''),
+        new Token(TokenType.PARAMETER, ''),
+        new Token(TokenType.PARAMETER, ''),
       ];
       Rule.tokenBuffer = new TokenBuffer(tokens);
       assert.isTrue(parameterSequence(parameters, 3));

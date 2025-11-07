@@ -6,7 +6,7 @@
  * KMC KMN Next Generation Parser (Recursive Descent/Kleene Operator Rules)
  */
 
-import { TokenTypes } from "./token-types.js";
+import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { NodeTypes } from "./node-types.js";
@@ -341,8 +341,8 @@ export class OneOrManyRule extends SingleChildRule {
  * TokenRule represents a Token (terminal) in the BNF.
  */
 export class TokenRule extends Rule {
-  private static tokenToNodeMap: Map<TokenTypes, NodeTypes>;
-  private tokenType: TokenTypes;
+  private static tokenToNodeMap: Map<TokenType, NodeTypes>;
+  private tokenType: TokenType;
   private addNode: boolean; // whether to add an ASTNode if the rule succeeds
 
   /**
@@ -351,7 +351,7 @@ export class TokenRule extends Rule {
    * @param tokenType the TokenType to potentially match
    * @param addNode whether to add an ASTNode if the rule succeeds
    */
-  public constructor(tokenType: TokenTypes, addNode: boolean=false) {
+  public constructor(tokenType: TokenType, addNode: boolean=false) {
     super();
     this.tokenType = tokenType;
     this.addNode   = addNode;
@@ -360,7 +360,7 @@ export class TokenRule extends Rule {
   private static tokenToNode = TOKEN_TO_NODE;
 
   static {
-    TokenRule.tokenToNodeMap = new Map<TokenTypes, NodeTypes>();
+    TokenRule.tokenToNodeMap = new Map<TokenType, NodeTypes>();
     for (const map of TokenRule.tokenToNode) {
       TokenRule.tokenToNodeMap.set(map.tokenType, map.nodeType);
     }
@@ -397,7 +397,7 @@ export class TokenRule extends Rule {
     return parseSuccess;
   }
 
-  public static getNodeType(tokenType: TokenTypes): NodeTypes {
+  public static getNodeType(tokenType: TokenType): NodeTypes {
     return TokenRule.tokenToNodeMap.get(tokenType);
   }
 }
@@ -406,22 +406,22 @@ export class TokenRule extends Rule {
  * AlternateTokenRule is an optimisation of an AlternateRule where
  * the rules array would consist entirely of TokenRules (all with the
  * same addNode setting). Instead, the TokenType of the current token
- * is directly compared against a supplied array of TokenTypes looking
+ * is directly compared against a supplied array of TokenType looking
  * for the first match.
  */
 export class AlternateTokenRule extends Rule {
-  private tokenTypes: Set<TokenTypes>; // a Set is used to avoid unnecessary duplicates
+  private tokenTypes: Set<TokenType>; // a Set is used to avoid unnecessary duplicates
   private addNode: boolean;
 
   /**
    * Construct an AlternateTokenRule
    *
-   * @param tokenTypes the array of TokenTypes to be potentially matched
+   * @param tokenTypes the array of TokenType to be potentially matched
    * @param addNode whether to add an ASTNode if the rule succeeds
    */
-  public constructor(tokenTypes: TokenTypes[], addNode: boolean=false) {
+  public constructor(tokenTypes: TokenType[], addNode: boolean=false) {
     super();
-    this.tokenTypes = new Set<TokenTypes>(tokenTypes);
+    this.tokenTypes = new Set<TokenType>(tokenTypes);
     // TODO: warning if there is a duplicate TokenType in the supplied array
     this.addNode    = addNode;
   }
@@ -465,7 +465,7 @@ export class AlternateTokenRule extends Rule {
  * @param numExpected the number of expected tokens of the same type
  * @returns true if the expected sequence of tokens was successfully matched
  */
-export function tokenSequence(tokens: Token[], tokenType: TokenTypes, numExpected: number): boolean {
+export function tokenSequence(tokens: Token[], tokenType: TokenType, numExpected: number): boolean {
   let parseSuccess: boolean = true;
   const save: number = Rule.tokenBuffer.currentPosition;
   let token: Token = Rule.tokenBuffer.nextToken();
@@ -501,5 +501,5 @@ export function tokenSequence(tokens: Token[], tokenType: TokenTypes, numExpecte
  * @returns true if the expected sequence of PARAMETER tokens was successfully matched
  */
 export function parameterSequence(parameters: Token[], numExpected: number): boolean {
-  return tokenSequence(parameters, TokenTypes.PARAMETER, numExpected);
+  return tokenSequence(parameters, TokenType.PARAMETER, numExpected);
 }

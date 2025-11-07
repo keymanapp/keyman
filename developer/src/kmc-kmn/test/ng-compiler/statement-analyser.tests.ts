@@ -15,7 +15,7 @@ import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, ComparisonRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule, IfNormalStoreStatementRule, IfStatementRule, IfSystemStoreStatementRule, IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, PlatformStatementRule, SaveStatementRule, SystemStoreNameForIfRule } from '../../src/ng-compiler/statement-analyser.js';
-import { TokenTypes } from '../../src/ng-compiler/token-types.js';
+import { TokenType } from '../../src/ng-compiler/token-type.js';
 
 let root: ASTNode = null;
 
@@ -481,27 +481,27 @@ describe("KMN Statement Analyser Tests", () => {
   describe("CommaRule Tests", () => {
     it("can construct a CommaRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      const comma: Rule = new TokenRule(TokenType.COMMA);
       assert.isNotNull(comma);
     });
     it("can parse correctly (comma)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(',');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      const comma: Rule = new TokenRule(TokenType.COMMA);
       assert.isTrue(comma.parse(root));
     });
     it("can parse correctly (comma, space before)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' ,');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      const comma: Rule = new TokenRule(TokenType.COMMA);
       assert.isTrue(comma.parse(root));
     });
     it("can parse correctly (comma, space after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(', ');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      const comma: Rule = new TokenRule(TokenType.COMMA);
       assert.isTrue(comma.parse(root));
     });
     it("can parse correctly (comma, space before and after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' , ');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      const comma: Rule = new TokenRule(TokenType.COMMA);
       assert.isTrue(comma.parse(root));
     });
   });

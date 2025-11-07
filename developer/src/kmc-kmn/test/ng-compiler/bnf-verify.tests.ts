@@ -18,7 +18,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { readFileSync } from 'fs';
-import { TokenTypes } from '../../src/ng-compiler/token-types.js';
+import { TokenType } from '../../src/ng-compiler/token-type.js';
 
 interface Dictionary {
   [key: string]: string;
@@ -45,7 +45,7 @@ describe("Verify BNF Against Lexer Tests", () => {
     bnfTokens.push('COMMENT', 'CONTINUATION', 'EOF', 'WHITESPACE');
     bnfTokens.sort();
     const bnfTokenSet = new Set<String>(bnfTokens);
-    const tokenTypes: string[] = Object.keys(TokenTypes).sort();
+    const tokenTypes: string[] = Object.keys(TokenType).sort();
     assert.deepEqual([...bnfTokenSet], tokenTypes);
   });
 });
@@ -207,8 +207,8 @@ function replaceManyElements(str: string): string {
 }
 
 function replaceTokenElements(str: string): string {
-  if (str != null && str.includes('TokenTypes.')) {
-    str = str.replaceAll(/(?:TokenTypes\.)([^|\s]*)/g,
+  if (str != null && str.includes('TokenType.')) {
+    str = str.replaceAll(/(?:TokenType\.)([^|\s]*)/g,
       (match, p1, offset, string, groups) =>
         { return p1.toLowerCase(); });
   }

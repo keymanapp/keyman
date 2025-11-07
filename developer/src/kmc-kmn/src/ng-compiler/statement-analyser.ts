@@ -8,7 +8,7 @@
  * Statement Rule Tests
  */
 
-import { TokenTypes } from "./token-types.js";
+import { TokenType } from "./token-type.js";
 import { PlainTextRule } from "./kmn-analyser.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
@@ -23,9 +23,9 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
 
   public constructor() {
     super();
-    this.leftBracket     = new TokenRule(TokenTypes.LEFT_BR);
+    this.leftBracket     = new TokenRule(TokenType.LEFT_BR);
     this.normalStoreName = new NormalStoreNameRule();
-    this.rightBracket    = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rightBracket    = new TokenRule(TokenType.RIGHT_BR);
   }
 
   public parse(node: ASTNode): boolean {
@@ -44,7 +44,7 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
 export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const any: Rule  = new TokenRule(TokenTypes.ANY, true);
+    const any: Rule  = new TokenRule(TokenType.ANY, true);
     this.cmdNodeType = NodeTypes.ANY;
     this.rule = new SequenceRule([
       any, this.leftBracket, this.normalStoreName, this.rightBracket
@@ -55,7 +55,7 @@ export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
 export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const call: Rule = new TokenRule(TokenTypes.CALL, true);
+    const call: Rule = new TokenRule(TokenType.CALL, true);
     this.cmdNodeType = NodeTypes.CALL;
     this.rule = new SequenceRule([
       call, this.leftBracket, this.normalStoreName, this.rightBracket
@@ -66,7 +66,7 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
 export class DeadkeyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const deadkey: Rule = new TokenRule(TokenTypes.DEADKEY, true);
+    const deadkey: Rule = new TokenRule(TokenType.DEADKEY, true);
     this.cmdNodeType = NodeTypes.DEADKEY;
     this.rule = new SequenceRule([
       deadkey, this.leftBracket, this.normalStoreName, this.rightBracket
@@ -77,7 +77,7 @@ export class DeadkeyStatementRule extends AbstractBracketedStoreNameStatementRul
 export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const notany: Rule = new TokenRule(TokenTypes.NOTANY, true);
+    const notany: Rule = new TokenRule(TokenType.NOTANY, true);
     this.cmdNodeType   = NodeTypes.NOTANY;
     this.rule = new SequenceRule([
       notany, this.leftBracket, this.normalStoreName, this.rightBracket
@@ -88,7 +88,7 @@ export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule
 export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const save: Rule = new TokenRule(TokenTypes.SAVE, true);
+    const save: Rule = new TokenRule(TokenType.SAVE, true);
     this.cmdNodeType = NodeTypes.SAVE;
     this.rule = new SequenceRule([
       save, this.leftBracket, this.normalStoreName, this.rightBracket
@@ -104,17 +104,17 @@ abstract class AbstractShortcutRule extends SingleChildRuleParseToTreeFromGivenN
 
   public constructor(nodeType: NodeTypes) {
     super(nodeType);
-    this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
+    this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
     this.plainText          = new PlainTextRule();
     this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
-    this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rightBracket       = new TokenRule(TokenType.RIGHT_BR);
   }
 }
 
 export class BaselayoutStatementRule extends AbstractShortcutRule {
   public constructor() {
     super(NodeTypes.BASELAYOUT_SHORTCUT);
-    const baselayout: Rule = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
+    const baselayout: Rule = new TokenRule(TokenType.BASELAYOUT_SHORTCUT, true);
     this.rule = new SequenceRule([
       baselayout, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
     ]);
@@ -124,7 +124,7 @@ export class BaselayoutStatementRule extends AbstractShortcutRule {
 export class LayerStatementRule extends AbstractShortcutRule {
   public constructor() {
     super(NodeTypes.LAYER_SHORTCUT);
-    const layer: Rule = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
+    const layer: Rule = new TokenRule(TokenType.LAYER_SHORTCUT, true);
     this.rule = new SequenceRule([
       layer, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
     ]);
@@ -134,7 +134,7 @@ export class LayerStatementRule extends AbstractShortcutRule {
 export class PlatformStatementRule extends AbstractShortcutRule {
   public constructor() {
     super(NodeTypes.PLATFORM_SHORTCUT);
-    const platform: Rule  = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
+    const platform: Rule  = new TokenRule(TokenType.PLATFORM_SHORTCUT, true);
     this.rule = new SequenceRule([
       platform, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
     ]);
@@ -172,10 +172,10 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRuleParseToTreeFr
 
   public constructor() {
     super(NodeTypes.IF);
-    this.ifRule             = new TokenRule(TokenTypes.IF, true);
-    this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
+    this.ifRule             = new TokenRule(TokenType.IF, true);
+    this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
     this.comparison         = new ComparisonRule();
-    this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rightBracket       = new TokenRule(TokenType.RIGHT_BR);
     this.plainText          = new PlainTextRule();
     this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
   }
@@ -207,11 +207,11 @@ export class SystemStoreNameForIfRule extends SingleChildRule {
   public constructor() {
     super();
     const systemStoreName: Rule = new SystemStoreNameRule();
-    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
-    const layer: Rule           = new TokenRule(TokenTypes.LAYER, true);
-    const newlayer: Rule        = new TokenRule(TokenTypes.NEWLAYER, true);
-    const oldlayer: Rule        = new TokenRule(TokenTypes.OLDLAYER, true);
-    const platform: Rule        = new TokenRule(TokenTypes.PLATFORM, true);
+    const baselayout: Rule      = new TokenRule(TokenType.BASELAYOUT, true);
+    const layer: Rule           = new TokenRule(TokenType.LAYER, true);
+    const newlayer: Rule        = new TokenRule(TokenType.NEWLAYER, true);
+    const oldlayer: Rule        = new TokenRule(TokenType.OLDLAYER, true);
+    const platform: Rule        = new TokenRule(TokenType.PLATFORM, true);
     this.rule = new AlternateRule([
       systemStoreName,
       baselayout,
@@ -226,8 +226,8 @@ export class SystemStoreNameForIfRule extends SingleChildRule {
 export class ComparisonRule extends SingleChildRule {
   public constructor() {
     super();
-    const equal: Rule    = new TokenRule(TokenTypes.EQUAL, true);
-    const notEqual: Rule = new TokenRule(TokenTypes.NOT_EQUAL, true);
+    const equal: Rule    = new TokenRule(TokenType.EQUAL, true);
+    const notEqual: Rule = new TokenRule(TokenType.NOT_EQUAL, true);
     this.rule = new AlternateRule([equal, notEqual]);
   }
 }
@@ -235,10 +235,10 @@ export class ComparisonRule extends SingleChildRule {
 export class ContextStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.CONTEXT);
-    const context: Rule       = new TokenRule(TokenTypes.CONTEXT, true);
-    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
+    const context: Rule       = new TokenRule(TokenType.CONTEXT, true);
+    const leftBracket: Rule   = new TokenRule(TokenType.LEFT_BR);
     const offset: Rule        = new OffsetRule();
-    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    const rightBracket: Rule  = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([
       context,
       leftBracket,
@@ -251,12 +251,12 @@ export class ContextStatementRule extends SingleChildRuleParseToTreeFromGivenNod
 export class IndexStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.INDEX);
-    const index: Rule           = new TokenRule(TokenTypes.INDEX, true);
-    const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
+    const index: Rule           = new TokenRule(TokenType.INDEX, true);
+    const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
-    const comma: Rule           = new TokenRule(TokenTypes.COMMA);
+    const comma: Rule           = new TokenRule(TokenType.COMMA);
     const offset: Rule          = new OffsetRule();
-    const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
+    const rightBracket: Rule    = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([
       index,
       leftBracket,
@@ -271,8 +271,8 @@ export class IndexStatementRule extends SingleChildRuleParseToTreeFromGivenNode 
 export class OffsetRule extends SingleChildRule {
   public constructor() {
     super();
-    const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
-    const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
+    const octal: Rule     = new TokenRule(TokenType.OCTAL, true);
+    const parameter: Rule = new TokenRule(TokenType.PARAMETER, true);
     this.rule = new AlternateRule([octal, parameter]);
   }
 
@@ -289,10 +289,10 @@ export class OffsetRule extends SingleChildRule {
 export class OutsStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeTypes.OUTS);
-    const outs: Rule         = new TokenRule(TokenTypes.OUTS, true);
-    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const outs: Rule         = new TokenRule(TokenType.OUTS, true);
+    const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
     const storeName: Rule    = new StoreNameRule();
-    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
+    const rightBracket: Rule = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([
       outs, leftBracket, storeName, rightBracket
     ]);
