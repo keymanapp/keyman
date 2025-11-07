@@ -17,16 +17,17 @@
   <Info>
     <Version URL=""></Version>
     <Name URL="">PlatformTest</Name>
+    <Description URL="">Test keyboard for displaying platform information.</Description>
   </Info>
   <Files>
     <File>
-      <Name>PlatformTest.kmx</Name>
-      <Description>Keyboard PlatformTest</Description>
+      <Name>../platformtest.kmx</Name>
+      <Description>Keyboard Platformtest</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
     <File>
-      <Name>platformtest.js</Name>
+      <Name>../platformtest.js</Name>
       <Description>File platformtest.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
