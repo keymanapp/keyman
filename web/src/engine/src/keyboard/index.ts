@@ -38,6 +38,15 @@ export { TextStoreLanguageProcessorInterface } from "./textStoreLanguageProcesso
 export { findCommonSubstringEndIndex } from "./stringDivergence.js";
 export { Deadkey } from "./deadkeys.js";
 
+import { DeadkeyTracker } from './deadkeys.js';
+
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const unitTestEndpoints = {
+  DeadkeyTracker,
+};
+
 // TODO-web-core: why do we export these here?
 export * from "keyman/common/web-utils";
 
