@@ -424,18 +424,28 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a KEYMAN token", () => {
       recogniseToken(TokenType.KEYMAN, '$keyman:');
+      recogniseToken(TokenType.KEYMAN, '$KEYMAN:');
+      recogniseToken(TokenType.KEYMAN, '$Keyman:');
     });
     it("can recognise a KEYMANONLY token", () => {
       recogniseToken(TokenType.KEYMANONLY, '$keymanonly:');
+      recogniseToken(TokenType.KEYMANONLY, '$KEYMANONLY:');
+      recogniseToken(TokenType.KEYMANONLY, '$KeymanOnly:');
     });
     it("can recognise a KEYMANWEB token", () => {
       recogniseToken(TokenType.KEYMANWEB, '$keymanweb:');
+      recogniseToken(TokenType.KEYMANWEB, '$KEYMANWEB:');
+      recogniseToken(TokenType.KEYMANWEB, '$KeymanWeb:');
     });
     it("can recognise a KMFL token", () => {
       recogniseToken(TokenType.KMFL, '$kmfl:');
+      recogniseToken(TokenType.KMFL, '$KMFL:');
+      recogniseToken(TokenType.KMFL, '$Kmfl:');
     });
     it("can recognise a WEAVER token", () => {
       recogniseToken(TokenType.WEAVER, '$weaver:');
+      recogniseToken(TokenType.WEAVER, '$WEAVER:');
+      recogniseToken(TokenType.WEAVER, '$Weaver:');
     });
     it("can recognise a LEFT_BR token", () => {
       recogniseToken(TokenType.LEFT_BR, '(');
@@ -467,9 +477,6 @@ describe("Lexer Tests", () => {
     it("can recognise a RANGE token", () => {
       recogniseToken(TokenType.RANGE, '..');
     });
-    // it("can recognise a DOLLAR token", () => {
-    //   recogniseToken(TokenTypes.DOLLAR, '$');
-    // });
     it("can recognise a U_CHAR token", () => {
       recogniseToken(TokenType.U_CHAR, 'U+1');
       recogniseToken(TokenType.U_CHAR, 'U+A');
@@ -522,6 +529,13 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenType.OCTAL, '777');
     });
     it("can recognise a MODIFIER token", () => {
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'rctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'alt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lalt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ncaps');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'CTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LCTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RCTRL');
@@ -529,6 +543,13 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LALT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RALT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'NCAPS');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Rctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Alt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lalt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ncaps');
     });
     it("can recognise a KEY_CODE token", () => {
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'K_K');
