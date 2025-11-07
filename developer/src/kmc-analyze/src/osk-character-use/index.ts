@@ -408,6 +408,8 @@ export class AnalyzeOskCharacterUse {
 
   /** @internal */
   public unitTestEndPoints = {
-    loadPreviousMap: this.loadPreviousMap.bind(this)
+    loadPreviousMap: this.loadPreviousMap.bind(this),
+    addStrings: this.addStrings.bind(this),
+    stringToUnicodeSequence: AnalyzeOskCharacterUse.stringToUnicodeSequence
   };
 }
