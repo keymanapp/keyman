@@ -17,10 +17,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe "Builds the lm-layer module" \
-  "@/common/tools/es-bundling" \
-  "@/common/web/keyman-version" \
-  "@/common/web/types" \
-  "@/web/src/engine/predictive-text/worker-thread" \
+  "@/common/tools/es-bundling   build" \
+  "@/common/web/keyman-version  build" \
+  "@/common/web/types           build" \
+  "@/web/src/engine/predictive-text/worker-thread  build" \
   "clean" \
   "configure" \
   "build" \
@@ -56,7 +56,7 @@ function do_test() {
   ./unit_tests/test.sh test:headless test:browser
 }
 
-builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
+builder_run_action configure  do_configure
 builder_run_action build      do_build
 builder_run_action test       do_test

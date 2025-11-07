@@ -12,6 +12,7 @@
   ],
 
 	"references": [
+    { "path": "../../../common/web-utils" },
     { "path": "../../../app/browser" },
     { "path": "../../../engine" }
 	]

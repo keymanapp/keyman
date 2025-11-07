@@ -16,10 +16,10 @@ SUBPROJECT_NAME=tools/testing/recorder
 ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's test-sequence recording tool" \
-  "@/common/tools/es-bundling" \
-  "@/common/web/keyman-version" \
-  "@/web/src/engine" \
-  "@../recorder-core" \
+  "@/common/tools/es-bundling  build" \
+  "@/common/web/keyman-version build" \
+  "@/web/src/engine            build" \
+  "@../recorder-core           build" \
   "clean" \
   "configure" \
   "build"

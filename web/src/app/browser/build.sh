@@ -14,9 +14,9 @@ SUBPROJECT_NAME=app/browser
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's website-integrating version for use in non-puppeted browsers." \
-  "@/common/tools/es-bundling" \
-  "@/web/src/engine build" \
-  "@/web/src/tools/building/sourcemap-root" \
+  "@/common/tools/es-bundling              build" \
+  "@/web/src/engine                        build" \
+  "@/web/src/tools/building/sourcemap-root build" \
   "clean" \
   "configure" \
   "build" \

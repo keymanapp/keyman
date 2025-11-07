@@ -14,8 +14,8 @@ SUBPROJECT_NAME=app/ui
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's desktop form-factor keyboard selection modules." \
-  "@/web/src/app/browser build" \
-  "@/web/src/tools/building/sourcemap-root" \
+  "@/web/src/app/browser                    build" \
+  "@/web/src/tools/building/sourcemap-root  build" \
   "clean" \
   "configure" \
   "build" \

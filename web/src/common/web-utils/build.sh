@@ -19,9 +19,9 @@ BUILD_DIR="/web/build/common/web-utils"
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@/common/tools/es-bundling" \
-  "@/common/web/keyman-version" \
-  "@/common/web/types" \
+  "@/common/tools/es-bundling   build" \
+  "@/common/web/keyman-version  build" \
+  "@/common/web/types           build" \
   clean configure build test
 
 builder_describe_outputs \
