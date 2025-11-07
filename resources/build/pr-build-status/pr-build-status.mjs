@@ -52,6 +52,8 @@
                   summary += addStatus(o, 'check', status.context, status.state);
                 } else if(status.context == 'Ubuntu Packaging') {
                   summary += addStatus(o, 'build', status.context, status.state);
+                } else if(status.context == 'npm pack/publish') {
+                  summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.context == 'check/web/file-size') {
                   // Ignore check/web/file-size -- we won't block automerge for this at this point
                   summary += addLog(`Skipping ${status.context}`);

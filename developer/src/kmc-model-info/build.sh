@@ -15,10 +15,7 @@ builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
   "configure" \
   "build" \
   "api                       analyze API and prepare API documentation" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -34,9 +31,3 @@ builder_run_action configure    node_select_version_and_npm_ci
 builder_run_action build        tsc --build
 builder_run_action api          api-extractor run --local --verbose
 builder_run_action test         typescript_run_eslint_mocha_tests 55
-
-#-------------------------------------------------------------------------------------------------------------------
-
-. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
-
-builder_run_action publish     ci_publish_npm

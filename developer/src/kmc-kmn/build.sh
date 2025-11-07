@@ -11,7 +11,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
-. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 builder_describe "Keyman Developer Compiler Module for .kmn to .kmx" \
   "@/common/web/keyman-version" \
@@ -23,10 +22,7 @@ builder_describe "Keyman Developer Compiler Module for .kmn to .kmx" \
   "build" \
   "clean" \
   "api                       analyze API and prepare API documentation" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -71,7 +67,3 @@ function do_test() {
 builder_run_action build      do_build
 builder_run_action api        api-extractor run --local --verbose
 builder_run_action test       do_test
-
-#-------------------------------------------------------------------------------------------------------------------
-
-builder_run_action publish  ci_publish_npm
