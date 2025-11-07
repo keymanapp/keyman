@@ -118,6 +118,8 @@ export class DeadkeyTracker {
     const index = this.dks.indexOf(dk);
     if (index > -1) {
       this.dks.splice(index, 1);
+    } else {
+      console.warn('Deadkey to remove not found in DeadkeyTracker.');
     }
   }
 
@@ -163,11 +165,10 @@ export class DeadkeyTracker {
       return false;
     }
 
-    const otherDks = other.dks;
-
-    for(const dk of this.dks) {
-      const match = otherDks.find((otherDk) => dk.equal(otherDk));
-      if(!match) {
+    const sortedDeadkeys = this.toSortedArray();
+    const otherDks = other.toSortedArray();
+    for(let i = 0; i < sortedDeadkeys.length; i++) {
+      if(!sortedDeadkeys[i].equal(otherDks[i])) {
         return false;
       }
     }

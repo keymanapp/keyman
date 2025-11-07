@@ -57,6 +57,23 @@ describe('DeadkeyTracker', function() {
       assert.isTrue(tracker1.equal(tracker2));
     });
 
+    it('treats two trackers with identical deadkeys as equal', function () {
+      const dk1 = new Deadkey(3, 1);
+      const dk2 = new Deadkey(5, 2);
+      const dk3 = new Deadkey(10, 3);
+      const tracker1 = new DeadkeyTracker();
+      tracker1.add(dk1);
+      tracker1.add(dk2);
+      tracker1.add(dk3);
+
+      const tracker2 = new DeadkeyTracker();
+      tracker2.add(dk1);
+      tracker2.add(dk2);
+      tracker2.add(dk3);
+
+      assert.isTrue(tracker1.equal(tracker2));
+    });
+
     it('treats two trackers with same deadkeys create separately not as equal', function () {
       const tracker1 = new DeadkeyTracker();
       tracker1.add(new Deadkey(3, 1));
@@ -109,6 +126,42 @@ describe('DeadkeyTracker', function() {
       tracker2.add(new Deadkey(15, 4));
 
       assert.isFalse(tracker1.equal(tracker2));
+    });
+
+    it('treats non-indentical trackers with duplicate deadkeys not as equal', function () {
+      const dk1 = new Deadkey(3, 1);
+      const dk2 = new Deadkey(5, 2);
+      const dk3 = new Deadkey(10, 3);
+      const tracker1 = new DeadkeyTracker();
+      tracker1.add(dk1);
+      tracker1.add(dk1); // add same again
+      tracker1.add(dk2);
+
+      const tracker2 = new DeadkeyTracker();
+      tracker2.add(dk1);
+      tracker2.add(dk2);
+      tracker2.add(dk3);
+
+      assert.isFalse(tracker1.equal(tracker2));
+    });
+
+    it('treats indentical trackers with duplicate deadkeys as equal', function () {
+      const dk1 = new Deadkey(3, 1);
+      const dk2 = new Deadkey(5, 2);
+      const dk3 = new Deadkey(10, 3);
+      const tracker1 = new DeadkeyTracker();
+      tracker1.add(dk1);
+      tracker1.add(dk1); // add same again
+      tracker1.add(dk2);
+      tracker1.add(dk3);
+
+      const tracker2 = new DeadkeyTracker();
+      tracker2.add(dk1);
+      tracker2.add(dk1); // add same again
+      tracker2.add(dk2);
+      tracker2.add(dk3);
+
+      assert.isTrue(tracker1.equal(tracker2));
     });
   });
 
