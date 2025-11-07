@@ -188,6 +188,37 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
     boundaryTextLen = KMWString.length(boundarySplit.matches[boundarySplit.matches.length - 1].text);
   }
 
+  // check... this.
+
+  // We should definitely use + leverage the token's "source range ID" at some
+  // stage. which likely (and/or should) match an ID computable from its
+  // SearchSpace, though that detail isn't super relevant here.
+  //
+  // What matters when combining tokenizations ISN'T the offset index being
+  // affected; what matters IS the source-range of the token we'll apply to!
+  // Note that internal indexing actually is fine within PendingTokenization:
+  // that data is relative to the tokenization it's based on and no others. It's
+  // quite useful there... just... less so for recognizing convergence of
+  // tokenizations.
+  //
+  // We can then identify the tokenization to be split or merged by a unique
+  // PendingTokenization identifier (for the Transform subset of the keystroke).
+  // PendingTokenization matches SearchPath, while the accumulation thereof
+  // matches SearchCluster.  Note that we still need the relative-index as part
+  // of this indentifier; we need to uniquely identify which transform from the
+  // PendingTokenization was selected. Thus, the ID should be built from at
+  // least two components:
+  // - PendingTokenization id
+  // - tail-token relative index
+  // - (?) transition ID - but this already exists on the transform pieces, so
+  //   "no need".
+  //
+  // Put this on the TokenInputSource object?  Is not directly part of the
+  // trueTransform, of course. But is related to the actual input... source,
+  // uniquely identifying it.
+  // - extend the "inputstartoffset" bit?
+  // - include "applied delete left" in some form?
+
   // Now, based on the transform tokenization. We want to force uniqueness for
   // all variations of result length on each tokenized transform resulting from
   // the precomputation's represented keystroke.
@@ -197,15 +228,21 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
       // The true boundary lies before the insert if the value is non-zero;
       // don't differentiate here!
       boundaryTextLen = 0;
+      // should probably record the original (and thus, remaining) boundary length properly
+      // (before rewriting it for logic reasons below)
     }
 
+    // Note:  if any sort of transform tokenization occurs, it's implicitly a split transform.
+    // Extra inserts after the boundary-insert component are parts split off from the head.
+    // No need for special 'split' marking; again, it's implicit.
     if(boundaryTextLen) {
       // transform.deleteLeft was already handled during boundary computation -
       // do not include it here!
       //
       // IMPORTANT:  update unit tests manually if the BI marker here changes
       // or the use of SENTINEL_CODE_UNIT as a key component separator changes.
-      components.push(`BI@${relativeIndex}-${boundaryTextLen + insertLen}`);
+
+      components.push(`BI@${relativeIndex}-${boundaryTextLen + insertLen}`); // boundary len is also part.  So len & source-range
       boundaryTextLen = 0;
     } else {
       components.push(`I@${relativeIndex}-${insertLen}`);

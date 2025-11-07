@@ -109,7 +109,7 @@ export class SearchCluster implements SearchSpace {
     return bestPrefixes.reduce((max, curr) => max.p < curr.p ? curr : max);
   }
 
-  public get parents(): SearchSpace[] {
+  public get parents(): SearchPath[] {
     return this.selectionQueue.toArray().slice();
   }
 
@@ -187,17 +187,42 @@ export class SearchCluster implements SearchSpace {
     return this.parents[0].sourceRangeKey;
   }
 
+  merge(space: SearchCluster): SearchCluster;
+  merge(space: SearchPath): SearchPath;
+  merge(space: SearchSpace): SearchSpace;
   merge(space: SearchSpace): SearchSpace {
     // If we're at a root (which is without inputs), bypass it.
     if(space.parents.length == 0) {
       return this;
     }
 
+    // What if we're trying to merge something previously split?
+    // That can only happen at the head of the incoming space, so we check for it early here.
+    if(space.inputCount == 1 && space instanceof SearchPath) {
+      // In such a case... the 'leading edge' of the incoming space needs to be checked
+      // against the trailing edge of `this` instance's entries.
+      const thisTailInputSource = this.inputSegments[this.inputSegments.length - 1];
+      const spaceHeadInputSource = space.inputSegments[0];
+
+      const isOnSplitInput =
+        // At this stage, spaceHeadInputSource.subsetId should not be accessible; clusters can't properly give that.
+        thisTailInputSource.transitionId == spaceHeadInputSource.transitionId
+        && thisTailInputSource.end == spaceHeadInputSource.start;
+
+      // In this case, we only rebuild the single path; an outer stack frame will reconstitute
+      // the split cluster from the individual paths built here.
+      if(isOnSplitInput) {
+        const firstHalf = this.parents.find((tailPath) => tailPath.inputSource?.subsetId == space.inputSource?.subsetId);
+        return firstHalf.merge(space) as SearchPath;
+      }
+    }
+
     // Simple, straightforward.  SearchPaths can easily built with a SearchCluster as parent.
     // In this case, there's also no chance of a prior split; if we'd split, it'd be a
     // SearchCluster on both ends.
     if(space instanceof SearchPath) {
-      return new SearchPath(this, space.inputs, space.inputSource);
+      const parentMerge = this.merge(space.parents[0]);
+      return new SearchPath(parentMerge, space.inputs, space.inputSource);
     }
 
     // If we're here, we have a SearchCluster being merged in... and to
@@ -206,85 +231,132 @@ export class SearchCluster implements SearchSpace {
     // Merge the parent components first as a baseline.  This specific state's
     // aspects have to come after their affects are merged in, anyway.
     // (Note:  is the main point of recursion.)
-    const parentMerges = space.parents.map((p) => this.merge(p));
+    const parents = (space as SearchCluster).parents; // the constituent paths
 
-    // Note how SearchCluster.split works - it always makes two SearchClusters.
-    // There is a chance that constituent paths were split, and that's something
-    // we need to check for.  Fortunately, if that did occur, the components of
-    // the split paths should align - we took care of that in .split().  Also,
-    // for such cases, the parent count should match, with each inputSource
-    // having a match divergent only by the .inputStartIndex.
-    //
-    // If that did not occur, we simply append the SearchCluster's parents, one
-    // at a time, and construct the rebuilt SearchCluster.
-    //
-    // Possible alternate route:  if a parent exists for each component of the
-    // cluster to be merged in.  Not if there's a child for every parent - a
-    // parent for every child is what we'd want if we relax restrictions.
+    // Assumes either none of the space's heads were split or that ALL were.
+    const parentMerges = parents.map((p) => this.merge(p)); // we get paths out
 
-    // Note:  we are constructing the full condition over multiple steps here.
-    const splitClusterCondition1 = parentMerges.length == space.parents.length;
-    const splitClusterCondition2 = splitClusterCondition1 && !parentMerges.find((p1, i) => {
-      const p2 = space.parents[i];
-      // If we somehow have a nested SearchCluster, we don't try to do nested merges.
-      // We won't worry about the logic for that yet.
-      if(!(p1 instanceof SearchPath) || !(p2 instanceof SearchPath)) {
-        return true;
-      }
-
-      // If a `trueTransform` doesn't match, we don't have a proper split; don't try
-      // to force a merge, as it won't be 'clean'.
-      return p1.inputSource.segment.transitionId != p2.inputSource.segment.transitionId;
-    });
-
-    if(!splitClusterCondition1 || !splitClusterCondition2) {
-      // Easy case:  we already built the paths, so just use that!
-      return new SearchCluster(parentMerges);
-    } else {
-      // Re-merge case:  we built a path with the first half, so pull that off
-      // and rebuild with the merged version.
-
-      const recombinedPaths = parentMerges.map((parent, index) => {
-        const child = space.parents[index];
-
-        // Assumption:  parent = SearchPath.  SearchPath instances have only one
-        // direct parent.
-        const trueParent = parent.parents[0];
-        // SearchPath will safely remerge this as a single input.
-        const remerged = parent.merge(child);
-        if(remerged.inputCount != parent.inputCount) {
-          console.log("unexpected issue:  did not properly re-merge stuff");
-        }
-
-        return trueParent.merge(remerged);
-      });
-
-      return new SearchCluster(recombinedPaths);
-    }
+    // Build a new SearchCluster from the terminal paths of the cluster being merged in.
+    return new SearchCluster(parentMerges);
   }
 
-  split(charIndex: number): [SearchSpace, SearchSpace] {
+  split(charIndex: number): [SearchSpace, SearchSpace][] {
     // Don't rebuild if this is already a perfect split point!
     if(this.codepointLength <= charIndex) {
-      return [this, new SearchPath(this.model)];
+      return [[this, new SearchPath(this.model)]];
     }
 
-    // It's... actually shockingly easy.  Split each constituent space, then
-    // combine the halves into their own SearchClusters.
-    //
-    // Neither can be just a SearchPath:  we only become a SearchCluster if
-    // there are different length edges on the path leading to the final
-    // .codepointLength.
-    const results = this.parents.map((p) => p.split(charIndex));
+    // Path-deduplication:  it is possible for paths to diverge after a point
+    // and then reconverge at later points.  If the split happens before such
+    // a divergence-reconvergence sequence, it is possible for left-hand side
+    // entries to be duplicated.
 
-    // TODO:  consider deduplicating r[0]s?  Or is that possibly even necessary?
-    // It doesn't seem possible for a keystroke-transform split, at least.
+    // this.parents:  should always be `SearchPath`s in practice.
+    // - If one is actually a cluster, we probably shouldn't attempt to
+    //   de-duplicate it; we haven't figured out the logic for that yet.
+    const results = this.parents.flatMap((p) => p.split(charIndex));
+
+    // Left-hand side:  could be either SearchPaths or SearchClusters.
+    // If clusters, check space ID.
+    // If paths... check in more detail.
+    // ... `.matches(space)`?
+    // ... `.isSplitFrom(space)`? (merges)
+    // - is there a different helper method that could really save our bacon?
+    //   - abstracting this for a possible future third type (or similar) may actually
+    //     be the key to moving forward.
+    // - do we need to verify EACH subset ID matches, rather than just the last?
+    //   - wait... can we even do that?  (parent SearchCluster)
+
+    // isSameSpace(space: SearchSpace) // or matches(space: __)
+    // - for deduplication
+
+    // Deduping LHS Path:
+    // - spaceID match?  Yay, the easy case!
+    // - else, TokenizationPath subset ID match + split indices match:  yay!  It's a match!
+    //   - so, the clustering condition (split indices), PLUS subset ID match.
+    //   - again, isSameSpace() - using get clusterKey()
+
+    // Deduping LHS cluster:
+    // - spaceID match?  Yay, the easy case!
+    // - ... is there any other case?
+    //   - ... well, if the cluster's paths (parents) all have matches, that's a match, yeah?
+    //   - is _that_ needed, though?
+    //     -
     //
-    // If it's a clean "before and after" split, though... maybe it matters then?
-    return [
-      new SearchCluster(results.map(r => r[0])),
-      new SearchCluster(results.map(r => r[1]))
-    ];
+    // ... suppose a cluster happens, then two divergent paths, cluster, divergent paths with clean split.
+    // - ... then cluster-paths-cluster is clean
+    //
+    // ... cluster | paths, cluster, paths, cluster
+    // - THAT would be the case to test for, wouldn't it?
+    // - while I can't fully envision the fallout, I CAN envision the UNIT TEST - and that'll be
+    //   very enlightening.  Use that!
+    //   - so, we'd have the 2nd cluster entry attempt to de-dupe from the parent cluster/paths split.
+    //
+    // - alternatively, three clusters in a row (with alternate clusters reachable by different paths)
+    //   - there's one test sequence I built with this; try splitting that properly for the diff cluster types.
+
+    // Clustering RHS paths (will NOT be clusters!)
+    // - RHS "split index" match?
+    //   - not split?  Awesome!
+    // - LHS "split index" match?
+    //   - ... again, same deal.
+    // ... so a combined split key:
+    // - if not split, then can cluster
+    // - if split, cluster entries with like combined split keys.
+    // `get clusterKey(): string`
+    // - codepoint length + split indices of final input.
+    //   - must match for all paths in same cluster.
+    //   - isn't it sourceRangeKey?
+    //   - OH.  codepointLength - that part certainly matters.
+    //   - ... but it will equal, b/c split works that way.
+
+    // SearchPath
+    // Right-hand side:  always SearchPaths.
+
+    // -- OLD THOUGHTS --
+    // .codepointLength + .inputSource.subsetId should be enough to uniquely ID
+    // duplicated left-hand splits.
+
+    // Clean splits and 'dirty' splits (where a constituent path is split in
+    // two) should return separate SearchClusters...
+    // - (?) they'll have different input counts and/or .codepointLength values.
+    //   - not necessarily true on LHS.
+    // - Partial transforms (that don't apply the whole thing) should be a range
+    //   mis-match against cases applying the whole thing.
+    //   - How to model that, then?  The distinction doesn't (yet) show up in keying!
+
+    const resultsWithCluster: [SearchCluster, SearchSpace][] = [];
+
+    const resultMap = new Map<string, {
+      heads: SearchPath[],
+      tails: SearchPath[]
+    }>();
+    results.forEach((result) => {
+      const [head, tail] = result;
+
+      if(head instanceof SearchCluster) {
+        // TODO:  Is this actually a case that can happen?
+        resultsWithCluster.push([head, tail]);
+        return;
+      }
+
+      let key = head.inputCount + '+' + (!(head instanceof SearchPath) ? '' : head.clusterKey);
+      const outerEntry = resultMap.get(key) ?? { heads: [], tails: [] };
+
+      if(!outerEntry.heads.find(p => head.isSameSpace(p))) {
+        outerEntry.heads.push(head as SearchPath);
+      }
+
+      outerEntry.tails.push(tail);
+      resultMap.set(key, outerEntry);
+    });
+
+    const resultsFromPaths = [...resultMap.values()].map((entry) => {
+      const headSpace = entry.heads.length > 1 ? new SearchCluster(entry.heads) : entry.heads[0];
+      const tailSpace = entry.tails.length > 1 ? new SearchCluster(entry.tails) : entry.tails[0];
+      return [headSpace, tailSpace] as [SearchSpace, SearchSpace];
+    });
+    return (resultsWithCluster as [SearchSpace, SearchSpace][]).concat(resultsFromPaths);
   }
 
   isSameSpace(space: SearchSpace): boolean {
