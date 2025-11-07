@@ -6,7 +6,7 @@
  * KMC KMN Next Generation Lexer
  */
 
-import { TokenTypes } from "./token-types.js";
+import { TokenType } from "./token-type.js";
 import { KMN_SCAN_RECOGNIZERS, ScanRecognizer } from "./scan-recognizer.js";
 
 /**
@@ -96,9 +96,9 @@ export class Lexer {
         if (handleContinuation) {
           // if handleContinuation is true, no CONTINUATIONs will be emitted,
           // nor will NEWLINEs that follow CONTINUATIONs be emitted
-          if (recognizer.tokenType === TokenTypes.CONTINUATION) {
+          if (recognizer.tokenType === TokenType.CONTINUATION) {
             this.seenContinuation = true;
-          } else if (recognizer.tokenType === TokenTypes.NEWLINE) {
+          } else if (recognizer.tokenType === TokenType.NEWLINE) {
             if (!this.seenContinuation) {
               if (emitAll || recognizer.emit) {
                this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, this.line, this.filename));
@@ -107,7 +107,7 @@ export class Lexer {
             }
             this.seenContinuation = false;
           } else { // other tokens
-            if (this.seenContinuation && recognizer.tokenType !== TokenTypes.WHITESPACE) {
+            if (this.seenContinuation && recognizer.tokenType !== TokenType.WHITESPACE) {
               // TODO: error as non-WHITESPACE tokens between CONTINUATION and NEWLINE
             }
             if (emitAll || recognizer.emit) {
@@ -115,7 +115,7 @@ export class Lexer {
             }
           }
         } else { // not handling continuation
-          if (recognizer.tokenType === TokenTypes.NEWLINE) {
+          if (recognizer.tokenType === TokenType.NEWLINE) {
             line      = this.line;
             this.line = '';
           }
@@ -125,7 +125,7 @@ export class Lexer {
         }
         tokenMatch  = true;
         this.offset = recognizer.regExp.lastIndex; // advance the buffer offset past the matched token
-        if (recognizer.tokenType === TokenTypes.NEWLINE) {
+        if (recognizer.tokenType === TokenType.NEWLINE) {
           this.lineNum += 1;
           this.charNum  = 1;
         } else {
@@ -135,16 +135,21 @@ export class Lexer {
     }
 
     // discard matching empty brackets
+    // Empty brackets are simply discarded by the current compiler, and allowing them through to the syntax analyser
+    // hugely complicates the grammar. When the Lexer is extended for error handling, it may be that a few more token
+    // combinations can be identified and warnings/errors given. Possibilities include mismatched braces, square
+    // brackets etc. I included this one at this stage because of an instance in the keyboard repository
+    // https://github.com/keymanapp/keyboards/blob/92240aaf75261aa771a019d0eee59a4e58806644/release/sil/sil_senegal_bqj_azerty/source/sil_senegal_bqj_azerty.kmn#L746
     if (!emitAll && (this.tokenList.length >= 2) &&
-      this.tokenList.at(-1).isTokenType(TokenTypes.RIGHT_BR) &&
-      this.tokenList.at(-2).isTokenType(TokenTypes.LEFT_BR)) {
+      this.tokenList.at(-1).isTokenType(TokenType.RIGHT_BR) &&
+      this.tokenList.at(-2).isTokenType(TokenType.LEFT_BR)) {
       this.tokenList.pop();
       this.tokenList.pop();
     }
 
     // add an end-of-file token if required
     if (this.offset >= this.buffer.length && addEOF) {
-      this.tokenList.push(new Token(TokenTypes.EOF, '', 1, 1, this.line, this.filename));
+      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, this.line, this.filename));
     }
 
     // return false if there was no match or the buffer is empty
@@ -160,7 +165,7 @@ export class Lexer {
  * An input Token found by the Next Generation Lexer for the Parser.
  */
 export class Token {
-  readonly tokenType: TokenTypes;
+  readonly tokenType: TokenType;
   private _text: string;
   private _lineNum: number; // starts from 1
   private _charNum: number; // starts from 1
@@ -177,16 +182,16 @@ export class Token {
    * @param line      the line of the matched next (NEWLINE/EOF) or null
    * @param filename  the filename
    */
-  public constructor(tokenType: TokenTypes, text: string, lineNum: number=1, charNum: number=1, line: string=null, filename:string=null) {
+  public constructor(tokenType: TokenType, text: string, lineNum: number=1, charNum: number=1, line: string=null, filename:string=null) {
     this.tokenType = tokenType;
     this._text     = text;
     this._lineNum  = (lineNum < 1 ) ? 1 : lineNum;
     this._charNum  = (charNum < 1 ) ? 1 : charNum;
-    this._line     = (tokenType === TokenTypes.NEWLINE || tokenType === TokenTypes.EOF) ? line : null;
+    this._line     = (tokenType === TokenType.NEWLINE || tokenType === TokenType.EOF) ? line : null;
     this._filename = filename;
   }
 
-  public isTokenType(tokenType: TokenTypes): boolean {
+  public isTokenType(tokenType: TokenType): boolean {
     return this.tokenType === tokenType;
   }
 
@@ -201,9 +206,9 @@ export class Token {
 
   public toString(): string {
     let buf: string = `[${this.tokenType}`
-    if (this.tokenType !== TokenTypes.NEWLINE &&
-      this.tokenType !== TokenTypes.EOF &&
-      this.tokenType !== TokenTypes.WHITESPACE) {
+    if (this.tokenType !== TokenType.NEWLINE &&
+      this.tokenType !== TokenType.EOF &&
+      this.tokenType !== TokenType.WHITESPACE) {
       buf = buf.concat(`,${this._text}`);
     }
     buf = buf.concat(']');

@@ -8,399 +8,544 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { TokenTypes } from '../../src/ng-compiler/token-types.js';
+import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js'
 
 describe("Lexer Tests", () => {
   describe("Lexer", () => {
     it("can recognise a BASELAYOUT token", () => {
-      recogniseToken(TokenTypes.BASELAYOUT, '&baselayout');
+      recogniseToken(TokenType.BASELAYOUT, '&baselayout');
+      recogniseToken(TokenType.BASELAYOUT, '&BASELAYOUT');
+      recogniseToken(TokenType.BASELAYOUT, '&BaseLayout');
     });
     it("can recognise a BITMAP token", () => {
-      recogniseToken(TokenTypes.BITMAP, '&bitmap');
+      recogniseToken(TokenType.BITMAP, '&bitmap');
+      recogniseToken(TokenType.BITMAP, '&BITMAP');
+      recogniseToken(TokenType.BITMAP, '&Bitmap');
     });
     it("can recognise a CASEDKEYS token", () => {
-      recogniseToken(TokenTypes.CASEDKEYS, '&casedkeys');
+      recogniseToken(TokenType.CASEDKEYS, '&casedkeys');
+      recogniseToken(TokenType.CASEDKEYS, '&CASEDKEYS');
+      recogniseToken(TokenType.CASEDKEYS, '&CasedKeys');
     });
     it("can recognise a COPYRIGHT token", () => {
-      recogniseToken(TokenTypes.COPYRIGHT, '&copyright');
+      recogniseToken(TokenType.COPYRIGHT, '&copyright');
+      recogniseToken(TokenType.COPYRIGHT, '&COPYRIGHT');
+      recogniseToken(TokenType.COPYRIGHT, '&Copyright');
     });
     it("can recognise a DISPLAYMAP token", () => {
-      recogniseToken(TokenTypes.DISPLAYMAP, '&displaymap');
+      recogniseToken(TokenType.DISPLAYMAP, '&displaymap');
+      recogniseToken(TokenType.DISPLAYMAP, '&DISPLAYMAP');
+      recogniseToken(TokenType.DISPLAYMAP, '&DisplayMap');
     });
     it("can recognise a ETHNOLOGUECODE token", () => {
-      recogniseToken(TokenTypes.ETHNOLOGUECODE, '&ethnologuecode');
+      recogniseToken(TokenType.ETHNOLOGUECODE, '&ethnologuecode');
+      recogniseToken(TokenType.ETHNOLOGUECODE, '&ETHNOLOGUECODE');
+      recogniseToken(TokenType.ETHNOLOGUECODE, '&EthnologueCode');
     });
     it("can recognise a HOTKEY token", () => {
-      recogniseToken(TokenTypes.HOTKEY, '&hotkey');
+      recogniseToken(TokenType.HOTKEY, '&hotkey');
+      recogniseToken(TokenType.HOTKEY, '&HOTKEY');
+      recogniseToken(TokenType.HOTKEY, '&HotKey');
     });
     it("can recognise a INCLUDECODES token", () => {
-      recogniseToken(TokenTypes.INCLUDECODES, '&includecodes');
+      recogniseToken(TokenType.INCLUDECODES, '&includecodes');
+      recogniseToken(TokenType.INCLUDECODES, '&INCLUDECODES');
+      recogniseToken(TokenType.INCLUDECODES, '&IncludeCodes');
     });
     it("can recognise a KEYBOARDVERSION token", () => {
-      recogniseToken(TokenTypes.KEYBOARDVERSION, '&keyboardversion');
+      recogniseToken(TokenType.KEYBOARDVERSION, '&keyboardversion');
+      recogniseToken(TokenType.KEYBOARDVERSION, '&KEYBOARDVERSION');
+      recogniseToken(TokenType.KEYBOARDVERSION, '&KeyboardVersion');
     });
     it("can recognise a KMW_EMBEDCSS token", () => {
-      recogniseToken(TokenTypes.KMW_EMBEDCSS, '&kmw_embedcss');
+      recogniseToken(TokenType.KMW_EMBEDCSS, '&kmw_embedcss');
+      recogniseToken(TokenType.KMW_EMBEDCSS, '&KMW_EMBEDCSS');
+      recogniseToken(TokenType.KMW_EMBEDCSS, '&Kmw_embedcss');
     });
     it("can recognise a KMW_EMBEDJS token", () => {
-      recogniseToken(TokenTypes.KMW_EMBEDJS, '&kmw_embedjs');
+      recogniseToken(TokenType.KMW_EMBEDJS, '&kmw_embedjs');
+      recogniseToken(TokenType.KMW_EMBEDJS, '&KMW_EMBEDJS');
+      recogniseToken(TokenType.KMW_EMBEDJS, '&Kmw_embedjs');
     });
     it("can recognise a KMW_HELPFILE token", () => {
-      recogniseToken(TokenTypes.KMW_HELPFILE, '&kmw_helpfile');
+      recogniseToken(TokenType.KMW_HELPFILE, '&kmw_helpfile');
+      recogniseToken(TokenType.KMW_HELPFILE, '&KMW_HELPFILE');
+      recogniseToken(TokenType.KMW_HELPFILE, '&Kmw_helpfile');
     });
     it("can recognise a KMW_HELPTEXT token", () => {
-      recogniseToken(TokenTypes.KMW_HELPTEXT, '&kmw_helptext');
+      recogniseToken(TokenType.KMW_HELPTEXT, '&kmw_helptext');
+      recogniseToken(TokenType.KMW_HELPTEXT, '&KMW_HELPTEXT');
+      recogniseToken(TokenType.KMW_HELPTEXT, '&Kmw_helptext');
     });
     it("can recognise a KMW_RTL token", () => {
-      recogniseToken(TokenTypes.KMW_RTL, '&kmw_rtl');
+      recogniseToken(TokenType.KMW_RTL, '&kmw_rtl');
+      recogniseToken(TokenType.KMW_RTL, '&KMW_RTL');
+      recogniseToken(TokenType.KMW_RTL, '&Kmw_rtl');
     });
     it("can recognise a LANGUAGE token", () => {
-      recogniseToken(TokenTypes.LANGUAGE, '&language');
+      recogniseToken(TokenType.LANGUAGE, '&language');
+      recogniseToken(TokenType.LANGUAGE, '&LANGUAGE');
+      recogniseToken(TokenType.LANGUAGE, '&Language');
     });
     it("can recognise a LAYER token", () => {
-      recogniseToken(TokenTypes.LAYER, '&layer');
+      recogniseToken(TokenType.LAYER, '&layer');
+      recogniseToken(TokenType.LAYER, '&LAYER');
+      recogniseToken(TokenType.LAYER, '&Layer');
     });
     it("can recognise a LAYOUTFILE token", () => {
-      recogniseToken(TokenTypes.LAYOUTFILE, '&layoutfile');
+      recogniseToken(TokenType.LAYOUTFILE, '&layoutfile');
+      recogniseToken(TokenType.LAYOUTFILE, '&LAYOUTFILE');
+      recogniseToken(TokenType.LAYOUTFILE, '&LayoutFile');
     });
     it("can recognise a MESSAGE token", () => {
-      recogniseToken(TokenTypes.MESSAGE, '&message');
+      recogniseToken(TokenType.MESSAGE, '&message');
+      recogniseToken(TokenType.MESSAGE, '&MESSAGE');
+      recogniseToken(TokenType.MESSAGE, '&Message');
     });
     it("can recognise a MNEMONICLAYOUT token", () => {
-      recogniseToken(TokenTypes.MNEMONICLAYOUT, '&mnemoniclayout');
+      recogniseToken(TokenType.MNEMONICLAYOUT, '&mnemoniclayout');
+      recogniseToken(TokenType.MNEMONICLAYOUT, '&MNEMONICLAYOUT');
+      recogniseToken(TokenType.MNEMONICLAYOUT, '&MnemonicLayout');
     });
     it("can recognise a NAME token", () => {
-      recogniseToken(TokenTypes.NAME, '&name');
+      recogniseToken(TokenType.NAME, '&name');
+      recogniseToken(TokenType.NAME, '&NAME');
+      recogniseToken(TokenType.NAME, '&Name');
     });
     it("can recognise a NEWLAYER token", () => {
-      recogniseToken(TokenTypes.NEWLAYER, '&newlayer');
+      recogniseToken(TokenType.NEWLAYER, '&newlayer');
+      recogniseToken(TokenType.NEWLAYER, '&NEWLAYER');
+      recogniseToken(TokenType.NEWLAYER, '&NewLayer');
     });
     it("can recognise a OLDCHARPOSMATCHING token", () => {
-      recogniseToken(TokenTypes.OLDCHARPOSMATCHING, '&oldcharposmatching');
+      recogniseToken(TokenType.OLDCHARPOSMATCHING, '&oldcharposmatching');
+      recogniseToken(TokenType.OLDCHARPOSMATCHING, '&OLDCHARPOSMATCHING');
+      recogniseToken(TokenType.OLDCHARPOSMATCHING, '&OldCharPosMatching');
     });
     it("can recognise a OLDLAYER token", () => {
-      recogniseToken(TokenTypes.OLDLAYER, '&oldlayer');
+      recogniseToken(TokenType.OLDLAYER, '&oldlayer');
+      recogniseToken(TokenType.OLDLAYER, '&OLDLAYER');
+      recogniseToken(TokenType.OLDLAYER, '&OldLayer');
     });
     it("can recognise a PLATFORM token", () => {
-      recogniseToken(TokenTypes.PLATFORM, '&platform');
+      recogniseToken(TokenType.PLATFORM, '&platform');
+      recogniseToken(TokenType.PLATFORM, '&PLATFORM');
+      recogniseToken(TokenType.PLATFORM, '&Platform');
     });
     it("can recognise a TARGETS token", () => {
-      recogniseToken(TokenTypes.TARGETS, '&targets');
+      recogniseToken(TokenType.TARGETS, '&targets');
+      recogniseToken(TokenType.TARGETS, '&TARGETS');
+      recogniseToken(TokenType.TARGETS, '&Targets');
     });
     it("can recognise a VERSION token", () => {
-      recogniseToken(TokenTypes.VERSION, '&version');
+      recogniseToken(TokenType.VERSION, '&version');
+      recogniseToken(TokenType.VERSION, '&VERSION');
+      recogniseToken(TokenType.VERSION, '&Version');
     });
     it("can recognise a VISUALKEYBOARD token", () => {
-      recogniseToken(TokenTypes.VISUALKEYBOARD, '&visualkeyboard');
+      recogniseToken(TokenType.VISUALKEYBOARD, '&visualkeyboard');
+      recogniseToken(TokenType.VISUALKEYBOARD, '&VISUALKEYBOARD');
+      recogniseToken(TokenType.VISUALKEYBOARD, '&VisualKeyboard');
     });
     it("can recognise a WINDOWSLANGUAGES token", () => {
-      recogniseToken(TokenTypes.WINDOWSLANGUAGES, '&windowslanguages');
+      recogniseToken(TokenType.WINDOWSLANGUAGES, '&windowslanguages');
+      recogniseToken(TokenType.WINDOWSLANGUAGES, '&WINDOWSLANGUAGES');
+      recogniseToken(TokenType.WINDOWSLANGUAGES, '&WindowsLanguages');
     });
     it("can recognise a CAPSALWAYSOFF token", () => {
-      recogniseToken(TokenTypes.CAPSALWAYSOFF, '&capsalwaysoff');
+      recogniseToken(TokenType.CAPSALWAYSOFF, '&capsalwaysoff');
+      recogniseToken(TokenType.CAPSALWAYSOFF, '&CAPSALWAYSOFF');
+      recogniseToken(TokenType.CAPSALWAYSOFF, '&CapsAlwaysOff');
     });
     it("can recognise a CAPSONONLY token", () => {
-      recogniseToken(TokenTypes.CAPSONONLY, '&capsononly');
+      recogniseToken(TokenType.CAPSONONLY, '&capsononly');
+      recogniseToken(TokenType.CAPSONONLY, '&CAPSONONLY');
+      recogniseToken(TokenType.CAPSONONLY, '&CapsOnOnly');
     });
     it("can recognise a SHIFTFREECAPS token", () => {
-      recogniseToken(TokenTypes.SHIFTFREESCAPS, '&shiftfreescaps');
+      recogniseToken(TokenType.SHIFTFREESCAPS, '&shiftfreescaps');
+      recogniseToken(TokenType.SHIFTFREESCAPS, '&SHIFTFREESCAPS');
+      recogniseToken(TokenType.SHIFTFREESCAPS, '&ShiftFreesCaps');
     });
     it("can recognise a CAPS token", () => {
-      recogniseToken(TokenTypes.CAPS, 'caps');
+      recogniseToken(TokenType.CAPS, 'caps');
+      recogniseToken(TokenType.CAPS, 'CAPS');
+      recogniseToken(TokenType.CAPS, 'Caps');
     });
-    it("can recognise a ALWAYS token", () => {
-      recogniseToken(TokenTypes.ALWAYS, 'always');
+    it("can recognise an ALWAYS token", () => {
+      recogniseToken(TokenType.ALWAYS, 'always');
+      recogniseToken(TokenType.ALWAYS, 'ALWAYS');
+      recogniseToken(TokenType.ALWAYS, 'Always');
     });
-    it("can recognise a OFF token", () => {
-      recogniseToken(TokenTypes.OFF, 'off');
+    it("can recognise an OFF token", () => {
+      recogniseToken(TokenType.OFF, 'off');
+      recogniseToken(TokenType.OFF, 'OFF');
+      recogniseToken(TokenType.OFF, 'Off');
     });
-    it("can recognise a ON token", () => {
-      recogniseToken(TokenTypes.ON, 'on');
+    it("can recognise an ON token", () => {
+      recogniseToken(TokenType.ON, 'on');
+      recogniseToken(TokenType.ON, 'ON');
+      recogniseToken(TokenType.ON, 'On');
     });
-    it("can recognise a ONLY token", () => {
-      recogniseToken(TokenTypes.ONLY, 'only');
+    it("can recognise an ONLY token", () => {
+      recogniseToken(TokenType.ONLY, 'only');
+      recogniseToken(TokenType.ONLY, 'ONLY');
+      recogniseToken(TokenType.ONLY, 'Only');
     });
     it("can recognise a SHIFT token", () => {
-      recogniseToken(TokenTypes.SHIFT, 'shift');
+      recogniseToken(TokenType.SHIFT, 'shift');
+      recogniseToken(TokenType.SHIFT, 'SHIFT');
+      recogniseToken(TokenType.SHIFT, 'Shift');
     });
     it("can recognise a FREES token", () => {
-      recogniseToken(TokenTypes.FREES, 'frees');
+      recogniseToken(TokenType.FREES, 'frees');
+      recogniseToken(TokenType.FREES, 'FREES');
+      recogniseToken(TokenType.FREES, 'Frees');
     });
     it("can recognise a BITMAP_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.BITMAP_HEADER, 'bitmap');
+      recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'bitmap');
+      recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'BITMAP');
+      recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'Bitmap');
     });
     it("can recognise a COPYRIGHTP_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.COPYRIGHT_HEADER, 'copyright');
+      recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'copyright');
+      recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'COPYRIGHT');
+      recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'Copyright');
     });
     it("can recognise a HOTKEY_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.HOTKEY_HEADER, 'hotkey');
+      recogniseTokenFollowedBySpace(TokenType.HOTKEY_HEADER, 'hotkey');
+      recogniseTokenFollowedBySpace(TokenType.HOTKEY_HEADER, 'HOTKEY');
+      recogniseTokenFollowedBySpace(TokenType.HOTKEY_HEADER, 'HotKey');
     });
     it("can recognise a LANGUAGE_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.LANGUAGE_HEADER, 'language');
+      recogniseTokenFollowedBySpace(TokenType.LANGUAGE_HEADER, 'language');
+      recogniseTokenFollowedBySpace(TokenType.LANGUAGE_HEADER, 'LANGUAGE');
+      recogniseTokenFollowedBySpace(TokenType.LANGUAGE_HEADER, 'Language');
     });
     it("can recognise a LAYOUT_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.LAYOUT_HEADER, 'layout');
+      recogniseTokenFollowedBySpace(TokenType.LAYOUT_HEADER, 'layout');
+      recogniseTokenFollowedBySpace(TokenType.LAYOUT_HEADER, 'LAYOUT');
+      recogniseTokenFollowedBySpace(TokenType.LAYOUT_HEADER, 'Layout');
     });
     it("can recognise a MESSAGE_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.MESSAGE_HEADER, 'message');
+      recogniseTokenFollowedBySpace(TokenType.MESSAGE_HEADER, 'message');
+      recogniseTokenFollowedBySpace(TokenType.MESSAGE_HEADER, 'MESSAGE');
+      recogniseTokenFollowedBySpace(TokenType.MESSAGE_HEADER, 'Message');
     });
     it("can recognise a NAME_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.NAME_HEADER, 'name');
+      recogniseTokenFollowedBySpace(TokenType.NAME_HEADER, 'name');
+      recogniseTokenFollowedBySpace(TokenType.NAME_HEADER, 'NAME');
+      recogniseTokenFollowedBySpace(TokenType.NAME_HEADER, 'Name');
     });
     it("can recognise a VERSION_HEADER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.VERSION_HEADER, 'version');
+      recogniseTokenFollowedBySpace(TokenType.VERSION_HEADER, 'version');
+      recogniseTokenFollowedBySpace(TokenType.VERSION_HEADER, 'VERSION');
+      recogniseTokenFollowedBySpace(TokenType.VERSION_HEADER, 'Version');
     });
     it("can recognise a BASELAYOUT_SHORTCUT token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.BASELAYOUT_SHORTCUT, 'baselayout');
+      recogniseTokenFollowedByLeftBracket(TokenType.BASELAYOUT_SHORTCUT, 'baselayout');
+      recogniseTokenFollowedByLeftBracket(TokenType.BASELAYOUT_SHORTCUT, 'BASELAYOUT');
+      recogniseTokenFollowedByLeftBracket(TokenType.BASELAYOUT_SHORTCUT, 'Baselayout');
     });
     it("can recognise a LAYER_SHORTCUT token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.LAYER_SHORTCUT, 'layer');
+      recogniseTokenFollowedByLeftBracket(TokenType.LAYER_SHORTCUT, 'layer');
+      recogniseTokenFollowedByLeftBracket(TokenType.LAYER_SHORTCUT, 'LAYER');
+      recogniseTokenFollowedByLeftBracket(TokenType.LAYER_SHORTCUT, 'Layer');
     });
     it("can recognise a PLATFORM_SHORTCUT token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.PLATFORM_SHORTCUT, 'platform');
+      recogniseTokenFollowedByLeftBracket(TokenType.PLATFORM_SHORTCUT, 'platform');
+      recogniseTokenFollowedByLeftBracket(TokenType.PLATFORM_SHORTCUT, 'PLATFORM');
+      recogniseTokenFollowedByLeftBracket(TokenType.PLATFORM_SHORTCUT, 'Platform');
     });
     it("can recognise an ANY token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.ANY, 'any');
+      recogniseTokenFollowedByLeftBracket(TokenType.ANY, 'any');
+      recogniseTokenFollowedByLeftBracket(TokenType.ANY, 'ANY');
+      recogniseTokenFollowedByLeftBracket(TokenType.ANY, 'Any');
     });
     it("can recognise a BEEP token", () => {
-      recogniseToken(TokenTypes.BEEP, 'beep');
+      recogniseToken(TokenType.BEEP, 'beep');
+      recogniseToken(TokenType.BEEP, 'BEEP');
+      recogniseToken(TokenType.BEEP, 'Beep');
     });
     it("can recognise a BEGIN token", () => {
-      recogniseToken(TokenTypes.BEGIN, 'begin');
+      recogniseToken(TokenType.BEGIN, 'begin');
+      recogniseToken(TokenType.BEGIN, 'BEGIN');
+      recogniseToken(TokenType.BEGIN, 'Begin');
     });
     it("can recognise a CALL token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.CALL, 'call');
+      recogniseTokenFollowedByLeftBracket(TokenType.CALL, 'call');
+      recogniseTokenFollowedByLeftBracket(TokenType.CALL, 'CALL');
+      recogniseTokenFollowedByLeftBracket(TokenType.CALL, 'Call');
     });
     it("can recognise a CONTEXT token", () => {
-      recogniseToken(TokenTypes.CONTEXT, 'context');
+      recogniseToken(TokenType.CONTEXT, 'context');
+      recogniseToken(TokenType.CONTEXT, 'CONTEXT');
+      recogniseToken(TokenType.CONTEXT, 'Context');
     });
     it("can recognise a DEADKEY token (deadkey)", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.DEADKEY, 'deadkey');
+      recogniseTokenFollowedByLeftBracket(TokenType.DEADKEY, 'deadkey');
+      recogniseTokenFollowedByLeftBracket(TokenType.DEADKEY, 'DEADKEY');
+      recogniseTokenFollowedByLeftBracket(TokenType.DEADKEY, 'DeadKey');
     });
     it("can recognise a DEADKEY token (dk)", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.DEADKEY, 'dk');
+      recogniseTokenFollowedByLeftBracket(TokenType.DEADKEY, 'dk');
+      recogniseTokenFollowedByLeftBracket(TokenType.DEADKEY, 'DK');
+      recogniseTokenFollowedByLeftBracket(TokenType.DEADKEY, 'Dk');
     });
     it("can recognise a GROUP token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.GROUP, 'group');
+      recogniseTokenFollowedByLeftBracket(TokenType.GROUP, 'group');
+      recogniseTokenFollowedByLeftBracket(TokenType.GROUP, 'GROUP');
+      recogniseTokenFollowedByLeftBracket(TokenType.GROUP, 'Group');
     });
     it("can recognise a IF token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.IF, 'if');
+      recogniseTokenFollowedByLeftBracket(TokenType.IF, 'if');
+      recogniseTokenFollowedByLeftBracket(TokenType.IF, 'IF');
+      recogniseTokenFollowedByLeftBracket(TokenType.IF, 'If');
     });
     it("can recognise a INDEX token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.INDEX, 'index');
+      recogniseTokenFollowedByLeftBracket(TokenType.INDEX, 'index');
+      recogniseTokenFollowedByLeftBracket(TokenType.INDEX, 'INDEX');
+      recogniseTokenFollowedByLeftBracket(TokenType.INDEX, 'Index');
     });
     it("can recognise a MATCH token", () => {
-      recogniseToken(TokenTypes.MATCH, 'match');
-    });
-    it("can recognise a MATCH token (empty brackets)", () => {
-      const lexer    = new Lexer('match()');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenTypes.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
-    });
-    it("can recognise a MATCH token (space before empty brackets)", () => {
-      const lexer    = new Lexer('match ()');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenTypes.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
-    });
-    it("can recognise a MATCH token (space after empty brackets)", () => {
-      const lexer    = new Lexer('match() ');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenTypes.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
-    });
-    it("can recognise a MATCH token (space in empty brackets)", () => {
-      const lexer    = new Lexer('match( )');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenTypes.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
+      recogniseToken(TokenType.MATCH, 'match');
+      recogniseToken(TokenType.MATCH, 'MATCH');
+      recogniseToken(TokenType.MATCH, 'Match');
     });
     it("can recognise a NOMATCH token", () => {
-      recogniseToken(TokenTypes.NOMATCH, 'nomatch');
+      recogniseToken(TokenType.NOMATCH, 'nomatch');
+      recogniseToken(TokenType.NOMATCH, 'NOMATCH');
+      recogniseToken(TokenType.NOMATCH, 'NoMatch');
     });
     it("can recognise a NOTANY token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.NOTANY, 'notany');
+      recogniseTokenFollowedByLeftBracket(TokenType.NOTANY, 'notany');
+      recogniseTokenFollowedByLeftBracket(TokenType.NOTANY, 'NOTANY');
+      recogniseTokenFollowedByLeftBracket(TokenType.NOTANY, 'NotAny');
     });
     it("can recognise a NUL token", () => {
-      recogniseToken(TokenTypes.NUL, 'nul');
+      recogniseToken(TokenType.NUL, 'nul');
+      recogniseToken(TokenType.NUL, 'NUL');
+      recogniseToken(TokenType.NUL, 'Nul');
     });
     it("can recognise a OUTS token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.OUTS, 'outs');
+      recogniseTokenFollowedByLeftBracket(TokenType.OUTS, 'outs');
+      recogniseTokenFollowedByLeftBracket(TokenType.OUTS, 'OUTS');
+      recogniseTokenFollowedByLeftBracket(TokenType.OUTS, 'Outs');
     });
     it("can recognise a RESET token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.RESET, 'reset');
+      recogniseTokenFollowedByLeftBracket(TokenType.RESET, 'reset');
+      recogniseTokenFollowedByLeftBracket(TokenType.RESET, 'RESET');
+      recogniseTokenFollowedByLeftBracket(TokenType.RESET, 'Reset');
     });
     it("can recognise a RETURN token", () => {
-      recogniseToken(TokenTypes.RETURN, 'return');
+      recogniseToken(TokenType.RETURN, 'return');
+      recogniseToken(TokenType.RETURN, 'RETURN');
+      recogniseToken(TokenType.RETURN, 'Return');
     });
     it("can recognise a SAVE token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.SAVE, 'save');
+      recogniseTokenFollowedByLeftBracket(TokenType.SAVE, 'save');
+      recogniseTokenFollowedByLeftBracket(TokenType.SAVE, 'SAVE');
+      recogniseTokenFollowedByLeftBracket(TokenType.SAVE, 'Save');
     });
     it("can recognise a SET token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.SET, 'set');
+      recogniseTokenFollowedByLeftBracket(TokenType.SET, 'set');
+      recogniseTokenFollowedByLeftBracket(TokenType.SET, 'SET');
+      recogniseTokenFollowedByLeftBracket(TokenType.SET, 'Set');
     });
     it("can recognise a STORE token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.STORE, 'store');
-    });
-    it("can recognise a STORE token in upper case", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.STORE, 'STORE');
-    });
-    it("can recognise a STORE token in mixed case", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.STORE, 'Store');
+      recogniseTokenFollowedByLeftBracket(TokenType.STORE, 'store');
+      recogniseTokenFollowedByLeftBracket(TokenType.STORE, 'STORE');
+      recogniseTokenFollowedByLeftBracket(TokenType.STORE, 'Store');
     });
     it("can recognise a USE token", () => {
-      recogniseTokenFollowedByLeftBracket(TokenTypes.USE, 'use');
+      recogniseTokenFollowedByLeftBracket(TokenType.USE, 'use');
+      recogniseTokenFollowedByLeftBracket(TokenType.USE, 'USE');
+      recogniseTokenFollowedByLeftBracket(TokenType.USE, 'Use');
     });
     it("can recognise a UNICODE token", () => {
-      recogniseToken(TokenTypes.UNICODE, 'unicode');
+      recogniseToken(TokenType.UNICODE, 'unicode');
+      recogniseToken(TokenType.UNICODE, 'UNICODE');
+      recogniseToken(TokenType.UNICODE, 'Unicode');
     });
     it("can recognise a NEWCONTEXT token", () => {
-      recogniseToken(TokenTypes.NEWCONTEXT, 'newcontext');
+      recogniseToken(TokenType.NEWCONTEXT, 'newcontext');
+      recogniseToken(TokenType.NEWCONTEXT, 'NEWCONTEXT');
+      recogniseToken(TokenType.NEWCONTEXT, 'NewContext');
     });
     it("can recognise a POSTKEYSTROKE token", () => {
-      recogniseToken(TokenTypes.POSTKEYSTROKE, 'postkeystroke');
+      recogniseToken(TokenType.POSTKEYSTROKE, 'postkeystroke');
+      recogniseToken(TokenType.POSTKEYSTROKE, 'POSTKEYSTROKE');
+      recogniseToken(TokenType.POSTKEYSTROKE, 'PostKeystroke');
     });
     it("can recognise a ANSI token", () => {
-      recogniseToken(TokenTypes.ANSI, 'ansi');
+      recogniseToken(TokenType.ANSI, 'ansi');
+      recogniseToken(TokenType.ANSI, 'ANSI');
+      recogniseToken(TokenType.ANSI, 'Ansi');
     });
     it("can recognise a READONLY token", () => {
-      recogniseToken(TokenTypes.READONLY, 'readonly');
+      recogniseToken(TokenType.READONLY, 'readonly');
+      recogniseToken(TokenType.READONLY, 'READONLY');
+      recogniseToken(TokenType.READONLY, 'ReadOnly');
     });
     it("can recognise a USING token", () => {
-      recogniseToken(TokenTypes.USING, 'using');
+      recogniseToken(TokenType.USING, 'using');
+      recogniseToken(TokenType.USING, 'USING');
+      recogniseToken(TokenType.USING, 'Using');
     });
     it("can recognise a KEYS token", () => {
-      recogniseToken(TokenTypes.KEYS, 'keys');
+      recogniseToken(TokenType.KEYS, 'keys');
+      recogniseToken(TokenType.KEYS, 'KEYS');
+      recogniseToken(TokenType.KEYS, 'Keys');
     });
     it("can recognise a KEYMAN token", () => {
-      recogniseToken(TokenTypes.KEYMAN, '$keyman:');
+      recogniseToken(TokenType.KEYMAN, '$keyman:');
+      recogniseToken(TokenType.KEYMAN, '$KEYMAN:');
+      recogniseToken(TokenType.KEYMAN, '$Keyman:');
     });
     it("can recognise a KEYMANONLY token", () => {
-      recogniseToken(TokenTypes.KEYMANONLY, '$keymanonly:');
+      recogniseToken(TokenType.KEYMANONLY, '$keymanonly:');
+      recogniseToken(TokenType.KEYMANONLY, '$KEYMANONLY:');
+      recogniseToken(TokenType.KEYMANONLY, '$KeymanOnly:');
     });
     it("can recognise a KEYMANWEB token", () => {
-      recogniseToken(TokenTypes.KEYMANWEB, '$keymanweb:');
+      recogniseToken(TokenType.KEYMANWEB, '$keymanweb:');
+      recogniseToken(TokenType.KEYMANWEB, '$KEYMANWEB:');
+      recogniseToken(TokenType.KEYMANWEB, '$KeymanWeb:');
     });
     it("can recognise a KMFL token", () => {
-      recogniseToken(TokenTypes.KMFL, '$kmfl:');
+      recogniseToken(TokenType.KMFL, '$kmfl:');
+      recogniseToken(TokenType.KMFL, '$KMFL:');
+      recogniseToken(TokenType.KMFL, '$Kmfl:');
     });
     it("can recognise a WEAVER token", () => {
-      recogniseToken(TokenTypes.WEAVER, '$weaver:');
+      recogniseToken(TokenType.WEAVER, '$weaver:');
+      recogniseToken(TokenType.WEAVER, '$WEAVER:');
+      recogniseToken(TokenType.WEAVER, '$Weaver:');
     });
     it("can recognise a LEFT_BR token", () => {
-      recogniseToken(TokenTypes.LEFT_BR, '(');
+      recogniseToken(TokenType.LEFT_BR, '(');
     });
     it("can recognise a RIGHT_BR token", () => {
-      recogniseToken(TokenTypes.RIGHT_BR, ')');
+      recogniseToken(TokenType.RIGHT_BR, ')');
     });
     it("can recognise a LEFT_SQ token", () => {
-      recogniseToken(TokenTypes.LEFT_SQ, '[');
+      recogniseToken(TokenType.LEFT_SQ, '[');
     });
     it("can recognise a RIGHT_SQ token", () => {
-      recogniseToken(TokenTypes.RIGHT_SQ, ']');
+      recogniseToken(TokenType.RIGHT_SQ, ']');
     });
     it("can recognise a CHEVRON token", () => {
-      recogniseToken(TokenTypes.CHEVRON, '>');
+      recogniseToken(TokenType.CHEVRON, '>');
     });
     it("can recognise a PLUS token", () => {
-      recogniseToken(TokenTypes.PLUS, '+');
+      recogniseToken(TokenType.PLUS, '+');
     });
     it("can recognise a COMMA token", () => {
-      recogniseToken(TokenTypes.COMMA, ',');
+      recogniseToken(TokenType.COMMA, ',');
     });
     it("can recognise a NOT_EQUAL token", () => {
-      recogniseToken(TokenTypes.NOT_EQUAL, '!=');
+      recogniseToken(TokenType.NOT_EQUAL, '!=');
     });
     it("can recognise a EQUAL token", () => {
-      recogniseToken(TokenTypes.EQUAL, '=');
+      recogniseToken(TokenType.EQUAL, '=');
     });
     it("can recognise a RANGE token", () => {
-      recogniseToken(TokenTypes.RANGE, '..');
+      recogniseToken(TokenType.RANGE, '..');
     });
-    // it("can recognise a DOLLAR token", () => {
-    //   recogniseToken(TokenTypes.DOLLAR, '$');
-    // });
     it("can recognise a U_CHAR token", () => {
-      recogniseToken(TokenTypes.U_CHAR, 'U+1');
-      recogniseToken(TokenTypes.U_CHAR, 'U+A');
-      recogniseToken(TokenTypes.U_CHAR, 'U+1B');
-      recogniseToken(TokenTypes.U_CHAR, 'U+1CD');
-      recogniseToken(TokenTypes.U_CHAR, 'U+1EF0');
-      recogniseToken(TokenTypes.U_CHAR, 'U+23456');
-      recogniseToken(TokenTypes.U_CHAR, 'U+789ABC');
+      recogniseToken(TokenType.U_CHAR, 'U+1');
+      recogniseToken(TokenType.U_CHAR, 'U+A');
+      recogniseToken(TokenType.U_CHAR, 'U+1B');
+      recogniseToken(TokenType.U_CHAR, 'U+1CD');
+      recogniseToken(TokenType.U_CHAR, 'U+1EF0');
+      recogniseToken(TokenType.U_CHAR, 'U+23456');
+      recogniseToken(TokenType.U_CHAR, 'U+789ABC');
     });
     it("can recognise a STRING token (single quote)", () => {
-      recogniseToken(TokenTypes.STRING, '\'10.0\'');
+      recogniseToken(TokenType.STRING, '\'10.0\'');
     });
     it("can recognise a STRING token (double quote)", () => {
-      recogniseToken(TokenTypes.STRING, '"10.0"');
+      recogniseToken(TokenType.STRING, '"10.0"');
     });
     it("can recognise a STRING token (repeated quotes)", () => {
       recogniseTokens(
         '\'hello\' \'world\'',
         [
-          new Token(TokenTypes.STRING,     '\'hello\''),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 8),
-          new Token(TokenTypes.STRING,     '\'world\'', 1, 9),
+          new Token(TokenType.STRING,     '\'hello\''),
+          new Token(TokenType.WHITESPACE, ' ', 1, 8),
+          new Token(TokenType.STRING,     '\'world\'', 1, 9),
         ]
       );
     });
     it("does not pick out tokens from inside strings", () => {
-      recogniseToken(TokenTypes.STRING, '"store"');
+      recogniseToken(TokenType.STRING, '"store"');
     });
     it("can recognise a DECIMAL token", () => {
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd999');
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'D0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'D99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'D999');
+      recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'd0');
+      recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'd99');
+      recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'd999');
+      recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'D0');
+      recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'D99');
+      recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'D999');
     });
     it("can recognise a HEXDECIMAL token", () => {
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xa99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xA99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'X0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'X99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'Xa99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'XA99');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'x0');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'x99');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'xa99');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'xA99');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'X0');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'X99');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'Xa99');
+      recogniseTokenFollowedByRightSquare(TokenType.HEXADECIMAL, 'XA99');
     });
     it("can recognise an OCTAL token", () => {
-      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '77');
-      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '777');
+      recogniseTokenFollowedByRightSquare(TokenType.OCTAL, '0');
+      recogniseTokenFollowedByRightSquare(TokenType.OCTAL, '77');
+      recogniseTokenFollowedByRightSquare(TokenType.OCTAL, '777');
     });
     it("can recognise a MODIFIER token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'CTRL');
-      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'LCTRL');
-      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'RCTRL');
-      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'ALT');
-      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'LALT');
-      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'RALT');
-      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'NCAPS');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'rctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'alt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lalt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ncaps');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'CTRL');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LCTRL');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RCTRL');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ALT');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LALT');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RALT');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'NCAPS');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Rctrl');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Alt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lalt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ncaps');
     });
     it("can recognise a KEY_CODE token", () => {
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'K_K');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'K_COLON');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'T_17D2_1780');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'U_0030');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'A21');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'k_k');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'k_colon');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 't_17D2_1780');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'u_0030');
-      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'a21');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'K_K');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'K_COLON');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'T_17D2_1780');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'U_0030');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'A21');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'k_k');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'k_colon');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 't_17D2_1780');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'u_0030');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'a21');
     });
     it("can recognise a KEY_CODE token (followed by space)", () => {
       recogniseTokens(
         'K_K ]',
         [
-          new Token(TokenTypes.KEY_CODE, 'K_K'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 4),
-          new Token(TokenTypes.RIGHT_SQ, ']', 1, 5),
+          new Token(TokenType.KEY_CODE, 'K_K'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 4),
+          new Token(TokenType.RIGHT_SQ, ']', 1, 5),
         ]
       );
     });
@@ -408,30 +553,30 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'd99 ]',
         [
-          new Token(TokenTypes.DECIMAL, 'd99'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 4),
-          new Token(TokenTypes.RIGHT_SQ, ']', 1, 5),
+          new Token(TokenType.DECIMAL, 'd99'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 4),
+          new Token(TokenType.RIGHT_SQ, ']', 1, 5),
         ]
       );
     });
     it("can recognise a HANGUL token", () => {
-      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_A');
-      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GA');
-      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGA');
-      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAE');
-      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAEG');
-      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAEGG');
-      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGYAEGG');
+      recogniseToken(TokenType.HANGUL, '$HANGUL_SYLLABLE_A');
+      recogniseToken(TokenType.HANGUL, '$HANGUL_SYLLABLE_GA');
+      recogniseToken(TokenType.HANGUL, '$HANGUL_SYLLABLE_GGA');
+      recogniseToken(TokenType.HANGUL, '$HANGUL_SYLLABLE_GGAE');
+      recogniseToken(TokenType.HANGUL, '$HANGUL_SYLLABLE_GGAEG');
+      recogniseToken(TokenType.HANGUL, '$HANGUL_SYLLABLE_GGAEGG');
+      recogniseToken(TokenType.HANGUL, '$HANGUL_SYLLABLE_GGYAEGG');
     });
     it("can recognise a COMMENT token", () => {
-      recogniseToken(TokenTypes.COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
+      recogniseToken(TokenType.COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
     });
     it("can recognise a COMMENT token (emitAll:false)", () => {
       const comment: string = 'c This tells Keyman which keys should have casing behavior applied';
       recogniseTokens(
         'c This tells Keyman which keys should have casing behavior applied\n',
         [
-          new Token(TokenTypes.NEWLINE, '\n', 1, 67, `${comment}\n`),
+          new Token(TokenType.NEWLINE, '\n', 1, 67, `${comment}\n`),
         ],
         {addEOF:false, emitAll:false, handleContinuation:true}
       );
@@ -441,8 +586,8 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'c This tells Keyman which keys should have casing behavior applied\n',
         [
-          new Token(TokenTypes.COMMENT, comment),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 67, `${comment}\n`),
+          new Token(TokenType.COMMENT, comment),
+          new Token(TokenType.NEWLINE, '\n', 1, 67, `${comment}\n`),
         ]
       );
     });
@@ -451,8 +596,8 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'c\n',
         [
-          new Token(TokenTypes.COMMENT, comment),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 2, `c\n`),
+          new Token(TokenType.COMMENT, comment),
+          new Token(TokenType.NEWLINE, '\n', 1, 2, `c\n`),
         ]
       );
     });
@@ -461,23 +606,23 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'c\n',
         [
-          new Token(TokenTypes.COMMENT, comment),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 2, `c\n`),
+          new Token(TokenType.COMMENT, comment),
+          new Token(TokenType.NEWLINE, '\n', 1, 2, `c\n`),
         ]
       );
     });
     it("can recognise a WHITESPACE token (single space)", () => {
-      recogniseToken(TokenTypes.WHITESPACE, ' ');
+      recogniseToken(TokenType.WHITESPACE, ' ');
     });
     it("can recognise a WHITESPACE token (two spaces)", () => {
-      recogniseToken(TokenTypes.WHITESPACE, '  ');
+      recogniseToken(TokenType.WHITESPACE, '  ');
     });
     it("can recognise a CONTINUATION token (no space after)", () => {
       recogniseTokens(
         '\\\n',
         [
-          new Token(TokenTypes.CONTINUATION, '\\'),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 2, '\\\n'),
+          new Token(TokenType.CONTINUATION, '\\'),
+          new Token(TokenType.NEWLINE, '\n', 1, 2, '\\\n'),
         ]
       );
     });
@@ -485,9 +630,9 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '\\ \n',
         [
-          new Token(TokenTypes.CONTINUATION, '\\'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 2),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 3, '\\ \n'),
+          new Token(TokenType.CONTINUATION, '\\'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 2),
+          new Token(TokenType.NEWLINE, '\n', 1, 3, '\\ \n'),
         ]
       );
     });
@@ -499,103 +644,103 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         `${line1}${line2}${line3}${line4}`,
         [
-          new Token(TokenTypes.STORE, 'store'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-          new Token(TokenTypes.PARAMETER, 'LaoConsonants', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 20),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 21),
-          new Token(TokenTypes.U_CHAR, 'U+0E81', 1, 22),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 28),
-          new Token(TokenTypes.U_CHAR, 'U+0E82', 1, 29),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 35),
-          new Token(TokenTypes.U_CHAR, 'U+0E84', 1, 36),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 42),
-          new Token(TokenTypes.U_CHAR, 'U+0E87', 1, 43),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 49),
-          new Token(TokenTypes.U_CHAR, 'U+0E88', 1, 50),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 56),
-          new Token(TokenTypes.U_CHAR, 'U+0E8A', 1, 57),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 63),
-          new Token(TokenTypes.U_CHAR, 'U+0E8D', 1, 64),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 70),
-          new Token(TokenTypes.U_CHAR, 'U+0E94', 1, 71),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 77),
-          new Token(TokenTypes.CONTINUATION, '\\', 1, 78),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 79, line1),
-          new Token(TokenTypes.WHITESPACE, '                     ', 2, 1),
-          new Token(TokenTypes.U_CHAR, 'U+0E95', 2, 22),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 28),
-          new Token(TokenTypes.U_CHAR, 'U+0E96', 2, 29),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 35),
-          new Token(TokenTypes.U_CHAR, 'U+0E97', 2, 36),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 42),
-          new Token(TokenTypes.U_CHAR, 'U+0E99', 2, 43),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 49),
-          new Token(TokenTypes.U_CHAR, 'U+0E9A', 2, 50),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 56),
-          new Token(TokenTypes.U_CHAR, 'U+0E9B', 2, 57),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 63),
-          new Token(TokenTypes.U_CHAR, 'U+0E9C', 2, 64),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 70),
-          new Token(TokenTypes.U_CHAR, 'U+0E9D', 2, 71),
-          new Token(TokenTypes.WHITESPACE, ' ', 2, 77),
-          new Token(TokenTypes.CONTINUATION, '\\', 2, 78),
-          new Token(TokenTypes.NEWLINE, '\n', 2, 79, line2),
-          new Token(TokenTypes.WHITESPACE, '                     ', 3, 1),
-          new Token(TokenTypes.U_CHAR, 'U+0E9E', 3, 22),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 28),
-          new Token(TokenTypes.U_CHAR, 'U+0E9F', 3, 29),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 35),
-          new Token(TokenTypes.U_CHAR, 'U+0EA1', 3, 36),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 42),
-          new Token(TokenTypes.U_CHAR, 'U+0EA2', 3, 43),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 49),
-          new Token(TokenTypes.U_CHAR, 'U+0EA3', 3, 50),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 56),
-          new Token(TokenTypes.U_CHAR, 'U+0EA5', 3, 57),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 63),
-          new Token(TokenTypes.U_CHAR, 'U+0EA7', 3, 64),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 70),
-          new Token(TokenTypes.U_CHAR, 'U+0EAA', 3, 71),
-          new Token(TokenTypes.WHITESPACE, ' ', 3, 77),
-          new Token(TokenTypes.CONTINUATION, '\\', 3, 78),
-          new Token(TokenTypes.NEWLINE, '\n', 3, 79, line3),
-          new Token(TokenTypes.WHITESPACE, '                     ', 4, 1),
-          new Token(TokenTypes.U_CHAR, 'U+0EAB', 4, 22),
-          new Token(TokenTypes.WHITESPACE, ' ', 4, 28),
-          new Token(TokenTypes.U_CHAR, 'U+0EAD', 4, 29),
-          new Token(TokenTypes.WHITESPACE, ' ', 4, 35),
-          new Token(TokenTypes.U_CHAR, 'U+0EAE', 4, 36),
-          new Token(TokenTypes.WHITESPACE, '    ', 4, 42),
-          new Token(TokenTypes.COMMENT, 'c list of all the Lao consonants', 4, 46),
-          new Token(TokenTypes.NEWLINE, '\n', 4, 78, line4),
+          new Token(TokenType.STORE, 'store'),
+          new Token(TokenType.LEFT_BR, '(', 1, 6),
+          new Token(TokenType.PARAMETER, 'LaoConsonants', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 20),
+          new Token(TokenType.WHITESPACE, ' ', 1, 21),
+          new Token(TokenType.U_CHAR, 'U+0E81', 1, 22),
+          new Token(TokenType.WHITESPACE, ' ', 1, 28),
+          new Token(TokenType.U_CHAR, 'U+0E82', 1, 29),
+          new Token(TokenType.WHITESPACE, ' ', 1, 35),
+          new Token(TokenType.U_CHAR, 'U+0E84', 1, 36),
+          new Token(TokenType.WHITESPACE, ' ', 1, 42),
+          new Token(TokenType.U_CHAR, 'U+0E87', 1, 43),
+          new Token(TokenType.WHITESPACE, ' ', 1, 49),
+          new Token(TokenType.U_CHAR, 'U+0E88', 1, 50),
+          new Token(TokenType.WHITESPACE, ' ', 1, 56),
+          new Token(TokenType.U_CHAR, 'U+0E8A', 1, 57),
+          new Token(TokenType.WHITESPACE, ' ', 1, 63),
+          new Token(TokenType.U_CHAR, 'U+0E8D', 1, 64),
+          new Token(TokenType.WHITESPACE, ' ', 1, 70),
+          new Token(TokenType.U_CHAR, 'U+0E94', 1, 71),
+          new Token(TokenType.WHITESPACE, ' ', 1, 77),
+          new Token(TokenType.CONTINUATION, '\\', 1, 78),
+          new Token(TokenType.NEWLINE, '\n', 1, 79, line1),
+          new Token(TokenType.WHITESPACE, '                     ', 2, 1),
+          new Token(TokenType.U_CHAR, 'U+0E95', 2, 22),
+          new Token(TokenType.WHITESPACE, ' ', 2, 28),
+          new Token(TokenType.U_CHAR, 'U+0E96', 2, 29),
+          new Token(TokenType.WHITESPACE, ' ', 2, 35),
+          new Token(TokenType.U_CHAR, 'U+0E97', 2, 36),
+          new Token(TokenType.WHITESPACE, ' ', 2, 42),
+          new Token(TokenType.U_CHAR, 'U+0E99', 2, 43),
+          new Token(TokenType.WHITESPACE, ' ', 2, 49),
+          new Token(TokenType.U_CHAR, 'U+0E9A', 2, 50),
+          new Token(TokenType.WHITESPACE, ' ', 2, 56),
+          new Token(TokenType.U_CHAR, 'U+0E9B', 2, 57),
+          new Token(TokenType.WHITESPACE, ' ', 2, 63),
+          new Token(TokenType.U_CHAR, 'U+0E9C', 2, 64),
+          new Token(TokenType.WHITESPACE, ' ', 2, 70),
+          new Token(TokenType.U_CHAR, 'U+0E9D', 2, 71),
+          new Token(TokenType.WHITESPACE, ' ', 2, 77),
+          new Token(TokenType.CONTINUATION, '\\', 2, 78),
+          new Token(TokenType.NEWLINE, '\n', 2, 79, line2),
+          new Token(TokenType.WHITESPACE, '                     ', 3, 1),
+          new Token(TokenType.U_CHAR, 'U+0E9E', 3, 22),
+          new Token(TokenType.WHITESPACE, ' ', 3, 28),
+          new Token(TokenType.U_CHAR, 'U+0E9F', 3, 29),
+          new Token(TokenType.WHITESPACE, ' ', 3, 35),
+          new Token(TokenType.U_CHAR, 'U+0EA1', 3, 36),
+          new Token(TokenType.WHITESPACE, ' ', 3, 42),
+          new Token(TokenType.U_CHAR, 'U+0EA2', 3, 43),
+          new Token(TokenType.WHITESPACE, ' ', 3, 49),
+          new Token(TokenType.U_CHAR, 'U+0EA3', 3, 50),
+          new Token(TokenType.WHITESPACE, ' ', 3, 56),
+          new Token(TokenType.U_CHAR, 'U+0EA5', 3, 57),
+          new Token(TokenType.WHITESPACE, ' ', 3, 63),
+          new Token(TokenType.U_CHAR, 'U+0EA7', 3, 64),
+          new Token(TokenType.WHITESPACE, ' ', 3, 70),
+          new Token(TokenType.U_CHAR, 'U+0EAA', 3, 71),
+          new Token(TokenType.WHITESPACE, ' ', 3, 77),
+          new Token(TokenType.CONTINUATION, '\\', 3, 78),
+          new Token(TokenType.NEWLINE, '\n', 3, 79, line3),
+          new Token(TokenType.WHITESPACE, '                     ', 4, 1),
+          new Token(TokenType.U_CHAR, 'U+0EAB', 4, 22),
+          new Token(TokenType.WHITESPACE, ' ', 4, 28),
+          new Token(TokenType.U_CHAR, 'U+0EAD', 4, 29),
+          new Token(TokenType.WHITESPACE, ' ', 4, 35),
+          new Token(TokenType.U_CHAR, 'U+0EAE', 4, 36),
+          new Token(TokenType.WHITESPACE, '    ', 4, 42),
+          new Token(TokenType.COMMENT, 'c list of all the Lao consonants', 4, 46),
+          new Token(TokenType.NEWLINE, '\n', 4, 78, line4),
         ]
       );
     });
     it("can recognise a NEWLINE token (LF)", () => {
-      recogniseToken(TokenTypes.NEWLINE, '\n');
+      recogniseToken(TokenType.NEWLINE, '\n');
     });
     it("can recognise a NEWLINE token (CR)", () => {
-      recogniseToken(TokenTypes.NEWLINE, '\r');
+      recogniseToken(TokenType.NEWLINE, '\r');
     });
     it("can recognise a NEWLINE token (CRLF)", () => {
-      recogniseToken(TokenTypes.NEWLINE, '\r\n');
+      recogniseToken(TokenType.NEWLINE, '\r\n');
     });
     it("can recognise a NAMED_CONSTANT token", () => {
-      recogniseToken(TokenTypes.NAMED_CONSTANT, '$abc');
+      recogniseToken(TokenType.NAMED_CONSTANT, '$abc');
     });
     it("can recognise a NAMED_CONSTANT token (followed by space)", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.NAMED_CONSTANT, '$abc');
+      recogniseTokenFollowedBySpace(TokenType.NAMED_CONSTANT, '$abc');
     });
     it("can recognise a NAMED_CONSTANT token (khmer)", () => {
-      recogniseToken(TokenTypes.NAMED_CONSTANT, '$សួស្តី');
+      recogniseToken(TokenType.NAMED_CONSTANT, '$សួស្តី');
     });
     it("can recognise a PARAMETER token", () => {
       recogniseTokens(
         'main)',
         [
-          new Token(TokenTypes.PARAMETER, 'main'),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 5),
+          new Token(TokenType.PARAMETER, 'main'),
+          new Token(TokenType.RIGHT_BR, ')', 1, 5),
         ]
       );
     });
@@ -603,9 +748,9 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main)',
         [
-          new Token(TokenTypes.LEFT_BR, '('),
-          new Token(TokenTypes.PARAMETER, 'main', 1, 2),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 6),
+          new Token(TokenType.LEFT_BR, '('),
+          new Token(TokenType.PARAMETER, 'main', 1, 2),
+          new Token(TokenType.RIGHT_BR, ')', 1, 6),
         ]
       );
     });
@@ -613,10 +758,10 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '( main)',
         [
-          new Token(TokenTypes.LEFT_BR, '('),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 2),
-          new Token(TokenTypes.PARAMETER, 'main', 1, 3),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 7),
+          new Token(TokenType.LEFT_BR, '('),
+          new Token(TokenType.WHITESPACE, ' ', 1, 2),
+          new Token(TokenType.PARAMETER, 'main', 1, 3),
+          new Token(TokenType.RIGHT_BR, ')', 1, 7),
         ]
       );
     });
@@ -624,10 +769,10 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main )',
         [
-          new Token(TokenTypes.LEFT_BR, '('),
-          new Token(TokenTypes.PARAMETER, 'main', 1, 2),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 7),
+          new Token(TokenType.LEFT_BR, '('),
+          new Token(TokenType.PARAMETER, 'main', 1, 2),
+          new Token(TokenType.WHITESPACE, ' ', 1, 6),
+          new Token(TokenType.RIGHT_BR, ')', 1, 7),
         ]
       );
     });
@@ -635,11 +780,11 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main,2)',
         [
-          new Token(TokenTypes.LEFT_BR, '('),
-          new Token(TokenTypes.PARAMETER, 'main', 1, 2),
-          new Token(TokenTypes.COMMA, ',', 1, 6),
-          new Token(TokenTypes.OCTAL, '2', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 8),
+          new Token(TokenType.LEFT_BR, '('),
+          new Token(TokenType.PARAMETER, 'main', 1, 2),
+          new Token(TokenType.COMMA, ',', 1, 6),
+          new Token(TokenType.OCTAL, '2', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 8),
         ]
       );
     });
@@ -647,11 +792,11 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main 2)',
         [
-          new Token(TokenTypes.LEFT_BR, '('),
-          new Token(TokenTypes.PARAMETER, 'main', 1, 2),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.OCTAL, '2', 1, 7),
-          new Token(TokenTypes.RIGHT_BR,   ')', 1, 8),
+          new Token(TokenType.LEFT_BR, '('),
+          new Token(TokenType.PARAMETER, 'main', 1, 2),
+          new Token(TokenType.WHITESPACE, ' ', 1, 6),
+          new Token(TokenType.OCTAL, '2', 1, 7),
+          new Token(TokenType.RIGHT_BR,   ')', 1, 8),
         ]
       );
     });
@@ -659,8 +804,8 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'anya)',
         [
-          new Token(TokenTypes.PARAMETER, 'anya'),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 5),
+          new Token(TokenType.PARAMETER, 'anya'),
+          new Token(TokenType.RIGHT_BR, ')', 1, 5),
         ]
       );
     });
@@ -668,8 +813,8 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'anyA)',
         [
-          new Token(TokenTypes.PARAMETER, 'anyA'),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 5),
+          new Token(TokenType.PARAMETER, 'anyA'),
+          new Token(TokenType.RIGHT_BR, ')', 1, 5),
         ]
       );
     });
@@ -677,11 +822,11 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'foo = "1"',
         [
-          new Token(TokenTypes.PARAMETER, 'foo'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 4),
-          new Token(TokenTypes.EQUAL, '=', 1, 5),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.STRING, '"1"', 1, 7),
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 4),
+          new Token(TokenType.EQUAL, '=', 1, 5),
+          new Token(TokenType.WHITESPACE, ' ', 1, 6),
+          new Token(TokenType.STRING, '"1"', 1, 7),
         ]
       );
     });
@@ -689,84 +834,108 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'foo="2"',
         [
-          new Token(TokenTypes.PARAMETER, 'foo'),
-          new Token(TokenTypes.EQUAL, '=', 1, 4),
-          new Token(TokenTypes.STRING, '"2"', 1, 5),
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.EQUAL, '=', 1, 4),
+          new Token(TokenType.STRING, '"2"', 1, 5),
         ]
       );
     });
+    it("can recognise a dummy token (empty brackets)", () => {
+      const lexer    = new Lexer('dummy()');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a dummy token (space before empty brackets)", () => {
+      const lexer    = new Lexer('dummy ()');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a dummy token (space after empty brackets)", () => {
+      const lexer    = new Lexer('dummy() ');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a dummy token (space in empty brackets)", () => {
+      const lexer    = new Lexer('dummy( )');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
+    });
     it("can recognise a bitmap store", () => {
-      recogniseSystemStoreWithString(TokenTypes.BITMAP, 'khmer_angkor.ico');
+      recogniseSystemStoreWithString(TokenType.BITMAP, 'khmer_angkor.ico');
     });
     it("can recognise a copyright store", () => {
-      recogniseSystemStoreWithString(TokenTypes.COPYRIGHT, '© SIL Global');
+      recogniseSystemStoreWithString(TokenType.COPYRIGHT, '© SIL Global');
     });
     it("can recognise a displaymap store", () => {
-      recogniseSystemStoreWithString(TokenTypes.DISPLAYMAP, '../../../shared/fonts/kbd/kbdkhmr/KbdKhmr.json');
+      recogniseSystemStoreWithString(TokenType.DISPLAYMAP, '../../../shared/fonts/kbd/kbdkhmr/KbdKhmr.json');
     });
     it("can recognise a keyboardversion store", () => {
-      recogniseSystemStoreWithString(TokenTypes.KEYBOARDVERSION, '2.0');
+      recogniseSystemStoreWithString(TokenType.KEYBOARDVERSION, '2.0');
     });
     it("can recognise a layoutfile store", () => {
-      recogniseSystemStoreWithString(TokenTypes.LAYOUTFILE, 'khmer_angkor.keyman-touch-layout');
+      recogniseSystemStoreWithString(TokenType.LAYOUTFILE, 'khmer_angkor.keyman-touch-layout');
     });
     it("can recognise a name store", () => {
-      recogniseSystemStoreWithString(TokenTypes.NAME, "Khmer Angkor");
+      recogniseSystemStoreWithString(TokenType.NAME, "Khmer Angkor");
     });
     it("can recognise a message store", () => {
-      recogniseSystemStoreWithString(TokenTypes.MESSAGE, "More than just a Khmer Unicode keyboard.");
+      recogniseSystemStoreWithString(TokenType.MESSAGE, "More than just a Khmer Unicode keyboard.");
     });
     it("can recognise a targets store", () => {
-      recogniseSystemStoreWithString(TokenTypes.TARGETS, 'any');
+      recogniseSystemStoreWithString(TokenType.TARGETS, 'any');
     });
     it("can recognise a version store", () => {
-      recogniseSystemStoreWithString(TokenTypes.VERSION, 'khmer_angkor.kvks');
+      recogniseSystemStoreWithString(TokenType.VERSION, 'khmer_angkor.kvks');
     });
     it("can recognise a visualkeyboard store", () => {
-      recogniseSystemStoreWithString(TokenTypes.VISUALKEYBOARD, '10.0');
+      recogniseSystemStoreWithString(TokenType.VISUALKEYBOARD, '10.0');
     });
     it("can recognise a capsalwaysoff store", () => {
-      recogniseSystemStoreWithString(TokenTypes.CAPSALWAYSOFF, "1");
+      recogniseSystemStoreWithString(TokenType.CAPSALWAYSOFF, "1");
     });
     it("can recognise a 'caps always off' statement", () => {
       recogniseTokens(
         'caps always off',
         [
-          new Token(TokenTypes.CAPS, 'caps'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 5),
-          new Token(TokenTypes.ALWAYS, 'always', 1, 6),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 12),
-          new Token(TokenTypes.OFF, 'off', 1, 13),
+          new Token(TokenType.CAPS, 'caps'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 5),
+          new Token(TokenType.ALWAYS, 'always', 1, 6),
+          new Token(TokenType.WHITESPACE, ' ', 1, 12),
+          new Token(TokenType.OFF, 'off', 1, 13),
         ]
       );
     });
     it("can recognise a capsononly store", () => {
-      recogniseSystemStoreWithString(TokenTypes.CAPSONONLY, "1");
+      recogniseSystemStoreWithString(TokenType.CAPSONONLY, "1");
     });
     it("can recognise a 'caps on only' statement", () => {
       recogniseTokens(
         'caps on only',
         [
-          new Token(TokenTypes.CAPS, 'caps'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 5),
-          new Token(TokenTypes.ON, 'on', 1, 6),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 8),
-          new Token(TokenTypes.ONLY, 'only', 1, 9),
+          new Token(TokenType.CAPS, 'caps'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 5),
+          new Token(TokenType.ON, 'on', 1, 6),
+          new Token(TokenType.WHITESPACE, ' ', 1, 8),
+          new Token(TokenType.ONLY, 'only', 1, 9),
         ]
       );
     });
     it("can recognise a shiftfreescaps store", () => {
-      recogniseSystemStoreWithString(TokenTypes.SHIFTFREESCAPS, "1");
+      recogniseSystemStoreWithString(TokenType.SHIFTFREESCAPS, "1");
     });
     it("can recognise a 'shift frees caps' statement", () => {
       recogniseTokens(
         'shift frees caps',
         [
-          new Token(TokenTypes.SHIFT, 'shift'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.FREES, 'frees', 1, 7),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 12),
-          new Token(TokenTypes.CAPS, 'caps', 1, 13),
+          new Token(TokenType.SHIFT, 'shift'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 6),
+          new Token(TokenType.FREES, 'frees', 1, 7),
+          new Token(TokenType.WHITESPACE, ' ', 1, 12),
+          new Token(TokenType.CAPS, 'caps', 1, 13),
         ]
       );
     });
@@ -774,16 +943,16 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'begin Unicode > use(main)',
         [
-          new Token(TokenTypes.BEGIN, 'begin'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.UNICODE, 'Unicode', 1, 7),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 14),
-          new Token(TokenTypes.CHEVRON, '>', 1, 15),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 16),
-          new Token(TokenTypes.USE, 'use', 1, 17),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 20),
-          new Token(TokenTypes.PARAMETER, 'main', 1, 21),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 25),
+          new Token(TokenType.BEGIN, 'begin'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 6),
+          new Token(TokenType.UNICODE, 'Unicode', 1, 7),
+          new Token(TokenType.WHITESPACE, ' ', 1, 14),
+          new Token(TokenType.CHEVRON, '>', 1, 15),
+          new Token(TokenType.WHITESPACE, ' ', 1, 16),
+          new Token(TokenType.USE, 'use', 1, 17),
+          new Token(TokenType.LEFT_BR, '(', 1, 20),
+          new Token(TokenType.PARAMETER, 'main', 1, 21),
+          new Token(TokenType.RIGHT_BR, ')', 1, 25),
         ]
       );
     });
@@ -791,16 +960,16 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'begin PostKeystroke > use(PostKeystroke)',
         [
-          new Token(TokenTypes.BEGIN, 'begin'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.POSTKEYSTROKE, 'PostKeystroke', 1, 7),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 20),
-          new Token(TokenTypes.CHEVRON, '>', 1, 21),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 22),
-          new Token(TokenTypes.USE, 'use', 1, 23),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 26),
-          new Token(TokenTypes.POSTKEYSTROKE, 'PostKeystroke', 1, 27), // recognised as keyword
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 40),
+          new Token(TokenType.BEGIN, 'begin'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 6),
+          new Token(TokenType.POSTKEYSTROKE, 'PostKeystroke', 1, 7),
+          new Token(TokenType.WHITESPACE, ' ', 1, 20),
+          new Token(TokenType.CHEVRON, '>', 1, 21),
+          new Token(TokenType.WHITESPACE, ' ', 1, 22),
+          new Token(TokenType.USE, 'use', 1, 23),
+          new Token(TokenType.LEFT_BR, '(', 1, 26),
+          new Token(TokenType.POSTKEYSTROKE, 'PostKeystroke', 1, 27), // recognised as keyword
+          new Token(TokenType.RIGHT_BR, ')', 1, 40),
         ]
       );
     });
@@ -808,12 +977,12 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'group(NewContext) readonly',
         [
-          new Token(TokenTypes.GROUP, 'group'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-          new Token(TokenTypes.NEWCONTEXT, 'NewContext', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 17),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 18),
-          new Token(TokenTypes.READONLY, 'readonly', 1, 19),
+          new Token(TokenType.GROUP, 'group'),
+          new Token(TokenType.LEFT_BR, '(', 1, 6),
+          new Token(TokenType.NEWCONTEXT, 'NewContext', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 17),
+          new Token(TokenType.WHITESPACE, ' ', 1, 18),
+          new Token(TokenType.READONLY, 'readonly', 1, 19),
         ]
       );
     });
@@ -821,14 +990,14 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'group(main) using keys',
         [
-          new Token(TokenTypes.GROUP, 'group'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-          new Token(TokenTypes.PARAMETER, 'main', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 11),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 12),
-          new Token(TokenTypes.USING, 'using', 1, 13),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 18),
-          new Token(TokenTypes.KEYS, 'keys', 1, 19),
+          new Token(TokenType.GROUP, 'group'),
+          new Token(TokenType.LEFT_BR, '(', 1, 6),
+          new Token(TokenType.PARAMETER, 'main', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 11),
+          new Token(TokenType.WHITESPACE, ' ', 1, 12),
+          new Token(TokenType.USING, 'using', 1, 13),
+          new Token(TokenType.WHITESPACE, ' ', 1, 18),
+          new Token(TokenType.KEYS, 'keys', 1, 19),
         ]
       );
     });
@@ -836,37 +1005,37 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'if(&newLayer = "") if(&layer = \'shift\') any(ShiftOutSingle) > context layer(\'default\')',
         [
-          new Token(TokenTypes.IF, 'if'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 3),
-          new Token(TokenTypes.NEWLAYER, '&newLayer', 1, 4),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 13),
-          new Token(TokenTypes.EQUAL, '=', 1, 14),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 15),
-          new Token(TokenTypes.STRING, '""', 1, 16),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 18),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 19),
-          new Token(TokenTypes.IF, 'if', 1, 20),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 22),
-          new Token(TokenTypes.LAYER, '&layer', 1, 23),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 29),
-          new Token(TokenTypes.EQUAL, '=', 1, 30),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 31),
-          new Token(TokenTypes.STRING, '\'shift\'', 1, 32),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 39),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 40),
-          new Token(TokenTypes.ANY, 'any', 1, 41),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 44),
-          new Token(TokenTypes.PARAMETER, 'ShiftOutSingle', 1, 45),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 59),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 60),
-          new Token(TokenTypes.CHEVRON, '>', 1, 61),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 62),
-          new Token(TokenTypes.CONTEXT, 'context', 1, 63),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 70),
-          new Token(TokenTypes.LAYER_SHORTCUT, 'layer', 1, 71),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 76),
-          new Token(TokenTypes.STRING, '\'default\'', 1, 77),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 86),
+          new Token(TokenType.IF, 'if'),
+          new Token(TokenType.LEFT_BR, '(', 1, 3),
+          new Token(TokenType.NEWLAYER, '&newLayer', 1, 4),
+          new Token(TokenType.WHITESPACE, ' ', 1, 13),
+          new Token(TokenType.EQUAL, '=', 1, 14),
+          new Token(TokenType.WHITESPACE, ' ', 1, 15),
+          new Token(TokenType.STRING, '""', 1, 16),
+          new Token(TokenType.RIGHT_BR, ')', 1, 18),
+          new Token(TokenType.WHITESPACE, ' ', 1, 19),
+          new Token(TokenType.IF, 'if', 1, 20),
+          new Token(TokenType.LEFT_BR, '(', 1, 22),
+          new Token(TokenType.LAYER, '&layer', 1, 23),
+          new Token(TokenType.WHITESPACE, ' ', 1, 29),
+          new Token(TokenType.EQUAL, '=', 1, 30),
+          new Token(TokenType.WHITESPACE, ' ', 1, 31),
+          new Token(TokenType.STRING, '\'shift\'', 1, 32),
+          new Token(TokenType.RIGHT_BR, ')', 1, 39),
+          new Token(TokenType.WHITESPACE, ' ', 1, 40),
+          new Token(TokenType.ANY, 'any', 1, 41),
+          new Token(TokenType.LEFT_BR, '(', 1, 44),
+          new Token(TokenType.PARAMETER, 'ShiftOutSingle', 1, 45),
+          new Token(TokenType.RIGHT_BR, ')', 1, 59),
+          new Token(TokenType.WHITESPACE, ' ', 1, 60),
+          new Token(TokenType.CHEVRON, '>', 1, 61),
+          new Token(TokenType.WHITESPACE, ' ', 1, 62),
+          new Token(TokenType.CONTEXT, 'context', 1, 63),
+          new Token(TokenType.WHITESPACE, ' ', 1, 70),
+          new Token(TokenType.LAYER_SHORTCUT, 'layer', 1, 71),
+          new Token(TokenType.LEFT_BR, '(', 1, 76),
+          new Token(TokenType.STRING, '\'default\'', 1, 77),
+          new Token(TokenType.RIGHT_BR, ')', 1, 86),
         ]
       );
     });
@@ -874,14 +1043,14 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'match > use(CombineDiacritics)',
         [
-          new Token(TokenTypes.MATCH, 'match'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.CHEVRON, '>', 1, 7),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 8),
-          new Token(TokenTypes.USE, 'use', 1, 9),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 12),
-          new Token(TokenTypes.PARAMETER, 'CombineDiacritics', 1, 13),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 30),
+          new Token(TokenType.MATCH, 'match'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 6),
+          new Token(TokenType.CHEVRON, '>', 1, 7),
+          new Token(TokenType.WHITESPACE, ' ', 1, 8),
+          new Token(TokenType.USE, 'use', 1, 9),
+          new Token(TokenType.LEFT_BR, '(', 1, 12),
+          new Token(TokenType.PARAMETER, 'CombineDiacritics', 1, 13),
+          new Token(TokenType.RIGHT_BR, ')', 1, 30),
         ]
       );
     });
@@ -889,14 +1058,14 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'nomatch > layer(\'default\')',
         [
-          new Token(TokenTypes.NOMATCH, 'nomatch'),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 8),
-          new Token(TokenTypes.CHEVRON, '>', 1, 9),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 10),
-          new Token(TokenTypes.LAYER_SHORTCUT, 'layer', 1, 11),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 16),
-          new Token(TokenTypes.STRING, '\'default\'', 1, 17),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 26),
+          new Token(TokenType.NOMATCH, 'nomatch'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 8),
+          new Token(TokenType.CHEVRON, '>', 1, 9),
+          new Token(TokenType.WHITESPACE, ' ', 1, 10),
+          new Token(TokenType.LAYER_SHORTCUT, 'layer', 1, 11),
+          new Token(TokenType.LEFT_BR, '(', 1, 16),
+          new Token(TokenType.STRING, '\'default\'', 1, 17),
+          new Token(TokenType.RIGHT_BR, ')', 1, 26),
         ]
       );
     });
@@ -904,17 +1073,17 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'platform(\'touch\') > use(detectStartOfSentence)',
         [
-          new Token(TokenTypes.PLATFORM_SHORTCUT, 'platform'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 9),
-          new Token(TokenTypes.STRING, '\'touch\'', 1, 10),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 17),
-          new Token(TokenTypes.WHITESPACE, ' ',1, 18),
-          new Token(TokenTypes.CHEVRON, '>', 1, 19),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 20),
-          new Token(TokenTypes.USE, 'use', 1, 21),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 24),
-          new Token(TokenTypes.PARAMETER, 'detectStartOfSentence', 1, 25),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 46),
+          new Token(TokenType.PLATFORM_SHORTCUT, 'platform'),
+          new Token(TokenType.LEFT_BR, '(', 1, 9),
+          new Token(TokenType.STRING, '\'touch\'', 1, 10),
+          new Token(TokenType.RIGHT_BR, ')', 1, 17),
+          new Token(TokenType.WHITESPACE, ' ',1, 18),
+          new Token(TokenType.CHEVRON, '>', 1, 19),
+          new Token(TokenType.WHITESPACE, ' ', 1, 20),
+          new Token(TokenType.USE, 'use', 1, 21),
+          new Token(TokenType.LEFT_BR, '(', 1, 24),
+          new Token(TokenType.PARAMETER, 'detectStartOfSentence', 1, 25),
+          new Token(TokenType.RIGHT_BR, ')', 1, 46),
         ]
       );
     });
@@ -922,30 +1091,30 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'store(ShiftOutAll)  outs(ShiftOutSingle) outs(vCombo1) outs(vCombo2) outs(vCombo3)',
         [
-          new Token(TokenTypes.STORE, 'store'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-          new Token(TokenTypes.PARAMETER, 'ShiftOutAll', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 18),
-          new Token(TokenTypes.WHITESPACE, '  ', 1, 19),
-          new Token(TokenTypes.OUTS, 'outs', 1, 21),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 25),
-          new Token(TokenTypes.PARAMETER, 'ShiftOutSingle', 1, 26),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 40),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 41),
-          new Token(TokenTypes.OUTS, 'outs', 1, 42),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 46),
-          new Token(TokenTypes.PARAMETER, 'vCombo1', 1, 47),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 54),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 55),
-          new Token(TokenTypes.OUTS, 'outs', 1, 56),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 60),
-          new Token(TokenTypes.PARAMETER, 'vCombo2', 1, 61),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 68),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 69),
-          new Token(TokenTypes.OUTS, 'outs', 1, 70),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 74),
-          new Token(TokenTypes.PARAMETER, 'vCombo3', 1, 75),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 82),
+          new Token(TokenType.STORE, 'store'),
+          new Token(TokenType.LEFT_BR, '(', 1, 6),
+          new Token(TokenType.PARAMETER, 'ShiftOutAll', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 18),
+          new Token(TokenType.WHITESPACE, '  ', 1, 19),
+          new Token(TokenType.OUTS, 'outs', 1, 21),
+          new Token(TokenType.LEFT_BR, '(', 1, 25),
+          new Token(TokenType.PARAMETER, 'ShiftOutSingle', 1, 26),
+          new Token(TokenType.RIGHT_BR, ')', 1, 40),
+          new Token(TokenType.WHITESPACE, ' ', 1, 41),
+          new Token(TokenType.OUTS, 'outs', 1, 42),
+          new Token(TokenType.LEFT_BR, '(', 1, 46),
+          new Token(TokenType.PARAMETER, 'vCombo1', 1, 47),
+          new Token(TokenType.RIGHT_BR, ')', 1, 54),
+          new Token(TokenType.WHITESPACE, ' ', 1, 55),
+          new Token(TokenType.OUTS, 'outs', 1, 56),
+          new Token(TokenType.LEFT_BR, '(', 1, 60),
+          new Token(TokenType.PARAMETER, 'vCombo2', 1, 61),
+          new Token(TokenType.RIGHT_BR, ')', 1, 68),
+          new Token(TokenType.WHITESPACE, ' ', 1, 69),
+          new Token(TokenType.OUTS, 'outs', 1, 70),
+          new Token(TokenType.LEFT_BR, '(', 1, 74),
+          new Token(TokenType.PARAMETER, 'vCombo3', 1, 75),
+          new Token(TokenType.RIGHT_BR, ')', 1, 82),
         ]
       );
     });
@@ -953,12 +1122,12 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'store(ShiftOutSingle) \'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\'',
         [
-          new Token(TokenTypes.STORE, 'store'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-          new Token(TokenTypes.PARAMETER, 'ShiftOutSingle', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 21),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 22),
-          new Token(TokenTypes.STRING, '\'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\'', 1, 23),
+          new Token(TokenType.STORE, 'store'),
+          new Token(TokenType.LEFT_BR, '(', 1, 6),
+          new Token(TokenType.PARAMETER, 'ShiftOutSingle', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 21),
+          new Token(TokenType.WHITESPACE, ' ', 1, 22),
+          new Token(TokenType.STRING, '\'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\'', 1, 23),
         ]
       );
     });
@@ -966,30 +1135,30 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'store(whitespace) \' \' U+00A0 U+000D U+000A',
         [
-          new Token(TokenTypes.STORE, 'store'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-          new Token(TokenTypes.PARAMETER, 'whitespace', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 17),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 18),
-          new Token(TokenTypes.STRING, '\' \'', 1, 19),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 22),
-          new Token(TokenTypes.U_CHAR, 'U+00A0', 1, 23),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 29),
-          new Token(TokenTypes.U_CHAR, 'U+000D', 1, 30),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 36),
-          new Token(TokenTypes.U_CHAR, 'U+000A', 1, 37),
+          new Token(TokenType.STORE, 'store'),
+          new Token(TokenType.LEFT_BR, '(', 1, 6),
+          new Token(TokenType.PARAMETER, 'whitespace', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 17),
+          new Token(TokenType.WHITESPACE, ' ', 1, 18),
+          new Token(TokenType.STRING, '\' \'', 1, 19),
+          new Token(TokenType.WHITESPACE, ' ', 1, 22),
+          new Token(TokenType.U_CHAR, 'U+00A0', 1, 23),
+          new Token(TokenType.WHITESPACE, ' ', 1, 29),
+          new Token(TokenType.U_CHAR, 'U+000D', 1, 30),
+          new Token(TokenType.WHITESPACE, ' ', 1, 36),
+          new Token(TokenType.U_CHAR, 'U+000A', 1, 37),
         ]
       );
     });
     it("can recognise compile targets (keyman, followed by space)", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.KEYMAN, '$keyman:');
+      recogniseTokenFollowedBySpace(TokenType.KEYMAN, '$keyman:');
     });
     it("can handle no newline at end of file", () => {
       const lexer    = new Lexer('beep');
       const actual   = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
       const expected = [
-        new Token(TokenTypes.BEEP, 'beep'),
-        new Token(TokenTypes.EOF, '', 1, 1, 'beep'),
+        new Token(TokenType.BEEP, 'beep'),
+        new Token(TokenType.EOF, '', 1, 1, 'beep'),
       ];
       assert.deepEqual(actual, expected);
     });
@@ -997,9 +1166,9 @@ describe("Lexer Tests", () => {
       const lexer    = new Lexer('beep\\\nbeep\n');
       const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:true});
       const expected = [
-        new Token(TokenTypes.BEEP, 'beep', 1, 1),
-        new Token(TokenTypes.BEEP, 'beep', 2, 1),
-        new Token(TokenTypes.NEWLINE, '\n', 2, 5, 'beep\\\nbeep\n'),
+        new Token(TokenType.BEEP, 'beep', 1, 1),
+        new Token(TokenType.BEEP, 'beep', 2, 1),
+        new Token(TokenType.NEWLINE, '\n', 2, 5, 'beep\\\nbeep\n'),
       ];
       assert.deepEqual(actual, expected);
     });
@@ -1011,38 +1180,38 @@ describe("Lexer Tests", () => {
       const lexer    = new Lexer(`${line1}${line2}${line3}${line4}`);
       const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:true});
       const expected = [
-          new Token(TokenTypes.STORE, 'store'),
-          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-          new Token(TokenTypes.PARAMETER, 'LaoConsonants', 1, 7),
-          new Token(TokenTypes.RIGHT_BR, ')', 1, 20),
-          new Token(TokenTypes.U_CHAR, 'U+0E81', 1, 22),
-          new Token(TokenTypes.U_CHAR, 'U+0E82', 1, 29),
-          new Token(TokenTypes.U_CHAR, 'U+0E84', 1, 36),
-          new Token(TokenTypes.U_CHAR, 'U+0E87', 1, 43),
-          new Token(TokenTypes.U_CHAR, 'U+0E88', 1, 50),
-          new Token(TokenTypes.U_CHAR, 'U+0E8A', 1, 57),
-          new Token(TokenTypes.U_CHAR, 'U+0E8D', 1, 64),
-          new Token(TokenTypes.U_CHAR, 'U+0E94', 1, 71),
-          new Token(TokenTypes.U_CHAR, 'U+0E95', 2, 22),
-          new Token(TokenTypes.U_CHAR, 'U+0E96', 2, 29),
-          new Token(TokenTypes.U_CHAR, 'U+0E97', 2, 36),
-          new Token(TokenTypes.U_CHAR, 'U+0E99', 2, 43),
-          new Token(TokenTypes.U_CHAR, 'U+0E9A', 2, 50),
-          new Token(TokenTypes.U_CHAR, 'U+0E9B', 2, 57),
-          new Token(TokenTypes.U_CHAR, 'U+0E9C', 2, 64),
-          new Token(TokenTypes.U_CHAR, 'U+0E9D', 2, 71),
-          new Token(TokenTypes.U_CHAR, 'U+0E9E', 3, 22),
-          new Token(TokenTypes.U_CHAR, 'U+0E9F', 3, 29),
-          new Token(TokenTypes.U_CHAR, 'U+0EA1', 3, 36),
-          new Token(TokenTypes.U_CHAR, 'U+0EA2', 3, 43),
-          new Token(TokenTypes.U_CHAR, 'U+0EA3', 3, 50),
-          new Token(TokenTypes.U_CHAR, 'U+0EA5', 3, 57),
-          new Token(TokenTypes.U_CHAR, 'U+0EA7', 3, 64),
-          new Token(TokenTypes.U_CHAR, 'U+0EAA', 3, 71),
-          new Token(TokenTypes.U_CHAR, 'U+0EAB', 4, 22),
-          new Token(TokenTypes.U_CHAR, 'U+0EAD', 4, 29),
-          new Token(TokenTypes.U_CHAR, 'U+0EAE', 4, 36),
-          new Token(TokenTypes.NEWLINE, '\n', 4, 78, `${line1}${line2}${line3}${line4}`),
+          new Token(TokenType.STORE, 'store'),
+          new Token(TokenType.LEFT_BR, '(', 1, 6),
+          new Token(TokenType.PARAMETER, 'LaoConsonants', 1, 7),
+          new Token(TokenType.RIGHT_BR, ')', 1, 20),
+          new Token(TokenType.U_CHAR, 'U+0E81', 1, 22),
+          new Token(TokenType.U_CHAR, 'U+0E82', 1, 29),
+          new Token(TokenType.U_CHAR, 'U+0E84', 1, 36),
+          new Token(TokenType.U_CHAR, 'U+0E87', 1, 43),
+          new Token(TokenType.U_CHAR, 'U+0E88', 1, 50),
+          new Token(TokenType.U_CHAR, 'U+0E8A', 1, 57),
+          new Token(TokenType.U_CHAR, 'U+0E8D', 1, 64),
+          new Token(TokenType.U_CHAR, 'U+0E94', 1, 71),
+          new Token(TokenType.U_CHAR, 'U+0E95', 2, 22),
+          new Token(TokenType.U_CHAR, 'U+0E96', 2, 29),
+          new Token(TokenType.U_CHAR, 'U+0E97', 2, 36),
+          new Token(TokenType.U_CHAR, 'U+0E99', 2, 43),
+          new Token(TokenType.U_CHAR, 'U+0E9A', 2, 50),
+          new Token(TokenType.U_CHAR, 'U+0E9B', 2, 57),
+          new Token(TokenType.U_CHAR, 'U+0E9C', 2, 64),
+          new Token(TokenType.U_CHAR, 'U+0E9D', 2, 71),
+          new Token(TokenType.U_CHAR, 'U+0E9E', 3, 22),
+          new Token(TokenType.U_CHAR, 'U+0E9F', 3, 29),
+          new Token(TokenType.U_CHAR, 'U+0EA1', 3, 36),
+          new Token(TokenType.U_CHAR, 'U+0EA2', 3, 43),
+          new Token(TokenType.U_CHAR, 'U+0EA3', 3, 50),
+          new Token(TokenType.U_CHAR, 'U+0EA5', 3, 57),
+          new Token(TokenType.U_CHAR, 'U+0EA7', 3, 64),
+          new Token(TokenType.U_CHAR, 'U+0EAA', 3, 71),
+          new Token(TokenType.U_CHAR, 'U+0EAB', 4, 22),
+          new Token(TokenType.U_CHAR, 'U+0EAD', 4, 29),
+          new Token(TokenType.U_CHAR, 'U+0EAE', 4, 36),
+          new Token(TokenType.NEWLINE, '\n', 4, 78, `${line1}${line2}${line3}${line4}`),
         ]
       assert.deepEqual(actual, expected);
     });
@@ -1086,8 +1255,6 @@ describe("Lexer Tests", () => {
         'only',
         'shift',
         'frees',
-        'fix',
-        'clearcontext',
         'beep',
         'begin',
         'context',
@@ -1121,25 +1288,25 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a command with whitespace before the bracket", () => {
       [
-        {type: TokenTypes.BASELAYOUT_SHORTCUT, text: 'baselayout'},
-        {type: TokenTypes.LAYER_SHORTCUT,      text: 'layer'},
-        {type: TokenTypes.PLATFORM_SHORTCUT,   text: 'platform'},
-        {type: TokenTypes.ANY,                 text: 'any'},
-        {type: TokenTypes.CALL,                text: 'call'},
-        {type: TokenTypes.DEADKEY,             text: 'deadkey'},
-        {type: TokenTypes.DEADKEY,             text: 'dk'},
-        {type: TokenTypes.GROUP,               text: 'group'},
-        {type: TokenTypes.IF,                  text: 'if'},
-        {type: TokenTypes.INDEX,               text: 'index'},
-        {type: TokenTypes.MATCH,               text: 'match'},
-        {type: TokenTypes.NOMATCH,             text: 'nomatch'},
-        {type: TokenTypes.NOTANY,              text: 'notany'},
-        {type: TokenTypes.OUTS,                text: 'outs'},
-        {type: TokenTypes.RESET,               text: 'reset'},
-        {type: TokenTypes.SAVE,                text: 'save'},
-        {type: TokenTypes.SET,                 text: 'set'},
-        {type: TokenTypes.STORE,               text: 'store'},
-        {type: TokenTypes.USE,                 text: 'use'},
+        {type: TokenType.BASELAYOUT_SHORTCUT, text: 'baselayout'},
+        {type: TokenType.LAYER_SHORTCUT,      text: 'layer'},
+        {type: TokenType.PLATFORM_SHORTCUT,   text: 'platform'},
+        {type: TokenType.ANY,                 text: 'any'},
+        {type: TokenType.CALL,                text: 'call'},
+        {type: TokenType.DEADKEY,             text: 'deadkey'},
+        {type: TokenType.DEADKEY,             text: 'dk'},
+        {type: TokenType.GROUP,               text: 'group'},
+        {type: TokenType.IF,                  text: 'if'},
+        {type: TokenType.INDEX,               text: 'index'},
+        {type: TokenType.MATCH,               text: 'match'},
+        {type: TokenType.NOMATCH,             text: 'nomatch'},
+        {type: TokenType.NOTANY,              text: 'notany'},
+        {type: TokenType.OUTS,                text: 'outs'},
+        {type: TokenType.RESET,               text: 'reset'},
+        {type: TokenType.SAVE,                text: 'save'},
+        {type: TokenType.SET,                 text: 'set'},
+        {type: TokenType.STORE,               text: 'store'},
+        {type: TokenType.USE,                 text: 'use'},
       ].forEach((testCase) => {
         recogniseTokenFollowedBySpacedLeftBracket(testCase.type, testCase.text);
       });
@@ -1190,63 +1357,63 @@ describe("Lexer Tests", () => {
   describe("Token", () => {
     describe("Token.constructor()", () => {
       it("can construct a Token", () => {
-        const token = new Token(TokenTypes.STORE, 'store');
+        const token = new Token(TokenType.STORE, 'store');
         assert.deepEqual(token.toString(), '[STORE,store]');
         assert.equal(token.lineNum, 1);
         assert.equal(token.charNum, 1);
         assert.isNull(token.line);
       });
       it("can construct a Token with line and char numbers", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.deepEqual(token.toString(), '[STORE,store]');
         assert.equal(token.lineNum, 2);
         assert.equal(token.charNum, 3);
         assert.isNull(token.line);
       });
       it("can handle a negative line number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', -2, 3);
+        const token = new Token(TokenType.STORE, 'store', -2, 3);
         assert.deepEqual(token.toString(), '[STORE,store]');
         assert.equal(token.lineNum, 1);
         assert.equal(token.charNum, 3);
         assert.isNull(token.line);
       });
       it("can handle a negative char number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, -3);
+        const token = new Token(TokenType.STORE, 'store', 2, -3);
         assert.deepEqual(token.toString(), '[STORE,store]');
         assert.equal(token.lineNum, 2);
         assert.equal(token.charNum, 1);
         assert.isNull(token.line);
       });
       it("can handle a zero line number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 0, 3);
+        const token = new Token(TokenType.STORE, 'store', 0, 3);
         assert.deepEqual(token.toString(), '[STORE,store]');
         assert.equal(token.lineNum, 1);
         assert.equal(token.charNum, 3);
         assert.isNull(token.line);
       });
       it("can handle a zero char number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 0);
+        const token = new Token(TokenType.STORE, 'store', 2, 0);
         assert.deepEqual(token.toString(), '[STORE,store]');
         assert.equal(token.lineNum, 2);
         assert.equal(token.charNum, 1);
         assert.isNull(token.line);
       });
       it("can construct a Token with a line (NEWLINE)", () => {
-        const token = new Token(TokenTypes.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
+        const token = new Token(TokenType.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
         assert.deepEqual(token.toString(), '[NEWLINE]');
         assert.equal(token.lineNum, 1);
         assert.equal(token.charNum, 19);
         assert.equal(token.line, 'store(one) "value"\n');
       });
       it("can construct a Token with a line (EOF)", () => {
-        const token = new Token(TokenTypes.EOF, '', 1, 18, 'store(one) "value"');
+        const token = new Token(TokenType.EOF, '', 1, 18, 'store(one) "value"');
         assert.deepEqual(token.toString(), '[EOF]');
         assert.equal(token.lineNum, 1);
         assert.equal(token.charNum, 18);
         assert.equal(token.line, 'store(one) "value"');
       });
       it("can handle invalid line in constructor", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 1, 1, 'store(one) "value"\n');
+        const token = new Token(TokenType.STORE, 'store', 1, 1, 'store(one) "value"\n');
         assert.deepEqual(token.toString(), '[STORE,store]');
         assert.equal(token.lineNum, 1);
         assert.equal(token.charNum, 1);
@@ -1255,44 +1422,44 @@ describe("Lexer Tests", () => {
     });
     describe("Token.isTokenType()", () => {
       it("can report match", () => {
-        const token = new Token(TokenTypes.STORE, 'store');
-        assert.isTrue(token.isTokenType(TokenTypes.STORE));
+        const token = new Token(TokenType.STORE, 'store');
+        assert.isTrue(token.isTokenType(TokenType.STORE));
       });
       it("can report non-match", () => {
-        const token = new Token(TokenTypes.STORE, 'store');
-        assert.isFalse(token.isTokenType(TokenTypes.BITMAP));
+        const token = new Token(TokenType.STORE, 'store');
+        assert.isFalse(token.isTokenType(TokenType.BITMAP));
       });
     });
     describe("Token.text", () => {
       it("can get text", () => {
-        const token = new Token(TokenTypes.STORE, 'store');
+        const token = new Token(TokenType.STORE, 'store');
         assert.equal(token.text, 'store');
       });
       it("can set text", () => {
-        const token = new Token(TokenTypes.STORE, 'store');
+        const token = new Token(TokenType.STORE, 'store');
         token.text = 'bitmap';
         assert.equal(token.text, 'bitmap');
       });
     });
     describe("Token.lineNum", () => {
       it("can get line number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.lineNum, 2);
       });
       it("can set line number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.lineNum, 2);
         token.lineNum = 4;
         assert.equal(token.lineNum, 4);
       });
       it("can handle a negative line number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.lineNum, 2);
         token.lineNum = -2;
         assert.equal(token.lineNum, 1);
       });
       it("can handle a zero line number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.lineNum, 2);
         token.lineNum = 0;
         assert.equal(token.lineNum, 1);
@@ -1300,23 +1467,23 @@ describe("Lexer Tests", () => {
     });
     describe("Token.charNum", () => {
       it("can get char number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.charNum, 3);
       });
       it("can set char number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.charNum, 3);
         token.charNum = 4;
         assert.equal(token.charNum, 4);
       });
       it("can handle a negative char number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.charNum, 3);
         token.charNum = -3;
         assert.equal(token.charNum, 1);
       });
       it("can handle a zero char number", () => {
-        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.charNum, 3);
         token.charNum = 0;
         assert.equal(token.charNum, 1);
@@ -1324,105 +1491,108 @@ describe("Lexer Tests", () => {
     });
     describe("Token.line", () => {
       it("can get line", () => {
-        const token = new Token(TokenTypes.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
+        const token = new Token(TokenType.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
         assert.equal(token.line, 'store(one) "value"\n');
       });
     });
   });
 });
 
-function recogniseToken(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseToken(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   const lexer    = new Lexer(text);
   const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
-  const line     = (type === TokenTypes.NEWLINE) ? text : null;
+  const line     = (type === TokenType.NEWLINE) ? text : null;
   const expected = [new Token(type, text, 1, 1, line)];
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokens(text: string, expected: Token[], {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokens(text: string, expected: Token[], {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   const lexer    = new Lexer(text);
   const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokenFollowedBySpace(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedBySpace(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text} `,
     [
       new Token(type, text),
-      new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
+      new Token(TokenType.WHITESPACE, ' ', 1, 1+text.length),
     ],
     {addEOF, emitAll, handleContinuation}
   );
 }
 
-function recogniseTokenFollowedByLeftBracket(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedByLeftBracket(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text}(`,
     [
       new Token(type, text),
-      new Token(TokenTypes.LEFT_BR, '(', 1, 1+text.length),
+      new Token(TokenType.LEFT_BR, '(', 1, 1+text.length),
     ],
    {addEOF, emitAll, handleContinuation}
   );
 }
 
-function recogniseTokenFollowedBySpacedLeftBracket(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedBySpacedLeftBracket(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text} (`,
     [
       new Token(type, text),
-      new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
-      new Token(TokenTypes.LEFT_BR, '(', 1, 2+text.length),
+      new Token(TokenType.WHITESPACE, ' ', 1, 1+text.length),
+      new Token(TokenType.LEFT_BR, '(', 1, 2+text.length),
     ],
    {addEOF, emitAll, handleContinuation}
   );
 }
 
-function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedByRightSquare(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text}]`,
     [
       new Token(type, text),
-      new Token(TokenTypes.RIGHT_SQ, ']', 1, 1+text.length),
+      new Token(TokenType.RIGHT_SQ, ']', 1, 1+text.length),
     ],
    {addEOF, emitAll, handleContinuation}
   );
 }
 
-function recogniseSystemStoreWithString(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
-  const value = TokenTypes[type].toLowerCase();
+function recogniseSystemStoreWithString(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}) {
+  const value = TokenType[type].toLowerCase();
   recogniseTokens(
     `store(&${value}) '${text}'`,
     [
-      new Token(TokenTypes.STORE, 'store'),
-      new Token(TokenTypes.LEFT_BR, '(', 1, 6),
+      new Token(TokenType.STORE, 'store'),
+      new Token(TokenType.LEFT_BR, '(', 1, 6),
       new Token(type, `&${value}`, 1, 7),
-      new Token(TokenTypes.RIGHT_BR, ')', 1, 8+value.length),
-      new Token(TokenTypes.WHITESPACE, ' ', 1, 9+value.length),
-      new Token(TokenTypes.STRING, `'${text}'`, 1, 10+value.length),
+      new Token(TokenType.RIGHT_BR, ')', 1, 8+value.length),
+      new Token(TokenType.WHITESPACE, ' ', 1, 9+value.length),
+      new Token(TokenType.STRING, `'${text}'`, 1, 10+value.length),
     ],
     {addEOF, emitAll, handleContinuation}
   );
 }
 
-function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}) {
   ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
     const textWithSuffix = `${text}${suffix}`;
     recogniseTokens(
       textWithSuffix,
-      [new Token(TokenTypes.PARAMETER, textWithSuffix)],
+      [new Token(TokenType.PARAMETER, textWithSuffix)],
       {addEOF, emitAll, handleContinuation}
     );
   });
 }
 
-function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}) {
   ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
     const textWithSuffix = `${text}${suffix}`;
     recogniseTokens(
       `${textWithSuffix}(`,
-      [new Token(TokenTypes.PARAMETER, `${textWithSuffix}(`)],
+      [
+        new Token(TokenType.PARAMETER, textWithSuffix),
+        new Token(TokenType.LEFT_BR, '(', 1, 1+textWithSuffix.length),
+      ],
       {addEOF, emitAll, handleContinuation}
     );
   });
@@ -1431,23 +1601,23 @@ function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleC
     recogniseTokens(
       `${textWithSuffix} (`,
       [
-        new Token(TokenTypes.PARAMETER, textWithSuffix),
-        new Token(TokenTypes.WHITESPACE, ' ', 1, 1+textWithSuffix.length),
-        new Token(TokenTypes.LEFT_BR, '(', 1, 2+textWithSuffix.length),
+        new Token(TokenType.PARAMETER, textWithSuffix),
+        new Token(TokenType.WHITESPACE, ' ', 1, 1+textWithSuffix.length),
+        new Token(TokenType.LEFT_BR, '(', 1, 2+textWithSuffix.length),
       ],
       {addEOF, emitAll, handleContinuation}
     );
   });
 }
 
-function handleCommandWithMissingLeftBracket(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function handleCommandWithMissingLeftBracket(text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   const line = `${text} \n`;
   recogniseTokens(
     line,
     [
-      new Token(TokenTypes.PARAMETER, text),
-      new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
-      new Token(TokenTypes.NEWLINE, '\n', 1, 2+text.length, line),
+      new Token(TokenType.PARAMETER, text),
+      new Token(TokenType.WHITESPACE, ' ', 1, 1+text.length),
+      new Token(TokenType.NEWLINE, '\n', 1, 2+text.length, line),
     ],
    {addEOF, emitAll, handleContinuation}
   );
