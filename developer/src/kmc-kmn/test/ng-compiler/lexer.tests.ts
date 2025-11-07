@@ -1331,7 +1331,7 @@ describe("Lexer Tests", () => {
   });
 });
 
-function recogniseToken(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseToken(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   const lexer    = new Lexer(text);
   const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
   const line     = (type === TokenType.NEWLINE) ? text : null;
@@ -1339,13 +1339,13 @@ function recogniseToken(type: TokenType, text: string, {addEOF=false, emitAll=tr
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokens(text: string, expected: Token[], {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokens(text: string, expected: Token[], {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   const lexer    = new Lexer(text);
   const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokenFollowedBySpace(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedBySpace(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text} `,
     [
@@ -1356,7 +1356,7 @@ function recogniseTokenFollowedBySpace(type: TokenType, text: string, {addEOF=fa
   );
 }
 
-function recogniseTokenFollowedByLeftBracket(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedByLeftBracket(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text}(`,
     [
@@ -1367,7 +1367,7 @@ function recogniseTokenFollowedByLeftBracket(type: TokenType, text: string, {add
   );
 }
 
-function recogniseTokenFollowedBySpacedLeftBracket(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedBySpacedLeftBracket(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text} (`,
     [
@@ -1379,7 +1379,7 @@ function recogniseTokenFollowedBySpacedLeftBracket(type: TokenType, text: string
   );
 }
 
-function recogniseTokenFollowedByRightSquare(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedByRightSquare(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   recogniseTokens(
     `${text}]`,
     [
@@ -1390,7 +1390,7 @@ function recogniseTokenFollowedByRightSquare(type: TokenType, text: string, {add
   );
 }
 
-function recogniseSystemStoreWithString(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+function recogniseSystemStoreWithString(type: TokenType, text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}) {
   const value = TokenType[type].toLowerCase();
   recogniseTokens(
     `store(&${value}) '${text}'`,
@@ -1406,7 +1406,7 @@ function recogniseSystemStoreWithString(type: TokenType, text: string, {addEOF=f
   );
 }
 
-function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}) {
   ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
     const textWithSuffix = `${text}${suffix}`;
     recogniseTokens(
@@ -1417,7 +1417,7 @@ function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleC
   });
 }
 
-function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}) {
   ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
     const textWithSuffix = `${text}${suffix}`;
     recogniseTokens(
@@ -1440,7 +1440,7 @@ function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleC
   });
 }
 
-function handleCommandWithMissingLeftBracket(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function handleCommandWithMissingLeftBracket(text: string, {addEOF=false, emitAll=true, handleContinuation=false}={}): void {
   const line = `${text} \n`;
   recogniseTokens(
     line,
