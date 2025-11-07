@@ -282,10 +282,48 @@ describe('DeadkeyTracker', function() {
       tracker.add(new Deadkey(5, 2));
       tracker.add(new Deadkey(10, 3));
 
-      // REVIEW: this behavior seems odd
       assert.isFalse(tracker.isMatch(0, 3, 1));
 
       assert.equal(tracker.dks[0].matched, 0);
+      assert.equal(tracker.dks[1].matched, 0);
+      assert.equal(tracker.dks[2].matched, 0);
+    });
+
+    it('returns true if offset is correct and we have multiple deadkeys with same id', function () {
+      const tracker = new DeadkeyTracker();
+      tracker.add(new Deadkey(3, 1));
+      tracker.add(new Deadkey(5, 1));
+      tracker.add(new Deadkey(10, 3));
+
+      assert.isTrue(tracker.isMatch(7, 2, 1));
+
+      assert.equal(tracker.dks[0].matched, 0);
+      assert.equal(tracker.dks[1].matched, 1);
+      assert.equal(tracker.dks[2].matched, 0);
+    });
+
+    it('matches entry with lowest ordinal value', function () {
+      const tracker = new DeadkeyTracker();
+      tracker.add(new Deadkey(3, 1));
+      tracker.add(new Deadkey(3, 1));
+      tracker.add(new Deadkey(10, 3));
+
+      assert.isTrue(tracker.isMatch(0, -3, 1));
+
+      assert.equal(tracker.dks[0].matched, 1);
+      assert.equal(tracker.dks[1].matched, 0);
+      assert.equal(tracker.dks[2].matched, 0);
+    });
+
+    it('matches entry with lowest ordinal value if caret is after deadkey', function () {
+      const tracker = new DeadkeyTracker();
+      tracker.add(new Deadkey(3, 1));
+      tracker.add(new Deadkey(3, 1));
+      tracker.add(new Deadkey(10, 3));
+
+      assert.isTrue(tracker.isMatch(5, 2, 1));
+
+      assert.equal(tracker.dks[0].matched, 1);
       assert.equal(tracker.dks[1].matched, 0);
       assert.equal(tracker.dks[2].matched, 0);
     });
@@ -296,7 +334,6 @@ describe('DeadkeyTracker', function() {
       tracker.add(new Deadkey(5, 2));
       tracker.add(new Deadkey(10, 3));
 
-      // REVIEW: this behavior seems odd
       assert.isTrue(tracker.isMatch(0, -3, 1));
 
       assert.equal(tracker.dks[0].matched, 1);
