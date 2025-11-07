@@ -313,30 +313,6 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.MATCH, 'MATCH');
       recogniseToken(TokenType.MATCH, 'Match');
     });
-    it("can recognise a MATCH token (empty brackets)", () => {
-      const lexer    = new Lexer('match()');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenType.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
-    });
-    it("can recognise a MATCH token (space before empty brackets)", () => {
-      const lexer    = new Lexer('match ()');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenType.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
-    });
-    it("can recognise a MATCH token (space after empty brackets)", () => {
-      const lexer    = new Lexer('match() ');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenType.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
-    });
-    it("can recognise a MATCH token (space in empty brackets)", () => {
-      const lexer    = new Lexer('match( )');
-      const actual   = lexer.parse({addEOF:false, emitAll:false});
-      const expected = [new Token(TokenType.MATCH, 'match')];
-      assert.deepEqual(actual, expected);
-    });
     it("can recognise a NOMATCH token", () => {
       recogniseToken(TokenType.NOMATCH, 'nomatch');
       recogniseToken(TokenType.NOMATCH, 'NOMATCH');
@@ -863,6 +839,30 @@ describe("Lexer Tests", () => {
           new Token(TokenType.STRING, '"2"', 1, 5),
         ]
       );
+    });
+    it("can recognise a dummy token (empty brackets)", () => {
+      const lexer    = new Lexer('dummy()');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a dummy token (space before empty brackets)", () => {
+      const lexer    = new Lexer('dummy ()');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a dummy token (space after empty brackets)", () => {
+      const lexer    = new Lexer('dummy() ');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a dummy token (space in empty brackets)", () => {
+      const lexer    = new Lexer('dummy( )');
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenType.PARAMETER, 'dummy')];
+      assert.deepEqual(actual, expected);
     });
     it("can recognise a bitmap store", () => {
       recogniseSystemStoreWithString(TokenType.BITMAP, 'khmer_angkor.ico');
@@ -1589,7 +1589,10 @@ function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleC
     const textWithSuffix = `${text}${suffix}`;
     recogniseTokens(
       `${textWithSuffix}(`,
-      [new Token(TokenType.PARAMETER, `${textWithSuffix}(`)],
+      [
+        new Token(TokenType.PARAMETER, textWithSuffix),
+        new Token(TokenType.LEFT_BR, '(', 1, 1+textWithSuffix.length),
+      ],
       {addEOF, emitAll, handleContinuation}
     );
   });

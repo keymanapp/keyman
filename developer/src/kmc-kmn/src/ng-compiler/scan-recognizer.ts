@@ -246,5 +246,5 @@ export const KMN_SCAN_RECOGNIZERS = [
   {tokenType: TokenType.NEWLINE,             regExp: /(\r\n|\n|\r)/y,                                         emit: true},
   // https://help.keyman.com/developer/language/guide/constants
   {tokenType: TokenType.NAMED_CONSTANT,      regExp: /\$\S+/y,                                                emit: true},
-  {tokenType: TokenType.PARAMETER,           regExp: /[^=,\)\s]+/y,                                           emit: true},
+  {tokenType: TokenType.PARAMETER,           regExp: /[^=,\(\)\s]+/y,                                           emit: true},
 ];
