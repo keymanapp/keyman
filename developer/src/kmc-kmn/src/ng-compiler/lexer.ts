@@ -134,6 +134,11 @@ export class Lexer {
     }
 
     // discard matching empty brackets
+    // Empty brackets are simply discarded by the current compiler, and allowing them through to the syntax analyser
+    // hugely complicates the grammar. When the Lexer is extended for error handling, it may be that a few more token
+    // combinations can be identified and warnings/errors given. Possibilities include mismatched braces, square
+    // brackets etc. I included this one at this stage because of an instance in the keyboard repository
+    // https://github.com/keymanapp/keyboards/blob/92240aaf75261aa771a019d0eee59a4e58806644/release/sil/sil_senegal_bqj_azerty/source/sil_senegal_bqj_azerty.kmn#L746
     if (!emitAll && (this.tokenList.length >= 2) &&
       this.tokenList.at(-1).isTokenType(TokenType.RIGHT_BR) &&
       this.tokenList.at(-2).isTokenType(TokenType.LEFT_BR)) {
