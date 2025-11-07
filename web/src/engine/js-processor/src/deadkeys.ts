@@ -1,6 +1,6 @@
 // Defines the base Deadkey-tracking object.
 export class Deadkey {
-  p: number;  // Position of deadkey
+  p: number;  // Position of deadkey in the textstore (deadkey comes before the character at this position)
   d: number;  // Numerical id of the deadkey
   o: number;  // Ordinal value of the deadkey (resolves same-place conflicts)
   matched: number;
