@@ -1,4 +1,4 @@
-import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
+import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction, KMXKeyboard } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 // TODO-web-core: remove alias
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard";
@@ -566,7 +566,7 @@ export class KeymanEngineBase<
         const kbdObj = this.keyboardRequisitioner.cache.getKeyboard(k0);
         if (!kbdObj) {
           throw new Error(`Keyboard '${k0}' has not been loaded.`);
-        } else if (!(kbdObj instanceof JSKeyboard)) {
+        } else if (kbdObj instanceof KMXKeyboard) {
           return false; // TODO-web-core: implement for KMX keyboards
         } else {
           k0 = kbdObj;
