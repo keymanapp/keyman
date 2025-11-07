@@ -12,6 +12,16 @@
 
 using namespace km::core::kmx;
 
+namespace km {
+  namespace core {
+    namespace kmx {
+
+      // Declarations of helper functions
+      extern bool header_from_bytes(const uint8_t *data, KMX_DWORD length, KMX_DWORD fileVersion, uint32_t ident, COMP_KMXPLUS_HEADER &out);
+    }
+  }
+}
+
 TEST(KMXPlusTest, test_COMP_KMXPLUS_KEYS_KEY) {
   COMP_KMXPLUS_KEYS_KEY e[2] = {
       {
@@ -282,18 +292,26 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withGoodStrings) {
     0x00000000,  // null
 
     // data @ +7
-    0x0041,  // 'a'
+    0x0041,  // 'A'
     0x0000,  // null
   };
 
-  const COMP_KMXPLUS_HEADER *header = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(mystrs);
-  ASSERT_TRUE(header->valid(mystrs[1]));
-  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(mystrs);
-  ASSERT_TRUE(strs->valid(mystrs[1]));
+
+  COMP_KMXPLUS_HEADER header;
+  ASSERT_TRUE(header_from_bytes(reinterpret_cast<uint8_t*>(&mystrs[0]), len * 4, LDML_KMXPLUS_VERSION_17, COMP_KMXPLUS_STRS::IDENT, header));
+
+  ASSERT_EQ(header.fileVersion(), LDML_KMXPLUS_VERSION_17);
+  ASSERT_EQ(header.headerSize(), LDML_LENGTH_HEADER_17);
+  ASSERT_EQ(header.ident, LDML_SECTIONID_STRS);
+  ASSERT_EQ(header.size, len * 4);
+  ASSERT_EQ(header.version, LDML_KMXPLUS_VERSION_17);
+
+  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(&mystrs[2]);
+  ASSERT_TRUE(strs->valid(header, mystrs[1]));
   KMX_DWORD_unaligned mycount = strs->count;
   ASSERT_EQ(mycount, 2);
-  ASSERT_EQ(strs->get(0), u"");
-  ASSERT_EQ(strs->get(1), u"A");
+  ASSERT_EQ(strs->get(header, 0), u"");
+  ASSERT_EQ(strs->get(header, 1), u"A");
 }
 
 
@@ -320,14 +338,24 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withBadStrings) {
     0x0000,  // null
   };
 
-  const COMP_KMXPLUS_HEADER *header = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(mystrs);
-  ASSERT_TRUE(header->valid(mystrs[1]));
-  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(mystrs);
-  ASSERT_FALSE(strs->valid(mystrs[1]));
+  COMP_KMXPLUS_HEADER header;
+  ASSERT_TRUE(header_from_bytes(reinterpret_cast<uint8_t*>(mystrs), len * 4, LDML_KMXPLUS_VERSION_17, COMP_KMXPLUS_STRS::IDENT, header));
+
+  ASSERT_EQ(header.fileVersion(), LDML_KMXPLUS_VERSION_17);
+  ASSERT_EQ(header.headerSize(), LDML_LENGTH_HEADER_17);
+  ASSERT_EQ(header.ident, LDML_SECTIONID_STRS);
+  ASSERT_EQ(header.size, len * 4);
+  ASSERT_EQ(header.version, LDML_KMXPLUS_VERSION_17);
+
+  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(&mystrs[2]);
+  ASSERT_FALSE(strs->valid(header, mystrs[1]));
 }
+
+extern KMX_BOOL km::core::kmx::g_debug_KeymanLog;
 
 GTEST_API_ int
 main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
+  km::core::kmx::g_debug_KeymanLog = FALSE;
   return RUN_ALL_TESTS();
 }

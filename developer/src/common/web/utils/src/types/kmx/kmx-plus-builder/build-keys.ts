@@ -76,8 +76,10 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   }
 
   const keys: BUILDER_KEYS = {
-    ident: constants.hex_section_id(constants.section.keys),
-    size: 0,
+    header: {
+      ident: constants.hex_section_id(constants.section.keys),
+      size: 0,
+    },
     keyCount: kmxplus.keys.keys.length,
     flicksCount: kmxplus.keys.flicks.length,
     flickCount: 0,
@@ -169,7 +171,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     (constants.length_keys_flick_element * keys.flickCount) +
     (constants.length_keys_flick_list * keys.flicksCount) +
     (constants.length_keys_kmap * keys.kmapCount);
-  keys.size = offset;
+  keys.header.size = offset;
 
   return keys;
 }

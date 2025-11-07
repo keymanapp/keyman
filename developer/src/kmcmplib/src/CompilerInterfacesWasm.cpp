@@ -124,6 +124,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("warnDeprecatedCode", &KMCMP_COMPILER_OPTIONS::warnDeprecatedCode)
     .property("shouldAddCompilerVersion", &KMCMP_COMPILER_OPTIONS::shouldAddCompilerVersion)
     .property("target", &KMCMP_COMPILER_OPTIONS::target)
+    .property("targetVersion", &KMCMP_COMPILER_OPTIONS::targetVersion)
     ;
 
   emscripten::class_<WASM_COMPILER_RESULT>("CompilerResult")
