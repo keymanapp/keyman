@@ -355,8 +355,16 @@ begin
 
     with TStringList.Create do
     try
-      LoadFromFile(FBaseFileName, TEncoding.UTF8);
-      FNewLayoutJS := Text;
+      try
+        LoadFromFile(FBaseFileName, TEncoding.UTF8);
+        FNewLayoutJS := Text;
+      except
+        on E:Exception do
+        begin
+          ShowMessage(E.Message);
+          Exit(False);
+        end;
+      end;
     finally
       Free;
     end;
