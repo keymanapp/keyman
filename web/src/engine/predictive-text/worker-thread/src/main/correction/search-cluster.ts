@@ -234,7 +234,7 @@ export class SearchCluster implements SearchSpace {
 
       // If a `trueTransform` doesn't match, we don't have a proper split; don't try
       // to force a merge, as it won't be 'clean'.
-      return p1.inputSource.trueTransform != p2.inputSource.trueTransform;
+      return p1.inputSource.segment.transitionId != p2.inputSource.segment.transitionId;
     });
 
     if(!splitClusterCondition1 || !splitClusterCondition2) {
