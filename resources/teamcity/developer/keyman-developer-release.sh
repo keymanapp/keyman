@@ -41,7 +41,7 @@ cd "${KEYMAN_ROOT}/developer/src"
 function _build_developer() {
   builder_echo start "build developer" "Building Keyman Developer"
 
-  ./build.sh configure build test api publish --npm-publish
+  ./build.sh configure build test api publish
 
   builder_echo end "build developer" success "Finished building Keyman Developer"
 }
