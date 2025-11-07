@@ -1255,8 +1255,6 @@ describe("Lexer Tests", () => {
         'only',
         'shift',
         'frees',
-        'fix',
-        'clearcontext',
         'beep',
         'begin',
         'context',
