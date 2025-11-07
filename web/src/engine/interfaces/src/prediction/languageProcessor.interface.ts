@@ -1,12 +1,17 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
 import { OutputTarget } from "keyman/engine/keyboard";
+import { type RuleBehavior, type Transcription } from "keyman/engine/js-processor";
+
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+
 
 export class ReadySuggestions {
-  suggestions: LexicalModelTypes.Suggestion[];
+  suggestions: Suggestion[];
   transcriptionID: number;
 
-  constructor(suggestions: LexicalModelTypes.Suggestion[], id: number) {
+  constructor(suggestions: Suggestion[], id: number) {
     this.suggestions = suggestions;
     this.transcriptionID = id;
   }
@@ -30,17 +35,11 @@ export type StateChangeEnum = 'active' | 'configured' | 'inactive';
  */
 export type StateChangeHandler = (state: StateChangeEnum) => any;
 
-/**
- * Covers 'tryaccept' events.
- */
-export type TryUIHandler = (source: string, returnObj: { shouldSwallow: boolean }) => boolean;
 
 export interface LanguageProcessorEventMap {
   'suggestionsready': ReadySuggestionsHandler,
   'invalidatesuggestions': InvalidateSuggestionsHandler,
-  'statechange': StateChangeHandler,
-  'tryaccept': TryUIHandler,
-  'tryrevert': () => void,
+  'statechange': StateChangeHandler
 
   /**
    * Is called synchronously once suggestion application is successful and the context has been updated.
@@ -56,7 +55,7 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
 
   get state(): StateChangeEnum;
 
-  invalidateContext(outputTarget: OutputTarget, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
+  invalidateContext(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]>;
 
   /**
    *
@@ -66,11 +65,23 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  applySuggestion(suggestion: LexicalModelTypes.Suggestion, outputTarget: OutputTarget, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
+  applySuggestion(
+    suggestion: Suggestion,
+    outputTarget: OutputTarget,
+    getLayerId: () => string,
+    ruleBehavior?: RuleBehavior
+  ): {
+    reversion: Promise<Reversion>,
+    appendedRuleBehavior?: RuleBehavior
+  };
 
-  applyReversion(reversion: LexicalModelTypes.Reversion, outputTarget: OutputTarget): Promise<LexicalModelTypes.Suggestion[]>;
+  applyReversion(reversion: Reversion, outputTarget: OutputTarget): Promise<Suggestion[]>;
 
-  get wordbreaksAfterSuggestions(): boolean;
+  predict(transcription: Transcription, layerId: string): Promise<Suggestion[]>;
+
+  hasState(transitionId: number): boolean;
+
+  get wordbreaksAfterSuggestions(): LexicalModelTypes.Configuration['appendsWordbreaks'];
 
   get mayAutoCorrect(): boolean;
 }
