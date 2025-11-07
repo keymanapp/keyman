@@ -31,14 +31,14 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/ldml-keyboard-constants": "*",
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/ldml-keyboard-constants": "*",
     "restructure": "3.0.1"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
-    "ajv": "^8.12.0",
+    "ajv": "^8.17.1",
     "ajv-cli": "^5.0.0",
     "ajv-formats": "^2.1.1",
     "c8": "^7.12.0",
