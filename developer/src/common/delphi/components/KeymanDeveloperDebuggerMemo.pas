@@ -36,6 +36,7 @@ type
   TMemoSelection = record
     Start, Finish: Integer;
     Anchor: Integer;
+    function ToString: string;
   end;
 
   TKeymanDeveloperDebuggerMemo = class(TRichEdit41)
@@ -107,6 +108,8 @@ end;
 
 function TKeymanDeveloperDebuggerMemo.GetSelection: TMemoSelection;
 begin
+  Result.Anchor := 0;
+
   // EM_GETSEL doesn't tell us the anchor position, but we can figure
   // it out with this kludge. I am not aware of side effects from this
   // at this time.
@@ -168,6 +171,13 @@ end;
 procedure Register;
 begin
   RegisterComponents('Keyman', [TKeymanDeveloperDebuggerMemo]);
+end;
+
+{ TMemoSelection }
+
+function TMemoSelection.ToString: string;
+begin
+  Result := Format('%d %d %d', [Start, Finish, Anchor]);
 end;
 
 end.

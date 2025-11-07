@@ -6,7 +6,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
-. "$KEYMAN_ROOT/developer/src/packages.inc.sh"
 
 builder_describe \
   "Keyman for Windows (app)" \

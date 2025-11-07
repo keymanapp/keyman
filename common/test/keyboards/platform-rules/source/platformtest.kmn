@@ -1,5 +1,8 @@
-﻿store(&TARGETS) 'any'
+﻿store(&VERSION) '10.0'
+store(&TARGETS) 'any'
 store(&NAME) 'PlatformTest'
+store(&KEYBOARDVERSION) '1.0'
+store(&COPYRIGHT) '© SIL Global'
 begin Unicode > use(main)
 
 group(main) using keys

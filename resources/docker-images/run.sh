@@ -51,7 +51,7 @@ run_android() {
 }
 
 run_core() {
-  docker_wrapper run "${DOCKER_RUN_ARGS[@]}" --privileged -i --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run "${DOCKER_RUN_ARGS[@]}" -i --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "${registry_slash}keymanapp/keyman-core-ci:${image_version}" \
     "${builder_extra_params[@]}"
