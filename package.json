@@ -48,6 +48,7 @@
     "developer/src/kmc-package",
     "developer/src/kmc",
     "developer/src/server",
+    "developer/src/vscode-plugin",
     "common/test/resources",
     "common/web/keyman-version",
     "common/web/langtags",
