@@ -15,150 +15,248 @@ describe("Lexer Tests", () => {
   describe("Lexer", () => {
     it("can recognise a BASELAYOUT token", () => {
       recogniseToken(TokenType.BASELAYOUT, '&baselayout');
+      recogniseToken(TokenType.BASELAYOUT, '&BASELAYOUT');
+      recogniseToken(TokenType.BASELAYOUT, '&BaseLayout');
     });
     it("can recognise a BITMAP token", () => {
       recogniseToken(TokenType.BITMAP, '&bitmap');
+      recogniseToken(TokenType.BITMAP, '&BITMAP');
+      recogniseToken(TokenType.BITMAP, '&Bitmap');
     });
     it("can recognise a CASEDKEYS token", () => {
       recogniseToken(TokenType.CASEDKEYS, '&casedkeys');
+      recogniseToken(TokenType.CASEDKEYS, '&CASEDKEYS');
+      recogniseToken(TokenType.CASEDKEYS, '&CasedKeys');
     });
     it("can recognise a COPYRIGHT token", () => {
       recogniseToken(TokenType.COPYRIGHT, '&copyright');
+      recogniseToken(TokenType.COPYRIGHT, '&COPYRIGHT');
+      recogniseToken(TokenType.COPYRIGHT, '&Copyright');
     });
     it("can recognise a DISPLAYMAP token", () => {
       recogniseToken(TokenType.DISPLAYMAP, '&displaymap');
+      recogniseToken(TokenType.DISPLAYMAP, '&DISPLAYMAP');
+      recogniseToken(TokenType.DISPLAYMAP, '&DisplayMap');
     });
     it("can recognise a ETHNOLOGUECODE token", () => {
       recogniseToken(TokenType.ETHNOLOGUECODE, '&ethnologuecode');
+      recogniseToken(TokenType.ETHNOLOGUECODE, '&ETHNOLOGUECODE');
+      recogniseToken(TokenType.ETHNOLOGUECODE, '&EthnologueCode');
     });
     it("can recognise a HOTKEY token", () => {
       recogniseToken(TokenType.HOTKEY, '&hotkey');
+      recogniseToken(TokenType.HOTKEY, '&HOTKEY');
+      recogniseToken(TokenType.HOTKEY, '&HotKey');
     });
     it("can recognise a INCLUDECODES token", () => {
       recogniseToken(TokenType.INCLUDECODES, '&includecodes');
+      recogniseToken(TokenType.INCLUDECODES, '&INCLUDECODES');
+      recogniseToken(TokenType.INCLUDECODES, '&IncludeCodes');
     });
     it("can recognise a KEYBOARDVERSION token", () => {
       recogniseToken(TokenType.KEYBOARDVERSION, '&keyboardversion');
+      recogniseToken(TokenType.KEYBOARDVERSION, '&KEYBOARDVERSION');
+      recogniseToken(TokenType.KEYBOARDVERSION, '&KeyboardVersion');
     });
     it("can recognise a KMW_EMBEDCSS token", () => {
       recogniseToken(TokenType.KMW_EMBEDCSS, '&kmw_embedcss');
+      recogniseToken(TokenType.KMW_EMBEDCSS, '&KMW_EMBEDCSS');
+      recogniseToken(TokenType.KMW_EMBEDCSS, '&Kmw_embedcss');
     });
     it("can recognise a KMW_EMBEDJS token", () => {
       recogniseToken(TokenType.KMW_EMBEDJS, '&kmw_embedjs');
+      recogniseToken(TokenType.KMW_EMBEDJS, '&KMW_EMBEDJS');
+      recogniseToken(TokenType.KMW_EMBEDJS, '&Kmw_embedjs');
     });
     it("can recognise a KMW_HELPFILE token", () => {
       recogniseToken(TokenType.KMW_HELPFILE, '&kmw_helpfile');
+      recogniseToken(TokenType.KMW_HELPFILE, '&KMW_HELPFILE');
+      recogniseToken(TokenType.KMW_HELPFILE, '&Kmw_helpfile');
     });
     it("can recognise a KMW_HELPTEXT token", () => {
       recogniseToken(TokenType.KMW_HELPTEXT, '&kmw_helptext');
+      recogniseToken(TokenType.KMW_HELPTEXT, '&KMW_HELPTEXT');
+      recogniseToken(TokenType.KMW_HELPTEXT, '&Kmw_helptext');
     });
     it("can recognise a KMW_RTL token", () => {
       recogniseToken(TokenType.KMW_RTL, '&kmw_rtl');
+      recogniseToken(TokenType.KMW_RTL, '&KMW_RTL');
+      recogniseToken(TokenType.KMW_RTL, '&Kmw_rtl');
     });
     it("can recognise a LANGUAGE token", () => {
       recogniseToken(TokenType.LANGUAGE, '&language');
+      recogniseToken(TokenType.LANGUAGE, '&LANGUAGE');
+      recogniseToken(TokenType.LANGUAGE, '&Language');
     });
     it("can recognise a LAYER token", () => {
       recogniseToken(TokenType.LAYER, '&layer');
+      recogniseToken(TokenType.LAYER, '&LAYER');
+      recogniseToken(TokenType.LAYER, '&Layer');
     });
     it("can recognise a LAYOUTFILE token", () => {
       recogniseToken(TokenType.LAYOUTFILE, '&layoutfile');
+      recogniseToken(TokenType.LAYOUTFILE, '&LAYOUTFILE');
+      recogniseToken(TokenType.LAYOUTFILE, '&LayoutFile');
     });
     it("can recognise a MESSAGE token", () => {
       recogniseToken(TokenType.MESSAGE, '&message');
+      recogniseToken(TokenType.MESSAGE, '&MESSAGE');
+      recogniseToken(TokenType.MESSAGE, '&Message');
     });
     it("can recognise a MNEMONICLAYOUT token", () => {
       recogniseToken(TokenType.MNEMONICLAYOUT, '&mnemoniclayout');
+      recogniseToken(TokenType.MNEMONICLAYOUT, '&MNEMONICLAYOUT');
+      recogniseToken(TokenType.MNEMONICLAYOUT, '&MnemonicLayout');
     });
     it("can recognise a NAME token", () => {
       recogniseToken(TokenType.NAME, '&name');
+      recogniseToken(TokenType.NAME, '&NAME');
+      recogniseToken(TokenType.NAME, '&Name');
     });
     it("can recognise a NEWLAYER token", () => {
       recogniseToken(TokenType.NEWLAYER, '&newlayer');
+      recogniseToken(TokenType.NEWLAYER, '&NEWLAYER');
+      recogniseToken(TokenType.NEWLAYER, '&NewLayer');
     });
     it("can recognise a OLDCHARPOSMATCHING token", () => {
       recogniseToken(TokenType.OLDCHARPOSMATCHING, '&oldcharposmatching');
+      recogniseToken(TokenType.OLDCHARPOSMATCHING, '&OLDCHARPOSMATCHING');
+      recogniseToken(TokenType.OLDCHARPOSMATCHING, '&OldCharPosMatching');
     });
     it("can recognise a OLDLAYER token", () => {
       recogniseToken(TokenType.OLDLAYER, '&oldlayer');
+      recogniseToken(TokenType.OLDLAYER, '&OLDLAYER');
+      recogniseToken(TokenType.OLDLAYER, '&OldLayer');
     });
     it("can recognise a PLATFORM token", () => {
       recogniseToken(TokenType.PLATFORM, '&platform');
+      recogniseToken(TokenType.PLATFORM, '&PLATFORM');
+      recogniseToken(TokenType.PLATFORM, '&Platform');
     });
     it("can recognise a TARGETS token", () => {
       recogniseToken(TokenType.TARGETS, '&targets');
+      recogniseToken(TokenType.TARGETS, '&TARGETS');
+      recogniseToken(TokenType.TARGETS, '&Targets');
     });
     it("can recognise a VERSION token", () => {
       recogniseToken(TokenType.VERSION, '&version');
+      recogniseToken(TokenType.VERSION, '&VERSION');
+      recogniseToken(TokenType.VERSION, '&Version');
     });
     it("can recognise a VISUALKEYBOARD token", () => {
       recogniseToken(TokenType.VISUALKEYBOARD, '&visualkeyboard');
+      recogniseToken(TokenType.VISUALKEYBOARD, '&VISUALKEYBOARD');
+      recogniseToken(TokenType.VISUALKEYBOARD, '&VisualKeyboard');
     });
     it("can recognise a WINDOWSLANGUAGES token", () => {
       recogniseToken(TokenType.WINDOWSLANGUAGES, '&windowslanguages');
+      recogniseToken(TokenType.WINDOWSLANGUAGES, '&WINDOWSLANGUAGES');
+      recogniseToken(TokenType.WINDOWSLANGUAGES, '&WindowsLanguages');
     });
     it("can recognise a CAPSALWAYSOFF token", () => {
       recogniseToken(TokenType.CAPSALWAYSOFF, '&capsalwaysoff');
+      recogniseToken(TokenType.CAPSALWAYSOFF, '&CAPSALWAYSOFF');
+      recogniseToken(TokenType.CAPSALWAYSOFF, '&CapsAlwaysOff');
     });
     it("can recognise a CAPSONONLY token", () => {
       recogniseToken(TokenType.CAPSONONLY, '&capsononly');
+      recogniseToken(TokenType.CAPSONONLY, '&CAPSONONLY');
+      recogniseToken(TokenType.CAPSONONLY, '&CapsOnOnly');
     });
     it("can recognise a SHIFTFREECAPS token", () => {
       recogniseToken(TokenType.SHIFTFREESCAPS, '&shiftfreescaps');
+      recogniseToken(TokenType.SHIFTFREESCAPS, '&SHIFTFREESCAPS');
+      recogniseToken(TokenType.SHIFTFREESCAPS, '&ShiftFreesCaps');
     });
     it("can recognise a CAPS token", () => {
       recogniseToken(TokenType.CAPS, 'caps');
+      recogniseToken(TokenType.CAPS, 'CAPS');
+      recogniseToken(TokenType.CAPS, 'Caps');
     });
-    it("can recognise a ALWAYS token", () => {
+    it("can recognise an ALWAYS token", () => {
       recogniseToken(TokenType.ALWAYS, 'always');
+      recogniseToken(TokenType.ALWAYS, 'ALWAYS');
+      recogniseToken(TokenType.ALWAYS, 'Always');
     });
-    it("can recognise a OFF token", () => {
+    it("can recognise an OFF token", () => {
       recogniseToken(TokenType.OFF, 'off');
+      recogniseToken(TokenType.OFF, 'OFF');
+      recogniseToken(TokenType.OFF, 'Off');
     });
-    it("can recognise a ON token", () => {
+    it("can recognise an ON token", () => {
       recogniseToken(TokenType.ON, 'on');
+      recogniseToken(TokenType.ON, 'ON');
+      recogniseToken(TokenType.ON, 'On');
     });
-    it("can recognise a ONLY token", () => {
+    it("can recognise an ONLY token", () => {
       recogniseToken(TokenType.ONLY, 'only');
+      recogniseToken(TokenType.ONLY, 'ONLY');
+      recogniseToken(TokenType.ONLY, 'Only');
     });
     it("can recognise a SHIFT token", () => {
       recogniseToken(TokenType.SHIFT, 'shift');
+      recogniseToken(TokenType.SHIFT, 'SHIFT');
+      recogniseToken(TokenType.SHIFT, 'Shift');
     });
     it("can recognise a FREES token", () => {
       recogniseToken(TokenType.FREES, 'frees');
+      recogniseToken(TokenType.FREES, 'FREES');
+      recogniseToken(TokenType.FREES, 'Frees');
     });
     it("can recognise a BITMAP_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'bitmap');
+      recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'BITMAP');
+      recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'Bitmap');
     });
     it("can recognise a COPYRIGHTP_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'copyright');
+      recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'COPYRIGHT');
+      recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'Copyright');
     });
     it("can recognise a HOTKEY_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.HOTKEY_HEADER, 'hotkey');
+      recogniseTokenFollowedBySpace(TokenType.HOTKEY_HEADER, 'HOTKEY');
+      recogniseTokenFollowedBySpace(TokenType.HOTKEY_HEADER, 'HotKey');
     });
     it("can recognise a LANGUAGE_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.LANGUAGE_HEADER, 'language');
+      recogniseTokenFollowedBySpace(TokenType.LANGUAGE_HEADER, 'LANGUAGE');
+      recogniseTokenFollowedBySpace(TokenType.LANGUAGE_HEADER, 'Language');
     });
     it("can recognise a LAYOUT_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.LAYOUT_HEADER, 'layout');
+      recogniseTokenFollowedBySpace(TokenType.LAYOUT_HEADER, 'LAYOUT');
+      recogniseTokenFollowedBySpace(TokenType.LAYOUT_HEADER, 'Layout');
     });
     it("can recognise a MESSAGE_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.MESSAGE_HEADER, 'message');
+      recogniseTokenFollowedBySpace(TokenType.MESSAGE_HEADER, 'MESSAGE');
+      recogniseTokenFollowedBySpace(TokenType.MESSAGE_HEADER, 'Message');
     });
     it("can recognise a NAME_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.NAME_HEADER, 'name');
+      recogniseTokenFollowedBySpace(TokenType.NAME_HEADER, 'NAME');
+      recogniseTokenFollowedBySpace(TokenType.NAME_HEADER, 'Name');
     });
     it("can recognise a VERSION_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.VERSION_HEADER, 'version');
+      recogniseTokenFollowedBySpace(TokenType.VERSION_HEADER, 'VERSION');
+      recogniseTokenFollowedBySpace(TokenType.VERSION_HEADER, 'Version');
     });
     it("can recognise a BASELAYOUT_SHORTCUT token", () => {
       recogniseTokenFollowedByLeftBracket(TokenType.BASELAYOUT_SHORTCUT, 'baselayout');
+      recogniseTokenFollowedByLeftBracket(TokenType.BASELAYOUT_SHORTCUT, 'BASELAYOUT');
+      recogniseTokenFollowedByLeftBracket(TokenType.BASELAYOUT_SHORTCUT, 'Baselayout');
     });
     it("can recognise a LAYER_SHORTCUT token", () => {
       recogniseTokenFollowedByLeftBracket(TokenType.LAYER_SHORTCUT, 'layer');
+      recogniseTokenFollowedByLeftBracket(TokenType.LAYER_SHORTCUT, 'LAYER');
+      recogniseTokenFollowedByLeftBracket(TokenType.LAYER_SHORTCUT, 'Layer');
     });
     it("can recognise a PLATFORM_SHORTCUT token", () => {
       recogniseTokenFollowedByLeftBracket(TokenType.PLATFORM_SHORTCUT, 'platform');
+      recogniseTokenFollowedByLeftBracket(TokenType.PLATFORM_SHORTCUT, 'PLATFORM');
+      recogniseTokenFollowedByLeftBracket(TokenType.PLATFORM_SHORTCUT, 'Platform');
     });
     it("can recognise an ANY token", () => {
       recogniseTokenFollowedByLeftBracket(TokenType.ANY, 'any');
