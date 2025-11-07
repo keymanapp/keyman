@@ -12,7 +12,7 @@ import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
-import { default as ContextManager } from './contextManager.js';
+import { ContextManager } from './contextManager.js';
 import DefaultBrowserRules from './defaultBrowserRules.js';
 import HardwareEventKeyboard from './hardwareEventKeyboard.js';
 import { FocusStateAPIObject } from './context/focusAssistant.js';
@@ -443,7 +443,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       kbd = this.core.activeKeyboard;
     }
 
-    // TODO-web-core: implement for KMX keyboards if needed
+    // We only support isCJK on legacy .js keyboards; see #7928
     return kbd && kbd instanceof JSKeyboard && kbd.isCJK;
   }
 
