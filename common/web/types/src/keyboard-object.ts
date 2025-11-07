@@ -8,8 +8,8 @@ export type ComplexKeyboardStore = (string | { t: 'd', d: number } | { ['t']: 'b
 // A stub for KeyEvent which is properly defined in KeymanWeb
 type KeyEventStub = {};
 
-// A stub for OutputTarget which is properly defined in KeymanWeb
-type OutputTargetStub = {};
+// A stub for TextStore which is properly defined in KeymanWeb
+type TextStoreStub = {};
 
 export interface EncodedVisualKeyboard {
   /** Represents CSS font styling to use for VisualKeyboard text */
@@ -43,31 +43,31 @@ export type KeyboardObject = {
    * group-start:  the function triggering processing for the keyboard's
    * "Unicode" start group, corresponding to `begin Unicode > use(_____)` in
    * Keyman keyboard language.
-   * @param outputTarget  The context to which the keystroke applies
+   * @param textStore  The context to which the keystroke applies
    * @param keystroke     The full, pre-processed keystroke triggering
    * keyboard-rule application.
    */
-  gs(outputTarget: OutputTargetStub, keystroke: KeyEventStub): boolean;
+  gs(textStore: TextStoreStub, keystroke: KeyEventStub): boolean;
 
   /**
    * group-newcontext:  the function triggering processing for the keyboard's
    * "NewContext" start group, corresponding to `begin NewContext > use(_____)`
    * in Keyman keyboard language.
-   * @param outputTarget  The new context to be used with future keystrokes
+   * @param textStore  The new context to be used with future keystrokes
    * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
-  gn?(outputTarget: OutputTargetStub, keystroke: KeyEventStub): boolean;
+  gn?(textStore: TextStoreStub, keystroke: KeyEventStub): boolean;
 
   /**
    * group-postkeystroke:  the function triggering processing for the keyboard's
    * "PostKeystroke" start group, corresponding to `begin PostKeystroke >
    * use(_____)` in Keyman keyboard language.
-   * @param outputTarget  The context altered by a recent keystroke.  As a
+   * @param textStore  The context altered by a recent keystroke.  As a
    * precondition, all changes due to `gs` / `begin Unicode` should already be
    * applied.
    * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
-  gpk?(outputTarget: OutputTargetStub, keystroke: KeyEventStub): boolean;
+  gpk?(textStore: TextStoreStub, keystroke: KeyEventStub): boolean;
 
   /**
    * Keyboard ID:  the uniquely-identifying name for this keyboard.  Includes the standard
@@ -175,6 +175,6 @@ export type KeyboardObject = {
    * @param       {number}    _PData        1 or 0
    * @returns
    */
-  KNS?: (_PCommand: number, _PTarget: OutputTargetStub, _PData: number) => void;
+  KNS?: (_PCommand: number, _PTarget: TextStoreStub, _PData: number) => void;
 } & Record<`s${number}`, string>
 

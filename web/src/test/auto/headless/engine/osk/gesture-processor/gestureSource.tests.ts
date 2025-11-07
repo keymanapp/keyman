@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { GestureDebugSource, InputSample } from '@keymanapp/gesture-recognizer';
+import { GestureDebugSource, InputSample } from 'keyman/engine/gesture-processor';
 
 const helloSample: InputSample<string> = {
   targetX: 1,

@@ -2,7 +2,7 @@ import * as KeymanOSK from 'keyman/engine/osk';
 import { DeviceDetector } from 'keyman/engine/main';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 
 import { assert } from 'chai';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';

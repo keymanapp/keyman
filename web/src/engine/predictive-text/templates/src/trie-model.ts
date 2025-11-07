@@ -25,7 +25,7 @@
 // Worth noting:  we're starting to get quite a 'library' of common model/LMLayer functionality.
 // Should probably make a 'lm-utils' submodule.
 
-import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
+import { KMWString, PriorityQueue } from "keyman/common/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";

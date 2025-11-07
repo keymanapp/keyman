@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { configWorker, createMessageEventWithData, emptyContext, iGotDistractedByHazel,
          importScriptsWith, randomToken, zeroTransform } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 
 import { LMLayerWorker } from '@keymanapp/lm-worker/test-index';
 import { OutgoingMessage } from '@keymanapp/lm-message-types';

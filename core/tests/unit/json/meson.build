@@ -11,7 +11,7 @@ else
 endif
 
 e = executable('jsontest', 'jsontest.cpp',
-    include_directories: [libsrc],
+    include_directories: [inc, libsrc],
     link_args: links + tests_flags,
     objects: lib.extract_objects('jsonpp.cpp'))
 test('jsontest', e, args: 'jsontest.json')

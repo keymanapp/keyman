@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 SUBPROJECT_NAME=engine/predictive-text/templates
 
 builder_describe "Builds the predictive-text model template implementation module" \
-  "@/common/web/keyman-version" \
+  "@/web/src/common/web-utils" \
   "@/web/src/tools/es-bundling" \
   "@../wordbreakers" \
   "clean" \

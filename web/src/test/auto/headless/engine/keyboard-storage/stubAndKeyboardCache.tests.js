@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-storage';
 
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 
 import path from 'path';
@@ -62,7 +62,7 @@ describe('StubAndKeyboardCache', function () {
     assert.strictEqual(cache.defaultStub, galaxie_stub);
   });
 
-  it('loads & caches `Keyboard`s, `Keyboard` promise pending resolution', async () => {
+  it('loads & caches `JSKeyboard`s, `JSKeyboard` promise pending resolution', async () => {
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardHarness({}, MinimalKeymanGlobal));
     const cache = new StubAndKeyboardCache(keyboardLoader);
 

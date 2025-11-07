@@ -16,6 +16,7 @@ SUBPROJECT_NAME=tools/testing/bulk_rendering
 ################################ Main script ################################
 
 builder_describe "Builds a 'bulk renderer' that loads all the cloud keyboards from api.keyman.com and renders each of them to a document." \
+  "@/web/src/common/web-utils build" \
   "@/web/src/app/browser build" \
   "@/web/src/app/ui build" \
   "clean" \

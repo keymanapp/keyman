@@ -1,5 +1,5 @@
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
-import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
+import { QueueComparator as Comparator, PriorityQueue } from 'keyman/common/web-utils';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
