@@ -14,8 +14,7 @@ SUBPROJECT_NAME=app/browser
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's website-integrating version for use in non-puppeted browsers." \
-  "@/web/src/engine/attachment build" \
-  "@/web/src/engine/main build" \
+  "@/web/src/engine build" \
   "@/web/src/tools/building/sourcemap-root" \
   "clean" \
   "configure" \
@@ -71,6 +70,10 @@ compile_and_copy() {
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
+
+  # Copy Keyman Core build artifacts for local reference
+  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/browser/debug/"
+  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/browser/release/"
 
   # Update the build/publish copy of our build artifacts
   prepare

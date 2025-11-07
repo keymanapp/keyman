@@ -6,14 +6,13 @@
   "extends": "../../../../tsconfig.base.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "build/obj",
     "tsBuildInfoFile": "build/obj/tsconfig.all.tsbuildinfo",
     "rootDir": "./src"
   },
   "files": [],
   "references": [
-    { "path": "../../common/web-utils" },
+    { "path": "../../../common/web-utils" },
     { "path": "../../../../../common/web/types"},
     { "path": "../types"},
     { "path": "src/node" },

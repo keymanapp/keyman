@@ -109,6 +109,7 @@ function test-headless() {
     TEST_OPTS+=(--extension "${TEST_EXTENSIONS}")
   fi
 
+  builder_echo '> ' mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   if [[ -e .c8rc.json ]]; then
     c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   else

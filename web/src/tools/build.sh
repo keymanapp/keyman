@@ -14,7 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Builds the Keyman Engine for Web's development & unit-testing tools" \
   "@/common/web/keyman-version" \
-  "@/web/src/engine/keyboard" \
+  "@/web/src/engine" \
   "configure" \
   "clean" \
   "build" \
@@ -22,7 +22,9 @@ builder_describe "Builds the Keyman Engine for Web's development & unit-testing 
   ":bulk_rendering=testing/bulk_rendering   Builds the bulk-rendering tool used to validate changes to OSK display code" \
   ":es-bundling                             Builds code used to esbundle Web engine artifacts for browser consumption" \
   ":recorder=testing/recorder               Builds the KMW recorder tool used for development of unit-test resources" \
-  ":sourcemap-root=building/sourcemap-root  Builds the sourcemap-cleaning tool used during minification of app/ builds"
+  ":sourcemap-root=building/sourcemap-root  Builds the sourcemap-cleaning tool used during minification of app/ builds" \
+  ":test-utils=testing/test-utils           Builds the test-utils module" \
+  ":gesture-processor=testing/gesture-processor      Gesture processor test utilities"
 
 builder_parse "$@"
 

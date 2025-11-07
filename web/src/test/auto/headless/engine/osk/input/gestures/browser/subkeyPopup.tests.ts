@@ -3,10 +3,15 @@ import { assert } from 'chai';
 import { JSDOM } from 'jsdom';
 import sinon from 'sinon';
 
-import { GesturePath, GestureSequence, GestureSource, GestureSourceSubview } from '@keymanapp/gesture-recognizer';
+import { GesturePath, GestureSequence, GestureSource, GestureSourceSubview } from 'keyman/engine/gesture-processor';
 import { ActiveSubKey, DeviceSpec } from 'keyman/engine/keyboard';
 import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard } from 'keyman/engine/osk';
-import { OSKBaseKey, OSKRow, SubkeyPopup, link } from 'keyman/engine/osk/internals';
+import { testIndex } from 'keyman/engine/osk';
+
+import OSKBaseKey = testIndex.OSKBaseKey;
+import OSKRow = testIndex.OSKRow;
+import SubkeyPopup = testIndex.SubkeyPopup;
+import link = testIndex.link;
 
 // Tests for #10126
 describe('subkey menu width', () => {

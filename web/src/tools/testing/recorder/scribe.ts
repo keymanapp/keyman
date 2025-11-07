@@ -17,7 +17,7 @@ import {
   RecordedSyntheticKeystroke
 } from "@keymanapp/recorder-core";
 
-import { outputTargetForElement } from 'keyman/engine/attachment';
+import { textStoreForElement } from 'keyman/engine/attachment';
 
 import { type KeymanEngine } from 'keyman/app/browser';
 
@@ -28,7 +28,7 @@ declare let keyman: KeymanEngine;
 //   export namespace dom {
 //     export declare var DOMEventHandlers: any;
 //     export declare class Utils {
-//       static getOutputTarget(elem: HTMLElement): any; // text.OutputTarget;
+//       static getOutputTarget(elem: HTMLElement): any; // text.TextStore;
 //     }
 //   }
 
@@ -183,7 +183,7 @@ export class Scribe extends EventEmitter {
     const recorderScribe = this;
 
     keyman.hardKeyboard.on('keyevent', (e) => {
-      const in_output = outputTargetForElement(recordingElement);
+      const in_output = textStoreForElement(recordingElement);
       if(!in_output || keyman.contextManager.activeTarget != in_output) {
         return;
       }
@@ -199,7 +199,7 @@ export class Scribe extends EventEmitter {
     });
 
     keyman.osk.on('keyevent', (e) => {
-      const in_output = outputTargetForElement(recordingElement);
+      const in_output = textStoreForElement(recordingElement);
       if(!in_output || keyman.contextManager.activeTarget != in_output) {
         return;
       }
@@ -212,7 +212,7 @@ export class Scribe extends EventEmitter {
     });
 
     keyman.contextManager.on('keyboardchange', (kbdTuple) => {
-      const in_output = outputTargetForElement(recordingElement);
+      const in_output = textStoreForElement(recordingElement);
       // If it's not on our recording control, ignore the change and do nothing special.
       if(!in_output || document.activeElement != in_output.getElement()) {
         return;

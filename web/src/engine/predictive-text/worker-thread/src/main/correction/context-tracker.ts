@@ -1,5 +1,5 @@
 import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 import { ClassicalDistanceCalculation, EditOperation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';

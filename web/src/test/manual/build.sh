@@ -37,8 +37,8 @@ SENTRY_MANAGER_MAP="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.j
 
 #### Build action definitions ####
 
-GESTURE_PROCESSOR_BUILD="$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build/lib/."
-GESTURE_PROCESSOR_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-processor/lib/"
+# GESTURE_PROCESSOR_BUILD="$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build/lib/."
+# GESTURE_PROCESSOR_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-processor/lib/"
 
 function do_copy() {
   mkdir -p "$KEYMAN_ROOT/$DEST/keyboards"
@@ -47,8 +47,8 @@ function do_copy() {
   cp "$SENTRY_MANAGER_SRC"  "$KEYMAN_ROOT/$DEST/sentry-manager.js"
   cp "$SENTRY_MANAGER_MAP"  "$KEYMAN_ROOT/$DEST/sentry-manager.js.map"
 
-  mkdir -p "$GESTURE_PROCESSOR_TARGET"
-  cp -a "$GESTURE_PROCESSOR_BUILD" "$GESTURE_PROCESSOR_TARGET"
+  # mkdir -p "$GESTURE_PROCESSOR_TARGET"
+  # cp -a "$GESTURE_PROCESSOR_BUILD" "$GESTURE_PROCESSOR_TARGET"
 
   # copy common test (resources) keyboards
   cp -f "$KEYMAN_ROOT/common/test/keyboards/platform-rules/platformtest.js" "$KEYMAN_ROOT/$DEST/keyboards/"
@@ -56,5 +56,5 @@ function do_copy() {
   cp -f "$KEYMAN_ROOT/common/test/resources/keyboards/"*.js "$KEYMAN_ROOT/$DEST/keyboards/"
 }
 
-builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST" && rm -rf "$GESTURE_PROCESSOR_TARGET"
+builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST"
 builder_run_action build do_copy

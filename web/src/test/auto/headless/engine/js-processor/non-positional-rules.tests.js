@@ -4,9 +4,9 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { Codes, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 
 // Compare and contrast the unit tests here with those for app/browser key-event unit testing
 // in the hardware-event-processing set; the output objects there should have the same format
@@ -27,7 +27,7 @@ describe('Engine - rule processing', function() {
 
     before(async () => {
       // -- START: Standard keyboard unit test loading boilerplate --
-      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
       // --  END:  Standard keyboard unit test loading boilerplate --
@@ -41,7 +41,7 @@ describe('Engine - rule processing', function() {
 
     it('matches rules with mnemonic-specced KeyEvents', () => {
       // Note:  plain 'n' is produced from default key outputs for sil_ipa, not a keyboard rule.
-      let mockMnemonic = new Mock('n');
+      let mockMnemonic = new SyntheticTextStore('n');
       let mnemonicEvent = new KeyEvent({
         // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
         Lcode: '>'.charCodeAt(0), // 62
@@ -62,7 +62,7 @@ describe('Engine - rule processing', function() {
 
     it('requires correct modifiers', () => {
       // Note:  plain 'n' is produced from default key outputs for sil_ipa, not a keyboard rule.
-      let mockMnemonic = new Mock('n');
+      let mockMnemonic = new SyntheticTextStore('n');
       let mnemonicEvent = new KeyEvent({
         // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
         Lcode: '>'.charCodeAt(0), // 62
@@ -81,7 +81,7 @@ describe('Engine - rule processing', function() {
     });
 
     it('does not match rules with positional-specced KeyEvents', () => {
-      let mockPositional = new Mock('n');
+      let mockPositional = new SyntheticTextStore('n');
       let positionalEvent = new KeyEvent({
         // If it were positional, we'd use this instead:
         Lcode: Codes.keyCodes.K_COMMA, // 188
@@ -106,7 +106,7 @@ describe('Engine - rule processing', function() {
 
     before(async () => {
       // -- START: Standard keyboard unit test loading boilerplate --
-      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(armenianPath);
       // --  END:  Standard keyboard unit test loading boilerplate --
@@ -119,7 +119,7 @@ describe('Engine - rule processing', function() {
     });
 
     it('matches rules with legacy-specced KeyEvents', () => {
-      let mockLegacy = new Mock('');
+      let mockLegacy = new SyntheticTextStore('');
       let legacyEvent = new KeyEvent({
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
@@ -139,7 +139,7 @@ describe('Engine - rule processing', function() {
     });
 
     it('ignores current modifiers and states', () => {
-      let mockLegacy = new Mock('');
+      let mockLegacy = new SyntheticTextStore('');
       let legacyEvent = new KeyEvent({
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
@@ -159,7 +159,7 @@ describe('Engine - rule processing', function() {
     });
 
     it('does not match rules with mnemonic-specced KeyEvents', () => {
-      let mockMnemonic = new Mock('');
+      let mockMnemonic = new SyntheticTextStore('');
       let mnemonicEvent = new KeyEvent({
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
@@ -178,7 +178,7 @@ describe('Engine - rule processing', function() {
     });
 
     it('does not match rules with positional-specced KeyEvents', () => {
-      let mockPositional = new Mock('');
+      let mockPositional = new SyntheticTextStore('');
       let positionalEvent = new KeyEvent({
         // If it were positional, we'd use this instead:
         Lcode: Codes.keyCodes.K_A,

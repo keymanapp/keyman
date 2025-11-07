@@ -34,7 +34,7 @@
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { KMWString } from "@keymanapp/web-utils";
+import { KMWString } from "keyman/common/web-utils";
 
 import ModelCompositor from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';

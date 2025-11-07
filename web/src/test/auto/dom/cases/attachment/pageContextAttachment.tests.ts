@@ -1,5 +1,5 @@
 import { PageContextAttachment } from 'keyman/engine/attachment';
-import { DeviceSpec, timedPromise } from '@keymanapp/web-utils';
+import { DeviceSpec, timedPromise } from 'keyman/common/web-utils';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 import { assert } from 'chai';
