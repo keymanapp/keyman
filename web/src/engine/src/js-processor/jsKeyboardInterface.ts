@@ -5,7 +5,7 @@
 
 //#region Imports
 
-import { type DeviceSpec, KMWString } from "@keymanapp/web-utils";
+import { type DeviceSpec, KMWString } from "keyman/common/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,

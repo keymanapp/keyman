@@ -11,7 +11,7 @@ import {
   PageAttachmentOptions,
 } from 'keyman/engine/attachment';
 
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import sinon from 'sinon';
 

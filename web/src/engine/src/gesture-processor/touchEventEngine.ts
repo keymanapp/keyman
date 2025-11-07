@@ -3,7 +3,7 @@ import { InputEventEngine } from "./inputEventEngine.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 import { GestureSource } from "./headless/gestureSource.js";
-import { ManagedPromise } from "@keymanapp/web-utils";
+import { ManagedPromise } from "keyman/common/web-utils";
 import { AsyncClosureDispatchQueue } from "./headless/asyncClosureDispatchQueue.js";
 import { GesturePath } from "./index.js";
 

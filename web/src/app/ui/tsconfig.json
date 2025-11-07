@@ -2,13 +2,9 @@
   "extends": "../../tsconfig.dom.json",
 
 	"compilerOptions": {
-    "baseUrl": "./",
 		"outDir": "../../../build/app/ui/obj",
 		"rootDir": "",
     "tsBuildInfoFile": "../../../build/app/ui/obj/tsconfig.tsbuildinfo",
-    "paths": {
-      "keyman/engine/*": ["../../engine/src/*/index.js"],
-    },
   },
   "files": [
 		"kmwuibutton.ts",

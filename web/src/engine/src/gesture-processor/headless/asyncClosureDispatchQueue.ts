@@ -1,4 +1,4 @@
-import { timedPromise } from "@keymanapp/web-utils";
+import { timedPromise } from "keyman/common/web-utils";
 import { reportError } from "../reportError.js";
 
 export type QueueClosure = () => (Promise<any> | void);

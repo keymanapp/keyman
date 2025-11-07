@@ -2,14 +2,14 @@
   "extends": "../tsconfig.dom.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../build/engine/obj/",
     "tsBuildInfoFile": "../../build/engine/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src",
-    "paths": {
-      "keyman/engine/*": ["./src/*/index.js"]
-    },
   },
 
   "include": [ "src/**/*.ts", "src/core-processor/import/*.js" ],
+
+  "references": [
+    { "path": "../common/web-utils" }
+  ]
 }

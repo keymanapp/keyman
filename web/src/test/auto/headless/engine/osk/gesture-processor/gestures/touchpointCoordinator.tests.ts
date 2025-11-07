@@ -12,7 +12,7 @@ const { GestureSequence } = matchers;
 type GestureSequence<Type> = gestures.matchers.GestureSequence<Type>;
 
 import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
-import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+import { ManagedPromise, timedPromise } from 'keyman/common/web-utils';
 
 import { assertGestureSequence, SequenceAssertion } from "../../../../../resources/sequenceAssertions.js";
 

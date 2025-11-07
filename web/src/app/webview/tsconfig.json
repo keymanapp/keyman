@@ -2,18 +2,15 @@
   "extends": "../../tsconfig.dom.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../build/app/webview/obj/",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../../build/app/webview/obj/tsconfig.tsbuildinfo",
-    "paths": {
-      "keyman/engine/*": ["../../engine/src/*/index.js"],
-    },
   },
 
   "include": [ "**/*.ts" ],
 
   "references": [
-    { "path": "../../engine" }
+    { "path": "../../engine" },
+    { "path": "../../common/web-utils" },
   ]
 }

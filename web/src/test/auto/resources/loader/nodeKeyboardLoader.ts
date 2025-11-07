@@ -1,7 +1,7 @@
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 
-import { globalObject } from '@keymanapp/web-utils';
+import { globalObject } from 'keyman/common/web-utils';
 
 import { JSKeyboard, KeyboardHarness, MinimalKeymanGlobal, KeyboardLoaderBase, KeyboardLoadErrorBuilder } from 'keyman/engine/keyboard';
 

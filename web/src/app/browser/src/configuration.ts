@@ -2,7 +2,7 @@ import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/
 
 import { AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 import { TextStore, ProcessorAction } from 'keyman/engine/keyboard';
-import { isEmptyTransform } from '@keymanapp/web-utils';
+import { isEmptyTransform } from 'keyman/common/web-utils';
 import { AlertHost } from "./utils/alertHost.js";
 import { whenDocumentReady } from "./utils/documentReady.js";
 

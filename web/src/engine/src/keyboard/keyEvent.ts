@@ -7,7 +7,7 @@
 // other platforms recognize and utilize this type.
 
 import { type JSKeyboard } from "./keyboards/jsKeyboard.js";
-import { type DeviceSpec } from "@keymanapp/web-utils";
+import { type DeviceSpec } from "keyman/common/web-utils";
 
 import { Codes } from './codes.js';
 import { DefaultRules } from "./defaultRules.js";

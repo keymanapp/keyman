@@ -1,4 +1,4 @@
-import { KMWString } from "@keymanapp/web-utils";
+import { KMWString } from "keyman/common/web-utils";
 import { Alternate, TextTransform } from "./keyboards/textTransform.js";
 import { Transcription } from "./keyboards/transcription.js";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";

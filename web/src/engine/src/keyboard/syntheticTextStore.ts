@@ -1,6 +1,6 @@
 import { TextStore } from './textStore.js';
 import { TextStoreLanguageProcessorInterface } from './textStoreLanguageProcessorInterface.js';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 export class SyntheticTextStore extends TextStore {
   text: string;

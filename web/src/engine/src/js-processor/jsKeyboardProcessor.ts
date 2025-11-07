@@ -14,11 +14,9 @@ import {
   TextStore, ProcessorAction, SystemStoreIDs, SyntheticTextStore
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
-import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
+import { DeviceSpec, globalObject, KMWString } from "keyman/common/web-utils";
 
 // #endregion
-
-// Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
 export type BeepHandler = (textStore: TextStore) => void;
 export type LogMessageHandler = (str: string) => void;

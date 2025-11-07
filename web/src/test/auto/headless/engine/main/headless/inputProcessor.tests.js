@@ -11,7 +11,7 @@ import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader
 import { KeyboardTest } from '@keymanapp/recorder-core';
 
 import { Worker } from '@keymanapp/lexical-model-layer/node';
-import * as utils from '@keymanapp/web-utils';
+import * as utils from 'keyman/common/web-utils';
 const KMWString = utils.KMWString;
 
 // Required initialization setup.

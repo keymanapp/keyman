@@ -9,7 +9,7 @@ import { JSDOM } from 'jsdom';
 import { VisualKeyboard } from 'keyman/engine/osk';
 import { ActiveLayout, JSKeyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 import { StylesheetManager } from 'keyman/engine/dom-utils';
-import { DeviceSpec } from "@keymanapp/web-utils";
+import { DeviceSpec } from "keyman/common/web-utils";
 
 describe('VisualKeyboard', () => {
   let dom: JSDOM;

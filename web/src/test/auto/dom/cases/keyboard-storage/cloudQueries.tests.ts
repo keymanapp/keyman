@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 import { CloudQueryEngine, type KeyboardStub, DOMCloudRequester } from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
-import { ManagedPromise } from '@keymanapp/web-utils';
+import { ManagedPromise } from 'keyman/common/web-utils';
 
 const pathConfig = new PathConfiguration({
   root: '',

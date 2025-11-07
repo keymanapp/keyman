@@ -11,7 +11,7 @@ import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
 import TouchLayoutSpec = TouchLayout.TouchLayoutPlatform;
 import TouchLayerSpec = TouchLayout.TouchLayoutLayer;
 import TouchLayoutKeySp = TouchLayout.TouchLayoutKeySp;
-import { type DeviceSpec } from "@keymanapp/web-utils";
+import { type DeviceSpec } from "keyman/common/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
 // non-enumerable by default. This broke our 'polyfill'

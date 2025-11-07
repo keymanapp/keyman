@@ -2,7 +2,7 @@
 // Only BrowserDriver.ts and its prerequisites are needed during actual integrated unit testing.
 /// <reference path="scribe.ts" />
 
-import { type DeviceSpec } from "@keymanapp/web-utils";
+import { type DeviceSpec } from "keyman/common/web-utils";
 
 import { type TextStore } from "keyman/engine/keyboard";
 

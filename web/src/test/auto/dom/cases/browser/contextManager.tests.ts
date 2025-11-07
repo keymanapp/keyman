@@ -9,7 +9,7 @@ import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 
-import { DeviceSpec, ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+import { DeviceSpec, ManagedPromise, timedPromise } from 'keyman/common/web-utils';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import sinon from 'sinon';
 

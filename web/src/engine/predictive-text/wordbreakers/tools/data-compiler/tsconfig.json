@@ -1,7 +1,6 @@
 {
   "extends": "../../../../../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../build/tools/data-compiler/obj",
     "tsBuildInfoFile": "../../build/tools/data-compiler/obj/tsconfig.tsbuildinfo",
     "rootDir": "./",

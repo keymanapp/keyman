@@ -1,6 +1,6 @@
 import { JSKeyboard } from "./jsKeyboard.js";
 import { Codes } from "../codes.js";
-import { DeviceSpec } from '@keymanapp/web-utils';
+import { DeviceSpec } from 'keyman/common/web-utils';
 
 /**
  * Defines members of the top-level `keyman` global object necessary to guarantee

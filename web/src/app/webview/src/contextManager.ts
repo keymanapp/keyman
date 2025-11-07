@@ -3,7 +3,7 @@ import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { KMWString, isEmptyTransform } from '@keymanapp/web-utils';
+import { KMWString, isEmptyTransform } from 'keyman/common/web-utils';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 

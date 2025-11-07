@@ -1,5 +1,5 @@
 import { landscapeView } from "keyman/engine/dom-utils";
-import { DeviceSpec } from "@keymanapp/web-utils";
+import { DeviceSpec } from "keyman/common/web-utils";
 
 /**
  * Get viewport scale factor for this document

@@ -5,7 +5,7 @@ import url from 'url';
 import fs from 'fs';
 
 import { GestureDebugPath } from 'keyman/engine/gesture-processor';
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 import { TouchpathTurtle } from '#gesture-tools';
 
 // Ensures that the resources are resolved relative to this script's source, not

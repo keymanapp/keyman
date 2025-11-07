@@ -3,7 +3,7 @@
    Copyright 2017 SIL International
 ***/
 
-import { Version, deepCopy } from "@keymanapp/web-utils";
+import { Version, deepCopy } from "keyman/common/web-utils";
 import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 
 import EncodedVisualKeyboard = KeymanWebKeyboard.EncodedVisualKeyboard;

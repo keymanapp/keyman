@@ -1,20 +1,16 @@
 {
   "extends": "../../../tsconfig.dom.json",
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../../build/tools/testing/recorder/obj/",
     "rootDir": ".",
     "tsBuildInfoFile": "../../../../build/tools/testing/recorder/obj/tsconfig.tsbuildinfo",
-    "paths": {
-      "keyman/engine/*": ["../../../engine/src/*/index.js"],
-    },
   },
 
   "include": [ "*.ts" ],
 
   "references": [
     { "path": "../../../../../common/web/keyman-version" },
-    { "path": "../../../engine/common/web-utils" },
+    { "path": "../../../common/web-utils" },
     { "path": "../../../engine/predictive-text/types" },
     { "path": "../../../app/browser" },
     { "path": "../recorder-core" },

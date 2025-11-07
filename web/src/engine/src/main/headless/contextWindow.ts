@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { SyntheticTextStore } from "keyman/engine/keyboard";
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 export default class ContextWindow implements LexicalModelTypes.Context {
   // Used to limit the range of context replicated for use of keyboard rules within

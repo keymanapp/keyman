@@ -38,7 +38,8 @@ export { TextStoreLanguageProcessorInterface } from "./textStoreLanguageProcesso
 export { findCommonSubstringEndIndex } from "./stringDivergence.js";
 export { Deadkey } from "./deadkeys.js";
 
-export * from "@keymanapp/web-utils";
+// TODO-web-core: why do we export these here?
+export * from "keyman/common/web-utils";
 
 // At the top level, there should be no default export.
 

@@ -6,7 +6,7 @@ const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
 import { InputSample, GestureSource, gestures, CumulativePathStats } from 'keyman/engine/gesture-processor';
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 
 import {
   InstantRejectionModel,
