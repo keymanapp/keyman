@@ -73,6 +73,10 @@
       "fast-json-patch": "^3.1.1"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
   "engines": {
     "node": "20.16.0"
   }
