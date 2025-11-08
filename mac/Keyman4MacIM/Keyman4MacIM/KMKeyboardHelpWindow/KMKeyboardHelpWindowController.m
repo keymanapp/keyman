@@ -11,9 +11,10 @@
 #import "KMPackageInfo.h"
 #import <WebKit/WebKit.h>
 #import "KMLogs.h"
+@import Sentry;
 
 @interface KMKeyboardHelpWindowController ()
-@property (nonatomic, weak) IBOutlet WebView *welcomeView;
+@property (nonatomic, strong) IBOutlet WKWebView *welcomeWebView;
 @property (nonatomic, strong) KMPackageInfo *packageInfo;
 @end
 
@@ -26,8 +27,7 @@
 - (void)windowDidLoad {
   [super windowDidLoad];
   [self.window setTitle:@"Keyman"];
-  [self.welcomeView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-  [self.welcomeView setPolicyDelegate:(id<WebPolicyDelegate>)self];
+  self.welcomeWebView.navigationDelegate = self;
 }
 
 - (void)setPackagePath:(NSString *)packagePath {
@@ -44,10 +44,12 @@
     }
     
     NSString *welcomeFile = [packagePath stringByAppendingPathComponent:@"welcome.htm"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:welcomeFile])
-      [self.welcomeView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:welcomeFile]]];
-    else
-      [self.welcomeView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:welcomeFile]) {
+      [self.welcomeWebView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:welcomeFile]]];
+    }
+    else {
+      [self.welcomeWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    }
   }
 }
 
@@ -66,24 +68,47 @@
 - (IBAction)printAction:(id)sender {
   NSPrintInfo *printInfo = [NSPrintInfo sharedPrintInfo];
   [printInfo setOrientation:NSPaperOrientationPortrait];
-  NSPrintOperation *printOperation = [[self.welcomeView.mainFrame frameView] printOperationWithPrintInfo:printInfo];
+  NSPrintOperation *printOperation = [self.welcomeWebView printOperationWithPrintInfo:printInfo];
+  
   [printOperation runOperationModalForWindow:self.window
                                     delegate:nil
                               didRunSelector:nil
                                  contextInfo:nil];
 }
 
-- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-  NSNumber *navType = [actionInformation objectForKey:WebActionNavigationTypeKey];
-  if (navType.integerValue == WebNavigationTypeLinkClicked && ![request.URL isFileURL]) {
-    NSString *urlStr = [[request URL] absoluteString];
-    if ([urlStr startsWith:@"link:"])
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+
+  os_log_debug([KMLogs uiLog], "KMKeyboardHelpWindowController decidePolicyForNavigationAction, navigating to %{public}@", navigationAction.request.URL);
+
+  if (navigationAction.navigationType == WebNavigationTypeLinkClicked && ![navigationAction.request.URL isFileURL]) {
+    NSString *urlStr = [navigationAction.request.URL absoluteString];
+    if ([urlStr startsWith:@"link:"]) {
       urlStr = [urlStr substringFromIndex:5];
+    }
     
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlStr]];
   }
   else
-    [listener use];
+    decisionHandler(WKNavigationActionPolicyAllow);
+}
+
+- (void) webView:(WKWebView *) webView
+didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *) navigation {
+  os_log_debug([KMLogs uiLog], "KMKeyboardHelpWindowController didReceiveServerRedirectForProvisionalNavigation");
+}
+
+- (void) webView:(WKWebView *) webView
+didFailProvisionalNavigation:(WKNavigation *) navigation
+       withError:(NSError *) error {
+  os_log_error([KMLogs uiLog], "KMKeyboardHelpWindowController didFailProvisionalNavigation, error: %{public}@", error);
+  [SentrySDK captureError:(error)];
+}
+
+- (void) webView:(WKWebView *) webView
+didFailNavigation:(WKNavigation *) navigation
+       withError:(NSError *) error {
+  os_log_error([KMLogs uiLog], "KMKeyboardHelpWindowController didFailNavigation, error: %{public}@", error);
+  [SentrySDK captureError:(error)];
 }
 
 @end
