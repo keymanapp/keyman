@@ -480,6 +480,8 @@ describe("Lexer Tests", () => {
     });
     it("does not pick out tokens from inside strings", () => {
       recogniseToken(TokenType.STRING, '"store"');
+      recogniseToken(TokenType.STRING, '"\'"');
+      recogniseToken(TokenType.STRING, "'\"'");
     });
     it("can recognise a DECIMAL token", () => {
       recogniseTokenFollowedByRightSquare(TokenType.DECIMAL, 'd0');
@@ -532,11 +534,17 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'K_COLON');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'T_17D2_1780');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'U_0030');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'U_0030_0031');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'U_10030');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'U_100030_1000');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'A21');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'k_k');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'k_colon');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 't_17D2_1780');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'u_0030');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'u_0030_0031');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'u_10030');
+      recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'u_100030_1000');
       recogniseTokenFollowedByRightSquare(TokenType.KEY_CODE, 'a21');
     });
     it("can recognise a KEY_CODE token (followed by space)", () => {
@@ -616,6 +624,15 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a WHITESPACE token (two spaces)", () => {
       recogniseToken(TokenType.WHITESPACE, '  ');
+    });
+    it("can recognise a WHITESPACE token (single tab)", () => {
+      recogniseToken(TokenType.WHITESPACE, '\t');
+    });
+    it("can recognise a WHITESPACE token (two tabs)", () => {
+      recogniseToken(TokenType.WHITESPACE, '\t\t');
+    });
+    it("can recognise a WHITESPACE token (mixed)", () => {
+      recogniseToken(TokenType.WHITESPACE, '\t \t ');
     });
     it("can recognise a CONTINUATION token (no space after)", () => {
       recogniseTokens(
