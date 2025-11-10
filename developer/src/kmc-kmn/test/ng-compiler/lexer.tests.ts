@@ -1229,6 +1229,29 @@ describe("Lexer Tests", () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it("can handle a single line continuation (handleContinuation:false)", () => {
+      const lexer    = new Lexer('beep\\\nbeep\n');
+      const actual   = lexer.parse({addEOF:false, emitAll:true, handleContinuation:false});
+      const expected = [
+        new Token(TokenType.BEEP, 'beep', 1, 1),
+        new Token(TokenType.CONTINUATION, '\\', 1, 5),
+        new Token(TokenType.NEWLINE, '\n', 1, 6, 'beep\\\n'),
+        new Token(TokenType.BEEP, 'beep', 2, 1),
+        new Token(TokenType.NEWLINE, '\n', 2, 5, 'beep\n'),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it("can handle a single line continuation (emitAll:false, handleContinuation:false)", () => {
+      const lexer    = new Lexer('beep\\\nbeep\n');
+      const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:false});
+      const expected = [
+        new Token(TokenType.BEEP, 'beep', 1, 1),
+        new Token(TokenType.NEWLINE, '\n', 1, 6, 'beep\\\n'),
+        new Token(TokenType.BEEP, 'beep', 2, 1),
+        new Token(TokenType.NEWLINE, '\n', 2, 5, 'beep\n'),
+      ];
+      assert.deepEqual(actual, expected);
+    });
     it("can handle a single line continuation (handleContinuation:true)", () => {
       const lexer    = new Lexer('beep\\\nbeep\n');
       const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:true});
@@ -1239,7 +1262,7 @@ describe("Lexer Tests", () => {
       ];
       assert.deepEqual(actual, expected);
     });
-    it("can handle muliple line continuations (handleContinuation:true)", () => {
+    it("can handle multiple line continuations (handleContinuation:true)", () => {
       const line1 = 'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n';
       const line2 = '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n';
       const line3 = '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n';
