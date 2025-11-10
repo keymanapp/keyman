@@ -29,9 +29,9 @@ describe("Verify Parser Against BNF Tests", () => {
     const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString();
     const bnfRules: Dictionary = getBnfRules(bnfBuffer);
     const sourceBuffer: string = [
-      '../../src/kmc-kmn/src/ng-compiler/kmn-analyser.ts',
-      '../../src/kmc-kmn/src/ng-compiler/statement-analyser.ts',
-      '../../src/kmc-kmn/src/ng-compiler/store-analyser.ts',
+      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
     ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
     const sourceRules: Dictionary = getSourceRules(sourceBuffer);
     assert.deepEqual(bnfRules, sourceRules);
