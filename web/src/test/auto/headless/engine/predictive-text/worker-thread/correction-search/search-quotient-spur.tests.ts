@@ -1359,7 +1359,13 @@ describe('SearchQuotientSpur', () => {
       assert.isTrue(tail instanceof LegacyQuotientSpur);
       assert.deepEqual((head as LegacyQuotientSpur).inputs, headTarget.inputs);
       assert.deepEqual((tail as LegacyQuotientSpur).inputs, tailTarget.inputs);
-      assert.deepEqual((head as LegacyQuotientSpur).inputSource, headTarget.inputSource);
+      assert.deepEqual((head as LegacyQuotientSpur).inputSource, {
+        ...headTarget.inputSource,
+        segment: {
+          ...headTarget.inputSource.segment,
+          end: 2
+        }
+      });
       assert.deepEqual((tail as LegacyQuotientSpur).inputSource, tailTarget.inputSource);
     });
   });
