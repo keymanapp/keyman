@@ -14,7 +14,10 @@ import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, ComparisonRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule, IfNormalStoreStatementRule, IfStatementRule, IfSystemStoreStatementRule, IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, PlatformStatementRule, SaveStatementRule, SystemStoreNameForIfRule } from '../../src/ng-compiler/statement-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, ComparisonRule, ContextStatementRule } from '../../src/ng-compiler/statement-analyzer.js';
+import { DeadkeyStatementRule, IfLikeStatementRule, IfNormalStoreStatementRule, IfStatementRule, IfSystemStoreStatementRule } from '../../src/ng-compiler/statement-analyzer.js';
+import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, PlatformStatementRule } from '../../src/ng-compiler/statement-analyzer.js';
+import { SaveStatementRule, SystemStoreNameForIfRule } from '../../src/ng-compiler/statement-analyzer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 
 let root: ASTNode = null;
