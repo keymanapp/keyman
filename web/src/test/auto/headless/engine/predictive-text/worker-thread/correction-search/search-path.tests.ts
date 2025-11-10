@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { models, SearchPath, TokenInputSource } from '@keymanapp/lm-worker/test-index';
+import { generateSubsetId, models, SearchPath, TokenInputSource } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -1419,7 +1419,8 @@ describe('SearchPath', () => {
         const originalInputBase: TokenInputSource = {
           trueTransform: {insert: 'biglargetransform', deleteLeft: 0, id: 11},
           inputStartIndex: 0,
-          bestProbFromSet: 1
+          bestProbFromSet: 1,
+          subsetId: generateSubsetId()
         };
 
         const originalInputs = [0, 3, 8].map(n => ({...originalInputBase, inputStartIndex: n}));
@@ -1527,7 +1528,8 @@ describe('SearchPath', () => {
           return {
             trueTransform: d[0].sample,
             bestProbFromSet: d[0].p,
-            inputStartIndex: 0
+            inputStartIndex: 0,
+            subsetId: generateSubsetId()
           }
         })
 
@@ -1694,7 +1696,8 @@ describe('SearchPath', () => {
           return {
             trueTransform: d[0].sample,
             bestProbFromSet: d[0].p,
-            inputStartIndex: 0
+            inputStartIndex: 0,
+            subsetId: generateSubsetId()
           }
         })
 
@@ -1871,7 +1874,12 @@ describe('SearchPath', () => {
         {sample: { insert: 'ce', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
       ];
       const headPath = new SearchPath(
-        path, headDistributionSplit, inputDistribution[0]
+        path, headDistributionSplit, {
+          trueTransform: inputDistribution[0].sample,
+          bestProbFromSet: inputDistribution[0].p,
+          inputStartIndex: 0,
+          subsetId: mergeTarget.inputSource.subsetId
+        }
       );
 
       const tailDistributionSplit = [
@@ -1885,7 +1893,8 @@ describe('SearchPath', () => {
         new SearchPath(testModel), tailDistributionSplit, {
           trueTransform: inputDistribution[0].sample,
           bestProbFromSet: inputDistribution[0].p,
-          inputStartIndex: 2
+          inputStartIndex: 2,
+          subsetId: mergeTarget.inputSource.subsetId
         }
       );
 
