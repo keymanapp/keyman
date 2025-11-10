@@ -4,8 +4,6 @@
  * Created by Dr Mark C. Sinclair on 2025-03-18
  *
  * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
- *
- * KMN Analyser Tests
  */
 
 import { TokenType } from "./token-type.js";
@@ -18,6 +16,28 @@ import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignR
 import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
+import { Lexer, Token } from "./lexer.js";
+import { TokenBuffer } from "./token-buffer.js";
+
+export class Parser {
+  private buffer: string;
+  private filename: string;
+
+  public constructor(buffer: string, filename: string=null) {
+    this.buffer   = buffer;
+    this.filename = filename;
+  }
+
+  public parse(): ASTNode {
+    const lexer = new Lexer(this.buffer, this.filename);
+    const tokens: Token[] = lexer.parse();
+    Rule.tokenBuffer = new TokenBuffer(tokens);
+    const kmnTreeRule: Rule = new KmnTreeRule();
+    const root: ASTNode = new ASTNode(NodeType.TMP);
+    kmnTreeRule.parse(root);
+    return root;
+  }
+}
 
 export class KmnTreeRule extends SingleChildRule {
   public constructor() {
