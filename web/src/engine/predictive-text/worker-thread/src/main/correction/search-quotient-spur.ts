@@ -192,7 +192,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
 
     // if parentMerges.length > 0, is a SearchCluster.
-    // const parentMerge = parentMerges.length > 0 ? new SearchCluster(parentMerges) : parentMerges[0];
     const parentMerge = parentMerges[0];
 
     // Special case:  if we've reached the head of the space to be merged, check
@@ -234,8 +233,20 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
         }
       });
 
+      const mergedInputSource = {
+        ...this.inputSource,
+        segment: {
+          ...this.inputSource.segment,
+          end: space.inputSource.segment.end
+        }
+      };
+
+      if(mergedInputSource.segment.end == undefined) {
+        delete mergedInputSource.segment.end;
+      }
+
       // Now to re-merge the two halves.
-      return space.construct(this.parentNode, mergedInputs, this.inputSource);
+      return space.construct(this.parentNode, mergedInputs, mergedInputSource);
     } else {
       // If the parent was a cluster, the cluster itself is the merge.
       return parentMerge;

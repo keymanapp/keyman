@@ -1385,14 +1385,23 @@ describe('SearchQuotientSpur', () => {
           subsetId: generateSubsetId()
         };
 
-        const originalInputs = [0, 3, 8].map(n => ({...originalInputBase, inputStartIndex: n}));
+        const splitOriginalInputs = [0, 3, 8].map(n => ({
+          ...originalInputBase,
+          segment: {
+            ...originalInputBase.segment,
+            start: n
+          }
+        }));
+        splitOriginalInputs[0].segment.end = 3;
+        splitOriginalInputs[1].segment.end = 8;
 
-        const paths = distributions.map((d, i) => new LegacyQuotientSpur(new LegacyQuotientRoot(testModel), d, originalInputs[i]));
+        const paths = distributions.map((d, i) => new LegacyQuotientSpur(new LegacyQuotientRoot(testModel), d, splitOriginalInputs[i]));
 
         return {
           paths,
           distributions,
-          originalInputs
+          splitOriginalInputs,
+          originalInput: originalInputBase
         };
       }
 
@@ -1408,7 +1417,7 @@ describe('SearchQuotientSpur', () => {
       }
 
       it('setup: constructs paths properly', () => {
-        const { paths, distributions, originalInputs } = buildPath();
+        const { paths, distributions, splitOriginalInputs: originalInputs } = buildPath();
 
         assert.equal(paths.length, 3);
         assert.equal(distributions.length, paths.length);
@@ -1425,12 +1434,14 @@ describe('SearchQuotientSpur', () => {
         });
 
         originalInputs.forEach((original) => {
-          assert.deepEqual({...original, inputStartIndex: 0}, {...originalInputs[0], inputStartIndex: 0});
+          assert.equal(original.segment.transitionId, originalInputs[0].segment.transitionId);
+          assert.equal(original.bestProbFromSet, originalInputs[0].bestProbFromSet);
+          assert.equal(original.subsetId, originalInputs[0].subsetId);
         });
       });
 
       it('merging order:  big + large, then + transform', () => {
-        const { paths, originalInputs } = buildPath();
+        const { originalInput, paths, splitOriginalInputs } = buildPath();
 
         const headMerge = paths[0].merge(paths[1]);
 
@@ -1441,14 +1452,20 @@ describe('SearchQuotientSpur', () => {
         assert.deepEqual((headMerge as SearchQuotientSpur).inputs, [
           { sample: { insert: 'biglarge', deleteLeft: 0, id: 11 }, p: 1 }
         ]);
-        assert.deepEqual((headMerge as SearchQuotientSpur).inputSource, originalInputs[0]);
+        assert.deepEqual((headMerge as SearchQuotientSpur).inputSource, {
+          ...originalInput,
+          segment: {
+            ...splitOriginalInputs[0].segment,
+            end: splitOriginalInputs[1].segment.end
+          }
+        });
 
         const fullMerge = headMerge.merge(paths[2]);
-        checkFinalStateAssertions(fullMerge as SearchQuotientSpur, originalInputs[0]);
+        checkFinalStateAssertions(fullMerge as SearchQuotientSpur, originalInput);
       });
 
       it('merging order:  large + transform, then + big', () => {
-        const { paths, originalInputs } = buildPath();
+        const { originalInput, paths, splitOriginalInputs } = buildPath();
 
         const tailMerge = paths[1].merge(paths[2]);
 
@@ -1459,10 +1476,16 @@ describe('SearchQuotientSpur', () => {
         assert.deepEqual((tailMerge as SearchQuotientSpur).inputs, [
           { sample: { insert: 'largetransform', deleteLeft: 0, id: 11 }, p: 1 }
         ]);
-        assert.deepEqual((tailMerge as SearchQuotientSpur).inputSource, originalInputs[1]);
+        assert.deepEqual((tailMerge as SearchQuotientSpur).inputSource, {
+          ...originalInput,
+          segment: {
+            ...splitOriginalInputs[2].segment,
+            start: splitOriginalInputs[1].segment.start
+          }
+        });
 
         const fullMerge = paths[0].merge(tailMerge);
-        checkFinalStateAssertions(fullMerge as SearchQuotientSpur, originalInputs[0]);
+        checkFinalStateAssertions(fullMerge as SearchQuotientSpur, originalInput);
       });
     });
 
