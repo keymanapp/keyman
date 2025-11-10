@@ -240,4 +240,6 @@ export interface SearchQuotientNode {
    * Intended only for use during unit testing.  Does not include the root node.
    */
   readonly constituentPaths: SearchQuotientSpur[][];
+
+  isSameSpace(space: SearchQuotientNode): boolean;
 }

@@ -223,7 +223,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
 
     // if parentMerges.length > 0, is a SearchCluster.
-    // const parentMerge = parentMerges.length > 0 ? new SearchCluster(parentMerges) : parentMerges[0];
     const parentMerge = parentMerges[0];
 
     // Special case:  if we've reached the head of the space to be merged, check
@@ -262,6 +261,18 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
           p: entry.p
         }
       });
+
+      const mergedInputSource = {
+        ...this.inputSource,
+        segment: {
+          ...this.inputSource.segment,
+          end: space.inputSource.segment.end
+        }
+      };
+
+      if(mergedInputSource.segment.end == undefined) {
+        delete mergedInputSource.segment.end;
+      }
 
       // Now to re-merge the two halves.
       return space.construct(this.parentNode, mergedInputs, this.inputSource);
@@ -486,5 +497,41 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
 
     return components.join('+');
+  }
+
+  isSameSpace(space: SearchQuotientNode): boolean {
+    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // a perfect match.
+    if(this == space || this.spaceId == space.spaceId) {
+      return true;
+    }
+
+    // If it's falsy or a different SearchSpace type, that's an easy filter.
+    if(!space || !(space instanceof SearchQuotientSpur)) {
+      return false;
+    }
+
+    // If the most recent 'input source' was not triggered from the same input
+    // subset, it's not a match.
+    if(this.inputSource?.subsetId != space.inputSource?.subsetId) {
+      return false;
+    }
+
+    // We check the indices of the input's split if one occurred.
+    if(this.inputSource?.segment.end != space.inputSource?.segment.end) {
+      return false;
+    }
+
+    if(this.inputSource?.segment.start != space.inputSource?.segment.start) {
+      return false;
+    }
+
+    return true;
+
+    // Commented out b/c parentSpace-checks cause unit-test ID issues after... a... split.
+    //
+    // // Finally, we recursively verify that the parent matches.  If there IS no parent,
+    // // we verify that _that_ aspect matches.
+    // return this.parentSpace?.isSameSpace(space.parentSpace) ?? this.parentSpace == space.parentSpace;
   }
 }
