@@ -8,8 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
-
-BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # BASE_DIR="/web/src/engine/osk/gesture-processor"
 BUILD_DIR=/web/build/tools/testing/gesture-processor
@@ -17,6 +16,7 @@ BUILD_DIR=/web/build/tools/testing/gesture-processor
 ################################ Main script ################################
 
 builder_describe "Testing-oriented tools for the Gesture Processor module of web-based Keyman OSKs" \
+  "@/common/tools/es-bundling" \
   "clean" \
   "build" \
   ":fixture       The HTML-element fixture and CSS fixture used for both user-testing and unit-testing" \
@@ -69,7 +69,7 @@ function do_build_fixture() {
 function do_build_testmodule() {
   compile "" "${THIS_SCRIPT_PATH}/unit-test-resources" "${KEYMAN_ROOT}/${BUILD_DIR}/unit-test-resources"
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/${BUILD_DIR}/unit-test-resources/obj/index.js" \
+  node_es_bundle "${KEYMAN_ROOT}/${BUILD_DIR}/unit-test-resources/obj/index.js" \
     --out        "${KEYMAN_ROOT}/${BUILD_DIR}/unit-test-resources/lib/index.mjs" \
     --format "esm"
 }

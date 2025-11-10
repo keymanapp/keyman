@@ -14,6 +14,7 @@ SUBPROJECT_NAME=app/webview
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's puppetable version designed for use within WebViews." \
+  "@/common/tools/es-bundling" \
   "@/web/src/engine build" \
   "@/web/src/tools/building/sourcemap-root" \
   "clean" \
@@ -43,13 +44,13 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/webview"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/webview/src"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
+  node_es_bundle "${SRC_ROOT}/debug-main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb-webview.js" \
     --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug" \
     --target     "es6"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
+  node_es_bundle "${SRC_ROOT}/release-main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb-webview.js" \
     --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \

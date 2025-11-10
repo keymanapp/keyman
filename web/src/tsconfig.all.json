@@ -15,7 +15,6 @@
     { "path": "engine/predictive-text/worker-main/tsconfig.all.json" },
     { "path": "engine/predictive-text/worker-thread" },
     { "path": "tools/testing/gesture-processor/unit-test-resources" },
-    { "path": "engine/sentry-manager/src" },
 
     { "path": "tools/testing/recorder" },
     // { "path": "tools/sourcemap-root/tsconfig.json" },

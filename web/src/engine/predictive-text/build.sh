@@ -28,19 +28,12 @@ builder_describe "Builds predictive-text components used within Keyman Engine fo
 
 builder_parse "$@"
 
-config=release
-if builder_is_debug_build; then
-  config=debug
-fi
-
 builder_describe_outputs \
   configure                     "/node_modules" \
   build:templates               "/web/src/engine/predictive-text/build/obj/index.js" \
   build:wordbreakers            "/web/src/engine/wordbreakers/build/main/obj/index.js" \
   build:worker-main             "/web/src/engine/worker-main/build/obj/lmlayer.js" \
   build:worker-thread           "/web/src/engine/worker-thread/build/obj/worker-main.wrapped.js"
-
-BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 #### Build action definitions ####
 

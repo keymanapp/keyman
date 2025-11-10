@@ -14,6 +14,7 @@ SUBPROJECT_NAME=app/browser
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's website-integrating version for use in non-puppeted browsers." \
+  "@/common/tools/es-bundling" \
   "@/web/src/engine build" \
   "@/web/src/tools/building/sourcemap-root" \
   "clean" \
@@ -48,13 +49,13 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/browser"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/browser/src"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
+  node_es_bundle "${SRC_ROOT}/debug-main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb.js" \
     --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/debug" \
     --target     "es6"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
+  node_es_bundle "${SRC_ROOT}/release-main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb.js" \
     --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
@@ -62,7 +63,7 @@ compile_and_copy() {
     --minify \
     --target     "es6"
 
-  $BUNDLE_CMD    "${BUILD_ROOT}/obj/test-index.js" \
+  node_es_bundle "${BUILD_ROOT}/obj/test-index.js" \
     --out        "${BUILD_ROOT}/lib/index.mjs" \
     --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/lib" \

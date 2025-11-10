@@ -9,12 +9,14 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # ################################ Main script ################################
 
 builder_set_child_base src
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   \
+  "@/common/tools/es-bundling" \
   "@/resources/tools/check-markdown  test:help" \
   \
   "clean" \
@@ -58,8 +60,6 @@ builder_describe_outputs \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"
 
-BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 #### Build action definitions ####
 
 # We can run all clean & configure actions at once without much issue.
@@ -84,7 +84,7 @@ precompile() {
   # types built-in to Node aren't available, and @web/test-runner doesn't do
   # treeshaking when loading the imports. We work around by pre-compiling.
   for f in "${DIR}"/*.js; do
-    ${BUNDLE_CMD}   "${f}" \
+    node_es_bundle  "${f}" \
       --out         "${f%.js}".mjs \
       --format esm
   done
