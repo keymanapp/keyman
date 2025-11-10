@@ -9,7 +9,7 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { PlainTextRule } from "./kmn-analyser.js";
+import { PlainTextRule } from "./kmn-analyzer.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
 import { NodeType } from "./node-type.js";

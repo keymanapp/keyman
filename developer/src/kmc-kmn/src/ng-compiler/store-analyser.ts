@@ -10,7 +10,7 @@
 
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
-import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
+import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OptionalRule, Rule, SingleChildRuleParseToTreeFromFirstNode, SingleChildRuleParseToTreeFromGivenNode } from "./recursive-descent.js";
 import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";import { OneOrManyRule  } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
