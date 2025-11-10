@@ -221,13 +221,15 @@ describe('SearchCluster', () => {
       assert.equal(cluster.likeliestSourceText, 'tr');
       assert.deepEqual(cluster.sourceIdentifiers, [
         {
-        trueTransform: leadEdgeDistribution[0].sample,
+          trueTransform: leadEdgeDistribution[0].sample,
           inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p
+          bestProbFromSet: leadEdgeDistribution[0].p,
+          subsetId: length1Path.inputSource.subsetId
         }, {
           trueTransform: tailEdgeDistribution[0].sample,
           inputStartIndex: 0,
-          bestProbFromSet: tailEdgeDistribution[0].p
+          bestProbFromSet: tailEdgeDistribution[0].p,
+          subsetId: length2Path.inputSource.subsetId
         }
       ]);
     });
