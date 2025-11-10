@@ -857,6 +857,36 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a PARAMETER token (contains a left-bracket)", () => {
+      recogniseTokens(
+        'foo("2"',
+        [
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.LEFT_BR, '(', 1, 4),
+          new Token(TokenType.STRING, '"2"', 1, 5),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (contains a left-square-bracket)", () => {
+      recogniseTokens(
+        'foo["2"',
+        [
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.LEFT_SQ, '[', 1, 4),
+          new Token(TokenType.STRING, '"2"', 1, 5),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (contains a right-square-bracket)", () => {
+      recogniseTokens(
+        'foo]"2"',
+        [
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.RIGHT_SQ, ']', 1, 4),
+          new Token(TokenType.STRING, '"2"', 1, 5),
+        ]
+      );
+    });
     it("can recognise a dummy token (empty brackets)", () => {
       const lexer    = new Lexer('dummy()');
       const actual   = lexer.parse({addEOF:false, emitAll:false});
