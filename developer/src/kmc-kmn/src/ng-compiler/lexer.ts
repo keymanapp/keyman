@@ -166,9 +166,9 @@ export class Lexer {
  */
 export class Token {
   readonly tokenType: TokenType;
-  private _text: string;
-  private _lineNum: number; // starts from 1
-  private _charNum: number; // starts from 1
+  private readonly _text: string;
+  private readonly _lineNum: number; // starts from 1
+  private readonly _charNum: number; // starts from 1
   private readonly _line: string;
   private readonly _filename: string;
 
@@ -196,11 +196,11 @@ export class Token {
   }
 
   public get text(): string { return this._text; }
-  public set text(text: string) { this._text = text; }
+  // public set text(text: string) { this._text = text; }
   public get lineNum(): number { return this._lineNum; }
-  public set lineNum(lineNum: number) { this._lineNum = (lineNum < 1 )? 1 : lineNum; }
+  // public set lineNum(lineNum: number) { this._lineNum = (lineNum < 1 )? 1 : lineNum; }
   public get charNum(): number { return this._charNum; }
-  public set charNum(charNum: number) { this._charNum = (charNum < 1 )? 1 : charNum; }
+  // public set charNum(charNum: number) { this._charNum = (charNum < 1 )? 1 : charNum; }
   public get line(): string { return this._line; }
   public get filename(): string { return this._filename; }
 
