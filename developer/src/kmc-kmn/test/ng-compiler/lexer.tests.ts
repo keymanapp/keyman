@@ -653,6 +653,26 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("recognise a continuation followed by non-whitespace as a PARAMETER", () => {
+      recogniseTokens(
+        '\\beep\n',
+        [
+          new Token(TokenType.PARAMETER, '\\beep'),
+          new Token(TokenType.NEWLINE, '\n', 1, 6, '\\beep\n'),
+        ]
+      );
+    });
+    it("recognise a continuation followed by whitespace and a diallowed token as a PARAMETER", () => {
+      recogniseTokens(
+        '\\ beep\n',
+        [
+          new Token(TokenType.PARAMETER, '\\'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 2),
+          new Token(TokenType.BEEP, 'beep', 1, 3),
+          new Token(TokenType.NEWLINE, '\n', 1, 7, '\\ beep\n'),
+        ]
+      );
+    });
     it("can recognise multiple CONTINUATION tokens", () => {
       const line1 = 'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n';
       const line2 = '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n';
