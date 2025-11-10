@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>10.0.1107.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+    <FollowKeyboardVersion/>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL=""></Version>
+    <Name URL="">PlatformTest</Name>
+    <Description URL="">Test keyboard for displaying platform information.</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>../platformtest.kmx</Name>
+      <Description>Keyboard Platformtest</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>../platformtest.js</Name>
+      <Description>File platformtest.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>PlatformTest</Name>
+      <ID>platformtest</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

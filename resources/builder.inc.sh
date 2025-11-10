@@ -51,9 +51,7 @@ function _builder_init() {
 }
 
 function _builder_findRepoRoot() {
-    # We don't need readlink here because our standard script prolog does a
-    # readlink -f already so we will have already escaped from any symlinks
-    REPO_ROOT="${BASH_SOURCE[0]%/*/*}"
+    REPO_ROOT="$(readlink -f "${BASH_SOURCE[0]%/*/*}")"
     readonly REPO_ROOT
 }
 

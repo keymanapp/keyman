@@ -1,4 +1,4 @@
-# shellscript shell=bash
+# shellcheck shell=bash
 #
 # This script contains zip and unzip (TODO) utilities to function for all environments.
 # unzip is available in all environments
@@ -46,29 +46,29 @@ function add_zip_files() {
     case "$1" in
       -r)
         # recursive paths - Identical flag to zip and 7z
-        ZIP_FLAGS+=($1)
-        SEVENZ_FLAGS+=($1)
+        ZIP_FLAGS+=("$1")
+        SEVENZ_FLAGS+=("$1")
         shift
         ;;
       -x@*)
         # Filename for a file containing list of files to exclude from the archive - Identical flag to zip and 7z
-        ZIP_FLAGS+=($1)
-        SEVENZ_FLAGS+=($1)
+        ZIP_FLAGS+=("$1")
+        SEVENZ_FLAGS+=("$1")
         shift
         ;;
       -xr!*)
         # Recursively exclude the file after -xr! from the archive
         EXCLUDE_FILE=$(mktemp)
-        find . -name ${1##-xr!} > "${EXCLUDE_FILE}"
+        find . -name "${1##-xr!}" > "${EXCLUDE_FILE}"
         ZIP_FLAGS+=("-x@${EXCLUDE_FILE}")
-        SEVENZ_FLAGS+=($1)
+        SEVENZ_FLAGS+=("$1")
         shift
         ;;
 
       # Zip flags that have a corresponding 7z flag
       -q)
         # quiet mode  -> disable progress indicator, set output log level 0
-        ZIP_FLAGS+=($1)
+        ZIP_FLAGS+=("$1")
         SEVENZ_FLAGS+=("-bd")
         SEVENZ_FLAGS+=("-bb0")
         shift
@@ -79,7 +79,7 @@ function add_zip_files() {
         # -1 indicates low compression (fastest)
         # -9 indicates ultra compression (slowest)
         HAS_COMPRESSION=true
-        ZIP_FLAGS+=($1)
+        ZIP_FLAGS+=("$1")
         if [[ $1 =~ -([0-9]) ]]; then
           SEVENZ_FLAGS+=("-mx${BASH_REMATCH[1]}")
         fi
@@ -88,7 +88,7 @@ function add_zip_files() {
 
       -*)
         # Remaining zip flags that don't apply to 7z
-        ZIP_FLAGS+=($1)
+        ZIP_FLAGS+=("$1")
         shift
         ;;
 
@@ -119,12 +119,15 @@ function add_zip_files() {
   _verify_input "${INCLUDE[@]}"
 
   local COMPRESS_CMD=zip
-  if ! command -v zip 2>&1 > /dev/null; then
+  if ! command -v zip > /dev/null 2>&1; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
       if builder_is_windows; then
-        # shellcheck disable=2154
-        SEVENZ="${SEVENZ_HOME}/7z.exe"
+        if [[ -z "${SEVENZ_HOME+x}" ]]; then
+          SEVENZ="$(command -v 7z.exe)"
+        else
+          SEVENZ="${SEVENZ_HOME}/7z.exe"
+        fi
       else
         SEVENZ=7z
       fi
@@ -140,7 +143,7 @@ function add_zip_files() {
 
   # Create archive
   # builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_FLAGS[@]} ${ZIP_FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}"
-  "${COMPRESS_CMD}" ${SEVENZ_FLAGS[@]} ${ZIP_FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}
+  "${COMPRESS_CMD}" "${SEVENZ_FLAGS[@]}" "${ZIP_FLAGS[@]}" "${ZIP_FILE}" "${INCLUDE[@]}"
 
   if [[ -n "${EXCLUDE_FILE:-}" ]]; then
     rm "${EXCLUDE_FILE}"

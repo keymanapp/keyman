@@ -13,6 +13,7 @@ from gi.repository import GObject
 from keyman_config import _
 from keyman_config import KeymanApiUrl, KeymanDownloadsUrl
 from keyman_config.deprecated_decorator import deprecated
+from keyman_config.sentry_handling import SentryErrorHandling
 
 
 class InstallLocation(GObject.GEnum):
@@ -21,7 +22,12 @@ class InstallLocation(GObject.GEnum):
     User = 3
     Unknown = 99
 
-can_use_cache = True
+
+# When running under sudo, we don't want to use the cache
+# since that stores files with root permissions so that they
+# can't be deleted/replaced by the user later.
+can_use_cache = not os.environ.get('SUDO_USER')
+
 
 def get_install_area_string(area):
     if area == InstallLocation.OS:
@@ -105,7 +111,7 @@ def get_keyboard_data(keyboardID, weekCache=False):
         dict: Keyboard data
     """
     logging.info('Getting data for keyboard %s', keyboardID)
-    api_url = KeymanApiUrl + '/keyboard/' + keyboardID
+    api_url = f'{KeymanApiUrl}/keyboard/{keyboardID}'
     logging.debug('At URL %s', api_url)
     cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()
@@ -123,10 +129,7 @@ def get_keyboard_data(keyboardID, weekCache=False):
     logging.debug('Time: {0} / Used Cache: {1}'.format(now, _did_use_cache(response)))
     os.chdir(current_dir)
     _uninstall_cache()
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+    return response.json() if response.status_code == 200 else None
 
 
 def get_download_folder():
@@ -234,6 +237,8 @@ def download_kmp_file(url, kmpfile, cache=False):
     """
     logging.info('Download URL: %s', url)
     downloadfile = None
+    sentry = SentryErrorHandling()
+    sentry.add_breadcrumb(category='download', message=f'Downloading keyboard from {url}')
 
     if cache:
         cache_dir = keyman_cache_dir()

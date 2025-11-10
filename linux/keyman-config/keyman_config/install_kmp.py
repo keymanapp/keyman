@@ -12,7 +12,7 @@ from keyman_config import _, __version__, secure_lookup
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.convertico import checkandsaveico, extractico
 from keyman_config.custom_keyboards import CustomKeyboards
-from keyman_config.dbus_util import get_keyman_config_service
+from keyman_config.dbus_util import keyboard_list_changed
 from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
                                    get_keyboard_dir, get_keyman_doc_dir,
@@ -23,6 +23,7 @@ from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
 from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, restart_ibus
 from keyman_config.kmpmetadata import KMFileTypes, get_metadata
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
+from keyman_config.sentry_handling import SentryErrorHandling
 
 # TODO userdir install
 # special processing for kmn if needed
@@ -105,6 +106,9 @@ class InstallKmp():
         self.kmpdocdir = get_keyman_doc_dir(area, self.packageID)
         self.kmpfontdir = get_keyman_font_dir(area, self.packageID)
 
+        sentry = SentryErrorHandling()
+        sentry.add_breadcrumb(category='install', message=f'Installing kmp: {self.packageID} from "{inputfile}" for lang: {language}; area: {"OS" if area == 1 else "Shared" if area == 2 else "User" if area == 3 else "Unknown"}')
+
         if not os.path.isfile(inputfile):
             message = _("File {kmpfile} doesn't exist").format(kmpfile=inputfile)
             logging.error("install_kmp.py: %s", message)
@@ -179,8 +183,9 @@ class InstallKmp():
                              f['name'])
                 name, ext = os.path.splitext(f['name'])
                 ldml = convert_kvk_to_ldml(name, fpath)
-                ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
-                output_ldml(ldmlfile, ldml)
+                if ldml is not None and len(ldml) > 0:
+                    ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
+                    output_ldml(ldmlfile, ldml)
             elif ftype == KMFileTypes.KM_ICON:
                 # Special handling of icon to convert to PNG
                 logging.info("Converting %s to PNG and installing both as keyman files",
@@ -257,6 +262,9 @@ class InstallKmp():
         if not language:
             language = self._add_custom_keyboard(firstKeyboard, packageDir, requested_language)
 
+        sentry = SentryErrorHandling()
+        sentry.add_breadcrumb(category='install', message=f'Installing keyboards for lang: {language}')
+
         if is_fcitx_running():
             return self._install_keyboards_to_fcitx()
 
@@ -308,7 +316,8 @@ def extract_kmp(kmpfile, directory):
 
 
 def process_keyboard_data(keyboardID, packageDir) -> bool:
-    if not (kbdata := get_keyboard_data(keyboardID)):
+    kbdata = get_keyboard_data(keyboardID)
+    if not kbdata or len(kbdata) <= 0:
         return False
     if not os.path.isdir(packageDir) and os.access(os.path.join(packageDir, os.pardir), os.X_OK | os.W_OK):
         try:
@@ -342,5 +351,5 @@ def install_kmp(inputfile, sharedarea=False, language=None):
     else:
         return_value = InstallKmp().install_kmp_user(inputfile, language)
 
-    get_keyman_config_service().keyboard_list_changed()
+    keyboard_list_changed()
     return return_value

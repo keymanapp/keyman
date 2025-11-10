@@ -4,7 +4,7 @@ title: IKeymanControl::OpenTextEditor() Method
 
 ## Introduction
 
-The `IKeymanControl::OpenTextEditor()` method opens Keyman Desktop Text
+The `IKeymanControl::OpenTextEditor()` method opens Keyman for Windows Text
 Editor.
 
 ## Specification

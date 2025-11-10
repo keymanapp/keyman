@@ -28,22 +28,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -349,6 +349,7 @@
     <ClCompile Include="K32_load.cpp" />
     <ClCompile Include="k32_lowlevelkeyboardhook.cpp" />
     <ClCompile Include="k32_tsf.cpp" />
+    <ClCompile Include="k32_visualkeyboardinterface.cpp" />
     <ClCompile Include="keybd_shift.cpp" />
     <ClCompile Include="keyboardoptions.cpp" />
     <ClCompile Include="keyman32.cpp" />
@@ -441,6 +442,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="hotkeys.h" />
     <ClInclude Include="k32_tsf.h" />
+    <ClInclude Include="k32_visualkeyboardinterface.h" />
     <ClInclude Include="KBD.H" />
     <ClInclude Include="keyboardoptions.h" />
     <ClInclude Include="keyman64.h" />

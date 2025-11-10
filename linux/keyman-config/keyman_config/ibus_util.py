@@ -10,9 +10,11 @@ import time
 
 import gi
 
+from keyman_config.dbus_util import DBusSessionBusAddress, XdgRuntimeDir
+
 gi.require_version('IBus', '1.0')
 from gi.repository import IBus
-from pkg_resources import parse_version
+from packaging import version
 
 from keyman_config.gnome_keyboards_util import is_gnome_desktop
 from keyman_config.gsettings import GSettings
@@ -114,10 +116,8 @@ def verify_ibus_daemon(start):
         return IbusDaemon.ERROR_USER
 
     try:
-        ps_output = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'),
-                                   check=False, stdout=subprocess.PIPE).stdout
-        ibus_daemons = re.findall(r'^[^ZT] (/[^ ]+/|)ibus-daemon( .*|$)',
-                                  ps_output.decode('utf-8'), re.MULTILINE)
+        ibus_daemons = subprocess.run(('pgrep', '-u', user, 'ibus-daemon'),
+                                      check=False, stdout=subprocess.PIPE).stdout.split()
         if len(ibus_daemons) <= 0:
             if start:
                 _start_ibus_daemon(realuser)
@@ -156,7 +156,7 @@ def _get_ibus_version():
 
 def _start_ibus_daemon(realuser):
     try:
-        if parse_version(_get_ibus_version()) >= parse_version('1.5.28'):
+        if version.parse(_get_ibus_version()) >= version.parse('1.5.28'):
             # IBus ~1.5.28 added the `start` command, so we use that if possible
             # and let IBus deal with the necessary parameters
             args = ['ibus', 'start', '-d']
@@ -171,36 +171,28 @@ def _start_ibus_daemon(realuser):
 
         if realuser:
             # we have been called with `sudo`. Start ibus-daemon for the real user.
-            logging.info('starting ibus-daemon for user %s', realuser)
-            subprocess.run(['sudo', '-u', realuser].extend(args), check=True)
+            args = ['sudo', '-u', realuser,
+                    DBusSessionBusAddress, XdgRuntimeDir, *args]
+            logging.info(f'starting ibus-daemon for user {realuser} with args: {args}')
         else:
-            logging.info('ibus-daemon not running. Starting it...')
-            subprocess.run(args, check=True)
-    except Exception:
-        logging.warning('Failed to start ibus-daemon')
+            logging.info(f'ibus-daemon not running. Starting it with args: {args}...')
+        subprocess.run(args, check=True)
+        logging.info('ibus-daemon started successfully')
+    except Exception as e:
+        logging.warning(f'Failed to start ibus-daemon: {e}')
 
 
 def restart_ibus(bus=None):
     verify_ibus_daemon(False)
     if realuser := os.environ.get('SUDO_USER'):
         # we have been called with `sudo`. Restart ibus for the real user.
-        logging.info('restarting IBus by subprocess for user %s', realuser)
-        subprocess.run(['sudo', '-u', realuser, 'ibus', 'restart'], check=False)
+        logging.info(f'restarting IBus by subprocess for user {realuser}')
+        subprocess.run(['sudo', '-u', realuser,
+                        DBusSessionBusAddress, XdgRuntimeDir,
+                        'ibus', 'restart'], check=False)
     else:
-        logging.info('restarting IBus through API')
-        try:
-            if not bus:
-                bus = get_ibus_bus()
-            if bus:
-                logging.info("restarting IBus")
-                # we no longer try to restart since we sometimes ended up with more than one
-                # ibus-daemon process (#6237). Instead we only exit ibus here, and start
-                # ibus again below.
-                bus.exit(False)
-                bus.destroy()
-        except Exception as e:
-            logging.warning("Failed to restart IBus")
-            logging.warning(e)
+        logging.info('restarting IBus by subprocess')
+        subprocess.run(['ibus', 'restart'], check=False)
     # give ibus a chance to shutdown (#6237)
     time.sleep(1)  # 1s
     verify_ibus_daemon(True)

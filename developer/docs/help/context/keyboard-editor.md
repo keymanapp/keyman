@@ -322,7 +322,7 @@ on any key to edit it. There are a number of controls:
 
 Red circle with an X
 :   This button to the top right of the key will delete the key from the
-    row; if it is the last key on the row, the entire row will be
+    row; if it is the only remaining key on the row, the entire row will be
     deleted.
 
 Green arrow with a +
@@ -602,7 +602,7 @@ Open source, build, and project folder
 
 ### Windows, macOS, and Linux Targets
 
-If your keyboard is designed to target Windows and macOS, then the
+If your keyboard is designed to target Windows, Linux, and macOS, then the
 following buttons will also be visible:
 
 Install
