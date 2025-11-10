@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.158 alpha 2025-11-10
+
+* fix(web): add unit tests for DeadkeyTracker and fix a few bugs (#15113)
+
 ## 19.0.157 alpha 2025-11-06
 
 * chore(common): Consolidate platformtest.js keyboard to `/common/test/keyboards/` (#15034)
