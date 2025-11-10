@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { PathResult, QUEUE_NODE_COMPARATOR, SearchPath } from './search-path.js';
+import { QUEUE_NODE_COMPARATOR, SearchPath } from './search-path.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -593,8 +593,23 @@ export class SearchResult {
   }
 }
 
-// The set of search spaces corresponding to the same 'context' for search.
-// Whenever a wordbreak boundary is crossed, a new instance should be made.
+type NullPath = {
+  type: 'none'
+}
+
+type IntermediateSearchPath = {
+  type: 'intermediate',
+  cost: number
+}
+
+type CompleteSearchPath = {
+  type: 'complete',
+  cost: number,
+  finalNode: SearchNode
+}
+
+export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
+
 // Current best guesstimate of how compositor will retrieve ideal corrections.
 export async function *getBestMatches(searchSpace: SearchPath, timer: ExecutionTimer): AsyncGenerator<SearchResult> {
   let currentReturns: {[resultKey: string]: SearchNode} = {};

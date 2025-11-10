@@ -11,7 +11,7 @@
 import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchNode } from './distance-modeler.js';
+import { PathResult, SearchNode } from './distance-modeler.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -20,23 +20,6 @@ import Transform = LexicalModelTypes.Transform;
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
   return arg1.currentCost - arg2.currentCost;
 }
-
-type NullPath = {
-  type: 'none'
-}
-
-type IntermediateSearchPath = {
-  type: 'intermediate',
-  cost: number
-}
-
-type CompleteSearchPath = {
-  type: 'complete',
-  cost: number,
-  finalNode: SearchNode
-}
-
-export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
@@ -226,7 +209,7 @@ export class SearchPath {
 
     let currentNode = this.selectionQueue.dequeue();
 
-    let unmatchedResult: IntermediateSearchPath = {
+    let unmatchedResult: PathResult = {
       type: 'intermediate',
       cost: currentNode.currentCost
     }
