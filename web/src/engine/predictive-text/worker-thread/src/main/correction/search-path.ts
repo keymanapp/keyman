@@ -26,7 +26,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchPath implements SearchSpace {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  private inputs?: Distribution<Readonly<Transform>>;
+  readonly inputs?: Distribution<Readonly<Transform>>;
 
   private parentSpace: SearchSpace;
   readonly spaceId: number;
@@ -162,7 +162,7 @@ export class SearchPath implements SearchSpace {
 
   get parents() {
     // The SearchPath class may only have a single parent.
-    return [this.parentSpace];
+    return this.parentSpace ? [this.parentSpace] : [];
   }
 
   increaseMaxEditDistance() {
