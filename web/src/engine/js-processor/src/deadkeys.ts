@@ -122,7 +122,7 @@ export class DeadkeyTracker {
     if (index > -1) {
       this.dks.splice(index, 1);
     } else {
-      console.warn('Deadkey to remove not found in DeadkeyTracker.');
+      console.warn(`Deadkey ${JSON.stringify(dk)} to remove not found in DeadkeyTracker.`);
     }
   }
 
