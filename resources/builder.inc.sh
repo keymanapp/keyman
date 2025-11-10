@@ -377,7 +377,7 @@ _builder_item_is_target() {
 
 function _builder_warn_if_incomplete() {
   if [ -n "${_builder_current_action}" ]; then
-    builder_echo warning "$_builder_current_action never reported success or failure"
+    builder_echo warning "WARNING: $_builder_current_action never reported success or failure"
     # exit 1  # If we wanted this scenario to result in a forced build-script fail.
   fi
 
@@ -441,31 +441,47 @@ _builder_cleanup_deps() {
 # Child scripts
 #------------------------------------------------------------------------------------------
 
+#
+# Starts a child script build, passing current build dependency, inheritable
+# options, and timing status through as parameters. This should be used rather
+# than calling the build script directly, to avoid multiple builds of
+# dependencies.
+#
+# ### Parameters
+#
+# * 1: `script`      path to script, relative to root of repo
+# * 2: `action`      action(s)+target(s) for the child script to run, comma separated, at least one
+#
+# ### Example
+#
+# ```bash
+#   builder_launch /core/build.sh configure,build:wasm
+# ```
+#
 builder_launch() {
   local script="$1"
   local action="$2"
-  local target
-  if [[ $# -lt 3 ]]; then
-    target=":*"
-  else
-    target="$3"
-  fi
-  _builder_execute_child_script "${action}" "${target}" "${KEYMAN_ROOT}${script}"
+  _builder_execute_child_script "${KEYMAN_ROOT}${script}" "${action}" ""
 }
 
 _builder_execute_child() {
-  local action=$1
-  local target=$2
-  local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
-  _builder_execute_child_script "$action" "$target" "$script"
-}
-
-_builder_execute_child_script() {
   local action="$1"
   local target="$2"
-  local script="$3"
+  local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
+  _builder_execute_child_script "$script" "$action"
+}
 
-  builder_echo start "$action$target" "## $action$target starting..."
+# ### Parameters
+#
+# * 1: `script`      path to script
+# * 2: `action`      action(s)+target(s) for the child script to run, comma separated, at least one
+# * 3: `target`      reporting target, used when executing a child script through builder_run_child_actions, optional
+_builder_execute_child_script() {
+  local script="$1"
+  local action="$2"
+  local target="${3:-}"
+
+  builder_echo start "child#$action$target" "## child $action$target starting..."
   _builder_timing_start "$action$target"
 
   # Build array of specified inheritable options
@@ -485,21 +501,25 @@ _builder_execute_child_script() {
     dep_module="$builder_dep_parent"
   fi
 
+  # Note: we do not pass '$target' to the child script, because it is used here
+  # only for reporting; the target was used to select the correct script in
+  # _builder_execute_child()
+
   "$script" \
     --builder-child \
     $_builder_build_deps \
     $dep_flag "$dep_module" \
-    $action \
+    "$action" \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
     $_builder_offline \
   && (
     _builder_timing_stop "$action$target"
-    builder_echo end "$action$target" success "## $action$target completed successfully"
+    builder_echo end "child#$action$target" success "## child $action$target completed successfully"
   ) || (
     result=$?
-    builder_echo end "$action$target" error "## $action$target failed with exit code $result"
+    builder_echo end "child#$action$target" error "## child $action$target failed with exit code $result"
     exit $result
   ) || exit $? # Required due to above subshell masking exit
 }
@@ -1526,7 +1546,7 @@ _builder_parse_expanded_parameters() {
           action=$new_action
           ;;
         *)
-          builder_warn "Parameter $action has $? matches, could mean any of {$new_action}"
+          builder_warn "ERROR: Parameter $action has $? matches, could mean any of {$new_action}"
           exit 1
           ;;
       esac
@@ -1537,7 +1557,7 @@ _builder_parse_expanded_parameters() {
           target=$new_target
           ;;
         *)
-          builder_warn "Parameter $target has $? matches, could mean any of {$new_target}"
+          builder_warn "ERROR: Parameter $target has $? matches, could mean any of {$new_target}"
           exit 1
           ;;
       esac
@@ -1711,6 +1731,12 @@ _builder_parse_expanded_parameters() {
   elif builder_is_child_build; then
     _builder_verify_expected_sub_process_variables
   else
+
+    # For now, we'll leave this warning disabled, but may re-enable in #15130
+    # if [[ ! -z "${_builder_deps_built+x}" ]]; then
+    #   builder_warn "WARNING: Child build '${THIS_SCRIPT_IDENTIFIER}' instantiated without using builder_launch"
+    # fi
+
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
     export _builder_deps_built=`mktemp`
@@ -2309,13 +2335,13 @@ builder_describe_platform() {
 
   # For testing, we can override the current platform
   if [[ ! -z "${BUILDER_PLATFORM_OVERRIDE+x}" ]]; then
-    builder_warn "BUILDER_PLATFORM_OVERRIDE variable found. Overriding detected platform '$builder_platform' with '$BUILDER_PLATFORM_OVERRIDE'"
+    builder_warn "WARNING: BUILDER_PLATFORM_OVERRIDE variable found. Overriding detected platform '$builder_platform' with '$BUILDER_PLATFORM_OVERRIDE'"
     builder_platform="$BUILDER_PLATFORM_OVERRIDE"
   fi
 
   # For testing, we can override the current tools
   if [[ ! -z "${BUILDER_TOOLS_OVERRIDE+x}" ]]; then
-    builder_warn "BUILDER_TOOLS_OVERRIDE variable found. Overriding detected tools (${builder_installed_tools[@]}) with (${BUILDER_TOOLS_OVERRIDE[@]})"
+    builder_warn "WARNING: BUILDER_TOOLS_OVERRIDE variable found. Overriding detected tools (${builder_installed_tools[@]}) with (${BUILDER_TOOLS_OVERRIDE[@]})"
     builder_installed_tools=("${BUILDER_TOOLS_OVERRIDE[@]}")
   fi
 

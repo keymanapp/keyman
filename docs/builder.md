@@ -1038,6 +1038,26 @@ fi
 
 --------------------------------------------------------------------------------
 
+## `builder_launch` function
+
+Starts a child script build, passing current build dependency, inheritable
+options, and timing status through as parameters. This should be used rather
+than calling the build script directly, to avoid multiple builds of
+dependencies.
+
+### Parameters
+
+* 1: `script`      path to script, relative to root of repo
+* 2: `action`      action(s)+target(s) for the child script to run, comma separated, at least one
+
+### Example
+
+```bash
+  builder_launch /core/build.sh configure,build:wasm
+```
+
+--------------------------------------------------------------------------------
+
 ## `builder_parse` function
 
 Initializes a build.sh script, parses command line. Will abort the script if
