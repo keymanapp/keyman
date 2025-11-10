@@ -240,4 +240,6 @@ export interface SearchSpace {
    * Intended only for use during unit testing.
    */
   readonly constituentPaths: SearchPath[][];
+
+  isSameSpace(space: SearchSpace): boolean;
 }

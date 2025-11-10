@@ -1799,6 +1799,7 @@ describe('SearchPath', () => {
         assert.equal(remergedPath.codepointLength, mergeTarget.codepointLength);
         assert.sameDeepOrderedMembers(remergedPath.sourceIdentifiers, mergeTarget.sourceIdentifiers);
         assert.isTrue(remergedPath.hasInputs(trueDistributions));
+        assert.isTrue(remergedPath.isSameSpace(mergeTarget));
       }
 
       it('setup: constructs path properly', () => {
@@ -1822,27 +1823,27 @@ describe('SearchPath', () => {
         }
       });
 
-      it('splits properly at index 0', () => {
+      it('merges tokens previously split at index 0', () => {
         runCommonAssertions(0);
       });
 
-      it('splits properly at index 1', () => {
+      it('merges tokens previously split at index 1', () => {
         runCommonAssertions(1);
       });
 
-      it('splits properly at index 2', () => {
+      it('merges tokens previously split at index 2', () => {
         runCommonAssertions(2);
       });
 
-      it('splits properly at index 3', () => {
+      it('merges tokens previously split at index 3', () => {
         runCommonAssertions(3);
       });
 
-      it('splits properly at index 4', () => {
+      it('merges tokens previously split at index 4', () => {
         runCommonAssertions(4);
       });
 
-      it('splits properly at index 5', () => {
+      it('merges tokens previously split at index 5', () => {
         runCommonAssertions(5);
       });
     });
@@ -1905,6 +1906,7 @@ describe('SearchPath', () => {
       assert.isTrue(remerged instanceof SearchPath);
       assert.deepEqual((remerged as SearchPath).inputs, inputDistribution);
       assert.isTrue(remerged.hasInputs([[startSample], inputDistribution]));
+      assert.isTrue(remerged.isSameSpace(mergeTarget));
     });
   });
 });
