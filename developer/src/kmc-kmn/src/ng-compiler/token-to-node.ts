@@ -8,7 +8,7 @@
  * TokenType to NodeTypes mapping for TokenRule
  */
 
-import { NodeType } from "./node-types.js";
+import { NodeType } from "./node-type.js";
 import { TokenType } from "./token-type.js";
 
 export const TOKEN_TO_NODE = [

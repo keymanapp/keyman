@@ -10,7 +10,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { NodeType } from "../../src/ng-compiler/node-types.js";
+import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';

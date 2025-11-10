@@ -9,13 +9,14 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToTreeFromGivenNode, SingleChildRuleParseToTreeFromNewNode } from "./recursive-descent.js";
-import { Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
+import { Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode } from "./recursive-descent.js";
+import { SingleChildRuleParseToTreeFromNewNode, TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyser.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
 import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyser.js";
 import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyser.js";
-import { NodeType } from "./node-types.js";
+import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {

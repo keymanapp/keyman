@@ -13,7 +13,7 @@ import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OptionalRule, Rule, SingleChildRuleParseToTreeFromFirstNode, SingleChildRuleParseToTreeFromGivenNode } from "./recursive-descent.js";
 import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";import { OneOrManyRule  } from "./recursive-descent.js";
-import { NodeType } from "./node-types.js";
+import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 
 export class SystemStoreAssignRule extends SingleChildRuleParseToTreeFromFirstNode {

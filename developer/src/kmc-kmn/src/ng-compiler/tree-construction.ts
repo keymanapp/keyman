@@ -7,7 +7,7 @@
  */
 
 import { Token } from "./lexer.js";
-import { NodeType } from "./node-types.js";
+import { NodeType } from "./node-type.js";
 
 /**
  * ASTNode objects form the abstract syntax tree created by the recursive-

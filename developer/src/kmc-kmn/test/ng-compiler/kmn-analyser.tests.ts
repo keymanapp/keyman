@@ -21,7 +21,7 @@ import { OutputStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, TextRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { NodeType } from "../../src/ng-compiler/node-types.js";
+import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { readFileSync } from 'fs';
 

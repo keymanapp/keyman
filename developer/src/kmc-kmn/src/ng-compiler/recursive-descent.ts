@@ -9,7 +9,7 @@
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { NodeType } from "./node-types.js";
+import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TOKEN_TO_NODE } from "./token-to-node.js";
 
