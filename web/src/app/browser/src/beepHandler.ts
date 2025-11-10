@@ -1,5 +1,4 @@
-import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { JSKeyboard, type KeyboardMinimalInterface } from 'keyman/engine/keyboard';
+import { type KeyboardMinimalInterface } from 'keyman/engine/keyboard';
 import { DesignIFrameElementTextStore, AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 
 // Utility object used to handle beep (keyboard error response) operations.
@@ -76,11 +75,6 @@ export class BeepHandler {
    * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
    */
   readonly reset = () => {
-    // TODO-web-core: implement for KMX keyboards if needed
-    if (this.keyboardInterface.activeKeyboard instanceof JSKeyboard) {
-      (this.keyboardInterface as JSKeyboardInterface).resetContextCache();
-    }
-
     this._BeepTimeout = 0;
     for(let Lbo=0;Lbo<this._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
       this._BeepObjects[Lbo].reset();
