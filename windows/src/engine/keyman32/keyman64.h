@@ -81,10 +81,12 @@
 #include "../../../../common/windows/cpp/include/xstring.h"
 #include "../../../../common/windows/cpp/include/legacy_kmx_memory.h"
 
-#ifdef _WIN64
-#define LIBRARY_NAME "KEYMAN64"
+#if defined(_M_ARM64)
+  #define LIBRARY_NAME "KEYMANARM64"
+#elif defined(_M_X64)
+  #define LIBRARY_NAME "KEYMAN64"
 #else
-#define LIBRARY_NAME "KEYMAN32"
+  #define LIBRARY_NAME "KEYMAN32"
 #endif
 
 #define NOT_IMPLEMENTED assert(FALSE)

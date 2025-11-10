@@ -141,9 +141,6 @@
     <ClCompile Include="appcontext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="k32_visualkeyboardinterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -158,6 +155,9 @@
     <None Include="keyman64.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="keymanarm64.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KEYMAN32.RC">
@@ -167,6 +167,9 @@
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="keyman64.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="keymanarm64.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -259,9 +262,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="appcontext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="k32_visualkeyboardinterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
