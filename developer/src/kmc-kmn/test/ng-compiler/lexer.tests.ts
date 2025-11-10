@@ -653,6 +653,26 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("recognise a continuation followed by non-whitespace as a PARAMETER", () => {
+      recogniseTokens(
+        '\\beep\n',
+        [
+          new Token(TokenType.PARAMETER, '\\beep'),
+          new Token(TokenType.NEWLINE, '\n', 1, 6, '\\beep\n'),
+        ]
+      );
+    });
+    it("recognise a continuation followed by whitespace and a diallowed token as a PARAMETER", () => {
+      recogniseTokens(
+        '\\ beep\n',
+        [
+          new Token(TokenType.PARAMETER, '\\'),
+          new Token(TokenType.WHITESPACE, ' ', 1, 2),
+          new Token(TokenType.BEEP, 'beep', 1, 3),
+          new Token(TokenType.NEWLINE, '\n', 1, 7, '\\ beep\n'),
+        ]
+      );
+    });
     it("can recognise multiple CONTINUATION tokens", () => {
       const line1 = 'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n';
       const line2 = '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n';
@@ -853,6 +873,36 @@ describe("Lexer Tests", () => {
         [
           new Token(TokenType.PARAMETER, 'foo'),
           new Token(TokenType.EQUAL, '=', 1, 4),
+          new Token(TokenType.STRING, '"2"', 1, 5),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (contains a left-bracket)", () => {
+      recogniseTokens(
+        'foo("2"',
+        [
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.LEFT_BR, '(', 1, 4),
+          new Token(TokenType.STRING, '"2"', 1, 5),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (contains a left-square-bracket)", () => {
+      recogniseTokens(
+        'foo["2"',
+        [
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.LEFT_SQ, '[', 1, 4),
+          new Token(TokenType.STRING, '"2"', 1, 5),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (contains a right-square-bracket)", () => {
+      recogniseTokens(
+        'foo]"2"',
+        [
+          new Token(TokenType.PARAMETER, 'foo'),
+          new Token(TokenType.RIGHT_SQ, ']', 1, 4),
           new Token(TokenType.STRING, '"2"', 1, 5),
         ]
       );
@@ -1179,6 +1229,29 @@ describe("Lexer Tests", () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it("can handle a single line continuation (handleContinuation:false)", () => {
+      const lexer    = new Lexer('beep\\\nbeep\n');
+      const actual   = lexer.parse({addEOF:false, emitAll:true, handleContinuation:false});
+      const expected = [
+        new Token(TokenType.BEEP, 'beep', 1, 1),
+        new Token(TokenType.CONTINUATION, '\\', 1, 5),
+        new Token(TokenType.NEWLINE, '\n', 1, 6, 'beep\\\n'),
+        new Token(TokenType.BEEP, 'beep', 2, 1),
+        new Token(TokenType.NEWLINE, '\n', 2, 5, 'beep\n'),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it("can handle a single line continuation (emitAll:false, handleContinuation:false)", () => {
+      const lexer    = new Lexer('beep\\\nbeep\n');
+      const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:false});
+      const expected = [
+        new Token(TokenType.BEEP, 'beep', 1, 1),
+        new Token(TokenType.NEWLINE, '\n', 1, 6, 'beep\\\n'),
+        new Token(TokenType.BEEP, 'beep', 2, 1),
+        new Token(TokenType.NEWLINE, '\n', 2, 5, 'beep\n'),
+      ];
+      assert.deepEqual(actual, expected);
+    });
     it("can handle a single line continuation (handleContinuation:true)", () => {
       const lexer    = new Lexer('beep\\\nbeep\n');
       const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:true});
@@ -1189,7 +1262,7 @@ describe("Lexer Tests", () => {
       ];
       assert.deepEqual(actual, expected);
     });
-    it("can handle muliple line continuations (handleContinuation:true)", () => {
+    it("can handle multiple line continuations (handleContinuation:true)", () => {
       const line1 = 'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n';
       const line2 = '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n';
       const line3 = '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n';
@@ -1447,69 +1520,40 @@ describe("Lexer Tests", () => {
         assert.isFalse(token.isTokenType(TokenType.BITMAP));
       });
     });
+    describe("Token.tokenType", () => {
+      it("can get tokenType", () => {
+        const token = new Token(TokenType.STORE, 'store');
+        assert.equal(token.tokenType, TokenType.STORE);
+      });
+    });
     describe("Token.text", () => {
       it("can get text", () => {
         const token = new Token(TokenType.STORE, 'store');
         assert.equal(token.text, 'store');
       });
-      // it("can set text", () => {
-      //   const token = new Token(TokenType.STORE, 'store');
-      //   token.text = 'bitmap';
-      //   assert.equal(token.text, 'bitmap');
-      // });
     });
     describe("Token.lineNum", () => {
       it("can get line number", () => {
         const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.lineNum, 2);
       });
-      // it("can set line number", () => {
-      //   const token = new Token(TokenType.STORE, 'store', 2, 3);
-      //   assert.equal(token.lineNum, 2);
-      //   token.lineNum = 4;
-      //   assert.equal(token.lineNum, 4);
-      // });
-      // it("can handle a negative line number", () => {
-      //   const token = new Token(TokenType.STORE, 'store', 2, 3);
-      //   assert.equal(token.lineNum, 2);
-      //   token.lineNum = -2;
-      //   assert.equal(token.lineNum, 1);
-      // });
-      // it("can handle a zero line number", () => {
-      //   const token = new Token(TokenType.STORE, 'store', 2, 3);
-      //   assert.equal(token.lineNum, 2);
-      //   token.lineNum = 0;
-      //   assert.equal(token.lineNum, 1);
-      // });
     });
     describe("Token.charNum", () => {
       it("can get char number", () => {
         const token = new Token(TokenType.STORE, 'store', 2, 3);
         assert.equal(token.charNum, 3);
       });
-      // it("can set char number", () => {
-      //   const token = new Token(TokenType.STORE, 'store', 2, 3);
-      //   assert.equal(token.charNum, 3);
-      //   token.charNum = 4;
-      //   assert.equal(token.charNum, 4);
-      // });
-      // it("can handle a negative char number", () => {
-      //   const token = new Token(TokenType.STORE, 'store', 2, 3);
-      //   assert.equal(token.charNum, 3);
-      //   token.charNum = -3;
-      //   assert.equal(token.charNum, 1);
-      // });
-      // it("can handle a zero char number", () => {
-      //   const token = new Token(TokenType.STORE, 'store', 2, 3);
-      //   assert.equal(token.charNum, 3);
-      //   token.charNum = 0;
-      //   assert.equal(token.charNum, 1);
-      // });
     });
     describe("Token.line", () => {
       it("can get line", () => {
         const token = new Token(TokenType.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
         assert.equal(token.line, 'store(one) "value"\n');
+      });
+    });
+    describe("Token.filename", () => {
+      it("can get filename", () => {
+        const token = new Token(TokenType.NEWLINE, '\n', 1, 19, 'store(one) "value"\n', 'dummy.kmn');
+        assert.equal(token.filename, 'dummy.kmn');
       });
     });
   });
