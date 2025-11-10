@@ -495,4 +495,26 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const segment = inputSrc.segment;
     return `E${inputSrc.subsetId}:${segment.start}${segment.end !== undefined ? `-${segment.end}` : ''}`;
   }
+
+  isSameNode(space: SearchQuotientNode): boolean {
+    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // a perfect match.
+    if(this == space || this.spaceId == space.spaceId) {
+      return true;
+    }
+
+    // If it's falsy or a different SearchSpace type, that's an easy filter.
+    if(!space || !(space instanceof SearchQuotientSpur)) {
+      return false;
+    }
+
+    // If this spur does not match the exact same edge conditions as the other spur,
+    // they are not duplicates.
+    if(this.edgeKey != space.edgeKey) {
+      return false;
+    }
+
+    // Finally, we recursively verify that the parent matches.
+    return this.parentNode.isSameNode(space.parentNode);
+  }
 }

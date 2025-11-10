@@ -98,6 +98,25 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return '';
   }
 
+  isSameNode(space: SearchQuotientNode): boolean {
+    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // a perfect match.
+    if(this == space || this.spaceId == space.spaceId) {
+      return true;
+    }
+
+    // If it's falsy or a different SearchQuotientNode type, that's an easy filter.
+    if(!space || !(space instanceof SearchQuotientRoot)) {
+      return false;
+    }
+
+    // The two should be based upon the same LexicalModel.
+    if(this.model != space.model) {
+      return false;
+    }
+    return true;
+  }
+
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
     return [this, new SearchQuotientRoot(this.model)];
   }

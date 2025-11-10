@@ -182,4 +182,25 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
     throw new Error('Method not implemented.');
   }
+
+  isSameNode(space: SearchQuotientNode): boolean {
+    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // a perfect match.
+    if(this == space || this.spaceId == space.spaceId) {
+      return true;
+    }
+
+    // If it's falsy or a different SearchSpace type, that's an easy filter.
+    if(!space || !(space instanceof SearchQuotientCluster)) {
+      return false;
+    }
+
+    // We need to check if the parents match.  Done naively in the manner below, this is O(N^2).
+    // Granted, we shouldn't have _that_ many incoming paths.
+    if(this.parents.find((path) => !space.parents.find((path2) => path.isSameNode(path2)))) {
+      return false;
+    }
+
+    return true;
+  }
 }
