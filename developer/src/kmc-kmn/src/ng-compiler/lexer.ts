@@ -164,7 +164,7 @@ export class Lexer {
  * An input Token found by the Next Generation Lexer for the Parser.
  */
 export class Token {
-  readonly tokenType: TokenType;
+  private readonly _tokenType: TokenType;
   private readonly _text: string;
   private readonly _lineNum: number; // starts from 1
   private readonly _charNum: number; // starts from 1
@@ -182,24 +182,22 @@ export class Token {
    * @param filename  the filename
    */
   public constructor(tokenType: TokenType, text: string, lineNum: number=1, charNum: number=1, line: string=null, filename:string=null) {
-    this.tokenType = tokenType;
-    this._text     = text;
-    this._lineNum  = (lineNum < 1 ) ? 1 : lineNum;
-    this._charNum  = (charNum < 1 ) ? 1 : charNum;
-    this._line     = (tokenType === TokenType.NEWLINE || tokenType === TokenType.EOF) ? line : null;
-    this._filename = filename;
+    this._tokenType = tokenType;
+    this._text      = text;
+    this._lineNum   = (lineNum < 1 ) ? 1 : lineNum;
+    this._charNum   = (charNum < 1 ) ? 1 : charNum;
+    this._line      = (tokenType === TokenType.NEWLINE || tokenType === TokenType.EOF) ? line : null;
+    this._filename  = filename;
   }
 
   public isTokenType(tokenType: TokenType): boolean {
-    return this.tokenType === tokenType;
+    return this._tokenType === tokenType;
   }
 
+  public get tokenType(): TokenType { return this._tokenType; }
   public get text(): string { return this._text; }
-  // public set text(text: string) { this._text = text; }
   public get lineNum(): number { return this._lineNum; }
-  // public set lineNum(lineNum: number) { this._lineNum = (lineNum < 1 )? 1 : lineNum; }
   public get charNum(): number { return this._charNum; }
-  // public set charNum(charNum: number) { this._charNum = (charNum < 1 )? 1 : charNum; }
   public get line(): string { return this._line; }
   public get filename(): string { return this._filename; }
 
