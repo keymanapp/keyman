@@ -259,7 +259,7 @@ export class SearchPath implements SearchSpace {
     this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
   }
 
-  public split(charIndex: number): [SearchSpace, SearchSpace] {
+  public split(charIndex: number): [SearchSpace, SearchPath] {
     const model = this.model;
     const internalSplitIndex = charIndex - (this.codepointLength - this.edgeLength);
 
@@ -298,7 +298,13 @@ export class SearchPath implements SearchSpace {
       // don't append any part of it to the parent; it's actually clean.
       const hasActualSplit = internalSplitIndex > 0 || this.inputs?.[0].sample.deleteLeft > 0;
       const parent = hasActualSplit
-        ? new SearchPath(this.parentSpace, firstSet, this.inputSource)
+        ? new SearchPath(this.parentSpace, firstSet, {
+          ...this.inputSource,
+          segment: {
+            ...this.inputSource.segment,
+            end: this.inputSource.segment.start + internalSplitIndex
+          }
+        })
         : this.parentSpace;
       // construct two SearchPath instances based on the two sets!
       return [

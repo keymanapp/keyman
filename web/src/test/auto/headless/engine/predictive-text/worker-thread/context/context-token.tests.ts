@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextToken, correction, generateSubsetId, getBestMatches, models, preprocessInputSources, SearchPath } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, generateSubsetId, getBestMatches, models, PathInputProperties, preprocessInputSources, SearchPath } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
@@ -464,20 +464,29 @@ describe('ContextToken', function() {
 
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
-      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.inputSegments[0]), [0, 3, 8].map(i => ({
-        segment: {
-          trueTransform: {
-            insert: 'biglargetransform',
-            id: 13,
-            deleteLeft: 0,
-            deleteRight: 0
+      const offsets = [0, 3, 8];
+      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.inputSegments[0]), [0, 1, 2].map(i => {
+        const inputSource: PathInputProperties = {
+          segment: {
+            trueTransform: {
+              insert: 'biglargetransform',
+              id: 13,
+              deleteLeft: 0,
+              deleteRight: 0
+            },
+            transitionId: 13,
+            start: offsets[i]
           },
-          transitionId: 13,
-          start: i
-        },
-        bestProbFromSet: 1,
-        subsetId
-      })));
+          bestProbFromSet: 1,
+          subsetId
+        };
+
+        if(offsets[i+1] !== undefined) {
+          inputSource.segment.end = offsets[i+1];
+        }
+
+        return inputSource;
+      }));
 
       for(let i = 0; i < resultsOfSplit.length; i++) {
         assert.isTrue(resultsOfSplit[i].searchSpace.hasInputs([
@@ -549,7 +558,8 @@ describe('ContextToken', function() {
           segment: {
             trueTransform: keystrokeDistributions[1][0].sample,
             transitionId: keystrokeDistributions[1][0].sample.id,
-            start: 0
+            start: 0,
+            end: 'arge'.length
           },
           bestProbFromSet: 1,
           subsetId: subsetIds[1]
@@ -568,7 +578,8 @@ describe('ContextToken', function() {
           segment: {
             trueTransform: keystrokeDistributions[2][0].sample,
             transitionId: keystrokeDistributions[2][0].sample.id,
-            start: 0
+            start: 0,
+            end: 'ng'.length
           },
           bestProbFromSet: 1,
           subsetId: subsetIds[2]
@@ -693,7 +704,8 @@ describe('ContextToken', function() {
           segment: {
             trueTransform: keystrokeDistributions[1][0].sample,
             transitionId: keystrokeDistributions[1][0].sample.id,
-            start: 0
+            start: 0,
+            end: 'arge'.length
           },
           bestProbFromSet: 1,
           subsetId: subsetIds[1]
@@ -711,7 +723,8 @@ describe('ContextToken', function() {
           segment: {
             trueTransform: keystrokeDistributions[2][0].sample,
             transitionId: keystrokeDistributions[2][0].sample.id,
-            start: 0
+            start: 0,
+            end: 'ng'.length
           },
           bestProbFromSet: 1,
           subsetId: subsetIds[2]
