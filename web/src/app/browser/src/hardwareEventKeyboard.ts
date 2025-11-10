@@ -7,7 +7,7 @@ import { DomEventTracker } from 'keyman/engine/events';
 import { DesignIFrameElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import { textStoreForEvent, textStoreForElement } from 'keyman/engine/attachment';
 
-import ContextManager from './contextManager.js';
+import { ContextManager } from './contextManager.js';
 
 type KeyboardState = {
   activeKeyboard: JSKeyboard,

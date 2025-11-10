@@ -1,5 +1,5 @@
 export { BrowserConfiguration, BrowserInitOptionSpec } from './configuration.js';
-export { default as ContextManager, KeyboardCookie } from "./contextManager.js";
+export { ContextManager, KeyboardCookie } from "./contextManager.js";
 export { preprocessKeyboardEvent, default as HardwareEventKeyboard } from './hardwareEventKeyboard.js';
 
 export { KeymanEngine } from './keymanEngine.js';

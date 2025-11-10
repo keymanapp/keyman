@@ -24,11 +24,16 @@ builder_describe_outputs \
 #### Build action definitions ####
 
 function do_copy() {
-  mkdir -p "$KEYMAN_ROOT/$DEST"
+  mkdir -p "$KEYMAN_ROOT/$DEST/keyboards"
 
   # The next two lines are needed for the sentry-integration manual test page.
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"      "$KEYMAN_ROOT/$DEST/sentry-manager.js"
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js.map"  "$KEYMAN_ROOT/$DEST/sentry-manager.js.map"
+
+  # copy common test (resources) keyboards
+  cp -f "$KEYMAN_ROOT/common/test/keyboards/platform-rules/platformtest.js" "$KEYMAN_ROOT/$DEST/keyboards/"
+  cp -f "$KEYMAN_ROOT/common/test/keyboards/test9469/build/test9469.js" "$KEYMAN_ROOT/$DEST/keyboards/"
+  cp -f "$KEYMAN_ROOT/common/test/resources/keyboards/"*.js "$KEYMAN_ROOT/$DEST/keyboards/"
 }
 
 builder_run_action clean   rm -rf "$KEYMAN_ROOT/$DEST"

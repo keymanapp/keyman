@@ -116,7 +116,7 @@ export class HostTextStore extends SyntheticTextStore {
   }
 }
 
-export default class ContextManager extends ContextManagerBase<WebviewConfiguration> {
+export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
   // Change of context?  Just replace the SyntheticTextStore.  Context will be ENTIRELY controlled
   // by whatever is hosting the WebView.  (Some aspects of this context replacement have
   // yet to be modularized at this time, though.)
