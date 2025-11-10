@@ -64,7 +64,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     // Custom initialization
     [self initOSKKeys];
   }
-  
+
   return self;
 }
 
@@ -76,26 +76,26 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 
 - (void)drawRect:(NSRect)rect {
   os_log_debug([KMELogs oskLog], "OSKView drawRect: %{public}@", NSStringFromRect(rect));
-  
+
   CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] CGContext];
   CGContextSetLineJoin(context, kCGLineJoinRound);
   CGContextSetLineWidth(context, 1.0);
   CGColorRef cgClearColor = CGColorGetConstantColor(kCGColorClear);
   CGContextSetStrokeColorWithColor(context, cgClearColor);
   CGContextSetFillColorWithColor(context, cgClearColor);
-  
+
   CGContextBeginPath(context);
   CGContextAddRect(context, CGRectMake(1.0, 1.0, rect.size.width-1.0, rect.size.height-1.0));
   CGContextDrawPath(context, kCGPathStroke);
-  
+
   CGContextBeginPath(context);
   CGContextAddRect(context, CGRectMake(1.0, 1.0, rect.size.width-1.0, rect.size.height-1.0));
   CGContextClip(context);
-  
+
   //TODO: gradient from clear to clear -- what does this do?
   NSColor *bgColor = [NSColor clearColor]; //[NSColor colorWithWhite:0.7 alpha:1.0];
   NSColor *bgColor2 = [NSColor clearColor]; //[NSColor colorWithWhite:0.5 alpha:1.0];
-  
+
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   NSArray *gradientColors = [NSArray arrayWithObjects:(id)bgColor.CGColor, bgColor2.CGColor, nil];
   CGFloat gradientLocations[] = {0, 1};
@@ -135,11 +135,11 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (void)setKvk:(KVKFile *)kvk {
   os_log_debug([KMELogs oskLog], "OSKView setKvk, forces keyboard to re-layout");
   _kvk = kvk;
-  
+
   // Force the keyboard to re-layout
   _oskLayout = nil;
   _oskDefaultNKeys = nil;
-  
+
   [self updateKeyLabelsForCurrentLayer];
 }
 
@@ -173,7 +173,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     }
     py += keyHeight;
   }
-  
+
   [self updateKeyLabelsForCurrentLayer];
 }
 
@@ -195,7 +195,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
                      [[OSKKey alloc] initWithKeyCode:MVK_MINUS caption:@"-" scale:1.0],
                      [[OSKKey alloc] initWithKeyCode:MVK_EQUAL caption:@"=" scale:1.0],
                      [[OSKKey alloc] initWithKeyCode:MVK_BACKSPACE caption:@"⬅︎" scale:1.5], nil];
-    
+
     NSArray *row2 = [NSArray arrayWithObjects:
                      [[OSKKey alloc] initWithKeyCode:MVK_TAB caption:@"↹" scale:1.5],
                      [[OSKKey alloc] initWithKeyCode:MVK_Q caption:@"Q" scale:1.0],
@@ -211,7 +211,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
                      [[OSKKey alloc] initWithKeyCode:MVK_LEFT_BRACKET caption:@"[" scale:1.0],
                      [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_BRACKET caption:@"]" scale:1.0],
                      [[OSKKey alloc] initWithKeyCode:MVK_BACKSLASH caption:@"\\" scale:1.0], nil];
-    
+
     NSArray *row3 = [NSArray arrayWithObjects:
                      [[OSKKey alloc] initWithKeyCode:MVK_CAPS_LOCK caption:@"Caps Lock" scale:1.75],
                      [[OSKKey alloc] initWithKeyCode:MVK_A caption:@"A" scale:1.0],
@@ -226,14 +226,14 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
                      [[OSKKey alloc] initWithKeyCode:MVK_SEMICOLON caption:@";" scale:1.0],
                      [[OSKKey alloc] initWithKeyCode:MVK_QUOTE caption:@"'" scale:1.0],
                      [[OSKKey alloc] initWithKeyCode:MVK_ENTER caption:@"↵" scale:1.75], nil];
-    
+
     NSArray *row4a = [self use102ndKey] ?
     [NSArray arrayWithObjects:
      [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:1.25],
      [[OSKKey alloc] initWithKeyCode:MVK_OEM102 caption:@"\\" scale:1.0], nil] :
     [NSArray arrayWithObjects:
      [[OSKKey alloc] initWithKeyCode:MVK_LEFT_SHIFT caption:@"⇧" scale:2.25], nil];
-    
+
     NSArray *row4b = [NSArray arrayWithObjects:
                       [[OSKKey alloc] initWithKeyCode:MVK_Z caption:@"Z" scale:1.0],
                       [[OSKKey alloc] initWithKeyCode:MVK_X caption:@"X" scale:1.0],
@@ -246,19 +246,19 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
                       [[OSKKey alloc] initWithKeyCode:MVK_PERIOD caption:@"." scale:1.0],
                       [[OSKKey alloc] initWithKeyCode:MVK_SLASH caption:@"/" scale:1.0],
                       [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_SHIFT caption:@"⇧" scale:2.25], nil];
-    
+
     NSArray *row4 = [row4a arrayByAddingObjectsFromArray:row4b];
-    
+
     NSArray *row5 = [NSArray arrayWithObjects:
                      [[OSKKey alloc] initWithKeyCode:MVK_LEFT_CTRL caption:@"Ctrl" scale:1.75],
                      [[OSKKey alloc] initWithKeyCode:MVK_LEFT_ALT caption:@"Alt" scale:1.5],
                      [[OSKKey alloc] initWithKeyCode:MVK_SPACE caption:@"" scale:8.0],
                      [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_ALT caption:@"Alt" scale:1.5],
                      [[OSKKey alloc] initWithKeyCode:MVK_RIGHT_CTRL caption:@"Ctrl" scale:1.75], nil];
-    
+
     _oskLayout = [NSArray arrayWithObjects:row1, row2, row3, row4, row5, nil];
   }
-  
+
   return _oskLayout;
 }
 
@@ -266,7 +266,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   if (_oskDefaultNKeys == nil) {
     os_log_debug([KMELogs oskLog], "oskDefaultNKeys -> creating new arrays of default number OSKKey objects");
     NSMutableArray *defNKeys = [[NSMutableArray alloc] initWithCapacity:0];
-    
+
     // row 1
     NKey *nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_GRAVE; nkey1.text = @"`"; nkey1.bitmap = nil;
     NKey *nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_GRAVE; nkey2.text = @"~"; nkey2.bitmap = nil;
@@ -307,7 +307,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_EQUAL; nkey1.text = @"="; nkey1.bitmap = nil;
     nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_EQUAL; nkey2.text = @"+"; nkey2.bitmap = nil;
     [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
-    
+
     // row 2
     nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_KEY_Q; nkey1.text = @"q"; nkey1.bitmap = nil;
     nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_KEY_Q; nkey2.text = @"Q"; nkey2.bitmap = nil;
@@ -348,7 +348,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_BACKSLASH; nkey1.text = @"\\"; nkey1.bitmap = nil;
     nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_BACKSLASH; nkey2.text = @"|"; nkey2.bitmap = nil;
     [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
-    
+
     // row 3
     nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_KEY_A; nkey1.text = @"a"; nkey1.bitmap = nil;
     nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_KEY_A; nkey2.text = @"A"; nkey2.bitmap = nil;
@@ -383,7 +383,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_QUOTE; nkey1.text = @"'"; nkey1.bitmap = nil;
     nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_QUOTE; nkey2.text = @"\""; nkey2.bitmap = nil;
     [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
-    
+
     if([self use102ndKey]) {
       nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_OEM_102; nkey1.text = @"\\"; nkey1.bitmap = nil;
       nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_OEM_102; nkey2.text = @"|"; nkey2.bitmap = nil;
@@ -420,10 +420,10 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     nkey1 = [[NKey alloc] init]; nkey1.typeFlags = 2; nkey1.modifierFlags = 0; nkey1.keyCode = VK_SLASH; nkey1.text = @"/"; nkey1.bitmap = nil;
     nkey2 = [[NKey alloc] init]; nkey2.typeFlags = 2; nkey2.modifierFlags = 1; nkey2.keyCode = VK_SLASH; nkey2.text = @"?"; nkey2.bitmap = nil;
     [defNKeys addObjectsFromArray:@[nkey1, nkey2]];
-    
+
     _oskDefaultNKeys = [[NSArray alloc] initWithArray:defNKeys];
   }
-  
+
   return _oskDefaultNKeys;
 }
 
@@ -471,7 +471,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     CGEventPostToPid(processId, keyUpEvent);
     CFRelease(keyDownEvent);
     CFRelease(keyUpEvent);
-    
+
     CFRelease(source);
   }
   else {
@@ -501,7 +501,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   BOOL shift = self.physicalShiftState | self.oskShiftState;
   BOOL option = self.physicalOptionState | self.oskOptionState;
   BOOL control = self.physicalControlState | self.oskControlState;
-  
+
   return [self getEventModifierFlags:shift optionFlag:option controlFlag:control];
 }
 
@@ -510,7 +510,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
  */
 - (NSEventModifierFlags)getEventModifierFlags:(BOOL)shift optionFlag:(BOOL)option controlFlag:(BOOL)control {
   NSEventModifierFlags modifierFlags = 0;
-  
+
   if (shift) {
     modifierFlags = modifierFlags | NSEventModifierFlagShift;
   }
@@ -524,7 +524,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   if (control) {
     modifierFlags = modifierFlags | NSEventModifierFlagControl;
   }
-  
+
   return modifierFlags;
 }
 
@@ -551,7 +551,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   NSView *view = [self viewWithTag:event.keyCode|0x1000];
   if (view == nil || ![view isKindOfClass:[KeyView class]])
     return;
-  
+
   KeyView *keyView = (KeyView *)view;
   if (event.type == NSEventTypeKeyDown)
     [keyView setKeyPressed:YES];
@@ -570,7 +570,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   BOOL shift = self.physicalShiftState | self.oskShiftState;
   BOOL option = self.physicalOptionState | self.oskOptionState;
   BOOL control = self.physicalControlState | self.oskControlState;
-  
+
   return [self getKeymanModifierFlags:shift optionFlag:option controlFlag:control];
 }
 
@@ -592,7 +592,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   if (control) {
     flags |= KVKS_RCTRL;
   }
-  
+
   return flags;
 }
 
@@ -602,15 +602,15 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
  */
 - (void)updateKeyLabelsForCurrentLayer {
   os_log_debug([KMELogs oskLog], "OSKView updateKeyLabelsForState, phsyical modifiers [shift: %d, option: %d, control: %d]\nosk modifiers [shift: %d, option: %d, control: %d]", self.physicalShiftState, self.physicalOptionState, self.physicalControlState, self.oskShiftState, self.oskOptionState, self.oskControlState);
-  
+
   [self resetKeyLabels];
   NSMutableArray *mKeys = [[self keyTags] mutableCopy];
   NSArray *nkeys = [self.kvk keys];
   if (nkeys == nil)
     nkeys = self.oskDefaultNKeys;
-  
+
   WORD keymanFlagsForCurrentLayer = [self getKeymanModifierFlagsForCurrentLayer];
-  
+
   NSString *ansiFont = [self ansiFont];
   NSString *unicodeFont = [self unicodeFont];
   unsigned short keyCode;
@@ -622,9 +622,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
         NSView *view = [self viewWithTag:keyCode|0x1000];
         if (view == nil || ![view isKindOfClass:[KeyView class]])
           continue;
-        
+
         KeyView *keyView = (KeyView *)view;
-        [keyView setLabelFont:ansiFont];
         if (nkey.typeFlags & KVKK_UNICODE) {
           [keyView setLabelText:nkey.text];
           NSString* label = nkey.text;
@@ -632,12 +631,16 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
           os_log_debug([KMELogs keyLog], "setLabelText to %{public}@, utf8data %{public}@", label, data);
           [keyView setLabelFont:unicodeFont];
           [mKeys removeObject:[NSNumber numberWithInteger:(keyCode|0x1000)]];
+        } else {
+          // This means it is a key definition for a non-Unicode layout.
+          // We do not support non-Unicode keyboards in Keyman for macOS.
+          continue;
         }
-        
+
         if (nkey.typeFlags & KVKK_BITMAP) {
           [keyView setBitmap:nkey.bitmap];
         }
-        
+
         [keyView setNeedsDisplay:YES];
       }
     }
@@ -647,7 +650,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
    NSView *view = [self viewWithTag:[t integerValue]|0x1000];
    if (view == nil || ![view isKindOfClass:[KeyView class]])
    continue;
-   
+
    KeyView *keyView = (KeyView *)view;
    [keyView setLabelText:@""];
    }*/
@@ -659,10 +662,10 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   for (NSView *view in views) {
     if (![view isKindOfClass:[KeyView class]])
       continue;
-    
+
     [keyTags addObject:[NSNumber numberWithInteger:[view tag]]];
   }
-  
+
   return keyTags;
 }
 
@@ -671,7 +674,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   for (NSView *view in views) {
     if (![view isKindOfClass:[KeyView class]])
       continue;
-    
+
     [(KeyView *)view setKey:[(KeyView *)view key]];
     [(KeyView *)view setBitmap:nil];
     [(KeyView *)view setNeedsDisplay:YES];
@@ -687,7 +690,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      * The state of the physical key overrides the modifier key clicked in the OSK.
      */
     _oskShiftState = NO;
-    
+
     os_log_debug([KMELogs oskLog], "hardware shift key released");
     [self updateKeyLabelsForCurrentLayer];
     [self updateShiftKeysForState];
@@ -705,7 +708,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (void)setPhysicalOptionState:(BOOL)state {
   if (_physicalOptionState != state) {
     _physicalOptionState = state;
-    
+
     /**
      * When setting the physical option state, clear the OSK option state
      * The state of the physical key overrides the modifier key clicked in the OSK.
@@ -727,7 +730,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (void)setPhysicalControlState:(BOOL)state {
   if (_physicalControlState != state) {
     _physicalControlState = state;
-    
+
     /**
      * When setting the physical control state, clear the OSK control state
      * The state of the physical key overrides the modifier key clicked in the OSK.
@@ -793,7 +796,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
       break;
     }
   }
-  
+
   return keyCode;
 }
 

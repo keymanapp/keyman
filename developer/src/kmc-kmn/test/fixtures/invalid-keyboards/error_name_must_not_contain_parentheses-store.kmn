@@ -1,0 +1,10 @@
+c Description: Verifies that kmc reports an error with invalid names in groups, stores, and deadkeys
+
+store(&NAME) 'error_name_must_not_contain_parentheses-store'
+
+begin unicode > use(main)
+
+store(test(test) 'test'
+
+group(main) using keys
+  + [K_A] > 'a'

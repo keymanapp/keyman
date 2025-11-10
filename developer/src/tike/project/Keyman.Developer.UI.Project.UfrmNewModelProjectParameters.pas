@@ -20,6 +20,7 @@ uses
 
   Browse4Folder,
 
+  Keyman.Developer.UI.FormValidation,
   kpsfile,
   PackageInfo,
   UfrmTike,
@@ -27,10 +28,10 @@ uses
 
 type
   TfrmNewModelProjectParameters = class(TTikeForm)
-    lblFileName: TLabel;
+    lblModelID: TLabel;
     lblPath: TLabel;
     lblAuthorID: TLabel;
-    lblCoypright: TLabel;
+    lblCopyright: TLabel;
     lblVersion: TLabel;
     lblAuthor: TLabel;
     lblLanguages: TLabel;
@@ -56,10 +57,24 @@ type
     Bevel1: TBevel;
     lblProjectFilename: TLabel;
     editProjectFilename: TEdit;
-    Label1: TLabel;
+    lblFullCopyright: TLabel;
     editFullCopyright: TEdit;
-    Label2: TLabel;
+    lblDescription: TLabel;
     memoDescription: TMemo;
+    lblDescriptionMarkdown: TLabel;
+    lblModelNameValidation: TLabel;
+    lblDescriptionValidation: TLabel;
+    lblCopyrightValidation: TLabel;
+    lblVersionValidation: TLabel;
+    lblAuthorValidation: TLabel;
+    lblFullCopyrightValidation: TLabel;
+    lblLanguagesValidation: TLabel;
+    lblPathValidation: TLabel;
+    lblModelIDValidation: TLabel;
+    lblProjectFilenameValidation: TLabel;
+    lblAuthorIDValidation: TLabel;
+    lblBCP47Validation: TLabel;
+    lblUniqValidation: TLabel;
     procedure cmdOKClick(Sender: TObject);
     procedure editModelIDComponentChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -78,7 +93,10 @@ type
     procedure editModelNameChange(Sender: TObject);
     procedure editFullCopyrightChange(Sender: TObject);
     procedure memoDescriptionChange(Sender: TObject);
+    procedure ControlExit(Sender: TObject);
+    procedure cmdAddLanguageExit(Sender: TObject);
   private
+    FormValidation: TFormValidation;
     pack: TKPSFile;
     FSetup: Integer;
     dlgBrowse: TBrowse4Folder;
@@ -88,7 +106,7 @@ type
     function GetBCP47Tags: string;
     function GetVersion: string;
     function Validate: Boolean;
-    procedure EnableControls;
+    procedure EnableControls(ChangingControl: TControl);
     function SelectedLanguage: TPackageKeyboardLanguage;
     procedure LanguageGrid_Fill;
     procedure BCP47_Fill;
@@ -104,7 +122,9 @@ type
     procedure UpdateProjectFilename;
     function GetFullCopyright: string;
     function GetDescription: string;
-  protected
+    procedure EnableGridControls;
+
+    procedure SetupValidation;  protected
     function GetHelpTopic: string; override;
     property AuthorID: string read GetAuthorID;
     property PrimaryBCP47: string read GetPrimaryBCP47;
@@ -166,9 +186,14 @@ begin
       try
         pt.Generate;
       except
-        on E:EFOpenError do
+        on E:EModelProjectTemplate do
         begin
           ShowMessage('Unable to create project: '+E.Message);
+          Exit(False);
+        end;
+        on E:EFOpenError do
+        begin
+          ShowMessage('Unable to create project; template files may be missing: '+E.Message);
           Exit(False);
         end;
       end;
@@ -189,6 +214,8 @@ end;
 procedure TfrmNewModelProjectParameters.FormCreate(Sender: TObject);
 begin
   inherited;
+  SetupValidation;
+
   editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
 
   dlgBrowse := TBrowse4Folder.Create(Self);
@@ -201,13 +228,14 @@ begin
   pack.LexicalModels.Add(TPackageLexicalModel.Create(pack));
 
   LanguageGrid_Fill;
-  EnableControls;
+  EnableControls(nil);
 end;
 
 procedure TfrmNewModelProjectParameters.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(pack);
+  FreeAndNil(FormValidation);
 end;
 
 function TfrmNewModelProjectParameters.GetHelpTopic: string;
@@ -246,11 +274,16 @@ begin
       LanguageGrid_Fill;
       gridLanguages.Row := gridLanguages.RowCount - 1;
       gridLanguagesClick(gridLanguages);
-      EnableControls;
+      EnableControls(gridLanguages);
     end;
   finally
     frm.Free;
   end;
+end;
+
+procedure TfrmNewModelProjectParameters.cmdAddLanguageExit(Sender: TObject);
+begin
+  EnableControls(gridLanguages);
 end;
 
 procedure TfrmNewModelProjectParameters.cmdEditLanguageClick(
@@ -276,7 +309,7 @@ begin
       lang.Name := frm.LanguageName;
       BCP47_Fill;
       LanguageGrid_Fill;
-      EnableControls;
+      EnableControls(gridLanguages);
     end;
   finally
     frm.Free;
@@ -297,84 +330,65 @@ begin
   lm.Languages.Remove(lang);
   LanguageGrid_Fill;
   BCP47_Fill;
-  EnableControls;
+  EnableControls(gridLanguages);
 end;
 
 procedure TfrmNewModelProjectParameters.cmdOKClick(Sender: TObject);
 begin
+  FormValidation.TouchAllFields;
   if Validate then
     ModalResult := mrOk;
+end;
+
+procedure TfrmNewModelProjectParameters.ControlExit(Sender: TObject);
+begin
+  EnableControls(Sender as TControl);
 end;
 
 procedure TfrmNewModelProjectParameters.editAuthorChange(Sender: TObject);
 begin
   UpdateAuthorIDFromAuthor;
-  EnableControls;
+  EnableControls(editAuthor);
 end;
 
 procedure TfrmNewModelProjectParameters.editModelNameChange(Sender: TObject);
 begin
   UpdateUniqFromModelName;
-  EnableControls;
+  EnableControls(editModelName);
 end;
 
 procedure TfrmNewModelProjectParameters.editCopyrightChange(Sender: TObject);
 begin
-  EnableControls;
+  EnableControls(editCopyright);
 end;
 
 procedure TfrmNewModelProjectParameters.editFullCopyrightChange(
   Sender: TObject);
 begin
-  EnableControls;
+  EnableControls(editFullCopyright);
 end;
 
 procedure TfrmNewModelProjectParameters.editModelIDChange(Sender: TObject);
 begin
   UpdateProjectFilename;
-  EnableControls;
+  EnableControls(editModelID);
 end;
 
 procedure TfrmNewModelProjectParameters.editModelIDComponentChange(Sender: TObject);
 begin
   UpdateModelIDFromComponents;
-  EnableControls;
+  EnableControls(Sender as TControl);
 end;
 
 procedure TfrmNewModelProjectParameters.editPathChange(Sender: TObject);
 begin
   UpdateProjectFilename;
-  EnableControls;
+  EnableControls(editPath);
 end;
 
 procedure TfrmNewModelProjectParameters.editVersionChange(Sender: TObject);
 begin
-  EnableControls;
-end;
-
-procedure TfrmNewModelProjectParameters.EnableControls;
-var
-  e: Boolean;
-begin
-  e :=
-    not Author.IsEmpty and
-    not Description.IsEmpty and
-    not ModelName.IsEmpty and
-    not AuthorID.IsEmpty and
-    not PrimaryBCP47.IsEmpty and
-    not Uniq.IsEmpty and
-    not Trim(editPath.Text).IsEmpty and
-    TLexicalModelUtils.DoesProjectFilenameFollowLexicalModelConventions(editModelID.Text + Ext_LexicalModelProject) and
-    (pack.LexicalModels[0].Languages.Count > 0);
-
-  cmdOK.Enabled := e;
-
-  e := gridLanguages.RowCount > 1;
-  gridLanguages.Enabled := e;
-  cmdRemoveLanguage.Enabled := e;
-  cmdEditLanguage.Enabled := e;
-  if e then
-    gridLanguages.FixedRows := 1;
+  EnableControls(editVersion);
 end;
 
 function TfrmNewModelProjectParameters.GetAuthor: string;
@@ -447,7 +461,7 @@ end;
 procedure TfrmNewModelProjectParameters.gridLanguagesClick(
   Sender: TObject);
 begin
-  EnableControls;
+  EnableGridControls;
 end;
 
 procedure TfrmNewModelProjectParameters.gridLanguagesDblClick(
@@ -461,6 +475,12 @@ function TfrmNewModelProjectParameters.Validate: Boolean;
 var
   ProjectFolder: string;
 begin
+  if not FormValidation.Update then
+  begin
+    ShowMessage('One or more fields are missing or invalid. Please correct these fields and try again.');
+    Exit(False);
+  end;
+
   Result := TLexicalModelUtils.DoesProjectFilenameFollowLexicalModelConventions(editModelID.Text + Ext_LexicalModelProject);
 
   if Result then
@@ -548,7 +568,7 @@ begin
     if not Assigned(lm) then
     begin
       gridLanguages.RowCount := 1;
-      EnableControls;
+      EnableGridControls;
       Exit;
     end;
 
@@ -562,7 +582,7 @@ begin
       gridLanguages.Cells[1, i+1] := lm.Languages[i].Name;
     end;
 
-    EnableControls;
+    EnableGridControls;
   finally
     Dec(FSetup);
   end;
@@ -570,7 +590,7 @@ end;
 
 procedure TfrmNewModelProjectParameters.memoDescriptionChange(Sender: TObject);
 begin
-  EnableControls;
+  EnableControls(memoDescription);
 end;
 
 procedure TfrmNewModelProjectParameters.BCP47_Fill;
@@ -592,6 +612,105 @@ begin
     cbBCP47.ItemIndex := 0;
 
   editModelIDComponentChange(cbBCP47);
+end;
+
+////
+//// Validation
+////
+
+procedure TfrmNewModelProjectParameters.SetupValidation;
+begin
+  FormValidation := TFormValidation.Create;
+
+  FormValidation.Add(lblAuthor,            lblAuthorValidation,          editAuthor);
+  FormValidation.Add(lblModelName,         lblModelNameValidation,       editModelName);
+  FormValidation.Add(lblDescription,       lblDescriptionValidation,     memoDescription);
+  FormValidation.Add(lblCopyright,         lblCopyrightValidation,       editCopyright);
+  FormValidation.Add(lblFullCopyright,     lblFullCopyrightValidation,   editFullCopyright);
+  FormValidation.Add(lblVersion,           lblVersionValidation,         editVersion);
+  FormValidation.Add(lblLanguages,         lblLanguagesValidation,       gridLanguages);
+  FormValidation.Add(lblPath,              lblPathValidation,            editPath);
+  FormValidation.Add(lblAuthorID,          lblAuthorIDValidation,        editAuthorID);
+  FormValidation.Add(lblBCP47,             lblBCP47Validation,           cbBCP47);
+  FormValidation.Add(lblUniq,              lblUniqValidation,            editUniq);
+  FormValidation.Add(lblModelID,           lblModelIDValidation,         editModelID);
+  FormValidation.Add(lblProjectFilename,   lblProjectFilenameValidation, editProjectFilename);
+
+  FormValidation.AddMethod(
+    editAuthor,
+    function: Boolean begin Result := not Author.IsEmpty end,
+    'Author name cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    memoDescription,
+    function: Boolean begin Result := not Description.IsEmpty end,
+    'Description cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editModelName,
+    function: Boolean begin Result := not ModelName.IsEmpty end,
+    'Model name cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editAuthorID,
+    function: Boolean begin Result := not AuthorID.IsEmpty end,
+    'Author ID cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    cbBCP47,
+    function: Boolean begin Result := not PrimaryBCP47.IsEmpty end,
+    'Primary language cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editUniq,
+    function: Boolean begin Result := not Uniq.IsEmpty end,
+    'Unique name cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editPath,
+    function: Boolean begin Result := (Trim(editPath.Text) <> '') end,
+    'Model path cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editModelID,
+    function: Boolean begin Result := TLexicalModelUtils.DoesProjectFilenameFollowLexicalModelConventions(editModelID.Text + Ext_LexicalModelProject) end,
+    'Model ID must follow convention of author.bcp47.uniq and cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    gridLanguages,
+    function: Boolean begin Result := Assigned(pack) and (pack.LexicalModels[0].Languages.Count > 0) end,
+    'Model must reference at least one language'
+  );
+end;
+
+procedure TfrmNewModelProjectParameters.EnableControls(ChangingControl: TControl);
+begin
+  if Assigned(ChangingControl) then
+  begin
+    FormValidation.TouchField(ChangingControl);
+  end;
+  FormValidation.Update;
+  EnableGridControls;
+end;
+
+procedure TfrmNewModelProjectParameters.EnableGridControls;
+var
+  e: Boolean;
+begin
+  e := gridLanguages.RowCount > 1;
+  gridLanguages.Enabled := e;
+  cmdRemoveLanguage.Enabled := e;
+  cmdEditLanguage.Enabled := e;
+  if e then
+    gridLanguages.FixedRows := 1;
 end;
 
 end.

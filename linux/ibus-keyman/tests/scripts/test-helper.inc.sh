@@ -94,10 +94,11 @@ function _link_test_keyboards() {
 }
 
 function _setup_init() {
-  local ENV_FILE CLEANUP_FILE PID_FILE
+  local ENV_FILE CLEANUP_FILE PID_FILE DISPLAY_SERVER
   ENV_FILE=$1
   CLEANUP_FILE=$2
   PID_FILE=$3
+  DISPLAY_SERVER=$4
 
   if [[ -z "${TOP_SRCDIR:-}" ]]; then
     TOP_SRCDIR=${G_TEST_SRCDIR:-$(realpath "$(dirname "$0")/..")}/..
@@ -110,7 +111,7 @@ function _setup_init() {
 
   if [[ -f "${CLEANUP_FILE}" ]]; then
     # kill previous instances
-    "$(dirname "$0")"/teardown-tests.sh "${CLEANUP_FILE}" || true
+    "$(dirname "$0")"/teardown-tests.sh "${CLEANUP_FILE}" "${DISPLAY_SERVER}" || true
   fi
 
   echo > "${CLEANUP_FILE}"
@@ -132,6 +133,54 @@ function _setup_init() {
 
   export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:${LD_LIBRARY_PATH-}
   echo "export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> "${ENV_FILE}"
+}
+
+function _setup_dbus_session() {
+  local ENV_FILE CLEANUP_FILE
+  ENV_FILE="$1"
+  CLEANUP_FILE="$2"
+
+  if [[ -z "${DOCKER_RUNNING:-}" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]] && ! pgrep -f jetbrains.buildServer.agent.AgentMain > /dev/null; then
+    return
+  fi
+
+  if [[ ! -d "/run/user/${UID:-$(id -u)}" ]]; then
+    # /run/user/$UID usually gets created by the session, but since we
+    # don't start the regular UI we don't have a session. Therefore we
+    # call the setupRuntimeDir.sh script to create the directory. The
+    # script should contain the following commands:
+    #  mkdir -p "/run/user/${SUDO_UID:-$(id -u)}"
+    #  chmod 0700 "/run/user/${SUDO_UID:-$(id -u)}"
+    #  chown "${SUDO_USER:-$(whoami)}" "/run/user/${SUDO_UID:-$(id -u)}"
+    if [[ -f "/usr/local/bin/setupRuntimeDir.sh" ]]; then
+      echo "# Creating /run/user/${UID:-$(id -u)}..."
+      sudo /usr/local/bin/setupRuntimeDir.sh
+    else
+      echo "# WARNING: /run/user/${UID:-$(id -u)} is missing without having /usr/local/bin/setupRuntimeDir.sh, tests will likely fail"
+    fi
+  fi
+
+  if [[ -z "${XDG_RUNTIME_DIR:-}" ]]; then
+    export XDG_RUNTIME_DIR=/run/user/${UID:-$(id -u)}
+    echo "export XDG_RUNTIME_DIR=/run/user/${UID:-$(id -u)}" >> "${ENV_FILE}"
+  fi
+  if [[ ! -d "${XDG_RUNTIME_DIR}" ]]; then
+    echo "${XDG_RUNTIME_DIR} is missing, please create it"
+    exit 1
+  fi
+
+  export NO_AT_BRIDGE=1
+  echo "export NO_AT_BRIDGE=1" >> "${ENV_FILE}"
+
+  if pgrep -u "${USER:-$(whoami)}" dbus-daemon > /dev/null; then
+    # dbus-daemon is already running, skipping setup
+    return
+  fi
+
+  echo "# Starting dbus session..."
+  dbus-launch --auto-syntax >> "${ENV_FILE}"
+  PID=$(pidof dbus-daemon)
+  echo "kill -9 ${PID} || true # dbus-daemon" >> "${CLEANUP_FILE}"
 }
 
 function _setup_test_dbus_server() {
@@ -172,11 +221,11 @@ function _setup_display_server() {
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
     mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "${TMPFILE}" &
     PID=$!
-    echo "kill -9 ${PID} || true # mutter" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # mutter" >> "${CLEANUP_FILE}"
     echo "${PID} mutter" >> "${PID_FILE}"
     sleep 1s
-    export WAYLAND_DISPLAY
     WAYLAND_DISPLAY=$(grep "Using Wayland display" "${TMPFILE}" | cut -d"'" -f2)
+    export WAYLAND_DISPLAY
     rm "${TMPFILE}"
     echo "export WAYLAND_DISPLAY=\"${WAYLAND_DISPLAY}\"" >> "${ENV_FILE}"
   else
@@ -191,7 +240,7 @@ function _setup_display_server() {
         break
       fi
     done
-    echo "kill -9 ${PID} || true # Xvfb" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # Xvfb" >> "${CLEANUP_FILE}"
     echo "${PID} Xvfb" >> "${PID_FILE}"
     while true; do
       echo "Starting Xephyr..."
@@ -203,12 +252,12 @@ function _setup_display_server() {
         break
       fi
     done
-    echo "kill -9 ${PID} || true # Xephyr" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # Xephyr" >> "${CLEANUP_FILE}"
     echo "${PID} Xephyr" >> "${PID_FILE}"
     echo "Starting metacity"
     metacity --display=":${DISP_XEPHYR}" &> /dev/null &
     PID=$!
-    echo "kill -9 ${PID} || true # metacity" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # metacity" >> "${CLEANUP_FILE}"
     echo "${PID} metacity" >> "${PID_FILE}"
 
     export DISPLAY=:${DISP_XEPHYR}
@@ -252,13 +301,14 @@ function _setup_ibus() {
   echo "Starting ibus-daemon..."
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
+
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
-  if [[ "${STANDALONE}" == "--standalone" ]] && [[ "${DOCKER_RUNNING:-false}" != "true" ]]; then
+  if [[ "${STANDALONE}" == "--standalone" ]] && [[ "${DOCKER_RUNNING:-false}" != "true" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]];  then
     # manual test run
-    echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
+    echo "if kill -9 ${PID} &> /dev/null; then ibus restart || ibus start -d; fi # ibus-daemon" >> "${CLEANUP_FILE}"
   else
     # test run as part of the build
-    echo "kill -9 ${PID} || true # ibus-daemon" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} &> /dev/null || true # ibus-daemon" >> "${CLEANUP_FILE}"
   fi
   echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s
@@ -272,7 +322,7 @@ function _setup_ibus() {
   #shellcheck disable=SC2086
   "${TOP_BINDIR}/src/ibus-engine-keyman" --testing ${ARG_VERBOSE-} &> /tmp/ibus-engine-keyman.log &
   PID=$!
-  echo "kill -9 ${PID} || true # ibus-engine-keyman" >> "${CLEANUP_FILE}"
+  echo "kill -9 ${PID} &> /dev/null || true # ibus-engine-keyman" >> "${CLEANUP_FILE}"
   echo "${PID} ibus-engine-keyman" >> "${PID_FILE}"
   sleep 1s
 }
@@ -285,7 +335,7 @@ function setup() {
   PID_FILE=$4
   STANDALONE=${5:-}
 
-  _setup_init "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
+  _setup_init "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
 
   TESTBASEDIR=${XDG_DATA_HOME:-${HOME}/.local/share}/keyman
   TESTDIR=${TESTBASEDIR}/test_kmx
@@ -294,6 +344,7 @@ function setup() {
 
   _generate_kmpjson "${TESTDIR}"
 
+  _setup_dbus_session "${ENV_FILE}" "${CLEANUP_FILE}"
   _setup_test_dbus_server "${ENV_FILE}" "${CLEANUP_FILE}"
   _setup_display_server "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
   _setup_schema_and_gsettings "${ENV_FILE}"
@@ -307,30 +358,46 @@ function setup_display_server_only() {
   CLEANUP_FILE=$3
   PID_FILE=$4
 
-  _setup_init "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
+  _setup_init "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
   _setup_display_server "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
   _setup_schema_and_gsettings "${ENV_FILE}"
 }
 
 function cleanup() {
-  local CLEANUP_FILE
+  local CLEANUP_FILE DISPLAY_SERVER
   CLEANUP_FILE=$1
+  DISPLAY_SERVER=$2
 
   if [[ -f "${CLEANUP_FILE}" ]]; then
     echo
     echo "# Shutting down processes..."
-    bash "${CLEANUP_FILE}" # > /dev/null 2>&1
-    rm "$CLEANUP_FILE"
+    bash "${CLEANUP_FILE}" # &> /dev/null
+    rm "${CLEANUP_FILE}"
     echo "# Finished shutdown of processes."
   fi
 
   if [[ "${DOCKER_RUNNING:-false}" == "true" ]]; then
-    # Note: build/tmp is build/docker-linux/tmp on the host!
+    echo "# Copying log files..."
+    # Note: build/tmp is build/docker-linux/<distro>/tmp on the host!
     BUILD_TMP="$(dirname "$0")/../../../build/tmp"
     mkdir -p "${BUILD_TMP}"
-    [[ -f /tmp/ibus-engine-keyman.log ]] && mv /tmp/ibus-engine-keyman.log "${BUILD_TMP}/ibus-engine-keyman.log"
-    [[ -f /tmp/ibus-daemon.log ]] && mv /tmp/ibus-daemon.log "${BUILD_TMP}/ibus-daemon.log"
-    [[ -f /tmp/km-test-server.log ]] && mv /tmp/km-test-server.log "${BUILD_TMP}/km-test-server.log"
+    [[ -f /tmp/ibus-engine-keyman.log ]] && mv /tmp/ibus-engine-keyman.log "${BUILD_TMP}/ibus-engine-keyman${DISPLAY_SERVER}.log"
+    [[ -f /tmp/ibus-daemon.log ]] && mv /tmp/ibus-daemon.log "${BUILD_TMP}/ibus-daemon${DISPLAY_SERVER}.log"
+    [[ -f /tmp/km-test-server.log ]] && mv /tmp/km-test-server.log "${BUILD_TMP}/km-test-server${DISPLAY_SERVER}.log"
+    echo "# Finished copying log files"
+  fi
+
+  if [[ -z "${DOCKER_RUNNING:-}" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]] && ! pgrep -f jetbrains.buildServer.agent.AgentMain > /dev/null; then
+    # Not running in Docker or TeamCity:
+    # Killing the ibus-daemon that we started for testing might have caused
+    # some other ibus processes that belong to the real ibus daemon to
+    # be killed as well, leaving us with no way to type.
+    # So we kill the remaining lonely ibus-daemon and start ibus again.
+    if [[ "$(ibus engine)" == ""  ]]; then
+      echo "# Killing and restarting ibus-daemon"
+      kill -9 "$(pgrep -u "${USER:-$(whoami)}" ibus-daemon)"
+      ibus start -d
+    fi
   fi
 }
 
@@ -374,8 +441,8 @@ function check_processes_running() {
       echo "${MISSING_PROCS}" ; \
       echo "Restarting..." ; } >> /tmp/debug.output
     mv /tmp/ibus-engine-keyman.log{,"-${TEST_NAME}-$(date -Iseconds)"}
-    cleanup "${CLEANUP_FILE}" > /dev/null 2>&1
-    setup "${DISPLAY_SERVER}" "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" > /dev/null 2>&1
+    cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER}" &> /dev/null
+    setup "${DISPLAY_SERVER}" "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" &> /dev/null
   fi
 
   if [[ "$(_get_missing_processes "$PID_FILE")" != "" ]]; then

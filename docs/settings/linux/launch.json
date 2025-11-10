@@ -58,6 +58,23 @@
       }
     },
     {
+      // - Run Docker container with `resources/docker-images/run.sh --remote-debug :linux -- linux/ibus-keyman/tests/scripts/run-tests.sh --no-x11 --remote-debug -- --directory /home/build/.local/share/keyman/test_kmx k_001___basic_input_unicodei`
+      // - then attach debugger in vscode
+      "type": "gdb",
+      "request": "attach",
+      "name": "Attach to gdbserver (ibus-keyman integration tests in Docker)",
+      "executable": "${workspaceFolder}/linux/build/x86_64/debug/tests/ibus-keyman-tests",
+      "target": "localhost:2345",
+      "remote": true,
+      "cwd": "${workspaceFolder}/linux/ibus-keyman",
+      "valuesFormatting": "parseText",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "KEYMAN_DEBUG": "1",
+        "G_ENABLE_DIAGNOSTIC": "1",
+      }
+    },
+    {
       "type": "gdb",
       "request": "launch",
       "name": "Launch ibus-keyman unit tests",
