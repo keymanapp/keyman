@@ -10,7 +10,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { NodeTypes } from "../../src/ng-compiler/node-types.js";
+import { NodeType } from "../../src/ng-compiler/node-types.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
@@ -22,7 +22,7 @@ let root: ASTNode = null;
 
 describe("KMN Store Analyser Tests", () => {
   beforeEach(() => {
-    root = new ASTNode(NodeTypes.TMP);
+    root = new ASTNode(NodeType.TMP);
   });
   describe("SystemStoreAssignRule Tests", () => {
     it("can construct a SystemStoreAssignRule", () => {
@@ -34,46 +34,46 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
-      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeType.STRING));
     });
     it("can parse bitmap store correctly (with continuation)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap)\\\n"filename"');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      const bitmapNode = root.getSoleChildOfType(NodeTypes.BITMAP);
+      const bitmapNode = root.getSoleChildOfType(NodeType.BITMAP);
       assert.isNotNull(bitmapNode);
-      assert.isNotNull(bitmapNode.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(bitmapNode.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse copyright store correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
-      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.COPYRIGHT));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeType.STRING));
     });
     it("can parse includecodes store correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&includecodes) "filename"');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
-      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.INCLUDECODES));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (casedkeys single virtual key)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      const casedkeysNode = root.getSoleChildOfType(NodeType.CASEDKEYS)
       assert.isNotNull(casedkeysNode);
-      assert.isNotNull(casedkeysNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+      assert.isNotNull(casedkeysNode.getSoleChildOfType(NodeType.VIRTUAL_KEY));
     });
     it("can parse correctly (casedkeys two virtual keys)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A] [K_B]');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      const casedkeysNode = root.getSoleChildOfType(NodeType.CASEDKEYS)
       assert.isNotNull(casedkeysNode);
-      const children = casedkeysNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
+      const children = casedkeysNode.getChildrenOfType(NodeType.VIRTUAL_KEY);
       assert.equal(children[0].getSoleChild().getText(), 'K_A');
       assert.equal(children[1].getSoleChild().getText(), 'K_B');
     });
@@ -81,10 +81,10 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]..[K_C]');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      const casedkeysNode = root.getSoleChildOfType(NodeType.CASEDKEYS)
       assert.isNotNull(casedkeysNode);
-      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
-      const children  = rangeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
+      const rangeNode = casedkeysNode.getSoleChildOfType(NodeType.RANGE);
+      const children  = rangeNode.getChildrenOfType(NodeType.VIRTUAL_KEY);
       assert.equal(children[0].getSoleChild().getText(), 'K_A');
       assert.equal(children[1].getSoleChild().getText(), 'K_C');
     });
@@ -92,10 +92,10 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) "a".."c"');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      const casedkeysNode = root.getSoleChildOfType(NodeType.CASEDKEYS)
       assert.isNotNull(casedkeysNode);
-      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
-      const children  = rangeNode.getChildrenOfType(NodeTypes.STRING);
+      const rangeNode = casedkeysNode.getSoleChildOfType(NodeType.RANGE);
+      const children  = rangeNode.getChildrenOfType(NodeType.STRING);
       assert.equal(children[0].getText(), '"a"');
       assert.equal(children[1].getText(), '"c"');
     });
@@ -103,15 +103,15 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&hotkey) [K_A]');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      const hotkeyNode = root.getSoleChildOfType(NodeTypes.HOTKEY)
+      const hotkeyNode = root.getSoleChildOfType(NodeType.HOTKEY)
       assert.isNotNull(hotkeyNode);
-      assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+      assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeType.VIRTUAL_KEY));
     });
     it("can parse correctly (no text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap)');
       const systemStoreAssign: Rule = new SystemStoreAssignRule();
       assert.isTrue(systemStoreAssign.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
     });
   });
   describe("SystemStoreRule Tests", () => {
@@ -124,25 +124,25 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap)');
       const systemStore: Rule = new SystemStoreRule();
       assert.isTrue(systemStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
     });
     it("can parse correctly (bitmap, whitespace after left bracket)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store( &bitmap)');
       const systemStore: Rule = new SystemStoreRule();
       assert.isTrue(systemStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
     });
     it("can parse correctly (bitmap, whitespace before right bracket)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap )');
       const systemStore: Rule = new SystemStoreRule();
       assert.isTrue(systemStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
     });
     it("can parse correctly (bitmap, whitespace after left and before right brackets)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store( &bitmap )');
       const systemStore: Rule = new SystemStoreRule();
       assert.isTrue(systemStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
     });
   });
   describe("SystemStoreNameRule Tests", () => {
@@ -153,35 +153,35 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly", () => {
       [
-        {code: 'bitmap',           nodeType: NodeTypes.BITMAP},
-        {code: 'casedkeys',        nodeType: NodeTypes.CASEDKEYS},
-        {code: 'copyright',        nodeType: NodeTypes.COPYRIGHT},
-        {code: 'displaymap',       nodeType: NodeTypes.DISPLAYMAP},
-        {code: 'ethnologuecode',   nodeType: NodeTypes.ETHNOLOGUECODE},
-        {code: 'hotkey',           nodeType: NodeTypes.HOTKEY},
-        {code: 'includecodes',     nodeType: NodeTypes.INCLUDECODES},
-        {code: 'keyboardversion',  nodeType: NodeTypes.KEYBOARDVERSION},
-        {code: 'kmw_embedcss',     nodeType: NodeTypes.KMW_EMBEDCSS},
-        {code: 'kmw_embedjs',      nodeType: NodeTypes.KMW_EMBEDJS},
-        {code: 'kmw_helpfile',     nodeType: NodeTypes.KMW_HELPFILE},
-        {code: 'kmw_helptext',     nodeType: NodeTypes.KMW_HELPTEXT},
-        {code: 'kmw_rtl',          nodeType: NodeTypes.KMW_RTL},
-        {code: 'language',         nodeType: NodeTypes.LANGUAGE},
-        {code: 'layoutfile',       nodeType: NodeTypes.LAYOUTFILE},
-        {code: 'message',          nodeType: NodeTypes.MESSAGE},
-        {code: 'mnemoniclayout',   nodeType: NodeTypes.MNEMONICLAYOUT},
-        {code: 'name',             nodeType: NodeTypes.NAME},
-        {code: 'targets',          nodeType: NodeTypes.TARGETS},
-        {code: 'version',          nodeType: NodeTypes.VERSION},
-        {code: 'visualkeyboard',   nodeType: NodeTypes.VISUALKEYBOARD},
-        {code: 'windowslanguages', nodeType: NodeTypes.WINDOWSLANGUAGES},
-        {code: 'capsalwaysoff',    nodeType: NodeTypes.CAPSALWAYSOFF},
-        {code: 'capsononly',       nodeType: NodeTypes.CAPSONONLY},
-        {code: 'shiftfreescaps',   nodeType: NodeTypes.SHIFTFREESCAPS},
+        {code: 'bitmap',           nodeType: NodeType.BITMAP},
+        {code: 'casedkeys',        nodeType: NodeType.CASEDKEYS},
+        {code: 'copyright',        nodeType: NodeType.COPYRIGHT},
+        {code: 'displaymap',       nodeType: NodeType.DISPLAYMAP},
+        {code: 'ethnologuecode',   nodeType: NodeType.ETHNOLOGUECODE},
+        {code: 'hotkey',           nodeType: NodeType.HOTKEY},
+        {code: 'includecodes',     nodeType: NodeType.INCLUDECODES},
+        {code: 'keyboardversion',  nodeType: NodeType.KEYBOARDVERSION},
+        {code: 'kmw_embedcss',     nodeType: NodeType.KMW_EMBEDCSS},
+        {code: 'kmw_embedjs',      nodeType: NodeType.KMW_EMBEDJS},
+        {code: 'kmw_helpfile',     nodeType: NodeType.KMW_HELPFILE},
+        {code: 'kmw_helptext',     nodeType: NodeType.KMW_HELPTEXT},
+        {code: 'kmw_rtl',          nodeType: NodeType.KMW_RTL},
+        {code: 'language',         nodeType: NodeType.LANGUAGE},
+        {code: 'layoutfile',       nodeType: NodeType.LAYOUTFILE},
+        {code: 'message',          nodeType: NodeType.MESSAGE},
+        {code: 'mnemoniclayout',   nodeType: NodeType.MNEMONICLAYOUT},
+        {code: 'name',             nodeType: NodeType.NAME},
+        {code: 'targets',          nodeType: NodeType.TARGETS},
+        {code: 'version',          nodeType: NodeType.VERSION},
+        {code: 'visualkeyboard',   nodeType: NodeType.VISUALKEYBOARD},
+        {code: 'windowslanguages', nodeType: NodeType.WINDOWSLANGUAGES},
+        {code: 'capsalwaysoff',    nodeType: NodeType.CAPSALWAYSOFF},
+        {code: 'capsononly',       nodeType: NodeType.CAPSONONLY},
+        {code: 'shiftfreescaps',   nodeType: NodeType.SHIFTFREESCAPS},
       ].forEach((testCase) => {
         Rule.tokenBuffer = stringToTokenBuffer(`&${testCase.code}`);
         const systemStoreName: Rule = new SystemStoreNameRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(systemStoreName.parse(root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType));
       });
@@ -197,76 +197,76 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.U_CHAR));
     });
     it("can parse correctly (single outs)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(ShiftOutAll)  outs(ShiftOutSingle)');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.OUTS));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.OUTS));
     });
     it("can parse correctly (two u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 U+1781');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.equal(storeNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
     it("can parse correctly (two u_char with continuation)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.equal(storeNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
     it("can parse correctly (two u_char with continuation, space before)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\\nU+1781');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.equal(storeNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
     it("can parse correctly (two u_char with continuation, space after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\n U+1781');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.equal(storeNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
     it("can parse correctly (two u_char with continuation, spaces before and after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\\n U+1781');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.equal(storeNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
     it("can parse correctly (two u_char with continuation, spaces before, after and between)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\ \n U+1781');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.equal(storeNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
     it("can parse correctly (mixed text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) " " U+1781 [K_K] outs(ShiftOutSingle)');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.STRING));
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.OUTS));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.STRING));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.U_CHAR));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.VIRTUAL_KEY));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.OUTS));
     });
     it("can parse correctly (multi line assignment)", () => {
       const line1 = 'store(c_key)           [K_K] [K_X] [SHIFT K_K] [SHIFT K_X] [K_G] \\\n';
@@ -280,16 +280,16 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer(str);
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      const virtualKeyNodes = storeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNodes = storeNode.getChildrenOfType(NodeType.VIRTUAL_KEY);
       assert.equal(virtualKeyNodes.length, 35);
     });
     it("can parse correctly (no text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_key)');
       const normalStoreAssign: Rule = new NormalStoreAssignRule();
       assert.isTrue(normalStoreAssign.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.STORE));
     });
   });
   describe("NormalStoreRule Tests", () => {
@@ -302,9 +302,9 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(digit)');
       const normalStore: Rule = new NormalStoreRule();
       assert.isTrue(normalStore.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE);
+      const storeNode = root.getSoleChildOfType(NodeType.STORE);
       assert.isNotNull(storeNode);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.STORENAME));
     });
   });
   describe("NormalStoreNameRule Tests", () => {
@@ -317,28 +317,28 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('main');
       const normalStoreName: Rule = new NormalStoreNameRule();
       assert.isTrue(normalStoreName.parse(root));
-      assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'main');
+      assert.equal(root.getSoleChildOfType(NodeType.STORENAME).getText(), 'main');
     });
     it("can parse correctly (octal)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('1');
       const normalStoreName: Rule = new NormalStoreNameRule();
       assert.isTrue(normalStoreName.parse(root));
-      assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), '1');
+      assert.equal(root.getSoleChildOfType(NodeType.STORENAME).getText(), '1');
     });
     it("can parse correctly (permitted keyword)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('newcontext');
       const normalStoreName: Rule = new NormalStoreNameRule();
       assert.isTrue(normalStoreName.parse(root));
-      assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'newcontext');
+      assert.equal(root.getSoleChildOfType(NodeType.STORENAME).getText(), 'newcontext');
     });
     it("can parse correctly (multi word name)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('Unicode Area');
       const normalStoreName: Rule = new NormalStoreNameRule();
       assert.isTrue(normalStoreName.parse(root));
-      const normalStoreNameNode = root.getSoleChildOfType(NodeTypes.STORENAME);
+      const normalStoreNameNode = root.getSoleChildOfType(NodeType.STORENAME);
       assert.isNotNull(normalStoreNameNode);
-      assert.equal(normalStoreNameNode.getSoleChildOfType(NodeTypes.UNICODE).getText(), 'Unicode');
-      assert.equal(normalStoreNameNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), 'Area');
+      assert.equal(normalStoreNameNode.getSoleChildOfType(NodeType.UNICODE).getText(), 'Unicode');
+      assert.equal(normalStoreNameNode.getSoleChildOfType(NodeType.PARAMETER).getText(), 'Area');
     });
   });
   describe("StoreNameRule Tests", () => {
@@ -358,17 +358,17 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
       const setNormalStore: Rule = new SetNormalStoreRule();
       assert.isTrue(setNormalStore.parse(root));
-      const setNode = root.getSoleChildOfType(NodeTypes.SET);
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+      const setNode = root.getSoleChildOfType(NodeType.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STORENAME));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (two u_chars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = U+1780 U+1781)');
       const setNormalStore: Rule = new SetNormalStoreRule();
       assert.isTrue(setNormalStore.parse(root));
-      const setNode = root.getSoleChildOfType(NodeTypes.SET);
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
-      assert.equal(setNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      const setNode = root.getSoleChildOfType(NodeType.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STORENAME));
+      assert.equal(setNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
   });
   describe("SetSystemStoreRule Tests", () => {
@@ -381,25 +381,25 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
       const SetSystemStore: Rule = new SetSystemStoreRule();
       assert.isTrue(SetSystemStore.parse(root));
-      const setNode = root.getSoleChildOfType(NodeTypes.SET);
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+      const setNode = root.getSoleChildOfType(NodeType.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.LAYER));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (layer, two u_chars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = U+1780 U+1781)');
       const SetSystemStore: Rule = new SetSystemStoreRule();
       assert.isTrue(SetSystemStore.parse(root));
-      const setNode = root.getSoleChildOfType(NodeTypes.SET);
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
-      assert.equal(setNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      const setNode = root.getSoleChildOfType(NodeType.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.LAYER));
+      assert.equal(setNode.getChildrenOfType(NodeType.U_CHAR).length, 2);
     });
     it("can parse correctly (bitmap)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&bitmap = "value")');
       const SetSystemStore: Rule = new SetSystemStoreRule();
       assert.isTrue(SetSystemStore.parse(root));
-      const setNode = root.getSoleChildOfType(NodeTypes.SET);
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.BITMAP));
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+      const setNode = root.getSoleChildOfType(NodeType.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.BITMAP));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STRING));
     });
   });
   describe("SystemStoreNameForSetRule Tests", () => {
@@ -412,13 +412,13 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('&bitmap');
       const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
       assert.isTrue(systemStoreNameForSet.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
     });
     it("can parse correctly (layer)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('&layer');
       const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
       assert.isTrue(systemStoreNameForSet.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.LAYER));
     });
   });
   describe("ResetStoreRule Tests", () => {
@@ -431,9 +431,9 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('reset(digit)');
       const resetStore: Rule = new ResetStoreRule();
       assert.isTrue(resetStore.parse(root));
-      const resetNode = root.getSoleChildOfType(NodeTypes.RESET);
+      const resetNode = root.getSoleChildOfType(NodeType.RESET);
       assert.isNotNull(resetNode);
-      assert.isNotNull(resetNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(resetNode.getSoleChildOfType(NodeType.STORENAME));
     });
   });
   describe("CapsAlwaysOffRule Tests", () => {
@@ -446,7 +446,7 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('caps always off');
       const capsAlwaysOff: Rule = new CapsAlwaysOffRule();
       assert.isTrue(capsAlwaysOff.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSALWAYSOFF));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSALWAYSOFF));
     });
   });
   describe("CapsOnOnlyRule Tests", () => {
@@ -459,7 +459,7 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('caps on only');
       const capsOnOnly: Rule = new CapsOnOnlyRule();
       assert.isTrue(capsOnOnly.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSONONLY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSONONLY));
     });
   });
   describe("ShiftFreesCapsRule Tests", () => {
@@ -472,7 +472,7 @@ describe("KMN Store Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('shift frees caps');
       const shiftFreesCaps: Rule = new ShiftFreesCapsRule();
       assert.isTrue(shiftFreesCaps.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.SHIFTFREESCAPS));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.SHIFTFREESCAPS));
     });
   });
   describe("HeaderAssignRule Tests", () => {
@@ -483,35 +483,35 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly (value is string)", () => {
       [
-        {code: 'bitmap',    nodeType: NodeTypes.BITMAP_HEADER},
-        {code: 'copyright', nodeType: NodeTypes.COPYRIGHT_HEADER},
-        {code: 'hotkey',    nodeType: NodeTypes.HOTKEY_HEADER},
-        {code: 'language',  nodeType: NodeTypes.LANGUAGE_HEADER},
-        {code: 'layout',    nodeType: NodeTypes.LAYOUT_HEADER},
-        {code: 'message',   nodeType: NodeTypes.MESSAGE_HEADER},
-        {code: 'name',      nodeType: NodeTypes.NAME_HEADER},
-        {code: 'version',   nodeType: NodeTypes.VERSION_HEADER},
+        {code: 'bitmap',    nodeType: NodeType.BITMAP_HEADER},
+        {code: 'copyright', nodeType: NodeType.COPYRIGHT_HEADER},
+        {code: 'hotkey',    nodeType: NodeType.HOTKEY_HEADER},
+        {code: 'language',  nodeType: NodeType.LANGUAGE_HEADER},
+        {code: 'layout',    nodeType: NodeType.LAYOUT_HEADER},
+        {code: 'message',   nodeType: NodeType.MESSAGE_HEADER},
+        {code: 'name',      nodeType: NodeType.NAME_HEADER},
+        {code: 'version',   nodeType: NodeType.VERSION_HEADER},
       ].forEach((testCase) => {
         Rule.tokenBuffer = stringToTokenBuffer(`${testCase.code} "value"`);
         const headerName: Rule = new HeaderAssignRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(headerName.parse(root));
         const headerNode = root.getSoleChildOfType(testCase.nodeType);
-        assert.equal(headerNode.getSoleChildOfType(NodeTypes.STRING).getText(), '"value"');
+        assert.equal(headerNode.getSoleChildOfType(NodeType.STRING).getText(), '"value"');
       });
     });
     it("can parse correctly (version with value as float)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('VERSION 10.0');
       const headerName: Rule = new HeaderAssignRule();
       assert.isTrue(headerName.parse(root));
-      const versionNode = root.getSoleChildOfType(NodeTypes.VERSION_HEADER);
-      assert.equal(versionNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), '10.0')
+      const versionNode = root.getSoleChildOfType(NodeType.VERSION_HEADER);
+      assert.equal(versionNode.getSoleChildOfType(NodeType.PARAMETER).getText(), '10.0')
     });
     it.skip("can parse correctly (no value)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('VERSION');
       const headerName: Rule = new HeaderAssignRule();
       assert.isTrue(headerName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION_HEADER));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.VERSION_HEADER));
     });
   });
   describe("HeaderNameRule Tests", () => {
@@ -522,18 +522,18 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly", () => {
       [
-        {code: 'bitmap',    nodeType: NodeTypes.BITMAP_HEADER},
-        {code: 'copyright', nodeType: NodeTypes.COPYRIGHT_HEADER},
-        {code: 'hotkey',    nodeType: NodeTypes.HOTKEY_HEADER},
-        {code: 'language',  nodeType: NodeTypes.LANGUAGE_HEADER},
-        {code: 'layout',    nodeType: NodeTypes.LAYOUT_HEADER},
-        {code: 'message',   nodeType: NodeTypes.MESSAGE_HEADER},
-        {code: 'name',      nodeType: NodeTypes.NAME_HEADER},
-        {code: 'version',   nodeType: NodeTypes.VERSION_HEADER},
+        {code: 'bitmap',    nodeType: NodeType.BITMAP_HEADER},
+        {code: 'copyright', nodeType: NodeType.COPYRIGHT_HEADER},
+        {code: 'hotkey',    nodeType: NodeType.HOTKEY_HEADER},
+        {code: 'language',  nodeType: NodeType.LANGUAGE_HEADER},
+        {code: 'layout',    nodeType: NodeType.LAYOUT_HEADER},
+        {code: 'message',   nodeType: NodeType.MESSAGE_HEADER},
+        {code: 'name',      nodeType: NodeType.NAME_HEADER},
+        {code: 'version',   nodeType: NodeType.VERSION_HEADER},
       ].forEach((testCase) => {
         Rule.tokenBuffer = stringToTokenBuffer(`${testCase.code} `);
         const headerName: Rule = new HeaderNameRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(headerName.parse(root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType));
       });

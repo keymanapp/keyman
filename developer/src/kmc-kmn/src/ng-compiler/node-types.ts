@@ -8,7 +8,9 @@
  * NodeTypes for the Recursive Descent Parser
  */
 
-export enum NodeTypes {
+/* These have been placed in alphabetical order for ease of access */
+
+export enum NodeType {
   ALWAYS                = "ALWAYS",
   ANSI                  = "ANSI",
   ANY                   = "ANY",

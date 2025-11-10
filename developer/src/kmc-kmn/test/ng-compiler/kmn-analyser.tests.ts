@@ -21,7 +21,7 @@ import { OutputStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, TextRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { NodeTypes } from "../../src/ng-compiler/node-types.js";
+import { NodeType } from "../../src/ng-compiler/node-types.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { readFileSync } from 'fs';
 
@@ -29,7 +29,7 @@ let root: ASTNode = null;
 
 describe("KMN Analyser Tests", () => {
   beforeEach(() => {
-    root = new ASTNode(NodeTypes.TMP);
+    root = new ASTNode(NodeType.TMP);
   });
   describe("KmnTreeRule Tests", () => {
     it("can construct a KmnTreeRule", () => {
@@ -41,16 +41,16 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&VERSION) "10.0"\nstore(&NAME) "Khmer Angkor"\nstore(&COPYRIGHT) "© SIL Global"\n');
       const kmnTree: Rule = new KmnTreeRule();
       assert.isTrue(kmnTree.parse(root));
-      const storesNode = root.getSoleChildOfType(NodeTypes.STORES);
+      const storesNode = root.getSoleChildOfType(NodeType.STORES);
       assert.isNotNull(storesNode);
       const children = storesNode.getChildren();
       assert.equal(children.length, 3);
-      assert.equal(children[0].nodeType, NodeTypes.VERSION);
-      assert.equal(children[1].nodeType, NodeTypes.NAME);
-      assert.equal(children[2].nodeType, NodeTypes.COPYRIGHT);
-      const sourceCodeNode = root.getSoleChildOfType(NodeTypes.SOURCE_CODE);
+      assert.equal(children[0].nodeType, NodeType.VERSION);
+      assert.equal(children[1].nodeType, NodeType.NAME);
+      assert.equal(children[2].nodeType, NodeType.COPYRIGHT);
+      const sourceCodeNode = root.getSoleChildOfType(NodeType.SOURCE_CODE);
       assert.isNotNull(sourceCodeNode);
-      assert.equal(sourceCodeNode.getChildrenOfType(NodeTypes.LINE).length, 3);
+      assert.equal(sourceCodeNode.getChildrenOfType(NodeType.LINE).length, 3);
     });
   });
   describe("LineRule Tests", () => {
@@ -65,9 +65,9 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.BITMAP);
+      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+      assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (no space before, no comment, space before newline)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" \n');
@@ -75,9 +75,9 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.BITMAP);
+      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+      assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (space before, no comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename"\n');
@@ -85,9 +85,9 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.BITMAP);
+      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+      assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (no space before, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" c a comment\n');
@@ -95,9 +95,9 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.BITMAP);
+      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+      assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (space before, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename" c a comment\n');
@@ -105,9 +105,9 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.BITMAP);
+      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+      assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (variable store assign, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 c a comment\n');
@@ -115,9 +115,9 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
-      assert.equal(children[0].nodeType, NodeTypes.STORE);
-      assert.equal(children[0].getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.STORE);
+      assert.equal(children[0].getSoleChildOfType(NodeType.STORENAME).getText(), 'c_out');
+      assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (variable store assign, continuation, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781 c a comment\n');
@@ -125,10 +125,10 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
-      assert.equal(children[0].nodeType, NodeTypes.STORE);
-      assert.equal(children[0].getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
-      assert.equal(children[0].getChildrenOfType(NodeTypes.U_CHAR).length, 2);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.STORE);
+      assert.equal(children[0].getSoleChildOfType(NodeType.STORENAME).getText(), 'c_out');
+      assert.equal(children[0].getChildrenOfType(NodeType.U_CHAR).length, 2);
+      assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (multi line variable store assignment, comment)", () => {
       const line1 = 'store(c_out)           U+1780 U+1781 U+1782 U+1783 U+1784 \\\n';
@@ -142,52 +142,52 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer(str);
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      const uCharNodes = storeNode.getChildrenOfType(NodeTypes.U_CHAR);
+      const uCharNodes = storeNode.getChildrenOfType(NodeType.U_CHAR);
       assert.equal(uCharNodes.length, 35);
     });
     it("can parse correctly (ruleBlock)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.U_CHAR));
     });
     it("can parse correctly (blank, no comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
     it("can parse correctly (blank, no comment, space before newline)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' \n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
     it("can parse correctly (blank, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
     it("can parse correctly (blank, space before comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' c This tells Keyman which keys should have casing behavior applied\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
     it("can parse correctly (compile target)", () => {
@@ -196,10 +196,10 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 3);
-      assert.equal(children[0].nodeType, NodeTypes.KEYMAN);
-      assert.equal(children[1].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[1].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[2].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.KEYMAN);
+      assert.equal(children[1].nodeType, NodeType.BITMAP);
+      assert.equal(children[1].getSoleChild().nodeType, NodeType.STRING);
+      assert.equal(children[2].nodeType, NodeType.LINE);
     });
     it("can parse correctly (compile target, plus, virtual key, u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$keymanonly: + [CTRL "."] > U+135E\n');
@@ -207,9 +207,9 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 3);
-      assert.equal(children[0].nodeType, NodeTypes.KEYMANONLY);
-      assert.equal(children[1].nodeType, NodeTypes.PRODUCTION);
-      assert.equal(children[2].nodeType, NodeTypes.LINE);
+      assert.equal(children[0].nodeType, NodeType.KEYMANONLY);
+      assert.equal(children[1].nodeType, NodeType.PRODUCTION);
+      assert.equal(children[2].nodeType, NodeType.LINE);
     });
   });
   describe("CompileTargetRule Tests", () => {
@@ -222,31 +222,31 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$keyman:');
       const compileTarget: Rule = new CompileTargetRule();
       assert.isTrue(compileTarget.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYMAN));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.KEYMAN));
     });
     it("can parse correctly (KEYMANONLY)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$keymanonly:');
       const compileTarget: Rule = new CompileTargetRule();
       assert.isTrue(compileTarget.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYMANONLY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.KEYMANONLY));
     });
     it("can parse correctly (KEYMANWEB)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$keymanweb:');
       const compileTarget: Rule = new CompileTargetRule();
       assert.isTrue(compileTarget.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYMANWEB));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.KEYMANWEB));
     });
     it("can parse correctly (KMFL)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$kmfl:');
       const compileTarget: Rule = new CompileTargetRule();
       assert.isTrue(compileTarget.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMFL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.KMFL));
     });
     it("can parse correctly (WEAVER)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$weaver:');
       const compileTarget: Rule = new CompileTargetRule();
       assert.isTrue(compileTarget.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.WEAVER));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.WEAVER));
     });
   });
   describe("ContentRule Tests", () => {
@@ -259,65 +259,65 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
-      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (casedkeys store assign)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      const casedkeysNode = root.getSoleChildOfType(NodeType.CASEDKEYS)
       assert.isNotNull(casedkeysNode);
-      assert.isNotNull(casedkeysNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+      assert.isNotNull(casedkeysNode.getSoleChildOfType(NodeType.VIRTUAL_KEY));
     });
     it("can parse correctly (hotkey store assign)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&hotkey) [K_A]');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      const hotkeyNode = root.getSoleChildOfType(NodeTypes.HOTKEY)
+      const hotkeyNode = root.getSoleChildOfType(NodeType.HOTKEY)
       assert.isNotNull(hotkeyNode);
-      assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+      assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeType.VIRTUAL_KEY));
     });
     it("can parse correctly (caps always off)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('caps always off');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSALWAYSOFF));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSALWAYSOFF));
     });
     it("can parse correctly (caps on only)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('caps on only');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSONONLY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSONONLY));
     });
     it("can parse correctly (shift frees caps)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('shift frees caps');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.SHIFTFREESCAPS));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.SHIFTFREESCAPS));
     });
     it("can parse correctly (header assign)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('hotkey [SHIFT K_H]');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HOTKEY_HEADER));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.HOTKEY_HEADER));
     });
     it("can parse correctly (normal store assign)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      const storeNode = root.getSoleChildOfType(NodeType.STORE)
       assert.isNotNull(storeNode);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeType.U_CHAR));
     });
     it("can parse correctly (plus, any, index)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key) > index(c_out,1)');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      assert.isNotNull(productionNode.getSoleChildOfType(NodeTypes.LHS));
-      assert.isNotNull(productionNode.getSoleChildOfType(NodeTypes.RHS));
+      assert.isNotNull(productionNode.getSoleChildOfType(NodeType.LHS));
+      assert.isNotNull(productionNode.getSoleChildOfType(NodeType.RHS));
     });
   });
   describe("TextRule Tests", () => {
@@ -330,25 +330,25 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a".."c"');
       const text: Rule = new TextRule();
       assert.isTrue(text.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].nodeType, NodeType.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeType.STRING);
       assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (simple text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a"');
       const text: Rule = new TextRule();
       assert.isTrue(text.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (outs statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('outs(digit)');
       const text: Rule = new TextRule();
       assert.isTrue(text.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.OUTS));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.OUTS));
     });
   });
   describe("PlainTextRule Tests", () => {
@@ -361,19 +361,19 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a".."c"');
       const plainText: Rule = new PlainTextRule();
       assert.isTrue(plainText.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].nodeType, NodeType.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeType.STRING);
       assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (simple text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a"');
       const plainText: Rule = new PlainTextRule();
       assert.isTrue(plainText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (outs statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('outs(digit)');
@@ -391,67 +391,67 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a"');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (virtualKey)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[K_K]');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.VIRTUAL_KEY));
     });
     it("can parse correctly (u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+1780');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.U_CHAR));
     });
     it("can parse correctly (named constant)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$CCedilla');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NAMED_CONSTANT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NAMED_CONSTANT));
     });
     it("can parse correctly (hangul)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('$HANGUL_SYLLABLE_A');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HANGUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.HANGUL));
     });
     it("can parse correctly (decimal, space)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('d99 ');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.DECIMAL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.DECIMAL));
     });
     it("can parse correctly (hexadecimal, space)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('xa99 ');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HEXADECIMAL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.HEXADECIMAL));
     });
     it("can parse correctly (octal, space)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('77 ');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.OCTAL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.OCTAL));
     });
     it("can parse correctly (nul)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
     });
     it("can parse correctly (deadkey)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('dk(1)');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.DEADKEY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.DEADKEY));
     });
     it("can parse correctly (beep)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('beep');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BEEP));
     });
   });
   describe("TextRangeRule Tests", () => {
@@ -464,74 +464,74 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a".."c"');
       const textRange: Rule = new TextRangeRule();
       assert.isTrue(textRange.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].nodeType, NodeType.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeType.STRING);
       assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (string range, space before range)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a" .."c"');
       const textRange: Rule = new TextRangeRule();
       assert.isTrue(textRange.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].nodeType, NodeType.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeType.STRING);
       assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (string range, space after range)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a".. "c"');
       const textRange: Rule = new TextRangeRule();
       assert.isTrue(textRange.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].nodeType, NodeType.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeType.STRING);
       assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (string range, space before and after range)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('"a" .. "c"');
       const textRange: Rule = new TextRangeRule();
       assert.isTrue(textRange.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].nodeType, NodeType.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeType.STRING);
       assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (virtual key range)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[K_A]..[K_C]');
       const textRange: Rule = new TextRangeRule();
       assert.isTrue(textRange.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[0].nodeType, NodeType.VIRTUAL_KEY);
       assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[1].nodeType, NodeType.VIRTUAL_KEY);
       assert.equal(children[1].getSoleChild().getText(), 'K_C');
     });
     it("can parse correctly (multiple virtual key range)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[K_A]..[K_C]..[K_E]');
       const textRange: Rule = new TextRangeRule();
       assert.isTrue(textRange.parse(root));
-      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      const rangeNode = root.getSoleChildOfType(NodeType.RANGE);
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[0].nodeType, NodeType.VIRTUAL_KEY);
       assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[1].nodeType, NodeType.VIRTUAL_KEY);
       assert.equal(children[1].getSoleChild().getText(), 'K_C');
-      assert.equal(children[2].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[2].nodeType, NodeType.VIRTUAL_KEY);
       assert.equal(children[2].getSoleChild().getText(), 'K_E');
     });
   });
@@ -545,27 +545,27 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[K_K]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.KEY_CODE));
     });
     it("can parse correctly (single shiftcode virtual key)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[SHIFT K_K]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.MODIFIER));
     });
     it("can parse correctly (two shiftcode virtual key)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[SHIFT CTRL K_K]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
-      const modifiers = virtualKeyNode.getChildrenOfType(NodeTypes.MODIFIER);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.KEY_CODE));
+      const modifiers = virtualKeyNode.getChildrenOfType(NodeType.MODIFIER);
       assert.equal(modifiers.length, 2);
       assert.equal(modifiers[0].token.text, 'SHIFT');
       assert.equal(modifiers[1].token.text, 'CTRL');
@@ -574,60 +574,60 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[ K_K]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.KEY_CODE));
     });
     it("can parse correctly (simple virtual key, space after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[K_K ]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.KEY_CODE));
     });
     it("can parse correctly (simple virtual key, space before and after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[ K_K ]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.KEY_CODE));
     });
     it("can parse correctly (virtual character)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('["A"]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (virtual character with modifier)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[CTRL "A"]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.STRING));
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.STRING));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.MODIFIER));
     });
     it("can parse correctly (ISO9995 code)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[CTRL A10]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.MODIFIER));
     });
     it("can parse correctly (ISO9995 code parsed as DECIMAL)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[CTRL D10]');
       const virtualKey: Rule = new VirtualKeyRule();
       assert.isTrue(virtualKey.parse(root));
-      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.DECIMAL));
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.DECIMAL));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.MODIFIER));
     });
   });
   describe("ModifierRule Tests", () => {
@@ -650,9 +650,9 @@ describe("KMN Analyser Tests", () => {
       ].forEach((code) => {
         Rule.tokenBuffer = stringToTokenBuffer(`${code} `);
         const modifier: Rule = new ModifierRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(modifier.parse(root));
-        assert.equal(root.getSoleChildOfType(NodeTypes.MODIFIER).getText(), code);
+        assert.equal(root.getSoleChildOfType(NodeType.MODIFIER).getText(), code);
       });
     });
   });
@@ -666,16 +666,16 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
       const productionBlock: Rule = new RuleBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS);
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.U_CHAR));
     });
   });
   describe("BeginStatementRule Tests", () => {
@@ -688,18 +688,18 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('begin > use(main)');
       const beginBlock: Rule = new BeginStatementRule();
       assert.isTrue(beginBlock.parse(root));
-      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
+      const beginNode = root.getSoleChildOfType(NodeType.BEGIN);
       assert.isNotNull(beginNode);
-      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
+      assert.isNotNull(beginNode.getSoleChildOfType(NodeType.USE));
     });
     it("can parse correctly (entrypoint)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('begin unicode > use(main)');
       const beginBlock: Rule = new BeginStatementRule();
       assert.isTrue(beginBlock.parse(root));
-      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
+      const beginNode = root.getSoleChildOfType(NodeType.BEGIN);
       assert.isNotNull(beginNode);
-      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.UNICODE));
-      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
+      assert.isNotNull(beginNode.getSoleChildOfType(NodeType.UNICODE));
+      assert.isNotNull(beginNode.getSoleChildOfType(NodeType.USE));
     });
   });
   describe("EntryPointRule Tests", () => {
@@ -712,25 +712,25 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('unicode');
       const entryPoint: Rule = new EntryPointRule();
       assert.isTrue(entryPoint.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.UNICODE));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.UNICODE));
     });
     it("can parse correctly (newcontext)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('newcontext');
       const entryPoint: Rule = new EntryPointRule();
       assert.isTrue(entryPoint.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWCONTEXT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NEWCONTEXT));
     });
     it("can parse correctly (postkeystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('postkeystroke');
       const entryPoint: Rule = new EntryPointRule();
       assert.isTrue(entryPoint.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.POSTKEYSTROKE));
     });
     it("can parse correctly (ansi)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('ansi');
       const entryPoint: Rule = new EntryPointRule();
       assert.isTrue(entryPoint.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.ANSI));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.ANSI));
     });
   });
   describe("UseStatementRule Tests", () => {
@@ -743,17 +743,17 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use(main)');
       const useStatement: Rule = new UseStatementRule();
       assert.isTrue(useStatement.parse(root));
-      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      const useNode = root.getSoleChildOfType(NodeType.USE);
       assert.isNotNull(useNode);
-      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+      assert.isNotNull(useNode.getSoleChildOfType(NodeType.GROUPNAME));
     });
     it("can parse correctly (space before parameter)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use( main)');
       const useStatement: Rule = new UseStatementRule();
       assert.isTrue(useStatement.parse(root));
-      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      const useNode = root.getSoleChildOfType(NodeType.USE);
       assert.isNotNull(useNode);
-      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeTypes.GROUPNAME);
+      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeType.GROUPNAME);
       assert.isNotNull(groupNameNode);
       assert.equal(groupNameNode.getText(), 'main');
     });
@@ -761,9 +761,9 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use(main )');
       const useStatement: Rule = new UseStatementRule();
       assert.isTrue(useStatement.parse(root));
-      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      const useNode = root.getSoleChildOfType(NodeType.USE);
       assert.isNotNull(useNode);
-      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeTypes.GROUPNAME);
+      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeType.GROUPNAME);
       assert.isNotNull(groupNameNode);
       assert.equal(groupNameNode.getText(), 'main');
     });
@@ -771,9 +771,9 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use( main )');
       const useStatement: Rule = new UseStatementRule();
       assert.isTrue(useStatement.parse(root));
-      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      const useNode = root.getSoleChildOfType(NodeType.USE);
       assert.isNotNull(useNode);
-      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeTypes.GROUPNAME);
+      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeType.GROUPNAME);
       assert.isNotNull(groupNameNode);
       assert.equal(groupNameNode.getText(), 'main');
     });
@@ -781,17 +781,17 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use(postkeystroke)');
       const useStatement: Rule = new UseStatementRule();
       assert.isTrue(useStatement.parse(root));
-      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      const useNode = root.getSoleChildOfType(NodeType.USE);
       assert.isNotNull(useNode);
-      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+      assert.isNotNull(useNode.getSoleChildOfType(NodeType.GROUPNAME));
     });
     it("can parse correctly (multi word name)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use(Unicode Group)');
       const useStatement: Rule = new UseStatementRule();
       assert.isTrue(useStatement.parse(root));
-      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      const useNode = root.getSoleChildOfType(NodeType.USE);
       assert.isNotNull(useNode);
-      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+      assert.isNotNull(useNode.getSoleChildOfType(NodeType.GROUPNAME));
     });
   });
   describe("GroupNameRule Tests", () => {
@@ -804,28 +804,28 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('main');
       const groupName: Rule = new GroupNameRule();
       assert.isTrue(groupName.parse(root));
-      assert.equal(root.getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'main');
+      assert.equal(root.getSoleChildOfType(NodeType.GROUPNAME).getText(), 'main');
     });
     it("can parse correctly (octal)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('1');
       const groupName: Rule = new GroupNameRule();
       assert.isTrue(groupName.parse(root));
-      assert.equal(root.getSoleChildOfType(NodeTypes.GROUPNAME).getText(), '1');
+      assert.equal(root.getSoleChildOfType(NodeType.GROUPNAME).getText(), '1');
     });
     it("can parse correctly (permitted keyword)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('newcontext');
       const groupName: Rule = new GroupNameRule();
       assert.isTrue(groupName.parse(root));
-      assert.equal(root.getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'newcontext');
+      assert.equal(root.getSoleChildOfType(NodeType.GROUPNAME).getText(), 'newcontext');
     });
     it("can parse correctly (multi word name)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('Unicode Group');
       const groupName: Rule = new GroupNameRule();
       assert.isTrue(groupName.parse(root));
-      const groupNameNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
+      const groupNameNode = root.getSoleChildOfType(NodeType.GROUPNAME);
       assert.isNotNull(groupNameNode);
-      assert.equal(groupNameNode.getSoleChildOfType(NodeTypes.UNICODE).getText(), 'Unicode');
-      assert.equal(groupNameNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), 'Group');
+      assert.equal(groupNameNode.getSoleChildOfType(NodeType.UNICODE).getText(), 'Unicode');
+      assert.equal(groupNameNode.getSoleChildOfType(NodeType.PARAMETER).getText(), 'Group');
     });
   });
   describe("PermittedKeywordRule Tests", () => {
@@ -837,41 +837,41 @@ describe("KMN Analyser Tests", () => {
     it("can parse correctly", () => {
       // *_HEADER tokens must be followed by a space
       [
-        {input: 'always',        nodeType: NodeTypes.ALWAYS},
-        {input: 'ansi',          nodeType: NodeTypes.ANSI},
-        {input: 'beep',          nodeType: NodeTypes.BEEP},
-        {input: 'begin',         nodeType: NodeTypes.BEGIN},
-        {input: 'bitmap ',       nodeType: NodeTypes.BITMAP_HEADER},
-        {input: 'caps',          nodeType: NodeTypes.CAPS},
-        {input: 'context',       nodeType: NodeTypes.CONTEXT},
-        {input: 'copyright ',    nodeType: NodeTypes.COPYRIGHT_HEADER},
-        {input: 'd1 ',           nodeType: NodeTypes.DECIMAL},
-        {input: 'frees',         nodeType: NodeTypes.FREES},
-        {input: 'xa1 ',          nodeType: NodeTypes.HEXADECIMAL},
-        {input: 'hotkey ',       nodeType: NodeTypes.HOTKEY_HEADER},
-        {input: 'keys',          nodeType: NodeTypes.KEYS},
-        {input: 'language ',     nodeType: NodeTypes.LANGUAGE_HEADER},
-        {input: 'layout ',       nodeType: NodeTypes.LAYOUT_HEADER},
-        {input: 'match',         nodeType: NodeTypes.MATCH},
-        {input: 'name ',         nodeType: NodeTypes.NAME_HEADER},
-        {input: 'newcontext',    nodeType: NodeTypes.NEWCONTEXT},
-        {input: 'nomatch',       nodeType: NodeTypes.NOMATCH},
-        {input: 'nul',           nodeType: NodeTypes.NUL},
-        {input: '10 ',           nodeType: NodeTypes.OCTAL},
-        {input: 'off',           nodeType: NodeTypes.OFF},
-        {input: 'on',            nodeType: NodeTypes.ON},
-        {input: 'only',          nodeType: NodeTypes.ONLY},
-        {input: 'postkeystroke', nodeType: NodeTypes.POSTKEYSTROKE},
-        {input: 'readonly',      nodeType: NodeTypes.READONLY},
-        {input: 'return',        nodeType: NodeTypes.RETURN},
-        {input: 'shift',         nodeType: NodeTypes.SHIFT},
-        {input: 'unicode',       nodeType: NodeTypes.UNICODE},
-        {input: 'using',         nodeType: NodeTypes.USING},
-        {input: 'version ',      nodeType: NodeTypes.VERSION_HEADER},
+        {input: 'always',        nodeType: NodeType.ALWAYS},
+        {input: 'ansi',          nodeType: NodeType.ANSI},
+        {input: 'beep',          nodeType: NodeType.BEEP},
+        {input: 'begin',         nodeType: NodeType.BEGIN},
+        {input: 'bitmap ',       nodeType: NodeType.BITMAP_HEADER},
+        {input: 'caps',          nodeType: NodeType.CAPS},
+        {input: 'context',       nodeType: NodeType.CONTEXT},
+        {input: 'copyright ',    nodeType: NodeType.COPYRIGHT_HEADER},
+        {input: 'd1 ',           nodeType: NodeType.DECIMAL},
+        {input: 'frees',         nodeType: NodeType.FREES},
+        {input: 'xa1 ',          nodeType: NodeType.HEXADECIMAL},
+        {input: 'hotkey ',       nodeType: NodeType.HOTKEY_HEADER},
+        {input: 'keys',          nodeType: NodeType.KEYS},
+        {input: 'language ',     nodeType: NodeType.LANGUAGE_HEADER},
+        {input: 'layout ',       nodeType: NodeType.LAYOUT_HEADER},
+        {input: 'match',         nodeType: NodeType.MATCH},
+        {input: 'name ',         nodeType: NodeType.NAME_HEADER},
+        {input: 'newcontext',    nodeType: NodeType.NEWCONTEXT},
+        {input: 'nomatch',       nodeType: NodeType.NOMATCH},
+        {input: 'nul',           nodeType: NodeType.NUL},
+        {input: '10 ',           nodeType: NodeType.OCTAL},
+        {input: 'off',           nodeType: NodeType.OFF},
+        {input: 'on',            nodeType: NodeType.ON},
+        {input: 'only',          nodeType: NodeType.ONLY},
+        {input: 'postkeystroke', nodeType: NodeType.POSTKEYSTROKE},
+        {input: 'readonly',      nodeType: NodeType.READONLY},
+        {input: 'return',        nodeType: NodeType.RETURN},
+        {input: 'shift',         nodeType: NodeType.SHIFT},
+        {input: 'unicode',       nodeType: NodeType.UNICODE},
+        {input: 'using',         nodeType: NodeType.USING},
+        {input: 'version ',      nodeType: NodeType.VERSION_HEADER},
       ].forEach((testCase) => {
         Rule.tokenBuffer = stringToTokenBuffer(testCase.input);
         const permittedKeyword: Rule = new PermittedKeywordRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(permittedKeyword.parse(root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType), `${testCase.input}`);
       });
@@ -887,43 +887,43 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(main)');
       const groupStatement: Rule = new GroupStatementRule();
       assert.isTrue(groupStatement.parse(root));
-      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
+      const groupNode = root.getSoleChildOfType(NodeType.GROUP);
       assert.isNotNull(groupNode);
-      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeType.GROUPNAME));
     });
     it("can parse correctly (octal, no qualifier)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(1)');
       const groupStatement: Rule = new GroupStatementRule();
       assert.isTrue(groupStatement.parse(root));
-      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
+      const groupNode = root.getSoleChildOfType(NodeType.GROUP);
       assert.isNotNull(groupNode);
-      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeType.GROUPNAME));
     });
     it("can parse correctly (permitted keyword, no qualifier)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(newcontext)');
       const groupStatement: Rule = new GroupStatementRule();
       assert.isTrue(groupStatement.parse(root));
-      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
+      const groupNode = root.getSoleChildOfType(NodeType.GROUP);
       assert.isNotNull(groupNode);
-      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeType.GROUPNAME));
     });
     it("can parse correctly (using keys)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(main) using keys');
       const groupStatement: Rule = new GroupStatementRule();
       assert.isTrue(groupStatement.parse(root));
-      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
+      const groupNode = root.getSoleChildOfType(NodeType.GROUP);
       assert.isNotNull(groupNode);
-      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.USING_KEYS));
-      assert.isNull(groupNode.getSoleChildOfType(NodeTypes.READONLY));
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeType.USING_KEYS));
+      assert.isNull(groupNode.getSoleChildOfType(NodeType.READONLY));
     });
     it("can parse correctly (readonly)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(main) readonly');
       const groupStatement: Rule = new GroupStatementRule();
       assert.isTrue(groupStatement.parse(root));
-      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
+      const groupNode = root.getSoleChildOfType(NodeType.GROUP);
       assert.isNotNull(groupNode);
-      assert.isNull(groupNode.getSoleChildOfType(NodeTypes.USING_KEYS));
-      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.READONLY));
+      assert.isNull(groupNode.getSoleChildOfType(NodeType.USING_KEYS));
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeType.READONLY));
     });
   });
   describe("GroupQualifierRule Tests", () => {
@@ -936,13 +936,13 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('using keys');
       const groupQualifier: Rule = new GroupQualifierRule();
       assert.isTrue(groupQualifier.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.USING_KEYS));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.USING_KEYS));
     });
     it("can parse correctly (readonly)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('readonly');
       const groupQualifier: Rule = new GroupQualifierRule();
       assert.isTrue(groupQualifier.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.READONLY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.READONLY));
     });
   });
   describe("UsingKeysRule Tests", () => {
@@ -955,7 +955,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('using keys');
       const usingKeys: Rule = new UsingKeysRule();
       assert.isTrue(usingKeys.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.USING_KEYS));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.USING_KEYS));
     });
   });
   describe("ProductionBlockRule Tests", () => {
@@ -968,159 +968,159 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key) > index(c_out,1)');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.INDEX));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.INDEX));
     });
     it("can parse correctly (plus, virtual key, two uChars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ [SHIFT K_A] > U+17B6 U+17C6');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      const uCharNodes = rhsNode.getChildrenOfType(NodeTypes.U_CHAR);
+      const uCharNodes = rhsNode.getChildrenOfType(NodeType.U_CHAR);
       assert.equal(uCharNodes.length, 2);
     });
     it("can parse correctly (u_char, plus, virtual key, context, u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.U_CHAR));
     });
     it("can parse correctly (if, plus, string, string, set, reset, set, reset)", () => {
       Rule.tokenBuffer = stringToTokenBuffer("if(foo = '1') + 'a' > 'foo.' set(foo='2') reset(foo) set(foo='3') reset(foo)");
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.IF));
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.IF));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
       const outputNodes = rhsNode.getChildren();
       assert.equal(outputNodes.length, 5);
-      assert.equal(outputNodes[0].nodeType, NodeTypes.STRING);
-      assert.equal(outputNodes[1].nodeType, NodeTypes.SET);
-      assert.equal(outputNodes[2].nodeType, NodeTypes.RESET);
-      assert.equal(outputNodes[3].nodeType, NodeTypes.SET);
-      assert.equal(outputNodes[4].nodeType, NodeTypes.RESET);
+      assert.equal(outputNodes[0].nodeType, NodeType.STRING);
+      assert.equal(outputNodes[1].nodeType, NodeType.SET);
+      assert.equal(outputNodes[2].nodeType, NodeType.RESET);
+      assert.equal(outputNodes[3].nodeType, NodeType.SET);
+      assert.equal(outputNodes[4].nodeType, NodeType.RESET);
     });
     it("can parse correctly (dk, string, dk, string, dk, plus, string, string, context, string)", () => {
       Rule.tokenBuffer = stringToTokenBuffer("dk(1) 'a' dk(2) 'b' dk(3) + 'z' > '<' context '>'");
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      const inputContextNode = lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
       const inputNodes = inputContextNode.getChildren();
       assert.equal(inputNodes.length, 5);
-      assert.equal(inputNodes[0].nodeType, NodeTypes.DEADKEY);
-      assert.equal(inputNodes[1].nodeType, NodeTypes.STRING);
-      assert.equal(inputNodes[2].nodeType, NodeTypes.DEADKEY);
-      assert.equal(inputNodes[3].nodeType, NodeTypes.STRING);
-      assert.equal(inputNodes[4].nodeType, NodeTypes.DEADKEY);
-      const keystrokeNode = lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.equal(inputNodes[0].nodeType, NodeType.DEADKEY);
+      assert.equal(inputNodes[1].nodeType, NodeType.STRING);
+      assert.equal(inputNodes[2].nodeType, NodeType.DEADKEY);
+      assert.equal(inputNodes[3].nodeType, NodeType.STRING);
+      assert.equal(inputNodes[4].nodeType, NodeType.DEADKEY);
+      const keystrokeNode = lhsNode.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
       const outputNodes = rhsNode.getChildren();
       assert.equal(outputNodes.length, 3);
-      assert.equal(outputNodes[0].nodeType, NodeTypes.STRING);
-      assert.equal(outputNodes[1].nodeType, NodeTypes.CONTEXT);
-      assert.equal(outputNodes[2].nodeType, NodeTypes.STRING);
+      assert.equal(outputNodes[0].nodeType, NodeType.STRING);
+      assert.equal(outputNodes[1].nodeType, NodeType.CONTEXT);
+      assert.equal(outputNodes[2].nodeType, NodeType.STRING);
     });
     it("can parse correctly (two uChars, uChar)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6 > U+17C4');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.U_CHAR));
     });
     it("can parse correctly (two uChars, two uChars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C6 U+17BB > U+17BB U+17C6');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      const uCharNodes = rhsNode.getChildrenOfType(NodeTypes.U_CHAR);
+      const uCharNodes = rhsNode.getChildrenOfType(NodeType.U_CHAR);
       assert.equal(uCharNodes.length, 2);
     });
     it("can parse correctly (platform, use)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") > use(detectStartOfSentence)');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.USE));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.USE));
     });
     it("can parse correctly (ifs, any, context, layer)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('if(&newLayer = "") if(&layer = "shift") any(ShiftOutSingle) > context layer("default")');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      const ifNodes = lhsNode.getChildrenOfType(NodeTypes.IF);
+      const ifNodes = lhsNode.getChildrenOfType(NodeType.IF);
       assert.equal(ifNodes.length, 2);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.LAYER_SHORTCUT));
     });
     it("can parse correctly (plus, virtual key, u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ [CTRL "."] > U+135E');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      const productionNode = root.getSoleChildOfType(NodeType.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeType.RHS)
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.U_CHAR));
     });
   });
   describe("LhsBlockRule Tests", () => {
@@ -1133,44 +1133,44 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('match');
       const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = root.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.MATCH));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.MATCH));
     });
     it("can parse correctly (nomatch)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nomatch');
       const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = root.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.NOMATCH));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.NOMATCH));
     });
     it("can parse correctly (if-like)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
       const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = root.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
     });
     it("can parse correctly (if-like, input context)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(digit)');
       const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = root.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeType.INPUT_CONTEXT));
     });
     it("can parse correctly (plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
       const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode = root.getSoleChildOfType(NodeType.LHS);
       assert.isNotNull(lhsNode);
-      const keystrokeNode = lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE)
+      const keystrokeNode = lhsNode.getSoleChildOfType(NodeType.KEYSTROKE)
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.ANY));
     });
   });
   describe("InputBlockRule Tests", () => {
@@ -1183,9 +1183,9 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      const uCharNodes = inputContextNode.getChildrenOfType(NodeTypes.U_CHAR);
+      const uCharNodes = inputContextNode.getChildrenOfType(NodeType.U_CHAR);
       assert.equal(uCharNodes.length, 2);
       assert.equal(uCharNodes[0].getText(), 'U+17C1');
       assert.equal(uCharNodes[1].getText(), 'U+17B6');
@@ -1194,10 +1194,10 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") U+17C1 U+17B6');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      const uCharNodes = inputContextNode.getChildrenOfType(NodeTypes.U_CHAR);
+      const uCharNodes = inputContextNode.getChildrenOfType(NodeType.U_CHAR);
       assert.equal(uCharNodes.length, 2);
       assert.equal(uCharNodes[0].getText(), 'U+17C1');
       assert.equal(uCharNodes[1].getText(), 'U+17B6');
@@ -1206,108 +1206,108 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") dk(1)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getChildrenOfType(NodeTypes.DEADKEY));
+      assert.isNotNull(inputContextNode.getChildrenOfType(NodeType.DEADKEY));
     });
     it("can parse correctly (keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(c_key)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (if-like block, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(c_key)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.INPUT_CONTEXT));
     });
     it("can parse correctly (nul, if-like block, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") any(c_key)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.INPUT_CONTEXT));
     });
     it("can parse correctly (plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (if-like block, plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") + any(c_key)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.KEYSTROKE));
     });
     it("can parse correctly (inputContext, plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(output) + any(diacriticKey)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.ANY));
+      const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (if-like, inputContext, plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(output) + any(diacriticKey)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.ANY));
+      const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (nul, if-like, plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") + any(diacriticKey)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (nul, if-like, inputContext, plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") dk(1) + any(diacriticKey)');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getChildrenOfType(NodeTypes.DEADKEY));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(inputContextNode.getChildrenOfType(NodeType.DEADKEY));
+      const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (nul only)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
     });
     it("can parse correctly (nul, if-like block)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch")');
       const inputBlock: Rule = new InputBlockRule();
       assert.isTrue(inputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT));
     });
   });
   describe("InputContextRule Tests", () => {
@@ -1320,44 +1320,44 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(c_shifter)');
       const inputContext: Rule = new InputContextRule();
       assert.isTrue(inputContext.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (two anys)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(digit) any(number)');
       const inputContext: Rule = new InputContextRule();
       assert.isTrue(inputContext.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      const anyNodes = inputContextNode.getChildrenOfType(NodeTypes.ANY);
+      const anyNodes = inputContextNode.getChildrenOfType(NodeType.ANY);
       assert.equal(anyNodes.length, 2);
     });
     it("can parse correctly (text, any)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 any(c_out)');
       const inputContext: Rule = new InputContextRule();
       assert.isTrue(inputContext.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.U_CHAR));
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.U_CHAR));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (any, context)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(digit) context(1)');
       const inputContext: Rule = new InputContextRule();
       assert.isTrue(inputContext.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.CONTEXT));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.ANY));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeType.CONTEXT));
     });
     it("can parse correctly (two anys, continuation)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(digit)\\\nany(number)');
       const inputContext: Rule = new InputContextRule();
       assert.isTrue(inputContext.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      const inputContextNode = root.getSoleChildOfType(NodeType.INPUT_CONTEXT);
       assert.isNotNull(inputContextNode);
-      const anyNodes = inputContextNode.getChildrenOfType(NodeTypes.ANY);
+      const anyNodes = inputContextNode.getChildrenOfType(NodeType.ANY);
       assert.equal(anyNodes.length, 2);
     });
   });
@@ -1371,48 +1371,48 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(digit)');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(root));
-      const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
+      const anyNode = root.getSoleChildOfType(NodeType.ANY);
       assert.isNotNull(anyNode);
-      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(anyNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (notAny)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('notany(digit)');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(root));
-      const notAnyNode = root.getSoleChildOfType(NodeTypes.NOTANY);
+      const notAnyNode = root.getSoleChildOfType(NodeType.NOTANY);
       assert.isNotNull(notAnyNode);
-      assert.isNotNull(notAnyNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(notAnyNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (deadKey [as text])", () => {
       Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(root));
-      const deadKeyNode = root.getSoleChildOfType(NodeTypes.DEADKEY);
+      const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
       assert.isNotNull(deadKeyNode);
-      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (contextStatement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('context(1)');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(root));
-      const contextNode = root.getSoleChildOfType(NodeTypes.CONTEXT);
+      const contextNode = root.getSoleChildOfType(NodeType.CONTEXT);
       assert.isNotNull(contextNode);
-      assert.equal(contextNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+      assert.equal(contextNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (indexStatement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('index(cons, 1)');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'cons');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+      assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'cons');
+      assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+1780');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.U_CHAR));
     });
   });
   describe("KeystrokeRule Tests", () => {
@@ -1425,17 +1425,17 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(digit)');
       const keystroke: Rule = new KeystrokeRule();
       assert.isTrue(keystroke.parse(root));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.ANY));
     });
     it("can parse correctly (text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ U+1780');
       const keystroke: Rule = new KeystrokeRule();
       assert.isTrue(keystroke.parse(root));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.U_CHAR));
     });
   });
   describe("RhsBlockRule Tests", () => {
@@ -1448,34 +1448,34 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('context layer("shift")');
       const rhsBlock: Rule = new RhsBlockRule();
       assert.isTrue(rhsBlock.parse(root));
-      const rhsNode = root.getSoleChildOfType(NodeTypes.RHS);
+      const rhsNode = root.getSoleChildOfType(NodeType.RHS);
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.LAYER_SHORTCUT));
     });
     it("can parse correctly (context only)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('context');
       const rhsBlock: Rule = new RhsBlockRule();
       assert.isTrue(rhsBlock.parse(root));
-      const rhsNode = root.getSoleChildOfType(NodeTypes.RHS);
+      const rhsNode = root.getSoleChildOfType(NodeType.RHS);
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.CONTEXT));
     });
     it("can parse correctly (return only)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('return');
       const rhsBlock: Rule = new RhsBlockRule();
       assert.isTrue(rhsBlock.parse(root));
-      const rhsNode = root.getSoleChildOfType(NodeTypes.RHS);
+      const rhsNode = root.getSoleChildOfType(NodeType.RHS);
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.RETURN));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.RETURN));
     });
     it("can parse correctly (nul only)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul');
       const rhsBlock: Rule = new RhsBlockRule();
       assert.isTrue(rhsBlock.parse(root));
-      const rhsNode = root.getSoleChildOfType(NodeTypes.RHS);
+      const rhsNode = root.getSoleChildOfType(NodeType.RHS);
       assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeType.NUL));
     });
   });
   describe("OutputStatementRule Tests", () => {
@@ -1488,100 +1488,100 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use(main)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      const useNode = root.getSoleChildOfType(NodeType.USE);
       assert.isNotNull(useNode);
-      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+      assert.isNotNull(useNode.getSoleChildOfType(NodeType.GROUPNAME));
     });
     it("can parse correctly (call statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('call(storeName)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const callNode = root.getSoleChildOfType(NodeTypes.CALL);
+      const callNode = root.getSoleChildOfType(NodeType.CALL);
       assert.isNotNull(callNode);
-      assert.isNotNull(callNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(callNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (set statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const setNode = root.getSoleChildOfType(NodeTypes.SET);
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+      const setNode = root.getSoleChildOfType(NodeType.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STORENAME));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (save statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('save(storeName)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const saveNode = root.getSoleChildOfType(NodeTypes.SAVE);
+      const saveNode = root.getSoleChildOfType(NodeType.SAVE);
       assert.isNotNull(saveNode);
-      assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(saveNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (reset statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('reset(storeName)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const resetNode = root.getSoleChildOfType(NodeTypes.RESET);
+      const resetNode = root.getSoleChildOfType(NodeType.RESET);
       assert.isNotNull(resetNode);
-      assert.isNotNull(resetNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(resetNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (deadkey statement [as text])", () => {
       Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const deadKeyNode = root.getSoleChildOfType(NodeTypes.DEADKEY);
+      const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
       assert.isNotNull(deadKeyNode);
-      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (set system store statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const setNode = root.getSoleChildOfType(NodeTypes.SET);
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
-      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+      const setNode = root.getSoleChildOfType(NodeType.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.LAYER));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeType.STRING));
     });
     it("can parse correctly (layer statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
+      const layerNode = root.getSoleChildOfType(NodeType.LAYER_SHORTCUT);
       assert.isNotNull(layerNode);
-      assert.equal(layerNode.getSoleChildOfType(NodeTypes.STRING).getText(), '"shift"');
+      assert.equal(layerNode.getSoleChildOfType(NodeType.STRING).getText(), '"shift"');
     });
     it("can parse correctly (index statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('index(c_out,1)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+      assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'c_out');
+      assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (context statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('context(1)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      const contextNode = root.getSoleChildOfType(NodeTypes.CONTEXT);
+      const contextNode = root.getSoleChildOfType(NodeType.CONTEXT);
       assert.isNotNull(contextNode);
-      assert.equal(contextNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+      assert.equal(contextNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+1780');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.U_CHAR));
     });
     it("can parse correctly (nul [as text])", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.NUL));
     });
     it("can parse correctly (beep)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('beep');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.BEEP));
     });
   });
   describe("Analyser Tests", () => {
@@ -1590,23 +1590,23 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer        = stringToTokenBuffer(buffer);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
-      const storesNode = root.getSoleChildOfType(NodeTypes.STORES);
+      const storesNode = root.getSoleChildOfType(NodeType.STORES);
       assert.isNotNull(storesNode);
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.VERSION));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.NAME));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.COPYRIGHT));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.MESSAGE));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.TARGETS));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.DISPLAYMAP));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.LAYOUTFILE));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.BITMAP));
-      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.VISUALKEYBOARD));
-      const beginNodes = root.getChildrenOfType(NodeTypes.BEGIN);
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.VERSION));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.NAME));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.COPYRIGHT));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.MESSAGE));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.TARGETS));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.DISPLAYMAP));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.LAYOUTFILE));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.KEYBOARDVERSION));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.BITMAP));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeType.VISUALKEYBOARD));
+      const beginNodes = root.getChildrenOfType(NodeType.BEGIN);
       assert.equal(beginNodes.length, 2);
-      assert.equal(beginNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
-      assert.equal(beginNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
-      const storeNodes = storesNode.getChildrenOfType(NodeTypes.STORE);
+      assert.equal(beginNodes[0].getDescendents(NodeType.GROUPNAME)[0].getText(), 'main');
+      assert.equal(beginNodes[1].getDescendents(NodeType.GROUPNAME)[0].getText(), 'PostKeystroke');
+      const storeNodes = storesNode.getChildrenOfType(NodeType.STORE);
       const storeNames = [
         'ShiftOutSingle', 'vCombo1', 'vCombo2', 'vCombo3', 'ShiftOutAll',
         'digit', 'number', 'whitespace', 'c_key', 'c_out',
@@ -1623,27 +1623,27 @@ describe("KMN Analyser Tests", () => {
       ];
       assert.equal(storeNodes.length, storeNames.length);
       storeNames.forEach((name, idx) => {
-        assert.equal(storeNodes[idx].getDescendents(NodeTypes.STORENAME)[0].getText(), name);
+        assert.equal(storeNodes[idx].getDescendents(NodeType.STORENAME)[0].getText(), name);
       });
-      const groupNodes = root.getChildrenOfType(NodeTypes.GROUP);
+      const groupNodes = root.getChildrenOfType(NodeType.GROUP);
       assert.equal(groupNodes.length, 5);
-      assert.equal(groupNodes[0].getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'NewContext');
-      assert.isNotNull(groupNodes[0].getSoleChildOfType(NodeTypes.READONLY));
-      assert.equal(groupNodes[0].getChildrenOfType(NodeTypes.PRODUCTION).length, 1);
-      assert.equal(groupNodes[1].getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'PostKeystroke');
-      assert.isNotNull(groupNodes[1].getSoleChildOfType(NodeTypes.READONLY));
-      assert.equal(groupNodes[1].getChildrenOfType(NodeTypes.PRODUCTION).length, 4);
-      assert.equal(groupNodes[2].getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'detectStartOfSentence');
-      assert.isNotNull(groupNodes[2].getSoleChildOfType(NodeTypes.READONLY));
-      assert.equal(groupNodes[2].getChildrenOfType(NodeTypes.PRODUCTION).length, 1);
-      assert.equal(groupNodes[3].getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'main');
-      assert.isNotNull(groupNodes[3].getSoleChildOfType(NodeTypes.USING_KEYS));
-      assert.equal(groupNodes[3].getChildrenOfType(NodeTypes.PRODUCTION).length, 54);
-      assert.equal(groupNodes[4].getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'normalise');
-      assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.USING_KEYS));
-      assert.equal(groupNodes[4].getChildrenOfType(NodeTypes.PRODUCTION).length, 208);
-      assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.READONLY));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.SOURCE_CODE));
+      assert.equal(groupNodes[0].getSoleChildOfType(NodeType.GROUPNAME).getText(), 'NewContext');
+      assert.isNotNull(groupNodes[0].getSoleChildOfType(NodeType.READONLY));
+      assert.equal(groupNodes[0].getChildrenOfType(NodeType.PRODUCTION).length, 1);
+      assert.equal(groupNodes[1].getSoleChildOfType(NodeType.GROUPNAME).getText(), 'PostKeystroke');
+      assert.isNotNull(groupNodes[1].getSoleChildOfType(NodeType.READONLY));
+      assert.equal(groupNodes[1].getChildrenOfType(NodeType.PRODUCTION).length, 4);
+      assert.equal(groupNodes[2].getSoleChildOfType(NodeType.GROUPNAME).getText(), 'detectStartOfSentence');
+      assert.isNotNull(groupNodes[2].getSoleChildOfType(NodeType.READONLY));
+      assert.equal(groupNodes[2].getChildrenOfType(NodeType.PRODUCTION).length, 1);
+      assert.equal(groupNodes[3].getSoleChildOfType(NodeType.GROUPNAME).getText(), 'main');
+      assert.isNotNull(groupNodes[3].getSoleChildOfType(NodeType.USING_KEYS));
+      assert.equal(groupNodes[3].getChildrenOfType(NodeType.PRODUCTION).length, 54);
+      assert.equal(groupNodes[4].getSoleChildOfType(NodeType.GROUPNAME).getText(), 'normalise');
+      assert.isFalse(groupNodes[4].hasChildOfType(NodeType.USING_KEYS));
+      assert.equal(groupNodes[4].getChildrenOfType(NodeType.PRODUCTION).length, 208);
+      assert.isFalse(groupNodes[4].hasChildOfType(NodeType.READONLY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.SOURCE_CODE));
       //assert.equal(root.toString(), '');
     });
     it("can parse Khmer Angkor correctly (round trip text)", () => {
@@ -1710,7 +1710,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer);
       });
@@ -1812,7 +1812,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -1923,7 +1923,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2034,7 +2034,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2145,7 +2145,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2255,7 +2255,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2364,7 +2364,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2475,7 +2475,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2586,7 +2586,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2697,7 +2697,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
@@ -2736,7 +2736,7 @@ describe("KMN Analyser Tests", () => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeTypes.TMP);
+        root = new ASTNode(NodeType.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });

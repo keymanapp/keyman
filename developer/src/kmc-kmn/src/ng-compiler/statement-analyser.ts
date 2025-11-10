@@ -12,14 +12,14 @@ import { TokenType } from "./token-type.js";
 import { PlainTextRule } from "./kmn-analyser.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
-import { NodeTypes } from "./node-types.js";
+import { NodeType } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   protected leftBracket: Rule;
   protected normalStoreName: Rule;
   protected rightBracket: Rule;
-  protected cmdNodeType: NodeTypes;
+  protected cmdNodeType: NodeType;
 
   public constructor() {
     super();
@@ -29,11 +29,11 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const cmdNode       = tmp.getSoleChildOfType(this.cmdNodeType);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      const storeNameNode = tmp.getSoleChildOfType(NodeType.STORENAME);
       cmdNode.addChild(storeNameNode);
       node.addChild(cmdNode);
     }
@@ -45,7 +45,7 @@ export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
     const any: Rule  = new TokenRule(TokenType.ANY, true);
-    this.cmdNodeType = NodeTypes.ANY;
+    this.cmdNodeType = NodeType.ANY;
     this.rule = new SequenceRule([
       any, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -56,7 +56,7 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
     const call: Rule = new TokenRule(TokenType.CALL, true);
-    this.cmdNodeType = NodeTypes.CALL;
+    this.cmdNodeType = NodeType.CALL;
     this.rule = new SequenceRule([
       call, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -67,7 +67,7 @@ export class DeadkeyStatementRule extends AbstractBracketedStoreNameStatementRul
   public constructor() {
     super();
     const deadkey: Rule = new TokenRule(TokenType.DEADKEY, true);
-    this.cmdNodeType = NodeTypes.DEADKEY;
+    this.cmdNodeType = NodeType.DEADKEY;
     this.rule = new SequenceRule([
       deadkey, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -78,7 +78,7 @@ export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule
   public constructor() {
     super();
     const notany: Rule = new TokenRule(TokenType.NOTANY, true);
-    this.cmdNodeType   = NodeTypes.NOTANY;
+    this.cmdNodeType   = NodeType.NOTANY;
     this.rule = new SequenceRule([
       notany, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -89,7 +89,7 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
     const save: Rule = new TokenRule(TokenType.SAVE, true);
-    this.cmdNodeType = NodeTypes.SAVE;
+    this.cmdNodeType = NodeType.SAVE;
     this.rule = new SequenceRule([
       save, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -102,7 +102,7 @@ abstract class AbstractShortcutRule extends SingleChildRuleParseToTreeFromGivenN
   protected oneOrManyPlainText: Rule;
   protected rightBracket: Rule;
 
-  public constructor(nodeType: NodeTypes) {
+  public constructor(nodeType: NodeType) {
     super(nodeType);
     this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
     this.plainText          = new PlainTextRule();
@@ -113,7 +113,7 @@ abstract class AbstractShortcutRule extends SingleChildRuleParseToTreeFromGivenN
 
 export class BaselayoutStatementRule extends AbstractShortcutRule {
   public constructor() {
-    super(NodeTypes.BASELAYOUT_SHORTCUT);
+    super(NodeType.BASELAYOUT_SHORTCUT);
     const baselayout: Rule = new TokenRule(TokenType.BASELAYOUT_SHORTCUT, true);
     this.rule = new SequenceRule([
       baselayout, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
@@ -123,7 +123,7 @@ export class BaselayoutStatementRule extends AbstractShortcutRule {
 
 export class LayerStatementRule extends AbstractShortcutRule {
   public constructor() {
-    super(NodeTypes.LAYER_SHORTCUT);
+    super(NodeType.LAYER_SHORTCUT);
     const layer: Rule = new TokenRule(TokenType.LAYER_SHORTCUT, true);
     this.rule = new SequenceRule([
       layer, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
@@ -133,7 +133,7 @@ export class LayerStatementRule extends AbstractShortcutRule {
 
 export class PlatformStatementRule extends AbstractShortcutRule {
   public constructor() {
-    super(NodeTypes.PLATFORM_SHORTCUT);
+    super(NodeType.PLATFORM_SHORTCUT);
     const platform: Rule  = new TokenRule(TokenType.PLATFORM_SHORTCUT, true);
     this.rule = new SequenceRule([
       platform, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
@@ -171,7 +171,7 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRuleParseToTreeFr
   protected oneOrManyPlainText: Rule;
 
   public constructor() {
-    super(NodeTypes.IF);
+    super(NodeType.IF);
     this.ifRule             = new TokenRule(TokenType.IF, true);
     this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
     this.comparison         = new ComparisonRule();
@@ -234,7 +234,7 @@ export class ComparisonRule extends SingleChildRule {
 
 export class ContextStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
-    super(NodeTypes.CONTEXT);
+    super(NodeType.CONTEXT);
     const context: Rule       = new TokenRule(TokenType.CONTEXT, true);
     const leftBracket: Rule   = new TokenRule(TokenType.LEFT_BR);
     const offset: Rule        = new OffsetRule();
@@ -250,7 +250,7 @@ export class ContextStatementRule extends SingleChildRuleParseToTreeFromGivenNod
 
 export class IndexStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
-    super(NodeTypes.INDEX);
+    super(NodeType.INDEX);
     const index: Rule           = new TokenRule(TokenType.INDEX, true);
     const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
@@ -277,10 +277,10 @@ export class OffsetRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      node.addNewChildWithToken(NodeTypes.OFFSET, tmp.getSoleChild().token);
+      node.addNewChildWithToken(NodeType.OFFSET, tmp.getSoleChild().token);
     }
     return parseSuccess;
   };
@@ -288,7 +288,7 @@ export class OffsetRule extends SingleChildRule {
 
 export class OutsStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
-    super(NodeTypes.OUTS);
+    super(NodeType.OUTS);
     const outs: Rule         = new TokenRule(TokenType.OUTS, true);
     const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
     const storeName: Rule    = new StoreNameRule();

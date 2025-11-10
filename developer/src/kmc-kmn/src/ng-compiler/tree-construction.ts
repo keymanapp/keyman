@@ -7,7 +7,7 @@
  */
 
 import { Token } from "./lexer.js";
-import { NodeTypes } from "./node-types.js";
+import { NodeType } from "./node-types.js";
 
 /**
  * ASTNode objects form the abstract syntax tree created by the recursive-
@@ -15,7 +15,7 @@ import { NodeTypes } from "./node-types.js";
  * and using the AST to build the in-memory semantic model.
  */
 export class ASTNode {
-  private _nodeType: NodeTypes; // the node type
+  private _nodeType: NodeType; // the node type
   private _token: Token; // a token (if appropriate) from the input
   private children: ASTNode[] = [];
 
@@ -25,7 +25,7 @@ export class ASTNode {
    * @param nodeType the node type
    * @param token a token from the input (or null)
    */
-  public constructor(nodeType: NodeTypes, token: Token=null) {
+  public constructor(nodeType: NodeType, token: Token=null) {
     this._nodeType = nodeType;
     this._token    = token;
   }
@@ -63,7 +63,7 @@ export class ASTNode {
    * @param token the token (or null)
    * @returns this
    */
-  public addNewChildWithToken(nodeType: NodeTypes, token: Token=null): ASTNode {
+  public addNewChildWithToken(nodeType: NodeType, token: Token=null): ASTNode {
     this.addChild(new ASTNode(nodeType, token));
     return this;
   }
@@ -74,7 +74,7 @@ export class ASTNode {
    * @param requiredType the required type
    * @returns an array of matching nodes (or an empty array)
    */
-  public getDescendents(requiredType: NodeTypes) {
+  public getDescendents(requiredType: NodeType) {
     const result: ASTNode[] = [];
     if (requiredType != null) {
       this.collectDescendents(result, requiredType);
@@ -82,7 +82,7 @@ export class ASTNode {
     return result;
   }
 
-  private collectDescendents(result: ASTNode[], requiredType: NodeTypes): void {
+  private collectDescendents(result: ASTNode[], requiredType: NodeType): void {
     if (this.nodeType === requiredType)
       result.push(this);
     for (const child of this.children)
@@ -104,7 +104,7 @@ export class ASTNode {
    * @param requiredType the required type
    * @returns true if there is at least one child of the required type
    */
-  public hasChildOfType(requiredType: NodeTypes): boolean  {
+  public hasChildOfType(requiredType: NodeType): boolean  {
     return this.getChildrenOfType(requiredType).length > 0;
   }
 
@@ -114,7 +114,7 @@ export class ASTNode {
    * @param requiredType the required type
    * @returns true if there is one and only one child of the required type
    */
-  public hasSoleChildOfType(requiredType: NodeTypes): boolean  {
+  public hasSoleChildOfType(requiredType: NodeType): boolean  {
     return this.getChildrenOfType(requiredType).length == 1
   }
 
@@ -134,7 +134,7 @@ export class ASTNode {
    * @param requiredType the required type
    * @returns token text or an empty string
    */
-  public getTextOfType(requiredType: NodeTypes): String  {
+  public getTextOfType(requiredType: NodeType): String  {
     const child: ASTNode = this.getSoleChildOfType(requiredType);
     return (child != null) ? child.getText() : '';
   }
@@ -154,7 +154,7 @@ export class ASTNode {
    *
    * @returns the sole child node or null
    */
-  public getSoleChildOfType(requiredType: NodeTypes): ASTNode {
+  public getSoleChildOfType(requiredType: NodeType): ASTNode {
     const children: ASTNode[] = this.getChildrenOfType(requiredType);
     return (children.length == 1) ? children[0] : null;
   }
@@ -173,7 +173,7 @@ export class ASTNode {
    *
    * @returns the child nodes or an empty array
    */
-  public getChildrenOfType(requiredType: NodeTypes): ASTNode[] {
+  public getChildrenOfType(requiredType: NodeType): ASTNode[] {
     return this.children.filter((child) => child.nodeType === requiredType);
   }
 
@@ -203,7 +203,7 @@ export class ASTNode {
    *
    * @returns the sole child of the required type or null
    */
-  public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
+  public removeSoleChildOfType(requiredType: NodeType): ASTNode {
     return this.hasSoleChildOfType(requiredType) ?
       this.removeChildrenOfType(requiredType)[0] : null;
   }
@@ -213,7 +213,7 @@ export class ASTNode {
    *
    * @returns all children of the required type or an empty array
    */
-  public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
+  public removeChildrenOfType(requiredType: NodeType): ASTNode[] {
     return this.removeChildrenOfTypes([requiredType]);
   }
 
@@ -222,7 +222,7 @@ export class ASTNode {
    *
    * @returns all children of the required types or an empty array
    */
-  public removeChildrenOfTypes(requiredTypes: NodeTypes[]): ASTNode[] {
+  public removeChildrenOfTypes(requiredTypes: NodeType[]): ASTNode[] {
     if (!requiredTypes?.length) {
       return [];
     }
@@ -251,7 +251,7 @@ export class ASTNode {
    *
    * @returns an array of parent trees or an empy array
    */
-  public removeBlocks(parentType: NodeTypes, childType: NodeTypes): ASTNode[] {
+  public removeBlocks(parentType: NodeType, childType: NodeType): ASTNode[] {
     const blocks: ASTNode[]   = [];
     const children: ASTNode[] = [];
     let inParent: boolean     = false;
@@ -309,8 +309,8 @@ export class ASTNode {
    */
   public toText(): string {
     let text: string = '';
-    if (this.hasSoleChildOfType(NodeTypes.SOURCE_CODE)) {
-      const sourceCodeNode = this.getSoleChildOfType(NodeTypes.SOURCE_CODE);
+    if (this.hasSoleChildOfType(NodeType.SOURCE_CODE)) {
+      const sourceCodeNode = this.getSoleChildOfType(NodeType.SOURCE_CODE);
       for (const lineNode of sourceCodeNode.getChildren()) {
         text = text.concat(lineNode.token.line.toString())
       }

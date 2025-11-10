@@ -15,7 +15,7 @@ import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyState
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
 import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyser.js";
 import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyser.js";
-import { NodeTypes } from "./node-types.js";
+import { NodeType } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
@@ -43,56 +43,56 @@ export class KmnTreeRule extends SingleChildRule {
   }
 
   private static STORES_NODETYPES = [
-    NodeTypes.BITMAP,
-    NodeTypes.CASEDKEYS,
-    NodeTypes.COPYRIGHT,
-    NodeTypes.DISPLAYMAP,
-    NodeTypes.ETHNOLOGUECODE,
-    NodeTypes.HOTKEY,
-    NodeTypes.INCLUDECODES,
-    NodeTypes.KEYBOARDVERSION,
-    NodeTypes.KMW_EMBEDCSS,
-    NodeTypes.KMW_EMBEDJS,
-    NodeTypes.KMW_HELPFILE,
-    NodeTypes.KMW_HELPTEXT,
-    NodeTypes.KMW_RTL,
-    NodeTypes.LANGUAGE,
-    NodeTypes.LAYOUTFILE,
-    NodeTypes.MESSAGE,
-    NodeTypes.MNEMONICLAYOUT,
-    NodeTypes.NAME,
-    NodeTypes.TARGETS,
-    NodeTypes.VERSION,
-    NodeTypes.VISUALKEYBOARD,
-    NodeTypes.WINDOWSLANGUAGES,
-    NodeTypes.CAPSALWAYSOFF,
-    NodeTypes.CAPSONONLY,
-    NodeTypes.SHIFTFREESCAPS,
-    NodeTypes.BITMAP_HEADER,
-    NodeTypes.COPYRIGHT_HEADER,
-    NodeTypes.HOTKEY_HEADER,
-    NodeTypes.LANGUAGE_HEADER,
-    NodeTypes.LAYOUT_HEADER,
-    NodeTypes.MESSAGE_HEADER,
-    NodeTypes.NAME_HEADER,
-    NodeTypes.VERSION_HEADER,
-    NodeTypes.STORE,
+    NodeType.BITMAP,
+    NodeType.CASEDKEYS,
+    NodeType.COPYRIGHT,
+    NodeType.DISPLAYMAP,
+    NodeType.ETHNOLOGUECODE,
+    NodeType.HOTKEY,
+    NodeType.INCLUDECODES,
+    NodeType.KEYBOARDVERSION,
+    NodeType.KMW_EMBEDCSS,
+    NodeType.KMW_EMBEDJS,
+    NodeType.KMW_HELPFILE,
+    NodeType.KMW_HELPTEXT,
+    NodeType.KMW_RTL,
+    NodeType.LANGUAGE,
+    NodeType.LAYOUTFILE,
+    NodeType.MESSAGE,
+    NodeType.MNEMONICLAYOUT,
+    NodeType.NAME,
+    NodeType.TARGETS,
+    NodeType.VERSION,
+    NodeType.VISUALKEYBOARD,
+    NodeType.WINDOWSLANGUAGES,
+    NodeType.CAPSALWAYSOFF,
+    NodeType.CAPSONONLY,
+    NodeType.SHIFTFREESCAPS,
+    NodeType.BITMAP_HEADER,
+    NodeType.COPYRIGHT_HEADER,
+    NodeType.HOTKEY_HEADER,
+    NodeType.LANGUAGE_HEADER,
+    NodeType.LAYOUT_HEADER,
+    NodeType.MESSAGE_HEADER,
+    NodeType.NAME_HEADER,
+    NodeType.VERSION_HEADER,
+    NodeType.STORE,
   ];
 
   private gatherStores(node: ASTNode): ASTNode {
     const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeRule.STORES_NODETYPES);
-    const storesNode: ASTNode   = new ASTNode(NodeTypes.STORES);
+    const storesNode: ASTNode   = new ASTNode(NodeType.STORES);
     storesNode.addChildren(storeNodes);
     return storesNode;
   }
 
   private gatherGroups(node: ASTNode): ASTNode[] {
-    return node.removeBlocks(NodeTypes.GROUP, NodeTypes.PRODUCTION);;
+    return node.removeBlocks(NodeType.GROUP, NodeType.PRODUCTION);;
   }
 
   private gatherSourceCode(node: ASTNode): ASTNode {
-    const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeTypes.LINE);
-    const sourceCodeNode: ASTNode = new ASTNode(NodeTypes.SOURCE_CODE);
+    const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeType.LINE);
+    const sourceCodeNode: ASTNode = new ASTNode(NodeType.SOURCE_CODE);
     sourceCodeNode.addChildren(lineNodes);
     return sourceCodeNode;
   }
@@ -196,7 +196,7 @@ export class SimpleTextRule extends SingleChildRule {
 
 export class TextRangeRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
-    super(NodeTypes.RANGE);
+    super(NodeType.RANGE);
     const simpleText: Rule        = new SimpleTextRule();
     const rangeEnd: Rule          = new RangeEndRule();
     const oneOrManyRangeEnd: Rule = new OneOrManyRule(rangeEnd);
@@ -215,7 +215,7 @@ export class RangeEndRule extends SingleChildRule {
 
 export class VirtualKeyRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
-    super(NodeTypes.VIRTUAL_KEY);
+    super(NodeType.VIRTUAL_KEY);
     const leftSquare: Rule   = new TokenRule(TokenType.LEFT_SQ);
     const modifier: Rule     = new ModifierRule();
     const manyModifier: Rule = new ManyRule(modifier);
@@ -237,12 +237,12 @@ export class ModifierRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      let modifierNode = tmp.getSoleChildOfType(NodeTypes.MODIFIER);
+      let modifierNode = tmp.getSoleChildOfType(NodeType.MODIFIER);
       if (modifierNode === null) {
-        modifierNode = new ASTNode(NodeTypes.MODIFIER, tmp.getSoleChild().token);
+        modifierNode = new ASTNode(NodeType.MODIFIER, tmp.getSoleChild().token);
       }
       node.addChild(modifierNode);
     }
@@ -273,7 +273,7 @@ export class RuleBlockRule extends SingleChildRule {
 
 export class BeginStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
-    super(NodeTypes.BEGIN);
+    super(NodeType.BEGIN);
     const begin: Rule          = new TokenRule(TokenType.BEGIN, true);
     const entryPointRule: Rule = new EntryPointRule();
     const optEntryPoint: Rule  = new OptionalRule(entryPointRule);
@@ -305,11 +305,11 @@ export class UseStatementRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const useNode       = tmp.getSoleChildOfType(NodeTypes.USE);
-      const groupNameNode = tmp.getSoleChildOfType(NodeTypes.GROUPNAME);
+      const useNode       = tmp.getSoleChildOfType(NodeType.USE);
+      const groupNameNode = tmp.getSoleChildOfType(NodeType.GROUPNAME);
       useNode.addChild(groupNameNode);
       node.addChild(useNode);
     }
@@ -319,7 +319,7 @@ export class UseStatementRule extends SingleChildRule {
 
 export class GroupStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
-    super(NodeTypes.GROUP);
+    super(NodeType.GROUP);
     const group: Rule              = new TokenRule(TokenType.GROUP, true);
     const leftBracket: Rule        = new TokenRule(TokenType.LEFT_BR);
     const groupName: Rule          = new GroupNameRule();
@@ -344,14 +344,14 @@ export class GroupNameRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const children = tmp.getChildren();
       if (children.length === 1) {
-        node.addNewChildWithToken(NodeTypes.GROUPNAME, children[0].token);
+        node.addNewChildWithToken(NodeType.GROUPNAME, children[0].token);
       } else {
-        const groupNameNode = new ASTNode(NodeTypes.GROUPNAME);
+        const groupNameNode = new ASTNode(NodeType.GROUPNAME);
         groupNameNode.addChildren(children);
         node.addChild(groupNameNode);
       }
@@ -428,10 +428,10 @@ export class UsingKeysRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      node.addChild(new ASTNode(NodeTypes.USING_KEYS));
+      node.addChild(new ASTNode(NodeType.USING_KEYS));
     }
     return parseSuccess;
   }
@@ -447,12 +447,12 @@ export class ProductionBlockRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS);
-      const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
-      const productionNode = new ASTNode(NodeTypes.PRODUCTION);
+      const lhsNode        = tmp.getSoleChildOfType(NodeType.LHS);
+      const rhsNode        = tmp.getSoleChildOfType(NodeType.RHS);
+      const productionNode = new ASTNode(NodeType.PRODUCTION);
       productionNode.addChild(lhsNode);
       productionNode.addChild(rhsNode);
       node.addChild(productionNode);
@@ -463,7 +463,7 @@ export class ProductionBlockRule extends SingleChildRule {
 
 export class LhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
-    super(NodeTypes.LHS);
+    super(NodeType.LHS);
     const match: Rule      = new TokenRule(TokenType.MATCH, true);
     const nomatch: Rule    = new TokenRule(TokenType.NOMATCH, true);
     const inputBlock: Rule = new InputBlockRule();
@@ -490,7 +490,7 @@ export class InputBlockRule extends SingleChildRule {
 
 export class InputContextRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
-    super(NodeTypes.INPUT_CONTEXT);
+    super(NodeType.INPUT_CONTEXT);
     const inputElement = new InputElementRule();
     this.rule = new OneOrManyRule(inputElement);
   }
@@ -516,7 +516,7 @@ export class InputElementRule extends SingleChildRule {
 
 export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
-    super(NodeTypes.KEYSTROKE);
+    super(NodeType.KEYSTROKE);
     const plus: Rule            = new TokenRule(TokenType.PLUS);
     const inputElement          = new InputElementRule();
     const oneOrManyInputElement = new OneOrManyRule(inputElement);
@@ -526,7 +526,7 @@ export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
 
 export class RhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
-    super(NodeTypes.RHS);
+    super(NodeType.RHS);
     const outputStatement: Rule = new OutputStatementRule();
     this.rule = new OneOrManyRule(outputStatement);
   }

@@ -9,7 +9,7 @@
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { NodeTypes } from "./node-types.js";
+import { NodeType } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 import { TOKEN_TO_NODE } from "./token-to-node.js";
 
@@ -58,9 +58,9 @@ export abstract class SingleChildRule extends Rule {
  * method that builds a tree rooted at the given node.
  */
 export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChildRule {
-  protected nodeType: NodeTypes = null;
+  protected nodeType: NodeType = null;
 
-  public constructor(nodeType: NodeTypes) {
+  public constructor(nodeType: NodeType) {
     super();
     this.nodeType = nodeType;
   }
@@ -73,7 +73,7 @@ export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChil
    * @returns true if this rule was successfully parsed
    */
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess && tmp.hasSoleChildOfType(this.nodeType)) {
       const givenNode: ASTNode = tmp.removeSoleChildOfType(this.nodeType);
@@ -89,9 +89,9 @@ export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChil
  * method that builds a tree rooted at a new node.
  */
 export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildRule {
-  protected nodeType: NodeTypes = null;
+  protected nodeType: NodeType = null;
 
-  public constructor(nodeType: NodeTypes) {
+  public constructor(nodeType: NodeType) {
     super();
     this.nodeType = nodeType;
   }
@@ -104,7 +104,7 @@ export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildR
    * @returns true if this rule was successfully parsed
    */
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const newNode: ASTNode = new ASTNode(this.nodeType);
@@ -132,7 +132,7 @@ export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChil
    * @returns true if this rule was successfully parsed
    */
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess && tmp.hasChild()) {
       const firstNode: ASTNode = tmp.removeFirstChild();
@@ -177,7 +177,7 @@ export class SequenceRule extends MultiChildRule {
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     const save: number = Rule.tokenBuffer.currentPosition;
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
 
     for (const rule of this.rules) {
       if (!rule.parse(tmp)) {
@@ -217,7 +217,7 @@ export class AlternateRule extends MultiChildRule {
     let tmp: ASTNode;
 
     for (const rule of this.rules) {
-      tmp = new ASTNode(NodeTypes.TMP);
+      tmp = new ASTNode(NodeType.TMP);
       if (rule.parse(tmp)) {
         parseSuccess = true;
         break;
@@ -253,7 +253,7 @@ export class OptionalRule extends SingleChildRule {
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     const save: number = Rule.tokenBuffer.currentPosition;
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
     parseSuccess = this.rule.parse(tmp);
 
     if (parseSuccess) {
@@ -289,7 +289,7 @@ export class ManyRule extends SingleChildRule {
     let parseSuccess: boolean = true;
     while (parseSuccess) {
       const save: number = Rule.tokenBuffer.currentPosition;
-      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      const tmp: ASTNode = new ASTNode(NodeType.TMP);
       parseSuccess       = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
@@ -324,7 +324,7 @@ export class OneOrManyRule extends SingleChildRule {
     let parseSuccess: boolean    = true;
     do {
       const save: number = Rule.tokenBuffer.currentPosition;
-      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      const tmp: ASTNode = new ASTNode(NodeType.TMP);
       parseSuccess       = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
@@ -341,7 +341,7 @@ export class OneOrManyRule extends SingleChildRule {
  * TokenRule represents a Token (terminal) in the BNF.
  */
 export class TokenRule extends Rule {
-  private static tokenToNodeMap: Map<TokenType, NodeTypes>;
+  private static tokenToNodeMap: Map<TokenType, NodeType>;
   private tokenType: TokenType;
   private addNode: boolean; // whether to add an ASTNode if the rule succeeds
 
@@ -360,7 +360,7 @@ export class TokenRule extends Rule {
   private static tokenToNode = TOKEN_TO_NODE;
 
   static {
-    TokenRule.tokenToNodeMap = new Map<TokenType, NodeTypes>();
+    TokenRule.tokenToNodeMap = new Map<TokenType, NodeType>();
     for (const map of TokenRule.tokenToNode) {
       TokenRule.tokenToNodeMap.set(map.tokenType, map.nodeType);
     }
@@ -384,7 +384,7 @@ export class TokenRule extends Rule {
       parseSuccess = true;
       Rule.tokenBuffer.popToken();
       if (this.addNode) {
-        const nodeType: NodeTypes = TokenRule.tokenToNodeMap.get(token.tokenType);
+        const nodeType: NodeType = TokenRule.tokenToNodeMap.get(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
           // TODO: warning if there is no valid mapping
@@ -397,7 +397,7 @@ export class TokenRule extends Rule {
     return parseSuccess;
   }
 
-  public static getNodeType(tokenType: TokenType): NodeTypes {
+  public static getNodeType(tokenType: TokenType): NodeType {
     return TokenRule.tokenToNodeMap.get(tokenType);
   }
 }
@@ -444,7 +444,7 @@ export class AlternateTokenRule extends Rule {
       parseSuccess = true;
       Rule.tokenBuffer.popToken();
       if (this.addNode) {
-        const nodeType: NodeTypes = TokenRule.getNodeType(token.tokenType);
+        const nodeType: NodeType = TokenRule.getNodeType(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
         }
