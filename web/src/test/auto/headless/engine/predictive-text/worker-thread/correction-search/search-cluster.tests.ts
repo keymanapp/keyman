@@ -94,7 +94,7 @@ export const buildAlphabeticClusterFixtures = () => {
   const cluster_k3c4 = new SearchCluster([path_k3c4_i4d0, path_k3c4_i5d1]);
 
   // Input 4
-  const distrib_c2_i1d0: Distribution<Transform> = [ // most likely for id 11
+  const distrib_c2_i1d0: Distribution<Transform> = [
     { sample: { insert: 'n', deleteLeft: 0, deleteRight: 0, id: 14 }, p: 0.12 },
     { sample: { insert: 'p', deleteLeft: 0, deleteRight: 0, id: 14 }, p: 0.08 },
   ];
@@ -121,6 +121,19 @@ export const buildAlphabeticClusterFixtures = () => {
   // entirely on path_k1c2, which must be split at index 1.
   const cluster_k4c5 = new SearchCluster([path_k4c5_i2, path_k4c5_i1]);
 
+  // Input 5 (currently used only for merge tests)
+  const distrib_c3_i2d0: Distribution<Transform> = [
+    { sample: { insert: 'xy', deleteLeft: 0, deleteRight: 0, id: 15 }, p: 0.6 } // most likely for id 15
+  ];
+  const distrib_c3_i1d0: Distribution<Transform> = [
+    { sample: { insert: 'z', deleteLeft: 0, deleteRight: 0, id: 15 }, p: 0.4 }
+  ];
+
+  const path_k5c6_a = new SearchPath(cluster_k4c4, distrib_c3_i2d0, distrib_c3_i2d0[0]);
+  const path_k5c6_b = new SearchPath(cluster_k4c5, distrib_c3_i1d0, distrib_c3_i2d0[0]);
+
+  const cluster_k5c6 = new SearchCluster([path_k5c6_a, path_k5c6_b]);
+
   return {
     distributions: {
       1: {
@@ -138,6 +151,10 @@ export const buildAlphabeticClusterFixtures = () => {
       4: {
         distrib_c2_i1d0,
         distrib_c2_i2d0
+      },
+      5: {
+        distrib_c3_i1d0,
+        distrib_c3_i2d0
       }
     },
     paths: {
@@ -166,13 +183,18 @@ export const buildAlphabeticClusterFixtures = () => {
         path_k4c5_i2,
         path_k4c5_i1,
         path_k4c6
+      },
+      5: {
+        path_k5c6_a,
+        path_k5c6_b
       }
     },
     clusters: {
       cluster_k3c3,
       cluster_k3c4,
       cluster_k4c4,
-      cluster_k4c5
+      cluster_k4c5,
+      cluster_k5c6
     }
   }
 }
@@ -844,17 +866,55 @@ describe('SearchCluster', () => {
     });
 
     it('merges in a SearchCluster with unsplit initial inputs', () => {
-      // can use:
-      // - cluster_k3c3 => path_k4c4_i1
-      // - cluster_k3c3 => path_k4c5_i2
-      // add a new keystroke to create cluster_k5c6
-      //
-      // also create a cluster starting with the input from those two paths,
-      // with the same followups.
+      const fixture = buildAlphabeticClusterFixtures();
+
+      // This is the cluster we wish to merge new content into.
+      const cluster_k3c3 = fixture.clusters.cluster_k3c3;
+
+      // Now, we manually construct the right-hand side that we wish to merge in.
+      const rightRoot = new SearchPath(testModel);
+
+      const pathA1 = new SearchPath(rightRoot, fixture.distributions[4].distrib_c2_i1d0, fixture.paths[4].path_k4c4_i1.inputSource);
+      const pathB1 = new SearchPath(rightRoot, fixture.distributions[4].distrib_c2_i2d0, fixture.paths[4].path_k4c5_i2.inputSource);
+
+      const pathA2 = new SearchPath(pathA1, fixture.distributions[5].distrib_c3_i2d0, fixture.paths[5].path_k5c6_a.inputSource);
+      const pathB2 = new SearchPath(pathB1, fixture.distributions[5].distrib_c3_i1d0, fixture.paths[5].path_k5c6_b.inputSource);
+
+      const rightHandCluster = new SearchCluster([pathA2, pathB2]);
+
+      const merged = cluster_k3c3.merge(rightHandCluster);
+
+      assert.isTrue(merged.isSameSpace(fixture.clusters.cluster_k5c6));
     });
 
     it('merges in a SearchPath with multiple inputs & an ancestor SearchCluster', () => {
-      // Append a new input to that hypothetical cluster_k5c6 and use that for the test.
+      const fixture = buildAlphabeticClusterFixtures();
+
+      // This is the cluster we wish to merge new content into.
+      const cluster_k3c3 = fixture.clusters.cluster_k3c3;
+
+      // Now, we manually construct the right-hand side that we wish to merge in.
+      const rightRoot = new SearchPath(testModel);
+
+      const pathA1 = new SearchPath(rightRoot, fixture.distributions[4].distrib_c2_i1d0, fixture.paths[4].path_k4c4_i1.inputSource);
+      const pathB1 = new SearchPath(rightRoot, fixture.distributions[4].distrib_c2_i2d0, fixture.paths[4].path_k4c5_i2.inputSource);
+
+      const pathA2 = new SearchPath(pathA1, fixture.distributions[5].distrib_c3_i2d0, fixture.paths[5].path_k5c6_a.inputSource);
+      const pathB2 = new SearchPath(pathB1, fixture.distributions[5].distrib_c3_i1d0, fixture.paths[5].path_k5c6_b.inputSource);
+
+      const rightHandCluster = new SearchCluster([pathA2, pathB2]); // endpoint for prior test.
+
+      // Append an extra path step.
+      const final_dist: Distribution<Transform> = [
+        { sample: { insert: '0', deleteLeft: 0, deleteRight: 0, id: 16 }, p: 0.6 }, // most likely for id 16
+        { sample: { insert: '1', deleteLeft: 0, deleteRight: 0, id: 16 }, p: 0.4 }
+      ];
+
+      const targetFinalPath = new SearchPath(fixture.clusters.cluster_k5c6, final_dist, final_dist[0]);
+      const rightHandFinalPath = new SearchPath(rightHandCluster, final_dist, targetFinalPath.inputSource);
+
+      const merged = cluster_k3c3.merge(rightHandFinalPath);
+      assert.isTrue(merged.isSameSpace(targetFinalPath));
     });
 
     it('remerges the components of a previous .split() result that split input keystrokes', () => {
