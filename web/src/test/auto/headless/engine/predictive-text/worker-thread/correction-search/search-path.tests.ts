@@ -1321,7 +1321,12 @@ describe('SearchPath', () => {
         {sample: { insert: 'ce', deleteLeft: 1, deleteRight: 0, id: 42 }, p: 0.04}
       ];
       const headTarget = new SearchPath(
-        path, headDistributionSplit, inputDistribution[0]
+        path, headDistributionSplit, {
+          trueTransform:   inputDistribution[0].sample,
+          bestProbFromSet: inputDistribution[0].p,
+          inputStartIndex: 0,
+          subsetId: pathToSplit.inputSource.subsetId
+        }
       );
 
       const tailDistributionSplit = [
@@ -1335,7 +1340,8 @@ describe('SearchPath', () => {
         new SearchPath(testModel), tailDistributionSplit, {
           trueTransform: inputDistribution[0].sample,
           bestProbFromSet: inputDistribution[0].p,
-          inputStartIndex: 2
+          inputStartIndex: 2,
+          subsetId: pathToSplit.inputSource.subsetId
         }
       );
 
