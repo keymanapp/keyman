@@ -39,26 +39,38 @@ type CompleteSearchPath = {
 
 export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
-/**
- * Models the properties and portion of an input event applied by a SearchSpace for
- * correction-search purposes.
- */
-export interface TokenInputSource {
+export interface InputSegment {
   /**
    * The Transform corresponding to the keystroke applied to the true context
    * for this input event.
    *
-   * NOTE:  outside of use for .sourceText / .likeliestSourceText, the only part
-   * that should actually be referenced is the Transform / transition ID.
+   * @deprecated Slated for removal within epic/autocorrect.
    */
   trueTransform: Transform;
 
   /**
+   * The transform / transition ID of the corresponding input event.
+   */
+  transitionId: number,
+
+  /**
    * Marks the initial index (inclusive) within the insert strings for the
-   * corresponding transitions' Transforms that is applied by the corresponding
+   * corresponding transitions' Transforms that are applied by the corresponding
    * tokenized correction-search input.
    */
-  inputStartIndex: number;
+  start: number
+}
+
+/**
+ * Models the properties and portion of an input event applied by a SearchSpace for
+ * correction-search purposes.
+ */
+export interface PathInputProperties {
+  /**
+   * Denotes the portion of the ongoing input stream represented by the corresponding
+   * input distribution(s) of a SearchSpace.
+   */
+  segment: InputSegment;
 
   /**
    * Notes the highest probability found in the input event's transform
@@ -154,8 +166,10 @@ export interface SearchQuotientNode {
   /**
    * Gets components useful for building a string-based representation of the
    * keystroke range corrected by this search space.
+   *
+   * TODO: will return only the `inputSegment` part of each entry in the future.
    */
-  readonly sourceIdentifiers: TokenInputSource[];
+  readonly inputSegments: PathInputProperties[];
 }
 
 /**

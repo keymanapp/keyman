@@ -11,7 +11,7 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode } from './distance-modeler.js';
-import { PathResult, SearchQuotientNode, TokenInputSource } from './search-quotient-node.js';
+import { PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -28,7 +28,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
    * @param inputs
    * @param bestProbFromSet
    */
-  constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: TokenInputSource | ProbabilityMass<Transform>) {
+  constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: PathInputProperties | ProbabilityMass<Transform>) {
     super(space, inputs, inputSource);
     this.queueNodes(this.buildEdgesForNodes(space.previousResults.map(r => r.node)));
     return;
