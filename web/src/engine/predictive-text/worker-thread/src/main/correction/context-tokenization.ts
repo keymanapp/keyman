@@ -590,7 +590,6 @@ export class ContextTokenization {
 
       const inputSource: PathInputProperties = {
         segment: {
-          trueTransform: sourceInput,
           transitionId: sourceInput.id,
           start: appliedLength
         },

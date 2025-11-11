@@ -13,7 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
+import { generateSpaceSeed, InputSegment, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
@@ -78,7 +78,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       const keystroke = inputSource as ProbabilityMass<Transform>;
       inputSource = {
         segment: {
-          trueTransform: keystroke.sample,
           transitionId: keystroke.sample.id,
           start: 0
         },
@@ -422,29 +421,29 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
-  public get inputSegments(): PathInputProperties[] {
+  public get inputSegments(): InputSegment[] {
     if(!this.parentNode) {
       return [];
     }
 
-    const parentSources = this.parentNode.inputSegments;
+    const segments = this.parentNode.inputSegments;
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
-      if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
+      if(inputId !== undefined && segments.length > 0 && segments[segments.length - 1].transitionId == inputId) {
         // Fuse the input sources!
-        const tailSrc = parentSources.pop();
+        const tailSegment = segments.pop();
         // Deep-copy the object and replace the segment end value.
-        const extendedTailSrc = {...tailSrc, segment: {...tailSrc.segment, end: this.inputSource.segment.end}};
-        if(extendedTailSrc.segment.end) {
-          delete extendedTailSrc.segment.end;
+        const extendedTailSegment = {...tailSegment, end: this.inputSource.segment.end};
+        if(extendedTailSegment.end) {
+          delete extendedTailSegment.end;
         }
-        parentSources.push(extendedTailSrc);
+        segments.push(extendedTailSegment);
       } else {
-        parentSources.push(this.inputSource);
+        segments.push(this.inputSource.segment);
       }
     }
 
-    return parentSources;
+    return segments;
   }
 
   /**
@@ -453,17 +452,17 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.inputSegments;
+    const segments = this.inputSegments;
 
-    for(const source of sources) {
-      const i = source.segment.start;
-      const j = source.segment.end;
-      let component = (`T${source.segment.transitionId}`);
+    for(const segment of segments) {
+      const i = segment.start;
+      const j = segment.end;
+      let component = (`T${segment.transitionId}`);
 
       const parentSegs = this.parentNode.inputSegments;
       // It is possible for an .end to be 0 after a split - if an input's
       // left-deletions are applied without applying any of its insert string.
-      const midInputStart = i != 0 || parentSegs[parentSegs.length - 1]?.segment.end !== undefined;
+      const midInputStart = i != 0 || parentSegs[parentSegs.length - 1]?.end !== undefined;
 
       // If there's an entry for end, always include the start position
       if(j !== undefined) {
