@@ -202,11 +202,11 @@ export class SearchCluster implements SearchSpace {
       // In such a case... the 'leading edge' of the incoming space needs to be checked
       // against the trailing edge of `this` instance's entries.
       const thisTailInputSource = this.inputSegments[this.inputSegments.length - 1];
+      const thisTailSpaceIds = this.parents.map((path) => path.inputSource.subsetId);
       const spaceHeadInputSource = space.inputSegments[0];
 
       const isOnSplitInput =
-        // At this stage, spaceHeadInputSource.subsetId should not be accessible; clusters can't properly give that.
-        thisTailInputSource.transitionId == spaceHeadInputSource.transitionId
+        thisTailSpaceIds.find((entry) => entry == space.inputSource.subsetId)
         && thisTailInputSource.end == spaceHeadInputSource.start;
 
       // In this case, we only rebuild the single path; an outer stack frame will reconstitute
