@@ -99,7 +99,6 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
-    "@keymanapp/web-sentry-manager": "*",
     "@sentry/cli": "^2.31.0",
     "@zip.js/zip.js": "^2.7.32",
     "c8": "^7.12.0",
