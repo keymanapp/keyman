@@ -49,6 +49,10 @@ export interface SearchSpace {
    */
   readonly spaceId: number;
 
+  /**
+   * Notes the SearchSpace(s) whose correction-search paths are extended by this
+   * SearchSpace.
+   */
   readonly parents: SearchSpace[];
 
   /**
