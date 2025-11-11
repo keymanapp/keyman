@@ -39,11 +39,31 @@ type CompleteSearchPath = {
 export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 /**
- * Notes critical properties of the inputs comprising each ContextToken.
+ * Models the properties and portion of an input event applied by a SearchSpace for
+ * correction-search purposes.
  */
 export interface TokenInputSource {
+  /**
+   * The Transform corresponding to the keystroke applied to the true context
+   * for this input event.
+   *
+   * NOTE:  outside of use for .sourceText / .likeliestSourceText, the only part
+   * that should actually be referenced is the Transform / transition ID.
+   */
   trueTransform: Transform;
+
+  /**
+   * Marks the initial index (inclusive) within the insert strings for the
+   * corresponding transitions' Transforms that is applied by the corresponding
+   * tokenized correction-search input.
+   */
   inputStartIndex: number;
+
+  /**
+   * Notes the highest probability found in the input event's transform
+   * distribution, regardless of whether or not that specific corresponding
+   * input is included within the SearchSpace's correction space.
+   */
   bestProbFromSet: number;
 }
 
@@ -58,6 +78,10 @@ export interface SearchSpace {
    */
   readonly spaceId: number;
 
+  /**
+   * Notes the SearchSpace(s) whose correction-search paths are extended by this
+   * SearchSpace.
+   */
   readonly parents: SearchSpace[];
 
   /**
