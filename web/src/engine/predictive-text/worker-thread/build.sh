@@ -24,11 +24,11 @@ SUBPROJECT_NAME=engine/predictive-text/worker-thread
 
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
-  "@/common/tools/es-bundling" \
-  "@/common/web/keyman-version" \
-  "@/web/src/tools/building/sourcemap-root" \
-  "@../wordbreakers" \
-  "@../templates" \
+  "@/common/tools/es-bundling   build" \
+  "@/common/web/keyman-version  build" \
+  "@/web/src/tools/building/sourcemap-root build" \
+  "@../wordbreakers build" \
+  "@../templates build" \
   configure clean build test \
   "--inspect  Runs browser-based tests in a locally-inspectable mode"
 

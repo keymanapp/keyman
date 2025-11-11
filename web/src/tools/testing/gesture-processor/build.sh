@@ -16,7 +16,7 @@ BUILD_DIR=/web/build/tools/testing/gesture-processor
 ################################ Main script ################################
 
 builder_describe "Testing-oriented tools for the Gesture Processor module of web-based Keyman OSKs" \
-  "@/common/tools/es-bundling" \
+  "@/common/tools/es-bundling   build" \
   "clean" \
   "build" \
   ":fixture       The HTML-element fixture and CSS fixture used for both user-testing and unit-testing" \
@@ -27,8 +27,8 @@ builder_parse "$@"
 
 builder_describe_outputs \
   configure            /node_modules \
-  build:fixture        "${BUILD_DIR}/host-fixture.html" \
-  build:recorder       "${BUILD_DIR}/recorder/build/recorder.mjs" \
+  build:fixture        "${BUILD_DIR}/unit-test-resources/host-fixture.html" \
+  build:recorder       "/web/tools/testing/gesture-processor/recorder/build/recorder.mjs" \
   build:test-module    "${BUILD_DIR}/unit-test-resources/lib/index.mjs"
 
 # TODO: build if out-of-date if test is specified

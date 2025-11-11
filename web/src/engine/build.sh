@@ -15,14 +15,14 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # ################################ Main script ################################
 
 builder_describe "Builds Keyman Engine for Web (KMW)" \
-  "@/core:wasm" \
-  "@/common/tools/es-bundling" \
-  "@/web/src/engine/predictive-text" \
-  "@/web/src/common/web-utils" \
+  "@/core:wasm                 build" \
+  "@/common/tools/es-bundling  build" \
+  "@/web/src/common/web-utils  build" \
   "clean" \
   "configure" \
   "build" \
-  "test"
+  "test" \
+  ":predictive-text"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -67,7 +67,11 @@ do_build () {
   node src/osk/validate-gesture-specs.js
 }
 
-builder_run_action configure node_select_version_and_npm_ci
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/engine"
+builder_run_child_actions clean
+builder_run_action configure node_select_version_and_npm_ci
+builder_run_child_actions configure
+builder_run_child_actions build
 builder_run_action build do_build
 builder_run_action test test-headless-typescript engine
+builder_run_child_actions test

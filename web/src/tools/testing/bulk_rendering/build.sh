@@ -16,10 +16,9 @@ SUBPROJECT_NAME=tools/testing/bulk_rendering
 ################################ Main script ################################
 
 builder_describe "Builds a 'bulk renderer' that loads all the cloud keyboards from api.keyman.com and renders each of them to a document." \
-  "@/common/tools/es-bundling" \
+  "@/common/tools/es-bundling build" \
   "@/web/src/common/web-utils build" \
-  "@/web/src/app/browser build" \
-  "@/web/src/app/ui build" \
+  "@/web/src/app/browser      build" \
   "clean" \
   "configure     runs 'npm ci' on root folder" \
   "build         (default) builds bulk_renderer to web/build/$SUBPROJECT_NAME/"
