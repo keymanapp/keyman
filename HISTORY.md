@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.159 alpha 2025-11-11
+
+* maint(core): fix option defaults for Meson >= 1.1 (#15131)
+
 ## 19.0.158 alpha 2025-11-10
 
 * fix(web): add unit tests for DeadkeyTracker and fix a few bugs (#15113)
