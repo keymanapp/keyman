@@ -32,8 +32,10 @@ export class SearchPath implements SearchSpace {
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: TokenInputSource;
 
-  private parentSpace: SearchSpace;
+  readonly parentSpace: SearchSpace;
   readonly spaceId: number;
+
+  readonly inputCount: number;
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
   // is cheaper than iteratively building a priority queue.
@@ -106,6 +108,7 @@ export class SearchPath implements SearchSpace {
       }
 
       this.inputs = inputs;
+      this.inputCount = parentSpace.inputCount + 1;
       this.inputSource = inputSrc;
       this.lowestPossibleSingleCost = parentSpace.lowestPossibleSingleCost + logTierCost;
       this.parentSpace = parentSpace;
@@ -118,6 +121,7 @@ export class SearchPath implements SearchSpace {
     const model = arg1 as LexicalModel;
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestPossibleSingleCost = 0;
+    this.inputCount = 0;
   }
 
   /**
@@ -182,14 +186,6 @@ export class SearchPath implements SearchSpace {
     // Shallow-copies the array to prevent external modification; the Transforms
     // are marked Readonly to prevent their modification as well.
     return [...this.inputs];
-  }
-
-  public get inputCount(): number {
-    if(!this.parentSpace) {
-      return 0;
-    } else {
-      return this.parentSpace.inputCount + 1;
-    }
   }
 
   public get bestExample(): {text: string, p: number} {
