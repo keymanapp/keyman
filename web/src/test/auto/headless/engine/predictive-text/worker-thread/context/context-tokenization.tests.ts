@@ -444,13 +444,13 @@ describe('ContextTokenization', function() {
       );
 
       const boundaryToken = tokenization.tokens[tokenization.tokens.length-3];
-      const boundaryTailInput = boundaryToken.sourceIdentifiers[boundaryToken.sourceIdentifiers.length - 1];
+      const boundaryTailInput = boundaryToken.inputSegments[boundaryToken.inputSegments.length - 1];
       assert.deepEqual(boundaryTailInput, {segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 0}, bestProbFromSet: 1});
 
       // The new tail tokens should not include anything from the original tail;
       // the token should be replaced.
-      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].sourceIdentifiers, [{segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 0}, bestProbFromSet: 1}]);
-      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].sourceIdentifiers, [{segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 1}, bestProbFromSet: 1}]);
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].inputSegments, [{segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 0}, bestProbFromSet: 1}]);
+      assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputSegments, [{segment: {trueTransform: inputTransform, transitionId: inputTransform.id, start: 1}, bestProbFromSet: 1}]);
 
       const tailIndex = tokenization.tokens.length - 1;
       for(let i of inputTransformMap.keys()) {

@@ -346,12 +346,12 @@ export class SearchPath implements SearchSpace {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
-  public get sourceIdentifiers(): PathInputProperties[] {
+  public get inputSegments(): PathInputProperties[] {
     if(!this.parentSpace) {
       return [];
     }
 
-    const parentSources = this.parentSpace.sourceIdentifiers;
+    const parentSources = this.parentSpace.inputSegments;
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
       if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
@@ -370,7 +370,7 @@ export class SearchPath implements SearchSpace {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.sourceIdentifiers;
+    const sources = this.inputSegments;
 
     for(const source of sources) {
       const i = source.segment.start;

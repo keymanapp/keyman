@@ -104,9 +104,9 @@ describe('ContextToken', function() {
 
       const merged = ContextToken.merge([token1, token2, token3], plainModel);
       assert.equal(merged.exampleInput, "can't");
-      token1.sourceIdentifiers.forEach((entry) => assert.isTrue(merged.sourceIdentifiers.indexOf(entry) > -1));
-      token2.sourceIdentifiers.forEach((entry) => assert.isTrue(merged.sourceIdentifiers.indexOf(entry) > -1));
-      token3.sourceIdentifiers.forEach((entry) => assert.isTrue(merged.sourceIdentifiers.indexOf(entry) > -1));
+      token1.inputSegments.forEach((entry) => assert.isTrue(merged.inputSegments.indexOf(entry) > -1));
+      token2.inputSegments.forEach((entry) => assert.isTrue(merged.inputSegments.indexOf(entry) > -1));
+      token3.inputSegments.forEach((entry) => assert.isTrue(merged.inputSegments.indexOf(entry) > -1));
 
       assert.isTrue(merged.searchSpace.hasInputs([
         [{sample: { insert: 'c', deleteLeft: 0 }, p: 1}],
@@ -153,7 +153,7 @@ describe('ContextToken', function() {
 
       const merged = ContextToken.merge([token1, token2, token3], plainModel);
       assert.equal(merged.exampleInput, "can't");
-      assert.deepEqual(merged.sourceIdentifiers, [ { segment: {trueTransform: srcTransform, transitionId: srcTransform.id, start: 0}, bestProbFromSet: 1 } ]);
+      assert.deepEqual(merged.inputSegments, [ { segment: {trueTransform: srcTransform, transitionId: srcTransform.id, start: 0}, bestProbFromSet: 1 } ]);
       assert.equal(merged.searchSpace.inputCount, 1);
       assert.deepEqual((merged.searchSpace as SearchPath).lastInput, [{sample: srcTransform, p: 1}]);
     });
@@ -231,7 +231,7 @@ describe('ContextToken', function() {
 
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
-      assert.deepEqual(merged.sourceIdentifiers, srcTransforms.map((t) => ({ segment: {trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
+      assert.deepEqual(merged.inputSegments, srcTransforms.map((t) => ({ segment: {trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
       assert.isTrue(merged.searchSpace.hasInputs(
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
       ));
@@ -310,7 +310,7 @@ describe('ContextToken', function() {
 
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
-      assert.deepEqual(merged.sourceIdentifiers, srcTransforms.map((t) => ({segment: { trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
+      assert.deepEqual(merged.inputSegments, srcTransforms.map((t) => ({segment: { trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
       assert.isTrue(merged.searchSpace.hasInputs(
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
       ));
@@ -410,7 +410,7 @@ describe('ContextToken', function() {
 
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
-      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.sourceIdentifiers[0]), [0, 3, 8].map(i => ({
+      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.inputSegments[0]), [0, 3, 8].map(i => ({
         segment: {
           trueTransform: {
             insert: 'biglargetransform',
@@ -475,7 +475,7 @@ describe('ContextToken', function() {
 
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
-      assert.deepEqual(resultsOfSplit[0].sourceIdentifiers, [
+      assert.deepEqual(resultsOfSplit[0].inputSegments, [
         {
           segment: {
             trueTransform: keystrokeDistributions[0][0].sample,
@@ -492,7 +492,7 @@ describe('ContextToken', function() {
           bestProbFromSet: 1
         },
       ]);
-      assert.deepEqual(resultsOfSplit[1].sourceIdentifiers, [
+      assert.deepEqual(resultsOfSplit[1].inputSegments, [
         {
           segment: {
             trueTransform: keystrokeDistributions[1][0].sample,
@@ -509,7 +509,7 @@ describe('ContextToken', function() {
           bestProbFromSet: 1
         },
       ]);
-      assert.deepEqual(resultsOfSplit[2].sourceIdentifiers, [
+      assert.deepEqual(resultsOfSplit[2].inputSegments, [
         {
           segment: {
             trueTransform: keystrokeDistributions[2][0].sample,
@@ -609,7 +609,7 @@ describe('ContextToken', function() {
 
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
-      assert.deepEqual(resultsOfSplit[0].sourceIdentifiers, [{
+      assert.deepEqual(resultsOfSplit[0].inputSegments, [{
           segment: {
             trueTransform: keystrokeDistributions[0][0].sample,
             transitionId: keystrokeDistributions[0][0].sample.id,
@@ -625,7 +625,7 @@ describe('ContextToken', function() {
           bestProbFromSet: 1
         },
       ]);
-      assert.deepEqual(resultsOfSplit[1].sourceIdentifiers, [{
+      assert.deepEqual(resultsOfSplit[1].inputSegments, [{
           segment: {
             trueTransform: keystrokeDistributions[1][0].sample,
             transitionId: keystrokeDistributions[1][0].sample.id,
@@ -641,7 +641,7 @@ describe('ContextToken', function() {
           bestProbFromSet: 1
         }
       ]);
-      assert.deepEqual(resultsOfSplit[2].sourceIdentifiers, [{
+      assert.deepEqual(resultsOfSplit[2].inputSegments, [{
         segment: {
           trueTransform: keystrokeDistributions[2][0].sample,
           transitionId: keystrokeDistributions[2][0].sample.id,

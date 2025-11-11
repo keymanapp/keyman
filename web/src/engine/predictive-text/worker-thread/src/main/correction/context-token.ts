@@ -146,8 +146,8 @@ export class ContextToken {
    * Denotes the original keystroke Transforms comprising the range corresponding
    * to this token.
    */
-  get sourceIdentifiers() {
-    return this.searchSpace.sourceIdentifiers;
+  get inputSegments() {
+    return this.searchSpace.inputSegments;
   }
 
   /**
@@ -197,7 +197,7 @@ export class ContextToken {
       }
 
       // Are we re-merging on a previously split transform?
-      if(lastSourceInput?.segment.trueTransform != token.sourceIdentifiers[0].segment.trueTransform) {
+      if(lastSourceInput?.segment.trueTransform != token.inputSegments[0].segment.trueTransform) {
         if(lastSourceInput) {
           resultToken.addInput(lastSourceInput, lastInputDistrib);
         } // else:  there's nothing to add as input
@@ -226,9 +226,9 @@ export class ContextToken {
       // Ignore the last entry for now - it may need to merge with a matching
       // entry in the next token!
       for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.sourceIdentifiers[i], token.searchSpace.inputSequence[i]);
+        resultToken.addInput(token.inputSegments[i], token.searchSpace.inputSequence[i]);
       }
-      lastSourceInput = token.sourceIdentifiers[inputCount-1];
+      lastSourceInput = token.inputSegments[inputCount-1];
       lastInputDistrib = token.searchSpace.inputSequence[inputCount-1];
     }
 
@@ -251,7 +251,7 @@ export class ContextToken {
 
     // Build an alternate version of the transforms:  if we preprocess all deleteLefts,
     // what text remains from each?
-    const alteredSources = preprocessInputSources(this.sourceIdentifiers);
+    const alteredSources = preprocessInputSources(this.inputSegments);
 
     const blankContext = { left: '', startOfBuffer: true, endOfBuffer: true };
     const splitSpecs = split.matches.slice();
@@ -307,7 +307,7 @@ export class ContextToken {
           };
         });
 
-        const priorSourceInput = overextendedToken.sourceIdentifiers[lastInputIndex];
+        const priorSourceInput = overextendedToken.inputSegments[lastInputIndex];
         constructingToken.addInput(priorSourceInput, headDistribution);
         tokensFromSplit.push(constructingToken);
 
@@ -335,7 +335,7 @@ export class ContextToken {
       backupToken = new ContextToken(constructingToken);
       lenBeforeLastApply = KMWString.length(currentText.left);
       currentText = applyTransform(alteredSources[transformIndex].segment.trueTransform, currentText);
-      constructingToken.addInput(this.sourceIdentifiers[transformIndex], this.searchSpace.inputSequence[transformIndex]);
+      constructingToken.addInput(this.inputSegments[transformIndex], this.searchSpace.inputSequence[transformIndex]);
       transformIndex++;
     }
 

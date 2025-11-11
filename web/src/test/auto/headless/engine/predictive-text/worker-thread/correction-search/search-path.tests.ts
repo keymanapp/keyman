@@ -77,7 +77,7 @@ describe('SearchPath', () => {
       assert.deepEqual(extendedPath.bestExample, {text: 't', p: 0.5});
       assert.deepEqual(extendedPath.parents, [rootPath]);
       assert.deepEqual(extendedPath.inputs, leadEdgeDistribution);
-      assert.deepEqual(extendedPath.sourceIdentifiers, [
+      assert.deepEqual(extendedPath.inputSegments, [
         {
           segment: {
             trueTransform: leadEdgeDistribution[0].sample,
@@ -133,7 +133,7 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tr', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
-      assert.deepEqual(length2Path.sourceIdentifiers, [
+      assert.deepEqual(length2Path.inputSegments, [
         {
           segment: {
             trueTransform: leadEdgeDistribution[0].sample,
@@ -211,7 +211,7 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tri', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
-      assert.deepEqual(length2Path.sourceIdentifiers, [
+      assert.deepEqual(length2Path.inputSegments, [
         {
           segment: {
             trueTransform: leadEdgeDistribution[0].sample,

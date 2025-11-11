@@ -40,7 +40,10 @@ export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 export interface InputSegment {
   /**
+   * The Transform corresponding to the keystroke applied to the true context
+   * for this input event.
    *
+   * @deprecated Slated for removal within epic/autocorrect.
    */
   trueTransform: Transform;
 
@@ -178,7 +181,7 @@ export interface SearchSpace {
    *
    * TODO: will return only the `inputSegment` part of each entry in the future.
    */
-  readonly sourceIdentifiers: PathInputProperties[];
+  readonly inputSegments: PathInputProperties[];
 
   /**
    * Gets a compact string-based representation of `inputRange` that
