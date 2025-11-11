@@ -13,7 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
+import { generateSpaceSeed, InputSegment, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
@@ -78,7 +78,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       const keystroke = inputSource as ProbabilityMass<Transform>;
       inputSource = {
         segment: {
-          trueTransform: keystroke.sample,
           transitionId: keystroke.sample.id,
           start: 0
         },
@@ -460,7 +459,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
-  public get inputSegments(): PathInputProperties[] {
+  public get inputSegments(): InputSegment[] {
     if(!this.parentNode) {
       return [];
     }
@@ -468,11 +467,11 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const parentSources = this.parentNode.inputSegments;
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
-      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
+      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].transitionId == inputId) {
         return parentSources;
       }
 
-      parentSources.push(this.inputSource);
+      parentSources.push(this.inputSource.segment);
     }
 
     return parentSources;
@@ -484,12 +483,12 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.inputSegments;
+    const segments = this.inputSegments;
 
-    for(const source of sources) {
-      const i = source.segment.start;
-      const j = source.segment.end;
-      let component = (`T${source.segment.transitionId}${i != 0 || j !== undefined  ? '@' + i : ''}`);
+    for(const segment of segments) {
+      const i = segment.start;
+      const j = segment.end;
+      let component = (`T${segment.transitionId}${i != 0 || j !== undefined  ? '@' + i : ''}`);
       if(j) {
         component = component + '-' + j;
       }
