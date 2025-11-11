@@ -180,7 +180,6 @@ describe('SearchCluster', () => {
       assert.isNumber(cluster.spaceId);
       assert.deepEqual(cluster.bestExample, {text: '', p: 1});
       assert.deepEqual(cluster.parents, [path]);
-      assert.equal(cluster.likeliestSourceText, '');
     });
 
     it('initializes from arbitrary SearchPath', () => {
@@ -218,18 +217,13 @@ describe('SearchCluster', () => {
       assert.notEqual(cluster.spaceId, length1Path.spaceId);
       assert.deepEqual(cluster.bestExample, {text: 'tr', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(cluster.parents, [length2Path]);
-      assert.equal(cluster.likeliestSourceText, 'tr');
-      assert.deepEqual(cluster.sourceIdentifiers, [
+      assert.deepEqual(cluster.inputSegments, [
         {
-          trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p,
-          subsetId: length1Path.inputSource.subsetId
+          transitionId: leadEdgeDistribution[0].sample.id,
+          start: 0
         }, {
-          trueTransform: tailEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: tailEdgeDistribution[0].p,
-          subsetId: length2Path.inputSource.subsetId
+          transitionId: tailEdgeDistribution[0].sample.id,
+          start: 0
         }
       ]);
     });

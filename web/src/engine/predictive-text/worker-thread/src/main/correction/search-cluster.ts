@@ -195,6 +195,27 @@ export class SearchCluster implements SearchSpace {
     throw new Error('Method not implemented.');
   }
 
+  isSameSpace(space: SearchSpace): boolean {
+    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // a perfect match.
+    if(this == space || this.spaceId == space.spaceId) {
+      return true;
+    }
+
+    // If it's falsy or a different SearchSpace type, that's an easy filter.
+    if(!space || !(space instanceof SearchCluster)) {
+      return false;
+    }
+
+    // We need to check if the parents match.  Done naively in the manner below, this is O(N^2).
+    // Granted, we shouldn't have _that_ many incoming paths.
+    if(this.parents.find((path) => !space.parents.find((path2) => path.isSameSpace(path2)))) {
+      return false;
+    }
+
+    return true;
+  }
+
   get constituentPaths(): SearchPath[][] {
     return this.parents.flatMap((p) => p.constituentPaths);
   }
