@@ -12,7 +12,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchPath } from "./search-path.js";
-import { SearchSpace, TokenInputSource } from "./search-space.js";
+import { SearchSpace, PathInputProperties } from "./search-space.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -110,8 +110,11 @@ export class ContextToken {
 
       rawTransformDistributions.forEach((entry) => {
         searchSpace = new SearchPath(searchSpace, entry, {
-          trueTransform: entry[0].sample,
-          inputStartIndex: 0,
+          segment: {
+            trueTransform: entry[0].sample,
+            transitionId: entry[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: 1
         });
       });
@@ -124,7 +127,7 @@ export class ContextToken {
    * Call this to record the original keystroke Transforms for the context range
    * corresponding to this token.
    */
-  addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
+  addInput(inputSource: PathInputProperties, distribution: Distribution<Transform>) {
     this._searchSpace = new SearchPath(this._searchSpace, distribution, inputSource);
   }
 
@@ -143,7 +146,7 @@ export class ContextToken {
    * Denotes the original keystroke Transforms comprising the range corresponding
    * to this token.
    */
-  get inputRange() {
+  get sourceIdentifiers() {
     return this.searchSpace.sourceIdentifiers;
   }
 
@@ -161,15 +164,6 @@ export class ContextToken {
    */
   get sourceRangeKey(): string {
     return this.searchSpace.sourceRangeKey;
-  }
-
-  /**
-   * Gets a simple, compact string-based representation of `inputRange`.
-   *
-   * This should only ever be used for debugging purposes.
-   */
-  get sourceText(): string {
-    return this.searchSpace.likeliestSourceText;
   }
 
   /**
@@ -192,7 +186,7 @@ export class ContextToken {
     // Thus, we don't set the .isWhitespace flag field.
     const resultToken = new ContextToken(lexicalModel);
 
-    let lastSourceInput: TokenInputSource;
+    let lastSourceInput: PathInputProperties;
     let lastInputDistrib: Distribution<Transform>;
     for(const token of tokensToMerge) {
       const inputCount = token.inputCount;
@@ -203,7 +197,7 @@ export class ContextToken {
       }
 
       // Are we re-merging on a previously split transform?
-      if(lastSourceInput?.trueTransform != token.inputRange[0].trueTransform) {
+      if(lastSourceInput?.segment.trueTransform != token.sourceIdentifiers[0].segment.trueTransform) {
         if(lastSourceInput) {
           resultToken.addInput(lastSourceInput, lastInputDistrib);
         } // else:  there's nothing to add as input
@@ -232,9 +226,9 @@ export class ContextToken {
       // Ignore the last entry for now - it may need to merge with a matching
       // entry in the next token!
       for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.inputRange[i], token.searchSpace.inputSequence[i]);
+        resultToken.addInput(token.sourceIdentifiers[i], token.searchSpace.inputSequence[i]);
       }
-      lastSourceInput = token.inputRange[inputCount-1];
+      lastSourceInput = token.sourceIdentifiers[inputCount-1];
       lastInputDistrib = token.searchSpace.inputSequence[inputCount-1];
     }
 
@@ -257,7 +251,7 @@ export class ContextToken {
 
     // Build an alternate version of the transforms:  if we preprocess all deleteLefts,
     // what text remains from each?
-    const alteredSources = preprocessInputSources(this.inputRange);
+    const alteredSources = preprocessInputSources(this.sourceIdentifiers);
 
     const blankContext = { left: '', startOfBuffer: true, endOfBuffer: true };
     const splitSpecs = split.matches.slice();
@@ -313,15 +307,17 @@ export class ContextToken {
           };
         });
 
-        const priorSourceInput = overextendedToken.inputRange[lastInputIndex];
+        const priorSourceInput = overextendedToken.sourceIdentifiers[lastInputIndex];
         constructingToken.addInput(priorSourceInput, headDistribution);
         tokensFromSplit.push(constructingToken);
 
         constructingToken = new ContextToken(lexicalModel);
         backupToken = new ContextToken(constructingToken);
         constructingToken.addInput({
-          trueTransform: priorSourceInput.trueTransform,
-          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded,
+          segment: {
+            ...priorSourceInput.segment,
+            start: priorSourceInput.segment.start + extraCharsAdded
+          },
           bestProbFromSet: priorSourceInput.bestProbFromSet
         }, tailDistribution);
 
@@ -338,8 +334,8 @@ export class ContextToken {
 
       backupToken = new ContextToken(constructingToken);
       lenBeforeLastApply = KMWString.length(currentText.left);
-      currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
-      constructingToken.addInput(this.inputRange[transformIndex], this.searchSpace.inputSequence[transformIndex]);
+      currentText = applyTransform(alteredSources[transformIndex].segment.trueTransform, currentText);
+      constructingToken.addInput(this.sourceIdentifiers[transformIndex], this.searchSpace.inputSequence[transformIndex]);
       transformIndex++;
     }
 
@@ -347,25 +343,25 @@ export class ContextToken {
   }
 }
 
-export function preprocessInputSources(inputSources: ReadonlyArray<TokenInputSource>) {
+export function preprocessInputSources(inputSources: ReadonlyArray<PathInputProperties>) {
   const alteredSources = deepCopy(inputSources);
   let trickledDeleteLeft = 0;
   for(let i = alteredSources.length - 1; i >= 0; i--) {
     const source = alteredSources[i];
     if(trickledDeleteLeft) {
-      const insLen = KMWString.length(source.trueTransform.insert);
+      const insLen = KMWString.length(source.segment.trueTransform.insert);
       if(insLen <= trickledDeleteLeft) {
-        source.trueTransform.insert = '';
+        source.segment.trueTransform.insert = '';
         trickledDeleteLeft -= insLen;
       } else {
-        source.trueTransform.insert = KMWString.substring(source.trueTransform.insert, 0, insLen - trickledDeleteLeft);
+        source.segment.trueTransform.insert = KMWString.substring(source.segment.trueTransform.insert, 0, insLen - trickledDeleteLeft);
         trickledDeleteLeft = 0;
       }
     }
-    trickledDeleteLeft += source.trueTransform.deleteLeft;
-    source.trueTransform.deleteLeft = 0;
+    trickledDeleteLeft += source.segment.trueTransform.deleteLeft;
+    source.segment.trueTransform.deleteLeft = 0;
   }
 
-  alteredSources[0].trueTransform.deleteLeft = trickledDeleteLeft;
+  alteredSources[0].segment.trueTransform.deleteLeft = trickledDeleteLeft;
   return alteredSources;
 }
