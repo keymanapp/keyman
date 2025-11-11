@@ -1322,9 +1322,12 @@ describe('SearchPath', () => {
       ];
       const headTarget = new SearchPath(
         path, headDistributionSplit, {
-          trueTransform:   inputDistribution[0].sample,
+          segment: {
+            trueTransform: inputDistribution[0].sample,
+            transitionId:  inputDistribution[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: inputDistribution[0].p,
-          inputStartIndex: 0,
           subsetId: pathToSplit.inputSource.subsetId
         }
       );
@@ -1338,9 +1341,12 @@ describe('SearchPath', () => {
       ];
       const tailTarget = new SearchPath(
         new SearchPath(testModel), tailDistributionSplit, {
-          trueTransform: inputDistribution[0].sample,
+          segment: {
+            trueTransform: inputDistribution[0].sample,
+            transitionId: inputDistribution[0].sample.id,
+            start: 2
+          },
           bestProbFromSet: inputDistribution[0].p,
-          inputStartIndex: 2,
           subsetId: pathToSplit.inputSource.subsetId
         }
       );
