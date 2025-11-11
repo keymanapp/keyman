@@ -302,11 +302,14 @@ export class SearchPath implements SearchSpace {
       // Now to re-merge the two halves.
       const mergedInputSource = {
         ...this.inputSource,
-        inputSplitIndex: space.inputSource.inputSplitIndex
+        segment: {
+          ...this.inputSource.segment,
+          end: space.inputSource.segment.end
+        }
       };
 
-      if(mergedInputSource.inputSplitIndex == undefined) {
-        delete mergedInputSource.inputSplitIndex;
+      if(mergedInputSource.segment.end == undefined) {
+        delete mergedInputSource.segment.end;
       }
 
       return new SearchPath(this.parentSpace, mergedInputs, mergedInputSource);
@@ -564,11 +567,11 @@ export class SearchPath implements SearchSpace {
     }
 
     // We check the indices of the input's split if one occurred.
-    if(this.inputSource?.inputSplitIndex != space.inputSource?.inputSplitIndex) {
+    if(this.inputSource?.segment.end != space.inputSource?.segment.end) {
       return false;
     }
 
-    if(this.inputSource?.inputStartIndex != space.inputSource?.inputStartIndex) {
+    if(this.inputSource?.segment.start != space.inputSource?.segment.start) {
       return false;
     }
 
