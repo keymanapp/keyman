@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { generateSubsetId, models, SearchPath, TokenInputSource } from '@keymanapp/lm-worker/test-index';
+import { generateSubsetId, models, SearchPath, PathInputProperties } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -1416,9 +1416,12 @@ describe('SearchPath', () => {
           [{ sample: {insert: 'transform', deleteLeft: 0, id: 11}, p: 1 }]
         ];
 
-        const originalInputBase: TokenInputSource = {
-          trueTransform: {insert: 'biglargetransform', deleteLeft: 0, id: 11},
-          inputStartIndex: 0,
+        const originalInputBase: PathInputProperties = {
+          segment: {
+            trueTransform: {insert: 'biglargetransform', deleteLeft: 0, id: 11},
+            transitionId: 11,
+            start: 0
+          },
           bestProbFromSet: 1,
           subsetId: generateSubsetId()
         };
@@ -1434,7 +1437,7 @@ describe('SearchPath', () => {
         };
       }
 
-      const checkFinalStateAssertions = (merged: SearchPath, originalInput: TokenInputSource) => {
+      const checkFinalStateAssertions = (merged: SearchPath, originalInput: PathInputProperties) => {
         assert.equal(merged.inputCount, 1);
         assert.isTrue(merged instanceof SearchPath);
         assert.deepEqual(merged.bestExample.text, "biglargetransform");
@@ -1507,7 +1510,7 @@ describe('SearchPath', () => {
     // Covers many common aspects of SearchPath merging, though not merging of
     // multi-member distributions.
     describe(`previously-split token comprised of complex, rewriting transforms:  cello`, () => {
-      const buildPath = (inputs: Distribution<Transform>[], sources: TokenInputSource[], root?: SearchPath) => {
+      const buildPath = (inputs: Distribution<Transform>[], sources: PathInputProperties[], root?: SearchPath) => {
         return inputs.reduce((path, input, index) => new SearchPath(path, input, sources[index]), root ?? new SearchPath(testModel));
       }
 
@@ -1524,11 +1527,14 @@ describe('SearchPath', () => {
           ]
         ];
 
-        const trueInputSources: TokenInputSource[] = trueDistributions.map((d) => {
+        const trueInputSources: PathInputProperties[] = trueDistributions.map((d) => {
           return {
-            trueTransform: d[0].sample,
+            segment: {
+              trueTransform: d[0].sample,
+              transitionId: d[0].sample.id,
+              start: 0
+            },
             bestProbFromSet: d[0].p,
-            inputStartIndex: 0,
             subsetId: generateSubsetId()
           }
         })
@@ -1555,7 +1561,7 @@ describe('SearchPath', () => {
             [{ sample: {insert: 'ent', deleteLeft: 0, id: 12}, p: 1 }],
             ...trueDistributions.slice(2)
           ], [
-            {...trueInputSources[1], inputStartIndex: 0},
+            {...trueInputSources[1], segment: {...trueInputSources[1].segment, start: 0}},
             ...trueInputSources.slice(2)
           ])
         ]);
@@ -1571,7 +1577,7 @@ describe('SearchPath', () => {
             [{ sample: {insert: 'llar', deleteLeft: 0, id: 13}, p: 1 }],
             ...trueDistributions.slice(3)
           ], [
-            {...trueInputSources[2], inputStartIndex: 0},
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 0}},
             ...trueInputSources.slice(3)
           ])
         ]);
@@ -1587,7 +1593,7 @@ describe('SearchPath', () => {
             [{ sample: {insert: 'lar', deleteLeft: 0, id: 13}, p: 1 }],
             ...trueDistributions.slice(3)
           ], [
-            {...trueInputSources[2], inputStartIndex: 1},
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 1}},
             ...trueInputSources.slice(3)
           ])
         ]);
@@ -1602,7 +1608,7 @@ describe('SearchPath', () => {
           buildPath([
             [{ sample: {insert: 'o', deleteLeft: 0, id: 14}, p: 1 }]
           ], [
-            {...trueInputSources[3], inputStartIndex: 0},
+            {...trueInputSources[3], segment: {...trueInputSources[3].segment, start: 0}},
           ])
         ]);
 
@@ -1629,7 +1635,7 @@ describe('SearchPath', () => {
         assert.deepEqual(remergedPath.bestExample, mergeTarget.bestExample);
         assert.equal(remergedPath.inputCount, mergeTarget.inputCount);
         assert.equal(remergedPath.codepointLength, mergeTarget.codepointLength);
-        assert.sameDeepOrderedMembers(remergedPath.sourceIdentifiers, mergeTarget.sourceIdentifiers);
+        assert.sameDeepOrderedMembers(remergedPath.inputSegments, mergeTarget.inputSegments);
         assert.isTrue(remergedPath.hasInputs(trueDistributions));
       }
 
@@ -1675,7 +1681,7 @@ describe('SearchPath', () => {
 
     // Same as the prior set, but now with non-BMP text!
     describe(`previously-split token comprised of complex, rewriting non-BMP transforms`, () => {
-      const buildPath = (inputs: Distribution<Transform>[], sources: TokenInputSource[], root?: SearchPath) => {
+      const buildPath = (inputs: Distribution<Transform>[], sources: PathInputProperties[], root?: SearchPath) => {
         return inputs.reduce((path, input, index) => new SearchPath(path, input, sources[index]), root ?? new SearchPath(testModel));
       }
 
@@ -1692,11 +1698,14 @@ describe('SearchPath', () => {
           ]
         ];
 
-        const trueInputSources: TokenInputSource[] = trueDistributions.map((d) => {
+        const trueInputSources: PathInputProperties[] = trueDistributions.map((d) => {
           return {
-            trueTransform: d[0].sample,
+            segment: {
+              trueTransform: d[0].sample,
+              transitionId: d[0].sample.id,
+              start: 0
+            },
             bestProbFromSet: d[0].p,
-            inputStartIndex: 0,
             subsetId: generateSubsetId()
           }
         })
@@ -1723,7 +1732,7 @@ describe('SearchPath', () => {
             [{ sample: {insert: toMathematicalSMP('ent'), deleteLeft: 0, id: 12}, p: 1 }],
             ...trueDistributions.slice(2)
           ], [
-            {...trueInputSources[1], inputStartIndex: 0},
+            {...trueInputSources[1], segment: {...trueInputSources[1].segment, start: 0}},
             ...trueInputSources.slice(2)
           ])
         ]);
@@ -1739,7 +1748,7 @@ describe('SearchPath', () => {
             [{ sample: {insert: toMathematicalSMP('llar'), deleteLeft: 0, id: 13}, p: 1 }],
             ...trueDistributions.slice(3)
           ], [
-            {...trueInputSources[2], inputStartIndex: 0},
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 0}},
             ...trueInputSources.slice(3)
           ])
         ]);
@@ -1755,7 +1764,7 @@ describe('SearchPath', () => {
             [{ sample: {insert: toMathematicalSMP('lar'), deleteLeft: 0, id: 13}, p: 1 }],
             ...trueDistributions.slice(3)
           ], [
-            {...trueInputSources[2], inputStartIndex: 1},
+            {...trueInputSources[2], segment: {...trueInputSources[2].segment, start: 1}},
             ...trueInputSources.slice(3)
           ])
         ]);
@@ -1770,7 +1779,7 @@ describe('SearchPath', () => {
           buildPath([
             [{ sample: {insert: toMathematicalSMP('o'), deleteLeft: 0, id: 14}, p: 1 }]
           ], [
-            {...trueInputSources[3], inputStartIndex: 0},
+            {...trueInputSources[3], segment: {...trueInputSources[3].segment, start: 0}},
           ])
         ]);
 
@@ -1797,7 +1806,7 @@ describe('SearchPath', () => {
         assert.deepEqual(remergedPath.bestExample, mergeTarget.bestExample);
         assert.equal(remergedPath.inputCount, mergeTarget.inputCount);
         assert.equal(remergedPath.codepointLength, mergeTarget.codepointLength);
-        assert.sameDeepOrderedMembers(remergedPath.sourceIdentifiers, mergeTarget.sourceIdentifiers);
+        assert.sameDeepOrderedMembers(remergedPath.inputSegments, mergeTarget.inputSegments);
         assert.isTrue(remergedPath.hasInputs(trueDistributions));
         assert.isTrue(remergedPath.isSameSpace(mergeTarget));
       }
@@ -1876,9 +1885,12 @@ describe('SearchPath', () => {
       ];
       const headPath = new SearchPath(
         path, headDistributionSplit, {
-          trueTransform: inputDistribution[0].sample,
+          segment: {
+            trueTransform: inputDistribution[0].sample,
+            transitionId: inputDistribution[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: inputDistribution[0].p,
-          inputStartIndex: 0,
           subsetId: mergeTarget.inputSource.subsetId
         }
       );
@@ -1892,9 +1904,12 @@ describe('SearchPath', () => {
       ];
       const tailPath = new SearchPath(
         new SearchPath(testModel), tailDistributionSplit, {
-          trueTransform: inputDistribution[0].sample,
+          segment: {
+            trueTransform: inputDistribution[0].sample,
+            transitionId: inputDistribution[0].sample.id,
+            start: 2
+          },
           bestProbFromSet: inputDistribution[0].p,
-          inputStartIndex: 2,
           subsetId: mergeTarget.inputSource.subsetId
         }
       );
