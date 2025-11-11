@@ -10,12 +10,10 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { applyTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchQuotientNode, TokenInputSource } from './search-quotient-node.js';
+import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 
-import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
@@ -29,7 +27,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 export abstract class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   readonly inputs?: Distribution<Transform>;
-  readonly inputSource?: TokenInputSource;
+  readonly inputSource?: PathInputProperties;
 
   private parentNode: SearchQuotientNode;
   readonly spaceId: number;
@@ -59,29 +57,32 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    * 2.  The sample from the incoming distribution that represents data actually
    * applied to the context.  It need not be included within the subset passed to `inputs`.
    */
-  constructor(parentNode: SearchQuotientNode, inputs?: Distribution<Transform>, inputSource?: TokenInputSource | ProbabilityMass<Transform>) {
+  constructor(parentNode: SearchQuotientNode, inputs?: Distribution<Transform>, inputSource?: PathInputProperties | ProbabilityMass<Transform>) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
     this.spaceId = generateSpaceSeed();
 
     // Coerce inputSource to TokenInputSource format.
-    if(inputSource && (inputSource as TokenInputSource).trueTransform == undefined) {
+    if(inputSource && (inputSource as ProbabilityMass<Transform>).sample != undefined) {
       const keystroke = inputSource as ProbabilityMass<Transform>;
       inputSource = {
-        trueTransform: keystroke.sample,
-        bestProbFromSet: keystroke.p,
-        inputStartIndex: 0
+        segment: {
+          trueTransform: keystroke.sample,
+          transitionId: keystroke.sample.id,
+          start: 0
+        },
+        bestProbFromSet: keystroke.p
       }
     };
-    const inputSrc = inputSource as TokenInputSource;
+    const inputSrc = inputSource as PathInputProperties;
 
     const transitionId = (inputs?.[0].sample.id);
-    if(transitionId !== undefined && inputSrc?.trueTransform.id != transitionId) {
+    if(transitionId !== undefined && inputSrc?.segment.transitionId != transitionId) {
       throw new Error("Input distribution and input-source transition IDs must match");
     }
 
     this.parentNode = parentNode;
-    this.inputSource = inputSource as TokenInputSource;
+    this.inputSource = inputSource as PathInputProperties;
     this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
@@ -155,23 +156,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
-  }
-
-  get likeliestSourceText(): string {
-    let prefixContext: Context = { left: this.parentNode?.likeliestSourceText ?? '', startOfBuffer: true, endOfBuffer: true };
-    const inputTransform = this.inputSource?.trueTransform ?? { insert: '', deleteLeft: 0 };
-
-    const excessDeletes = inputTransform.deleteLeft - KMWString.length(prefixContext.left);
-    if(excessDeletes > 0) {
-      prefixContext = {
-        ...prefixContext,
-        // \u{2421} = ␡ (Unicode symbol for Delete)
-        left: '\u{2421}'.repeat(excessDeletes) + prefixContext.left
-      };
-    }
-
-    const result = applyTransform(inputTransform, prefixContext);
-    return result.left;
   }
 
   get parents() {
@@ -310,15 +294,15 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
-  public get sourceIdentifiers(): TokenInputSource[] {
+  public get inputSegments(): PathInputProperties[] {
     if(!this.parentNode) {
       return [];
     }
 
-    const parentSources = this.parentNode.sourceIdentifiers;
+    const parentSources = this.parentNode.inputSegments;
     if(this.inputSource) {
-      const inputId = this.inputSource.trueTransform.id;
-      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+      const inputId = this.inputSource.segment.transitionId;
+      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
         return parentSources;
       }
 
@@ -334,11 +318,11 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.sourceIdentifiers;
+    const sources = this.inputSegments;
 
     for(const source of sources) {
-      const i = source.inputStartIndex;
-      components.push(`T${source.trueTransform.id}${i != 0 ? '@' + i : ''}`);
+      const i = source.segment.start;
+      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
     }
 
     return components.join('+');
