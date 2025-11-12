@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.160 alpha 2025-11-12
+
+* fix(android): Change Alert Dialog instead of Toast if package missing keyboard and lexical-model files (#15098)
+* chore(linux): add support for Ubuntu 26.04 LTS Resolute (#15137)
+
 ## 19.0.159 alpha 2025-11-11
 
 * maint(core): fix option defaults for Meson >= 1.1 (#15131)
