@@ -152,4 +152,6 @@ testing and packing keyboards for distribution.
 
 Various build-time tools for Keyman Developer.
 
+## epic/ldml-editor
 
+Starting point for the new vscode-extension-hosted LDML keyboard editor.
