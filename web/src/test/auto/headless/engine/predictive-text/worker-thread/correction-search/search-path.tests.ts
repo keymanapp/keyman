@@ -24,24 +24,24 @@ export function buildSimplePathSplitFixture() {
     { sample: {insert: 'r', deleteLeft: 0, id: 11}, p: 0.4 },
     { sample: {insert: 't', deleteLeft: 0, id: 11}, p: 0.1 }
   ];
-  const path1 = new SearchPath(rootPath, distrib1, distrib1[0].p);
+  const path1 = new SearchPath(rootPath, distrib1, distrib1[0]);
 
   const distrib2 = [
     { sample: {insert: 'a', deleteLeft: 0, id: 12}, p: 0.7 },
     { sample: {insert: 'e', deleteLeft: 0, id: 12}, p: 0.3 }
   ];
-  const path2 = new SearchPath(path1, distrib2, distrib2[0].p);
+  const path2 = new SearchPath(path1, distrib2, distrib2[0]);
 
   const distrib3 = [
     { sample: {insert: 'n', deleteLeft: 0, id: 13}, p: 0.8 },
     { sample: {insert: 'r', deleteLeft: 0, id: 13}, p: 0.2 }
   ];
-  const path3 = new SearchPath(path2, distrib3, distrib3[0].p);
+  const path3 = new SearchPath(path2, distrib3, distrib3[0]);
 
   const distrib4 = [
     { sample: {insert: 't', deleteLeft: 0, id: 14}, p: 1 }
   ];
-  const path4 = new SearchPath(path3, distrib4, distrib4[0].p);
+  const path4 = new SearchPath(path3, distrib4, distrib4[0]);
 
   return {
     paths: [rootPath, path1, path2, path3, path4],
@@ -58,6 +58,7 @@ describe('SearchPath', () => {
       assert.deepEqual(path.bestExample, {text: '', p: 1});
       assert.deepEqual(path.parents, []);
       assert.isNotOk(path.inputs);
+      assert.equal(path.likeliestSourceText, '');
     });
 
     it('may be extended from root path', () => {
@@ -69,7 +70,7 @@ describe('SearchPath', () => {
         {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
       ];
 
-      const extendedPath = new SearchPath(rootPath, leadEdgeDistribution, leadEdgeDistribution[0].p);
+      const extendedPath = new SearchPath(rootPath, leadEdgeDistribution, leadEdgeDistribution[0]);
 
       assert.equal(extendedPath.inputCount, 1);
       assert.isNumber(extendedPath.spaceId);
@@ -77,6 +78,14 @@ describe('SearchPath', () => {
       assert.deepEqual(extendedPath.bestExample, {text: 't', p: 0.5});
       assert.deepEqual(extendedPath.parents, [rootPath]);
       assert.deepEqual(extendedPath.inputs, leadEdgeDistribution);
+      assert.equal(extendedPath.likeliestSourceText, 't');
+      assert.deepEqual(extendedPath.sourceIdentifiers, [
+        {
+          trueTransform: leadEdgeDistribution[0].sample,
+          inputStartIndex: 0,
+          bestProbFromSet: leadEdgeDistribution[0].p
+        }
+      ]);
 
       // Assert the root is unchanged.
       assert.equal(rootPath.inputCount, 0);
@@ -99,7 +108,7 @@ describe('SearchPath', () => {
       const length1Path = new SearchPath(
         rootPath,
         leadEdgeDistribution,
-        leadEdgeDistribution[0].p
+        leadEdgeDistribution[0]
       );
 
       const tailEdgeDistribution = [
@@ -111,7 +120,7 @@ describe('SearchPath', () => {
       const length2Path = new SearchPath(
         length1Path,
         tailEdgeDistribution,
-        tailEdgeDistribution[0].p
+        tailEdgeDistribution[0]
       );
 
       // Verify that the prior distribution remains fully unaltered.
@@ -123,6 +132,18 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tr', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
+      assert.equal(length2Path.likeliestSourceText, 'tr');
+      assert.deepEqual(length2Path.sourceIdentifiers, [
+        {
+          trueTransform: leadEdgeDistribution[0].sample,
+          inputStartIndex: 0,
+          bestProbFromSet: leadEdgeDistribution[0].p
+        }, {
+          trueTransform: tailEdgeDistribution[0].sample,
+          inputStartIndex: 0,
+          bestProbFromSet: tailEdgeDistribution[0].p
+        }
+      ]);
 
       assert.equal(length1Path.inputCount, 1);
       assert.isNumber(length1Path.spaceId);
@@ -130,6 +151,21 @@ describe('SearchPath', () => {
       assert.deepEqual(length1Path.bestExample, {text: 't', p: 0.5});
       assert.deepEqual(length1Path.parents, [rootPath]);
       assert.deepEqual(length1Path.inputs, leadEdgeDistribution);
+    });
+
+    it('throws if input and input-source transition IDs mismatch', () => {
+      const rootPath = new SearchPath(testModel);
+
+      const leadEdgeDistribution = [
+        {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
+        {sample: {insert: 'a', deleteLeft: 0, id: 13 }, p: 0.3},
+        {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
+      ];
+
+      assert.throws(() => new SearchPath(rootPath, leadEdgeDistribution, {
+        ...leadEdgeDistribution[0],
+        sample: {...leadEdgeDistribution[0].sample, id: 15}
+      }));
     });
 
     it('may extend with a Transform inserting multiple codepoints', () => {
@@ -145,7 +181,7 @@ describe('SearchPath', () => {
       const length1Path = new SearchPath(
         rootPath,
         leadEdgeDistribution,
-        leadEdgeDistribution[0].p
+        leadEdgeDistribution[0]
       );
 
       const tailEdgeDistribution = [
@@ -157,7 +193,7 @@ describe('SearchPath', () => {
       const length2Path = new SearchPath(
         length1Path,
         tailEdgeDistribution,
-        tailEdgeDistribution[0].p
+        tailEdgeDistribution[0]
       );
 
       // Verify that the prior distribution remains fully unaltered.
@@ -169,6 +205,18 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tri', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
+      assert.equal(length2Path.likeliestSourceText, 'tri');
+      assert.deepEqual(length2Path.sourceIdentifiers, [
+        {
+          trueTransform: leadEdgeDistribution[0].sample,
+          inputStartIndex: 0,
+          bestProbFromSet: leadEdgeDistribution[0].p
+        }, {
+          trueTransform: tailEdgeDistribution[0].sample,
+          inputStartIndex: 0,
+          bestProbFromSet: tailEdgeDistribution[0].p
+        }
+      ]);
 
       assert.equal(length1Path.inputCount, 1);
       assert.isNumber(length1Path.spaceId);
