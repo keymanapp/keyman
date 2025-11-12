@@ -1518,7 +1518,11 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     assert(valid);
     return;
   }
-  if ( ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
+  // check individual components to avoid overflow on sum (we'll never get even
+  // a 2GB file so if both components are < length then we are okay to sum)
+  if (ex->kmxplus.dpKMXPlus > length ||
+      ex->kmxplus.dwKMXPlusSize > length ||
+      ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
     DebugLog("dpKMXPlus + dwKMXPlusSize is past the end of the file");
     valid = false;
     assert(valid);

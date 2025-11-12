@@ -24,7 +24,7 @@ export { TouchLayoutFileReader } from './types/keyman-touch-layout/keyman-touch-
 export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './types/keyman-touch-layout/keyman-touch-layout-file-writer.js';
 
 export { default as KMXBuilder } from './types/kmx/kmx-builder.js';
-export { default as KMXPlusBuilder}  from './types/kmx/kmx-plus-builder/kmx-plus-builder.js';
+export { default as KMXPlusBuilder, SectionBuilders } from './types/kmx/kmx-plus-builder/kmx-plus-builder.js';
 
 export * as LDMLKeyboard from './types/ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './types/ldml-keyboard/ldml-keyboard-testdata-xml.js';

@@ -241,7 +241,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   }
 
   private buildSections(source: LDMLKeyboardXMLSourceFile) {
-    return SECTION_COMPILERS.map(c => new c(source, this.callbacks));
+    return SECTION_COMPILERS.map(c => new c(source, this.callbacks, this.kmxPlusTargetVersion));
   }
 
   /**

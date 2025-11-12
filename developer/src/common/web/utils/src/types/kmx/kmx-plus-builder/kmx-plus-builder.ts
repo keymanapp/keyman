@@ -20,7 +20,7 @@ import KMXPlusFile = KMXPlus.KMXPlusFile;
 type BUILDER_BKSP = BUILDER_TRAN;
 // type BUILDER_FINL = BUILDER_TRAN;
 
-type SectionBuilders = {
+export type SectionBuilders = {
   // [id in SectionIdent]: BUILDER_SECTION;
   sect?: BUILDER_SECT;
   bksp?: BUILDER_BKSP;
@@ -38,16 +38,12 @@ type SectionBuilders = {
 };
 
 export default class KMXPlusBuilder {
-  private file: KMXPlusFile;
-  //private writeDebug: boolean;
-
   sect : SectionBuilders = {
 
   };
 
-  constructor(file: KMXPlusFile, _writeDebug: boolean) {
+  constructor(private file: KMXPlusFile) {
     this.file = file;
-    //this.writeDebug = _writeDebug;
   }
 
   public compile(): Uint8Array {
@@ -57,11 +53,18 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect.sect);
     // Keep the rest of these in order.
     this.emitSection(file, this.file.COMP_PLUS_BKSP, this.sect.bksp);
-    this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect.disp);
+    this.emitSection(
+      file,
+      this.file.version == KMXPlusVersion.Version17 ? this.file.COMP_PLUS_DISP_v17 : this.file.COMP_PLUS_DISP_v19,
+      this.sect.disp
+    );
     this.emitSection(file, this.file.COMP_PLUS_ELEM, this.sect.elem);
     this.emitElements(file);
     this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect.keys);
-    this.emitSection(file, this.file.COMP_PLUS_LAYR, this.sect.layr);
+    this.emitSection(file,
+      this.file.version == KMXPlusVersion.Version17 ? this.file.COMP_PLUS_LAYR_v17 : this.file.COMP_PLUS_LAYR_v19,
+      this.sect.layr
+    );
     this.emitSection(file, this.file.COMP_PLUS_LIST, this.sect.list);
     this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect.loca);
     this.emitSection(file, this.file.COMP_PLUS_META, this.sect.meta);
@@ -87,9 +90,9 @@ export default class KMXPlusBuilder {
     const build_bksp = build_tran;
 
     this.sect.bksp = build_bksp(this.file.kmxplus.bksp, this.sect.strs, this.sect.elem);
-    this.sect.disp = build_disp(this.file.kmxplus, this.sect.strs);
+    this.sect.disp = build_disp(this.file.kmxplus, this.sect.strs, this.file.version);
     this.sect.keys = build_keys(this.file.kmxplus, this.sect.strs, this.sect.list);
-    this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list);
+    this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.file.version);
     this.sect.loca = build_loca(this.file.kmxplus, this.sect.strs);
     this.sect.meta = build_meta(this.file.kmxplus, this.sect.strs);
     this.sect.tran = build_tran(this.file.kmxplus.tran, this.sect.strs, this.sect.elem);
