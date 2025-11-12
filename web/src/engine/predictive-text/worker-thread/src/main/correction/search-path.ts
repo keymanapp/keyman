@@ -379,4 +379,20 @@ export class SearchPath implements SearchSpace {
 
     return parentSources;
   }
+
+  /**
+   * Gets a compact string-based representation of `inputRange` that
+   * maps compatible token source ranges to each other.
+   */
+  get sourceRangeKey(): string {
+    const components: string[] = [];
+    const sources = this.sourceIdentifiers;
+
+    for(const source of sources) {
+      const i = source.inputStartIndex;
+      components.push(`T${source.trueTransform.id}${i != 0 ? '@' + i : ''}`);
+    }
+
+    return components.join('+');
+  }
 }

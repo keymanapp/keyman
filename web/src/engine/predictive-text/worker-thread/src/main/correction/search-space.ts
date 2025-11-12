@@ -170,4 +170,10 @@ export interface SearchSpace {
    * keystroke range corrected by this search space.
    */
   readonly sourceIdentifiers: TokenInputSource[];
+
+  /**
+   * Gets a compact string-based representation of `inputRange` that
+   * maps compatible token source ranges to each other.
+   */
+  get sourceRangeKey(): string;
 }
