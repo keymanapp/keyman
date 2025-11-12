@@ -496,12 +496,20 @@ COMP_KMXPLUS_META::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unuse
 
 bool
 COMP_KMXPLUS_DISP::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+  if(header.version != LDML_KMXPLUS_VERSION_17) {
+    // TODO-EMBED-OSK-IN-KMX
+    assert(false);
+    return false;
+  }
+
   DebugLog("disp: count 0x%X\n", count);
+
   if (!is_block_valid(header, header.headerSize(), sizeof(*this)+(sizeof(entries[0])*count))) {
     DebugLog("header.size < expected size");
     assert(false);
     return false;
   }
+
   if (baseCharacter != 0) {
     DebugLog("disp: baseCharacter str#0x%X", baseCharacter);
   }
@@ -513,6 +521,20 @@ COMP_KMXPLUS_DISP::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unuse
       return false;
     }
   }
+  return true;
+}
+
+bool
+COMP_KMXPLUS_DISP_Helper::set(const COMP_KMXPLUS_DISP *newDisp) {
+  if(header.version != LDML_KMXPLUS_VERSION_17) {
+    // TODO-EMBED-OSK-IN-KMX
+    return false;
+  }
+
+  if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_DISP>::set(newDisp)) {
+    return false;
+  }
+
   return true;
 }
 
@@ -898,10 +920,14 @@ COMP_KMXPLUS_TRAN_Helper::set(const COMP_KMXPLUS_TRAN *newTran) {
   return is_valid;
 }
 
-
-
 bool
 COMP_KMXPLUS_LAYR::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+  if(header.version != LDML_KMXPLUS_VERSION_17) {
+    // TODO-EMBED-OSK-IN-KMX
+    assert(false);
+    return false;
+  }
+
   if(!is_block_valid(header, header.headerSize(),
     sizeof(*this)
       + (formCount  * sizeof(COMP_KMXPLUS_LAYR_FORM))
@@ -910,6 +936,7 @@ COMP_KMXPLUS_LAYR::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unuse
       + (keyCount   * sizeof(COMP_KMXPLUS_LAYR_KEY)))) {
     return false;
   }
+
   DebugLog("layr header is valid");
   // Note: We only do minimal validation here because of the
   // dynamic structure. See COMP_KMXPLUS_LAYR_Helper.set()  (below)
@@ -927,6 +954,11 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
   entries = nullptr;
   rows = nullptr;
   keys = nullptr;
+
+  if(header.version != LDML_KMXPLUS_VERSION_17) {
+    // TODO-EMBED-OSK-IN-KMX
+    return false;
+  }
 
   if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_LAYR>::set(newLayr)) {
     return false;
@@ -1518,7 +1550,11 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     assert(valid);
     return;
   }
-  if ( ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
+  // check individual components to avoid overflow on sum (we'll never get even
+  // a 2GB file so if both components are < length then we are okay to sum)
+  if (ex->kmxplus.dpKMXPlus > length ||
+      ex->kmxplus.dwKMXPlusSize > length ||
+      ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
     DebugLog("dpKMXPlus + dwKMXPlusSize is past the end of the file");
     valid = false;
     assert(valid);

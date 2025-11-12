@@ -2,6 +2,8 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Created by mcdurdin on 2025-10-08
+ *
+ * Binary file format Restructure structs for KMX+
  */
 import * as KMX from '../kmx.js';
 import * as r from 'restructure';
@@ -24,8 +26,10 @@ export class KMXPlusFileFormat extends KMXFile {
   public readonly COMP_PLUS_BKSP_ITEM: any;
   public readonly COMP_PLUS_BKSP: any;
 
-  public readonly COMP_PLUS_DISP_ITEM: any;
-  public readonly COMP_PLUS_DISP: any;
+  public readonly COMP_PLUS_DISP_ITEM_v17: any;
+  public readonly COMP_PLUS_DISP_v17: any;
+  public readonly COMP_PLUS_DISP_ITEM_v19: any;
+  public readonly COMP_PLUS_DISP_v19: any;
 
   public readonly COMP_PLUS_ELEM_ELEMENT: any;
   public readonly COMP_PLUS_ELEM_STRING: any;
@@ -35,9 +39,11 @@ export class KMXPlusFileFormat extends KMXFile {
 
   public readonly COMP_PLUS_LAYR_ENTRY: any;
   public readonly COMP_PLUS_LAYR_KEY: any;
-  public readonly COMP_PLUS_LAYR_FORM: any;
+  public readonly COMP_PLUS_LAYR_FORM_v17: any;
+  public readonly COMP_PLUS_LAYR_FORM_v19: any;
   public readonly COMP_PLUS_LAYR_ROW: any;
-  public readonly COMP_PLUS_LAYR: any;
+  public readonly COMP_PLUS_LAYR_v17: any;
+  public readonly COMP_PLUS_LAYR_v19: any;
 
   public readonly COMP_PLUS_KEYS_FLICK: any;
   public readonly COMP_PLUS_KEYS_FLICKS: any;
@@ -74,7 +80,7 @@ export class KMXPlusFileFormat extends KMXFile {
 
   private readonly COMP_PLUS_SectionHeader: any;
 
-  constructor(public version: KMXPlusVersion) {
+  constructor(public readonly version: KMXPlusVersion) {
     super();
     // Binary-correct structures matching kmx_plus.h
 
@@ -123,17 +129,30 @@ export class KMXPlusFileFormat extends KMXFile {
     // 'bksp' - see 'tran'
 
     // 'disp'
-    this.COMP_PLUS_DISP_ITEM = new r.Struct({
+    this.COMP_PLUS_DISP_ITEM_v17 = new r.Struct({
       to: STR_REF,
       id: STR_REF,
       display: STR_REF,
     });
 
-    this.COMP_PLUS_DISP = new r.Struct({
+    this.COMP_PLUS_DISP_v17 = new r.Struct({
       header: this.COMP_PLUS_SectionHeader,
       count: r.uint32le,
       baseCharacter: CHAR32,
-      items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
+      items: new r.Array(this.COMP_PLUS_DISP_ITEM_v17, 'count'),
+    });
+
+    this.COMP_PLUS_DISP_ITEM_v19 = new r.Struct({
+      toId: STR_REF,
+      display: STR_REF,
+      flags: r.uint32le,
+    });
+
+    this.COMP_PLUS_DISP_v19 = new r.Struct({
+      header: this.COMP_PLUS_SectionHeader,
+      count: r.uint32le,
+      baseCharacter: CHAR32,
+      items: new r.Array(this.COMP_PLUS_DISP_ITEM_v19, 'count'),
     });
 
     // 'elem'
@@ -172,11 +191,22 @@ export class KMXPlusFileFormat extends KMXFile {
       key: r.uint32le, // str: key id
     });
 
-    this.COMP_PLUS_LAYR_FORM = new r.Struct({
+    this.COMP_PLUS_LAYR_FORM_v17 = new r.Struct({
       hardware: STR_REF, // str: hardware name
       layer: r.uint32le, // index into layers
       count: r.uint32le,
       minDeviceWidth: r.uint32le, // integer: millimeters
+    });
+
+    this.COMP_PLUS_LAYR_FORM_v19 = new r.Struct({
+      hardware: STR_REF,          // str: hardware name
+      layer: r.uint32le,          // index into layers
+      count: r.uint32le,
+      minDeviceWidth: r.uint32le, // integer: millimeters
+      baseLayout: STR_REF,        // v19: str: identifier for base layout (reserved)
+      fontFaceName: STR_REF,      // v19: str: font face name
+      fontSizePct: r.uint32le,    // v19: font size in % of default size
+      flags: r.uint32le,          // v19: flags
     });
 
     this.COMP_PLUS_LAYR_ROW = new r.Struct({
@@ -184,13 +214,25 @@ export class KMXPlusFileFormat extends KMXFile {
       count: r.uint32le,
     });
 
-    this.COMP_PLUS_LAYR = new r.Struct({
+    this.COMP_PLUS_LAYR_v17 = new r.Struct({
       header: this.COMP_PLUS_SectionHeader,
       formCount: r.uint32le,
       layerCount: r.uint32le,
       rowCount: r.uint32le,
       keyCount: r.uint32le,
-      forms: new r.Array(this.COMP_PLUS_LAYR_FORM, 'formCount'),
+      forms: new r.Array(this.COMP_PLUS_LAYR_FORM_v17, 'formCount'),
+      layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
+      rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
+      keys: new r.Array(this.COMP_PLUS_LAYR_KEY, 'keyCount'),
+    });
+
+    this.COMP_PLUS_LAYR_v19 = new r.Struct({
+      header: this.COMP_PLUS_SectionHeader,
+      formCount: r.uint32le,
+      layerCount: r.uint32le,
+      rowCount: r.uint32le,
+      keyCount: r.uint32le,
+      forms: new r.Array(this.COMP_PLUS_LAYR_FORM_v19, 'formCount'),
       layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
       rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
       keys: new r.Array(this.COMP_PLUS_LAYR_KEY, 'keyCount'),

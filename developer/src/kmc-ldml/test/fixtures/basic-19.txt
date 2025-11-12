@@ -1,25 +1,19 @@
 #
 # Keyman is copyright (C) SIL International. MIT License.
 #
-# basic-v19.txt describes the expected output of running kmc against basic.xml
-# with v19 schema. It is used in the end-to-end test test-compiler-e2e.ts.
+# basic-19.txt describes the expected output of running kmc against basic.xml
+# with v19 schema and v19 target version. It is used in the end-to-end test
+# test-compiler-e2e.ts.
 #
-# Any changes to the compiler or basic.xml will likely result in changes to the compiled file.
-# While structural differences should be updated manually in this file to ensure that we are
-# getting the expected result for the e2e test, the checksum can be safely retrieved from the
-# updated compilation result. The following may be helpful for working with this file when
-# updating the binary format:
+# Differences from v17:
+# * KMX: COMP_KEYBOARD.dwFileVersion
+# * KMX+: `sec2` section vs `sect` section
+# * KMX+: each section has an additional version header field
+# * KMX+: `disp` section is v19
+# * KMX+: `layr` section is v19
 #
-#    cd developer/src/kmc
-#    ./build.sh configure build # if needed
-#    ./build.sh build-fixtures
+# See README.md for more information.
 #
-#  This will compile both the .xml and the .txt to build/test/fixtures and also emit the
-#  checksum for basic-xml.kmx so you can patch that into this file.
-#
-# For the format of this file, see “hextobin.ts”
-#
-# P.S. surprisingly, the Dart language highlighter in VSCode does a helpful job on this file.
 
 block(kmxheader)  #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
@@ -96,7 +90,7 @@ block(store_vk_path_string)
   62 00 61 00 73 00 69 00 63 00 2d 00 78 00 6d 00 6c 00 2e 00 6b 00 76 00 6b 00 00 00 # 'basic-xml.kvk'
 
 block(sec2)                         #  struct COMP_KMXPLUS_SEC2 {
-  73 65 63 32                       #    KMX_DWORD header.ident;   // 0000 Section name
+  73 65 63 32                       #    KMX_DWORD header.ident;   // 0000 Section name 'sec2'
   diff(sec2,endsec2)                #    KMX_DWORD header.size;    // 0004 Section length
   00 13 00 00                       #    KMX_DWORD header.version; // 0008 Section version, 19 = 0x13
   diff(sec2,eof)                    #    KMX_DWORD total;          // 000C KMXPlus entire length
@@ -171,26 +165,26 @@ block(bksp)
 
 
 # ----------------------------------------------------------------------------------------------------
-# disp
+# disp (v19)
 # ----------------------------------------------------------------------------------------------------
 
 block(disp)                         # struct COMP_KMXPLUS_DISP {
   64 69 73 70                       #   KMX_DWORD header.ident;   // 0000 Section name - disp
   sizeof(disp)                      #   KMX_DWORD header.size;    // 0004 Section length
-  00 11 00 00                       #   KMX_DWORD header.version; // 0008 Section version, 17 = 0x11
+  00 13 00 00                       #   KMX_DWORD header.version; // 0008 Section version, 19 = 0x13
   02 00 00 00                       #   KMX_DWORD count;          // 000C number of entries
   index(strNull,strElemBkspFrom2,2) #   KMX_DWORD baseCharacter   // 0010 baseCharacter = 'e'
                                     # };
 
                                     # entry 0
-  index(strNull,strA,2)             #   KMX_DWORD to       // 000C baseCharacter = 'a'
-  index(strNull,strNull,2)          #   KMX_DWORD id 0
-  index(strNull,strElemTranFrom1,2) #   KMX_DWORD display   // 000C baseCharacter = '^'
+  index(strNull,strA,2)             #   KMX_DWORD toId       // 0000 baseCharacter = 'a'
+  index(strNull,strElemTranFrom1,2) #   KMX_DWORD display    // 0004 display = '^'
+  00 00 00 00                       #   KMX_DWORD flags      // 0008 isId=0
 
                                     # entry 1
-  index(strNull,strNull,2)           #   KMX_DWORD to       // 000C baseCharacter = 'a'
-  index(strNull,strElemBkspFrom2,2) #   KMX_DWORD id  'e'
-  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD display   '^e'
+  index(strNull,strElemBkspFrom2,2) #   KMX_DWORD toId       // 0000 id = 'e'
+  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD display   // 0004 '^e'
+  01 00 00 00                       #   KMX_DWORD flags      // 0008 isId=1
 
 
 
@@ -405,16 +399,21 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
 block(layr)                         # struct COMP_KMXPLUS_LAYR {
   6c 61 79 72                       #   KMX_DWORD header.ident;   // 0000 Section name - layr
   sizeof(layr)                      #   KMX_DWORD header.size;    // 0004 Section length
-  00 11 00 00                       #   KMX_DWORD header.version; // 0008 Section version, 17 = 0x11
-  01 00 00 00                       #   KMX_DWORD listCount
+  00 13 00 00                       #   KMX_DWORD header.version; // 0008 Section version, 19 = 0x13
+  01 00 00 00                       #   KMX_DWORD formCount
   01 00 00 00                       #   KMX_DWORD layerCount
   01 00 00 00                       #   KMX_DWORD rowCount
   02 00 00 00                       #   KMX_DWORD keyCount
-  # list 0
+  # form 0
   index(strNull,strUs,2)            #   KMXPLUS_STR hardware = 'us'
   00 00 00 00                       #   KMX_DWORD layer;
-  01 00 00 00 # count
+  01 00 00 00                       #   KMX_DWORD count
   7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
+  00 00 00 00                       #   KMXPLUS_STR baseLayout v19
+  00 00 00 00                       #   KMXPLUS_STR fontFaceName v19
+  64 00 00 00                       #   KMX_DWORD fontSizePct v19 // 100%
+  00 00 00 00                       #   KMX_DWORD flags v19
+
   # layers 0
   00 00 00 00                       #   KMXPLUS_STR id;
   00 00 00 00                       #   KMX_DWORD mod

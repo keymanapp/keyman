@@ -519,7 +519,9 @@ struct COMP_KMXPLUS_DISP {
 static_assert(sizeof(struct COMP_KMXPLUS_DISP) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_DISP) == LDML_LENGTH_DISP - LDML_LENGTH_HEADER_17, "mismatched size of section disp");
 
-class COMP_KMXPLUS_DISP_Helper : public COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_DISP> {};
+class COMP_KMXPLUS_DISP_Helper : public COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_DISP> {
+  virtual bool set(const COMP_KMXPLUS_DISP *newDisp);
+};
 
 /* ------------------------------------------------------------------
  * layr section
@@ -532,7 +534,8 @@ struct COMP_KMXPLUS_LAYR_FORM {
     KMX_DWORD_unaligned minDeviceWidth;
 };
 
-static_assert(sizeof(struct COMP_KMXPLUS_LAYR_FORM) == LDML_LENGTH_LAYR_FORM, "mismatched size of COMP_KMXPLUS_LAYR_FORM");
+// TODO-EMBED-OSK-IN-KMX:
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_FORM) == LDML_LENGTH_LAYR_FORM_V17, "mismatched size of COMP_KMXPLUS_LAYR_FORM");
 
 struct COMP_KMXPLUS_LAYR_ENTRY {
     KMXPLUS_STR id;

@@ -8,6 +8,7 @@
 import { ModifierKeyConstants, KMXPlus, VisualKeyboard } from "@keymanapp/common-types";
 import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
+import { constants } from "@keymanapp/ldml-keyboard-constants";
 
 // This is a partial polyfill for findLast, so not polluting Array.prototype
 // https://medium.com/@stheodorejohn/findlast-method-polyfill-in-javascript-bridging-browser-gaps-c3baf6aabae1
@@ -136,7 +137,12 @@ export class LdmlKeyboardVisualKeyboardCompiler {
   }
 
   private getDisplayFromKey(keydef: KMXPlus.KeysKeys, source: KMXPlus.KMXPlusData) {
-    const display = source.disp?.disps?.find(d => d.id.value == keydef.id.value || d.to.value == keydef.to.value);
+    // if(source.disp.disps[0].toId)
+    const display = source.disp?.disps?.find(d =>
+      d.toId !== null
+      ? (d.toId.value == keydef.id.value && d.flags & constants.disp_item_flags_is_id) ||
+        (d.toId.value == keydef.to.value && !(d.flags & constants.disp_item_flags_is_id))
+      : d.id.value == keydef.id.value || d.to.value == keydef.to.value);
     const value = display?.display.value ?? keydef.to.value;
     // strip markers from the output (these are valid in keydef.to, but not in display.display, nor in kvk)
     return value.replaceAll(/\uffff\u0008./g, '');
