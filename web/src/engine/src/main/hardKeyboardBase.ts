@@ -60,7 +60,6 @@ export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: Keyboa
     }
   } else {
     // KMX keyboard
-    // TODO-web-core: forward to Core
   }
 
   return s;
