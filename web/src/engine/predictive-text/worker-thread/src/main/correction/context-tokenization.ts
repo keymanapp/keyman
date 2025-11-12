@@ -526,7 +526,7 @@ export class ContextTokenization {
         // consider:  move to ContextToken as class method.  (static?)
         const merge = merges.shift();
         const tokensToMerge = merge.inputs.map((m) => baseTokenization[m.index]);
-        const mergeResult = ContextToken.merge(tokensToMerge, lexicalModel);
+        const mergeResult = ContextToken.merge(tokensToMerge);
         tokenization.push(mergeResult);
         i = merge.inputs[merge.inputs.length - 1].index;
         continue;
