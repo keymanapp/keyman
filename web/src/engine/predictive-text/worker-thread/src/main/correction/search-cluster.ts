@@ -252,38 +252,52 @@ export class SearchCluster implements SearchSpace {
     // and then reconverge at later points.  If the split happens before such
     // a divergence-reconvergence sequence, it is possible for left-hand side
     // entries to be duplicated.
-    const resultsWithCluster: [SearchCluster, SearchSpace][] = [];
+    //
+    // Deduplicate clusters based solely on spaceId, though; an intact cluster
+    // should match on this basis alone.
+    const headClusterResultMap: Map<number, {
+      head: SearchCluster,
+      tails: SearchPath[]
+    }> = new Map();
 
-    const resultMap = new Map<string, {
+    const headPathResultMap = new Map<string, {
       heads: SearchPath[],
       tails: SearchPath[]
     }>();
+
     results.forEach((result) => {
       const [head, tail] = result;
 
-      // Is certainly possible.
       if(head instanceof SearchCluster) {
-        resultsWithCluster.push([head, tail]);
+        const bucket = headClusterResultMap.get(head.spaceId) ?? { head, tails: []};
+        bucket.tails.push(tail);
+        headClusterResultMap.set(head.spaceId, bucket);
         return;
       }
 
       let key = head.inputCount + '+' + (!(head instanceof SearchPath) ? '' : head.clusterKey);
-      const outerEntry = resultMap.get(key) ?? { heads: [], tails: [] };
+      const outerEntry = headPathResultMap.get(key) ?? { heads: [], tails: [] };
 
       if(!outerEntry.heads.find(p => head.isSameSpace(p))) {
         outerEntry.heads.push(head as SearchPath);
       }
 
       outerEntry.tails.push(tail);
-      resultMap.set(key, outerEntry);
+      headPathResultMap.set(key, outerEntry);
     });
 
-    const resultsFromPaths = [...resultMap.values()].map((entry) => {
+    const resultsFromClusterHeadPaths = [...headClusterResultMap.values()].map((entry) => {
+      const tailSpace = entry.tails.length > 1 ? new SearchCluster(entry.tails) : entry.tails[0];
+      return [entry.head, tailSpace] as [SearchSpace, SearchSpace];
+    });
+
+    const resultsFromHeadPaths = [...headPathResultMap.values()].map((entry) => {
       const headSpace = entry.heads.length > 1 ? new SearchCluster(entry.heads) : entry.heads[0];
       const tailSpace = entry.tails.length > 1 ? new SearchCluster(entry.tails) : entry.tails[0];
       return [headSpace, tailSpace] as [SearchSpace, SearchSpace];
     });
-    return (resultsWithCluster as [SearchSpace, SearchSpace][]).concat(resultsFromPaths);
+
+    return resultsFromClusterHeadPaths.concat(resultsFromHeadPaths);
   }
 
   isSameSpace(space: SearchSpace): boolean {
