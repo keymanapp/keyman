@@ -1361,7 +1361,13 @@ describe('SearchPath', () => {
       assert.isTrue(tail instanceof SearchPath);
       assert.deepEqual((head as SearchPath).inputs, headTarget.inputs);
       assert.deepEqual((tail as SearchPath).inputs, tailTarget.inputs);
-      assert.deepEqual((head as SearchPath).inputSource, headTarget.inputSource);
+      assert.deepEqual((head as SearchPath).inputSource, {
+        ...headTarget.inputSource,
+        segment: {
+          ...headTarget.inputSource.segment,
+          end: 2
+        }
+      });
       assert.deepEqual((tail as SearchPath).inputSource, tailTarget.inputSource);
     });
   });
