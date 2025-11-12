@@ -40,6 +40,8 @@ export class SearchPath implements SearchSpace {
   readonly spaceId: number;
 
   readonly inputCount: number;
+  readonly codepointLength: number;
+  readonly edgeLength: number;
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
   // is cheaper than iteratively building a priority queue.
@@ -123,6 +125,14 @@ export class SearchPath implements SearchSpace {
       this.lowestPossibleSingleCost = parentSpace.lowestPossibleSingleCost + logTierCost;
       this.parentSpace = parentSpace;
 
+      // Compute this SearchPath's codepoint length & edge length.
+      const insert = this.inputs?.[0].sample.insert ?? '';
+      this.edgeLength = KMWString.length(insert);
+
+      const deleteLeft = this.inputs?.[0].sample.deleteLeft ?? 0;
+      const baseLength = this.parentSpace?.codepointLength ?? 0;
+      this.codepointLength = baseLength + this.edgeLength - deleteLeft;
+
       this.addEdgesForNodes(parentSpace.previousResults.map(r => r.node));
 
       return;
@@ -133,6 +143,8 @@ export class SearchPath implements SearchSpace {
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestPossibleSingleCost = 0;
     this.inputCount = 0;
+    this.codepointLength = 0;
+    this.edgeLength = 0;
     this.bestProbInEdge = 1;
   }
 
@@ -203,27 +215,12 @@ export class SearchPath implements SearchSpace {
     return -Math.log(this.bestProbInEdge);
   }
 
-  // TODO:  track as a class property; avoid the need for repeated string calculations.
-  // Or just use the subset and its pre-known length/delete values in some manner.
-  public get edgeLength(): number {
-    const insert = this.inputs?.[0].sample.insert ?? '';
-    return KMWString.length(insert);
-  }
-
-  // TODO:  consider optimizing this; we could certainly precompute these values
-  // rather than recalculating it each time.
-  public get codepointLength(): number {
-    const deleteLeft = this.inputs?.[0].sample.deleteLeft ?? 0;
-    const baseLength = this.parentSpace?.codepointLength ?? 0;
-    return baseLength + this.edgeLength - deleteLeft;
-  }
-
   public get bestExample(): {text: string, p: number} {
     const bestPrefix = this.parentSpace?.bestExample ?? { text: '', p: 1 };
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
-      text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      text: KMWString.substring(bestPrefix.text, 0, (this.parentSpace?.codepointLength ?? 0) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
   }
