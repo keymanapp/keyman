@@ -246,85 +246,12 @@ export class SearchCluster implements SearchSpace {
       return [[this, new SearchPath(this.model)]];
     }
 
+    const results = this.parents.flatMap((p) => p.split(charIndex));
+
     // Path-deduplication:  it is possible for paths to diverge after a point
     // and then reconverge at later points.  If the split happens before such
     // a divergence-reconvergence sequence, it is possible for left-hand side
     // entries to be duplicated.
-
-    // this.parents:  should always be `SearchPath`s in practice.
-    // - If one is actually a cluster, we probably shouldn't attempt to
-    //   de-duplicate it; we haven't figured out the logic for that yet.
-    const results = this.parents.flatMap((p) => p.split(charIndex));
-
-    // Left-hand side:  could be either SearchPaths or SearchClusters.
-    // If clusters, check space ID.
-    // If paths... check in more detail.
-    // ... `.matches(space)`?
-    // ... `.isSplitFrom(space)`? (merges)
-    // - is there a different helper method that could really save our bacon?
-    //   - abstracting this for a possible future third type (or similar) may actually
-    //     be the key to moving forward.
-    // - do we need to verify EACH subset ID matches, rather than just the last?
-    //   - wait... can we even do that?  (parent SearchCluster)
-
-    // isSameSpace(space: SearchSpace) // or matches(space: __)
-    // - for deduplication
-
-    // Deduping LHS Path:
-    // - spaceID match?  Yay, the easy case!
-    // - else, TokenizationPath subset ID match + split indices match:  yay!  It's a match!
-    //   - so, the clustering condition (split indices), PLUS subset ID match.
-    //   - again, isSameSpace() - using get clusterKey()
-
-    // Deduping LHS cluster:
-    // - spaceID match?  Yay, the easy case!
-    // - ... is there any other case?
-    //   - ... well, if the cluster's paths (parents) all have matches, that's a match, yeah?
-    //   - is _that_ needed, though?
-    //     -
-    //
-    // ... suppose a cluster happens, then two divergent paths, cluster, divergent paths with clean split.
-    // - ... then cluster-paths-cluster is clean
-    //
-    // ... cluster | paths, cluster, paths, cluster
-    // - THAT would be the case to test for, wouldn't it?
-    // - while I can't fully envision the fallout, I CAN envision the UNIT TEST - and that'll be
-    //   very enlightening.  Use that!
-    //   - so, we'd have the 2nd cluster entry attempt to de-dupe from the parent cluster/paths split.
-    //
-    // - alternatively, three clusters in a row (with alternate clusters reachable by different paths)
-    //   - there's one test sequence I built with this; try splitting that properly for the diff cluster types.
-
-    // Clustering RHS paths (will NOT be clusters!)
-    // - RHS "split index" match?
-    //   - not split?  Awesome!
-    // - LHS "split index" match?
-    //   - ... again, same deal.
-    // ... so a combined split key:
-    // - if not split, then can cluster
-    // - if split, cluster entries with like combined split keys.
-    // `get clusterKey(): string`
-    // - codepoint length + split indices of final input.
-    //   - must match for all paths in same cluster.
-    //   - isn't it sourceRangeKey?
-    //   - OH.  codepointLength - that part certainly matters.
-    //   - ... but it will equal, b/c split works that way.
-
-    // SearchPath
-    // Right-hand side:  always SearchPaths.
-
-    // -- OLD THOUGHTS --
-    // .codepointLength + .inputSource.subsetId should be enough to uniquely ID
-    // duplicated left-hand splits.
-
-    // Clean splits and 'dirty' splits (where a constituent path is split in
-    // two) should return separate SearchClusters...
-    // - (?) they'll have different input counts and/or .codepointLength values.
-    //   - not necessarily true on LHS.
-    // - Partial transforms (that don't apply the whole thing) should be a range
-    //   mis-match against cases applying the whole thing.
-    //   - How to model that, then?  The distinction doesn't (yet) show up in keying!
-
     const resultsWithCluster: [SearchCluster, SearchSpace][] = [];
 
     const resultMap = new Map<string, {
@@ -334,8 +261,8 @@ export class SearchCluster implements SearchSpace {
     results.forEach((result) => {
       const [head, tail] = result;
 
+      // Is certainly possible.
       if(head instanceof SearchCluster) {
-        // TODO:  Is this actually a case that can happen?
         resultsWithCluster.push([head, tail]);
         return;
       }
