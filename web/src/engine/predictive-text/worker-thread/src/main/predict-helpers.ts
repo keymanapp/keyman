@@ -298,7 +298,9 @@ export function determineContextTransition(
   // the current context state.
   if(inputIsEmpty) {
     // Directly build a simple empty transition that duplicates the last seen state.
-    const priorState = contextTracker.latest.final;
+    // This should also clear the preservation transform if it exists!
+    const tokenization = new ContextTokenization(contextTracker.latest.final.tokenization.tokens);
+    const priorState = new ContextState(context, transition.final.model, tokenization);
     transition = new ContextTransition(priorState, inputTransform.id);
     transition.finalize(priorState, transformDistribution);
   } else if(
