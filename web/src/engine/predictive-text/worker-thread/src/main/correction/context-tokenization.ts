@@ -328,7 +328,7 @@ export class ContextTokenization {
    * @param edgeOptions
    * @returns
    */
-  mapWhitespacedTokenization(
+  mapWhitespacedTokenization( // check... this.
     lexicalModel: LexicalModel,
     transform: Transform,
     edgeOptions?: EdgeWindowOptions

@@ -246,6 +246,8 @@ export class SearchPath implements SearchSpace {
 
   // spaces are in sequence here.
   // `this` = head 'space'.
+  // public merge(space: SearchPath): SearchPath;
+  // public merge(space: SearchCluster): SearchCluster;
   public merge(space: SearchSpace): SearchSpace {
     // Head node for the incoming path is empty, so skip it.
     if(space.parents.length == 0) {
@@ -316,20 +318,20 @@ export class SearchPath implements SearchSpace {
     }
   }
 
-  public split(charIndex: number): [SearchSpace, SearchPath] {
+  public split(charIndex: number): [SearchSpace, SearchPath][] {
     const model = this.model;
     const internalSplitIndex = charIndex - (this.codepointLength - this.edgeLength);
 
     if(internalSplitIndex <= 0 && this.parents[0]) {
       const parentResults = this.parents[0].split(charIndex);
-      return [parentResults[0], new SearchPath(parentResults[1], this.inputs, this.inputSource)];
+      return parentResults.map((result) => [result[0], new SearchPath(result[1], this.inputs, this.inputSource)]);
     } else if(charIndex >= this.codepointLength) {
       // this instance = 'first set'
       // second instance:  empty transforms.
       //
       // stopgap:  maybe go ahead and check each input for any that are longer?
       // won't matter shortly, though.
-      return [this, new SearchPath(model)];
+      return [[this, new SearchPath(model)]];
     } else {
       const firstSet: Distribution<Transform> = this.inputs.map((input) => ({
         // keep insert head
@@ -364,7 +366,7 @@ export class SearchPath implements SearchSpace {
         })
         : this.parentSpace;
       // construct two SearchPath instances based on the two sets!
-      return [
+      return [[
         parent,
         new SearchPath(new SearchPath(model), secondSet, {
           ...this.inputSource,
@@ -373,7 +375,7 @@ export class SearchPath implements SearchSpace {
             start: this.inputSource.segment.start + internalSplitIndex
           }
         })
-      ];
+      ]];
     }
   }
 
@@ -579,5 +581,15 @@ export class SearchPath implements SearchSpace {
     // // Finally, we recursively verify that the parent matches.  If there IS no parent,
     // // we verify that _that_ aspect matches.
     // return this.parentSpace?.isSameSpace(space.parentSpace) ?? this.parentSpace == space.parentSpace;
+  }
+
+  // Used to identify cluster-compatible components of SearchPaths during SearchCluster split operations.
+  get clusterKey(): string {
+    const pathSrc = this.inputSource;
+    if(!pathSrc) {
+      return '';
+    }
+
+    return `${pathSrc.segment.start}${pathSrc.segment.end == undefined ? '' : '-' + pathSrc.segment.end}`;
   }
 }

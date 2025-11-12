@@ -12,10 +12,10 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchSpace } from './search-space.js';
+import { SearchPath } from './search-path.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
-import { SearchPath } from './search-path.js';
 
 const PATH_QUEUE_COMPARATOR: Comparator<SearchPath> = (a, b) => {
   return a.currentCost - b.currentCost;
@@ -109,7 +109,7 @@ export class SearchCluster implements SearchSpace {
     return bestPrefixes.reduce((max, curr) => max.p < curr.p ? curr : max);
   }
 
-  public get parents(): SearchSpace[] {
+  public get parents(): SearchPath[] {
     return this.selectionQueue.toArray().slice();
   }
 
@@ -187,12 +187,117 @@ export class SearchCluster implements SearchSpace {
     return this.parents[0].sourceRangeKey;
   }
 
+  merge(space: SearchCluster): SearchCluster;
+  merge(space: SearchPath): SearchPath;
+  merge(space: SearchSpace): SearchSpace;
   merge(space: SearchSpace): SearchSpace {
-    throw new Error('Method not implemented.');
+    // If we're at a root (which is without inputs), bypass it.
+    if(space.parents.length == 0) {
+      return this;
+    }
+
+    // What if we're trying to merge something previously split?
+    // That can only happen at the head of the incoming space, so we check for it early here.
+    if(space.inputCount == 1 && space instanceof SearchPath) {
+      // In such a case... the 'leading edge' of the incoming space needs to be checked
+      // against the trailing edge of `this` instance's entries.
+      const thisTailInputSource = this.inputSegments[this.inputSegments.length - 1];
+      const thisTailSpaceIds = this.parents.map((path) => path.inputSource.subsetId);
+      const spaceHeadInputSource = space.inputSegments[0];
+
+      const isOnSplitInput =
+        thisTailSpaceIds.find((entry) => entry == space.inputSource.subsetId)
+        && thisTailInputSource.end == spaceHeadInputSource.start;
+
+      // In this case, we only rebuild the single path; an outer stack frame will reconstitute
+      // the split cluster from the individual paths built here.
+      if(isOnSplitInput) {
+        const firstHalf = this.parents.find((tailPath) => tailPath.inputSource?.subsetId == space.inputSource?.subsetId);
+        return firstHalf.merge(space) as SearchPath;
+      }
+    }
+
+    // Simple, straightforward.  SearchPaths can easily built with a SearchCluster as parent.
+    // In this case, there's also no chance of a prior split; if we'd split, it'd be a
+    // SearchCluster on both ends.
+    if(space instanceof SearchPath) {
+      const parentMerge = this.merge(space.parents[0]);
+      return new SearchPath(parentMerge, space.inputs, space.inputSource);
+    }
+
+    // If we're here, we have a SearchCluster being merged in... and to
+    // something that's already a SearchCluster.
+    //
+    // Merge the parent components first as a baseline.  This specific state's
+    // aspects have to come after their affects are merged in, anyway.
+    // (Note:  is the main point of recursion.)
+    const parents = (space as SearchCluster).parents; // the constituent paths
+
+    // Assumes either none of the space's heads were split or that ALL were.
+    const parentMerges = parents.map((p) => this.merge(p)); // we get paths out
+
+    // Build a new SearchCluster from the terminal paths of the cluster being merged in.
+    return new SearchCluster(parentMerges);
   }
 
-  split(charIndex: number): [SearchSpace, SearchSpace] {
-    throw new Error('Method not implemented.');
+  split(charIndex: number): [SearchSpace, SearchSpace][] {
+    // Don't rebuild if this is already a perfect split point!
+    if(this.codepointLength <= charIndex) {
+      return [[this, new SearchPath(this.model)]];
+    }
+
+    const results = this.parents.flatMap((p) => p.split(charIndex));
+
+    // Path-deduplication:  it is possible for paths to diverge after a point
+    // and then reconverge at later points.  If the split happens before such
+    // a divergence-reconvergence sequence, it is possible for left-hand side
+    // entries to be duplicated.
+    //
+    // Deduplicate clusters based solely on spaceId, though; an intact cluster
+    // should match on this basis alone.
+    const headClusterResultMap: Map<number, {
+      head: SearchCluster,
+      tails: SearchPath[]
+    }> = new Map();
+
+    const headPathResultMap = new Map<string, {
+      heads: SearchPath[],
+      tails: SearchPath[]
+    }>();
+
+    results.forEach((result) => {
+      const [head, tail] = result;
+
+      if(head instanceof SearchCluster) {
+        const bucket = headClusterResultMap.get(head.spaceId) ?? { head, tails: []};
+        bucket.tails.push(tail);
+        headClusterResultMap.set(head.spaceId, bucket);
+        return;
+      }
+
+      let key = head.inputCount + '+' + (!(head instanceof SearchPath) ? '' : head.clusterKey);
+      const outerEntry = headPathResultMap.get(key) ?? { heads: [], tails: [] };
+
+      if(!outerEntry.heads.find(p => head.isSameSpace(p))) {
+        outerEntry.heads.push(head as SearchPath);
+      }
+
+      outerEntry.tails.push(tail);
+      headPathResultMap.set(key, outerEntry);
+    });
+
+    const resultsFromClusterHeadPaths = [...headClusterResultMap.values()].map((entry) => {
+      const tailSpace = entry.tails.length > 1 ? new SearchCluster(entry.tails) : entry.tails[0];
+      return [entry.head, tailSpace] as [SearchSpace, SearchSpace];
+    });
+
+    const resultsFromHeadPaths = [...headPathResultMap.values()].map((entry) => {
+      const headSpace = entry.heads.length > 1 ? new SearchCluster(entry.heads) : entry.heads[0];
+      const tailSpace = entry.tails.length > 1 ? new SearchCluster(entry.tails) : entry.tails[0];
+      return [headSpace, tailSpace] as [SearchSpace, SearchSpace];
+    });
+
+    return resultsFromClusterHeadPaths.concat(resultsFromHeadPaths);
   }
 
   isSameSpace(space: SearchSpace): boolean {
