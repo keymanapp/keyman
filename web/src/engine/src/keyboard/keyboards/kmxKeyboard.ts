@@ -1,4 +1,4 @@
-import { KM_Core, km_core_keyboard } from 'keyman/engine/core-processor';
+import { KM_Core, km_core_keyboard } from 'keyman/engine/core-adapter';
 
 /**
  * Acts as a wrapper class for KMX(+) Keyman keyboards
