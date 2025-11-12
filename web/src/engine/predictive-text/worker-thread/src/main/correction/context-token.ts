@@ -8,7 +8,6 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchPath } from "./search-path.js";
 import { SearchSpace, PathInputProperties } from "./search-space.js";
@@ -111,7 +110,6 @@ export class ContextToken {
       rawTransformDistributions.forEach((entry) => {
         searchSpace = new SearchPath(searchSpace, entry, {
           segment: {
-            trueTransform: entry[0].sample,
             transitionId: entry[0].sample.id,
             start: 0
           },
@@ -236,27 +234,4 @@ export class ContextToken {
 
     return tokensFromSplit;
   }
-}
-
-export function preprocessInputSources(inputSources: ReadonlyArray<PathInputProperties>) {
-  const alteredSources = deepCopy(inputSources);
-  let trickledDeleteLeft = 0;
-  for(let i = alteredSources.length - 1; i >= 0; i--) {
-    const source = alteredSources[i];
-    if(trickledDeleteLeft) {
-      const insLen = KMWString.length(source.segment.trueTransform.insert);
-      if(insLen <= trickledDeleteLeft) {
-        source.segment.trueTransform.insert = '';
-        trickledDeleteLeft -= insLen;
-      } else {
-        source.segment.trueTransform.insert = KMWString.substring(source.segment.trueTransform.insert, 0, insLen - trickledDeleteLeft);
-        trickledDeleteLeft = 0;
-      }
-    }
-    trickledDeleteLeft += source.segment.trueTransform.deleteLeft;
-    source.segment.trueTransform.deleteLeft = 0;
-  }
-
-  alteredSources[0].segment.trueTransform.deleteLeft = trickledDeleteLeft;
-  return alteredSources;
 }

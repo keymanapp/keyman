@@ -13,7 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchSpace, PathInputProperties } from './search-space.js';
+import { generateSpaceSeed, PathResult, SearchSpace, PathInputProperties, InputSegment } from './search-space.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -98,7 +98,6 @@ export class SearchPath implements SearchSpace {
       const keystroke = inputSource as ProbabilityMass<Transform>;
       inputSource = {
         segment: {
-          trueTransform: keystroke.sample,
           transitionId: keystroke.sample.id,
           start: 0
         },
@@ -506,7 +505,7 @@ export class SearchPath implements SearchSpace {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
-  public get inputSegments(): PathInputProperties[] {
+  public get inputSegments(): InputSegment[] {
     if(!this.parentSpace) {
       return [];
     }
@@ -514,11 +513,11 @@ export class SearchPath implements SearchSpace {
     const parentSources = this.parentSpace.inputSegments;
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
-      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
+      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].transitionId == inputId) {
         return parentSources;
       }
 
-      parentSources.push(this.inputSource);
+      parentSources.push(this.inputSource.segment);
     }
 
     return parentSources;
@@ -530,12 +529,12 @@ export class SearchPath implements SearchSpace {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.inputSegments;
+    const segments = this.inputSegments;
 
-    for(const source of sources) {
-      const i = source.segment.start;
-      const j = source.segment.end;
-      let component = (`T${source.segment.transitionId}${i != 0 || j !== undefined  ? '@' + i : ''}`);
+    for(const segment of segments) {
+      const i = segment.start;
+      const j = segment.end;
+      let component = (`T${segment.transitionId}${i != 0 || j !== undefined  ? '@' + i : ''}`);
       if(j) {
         component = component + '-' + j;
       }

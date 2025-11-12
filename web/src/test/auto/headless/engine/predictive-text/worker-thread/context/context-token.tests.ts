@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextToken, correction, generateSubsetId, getBestMatches, models, PathInputProperties, preprocessInputSources, SearchPath } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, generateSubsetId, getBestMatches, InputSegment, models, SearchPath } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
@@ -127,7 +127,6 @@ describe('ContextToken', function() {
 
       token1.addInput({
         segment: {
-          trueTransform: srcTransform,
           transitionId: srcTransform.id,
           start: 0
         },
@@ -137,7 +136,6 @@ describe('ContextToken', function() {
 
       token2.addInput({
         segment: {
-          trueTransform: srcTransform,
           transitionId: srcTransform.id,
           start: 3
         },
@@ -147,7 +145,6 @@ describe('ContextToken', function() {
 
       token3.addInput({
         segment: {
-          trueTransform: srcTransform,
           transitionId: srcTransform.id,
           start: 4
         },
@@ -158,12 +155,8 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge([token1, token2, token3]);
       assert.equal(merged.exampleInput, "can't");
       assert.deepEqual(merged.inputSegments, [ {
-        segment: {
-          trueTransform: srcTransform,
-          transitionId: srcTransform.id,
-          start: 0
-        }, bestProbFromSet: 1,
-        subsetId: srcSubsetId
+        transitionId: srcTransform.id,
+        start: 0
       } ]);
       assert.equal(merged.searchSpace.inputCount, 1);
       assert.deepEqual((merged.searchSpace as SearchPath).lastInput, [{sample: srcTransform, p: 1}]);
@@ -197,7 +190,6 @@ describe('ContextToken', function() {
 
       token1.addInput({
         segment: {
-          trueTransform: srcTransforms[0],
           transitionId: srcTransforms[0].id,
           start: 0
         },
@@ -206,7 +198,6 @@ describe('ContextToken', function() {
       }, [{sample: srcTransforms[0], p: 1}]);
       token1.addInput({
         segment: {
-          trueTransform: srcTransforms[1],
           transitionId: srcTransforms[1].id,
           start: 0
         },
@@ -216,7 +207,6 @@ describe('ContextToken', function() {
 
       token2.addInput({
         segment: {
-          trueTransform: srcTransforms[1],
           transitionId: srcTransforms[1].id,
           start: 1
         },
@@ -226,7 +216,6 @@ describe('ContextToken', function() {
 
       token3.addInput({
         segment: {
-          trueTransform: srcTransforms[1],
           transitionId: srcTransforms[1].id,
           start: 4
         },
@@ -235,7 +224,6 @@ describe('ContextToken', function() {
       }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
       token3.addInput({
         segment: {
-          trueTransform: srcTransforms[2],
           transitionId: srcTransforms[2].id,
           start: 0
         },
@@ -245,7 +233,6 @@ describe('ContextToken', function() {
 
       token4.addInput({
         segment: {
-          trueTransform: srcTransforms[3],
           transitionId: srcTransforms[3].id,
           start: 0
         },
@@ -256,12 +243,8 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
       assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
-        segment: {
-          trueTransform: t,
-          transitionId: t.id,
-          start: 0
-        }, bestProbFromSet: 1 ,
-        subsetId: srcSubsetIds[i]
+        transitionId: t.id,
+        start: 0
       }) ));
       assert.isTrue(merged.searchSpace.hasInputs(
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
@@ -296,7 +279,6 @@ describe('ContextToken', function() {
 
       token1.addInput({
         segment: {
-          trueTransform: srcTransforms[0],
           transitionId: srcTransforms[0].id,
           start: 0
         },
@@ -305,7 +287,6 @@ describe('ContextToken', function() {
       }, [{sample: srcTransforms[0], p: 1}]);
       token1.addInput({
         segment: {
-          trueTransform: srcTransforms[1],
           transitionId: srcTransforms[1].id,
           start: 0
         },
@@ -315,7 +296,6 @@ describe('ContextToken', function() {
 
       token2.addInput({
         segment: {
-          trueTransform: srcTransforms[1],
           transitionId: srcTransforms[1].id,
           start: 1
         },
@@ -325,7 +305,6 @@ describe('ContextToken', function() {
 
       token3.addInput({
         segment: {
-          trueTransform: srcTransforms[1],
           transitionId: srcTransforms[1].id,
           start: 4
         },
@@ -334,7 +313,6 @@ describe('ContextToken', function() {
       }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
       token3.addInput({
         segment: {
-          trueTransform: srcTransforms[2],
           transitionId: srcTransforms[2].id,
           start: 0
         },
@@ -344,7 +322,6 @@ describe('ContextToken', function() {
 
       token4.addInput({
         segment: {
-          trueTransform: srcTransforms[3],
           transitionId: srcTransforms[3].id,
           start: 0
         },
@@ -355,12 +332,8 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
       assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
-        segment: {
-          trueTransform: t,
-          transitionId: t.id,
-          start: 0
-        }, bestProbFromSet: 1,
-        subsetId: srcSubsetIds[i]
+        transitionId: t.id,
+        start: 0
       }) ));
       assert.isTrue(merged.searchSpace.hasInputs(
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
@@ -394,7 +367,6 @@ describe('ContextToken', function() {
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {
-            trueTransform: keystrokeDistributions[i][0].sample,
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
           }, bestProbFromSet: .75,
@@ -437,7 +409,6 @@ describe('ContextToken', function() {
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {
-            trueTransform: keystrokeDistributions[i][0].sample,
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
           },
@@ -466,26 +437,16 @@ describe('ContextToken', function() {
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
       const offsets = [0, 3, 8];
       assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.inputSegments[0]), [0, 1, 2].map(i => {
-        const inputSource: PathInputProperties = {
-          segment: {
-            trueTransform: {
-              insert: 'biglargetransform',
-              id: 13,
-              deleteLeft: 0,
-              deleteRight: 0
-            },
-            transitionId: 13,
-            start: offsets[i]
-          },
-          bestProbFromSet: 1,
-          subsetId
+        const segment: InputSegment = {
+          transitionId: 13,
+          start: offsets[i]
         };
 
         if(offsets[i+1] !== undefined) {
-          inputSource.segment.end = offsets[i+1];
+          segment.end = offsets[i+1];
         }
 
-        return inputSource;
+        return segment;
       }));
 
       for(let i = 0; i < resultsOfSplit.length; i++) {
@@ -517,7 +478,6 @@ describe('ContextToken', function() {
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {
-            trueTransform: keystrokeDistributions[i][0].sample,
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
           },
@@ -547,53 +507,28 @@ describe('ContextToken', function() {
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
       assert.deepEqual(resultsOfSplit[0].inputSegments, [
         {
-          segment: {
-            trueTransform: keystrokeDistributions[0][0].sample,
-            transitionId: keystrokeDistributions[0][0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[0]
+          transitionId: keystrokeDistributions[0][0].sample.id,
+          start: 0
         }, {
-          segment: {
-            trueTransform: keystrokeDistributions[1][0].sample,
-            transitionId: keystrokeDistributions[1][0].sample.id,
-            start: 0,
-            end: 'arge'.length
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[1]
+          transitionId: keystrokeDistributions[1][0].sample.id,
+          start: 0,
+          end: 'arge'.length
         },
       ]);
       assert.deepEqual(resultsOfSplit[1].inputSegments, [
         {
-          segment: {
-            trueTransform: keystrokeDistributions[1][0].sample,
-            transitionId: keystrokeDistributions[1][0].sample.id,
-            start: 'arge'.length
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[1]
+          transitionId: keystrokeDistributions[1][0].sample.id,
+          start: 'arge'.length
         }, {
-          segment: {
-            trueTransform: keystrokeDistributions[2][0].sample,
-            transitionId: keystrokeDistributions[2][0].sample.id,
-            start: 0,
-            end: 'ng'.length
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[2]
+          transitionId: keystrokeDistributions[2][0].sample.id,
+          start: 0,
+          end: 'ng'.length
         },
       ]);
       assert.deepEqual(resultsOfSplit[2].inputSegments, [
         {
-          segment: {
-            trueTransform: keystrokeDistributions[2][0].sample,
-            transitionId: keystrokeDistributions[2][0].sample.id,
-            start: 'ng'.length,
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[2]
+          transitionId: keystrokeDistributions[2][0].sample.id,
+          start: 'ng'.length,
         }
       ]);
 
@@ -664,7 +599,6 @@ describe('ContextToken', function() {
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {
-            trueTransform: keystrokeDistributions[i][0].sample,
             transitionId: keystrokeDistributions[i][0].sample.id,
             start: 0
           },
@@ -693,51 +627,26 @@ describe('ContextToken', function() {
       assert.equal(resultsOfSplit.length, 3);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), splitTextArray);
       assert.deepEqual(resultsOfSplit[0].inputSegments, [{
-          segment: {
-            trueTransform: keystrokeDistributions[0][0].sample,
-            transitionId: keystrokeDistributions[0][0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[0]
+          transitionId: keystrokeDistributions[0][0].sample.id,
+          start: 0
         }, {
-          segment: {
-            trueTransform: keystrokeDistributions[1][0].sample,
-            transitionId: keystrokeDistributions[1][0].sample.id,
-            start: 0,
-            end: 'arge'.length
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[1]
+          transitionId: keystrokeDistributions[1][0].sample.id,
+          start: 0,
+          end: 'arge'.length
         },
       ]);
       assert.deepEqual(resultsOfSplit[1].inputSegments, [{
-          segment: {
-            trueTransform: keystrokeDistributions[1][0].sample,
-            transitionId: keystrokeDistributions[1][0].sample.id,
-            start: 'arge'.length
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[1]
+          transitionId: keystrokeDistributions[1][0].sample.id,
+          start: 'arge'.length
         }, {
-          segment: {
-            trueTransform: keystrokeDistributions[2][0].sample,
-            transitionId: keystrokeDistributions[2][0].sample.id,
-            start: 0,
-            end: 'ng'.length
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[2]
+          transitionId: keystrokeDistributions[2][0].sample.id,
+          start: 0,
+          end: 'ng'.length
         }
       ]);
       assert.deepEqual(resultsOfSplit[2].inputSegments, [{
-        segment: {
-          trueTransform: keystrokeDistributions[2][0].sample,
-          transitionId: keystrokeDistributions[2][0].sample.id,
-          start: 'ng'.length
-        },
-        bestProbFromSet: 1,
-        subsetId: subsetIds[2]
+        transitionId: keystrokeDistributions[2][0].sample.id,
+        start: 'ng'.length
       }]);
 
       assert.isTrue(resultsOfSplit[0].searchSpace.hasInputs([
@@ -784,35 +693,5 @@ describe('ContextToken', function() {
         }),
       ]));
     });
-  });
-});
-
-describe('preprocessInputSources', () => {
-  it('properly preprocesses deleteLefts in the transforms', () => {
-    const transforms: Transform[] = [
-      { insert: 'long', deleteLeft: 0, deleteRight: 0, id: 11 },
-      { insert: 'argelovely', deleteLeft: 3, deleteRight: 0, id: 12 },
-      { insert: 'ngtransforms', deleteLeft: 4, deleteRight: 0, id: 13 }
-    ];
-
-    const subsetIds = [
-      generateSubsetId(),
-      generateSubsetId(),
-      generateSubsetId()
-    ];
-
-    const results = preprocessInputSources(transforms.map((t, i) => ({
-      segment: {
-        trueTransform: t,
-        transitionId: t.id,
-        start: 0
-      },
-      bestProbFromSet: 1,
-      subsetId: subsetIds[i]
-    })));
-
-    assert.equal(results.length, transforms.length);
-    assert.sameOrderedMembers(results.map((entry) => entry.segment.trueTransform.insert), ['l', 'argelo', 'ngtransforms']);
-    assert.sameOrderedMembers(results.map((entry) => entry.segment.trueTransform.deleteLeft), [0, 0, 0]);
   });
 });

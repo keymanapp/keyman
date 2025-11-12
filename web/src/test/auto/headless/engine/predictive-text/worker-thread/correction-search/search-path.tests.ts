@@ -115,14 +115,8 @@ describe('SearchPath', () => {
       assert.deepEqual(extendedPath.inputs, leadEdgeDistribution);
       assert.deepEqual(extendedPath.inputSegments, [
         {
-          segment: {
-            trueTransform: leadEdgeDistribution[0].sample,
-            transitionId: leadEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: leadEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: extendedPath.inputSegments[0].subsetId
+          transitionId: leadEdgeDistribution[0].sample.id,
+          start: 0
         }
       ]);
 
@@ -174,23 +168,11 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
       assert.deepEqual(length2Path.inputSegments, [
         {
-          segment: {
-            trueTransform: leadEdgeDistribution[0].sample,
-            transitionId: leadEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: leadEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[0].subsetId
+          transitionId: leadEdgeDistribution[0].sample.id,
+          start: 0
         }, {
-          segment: {
-            trueTransform: tailEdgeDistribution[0].sample,
-            transitionId: tailEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: tailEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[1].subsetId
+          transitionId: tailEdgeDistribution[0].sample.id,
+          start: 0
         }
       ]);
 
@@ -258,23 +240,11 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
       assert.deepEqual(length2Path.inputSegments, [
         {
-          segment: {
-            trueTransform: leadEdgeDistribution[0].sample,
-            transitionId: leadEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: leadEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[0].subsetId
+          transitionId: leadEdgeDistribution[0].sample.id,
+          start: 0
         }, {
-          segment: {
-            trueTransform: tailEdgeDistribution[0].sample,
-            transitionId: tailEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: tailEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[1].subsetId
+          transitionId: tailEdgeDistribution[0].sample.id,
+          start: 0
         }
       ]);
 
@@ -1326,7 +1296,6 @@ describe('SearchPath', () => {
       const headTarget = new SearchPath(
         path, headDistributionSplit, {
           segment: {
-            trueTransform: inputDistribution[0].sample,
             transitionId:  inputDistribution[0].sample.id,
             start: 0
           },
@@ -1345,7 +1314,6 @@ describe('SearchPath', () => {
       const tailTarget = new SearchPath(
         new SearchPath(testModel), tailDistributionSplit, {
           segment: {
-            trueTransform: inputDistribution[0].sample,
             transitionId: inputDistribution[0].sample.id,
             start: 2
           },
@@ -1418,7 +1386,6 @@ describe('SearchPath', () => {
 
         const originalInputBase: PathInputProperties = {
           segment: {
-            trueTransform: {insert: 'biglargetransform', deleteLeft: 0, id: 11},
             transitionId: 11,
             start: 0
           },
@@ -1886,7 +1853,6 @@ describe('SearchPath', () => {
       const headPath = new SearchPath(
         path, headDistributionSplit, {
           segment: {
-            trueTransform: inputDistribution[0].sample,
             transitionId: inputDistribution[0].sample.id,
             start: 0
           },
@@ -1905,7 +1871,6 @@ describe('SearchPath', () => {
       const tailPath = new SearchPath(
         new SearchPath(testModel), tailDistributionSplit, {
           segment: {
-            trueTransform: inputDistribution[0].sample,
             transitionId: inputDistribution[0].sample.id,
             start: 2
           },
