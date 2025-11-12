@@ -904,7 +904,7 @@ bool
 COMP_KMXPLUS_LAYR::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
   if(!is_block_valid(header, header.headerSize(),
     sizeof(*this)
-      + (listCount  * sizeof(COMP_KMXPLUS_LAYR_LIST))
+      + (formCount  * sizeof(COMP_KMXPLUS_LAYR_FORM))
       + (layerCount * sizeof(COMP_KMXPLUS_LAYR_ENTRY))
       + (rowCount   * sizeof(COMP_KMXPLUS_LAYR_ROW))
       + (keyCount   * sizeof(COMP_KMXPLUS_LAYR_KEY)))) {
@@ -923,7 +923,7 @@ COMP_KMXPLUS_LAYR_Helper::COMP_KMXPLUS_LAYR_Helper() : is_valid(false) {
 bool
 COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
   is_valid = false;
-  lists = nullptr;
+  forms = nullptr;
   entries = nullptr;
   rows = nullptr;
   keys = nullptr;
@@ -940,9 +940,9 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
   }
   KMX_DWORD offset = this->header.calculateBaseSize(LDML_LENGTH_LAYR);  // skip past non-dynamic portion
 
-  // lists (required)
-  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_LIST>(
-      data(), header, data()->listCount, offset, lists);
+  // forms (required)
+  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_FORM>(
+      data(), header, data()->formCount, offset, forms);
   assert(is_valid);
 
   // entries (required) - note, "entryCount" is called "layerCount" in COMP_KMXPLUS_LAYR
@@ -962,15 +962,15 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
 
   // Now, validate offsets by walking
   if (is_valid) {
-    for(KMX_DWORD i = 0; is_valid && i < data()->listCount; i++) {
-      const COMP_KMXPLUS_LAYR_LIST &list = lists[i];
+    for(KMX_DWORD i = 0; is_valid && i < data()->formCount; i++) {
+      const COMP_KMXPLUS_LAYR_FORM &form = forms[i];
       // is the count off the end?
       DebugLog(
-          "<layers> %d: hardware s#0x%X, layers %d..%d, minDeviceWidth %.1fmm", i, list.hardware, list.layer,
-          list.layer + list.count - 1, list.minDeviceWidth * (double)0.1);
-      if ((list.layer >= data()->layerCount) || (list.layer + list.count > data()->layerCount)) {
-        DebugLog("COMP_KMXPLUS_LAYR_Helper: list[%d] would access layer %d+%d, > count %d",
-            i, list.layer, list.count, data()->layerCount);
+          "<layers> %d: hardware s#0x%X, layers %d..%d, minDeviceWidth %.1fmm", i, form.hardware, form.layer,
+          form.layer + form.count - 1, form.minDeviceWidth * (double)0.1);
+      if ((form.layer >= data()->layerCount) || (form.layer + form.count > data()->layerCount)) {
+        DebugLog("COMP_KMXPLUS_LAYR_Helper: form[%d] would access layer %d+%d, > count %d",
+            i, form.layer, form.count, data()->layerCount);
         is_valid = false;
         assert(is_valid);
       }
@@ -1013,13 +1013,13 @@ bool COMP_KMXPLUS_LAYR_Helper::valid() const {
   return is_valid;
 }
 
-const COMP_KMXPLUS_LAYR_LIST *
-COMP_KMXPLUS_LAYR_Helper::getList(KMX_DWORD list) const {
-  if (!valid() || list >= data()->listCount) {
+const COMP_KMXPLUS_LAYR_FORM *
+COMP_KMXPLUS_LAYR_Helper::getForm(KMX_DWORD form) const {
+  if (!valid() || form >= data()->formCount) {
     assert(false);
     return nullptr;
   }
-  return lists + list;
+  return forms + form;
 }
 
 const COMP_KMXPLUS_LAYR_ENTRY *

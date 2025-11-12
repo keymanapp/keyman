@@ -498,7 +498,7 @@ export class Disp extends Section {
 /**
  * In-memory `<layers>`
  */
-export class LayrList {
+export class LayrForm {
   hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
@@ -521,7 +521,7 @@ export class LayrList {
 };
 
 export class Layr extends Section {
-  lists: LayrList[] = [];
+  forms: LayrForm[] = [];
 };
 
 export class KeysKeys {

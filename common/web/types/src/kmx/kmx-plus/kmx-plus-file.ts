@@ -35,7 +35,7 @@ export class KMXPlusFileFormat extends KMXFile {
 
   public readonly COMP_PLUS_LAYR_ENTRY: any;
   public readonly COMP_PLUS_LAYR_KEY: any;
-  public readonly COMP_PLUS_LAYR_LIST: any;
+  public readonly COMP_PLUS_LAYR_FORM: any;
   public readonly COMP_PLUS_LAYR_ROW: any;
   public readonly COMP_PLUS_LAYR: any;
 
@@ -172,7 +172,7 @@ export class KMXPlusFileFormat extends KMXFile {
       key: r.uint32le, // str: key id
     });
 
-    this.COMP_PLUS_LAYR_LIST = new r.Struct({
+    this.COMP_PLUS_LAYR_FORM = new r.Struct({
       hardware: STR_REF, // str: hardware name
       layer: r.uint32le, // index into layers
       count: r.uint32le,
@@ -186,11 +186,11 @@ export class KMXPlusFileFormat extends KMXFile {
 
     this.COMP_PLUS_LAYR = new r.Struct({
       header: this.COMP_PLUS_SectionHeader,
-      listCount: r.uint32le,
+      formCount: r.uint32le,
       layerCount: r.uint32le,
       rowCount: r.uint32le,
       keyCount: r.uint32le,
-      lists: new r.Array(this.COMP_PLUS_LAYR_LIST, 'listCount'),
+      forms: new r.Array(this.COMP_PLUS_LAYR_FORM, 'formCount'),
       layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
       rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
       keys: new r.Array(this.COMP_PLUS_LAYR_KEY, 'keyCount'),
