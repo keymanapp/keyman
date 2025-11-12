@@ -10,8 +10,10 @@
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchNode, SearchResult } from "./distance-modeler.js";
+import { SearchPath } from "./search-path.js";
 
 import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
 export let SPACE_ID_SEED = 0;
@@ -102,6 +104,11 @@ export interface SearchSpace {
   readonly spaceId: number;
 
   /**
+   * The active LexicalModel for use with correction-search.
+   */
+  readonly model: LexicalModel;
+
+  /**
    * Notes the SearchSpace(s) whose correction-search paths are extended by this
    * SearchSpace.
    */
@@ -175,10 +182,17 @@ export interface SearchSpace {
   /**
    * Retrieves the sequence of inputs that led to this SearchSpace.
    *
-   * THIS WILL BE REMOVED SHORTLY.  (Once SearchPath takes on merging &
-   * splitting)
+   * THIS WILL BE REMOVED SHORTLY in favor of `constituentPaths` below, which
+   * provides an improved view into the data and models multiple paths to the
+   * space when they exist.  (Once SearchPath takes on merging & splitting)
    */
   readonly inputSequence: Distribution<Transform>[];
+
+  /**
+   * Reports the length in codepoints of corrected text represented by completed
+   * paths from this instance.
+   */
+  readonly codepointLength: number;
 
   /**
    * Determines the best example text representable by this batcher's portion of
@@ -199,4 +213,20 @@ export interface SearchSpace {
    * maps compatible token source ranges to each other.
    */
   get sourceRangeKey(): string;
+
+  /**
+   * Splits this SearchSpace into two halves at the specified codepoint index.
+   * The 'head' component will maximally re-use existing cached data, while the
+   * 'tail' must be reconstructed from scratch due to the new start position.
+   * @param charIndex
+   */
+  split(charIndex: number): [SearchSpace, SearchSpace];
+
+  /**
+   * Enumerates the different potential SearchPath sequences that lead to the
+   * current SearchSpace.
+   *
+   * Intended only for use during unit testing.
+   */
+  readonly constituentPaths: SearchPath[][];
 }
