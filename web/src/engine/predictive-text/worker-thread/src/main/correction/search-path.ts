@@ -10,12 +10,11 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { applyTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchSpace, TokenInputSource } from './search-space.js';
+import { generateSpaceSeed, PathResult, SearchSpace, PathInputProperties } from './search-space.js';
+import { generateSubsetId } from './tokenization-subsets.js';
 
-import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
@@ -30,7 +29,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 export class SearchPath implements SearchSpace {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   readonly inputs?: Distribution<Transform>;
-  readonly inputSource?: TokenInputSource;
+  readonly inputSource?: PathInputProperties;
 
   readonly parentSpace: SearchSpace;
   readonly spaceId: number;
@@ -62,6 +61,7 @@ export class SearchPath implements SearchSpace {
   /**
    * Extends an existing SearchSpace (and its correction data) by a keystroke based
    * on a subset of the incoming keystroke's fat-finger distribution.
+   *
    * @param space
    * @param inputs
    * @param srcKeystroke The sample from the incoming distribution that represents data actually
@@ -79,31 +79,35 @@ export class SearchPath implements SearchSpace {
    * @param srcKeystroke Data about the actual context range represented by `inputs` and
    * its underlying keystroke.
    */
-  constructor(space: SearchSpace, inputs: Distribution<Transform>, srcKeystroke: TokenInputSource);
-  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: TokenInputSource | ProbabilityMass<Transform>) {
+  constructor(space: SearchSpace, inputs: Distribution<Transform>, srcKeystroke: PathInputProperties);
+  constructor(arg1: LexicalModel | SearchSpace, inputs?: Distribution<Transform>, inputSource?: PathInputProperties | ProbabilityMass<Transform>) {
     // If we're taking in a pre-constructed search node, it's got an associated,
     // pre-assigned spaceID - so use that.
     const isExtending = (arg1 instanceof SearchPath);
     this.spaceId = generateSpaceSeed();
 
     // Coerce inputSource to TokenInputSource format.
-    if(inputSource && (inputSource as TokenInputSource).trueTransform == undefined) {
+    if(inputSource && (inputSource as ProbabilityMass<Transform>).sample != undefined) {
       const keystroke = inputSource as ProbabilityMass<Transform>;
       inputSource = {
-        trueTransform: keystroke.sample,
+        segment: {
+          trueTransform: keystroke.sample,
+          transitionId: keystroke.sample.id,
+          start: 0
+        },
         bestProbFromSet: keystroke.p,
-        inputStartIndex: 0
+        subsetId: generateSubsetId()
       }
     };
 
-    const inputSrc = inputSource as TokenInputSource;
+    const inputSrc = inputSource as PathInputProperties;
 
     if(isExtending) {
       const parentSpace = arg1 as SearchSpace;
       const logTierCost = -Math.log(inputSrc.bestProbFromSet);
 
       const transitionId = (inputs?.[0].sample.id);
-      if(transitionId !== undefined && inputSrc.trueTransform.id != transitionId) {
+      if(transitionId !== undefined && inputSrc.segment.transitionId != transitionId) {
         throw new Error("Input distribution and input-source transition IDs must match");
       }
 
@@ -196,23 +200,6 @@ export class SearchPath implements SearchSpace {
       text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
-  }
-
-  get likeliestSourceText(): string {
-    let prefixContext: Context = { left: this.parentSpace?.likeliestSourceText ?? '', startOfBuffer: true, endOfBuffer: true };
-    const inputTransform = this.inputSource?.trueTransform ?? { insert: '', deleteLeft: 0 };
-
-    const excessDeletes = inputTransform.deleteLeft - KMWString.length(prefixContext.left);
-    if(excessDeletes > 0) {
-      prefixContext = {
-        ...prefixContext,
-        // \u{2421} = ␡ (Unicode symbol for Delete)
-        left: '\u{2421}'.repeat(excessDeletes) + prefixContext.left
-      };
-    }
-
-    const result = applyTransform(inputTransform, prefixContext);
-    return result.left;
   }
 
   get parents() {
@@ -362,15 +349,15 @@ export class SearchPath implements SearchSpace {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
-  public get sourceIdentifiers(): TokenInputSource[] {
+  public get inputSegments(): PathInputProperties[] {
     if(!this.parentSpace) {
       return [];
     }
 
-    const parentSources = this.parentSpace.sourceIdentifiers;
+    const parentSources = this.parentSpace.inputSegments;
     if(this.inputSource) {
-      const inputId = this.inputSource.trueTransform.id;
-      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+      const inputId = this.inputSource.segment.transitionId;
+      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
         return parentSources;
       }
 
@@ -386,11 +373,11 @@ export class SearchPath implements SearchSpace {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.sourceIdentifiers;
+    const sources = this.inputSegments;
 
     for(const source of sources) {
-      const i = source.inputStartIndex;
-      components.push(`T${source.trueTransform.id}${i != 0 ? '@' + i : ''}`);
+      const i = source.segment.start;
+      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
     }
 
     return components.join('+');

@@ -58,7 +58,6 @@ describe('SearchPath', () => {
       assert.deepEqual(path.bestExample, {text: '', p: 1});
       assert.deepEqual(path.parents, []);
       assert.isNotOk(path.inputs);
-      assert.equal(path.likeliestSourceText, '');
     });
 
     it('may be extended from root path', () => {
@@ -78,12 +77,16 @@ describe('SearchPath', () => {
       assert.deepEqual(extendedPath.bestExample, {text: 't', p: 0.5});
       assert.deepEqual(extendedPath.parents, [rootPath]);
       assert.deepEqual(extendedPath.inputs, leadEdgeDistribution);
-      assert.equal(extendedPath.likeliestSourceText, 't');
-      assert.deepEqual(extendedPath.sourceIdentifiers, [
+      assert.deepEqual(extendedPath.inputSegments, [
         {
-          trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p
+          segment: {
+            trueTransform: leadEdgeDistribution[0].sample,
+            transitionId: leadEdgeDistribution[0].sample.id,
+            start: 0
+          },
+          bestProbFromSet: leadEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: extendedPath.inputSegments[0].subsetId
         }
       ]);
 
@@ -132,16 +135,25 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tr', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
-      assert.equal(length2Path.likeliestSourceText, 'tr');
-      assert.deepEqual(length2Path.sourceIdentifiers, [
+      assert.deepEqual(length2Path.inputSegments, [
         {
-          trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p
+          segment: {
+            trueTransform: leadEdgeDistribution[0].sample,
+            transitionId: leadEdgeDistribution[0].sample.id,
+            start: 0
+          },
+          bestProbFromSet: leadEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[0].subsetId
         }, {
-          trueTransform: tailEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: tailEdgeDistribution[0].p
+          segment: {
+            trueTransform: tailEdgeDistribution[0].sample,
+            transitionId: tailEdgeDistribution[0].sample.id,
+            start: 0
+          },
+          bestProbFromSet: tailEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[1].subsetId
         }
       ]);
 
@@ -205,16 +217,25 @@ describe('SearchPath', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tri', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
-      assert.equal(length2Path.likeliestSourceText, 'tri');
-      assert.deepEqual(length2Path.sourceIdentifiers, [
+      assert.deepEqual(length2Path.inputSegments, [
         {
-          trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: leadEdgeDistribution[0].p
+          segment: {
+            trueTransform: leadEdgeDistribution[0].sample,
+            transitionId: leadEdgeDistribution[0].sample.id,
+            start: 0
+          },
+          bestProbFromSet: leadEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[0].subsetId
         }, {
-          trueTransform: tailEdgeDistribution[0].sample,
-          inputStartIndex: 0,
-          bestProbFromSet: tailEdgeDistribution[0].p
+          segment: {
+            trueTransform: tailEdgeDistribution[0].sample,
+            transitionId: tailEdgeDistribution[0].sample.id,
+            start: 0
+          },
+          bestProbFromSet: tailEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[1].subsetId
         }
       ]);
 
