@@ -85,7 +85,7 @@ export interface PathInputProperties {
    * This tends to serve as an identifying factor for tokenized input distributions,
    * indicating the distributions were all sourced from the same original input event.
    *
-   * @see PendingTokenization.inputSubsetId
+   * @see TokenizationPath.inputSubsetId
    */
   subsetId: number;
 }

@@ -15,7 +15,7 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, generateSubsetId, models, PendingTokenization, SearchPath, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
+import { analyzePathMergesAndSplits, assembleTransforms, buildEdgeWindow, ContextToken, ContextTokenization, EditOperation, EditTuple, ExtendedEditOperation, generateSubsetId, models, TokenizationPath, SearchPath, traceInsertEdits } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -96,7 +96,7 @@ describe('ContextTokenization', function() {
 
       // We _could_ flesh this out a bit more... but it's not really needed for this test.
       const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: PendingTokenization = {
+      let transitionEdits: TokenizationPath = {
         alignment: {
           merges: [],
           splits: [],
@@ -129,7 +129,7 @@ describe('ContextTokenization', function() {
 
       // We _could_ flesh this out a bit more... but it's not really needed for this test.
       const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: PendingTokenization = {
+      let transitionEdits: TokenizationPath = {
         alignment: {
           merges: [],
           splits: [],
