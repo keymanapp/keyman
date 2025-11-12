@@ -14,6 +14,8 @@ import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { generateSubsetId, models, SearchPath, PathInputProperties } from '@keymanapp/lm-worker/test-index';
 
+import { buildAlphabeticClusterFixtures } from './search-cluster.tests.js';
+
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -334,7 +336,22 @@ describe('SearchPath', () => {
       assert.sameOrderedMembers(pathSequence, paths);
     });
 
-    // TODO:  add a test for mixed SearchPath / SearchCluster cases.
+    it('properly enumerates child paths when encountering SearchCluster ancestors', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const finalPath = fixture.paths[4].path_k4c6;
+
+      // The longest SearchPath at the end of that fixture's set is based on a
+      // lead-in cluster; all variants of that should be included.
+      assert.equal(finalPath.constituentPaths.length, fixture.clusters.cluster_k3c4.constituentPaths.length);
+
+      // That cluster holds the different potential penultimate paths;
+      // finalPath's inputs are added directly after any variation that may be
+      // output from the cluster.
+      assert.sameDeepMembers(finalPath.constituentPaths, fixture.clusters.cluster_k3c4.constituentPaths.map((p) => {
+        p.push(finalPath);
+        return p;
+      }));
+    });
   });
 
   describe('split()', () => {
