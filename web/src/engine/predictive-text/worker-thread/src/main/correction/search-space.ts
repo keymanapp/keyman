@@ -195,8 +195,9 @@ export interface SearchSpace {
   readonly bestExample: { text: string, p: number };
 
   /**
-   * Gets components useful for building a string-based representation of the
-   * keystroke range corrected by this search space.
+   * Gets components representing the keystroke range corrected by this search
+   * space.   If only part of any keystroke's effects are used, this will also
+   * be noted.
    */
   readonly inputSegments: InputSegment[];
 
