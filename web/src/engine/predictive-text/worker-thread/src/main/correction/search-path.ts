@@ -233,7 +233,7 @@ export class SearchPath implements SearchSpace {
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
-      text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      text: KMWString.substring(bestPrefix.text, 0, (this.parentSpace?.codepointLength ?? 0) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
   }
