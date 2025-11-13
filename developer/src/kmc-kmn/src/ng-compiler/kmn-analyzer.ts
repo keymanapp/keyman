@@ -394,33 +394,14 @@ export class EntryPointRule extends SingleChildRule {
 /**
  * (BNF) useStatement: USE LEFT_BR groupName RIGHT_BR
  */
-export class UseStatementRule extends SingleChildRule {
+export class UseStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
-    super();
+    super(NodeType.USE);
     const use: Rule          = new TokenRule(TokenType.USE, true);
     const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
     const groupName: Rule    = new GroupNameRule();
     const rightBracket: Rule = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([use, leftBracket, groupName, rightBracket]);
-  }
-
-  /**
-   * Parse a UseStatementRule
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const useNode       = tmp.getSoleChildOfType(NodeType.USE);
-      const groupNameNode = tmp.getSoleChildOfType(NodeType.GROUPNAME);
-      useNode.addChild(groupNameNode);
-      node.addChild(useNode);
-    }
-    return parseSuccess;
   }
 }
 
