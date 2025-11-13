@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule } from '../../src/ng-compiler/kmn-analyzer.js';
+import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
 import { GroupQualifierRule, GroupStatementRule, InputBlockRule, InputContextRule, InputElementRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { KeystrokeRule, KmnTreeRule, LhsBlockRule, LineRule, ModifierRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { OutputStatementRule, PermittedKeywordRule, PlainTextRule, ProductionBlockRule, RhsBlockRule } from '../../src/ng-compiler/kmn-analyzer.js';
@@ -1581,12 +1581,12 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeType.BEEP));
     });
   });
-  describe("Analyser Tests", () => {
+  describe("Parser Tests", () => {
     it("can parse Khmer Angkor correctly", () => {
-      const buffer: string    = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
-      tokenBuffer        = stringToTokenBuffer(buffer);
-      const kmnTreeRule: Rule = new KmnTreeRule();
-      assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+      const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
+      tokenBuffer          = stringToTokenBuffer(buffer);
+      const parser: Parser = new Parser(tokenBuffer);
+      root = parser.parse();
       const storesNode = root.getSoleChildOfType(NodeType.STORES);
       assert.isNotNull(storesNode);
       assert.isNotNull(storesNode.getSoleChildOfType(NodeType.VERSION));
@@ -1646,8 +1646,8 @@ describe("KMN Analyser Tests", () => {
     it("can parse Khmer Angkor correctly (round trip text)", () => {
       const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
       tokenBuffer = stringToTokenBuffer(buffer);
-      const kmnTreeRule: Rule = new KmnTreeRule();
-      assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+      const parser: Parser = new Parser(tokenBuffer);
+      root = parser.parse();
       assert.equal(root.toText(), buffer);
     });
     it("can provide round trip text for baseline keyboards", () => {
@@ -1706,9 +1706,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer);
       });
     });
@@ -1808,9 +1807,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -1919,9 +1917,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2030,9 +2027,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2141,9 +2137,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2251,9 +2246,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2360,9 +2354,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2471,9 +2464,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2582,9 +2574,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2693,9 +2684,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
@@ -2732,9 +2722,8 @@ describe("KMN Analyser Tests", () => {
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
-        const kmnTreeRule: Rule = new KmnTreeRule();
-        root = new ASTNode(NodeType.TMP);
-        assert.isTrue(kmnTreeRule.parse(tokenBuffer, root));
+        const parser: Parser = new Parser(tokenBuffer);
+        root = parser.parse();
         assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
