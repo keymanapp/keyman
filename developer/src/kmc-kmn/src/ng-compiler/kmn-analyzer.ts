@@ -7,7 +7,7 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToNewNodeOrTree } from "./recursive-descent.js";
 import { Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode } from "./recursive-descent.js";
 import { SingleChildRuleParseToTreeFromNewNode, TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
@@ -430,34 +430,11 @@ export class GroupStatementRule extends SingleChildRuleParseToTreeFromGivenNode 
 /**
  * (BNF) groupName: groupNameElement+
  */
-export class GroupNameRule extends SingleChildRule {
+export class GroupNameRule extends SingleChildRuleParseToNewNodeOrTree {
   public constructor() {
-    super();
+    super(NodeType.GROUPNAME);
     const groupNameElement: Rule = new GroupNameElementRule();
     this.rule = new OneOrManyRule(groupNameElement);
-  }
-
-  /**
-   * Parse a GroupNameRule
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const children = tmp.getChildren();
-      if (children.length === 1) {
-        node.addNewChildWithToken(NodeType.GROUPNAME, children[0].token);
-      } else {
-        const groupNameNode = new ASTNode(NodeType.GROUPNAME);
-        groupNameNode.addChildren(children);
-        node.addChild(groupNameNode);
-      }
-    }
-    return parseSuccess;
   }
 }
 

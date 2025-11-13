@@ -11,7 +11,7 @@
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleParseToNewNodeOrTree } from "./recursive-descent.js";
 import { SingleChildRule, SingleChildRuleParseToTreeFromFirstNode, SingleChildRuleParseToTreeFromGivenNode, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
@@ -109,28 +109,11 @@ export class NormalStoreRule extends SingleChildRule {
   }
 }
 
-export class NormalStoreNameRule extends SingleChildRule {
+export class NormalStoreNameRule extends SingleChildRuleParseToNewNodeOrTree {
   public constructor() {
-    super();
+    super(NodeType.STORENAME);
     const normalStoreNameElement: Rule = new NormalStoreNameElementRule();
     this.rule = new OneOrManyRule(normalStoreNameElement);
-  }
-
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const children = tmp.getChildren();
-      // two structures depending on number of children
-      if (children.length === 1) {
-        node.addNewChildWithToken(NodeType.STORENAME, children[0].token);
-      } else {
-        const normalStoreNameNode = new ASTNode(NodeType.STORENAME);
-        normalStoreNameNode.addChildren(children);
-        node.addChild(normalStoreNameNode);
-      }
-    }
-    return parseSuccess;
   }
 }
 
@@ -144,28 +127,11 @@ export class NormalStoreNameElementRule extends SingleChildRule {
   }
 }
 
-export class DeadkeyNameRule extends SingleChildRule {
+export class DeadkeyNameRule extends SingleChildRuleParseToNewNodeOrTree {
   public constructor() {
-    super();
+    super(NodeType.DEADKEYNAME);
     const deadkeyNameElement: Rule = new DeadkeyNameElementRule();
     this.rule = new OneOrManyRule(deadkeyNameElement);
-  }
-
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const children = tmp.getChildren();
-      // two structures depending on number of children
-      if (children.length === 1) {
-        node.addNewChildWithToken(NodeType.DEADKEYNAME, children[0].token);
-      } else {
-        const deadkeyNameNode = new ASTNode(NodeType.DEADKEYNAME);
-        deadkeyNameNode.addChildren(children);
-        node.addChild(deadkeyNameNode);
-      }
-    }
-    return parseSuccess;
   }
 }
 

@@ -110,6 +110,46 @@ export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildR
 }
 
 /**
+ * SingleChildRuleParseToNewNodeOrTree extends SingleChildRule with a parse()
+ * method that adds either a single new node or builds a tree rooted at a new node,
+ * depending on the number of children found (one or more).
+ */
+export abstract class SingleChildRuleParseToNewNodeOrTree extends SingleChildRule {
+  protected nodeType: NodeType = null;
+
+  public constructor(nodeType: NodeType) {
+    super();
+    this.nodeType = nodeType;
+  }
+
+  /**
+   * Parses the stored rule. If successful, either adds a dingle new node of
+   * the given type (for one child found) or rearranges the resulting tree
+   * to be rooted at a new node of the given type.
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    if (parseSuccess) {
+      const children = tmp.getChildren();
+      // two structures depending on number of children
+      if (children.length === 1) {
+        node.addNewChildWithToken(this.nodeType, children[0].token);
+      } else {
+        const newNode: ASTNode = new ASTNode(this.nodeType);
+        newNode.addChildren(tmp.getChildren());
+        node.addChild(newNode);
+      }
+    }
+    return parseSuccess;
+  };
+}
+
+/**
  * SingleChildRuleParseToTreeFromFirstNode extends SingleChildRule with a parse()
  * method that builds a tree rooted at the first node found.
  */
