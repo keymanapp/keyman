@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.161 alpha 2025-11-13
+
+* docs(android): Document disclaimer of Keyman NOT containing adware/spyware (#15136)
+
 ## 19.0.160 alpha 2025-11-12
 
 * fix(android): Change Alert Dialog instead of Toast if package missing keyboard and lexical-model files (#15098)
