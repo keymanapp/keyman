@@ -23,20 +23,12 @@ const PATH_QUEUE_COMPARATOR: QueueComparator<SearchQuotientNode> = (a, b) => {
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientCluster implements SearchQuotientNode {
+export class SearchQuotientCluster extends SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
   readonly spaceId: number;
 
-  // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
-  // is cheaper than iteratively building a priority queue.
-  /**
-   * This tracks all paths that have reached the end of a viable input-matching path - even
-   * those of lower cost that produce the same correction as other paths.
-   *
-   * When new input is received, its entries are then used to append edges to the path in order
-   * to find potential paths to reach a new viable end.
-   */
-  private completedPaths?: TokenResultMapping[] = [];
+  // We use an array and not a PriorityQueue b/c batch-heapifying at a single
+  // point in time is cheaper than iteratively building a priority queue.
 
   /**
    * Acts as a Map that prevents duplicating a correction-search path if reached
@@ -60,6 +52,8 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * @param inboundPaths
    */
   constructor(inboundPaths: SearchQuotientNode[]) {
+    super();
+
     if(inboundPaths.length == 0) {
       throw new Error("SearchQuotientCluster requires an array with at least one SearchQuotientNode");
     }
@@ -86,7 +80,6 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.spaceId = generateSpaceSeed();
 
     this.lowestPossibleSingleCost = lowestPossibleSingleCost;
-    this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => new TokenResultMapping(this, r));
     this.selectionQueue.enqueueAll(inboundPaths);
 
     return;
@@ -140,23 +133,19 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    */
   public handleNextNode(): PathResult<TokenResultMapping> {
     const bestPath = this.selectionQueue.dequeue();
-    const currentResult = bestPath.handleNextNode();
+    const baseResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
 
-    let finalResult = currentResult;
-    if(currentResult.type == 'complete') {
+    let finalResult = baseResult;
+    if(baseResult.type == 'complete') {
       finalResult = {
-        ...currentResult,
-        mapping: new TokenResultMapping(this, currentResult.mapping)
+        ...baseResult,
+        mapping: new TokenResultMapping(this, baseResult.mapping)
       };
-      this.completedPaths.push(finalResult.mapping);
+      this.saveResult(finalResult.mapping);
     }
 
     return finalResult;
-  }
-
-  public get previousResults(): TokenResultMapping[] {
-    return this.completedPaths;
   }
 
   get model(): LexicalModelTypes.LexicalModel {

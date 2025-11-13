@@ -31,8 +31,15 @@ export const QUEUE_NODE_COMPARATOR: QueueComparator<SearchNode> = function(arg1,
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export abstract class SearchQuotientSpur implements SearchQuotientNode {
+export abstract class SearchQuotientSpur extends SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
+
+  /**
+   * Holds all incoming Nodes generated from a parent `SearchSpace` that have not yet been
+   * extended with this `SearchSpace`'s input.
+   */
+  private incomingNodes: TokenResultMapping[] = [];
+
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
@@ -43,12 +50,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   readonly codepointLength: number;
   public abstract readonly insertLength: number;
   public abstract readonly leftDeleteLength: number
-
-  /**
-   * Marks all results that have already been returned from this instance of SearchPath.
-   * Should be deleted and cleared if any paths consider this one as a parent.
-   */
-  private returnedValues?: {[resultKey: string]: SearchNode} = {};
 
   /**
    * Provides a heuristic for the base cost at this path's depth if the best
@@ -74,6 +75,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     inputSource: PathInputProperties | ProbabilityMass<Transform>,
     codepointLength: number
   ) {
+    super();
     this.spaceId = generateSpaceSeed();
 
     // Coerce inputSource to TokenInputSource format.
@@ -101,6 +103,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
     this.codepointLength = codepointLength;
+
+    this.queueNodes(this.buildEdgesFromResults(parentNode.previousResults));
+    this.linkAndQueueFromParent(parentNode, this.incomingNodes);
   }
 
   public get model(): LexicalModel {
@@ -334,6 +339,11 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    * @returns
    */
   public handleNextNode(): PathResult<TokenResultMapping> {
+    if(this.incomingNodes.length > 0) {
+      this.buildEdgesFromResults(this.incomingNodes);
+      this.incomingNodes = [];
+    }
+
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -346,6 +356,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     if(parentCost <= localCost) {
       const result = this.parentNode.handleNextNode();
+      // The parent will insert the node into our queue.  We don't need it, though
+      // any siblings certainly will.
+      this.incomingNodes = [];
 
       if(result.type == 'complete') {
         this.queueNodes(this.buildEdgesFromResults([result.mapping]));
@@ -392,29 +405,25 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     // OK, we fully crossed a graph edge and have landed on a transition point;
     // time to build more edges / edge batches.
 
+    const result = new TokenResultMapping(this, currentNode);
     if(currentNode.spaceId == this.spaceId) {
-      if(this.returnedValues) {
-        if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
-          this.returnedValues[currentNode.resultKey] = currentNode;
-        } else {
-          // Not a better cost, so reject it and move on to the next potential result.
-          return this.handleNextNode();
-        }
+      // Verify that we don't already have a better-cost result for the
+      // correction already.
+      const isUnhandled = this.saveResult(result);
+      if(!isUnhandled) {
+        // Not a better cost, so reject it and move on to the next potential result.
+        return this.handleNextNode();
       }
 
       return {
         type: 'complete',
         cost: currentNode.currentCost,
-        mapping: new TokenResultMapping(this, currentNode)
+        mapping: result
       };
     }
 
     // If we've somehow fully exhausted all search options, indicate that none remain.
     return unmatchedResult;
-  }
-
-  public get previousResults(): TokenResultMapping[] {
-    return Object.values(this.returnedValues ?? {}).map(v => new TokenResultMapping(this, v));
   }
 
   public get inputSegments(): InputSegment[] {

@@ -45,10 +45,12 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     }
 
     this.processed.push(node);
+    const result = new TokenResultMapping(this, node);
+    this.saveResult(result);
     return {
       type: 'complete',
       cost: node.currentCost,
-      mapping: new TokenResultMapping(this, node)
+      mapping: result
     };
   }
 
