@@ -19,4 +19,12 @@ describe("TOKEN_TO_NODE Tests", () => {
     const sortedTypes: TokenType[] = [...tokenTypes].sort();
     assert.deepEqual(tokenTypes, sortedTypes);
   });
+  it("has matching TokenType and NodeType values", () => {
+    const tokenTypeValues: string[] = TOKEN_TO_NODE.map((row) => { return row.tokenType.toString(); });
+    const nodeTypeValues: string[]  = TOKEN_TO_NODE.map((row) => {
+      const value = row.nodeType.toString();
+      return value === "LINE" ? "NEWLINE" : value;
+    });
+    assert.deepEqual(tokenTypeValues, nodeTypeValues);
+  });
 });
