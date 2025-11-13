@@ -15,7 +15,7 @@ import { TOKEN_TO_NODE } from "./token-to-node.js";
 
 /**
  * Rule is the abstract base class of all the recursive-descent
- * syntax analyser rules.
+ * syntax analyzer rules.
  */
 export abstract class Rule { // equivalent to a no-child rule
   /**
@@ -30,7 +30,7 @@ export abstract class Rule { // equivalent to a no-child rule
 
 /**
  * SingleChildRule is the abstract base class of all the recursive-descent
- * syntax analyser rules with a single child.
+ * syntax analyzer rules with a single child.
  */
 export abstract class SingleChildRule extends Rule {
   protected rule: Rule;
@@ -140,7 +140,7 @@ export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChil
 
 /**
  * MultiChildRule is the abstract base class of all the recursive-descent
- * syntax analyser rules with multiple children.
+ * syntax analyzer rules with multiple children.
  */
 export abstract class MultiChildRule extends Rule {
   protected rules: Rule[];
@@ -154,7 +154,7 @@ export abstract class MultiChildRule extends Rule {
 
 /**
  * SequenceRule represents sequential rules in the recursive-descent
- * syntax analyser.
+ * syntax analyzer (rules eparated by spaces in the BNF).
  */
 export class SequenceRule extends MultiChildRule {
   public constructor(rules: Rule[]) {
@@ -193,7 +193,7 @@ export class SequenceRule extends MultiChildRule {
 
 /**
  * AlternateRule represents alternative rules in the recursive-descent
- * syntax analyser.
+ * syntax analyzer (rules eparated by '|' in the BNF).
  */
 export class AlternateRule extends MultiChildRule {
   public constructor(rules: Rule[]) {
@@ -232,7 +232,7 @@ export class AlternateRule extends MultiChildRule {
 
 /**
  * OptionalRule represents optional rules in the recursive-descent
- * syntax analyser ('?' in the BNF).
+ * syntax analyzer ('?' in the BNF).
  */
 export class OptionalRule extends SingleChildRule {
   public constructor(rule: Rule) {
@@ -258,7 +258,7 @@ export class OptionalRule extends SingleChildRule {
       node.addChildren(tmp.getChildren());
     } else {
       tokenBuffer.resetCurrentPosition(save);
-      // TODO generate warning
+      // TODO generate warning as parse returns true
     }
 
     return true;
@@ -267,7 +267,7 @@ export class OptionalRule extends SingleChildRule {
 
 /**
  * ManyRule represents 'many' rules in the recursive-descent
- * syntax analyser ('*' in the BNF).
+ * syntax analyzer ('*' in the BNF).
  */
 export class ManyRule extends SingleChildRule {
   public constructor(rule: Rule) {
@@ -302,7 +302,7 @@ export class ManyRule extends SingleChildRule {
 
 /**
  * OneOrManyRule represents one-or-many rules in the recursive-descent
- * syntax analyser ('+' in the BNF).
+ * syntax analyzer ('+' in the BNF).
  */
 export class OneOrManyRule extends SingleChildRule {
   public constructor(rule: Rule) {
@@ -449,6 +449,7 @@ export class AlternateTokenRule extends Rule {
         const nodeType: NodeType = TokenRule.getNodeType(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
+          // TODO: warning if there is no valid mapping
         }
       }
     }
