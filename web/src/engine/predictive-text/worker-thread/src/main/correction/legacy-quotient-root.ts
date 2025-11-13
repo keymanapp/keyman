@@ -43,6 +43,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     }
 
     this.processed.push(new SearchResult(node));
+    this.bufferNode(node);
     return {
       type: 'complete',
       cost: node.currentCost,
