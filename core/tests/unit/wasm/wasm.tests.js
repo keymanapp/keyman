@@ -146,4 +146,44 @@ describe('Unit tests for wasm Core API', function () {
     const context = km_core.state_context_debug(state, 0);
     assert.equal(context, '|abc| (len: 3) [ U+0061 U+0062 U+0063 ]');
   });
+
+  const contextItemsFromString = function (str) {
+    const context_items = new km_core.km_core_context_items();
+    for (let i = 0; i < str.length; i++) {
+      const item = new km_core.km_core_context_item();
+      item.character = str.charCodeAt(i);
+      context_items.push_back(item);
+    }
+    context_items.push_back(km_core.create_end_context());
+    return context_items;
+  };
+
+  it('can get and set context items', function () {
+    // Setup
+    const state = createState('k_020___deadkeys_and_backspace');
+    const context = km_core.state_context(state);
+    const data = "Hello, အရှောက်, मानव अधिकारों की सार्वभौम घोषणा";
+    const contextItems = contextItemsFromString(data);
+
+    // Execute
+    const status = km_core.context_set(context, contextItems);
+
+    // Verify
+    assert.equal(status, 0);
+
+    // Execute
+    const result = km_core.context_get(context);
+
+    // Verify
+    assert.equal(result.status, 0);
+    assert.isOk(result.object);
+    const resultContextItems = result.object;
+    assert.equal(resultContextItems.size(), contextItems.size());
+    for (let i = 0; i < resultContextItems.size(); i++) {
+      assert.equal(resultContextItems.get(i).type, contextItems.get(i).type, `at index ${i}`);
+      assert.equal(resultContextItems.get(i).character, contextItems.get(i).character, `at index ${i}`);
+    }
+    assert.deepEqual(resultContextItems.data(), contextItems.data());
+    assert.deepEqual(resultContextItems, contextItems);
+  });
 });
