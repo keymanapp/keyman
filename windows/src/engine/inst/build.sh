@@ -34,15 +34,29 @@ function do_publish() {
   #
   # Build the installation archive
   #
-  "$WIXCANDLE" -dKEYMAN_VERSION=$KEYMAN_VERSION_WIN -dRELEASE=$KEYMAN_VERSION_RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
+  #"$WIXCANDLE" -dKEYMAN_VERSION=$KEYMAN_VERSION_WIN -dRELEASE=$KEYMAN_VERSION_RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
 
   # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
-  "$WIXLIGHT" \
-    -sw1072 \
-    -ext WixUtilExtension \
-    "$WIXLIGHTCOMPRESSION" \
-    keymanengine.wixobj components.wixobj \
-    -o keymanengine.msm
+  #"$WIXLIGHT" \
+  #  -sw1072 \
+  #  -ext WixUtilExtension \
+  #  "$WIXLIGHTCOMPRESSION" \
+  #  keymanengine.wixobj components.wixobj \
+  #  -o keymanengine.msm
+  #wix build keymanengine.wxs components.wxs \
+  #-ext WixToolset.Util.wixext \
+  #-d KEYMAN_VERSION=$KEYMAN_VERSION_WIN \
+  #-d RELEASE=$KEYMAN_VERSION_RELEASE \
+  #-sw1072 \
+  #-out keymanengine.msm
+  wix build -d KEYMAN_VERSION=$env:KEYMAN_VERSION -d RELEASE=$env:KEYMAN_VERSION_RELEASE keymanengine.wxs components.wxs -ext WixToolset.Util.wixext -sw1072 -out keymanengine.msm
+
+
+  echo $KEYMAN_VERSION_RELEASE
+  echo $KEYMAN_VERSION_WIN
+  echo $KEYMAN_VERSION
+  echo $RELEASE
+
 
   #
   # Sign the installation archive

@@ -1,10 +1,8 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
     <ComponentGroup Id="KeymanEngineComponents" Directory="INSTALLDIR" Source="..\..\..\bin\engine\">
       <Component Id="kmcomapi.dll" Guid="{6272B8A9-B41E-49B1-A65B-23BCFDB42167}" SharedDllRefCount="yes">
-        <File Id="kmcomapi.dll" Name="kmcomapi.dll" KeyPath="yes" >
+        <File Id="kmcomapi.dll" Name="kmcomapi.dll" KeyPath="yes">
           <TypeLib Id="{F16E2A9A-DA46-4EA3-BFF3-BA46B480C961}" Description="Keyman API Library" Language="0" MajorVersion="1" MinorVersion="5">
               <Class Id="{CF46549D-4D2D-4679-A2E1-23A815F172F8}" Context="InprocServer32" Description="Keyman Object" ThreadingModel="apartment" Version="$(var.RELEASE)">
                   <ProgId Id="keymanapi.Keyman" Description="Keyman Object" />
@@ -51,8 +49,8 @@
         </File>
       </Component>
 
-      <Component Id="kmcomapi.x64.dll" Guid="{8AE57882-9901-4E53-B6B1-F78DD7707050}" SharedDllRefCount="yes" Win64="yes">
-        <Condition>VersionNT64</Condition>
+      <Component Id="kmcomapi.x64.dll" Guid="{8AE57882-9901-4E53-B6B1-F78DD7707050}" SharedDllRefCount="yes" Condition="VersionNT64" Bitness="always64">
+
         <File Id="kmcomapi.x64.dll" Name="kmcomapi.x64.dll" KeyPath="yes">
           <TypeLib Id="{F16E2A9A-DA46-4EA3-BFF3-BA46B480C961}" Description="Keyman API Library (64-bit)" Language="0" MajorVersion="1" MinorVersion="5">
               <Class Id="{CF46549D-4D2D-4679-A2E1-23A815F172F8}" Context="InprocServer32" Description="Keyman Object" ThreadingModel="apartment" Version="$(var.RELEASE)">
@@ -130,7 +128,7 @@
         <RegistryValue Root="HKCR" Key="Keyman.File.Diagnostics" Type="string" Value="Keyman Diagnostics File" />
         <RegistryValue Root="HKCR" Key="Keyman.File.Diagnostics\Shell" Type="string" Value="open" />
         <RegistryValue Root="HKCR" Key="Keyman.File.Diagnostics\Shell\open" Type="string" Value="&amp;Open" />
-        <RegistryValue Root="HKCR" Key="Keyman.File.Diagnostics\Shell\open\Command" Type="string" Value='"[#tsysinfo.exe]" "%1"' />
+        <RegistryValue Root="HKCR" Key="Keyman.File.Diagnostics\Shell\open\Command" Type="string" Value="&quot;[#tsysinfo.exe]&quot; &quot;%1&quot;" />
       </Component>
 
       <Component Guid="{4210C15D-0121-40BE-9B09-1576C08C4A78}">
@@ -142,51 +140,44 @@
       </Component>
 
       <Component Guid="{6B6EF05E-E60A-4902-B5F5-EEB3F8AAB384}">
-        <File Id="keymanhp.x64.exe" Name='keymanhp.x64.exe' KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.x64.exe" />
+        <File Id="keymanhp.x64.exe" Name="keymanhp.x64.exe" KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.x64.exe" />
       </Component>
 
       <Component Guid="{65E99D02-6B68-4840-BEE2-0FADB0ED67A0}">
-        <File Id="keymanhp.arm64.exe" Name='keymanhp.arm64.exe' KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.arm64.exe" />
+        <File Id="keymanhp.arm64.exe" Name="keymanhp.arm64.exe" KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.arm64.exe" />
       </Component>
 
       <Component Guid="{FB88ED52-C8F9-44F8-91F2-D0E377504C0D}">
-        <File Id="mcompile.exe" Name='mcompile.exe' KeyPath="yes" Source="..\..\..\bin\engine\mcompile.exe" />
+        <File Id="mcompile.exe" Name="mcompile.exe" KeyPath="yes" Source="..\..\..\bin\engine\mcompile.exe" />
       </Component>
 
       <Component Guid="{7D3374DC-7B4E-4593-819E-B212E876BDAF}">
         <File Id="keymanmc.dll" Name="keymanmc.dll" KeyPath="yes" Source="..\..\..\bin\engine\keymanmc.dll" />
-        <util:EventSource
-          CategoryCount="1"
-          CategoryMessageFile="[#keymanmc.dll]"
-          EventMessageFile="[#keymanmc.dll]"
-          Log="Application"
-          Name="Keyman"
-          SupportsInformationals="yes"
-          SupportsErrors="yes"
-          SupportsWarnings="yes"
-        />
+        <util:EventSource CategoryCount="1" CategoryMessageFile="[#keymanmc.dll]" EventMessageFile="[#keymanmc.dll]" Log="Application" Name="Keyman" SupportsInformationals="yes" SupportsErrors="yes" SupportsWarnings="yes" />
       </Component>
 
-      <Component Guid="*">
-        <File Id="kmrefresh.x86.exe" KeyPath="yes" />
+
+
+      <Component  Id="kmrefresh.x86.exe">
+        <File Id="kmrefresh.x86.exe" KeyPath="yes" Source="..\..\..\bin\engine\kmrefresh.x86.exe"/>
       </Component>
 
-      <Component Guid="*">
-        <File Id="kmrefresh.x64.exe" KeyPath="yes" />
+      <Component  Id="kmrefresh.x64.exe">
+        <File Id="kmrefresh.x64.exe" KeyPath="yes" Source="..\..\..\bin\engine\kmrefresh.x64.exe"/>
       </Component>
 
       <Component Guid="{FA89BC70-11F3-4DAF-A0B4-6EBA64FC6C5C}" Id="tsysinfo.xslts">
-        <File Id="base.xslt" Name='base.xslt'                 Source='..\..\engine\tsysinfo\base.xslt' />
-        <File Id="si_browsers.xslt" Name='si_browsers.xslt'   Source='..\..\engine\tsysinfo\si_browsers.xslt' />
-        <File Id="si_fonts.xslt" Name='si_fonts.xslt'         Source='..\..\engine\tsysinfo\si_fonts.xslt' />
-        <File Id="si_hookdlls.xslt" Name='si_hookdlls.xslt'   Source='..\..\engine\tsysinfo\si_hookdlls.xslt' />
-        <File Id="si_keyman.xslt" Name='si_keyman.xslt'       Source='..\..\engine\tsysinfo\si_keyman.xslt' />
-        <File Id="si_language.xslt" Name='si_language.xslt'   Source='..\..\engine\tsysinfo\si_language.xslt' />
-        <File Id="si_office.xslt" Name='si_office.xslt'       Source='..\..\engine\tsysinfo\si_office.xslt' />
-        <File Id="si_overview.xslt" Name='si_overview.xslt'   Source='..\..\engine\tsysinfo\si_overview.xslt' />
-        <File Id="si_processes.xslt" Name='si_processes.xslt' Source='..\..\engine\tsysinfo\si_processes.xslt' />
-        <File Id="si_processes_x64.xslt" Name='si_processes_x64.xslt' Source='..\..\engine\tsysinfo\si_processes_x64.xslt' />
-        <File Id="si_startup.xslt" Name='si_startup.xslt'     Source='..\..\engine\tsysinfo\si_startup.xslt' />
+        <File Id="base.xslt" Name="base.xslt" Source="..\..\engine\tsysinfo\base.xslt" />
+        <File Id="si_browsers.xslt" Name="si_browsers.xslt" Source="..\..\engine\tsysinfo\si_browsers.xslt" />
+        <File Id="si_fonts.xslt" Name="si_fonts.xslt" Source="..\..\engine\tsysinfo\si_fonts.xslt" />
+        <File Id="si_hookdlls.xslt" Name="si_hookdlls.xslt" Source="..\..\engine\tsysinfo\si_hookdlls.xslt" />
+        <File Id="si_keyman.xslt" Name="si_keyman.xslt" Source="..\..\engine\tsysinfo\si_keyman.xslt" />
+        <File Id="si_language.xslt" Name="si_language.xslt" Source="..\..\engine\tsysinfo\si_language.xslt" />
+        <File Id="si_office.xslt" Name="si_office.xslt" Source="..\..\engine\tsysinfo\si_office.xslt" />
+        <File Id="si_overview.xslt" Name="si_overview.xslt" Source="..\..\engine\tsysinfo\si_overview.xslt" />
+        <File Id="si_processes.xslt" Name="si_processes.xslt" Source="..\..\engine\tsysinfo\si_processes.xslt" />
+        <File Id="si_processes_x64.xslt" Name="si_processes_x64.xslt" Source="..\..\engine\tsysinfo\si_processes_x64.xslt" />
+        <File Id="si_startup.xslt" Name="si_startup.xslt" Source="..\..\engine\tsysinfo\si_startup.xslt" />
       </Component>
 
       <Component Id="kmtip.dll" Guid="{48060517-BD85-494C-B2FF-F9C4FFE1A987}" SharedDllRefCount="yes">
@@ -215,8 +206,8 @@
         </RegistryKey>
       </Component>
 
-      <Component Guid="{238931D6-CC32-4C71-8455-887318F2A963}" Id="kmtip_reg_win8">
-        <Condition>VersionNT &gt;= 602</Condition>
+      <Component Guid="{238931D6-CC32-4C71-8455-887318F2A963}" Id="kmtip_reg_win8" Condition="VersionNT &gt;= 602">
+
 
         <RegistryValue KeyPath="yes" Id="registry_win8_keypath" Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="win8 tip install" Value="installed" Type="string" />
 
@@ -234,16 +225,16 @@
         </RegistryKey>
       </Component>
 
-      <Component Id="kmtip64.dll" Guid="{7511B389-24C5-4C79-9050-934791014682}" SharedDllRefCount="yes" Win64="yes">
-        <Condition>VersionNT64</Condition>
+      <Component Id="kmtip64.dll" Guid="{7511B389-24C5-4C79-9050-934791014682}" SharedDllRefCount="yes" Condition="VersionNT64" Bitness="always64">
+
         <File Id="kmtip64.dll" Name="kmtip64.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtip64.dll">
           <Class Id="FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7" Context="InprocServer32" ThreadingModel="apartment" Description="Keyman Engine Text Service x64" />
         </File>
         <!-- we will register post-install? -->
       </Component>
 
-      <Component Id="kmtiparm64.dll" Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}" SharedDllRefCount="yes" Win64="yes">
-        <Condition>VersionNT64 AND ProcessorArchitecture="ARM64"</Condition>
+      <Component Id="kmtiparm64.dll" Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}" SharedDllRefCount="yes" Condition="VersionNTARM64" Bitness="always64">
+
         <File Id="kmtiparm64.dll" Name="kmtiparm64.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtiparm64.dll">
           <Class Id="FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7" Context="InprocServer32" ThreadingModel="apartment" Description="Keyman Engine Text Service ARM64" />
         </File>
@@ -260,16 +251,16 @@
 
     <ComponentGroup Id="KeymanEngineSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\..\bin\engine">
       <Component Guid="{95AB1B5C-2556-4282-B327-E2E417B26926}">
-        <File Id="sentry.dll" KeyPath="yes" />
+        <File Id="sentry.dll" Name="sentry.dll" KeyPath="yes" />
       </Component>
       <Component Guid="{3E5DACB3-055A-41EC-8890-15A30A40548B}">
-        <File Id="sentry.x64.dll" KeyPath="yes" />
+        <File Id="sentry.x64.dll" Name="sentry.x64.dll" KeyPath="yes" />
       </Component>
       <Component Guid="{B63B5989-7303-469E-AD00-BFAEEE38D1D3}">
-        <File Id="sentry.arm64.dll" KeyPath="yes" />
+        <File Id="sentry.arm64.dll" Name="sentry.arm64.dll" KeyPath="yes" />
       </Component>
       <Component Guid="{AA5AF288-4D67-49F4-A10B-E5725A42599B}">
-        <File Name="crashpad_handler.exe" KeyPath="yes" />
+        <File Id="crashpad_handler.exe" Name="crashpad_handler.exe" KeyPath="yes" />
       </Component>
     </ComponentGroup>
   </Fragment>

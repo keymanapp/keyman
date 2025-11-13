@@ -1,15 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Module Id="engine" Version="$(var.KEYMAN_VERSION)" Language="1033">
-    <Package Id="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" Keywords="Keyman,Keyboard,Engine"
-             Description="Keyman Engine $(var.RELEASE)" Comments="Contact:  Your local administrator"
-             Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id="engine" Version="$(var.KEYMAN_VERSION)" Language="1033" Guid="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" InstallerVersion="200"><SummaryInformation Keywords="Keyman,Keyboard,Engine" Description="Keyman Engine $(var.RELEASE)" Manufacturer="SIL International" />
 
     <ComponentGroupRef Id="KeymanEngineComponents" />
     <ComponentGroupRef Id="KeymanEngineSentryComponents" />
 
-    <Directory Id="TARGETDIR" Name="SourceDir" ComponentGuidGenerationSeed="50d43807-710f-4ed9-b503-637558eb0651">
-      <Directory Id="CommonFilesFolder">
+    
+
+    <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" DllEntry="PreUninstall" BinaryRef="insthelper.dll" />
+    <CustomAction Id="EnginePostInstall" Execute="deferred" Impersonate="no" DllEntry="EnginePostInstall" BinaryRef="insthelper.dll" />
+
+    <InstallExecuteSequence>
+      <Custom Action="PreUninstallA" After="InstallInitialize" Condition="REMOVE=&quot;ALL&quot; And Not REINSTALL And Not UPGRADINGPRODUCTCODE" />
+      <Custom Action="EnginePostInstall" Before="InstallFinalize" Condition="NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL" />
+    </InstallExecuteSequence>
+
+    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" />
+
+  
+      <StandardDirectory Id="CommonFilesFolder">
         <Directory Id="KEYMANROOT" Name="Keyman">
           <Directory Id="KEYMAN_ENGINE" Name="Keyman Engine">
             <Directory Id="INSTALLDIR">
@@ -21,30 +29,30 @@
                          guid rules with merge modules, as we end up with LGHT0231, as the CommonFilesFolder root folder seems to be
                          ignored when building the merge module. Therefore we list these files in a single component for now. -->
                     <File Id="osk.xsl" Name="osk.xsl" />
-                    <File Id="keyaltl.gif"         Name="key-altl.gif" />
-                    <File Id="keyaltr.gif"         Name="key-altr.gif" />
-                    <File Id="keybackspace.gif"    Name="key-backspace.gif" />
-                    <File Id="keybkslash.gif"      Name="key-bkslash.gif" />
-                    <File Id="keycapslock.gif"     Name="key-capslock.gif" />
-                    <File Id="keyctrll.gif"        Name="key-ctrll.gif" />
-                    <File Id="keyctrlr.gif"        Name="key-ctrlr.gif" />
-                    <File Id="keyenter.gif"        Name="key-enter.gif" />
-                    <File Id="keyplain.gif"        Name="key-plain.gif" />
-                    <File Id="keyshift102.gif"     Name="key-shift102.gif" />
-                    <File Id="keyshiftl.gif"       Name="key-shiftl.gif" />
-                    <File Id="keyshiftr.gif"       Name="key-shiftr.gif" />
-                    <File Id="keyspace.gif"        Name="key-space.gif" />
-                    <File Id="keytab.gif"          Name="key-tab.gif" />
+                    <File Id="keyaltl.gif" Name="key-altl.gif" />
+                    <File Id="keyaltr.gif" Name="key-altr.gif" />
+                    <File Id="keybackspace.gif" Name="key-backspace.gif" />
+                    <File Id="keybkslash.gif" Name="key-bkslash.gif" />
+                    <File Id="keycapslock.gif" Name="key-capslock.gif" />
+                    <File Id="keyctrll.gif" Name="key-ctrll.gif" />
+                    <File Id="keyctrlr.gif" Name="key-ctrlr.gif" />
+                    <File Id="keyenter.gif" Name="key-enter.gif" />
+                    <File Id="keyplain.gif" Name="key-plain.gif" />
+                    <File Id="keyshift102.gif" Name="key-shift102.gif" />
+                    <File Id="keyshiftl.gif" Name="key-shiftl.gif" />
+                    <File Id="keyshiftr.gif" Name="key-shiftr.gif" />
+                    <File Id="keyspace.gif" Name="key-space.gif" />
+                    <File Id="keytab.gif" Name="key-tab.gif" />
                   </Component>
                 </Directory>
               </Directory>
             </Directory>
           </Directory>
         </Directory>
-      </Directory>
+      </StandardDirectory>
 
-      <Directory Id="CommonAppDataFolder" Name="CADF">
-        <Directory Id="CommonApp_KeymanRoot" Name="Keyman" >
+      <StandardDirectory Id="CommonAppDataFolder">
+        <Directory Id="CommonApp_KeymanRoot" Name="Keyman">
           <Directory Id="CommonApp_TS_Keyman" Name="Keyman Engine">
             <Directory Id="CommonApp_TS_Keyman_Kbd" Name="Keyboard">
               <Directory Id="CommonApp_TS_Keyman_Kbd_Pkg" Name="_Package" />
@@ -61,9 +69,9 @@
             <RemoveFolder Id="CAD_ts_Keyman_Kbd_Pkg_Uninst" On="uninstall" Directory="CommonApp_TS_Keyman_Kbd_Pkg" />
           </Component>
         </Directory>
-      </Directory>
-      <Directory Id="AppDataFolder" Name="ADF">
-        <Directory Id="App_KeymanRoot" Name="Keyman" >
+      </StandardDirectory>
+      <StandardDirectory Id="AppDataFolder">
+        <Directory Id="App_KeymanRoot" Name="Keyman">
           <Directory Id="App_TS_Keyman" Name="Keyman Engine">
             <Directory Id="App_TS_Keyman_Keyboard" Name="Keyboard">
               <Directory Id="App_TS_Keyman_Kbd_Pkg" Name="_Package" />
@@ -80,18 +88,6 @@
             <RemoveFolder Id="AD_ts_Keyman_Kbd_Pkg_Uninst" On="uninstall" Directory="App_TS_Keyman_Kbd_Pkg" />
           </Component>
         </Directory>
-      </Directory>
-    </Directory>
-
-    <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="PreUninstall" />
-    <CustomAction Id="EnginePostInstall" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="EnginePostInstall" />
-
-    <InstallExecuteSequence>
-      <Custom Action="PreUninstallA" After="InstallInitialize"><![CDATA[REMOVE="ALL" And Not REINSTALL And Not UPGRADINGPRODUCTCODE]]></Custom>
-      <Custom Action="EnginePostInstall" Before="InstallFinalize"><![CDATA[NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL]]></Custom>
-    </InstallExecuteSequence>
-
-    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" />
-
-  </Module>
+      </StandardDirectory>
+    </Module>
 </Wix>

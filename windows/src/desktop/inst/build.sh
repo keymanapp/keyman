@@ -20,7 +20,7 @@ builder_if_release_build_level builder_describe_outputs \
 builder_parse "$@"
 
 . "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
+. "$KEYMAN_ROOT/resources/build/win/wix6.inc.sh"
 . "$KEYMAN_ROOT/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
@@ -62,20 +62,20 @@ function do_publish() {
   #
   # Build the installation archive
   #
-  do_candle
-
+  #do_candle
+  do_wix_build
   # ICE82: we suppress because it reports spurious errors with merge module
   #        keymanengine to do with duplicate sequence numbers.  Safely ignored.
   # ICE80: we suppress because it reports x64 components without targeting x64.
   #        Safely ignored.
 
-  "$WIXLIGHT" \
-    -sice:ICE82 -sice:ICE80 \
-    -nologo \
-    -dWixUILicenseRtf=License.rtf \
-    "$WIXLIGHTCOMPRESSION" \
-    -out keymandesktop.msi -ext WixUIExtension \
-    keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
+  #"$WIXLIGHT" \
+  #  -sice:ICE82 -sice:ICE80 \
+  #  -nologo \
+  #  -dWixUILicenseRtf=License.rtf \
+  #  "$WIXLIGHTCOMPRESSION" \
+  #  -out keymandesktop.msi -ext WixUIExtension \
+  #  keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
 
   #
   # Sign the installation archive
@@ -135,12 +135,53 @@ function test-releaseexists() {
   fi
 }
 
+
+function do_wix_build_OLD() {
+  #"${WIXCOMPRESSION}" \ this line was in the wix build cli     -culture en-us \
+  local GUID1=$(generate_uuid)
+  DESKTOP_UI_SRC="../kmshell/xml"
+  LOCALE_SRC="../kmshell/locale"
+$WIX6BUILD \
+    -d KEYMAN_VERSION_WITH_TAG="${KEYMAN_VERSION_WITH_TAG}" \
+    -d KEYMAN_VERSION="${KEYMAN_VERSION_WIN}" \
+    -d RELEASE="${KEYMAN_VERSION_RELEASE}" \
+    -d PRODUCTID="${GUID1}" \
+    -d CefSourceDir="${KEYMAN_CEF4DELPHI_ROOT}" \
+    -d DesktopUISource="${DESKTOP_UI_SRC}" \
+    -d LocaleSource="${LOCALE_SRC}" \
+    -d HarvestFileGenerateGuidsNow=true \
+    keymandesktop.wxs \
+    -ext WixToolset.Util.wixext \
+    -o "KeymanDesktop-${KEYMAN_VERSION_WITH_TAG}.msi" \
+
+}
+
+function do_wix_build() {
+  #"${WIXCOMPRESSION}" \ this line was in the wix build cli     -culture en-us \
+  exclude-cef
+  local GUID1=$(generate_uuid)
+  DESKTOPUISOURCE="../kmshell/xml"
+  LOCALESOURCE="../kmshell/locale"
+echo "Building with ProductID: $GUID1"
+  dotnet build KeymanDesktop.wixproj \
+  -p:PRODUCTID="$GUID1" \
+  -p:RELEASE="$KEYMAN_VERSION_RELEASE" \
+  -p:KEYMAN_VERSION="$KEYMAN_VERSION_WIN" \
+  -p:KEYMAN_VERSION_WITH_TAG="$KEYMAN_VERSION_WITH_TAG" \
+  -p:KEYMAN_VERSION_WIN="$KEYMAN_VERSION_WIN" \
+  -p:CefSourceDir="$KEYMAN_WIX_TEMP_CEF" \
+  -p:DESKTOPUISOURCE="$DESKTOPUISOURCE" \
+  -p:LOCALESOURCE="$LOCALESOURCE"
+}
+
+
 function do_candle() {
   heat-cef
 
   builder_heading candle
 
   local GUID1=$(generate_uuid)
+  "$WIXHEAT" dir "$KEYMAN_WIX_TEMP_CEF" -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
   "$WIXHEAT" dir ../kmshell/xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
   "$WIXHEAT" dir ../kmshell/locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
   "$WIXCANDLE" -dKEYMAN_VERSION_WITH_TAG=${KEYMAN_VERSION_WITH_TAG} -dKEYMAN_VERSION=${KEYMAN_VERSION_WIN} -dRELEASE=${KEYMAN_VERSION_RELEASE} -dPRODUCTID=$GUID1 \
@@ -158,6 +199,15 @@ function heat-cef() {
   "$WIXHEAT" dir "$KEYMAN_WIX_TEMP_CEF" -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
   # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
   rm -rf "$KEYMAN_WIX_TEMP_CEF"
+}
+
+function exclude-cef() {
+  builder_heading exclude-cef
+
+  # We copy the files to a temp folder in order to exclude .git  from harvesting
+  rm -rf "$KEYMAN_WIX_TEMP_CEF"
+  mkdir -p "$KEYMAN_WIX_TEMP_CEF"
+  cp -r "$KEYMAN_CEF4DELPHI_ROOT"/* "$KEYMAN_WIX_TEMP_CEF"
 }
 
 
