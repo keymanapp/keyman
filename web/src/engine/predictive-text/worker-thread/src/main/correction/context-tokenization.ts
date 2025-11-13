@@ -586,7 +586,7 @@ export class ContextTokenization {
       if(affectedToken.inputRange.length == 0 && distribution[0].sample.deleteLeft != 0) {
         distribution = distribution.map((mass) => ({sample: { ...mass.sample, deleteLeft: 0 }, p: mass.p }));
       }
-      affectedToken.addInput({trueTransform: sourceInput, inputStartIndex: appliedLength, bestProbFromSet: bestProbFromSet}, distribution);
+      affectedToken.addInput({trueTransform: sourceInput, inputStartIndex: appliedLength, bestProbFromSet}, distribution);
       appliedLength += KMWString.length(distribution[0].sample.insert);
 
       const tokenize = determineModelTokenizer(lexicalModel);
