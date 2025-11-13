@@ -15,7 +15,7 @@ export enum TokenType {
   ANSI                = "ANSI",                // https://help.keyman.com/developer/language/reference/begin
   ANY                 = "ANY",                 // https://help.keyman.com/developer/language/reference/any
   BASELAYOUT          = "BASELAYOUT",          // https://help.keyman.com/developer/language/reference/baselayout
-  BASELAYOUT_SHORTCUT = "BASELAYOUT_SHORTCUT", //https://help.keyman.com/developer/language/reference/baselayout
+  BASELAYOUT_SHORTCUT = "BASELAYOUT_SHORTCUT", // https://help.keyman.com/developer/language/reference/baselayout
   BEEP                = "BEEP",                // https://help.keyman.com/developer/language/reference/beep
   BEGIN               = "BEGIN",               // https://help.keyman.com/developer/language/reference/begin
   BITMAP              = "BITMAP",              // https://help.keyman.com/developer/language/reference/bitmap
