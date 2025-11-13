@@ -16,22 +16,17 @@ import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignR
 import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
-import { Lexer, Token } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
 
 export class Parser {
-  private buffer: string;
-  private filename: string;
+  private readonly tokenBuffer: TokenBuffer;
 
-  public constructor(buffer: string, filename: string=null) {
-    this.buffer   = buffer;
-    this.filename = filename;
+  public constructor(buffer: TokenBuffer) {
+    this.tokenBuffer = buffer;
   }
 
   public parse(): ASTNode {
-    const lexer = new Lexer(this.buffer, this.filename);
-    const tokens: Token[] = lexer.parse();
-    Rule.tokenBuffer = new TokenBuffer(tokens);
+    Rule.tokenBuffer = this.tokenBuffer;
     const kmnTreeRule: Rule = new KmnTreeRule();
     const root: ASTNode = new ASTNode(NodeType.TMP);
     kmnTreeRule.parse(root);
