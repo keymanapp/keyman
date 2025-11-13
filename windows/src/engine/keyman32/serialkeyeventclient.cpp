@@ -22,25 +22,25 @@ public:
 
     m_hKeyEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, GLOBAL_KEY_EVENT_NAME);
     if (m_hKeyEvent == 0) {
-      DebugLastError("OpenEvent");
+      // DebugLastError("OpenEvent");
       return;
     }
 
     m_hKeyMutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, GLOBAL_KEY_MUTEX_NAME);
     if (m_hKeyMutex == 0) {
-      DebugLastError("OpenMutex");
+      // DebugLastError("OpenMutex");
       return;
     }
 
     m_hMMF = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GLOBAL_FILE_MAPPING_NAME);
     if (m_hMMF == 0) {
-      DebugLastError("OpenFileMapping");
+      // DebugLastError("OpenFileMapping");
       return;
     }
 
     m_pSharedData = (SerialKeyEventSharedData *)MapViewOfFile(m_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SerialKeyEventSharedData));
     if (!m_pSharedData) {
-      DebugLastError("MapViewOfFile");
+      // DebugLastError("MapViewOfFile");
       return;
     }
   }
@@ -48,25 +48,25 @@ public:
   SerialKeyEventClient::~SerialKeyEventClient() {
     if (m_pSharedData != NULL) {
       if (!UnmapViewOfFile(m_pSharedData)) {
-        DebugLastError("UnmapViewOfFile");
+        // DebugLastError("UnmapViewOfFile");
       }
     }
 
     if (m_hMMF != NULL) {
       if (!CloseHandle(m_hMMF)) {
-        DebugLastError("CloseHandle(m_hMMF)");
+        // DebugLastError("CloseHandle(m_hMMF)");
       }
     }
 
     if (m_hKeyMutex != NULL) {
       if (!CloseHandle(m_hKeyMutex)) {
-        DebugLastError("CloseHandle(m_hKeyMutex)");
+        // DebugLastError("CloseHandle(m_hKeyMutex)");
       }
     }
 
     if (m_hKeyEvent != NULL) {
       if (!CloseHandle(m_hKeyEvent)) {
-        DebugLastError("CloseHandle(m_hKeyEvent)");
+        // DebugLastError("CloseHandle(m_hKeyEvent)");
       }
     }
   }
@@ -149,7 +149,7 @@ public:
 };
 
 void ISerialKeyEventClient::Startup() {
-  OutputThreadDebugString("ISerialKeyEventClient::Startup");
+  // OutputThreadDebugString("ISerialKeyEventClient::Startup");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (_td) {
     _td->pSerialKeyEventClient = new SerialKeyEventClient();
@@ -157,7 +157,7 @@ void ISerialKeyEventClient::Startup() {
 }
 
 void ISerialKeyEventClient::Shutdown() {
-  OutputThreadDebugString("ISerialKeyEventClient::Shutdown");
+  // OutputThreadDebugString("ISerialKeyEventClient::Shutdown");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (_td && _td->pSerialKeyEventClient) {
     delete _td->pSerialKeyEventClient;

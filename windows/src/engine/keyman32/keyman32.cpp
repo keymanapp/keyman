@@ -119,27 +119,20 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 	switch(fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-    //OutputThreadDebugString("DLL_PROCESS_ATTACH");
     if(!Globals_InitProcess()) return FALSE;
 		break;
 	case DLL_PROCESS_DETACH:
     if (reserved == NULL) {
       // If reserved == NULL, that means the library is being unloaded, but
       // the process is not terminating.
-      //OutputThreadDebugString("DLL_PROCESS_DETACH not terminating");
       UninitialiseProcess(FALSE);
       Globals_UninitProcess();
     }
-    else {
-      //OutputThreadDebugString("DLL_PROCESS_DETACH terminating");
-    }
 		break;
 	case DLL_THREAD_ATTACH:
-    //OutputThreadDebugString("DLL_THREAD_ATTACH");
     Globals_InitThread();
 		break;
 	case DLL_THREAD_DETACH:
-    //OutputThreadDebugString("DLL_THREAD_DETACH");
     UninitialiseProcess(FALSE);
     Globals_UninitThread();
 		break;
@@ -838,7 +831,7 @@ void RefreshKeyboards(BOOL Initialising)
 
 void ReleaseKeyboards(BOOL Lock)
 {
-  OutputThreadDebugString("ReleaseKeyboards");
+  // OutputThreadDebugString("ReleaseKeyboards");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
 	if(!_td || !_td->lpKeyboards) return;
 
