@@ -14,7 +14,7 @@ import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyzer.tests.js';
-import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, HeaderNameRule, NormalStoreNameRule } from '../../src/ng-compiler/store-analyzer.js';
+import { CapsAlwaysOffRule, CapsOnOnlyRule, DeadkeyNameRule, HeaderAssignRule, HeaderNameRule, NormalStoreNameRule } from '../../src/ng-compiler/store-analyzer.js';
 import { NormalStoreAssignRule, NormalStoreRule, ResetStoreRule, SetNormalStoreRule, SetSystemStoreRule } from '../../src/ng-compiler/store-analyzer.js';
 import { ShiftFreesCapsRule, StoreNameRule, SystemStoreAssignRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyzer.js';
 import { SystemStoreNameRule, SystemStoreRule } from '../../src/ng-compiler/store-analyzer.js';
@@ -342,6 +342,40 @@ describe("KMN Store Analyser Tests", () => {
       assert.isNotNull(normalStoreNameNode);
       assert.equal(normalStoreNameNode.getSoleChildOfType(NodeType.UNICODE).getText(), 'Unicode');
       assert.equal(normalStoreNameNode.getSoleChildOfType(NodeType.PARAMETER).getText(), 'Area');
+    });
+  });
+  describe("DeadkeyNameRule Tests", () => {
+    it("can construct a DeadkeyNameRule", () => {
+      tokenBuffer = stringToTokenBuffer('');
+      const deadkeyName: Rule = new DeadkeyNameRule();
+      assert.isNotNull(deadkeyName);
+    });
+    it("can parse correctly (parameter)", () => {
+      tokenBuffer = stringToTokenBuffer('main');
+      const deadkeyName: Rule = new DeadkeyNameRule();
+      assert.isTrue(deadkeyName.parse(tokenBuffer, root));
+      assert.equal(root.getSoleChildOfType(NodeType.DEADKEYNAME).getText(), 'main');
+    });
+    it("can parse correctly (octal)", () => {
+      tokenBuffer = stringToTokenBuffer('1');
+      const deadkeyName: Rule = new DeadkeyNameRule();
+      assert.isTrue(deadkeyName.parse(tokenBuffer, root));
+      assert.equal(root.getSoleChildOfType(NodeType.DEADKEYNAME).getText(), '1');
+    });
+    it("can parse correctly (permitted keyword)", () => {
+      tokenBuffer = stringToTokenBuffer('newcontext');
+      const deadkeyName: Rule = new DeadkeyNameRule();
+      assert.isTrue(deadkeyName.parse(tokenBuffer, root));
+      assert.equal(root.getSoleChildOfType(NodeType.DEADKEYNAME).getText(), 'newcontext');
+    });
+    it("can parse correctly (multi word name)", () => {
+      tokenBuffer = stringToTokenBuffer('Unicode Area');
+      const deadkeyName: Rule = new DeadkeyNameRule();
+      assert.isTrue(deadkeyName.parse(tokenBuffer, root));
+      const deadkeyNameNode = root.getSoleChildOfType(NodeType.DEADKEYNAME);
+      assert.isNotNull(deadkeyNameNode);
+      assert.equal(deadkeyNameNode.getSoleChildOfType(NodeType.UNICODE).getText(), 'Unicode');
+      assert.equal(deadkeyNameNode.getSoleChildOfType(NodeType.PARAMETER).getText(), 'Area');
     });
   });
   describe("StoreNameRule Tests", () => {
