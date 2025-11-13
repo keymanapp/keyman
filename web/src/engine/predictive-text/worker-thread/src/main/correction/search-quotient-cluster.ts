@@ -29,14 +29,21 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
   readonly spaceId: number;
 
-  // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
-  // is cheaper than iteratively building a priority queue.
   /**
-   * This tracks all paths that have reached the end of a viable input-matching path - even
-   * those of lower cost that produce the same correction as other paths.
+   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
+   * this SearchCluster but not yet by child SearchSpaces.
+   */
+  private childBuffers: SearchNode[][] = [];
+
+  // We use an array and not a PriorityQueue b/c batch-heapifying at a single
+  // point in time is cheaper than iteratively building a priority queue.
+  /**
+   * This tracks all paths that have reached the end of a viable input-matching
+   * path - even those of lower cost that produce the same correction as other
+   * paths.
    *
-   * When new input is received, its entries are then used to append edges to the path in order
-   * to find potential paths to reach a new viable end.
+   * When new input is received, its entries are then used to append edges to
+   * the path in order to find potential paths to reach a new viable end.
    */
   private completedPaths?: SearchNode[] = [];
 
@@ -147,6 +154,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.selectionQueue.enqueue(bestPath);
 
     if(currentResult.type == 'complete') {
+      this.bufferNode(currentResult.finalNode);
       this.completedPaths?.push(currentResult.finalNode);
       currentResult.spaceId = this.spaceId;
     }
@@ -156,6 +164,14 @@ export class SearchQuotientCluster implements SearchQuotientNode {
 
   public get previousResults(): SearchResult[] {
     return this.completedPaths?.map((n => new SearchResult(n, this.spaceId))) ?? [];
+  }
+
+  public addResultBuffer(nodeBuffer: SearchNode[]): void {
+    this.childBuffers.push(nodeBuffer);
+  }
+
+  private bufferNode(node: SearchNode) {
+    this.childBuffers.forEach((buf) => buf.push(node));
   }
 
   get model(): LexicalModelTypes.LexicalModel {

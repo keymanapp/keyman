@@ -31,6 +31,19 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export abstract class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
+
+  /**
+   * Holds all incoming Nodes generated from a parent `SearchSpace` that have not yet been
+   * extended with this `SearchSpace`'s input.
+   */
+  private incomingNodes: SearchNode[] = [];
+
+  /**
+   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
+   * this SearchPath but not yet by child SearchSpaces.
+   */
+  private childBuffers: SearchNode[][] = [];
+
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
@@ -99,6 +112,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
     this.codepointLength = codepointLength;
+
+    this.queueNodes(this.buildEdgesForNodes(parentNode.previousResults.map(r => r.node)));
+    parentNode.addResultBuffer(this.incomingNodes);
   }
 
   public get model(): LexicalModel {
@@ -328,6 +344,11 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    * @returns
    */
   public handleNextNode(): PathResult {
+    if(this.incomingNodes.length > 0) {
+      this.buildEdgesForNodes(this.incomingNodes);
+      this.incomingNodes = [];
+    }
+
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -339,6 +360,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       }
 
       const result = this.parentNode.handleNextNode();
+      // The parent will insert the node into our queue.  We don't need it, though
+      // any siblings certainly will.
+      this.incomingNodes = [];
 
       if(result.type == 'complete') {
         this.queueNodes(this.buildEdgesForNodes([result.finalNode]));
@@ -404,6 +428,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
         }
       }
 
+      this.bufferNode(currentNode);
       return {
         type: 'complete',
         cost: currentNode.currentCost,
@@ -418,6 +443,14 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
   public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  }
+
+  public addResultBuffer(nodeBuffer: SearchNode[]): void {
+    this.childBuffers.push(nodeBuffer);
+  }
+
+  private bufferNode(node: SearchNode) {
+    this.childBuffers.forEach((buf) => buf.push(node));
   }
 
   public get inputSegments(): InputSegment[] {

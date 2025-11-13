@@ -23,8 +23,14 @@ export class SearchQuotientRoot implements SearchQuotientNode {
   private hasBeenProcessed: boolean = false;
 
   /**
-   * Constructs a fresh SearchQuotientRoot instance to be used as the root of
-   * the predictive-text correction / suggestion search process.
+   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
+   * this SearchPath but not yet by child SearchSpaces.
+   */
+  private childBuffers: SearchNode[][] = [];
+
+  /**
+   * Constructs a fresh SearchSpace instance for used in predictive-text correction
+   * and suggestion searches.
    * @param baseSpaceId
    * @param model
    */
@@ -69,6 +75,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
     this.hasBeenProcessed = true;
 
+    this.bufferNode(this.rootNode);
     return {
       type: 'complete',
       cost: 0,
@@ -146,5 +153,13 @@ export class SearchQuotientRoot implements SearchQuotientNode {
       // If the parent was a cluster, the cluster itself is the merge.
       return parentMerge;
     }
+  }
+
+  addResultBuffer(nodeBuffer: SearchNode[]): void {
+    this.childBuffers.push(nodeBuffer);
+  }
+
+  protected bufferNode(node: SearchNode) {
+    this.childBuffers.forEach((buf) => buf.push(node));
   }
 }
