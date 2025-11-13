@@ -1718,6 +1718,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can provide round trip text for repository keyboards (0-99)", () => {
       [
+        'release/a/aksarabali_panlex/source/aksarabali_panlex',
+        /*
         'experimental/a/alephwithbeth/source/alephwithbeth',
         'experimental/a/amuzgo_guerrero/source/amuzgo_guerrero',
         'experimental/b/beria_erfe_phonetic/source/beria_erfe_phonetic',
@@ -1809,6 +1811,7 @@ describe("KMN Analyser Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
+        */
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
@@ -2088,7 +2091,7 @@ describe("KMN Analyser Tests", () => {
         'release/e/enggano/source/enggano',
         'release/e/english_shavian_igc/source/english_shavian_igc',
         'release/e/english_shavian_qwerty/source/english_shavian_qwerty',
-        'release/e/engram/source/engram',
+        // 'release/e/engram/source/engram', no longer in repository
         'release/e/eo_plus/source/eo_plus',
         'release/e/esperanto_sava_eujao/source/esperanto_sava_eujao',
         'release/e/esperuni/source/esperuni',

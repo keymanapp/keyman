@@ -36,7 +36,7 @@ describe("TOKEN_TO_NODE Tests", () => {
     const bnfTokenSet = new Set<String>(bnfTokens);
     const tokenTypes: string[] = TOKEN_TO_NODE.map((row) => { return row.tokenType.toString(); })
     // BNF tokens that do not get mapped directly to NodeTypes
-    tokenTypes.push('CHEVRON', 'COMMA', 'LEFT_BR', 'LEFT_SQ', 'OLDCHARPOSMATCHING', 'PLUS', 'RANGE', 'RIGHT_BR', 'RIGHT_SQ');
+    tokenTypes.push('CHEVRON', 'COMMA', 'EOF', 'LEFT_BR', 'LEFT_SQ', 'OLDCHARPOSMATCHING', 'PLUS', 'RANGE', 'RIGHT_BR', 'RIGHT_SQ');
     tokenTypes.sort();
     assert.deepEqual([...bnfTokenSet], tokenTypes);
   });
