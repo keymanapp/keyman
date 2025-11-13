@@ -30,10 +30,10 @@ function do_build() {
 
 function do_install() {
   cp "$WINDOWS_PROGRAM_ENGINE/keymanmc.dll" "$INSTALLPATH_KEYMANENGINE/keymanmc.dll"
-  reg add 'HKLM\\SYSTEM\\CurrentControlSet\\services\\eventlog\\Application\\Keyman' //v CategoryCount //t REG_DWORD //d 1 //f
-  reg add 'HKLM\\SYSTEM\\CurrentControlSet\\services\\eventlog\\Application\\Keyman' //v CategoryMessageFile //t REG_SZ //d "$INSTALLPATH_KEYMANENGINE\\keymanmc.dll" //f
-  reg add 'HKLM\\SYSTEM\\CurrentControlSet\\services\\eventlog\\Application\\Keyman' //v EventMessageFile //t REG_SZ //d "$INSTALLPATH_KEYMANENGINE\\keymanmc.dll" //f
-  reg add 'HKLM\\SYSTEM\\CurrentControlSet\\services\\eventlog\\Application\\Keyman' //v TypesSupported //t REG_DWORD //d 7 //f
+  reg add 'HKLM\SYSTEM\CurrentControlSet\services\eventlog\Application\Keyman' //v CategoryCount //t REG_DWORD //d 1 //f
+  reg add 'HKLM\SYSTEM\CurrentControlSet\services\eventlog\Application\Keyman' //v CategoryMessageFile //t REG_SZ //d "$INSTALLPATH_KEYMANENGINE\\keymanmc.dll" //f
+  reg add 'HKLM\SYSTEM\CurrentControlSet\services\eventlog\Application\Keyman' //v EventMessageFile //t REG_SZ //d "$INSTALLPATH_KEYMANENGINE\\keymanmc.dll" //f
+  reg add 'HKLM\SYSTEM\CurrentControlSet\services\eventlog\Application\Keyman' //v TypesSupported //t REG_DWORD //d 7 //f
 }
 
 builder_run_action clean:project        rm -f keymanmc.dll keymanmc.h keymanmc.rc keymanmc.res MSG00409.bin
