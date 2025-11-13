@@ -18,13 +18,30 @@ import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
 
+/**
+ * The Next Generation Parser for the Keyman Keyboard Language.
+ *
+ * The Parser builds an Abstract Syntax Tree from the supplied TokenBuffer.
+ *
+ */
 export class Parser {
   private readonly tokenBuffer: TokenBuffer;
 
-  public constructor(buffer: TokenBuffer) {
-    this.tokenBuffer = buffer;
+  /**
+   * Construct a Parser
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   */
+  public constructor(tokenBuffer: TokenBuffer) {
+    this.tokenBuffer = tokenBuffer;
   }
 
+  /**
+   * Parses the tokenBuffer to create an abstract syntax
+   * tree (AST) of a KMN file.
+   *
+   * @returns the abstract syntax tree (AST)
+   */
   public parse(): ASTNode {
     const kmnTreeRule: Rule = new KmnTreeRule();
     const root: ASTNode = new ASTNode(NodeType.TMP);
@@ -33,6 +50,9 @@ export class Parser {
   }
 }
 
+/**
+ * (BNF) kmnTree: line*
+ */
 export class KmnTreeRule extends SingleChildRule {
   public constructor() {
     super();
@@ -40,6 +60,15 @@ export class KmnTreeRule extends SingleChildRule {
     this.rule = new ManyRule(line);
   }
 
+  /**
+   * Parse a KMNTreeRule, including gathering the source code,
+   * groups and stores and arranging these stores, other nodes,
+   * groups and then source code.
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     if (this.rule === null) {
       return false;
@@ -113,6 +142,9 @@ export class KmnTreeRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) line: compileTarget? content? NEWLINE
+ */
 export class LineRule extends SingleChildRule {
   public constructor() {
     super();
@@ -125,6 +157,9 @@ export class LineRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
+ */
 export class CompileTargetRule extends SingleChildRule {
   public constructor() {
     super();
@@ -139,6 +174,10 @@ export class CompileTargetRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
+ * headerAssign|normalStoreAssign|ruleBlock
+ */
 export class ContentRule extends SingleChildRule {
   public constructor() {
     super();
@@ -161,6 +200,9 @@ export class ContentRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) text: plainText|outsStatement
+ */
 export class TextRule extends SingleChildRule {
   public constructor() {
     super();
@@ -170,6 +212,9 @@ export class TextRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) plainText: textRange|simpleText
+ */
 export class PlainTextRule extends SingleChildRule {
   public constructor() {
     super();
@@ -179,6 +224,10 @@ export class PlainTextRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
+ * DECIMAL|HEXADECIMAL|OCTAL|NUL|deadkeyStatement|BEEP
+ */
 export class SimpleTextRule extends SingleChildRule {
   public constructor() {
     super();
@@ -209,6 +258,9 @@ export class SimpleTextRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) textRange: simpleText rangeEnd+
+ */
 export class TextRangeRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeType.RANGE);
@@ -219,6 +271,9 @@ export class TextRangeRule extends SingleChildRuleParseToTreeFromNewNode {
   }
 }
 
+/**
+ * (BNF) rangeEnd: RANGE simpleText
+ */
 export class RangeEndRule extends SingleChildRule {
   public constructor() {
     super();
@@ -228,6 +283,9 @@ export class RangeEndRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
+ */
 export class VirtualKeyRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeType.VIRTUAL_KEY);
@@ -242,6 +300,9 @@ export class VirtualKeyRule extends SingleChildRuleParseToTreeFromNewNode {
   }
 }
 
+/**
+ * (BNF) modifier: SHIFT|CAPS|MODIFIER
+ */
 export class ModifierRule extends SingleChildRule {
   public constructor() {
     super();
@@ -251,6 +312,15 @@ export class ModifierRule extends SingleChildRule {
     this.rule = new AlternateRule([shift, caps, modifier]);
   }
 
+  /**
+   * Parse a ModifierRule.  As SHIFT and CAPS are separately
+   * identified as they are used in other rules, a MODIFIER
+   * node must be created for them if needed.
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
@@ -265,6 +335,9 @@ export class ModifierRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) keyCode: KEY_CODE|STRING|DECIMAL
+ */
 export class KeyCodeRule extends SingleChildRule {
   // DECIMAL is included because of e.g. d10, which could be ISO9995 code
   public constructor() {
@@ -276,6 +349,9 @@ export class KeyCodeRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) ruleBlock: beginStatement|groupStatement|productionBlock
+ */
 export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
@@ -286,6 +362,9 @@ export class RuleBlockRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) beginStatement: BEGIN entryPoint? CHEVRON useStatement
+ */
 export class BeginStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeType.BEGIN);
@@ -298,6 +377,9 @@ export class BeginStatementRule extends SingleChildRuleParseToTreeFromGivenNode 
   }
 }
 
+/**
+ * (BNF) entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
+ */
 export class EntryPointRule extends SingleChildRule {
   public constructor() {
     super();
@@ -309,6 +391,9 @@ export class EntryPointRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) useStatement: USE LEFT_BR groupName RIGHT_BR
+ */
 export class UseStatementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -319,6 +404,13 @@ export class UseStatementRule extends SingleChildRule {
     this.rule = new SequenceRule([use, leftBracket, groupName, rightBracket]);
   }
 
+  /**
+   * Parse a UseStatementRule
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
@@ -332,6 +424,9 @@ export class UseStatementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
+ */
 export class GroupStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
   public constructor() {
     super(NodeType.GROUP);
@@ -351,6 +446,9 @@ export class GroupStatementRule extends SingleChildRuleParseToTreeFromGivenNode 
   }
 }
 
+/**
+ * (BNF) groupName: groupNameElement+
+ */
 export class GroupNameRule extends SingleChildRule {
   public constructor() {
     super();
@@ -358,6 +456,13 @@ export class GroupNameRule extends SingleChildRule {
     this.rule = new OneOrManyRule(groupNameElement);
   }
 
+  /**
+   * Parse a GroupNameRule
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
@@ -375,6 +480,9 @@ export class GroupNameRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) groupNameElement: PARAMETER|OCTAL|permittedKeyword
+ */
 export class GroupNameElementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -385,6 +493,9 @@ export class GroupNameElementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) see the BNF file (kmn-file.bnf)
+ */
 export class PermittedKeywordRule extends AlternateTokenRule {
   public constructor() {
     super([
@@ -425,6 +536,9 @@ export class PermittedKeywordRule extends AlternateTokenRule {
   }
 }
 
+/**
+ * (BNF) groupQualifier: usingKeys|READONLY
+ */
 export class GroupQualifierRule extends SingleChildRule {
   public constructor() {
     super();
@@ -434,6 +548,9 @@ export class GroupQualifierRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) usingKeys: USING KEYS
+ */
 export class UsingKeysRule extends SingleChildRule {
   public constructor() {
     super();
@@ -442,6 +559,13 @@ export class UsingKeysRule extends SingleChildRule {
     this.rule = new SequenceRule([using, keys]);
   }
 
+  /**
+   * Parse a UsingKeysRule
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
@@ -452,6 +576,9 @@ export class UsingKeysRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) productionBlock: lhsBlock CHEVRON rhsBlock
+ */
 export class ProductionBlockRule extends SingleChildRule {
   public constructor() {
     super();
@@ -461,6 +588,13 @@ export class ProductionBlockRule extends SingleChildRule {
     this.rule = new SequenceRule([lhsBlock, chevron, rhsBlock]);
   }
 
+  /**
+   * Parse a ProductionBlockRule
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
@@ -476,6 +610,9 @@ export class ProductionBlockRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) lhsBlock: MATCH|NOMATCH|inputBlock
+ */
 export class LhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeType.LHS);
@@ -486,6 +623,9 @@ export class LhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   }
 }
 
+/**
+ * (BNF) inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
+ */
 export class InputBlockRule extends SingleChildRule {
   public constructor() {
     super();
@@ -503,6 +643,9 @@ export class InputBlockRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) inputContext: inputElement+
+ */
 export class InputContextRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeType.INPUT_CONTEXT);
@@ -511,6 +654,9 @@ export class InputContextRule extends SingleChildRuleParseToTreeFromNewNode {
   }
 }
 
+/**
+ * (BNF) inputElement: anyStatement|notanyStatement|contextStatement|indexStatement|text
+ */
 export class InputElementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -529,6 +675,9 @@ export class InputElementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) keystroke: PLUS inputElement+
+ */
 export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeType.KEYSTROKE);
@@ -539,6 +688,9 @@ export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
   }
 }
 
+/**
+ * (BNF) rhsBlock: outputStatement+
+ */
 export class RhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   public constructor() {
     super(NodeType.RHS);
@@ -547,6 +699,11 @@ export class RhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
   }
 }
 
+/**
+ * (BNF) outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
+ * resetStore|setSystemStore|layerStatement|indexStatement|
+ * contextStatement|CONTEXT|RETURN|text|BEEP
+ */
 export class OutputStatementRule extends SingleChildRule {
   public constructor() {
     super();
