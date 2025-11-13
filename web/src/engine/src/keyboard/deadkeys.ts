@@ -43,6 +43,10 @@ export class Deadkey {
     return this.d == other.d && this.p == other.p && this.o == other.o;
   }
 
+  toString() {
+    return `Deadkey { p: ${this.p}, d: ${this.d}, o: ${this.o}, matched: ${this.matched}}`
+  }
+
   /**
    * Sorts the deadkeys in reverse order.
    */
