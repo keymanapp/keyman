@@ -11,10 +11,11 @@ export class Deadkey {
     this.p = pos;
     this.d = id;
     this.o = Deadkey.ordinalSeed++;
+    this.matched = 0;
   }
 
-  match(p: number, d: number): boolean {
-    const result:boolean = (this.p == p && this.d == d);
+  match(pos: number, deadkey: number): boolean {
+    const result:boolean = (this.p == pos && this.d == deadkey);
 
     return result;
   }
@@ -39,7 +40,7 @@ export class Deadkey {
   }
 
   equal(other: Deadkey) {
-    return this.d == other.d && this.p == other.d && this.o == other.o;
+    return this.d == other.d && this.p == other.p && this.o == other.o;
   }
 
   /**
@@ -82,11 +83,11 @@ export class DeadkeyTracker {
    * Scope        Public
    * @param       {number}      caretPos  current cursor position
    * @param       {number}      n         expected offset of deadkey from cursor
-   * @param       {number}      d         deadkey
+   * @param       {number}      deadkey   deadkey
    * @return      {boolean}               True if deadkey found selected context matches val
    * Description  Match deadkey at current cursor position
    */
-  isMatch(caretPos: number, n: number, d: number): boolean {
+  isMatch(caretPos: number, n: number, deadkey: number): boolean {
     if(this.dks.length == 0) {
       return false; // I3318
     }
@@ -96,7 +97,7 @@ export class DeadkeyTracker {
     for(let i = 0; i < this.dks.length; i++) {
       // Don't re-match an already-matched deadkey.  It's possible to have two identical
       // entries, and they should be kept separately.
-      if(this.dks[i].match(n, d) && !this.dks[i].matched) {
+      if(this.dks[i].match(n, deadkey) && !this.dks[i].matched) {
         this.dks[i].set();
         // Assumption:  since we match the first possible entry in the array, we
         // match the entry with the lower ordinal - the 'first' deadkey in the position.
@@ -115,7 +116,9 @@ export class DeadkeyTracker {
 
   remove(dk: Deadkey) {
     const index = this.dks.indexOf(dk);
-    this.dks.splice(index, 1);
+    if (index > -1) {
+      this.dks.splice(index, 1);
+    }
   }
 
   clear() {
@@ -161,7 +164,6 @@ export class DeadkeyTracker {
     }
 
     const otherDks = other.dks;
-    const matchedDks: Deadkey[] = [];
 
     for(const dk of this.dks) {
       const match = otherDks.find((otherDk) => dk.equal(otherDk));
@@ -170,7 +172,7 @@ export class DeadkeyTracker {
       }
     }
 
-    return matchedDks.length == otherDks.length;
+    return true;
   }
 
   count(): number {
