@@ -11,7 +11,7 @@
 import { TokenType } from "./token-type.js";
 import { PlainTextRule } from "./kmn-analyzer.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode, TokenRule } from "./recursive-descent.js";
-import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyzer.js";
+import { DeadkeyNameRule, NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
@@ -64,14 +64,28 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
-export class DeadkeyStatementRule extends AbstractBracketedStoreNameStatementRule {
+export class DeadkeyStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const deadkey: Rule = new TokenRule(TokenType.DEADKEY, true);
-    this.cmdNodeType = NodeType.DEADKEY;
+    const deadkey: Rule      = new TokenRule(TokenType.DEADKEY, true);
+    const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
+    const deadkeyName: Rule  = new DeadkeyNameRule();
+    const rightBracket: Rule = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([
-      deadkey, this.leftBracket, this.normalStoreName, this.rightBracket
+      deadkey, leftBracket, deadkeyName, rightBracket
     ]);
+  }
+
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    if (parseSuccess) {
+      const deadkeyNode     = tmp.getSoleChildOfType(NodeType.DEADKEY);
+      const deadkeyNameNode = tmp.getSoleChildOfType(NodeType.DEADKEYNAME);
+      deadkeyNode.addChild(deadkeyNameNode);
+      node.addChild(deadkeyNode);
+    }
+    return parseSuccess;
   }
 }
 

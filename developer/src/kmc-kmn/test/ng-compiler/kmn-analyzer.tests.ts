@@ -1381,12 +1381,12 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(notAnyNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (deadKey [as text])", () => {
-      tokenBuffer = stringToTokenBuffer('dk(storeName)');
+      tokenBuffer = stringToTokenBuffer('dk(deadkeyName)');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(tokenBuffer, root));
       const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
       assert.isNotNull(deadKeyNode);
-      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.STORENAME));
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.DEADKEYNAME));
     });
     it("can parse correctly (contextStatement)", () => {
       tokenBuffer = stringToTokenBuffer('context(1)');
@@ -1522,12 +1522,12 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(resetNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (deadkey statement [as text])", () => {
-      tokenBuffer = stringToTokenBuffer('dk(storeName)');
+      tokenBuffer = stringToTokenBuffer('dk(deadkeyName)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(tokenBuffer, root));
       const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
       assert.isNotNull(deadKeyNode);
-      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.STORENAME));
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.DEADKEYNAME));
     });
     it("can parse correctly (set system store statement)", () => {
       tokenBuffer = stringToTokenBuffer('set(&layer = "value")');

@@ -65,12 +65,12 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(deadKeyStatement);
     });
     it("can parse correctly", () => {
-      tokenBuffer = stringToTokenBuffer('dk(storeName)');
+      tokenBuffer = stringToTokenBuffer('dk(deadkeyName)');
       const deadKeyStatement: Rule = new DeadkeyStatementRule();
       assert.isTrue(deadKeyStatement.parse(tokenBuffer, root));
       const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
       assert.isNotNull(deadKeyNode);
-      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.STORENAME));
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.DEADKEYNAME));
     });
   });
   describe("NotanyStatementRule Tests", () => {

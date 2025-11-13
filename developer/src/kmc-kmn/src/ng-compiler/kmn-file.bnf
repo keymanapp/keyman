@@ -40,7 +40,7 @@ outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
 # Statement Rules
 anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
 callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
-deadkeyStatement: DEADKEY LEFT_BR normalStoreName RIGHT_BR
+deadkeyStatement: DEADKEY LEFT_BR deadkeyName RIGHT_BR
 notanyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
 saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
 baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
@@ -69,6 +69,8 @@ normalStoreAssign: normalStore text*
 normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: normalStoreNameElement+
 normalStoreNameElement: PARAMETER|OCTAL|permittedKeyword
+deadkeyName: deadkeyNameElement+
+deadkeyNameElement: PARAMETER|OCTAL|permittedKeyword
 storeName: systemStoreName|normalStoreName
 setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR

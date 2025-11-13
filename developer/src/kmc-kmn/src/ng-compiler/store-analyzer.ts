@@ -144,6 +144,41 @@ export class NormalStoreNameElementRule extends SingleChildRule {
   }
 }
 
+export class DeadkeyNameRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const deadkeyNameElement: Rule = new DeadkeyNameElementRule();
+    this.rule = new OneOrManyRule(deadkeyNameElement);
+  }
+
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    if (parseSuccess) {
+      const children = tmp.getChildren();
+      // two structures depending on number of children
+      if (children.length === 1) {
+        node.addNewChildWithToken(NodeType.DEADKEYNAME, children[0].token);
+      } else {
+        const deadkeyNameNode = new ASTNode(NodeType.DEADKEYNAME);
+        deadkeyNameNode.addChildren(children);
+        node.addChild(deadkeyNameNode);
+      }
+    }
+    return parseSuccess;
+  }
+}
+
+export class DeadkeyNameElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const parameter: Rule        = new TokenRule(TokenType.PARAMETER, true);
+    const octal: Rule            = new TokenRule(TokenType.OCTAL, true);
+    const permittedKeyword: Rule = new PermittedKeywordRule();
+    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+  }
+}
+
 export class StoreNameRule extends SingleChildRule {
   public constructor() {
     super();

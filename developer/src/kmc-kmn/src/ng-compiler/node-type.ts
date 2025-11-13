@@ -30,6 +30,7 @@ export enum NodeType {
   COPYRIGHT             = "COPYRIGHT",
   COPYRIGHT_HEADER      = "COPYRIGHT_HEADER",
   DEADKEY               = "DEADKEY",
+  DEADKEYNAME           = "DEADKEYNAME",
   DECIMAL               = "DECIMAL",
   DISPLAYMAP            = "DISPLAYMAP",
   EQUAL                 = "EQUAL",
