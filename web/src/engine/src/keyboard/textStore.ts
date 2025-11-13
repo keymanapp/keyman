@@ -11,10 +11,10 @@ import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 export abstract class TextStore {
-  private _dks: DeadkeyTracker;
+  private _deadkeys: DeadkeyTracker;
 
   constructor() {
-    this._dks = new DeadkeyTracker();
+    this._deadkeys = new DeadkeyTracker();
   }
 
   /**
@@ -30,15 +30,15 @@ export abstract class TextStore {
   }
 
   deadkeys(): DeadkeyTracker {
-    return this._dks;
+    return this._deadkeys;
   }
 
   hasDeadkeyMatch(n: number, d: number): boolean {
-    return this.deadkeys().isMatch(this.getDeadkeyCaret(), n, d);
+    return this.deadkeys().isMatch(this.getCaret(), n, d);
   }
 
   insertDeadkeyBeforeCaret(d: number) {
-    const dk: Deadkey = new Deadkey(this.getDeadkeyCaret(), d);
+    const dk: Deadkey = new Deadkey(this.getCaret(), d);
     this.deadkeys().add(dk);
   }
 
@@ -49,7 +49,7 @@ export abstract class TextStore {
    * @param {number} delta  Use negative values if characters were deleted, positive if characters were added.
    */
   protected adjustDeadkeys(delta: number) {
-    this.deadkeys().adjustPositions(this.getDeadkeyCaret(), delta);
+    this.deadkeys().adjustPositions(this.getCaret(), delta);
   }
 
   /**
@@ -57,7 +57,7 @@ export abstract class TextStore {
    * @param {object}  dks   An existing set of deadkeys to deep-copy for use by this element interface.
    */
   protected setDeadkeys(dks: DeadkeyTracker) {
-    this._dks = dks.clone();
+    this._deadkeys = dks.clone();
   }
 
   static assertIsTextStore(textStore: TextStoreLanguageProcessorInterface): asserts textStore is TextStore {
@@ -123,7 +123,8 @@ export abstract class TextStore {
     this.setTextAfterCaret(original.getTextAfterCaret());
 
     // Also, restore the deadkeys!
-    this._dks = original._dks.clone();
+    // TODO-web-core: km_core_context_set or similar?
+    this.setDeadkeys(original._deadkeys);
   }
 
   apply(transform: LexicalModelTypes.Transform) {
@@ -145,7 +146,7 @@ export abstract class TextStore {
 
     // We assume that all deadkeys are invalidated after applying a Transform, since
     // prediction implies we'll be completing a word, post-deadkeys.
-    this._dks.clear();
+    this.deadkeys().clear();
   }
 
   /**
@@ -191,9 +192,9 @@ export abstract class TextStore {
   abstract isSelectionEmpty(): boolean;
 
   /**
-   * Returns an index corresponding to the caret's position for use with deadkeys.
+   * Returns an index corresponding to the caret's position in the text store.
    */
-  abstract getDeadkeyCaret(): number;
+  abstract getCaret(): number;
 
   /**
    * Relative to the caret, gets the current context within the wrapper's element.
