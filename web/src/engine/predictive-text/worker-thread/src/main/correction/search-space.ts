@@ -237,4 +237,12 @@ export interface SearchSpace {
   readonly constituentPaths: SearchPath[][];
 
   isSameSpace(space: SearchSpace): boolean;
+
+  /**
+   * This is used among SearchSpaces to ensure that nodes processed by earlier portions
+   * of the correction-search dynamic graph are provided to all child SearchSpaces for
+   * construction of new portions of the graph corresponding to their modeled inputs.
+   * @param nodeBuffer
+   */
+  addResultBuffer(nodeBuffer: SearchNode[]): void;
 }
