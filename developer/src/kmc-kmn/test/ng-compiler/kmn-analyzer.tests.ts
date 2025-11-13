@@ -1582,6 +1582,11 @@ describe("KMN Analyser Tests", () => {
     });
   });
   describe("Parser Tests", () => {
+    it("can construct a Parser", () => {
+      tokenBuffer = stringToTokenBuffer('');
+      const parser: Parser = new Parser(tokenBuffer);
+      assert.isNotNull(parser);
+    });
     it("can parse Khmer Angkor correctly", () => {
       const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
       tokenBuffer          = stringToTokenBuffer(buffer);
