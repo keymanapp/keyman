@@ -525,14 +525,14 @@ class COMP_KMXPLUS_DISP_Helper : public COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS
  * layr section
    ------------------------------------------------------------------ */
 
-struct COMP_KMXPLUS_LAYR_LIST {
+struct COMP_KMXPLUS_LAYR_FORM {
     KMX_DWORD_unaligned hardware;
     KMX_DWORD_unaligned layer;
     KMX_DWORD_unaligned count;
     KMX_DWORD_unaligned minDeviceWidth;
 };
 
-static_assert(sizeof(struct COMP_KMXPLUS_LAYR_LIST) == LDML_LENGTH_LAYR_LIST, "mismatched size of COMP_KMXPLUS_LAYR_LIST");
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_FORM) == LDML_LENGTH_LAYR_FORM, "mismatched size of COMP_KMXPLUS_LAYR_FORM");
 
 struct COMP_KMXPLUS_LAYR_ENTRY {
     KMXPLUS_STR id;
@@ -559,14 +559,14 @@ static_assert(sizeof(struct COMP_KMXPLUS_LAYR_KEY) == LDML_LENGTH_LAYR_KEY, "mis
 
 struct COMP_KMXPLUS_LAYR {
   static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_LAYR;
-  KMX_DWORD_unaligned listCount;
+  KMX_DWORD_unaligned formCount;
   KMX_DWORD_unaligned layerCount;
   KMX_DWORD_unaligned rowCount;
   KMX_DWORD_unaligned keyCount;
   // entries, rows, and keys have a dynamic offset
   // use COMP_KMXPLUS_LAYR_Helper to access.
   //
-  // COMP_KMXPLUS_LAYR_LIST lists[];
+  // COMP_KMXPLUS_LAYR_FORM forms[];
   // COMP_KMXPLUS_LAYR_ENTRY entries[];
   // COMP_KMXPLUS_LAYR_ROW rows[];
   // COMP_KMXPLUS_LAYR_KEY keys[];
@@ -592,11 +592,11 @@ public:
   virtual bool valid() const;
 
   /**
-   * @param list index from 0 to layr->listCount
+   * @param form index from 0 to layr->formCount
    */
-  const COMP_KMXPLUS_LAYR_LIST  *getList(KMX_DWORD list) const;
+  const COMP_KMXPLUS_LAYR_FORM  *getForm(KMX_DWORD form) const;
   /**
-   * @param entry index value: COMP_KMXPLUS_LAYR_LIST.layer but less than COMP_KMXPLUS_LAYR_LIST.layer+COMP_KMXPLUS_LAYR_LIST.count
+   * @param entry index value: COMP_KMXPLUS_LAYR_FORM.layer but less than COMP_KMXPLUS_LAYR_FORM.layer+COMP_KMXPLUS_LAYR_FORM.count
    */
   const COMP_KMXPLUS_LAYR_ENTRY *getEntry(KMX_DWORD entry) const;
   const COMP_KMXPLUS_LAYR_ROW   *getRow(KMX_DWORD row) const;
@@ -604,7 +604,7 @@ public:
 
 private:
   bool is_valid;
-  const COMP_KMXPLUS_LAYR_LIST *lists;
+  const COMP_KMXPLUS_LAYR_FORM *forms;
   const COMP_KMXPLUS_LAYR_ENTRY *entries;
   const COMP_KMXPLUS_LAYR_ROW *rows;
   const COMP_KMXPLUS_LAYR_KEY *keys;

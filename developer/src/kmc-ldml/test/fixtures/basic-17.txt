@@ -427,7 +427,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
 
 # TODO-LDML: lots of comment-out ahead. Need to revisit.
 
-block(list)                         # struct COMP_KMXPLUS_LAYR_LIST {
+block(list)                         # struct COMP_KMXPLUS_LIST {
   6c 69 73 74                       #   KMX_DWORD header.ident;   // 0000 Section name - list
   diff(list,endList)                #   KMX_DWORD header.size;    // 0004 Section length
   03 00 00 00                       #   KMX_DWORD listCount (should be 2)

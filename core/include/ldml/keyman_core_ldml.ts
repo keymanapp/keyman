@@ -363,13 +363,13 @@ class Constants {
    */
   readonly length_layr = 24;
   /**
-   *  Length of each layer list in the 'layr' section variable part
+   *  Length of each layer form in the 'layr' section variable part
    */
-  readonly length_layr_list = 16;
+  readonly length_layr_form = 16;
   /**
    * for the 'hardware' field indicating a touch keyboard, non-hardware
    */
-  readonly layr_list_hardware_touch = 'touch';
+  readonly layr_form_hardware_touch = 'touch';
   /**
    * Length of each layer entry in the 'layr' section variable part
    */
@@ -384,12 +384,12 @@ class Constants {
   readonly length_layr_key = 4;
 
   /**
-   * Minimum allowed minDeviceWidth for a layer list
+   * Minimum allowed minDeviceWidth for a layer form
    */
   readonly layr_min_minDeviceWidth = 1;
 
   /**
-   * Maximum allowed minDeviceWidth for a layer list
+   * Maximum allowed minDeviceWidth for a layer form
    */
   readonly layr_max_minDeviceWidth = 999;
 

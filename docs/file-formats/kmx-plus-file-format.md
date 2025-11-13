@@ -294,32 +294,35 @@ Represents layers on the keyboard.
 |---|------|------------|------------------------------------------|
 | 0 |  32  | ident      | `layr`                                   |
 | 4 |  32  | size       | int: Length of section                   |
-| 8 |  32  | listCount  | int: Number of layer lists               |
+| 8 |  32  | formCount  | int: Number of layer forms               |
 |12 |  32  | layerCount | int: number of layer entries             |
 |16 |  32  | rowCount   | int: number of row entries               |
 |20 |  32  | keyCount   | int: number of key entries               |
-|24 | var  | lists      | layer list sub-table                     |
+|24 | var  | forms      | layer form sub-table                     |
 | - | var  | layers     | layers sub-table                         |
 | - | var  | rows       | rows sub-table                           |
 | - | var  | keys       | keys sub-table                           |
 
-### `layr.lists` subtable
+### `layr.forms` subtable
 
-Each layer list corresponds to one `<layers>` element.
-There are `listCount` total lists.
+Each layer form corresponds to one `<layers>` element.
+There are `formCount` total forms.
+
+Note: renamed from `lists` to `forms` in Keyman 19, to increase clarity
+and differentiate from other uses of `list`.
 
 | ∆ | Bits | Name             | Description                                |
 |---|------|------------------|--------------------------------------------|
 | 0+|  32  | hardware         | str: name of hardware layout.              |
 | 4+|  32  | layer            | int: index to first layer element          |
-| 8+|  32  | count            | int: number of layer elements in this list |
+| 8+|  32  | count            | int: number of layer elements in this form |
 |12+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
 - `hardware` is the name of a form, or the string `touch`
 
 See UTS #35 section 7 for details about these values.
 
-Layer lists are sorted by `hardware` string, then minDeviceWidth ascending.
+Layer forms are sorted by `hardware` string, then minDeviceWidth ascending.
 
 ### `layr.layers` subtable
 
