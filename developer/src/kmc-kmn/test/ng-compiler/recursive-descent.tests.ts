@@ -30,10 +30,10 @@ class TrueRule extends Rule {
     super();
   }
 
-  public parse(node: ASTNode): boolean {
-    if (Rule.tokenBuffer.nextToken().isTokenType(TokenType.EOF))
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    if (tokenBuffer.nextToken().isTokenType(TokenType.EOF))
       return false;
-    Rule.tokenBuffer.popToken();
+    tokenBuffer.popToken();
     node.addChild(new ASTNode(NodeType.TMP));
     return true;
   }
@@ -44,24 +44,25 @@ class FalseRule extends Rule {
     super();
   }
 
-  public parse(node: ASTNode): boolean {
-    Rule.tokenBuffer.popToken();
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    tokenBuffer.popToken();
     return false;
   }
 }
 
-let root: ASTNode       = null;
-let trueRule: Rule      = null;
-let falseRule: Rule     = null;
-let parameters: Token[] = null;
+let tokenBuffer: TokenBuffer = null;
+let root: ASTNode            = null;
+let trueRule: Rule           = null;
+let falseRule: Rule          = null;
+let parameters: Token[]      = null;
 
 describe("Recursive Descent Tests", () => {
   beforeEach(() => {
-    Rule.tokenBuffer = new TokenBuffer(LIST_OF_ONE);
-    root             = new ASTNode(NodeType.TMP);
-    trueRule         = new TrueRule();
-    falseRule        = new FalseRule();
-    parameters       = [];
+    tokenBuffer = new TokenBuffer(LIST_OF_ONE);
+    root        = new ASTNode(NodeType.TMP);
+    trueRule    = new TrueRule();
+    falseRule   = new FalseRule();
+    parameters  = [];
   });
   describe("SequenceRule Tests", () => {
     it("can construct a SequenceRule", () => {
@@ -70,27 +71,27 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (single child Rule)", () => {
       const sequence: Rule = new SequenceRule([trueRule]);
-      assert.isTrue(sequence.parse(root));
+      assert.isTrue(sequence.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 1);
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with a successful child Rule (three child Rules)", () => {
-      Rule.tokenBuffer     = new TokenBuffer(LIST_OF_THREE);
+      tokenBuffer          = new TokenBuffer(LIST_OF_THREE);
       const sequence: Rule = new SequenceRule([trueRule, trueRule, trueRule]);
-      assert.isTrue(sequence.parse(root));
+      assert.isTrue(sequence.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 3);
-      assert.equal(Rule.tokenBuffer.currentPosition, 3);
+      assert.equal(tokenBuffer.currentPosition, 3);
     });
     it("can parse with an unsuccessful child Rule (three child Rules)", () => {
-      Rule.tokenBuffer     = new TokenBuffer(LIST_OF_THREE);
+      tokenBuffer          = new TokenBuffer(LIST_OF_THREE);
       const sequence: Rule = new SequenceRule([trueRule, falseRule, trueRule]);
-      assert.isFalse(sequence.parse(root));
+      assert.isFalse(sequence.parse(tokenBuffer, root));
       assert.isFalse(root.hasChild());
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
   describe("AlternateRule Tests", () => {
@@ -100,27 +101,27 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (single child Rule)", () => {
       const alternate: Rule = new AlternateRule([trueRule]);
-      assert.isTrue(alternate.parse(root));
+      assert.isTrue(alternate.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 1);
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with a successful child Rule (three child Rules)", () => {
-      Rule.tokenBuffer      = new TokenBuffer(LIST_OF_THREE);
+      tokenBuffer           = new TokenBuffer(LIST_OF_THREE);
       const alternate: Rule = new AlternateRule([trueRule, trueRule, falseRule]);
-      assert.isTrue(alternate.parse(root));
+      assert.isTrue(alternate.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 1);
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule (three child Rules)", () => {
-      Rule.tokenBuffer      = new TokenBuffer(LIST_OF_THREE);
+      tokenBuffer           = new TokenBuffer(LIST_OF_THREE);
       const alternate: Rule = new AlternateRule([falseRule, falseRule, falseRule]);
-      assert.isFalse(alternate.parse(root));
+      assert.isFalse(alternate.parse(tokenBuffer, root));
       assert.isFalse(root.hasChild());
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
   describe("OptionalRule Tests", () => {
@@ -130,17 +131,17 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule", () => {
       const optional: Rule = new OptionalRule(trueRule);
-      assert.isTrue(optional.parse(root));
+      assert.isTrue(optional.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 1);
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule", () => {
-      const optional: Rule  = new OptionalRule(falseRule);
-      assert.isTrue(optional.parse(root));
+      const optional: Rule = new OptionalRule(falseRule);
+      assert.isTrue(optional.parse(tokenBuffer, root));
       assert.isFalse(root.hasChild());
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
   describe("ManyRule Tests", () => {
@@ -150,26 +151,26 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (single Token)", () => {
       const many: Rule = new ManyRule(trueRule);
-      assert.isTrue(many.parse(root));
+      assert.isTrue(many.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 1);
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with a successful child Rule (three Tokens)", () => {
-      Rule.tokenBuffer = new TokenBuffer(LIST_OF_THREE);
+      tokenBuffer      = new TokenBuffer(LIST_OF_THREE);
       const many: Rule = new ManyRule(trueRule);
-      assert.isTrue(many.parse(root));
+      assert.isTrue(many.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 3);
-      assert.equal(Rule.tokenBuffer.currentPosition, 3);
+      assert.equal(tokenBuffer.currentPosition, 3);
     });
     it("can parse with a unsuccessful child Rule", () => {
       const many: Rule = new ManyRule(falseRule);
-      assert.isTrue(many.parse(root));
+      assert.isTrue(many.parse(tokenBuffer, root));
       assert.isFalse(root.hasChild());
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
   describe("OneOrManyRule Tests", () => {
@@ -179,40 +180,40 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (single Token)", () => {
       const oneOrMany: Rule = new OneOrManyRule(trueRule);
-      assert.isTrue(oneOrMany.parse(root));
+      assert.isTrue(oneOrMany.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 1);
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with a successful child Rule (three Tokens)", () => {
-      Rule.tokenBuffer      = new TokenBuffer(LIST_OF_THREE);
+      tokenBuffer           = new TokenBuffer(LIST_OF_THREE);
       const oneOrMany: Rule = new OneOrManyRule(trueRule);
-      assert.isTrue(oneOrMany.parse(root));
+      assert.isTrue(oneOrMany.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.TMP));
       assert.equal(root.getChildren().length, 3);
-      assert.equal(Rule.tokenBuffer.currentPosition, 3);
+      assert.equal(tokenBuffer.currentPosition, 3);
     });
     it("can parse with a successful child Rule (two Tokens)", () => {
-      Rule.tokenBuffer = new TokenBuffer([
+      tokenBuffer = new TokenBuffer([
         new Token(TokenType.STRING, ''),
         new Token(TokenType.STRING, ''),
         new Token(TokenType.STORE, ''),
       ]);
       const tokenRule: Rule = new TokenRule(TokenType.STRING, true);
       const oneOrMany: Rule = new OneOrManyRule(tokenRule);
-      assert.isTrue(oneOrMany.parse(root));
+      assert.isTrue(oneOrMany.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeType.STRING));
       assert.equal(root.getChildren().length, 2);
-      assert.equal(Rule.tokenBuffer.currentPosition, 2);
+      assert.equal(tokenBuffer.currentPosition, 2);
     });
     it("can parse with a unsuccessful child Rule", () => {
       const oneOrMany: Rule = new OneOrManyRule(falseRule);
-      assert.isFalse(oneOrMany.parse(root));
+      assert.isFalse(oneOrMany.parse(tokenBuffer, root));
       assert.isFalse(root.hasChild());
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
   describe("TokenRule Tests", () => {
@@ -222,21 +223,21 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (addNode false)", () => {
       const tokenRule: Rule = new TokenRule(TokenType.STRING);
-      assert.isTrue(tokenRule.parse(root));
+      assert.isTrue(tokenRule.parse(tokenBuffer, root));
       assert.isFalse(root.hasChild());
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with a successful child Rule (addNode true)", () => {
       const tokenRule: Rule = new TokenRule(TokenType.STRING, true);
-      assert.isTrue(tokenRule.parse(root));
+      assert.isTrue(tokenRule.parse(tokenBuffer, root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasSoleChildOfType(NodeType.STRING));
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule", () => {
       const tokenRule: Rule = new TokenRule(TokenType.STORE);
-      assert.isFalse(tokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.isFalse(tokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
   describe("AlternateTokenRule Tests", () => {
@@ -246,43 +247,43 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse a matched token (from a list of one)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([TokenType.STRING]);
-      assert.isTrue(alternateTokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.isTrue(alternateTokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse an unmatched token (from a list of one)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([TokenType.PARAMETER]);
-      assert.isFalse(alternateTokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.isFalse(alternateTokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
     it("can parse a matched token (from a list of three)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([
         TokenType.BITMAP, TokenType.STRING, TokenType.PARAMETER,
       ]);
-      assert.isTrue(alternateTokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.isTrue(alternateTokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse an unmatched token (from a list of three)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([
         TokenType.BITMAP, TokenType.COPYRIGHT, TokenType.PARAMETER,
       ]);
-      assert.isFalse(alternateTokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.isFalse(alternateTokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
     it("can parse a matched token (from a list of one, addNode is true)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([TokenType.STRING], true);
-      assert.isTrue(alternateTokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.isTrue(alternateTokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 1);
       assert.isTrue(root.hasChildOfType(NodeType.STRING));
     });
     it("can parse an unmatched token (from an empty list)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule([]);
-      assert.isFalse(alternateTokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.isFalse(alternateTokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
     it("can parse an unmatched token (from a null list)", () => {
       const alternateTokenRule: Rule = new AlternateTokenRule(null);
-      assert.isFalse(alternateTokenRule.parse(root));
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.isFalse(alternateTokenRule.parse(tokenBuffer, root));
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
   describe("parameterSequence() Tests", () => {
@@ -290,10 +291,10 @@ describe("Recursive Descent Tests", () => {
       const tokens = [
         new Token(TokenType.PARAMETER, ''),
       ];
-      Rule.tokenBuffer = new TokenBuffer(tokens);
-      assert.isTrue(parameterSequence(parameters, 1));
+      tokenBuffer = new TokenBuffer(tokens);
+      assert.isTrue(parameterSequence(tokenBuffer, parameters, 1));
       assert.deepEqual(parameters, tokens);
-      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse three parameters", () => {
       const tokens = [
@@ -301,15 +302,15 @@ describe("Recursive Descent Tests", () => {
         new Token(TokenType.PARAMETER, ''),
         new Token(TokenType.PARAMETER, ''),
       ];
-      Rule.tokenBuffer = new TokenBuffer(tokens);
-      assert.isTrue(parameterSequence(parameters, 3));
+      tokenBuffer = new TokenBuffer(tokens);
+      assert.isTrue(parameterSequence(tokenBuffer, parameters, 3));
       assert.deepEqual(parameters, tokens);
-      assert.equal(Rule.tokenBuffer.currentPosition, 3);
+      assert.equal(tokenBuffer.currentPosition, 3);
     });
     it("can handle a missing parameter", () => {
-      assert.isFalse(parameterSequence(parameters, 1));
+      assert.isFalse(parameterSequence(tokenBuffer, parameters, 1));
       assert.deepEqual(parameters, []);
-      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
 });

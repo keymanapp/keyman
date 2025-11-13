@@ -26,10 +26,9 @@ export class Parser {
   }
 
   public parse(): ASTNode {
-    Rule.tokenBuffer = this.tokenBuffer;
     const kmnTreeRule: Rule = new KmnTreeRule();
     const root: ASTNode = new ASTNode(NodeType.TMP);
-    kmnTreeRule.parse(root);
+    kmnTreeRule.parse(this.tokenBuffer, root);
     return root;
   }
 }
@@ -41,11 +40,11 @@ export class KmnTreeRule extends SingleChildRule {
     this.rule = new ManyRule(line);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     if (this.rule === null) {
       return false;
     }
-    const parseSuccess = this.rule.parse(node);
+    const parseSuccess = this.rule.parse(tokenBuffer, node);
     const children: ASTNode[] = [];
     const sourceCodeNode: ASTNode = this.gatherSourceCode(node);
     const groupNodes: ASTNode[]   = this.gatherGroups(node);
@@ -252,9 +251,9 @@ export class ModifierRule extends SingleChildRule {
     this.rule = new AlternateRule([shift, caps, modifier]);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       let modifierNode = tmp.getSoleChildOfType(NodeType.MODIFIER);
       if (modifierNode === null) {
@@ -320,9 +319,9 @@ export class UseStatementRule extends SingleChildRule {
     this.rule = new SequenceRule([use, leftBracket, groupName, rightBracket]);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const useNode       = tmp.getSoleChildOfType(NodeType.USE);
       const groupNameNode = tmp.getSoleChildOfType(NodeType.GROUPNAME);
@@ -359,9 +358,9 @@ export class GroupNameRule extends SingleChildRule {
     this.rule = new OneOrManyRule(groupNameElement);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const children = tmp.getChildren();
       if (children.length === 1) {
@@ -443,9 +442,9 @@ export class UsingKeysRule extends SingleChildRule {
     this.rule = new SequenceRule([using, keys]);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       node.addChild(new ASTNode(NodeType.USING_KEYS));
     }
@@ -462,9 +461,9 @@ export class ProductionBlockRule extends SingleChildRule {
     this.rule = new SequenceRule([lhsBlock, chevron, rhsBlock]);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const lhsNode        = tmp.getSoleChildOfType(NodeType.LHS);
       const rhsNode        = tmp.getSoleChildOfType(NodeType.RHS);

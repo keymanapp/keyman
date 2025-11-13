@@ -18,22 +18,14 @@ import { TOKEN_TO_NODE } from "./token-to-node.js";
  * syntax analyser rules.
  */
 export abstract class Rule { // equivalent to a no-child rule
-  protected static _tokenBuffer: TokenBuffer = null;
-
-  public static set tokenBuffer(tokenBuffer: TokenBuffer) {
-    // TODO error if tokenBuffer is null
-    Rule._tokenBuffer = tokenBuffer;
-  }
-
-  public static get tokenBuffer(): TokenBuffer { return Rule._tokenBuffer; }
-
   /**
    * Parse the tokenBuffer, building it into an abstract syntax tree (AST).
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
-  public abstract parse(node: ASTNode): boolean;
+  public abstract parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean;
 }
 
 /**
@@ -48,8 +40,8 @@ export abstract class SingleChildRule extends Rule {
     this.rule = rule;
   }
 
-  public parse(node: ASTNode): boolean {
-    return this.rule === null ? false : this.rule.parse(node);
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    return this.rule === null ? false : this.rule.parse(tokenBuffer, node);
   }
 }
 
@@ -69,12 +61,13 @@ export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChil
    * Parses the stored rule. If successful, rearranges the resulting tree
    * to be rooted at the node of given type.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess && tmp.hasSoleChildOfType(this.nodeType)) {
       const givenNode: ASTNode = tmp.removeSoleChildOfType(this.nodeType);
       givenNode.addChildren(tmp.getChildren());
@@ -100,12 +93,13 @@ export abstract class SingleChildRuleParseToTreeFromNewNode extends SingleChildR
    * Parses the stored rule. If successful, rearranges the resulting tree
    * to be rooted at a new node of the given type.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const newNode: ASTNode = new ASTNode(this.nodeType);
       newNode.addChildren(tmp.getChildren());
@@ -128,12 +122,13 @@ export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChil
    * Parses the stored rule. If successful, rearranges the resulting tree
    * to be rooted at the first node found.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess && tmp.hasChild()) {
       const firstNode: ASTNode = tmp.removeFirstChild();
       firstNode.addChildren(tmp.getChildren());
@@ -168,19 +163,20 @@ export class SequenceRule extends MultiChildRule {
 
   /**
    * Parse each rule in turn, succeeding only if all succeed.
-   * In the event of failure, reset the Rule.tokenBuffer to the position
+   * In the event of failure, reset the tokenBuffer to the position
    * saved at the start of the attempted parse.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = true;
-    const save: number = Rule.tokenBuffer.currentPosition;
+    const save: number = tokenBuffer.currentPosition;
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
 
     for (const rule of this.rules) {
-      if (!rule.parse(tmp)) {
+      if (!rule.parse(tokenBuffer, tmp)) {
         parseSuccess = false;
         break;
       }
@@ -188,7 +184,7 @@ export class SequenceRule extends MultiChildRule {
     if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
-      Rule.tokenBuffer.resetCurrentPosition(save);
+      tokenBuffer.resetCurrentPosition(save);
     }
 
     return parseSuccess;
@@ -206,19 +202,20 @@ export class AlternateRule extends MultiChildRule {
 
   /**
    * Parse each rule in turn, succeeding if any succeed. In the event of failure,
-   * reset the Rule.tokenBuffer to the position saved at the start of the attempted parse.
+   * reset the tokenBuffer to the position saved at the start of the attempted parse.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    const save: number = Rule.tokenBuffer.currentPosition;
+    const save: number = tokenBuffer.currentPosition;
     let tmp: ASTNode;
 
     for (const rule of this.rules) {
       tmp = new ASTNode(NodeType.TMP);
-      if (rule.parse(tmp)) {
+      if (rule.parse(tokenBuffer, tmp)) {
         parseSuccess = true;
         break;
       }
@@ -226,7 +223,7 @@ export class AlternateRule extends MultiChildRule {
     if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
-      Rule.tokenBuffer.resetCurrentPosition(save);
+      tokenBuffer.resetCurrentPosition(save);
     }
 
     return parseSuccess;
@@ -244,22 +241,23 @@ export class OptionalRule extends SingleChildRule {
 
   /**
    * Parses the stored rule, always succeeding as the rule is optional.
-   * In the event of failure of the stored rule, reset the Rule.tokenBuffer
+   * In the event of failure of the stored rule, reset the tokenBuffer
    * to the position saved at the start of the attempted parse.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = true;
-    const save: number = Rule.tokenBuffer.currentPosition;
+    const save: number = tokenBuffer.currentPosition;
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    parseSuccess = this.rule.parse(tmp);
+    parseSuccess = this.rule.parse(tokenBuffer, tmp);
 
     if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
-      Rule.tokenBuffer.resetCurrentPosition(save);
+      tokenBuffer.resetCurrentPosition(save);
       // TODO generate warning
     }
 
@@ -279,22 +277,23 @@ export class ManyRule extends SingleChildRule {
   /**
    * Parses the stored rule as many times as possible, always succeeding
    * as the rule is optional. In the event of failure of the stored rule,
-   * reset the Rule.tokenBuffer to the position saved at the start of that
+   * reset the tokenBuffer to the position saved at the start of that
    * individual attempt to parse.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     while (parseSuccess) {
-      const save: number = Rule.tokenBuffer.currentPosition;
+      const save: number = tokenBuffer.currentPosition;
       const tmp: ASTNode = new ASTNode(NodeType.TMP);
-      parseSuccess       = this.rule.parse(tmp);
+      parseSuccess       = this.rule.parse(tokenBuffer, tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
       } else {
-        Rule.tokenBuffer.resetCurrentPosition(save);
+        tokenBuffer.resetCurrentPosition(save);
       }
     };
     return true;
@@ -313,24 +312,25 @@ export class OneOrManyRule extends SingleChildRule {
   /**
    * Parses the stored rule as many times as possible, succeeding if the
    * rule suceeds at least once. In the event of failure of the stored rule,
-   * reset the Rule.tokenBuffer to the position saved at the start of that
+   * reset the tokenBuffer to the position saved at the start of that
    * individual attempt to parse.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let anyParseSuccess: boolean = false;
     let parseSuccess: boolean    = true;
     do {
-      const save: number = Rule.tokenBuffer.currentPosition;
+      const save: number = tokenBuffer.currentPosition;
       const tmp: ASTNode = new ASTNode(NodeType.TMP);
-      parseSuccess       = this.rule.parse(tmp);
+      parseSuccess       = this.rule.parse(tokenBuffer, tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
         anyParseSuccess = true;
       } else {
-        Rule.tokenBuffer.resetCurrentPosition(save);
+        tokenBuffer.resetCurrentPosition(save);
       }
     } while (parseSuccess);
     return anyParseSuccess;
@@ -371,18 +371,19 @@ export class TokenRule extends Rule {
    * If matched, the rule succeeds.  Moreover, if adding an ASTNode has
    * been requested (addNode), and there is a valid mapping from the
    * TokenType to a NodeType, then add the ASTNode. If there is no match,
-   * reset the Rule.tokenBuffer to the position saved at the start of the method.
+   * reset the tokenBuffer to the position saved at the start of the method.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    const token: Token = Rule.tokenBuffer.nextToken();
+    const token: Token = tokenBuffer.nextToken();
 
     if (token.isTokenType(this.tokenType)) {
       parseSuccess = true;
-      Rule.tokenBuffer.popToken();
+      tokenBuffer.popToken();
       if (this.addNode) {
         const nodeType: NodeType = TokenRule.tokenToNodeMap.get(token.tokenType);
         if (nodeType !== undefined) {
@@ -431,18 +432,19 @@ export class AlternateTokenRule extends Rule {
    * If so, the rule succeeds. Moreover, if adding an ASTNode has
    * been requested (addNode), and there is a valid mapping from the
    * TokenType to a NodeType, then add the ASTNode. If there is no match,
-   * reset the Rule.tokenBuffer to the position saved at the start of the method.
+   * reset the tokenBuffer to the position saved at the start of the method.
    *
+   * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if the current token was successfully matched
    */
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    const token: Token = Rule.tokenBuffer.nextToken();
+    const token: Token = tokenBuffer.nextToken();
 
     if (this.tokenTypes.has(token.tokenType)) {
       parseSuccess = true;
-      Rule.tokenBuffer.popToken();
+      tokenBuffer.popToken();
       if (this.addNode) {
         const nodeType: NodeType = TokenRule.getNodeType(token.tokenType);
         if (nodeType !== undefined) {
@@ -458,24 +460,25 @@ export class AlternateTokenRule extends Rule {
 /**
  * Attempt to match a sequence of an expected number of tokens all of the same TokenType,
  * returning the matched tokens in a supplied array.  If there is no match, reset the
- * Rule.tokenBuffer to the position saved at the start of the function.
+ * tokenBuffer to the position saved at the start of the function.
  *
+ * @param tokenBuffer the TokenBuffer to parse
  * @param tokens the matched tokens (if any) are pushed onto this array
  * @param tokenType the TokenType to potentially match
  * @param numExpected the number of expected tokens of the same type
  * @returns true if the expected sequence of tokens was successfully matched
  */
-export function tokenSequence(tokens: Token[], tokenType: TokenType, numExpected: number): boolean {
+export function tokenSequence(tokenBuffer: TokenBuffer, tokens: Token[], tokenType: TokenType, numExpected: number): boolean {
   let parseSuccess: boolean = true;
-  const save: number = Rule.tokenBuffer.currentPosition;
-  let token: Token = Rule.tokenBuffer.nextToken();
+  const save: number = tokenBuffer.currentPosition;
+  let token: Token = tokenBuffer.nextToken();
   const tmpTokens: Token[] = [];
 
   for (let num=0; num<numExpected; num++) {
     if (token.isTokenType(tokenType)) {
-      Rule.tokenBuffer.popToken();
+      tokenBuffer.popToken();
       tmpTokens.push(token);
-      token = Rule.tokenBuffer.nextToken();
+      token = tokenBuffer.nextToken();
     } else {
       parseSuccess = false;
       break;
@@ -485,7 +488,7 @@ export function tokenSequence(tokens: Token[], tokenType: TokenType, numExpected
   if (parseSuccess) {
     tokens.push(...tmpTokens);
   } else {
-    Rule.tokenBuffer.resetCurrentPosition(save);
+    tokenBuffer.resetCurrentPosition(save);
   }
 
   return parseSuccess;
@@ -494,12 +497,13 @@ export function tokenSequence(tokens: Token[], tokenType: TokenType, numExpected
 /**
  * Attempt to match a sequence of an expected number of PARAMETER tokens,
  * returning the matched tokens in a supplied array.  If there is no match, reset the
- * Rule.tokenBuffer to the position saved at the start of the function.
- * 
+ * tokenBuffer to the position saved at the start of the function.
+ *
+ * @param tokenBuffer the TokenBuffer to parse
  * @param parameters the matched PARAMETER tokens (if any) are pushed onto this array
  * @param numExpected the number of expected PARAMETER tokens
  * @returns true if the expected sequence of PARAMETER tokens was successfully matched
  */
-export function parameterSequence(parameters: Token[], numExpected: number): boolean {
-  return tokenSequence(parameters, TokenType.PARAMETER, numExpected);
+export function parameterSequence(tokenBuffer: TokenBuffer, parameters: Token[], numExpected: number): boolean {
+  return tokenSequence(tokenBuffer, parameters, TokenType.PARAMETER, numExpected);
 }

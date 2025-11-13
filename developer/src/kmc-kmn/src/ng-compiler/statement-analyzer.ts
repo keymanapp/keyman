@@ -14,6 +14,7 @@ import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, Sing
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
+import { TokenBuffer } from "./token-buffer.js";
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   protected leftBracket: Rule;
@@ -28,9 +29,9 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
     this.rightBracket    = new TokenRule(TokenType.RIGHT_BR);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const cmdNode       = tmp.getSoleChildOfType(this.cmdNodeType);
       const storeNameNode = tmp.getSoleChildOfType(NodeType.STORENAME);
@@ -276,9 +277,9 @@ export class OffsetRule extends SingleChildRule {
     this.rule = new AlternateRule([octal, parameter]);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       node.addNewChildWithToken(NodeType.OFFSET, tmp.getSoleChild().token);
     }

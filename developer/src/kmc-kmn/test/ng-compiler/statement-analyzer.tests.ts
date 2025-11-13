@@ -19,7 +19,9 @@ import { DeadkeyStatementRule, IfLikeStatementRule, IfNormalStoreStatementRule, 
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, PlatformStatementRule } from '../../src/ng-compiler/statement-analyzer.js';
 import { SaveStatementRule, SystemStoreNameForIfRule } from '../../src/ng-compiler/statement-analyzer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
+import { TokenBuffer } from './token-buffer.js';
 
+let tokenBuffer: TokenBuffer = null;
 let root: ASTNode = null;
 
 describe("KMN Statement Analyser Tests", () => {
@@ -28,14 +30,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("AnyStatementRule Tests", () => {
     it("can construct an AnyStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const anyStatement: Rule = new AnyStatementRule();
       assert.isNotNull(anyStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('any(digit)');
+      tokenBuffer = stringToTokenBuffer('any(digit)');
       const anyStatement: Rule = new AnyStatementRule();
-      assert.isTrue(anyStatement.parse(root));
+      assert.isTrue(anyStatement.parse(tokenBuffer, root));
       const anyNode = root.getSoleChildOfType(NodeType.ANY);
       assert.isNotNull(anyNode);
       assert.isNotNull(anyNode.getSoleChildOfType(NodeType.STORENAME));
@@ -43,14 +45,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("CallStatementRule Tests", () => {
     it("can construct an CallStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const callStatement: Rule = new CallStatementRule();
       assert.isNotNull(callStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('call(callDefinitionStore)');
+      tokenBuffer = stringToTokenBuffer('call(callDefinitionStore)');
       const callStatement: Rule = new CallStatementRule();
-      assert.isTrue(callStatement.parse(root));
+      assert.isTrue(callStatement.parse(tokenBuffer, root));
       const callNode = root.getSoleChildOfType(NodeType.CALL);
       assert.isNotNull(callNode);
       assert.isNotNull(callNode.getSoleChildOfType(NodeType.STORENAME));
@@ -58,14 +60,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("DeadkeyStatementRule Tests", () => {
     it("can construct an DeadkeyStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const deadKeyStatement: Rule = new DeadkeyStatementRule();
       assert.isNotNull(deadKeyStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
+      tokenBuffer = stringToTokenBuffer('dk(storeName)');
       const deadKeyStatement: Rule = new DeadkeyStatementRule();
-      assert.isTrue(deadKeyStatement.parse(root));
+      assert.isTrue(deadKeyStatement.parse(tokenBuffer, root));
       const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
       assert.isNotNull(deadKeyNode);
       assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.STORENAME));
@@ -73,14 +75,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("NotanyStatementRule Tests", () => {
     it("can construct an NotanyStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const notAnyStatement: Rule = new NotanyStatementRule();
       assert.isNotNull(notAnyStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('notany(digit)');
+      tokenBuffer = stringToTokenBuffer('notany(digit)');
       const notAnyStatement: Rule = new NotanyStatementRule();
-      assert.isTrue(notAnyStatement.parse(root));
+      assert.isTrue(notAnyStatement.parse(tokenBuffer, root));
       const notAnyNode = root.getSoleChildOfType(NodeType.NOTANY);
       assert.isNotNull(notAnyNode);
       assert.isNotNull(notAnyNode.getSoleChildOfType(NodeType.STORENAME));
@@ -88,14 +90,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("SaveStatementRule Tests", () => {
     it("can construct an SaveStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const saveStatement: Rule = new SaveStatementRule();
       assert.isNotNull(saveStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('save(storeName)');
+      tokenBuffer = stringToTokenBuffer('save(storeName)');
       const saveStatement: Rule = new SaveStatementRule();
-      assert.isTrue(saveStatement.parse(root));
+      assert.isTrue(saveStatement.parse(tokenBuffer, root));
       const saveNode = root.getSoleChildOfType(NodeType.SAVE);
       assert.isNotNull(saveNode);
       assert.isNotNull(saveNode.getSoleChildOfType(NodeType.STORENAME));
@@ -103,14 +105,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("BaselayoutStatementRule Tests", () => {
     it("can construct an BaselayoutStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const baselayoutStatement: Rule = new BaselayoutStatementRule();
       assert.isNotNull(baselayoutStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('baselayout("en-US")');
+      tokenBuffer = stringToTokenBuffer('baselayout("en-US")');
       const baselayoutStatement: Rule = new BaselayoutStatementRule();
-      assert.isTrue(baselayoutStatement.parse(root));
+      assert.isTrue(baselayoutStatement.parse(tokenBuffer, root));
       const baselayoutNode = root.getSoleChildOfType(NodeType.BASELAYOUT_SHORTCUT);
       assert.isNotNull(baselayoutNode);
       const stringNode = baselayoutNode.getSoleChildOfType(NodeType.STRING)
@@ -120,14 +122,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("LayerStatementRule Tests", () => {
     it("can construct an LayerStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const layerStatement: Rule = new LayerStatementRule();
       assert.isNotNull(layerStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
+      tokenBuffer = stringToTokenBuffer('layer("shift")');
       const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
+      assert.isTrue(layerStatement.parse(tokenBuffer, root));
       const layerNode = root.getSoleChildOfType(NodeType.LAYER_SHORTCUT);
       assert.isNotNull(layerNode);
       const stringNode = layerNode.getSoleChildOfType(NodeType.STRING)
@@ -135,9 +137,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.equal(stringNode.getText(), '"shift"');
     });
     it("can parse correctly (spacve before name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer( "shift")');
+      tokenBuffer = stringToTokenBuffer('layer( "shift")');
       const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
+      assert.isTrue(layerStatement.parse(tokenBuffer, root));
       const layerNode = root.getSoleChildOfType(NodeType.LAYER_SHORTCUT);
       assert.isNotNull(layerNode);
       const stringNode = layerNode.getSoleChildOfType(NodeType.STRING)
@@ -145,9 +147,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.equal(stringNode.getText(), '"shift"');
     });
     it("can parse correctly (space after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer("shift" )');
+      tokenBuffer = stringToTokenBuffer('layer("shift" )');
       const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
+      assert.isTrue(layerStatement.parse(tokenBuffer, root));
       const layerNode = root.getSoleChildOfType(NodeType.LAYER_SHORTCUT);
       assert.isNotNull(layerNode);
       const stringNode = layerNode.getSoleChildOfType(NodeType.STRING)
@@ -155,9 +157,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.equal(stringNode.getText(), '"shift"');
     });
     it("can parse correctly (space before and after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer( "shift" )');
+      tokenBuffer = stringToTokenBuffer('layer( "shift" )');
       const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
+      assert.isTrue(layerStatement.parse(tokenBuffer, root));
       const layerNode = root.getSoleChildOfType(NodeType.LAYER_SHORTCUT);
       assert.isNotNull(layerNode);
       const stringNode = layerNode.getSoleChildOfType(NodeType.STRING)
@@ -167,14 +169,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("PlatformStatementRule Tests", () => {
     it("can construct an PlatformStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const platformStatement: Rule = new PlatformStatementRule();
       assert.isNotNull(platformStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
+      tokenBuffer = stringToTokenBuffer('platform("touch")');
       const platformStatement: Rule = new PlatformStatementRule();
-      assert.isTrue(platformStatement.parse(root));
+      assert.isTrue(platformStatement.parse(tokenBuffer, root));
       const platformNode = root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT);
       assert.isNotNull(platformNode);
       const stringNode = platformNode.getSoleChildOfType(NodeType.STRING)
@@ -184,14 +186,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("IfLikeStatementRule Tests", () => {
     it("can construct a IfLikeStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const ifLikeStatement: Rule = new IfLikeStatementRule();
       assert.isNotNull(ifLikeStatement);
     });
     it("can parse correctly (if)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(number = "1")');
+      tokenBuffer = stringToTokenBuffer('if(number = "1")');
       const ifLikeStatement: Rule = new IfLikeStatementRule();
-      assert.isTrue(ifLikeStatement.parse(root));
+      assert.isTrue(ifLikeStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.EQUAL))
@@ -199,9 +201,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.STRING))
     });
     it("can parse correctly (platform)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
+      tokenBuffer = stringToTokenBuffer('platform("touch")');
       const ifLikeStatement: Rule = new IfLikeStatementRule();
-      assert.isTrue(ifLikeStatement.parse(root));
+      assert.isTrue(ifLikeStatement.parse(tokenBuffer, root));
       const platformNode = root.getSoleChildOfType(NodeType.PLATFORM_SHORTCUT);
       assert.isNotNull(platformNode);
       const stringNode = platformNode.getSoleChildOfType(NodeType.STRING)
@@ -209,9 +211,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.equal(stringNode.getText(), '"touch"');
     });
     it("can parse correctly (baselayout)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('baselayout("en-US")');
+      tokenBuffer = stringToTokenBuffer('baselayout("en-US")');
       const ifLikeStatement: Rule = new IfLikeStatementRule();
-      assert.isTrue(ifLikeStatement.parse(root));
+      assert.isTrue(ifLikeStatement.parse(tokenBuffer, root));
       const baselayoutNode = root.getSoleChildOfType(NodeType.BASELAYOUT_SHORTCUT);
       assert.isNotNull(baselayoutNode);
       const stringNode = baselayoutNode.getSoleChildOfType(NodeType.STRING)
@@ -221,14 +223,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("IfStatementRule Tests", () => {
     it("can construct a IfStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const ifStatement: Rule = new IfStatementRule();
       assert.isNotNull(ifStatement);
     });
     it("can parse correctly (store, string)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(number = "1")');
+      tokenBuffer = stringToTokenBuffer('if(number = "1")');
       const ifStatement: Rule = new IfStatementRule();
-      assert.isTrue(ifStatement.parse(root));
+      assert.isTrue(ifStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.EQUAL))
@@ -236,9 +238,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.STRING))
     });
     it("can parse correctly (system store, string)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = "filename")');
+      tokenBuffer = stringToTokenBuffer('if(&bitmap = "filename")');
       const ifStatement: Rule = new IfStatementRule();
-      assert.isTrue(ifStatement.parse(root));
+      assert.isTrue(ifStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.EQUAL))
@@ -248,14 +250,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("IfNormalStoreStatementRule Tests", () => {
     it("can construct a IfNormalStoreStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
       assert.isNotNull(ifNormalStoreStatement);
     });
     it("can parse correctly (equal)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(number = "1")');
+      tokenBuffer = stringToTokenBuffer('if(number = "1")');
       const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
-      assert.isTrue(ifNormalStoreStatement.parse(root));
+      assert.isTrue(ifNormalStoreStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.EQUAL))
@@ -263,9 +265,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.STRING))
     });
     it("can parse correctly (not equal)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(number != "1")');
+      tokenBuffer = stringToTokenBuffer('if(number != "1")');
       const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
-      assert.isTrue(ifNormalStoreStatement.parse(root));
+      assert.isTrue(ifNormalStoreStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.NOT_EQUAL))
@@ -273,9 +275,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.STRING))
     });
     it("can parse correctly (equal, two u_chars)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(number = U+1780 U+1781)');
+      tokenBuffer = stringToTokenBuffer('if(number = U+1780 U+1781)');
       const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
-      assert.isTrue(ifNormalStoreStatement.parse(root));
+      assert.isTrue(ifNormalStoreStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.EQUAL))
@@ -285,14 +287,14 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("IfSystemStoreStatementRule Tests", () => {
     it("can construct a IfSystemStoreStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
       assert.isNotNull(ifSystemStoreStatement);
     });
     it("can parse correctly (equal)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = "filename")');
+      tokenBuffer = stringToTokenBuffer('if(&bitmap = "filename")');
       const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
-      assert.isTrue(ifSystemStoreStatement.parse(root));
+      assert.isTrue(ifSystemStoreStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.EQUAL))
@@ -300,9 +302,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.STRING))
     });
     it("can parse correctly (equal)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap != "filename")');
+      tokenBuffer = stringToTokenBuffer('if(&bitmap != "filename")');
       const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
-      assert.isTrue(ifSystemStoreStatement.parse(root));
+      assert.isTrue(ifSystemStoreStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.NOT_EQUAL))
@@ -310,9 +312,9 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.STRING))
     });
     it("can parse correctly (equal, two u_chars)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = U+1780 U+1781)');
+      tokenBuffer = stringToTokenBuffer('if(&bitmap = U+1780 U+1781)');
       const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
-      assert.isTrue(ifSystemStoreStatement.parse(root));
+      assert.isTrue(ifSystemStoreStatement.parse(tokenBuffer, root));
       const ifNode = root.getSoleChildOfType(NodeType.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeType.EQUAL))
@@ -322,159 +324,159 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("SystemStoreNameForIfRule Tests", () => {
     it("can construct a SystemStoreNameForIfRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
       assert.isNotNull(systemStoreNameForIf);
     });
     it("can parse correctly (string system store name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('&bitmap');
+      tokenBuffer = stringToTokenBuffer('&bitmap');
       const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-      assert.isTrue(systemStoreNameForIf.parse(root));
+      assert.isTrue(systemStoreNameForIf.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.BITMAP));
     });
     it("can parse correctly (baselayout)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('&baselayout');
+      tokenBuffer = stringToTokenBuffer('&baselayout');
       const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-      assert.isTrue(systemStoreNameForIf.parse(root));
+      assert.isTrue(systemStoreNameForIf.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.BASELAYOUT));
     });
     it("can parse correctly (layer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('&layer');
+      tokenBuffer = stringToTokenBuffer('&layer');
       const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-      assert.isTrue(systemStoreNameForIf.parse(root));
+      assert.isTrue(systemStoreNameForIf.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.LAYER));
     });
     it("can parse correctly (newLayer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('&newLayer');
+      tokenBuffer = stringToTokenBuffer('&newLayer');
       const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-      assert.isTrue(systemStoreNameForIf.parse(root));
+      assert.isTrue(systemStoreNameForIf.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.NEWLAYER));
     });
     it("can parse correctly (oldLayer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('&oldLayer');
+      tokenBuffer = stringToTokenBuffer('&oldLayer');
       const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-      assert.isTrue(systemStoreNameForIf.parse(root));
+      assert.isTrue(systemStoreNameForIf.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.OLDLAYER));
     });
     it("can parse correctly (platform)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('&platform');
+      tokenBuffer = stringToTokenBuffer('&platform');
       const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-      assert.isTrue(systemStoreNameForIf.parse(root));
+      assert.isTrue(systemStoreNameForIf.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.PLATFORM));
     });
   });
   describe("ComparisonRule Tests", () => {
     it("can construct a ComparisonRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const comparison: Rule = new ComparisonRule();
       assert.isNotNull(comparison);
     });
     it("can parse correctly (=)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('=');
+      tokenBuffer = stringToTokenBuffer('=');
       const comparison: Rule = new ComparisonRule();
-      assert.isTrue(comparison.parse(root));
+      assert.isTrue(comparison.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.EQUAL));
     });
     it("can parse correctly (!=)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('!=');
+      tokenBuffer = stringToTokenBuffer('!=');
       const comparison: Rule = new ComparisonRule();
-      assert.isTrue(comparison.parse(root));
+      assert.isTrue(comparison.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.NOT_EQUAL));
     });
   });
   describe("ContextStatementRule Tests", () => {
     it("can construct a ContextStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const contextStatement: Rule = new ContextStatementRule();
       assert.isNotNull(contextStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('context(1)');
+      tokenBuffer = stringToTokenBuffer('context(1)');
       const contextStatement: Rule = new ContextStatementRule();
-      assert.isTrue(contextStatement.parse(root));
+      assert.isTrue(contextStatement.parse(tokenBuffer, root));
       const contextNode = root.getSoleChildOfType(NodeType.CONTEXT);
       assert.isNotNull(contextNode);
       assert.equal(contextNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("rejects a context without brackets", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('context');
+      tokenBuffer = stringToTokenBuffer('context');
       const contextStatement: Rule = new ContextStatementRule();
-      assert.isFalse(contextStatement.parse(root));
+      assert.isFalse(contextStatement.parse(tokenBuffer, root));
     });
   });
   describe("IndexStatementRule Tests", () => {
     it("can construct a IndexStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const indexStatement: Rule = new IndexStatementRule();
       assert.isNotNull(indexStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit,1)');
+      tokenBuffer = stringToTokenBuffer('index(digit,1)');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
       assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (offset > 7)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit,8)');
+      tokenBuffer = stringToTokenBuffer('index(digit,8)');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
       assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '8');
     });
     it("can parse correctly (space after open)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index( digit,1)');
+      tokenBuffer = stringToTokenBuffer('index( digit,1)');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
       assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (space before close)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit,1 )');
+      tokenBuffer = stringToTokenBuffer('index(digit,1 )');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
       assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (space after open and before close)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index( digit,1 )');
+      tokenBuffer = stringToTokenBuffer('index( digit,1 )');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
       assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (space before comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit ,1)');
+      tokenBuffer = stringToTokenBuffer('index(digit ,1)');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
       assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (space after comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit, 1)');
+      tokenBuffer = stringToTokenBuffer('index(digit, 1)');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
       assert.equal(indexNode.getSoleChildOfType(NodeType.OFFSET).getText(), '1');
     });
     it("can parse correctly (space before and after comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit , 1)');
+      tokenBuffer = stringToTokenBuffer('index(digit , 1)');
       const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
+      assert.isTrue(indexStatement.parse(tokenBuffer, root));
       const indexNode = root.getSoleChildOfType(NodeType.INDEX);
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
@@ -483,73 +485,73 @@ describe("KMN Statement Analyser Tests", () => {
   });
   describe("CommaRule Tests", () => {
     it("can construct a CommaRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const comma: Rule = new TokenRule(TokenType.COMMA);
       assert.isNotNull(comma);
     });
     it("can parse correctly (comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(',');
+      tokenBuffer = stringToTokenBuffer(',');
       const comma: Rule = new TokenRule(TokenType.COMMA);
-      assert.isTrue(comma.parse(root));
+      assert.isTrue(comma.parse(tokenBuffer, root));
     });
     it("can parse correctly (comma, space before)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(' ,');
+      tokenBuffer = stringToTokenBuffer(' ,');
       const comma: Rule = new TokenRule(TokenType.COMMA);
-      assert.isTrue(comma.parse(root));
+      assert.isTrue(comma.parse(tokenBuffer, root));
     });
     it("can parse correctly (comma, space after)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(', ');
+      tokenBuffer = stringToTokenBuffer(', ');
       const comma: Rule = new TokenRule(TokenType.COMMA);
-      assert.isTrue(comma.parse(root));
+      assert.isTrue(comma.parse(tokenBuffer, root));
     });
     it("can parse correctly (comma, space before and after)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(' , ');
+      tokenBuffer = stringToTokenBuffer(' , ');
       const comma: Rule = new TokenRule(TokenType.COMMA);
-      assert.isTrue(comma.parse(root));
+      assert.isTrue(comma.parse(tokenBuffer, root));
     });
   });
   describe("OutsStatementRule Tests", () => {
     it("can construct an OutsStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
+      tokenBuffer = stringToTokenBuffer('');
       const outsStatement: Rule = new OutsStatementRule();
       assert.isNotNull(outsStatement);
     });
     it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs(digit)');
+      tokenBuffer = stringToTokenBuffer('outs(digit)');
       const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
+      assert.isTrue(outsStatement.parse(tokenBuffer, root));
       const outsNode = root.getSoleChildOfType(NodeType.OUTS);
       assert.isNotNull(outsNode);
       assert.isNotNull(outsNode.getSoleChildOfType(NodeType.STORENAME));
     });
     it("can parse correctly (space before name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs( digit)');
+      tokenBuffer = stringToTokenBuffer('outs( digit)');
       const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
+      assert.isTrue(outsStatement.parse(tokenBuffer, root));
       const outsNode = root.getSoleChildOfType(NodeType.OUTS);
       assert.isNotNull(outsNode);
       assert.equal(outsNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
     });
     it("can parse correctly (space after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs(digit )');
+      tokenBuffer = stringToTokenBuffer('outs(digit )');
       const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
+      assert.isTrue(outsStatement.parse(tokenBuffer, root));
       const outsNode = root.getSoleChildOfType(NodeType.OUTS);
       assert.isNotNull(outsNode);
       assert.equal(outsNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
     });
     it("can parse correctly (space before and after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs( digit )');
+      tokenBuffer = stringToTokenBuffer('outs( digit )');
       const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
+      assert.isTrue(outsStatement.parse(tokenBuffer, root));
       const outsNode = root.getSoleChildOfType(NodeType.OUTS);
       assert.isNotNull(outsNode);
       assert.equal(outsNode.getSoleChildOfType(NodeType.STORENAME).getText(), 'digit');
     });
     it("can parse correctly (system store)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs(&keyboardversion)');
+      tokenBuffer = stringToTokenBuffer('outs(&keyboardversion)');
       const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
+      assert.isTrue(outsStatement.parse(tokenBuffer, root));
       const outsNode = root.getSoleChildOfType(NodeType.OUTS);
       assert.isNotNull(outsNode);
       assert.isNotNull(outsNode.getSoleChildOfType(NodeType.KEYBOARDVERSION));

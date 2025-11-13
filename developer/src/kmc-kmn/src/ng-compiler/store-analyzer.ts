@@ -15,6 +15,7 @@ import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRul
 import { SingleChildRule, SingleChildRuleParseToTreeFromFirstNode, SingleChildRuleParseToTreeFromGivenNode, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
+import { TokenBuffer } from "./token-buffer.js";
 
 export class SystemStoreAssignRule extends SingleChildRuleParseToTreeFromFirstNode {
   public constructor() {
@@ -95,9 +96,9 @@ export class NormalStoreRule extends SingleChildRule {
     this.rule = new SequenceRule([store, leftBracket, normalStoreName, rightBracket]);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const storeNode     = tmp.getSoleChildOfType(NodeType.STORE);
       const storeNameNode = tmp.getSoleChildOfType(NodeType.STORENAME);
@@ -115,9 +116,9 @@ export class NormalStoreNameRule extends SingleChildRule {
     this.rule = new OneOrManyRule(normalStoreNameElement);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const children = tmp.getChildren();
       // two structures depending on number of children
@@ -215,9 +216,9 @@ export class ResetStoreRule extends SingleChildRule {
     this.rule = new SequenceRule([reset, leftBracket, normalStoreName, rightBracket]);
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       const resetNode = tmp.getSoleChildOfType(NodeType.RESET);
       const storeNameNode = tmp.getSoleChildOfType(NodeType.STORENAME);
@@ -236,9 +237,9 @@ abstract class CapsLockStatementRule extends SingleChildRule {
     super();
   }
 
-  public parse(node: ASTNode): boolean {
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
       // TODO: warning deprecated
       const token: Token = new Token(this.tokenType, '1');
