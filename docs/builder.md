@@ -1045,15 +1045,17 @@ options, and timing status through as parameters. This should be used rather
 than calling the build script directly, to avoid multiple builds of
 dependencies.
 
+Do not use builder standard options such as `--deps` or `--debug`.
+
 ### Parameters
 
 * 1: `script`      path to script, relative to root of repo
-* 2: `action`      action(s)+target(s) for the child script to run, comma separated, at least one
+* 2+: `parameters` action(s), target(s), parameters for the child script to run
 
 ### Example
 
 ```bash
-  builder_launch /core/build.sh configure,build:wasm
+  builder_launch core/build.sh configure,build:wasm --no-tests
 ```
 
 --------------------------------------------------------------------------------
