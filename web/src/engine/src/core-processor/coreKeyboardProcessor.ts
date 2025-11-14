@@ -3,19 +3,19 @@
  */
 
 import { EventEmitter } from 'eventemitter3';
-import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
+import { KM_Core, KM_CORE_STATUS, KM_CORE_CT, km_core_context, km_core_context_items } from 'keyman/engine/core-adapter';
 import {
   BeepHandler,
   DeviceSpec, EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
   KeyEvent, KMXKeyboard, SyntheticTextStore, MutableSystemStore, TextStore, ProcessorAction,
-  StateKeyMap
+  StateKeyMap,
+  Deadkey
 } from "keyman/engine/keyboard";
 
 export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   public activeKeyboard: Keyboard;
 
   constructor() {
-
   }
 }
 
@@ -91,10 +91,78 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     return null;
   }
 
+  private applyContextFromTextStore(context: km_core_context, textStore: TextStore) {
+    // Retrieve context including deadkeys from textStore and
+    // apply to Core's context
+    //
+    // Unlike the desktop Engines, we still track markers (deadkeys) in Engine
+    // for Web at this time. This is for two reasons:
+    // 1. We still have the legacy JSKeyboard code paths which manage deadkey
+    //    state
+    // 2. SyntheticTextStores which are used for rewinding and replaying key
+    //    events in predictive text and multitap need to also replay deadkeys
+    //
+    // TODO: Once we make CoreKeyboardProcessor the primary keyboard processor
+    // and fully deprecate JSKeyboardProcessor, we should consider moving the
+    // ownership of context back into opaque Core objects within
+    // SyntheticTextStore, so ownership of context and marker state can be
+    // managed entirely within Core, KeymanWeb does not need to have knowledge
+    // of markers, and then we better align with the desktop Engines.
+
+    const text = textStore.getText();
+    const deadKeys = textStore.deadkeys().dks.sort((a, b) => a.p != b.p ? a.p - b.p : a.o - b.o);
+    const contextItems = new KM_Core.instance.km_core_context_items();
+    const caretPosition = textStore.getCaret();
+    let textIndex = 0
+    for (let deadkeyIndex = 0; deadkeyIndex < deadKeys.length; deadkeyIndex++) {
+      const deadKey = deadKeys[deadkeyIndex];
+      for (; textIndex < text.length && textIndex <= caretPosition; textIndex++) {
+        const contextItem = new KM_Core.instance.km_core_context_item();
+        if (deadKey.p == textIndex) {
+          contextItem.marker = deadKey.d;
+          contextItems.push_back(contextItem);
+          break;
+        }
+        contextItem.character = text.charCodeAt(textIndex);
+        contextItems.push_back(contextItem);
+      }
+    }
+
+    // Add end element
+    contextItems.push_back(KM_Core.instance.create_end_context());
+
+    KM_Core.instance.context_set(context, contextItems);
+  }
+
+  private saveMarkersToTextStore(context: km_core_context, textStore: TextStore): void {
+    const { status, object } = KM_Core.instance.context_get(context);
+    if (status != KM_CORE_STATUS.OK) {
+      console.error('KeymanWeb: km_core_context_get failed with status: ' + status);
+      return;
+    }
+    textStore.deadkeys().clear();
+    let textIndex = 0;
+    const contextItems: km_core_context_items = object;
+    for (let i = 0; i < contextItems.size(); i++) {
+      const contextItem = contextItems.get(i);
+      if (contextItem.type !== KM_CORE_CT.MARKER) {
+        textIndex++;
+        continue;
+      }
+      textStore.deadkeys().add(new Deadkey(textIndex, contextItem.marker));
+    }
+  }
+
   public processKeystroke(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
+
     const preInput = SyntheticTextStore.from(textStore, true);
     const activeKeyboard = this.activeKeyboard as KMXKeyboard;
-    const status = KM_Core.instance.process_event(activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, 1, 0); // TODO-web-core: properly set keyDown and flags
+    const coreContext = KM_Core.instance.state_context(activeKeyboard.state);
+
+    this.applyContextFromTextStore(coreContext, textStore);
+
+    const status = KM_Core.instance.process_event(activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, 1, 0);
+    // TODO-web-core: properly set keyDown and flags
     if (status != KM_CORE_STATUS.OK) {
       console.error('KeymanWeb: km_core_process_event failed with status: ' + status);
       return null;
@@ -104,10 +172,12 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
 
     textStore.deleteCharsBeforeCaret(core_actions.code_points_to_delete);
     textStore.insertTextBeforeCaret(core_actions.output);
+    this.saveMarkersToTextStore(coreContext, textStore);
+
     processorAction.beep = core_actions.do_alert;
     processorAction.triggerKeyDefault = core_actions.emit_keystroke;
 
-    // TODO-web-core: Implement options
+    // TODO-web-core: Implement options (#13426)
     // process_persist_action(engine, actions->persist_options);
     // TODO-web-core: do we have to do anything with the new_caps_lock_state?
     // process_capslock_action(actions->new_caps_lock_state);
@@ -141,4 +211,10 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   public setNumericLayer(device: DeviceSpec): void {}
 
   public finalizeProcessorAction(data: ProcessorAction, textStore: TextStore): void {}
+
+  /** @internal */
+  public unitTestEndPoints = {
+    saveMarkersToTextStore: this.saveMarkersToTextStore.bind(this),
+    applyContextFromTextStore: this.applyContextFromTextStore.bind(this),
+  };
 }
