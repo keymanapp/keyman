@@ -103,8 +103,8 @@ build_tests_action() {
 
   builder_echo "Copying some files"
 
-  mkdir -p "${KEYMAN_ROOT}/web/build/test/dom/cases/core-processor/import/core/"
-  cp "${KEYMAN_ROOT}/web/src/engine/src/core-processor/import/core/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/test/dom/cases/core-processor/import/core/"
+  mkdir -p "${KEYMAN_ROOT}/web/build/test/dom/cases/core-adapter/import/core/"
+  cp "${KEYMAN_ROOT}/web/src/engine/src/core-adapter/import/core/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/test/dom/cases/core-adapter/import/core/"
 
   for dir in \
     "${KEYMAN_ROOT}/web/build/test/dom/cases"/*/ \
@@ -149,7 +149,7 @@ builder_run_child_actions build:common/web-utils
 builder_run_child_actions build:engine
 # builder_run_child_actions build:engine/predictive-text
 
-# Uses all but engine/element-wrappers and engine/attachment
+# Uses all but engine/element-text-stores and engine/attachment
 builder_run_child_actions build:app/webview
 
 # Uses literally everything `engine/` above

@@ -1,10 +1,10 @@
 import { assert } from 'chai';
-import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-processor';
+import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
 
-const coreurl = '/build/engine/core-processor/obj/import/core';
+const coreurl = '/build/engine/obj/core-adapter/import/core';
 
-// Test the CoreProcessor interface.
-describe('CoreProcessor', function () {
+// Test the KM_Core interface.
+describe('KM_Core', function () {
   this.timeout(5000); // increased timeout for async loading
 
   async function loadKeyboardBlob(uri: string) {

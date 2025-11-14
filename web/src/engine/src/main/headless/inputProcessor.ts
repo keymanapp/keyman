@@ -5,7 +5,7 @@ import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec, isEmptyTransform } from "keyman/common/web-utils";
 
-import { KM_Core } from 'keyman/engine/core-processor';
+import { KM_Core } from 'keyman/engine/core-adapter';
 
 import {
   Codes,

@@ -36,16 +36,16 @@ builder_parse "$@"
 #### Build action definitions ####
 
 copy_deps() {
-  mkdir -p "src/core-processor/import/core/"
+  mkdir -p "${KEYMAN_ROOT}/web/src/engine/src/core-adapter/import/core/"
   # we don't need this file for release builds, but it's nice to have
   # for reference and auto-completion
-  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "src/core-processor/import/core/"
+  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "${KEYMAN_ROOT}/web/src/engine/src/core-adapter/import/core/"
 
-  mkdir -p "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"
-  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"
-  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core{.js,.wasm} "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"
+  mkdir -p "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"
+  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"
+  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core{.js,.wasm} "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"
 
-  cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$KEYMAN_ROOT/web/src/resources/osk/"
+  cp "${KEYMAN_ROOT}/common/resources/fonts/keymanweb-osk.ttf" "${KEYMAN_ROOT}/web/src/resources/osk/"
 }
 
 do_build () {
