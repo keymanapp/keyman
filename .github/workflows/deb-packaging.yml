@@ -31,6 +31,7 @@ env:
   STATUS_CONTEXT: 'Ubuntu Packaging'
   DEBFULLNAME: 'Keyman GHA packager'
   DEBEMAIL: 'support@keyman.com'
+  _builder_timings: false
 
 jobs:
   sourcepackage:

@@ -392,6 +392,7 @@ _builder_failure_trap() {
   local action target
 
   _builder_cleanup_deps
+  _builder_timing_cleanup_and_report $trappedExitCode
 
   # Since 'exit' is also trapped, we can also handle end-of-script incomplete actions.
   if [[ $trappedExitCode == 0 ]]; then
@@ -440,13 +441,32 @@ _builder_cleanup_deps() {
 # Child scripts
 #------------------------------------------------------------------------------------------
 
+builder_launch() {
+  local script="$1"
+  local action="$2"
+  local target
+  if [[ $# -lt 3 ]]; then
+    target=":*"
+  else
+    target="$3"
+  fi
+  _builder_execute_child_script "${action}" "${target}" "${KEYMAN_ROOT}${script}"
+}
+
 _builder_execute_child() {
   local action=$1
   local target=$2
-
   local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
+  _builder_execute_child_script "$action" "$target" "$script"
+}
+
+_builder_execute_child_script() {
+  local action="$1"
+  local target="$2"
+  local script="$3"
 
   builder_echo start "$action$target" "## $action$target starting..."
+  _builder_timing_start "$action$target"
 
   # Build array of specified inheritable options
   local child_options=()
@@ -475,6 +495,7 @@ _builder_execute_child() {
     $builder_debug \
     $_builder_offline \
   && (
+    _builder_timing_stop "$action$target"
     builder_echo end "$action$target" success "## $action$target completed successfully"
   ) || (
     result=$?
@@ -679,6 +700,9 @@ builder_start_action() {
     fi
     _builder_current_action="${_builder_matched_action}"
 
+    # Note: we include the action's dependencies in timing
+    _builder_timing_start "${_builder_matched_action}"
+
     # Build dependencies as required
     _builder_do_build_deps "${_builder_matched_action}"
     return 0
@@ -686,6 +710,143 @@ builder_start_action() {
     return 1
   fi
 }
+
+###################################################################################################
+# Timing
+###################################################################################################
+
+_builder_timing_setup() {
+  if $_builder_timings; then
+    export _builder_timing_report_file=`mktemp`
+    _builder_timing_start "build.sh:top"
+  fi
+}
+
+_builder_timing_start() {
+  local context="$1"
+  if [[ ! -z "${_builder_timing_report_file:+x}" ]]; then
+    echo "START $THIS_SCRIPT_IDENTIFIER:$context $(date +%s.%N)" >> "$_builder_timing_report_file"
+  fi
+}
+
+_builder_timing_stop() {
+  local context="$1"
+  if [[ ! -z "${_builder_timing_report_file:+x}" ]]; then
+    echo "STOP $THIS_SCRIPT_IDENTIFIER:$context $(date +%s.%N)" >> "$_builder_timing_report_file"
+  fi
+}
+
+#
+# Removes temporary `_builder_timing_report_file` file when top-level build
+# script finishes and reports on timings if they were requested.
+#
+_builder_timing_cleanup_and_report() {
+  local build_exit_code="$1"
+  if builder_is_dep_build || builder_is_child_build || [[ -z ${_builder_timing_report_file:+x} ]]; then
+    return 0
+  fi
+
+  if [[ -z "${_builder_timing_report_file:+x}" ]]; then
+    return 0
+  fi
+
+  if [[ "$build_exit_code" != 0 ]]; then
+    # Hide the timings report if build failed, but still cleanup
+    _builder_timings=false
+  fi
+
+  if $_builder_timings; then
+    _builder_timing_stop "build.sh:top"
+
+    if ! command -v node > /dev/null; then
+      builder_warn "WARNING: node.js not found, skipping timings report"
+    else
+      builder_heading "## Build timings"
+
+      # for simplicity of distribution, we embed the node.js script here
+
+      # shellcheck disable=SC2016
+      node -e '
+        const fs = require("node:fs");
+        const process = require("node:process");
+
+        let
+          COLOR_RED="", COLOR_GREEN="", COLOR_YELLOW="", COLOR_BLUE="", COLOR_PURPLE="", COLOR_TEAL="",
+          COLOR_WHITE="", COLOR_BRIGHT_WHITE="", COLOR_GREY="", COLOR_RESET="", BUILDER_BOLD="";
+
+        if(process.stdout.isTTY) {
+          COLOR_RED="\x1b[31m"; COLOR_GREEN="\x1b[32m"; COLOR_YELLOW="\x1b[33m"; COLOR_BLUE="\x1b[34m";
+          COLOR_PURPLE="\x1b[35m"; COLOR_TEAL="\x1b[36m"; COLOR_WHITE="\x1b[38;5;252m";
+          COLOR_BRIGHT_WHITE="\x1b[38;5;255m"; COLOR_GREY="\x1b[90m"; COLOR_RESET="\x1b(B\x1b[m";
+          BUILDER_BOLD="\x1b[1m";
+        }
+
+        const log = fs.readFileSync(process.argv[process.argv.length-1], "utf8").split("\n");
+
+        let top = null;
+        const modules = {};
+        const tree = [];
+
+        for(const line of log) {
+          if(line.trim() == "") continue;
+          const [event, area, time] = line.split(" ");
+          const [module, action, target, sub] = area.split(":");
+          if(event == "START") {
+            const mod = {area, module, action, target: target ? ":"+target : "", sub: sub ?? "", start:parseFloat(time), stop:null, modules:[]};
+            if(!top) top = mod;
+            modules[area] = mod;
+            if(tree.length) {
+              tree[tree.length-1].modules.push(mod);
+            }
+            tree.push(mod);
+          } else if(event == "STOP") {
+            if(tree.length) {
+              const mod = tree.pop();
+              if(mod.area != area) {
+                console.error(`Expected ${area} to equal ${mod.area}`);
+              }
+            }
+            const mod = modules[area];
+            if(!mod) {
+              console.error(`START not found for ${area}`);
+            } else {
+              mod.stop = parseFloat(time);
+            }
+          } else {
+            console.error(`Unrecognized line: "${line}"`);
+          }
+        }
+
+        if(tree.length) {
+          console.error(`Expected tree to be empty`);
+          console.dir(tree);
+        }
+
+        if(!Object.keys(modules).length || !top) {
+          console.error(`Expected report to be non-empty`);
+          process.exit(0);
+        }
+
+        // Write out the tree with Pretty Printing
+
+        printModule("", top);
+
+        function printModule(indent, mod) {
+          const duration = Math.round((mod.stop - mod.start) * 10) / 10;
+          console.log(`${indent}${BUILDER_BOLD}[${mod.module}]${COLOR_RESET} ${COLOR_GREEN}${mod.action}${mod.target}${COLOR_RESET} ${mod.sub}   ${duration}`);
+          for(const submod of mod.modules) {
+            printModule(indent+"  ", submod);
+          }
+        }
+      ' "${_builder_timing_report_file}"
+    fi
+  fi
+
+  rm -f "$_builder_timing_report_file"
+  _builder_timing_report_file=
+}
+
+###################################################################################################
 
 #
 # Returns 0 if the user has --option on the command line
@@ -1096,6 +1257,7 @@ _builder_get_default_description() {
     :engine)   description="engine module" ;;
     :module)   description="this module" ;;
     :tools)    description="build tools for this project" ;;
+    --timings) description="report on timings" ;;
     --debug)   description="debug build" ;;
     --release) description="release build (prevents --debug in local-env builds)" ;;
   esac
@@ -1318,6 +1480,16 @@ builder_parse() {
 _builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
+
+  if [[ -z "${_builder_timings+x}" ]]; then
+    # Only set _builder_timings if not already set
+    if builder_is_ci_build; then
+      _builder_timings=true
+    else
+      _builder_timings=false
+    fi
+    export _builder_timings
+  fi
   builder_debug=
   local is_release=false
   local _params=($@)
@@ -1438,6 +1610,12 @@ _builder_parse_expanded_parameters() {
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
           ;;
+        --timings)
+          _builder_timings=true
+          ;;
+        --no-timings)
+          _builder_timings=false
+          ;;
         --debug)
           _builder_chosen_options+=(--debug)
           builder_debug=--debug
@@ -1529,17 +1707,16 @@ _builder_parse_expanded_parameters() {
   fi
 
   if builder_is_dep_build; then
-    if [[ -z ${_builder_deps_built+x} ]]; then
-      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
-    fi
+    _builder_verify_expected_sub_process_variables
   elif builder_is_child_build; then
-    if [[ -z ${_builder_deps_built+x} ]]; then
-      builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
-    fi
+    _builder_verify_expected_sub_process_variables
   else
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
     export _builder_deps_built=`mktemp`
+
+    # We will also track timings
+    _builder_timing_setup
 
     # Per #11106, local builds use --debug by default.
     # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
@@ -1572,6 +1749,17 @@ _builder_parse_expanded_parameters() {
   if [[ -z "$(trap -p DEBUG)" ]]; then
     # not running in bashdb
     trap _builder_failure_trap err exit
+  fi
+}
+
+_builder_verify_expected_sub_process_variables() {
+  if [[ -z ${_builder_deps_built+x} ]]; then
+    builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
+  fi
+  if $_builder_timings; then
+    if [[ -z ${_builder_timing_report_file+x} ]]; then
+      builder_die "FATAL ERROR: Expected '_builder_timing_report_file' variable to be set"
+    fi
   fi
 }
 
@@ -1755,6 +1943,8 @@ builder_finish_action() {
       builder_echo end "$action_name" error "## $action_name failed with message: $result"
     fi
 
+    _builder_timing_stop "${_builder_matched_action}"
+
     # Remove $action$target from the array; it is no longer a current action
     _builder_current_action=
   else
@@ -1833,6 +2023,8 @@ _builder_do_build_deps() {
     return 0
   fi
 
+  _builder_timing_start "$1:dependencies"
+
   for dep in "${_builder_deps[@]}"; do
     # Don't attempt to build dependencies that don't match the current
     # action:target (wildcards supported for matches here)
@@ -1861,7 +2053,7 @@ _builder_do_build_deps() {
       $_builder_build_deps \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
       if $_builder_debug_internal; then
-        builder_echo success "## Dependency $dep$dep_target for $_builder_matched_action_name successfully"
+        builder_echo success "## Dependency $dep$dep_target for $_builder_matched_action_name completed successfully"
       fi
     ) || (
       result=$?
@@ -1869,6 +2061,8 @@ _builder_do_build_deps() {
       exit $result
     ) || exit $? # Required due to above subshell masking exit
   done
+
+  _builder_timing_stop "$1:dependencies"
 }
 
 #
