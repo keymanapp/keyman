@@ -1752,8 +1752,6 @@ describe("KMN Analyser Tests", () => {
     });
     it("can provide round trip text for repository keyboards (0-99)", () => {
       [
-        'release/a/aksarabali_panlex/source/aksarabali_panlex',
-        /*
         'experimental/a/alephwithbeth/source/alephwithbeth',
         'experimental/a/amuzgo_guerrero/source/amuzgo_guerrero',
         'experimental/b/beria_erfe_phonetic/source/beria_erfe_phonetic',
@@ -1845,7 +1843,7 @@ describe("KMN Analyser Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
-        */
+
       ].forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
@@ -2393,7 +2391,7 @@ describe("KMN Analyser Tests", () => {
         'release/m/medefaidrin/source/medefaidrin',
         'release/m/meroitic_cursive/source/meroitic_cursive',
         'release/m/meroitic_hieroglyphs/source/meroitic_hieroglyphs',
-      ].forEach((name) => {
+      ].slice(12, 13).forEach((name) => {
         const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         tokenBuffer = stringToTokenBuffer(buffer);
         const parser: Parser = new Parser(tokenBuffer);

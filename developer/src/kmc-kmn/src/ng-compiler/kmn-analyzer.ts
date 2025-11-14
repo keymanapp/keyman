@@ -60,8 +60,7 @@ export class KmnTreeRule extends SingleChildRule {
     const line: Rule = new LineRule();
     const manyLine: Rule = new ManyRule(line);
     const finalLine: Rule = new FinalLineRule();
-    const optFinalLine: Rule = new OptionalRule(finalLine);
-    this.rule = new SequenceRule([manyLine, optFinalLine]);
+    this.rule = new SequenceRule([manyLine, finalLine]);
   }
 
   /**

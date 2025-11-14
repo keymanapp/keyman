@@ -1,4 +1,4 @@
-kmnTree: line* finalLine?
+kmnTree: line* finalLine
 line: compileTarget? content? NEWLINE
 finalLine: EOF
 compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
