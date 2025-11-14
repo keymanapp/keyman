@@ -132,11 +132,9 @@ export class InputProcessor {
           // Has there been a context change at any point during the multitap?  If so, we need
           // to revert it.  If not, we assume it's a layer-change multitap, in which case
           // no such reset is needed.
-          // TODO-web-core
-          if(!isEmptyTransform(transcription.transform) || !(transcription.preInput as SyntheticTextStore).isEqual(SyntheticTextStore.from(textStore))) {
+          if(!isEmptyTransform(transcription.transform) || !transcription.preInput.isEqual(SyntheticTextStore.from(textStore))) {
             // Restores full context, including deadkeys in their exact pre-keystroke state.
-            // TODO-web-core
-            textStore.restoreTo(transcription.preInput as SyntheticTextStore);
+            textStore.restoreTo(transcription.preInput);
           }
           /*
             else:
