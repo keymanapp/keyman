@@ -234,7 +234,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
       // Builds the reversion option according to the loaded lexical model's known
       // syntactic properties.
-      const suggestionContext = new ContextWindow(original.preInput as SyntheticTextStore, this.configuration, getLayerId());
+      const suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
 
       // We must accept the Suggestion from its original context, which was before
       // `original.transform` was applied.
@@ -297,7 +297,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     textStore.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput as SyntheticTextStore, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -324,7 +324,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    const context = new ContextWindow(transcription.preInput as SyntheticTextStore, this.configuration, layerId);
+    const context = new ContextWindow(transcription.preInput, this.configuration, layerId);
     this.recordTranscription(transcription);
 
     if(resetContext) {

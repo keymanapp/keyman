@@ -1,20 +1,20 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
-import { TextStore } from '../textStore.js';
 import { KeyEvent } from '../keyEvent.js';
 import { Alternate, TextTransform } from './textTransform.js';
+import { SyntheticTextStore } from '../syntheticTextStore.js';
 
 export class Transcription {
   readonly token: number;
   readonly keystroke: KeyEvent;
   readonly transform: TextTransform;
   alternates: Alternate[]; // constructed after the rest of the transcription.
-  readonly preInput: TextStore;
+  readonly preInput: SyntheticTextStore;
 
   private static tokenSeed: number = 0;
 
-  constructor(keystroke: KeyEvent, transform: TextTransform, preInput: TextStore, alternates?: Alternate[]) {
+  constructor(keystroke: KeyEvent, transform: TextTransform, preInput: SyntheticTextStore, alternates?: Alternate[]) {
     const token = this.token = Transcription.tokenSeed++;
 
     this.keystroke = keystroke;
