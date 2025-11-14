@@ -1,0 +1,721 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Dr Mark C. Sinclair on 2025-03-18
+ *
+ * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
+ */
+
+import { TokenType } from "./token-type.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToNewNodeOrTree } from "./recursive-descent.js";
+import { Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode } from "./recursive-descent.js";
+import { SingleChildRuleParseToTreeFromNewNode, TokenRule } from "./recursive-descent.js";
+import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
+import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
+import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
+import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyzer.js";
+import { NodeType } from "./node-type.js";
+import { ASTNode } from "./tree-construction.js";
+import { TokenBuffer } from "./token-buffer.js";
+import { Token } from "./lexer.js";
+
+/**
+ * The Next Generation Parser for the Keyman Keyboard Language.
+ *
+ * The Parser builds an Abstract Syntax Tree from the supplied TokenBuffer.
+ *
+ */
+export class Parser {
+  private readonly tokenBuffer: TokenBuffer;
+
+  /**
+   * Construct a Parser
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   */
+  public constructor(tokenBuffer: TokenBuffer) {
+    this.tokenBuffer = tokenBuffer;
+  }
+
+  /**
+   * Parses the tokenBuffer to create an abstract syntax
+   * tree (AST) of a KMN file.
+   *
+   * @returns the abstract syntax tree (AST)
+   */
+  public parse(): ASTNode {
+    const kmnTreeRule: Rule = new KmnTreeRule();
+    const root: ASTNode = new ASTNode(NodeType.TMP);
+    kmnTreeRule.parse(this.tokenBuffer, root);
+    return root;
+  }
+}
+
+/**
+ * (BNF) kmnTree: line* finalLine?
+ */
+export class KmnTreeRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const line: Rule = new LineRule();
+    const manyLine: Rule = new ManyRule(line);
+    const finalLine: Rule = new FinalLineRule();
+    this.rule = new SequenceRule([manyLine, finalLine]);
+  }
+
+  /**
+   * Parse a KMNTreeRule, including gathering the source code,
+   * groups and stores and arranging these stores, other nodes,
+   * groups and then source code.
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    if (this.rule === null) {
+      return false;
+    }
+    const parseSuccess = this.rule.parse(tokenBuffer, node);
+    const children: ASTNode[] = [];
+    const sourceCodeNode: ASTNode = this.gatherSourceCode(node);
+    const groupNodes: ASTNode[]   = this.gatherGroups(node);
+    const storesNode: ASTNode     = this.gatherStores(node);
+    children.unshift(storesNode);
+    children.push(...node.removeChildren());
+    children.push(...groupNodes);
+    children.push(sourceCodeNode);
+    node.addChildren(children);
+    return parseSuccess;
+  }
+
+  private static STORES_NODETYPES = [
+    NodeType.BITMAP,
+    NodeType.CASEDKEYS,
+    NodeType.COPYRIGHT,
+    NodeType.DISPLAYMAP,
+    NodeType.ETHNOLOGUECODE,
+    NodeType.HOTKEY,
+    NodeType.INCLUDECODES,
+    NodeType.KEYBOARDVERSION,
+    NodeType.KMW_EMBEDCSS,
+    NodeType.KMW_EMBEDJS,
+    NodeType.KMW_HELPFILE,
+    NodeType.KMW_HELPTEXT,
+    NodeType.KMW_RTL,
+    NodeType.LANGUAGE,
+    NodeType.LAYOUTFILE,
+    NodeType.MESSAGE,
+    NodeType.MNEMONICLAYOUT,
+    NodeType.NAME,
+    NodeType.TARGETS,
+    NodeType.VERSION,
+    NodeType.VISUALKEYBOARD,
+    NodeType.WINDOWSLANGUAGES,
+    NodeType.CAPSALWAYSOFF,
+    NodeType.CAPSONONLY,
+    NodeType.SHIFTFREESCAPS,
+    NodeType.BITMAP_HEADER,
+    NodeType.COPYRIGHT_HEADER,
+    NodeType.HOTKEY_HEADER,
+    NodeType.LANGUAGE_HEADER,
+    NodeType.LAYOUT_HEADER,
+    NodeType.MESSAGE_HEADER,
+    NodeType.NAME_HEADER,
+    NodeType.VERSION_HEADER,
+    NodeType.STORE,
+  ];
+
+  private gatherStores(node: ASTNode): ASTNode {
+    const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeRule.STORES_NODETYPES);
+    const storesNode: ASTNode   = new ASTNode(NodeType.STORES);
+    storesNode.addChildren(storeNodes);
+    return storesNode;
+  }
+
+  private gatherGroups(node: ASTNode): ASTNode[] {
+    return node.removeBlocks(NodeType.GROUP, NodeType.PRODUCTION);;
+  }
+
+  private gatherSourceCode(node: ASTNode): ASTNode {
+    const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeType.LINE);
+    const sourceCodeNode: ASTNode = new ASTNode(NodeType.SOURCE_CODE);
+    sourceCodeNode.addChildren(lineNodes);
+    return sourceCodeNode;
+  }
+}
+
+/**
+ * (BNF) line: compileTarget? content? NEWLINE
+ */
+export class LineRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const compileTarget: Rule    = new CompileTargetRule();
+    const optCompileTarget: Rule = new OptionalRule(compileTarget);
+    const content: Rule          = new ContentRule();
+    const optContent: Rule       = new OptionalRule(content);
+    const newline: Rule          = new TokenRule(TokenType.NEWLINE, true);
+    this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
+  }
+}
+
+/**
+ * (BNF) finalLine: EOF
+ */
+export class FinalLineRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const eof: Rule = new TokenRule(TokenType.EOF);
+    this.rule = eof;
+  }
+
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    const token: Token = tokenBuffer.nextToken();
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const parseSuccess = this.rule.parse(tokenBuffer, tmp);
+    if (parseSuccess && token.line.length > 0) {
+      node.addNewChildWithToken(NodeType.LINE, token);
+    }
+    return parseSuccess;
+  }
+}
+
+/**
+ * (BNF) compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
+ */
+export class CompileTargetRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const keyman: Rule     = new TokenRule(TokenType.KEYMAN, true);
+    const keymanonly: Rule = new TokenRule(TokenType.KEYMANONLY, true);
+    const keymanweb: Rule  = new TokenRule(TokenType.KEYMANWEB, true);
+    const kmfl: Rule       = new TokenRule(TokenType.KMFL, true);
+    const weaver: Rule     = new TokenRule(TokenType.WEAVER, true);
+    this.rule = new AlternateRule([
+      keyman, keymanonly, keymanweb, kmfl, weaver,
+    ]);
+  }
+}
+
+/**
+ * (BNF) content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
+ * headerAssign|normalStoreAssign|ruleBlock
+ */
+export class ContentRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const systemStoreAssign: Rule  = new SystemStoreAssignRule();
+    const capsAlwaysOff: Rule      = new CapsAlwaysOffRule();
+    const capsOnOnly: Rule         = new CapsOnOnlyRule();
+    const shiftFreesCaps: Rule     = new ShiftFreesCapsRule();
+    const headerAssign: Rule       = new HeaderAssignRule();
+    const normalStoreAssign: Rule  = new NormalStoreAssignRule();
+    const ruleBlock: Rule          = new RuleBlockRule();
+    this.rule = new AlternateRule([
+      systemStoreAssign,
+      capsAlwaysOff,
+      capsOnOnly,
+      shiftFreesCaps,
+      headerAssign,
+      normalStoreAssign,
+      ruleBlock,
+    ]);
+  }
+}
+
+/**
+ * (BNF) text: plainText|outsStatement
+ */
+export class TextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const plainText: Rule     = new PlainTextRule();
+    const outsStatement: Rule = new OutsStatementRule();
+    this.rule = new AlternateRule([plainText, outsStatement]);
+  }
+}
+
+/**
+ * (BNF) plainText: textRange|simpleText
+ */
+export class PlainTextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const textRange: Rule  = new TextRangeRule();
+    const simpleText: Rule = new SimpleTextRule();
+    this.rule = new AlternateRule([textRange, simpleText]);
+  }
+}
+
+/**
+ * (BNF) simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
+ * DECIMAL|HEXADECIMAL|OCTAL|NUL|deadkeyStatement|BEEP
+ */
+export class SimpleTextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const stringRule: Rule       = new TokenRule(TokenType.STRING, true);
+    const virtualKey: Rule       = new VirtualKeyRule();
+    const uChar: Rule            = new TokenRule(TokenType.U_CHAR, true);
+    const namedConstant: Rule    = new TokenRule(TokenType.NAMED_CONSTANT, true);
+    const hangul: Rule           = new TokenRule(TokenType.HANGUL, true);
+    const decimal: Rule          = new TokenRule(TokenType.DECIMAL, true);
+    const hexadecimal: Rule      = new TokenRule(TokenType.HEXADECIMAL, true);
+    const octal: Rule            = new TokenRule(TokenType.OCTAL, true);
+    const nul: Rule              = new TokenRule(TokenType.NUL, true);
+    const deadkeyStatement: Rule = new DeadkeyStatementRule();
+    const beep: Rule             = new TokenRule(TokenType.BEEP, true);
+    this.rule = new AlternateRule([
+      stringRule,
+      virtualKey,
+      uChar,
+      namedConstant,
+      hangul,
+      decimal,
+      hexadecimal,
+      octal,
+      nul,
+      deadkeyStatement,
+      beep,
+    ]);
+  }
+}
+
+/**
+ * (BNF) textRange: simpleText rangeEnd+
+ */
+export class TextRangeRule extends SingleChildRuleParseToTreeFromNewNode {
+  public constructor() {
+    super(NodeType.RANGE);
+    const simpleText: Rule        = new SimpleTextRule();
+    const rangeEnd: Rule          = new RangeEndRule();
+    const oneOrManyRangeEnd: Rule = new OneOrManyRule(rangeEnd);
+    this.rule = new SequenceRule([simpleText, oneOrManyRangeEnd]);
+  }
+}
+
+/**
+ * (BNF) rangeEnd: RANGE simpleText
+ */
+export class RangeEndRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const range: Rule         = new TokenRule(TokenType.RANGE);
+    const simpleText: Rule    = new SimpleTextRule();
+    this.rule = new SequenceRule([range, simpleText]);
+  }
+}
+
+/**
+ * (BNF) virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
+ */
+export class VirtualKeyRule extends SingleChildRuleParseToTreeFromNewNode {
+  public constructor() {
+    super(NodeType.VIRTUAL_KEY);
+    const leftSquare: Rule   = new TokenRule(TokenType.LEFT_SQ);
+    const modifier: Rule     = new ModifierRule();
+    const manyModifier: Rule = new ManyRule(modifier);
+    const keyCode: Rule      = new KeyCodeRule();
+    const rightSquare: Rule  = new TokenRule(TokenType.RIGHT_SQ);
+    this.rule = new SequenceRule([
+      leftSquare, manyModifier, keyCode, rightSquare
+    ]);
+  }
+}
+
+/**
+ * (BNF) modifier: SHIFT|CAPS|MODIFIER
+ */
+export class ModifierRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const shift: Rule    = new TokenRule(TokenType.SHIFT, true);
+    const caps: Rule     = new TokenRule(TokenType.CAPS, true);
+    const modifier: Rule = new TokenRule(TokenType.MODIFIER, true);
+    this.rule = new AlternateRule([shift, caps, modifier]);
+  }
+
+  /**
+   * Parse a ModifierRule.  As SHIFT and CAPS are separately
+   * identified as they are used in other rules, a MODIFIER
+   * node must be created for them if needed.
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    if (parseSuccess) {
+      let modifierNode = tmp.getSoleChildOfType(NodeType.MODIFIER);
+      if (modifierNode === null) {
+        modifierNode = new ASTNode(NodeType.MODIFIER, tmp.getSoleChild().token);
+      }
+      node.addChild(modifierNode);
+    }
+    return parseSuccess;
+  }
+}
+
+/**
+ * (BNF) keyCode: KEY_CODE|STRING|DECIMAL
+ */
+export class KeyCodeRule extends SingleChildRule {
+  // DECIMAL is included because of e.g. d10, which could be ISO9995 code
+  public constructor() {
+    super();
+    const keyCode: Rule    = new TokenRule(TokenType.KEY_CODE, true);
+    const stringRule: Rule = new TokenRule(TokenType.STRING, true);
+    const decimal: Rule    = new TokenRule(TokenType.DECIMAL, true);
+    this.rule = new AlternateRule([keyCode, stringRule, decimal]);
+  }
+}
+
+/**
+ * (BNF) ruleBlock: beginStatement|groupStatement|productionBlock
+ */
+export class RuleBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const beginStatement: Rule  = new BeginStatementRule();
+    const groupStatement: Rule  = new GroupStatementRule();
+    const productionBlock: Rule = new ProductionBlockRule();
+    this.rule = new AlternateRule([beginStatement, groupStatement, productionBlock]);
+  }
+}
+
+/**
+ * (BNF) beginStatement: BEGIN entryPoint? CHEVRON useStatement
+ */
+export class BeginStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+  public constructor() {
+    super(NodeType.BEGIN);
+    const begin: Rule          = new TokenRule(TokenType.BEGIN, true);
+    const entryPointRule: Rule = new EntryPointRule();
+    const optEntryPoint: Rule  = new OptionalRule(entryPointRule);
+    const chevron: Rule        = new TokenRule(TokenType.CHEVRON);
+    const useStatement: Rule   = new UseStatementRule();
+    this.rule = new SequenceRule([begin, optEntryPoint, chevron, useStatement]);
+  }
+}
+
+/**
+ * (BNF) entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
+ */
+export class EntryPointRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const unicode: Rule       = new TokenRule(TokenType.UNICODE, true);
+    const newcontext: Rule    = new TokenRule(TokenType.NEWCONTEXT, true);
+    const postkeystroke: Rule = new TokenRule(TokenType.POSTKEYSTROKE, true);
+    const ansi: Rule          = new TokenRule(TokenType.ANSI, true);
+    this.rule = new AlternateRule([unicode, newcontext, postkeystroke, ansi]);
+  }
+}
+
+/**
+ * (BNF) useStatement: USE LEFT_BR groupName RIGHT_BR
+ */
+export class UseStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+  public constructor() {
+    super(NodeType.USE);
+    const use: Rule          = new TokenRule(TokenType.USE, true);
+    const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
+    const groupName: Rule    = new GroupNameRule();
+    const rightBracket: Rule = new TokenRule(TokenType.RIGHT_BR);
+    this.rule = new SequenceRule([use, leftBracket, groupName, rightBracket]);
+  }
+}
+
+/**
+ * (BNF) groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
+ */
+export class GroupStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+  public constructor() {
+    super(NodeType.GROUP);
+    const group: Rule              = new TokenRule(TokenType.GROUP, true);
+    const leftBracket: Rule        = new TokenRule(TokenType.LEFT_BR);
+    const groupName: Rule          = new GroupNameRule();
+    const rightBracket: Rule       = new TokenRule(TokenType.RIGHT_BR);
+    const groupQualifierRule: Rule = new GroupQualifierRule();
+    const optGroupQualifier: Rule  = new OptionalRule(groupQualifierRule);
+    this.rule = new SequenceRule([
+      group,
+      leftBracket,
+      groupName,
+      rightBracket,
+      optGroupQualifier,
+    ]);
+  }
+}
+
+/**
+ * (BNF) groupName: groupNameElement+
+ */
+export class GroupNameRule extends SingleChildRuleParseToNewNodeOrTree {
+  public constructor() {
+    super(NodeType.GROUPNAME);
+    const groupNameElement: Rule = new GroupNameElementRule();
+    this.rule = new OneOrManyRule(groupNameElement);
+  }
+}
+
+/**
+ * (BNF) groupNameElement: PARAMETER|OCTAL|permittedKeyword
+ */
+export class GroupNameElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const parameter: Rule        = new TokenRule(TokenType.PARAMETER, true);
+    const octal: Rule            = new TokenRule(TokenType.OCTAL, true);
+    const permittedKeyword: Rule = new PermittedKeywordRule();
+    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+  }
+}
+
+/**
+ * (BNF) see the BNF file (kmn-file.bnf)
+ */
+export class PermittedKeywordRule extends AlternateTokenRule {
+  public constructor() {
+    super([
+      TokenType.ALWAYS,
+      TokenType.ANSI,
+      TokenType.BEEP,
+      TokenType.BEGIN,
+      TokenType.BITMAP_HEADER,
+      TokenType.CAPS,
+      TokenType.CONTEXT,
+      TokenType.COPYRIGHT_HEADER,
+      TokenType.DECIMAL,
+      TokenType.FREES,
+      TokenType.HEXADECIMAL,
+      TokenType.HOTKEY_HEADER,
+      TokenType.KEY_CODE,
+      TokenType.KEYS,
+      TokenType.LANGUAGE_HEADER,
+      TokenType.LAYOUT_HEADER,
+      TokenType.MATCH,
+      TokenType.MESSAGE_HEADER,
+      TokenType.NAME_HEADER,
+      TokenType.NEWCONTEXT,
+      TokenType.NOMATCH,
+      TokenType.NUL,
+      TokenType.OCTAL,
+      TokenType.OFF,
+      TokenType.ON,
+      TokenType.ONLY,
+      TokenType.POSTKEYSTROKE,
+      TokenType.READONLY,
+      TokenType.RETURN,
+      TokenType.SHIFT,
+      TokenType.UNICODE,
+      TokenType.USING,
+      TokenType.VERSION_HEADER,
+    ], true);
+  }
+}
+
+/**
+ * (BNF) groupQualifier: usingKeys|READONLY
+ */
+export class GroupQualifierRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const usingKeys: Rule = new UsingKeysRule();
+    const readonly: Rule  = new TokenRule(TokenType.READONLY, true);
+    this.rule = new AlternateRule([usingKeys, readonly]);
+  }
+}
+
+/**
+ * (BNF) usingKeys: USING KEYS
+ */
+export class UsingKeysRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const using: Rule = new TokenRule(TokenType.USING);
+    const keys: Rule  = new TokenRule(TokenType.KEYS);
+    this.rule = new SequenceRule([using, keys]);
+  }
+
+  /**
+   * Parse a UsingKeysRule
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    if (parseSuccess) {
+      node.addChild(new ASTNode(NodeType.USING_KEYS));
+    }
+    return parseSuccess;
+  }
+}
+
+/**
+ * (BNF) productionBlock: lhsBlock CHEVRON rhsBlock
+ */
+export class ProductionBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const lhsBlock = new LhsBlockRule();
+    const chevron  = new TokenRule(TokenType.CHEVRON);
+    const rhsBlock = new RhsBlockRule();
+    this.rule = new SequenceRule([lhsBlock, chevron, rhsBlock]);
+  }
+
+  /**
+   * Parse a ProductionBlockRule
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
+  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    if (parseSuccess) {
+      const lhsNode        = tmp.getSoleChildOfType(NodeType.LHS);
+      const rhsNode        = tmp.getSoleChildOfType(NodeType.RHS);
+      const productionNode = new ASTNode(NodeType.PRODUCTION);
+      productionNode.addChild(lhsNode);
+      productionNode.addChild(rhsNode);
+      node.addChild(productionNode);
+    }
+    return parseSuccess;
+  }
+}
+
+/**
+ * (BNF) lhsBlock: MATCH|NOMATCH|inputBlock
+ */
+export class LhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
+  public constructor() {
+    super(NodeType.LHS);
+    const match: Rule      = new TokenRule(TokenType.MATCH, true);
+    const nomatch: Rule    = new TokenRule(TokenType.NOMATCH, true);
+    const inputBlock: Rule = new InputBlockRule();
+    this.rule = new AlternateRule([match, nomatch,inputBlock]);
+  }
+}
+
+/**
+ * (BNF) inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
+ */
+export class InputBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const nulRule: Rule             = new TokenRule(TokenType.NUL, true);
+    const optNul: Rule              = new OptionalRule(nulRule);
+    const ifLikeStatement: Rule     = new IfLikeStatementRule();
+    const manyIfLikeStatement: Rule = new ManyRule(ifLikeStatement);
+    const inputContext: Rule        = new InputContextRule();
+    const optInputContext: Rule     = new OptionalRule(inputContext);
+    const keystoke: Rule            = new KeystrokeRule();
+    const optKeystroke: Rule        = new OptionalRule(keystoke);
+    this.rule = new SequenceRule([
+      optNul, manyIfLikeStatement, optInputContext, optKeystroke,
+    ]);
+  }
+}
+
+/**
+ * (BNF) inputContext: inputElement+
+ */
+export class InputContextRule extends SingleChildRuleParseToTreeFromNewNode {
+  public constructor() {
+    super(NodeType.INPUT_CONTEXT);
+    const inputElement = new InputElementRule();
+    this.rule = new OneOrManyRule(inputElement);
+  }
+}
+
+/**
+ * (BNF) inputElement: anyStatement|notanyStatement|contextStatement|indexStatement|text
+ */
+export class InputElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const anyStatement: Rule     = new AnyStatementRule();
+    const notanyStatement: Rule  = new NotanyStatementRule();
+    const contextStatement: Rule = new ContextStatementRule();
+    const indexStatement: Rule   = new IndexStatementRule();
+    const text: Rule             = new TextRule();
+    this.rule = new AlternateRule([
+      anyStatement,
+      notanyStatement,
+      contextStatement,
+      indexStatement,
+      text
+    ]);
+  }
+}
+
+/**
+ * (BNF) keystroke: PLUS inputElement+
+ */
+export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
+  public constructor() {
+    super(NodeType.KEYSTROKE);
+    const plus: Rule            = new TokenRule(TokenType.PLUS);
+    const inputElement          = new InputElementRule();
+    const oneOrManyInputElement = new OneOrManyRule(inputElement);
+    this.rule = new SequenceRule([plus, oneOrManyInputElement]);
+  }
+}
+
+/**
+ * (BNF) rhsBlock: outputStatement+
+ */
+export class RhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
+  public constructor() {
+    super(NodeType.RHS);
+    const outputStatement: Rule = new OutputStatementRule();
+    this.rule = new OneOrManyRule(outputStatement);
+  }
+}
+
+/**
+ * (BNF) outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
+ * resetStore|setSystemStore|layerStatement|indexStatement|
+ * contextStatement|CONTEXT|RETURN|text|BEEP
+ */
+export class OutputStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const useStatement: Rule     = new UseStatementRule();
+    const callStatement: Rule    = new CallStatementRule();
+    const setNormalStore: Rule   = new SetNormalStoreRule();
+    const saveStatement: Rule    = new SaveStatementRule();
+    const resetStore: Rule       = new ResetStoreRule();
+    const setSystemStore: Rule   = new SetSystemStoreRule();
+    const layerStatement: Rule   = new LayerStatementRule();
+    const indexStatement: Rule   = new IndexStatementRule();
+    const contextStatement: Rule = new ContextStatementRule();
+    const context: Rule          = new TokenRule(TokenType.CONTEXT, true);
+    const returnRule: Rule       = new TokenRule(TokenType.RETURN, true);
+    const text: Rule             = new TextRule();
+    const beep: Rule             = new TokenRule(TokenType.BEEP, true);
+    this.rule = new AlternateRule([
+      useStatement,
+      callStatement,
+      setNormalStore,
+      saveStatement,
+      resetStore,
+      setSystemStore,
+      layerStatement,
+      indexStatement,
+      contextStatement,
+      context,
+      returnRule,
+      text,
+      beep,
+    ]);
+  }
+}
