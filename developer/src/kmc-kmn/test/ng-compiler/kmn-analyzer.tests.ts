@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
+import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, FinalLineRule, GroupNameRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
 import { GroupQualifierRule, GroupStatementRule, InputBlockRule, InputContextRule, InputElementRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { KeystrokeRule, KmnTreeRule, LhsBlockRule, LineRule, ModifierRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { OutputStatementRule, PermittedKeywordRule, PlainTextRule, ProductionBlockRule, RhsBlockRule } from '../../src/ng-compiler/kmn-analyzer.js';
@@ -48,6 +48,11 @@ describe("KMN Analyser Tests", () => {
       const sourceCodeNode = root.getSoleChildOfType(NodeType.SOURCE_CODE);
       assert.isNotNull(sourceCodeNode);
       assert.equal(sourceCodeNode.getChildrenOfType(NodeType.LINE).length, 3);
+    });
+    it("can parse correctly (comment on final line with no newline)", () => {
+      tokenBuffer = stringToTokenBuffer('group(emit) using keys\n  c empty final group causes keystroke to be emitted to app');
+      const kmnTree: Rule = new KmnTreeRule();
+      assert.isTrue(kmnTree.parse(tokenBuffer, root));
     });
   });
   describe("LineRule Tests", () => {
@@ -207,6 +212,35 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[0].nodeType, NodeType.KEYMANONLY);
       assert.equal(children[1].nodeType, NodeType.PRODUCTION);
       assert.equal(children[2].nodeType, NodeType.LINE);
+    });
+  });
+  describe("FinalLineRule Tests", () => {
+    it("can construct a FinalLineRule", () => {
+      tokenBuffer = stringToTokenBuffer('');
+      const line: Rule = new FinalLineRule();
+      assert.isNotNull(line);
+    });
+    it("can parse correctly (empty line)", () => {
+      tokenBuffer = stringToTokenBuffer('');
+      const line: Rule = new FinalLineRule();
+      assert.isTrue(line.parse(tokenBuffer, root));
+      assert.isFalse(root.hasChild());
+    });
+    it("can parse correctly (space)", () => {
+      tokenBuffer = stringToTokenBuffer(' ');
+      const line: Rule = new FinalLineRule();
+      assert.isTrue(line.parse(tokenBuffer, root));
+      const lineNode = root.getSoleChildOfType(NodeType.LINE);
+      assert.isNotNull(lineNode);
+      assert.deepEqual(lineNode.token.line, ' ');
+    });
+    it("can parse correctly (comment)", () => {
+      tokenBuffer = stringToTokenBuffer('c final line');
+      const line: Rule = new FinalLineRule();
+      assert.isTrue(line.parse(tokenBuffer, root));
+      const lineNode = root.getSoleChildOfType(NodeType.LINE);
+      assert.isNotNull(lineNode);
+      assert.deepEqual(lineNode.token.line, 'c final line');
     });
   });
   describe("CompileTargetRule Tests", () => {
