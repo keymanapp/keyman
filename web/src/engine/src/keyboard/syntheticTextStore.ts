@@ -58,6 +58,7 @@ export class SyntheticTextStore extends TextStore {
       clone = new SyntheticTextStore(text, selectionStart, selectionEnd);
     }
 
+    // TODO-web-core: we need to support saving Core markers here (km_core_context_get / km_core_context_set)
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
     clone.setDeadkeys(textStore.deadkeys());
 

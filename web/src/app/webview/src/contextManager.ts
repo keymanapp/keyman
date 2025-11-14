@@ -209,7 +209,7 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
     // That said, it's best to keep it around for now and verify later.
     if(originalKeyboard?.metadata?.id == activatingKeyboard?.metadata?.id) {
       activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
-        // TODO-web-core: Do we need to refresh layouts for KMX keyboards also?
+        // TODO-embed-osk-in-kmx: Do we need to refresh layouts for KMX keyboards also?
         if (kbd instanceof JSKeyboard) {
           kbd.refreshLayouts();
         }

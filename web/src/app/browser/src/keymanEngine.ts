@@ -396,6 +396,10 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * @return      {Object}               Copy of keyboard identification strings
    *
    */
+  // TODO-web-core: Lkbd should be type 'Keyboard'
+  // TODO-web-core: add isRTL into KMXKeyboard keyboard definition
+  // TODO-web-core: check each property of Lstub for KMXKeyboard availability
+  // TODO-web-core: define an interface for the return type and use it instead of ReturnType<> (and document!)
   private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: JSKeyboard) { // I2078 - Full keyboard detail
     const Lr = {
       Name: Lstub.KN,
@@ -463,7 +467,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     if (keyboard instanceof JSKeyboard) {
       return stub && this._GetKeyboardDetail(stub, keyboard);
     } else {
-      // TODO-web-core: implement for KMX keyboards if needed
+      // TODO-web-core: do this work in _GetKeyboardDetail (implement for KMX keyboards)
       return null;
     }
   }
@@ -494,7 +498,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
         const Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
         Lr.push(Lrn);
       } else {
-        // TODO-web-core: implement for KMX keyboards if needed
+        // TODO-web-core:  do this work in _GetKeyboardDetail (implement for KMX keyboards if needed)
       }
     }
     return Lr;
@@ -693,7 +697,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     PKbd = PKbd || this.core.activeKeyboard;
     if (PKbd instanceof KMXKeyboard) {
-      // TODO-web-core: implement for KMX keyboards if needed
+      // TODO-web-core: implement for KMX keyboards (epic/embed-osk-in-kmx)
       return null;
     }
     const Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);

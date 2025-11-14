@@ -27,7 +27,7 @@ export interface KeyboardCookie {
  * @param       {Keyboard}    activeKeyboard  The active keyboard
  */
 function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
-  // TODO-web-core: do we need to support RTL in Core?
+  // TODO-web-core: we need to support RTL in Core. Means supporting km_core_keyboard_get_named_attr(KMX.KMXFile.TSS_KMW_RTL)
   const elDir = activeKeyboard instanceof JSKeyboard && activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
   if(Ptarg) {

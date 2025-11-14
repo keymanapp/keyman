@@ -25,15 +25,15 @@ export class KMXKeyboard {
         }, {
           scope: KM_CORE_OPTION_SCOPE.OPT_ENVIRONMENT,
           key: KM_CORE_KMX_ENV.BASELAYOUT,
-          value: "kbdus.dll"
+          value: "kbdus.dll" // TODO: Base layout assumed to be US in v19
         }, {
           scope: KM_CORE_OPTION_SCOPE.OPT_ENVIRONMENT,
           key: KM_CORE_KMX_ENV.BASELAYOUTALT,
-          value: "us", // TODO-web-core: use proper base layout
+          value: "us", // TODO: Base layout assumed to be US in v19
         },{
           scope: KM_CORE_OPTION_SCOPE.OPT_ENVIRONMENT,
           key: KM_CORE_KMX_ENV.SIMULATEALTGR,
-          value: "0" // TODO-web-core: keyman_get_option_fromdconf(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR) ? "1": "0"
+          value: "0" // TODO: We won't support simulating AltGr option in v19
         }
       ]
     const result = KM_Core.instance.state_create(_keyboard, environment_opts);
