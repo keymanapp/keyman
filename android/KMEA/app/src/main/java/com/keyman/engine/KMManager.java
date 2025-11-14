@@ -2416,11 +2416,8 @@ public final class KMManager {
       height = defaultHeightForContext;
     } else {
       // Applying gating to 50%-200% of default height (following Keyman)
-      if (height < (defaultHeightForContext / 2)) {
-        height = (int) (defaultHeightForContext / 2);
-      } else if (height > (defaultHeightForContext * 2)) {
-        height = (int) (defaultHeightForContext * 2);
-      }
+      height = Math.max((int) getKeyboardHeightMin(context), height);
+      height = Math.min((int) getKeyboardHeightMax(context), height);
 
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2517,6 +2514,36 @@ public final class KMManager {
     int resourceId = context.getResources().getIdentifier(
       "navigation_bar_height", "dimen", "android");
     return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
+  }
+
+  public static int getKeyboardHeightMax(Context context) {
+    int orientation = getOrientation(context);
+    return getKeyboardHeightMax(context, orientation);
+  }
+
+  public static int getKeyboardHeightMax(Context context, int orientation) {
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return (int) KMManager.KeyboardHeight_Context_Landscape_Default * 2;
+    } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return (int) KMManager.KeyboardHeight_Context_Portrait_Default * 2;
+    } else {
+      return KMManager.KeyboardHeight_Reset;
+    }
+  }
+
+  public static int getKeyboardHeightMin(Context context) {
+    int orientation = getOrientation(context);
+    return getKeyboardHeightMin(context, orientation);
+  }
+
+  public static int getKeyboardHeightMin(Context context, int orientation) {
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return (int) KMManager.KeyboardHeight_Context_Landscape_Default / 2;
+    } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return (int) KMManager.KeyboardHeight_Context_Portrait_Default / 2;
+    } else {
+      return KMManager.KeyboardHeight_Reset;
+    }
   }
 
   /**
