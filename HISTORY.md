@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.162 alpha 2025-11-14
+
+* chore(linux): use `devel` for next Ubuntu release (#15157)
+* maint(resources): add build timing report to builder (#15114)
+* maint(resources): add `builder_launch` function (#15129)
+* fix(web): improve determination of default path (#15159)
+* maint(linux): free disk space before running autopkgtests (#15172)
+
 ## 19.0.161 alpha 2025-11-13
 
 * docs(android): Document disclaimer of Keyman NOT containing adware/spyware (#15136)
