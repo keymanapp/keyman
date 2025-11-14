@@ -490,8 +490,7 @@ _builder_execute_child() {
 # ### Parameters
 #
 # * 1: `script`      path to script
-# * 2: `action`      action(s)+target(s) for the child script to run, comma separated, at least one
-# * 3: `target`      reporting target, used when executing a child script through builder_run_child_actions, optional
+# * 2+: `parameters`   action(s), target(s), parameters for the child script to run
 _builder_execute_child_script() {
   local script="$1"
   # subsequent parameters passed as $@/$* below
@@ -513,10 +512,6 @@ _builder_execute_child_script() {
     dep_flag=--builder-dep-parent
     dep_module="$builder_dep_parent"
   fi
-
-  # Note: we do not pass '$target' to the child script, because it is used here
-  # only for reporting; the target was used to select the correct script in
-  # _builder_execute_child()
 
   "$script" \
     --builder-child \
