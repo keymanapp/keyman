@@ -161,7 +161,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [resolute]
+        dist: [devel]
 
     steps:
     - name: Checkout
