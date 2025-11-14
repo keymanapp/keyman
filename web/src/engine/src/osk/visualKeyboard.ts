@@ -2,18 +2,18 @@ import { EventEmitter } from 'eventemitter3';
 
 import {
   ActiveKey,
+  ActiveKeyBase,
   ActiveLayout,
+  ActiveSubKey,
   DeviceSpec,
-  type InternalKeyboardFont,
   JSKeyboard,
   KeyboardProperties,
   KeyDistribution,
   KeyEvent,
   Layouts,
   StateKeyMap,
-  ActiveSubKey,
   timedPromise,
-  ActiveKeyBase
+  type InternalKeyboardFont,
 } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from 'keyman/common/web-utils';
 

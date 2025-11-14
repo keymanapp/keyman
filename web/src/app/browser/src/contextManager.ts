@@ -43,14 +43,14 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
 }
 
 export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
-  private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
+  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant(() => this.activeTarget?.isForcingScroll());
   readonly page: PageContextAttachment;
   private mostRecentTarget: AbstractElementTextStore<any>;
   private currentTarget: AbstractElementTextStore<any>;
 
-  private globalKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
+  private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
 
   private _eventsObj: () => LegacyEventEmitter<LegacyAPIEvents>;
   private domEventTracker = new DomEventTracker();
@@ -387,7 +387,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
-  activateKeyboardForTarget(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, target: AbstractElementTextStore<any>) {
+  activateKeyboardForTarget(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, target: AbstractElementTextStore<any>) {
     const attachment = target?.getElement()._kmwAttachment;
 
     if(!attachment) {
