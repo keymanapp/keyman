@@ -53,7 +53,7 @@ function do_build() {
 
 function do_test() {
   typescript_run_eslint_mocha_tests 50
-  ./test/command-line-tests.sh test
+  builder_launch /developer/src/kmc/test/command-line-tests.sh test
 }
 
 #-------------------------------------------------------------------------------------------------------------------

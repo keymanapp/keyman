@@ -303,12 +303,12 @@ function builder_echo_start_end_tests() {
   TEAMCITY_GIT_PATH=""
   _builder_debug_internal=false
   _builder_is_child=0
-  expected=""
+  expected="$(builder_echo heading "description")"
   result=$(builder_echo start "foo" "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo start foo description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
-  expected=""
+  expected="$(builder_echo success "description")"
   result=$(builder_echo end "foo" success "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"

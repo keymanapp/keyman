@@ -30,6 +30,11 @@ set -eu
 #
 SHLVL=0
 
+# A regex of reserved builder parameters, must be kept in sync with
+# the matching of builder parameters in _builder_parse_expanded_parameters
+_builder_reserved_parameters='^(--help|-h|--color|--no-color|--verbose|-v|--timings|--no-timings|--debug|--release|--deps|--no-deps|--force-deps|--builder-dep-parent|--builder-child|--builder-report-dependencies|--builder-completion-describe|--offline|--builder-ignore-unknown-options)$'
+
+
 # _builder_init is called internally at the bottom of this file after we have
 # all function declarations in place.
 function _builder_init() {
@@ -180,7 +185,7 @@ function builder_heading() {
 
 
 builder_echo() {
-  local color=white message= mark= block= action= do_output=true test=
+  local color=white message= mark= block= action= test=
   local echo_target=echo
 
   if [[ $# -gt 1 ]]; then
@@ -194,9 +199,6 @@ builder_echo() {
       shift 2
       action="start"
       color="heading"
-      if ! builder_is_running_on_teamcity && builder_is_child_build; then
-        do_output=${_builder_debug_internal:-false}
-      fi
     elif [[ $1 == "end" ]] || [[ $1 == "endTest" ]]; then
       # builder_echo end block status message
       test="$1"
@@ -204,9 +206,6 @@ builder_echo() {
       color="$3"
       shift 3
       action="end"
-      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity && builder_is_child_build; then
-        do_output=${_builder_debug_internal:-false}
-      fi
     fi
   fi
   message="$*"
@@ -219,30 +218,28 @@ builder_echo() {
     fi
   fi
 
-  if ${do_output}; then
-    if [[ ! -z ${COLOR_RED+x} ]]; then
-      case $color in
-        white) color="$COLOR_WHITE" ;;
-        grey) color="$COLOR_GREY" ;;
-        green|success) color="$COLOR_GREEN" ;;
-        blue|heading) color="$COLOR_BLUE" ;;
-        yellow|warning) color="$COLOR_YELLOW" ;;
-        red|error) color="$COLOR_RED"; echo_target=_builder_error_echo ;;
-        purple) color="$COLOR_PURPLE" ;;
-        brightwhite) color="$COLOR_BRIGHTWHITE" ;;
-        teal|debug) color="$COLOR_TEAL" ;;
-        setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
-      esac
+  if [[ ! -z ${COLOR_RED+x} ]]; then
+    case $color in
+      white) color="$COLOR_WHITE" ;;
+      grey) color="$COLOR_GREY" ;;
+      green|success) color="$COLOR_GREEN" ;;
+      blue|heading) color="$COLOR_BLUE" ;;
+      yellow|warning) color="$COLOR_YELLOW" ;;
+      red|error) color="$COLOR_RED"; echo_target=_builder_error_echo ;;
+      purple) color="$COLOR_PURPLE" ;;
+      brightwhite) color="$COLOR_BRIGHTWHITE" ;;
+      teal|debug) color="$COLOR_TEAL" ;;
+      setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
+    esac
 
-      if builder_is_dep_build; then
-        $echo_target -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
-      else
-        $echo_target -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
-      fi
+    if builder_is_dep_build; then
+      $echo_target -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
     else
-      # Cope with the case of pre-init message and just emit plain text
-      $echo_target -e "$message"
+      $echo_target -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
     fi
+  else
+    # Cope with the case of pre-init message and just emit plain text
+    $echo_target -e "$message"
   fi
 
   if [[ "${action}" == "end" ]] && builder_is_running_on_teamcity; then
@@ -377,7 +374,7 @@ _builder_item_is_target() {
 
 function _builder_warn_if_incomplete() {
   if [ -n "${_builder_current_action}" ]; then
-    builder_echo warning "$_builder_current_action never reported success or failure"
+    builder_echo warning "WARNING: $_builder_current_action never reported success or failure"
     # exit 1  # If we wanted this scenario to result in a forced build-script fail.
   fi
 
@@ -441,39 +438,70 @@ _builder_cleanup_deps() {
 # Child scripts
 #------------------------------------------------------------------------------------------
 
+#
+# Starts a child script build, passing current build dependency, inheritable
+# options, and timing status through as parameters. This should be used rather
+# than calling the build script directly, to avoid multiple builds of
+# dependencies.
+#
+# Do not use builder standard options such as `--deps` or `--debug`.
+#
+# ### Parameters
+#
+# * 1: `script`      path to script, relative to root of repo
+# * 2+: `parameters` action(s), target(s), parameters for the child script to run
+#
+# ### Example
+#
+# ```bash
+#   builder_launch core/build.sh configure,build:wasm --no-tests
+# ```
+#
 builder_launch() {
   local script="$1"
-  local action="$2"
-  local target
-  if [[ $# -lt 3 ]]; then
-    target=":*"
-  else
-    target="$3"
+  local param
+  shift
+
+  if [[ ! "$script" =~ ^/(.+) ]]; then
+    builder_die "Error: builder_launch: script path must start with /, and is relative to repo root"
   fi
-  _builder_execute_child_script "${action}" "${target}" "${KEYMAN_ROOT}${script}"
+
+  for param in "$@"; do
+    if [[ "${param}" =~ ${_builder_reserved_parameters} ]]; then
+      builder_die "Error: builder_launch: reserved parameter '${param}' used"
+    fi
+  done
+
+  builder_echo grey "## script '$script $*' launched..."
+  _builder_execute_child_script "${KEYMAN_ROOT}${script}" "$@"
+  builder_echo grey "## script '$script $*' completed"
 }
 
 _builder_execute_child() {
-  local action=$1
-  local target=$2
-  local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
-  _builder_execute_child_script "$action" "$target" "$script"
-}
-
-_builder_execute_child_script() {
   local action="$1"
   local target="$2"
-  local script="$3"
+  local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
 
-  builder_echo start "$action$target" "## $action$target starting..."
-  _builder_timing_start "$action$target"
+  builder_echo grey "## child $action$target starting..."
+  _builder_execute_child_script "$script" "$action"
+  builder_echo grey "## child $action$target completed successfully"
+}
+
+# ### Parameters
+#
+# * 1: `script`      path to script
+# * 2+: `parameters`   action(s), target(s), parameters for the child script to run
+_builder_execute_child_script() {
+  local script="$1"
+  # subsequent parameters passed as $@/$* below
+  shift
 
   # Build array of specified inheritable options
   local child_options=()
   local opt
   for opt in "${_builder_options_inheritable[@]}"; do
-    if builder_has_option $opt; then
-      child_options+=($opt)
+    if builder_has_option "${opt}"; then
+      child_options+=("${opt}")
     fi
   done
 
@@ -489,17 +517,14 @@ _builder_execute_child_script() {
     --builder-child \
     $_builder_build_deps \
     $dep_flag "$dep_module" \
-    $action \
-    ${child_options[@]} \
+    "$@" \
+    "${child_options[@]}" \
     $builder_verbose \
     $builder_debug \
     $_builder_offline \
-  && (
-    _builder_timing_stop "$action$target"
-    builder_echo end "$action$target" success "## $action$target completed successfully"
-  ) || (
+  || (
     result=$?
-    builder_echo end "$action$target" error "## $action$target failed with exit code $result"
+    builder_echo error "## child script '$script $*' failed with exit code $result"
     exit $result
   ) || exit $? # Required due to above subshell masking exit
 }
@@ -743,10 +768,6 @@ _builder_timing_stop() {
 _builder_timing_cleanup_and_report() {
   local build_exit_code="$1"
   if builder_is_dep_build || builder_is_child_build || [[ -z ${_builder_timing_report_file:+x} ]]; then
-    return 0
-  fi
-
-  if [[ -z "${_builder_timing_report_file:+x}" ]]; then
     return 0
   fi
 
@@ -1526,7 +1547,7 @@ _builder_parse_expanded_parameters() {
           action=$new_action
           ;;
         *)
-          builder_warn "Parameter $action has $? matches, could mean any of {$new_action}"
+          builder_warn "ERROR: Parameter $action has $? matches, could mean any of {$new_action}"
           exit 1
           ;;
       esac
@@ -1537,7 +1558,7 @@ _builder_parse_expanded_parameters() {
           target=$new_target
           ;;
         *)
-          builder_warn "Parameter $target has $? matches, could mean any of {$new_target}"
+          builder_warn "ERROR: Parameter $target has $? matches, could mean any of {$new_target}"
           exit 1
           ;;
       esac
@@ -1595,6 +1616,7 @@ _builder_parse_expanded_parameters() {
       fi
 
     else
+      # See also _builder_reserved_parameters
       case "$key" in
         --help|-h)
           builder_display_usage
@@ -1711,6 +1733,12 @@ _builder_parse_expanded_parameters() {
   elif builder_is_child_build; then
     _builder_verify_expected_sub_process_variables
   else
+
+    # For now, we'll leave this warning disabled, but may re-enable in #15130
+    # if [[ ! -z "${_builder_deps_built+x}" ]]; then
+    #   builder_warn "WARNING: Child build '${THIS_SCRIPT_IDENTIFIER}' instantiated without using builder_launch"
+    # fi
+
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
     export _builder_deps_built=`mktemp`
@@ -1784,21 +1812,14 @@ _builder_completion_describe() {
   echo -n "; "
   printf '%s ' "${_builder_targets[@]}"
   echo -n "; "
-  # Remove all '+' suffixes from options; they're a config on the option, not part
-  # of the actual option text itself.
-  local _builder_opts=()
-  for e in "${!_builder_params[@]}"; do
-    if [[ $e =~ ^-- ]]; then
-      _builder_opts+=(${e%+*})
-    fi
-  done
 
-  # Add default options
-  _builder_opts+=( --verbose --debug --color --no-color --offline --help )
+  local opts=("${_builder_options[@]}")
+  # Add default options; see also _builder_reserved_parameters
+  opts+=( --verbose --debug --release --color --no-color --offline --help --timings --no-timings )
   if builder_has_dependencies; then
-    _builder_opts+=( --deps --no-deps --force-deps )
+    opts+=( --deps --no-deps --force-deps )
   fi
-  printf '%s ' "${_builder_opts[@]}"
+  printf '%s ' "${opts[@]}"
 }
 
 builder_display_usage() {
@@ -1874,6 +1895,7 @@ builder_display_usage() {
     fi
   done
 
+  # See also _builder_reserved_parameters
   _builder_pad $width "  --verbose, -v"  "Verbose logging"
   _builder_pad $width "  --debug, -d"    "Debug build"
   _builder_pad $width "  --color"        "Force colorized output"
@@ -2309,13 +2331,13 @@ builder_describe_platform() {
 
   # For testing, we can override the current platform
   if [[ ! -z "${BUILDER_PLATFORM_OVERRIDE+x}" ]]; then
-    builder_warn "BUILDER_PLATFORM_OVERRIDE variable found. Overriding detected platform '$builder_platform' with '$BUILDER_PLATFORM_OVERRIDE'"
+    builder_warn "WARNING: BUILDER_PLATFORM_OVERRIDE variable found. Overriding detected platform '$builder_platform' with '$BUILDER_PLATFORM_OVERRIDE'"
     builder_platform="$BUILDER_PLATFORM_OVERRIDE"
   fi
 
   # For testing, we can override the current tools
   if [[ ! -z "${BUILDER_TOOLS_OVERRIDE+x}" ]]; then
-    builder_warn "BUILDER_TOOLS_OVERRIDE variable found. Overriding detected tools (${builder_installed_tools[@]}) with (${BUILDER_TOOLS_OVERRIDE[@]})"
+    builder_warn "WARNING: BUILDER_TOOLS_OVERRIDE variable found. Overriding detected tools (${builder_installed_tools[@]}) with (${BUILDER_TOOLS_OVERRIDE[@]})"
     builder_installed_tools=("${BUILDER_TOOLS_OVERRIDE[@]}")
   fi
 
