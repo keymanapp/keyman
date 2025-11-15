@@ -76,6 +76,10 @@
 
     <Property Id="OnlineProductID" Value="30" />
 
+    <PropertyRef Id="WIX_NATIVE_MACHINE" />
+
+
+
 
     <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\..\..\common\windows\delphi\ext\sentry">
       <Component>
@@ -119,6 +123,7 @@
     </Feature>
 
     <!-- Actions -->
+    <CustomAction Id="DebugMachine" Property="WIX_NATIVE_MACHINE" Value="[WIX_NATIVE_MACHINE]" Execute="immediate" />
 
     <CustomAction Id="RollbackPostInstallCU" Execute="rollback" Impersonate="yes" ExeCommand="-rcu" BinaryRef="insthelp.exe" />
     <CustomAction Id="RollbackPostInstallLM" Execute="rollback" Impersonate="no" ExeCommand="-rlm" BinaryRef="insthelp.exe" />
@@ -133,7 +138,6 @@
     <!-- I1165 - Uninstall failure on Win9x - refer to ProgramFilesFolder instead of %ProgramFiles! -->
     <CustomAction Id="CachedInstallDir" Property="CachedInstallDir" Value="[ProgramFilesFolder]\Keyman\Cached Installer Files\[ProductCode]" />
     <CustomAction Id="CachedInstallDirParent" Property="CachedInstallDirParent" Value="[ProgramFilesFolder]\Keyman\Cached Installer Files" />
-
     <InstallExecuteSequence>
       <Custom Action="LocateInstallDir" After="CostFinalize" Condition="VERSION11FOUND" />
 
@@ -174,6 +178,7 @@
     <Property Id="ARPHELPLINK" Value="http://help.keyman.com/" />
 
     <Property Id="VersionWithTag" Value="$(var.KEYMAN_VERSION_WITH_TAG)" />
+    <Property Id="WIX_NATIVE_MACHINE" Secure="yes" />  <!-- Added to define the property for build-time resolution -->
 
 
     <StandardDirectory Id="ProgramFilesFolder">

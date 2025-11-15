@@ -1,10 +1,9 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Module Id="engine" Version="$(var.KEYMAN_VERSION)" Language="1033" Guid="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" InstallerVersion="200"><SummaryInformation Keywords="Keyman,Keyboard,Engine" Description="Keyman Engine $(var.RELEASE)" Manufacturer="SIL International" />
-
     <ComponentGroupRef Id="KeymanEngineComponents" />
     <ComponentGroupRef Id="KeymanEngineSentryComponents" />
 
-    
+
 
     <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" DllEntry="PreUninstall" BinaryRef="insthelper.dll" />
     <CustomAction Id="EnginePostInstall" Execute="deferred" Impersonate="no" DllEntry="EnginePostInstall" BinaryRef="insthelper.dll" />
@@ -16,7 +15,7 @@
 
     <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" />
 
-  
+
       <StandardDirectory Id="CommonFilesFolder">
         <Directory Id="KEYMANROOT" Name="Keyman">
           <Directory Id="KEYMAN_ENGINE" Name="Keyman Engine">

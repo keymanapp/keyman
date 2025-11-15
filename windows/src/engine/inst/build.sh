@@ -49,13 +49,15 @@ function do_publish() {
   #-d RELEASE=$KEYMAN_VERSION_RELEASE \
   #-sw1072 \
   #-out keymanengine.msm
-  wix build -d KEYMAN_VERSION=$env:KEYMAN_VERSION -d RELEASE=$env:KEYMAN_VERSION_RELEASE keymanengine.wxs components.wxs -ext WixToolset.Util.wixext -sw1072 -out keymanengine.msm
-
 
   echo $KEYMAN_VERSION_RELEASE
   echo $KEYMAN_VERSION_WIN
   echo $KEYMAN_VERSION
-  echo $RELEASE
+  #echo $RELEASE
+  wix build -d KEYMAN_VERSION=$KEYMAN_VERSION_WIN -d RELEASE=$KEYMAN_VERSION_RELEASE keymanengine.wxs components.wxs -ext WixToolset.Util.wixext -sw1072 -out keymanengine.msm
+
+
+
 
 
   #
