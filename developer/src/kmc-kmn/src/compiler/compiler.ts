@@ -322,6 +322,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
+      wasm_options.targetVersion = options.targetVersion ?? 0;
       wasm_options.target = 0; // CKF_KEYMAN; TODO use COMPILETARGETS_KMX
 
       wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_callbacks);

@@ -121,6 +121,7 @@ namespace kmcmp{
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
   int BeginLine[4];
+  int TargetVersion;
 
   KMX_BOOL IsValidCallStore(PFILE_STORE fs);
   void CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
@@ -1132,6 +1133,12 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_VERSION:
+    if(kmcmp::TargetVersion != 0) {
+      // If the targetVersion option is passed in, then we don't use automatic
+      // versioning, and we ignore the &VERSION store
+      // TODO-EMBED-OSK-IN-KMX: consider a compiler hint?
+      return TRUE;
+    }
     if ((fk->dwFlags & KF_AUTOMATICVERSION) == 0) {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_VersionAlreadyIncluded);
       return FALSE;
@@ -1156,6 +1163,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
+    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Embedded OSK
 
     else {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidVersion);

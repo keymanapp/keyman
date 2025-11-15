@@ -29,8 +29,8 @@ describe('layr', function () {
         assert.ok(layr);
         assert.equal(compilerTestCallbacks.messages.length, 0);
 
-        assert.equal(layr.lists?.length, 1);
-        const list0 = layr.lists[0];
+        assert.equal(layr.forms?.length, 1);
+        const list0 = layr.forms[0];
         assert.ok(list0);
         assert.equal(list0.layers.length, 1);
         assert.equal(list0.hardware.value, 'us');
@@ -50,9 +50,9 @@ describe('layr', function () {
       subpath: 'sections/keys/maximal.xml',
       callback(sect) {
         const layr = <Layr> sect;
-        assert.equal(layr.lists?.length, 2);
+        assert.equal(layr.forms?.length, 2);
 
-        const listHardware = layr.lists.find(v => v.hardware.value === 'iso');
+        const listHardware = layr.forms.find(v => v.hardware.value === 'iso');
         assert.ok(listHardware);
         assert.equal(listHardware.minDeviceWidth, 0);
         assert.equal(listHardware.layers.length, 2);
@@ -74,7 +74,7 @@ describe('layr', function () {
         assert.equal(hardware1row0.keys.length, 3);
         allKeysOk(hardware1row0,'q w amarker', 'hardware1row0');
 
-        const listTouch = layr.lists.find(v => v.hardware.value === constants.layr_list_hardware_touch);
+        const listTouch = layr.forms.find(v => v.hardware.value === constants.layr_form_hardware_touch);
         assert.ok(listTouch);
         assert.equal(listTouch.minDeviceWidth, 300);
         assert.equal(listTouch.layers.length, 1);
@@ -123,8 +123,8 @@ describe('layr', function () {
       callback(sect) {
         const layr = <Layr> sect;
         assert.ok(layr);
-        assert.equal(layr.lists.length, 1, 'layr.lists.length');
-        const layers = layr.lists[0];
+        assert.equal(layr.forms.length, 1, 'layr.lists.length');
+        const layers = layr.forms[0];
         const bymod = layers.layers.map(({id,mod,rows})=>([
           id.value, mod, rows[0].keys[0].value,
         ]));
@@ -149,8 +149,8 @@ describe('layr', function () {
         assert.ok(layr);
         assert.equal(compilerTestCallbacks.messages.length, 0);
 
-        assert.equal(layr.lists?.length, 1);
-        const list0 = layr.lists[0];
+        assert.equal(layr.forms?.length, 1);
+        const list0 = layr.forms[0];
         assert.ok(list0);
         assert.equal(list0.layers.length, 1);
         assert.equal(list0.hardware.value, 'us');

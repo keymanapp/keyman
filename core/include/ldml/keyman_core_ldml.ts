@@ -43,6 +43,11 @@ type SectionMap = {
   [id in SectionIdent]: SectionIdent;
 }
 
+export enum KMXPlusVersion {
+  Version17 = 0x1100, // == KMXFile.VERSION_170,
+  Version19 = 0x1300, // == KMXFile.VERSION_190,
+};
+
 // TODO-LDML: namespace com.keyman.core.ldml {
 /**
  * Constants for the KMXPlus data format
@@ -79,7 +84,23 @@ class Constants {
   /**
    * Length of a raw section header, in bytes
    */
-  readonly length_header = 8;
+  readonly length_header_17 = 8;
+  /**
+   * Length of a raw section header, in bytes
+   */
+  readonly length_header_19 = 12;
+
+  /**
+   * Version number 17 for KMX+ file format, initial release version,
+   * corresponds to Keyman 17.0
+   */
+  readonly kmxplus_version_17: KMXPlusVersion = KMXPlusVersion.Version17;
+
+  /**
+   * Version number 19 for KMX+ file format, new SEC2 section and version
+   * header, corresponds to Keyman 19.0
+   */
+  readonly kmxplus_version_19: KMXPlusVersion = KMXPlusVersion.Version19;
 
   /* ------------------------------------------------------------------
     * sect section
@@ -342,13 +363,13 @@ class Constants {
    */
   readonly length_layr = 24;
   /**
-   *  Length of each layer list in the 'layr' section variable part
+   *  Length of each layer form in the 'layr' section variable part
    */
-  readonly length_layr_list = 16;
+  readonly length_layr_form = 16;
   /**
    * for the 'hardware' field indicating a touch keyboard, non-hardware
    */
-  readonly layr_list_hardware_touch = 'touch';
+  readonly layr_form_hardware_touch = 'touch';
   /**
    * Length of each layer entry in the 'layr' section variable part
    */
@@ -363,12 +384,12 @@ class Constants {
   readonly length_layr_key = 4;
 
   /**
-   * Minimum allowed minDeviceWidth for a layer list
+   * Minimum allowed minDeviceWidth for a layer form
    */
   readonly layr_min_minDeviceWidth = 1;
 
   /**
-   * Maximum allowed minDeviceWidth for a layer list
+   * Maximum allowed minDeviceWidth for a layer form
    */
   readonly layr_max_minDeviceWidth = 999;
 
@@ -528,6 +549,10 @@ class Constants {
       vars: 'vars',
   };
 
+  // v19+: special case for 'sect' override with 'sec2'
+  readonly sectionname_sec2 = 'sec2';
+  readonly sectionid_sec2 = 0x32636573;
+
   /**
    * Use to convert 4-char string into hex
    * @param id section id such as 'sect'
@@ -579,6 +604,17 @@ class Constants {
    */
   treatAsLatest(version: string): boolean {
     return cldrTreatAsLatest.has(version);
+  }
+
+  /**
+   * Difference in section header size from default v17 size
+   */
+  headerSizeDelta(version: KMXPlusVersion): number {
+    if(version == KMXPlusVersion.Version17) {
+      return 0;
+    }
+
+    return 4; /* KMXPlusVersion.Version19, additional version uint32le field */
   }
 };
 

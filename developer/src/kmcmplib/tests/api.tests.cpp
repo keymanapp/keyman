@@ -64,6 +64,7 @@ void test_kmcmp_CompileKeyboard(char *kmn_file) {
   options.warnDeprecatedCode = true;
   options.shouldAddCompilerVersion = false;
   options.target = CKF_KEYMAN;
+  options.targetVersion = 0;
   test_assert(!kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result));
   test_assert(error_vec.size() == 1);
   test_assert(error_vec[0] == KmnCompilerMessages::ERROR_InfileNotExist); // zero byte no longer gives us KmnCompilerMessages::ERROR_CannotReadInfile

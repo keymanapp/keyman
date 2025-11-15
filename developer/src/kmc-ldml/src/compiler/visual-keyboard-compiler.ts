@@ -60,13 +60,13 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
     let hasVisualKeyboard = false;
 
-    for(const layersList of source.layr.lists) {
-      const formId = layersList.hardware.value;
+    for(const layersForm of source.layr.forms) {
+      const formId = layersForm.hardware.value;
       if(formId == 'touch') {
         continue;
       }
 
-      for(const layer of layersList.layers) {
+      for(const layer of layersForm.layers) {
         const res = this.compileHardwareLayer(source, result, layer, formId);
         if(res === false) {
           // failed to compile the layer

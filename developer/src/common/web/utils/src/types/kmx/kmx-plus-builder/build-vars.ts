@@ -46,9 +46,11 @@ export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_e
   });
 
   const vars: BUILDER_VARS = {
-    ident: constants.hex_section_id(constants.section.vars),
-    size: constants.length_vars +
-      (constants.length_vars_item * kmxplus.vars.totalCount()),
+    header: {
+      ident: constants.hex_section_id(constants.section.vars),
+      size: constants.length_vars +
+        (constants.length_vars_item * kmxplus.vars.totalCount()),
+    },
     _offset: 0,
     markers: build_list_index(sect_list, kmxplus.vars.markers),
     varCount: kmxplus.vars.totalCount(),
