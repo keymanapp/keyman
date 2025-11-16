@@ -37,6 +37,7 @@ export class Lexer {
    * Construct a Lexer
    *
    * @param buffer the string to search for tokens
+   * @param filename the filename to use in tokens
    */
   public constructor(buffer: string, filename: string=null) {
     this.buffer           = buffer;
@@ -47,7 +48,7 @@ export class Lexer {
     this.filename         = filename;
     this.tokenList        = [];
     this.seenContinuation = false;
-    this.scanRecognizers = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
+    this.scanRecognizers  = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
     }
 
   /**
@@ -143,9 +144,13 @@ export class Lexer {
       this.tokenList.pop();
     }
 
-    // add an end-of-file token if required
+    // add a newline and end-of-file tokens if required
     if (this.offset >= this.buffer.length && addEOF) {
-      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, this.line, this.filename));
+      if (this.line.length > 0) { // add a NEWLINE (with no text) if it is missing from the final line
+        this.tokenList.push(new Token(TokenType.NEWLINE, '', 1, 1, this.line, this.filename));
+        this.line = '';
+      }
+      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, '', this.filename));
     }
 
     // return false if there was no match or the buffer is empty

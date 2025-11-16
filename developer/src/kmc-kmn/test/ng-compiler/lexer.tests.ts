@@ -1225,7 +1225,8 @@ describe("Lexer Tests", () => {
       const actual   = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
       const expected = [
         new Token(TokenType.BEEP, 'beep'),
-        new Token(TokenType.EOF, '', 1, 1, 'beep'),
+        new Token(TokenType.NEWLINE, '', 1, 1, 'beep'),
+        new Token(TokenType.EOF, '', 1, 1, ''),
       ];
       assert.deepEqual(actual, expected);
     });
