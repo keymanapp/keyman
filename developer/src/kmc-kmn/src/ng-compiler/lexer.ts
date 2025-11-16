@@ -48,7 +48,7 @@ export class Lexer {
     this.filename         = filename;
     this.tokenList        = [];
     this.seenContinuation = false;
-    this.scanRecognizers = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
+    this.scanRecognizers  = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
     }
 
   /**
