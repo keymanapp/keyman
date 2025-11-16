@@ -17,7 +17,6 @@ import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStore
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { Token } from "./lexer.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -58,9 +57,6 @@ export class KmnTreeRule extends SingleChildRule {
   public constructor() {
     super();
     const line: Rule = new LineRule();
-    // const manyLine: Rule = new ManyRule(line);
-    // const finalLine: Rule = new FinalLineRule();
-    // this.rule = new SequenceRule([manyLine, finalLine]);
     this.rule = new ManyRule(line);
   }
 
@@ -158,27 +154,6 @@ export class LineRule extends SingleChildRule {
     const optContent: Rule       = new OptionalRule(content);
     const newline: Rule          = new TokenRule(TokenType.NEWLINE, true);
     this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
-  }
-}
-
-/**
- * (BNF) finalLine: EOF
- */
-export class FinalLineRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const eof: Rule = new TokenRule(TokenType.EOF);
-    this.rule = eof;
-  }
-
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const token: Token = tokenBuffer.nextToken();
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess && token.line.length > 0) {
-      node.addNewChildWithToken(NodeType.LINE, token);
-    }
-    return parseSuccess;
   }
 }
 

@@ -25,7 +25,7 @@ interface Dictionary {
 }
 
 describe("Verify Parser Against BNF Tests", () => {
-  it.skip("matches the BNF grammar rules", () => {
+  it("matches the BNF grammar rules", () => {
     const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString();
     const bnfRules: Dictionary = getBnfRules(bnfBuffer);
     const sourceBuffer: string = [
