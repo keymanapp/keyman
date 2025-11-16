@@ -144,9 +144,13 @@ export class Lexer {
       this.tokenList.pop();
     }
 
-    // add an end-of-file token if required
+    // add a newline and end-of-file tokens if required
     if (this.offset >= this.buffer.length && addEOF) {
-      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, this.line, this.filename));
+      if (this.line.length > 0) { // add a NEWLINE (with no text) if it is missing from the final line
+        this.tokenList.push(new Token(TokenType.NEWLINE, '', 1, 1, this.line, this.filename));
+        this.line = '';
+      }
+      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, '', this.filename));
     }
 
     // return false if there was no match or the buffer is empty

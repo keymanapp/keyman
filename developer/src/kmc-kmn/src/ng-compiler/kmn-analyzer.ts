@@ -58,9 +58,10 @@ export class KmnTreeRule extends SingleChildRule {
   public constructor() {
     super();
     const line: Rule = new LineRule();
-    const manyLine: Rule = new ManyRule(line);
-    const finalLine: Rule = new FinalLineRule();
-    this.rule = new SequenceRule([manyLine, finalLine]);
+    // const manyLine: Rule = new ManyRule(line);
+    // const finalLine: Rule = new FinalLineRule();
+    // this.rule = new SequenceRule([manyLine, finalLine]);
+    this.rule = new ManyRule(line);
   }
 
   /**

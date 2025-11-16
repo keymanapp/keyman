@@ -1,6 +1,5 @@
-kmnTree: line* finalLine
+kmnTree: line*
 line: compileTarget? content? NEWLINE
-finalLine: EOF
 compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
 content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
   headerAssign|normalStoreAssign|ruleBlock

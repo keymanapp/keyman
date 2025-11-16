@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, FinalLineRule, GroupNameRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
+import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
 import { GroupQualifierRule, GroupStatementRule, InputBlockRule, InputContextRule, InputElementRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { KeystrokeRule, KmnTreeRule, LhsBlockRule, LineRule, ModifierRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { OutputStatementRule, PermittedKeywordRule, PlainTextRule, ProductionBlockRule, RhsBlockRule } from '../../src/ng-compiler/kmn-analyzer.js';
@@ -214,35 +214,35 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[2].nodeType, NodeType.LINE);
     });
   });
-  describe("FinalLineRule Tests", () => {
-    it("can construct a FinalLineRule", () => {
-      tokenBuffer = stringToTokenBuffer('');
-      const line: Rule = new FinalLineRule();
-      assert.isNotNull(line);
-    });
-    it("can parse correctly (empty line)", () => {
-      tokenBuffer = stringToTokenBuffer('');
-      const line: Rule = new FinalLineRule();
-      assert.isTrue(line.parse(tokenBuffer, root));
-      assert.isFalse(root.hasChild());
-    });
-    it("can parse correctly (space)", () => {
-      tokenBuffer = stringToTokenBuffer(' ');
-      const line: Rule = new FinalLineRule();
-      assert.isTrue(line.parse(tokenBuffer, root));
-      const lineNode = root.getSoleChildOfType(NodeType.LINE);
-      assert.isNotNull(lineNode);
-      assert.deepEqual(lineNode.token.line, ' ');
-    });
-    it("can parse correctly (comment)", () => {
-      tokenBuffer = stringToTokenBuffer('c final line');
-      const line: Rule = new FinalLineRule();
-      assert.isTrue(line.parse(tokenBuffer, root));
-      const lineNode = root.getSoleChildOfType(NodeType.LINE);
-      assert.isNotNull(lineNode);
-      assert.deepEqual(lineNode.token.line, 'c final line');
-    });
-  });
+  // describe("FinalLineRule Tests", () => {
+  //   it("can construct a FinalLineRule", () => {
+  //     tokenBuffer = stringToTokenBuffer('');
+  //     const line: Rule = new FinalLineRule();
+  //     assert.isNotNull(line);
+  //   });
+  //   it("can parse correctly (empty line)", () => {
+  //     tokenBuffer = stringToTokenBuffer('');
+  //     const line: Rule = new FinalLineRule();
+  //     assert.isTrue(line.parse(tokenBuffer, root));
+  //     assert.isFalse(root.hasChild());
+  //   });
+  //   it("can parse correctly (space)", () => {
+  //     tokenBuffer = stringToTokenBuffer(' ');
+  //     const line: Rule = new FinalLineRule();
+  //     assert.isTrue(line.parse(tokenBuffer, root));
+  //     const lineNode = root.getSoleChildOfType(NodeType.LINE);
+  //     assert.isNotNull(lineNode);
+  //     assert.deepEqual(lineNode.token.line, ' ');
+  //   });
+  //   it("can parse correctly (comment)", () => {
+  //     tokenBuffer = stringToTokenBuffer('c final line');
+  //     const line: Rule = new FinalLineRule();
+  //     assert.isTrue(line.parse(tokenBuffer, root));
+  //     const lineNode = root.getSoleChildOfType(NodeType.LINE);
+  //     assert.isNotNull(lineNode);
+  //     assert.deepEqual(lineNode.token.line, 'c final line');
+  //   });
+  // });
   describe("CompileTargetRule Tests", () => {
     it("can construct a CompileTargetRule", () => {
       tokenBuffer = stringToTokenBuffer('');
@@ -2305,7 +2305,7 @@ describe("KMN Analyser Tests", () => {
         'release/gff/gff_tigrinya_eritrea/source/gff_tigrinya_eritrea',
         'release/gff/gff_tigrinya_ethiopia/source/gff_tigrinya_ethiopia',
         'release/h/hainam/source/hainam',
-        //'release/h/hakka/source/hakka', causes stack overflow
+        'release/h/hakka/source/hakka',
         'release/h/hanifi_rohingya/source/hanifi_rohingya',
         'release/h/hanunoo/source/hanunoo',
         'release/h/haroi/source/haroi',
@@ -2741,7 +2741,7 @@ describe("KMN Analyser Tests", () => {
         'release/u/urdu_phonetic/source/urdu_phonetic',
         'release/u/urdu_phonetic_crulp/source/urdu_phonetic_crulp',
         'release/v/venetia_et_histria/source/venetia_et_histria',
-        // 'release/v/vietnamese_telex/source/vietnamese_telex', causes stack overflow
+        'release/v/vietnamese_telex/source/vietnamese_telex',
         'release/v/vietnamese_telex_legacy/source/vietnamese_telex_legacy',
         'release/v/vietnamese_vni/source/vietnamese_vni',
         'release/v/vithkuqi/source/vithkuqi',
