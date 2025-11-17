@@ -124,6 +124,7 @@ export class Lexer {
     if (!emitAll && (this.tokenList.length >= 2) &&
       this.tokenList.at(-1).isTokenType(TokenType.RIGHT_BR) &&
       this.tokenList.at(-2).isTokenType(TokenType.LEFT_BR)) {
+      // TODO: syntax error or warning for empty brackets
       this.tokenList.pop();
       this.tokenList.pop();
     }
