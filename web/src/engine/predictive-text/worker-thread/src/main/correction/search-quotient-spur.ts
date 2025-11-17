@@ -325,6 +325,14 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get currentCost(): number {
+    if(this.incomingNodes.length > 0) {
+      this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
+    }
+
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -345,8 +353,11 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    */
   public handleNextNode(): PathResult {
     if(this.incomingNodes.length > 0) {
-      this.buildEdgesForNodes(this.incomingNodes);
-      this.incomingNodes = [];
+      this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
     }
 
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
@@ -359,11 +370,22 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       };
     }
 
-    if(parentCost <= localCost) {
+    // Only prioritize the parent if it is of explicitly lower cost. The result
+    // propagation logic impacts other quotient-nodes when the parent is
+    // prioritized.  We'd rather prioritize the processing of nearly-completed
+    // nodes of similar cost.
+    //
+    // Per #14366, the cost should be monotonically increasing - new nodes built
+    // on new parent results should never have better cost than what's already
+    // local.
+    if(parentCost < localCost) {
       const result = this.parentNode.handleNextNode();
       // The parent will insert the node into our queue.  We don't need it, though
       // any siblings certainly will.
-      this.incomingNodes = [];
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
 
       if(result.type == 'complete') {
         this.queueNodes(this.buildEdgesForNodes([result.finalNode]));
