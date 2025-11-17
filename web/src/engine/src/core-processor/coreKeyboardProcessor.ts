@@ -113,7 +113,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     const deadKeys = textStore.deadkeys().dks.sort((a, b) => a.p != b.p ? a.p - b.p : a.o - b.o);
     const contextItems = new KM_Core.instance.km_core_context_items();
     const caretPosition = textStore.getCaret();
-    let textIndex = 0
+    let textIndex = 0;
     for (const deadkey of deadkeys) {
       for (; textIndex < text.length && textIndex <= caretPosition; textIndex++) {
         const contextItem = new KM_Core.instance.km_core_context_item();
