@@ -135,6 +135,7 @@ export class SearchQuotientCluster extends SearchQuotientNode {
     const bestPath = this.selectionQueue.dequeue();
     const baseResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
+    this.selectionQueue = new PriorityQueue(PATH_QUEUE_COMPARATOR, this.selectionQueue.toArray());
 
     let finalResult = baseResult;
     if(baseResult.type == 'complete') {
