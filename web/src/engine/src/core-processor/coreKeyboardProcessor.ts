@@ -114,12 +114,11 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     const contextItems = new KM_Core.instance.km_core_context_items();
     const caretPosition = textStore.getCaret();
     let textIndex = 0
-    for (let deadkeyIndex = 0; deadkeyIndex < deadKeys.length; deadkeyIndex++) {
-      const deadKey = deadKeys[deadkeyIndex];
+    for (const deadkey of deadkeys) {
       for (; textIndex < text.length && textIndex <= caretPosition; textIndex++) {
         const contextItem = new KM_Core.instance.km_core_context_item();
-        if (deadKey.p == textIndex) {
-          contextItem.marker = deadKey.d;
+        if (deadkey.p == textIndex) {
+          contextItem.marker = deadkey.d;
           contextItems.push_back(contextItem);
           break;
         }
