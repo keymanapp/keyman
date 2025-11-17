@@ -14,29 +14,22 @@ import { TokenType } from "./token-type.js";
  * A ScanRecognizer identifies an individual Token as part of the Next Generation Lexer.
  */
 export class ScanRecognizer {
-  private readonly _tokenType: TokenType;
-  private readonly _regExp: RegExp;
-  private readonly _emit: boolean;
-
   /**
    * Construct a ScanRecognizer
-   *
-   * @param tokenType the token type to return if matched
-   * @param regExp    the regex to identify the token
-   * @param emit      whether to emit the token or not?
    */
-  public constructor(tokenType: TokenType, regExp: RegExp, emit: boolean) {
-    this._tokenType = tokenType;
-    this._regExp    = new RegExp(regExp);  // does not preserve lastIndex
-    this._emit      = emit;
+  public constructor(
+    /** the token type to return if matched */
+    public readonly tokenType: TokenType,
+    /** the regex to identify the token */
+    public readonly regExp: RegExp,
+    /**  whether to emit the token or not? */
+    public readonly emit: boolean
+  ) {
+    this.regExp = new RegExp(regExp); // does not preserve lastIndex
   }
 
-  public get tokenType(): TokenType { return this._tokenType; }
-  public get regExp(): RegExp { return this._regExp; }
-  public get emit(): boolean { return this._emit; }
-
   public toString(): string {
-    return `[${this._tokenType},${this._regExp},${this._emit}]`;
+    return `[${this.tokenType},${this.regExp},${this.emit}]`;
   }
 }
 
