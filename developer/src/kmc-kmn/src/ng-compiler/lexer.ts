@@ -82,7 +82,6 @@ export class Lexer {
 
       if (match) {
         this.line = this.line.concat(match[0].toString());
-        let line: string = null;
         if (handleContinuation) {
           // if handleContinuation is true, no CONTINUATIONs will be emitted,
           // nor will NEWLINEs that follow CONTINUATIONs be emitted
@@ -103,11 +102,14 @@ export class Lexer {
           }
         } else { // not handling continuation
           if (recognizer.tokenType === TokenType.NEWLINE) {
-            line      = this.line;
+            if (emitAll || recognizer.emit) {
+              this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, this.line, this.filename));
+            }
             this.line = '';
-          }
-          if (emitAll || recognizer.emit) {
-            this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, line, this.filename));
+          } else {
+            if (emitAll || recognizer.emit) {
+              this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
+            }
           }
         }
         tokenMatch  = true;
