@@ -77,40 +77,32 @@ export class Lexer {
     // loop over all ScanRecognizers looking for a match at the offset into the buffer
     while (!(iterResult = patternIterator.next()).done && !tokenMatch) {
       const recognizer: ScanRecognizer    = iterResult.value;
+      const emitToken: boolean            = emitAll || recognizer.emit;
       recognizer.regExp.lastIndex         = this.offset;
       const match: RegExpExecArray | null = recognizer.regExp.exec(this.buffer);
 
       if (match) {
         this.line = this.line.concat(match[0].toString());
-        if (handleContinuation) {
-          // if handleContinuation is true, no CONTINUATIONs will be emitted,
-          // nor will NEWLINEs that follow CONTINUATIONs be emitted
-          if (recognizer.tokenType === TokenType.CONTINUATION) {
-            this.seenContinuation = true;
-          } else if (recognizer.tokenType === TokenType.NEWLINE) {
-            if (!this.seenContinuation) {
-              if (emitAll || recognizer.emit) {
-               this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, this.line, this.filename));
-              }
-              this.line = '';
+        // if handleContinuation is true, no CONTINUATIONs will be emitted,
+        // nor will NEWLINEs that follow CONTINUATIONs be emitted
+        if (recognizer.tokenType === TokenType.CONTINUATION) {
+            if (handleContinuation) {
+              this.seenContinuation = true;
+            } else if (emitToken) { // not handling continuation and emitting CONTINUATION
+              this.tokenList.push(new Token(TokenType.CONTINUATION, match[0], this.lineNum, this.charNum, null, this.filename));
             }
-            this.seenContinuation = false;
-          } else { // other tokens
-            if (emitAll || recognizer.emit) {
-              this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
+        } else if (recognizer.tokenType === TokenType.NEWLINE) {
+          if ((handleContinuation && !this.seenContinuation) || !handleContinuation) {
+            if (emitToken) { // emitting NEWLINE
+              this.tokenList.push(new Token(TokenType.NEWLINE, match[0], this.lineNum, this.charNum, this.line, this.filename));
             }
+            this.line = ''; // reset on NEWLINE
           }
-        } else { // not handling continuation
-          if (recognizer.tokenType === TokenType.NEWLINE) {
-            if (emitAll || recognizer.emit) {
-              this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, this.line, this.filename));
-            }
-            this.line = '';
-          } else {
-            if (emitAll || recognizer.emit) {
-              this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
-            }
+          if (handleContinuation) {
+            this.seenContinuation = false; // as seen a NEWLINE
           }
+        } else if (emitToken) { // emitting other tokens
+          this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
         }
         tokenMatch  = true;
         this.offset = recognizer.regExp.lastIndex; // advance the buffer offset past the matched token
