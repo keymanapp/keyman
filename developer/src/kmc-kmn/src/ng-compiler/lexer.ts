@@ -129,6 +129,8 @@ export class Lexer {
       this.tokenList.pop();
     }
 
+    // TODO: fatal error if this.offset > this.buffer.length
+
     // add a newline and end-of-file tokens if required
     if (this.offset >= this.buffer.length && addEOF) {
       if (this.line.length > 0) { // add a NEWLINE (with no text) if it is missing from the final line
@@ -151,49 +153,41 @@ export class Lexer {
  * An input Token found by the Next Generation Lexer for the Parser.
  */
 export class Token {
-  private readonly _tokenType: TokenType;
-  private readonly _text: string;
-  private readonly _lineNum: number; // starts from 1
-  private readonly _charNum: number; // starts from 1
-  private readonly _line: string;
-  private readonly _filename: string;
-
   /**
    * Construct a Token
-   *
-   * @param tokenType the token type
-   * @param text      the matched text
-   * @param lineNum   the line number of the matched text
-   * @param charNum   the character number of the matched text
-   * @param line      the line of the matched next (NEWLINE/EOF) or null
-   * @param filename  the filename
    */
-  public constructor(tokenType: TokenType, text: string, lineNum: number=1, charNum: number=1, line: string=null, filename:string=null) {
-    this._tokenType = tokenType;
-    this._text      = text;
-    this._lineNum   = (lineNum < 1 ) ? 1 : lineNum;
-    this._charNum   = (charNum < 1 ) ? 1 : charNum;
-    this._line      = (tokenType === TokenType.NEWLINE || tokenType === TokenType.EOF) ? line : null;
-    this._filename  = filename;
+  public constructor(
+    /** the token type */
+    public readonly tokenType: TokenType,
+    /** the matched text */
+    public readonly text: string,
+    /** the line number of the matched text, starts from 1 */
+    public readonly lineNum: number=1,
+    /** the character number of the matched text, starts from 1 */
+    public readonly charNum: number=1,
+    /** the line of the matched next (NEWLINE/EOF) or null */
+    public readonly line: string=null,
+    /** the filename */
+    public readonly filename: string=null
+  ) {
+    // TODO: fatal error if lineNum < 1
+    this.lineNum   = (lineNum < 1 ) ? 1 : lineNum;
+    // TODO: fatal error if charNum < 1
+    this.charNum   = (charNum < 1 ) ? 1 : charNum;
+    // TODO: fatal error if line is non-null for non-NEWLINE
+    this.line      = (tokenType === TokenType.NEWLINE) ? line : null;
   }
 
   public isTokenType(tokenType: TokenType): boolean {
-    return this._tokenType === tokenType;
+    return this.tokenType === tokenType;
   }
-
-  public get tokenType(): TokenType { return this._tokenType; }
-  public get text(): string { return this._text; }
-  public get lineNum(): number { return this._lineNum; }
-  public get charNum(): number { return this._charNum; }
-  public get line(): string { return this._line; }
-  public get filename(): string { return this._filename; }
 
   public toString(): string {
     let buf: string = `[${this.tokenType}`
     if (this.tokenType !== TokenType.NEWLINE &&
       this.tokenType !== TokenType.EOF &&
       this.tokenType !== TokenType.WHITESPACE) {
-      buf = buf.concat(`,${this._text}`);
+      buf = buf.concat(`,${this.text}`);
     }
     buf = buf.concat(']');
     return buf;
