@@ -152,6 +152,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     const bestPath = this.selectionQueue.dequeue();
     const currentResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
+    this.selectionQueue = new PriorityQueue(PATH_QUEUE_COMPARATOR, this.selectionQueue.toArray());
 
     if(currentResult.type == 'complete') {
       this.bufferNode(currentResult.finalNode);
