@@ -325,6 +325,14 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get currentCost(): number {
+    if(this.incomingNodes.length > 0) {
+      this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
+    }
+
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -345,14 +353,17 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    */
   public handleNextNode(): PathResult {
     if(this.incomingNodes.length > 0) {
-      this.buildEdgesForNodes(this.incomingNodes);
-      this.incomingNodes = [];
+      this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
     }
 
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
-    if(parentCost <= localCost) {
+    if(parentCost < localCost) {
       if(parentCost == Number.POSITIVE_INFINITY) {
         return {
           type: 'none'
@@ -362,7 +373,10 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       const result = this.parentNode.handleNextNode();
       // The parent will insert the node into our queue.  We don't need it, though
       // any siblings certainly will.
-      this.incomingNodes = [];
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
 
       if(result.type == 'complete') {
         this.queueNodes(this.buildEdgesForNodes([result.finalNode]));

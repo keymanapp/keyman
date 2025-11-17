@@ -636,7 +636,8 @@ export class SearchResult {
  * @returns
  */
 export async function *getBestMatches(searchModules: SearchQuotientNode[], timer: ExecutionTimer): AsyncGenerator<SearchResult> {
-  const spaceQueue = new PriorityQueue<SearchQuotientNode>((a, b) => a.currentCost - b.currentCost);
+  const comparator = (a: SearchQuotientNode, b: SearchQuotientNode) => a.currentCost - b.currentCost;
+  let spaceQueue = new PriorityQueue<SearchQuotientNode>(comparator);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
   // and iterate over it first.
@@ -664,6 +665,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
       let lowestCostSource = spaceQueue.dequeue();
       const newResult = lowestCostSource.handleNextNode();
       spaceQueue.enqueue(lowestCostSource);
+      spaceQueue = new PriorityQueue(comparator, spaceQueue.toArray());
 
       if(newResult.type == 'none') {
         return null;
