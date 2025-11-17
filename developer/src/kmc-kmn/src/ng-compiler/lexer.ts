@@ -16,40 +16,30 @@ import { KMN_SCAN_RECOGNIZERS, ScanRecognizer } from "./scan-recognizer.js";
  *
  */
 export class Lexer {
-  private buffer: string;
   /** offset into the buffer */
-  private offset: number;
-  /** the filename (for use in the Tokens) */
-  private filename: string;
+  private offset: number = 0;
   /** the current line number */
-  private lineNum: number;
+  private lineNum: number = 1;
   /** the current character number */
-  private charNum: number;
+  private charNum: number = 1;
   /** the line seen so far */
-  private line: string;
+  private line: string = '';
   /** the accumulating tokens */
-  private tokenList: Token[];
+  private tokenList: Token[] = [];
   /** have we just seen a continuation line? */
-  private seenContinuation: boolean;
-  private scanRecognizers: ScanRecognizer[];
+  private seenContinuation: boolean = false;
+  private scanRecognizers: ScanRecognizer[] = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
 
   /**
    * Construct a Lexer
-   *
-   * @param buffer the string to search for tokens
-   * @param filename the filename to use in tokens
    */
-  public constructor(buffer: string, filename: string=null) {
-    this.buffer           = buffer;
-    this.offset           = 0;
-    this.lineNum          = 1;
-    this.charNum          = 1;
-    this.line             = '';
-    this.filename         = filename;
-    this.tokenList        = [];
-    this.seenContinuation = false;
-    this.scanRecognizers  = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
-    }
+  public constructor(
+    /** the string to search for tokens */
+    private readonly buffer: string,
+    /** the filename (for use in the Tokens) */
+    private readonly filename: string=null
+  ) {
+  }
 
   /**
    * Identify all tokens in the buffer
