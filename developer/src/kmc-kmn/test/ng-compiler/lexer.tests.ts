@@ -1501,7 +1501,7 @@ describe("Lexer Tests", () => {
         assert.deepEqual(token.toString(), '[EOF]');
         assert.equal(token.lineNum, 1);
         assert.equal(token.charNum, 18);
-        assert.equal(token.line, 'store(one) "value"');
+        assert.isNull(token.line);
       });
       it("can handle invalid line in constructor", () => {
         const token = new Token(TokenType.STORE, 'store', 1, 1, 'store(one) "value"\n');

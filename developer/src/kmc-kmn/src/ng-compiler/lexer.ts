@@ -16,40 +16,30 @@ import { KMN_SCAN_RECOGNIZERS, ScanRecognizer } from "./scan-recognizer.js";
  *
  */
 export class Lexer {
-  private buffer: string;
   /** offset into the buffer */
-  private offset: number;
-  /** the filename (for use in the Tokens) */
-  private filename: string;
+  private offset: number = 0;
   /** the current line number */
-  private lineNum: number;
+  private lineNum: number = 1;
   /** the current character number */
-  private charNum: number;
+  private charNum: number = 1;
   /** the line seen so far */
-  private line: string;
+  private line: string = '';
   /** the accumulating tokens */
-  private tokenList: Token[];
+  private tokenList: Token[] = [];
   /** have we just seen a continuation line? */
-  private seenContinuation: boolean;
-  private scanRecognizers: ScanRecognizer[];
+  private seenContinuation: boolean = false;
+  private scanRecognizers: ScanRecognizer[] = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
 
   /**
    * Construct a Lexer
-   *
-   * @param buffer the string to search for tokens
-   * @param filename the filename to use in tokens
    */
-  public constructor(buffer: string, filename: string=null) {
-    this.buffer           = buffer;
-    this.offset           = 0;
-    this.lineNum          = 1;
-    this.charNum          = 1;
-    this.line             = '';
-    this.filename         = filename;
-    this.tokenList        = [];
-    this.seenContinuation = false;
-    this.scanRecognizers  = KMN_SCAN_RECOGNIZERS.map((x) => new ScanRecognizer(x.tokenType, x.regExp, x.emit));
-    }
+  public constructor(
+    /** the string to search for tokens */
+    private readonly buffer: string,
+    /** the filename (for use in the Tokens) */
+    private readonly filename: string=null
+  ) {
+  }
 
   /**
    * Identify all tokens in the buffer
@@ -87,38 +77,32 @@ export class Lexer {
     // loop over all ScanRecognizers looking for a match at the offset into the buffer
     while (!(iterResult = patternIterator.next()).done && !tokenMatch) {
       const recognizer: ScanRecognizer    = iterResult.value;
+      const emitToken: boolean            = emitAll || recognizer.emit;
       recognizer.regExp.lastIndex         = this.offset;
       const match: RegExpExecArray | null = recognizer.regExp.exec(this.buffer);
 
       if (match) {
         this.line = this.line.concat(match[0].toString());
-        let line: string = null;
-        if (handleContinuation) {
-          // if handleContinuation is true, no CONTINUATIONs will be emitted,
-          // nor will NEWLINEs that follow CONTINUATIONs be emitted
-          if (recognizer.tokenType === TokenType.CONTINUATION) {
-            this.seenContinuation = true;
-          } else if (recognizer.tokenType === TokenType.NEWLINE) {
-            if (!this.seenContinuation) {
-              if (emitAll || recognizer.emit) {
-               this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, this.line, this.filename));
-              }
-              this.line = '';
+        // if handleContinuation is true, no CONTINUATIONs will be emitted,
+        // nor will NEWLINEs that follow CONTINUATIONs be emitted
+        if (recognizer.tokenType === TokenType.CONTINUATION) {
+            if (handleContinuation) {
+              this.seenContinuation = true;
+            } else if (emitToken) { // not handling continuation and emitting CONTINUATION
+              this.tokenList.push(new Token(TokenType.CONTINUATION, match[0], this.lineNum, this.charNum, null, this.filename));
             }
-            this.seenContinuation = false;
-          } else { // other tokens
-            if (emitAll || recognizer.emit) {
-              this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
+        } else if (recognizer.tokenType === TokenType.NEWLINE) {
+          if ((handleContinuation && !this.seenContinuation) || !handleContinuation) {
+            if (emitToken) { // emitting NEWLINE
+              this.tokenList.push(new Token(TokenType.NEWLINE, match[0], this.lineNum, this.charNum, this.line, this.filename));
             }
+            this.line = ''; // reset on NEWLINE
           }
-        } else { // not handling continuation
-          if (recognizer.tokenType === TokenType.NEWLINE) {
-            line      = this.line;
-            this.line = '';
+          if (handleContinuation) {
+            this.seenContinuation = false; // as seen a NEWLINE
           }
-          if (emitAll || recognizer.emit) {
-            this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, line, this.filename));
-          }
+        } else if (emitToken) { // emitting other tokens
+          this.tokenList.push(new Token(recognizer.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
         }
         tokenMatch  = true;
         this.offset = recognizer.regExp.lastIndex; // advance the buffer offset past the matched token
@@ -140,9 +124,12 @@ export class Lexer {
     if (!emitAll && (this.tokenList.length >= 2) &&
       this.tokenList.at(-1).isTokenType(TokenType.RIGHT_BR) &&
       this.tokenList.at(-2).isTokenType(TokenType.LEFT_BR)) {
+      // TODO: syntax error or warning for empty brackets
       this.tokenList.pop();
       this.tokenList.pop();
     }
+
+    // TODO: fatal error if this.offset > this.buffer.length
 
     // add a newline and end-of-file tokens if required
     if (this.offset >= this.buffer.length && addEOF) {
@@ -150,7 +137,7 @@ export class Lexer {
         this.tokenList.push(new Token(TokenType.NEWLINE, '', 1, 1, this.line, this.filename));
         this.line = '';
       }
-      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, '', this.filename));
+      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, null, this.filename));
     }
 
     // return false if there was no match or the buffer is empty
@@ -166,49 +153,41 @@ export class Lexer {
  * An input Token found by the Next Generation Lexer for the Parser.
  */
 export class Token {
-  private readonly _tokenType: TokenType;
-  private readonly _text: string;
-  private readonly _lineNum: number; // starts from 1
-  private readonly _charNum: number; // starts from 1
-  private readonly _line: string;
-  private readonly _filename: string;
-
   /**
    * Construct a Token
-   *
-   * @param tokenType the token type
-   * @param text      the matched text
-   * @param lineNum   the line number of the matched text
-   * @param charNum   the character number of the matched text
-   * @param line      the line of the matched next (NEWLINE/EOF) or null
-   * @param filename  the filename
    */
-  public constructor(tokenType: TokenType, text: string, lineNum: number=1, charNum: number=1, line: string=null, filename:string=null) {
-    this._tokenType = tokenType;
-    this._text      = text;
-    this._lineNum   = (lineNum < 1 ) ? 1 : lineNum;
-    this._charNum   = (charNum < 1 ) ? 1 : charNum;
-    this._line      = (tokenType === TokenType.NEWLINE || tokenType === TokenType.EOF) ? line : null;
-    this._filename  = filename;
+  public constructor(
+    /** the token type */
+    public readonly tokenType: TokenType,
+    /** the matched text */
+    public readonly text: string,
+    /** the line number of the matched text, starts from 1 */
+    public readonly lineNum: number=1,
+    /** the character number of the matched text, starts from 1 */
+    public readonly charNum: number=1,
+    /** the line of the matched next NEWLINE or null */
+    public readonly line: string=null,
+    /** the filename */
+    public readonly filename: string=null
+  ) {
+    // TODO: fatal error if lineNum < 1
+    this.lineNum   = (lineNum < 1 ) ? 1 : lineNum;
+    // TODO: fatal error if charNum < 1
+    this.charNum   = (charNum < 1 ) ? 1 : charNum;
+    // TODO: fatal error if line is non-null for non-NEWLINE
+    this.line      = (tokenType === TokenType.NEWLINE) ? line : null;
   }
 
   public isTokenType(tokenType: TokenType): boolean {
-    return this._tokenType === tokenType;
+    return this.tokenType === tokenType;
   }
-
-  public get tokenType(): TokenType { return this._tokenType; }
-  public get text(): string { return this._text; }
-  public get lineNum(): number { return this._lineNum; }
-  public get charNum(): number { return this._charNum; }
-  public get line(): string { return this._line; }
-  public get filename(): string { return this._filename; }
 
   public toString(): string {
     let buf: string = `[${this.tokenType}`
     if (this.tokenType !== TokenType.NEWLINE &&
       this.tokenType !== TokenType.EOF &&
       this.tokenType !== TokenType.WHITESPACE) {
-      buf = buf.concat(`,${this._text}`);
+      buf = buf.concat(`,${this.text}`);
     }
     buf = buf.concat(']');
     return buf;
