@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 19.0.163 alpha 2025-11-17
+
+* chore(linux): Update debian changelog (#15133)
+* fix(windows): handle exceptions when walking stack in exception handler (#15150)
+* fix(windows): disable OutputDebugString from DllMain (#15151)
+* change(windows): include map2pdb generation for relevant Delphi projects (#14799)
+* change(windows): use circular buffer for logging (#15163)
+* fix(windows): handle forward slash for KEYMAN_ROOT env var (#15156)
+* maint(mac): handle hdiutil detach failure correctly in make-km-dmg.sh (#15176)
+
 ## 19.0.162 alpha 2025-11-14
 
 * chore(linux): use `devel` for next Ubuntu release (#15157)
