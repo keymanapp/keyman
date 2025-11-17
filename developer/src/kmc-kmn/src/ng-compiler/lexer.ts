@@ -137,7 +137,7 @@ export class Lexer {
         this.tokenList.push(new Token(TokenType.NEWLINE, '', 1, 1, this.line, this.filename));
         this.line = '';
       }
-      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, '', this.filename));
+      this.tokenList.push(new Token(TokenType.EOF, '', 1, 1, null, this.filename));
     }
 
     // return false if there was no match or the buffer is empty
@@ -165,7 +165,7 @@ export class Token {
     public readonly lineNum: number=1,
     /** the character number of the matched text, starts from 1 */
     public readonly charNum: number=1,
-    /** the line of the matched next (NEWLINE/EOF) or null */
+    /** the line of the matched next NEWLINE or null */
     public readonly line: string=null,
     /** the filename */
     public readonly filename: string=null
