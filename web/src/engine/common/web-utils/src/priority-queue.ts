@@ -47,7 +47,7 @@ export default class PriorityQueue<Type> {
     this.comparator = comparator;
 
     this.heap = (initialEntries ?? []).slice(0);
-    this.heapify();
+    this._heapify();
   }
 
   private static leftChildIndex(index: number): number {
@@ -67,13 +67,22 @@ export default class PriorityQueue<Type> {
    * are properly satisfied.
    * - O(N) when 'heapifying' the whole heap
    * - O(N) worst-case for partial heap operations (as part of an enqueueAll)
-   * <p>
    */
-  private heapify(): void;
-  private heapify(start: number, end: number): void;
-  private heapify(start?: number, end?: number): void {
+  public heapify(): void {
+    this._heapify();
+  }
+
+  /**
+   * Maintains internal state, rearranging the internal state until all heap constraints
+   * are properly satisfied.
+   * - O(N) when 'heapifying' the whole heap
+   * - O(N) worst-case for partial heap operations (as part of an enqueueAll)
+   */
+  private _heapify(): void;
+  private _heapify(start: number, end: number): void;
+  private _heapify(start?: number, end?: number): void {
     if(start == undefined || end == undefined) {
-      this.heapify(0, this.count - 1);
+      this._heapify(0, this.count - 1);
       return;
     }
 
@@ -161,7 +170,7 @@ export default class PriorityQueue<Type> {
     const firstParent = PriorityQueue.parentIndex(firstIndex);
 
     // The 'parent' of index 0 will return -1, which is illegal.
-    this.heapify(firstParent >= 0 ? firstParent : 0, PriorityQueue.parentIndex(this.count-1));
+    this._heapify(firstParent >= 0 ? firstParent : 0, PriorityQueue.parentIndex(this.count-1));
   }
 
   /**

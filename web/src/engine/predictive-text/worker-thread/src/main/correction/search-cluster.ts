@@ -157,6 +157,7 @@ export class SearchCluster implements SearchSpace {
     const bestPath = this.selectionQueue.dequeue();
     const currentResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
+    this.selectionQueue.heapify();
 
     if(currentResult.type == 'complete') {
       this.bufferNode(currentResult.finalNode);

@@ -400,6 +400,14 @@ export class SearchPath implements SearchSpace {
   }
 
   public get currentCost(): number {
+    if(this.incomingNodes.length > 0) {
+      this.addEdgesForNodes(this.incomingNodes);
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
+    }
+
     const parentCost = this.parentSpace?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -432,13 +440,16 @@ export class SearchPath implements SearchSpace {
   public handleNextNode(): PathResult {
     if(this.incomingNodes.length > 0) {
       this.addEdgesForNodes(this.incomingNodes);
-      this.incomingNodes = [];
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
     }
 
     const parentCost = this.parentSpace?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
-    if(parentCost <= localCost) {
+    if(parentCost < localCost) {
       if(parentCost == Number.POSITIVE_INFINITY) {
         return {
           type: 'none'
@@ -448,7 +459,10 @@ export class SearchPath implements SearchSpace {
       const result = this.parentSpace.handleNextNode();
       // The parent will insert the node into our queue.  We don't need it, though
       // any siblings certainly will.
-      this.incomingNodes = [];
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
 
       if(result.type == 'complete') {
         this.addEdgesForNodes([result.finalNode]);
