@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Package UpgradeCode="c70af17c-8b9e-47a1-a099-b65aee3dc8b4" Manufacturer="SIL International" Name="Keyman $(var.RELEASE)" Version="$(var.KEYMAN_VERSION)" Language="1033" InstallerVersion="400"><SummaryInformation Keywords="Keyman,Keyman for Windows,Keyboard,Engine" Description="Keyman $(var.RELEASE)" Manufacturer="SIL International" />
 
     <!-- ALLOW Upgrade from 7.0 Light -->
@@ -77,8 +77,7 @@
     <Property Id="OnlineProductID" Value="30" />
 
     <PropertyRef Id="WIX_NATIVE_MACHINE" />
-
-
+    <SetProperty Id="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE]" After="CostFinalize" />
 
 
     <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\..\..\common\windows\delphi\ext\sentry">
@@ -123,8 +122,7 @@
     </Feature>
 
     <!-- Actions -->
-    <CustomAction Id="DebugMachine" Property="WIX_NATIVE_MACHINE" Value="[WIX_NATIVE_MACHINE]" Execute="immediate" />
-
+    <!-- <CustomAction Id="WIX_NATIVE_MACHINE.guid" Property="WIX_NATIVE_MACHINE" Value="[WIX_NATIVE_MACHINE]" Execute="immediate" /> -->
     <CustomAction Id="RollbackPostInstallCU" Execute="rollback" Impersonate="yes" ExeCommand="-rcu" BinaryRef="insthelp.exe" />
     <CustomAction Id="RollbackPostInstallLM" Execute="rollback" Impersonate="no" ExeCommand="-rlm" BinaryRef="insthelp.exe" />
     <CustomAction Id="PreUninstallUser" Execute="deferred" Impersonate="yes" ExeCommand="-uu" BinaryRef="insthelp.exe" />
@@ -134,15 +132,20 @@
     <CustomAction Id="LocateInstallDir" Execute="immediate" Directory="INSTALLDIR" Value="[OLDINSTALLDIR]" />
 
     <CustomAction Id="SaveARPInstallLocation" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
-
+    <CustomAction Id="SetNativeMachineProperty" Property="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F]" />
+    <CustomAction Id="DebugNativeMSM" Property="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F]" Execute="immediate" />
+    <CustomAction Id="DebugNativeParent" Property="WIX_NATIVE_MACHINE" Value="[WIX_NATIVE_MACHINE]" Execute="immediate" />
     <!-- I1165 - Uninstall failure on Win9x - refer to ProgramFilesFolder instead of %ProgramFiles! -->
     <CustomAction Id="CachedInstallDir" Property="CachedInstallDir" Value="[ProgramFilesFolder]\Keyman\Cached Installer Files\[ProductCode]" />
     <CustomAction Id="CachedInstallDirParent" Property="CachedInstallDirParent" Value="[ProgramFilesFolder]\Keyman\Cached Installer Files" />
     <InstallExecuteSequence>
       <Custom Action="LocateInstallDir" After="CostFinalize" Condition="VERSION11FOUND" />
-
       <Custom Action="CachedInstallDir" After="CostFinalize" />
       <Custom Action="CachedInstallDirParent" After="CostFinalize" />
+      <!-- <SetProperty Id="WIX_NATIVE_MACHINE.CE38CB16-4448-4432-851B-B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE]" After="AppSearch" /> -->
+      <Custom Action="SetNativeMachineProperty" After="AppSearch" Condition="1" />
+      <Custom Action="DebugNativeMSM" Before="AppSearch" Condition="1" />
+      <Custom Action="DebugNativeParent" After="CostFinalize" Condition="1" />
 
       <Custom Action="AlreadyUpdated" After="FindRelatedProducts" Condition="CURRENTVERSIONFOUND" />
       <Custom Action="NoDowngrade" After="AlreadyUpdated" Condition="NEWERFOUND Or HIGHERFOUND" />
@@ -165,6 +168,7 @@
     <!-- <Property Id="ALLUSERS" Value="1" /> -->
 
     <ui:WixUI Id="WixUI_FeatureTree" />
+    <util:QueryNativeMachine />
 
     <Icon Id="appicon.ico" SourceFile="..\branding\appicon.ico" />
     <Icon Id="KMSHELL.ico" SourceFile="..\branding\cfgicon.ico" />

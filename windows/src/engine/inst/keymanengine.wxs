@@ -2,6 +2,8 @@
   <Module Id="engine" Version="$(var.KEYMAN_VERSION)" Language="1033" Guid="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" InstallerVersion="200"><SummaryInformation Keywords="Keyman,Keyboard,Engine" Description="Keyman Engine $(var.RELEASE)" Manufacturer="SIL International" />
     <ComponentGroupRef Id="KeymanEngineComponents" />
     <ComponentGroupRef Id="KeymanEngineSentryComponents" />
+    <!-- <util:QueryNativeMachine /> -->
+
 
 
 
@@ -11,6 +13,7 @@
     <InstallExecuteSequence>
       <Custom Action="PreUninstallA" After="InstallInitialize" Condition="REMOVE=&quot;ALL&quot; And Not REINSTALL And Not UPGRADINGPRODUCTCODE" />
       <Custom Action="EnginePostInstall" Before="InstallFinalize" Condition="NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL" />
+
     </InstallExecuteSequence>
 
     <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" />

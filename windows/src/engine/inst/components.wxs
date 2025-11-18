@@ -166,6 +166,15 @@
         <File Id="kmrefresh.x64.exe" KeyPath="yes" Source="..\..\..\bin\engine\kmrefresh.x64.exe"/>
       </Component>
 
+
+      <Component Id="arm64e.txt" Condition="WIX_NATIVE_MACHINE = 43620" >
+        <File Id="arm64e.txt" Name="arm64e.txt" Source="arm64e.txt" KeyPath="yes" />
+      </Component>
+
+      <Component Id="x64e.txt" Condition="WIX_NATIVE_MACHINE = 34404">
+        <File Id="x64e.txt" Name="x64e.txt" Source="x64e.txt" KeyPath="yes" />
+      </Component>
+
       <Component Guid="{FA89BC70-11F3-4DAF-A0B4-6EBA64FC6C5C}" Id="tsysinfo.xslts">
         <File Id="base.xslt" Name="base.xslt" Source="..\..\engine\tsysinfo\base.xslt" />
         <File Id="si_browsers.xslt" Name="si_browsers.xslt" Source="..\..\engine\tsysinfo\si_browsers.xslt" />
