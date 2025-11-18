@@ -5,11 +5,11 @@ import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec, isEmptyTransform } from "keyman/common/web-utils";
 
-import { KM_Core } from 'keyman/engine/core-adapter';
+import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
 
 import {
   Codes,
-  JSKeyboard,
+  JSKeyboard, // TODO-web-core: huh? why is this here
   KeyboardMinimalInterface,
   SyntheticTextStore,
   TextStore,
@@ -18,6 +18,7 @@ import {
   type Alternate,
   type Keyboard,
   type KeyEvent,
+  KeyboardProcessor
 } from "keyman/engine/keyboard";
 import {
   JSKeyboardProcessor,
@@ -39,8 +40,10 @@ export class InputProcessor {
    * entry points.
    */
   private contextDevice: DeviceSpec;
-  private kbdProcessor: JSKeyboardProcessor;
-  private lngProcessor: LanguageProcessor;
+  private jsKbdProcessor: JSKeyboardProcessor;
+  private coreKbdProcessor: CoreKeyboardProcessor;
+  private _keyboardProcessor: KeyboardProcessor;
+  private _languageProcessor: LanguageProcessor;
 
 
   private readonly contextCache = new TranscriptionCache();
@@ -55,20 +58,22 @@ export class InputProcessor {
     }
 
     this.contextDevice = device;
-    this.kbdProcessor = new JSKeyboardProcessor(device, options);
-    this.lngProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
+    this.jsKbdProcessor = new JSKeyboardProcessor(device, options);
+    this._keyboardProcessor = this.jsKbdProcessor;
+    this.coreKbdProcessor = new CoreKeyboardProcessor();
+    this._languageProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
   }
 
   public async init(paths: PathConfiguration): Promise<void> {
-    await KM_Core.createCoreProcessor(paths.basePath);
+    await this.coreKbdProcessor.init(paths.basePath);
   }
 
   public get languageProcessor(): LanguageProcessor {
-    return this.lngProcessor;
+    return this._languageProcessor;
   }
 
-  public get keyboardProcessor(): JSKeyboardProcessor {
-    return this.kbdProcessor;
+  public get keyboardProcessor(): KeyboardProcessor {
+    return this._keyboardProcessor;
   }
 
   public get keyboardInterface(): KeyboardMinimalInterface {
@@ -80,6 +85,14 @@ export class InputProcessor {
   }
 
   public set activeKeyboard(keyboard: Keyboard) {
+
+    if (keyboard instanceof JSKeyboard || keyboard == null) {
+      // TODO-web-core: consider keyboard==null scenario; which keyboardProcessor should be active?
+      this._keyboardProcessor = this.jsKbdProcessor;
+    } else {
+      this._keyboardProcessor = this.coreKbdProcessor;
+    }
+
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated
