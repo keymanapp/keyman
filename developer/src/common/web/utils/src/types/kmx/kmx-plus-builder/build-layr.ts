@@ -1,8 +1,7 @@
 
-import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { constants, KMXPlusVersion } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
-import { BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 import KMXPlusData = KMXPlus.KMXPlusData;
@@ -15,7 +14,7 @@ import StrsItem = KMXPlus.StrsItem;
  ------------------------------------------------------------------ */
 
 /**
- * A form that containts a set of layers, the <layers> element
+ * A layer form, containing a set of layers, the <layers> element
  */
 interface BUILDER_LAYR_FORM {
   hardware: BUILDER_STR_REF; // hardware or 'touch'
@@ -23,6 +22,10 @@ interface BUILDER_LAYR_FORM {
   count: number; // number of layer entries in the form
   minDeviceWidth: number; // width in millimeters
   _layers: LayrEntry[]; // original layer entry, for in-memory only
+  baseLayout: BUILDER_STR_REF;   // v19: base layout (e.g. 'us')
+  fontFaceName: BUILDER_STR_REF; // v19: face name of font for key caps
+  fontSizePct: number;           // v19: font size in % of default size for implementation, typically 100
+  flags: KMXPlus.LayrFormFlags;  // v19: flags
 };
 
 /**
@@ -56,17 +59,17 @@ interface BUILDER_LAYR_KEY {
  * Builder for the 'keys' section
  */
 export interface BUILDER_LAYR extends BUILDER_SECTION {
-  formCount: number, // number of entries in forms subtable
+  formCount: number, // number of entries in forms subtable (renamed in v19, formerly, listCount)
   layerCount: number, // number of entries in layers subtable
   rowCount: number, // number of entries in rows subtable
   keyCount: number, // number of entries in keys subtable
-  forms: BUILDER_LAYR_FORM[], // subtable of <layers> elements
+  forms: BUILDER_LAYR_FORM[], // subtable of <layers> elements (renamed in v19, formerly, lists)
   layers: BUILDER_LAYR_LAYER[], // subtable of <layer> elements
   rows: BUILDER_LAYR_ROW[], // subtable of <row> elements
   keys: BUILDER_LAYR_KEY[], // subtable of key entries
 };
 
-export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_LAYR {
+export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, version: KMXPlusVersion): BUILDER_LAYR {
   if (!kmxplus.layr?.forms) {
     return null;  // if there aren't any layers at all (which should be an invalid keyboard)
   }
@@ -74,7 +77,8 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   const layr: BUILDER_LAYR = {
     header: {
       ident: constants.hex_section_id(constants.section.layr),
-      size: constants.length_layr,
+      size: 0, // calculated below
+      version: version == KMXPlusVersion.Version17 ? KMXPlusVersion.Version17 : KMXPlusVersion.Version19,
     },
     _offset: 0,
     formCount: kmxplus.layr.forms.length,
@@ -84,19 +88,23 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     forms: [],
     layers: [],
     rows: [],
-    keys: []
+    keys: [],
   };
 
-  layr.forms = kmxplus.layr.forms.map((form) => {
-    const bform: BUILDER_LAYR_FORM = {
+  layr.forms = kmxplus.layr.forms.map<BUILDER_LAYR_FORM>((form) => {
+    return {
       hardware: build_strs_index(sect_strs, form.hardware),
       layer: null, // to be set below
       _layers: form.layers,
       count: form.layers.length,
       minDeviceWidth: form.minDeviceWidth,
+      baseLayout: build_strs_index(sect_strs, form.baseLayout),
+      fontFaceName: build_strs_index(sect_strs, form.fontFaceName),
+      fontSizePct: form.fontSizePct,
+      flags: form.flags,
     };
-    return bform;
   });
+
   // now sort the forms
   layr.forms.sort((a, b) => {
     // sort by string #
@@ -152,11 +160,16 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   layr.rowCount = layr.rows.length;
   layr.keyCount = layr.keys.length;
 
-  const offset = constants.length_layr +
-    (constants.length_layr_form * layr.formCount) +
-    (constants.length_layr_entry * layr.layerCount) +
-    (constants.length_layr_row * layr.rowCount) +
-    (constants.length_layr_key * layr.keyCount);
-  layr.header.size = offset;
+  layr.header.size = version == KMXPlusVersion.Version17
+    ? constants.length_layr +
+      (constants.length_layr_form_v17 * layr.formCount) +
+      (constants.length_layr_entry * layr.layerCount) +
+      (constants.length_layr_row * layr.rowCount) +
+      (constants.length_layr_key * layr.keyCount)
+    : constants.length_layr +
+      (constants.length_layr_form_v19 * layr.formCount) +
+      (constants.length_layr_entry * layr.layerCount) +
+      (constants.length_layr_row * layr.rowCount) +
+      (constants.length_layr_key * layr.keyCount);
   return layr;
 }

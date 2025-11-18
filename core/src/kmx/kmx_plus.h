@@ -497,42 +497,64 @@ class COMP_KMXPLUS_VARS_Helper : public COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS
  * disp section
    ------------------------------------------------------------------ */
 
-struct COMP_KMXPLUS_DISP_ENTRY {
+struct COMP_KMXPLUS_DISP_ENTRY_17 {
     KMXPLUS_STR to;
     KMXPLUS_STR id;
     KMXPLUS_STR display;
+};
+
+struct COMP_KMXPLUS_DISP_ENTRY_19 {
+    KMXPLUS_STR toId;
+    KMXPLUS_STR display;
+    KMX_DWORD_unaligned flags;
 };
 
 struct COMP_KMXPLUS_DISP {
   static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_DISP;
   KMX_DWORD_unaligned count;
   KMXPLUS_STR baseCharacter;
-  COMP_KMXPLUS_DISP_ENTRY entries[];
+  COMP_KMXPLUS_DISP_ENTRY_19 entries[];
   /**
    * @brief True if section is valid.
    * @param header       reference to the 'disp' section header
    * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
+  bool valid_19(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
+  bool valid_17(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_DISP) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_DISP) == LDML_LENGTH_DISP - LDML_LENGTH_HEADER_17, "mismatched size of section disp");
 
-class COMP_KMXPLUS_DISP_Helper : public COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_DISP> {};
+class COMP_KMXPLUS_DISP_Helper : public COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_DISP> {
+  virtual bool set(const COMP_KMXPLUS_DISP *newDisp);
+};
 
 /* ------------------------------------------------------------------
  * layr section
    ------------------------------------------------------------------ */
 
-struct COMP_KMXPLUS_LAYR_FORM {
+struct COMP_KMXPLUS_LAYR_FORM_V17 {
     KMX_DWORD_unaligned hardware;
     KMX_DWORD_unaligned layer;
     KMX_DWORD_unaligned count;
     KMX_DWORD_unaligned minDeviceWidth;
 };
 
-static_assert(sizeof(struct COMP_KMXPLUS_LAYR_FORM) == LDML_LENGTH_LAYR_FORM, "mismatched size of COMP_KMXPLUS_LAYR_FORM");
+struct COMP_KMXPLUS_LAYR_FORM_V19 {
+    KMX_DWORD_unaligned hardware;
+    KMX_DWORD_unaligned layer;
+    KMX_DWORD_unaligned count;
+    KMX_DWORD_unaligned minDeviceWidth;
+    KMXPLUS_STR         baseLayout;        // v19: str: identifier for base layout (reserved)
+    KMXPLUS_STR         fontFaceName;      // v19: str: font face name
+    KMX_DWORD_unaligned fontSizePct;       // v19: font size in % of default size
+    KMX_DWORD_unaligned flags;             // v19: flags
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_FORM_V17) == LDML_LENGTH_LAYR_FORM_V17, "mismatched size of COMP_KMXPLUS_LAYR_FORM_V17");
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_FORM_V19) == LDML_LENGTH_LAYR_FORM_V19, "mismatched size of COMP_KMXPLUS_LAYR_FORM_V19");
 
 struct COMP_KMXPLUS_LAYR_ENTRY {
     KMXPLUS_STR id;
@@ -576,6 +598,8 @@ struct COMP_KMXPLUS_LAYR {
    * @param length       length of the section in bytes
    */
   bool valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
+  bool valid_19(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
+  bool valid_17(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const;
 };
 
 /**
@@ -584,6 +608,12 @@ struct COMP_KMXPLUS_LAYR {
 class COMP_KMXPLUS_LAYR_Helper : public COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_LAYR> {
 public:
   COMP_KMXPLUS_LAYR_Helper();
+  ~COMP_KMXPLUS_LAYR_Helper() {
+    if(own_forms) {
+      delete [] forms;
+      forms = nullptr;
+    }
+  }
   /**
    * Initialize the helper to point at a layr section.
    * @return true if valid
@@ -594,7 +624,7 @@ public:
   /**
    * @param form index from 0 to layr->formCount
    */
-  const COMP_KMXPLUS_LAYR_FORM  *getForm(KMX_DWORD form) const;
+  const COMP_KMXPLUS_LAYR_FORM_V19  *getForm(KMX_DWORD form) const;
   /**
    * @param entry index value: COMP_KMXPLUS_LAYR_FORM.layer but less than COMP_KMXPLUS_LAYR_FORM.layer+COMP_KMXPLUS_LAYR_FORM.count
    */
@@ -604,7 +634,8 @@ public:
 
 private:
   bool is_valid;
-  const COMP_KMXPLUS_LAYR_FORM *forms;
+  bool own_forms;
+  const COMP_KMXPLUS_LAYR_FORM_V19 *forms;
   const COMP_KMXPLUS_LAYR_ENTRY *entries;
   const COMP_KMXPLUS_LAYR_ROW *rows;
   const COMP_KMXPLUS_LAYR_KEY *keys;

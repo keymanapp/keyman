@@ -1,5 +1,7 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * KMX+ file format structures and helper functions
  */
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { ElementString } from './element-string.js';
@@ -481,11 +483,93 @@ export class Bksp extends Tran {
   }
 };
 
+export enum DispItemFlags {
+  isId = constants.disp_item_flags_is_id,
+  isSvg = constants.disp_item_flags_is_svg,
+
+  maskHint = constants.disp_item_flags_mask_hint,
+
+  hintPrimary = constants.disp_item_hint_primary << constants.disp_item_flags_shift_hint,
+  hintNW = constants.disp_item_hint_nw << constants.disp_item_flags_shift_hint,
+  hintN = constants.disp_item_hint_n << constants.disp_item_flags_shift_hint,
+  hintNE = constants.disp_item_hint_ne << constants.disp_item_flags_shift_hint,
+  hintW = constants.disp_item_hint_w << constants.disp_item_flags_shift_hint,
+  hintE = constants.disp_item_hint_e << constants.disp_item_flags_shift_hint,
+  hintSW = constants.disp_item_hint_sw << constants.disp_item_flags_shift_hint,
+  hintS = constants.disp_item_hint_s << constants.disp_item_flags_shift_hint,
+  hintSE = constants.disp_item_hint_se << constants.disp_item_flags_shift_hint,
+
+  maskKeyCapType = constants.disp_item_flags_mask_key_cap_type,
+
+  keyCapShift = constants.disp_key_cap_shift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEnter = constants.disp_key_cap_enter << constants.disp_item_flags_shift_key_cap_type,
+  keyCapTab = constants.disp_key_cap_tab << constants.disp_item_flags_shift_key_cap_type,
+  keyCapBksp = constants.disp_key_cap_bksp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapMenu = constants.disp_key_cap_menu << constants.disp_item_flags_shift_key_cap_type,
+  keyCapHide = constants.disp_key_cap_hide << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAlt = constants.disp_key_cap_alt << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCtrl = constants.disp_key_cap_ctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCaps = constants.disp_key_cap_caps << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAbc_Upper = constants.disp_key_cap_abc_upper << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAbc_Lower = constants.disp_key_cap_abc_lower << constants.disp_item_flags_shift_key_cap_type,
+  keyCap123 = constants.disp_key_cap_123 << constants.disp_item_flags_shift_key_cap_type,
+  keyCapSymbol = constants.disp_key_cap_symbol << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCurrency = constants.disp_key_cap_currency << constants.disp_item_flags_shift_key_cap_type,
+  keyCapShifted = constants.disp_key_cap_shifted << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAltgr = constants.disp_key_cap_altgr << constants.disp_item_flags_shift_key_cap_type,
+  keyCapTableft = constants.disp_key_cap_tableft << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLalt = constants.disp_key_cap_lalt << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRalt = constants.disp_key_cap_ralt << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLctrl = constants.disp_key_cap_lctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRctrl = constants.disp_key_cap_rctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLaltctrl = constants.disp_key_cap_laltctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRaltctrl = constants.disp_key_cap_raltctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLaltctrlshift = constants.disp_key_cap_laltctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRaltctrlshift = constants.disp_key_cap_raltctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAltshift = constants.disp_key_cap_altshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCtrlshift = constants.disp_key_cap_ctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAltctrlshift = constants.disp_key_cap_altctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLaltshift = constants.disp_key_cap_laltshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRaltshift = constants.disp_key_cap_raltshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLctrlshift = constants.disp_key_cap_lctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRctrlshift = constants.disp_key_cap_rctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLtrenter = constants.disp_key_cap_ltrenter << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLtrbksp = constants.disp_key_cap_ltrbksp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRtlenter = constants.disp_key_cap_rtlenter << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRtlbksp = constants.disp_key_cap_rtlbksp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapShiftlock = constants.disp_key_cap_shiftlock << constants.disp_item_flags_shift_key_cap_type,
+  keyCapShiftedlock = constants.disp_key_cap_shiftedlock << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnj = constants.disp_key_cap_zwnj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnjios = constants.disp_key_cap_zwnjios << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnjandroid = constants.disp_key_cap_zwnjandroid << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnjgeneric = constants.disp_key_cap_zwnjgeneric << constants.disp_item_flags_shift_key_cap_type,
+  keyCapSp = constants.disp_key_cap_sp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapNbsp = constants.disp_key_cap_nbsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapNarnbsp = constants.disp_key_cap_narnbsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEnq = constants.disp_key_cap_enq << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEmq = constants.disp_key_cap_emq << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEnsp = constants.disp_key_cap_ensp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEmsp = constants.disp_key_cap_emsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapPunctsp = constants.disp_key_cap_punctsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapThsp = constants.disp_key_cap_thsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapHsp = constants.disp_key_cap_hsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwsp = constants.disp_key_cap_zwsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwj = constants.disp_key_cap_zwj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapWj = constants.disp_key_cap_wj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCgj = constants.disp_key_cap_cgj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLtrm = constants.disp_key_cap_ltrm << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRtlm = constants.disp_key_cap_rtlm << constants.disp_item_flags_shift_key_cap_type,
+  keyCapSh = constants.disp_key_cap_sh << constants.disp_item_flags_shift_key_cap_type,
+  keyCapHtab = constants.disp_key_cap_htab << constants.disp_item_flags_shift_key_cap_type,
+}
+
 // 'disp'
-export class DispItem {
-  to: StrsItem;
-  id: StrsItem;
+export interface DispItem {
+  to: StrsItem;   // not used in v19
+  id: StrsItem;   // not used in v19
   display: StrsItem;
+  toId: StrsItem; // v19
+  flags: DispItemFlags; // v19
 };
 
 export class Disp extends Section {
@@ -495,6 +579,11 @@ export class Disp extends Section {
 
 // 'layr'
 
+export enum LayrFormFlags {
+   showBaseLayout = constants.layr_form_flags_show_base_layout,
+   chiralSeparate = constants.layr_form_flags_chiral_separate,
+};
+
 /**
  * In-memory `<layers>`
  */
@@ -502,6 +591,10 @@ export class LayrForm {
   hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
+  baseLayout: StrsItem;   // v19
+  fontFaceName: StrsItem; // v19
+  fontSizePct: number;    // v19 (integer percentage)
+  flags: LayrFormFlags;   // v19
 };
 
 /**

@@ -8,8 +8,9 @@ import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import { kmxToXml } from '../src/util/serialize.js';
 import { writeFileSync } from 'node:fs';
 import { LdmlCompilerMessages } from '../src/main.js';
-import { util } from '@keymanapp/common-types';
-import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
+import { KMX, util } from '@keymanapp/common-types';
+import { KMXPlusBuilder, SectionBuilders } from '@keymanapp/developer-utils';
+import { constants, KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
 const debug=false;
 
@@ -28,10 +29,10 @@ describe('compiler-tests', function() {
   });
 
   [
-    [17, KMXPlusVersion.Version17],
-    [19, KMXPlusVersion.Version19],
+    [17, KMX.KMX_Version.VERSION_170],
+    [19, KMX.KMX_Version.VERSION_190],
   ].forEach(([vernum, version]) => {
-    it(`should-build-fixtures for ${vernum}`, async function() {
+    it(`should-build-fixtures for v${vernum}.0`, async function() {
       this.timeout(4000);
       // Let's build basic.xml
       // It should match basic.kmx (built from basic.txt)
@@ -50,7 +51,7 @@ describe('compiler-tests', function() {
 
       const { artifacts } = await k.run(inputFilename, "basic-xml.kmx"); // need the exact name passed to build-fixtures
       assert.isNotNull(artifacts);
-      const { kmx, kvk  } = artifacts;
+      const { kmx, kvk } = artifacts;
       assert.isNotNull(kmx);
       assert.isNotNull(kmx.data);
       if(debug) {
@@ -63,6 +64,64 @@ describe('compiler-tests', function() {
       assert.isNotNull(kvk?.data);
     });
   });
+
+  it('should not build a v19 file with incorrect section versions for sect, disp, and layr', async function() {
+      const inputFilename = makePathToFixture('basic.xml');
+      const kmxPlusBuilder = await runKmxPlusCompiler(inputFilename, KMX.KMX_Version.VERSION_190);
+
+      assert.equal(kmxPlusBuilder.sect.sect?.header.ident, constants.sectionid_sec2);
+
+      // verify sections that should be v19 - sect (aka sec2), disp, and layr
+      assertSectionVersions(
+        kmxPlusBuilder.sect,
+        ['sect','disp','layr'],
+        KMXPlusVersion.Version19
+      );
+
+      // verify sections that should be v17 - all should be present
+      assertSectionVersions(
+        kmxPlusBuilder.sect,
+        ['bksp','elem','keys','list','loca','meta','strs','tran','uset','vars'],
+        KMXPlusVersion.Version17
+      );
+  });
+
+  it('should not build a v17 file with incorrect section versions', async function() {
+      const inputFilename = makePathToFixture('basic.xml');
+      const kmxPlusBuilder = await runKmxPlusCompiler(inputFilename, KMX.KMX_Version.VERSION_170);
+
+      assert.equal(kmxPlusBuilder.sect.sect?.header.ident, constants.hex_section_id(constants.section.sect));
+
+      assertSectionVersions(
+        kmxPlusBuilder.sect,
+        ['bksp','disp','elem','keys','layr','list','loca','meta','sect','strs','tran','uset','vars'],
+        KMXPlusVersion.Version17
+      );
+  });
+
+  // Helper functions
+
+  function assertSectionVersions(sect: SectionBuilders, idents: (keyof SectionBuilders)[], version: KMXPlusVersion) {
+    idents.forEach(ident => {
+      assert.isNotNull(sect[ident]);
+      assert.isNotNull(sect[ident].header);
+      assert.equal(sect[ident].header.version, version);
+    });
+  }
+
+  async function runKmxPlusCompiler(inputFilename: string, version: KMX.KMX_Version) {
+    const compiler = new LdmlKeyboardCompiler();
+    assert.isTrue(await compiler.init(compilerTestCallbacks, { ...compilerTestOptions, targetVersion: version }));
+    const source = compiler.load(inputFilename);
+    assert.isNotNull(source);
+    const kmxPlusFile = await compiler.compile(source, true);
+    assert.isNotNull(kmxPlusFile);
+
+    const kmxPlusBuilder = new KMXPlusBuilder(kmxPlusFile);
+    assert.isNotNull(kmxPlusBuilder.compile());
+    return kmxPlusBuilder;
+  }
+
 
   it('should-validate-on-run compiling sections/strs/invalid-illegal.xml', async function() {
     this.timeout(4000);

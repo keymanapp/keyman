@@ -4,7 +4,7 @@ import { KeysCompiler } from '../src/compiler/keys.js';
 import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, Constants, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
-import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 import { MetaCompiler } from '../src/compiler/meta.js';
 const keysDependencies = [ ...BASIC_DEPENDENCIES, MetaCompiler ];
 import Keys = KMXPlus.Keys;
@@ -213,14 +213,14 @@ describe('keys', function () {
         assert.equal(interrobang.to.value, `‽`, `Interrobang's value`);
       },
     },
-  ], keysDependencies);
+  ], KMXPlusVersion.Version17, keysDependencies);
 });
 
 describe('keys.kmap', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal kmap data', async function() {
-    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     // skip reserved (gap) keys
@@ -443,10 +443,10 @@ describe('keys.kmap', function () {
         ], 'modifiers for c');
       },
     },
-  ], keysDependencies);
+  ], KMXPlusVersion.Version17, keysDependencies);
 
   it('should reject layouts with too many hardware rows', async function() {
-    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
@@ -454,7 +454,7 @@ describe('keys.kmap', function () {
   });
 
   it('should reject layouts with too many hardware keys', async function() {
-    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
@@ -462,14 +462,14 @@ describe('keys.kmap', function () {
   });
 
   it('should reject layouts with undefined keys', async function() {
-    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
     assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}, withOffset(271) as LDMLKeyboard.LKRow));
   });
   it('should reject layouts with invalid keys', async function() {
-    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch(
@@ -478,7 +478,7 @@ describe('keys.kmap', function () {
     ));
   });
   it('should accept layouts with gap/switch keys', async function() {
-    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(keys.keys.length, 4 + KeysCompiler.reserved_count);
