@@ -14,11 +14,11 @@ import StrsItem = KMXPlus.StrsItem;
  ------------------------------------------------------------------ */
 
 /**
- * A layer form, containing a set of layers, the <layers> element
+ * A form that contains a set of layers, the <layers> element
  */
 interface BUILDER_LAYR_FORM {
   hardware: BUILDER_STR_REF; // hardware or 'touch'
-  layer: number; // index of first layer in the form, in the
+  layer: number; // index of first layer in the form, in the layers subtable
   count: number; // number of layer entries in the form
   minDeviceWidth: number; // width in millimeters
   _layers: LayrEntry[]; // original layer entry, for in-memory only
