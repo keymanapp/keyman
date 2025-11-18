@@ -91,10 +91,13 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     return null;
   }
 
-  private applyContextFromTextStore(context: km_core_context, textStore: TextStore) {
-    // Retrieve context including deadkeys from textStore and
-    // apply to Core's context
-    //
+  /**
+   * Retrieve context including deadkeys from TextStore and apply to Core's context
+   *
+   * @param context     Context from Keyman Core
+   * @param textStore   Web TextStore
+   */
+  private applyContextFromTextStore(context: km_core_context, textStore: TextStore): void {
     // Unlike the desktop Engines, we still track markers (deadkeys) in Engine
     // for Web at this time. This is for two reasons:
     // 1. We still have the legacy JSKeyboard code paths which manage deadkey
@@ -110,7 +113,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     // of markers, and then we better align with the desktop Engines.
 
     const text = textStore.getText();
-    const deadKeys = textStore.deadkeys().dks.sort((a, b) => a.p != b.p ? a.p - b.p : a.o - b.o);
+    const deadkeys = textStore.deadkeys().dks.sort((a, b) => a.p != b.p ? a.p - b.p : a.o - b.o);
     const contextItems = new KM_Core.instance.km_core_context_items();
     const caretPosition = textStore.getCaret();
     let textIndex = 0;
@@ -122,7 +125,11 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
           contextItems.push_back(contextItem);
           break;
         }
-        contextItem.character = text.charCodeAt(textIndex);
+        contextItem.character = text.codePointAt(textIndex);
+        if (contextItem.character > 0xFFFF) {
+          // we have a surrogate pair, skip other half of surrogate
+          textIndex++;
+        }
         contextItems.push_back(contextItem);
       }
     }
@@ -133,6 +140,12 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     KM_Core.instance.context_set(context, contextItems);
   }
 
+  /**
+   * Saves marker entries from Core's context into a TextStore's deadkey list.
+   *
+   * @param context     Context from Keyman Core
+   * @param textStore   Web TextStore
+   */
   private saveMarkersToTextStore(context: km_core_context, textStore: TextStore): void {
     const { status, object } = KM_Core.instance.context_get(context);
     if (status != KM_CORE_STATUS.OK) {
@@ -146,6 +159,10 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
       const contextItem = contextItems.get(i);
       if (contextItem.type !== KM_CORE_CT.MARKER) {
         textIndex++;
+        if (contextItem.character > 0xFFFF) {
+          // character will be a surrogate pair in the text store
+          textIndex++;
+        }
         continue;
       }
       textStore.deadkeys().add(new Deadkey(textIndex, contextItem.marker));
