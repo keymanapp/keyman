@@ -19,7 +19,7 @@ builder_parse "$@"
 DEST="web/build/test-resources"
 
 builder_describe_outputs \
-  build       "${KEYMAN_ROOT}/${DEST}/sentry-manager.js"
+  build       "/${DEST}/sentry-manager.js"
 
 #### Build action definitions ####
 
@@ -30,7 +30,7 @@ function do_copy() {
   cp "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/index.js"      "${KEYMAN_ROOT}/${DEST}/sentry-manager.js"
   cp "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/index.js.map"  "${KEYMAN_ROOT}/${DEST}/sentry-manager.js.map"
 
-  cp "${KEYMAN_ROOT}/common/web/types/tests/fixtures/kmx/khmer_angkor.kmx" "${KEYMAN_ROOT}/${DEST}/"
+  cp "${KEYMAN_ROOT}/common/web/types/tests/fixtures/kmx/khmer_angkor.kmx" "${KEYMAN_ROOT}/${DEST}/keyboards/"
 
   # copy common test (resources) keyboards
   cp -f "${KEYMAN_ROOT}/common/test/keyboards/platform-rules/platformtest.js" "${KEYMAN_ROOT}/${DEST}/keyboards/"

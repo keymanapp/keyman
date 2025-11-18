@@ -14,23 +14,37 @@ import {
 
 export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   public activeKeyboard: Keyboard;
-
-  constructor() {
-  }
 }
 
+/**
+ * Implements the core keyboard processing engine that interacts with the
+ * shared Keyman Core component which handles .kmx keyboards.
+ */
 export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
   private _newLayerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
   private _oldLayerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
   private _layerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
   private _keyboardInterface: CoreKeyboardInterface = new CoreKeyboardInterface();
 
+  /**
+   * Initialize the core processor with the provided base path.
+   * Sets up the necessary environment for processing keyboard events.
+   *
+   * @param {string}  basePath    The path for the core processor resources, i.e. where the
+   *                              km-core.js file is located.
+   * @returns {Promise<void>} A promise that resolves when initialization is complete.
+   */
   public async init(basePath: string): Promise<void> {
     await KM_Core.createCoreProcessor(basePath);
   }
 
-  // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
-  // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
+  /**
+   * Tracks the simulated value for supported state keys, allowing the OSK to
+   * mirror a physical keyboard for them. Uses the exact keyCode name from the
+   * Codes definitions to enable certain optimizations elsewhere in the code.
+   *
+   * @type {StateKeyMap}
+   */
   public stateKeys: StateKeyMap = {
     "K_CAPS": false,
     "K_NUMLOCK": false,
@@ -38,57 +52,101 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   }
 
   /**
-  * Indicates the device (platform) to be used for non-keystroke events,
-  * such as those sent to `begin postkeystroke` and `begin newcontext`
-  * entry points.
-  */
+   * Indicates the device (platform) to be used for non-keystroke events.
+   * Used for events such as those sent to `begin postkeystroke` and
+   * `begin newcontext` entry points.
+   *
+   * @type {DeviceSpec}
+   */
   public contextDevice: DeviceSpec;
 
+  /**
+   * Optional handler for beep events triggered by the processor.
+   * Allows custom handling of beep feedback, such as for alerts or errors.
+   *
+   * @type {BeepHandler}
+   */
   public beepHandler?: BeepHandler;
 
-  // Tracks the most recent modifier state information in order to quickly detect changes
-  // in keyboard state not otherwise captured by the hosting page in the browser.
-  // Needed for AltGr simulation.
+  /**
+   * Bitfield representing the most recent modifier state (Alt, Ctrl, Shift, etc.)
+   * as observed or simulated by the processor. Used to quickly detect changes in
+   * modifier state not otherwise captured by the hosting page (important for AltGr).
+   *
+   * @type {number}
+   */
   public modStateFlags: number = 0;
+
+  /**
+   * Stores the identifier for the base keyboard layout in use.
+   * Used to determine the default layout for key mapping and processing.
+   *
+   * @type {string}
+   */
   public baseLayout: string;
 
+  /**
+   * The currently active keyboard.
+   *
+   * @type {Keyboard}
+   */
   public get activeKeyboard(): Keyboard {
     return this.keyboardInterface.activeKeyboard;
   }
-
   public set activeKeyboard(keyboard: Keyboard) {
     this.keyboardInterface.activeKeyboard = keyboard;
   }
 
+  /**
+   * The keyboard interface used by the processor.
+   * Provides access to the keyboard interface implementation.
+   *
+   * @type {KeyboardMinimalInterface}
+   */
   get keyboardInterface(): KeyboardMinimalInterface {
     return this._keyboardInterface;
   }
 
+  /**
+   * The store representing the currently active keyboard layer.
+   *
+   * @type {MutableSystemStore}
+   */
   public get layerStore(): MutableSystemStore {
     // TODO-web-core: link to .kmx layer store
     return this._layerStore;
   }
 
+  /**
+   * A writable store used when transitioning to a new layer
+   *
+   * @type {MutableSystemStore}
+   */
   public get newLayerStore(): MutableSystemStore {
     // TODO-web-core: link to .kmx new-layer store
     return this._newLayerStore;
   }
 
+  /**
+   * A store representing the previously active layer
+   *
+   * @type {MutableSystemStore}
+   */
   public get oldLayerStore(): MutableSystemStore {
     // TODO-web-core: link to .kmx old-layer store
     return this._oldLayerStore;
   }
 
+  /**
+   * Identifier of the currently active layer.
+   *
+   * @type {string}
+   */
   public get layerId(): string {
     return this._layerStore.value;
   }
   public set layerId(value: string) {
     this._layerStore.set(value);
-  }
-
-  public processPostKeystroke(device: DeviceSpec, textStore: TextStore): ProcessorAction {
-    // TODO-web-core: Implement this method
-    return null;
   }
 
   /**
@@ -169,6 +227,15 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     }
   }
 
+  /**
+   * Processes a keystroke event and updates the text store accordingly.
+   * Handles the main logic for interpreting and applying keyboard input.
+   *
+   * @param {KeyEvent}   keyEvent    The key event to process.
+   * @param {TextStore}  textStore   The current text store context.
+   *
+   * @returns {ProcessorAction} The resulting processor action.
+   */
   public processKeystroke(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
 
     const preInput = SyntheticTextStore.from(textStore, true);
@@ -204,29 +271,72 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   }
 
   /**
-   * Select the OSK's next keyboard layer based upon layer switching keys as a default
-   * The next layer will be determined from the key name unless otherwise specifed
+   * Processes post-keystroke actions for the given device and text store.
+   * Handles any actions that should occur after a keystroke is processed.
    *
-   *  @param  {string}                    keyName     key identifier
-   *  @return {boolean}                               return true if keyboard layer changed
+   * @param {DeviceSpec}  device     The device specification.
+   * @param {TextStore}   textStore  The current text store context.
+   *
+   * @returns {ProcessorAction} The resulting processor action, or null if not applicable.
+   */
+  public processPostKeystroke(device: DeviceSpec, textStore: TextStore): ProcessorAction {
+    // TODO-web-core: Implement this method
+    return null;
+  }
+
+  /**
+   * Determines if the given key event is a modifier key press.
+   * Returns true if the event corresponds to a modifier key, otherwise false.
+   *
+   * @param {KeyEvent}   keyEvent    The key event to evaluate.
+   * @param {TextStore}  textStore   The current text store context.
+   * @param {boolean}    isKeyDown   Indicates if the key event is a key down event.
+   *
+   * @returns {boolean} True if the event is a modifier key press, false otherwise.
+   */
+  public doModifierPress(keyEvent: KeyEvent, textStore: TextStore, isKeyDown: boolean): boolean {
+    // TODO-web-core: Implement this method
+    return false;
+  }
+
+  /**
+   * Resets the keyboard context, optionally using the provided text store.
+   * Clears or reinitializes the context for subsequent keyboard processing.
+   *
+   * @param {TextStore} [textStore] - The optional text store to use for resetting context.
+   */
+  public resetContext(textStore?: TextStore): void {}
+
+  /**
+   * Finalizes the processor action and applies any final changes to the text store.
+   * Ensures that all necessary updates are completed after processing a key event.
+   *
+   * @param {ProcessorAction}   data        The processor action to finalize.
+   * @param {TextStore}         textStore   The text store to update.
+   */
+  public finalizeProcessorAction(data: ProcessorAction, textStore: TextStore): void { }
+
+  /**
+   * Selects the next keyboard layer based on the provided key event.
+   * Determines and applies the appropriate layer switch for the OSK.
+   *
+   * @param {KeyEvent}  keyEvent   The key event used to determine the next layer.
+   *
+   * @returns {boolean} True if the keyboard layer changed, false otherwise.
    */
   public selectLayer(keyEvent: KeyEvent): boolean {
     // TODO-web-core: Implement this method
     return false;
   }
 
-  // Returns true if the key event is a modifier press, allowing keyPress to return selectively
-  // in those cases.
-  public doModifierPress(Levent: KeyEvent, textStore: TextStore, isKeyDown: boolean): boolean {
-    // TODO-web-core: Implement this method
-    return false;
-  }
-
-  public resetContext(textStore?: TextStore): void {}
-
+  /**
+   * Sets the numeric layer for the given device.
+   * Switches the keyboard to a numeric input layer if supported.
+   *
+   * @param {DeviceSpec} device - The device for which to set the numeric layer.
+   */
   public setNumericLayer(device: DeviceSpec): void {}
 
-  public finalizeProcessorAction(data: ProcessorAction, textStore: TextStore): void {}
 
   /** @internal */
   public unitTestEndPoints = {
