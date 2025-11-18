@@ -76,7 +76,7 @@ describe('layr', function () {
         assert.equal(hardware1row0.keys.length, 3);
         allKeysOk(hardware1row0,'q w amarker', 'hardware1row0');
 
-        const formTouch = layr.forms.find(v => v.hardware.value === constants.layr_list_hardware_touch);
+        const formTouch = layr.forms.find(v => v.hardware.value === constants.layr_form_hardware_touch);
         assert.ok(formTouch);
         assert.equal(formTouch.minDeviceWidth, 300);
         assert.equal(formTouch.layers.length, 1);
