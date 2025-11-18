@@ -81,7 +81,7 @@
     <Property Id='OnlineProductID' Value='30' />
 
 
-    <SetProperty Id="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE]" After="CostFinalize"/>
+    <SetProperty Id="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE]" Before="LaunchConditions"/>
 
     <Directory Id="TARGETDIR" Name="SourceDir" DiskId="1">
 
