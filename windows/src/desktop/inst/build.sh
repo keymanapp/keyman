@@ -20,7 +20,7 @@ builder_if_release_build_level builder_describe_outputs \
 builder_parse "$@"
 
 . "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/wix6.inc.sh"
+. "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
 . "$KEYMAN_ROOT/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
@@ -62,20 +62,20 @@ function do_publish() {
   #
   # Build the installation archive
   #
-  #do_candle
-  do_wix_build
+  do_candle
+  #do_wix_build
   # ICE82: we suppress because it reports spurious errors with merge module
   #        keymanengine to do with duplicate sequence numbers.  Safely ignored.
   # ICE80: we suppress because it reports x64 components without targeting x64.
   #        Safely ignored.
 
-  #"$WIXLIGHT" \
-  #  -sice:ICE82 -sice:ICE80 \
-  #  -nologo \
-  #  -dWixUILicenseRtf=License.rtf \
-  #  "$WIXLIGHTCOMPRESSION" \
-  #  -out keymandesktop.msi -ext WixUIExtension \
-  #  keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
+  "$WIXLIGHT" \
+    -sice:ICE82 -sice:ICE80 \
+    -nologo \
+    -dWixUILicenseRtf=License.rtf \
+    "$WIXLIGHTCOMPRESSION" \
+    -out keymandesktop.msi -ext WixUIExtension -ext WixUtilExtension \
+    keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
 
   #
   # Sign the installation archive
@@ -181,7 +181,6 @@ function do_candle() {
   builder_heading candle
 
   local GUID1=$(generate_uuid)
-  "$WIXHEAT" dir "$KEYMAN_WIX_TEMP_CEF" -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
   "$WIXHEAT" dir ../kmshell/xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
   "$WIXHEAT" dir ../kmshell/locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
   "$WIXCANDLE" -dKEYMAN_VERSION_WITH_TAG=${KEYMAN_VERSION_WITH_TAG} -dKEYMAN_VERSION=${KEYMAN_VERSION_WIN} -dRELEASE=${KEYMAN_VERSION_RELEASE} -dPRODUCTID=$GUID1 \
