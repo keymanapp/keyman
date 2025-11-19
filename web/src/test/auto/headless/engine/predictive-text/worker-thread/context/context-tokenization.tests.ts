@@ -132,8 +132,7 @@ describe('ContextTokenization', function() {
       assert.isOk(tokenization.transitionEdits);
       assert.deepEqual(tokenization.transitionEdits, {
         addedNewTokens: false,
-        removedOldTokens: false,
-        editedTokenCount: 1
+        removedOldTokens: false
       });
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);

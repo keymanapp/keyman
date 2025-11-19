@@ -112,10 +112,7 @@ export class ContextTokenization {
    */
   readonly transitionEdits?: {
     addedNewTokens: boolean,
-    removedOldTokens: boolean,
-    // NOTE:  slated for removal in an upcoming PR.  Exists in this form to
-    // facilitate factorization of the changes into smaller bodies of work.
-    editedTokenCount: number
+    removedOldTokens: boolean
   };
 
   /**
@@ -145,8 +142,7 @@ export class ContextTokenization {
       if(tokenizationPath) {
         this.transitionEdits = {
           addedNewTokens: tokenizationPath?.inputs[0].sample.has(1) ?? false,
-          removedOldTokens: (tokenizationPath?.alignment.removedTokenCount ?? 0) > 0,
-          editedTokenCount: tokenizationPath?.inputs[0].sample.size
+          removedOldTokens: (tokenizationPath?.alignment.removedTokenCount ?? 0) > 0
         }
       }
       this.taillessTrueKeystroke = taillessTrueKeystroke;
@@ -612,7 +608,11 @@ export class ContextTokenization {
       }
 
       affectedToken.isPartial = true;
-      delete affectedToken.appliedTransitionId;
+      if(appliedSuggestionId !== undefined) {
+        affectedToken.appliedTransitionId = appliedSuggestionId;
+      } else {
+        delete affectedToken.appliedTransitionId;
+      }
 
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
@@ -648,7 +648,7 @@ export class ContextTokenization {
 
     return new ContextTokenization(
       this.tokens.slice(0, sliceIndex).concat(tailTokenization),
-      null,
+      transitionEdge,
       determineTaillessTrueKeystroke(transitionEdge)
     );
   }
