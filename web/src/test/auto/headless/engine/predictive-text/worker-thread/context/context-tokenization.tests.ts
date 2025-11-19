@@ -130,7 +130,10 @@ describe('ContextTokenization', function() {
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
       assert.isOk(tokenization.transitionEdits);
-      assert.deepEqual(tokenization.transitionEdits, transitionEdits);
+      assert.deepEqual(tokenization.transitionEdits, {
+        addedNewTokens: false,
+        removedOldTokens: false
+      });
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
@@ -191,10 +194,10 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0, id: 11 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0 });
-      inputTransformMap.set(2, { insert: '', deleteLeft: 0 });
+      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0, id: 11 });
+      inputTransformMap.set(2, { insert: '', deleteLeft: 0, id: 11 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -212,8 +215,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -266,8 +268,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -283,9 +284,9 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: 'y', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: 'y', deleteLeft: 0, deleteRight: 0, id: 13 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(0, { insert: 'y', deleteLeft: 0 });
+      inputTransformMap.set(0, { insert: 'y', deleteLeft: 0, id: 13 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -304,8 +305,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -330,9 +330,9 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'week'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: 'week', deleteLeft: 3, deleteRight: 0 };
+      const inputTransform = { insert: 'week', deleteLeft: 3, deleteRight: 0, id: 12 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(0, { insert: 'week', deleteLeft: 3 });
+      inputTransformMap.set(0, { insert: 'week', deleteLeft: 3, id: 12 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -351,8 +351,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -376,7 +375,7 @@ describe('ContextTokenization', function() {
         (tokenization.tail.searchModule as SearchQuotientSpur).lastInput,
         // As we fully deleted the old token, the new one "starts" after the deleteLeft.
         // The deleteLeft component should not be included here.
-        [{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */ }, p: 1}]
+        [{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */, id: inputTransform.id }, p: 1}]
       );
     });
 
@@ -408,8 +407,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -461,8 +459,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: subsetId
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -514,10 +511,10 @@ describe('ContextTokenization', function() {
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', '  ', ''].map((t) => (
         {text: t, isWhitespace: t != '' && t.trim() == ''}
       ));
-      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0, id: 42 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 0 });
-      inputTransformMap.set( 0, { insert: '',  deleteLeft: 0 });
+      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 0, id: 42 });
+      inputTransformMap.set( 0, { insert: '',  deleteLeft: 0, id: 42 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -535,8 +532,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        { insert: ' ', deleteLeft: 0 },
+        inputTransform.id,
         1
       );
 
@@ -566,7 +562,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\'t'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0, id: 42 };
       const inputTransformMap: Map<number, Transform> = new Map();
       inputTransformMap.set(0, inputTransform);
 
@@ -599,8 +595,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        { insert: 't', deleteLeft: 0 },
+        inputTransform.id,
         1
       );
 
@@ -630,7 +625,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\'', '.'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0, id: 101 };
       const inputTransformMap: Map<number, Transform> = new Map();
       // Lands after the split-off '\''.
       inputTransformMap.set(1, { insert: '.', deleteLeft: 0 });
@@ -666,8 +661,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
