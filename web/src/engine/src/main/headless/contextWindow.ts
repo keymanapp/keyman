@@ -18,15 +18,15 @@ export default class ContextWindow implements LexicalModelTypes.Context {
 
   casingForm?: LexicalModelTypes.CasingForm;
 
-  constructor(mock: SyntheticTextStore, config: LexicalModelTypes.Configuration, layerId: string) {
-    this.left = mock.getTextBeforeCaret();
+  constructor(textStore: SyntheticTextStore, config: LexicalModelTypes.Configuration, layerId: string) {
+    this.left = textStore.getTextBeforeCaret();
     this.startOfBuffer = KMWString.length(this.left) <= config.leftContextCodePoints;
     if(!this.startOfBuffer) {
       // Our custom substring version will return the last n characters if param #1 is given -n.
       this.left = KMWString.substr(this.left, -config.leftContextCodePoints);
     }
 
-    this.right = mock.getTextAfterCaret();
+    this.right = textStore.getTextAfterCaret();
     this.endOfBuffer = KMWString.length(this.right) <= config.rightContextCodePoints;
     if(!this.endOfBuffer) {
       this.right = KMWString.substr(this.right, 0, config.rightContextCodePoints);
@@ -38,7 +38,7 @@ export default class ContextWindow implements LexicalModelTypes.Context {
       null;
   }
 
-  public toMock(): SyntheticTextStore {
+  public toSyntheticTextStore(): SyntheticTextStore {
     const caretPos = KMWString.length(this.left);
 
     return new SyntheticTextStore(this.left + (this.right || ""), caretPos);

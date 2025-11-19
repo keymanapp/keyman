@@ -54,7 +54,7 @@ describe("'Canary' checks", function() {
     const jsonObject = await jsonResponse.json();
 
     const targetRoot = document.getElementById('host-fixture');
-    let controller = new HostFixtureLayoutController();
+    const controller = new HostFixtureLayoutController();
     // Note:  this is set BEFORE the controller is configured (in the following line).
     // The class is designed to support this.
     controller.layoutConfiguration = new FixtureLayoutConfiguration(jsonObject.config);

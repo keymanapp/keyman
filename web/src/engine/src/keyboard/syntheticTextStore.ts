@@ -35,8 +35,8 @@ export class SyntheticTextStore extends TextStore {
     if (textStore instanceof SyntheticTextStore) {
       // Avoids the need to run expensive kmwstring.ts `length()`
       // calculations when deep-copying SyntheticTextStore instances.
-      const priorMock = textStore as SyntheticTextStore;
-      clone = new SyntheticTextStore(priorMock.text, priorMock.selStart, priorMock.selEnd);
+      const priorTextStore = textStore as SyntheticTextStore;
+      clone = new SyntheticTextStore(priorTextStore.text, priorTextStore.selStart, priorTextStore.selEnd);
     } else {
       const text = textStore.getText();
       const textLen = KMWString.length(text);

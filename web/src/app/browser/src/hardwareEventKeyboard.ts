@@ -229,20 +229,20 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
     this.contextManager = contextManager;
     this.processor = processor;
 
-    const page = contextManager.page;
+    const {page} = contextManager;
 
     const eventTracker = this.domEventTracker;
 
     page.on('enabled', (Pelem) => {
-      const target = textStoreForElement(Pelem);
+      const textStore = textStoreForElement(Pelem);
 
-      if(!(target instanceof DesignIFrameElementTextStore)) {
+      if(!(textStore instanceof DesignIFrameElementTextStore)) {
         // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
         eventTracker.attachDOMEvent(Pelem, 'keypress', this._KeyPress);
         eventTracker.attachDOMEvent(Pelem, 'keydown', this._KeyDown);
         eventTracker.attachDOMEvent(Pelem, 'keyup', this._KeyUp);
       } else {
-        const Lelem = target.getElement().contentDocument;
+        const Lelem = textStore.getElement().contentDocument;
         eventTracker.attachDOMEvent(Lelem.body,'keydown', this._KeyDown);
         eventTracker.attachDOMEvent(Lelem.body,'keypress', this._KeyPress);
         eventTracker.attachDOMEvent(Lelem.body,'keyup', this._KeyUp);
@@ -250,14 +250,14 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
     });
 
     page.on('disabled', (Pelem) => {
-      const target = textStoreForElement(Pelem);
+      const textStore = textStoreForElement(Pelem);
 
-      if(!(target instanceof DesignIFrameElementTextStore)) {
+      if(!(textStore instanceof DesignIFrameElementTextStore)) {
         eventTracker.detachDOMEvent(Pelem, 'keypress', this._KeyPress);
         eventTracker.detachDOMEvent(Pelem, 'keydown', this._KeyDown);
         eventTracker.detachDOMEvent(Pelem, 'keyup', this._KeyUp);
       } else {
-        const Lelem = target.getElement().contentDocument;
+        const Lelem = textStore.getElement().contentDocument;
         eventTracker.detachDOMEvent(Lelem.body,'keydown', this._KeyDown);
         eventTracker.detachDOMEvent(Lelem.body,'keypress', this._KeyPress);
         eventTracker.detachDOMEvent(Lelem.body,'keyup', this._KeyUp);
@@ -275,15 +275,15 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
    * not affected.
    */
   _KeyDown: (e: KeyboardEvent) => boolean = (e) => {
-    const activeKeyboard = this.contextManager.activeKeyboard;
-    const target = textStoreForEvent(e);
+    const {activeKeyboard} = this.contextManager;
+    const textStore = textStoreForEvent(e);
 
-    if(!target || activeKeyboard == null) {
+    if(!textStore || activeKeyboard == null) {
       return true;
     }
 
     // Prevent mapping element is readonly or tagged as kmw-disabled
-    const el = target.getElement();
+    const el = textStore.getElement();
     if(el?.getAttribute('class')?.indexOf('kmw-disabled') >= 0) {
       return true;
     }
@@ -297,8 +297,8 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
    * Description Processes keypress event (does not pass data to keyboard)
    */
   _KeyPress: (e: KeyboardEvent) => boolean = (e) => {
-    const target = textStoreForEvent(e);
-    if(!target || this.contextManager.activeKeyboard?.keyboard == null) {
+    const textStore = textStoreForEvent(e);
+    if(!textStore || this.contextManager.activeKeyboard?.keyboard == null) {
       return true;
     }
 
@@ -311,13 +311,13 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
    * Description Processes keyup event and passes event data to keyboard
    */
   _KeyUp: (e: KeyboardEvent) => boolean = (e) => {
-    const target = textStoreForEvent(e);
+    const textStore = textStoreForEvent(e);
     const Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
-    if(Levent == null || target == null) {
+    if(Levent == null || textStore == null) {
       return true;
     }
 
-    const inputEle = target.getElement();
+    const inputEle = textStore.getElement();
 
     // Since this part concerns DOM element + browser interaction management, we preprocess it for
     // browser form commands before passing control to the Processor module.

@@ -321,7 +321,7 @@ class DesignIFrameTestHelper implements TestHelper {
 //#endregion
 
 //#region Defines helpers related to SyntheticTextStore test setup.
-class MockTestHelper implements TestHelper {
+class SyntheticTextStoreTestHelper implements TestHelper {
   setupElement(): ElementPair<any> {
     return { elem: null, wrapper: new SyntheticTextStore() };
   }
@@ -371,7 +371,7 @@ class InterfaceTests {
 
   public static DesignIFrameElementTextStore = new DesignIFrameTestHelper();
 
-  public static SyntheticTextStore = new MockTestHelper();
+  public static SyntheticTextStore = new SyntheticTextStoreTestHelper();
 
   //#region Defines common test patterns across element tests
   public static Tests = class {
@@ -1379,9 +1379,9 @@ describe('Element InputElementTextStore/Output Interfacing', function () {
     });
   });
 
-  describe('The "SyntheticTextStore" output target', function () {
+  describe('The "SyntheticTextStore" textStore', function () {
     // Unique to the SyntheticTextStore type - element interface cloning tests.  Is element state properly copied?
-    // As those require a very different setup, they're in the target_mocks.js test case file instead.
+    // As those require a very different setup, they're in the syntheticTextStore.tests.ts test case file instead.
 
     // Basic text-retrieval unit tests are now done headlessly in keyman/engine/keyboard.
 

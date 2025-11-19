@@ -354,15 +354,16 @@ export class JSKeyboard {
   }
 
   /**
-   * @param       {number}    _PCommand     event code (16,17,18) or 0
-   * @param       {Object}    _PTarget      target element
-   * @param       {number}    _PData        1 or 0
    * Notifies keyboard of keystroke or other event
+   *
+   * @param       {number}    command     event code (16,17,18) or 0
+   * @param       {TextStore} textStore   textStore
+   * @param       {number}    data        1 or 0
    */
-  notify(_PCommand: number, _PTarget: TextStore, _PData: number) { // I2187
+  public notify(command: number, textStore: TextStore, data: number): void { // I2187
     // Good example use case - the Japanese CJK-picker keyboard
     if(typeof(this.scriptObject['KNS']) == 'function') {
-      this.scriptObject['KNS'](_PCommand, _PTarget, _PData);
+      this.scriptObject['KNS'](command, textStore, data);
     }
   }
 

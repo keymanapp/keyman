@@ -11,7 +11,7 @@ document.body.appendChild(host);
 const u = (code: number) => String.fromCodePoint(code);
 
 // Define common interface testing functions that can be run upon the TextStore interface.
-class MockTests {
+class SyntheticTextStoreTests {
   public static Apple = {
     normal: 'apple',
     // Built in-line via function.  Looks functionally equivalent to "apple", but with SMP characters.
@@ -28,9 +28,7 @@ class MockTests {
   public static initBase() {
     const elem = document.createElement('input');
     host.appendChild(elem);
-    const wrapper = new InputElementTextStore(elem);
-
-    return wrapper;
+    return new InputElementTextStore(elem);
   }
 
   public static applyDeadkeys(base: any, dks: any) {
@@ -51,7 +49,7 @@ class MockTests {
     }
 
     const base = this.initBase();
-    base.root.value = MockTests.Apple.mixed;
+    base.root.value = SyntheticTextStoreTests.Apple.mixed;
     this.applyDeadkeys(base, this.Deadkeys);
 
     // Set the requested selection range.
@@ -78,33 +76,33 @@ describe('SyntheticTextStore', function() {
     KMWString.enableSupplementaryPlane(false);
   })
 
-  describe('The "SyntheticTextStore" output target', function() {
+  describe('The "SyntheticTextStore" textStore', function() {
     describe('Initialization', function() {
       it('properly initializes from a raw string', function() {
-        const mock = new SyntheticTextStore(MockTests.Apple.mixed);
+        const textStore = new SyntheticTextStore(SyntheticTextStoreTests.Apple.mixed);
 
-        assert.equal(mock.getText(), MockTests.Apple.mixed);
-        assert.equal(mock.getCaret(), 5);
+        assert.equal(textStore.getText(), SyntheticTextStoreTests.Apple.mixed);
+        assert.equal(textStore.getCaret(), 5);
       });
 
       it('copies an existing TextStore without a text selection', function() {
-        const base = MockTests.setupBase(4);
+        const base = SyntheticTextStoreTests.setupBase(4);
 
-        const mock = SyntheticTextStore.from(base);
-        assert.equal(mock.getText(), MockTests.Apple.mixed);
-        assert.deepEqual(mock.deadkeys(), base.deadkeys());
+        const textStore = SyntheticTextStore.from(base);
+        assert.equal(textStore.getText(), SyntheticTextStoreTests.Apple.mixed);
+        assert.deepEqual(textStore.deadkeys(), base.deadkeys());
       });
 
       it('copies an existing TextStore with a text selection', function() {
-        const base = MockTests.setupBase(4, 5);
+        const base = SyntheticTextStoreTests.setupBase(4, 5);
 
-        const mock = SyntheticTextStore.from(base);
+        const textStore = SyntheticTextStore.from(base);
         // The selection should appear to be automatically deleted, as any text mutation
         // by KMW would automatically erase the text anyway.
-        assert.equal(mock.getTextBeforeCaret(), MockTests.Apple.mixed.substr(0, 5));
-        assert.equal(mock.getText(), MockTests.Apple.mixed);
-        assert.equal(mock.getSelectedText(), MockTests.Apple.mixed.substring(5));
-        assert.deepEqual(mock.deadkeys(), base.deadkeys());
+        assert.equal(textStore.getTextBeforeCaret(), SyntheticTextStoreTests.Apple.mixed.substr(0, 5));
+        assert.equal(textStore.getText(), SyntheticTextStoreTests.Apple.mixed);
+        assert.equal(textStore.getSelectedText(), SyntheticTextStoreTests.Apple.mixed.substring(5));
+        assert.deepEqual(textStore.deadkeys(), base.deadkeys());
       });
     });
 
@@ -113,12 +111,12 @@ describe('SyntheticTextStore', function() {
       // with/without deadkeys
       it('is not affected by mutation of the source element', function() {
         // Already-verified code
-        const base = MockTests.setupBase(4);
-        const mock = SyntheticTextStore.from(base);
+        const base = SyntheticTextStoreTests.setupBase(4);
+        const textStore = SyntheticTextStore.from(base);
         const baseInitDks = base.deadkeys().clone();
 
         // Now for the actual test.
-        const dk = MockTests.Deadkeys;
+        const dk = SyntheticTextStoreTests.Deadkeys;
         // Note - we selectively match and remove only ONE of the deadkeys.  (Naturally, the one closer to the caret.)
         base.hasDeadkeyMatch(4-dk[1].p, dk[1].d);
         base.deadkeys().deleteMatched();
@@ -126,25 +124,25 @@ describe('SyntheticTextStore', function() {
 
         assert.notDeepEqual(base.deadkeys(), baseInitDks, 'TextStore deadkey return is not a proper deep-copy');
 
-        assert.equal(mock.getText(), MockTests.Apple.mixed);
-        assert.deepEqual(mock.deadkeys(), baseInitDks);
+        assert.equal(textStore.getText(), SyntheticTextStoreTests.Apple.mixed);
+        assert.deepEqual(textStore.deadkeys(), baseInitDks);
       });
 
       it('does not affect the source element when mutated', function() {
         // Already-verified code
-        const base = MockTests.setupBase(4);
-        const mock = SyntheticTextStore.from(base);
+        const base = SyntheticTextStoreTests.setupBase(4);
+        const textStore = SyntheticTextStore.from(base);
         const baseInitDks = base.deadkeys().clone();
 
         // Now for the actual test.
-        const dk = MockTests.Deadkeys;
+        const dk = SyntheticTextStoreTests.Deadkeys;
         // Note - we selectively match and remove only ONE of the deadkeys.  (Naturally, the one closer to the caret.)
-        mock.hasDeadkeyMatch(4-dk[1].p, dk[1].d);
-        mock.deadkeys().deleteMatched();
-        mock.deleteCharsBeforeCaret(2);
+        textStore.hasDeadkeyMatch(4-dk[1].p, dk[1].d);
+        textStore.deadkeys().deleteMatched();
+        textStore.deleteCharsBeforeCaret(2);
 
-        assert.notDeepEqual(mock.deadkeys(), baseInitDks);
-        assert.equal(base.getText(), MockTests.Apple.mixed);
+        assert.notDeepEqual(textStore.deadkeys(), baseInitDks);
+        assert.equal(base.getText(), SyntheticTextStoreTests.Apple.mixed);
         assert.deepEqual(base.deadkeys(), baseInitDks);
       });
     });

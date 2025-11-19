@@ -6,8 +6,8 @@ import { PredictionContext } from 'keyman/engine/interfaces';
 import { EngineConfiguration } from './engineConfiguration.js';
 
 interface EventMap {
-  // target, then keyboard.
-  'targetchange': (target: TextStore) => boolean;
+  // textStore, then keyboard.
+  'textstorechange': (textStore: TextStore) => boolean;
 
   /**
    * This event is raised whenever a keyboard change is requested.
@@ -64,7 +64,7 @@ export interface ContextManagerConfiguration {
 }
 
 interface PendingActivation {
-  target: TextStore,
+  textStore: TextStore,
   keyboard: Promise<Keyboard>,
   stub: KeyboardStub;
 }
@@ -72,9 +72,9 @@ interface PendingActivation {
 export abstract class ContextManagerBase<MainConfig extends EngineConfiguration> extends EventEmitter<EventMap> {
   public static readonly TIMEOUT_THRESHOLD = 10000;
 
-  abstract initialize(): void;
+  public abstract initialize(): void;
 
-  abstract get activeTarget(): TextStore;
+  public abstract get activeTextStore(): TextStore;
 
   private _predictionContext: PredictionContext;
   protected keyboardCache: StubAndKeyboardCache;
@@ -83,33 +83,33 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
   private pendingActivations: PendingActivation[] = [];
   protected engineConfig: MainConfig;
 
-  get predictionContext(): PredictionContext {
+  public get predictionContext(): PredictionContext {
     return this._predictionContext;
   }
 
-  constructor(engineConfig: MainConfig) {
+  public constructor(engineConfig: MainConfig) {
     super();
 
     this.engineConfig = engineConfig;
   }
 
-  configure(config: ContextManagerConfiguration) {
+  public configure(config: ContextManagerConfiguration): void {
     this._resetContext = config.resetContext;
     this._predictionContext = config.predictionContext;
     this.keyboardCache = config.keyboardCache;
   }
 
-  insertText(kbdInterface: JSKeyboardInterface, Ptext: string, PdeadKey: number) {
-    // Find the correct output target to manipulate.
-    const textStore = this.activeTarget;
+  public insertText(kbdInterface: JSKeyboardInterface, text: string, deadkey: number): boolean {
+    // Find the correct textStore to manipulate.
+    const textStore = this.activeTextStore;
 
     if(textStore != null) {
-      if(Ptext != null) {
-        kbdInterface.output(0, textStore, Ptext);
+      if(text != null) {
+        kbdInterface.output(0, textStore, text);
       }
 
-      if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) {
-        kbdInterface.deadkeyOutput(0, textStore, PdeadKey);
+      if((typeof(deadkey)!=='undefined') && (deadkey !== null)) {
+        kbdInterface.deadkeyOutput(0, textStore, deadkey);
       }
 
       textStore.invalidateSelection();
@@ -119,44 +119,44 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     return false;
   }
 
-  resetContext() {
-    this._resetContext(this.activeTarget);
+  public resetContext(): void {
+    this._resetContext(this.activeTextStore);
     this.predictionContext.resetContext();
   }
 
-  abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
+  public abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
 
   /**
-   * Determines the 'target' currently used to determine which keyboard should be active.
+   * Determines the textStore currently used to determine which keyboard should be active.
    * When `null`, keyboard-activation operations will affect the global default; otherwise,
-   * such operations affect only the specified `target`.
+   * such operations affect only the specified `textStore`.
    *
    * This method exists to facilitate independent-keyboard mode operations for specific
-   * attached elements within the app/browser target.  For `app/webview`, this should
+   * attached elements within the app/browser textStore.  For `app/webview`, this should
    * always return a consistent value - likely, `null`.
    */
-  protected abstract currentKeyboardSrcTarget(): TextStore;
+  protected abstract currentKeyboardSrcTextStore(): TextStore;
 
   /**
    * Ensures that newly activated keyboards are set correctly within managed context, possibly
-   * against inactive output targets.
+   * against inactive textStores.
    * @param kbd
-   * @param target
+   * @param textStore
    */
-  protected abstract activateKeyboardForTarget(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, target: TextStore): void;
+  protected abstract activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: TextStore): void;
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
    * TextStore.  If found, also removes the entry for bookkeeping purposes.
-   * @param target  The specific TextStore affected by the pending Keyboard activation.
+   * @param textStore  The specific TextStore affected by the pending Keyboard activation.
    *                May be `null`, which corresponds to the global default Keyboard.
    * @returns `true` if pending activation is still valid, `false` otherwise.
    */
-  private findAndPopActivation(target: TextStore): PendingActivation {
+  private findAndPopActivation(textStore: TextStore): PendingActivation {
     // Array.findIndex requires Chrome 45+. :(
     let activationIndex;
     for(activationIndex = 0; activationIndex < this.pendingActivations.length; activationIndex++) {
-      if(this.pendingActivations[activationIndex].target == target) {
+      if(this.pendingActivations[activationIndex].textStore == textStore) {
         break;
       }
     }
@@ -174,27 +174,27 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * corresponding context.
    * @param kbdPromise
    * @param metadata
-   * @param target
+   * @param textStore
    * @returns
    */
   protected async deferredKeyboardActivation(
     kbdPromise: Promise<Keyboard>,
     metadata: KeyboardStub,
-    target: TextStore
+    textStore: TextStore
   ): Promise<PendingActivation> {
     const activation: PendingActivation = {
-      target: target,
+      textStore: textStore,
       keyboard: kbdPromise,
       stub: metadata
     };
 
-    // Invalidate existing requests for the specified target.
-    this.findAndPopActivation(target);
+    // Invalidate existing requests for the specified textStore.
+    this.findAndPopActivation(textStore);
     this.pendingActivations.push(activation);
     await kbdPromise;
 
     // The keyboard-load is complete; is the activation still desired?
-    const activationAfterAwait = this.findAndPopActivation(target);
+    const activationAfterAwait = this.findAndPopActivation(textStore);
     if(activationAfterAwait == activation) {
       return activation;
     } else if(activationAfterAwait) {
@@ -232,14 +232,14 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     // unfound stubs here.
     const wasNull = !this.activeKeyboard;
 
-    // If there was a previous activation attempt set and still active for the specified keyboard target,
+    // If there was a previous activation attempt set and still active for the specified keyboard textStore,
     // cancel it.  For exmaple, if the user selects a preloaded keyboard after having tried to select one
     // still async-loading, we should go with the later setting - the preloaded one.
-    this.findAndPopActivation(this.currentKeyboardSrcTarget());
+    this.findAndPopActivation(this.currentKeyboardSrcTextStore());
 
     const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
 
-    const originalKeyboardTarget = this.currentKeyboardSrcTarget();
+    const originalKeyboardTextStore = this.currentKeyboardSrcTextStore();
 
     const keyboard = await activatingKeyboard.keyboard;
     if(keyboard == null && activatingKeyboard.metadata) {
@@ -259,7 +259,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
      * If the now-current context would be unaffected by the keyboard change, we do not raise the corresponding
      * event.
      */
-    if(this.currentKeyboardSrcTarget() == originalKeyboardTarget) {
+    if(this.currentKeyboardSrcTextStore() == originalKeyboardTextStore) {
       this.emit('beforekeyboardchange', activatingKeyboard.metadata);
     }
 
@@ -271,12 +271,12 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       };
     }
 
-    this.activateKeyboardForTarget(kbdStubPair, originalKeyboardTarget);
+    this.activateKeyboardForTextStore(kbdStubPair, originalKeyboardTextStore);
 
     // Only trigger `keyboardchange` events when they will affect the active context.
     // (!wasNull || !!keyboard) - blocks events for `null` -> `null` transitions.
     // (keyman/keymanweb.com#96)
-    if(this.currentKeyboardSrcTarget() == originalKeyboardTarget && (!wasNull || !!keyboard)) {
+    if(this.currentKeyboardSrcTextStore() == originalKeyboardTextStore && (!wasNull || !!keyboard)) {
       // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.
       this.emit('keyboardchange', this.activeKeyboard);
     }
@@ -322,8 +322,8 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     }
 
     // Check if current keyboard matches requested keyboard, but not (necessarily) stub
-    if(this.activeKeyboard?.metadata && keyboardId == this.activeKeyboard.metadata.id) {
-      const keyboard = this.activeKeyboard.keyboard;
+    if (this.activeKeyboard?.metadata && keyboardId == this.activeKeyboard.metadata.id) {
+      const {keyboard} = this.activeKeyboard;
       // In this case, the keyboard is loaded; just update the stub.
 
       return {
@@ -373,14 +373,14 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       });
 
       // Now the fun part:  note the original call's parameters as a pending activation.
-      const promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTarget());
+      const promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTextStore());
       return {
         keyboard: promise.then(async (activation) => {
           // Is the activation we requested still pending, or was it cancelled in favor of a
           // different activation in some manner?
           if(!activation) {
             // If the user chose to load a different keyboard afterward that would affect the same
-            // output target, the activation is no longer valid.
+            // textStore, the activation is no longer valid.
             return Promise.resolve(null);
           } else {
             return defermentPromise;

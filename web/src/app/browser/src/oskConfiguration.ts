@@ -23,14 +23,14 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
   osk.on('hiderequested', (key) => { // K_ROPT
     if(osk) {
       osk.startHide(true);
-      contextManager.forgetActiveTarget();
+      contextManager.forgetActiveTextStore();
     }
   });
 
   osk.addEventListener('hide', (params) => {
     // If hidden by the UI, be sure to restore the focus
     if(params?.HiddenByUser) {
-      contextManager.activeTarget?.focus();
+      contextManager.activeTextStore?.focus();
     }
   });
 
@@ -44,7 +44,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
 
     await promise;
 
-    contextManager.restoreLastActiveTarget();
+    contextManager.restoreLastActiveTextStore();
 
     focusAssistant.restoringFocus = false;
     focusAssistant.setMaintainingFocus(false);
@@ -54,7 +54,7 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     focusAssistant.restoringFocus = true;
 
     await promise;
-    contextManager.restoreLastActiveTarget();
+    contextManager.restoreLastActiveTextStore();
 
     focusAssistant.restoringFocus = false;
     focusAssistant.setMaintainingFocus(false);

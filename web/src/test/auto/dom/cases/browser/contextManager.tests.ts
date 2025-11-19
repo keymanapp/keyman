@@ -189,7 +189,7 @@ describe('app/browser:  ContextManager', function () {
       predictionContext: {
         // we're dummying these out.
         resetContext: (() => {}) as any,
-        setCurrentTarget: (() => {}) as any,
+        setCurrentTextStore: (() => {}) as any,
       } as any,
       resetContext: () => {}
     });
@@ -225,42 +225,42 @@ describe('app/browser:  ContextManager', function () {
   // ---------------------------- Start of suite 1 -------------------------------
   describe('focus management', () => {
     it('initial state: null', () => {
-      assert.isNotOk(contextManager.activeTarget);
+      assert.isNotOk(contextManager.activeTextStore);
     });
 
     it('change: null -> input', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
-      assert.equal(contextManager.activeTarget?.getElement(), input, ".activeTarget not updated when element gained focus");
+      assert.equal(contextManager.activeTextStore?.getElement(), input, ".activeTextStore not updated when element gained focus");
 
-      // Check our expectations re: the `targetchange` event.
-      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
-      assert.equal(textStore.getElement(), input, '.activeTarget does not match the newly-focused element');
+      // Check our expectations re: the `textstorechange` event.
+      assert.isTrue(textstorechange.calledOnce, 'textstorechange event not raised');
+      const textStore = textstorechange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
+      assert.equal(textStore.getElement(), input, '.activeTextStore does not match the newly-focused element');
     });
 
     it('change: null -> textarea', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const textarea = document.getElementById('textarea');
       dispatchFocus('focus', textarea);
 
-      assert.equal(contextManager.activeTarget?.getElement(), textarea, ".activeTarget not updated when element gained focus");
+      assert.equal(contextManager.activeTextStore?.getElement(), textarea, ".activeTextStore not updated when element gained focus");
 
-      // Check our expectations re: the `targetchange` event.
-      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
-      assert.equal(textStore.getElement(), textarea, '.activeTarget does not match the newly-focused element');
+      // Check our expectations re: the `textstorechange` event.
+      assert.isTrue(textstorechange.calledOnce, 'textstorechange event not raised');
+      const textStore = textstorechange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
+      assert.equal(textStore.getElement(), textarea, '.activeTextStore does not match the newly-focused element');
     });
 
     it('change: null -> designIframe', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const iframe = document.getElementById('design-iframe') as HTMLIFrameElement;
 
@@ -274,56 +274,56 @@ describe('app/browser:  ContextManager', function () {
       // Though that may be affected by the Chrome vs Firefox bit noted above.
       dispatchFocus('focus', iframe.contentDocument.body);
 
-      assert.equal(contextManager.activeTarget?.getElement(), iframe, ".activeTarget not updated when element gained focus");
+      assert.equal(contextManager.activeTextStore?.getElement(), iframe, ".activeTextStore not updated when element gained focus");
 
-      // Check our expectations re: the `targetchange` event.
-      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
-      assert.equal(textStore.getElement(), iframe, '.activeTarget does not match the newly-focused element');
+      // Check our expectations re: the `textstorechange` event.
+      assert.isTrue(textstorechange.calledOnce, 'textstorechange event not raised');
+      const textStore = textstorechange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
+      assert.equal(textStore.getElement(), iframe, '.activeTextStore does not match the newly-focused element');
     });
 
     it('change: null -> contentEditable', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const editable = document.getElementById('editable');
       dispatchFocus('focus', editable);
 
-      assert.equal(contextManager.activeTarget?.getElement(), editable, ".activeTarget not updated when element gained focus");
+      assert.equal(contextManager.activeTextStore?.getElement(), editable, ".activeTextStore not updated when element gained focus");
 
-      // Check our expectations re: the `targetchange` event.
-      assert.isTrue(targetchange.calledOnce, 'targetchange event not raised');
-      const textStore = targetchange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
-      assert.equal(textStore.getElement(), editable, '.activeTarget does not match the newly-focused element');
+      // Check our expectations re: the `textstorechange` event.
+      assert.isTrue(textstorechange.calledOnce, 'textstorechange event not raised');
+      const textStore = textstorechange.firstCall.args[0]; // Should be an `InputElementTextStore` instance.
+      assert.equal(textStore.getElement(), editable, '.activeTextStore does not match the newly-focused element');
     });
 
     it('change: input -> null', () => {
       // Setup:  from prior test
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
 
       // actual test
       dispatchFocus('blur', input);
-      assert.equal(contextManager.activeTarget, null, '.activeTarget not updated when element lost focus');
+      assert.equal(contextManager.activeTextStore, null, '.activeTextStore not updated when element lost focus');
 
-      // Check our expectations re: the `targetchange` event.
-      assert.isTrue(targetchange.calledTwice, 'targetchange event not raised');
-      const textStore = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
-      assert.equal(textStore, null, 'targetchange event did not indicate clearing of .activeTarget');
+      // Check our expectations re: the `textstorechange` event.
+      assert.isTrue(textstorechange.calledTwice, 'textstorechange event not raised');
+      const textStore = textstorechange.secondCall.args[0]; // Should be null, since we lost focus.
+      assert.equal(textStore, null, 'textstorechange event did not indicate clearing of .activeTextStore');
     });
 
     it('change: input disabled, -> null', async () => {
       // Setup:  from prior test
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
 
       // actual test
       contextManager.page.disableControl(input);
@@ -331,155 +331,155 @@ describe('app/browser:  ContextManager', function () {
       // Relies on a MutationObserver (for 'kmw-disabled' CSS class name checks) to resolve
       await timedPromise(10);
 
-      assert.equal(contextManager.activeTarget, null, '.activeTarget not updated when element KMW-disabled');
+      assert.equal(contextManager.activeTextStore, null, '.activeTextStore not updated when element KMW-disabled');
 
-      // Check our expectations re: the `targetchange` event.
-      assert.isTrue(targetchange.calledTwice, 'targetchange event not raised');
-      const textStore = targetchange.secondCall.args[0]; // Should be null, since we lost focus.
-      assert.equal(textStore, null, 'targetchange event did not indicate clearing of .activeTarget');
+      // Check our expectations re: the `textstorechange` event.
+      assert.isTrue(textstorechange.calledTwice, 'textstorechange event not raised');
+      const textStore = textstorechange.secondCall.args[0]; // Should be null, since we lost focus.
+      assert.equal(textStore, null, 'textstorechange event did not indicate clearing of .activeTextStore');
     });
 
     it('change: input -> textarea', () => {
       // Setup:  from prior test
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
 
       dispatchFocus('blur', input);
-      assert.equal(contextManager.activeTarget?.getElement(), null);
+      assert.equal(contextManager.activeTextStore?.getElement(), null);
 
       // And now the new stuff.
       const textarea = document.getElementById('textarea');
       dispatchFocus('focus', textarea);
 
-      assert.equal(contextManager.activeTarget?.getElement(), textarea, ".activeTarget not updated when element gained focus");
+      assert.equal(contextManager.activeTextStore?.getElement(), textarea, ".activeTextStore not updated when element gained focus");
 
-      // Check our expectations re: the `targetchange` event.
-      assert.isTrue(targetchange.calledThrice, 'targetchange event not raised');
-      const textStore = targetchange.thirdCall.args[0]; // Should be an `InputElementTextStore` instance.
-      assert.equal(textStore.getElement(), textarea, '.activeTarget does not match the newly-focused element');
+      // Check our expectations re: the `textstorechange` event.
+      assert.isTrue(textstorechange.calledThrice, 'textstorechange event not raised');
+      const textStore = textstorechange.thirdCall.args[0]; // Should be an `InputElementTextStore` instance.
+      assert.equal(textStore.getElement(), textarea, '.activeTextStore does not match the newly-focused element');
     });
 
     it('restoration: input (no flags set)', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
-      assert.isTrue(targetchange.calledOnce);
+      assert.isTrue(textstorechange.calledOnce);
       dispatchFocus('blur', input);
-      assert.isTrue(targetchange.calledTwice);
+      assert.isTrue(textstorechange.calledTwice);
 
-      assert.equal(contextManager.activeTarget?.getElement(), null);
+      assert.equal(contextManager.activeTextStore?.getElement(), null);
 
-      contextManager.restoreLastActiveTarget();
-      assert.isTrue(targetchange.calledThrice);
+      contextManager.restoreLastActiveTextStore();
+      assert.isTrue(textstorechange.calledThrice);
 
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
     });
 
     it('forget: input', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
-      assert.isTrue(targetchange.calledOnce);
+      assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       contextManager.focusAssistant.restoringFocus = true;
-      contextManager.forgetActiveTarget();
+      contextManager.forgetActiveTextStore();
       // The 'forget' operation is **aggressive**.  Perma-forget.
-      assert.isNotOk(contextManager.lastActiveTarget);
+      assert.isNotOk(contextManager.lastActiveTextStore);
 
-      assert.isTrue(targetchange.calledTwice);
-      assert.equal(contextManager.activeTarget?.getElement(), null);
+      assert.isTrue(textstorechange.calledTwice);
+      assert.equal(contextManager.activeTextStore?.getElement(), null);
       // Again, the 'forget' operation is **aggressive**.  Clears all focus-maintenance states.
-      // After all, there's no longer any prior target to maintain or restore - it's forgotten.
+      // After all, there's no longer any prior textStore to maintain or restore - it's forgotten.
       assert.equal(contextManager.focusAssistant.maintainingFocus, false);
       assert.equal(contextManager.focusAssistant.restoringFocus, false);
 
       dispatchFocus('blur', input); // Should be 100% ignored
-      assert.isTrue(targetchange.calledTwice); // there should be no effect.
-      assert.equal(contextManager.activeTarget?.getElement(), null);
+      assert.isTrue(textstorechange.calledTwice); // there should be no effect.
+      assert.equal(contextManager.activeTextStore?.getElement(), null);
       // If we aren't careful, we can accidentally 'unforget' the element here!
-      assert.isNotOk(contextManager.lastActiveTarget, "post-forget target blur restored .lastActiveTarget");
+      assert.isNotOk(contextManager.lastActiveTextStore, "post-forget textStore blur restored .lastActiveTextStore");
 
-      contextManager.restoreLastActiveTarget();
-      assert.isTrue(targetchange.calledTwice); // there should be no effect.
-      assert.equal(contextManager.activeTarget?.getElement(), null);
+      contextManager.restoreLastActiveTextStore();
+      assert.isTrue(textstorechange.calledTwice); // there should be no effect.
+      assert.equal(contextManager.activeTextStore?.getElement(), null);
     });
 
     it('restoration: input (`maintaining`)', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
-      assert.isTrue(targetchange.calledOnce);
+      assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       dispatchFocus('blur', input); // ignored
-      assert.isTrue(targetchange.calledOnce);
+      assert.isTrue(textstorechange.calledOnce);
 
       // b/c is 'maintained'
-      assert.isTrue(targetchange.calledOnce, 'targetchange called on blur during maintaining state');
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.isTrue(textstorechange.calledOnce, 'textstorechange called on blur during maintaining state');
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
 
-      contextManager.restoreLastActiveTarget();
+      contextManager.restoreLastActiveTextStore();
 
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
 
       // Since we never 'lost' focus due to the 'maintaining' state, we should only
-      // have the initial 'targetchange' raise.
-      assert.isTrue(targetchange.calledOnce, 'targetchange called during restoration of maintained state');
+      // have the initial 'textstorechange' raise.
+      assert.isTrue(textstorechange.calledOnce, 'textstorechange called during restoration of maintained state');
     });
 
     it('loss: input (on clear of `maintaining`)', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input);
-      assert.isTrue(targetchange.calledOnce);
+      assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       dispatchFocus('blur', input); // ignored
 
       // b/c is 'maintained'
-      assert.isTrue(targetchange.calledOnce);
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.isTrue(textstorechange.calledOnce);
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
 
       contextManager.focusAssistant.maintainingFocus = false;
-      assert.isTrue(targetchange.calledTwice);
+      assert.isTrue(textstorechange.calledTwice);
 
-      assert.equal(contextManager.activeTarget?.getElement(), null);
+      assert.equal(contextManager.activeTextStore?.getElement(), null);
     });
 
     it('restoration: input (`restoring`)', () => {
-      const targetchange = sinon.fake();
-      contextManager.on('targetchange', targetchange);
+      const textstorechange = sinon.fake();
+      contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
       dispatchFocus('focus', input); // 1
-      assert.isTrue(targetchange.calledOnce);
+      assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       dispatchFocus('blur', input);
-      assert.isTrue(targetchange.calledOnce); // 'maintaining' state
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.isTrue(textstorechange.calledOnce); // 'maintaining' state
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
 
       contextManager.focusAssistant.maintainingFocus = false;
-      assert.isTrue(targetchange.calledTwice);
-      assert.equal(contextManager.activeTarget?.getElement(), null);
+      assert.isTrue(textstorechange.calledTwice);
+      assert.equal(contextManager.activeTextStore?.getElement(), null);
 
       contextManager.focusAssistant.restoringFocus = true;
-      contextManager.restoreLastActiveTarget();
-      assert.isTrue(targetchange.calledThrice);
+      contextManager.restoreLastActiveTextStore();
+      assert.isTrue(textstorechange.calledThrice);
 
-      assert.equal(contextManager.activeTarget?.getElement(), input);
+      assert.equal(contextManager.activeTextStore?.getElement(), input);
     });
   });
 
@@ -536,7 +536,7 @@ describe('app/browser:  ContextManager', function () {
     });
 
     describe('global-keyboard mode only' , () => {
-      it('activate: without .activeTarget, null -> null (desktop)', async () => {
+      it('activate: without .activeTextStore, null -> null (desktop)', async () => {
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
         const keyboardasyncload = sinon.fake();
@@ -555,7 +555,7 @@ describe('app/browser:  ContextManager', function () {
         assert.isTrue(keyboardasyncload.notCalled);
       });
 
-      it('activate: without .activeTarget, null -> null (touch)', async () => {
+      it('activate: without .activeTextStore, null -> null (touch)', async () => {
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
         const keyboardasyncload = sinon.fake();
@@ -576,7 +576,7 @@ describe('app/browser:  ContextManager', function () {
         assert.equal(keyboardchange.firstCall.args[0].metadata.id, 'khmer_angkor');
       });
 
-      it('activate: without .activeTarget, preloaded keyboard', async () => {
+      it('activate: without .activeTextStore, preloaded keyboard', async () => {
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
         const keyboardasyncload = sinon.fake();
@@ -598,7 +598,7 @@ describe('app/browser:  ContextManager', function () {
         assert.strictEqual(keyboardchange.firstCall.args[0], contextManager.activeKeyboard);
       });
 
-      it('activate: without .activeTarget, loads keyboard', async () => {
+      it('activate: without .activeTextStore, loads keyboard', async () => {
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
         const keyboardasyncload = sinon.fake();
@@ -622,7 +622,7 @@ describe('app/browser:  ContextManager', function () {
         await assertPromiseResolved(keyboardasyncload.firstCall.args[1]);
       });
 
-      it('activate: without .activeTarget, missing definition (desktop)', async () => {
+      it('activate: without .activeTextStore, missing definition (desktop)', async () => {
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
         const keyboardasyncload = sinon.fake();
@@ -654,7 +654,7 @@ describe('app/browser:  ContextManager', function () {
         assert.isTrue(keyboardasyncload.notCalled);
       });
 
-      it('activate: without .activeTarget, missing definition (touch)', async () => {
+      it('activate: without .activeTextStore, missing definition (touch)', async () => {
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
         const keyboardasyncload = sinon.fake();
@@ -863,10 +863,10 @@ describe('app/browser:  ContextManager', function () {
 
         const textarea = document.getElementById('textarea');
         const textStore = textStoreForElement(textarea);
-        contextManager.setKeyboardForTarget(textStore, 'lao_2008_basic', 'lo');
+        contextManager.setKeyboardForTextStore(textStore, 'lao_2008_basic', 'lo');
 
         // As we haven't yet focused the affected target, no keyboard-change events should have triggered yet.
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), null);
         assert.isTrue(beforekeyboardchange.notCalled);
         assert.isTrue(keyboardchange.notCalled);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -878,7 +878,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // No need to 'keyboardchange' when the same keyboard is kept active.
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), textStore);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), textStore);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -908,8 +908,8 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = textStoreForElement(textarea);
-        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        const textStore = textStoreForElement(textarea);
+        contextManager.setKeyboardForTextStore(textStore, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
@@ -949,8 +949,8 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = textStoreForElement(textarea);
-        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        const textStore = textStoreForElement(textarea);
+        contextManager.setKeyboardForTextStore(textStore, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
@@ -966,7 +966,7 @@ describe('app/browser:  ContextManager', function () {
 
         // Actual test:  transitioning focus from an independent-mode target
         // to a global-mode target.
-        contextManager.setKeyboardForTarget(target, '', '');
+        contextManager.setKeyboardForTextStore(textStore, '', '');
 
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
@@ -998,8 +998,8 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = textStoreForElement(textarea);
-        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        const textStore = textStoreForElement(textarea);
+        contextManager.setKeyboardForTextStore(textStore, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
@@ -1014,7 +1014,7 @@ describe('app/browser:  ContextManager', function () {
 
         // Actual test:  transitioning focus from an independent-mode target
         // to a global-mode target.
-        contextManager.setKeyboardForTarget(target, '', '');
+        contextManager.setKeyboardForTextStore(textStore, '', '');
 
         // Allow the indirect keyboard-change operation to resolve.
         await timedPromise(10);
@@ -1035,8 +1035,8 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = textStoreForElement(textarea);
-        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        const textStore = textStoreForElement(textarea);
+        contextManager.setKeyboardForTextStore(textStore, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
@@ -1055,7 +1055,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('test_chirality', 'en');
 
         // Aspect 1:  the current keyboard has changed
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), textStore);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1069,7 +1069,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // Aspect 2: ... without affecting the global keyboard's setting.
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);
         assert.isTrue(keyboardchange.calledTwice);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1085,8 +1085,8 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = textStoreForElement(textarea);
-        contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
+        const textStore = textStoreForElement(textarea);
+        contextManager.setKeyboardForTextStore(textStore, 'lao_2008_basic', 'lo');
         dispatchFocus('focus', textarea);
 
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
@@ -1110,7 +1110,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 1:  the current keyboard has not yet changed
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), textStore);
         assert.isTrue(beforekeyboardchange.calledOnce);  // +1
         assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
         assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
@@ -1125,7 +1125,7 @@ describe('app/browser:  ContextManager', function () {
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
         await timedPromise(10);
 
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
         assert.isTrue(keyboardchange.calledOnce);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1136,7 +1136,7 @@ describe('app/browser:  ContextManager', function () {
 
         // ...and verify that the active keyboard has not changed, since the target for
         // activation is not itself active.
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
         assert.isTrue(keyboardchange.calledOnce);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1154,7 +1154,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // And, final expectations:
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), textStore);
         assert.isTrue(beforekeyboardchange.calledThrice);  // +1: activating the independent-mode kbd
         assert.isTrue(keyboardchange.calledTwice);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1179,9 +1179,9 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('khmer_angkor', 'km');
 
         const textarea = document.getElementById('textarea');
-        const target = textStoreForElement(textarea);
+        const textStore = textStoreForElement(textarea);
         // Matches the current global keyboard, but still sets it to independent-mode.
-        contextManager.setKeyboardForTarget(target, 'khmer_angkor', 'km');
+        contextManager.setKeyboardForTextStore(textStore, 'khmer_angkor', 'km');
         dispatchFocus('focus', textarea);
 
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
@@ -1206,7 +1206,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 1:  the current keyboard has not yet changed
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), textStore);
         assert.isTrue(beforekeyboardchange.calledOnce);  // +1
         assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
         assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
@@ -1229,7 +1229,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 2:  the current keyboard STILL has not yet changed - still delayed.
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), textStore);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1
         assert.isTrue(keyboardchange.notCalled);          // both should still be delayed.
         assert.isTrue(keyboardasyncload.calledTwice);      // The async load has already started.
@@ -1241,7 +1241,7 @@ describe('app/browser:  ContextManager', function () {
 
         // Critical bit: the `lao` activation should appear to have auto-canceled; this is because
         // when its keyboard loaded, we'd already requested the `test_chirality` keyboard.
-        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), textStore);
         assert.isTrue(beforekeyboardchange.calledThrice);  // +1
         assert.isTrue(keyboardchange.calledOnce);          // There should be no attempt to swap to the lao kbd.
         assert.isTrue(keyboardasyncload.calledTwice);

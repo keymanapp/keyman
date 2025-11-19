@@ -53,7 +53,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   public readonly helpURL = 'https://help.keyman.com/go';
 
   keyEventRefocus = () => {
-    this.contextManager.restoreLastActiveTarget();
+    this.contextManager.restoreLastActiveTextStore();
   }
 
   constructor(workerFactory: WorkerFactory, sourceUri: string) {
@@ -70,18 +70,18 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     this._util = new UtilApiEndpoint(config);
     this.beepHandler = new BeepHandler(this.core.keyboardInterface);
-    this.core.keyboardProcessor.beepHandler = () => this.beepHandler.beep(this.contextManager.activeTarget);
+    this.core.keyboardProcessor.beepHandler = () => this.beepHandler.beep(this.contextManager.activeTextStore);
 
     this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
-    this.contextManager.on('targetchange', (target) => {
-      const e = (target as AbstractElementTextStore<any>)?.getElement();
+    this.contextManager.on('textstorechange', (textStore) => {
+      const e = (textStore as AbstractElementTextStore<any>)?.getElement();
       if(this.osk) {
         (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
       }
 
-      if(this.config.hostDevice.touchable && target) {
+      if(this.config.hostDevice.touchable && textStore) {
         this.ensureElementVisibility(e);
       }
     });
@@ -302,7 +302,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    this.contextManager.setKeyboardForTarget(Pelem._kmwAttachment.textStore, Pkbd, Plc);
+    this.contextManager.setKeyboardForTextStore(Pelem._kmwAttachment.textStore, Pkbd, Plc);
   }
   /**
    * Function     getKeyboardForControl
@@ -315,8 +315,8 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    */
   public getKeyboardForControl(Pelem: HTMLElement) {
-    const target = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTarget(target).id;
+    const textStore = textStoreForElement(Pelem);
+    return this.contextManager.getKeyboardStubForTextStore(textStore).id;
   }
 
   // Is not currently published API... but it exists.
@@ -329,8 +329,8 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *              If it is currently following the global keyboard setting, returns null instead.
    */
   getLanguageForControl(Pelem: HTMLElement) {
-    const target = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTarget(target).langId;
+    const textStore = textStoreForElement(Pelem);
+    return this.contextManager.getKeyboardStubForTextStore(textStore).langId;
   }
 
   isAttached(x: HTMLElement): boolean {
@@ -544,7 +544,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/focusLastActiveElement
    */
   public focusLastActiveElement() {
-    this.contextManager.lastActiveTarget?.focus();
+    this.contextManager.lastActiveTextStore?.focus();
   }
 
   /**
@@ -555,7 +555,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getLastActiveElement
    */
   public getLastActiveElement() {
-    return this.contextManager.lastActiveTarget?.getElement();
+    return this.contextManager.lastActiveTextStore?.getElement();
   }
 
   /**
@@ -574,11 +574,11 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    const target = textStoreForElement(e);
-    if(!target) {
+    const textStore = textStoreForElement(e);
+    if(!textStore) {
       throw new Error(`KMW is not attached to the specified element (id: ${e.id}).`);
     }
-    this.contextManager.setActiveTarget(target, setFocus);
+    this.contextManager.setActiveTextStore(textStore, setFocus);
   }
 
   /**

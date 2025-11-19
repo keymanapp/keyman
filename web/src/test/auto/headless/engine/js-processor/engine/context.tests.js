@@ -60,14 +60,14 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       var ruleSeq = new RecordedKeystrokeSequence(matchTest.sequence);
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
-      // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new SyntheticTextStore();
-      ruleSeq.test(proctor, target);
+      // We want to specify the TextStore for this test; our actual concern is the resulting context.
+      var textStore = new SyntheticTextStore();
+      ruleSeq.test(proctor, textStore);
 
       // Now for the real test!
       let processor = new JSKeyboardProcessor(device);
       processor.keyboardInterface = keyboardWithHarness;
-      var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, target, ruleDef.rule);
+      var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, textStore, ruleDef.rule);
 
       var msg = matchTest.msg;
       if(!msg) {
@@ -1111,20 +1111,19 @@ describe('Engine - Context Matching', function() {
   it('properly generates extended context data needed by context-matching checks below', function() {
     let matchDefs = FULL_RULE_SET;
 
-    for(var j = 0; j < matchDefs.length; j++) {
+    for(const ruleDef of matchDefs) {
       // Prepare the context!
-      var ruleDef = matchDefs[j];
-      var ruleSeq = new RecordedKeystrokeSequence(ruleDef.baseSequence);
+      const ruleSeq = new RecordedKeystrokeSequence(ruleDef.baseSequence);
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
-      // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new SyntheticTextStore();
-      ruleSeq.test(proctor, target);
+      // We want to specify the TextStore for this test; our actual concern is the resulting context.
+      const textStore = new SyntheticTextStore();
+      ruleSeq.test(proctor, textStore);
 
       // Now for the real test!
-      let processor = new JSKeyboardProcessor(device);
+      const processor = new JSKeyboardProcessor(device);
       processor.keyboardInterface = keyboardWithHarness;
-      var res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, target);
+      const res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, textStore);
 
       assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);
     }

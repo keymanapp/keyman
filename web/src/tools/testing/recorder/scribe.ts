@@ -28,7 +28,7 @@ declare let keyman: KeymanEngine;
 //   export namespace dom {
 //     export declare var DOMEventHandlers: any;
 //     export declare class Utils {
-//       static getOutputTarget(elem: HTMLElement): any; // text.TextStore;
+//       static getTextStore(elem: HTMLElement): any; // text.TextStore;
 //     }
 //   }
 
@@ -184,7 +184,7 @@ export class Scribe extends EventEmitter {
 
     keyman.hardKeyboard.on('keyevent', (e) => {
       const in_output = textStoreForElement(recordingElement);
-      if(!in_output || keyman.contextManager.activeTarget != in_output) {
+      if(!in_output || keyman.contextManager.activeTextStore != in_output) {
         return;
       }
 
@@ -200,7 +200,7 @@ export class Scribe extends EventEmitter {
 
     keyman.osk.on('keyevent', (e) => {
       const in_output = textStoreForElement(recordingElement);
-      if(!in_output || keyman.contextManager.activeTarget != in_output) {
+      if(!in_output || keyman.contextManager.activeTextStore != in_output) {
         return;
       }
 
@@ -230,7 +230,7 @@ export class Scribe extends EventEmitter {
 
       // What's the active stub immediately after our _SetActiveKeyboard call?
       const internalStub = kbdTuple.metadata;
-      if(internalStub && (keyman.contextManager.activeTarget == in_output)) {
+      if(internalStub && (keyman.contextManager.activeTextStore == in_output)) {
         const kbdRecord = Scribe.recordKeyboardStub(internalStub, 'resources/keyboards');
 
         recorderScribe.emit('stub-changed', JSON.stringify(kbdRecord));

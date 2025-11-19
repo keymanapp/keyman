@@ -49,5 +49,5 @@ export default abstract class Proctor {
    * Simulates the specified test sequence for use in testing.
    * @param sequence The recorded sequence, generally provided by a test set.
    */
-  abstract simulateSequence(sequence: TestSequence<any>, target?: TextStore): Promise<string>;
+  abstract simulateSequence(sequence: TestSequence<any>, textStore?: TextStore): Promise<string>;
 }

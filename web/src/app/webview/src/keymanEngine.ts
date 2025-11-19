@@ -157,6 +157,6 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
   getOskWidth?: () => number = null;
 
   get context() {
-    return this.contextManager.activeTarget;
+    return this.contextManager.activeTextStore;
   }
 }

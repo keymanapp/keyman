@@ -82,7 +82,7 @@ describe("PredictionContext", () => {
     predictiveContext.on('update', updateFake);
 
     let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
-    const initialMock = SyntheticTextStore.from(textStore);
+    const initialTextStore = SyntheticTextStore.from(textStore);
     const promise = predictiveContext.setCurrentTarget(textStore);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
@@ -100,7 +100,7 @@ describe("PredictionContext", () => {
     assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
 
     textStore.insertTextBeforeCaret('e'); // appl| + e = apple
-    let transcription = textStore.buildTranscriptionFrom(initialMock, null, true);
+    let transcription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
     await langProcessor.predict(transcription, dummiedGetLayer());
 
     // First predict call results:  our second set of dummy suggestions, the first of which includes
@@ -121,7 +121,7 @@ describe("PredictionContext", () => {
     predictiveContext.on('update', updateFake);
 
     let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
-    const initialMock = SyntheticTextStore.from(textStore);
+    const initialTextStore = SyntheticTextStore.from(textStore);
     const promise = predictiveContext.setCurrentTarget(textStore);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
@@ -138,14 +138,14 @@ describe("PredictionContext", () => {
     assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
     assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
 
-    const baseTranscription = textStore.buildTranscriptionFrom(initialMock, null, true);
+    const baseTranscription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
 
     // Mocking:  corresponds to the second set of mocked predictions - round 2 of
     // 'apple', 'apply', 'apples'.
     const skippedPromise = langProcessor.predict(baseTranscription, dummiedGetLayer());
 
     textStore.insertTextBeforeCaret('e'); // appl| + e = apple
-    const finalTranscription = textStore.buildTranscriptionFrom(initialMock, null, true);
+    const finalTranscription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
 
     // Mocking:  corresponds to the third set of mocked predictions - 'applied'.
     const expectedPromise = langProcessor.predict(finalTranscription, dummiedGetLayer());
