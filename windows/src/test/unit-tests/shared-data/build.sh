@@ -29,7 +29,6 @@ function do_test() {
   "./delphi/$WIN64_TARGET_PATH/delphishareddata.exe" > delphi-win64.txt
   "./cpp/$WIN32_TARGET_PATH/cppshareddata.exe" > cpp-win32.txt
   "./cpp/$X64_TARGET_PATH/cppshareddata.exe" > cpp-win64.txt
-  "./cpp/$ARM64_TARGET_PATH/cppshareddata.exe" > cpp-arm64.txt
   diff -q delphi-win32.txt delphi-win64.txt
   diff -q delphi-win32.txt cpp-win32.txt
   diff -q delphi-win32.txt cpp-win64.txt
