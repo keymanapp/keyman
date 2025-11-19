@@ -6,6 +6,7 @@ import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrameElementTextStore, AbstractElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import {
   ContextManagerBase,
+  type KeyboardInfoPair,
   type KeyboardInterfaceBase,
   LegacyAPIEvents
 } from 'keyman/engine/main';
@@ -43,14 +44,14 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
 }
 
 export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
-  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private _activeKeyboard: KeyboardInfoPair;
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant(() => this.activeTextStore?.isForcingScroll());
   readonly page: PageContextAttachment;
   private mostRecentTextStore: AbstractElementTextStore<any>;
   private currentTextStore: AbstractElementTextStore<any>;
 
-  private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private globalKeyboard: KeyboardInfoPair;
 
   private _eventsObj: () => LegacyEventEmitter<LegacyAPIEvents>;
   private domEventTracker = new DomEventTracker();
@@ -329,7 +330,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     }
   }
 
-  public get activeKeyboard(): { keyboard: Keyboard, metadata: KeyboardStub } {
+  public get activeKeyboard(): KeyboardInfoPair {
     return this._activeKeyboard;
   }
 
@@ -387,7 +388,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
-  public activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: AbstractElementTextStore<any>): void {
+  public activateKeyboardForTextStore(kbd: KeyboardInfoPair, textStore: AbstractElementTextStore<any>): void {
     const attachment = textStore?.getElement()._kmwAttachment;
 
     if(!attachment) {
