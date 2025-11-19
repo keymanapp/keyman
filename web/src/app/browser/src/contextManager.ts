@@ -351,16 +351,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     // original context element may have been lost.
     this.restoreLastActiveTextStore();
 
-    let textStore = this.activeTextStore;
-
-    if(textStore == null && this.mostRecentTextStore) {
-      textStore = this.activeTextStore;
-    }
-
-    if(textStore != null) {
-      return super.insertText(kbdInterface, text, deadkey);
-    }
-    return false;
+    return super.insertText(kbdInterface, text, deadkey);
   }
 
   /**
