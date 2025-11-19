@@ -16,10 +16,10 @@ import { computeDistance, EditOperation, EditTuple } from './classical-calculati
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 import { TokenizationPath } from './tokenization-subsets.js';
+import { PathInputProperties } from './search-space.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-import { PathInputProperties } from './search-space.js';
 
 // May be able to "get away" with 2 & 5 or so, but having extra will likely help
 // with edit path stability.
@@ -105,11 +105,15 @@ export class ContextTokenization {
    * The sequence of tokens in the context represented by this instance.
    */
   readonly tokens: ContextToken[];
+
   /**
-   * The tokenization-transition metadata relating this instance to the most likely
-   * tokenization from a prior state.
+   * Denotes whether or not the transition to this tokenization added or deleted
+   * any tokens.
    */
-  readonly transitionEdits?: TokenizationPath;
+  readonly transitionEdits?: {
+    addedNewTokens: boolean,
+    removedOldTokens: boolean
+  };
 
   /**
    * The portion of edits from the true input keystroke that are not part of the
@@ -129,13 +133,18 @@ export class ContextTokenization {
   constructor(tokens: ContextToken[], alignment: TokenizationPath, taillessTrueKeystroke: Transform);
   constructor(
     param1: ContextToken[] | ContextTokenization,
-    alignment?: TokenizationPath,
+    tokenizationPath?: TokenizationPath,
     taillessTrueKeystroke?: Transform
   ) {
     if(!(param1 instanceof ContextTokenization)) {
       const tokens = param1;
       this.tokens = [].concat(tokens);
-      this.transitionEdits = alignment;
+      if(tokenizationPath) {
+        this.transitionEdits = {
+          addedNewTokens: tokenizationPath?.inputs[0].sample.has(1) ?? false,
+          removedOldTokens: (tokenizationPath?.alignment.removedTokenCount ?? 0) > 0
+        }
+      }
       this.taillessTrueKeystroke = taillessTrueKeystroke;
     } else {
       const priorToClone = param1;
@@ -487,32 +496,9 @@ export class ContextTokenization {
     };
   }
 
-  /**
-   * Given results from `precomputeTokenizationAfterInput`, this method will
-   * evaluate the pending transition in tokenization for all associated inputs
-   * while reusing as many correction-search intermediate results as possible.
-   * @param tokenizationPath Batched results from one or more
-   * `precomputeTokenizationAfterInput` calls on this instance, all with the
-   * same alignment values.
-   * @param lexicalModel The active lexical model
-   * @param sourceInput The Transform associated with the keystroke triggering
-   * the transition.
-   * @param bestProbFromSet The probability of the single most likely input
-   * transform in the overall transformDistribution associated with the
-   * keystroke triggering theh transition.  It need not be represented by the
-   * tokenizationPath to be built.
-   * @returns
-   */
-  evaluateTransition(
-    tokenizationPath: TokenizationPath,
-    lexicalModel: LexicalModel,
-    sourceInput: Transform,
-    bestProbFromSet: number
-  ): ContextTokenization {
-    const { alignment: alignment, inputs } = tokenizationPath;
+  realign(alignment: TokenizationEdgeAlignment): ContextTokenization {
     const sliceIndex = alignment.edgeWindow.sliceIndex;
     const baseTokenization = this.tokens.slice(sliceIndex);
-    let affectedToken: ContextToken;
 
     const tokenization: ContextToken[] = [];
 
@@ -553,6 +539,40 @@ export class ContextTokenization {
       tokenization.push(token);
     }
 
+    return new ContextTokenization(tokenization, null, this.taillessTrueKeystroke);
+  }
+
+  /**
+   * Given results from `precomputeTokenizationAfterInput`, this method will
+   * evaluate the pending transition in tokenization for all associated inputs
+   * while reusing as many correction-search intermediate results as possible.
+   * @param tokenizationPath Batched results from one or more
+   * `precomputeTokenizationAfterInput` calls on this instance, all with the
+   * same alignment values.
+   * @param transitionId The id of the Transform associated with the keystroke
+   * triggering the transition.
+   * @param bestProbFromSet The probability of the single most likely input
+   * transform in the overall transformDistribution associated with the
+   * keystroke triggering theh transition.  It need not be represented by the
+   * tokenizationPath to be built.
+   * @param appliedSuggestionId
+   * @returns
+   */
+  evaluateTransition(
+    tokenizationPath: TokenizationPath,
+    transitionId: number,
+    bestProbFromSet: number,
+    appliedSuggestionId?: number
+  ): ContextTokenization {
+    const { alignment, inputs } = tokenizationPath;
+    const sliceIndex = alignment.edgeWindow.sliceIndex;
+    const lexicalModel = this.tail.searchSpace.model;
+
+    let affectedToken: ContextToken;
+
+    const realignedTokenization = this.realign(alignment);
+    const tokenization = realignedTokenization.tokens;
+
     // Assumption:  inputs.length > 0.  (There is at least one input transform.)
     const inputTransformKeys = [...inputs[0].sample.keys()];
     let removedTokenCount = alignment.removedTokenCount;
@@ -579,7 +599,11 @@ export class ContextTokenization {
       }
 
       affectedToken.isPartial = true;
-      delete affectedToken.appliedTransitionId;
+      if(appliedSuggestionId !== undefined) {
+        affectedToken.appliedTransitionId = appliedSuggestionId;
+      } else {
+        delete affectedToken.appliedTransitionId;
+      }
 
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
@@ -590,7 +614,7 @@ export class ContextTokenization {
 
       const inputSource: PathInputProperties = {
         segment: {
-          transitionId: sourceInput.id,
+          transitionId,
           start: appliedLength
         },
         bestProbFromSet: bestProbFromSet,
@@ -611,7 +635,7 @@ export class ContextTokenization {
 
     return new ContextTokenization(
       this.tokens.slice(0, sliceIndex).concat(tokenization),
-      null /* tokenMapping */,
+      tokenizationPath,
       determineTaillessTrueKeystroke(tokenizationPath)
     );
   }

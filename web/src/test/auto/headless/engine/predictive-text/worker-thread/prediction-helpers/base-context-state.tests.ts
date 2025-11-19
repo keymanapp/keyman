@@ -137,7 +137,7 @@ describe('matchBaseContextState', () => {
       left: 'ot of test here might cause the sliding context window to shift ',
       startOfBuffer: false, // We're sliding now.
       endOfBuffer: true
-    }, [{sample: { insert: 'dramatically', deleteLeft: 0 }, p: 1}], true);
+    }, [{sample: { insert: 'dramatically', deleteLeft: 0 }, p: 1}], Math.random());
     contextTracker.latest = transition;
 
     const warningSpy = sinon.spy(console, 'warn');
@@ -168,7 +168,7 @@ it('handles backward-sliding context after big delete', () => {
       left: 'ere might cause the sliding context window to shift dramatically',
       startOfBuffer: false, // We're sliding now.
       endOfBuffer: true
-    }, [{sample: { insert: '', deleteLeft: 'dramatically'.length }, p: 1}], true);
+    }, [{sample: { insert: '', deleteLeft: 'dramatically'.length }, p: 1}], Math.random());
     contextTracker.latest = transition;
 
     const warningSpy = sinon.spy(console, 'warn');
