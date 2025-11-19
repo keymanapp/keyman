@@ -1,13 +1,12 @@
+// import { BrowserConfiguration, ContextManager } from 'keyman/app/browser';
 import { ContextManager } from 'keyman/app/browser';
-import {
-  textStoreForElement
-} from 'keyman/engine/attachment';
+import { TextAreaElementTextStore, textStoreForElement } from 'keyman/engine/attachment';
 import { LegacyEventEmitter } from 'keyman/engine/events';
 import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
+import { KeyboardInterfaceBase } from 'keyman/engine/main';
 
-import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
-import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
+import { KeyboardHarness, MinimalKeymanGlobal, DOMKeyboardLoader  } from 'keyman/engine/keyboard';
+import { KeyboardMap, loadKeyboardsFromStubs } from '../../kbdLoader.js';
 
 import { DeviceSpec, ManagedPromise, timedPromise } from 'keyman/common/web-utils';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
@@ -125,6 +124,18 @@ async function withDelayedFetching(keyboardLoader: any, time: number, closure: a
 
   keyboardLoader.loadKeyboardInternal = fetchIntercept;
   await closure();
+}
+
+async function loadKeyboardsForTests(apiStubs: string[]): Promise<KeyboardMap> {
+  const kbdStubPromises = apiStubs.map((file: string) => {
+    return fetch(`common/test/resources/json/${file}.json`).then((response) => {
+      return response.json();
+    });
+  });
+
+  const kbdStubs = await Promise.all(kbdStubPromises);
+
+  return await loadKeyboardsFromStubs(kbdStubs, 'common/test/');
 }
 
 describe('app/browser:  ContextManager', function () {
@@ -508,15 +519,7 @@ describe('app/browser:  ContextManager', function () {
         '/keyboards/test_deadkeys'
       ];
 
-      const kbdStubPromises = apiStubs.map((file: string) => {
-        return fetch(`common/test/resources/json/${file}.json`).then((response) => {
-          return response.json();
-        });
-      });
-
-      const kbdStubs = await Promise.all(kbdStubPromises);
-
-      KEYBOARDS = await loadKeyboardsFromStubs(kbdStubs, 'common/test/');
+      KEYBOARDS = await loadKeyboardsForTests(apiStubs);
     });
 
     beforeEach(() => {
@@ -1247,6 +1250,77 @@ describe('app/browser:  ContextManager', function () {
         assert.isTrue(keyboardasyncload.calledTwice);
         assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.test_chirality.metadata);
       });
+    });
+  });
+
+  describe('ContextManager.insertText', () =>{
+    let KEYBOARDS: KeyboardMap;
+    let kbdInterface: KeyboardInterfaceBase<ContextManager>;
+
+    beforeEach(async () => {
+      KEYBOARDS = await loadKeyboardsForTests(['/keyboards/khmer_angkor']);
+      const keyboard = KEYBOARDS.khmer_angkor;
+      keyboardCache.addKeyboard(keyboard.keyboard);
+      keyboardCache.addStub(keyboard.metadata);
+      await contextManager.activateKeyboard('khmer_angkor', 'km');
+      kbdInterface = new KeyboardInterfaceBase<ContextManager>(new Object(), null, null);
+    });
+
+    it('returns false if no text store set', async () => {
+      // Execute
+      const ret = contextManager.insertText(kbdInterface, 'a', 0);
+
+      // Verify
+      assert.isFalse(ret);
+    });
+
+    it('returns true if current text store set', async () => {
+      // Setup
+      const element = document.getElementById('textarea') as HTMLTextAreaElement;
+      const textStore = new TextAreaElementTextStore(element);
+      (contextManager as any).currentTextStore = textStore;
+
+      // Execute
+      const ret = contextManager.insertText(kbdInterface, 'a', 0);
+
+      // Verify
+      assert.isTrue(ret);
+      const ts = contextManager.activeTextStore;
+      assert.equal(ts.getText(), 'a');
+    });
+
+    it('returns true if most recent text store set and maintaining focus', async () => {
+      // Setup
+      const element = document.getElementById('textarea') as HTMLTextAreaElement;
+      const textStore = new TextAreaElementTextStore(element);
+      (contextManager as any).currentTextStore = null;
+      (contextManager as any).mostRecentTextStore = textStore;
+      (contextManager as any).focusAssistant = { maintainingFocus: true, isTargetForcingScroll: () => false };
+
+      // Execute
+      const ret = contextManager.insertText(kbdInterface, 'a', 0);
+
+      // Verify
+      assert.isTrue(ret);
+      const ts = contextManager.activeTextStore;
+      assert.equal(ts.getText(), 'a');
+    });
+
+    it('returns true if most recent text store and not maintaing focus', async () => {
+      // Setup
+      const element = document.getElementById('textarea') as HTMLTextAreaElement;
+      const textStore = new TextAreaElementTextStore(element);
+      (contextManager as any).currentTextStore = null;
+      (contextManager as any).mostRecentTextStore = textStore;
+      (contextManager as any).focusAssistant = { maintainingFocus: false, isTargetForcingScroll: () => false };
+
+      // Execute
+      const ret = contextManager.insertText(kbdInterface, 'a', 0);
+
+      // Verify
+      assert.isTrue(ret);
+      const ts = contextManager.activeTextStore;
+      assert.equal(ts.getText(), 'a');
     });
   });
 });
