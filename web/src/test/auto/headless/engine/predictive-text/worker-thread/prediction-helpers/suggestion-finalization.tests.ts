@@ -167,7 +167,10 @@ describe('finalizeSuggestions', () => {
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
-      expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
+      expected.forEach((entry) => entry.appendedTransform = {
+        insert: testModelWithSpacing.punctuation.insertAfterWord,
+        deleteLeft: 0
+      });
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
@@ -216,7 +219,10 @@ describe('finalizeSuggestions', () => {
 
       // The character after the caret isn't the whitespace we'd usually insert,
       // so we don't swallow it this time.
-      expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
+      expected.forEach((entry) => entry.appendedTransform = {
+        insert: testModelWithSpacing.punctuation.insertAfterWord,
+        deleteLeft: 0
+      });
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
@@ -241,7 +247,10 @@ describe('finalizeSuggestions', () => {
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
-      expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
+      expected.forEach((entry) => entry.appendedTransform = {
+        insert: testModelWithSpacing.punctuation.insertAfterWord,
+        deleteLeft: 0
+      });
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });
@@ -340,7 +349,10 @@ describe('finalizeSuggestions', () => {
       const { unfinalized, expected } = build_its_is_set('verbose');
       const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, /* verbose */ true);
 
-      expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
+      expected.forEach((entry) => entry.appendedTransform = {
+        insert: testModelWithSpacing.punctuation.insertAfterWord,
+        deleteLeft: 0
+      });
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
@@ -363,7 +375,10 @@ describe('finalizeSuggestions', () => {
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
-      expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
+      expected.forEach((entry) => entry.appendedTransform = {
+        insert: testModelWithSpacing.punctuation.insertAfterWord,
+        deleteLeft: 0
+      });
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });

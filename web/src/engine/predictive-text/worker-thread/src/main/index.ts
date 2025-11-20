@@ -237,11 +237,25 @@ export default class LMLayerWorker {
       }
 
       let compositor = this.transitionToReadyState(model);
+      const autoInsert = compositor.punctuation.insertAfterWord;
+
       // This test allows models to directly specify the property without it being auto-overridden by
       // this default.
-      if(configuration.wordbreaksAfterSuggestions === undefined) {
-        configuration.wordbreaksAfterSuggestions = (compositor.punctuation.insertAfterWord != '');
+      if(configuration.appendsWordbreaks === undefined) {
+        // If we automatically insert something after a suggestion, that implies
+        // it serves as a wordbreaking token.
+        if(autoInsert != '') {
+          configuration.appendsWordbreaks = {
+            breakingMarks: [autoInsert, '.', ',', ';', ':', '?', '!']
+          };
+        } // else leave undefined (falsy) - it has unusual wordbreaking patterns,
+          // so avoid further assumptions.
+      } else if(autoInsert != '') {
+        // If it's auto-inserted after a suggestion, we treat it as an
+        // implied wordbreaking mark.  This array may safely have duplicates.
+        configuration.appendsWordbreaks.breakingMarks.push(autoInsert);
       }
+      compositor.setConfiguration(configuration);
       this.cast('ready', { configuration });
     } catch (err) {
       this.error("loadModel failed!", err);
@@ -367,9 +381,9 @@ export default class LMLayerWorker {
             });
             break;
           case 'revert':
-            var {reversion, context} = payload;
+            var {reversion, context, appendedOnly} = payload;
 
-            compositor.applyReversion(reversion, context).then((suggestions) => {
+            compositor.applyReversion(reversion, context, appendedOnly).then((suggestions) => {
               this.cast('postrevert', {
                 token: payload.token,
                 suggestions: suggestions
@@ -377,8 +391,8 @@ export default class LMLayerWorker {
             });
             break;
           case 'reset-context':
-            var {context} = payload;
-            compositor.resetContext(context);
+            var {context, stateId} = payload;
+            compositor.resetContext(context, stateId);
             break;
           default:
             throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'reset-context', 'unload'} but got ${payload.message}`);
