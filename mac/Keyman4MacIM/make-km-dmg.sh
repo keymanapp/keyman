@@ -192,12 +192,17 @@ builder_echo info "Detaching \"$WORKING_COPY_OF_IMAGE\""
 DETACH_SUCCESS=0
 DETACH_FORCE=
 while (( DETACH_SUCCESS < 10 )); do
-    DETACH_RESULT=0
-    hdiutil detach $STAGING_DIR $VERBOSITY $DETACH_FORCE || DETACH_RESULT=$?
-    if  [[ $DETACH_RESULT != 0 || -d "$STAGING_DIR" ]] ; then
+    if hdiutil detach $STAGING_DIR $VERBOSITY $DETACH_FORCE; then
+        DETACH_RESULT=0
+        echo "hdiutil detach reported success"
+    else
+        DETACH_RESULT=$?
+        echo "hdiutil detach reported failure code ${DETACH_RESULT}"
+    fi
+    if [[ $DETACH_RESULT != 0 ]] || [[ -d "$STAGING_DIR" ]] ; then
         (( DETACH_SUCCESS++ ))
         echo "Failed to unmount: \"$STAGING_DIR\" on attempt #$DETACH_SUCCESS. Waiting 5 seconds to try again."
-        if (( DETACH_SUCCESS > 5 )); then
+        if (( DETACH_SUCCESS == 6 )); then
             echo "  Note: Detach failed first five times, so now attempting with '-force'"
             DETACH_FORCE=-force
         fi
