@@ -3,7 +3,7 @@ import { InputElementTextStore } from './inputTextStore.js';
 import { TextAreaElementTextStore } from './textareaTextStore.js';
 import { DesignIFrameElementTextStore } from './designIFrameTextStore.js';
 import { ContentEditableElementTextStore } from './contentEditableTextStore.js';
-import { nestedInstanceOf } from './utils.js';
+import { nestedInstanceOf } from './nestedInstanceOf.js';
 
 export function createTextStoreForElement(e: HTMLElement): AbstractElementTextStore<any> {
   // Complex type scoping is implemented here so that kmwutils.ts is not a dependency for test compilations.
