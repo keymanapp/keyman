@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.164 alpha 2025-11-20
+
+* feat(windows): update wix to 3.14.1 (#15194)
+
 ## 19.0.163 alpha 2025-11-17
 
 * chore(linux): Update debian changelog (#15133)
