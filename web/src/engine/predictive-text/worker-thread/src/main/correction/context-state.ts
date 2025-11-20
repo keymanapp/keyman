@@ -187,14 +187,15 @@ export class ContextState {
    *
    * May also contain a single entry for applying Suggestions or when correction behavior
    * is disabled.
-   * @param isApplyingSuggestion When true, alters behavior to better model application of suggestions.
+   * @param appliedSuggestionId When defined, notes the original transition ID corresponding to
+   * the applied suggestion.
    * @returns
    */
   analyzeTransition(
     context: Context,
     transformDistribution: Distribution<Transform>,
     // overrides checks for token substitution that can fail for large applied suggestions.
-    isApplyingSuggestion?: boolean
+    appliedSuggestionId?: number
   ): ContextTransition {
     const lexicalModel = this.model;
 
@@ -249,7 +250,8 @@ export class ContextState {
     // into subsets.
     const bestProb = transformDistribution.reduce((best, curr) => Math.max(best, curr.p), 0);
     // Should gain one per subsetBuilder.subsets entry.
-    const resultTokenization = baseTokenization.evaluateTransition(tokenizationAnalysis, lexicalModel, trueInput, bestProb);
+    const realignedTokenization = baseTokenization.realign(tokenizationAnalysis.alignment);
+    const resultTokenization = realignedTokenization.evaluateTransition(tokenizationAnalysis, trueInput.id, bestProb, appliedSuggestionId);
 
     // ------------
 

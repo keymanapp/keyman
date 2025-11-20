@@ -346,14 +346,13 @@ export function determineSuggestionAlignment(
   const context = transition.base.context;
   const postContext = transition.final.context;
   const inputTransform = transition.inputDistribution[0].sample;
-  const inputTransformMap = transitionEdits?.inputs[0].sample;
   let deleteLeft: number;
 
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
   // Is the token under construction newly-constructed / is there no pre-existing root?
-  if(tokenization.taillessTrueKeystroke && inputTransformMap?.has(1)) {
+  if(tokenization.taillessTrueKeystroke && transitionEdits?.addedNewTokens) {
     return {
       // If the new token is due to whitespace or due to a different input type
       // that would likely imply a tokenization boundary, infer 'new word' mode.
@@ -366,7 +365,7 @@ export function determineSuggestionAlignment(
       deleteLeft: 0
     };
     // If the tokenized context length is shorter... sounds like a backspace (or similar).
-  } else if (transitionEdits?.alignment.removedTokenCount > 0) {
+  } else if (transitionEdits?.removedOldTokens) {
     /* Ooh, we've dropped context here.  Almost certainly from a backspace or
      * similar effect.  Even if we drop multiple tokens... well, we know exactly
      * how many chars were actually deleted - `inputTransform.deleteLeft`. Since

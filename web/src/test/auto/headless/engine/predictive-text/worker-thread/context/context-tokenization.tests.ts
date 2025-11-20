@@ -116,7 +116,10 @@ describe('ContextTokenization', function() {
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
       assert.isOk(tokenization.transitionEdits);
-      assert.deepEqual(tokenization.transitionEdits, transitionEdits);
+      assert.deepEqual(tokenization.transitionEdits, {
+        addedNewTokens: false,
+        removedOldTokens: false
+      });
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
@@ -171,16 +174,133 @@ describe('ContextTokenization', function() {
     assert.deepEqual(tokenization.exampleInput, rawTextTokens);
   });
 
+  describe('realign', () => {
+    it('performs queued merge operations', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0, id: 42 };
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.realign({
+        merges: [{
+          inputs: [{
+              text: 'can',
+              index: 8 - edgeWindow.sliceIndex
+            }, {
+              text: '\'',
+              index: 9 - edgeWindow.sliceIndex
+            }
+          ],
+          match: {
+            text: 'can\'',
+            index: 8 - edgeWindow.sliceIndex
+          }
+        }],
+        splits: [],
+        unmappedEdits: [],
+        edgeWindow: {
+          ...edgeWindow,
+          // The range within the window constructed by the prior call for its parameterization.
+          retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text), 'can\'']
+        },
+        removedTokenCount: 0
+      });
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      const basePreTail = baseTokenization.tokens[baseTokenization.tokens.length - 2];
+      const baseTail = baseTokenization.tail;
+      assert.equal(
+        tokenization.tail.searchSpace.inputCount,
+        basePreTail.searchSpace.inputCount + baseTail.searchSpace.inputCount
+      );
+      assert.equal(tokenization.tail.exampleInput, 'can\'');
+      assert.deepEqual(tokenization.tail.searchSpace.bestExample, {
+        text: basePreTail.searchSpace.bestExample.text + baseTail.searchSpace.bestExample.text,
+        p: basePreTail.searchSpace.bestExample.p * baseTail.searchSpace.bestExample.p
+      });
+    });
+
+    it('performs queued split operations', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0, id: 101 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      // Lands after the split-off '\''.
+      inputTransformMap.set(1, { insert: '.', deleteLeft: 0 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.realign({
+        merges: [],
+        splits: [{
+          matches: [{
+              text: 'can',
+              index: 8 - edgeWindow.sliceIndex,
+              textOffset: 0
+            }, {
+              text: '\'',
+              index: 9 - edgeWindow.sliceIndex,
+              textOffset: 3
+            }
+          ],
+          input: {
+            text: 'can\'',
+            index: 8 - edgeWindow.sliceIndex
+          }
+        }],
+        unmappedEdits: [],
+        edgeWindow: {
+          ...edgeWindow,
+          // The range within the window constructed by the prior call for its parameterization.
+          retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text)]
+        },
+        removedTokenCount: 0
+      });
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      const preTail = tokenization.tokens[tokenization.tokens.length - 2];
+      const tail = tokenization.tail;
+      assert.equal(
+        baseTokenization.tail.searchSpace.inputCount,
+        preTail.searchSpace.inputCount + tail.searchSpace.inputCount
+      );
+      assert.equal(tail.searchSpace.inputCount, 1);
+      // base tokenization did not include the '.' component.
+      assert.deepEqual((tail.searchSpace as SearchPath).lastInput, (baseTokenization.tail.searchSpace as SearchPath).lastInput);
+      assert.equal(preTail.exampleInput, 'can');
+      assert.equal(tail.exampleInput, '\'');
+      assert.deepEqual({
+        text: preTail.searchSpace.bestExample.text + tail.searchSpace.bestExample.text,
+        p: preTail.searchSpace.bestExample.p * tail.searchSpace.bestExample.p
+      }, baseTokenization.tail.searchSpace.bestExample);
+    });
+  });
+
   describe('evaluateTransition', () => {
     it('handles simple case - new whitespace + new empty token', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0, id: 11 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0 });
-      inputTransformMap.set(2, { insert: '', deleteLeft: 0 });
+      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0, id: 11 });
+      inputTransformMap.set(2, { insert: '', deleteLeft: 0, id: 11 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -198,8 +318,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -252,8 +371,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -269,9 +387,9 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: 'y', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: 'y', deleteLeft: 0, deleteRight: 0, id: 13 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(0, { insert: 'y', deleteLeft: 0 });
+      inputTransformMap.set(0, { insert: 'y', deleteLeft: 0, id: 13 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -290,8 +408,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -316,9 +433,9 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'week'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: 'week', deleteLeft: 3, deleteRight: 0 };
+      const inputTransform = { insert: 'week', deleteLeft: 3, deleteRight: 0, id: 12 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(0, { insert: 'week', deleteLeft: 3 });
+      inputTransformMap.set(0, { insert: 'week', deleteLeft: 3, id: 12 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -337,8 +454,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -362,7 +478,7 @@ describe('ContextTokenization', function() {
         (tokenization.tail.searchSpace as SearchPath).lastInput,
         // As we fully deleted the old token, the new one "starts" after the deleteLeft.
         // The deleteLeft component should not be included here.
-        [{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */ }, p: 1}]
+        [{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */, id: inputTransform.id }, p: 1}]
       );
     });
 
@@ -394,8 +510,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -447,8 +562,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: subsetId
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -500,10 +614,10 @@ describe('ContextTokenization', function() {
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', '  ', ''].map((t) => (
         {text: t, isWhitespace: t != '' && t.trim() == ''}
       ));
-      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: ' ', deleteLeft: 0, deleteRight: 0, id: 42 };
       const inputTransformMap: Map<number, Transform> = new Map();
-      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 0 });
-      inputTransformMap.set( 0, { insert: '',  deleteLeft: 0 });
+      inputTransformMap.set(-1, { insert: ' ', deleteLeft: 0, id: 42 });
+      inputTransformMap.set( 0, { insert: '',  deleteLeft: 0, id: 42 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
@@ -521,8 +635,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        { insert: ' ', deleteLeft: 0 },
+        inputTransform.id,
         1
       );
 
@@ -547,17 +660,20 @@ describe('ContextTokenization', function() {
       }
     });
 
-    it.skip('handles case that triggers a token merge:  can+\'+t', () => {
-      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
+    it('handles case that triggers a token merge:  can+\'+t', () => {
+      // Matches results from a pre-run .realign call;
+      // 'can' and '\'' would have been separate before it.
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\'t'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0, id: 42 };
       const inputTransformMap: Map<number, Transform> = new Map();
       inputTransformMap.set(0, inputTransform);
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
+        // matches the 'alignment' seen in realign "queued merge" test
         alignment: {
           merges: [{
             inputs: [{
@@ -585,8 +701,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        { insert: 't', deleteLeft: 0 },
+        inputTransform.id,
         1
       );
 
@@ -597,32 +712,34 @@ describe('ContextTokenization', function() {
         targetTokens
       );
 
-      const basePreTail = baseTokenization.tokens[baseTokenization.tokens.length - 2];
       const baseTail = baseTokenization.tail;
       assert.equal(
         tokenization.tail.searchSpace.inputCount,
-        basePreTail.searchSpace.inputCount + baseTail.searchSpace.inputCount + 1 /* +1 - incoming transform */
+        baseTail.searchSpace.inputCount + 1 /* +1 - incoming transform */
       );
       assert.deepEqual((tokenization.tail.searchSpace as SearchPath).lastInput, [{ sample: inputTransform, p: 1 }]);
       assert.equal(tokenization.tail.exampleInput, 'can\'t');
       assert.deepEqual(tokenization.tail.searchSpace.bestExample, {
-        text: basePreTail.searchSpace.bestExample.text + baseTail.searchSpace.bestExample.text + inputTransform.insert,
-        p: basePreTail.searchSpace.bestExample.p * baseTail.searchSpace.bestExample.p * 1 /* prob of input transform */
+        text: baseTail.searchSpace.bestExample.text + inputTransform.insert,
+        p: baseTail.searchSpace.bestExample.p * 1 /* prob of input transform */
       });
     });
 
-    it.skip('handles case that triggers a token split:  can\' +. => can, \', .', () => {
-      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
+    it('handles case that triggers a token split:  can\' +. => can, \', .', () => {
+      // Matches results from a pre-run .realign call;
+      // 'can' and '\'' would have been merged before it.
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\'', '.'].map((t) => ({text: t, isWhitespace: t == ' '}));
-      const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0 };
+      const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0, id: 101 };
       const inputTransformMap: Map<number, Transform> = new Map();
       // Lands after the split-off '\''.
       inputTransformMap.set(1, { insert: '.', deleteLeft: 0 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
+        // matches the 'alignment' seen in realign "queued split" test
         alignment: {
           merges: [],
           splits: [{
@@ -652,8 +769,7 @@ describe('ContextTokenization', function() {
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
       },
-        plainModel,
-        inputTransform,
+        inputTransform.id,
         1
       );
 
@@ -668,9 +784,22 @@ describe('ContextTokenization', function() {
       const preTail = tokenization.tokens[tokenization.tokens.length - 2];
       const tail = tokenization.tail;
       assert.equal(
-        baseTokenization.tail.searchSpace.inputCount,
-        prepreTail.searchSpace.inputCount + preTail.searchSpace.inputCount
+        prepreTail.searchSpace.inputCount,
+        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchSpace.inputCount
       );
+      assert.deepEqual(
+        prepreTail.searchSpace.bestExample,
+        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchSpace.bestExample
+      );
+      assert.equal(
+        preTail.searchSpace.inputCount,
+        baseTokenization.tail.searchSpace.inputCount
+      );
+      assert.deepEqual(
+        preTail.searchSpace.bestExample,
+        baseTokenization.tail.searchSpace.bestExample
+      );
+
       assert.equal(tail.searchSpace.inputCount, 1);
       // base tokenization did not include the '.' component.
       assert.deepEqual((preTail.searchSpace as SearchPath).lastInput, (baseTokenization.tail.searchSpace as SearchPath).lastInput);
@@ -678,10 +807,6 @@ describe('ContextTokenization', function() {
       assert.equal(prepreTail.exampleInput, 'can');
       assert.equal(preTail.exampleInput, '\'');
       assert.equal(tail.exampleInput, '.');
-      assert.deepEqual({
-        text: prepreTail.searchSpace.bestExample.text + preTail.searchSpace.bestExample.text,
-        p: prepreTail.searchSpace.bestExample.p * preTail.searchSpace.bestExample.p
-      }, baseTokenization.tail.searchSpace.bestExample);
     });
   });
 
