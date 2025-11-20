@@ -38,7 +38,7 @@ export default class KMXBuilder {
     return [base, base + string.length * 2 + 2]; // include trailing zero
   }
 
-  private build() {
+  private build(version: number) {
     this.base_keyboard = 0;
     this.base_kmxplus = 0;
 
@@ -46,7 +46,7 @@ export default class KMXBuilder {
 
     this.comp_header = {
       dwIdentifier: KMXFile.FILEID_COMPILED,
-      dwFileVersion: KMXFile.VERSION_170,
+      dwFileVersion: version,
       dwCheckSum: 0,  // Deprecated in Keyman 16.0
       KeyboardID: 0,
       IsRegistered: 1,
@@ -183,8 +183,8 @@ export default class KMXBuilder {
     }
   }
 
-  compile(): Uint8Array {
-    const fileSize = this.build();
+  compile(version: number = KMXFile.VERSION_170): Uint8Array {
+    const fileSize = this.build(version);
 
     const file: Uint8Array = new Uint8Array(fileSize);
 
