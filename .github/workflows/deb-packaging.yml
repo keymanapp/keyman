@@ -31,6 +31,7 @@ env:
   STATUS_CONTEXT: 'Ubuntu Packaging'
   DEBFULLNAME: 'Keyman GHA packager'
   DEBEMAIL: 'support@keyman.com'
+  _builder_timings: false
 
 jobs:
   sourcepackage:
@@ -135,7 +136,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [jammy, noble, plucky]
+        dist: [jammy, noble, plucky, questing]
 
     steps:
     - name: Checkout
@@ -161,7 +162,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [questing]
+        dist: [devel]
 
     steps:
     - name: Checkout
@@ -185,6 +186,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Free disk space
+      run: |
+        # Free disk space by removing some large directories that we don't use (#15171)
+        # see https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+
+        # Remove Android SDKs (frees 12 GB on Ubuntu 24.04)
+        sudo rm -rf /usr/local/lib/android
+
+        # Remove Haskell (GHC) (frees 6.4 GB)
+        sudo rm -rf /usr/local/.ghcup
+
+        # Remove CodeQL and other toolcaches (frees 5.8 GB)
+        sudo rm -rf /opt/hostedtoolcache
+
+        # Remove .NET SDKs (frees 4.0 GB)
+        sudo rm -rf /usr/share/dotnet
+
     - name: Download Source Artifacts
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:

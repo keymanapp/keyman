@@ -35,11 +35,10 @@ function do_build() {
   build_manifest.res
   run_in_vs_env rc icons.rc
   delphi_msbuild kmshell.dproj "//p:Platform=Win32"
-  sentrytool_delphiprep "$WIN32_TARGET" kmshell.dpr
-  tds2dbg "$WIN32_TARGET"
+  do_map2pdb "$WIN32_TARGET_PATH/kmshell.map" "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmshell.dbg" "$WINDOWS_DEBUGPATH_APP/kmshell.dbg"
+  cp_if_exists "$WIN32_TARGET_PATH/kmshell.pdb" "$WINDOWS_DEBUGPATH_APP"
 
   do_build_data
 }
@@ -73,11 +72,13 @@ function do_publish() {
 
   wrap-signcode //d "Keyman for Windows" "$WINDOWS_PROGRAM_APP/kmshell.exe"
   wrap-symstore "$WINDOWS_PROGRAM_APP/kmshell.exe" //t keyman-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_APP/kmshell.dbg" //t keyman-windows
+  wrap-symstore "$WINDOWS_DEBUGPATH_APP/kmshell.pdb" //t keyman-windows
 }
 
 function do_install() {
   cp "$WINDOWS_PROGRAM_APP/kmshell.exe" "$INSTALLPATH_KEYMANAPP/kmshell.exe"
+  cp_if_exists "$WINDOWS_DEBUGPATH_APP/kmshell.pdb" "$INSTALLPATH_KEYMANAPP/kmshell.pdb"
+
   rm -rf "$INSTALLPATH_KEYMANAPP/xml"
   mkdir -p "$INSTALLPATH_KEYMANAPP/xml"
   cp -r "$WINDOWS_PROGRAM_APP/xml"/* "$INSTALLPATH_KEYMANAPP/xml/"

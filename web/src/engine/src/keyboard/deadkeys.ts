@@ -1,6 +1,6 @@
 // Defines the base Deadkey-tracking object.
 export class Deadkey {
-  p: number;  // Position of deadkey
+  p: number;  // Position of deadkey in the textstore (deadkey comes before the character at this position)
   d: number;  // Numerical id of the deadkey
   o: number;  // Ordinal value of the deadkey (resolves same-place conflicts)
   matched: number;
@@ -86,22 +86,25 @@ export class DeadkeyTracker {
    * Function     isMatch
    * Scope        Public
    * @param       {number}      caretPos  current cursor position
-   * @param       {number}      n         expected offset of deadkey from cursor
-   * @param       {number}      deadkey   deadkey
-   * @return      {boolean}               True if deadkey found selected context matches val
+   * @param       {number}      offset    expected offset to add to deadkey position to get to caretPos
+   * @param       {number}      deadkey   deadkey to match
+   * @return      {boolean}               True if deadkey found at offset position
    * Description  Match deadkey at current cursor position
    */
-  isMatch(caretPos: number, n: number, deadkey: number): boolean {
+  isMatch(caretPos: number, offset: number, deadkey: number): boolean {
     if(this.dks.length == 0) {
       return false; // I3318
     }
 
-    const sp=caretPos;
-    n = sp - n;
+    // Calculate position of deadkey from beginning of context.
+    // Caret position is always after the deadkey position (although this
+    // doesn't really matter for the calculation).
+    const dkPosition = caretPos - offset;
+
     for(let i = 0; i < this.dks.length; i++) {
       // Don't re-match an already-matched deadkey.  It's possible to have two identical
       // entries, and they should be kept separately.
-      if(this.dks[i].match(n, deadkey) && !this.dks[i].matched) {
+      if (this.dks[i].match(dkPosition, deadkey) && !this.dks[i].matched) {
         this.dks[i].set();
         // Assumption:  since we match the first possible entry in the array, we
         // match the entry with the lower ordinal - the 'first' deadkey in the position.
@@ -122,6 +125,8 @@ export class DeadkeyTracker {
     const index = this.dks.indexOf(dk);
     if (index > -1) {
       this.dks.splice(index, 1);
+    } else {
+      console.warn(`Deadkey ${JSON.stringify(dk)} to remove not found in DeadkeyTracker.`);
     }
   }
 
@@ -167,11 +172,10 @@ export class DeadkeyTracker {
       return false;
     }
 
-    const otherDks = other.dks;
-
-    for(const dk of this.dks) {
-      const match = otherDks.find((otherDk) => dk.equal(otherDk));
-      if(!match) {
+    const sortedDeadkeys = this.toSortedArray();
+    const otherDks = other.toSortedArray();
+    for(let i = 0; i < sortedDeadkeys.length; i++) {
+      if(!sortedDeadkeys[i].equal(otherDks[i])) {
         return false;
       }
     }
