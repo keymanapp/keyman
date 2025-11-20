@@ -548,7 +548,7 @@ export class ContextTokenization {
       tokenization.push(token);
     }
 
-    return new ContextTokenization(tokenization, null, this.taillessTrueKeystroke);
+    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tokenization), null, this.taillessTrueKeystroke);
   }
 
   /**
@@ -579,32 +579,32 @@ export class ContextTokenization {
 
     let affectedToken: ContextToken;
 
-    const realignedTokenization = this.realign(alignment);
-    const tokenization = realignedTokenization.tokens;
+    const tailTokenization = this.tokens.slice(sliceIndex);
 
     // Assumption:  inputs.length > 0.  (There is at least one input transform.)
     const inputTransformKeys = [...inputs[0].sample.keys()];
+    const baseTailIndex = (tailTokenization.length - 1);
     let removedTokenCount = alignment.removedTokenCount;
     while(removedTokenCount-- > 0) {
       inputTransformKeys.pop();
-      tokenization.pop();
+      tailTokenization.pop();
     }
 
     let appliedLength = 0;
     for(let i = 0; i < inputTransformKeys.length; i++) {
       const tailRelativeIndex = inputTransformKeys[i];
       let distribution = inputs.map((i) => ({sample: i.sample.get(tailRelativeIndex), p: i.p}));
-      const tokenIndex = (tokenization.length - 1) + tailRelativeIndex;
+      const tokenIndex = baseTailIndex + tailRelativeIndex;
 
-      affectedToken = tokenization[tokenIndex];
+      affectedToken = tailTokenization[tokenIndex];
       if(!affectedToken) {
         affectedToken = new ContextToken(lexicalModel);
-        tokenization.push(affectedToken);
+        tailTokenization.push(affectedToken);
       } else if(KMWString.length(affectedToken.exampleInput) == distribution[0].sample.deleteLeft) {
         // If the entire token will be replaced, throw out the old one and start anew.
         affectedToken = new ContextToken(lexicalModel);
         // Replace the token at the affected index with a brand-new token.
-        tokenization.splice(tokenIndex, 1, affectedToken);
+        tailTokenization.splice(tokenIndex, 1, affectedToken);
       }
 
       affectedToken.isPartial = true;
@@ -634,16 +634,20 @@ export class ContextTokenization {
         inputSource.segment.end = appliedLength;
       }
 
+      affectedToken = new ContextToken(affectedToken);
       affectedToken.addInput(inputSource, distribution);
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
+      // Do not re-use the previous token; the mutation may have unexpected
+      // results (say, in unit-testing)
+      tailTokenization[tokenIndex] = affectedToken;
 
       affectedToken = null;
     }
 
     return new ContextTokenization(
-      this.tokens.slice(0, sliceIndex).concat(tokenization),
+      this.tokens.slice(0, sliceIndex).concat(tailTokenization),
       transitionEdge,
       determineTaillessTrueKeystroke(transitionEdge)
     );

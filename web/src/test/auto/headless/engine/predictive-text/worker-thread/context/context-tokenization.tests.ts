@@ -188,6 +188,123 @@ describe('ContextTokenization', function() {
     assert.deepEqual(tokenization.exampleInput, rawTextTokens);
   });
 
+  describe('realign', () => {
+    it('performs queued merge operations', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: 't', deleteLeft: 0, deleteRight: 0, id: 42 };
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.realign({
+        merges: [{
+          inputs: [{
+              text: 'can',
+              index: 8 - edgeWindow.sliceIndex
+            }, {
+              text: '\'',
+              index: 9 - edgeWindow.sliceIndex
+            }
+          ],
+          match: {
+            text: 'can\'',
+            index: 8 - edgeWindow.sliceIndex
+          }
+        }],
+        splits: [],
+        unmappedEdits: [],
+        edgeWindow: {
+          ...edgeWindow,
+          // The range within the window constructed by the prior call for its parameterization.
+          retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text), 'can\'']
+        },
+        removedTokenCount: 0
+      });
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      const basePreTail = baseTokenization.tokens[baseTokenization.tokens.length - 2];
+      const baseTail = baseTokenization.tail;
+      assert.equal(
+        tokenization.tail.searchModule.inputCount,
+        basePreTail.searchModule.inputCount + baseTail.searchModule.inputCount
+      );
+      assert.equal(tokenization.tail.exampleInput, 'can\'');
+      assert.deepEqual(tokenization.tail.searchModule.bestExample, {
+        text: basePreTail.searchModule.bestExample.text + baseTail.searchModule.bestExample.text,
+        p: basePreTail.searchModule.bestExample.p * baseTail.searchModule.bestExample.p
+      });
+    });
+
+    it('performs queued split operations', () => {
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+      const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: '.', deleteLeft: 0, deleteRight: 0, id: 101 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      // Lands after the split-off '\''.
+      inputTransformMap.set(1, { insert: '.', deleteLeft: 0 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.realign({
+        merges: [],
+        splits: [{
+          matches: [{
+              text: 'can',
+              index: 8 - edgeWindow.sliceIndex,
+              textOffset: 0
+            }, {
+              text: '\'',
+              index: 9 - edgeWindow.sliceIndex,
+              textOffset: 3
+            }
+          ],
+          input: {
+            text: 'can\'',
+            index: 8 - edgeWindow.sliceIndex
+          }
+        }],
+        unmappedEdits: [],
+        edgeWindow: {
+          ...edgeWindow,
+          // The range within the window constructed by the prior call for its parameterization.
+          retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text)]
+        },
+        removedTokenCount: 0
+      });
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+
+      const preTail = tokenization.tokens[tokenization.tokens.length - 2];
+      const tail = tokenization.tail;
+      assert.equal(
+        baseTokenization.tail.searchModule.inputCount,
+        preTail.searchModule.inputCount + tail.searchModule.inputCount
+      );
+      assert.equal(tail.searchModule.inputCount, 1);
+      // base tokenization did not include the '.' component.
+      assert.deepEqual((tail.searchModule as SearchQuotientSpur).lastInput, (baseTokenization.tail.searchModule as SearchQuotientSpur).lastInput);
+      assert.equal(preTail.exampleInput, 'can');
+      assert.equal(tail.exampleInput, '\'');
+      assert.deepEqual({
+        text: preTail.searchModule.bestExample.text + tail.searchModule.bestExample.text,
+        p: preTail.searchModule.bestExample.p * tail.searchModule.bestExample.p
+      }, baseTokenization.tail.searchModule.bestExample);
+    });
+  });
+
   describe('evaluateTransition', () => {
     it('handles simple case - new whitespace + new empty token', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
@@ -557,8 +674,10 @@ describe('ContextTokenization', function() {
       }
     });
 
-    it.skip('handles case that triggers a token merge:  can+\'+t', () => {
-      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
+    it('handles case that triggers a token merge:  can+\'+t', () => {
+      // Matches results from a pre-run .realign call;
+      // 'can' and '\'' would have been separate before it.
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\'t'].map((t) => ({text: t, isWhitespace: t == ' '}));
@@ -568,6 +687,7 @@ describe('ContextTokenization', function() {
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
+        // matches the 'alignment' seen in realign "queued merge" test
         alignment: {
           merges: [{
             inputs: [{
@@ -606,22 +726,23 @@ describe('ContextTokenization', function() {
         targetTokens
       );
 
-      const basePreTail = baseTokenization.tokens[baseTokenization.tokens.length - 2];
       const baseTail = baseTokenization.tail;
       assert.equal(
         tokenization.tail.searchModule.inputCount,
-        basePreTail.searchModule.inputCount + baseTail.searchModule.inputCount + 1 /* +1 - incoming transform */
+        baseTail.searchModule.inputCount + 1 /* +1 - incoming transform */
       );
       assert.deepEqual((tokenization.tail.searchModule as SearchQuotientSpur).lastInput, [{ sample: inputTransform, p: 1 }]);
       assert.equal(tokenization.tail.exampleInput, 'can\'t');
       assert.deepEqual(tokenization.tail.searchModule.bestExample, {
-        text: basePreTail.searchModule.bestExample.text + baseTail.searchModule.bestExample.text + inputTransform.insert,
-        p: basePreTail.searchModule.bestExample.p * baseTail.searchModule.bestExample.p * 1 /* prob of input transform */
+        text: baseTail.searchModule.bestExample.text + inputTransform.insert,
+        p: baseTail.searchModule.bestExample.p * 1 /* prob of input transform */
       });
     });
 
-    it.skip('handles case that triggers a token split:  can\' +. => can, \', .', () => {
-      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
+    it('handles case that triggers a token split:  can\' +. => can, \', .', () => {
+      // Matches results from a pre-run .realign call;
+      // 'can' and '\'' would have been merged before it.
+      const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\'', '.'].map((t) => ({text: t, isWhitespace: t == ' '}));
@@ -632,6 +753,7 @@ describe('ContextTokenization', function() {
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
       const tokenization = baseTokenization.evaluateTransition({
+        // matches the 'alignment' seen in realign "queued split" test
         alignment: {
           merges: [],
           splits: [{
@@ -676,9 +798,22 @@ describe('ContextTokenization', function() {
       const preTail = tokenization.tokens[tokenization.tokens.length - 2];
       const tail = tokenization.tail;
       assert.equal(
-        baseTokenization.tail.searchModule.inputCount,
-        prepreTail.searchModule.inputCount + preTail.searchModule.inputCount
+        prepreTail.searchModule.inputCount,
+        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchModule.inputCount
       );
+      assert.deepEqual(
+        prepreTail.searchModule.bestExample,
+        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchModule.bestExample
+      );
+      assert.equal(
+        preTail.searchModule.inputCount,
+        baseTokenization.tail.searchModule.inputCount
+      );
+      assert.deepEqual(
+        preTail.searchModule.bestExample,
+        baseTokenization.tail.searchModule.bestExample
+      );
+
       assert.equal(tail.searchModule.inputCount, 1);
       // base tokenization did not include the '.' component.
       assert.deepEqual((preTail.searchModule as SearchQuotientSpur).lastInput, (baseTokenization.tail.searchModule as SearchQuotientSpur).lastInput);
@@ -686,10 +821,6 @@ describe('ContextTokenization', function() {
       assert.equal(prepreTail.exampleInput, 'can');
       assert.equal(preTail.exampleInput, '\'');
       assert.equal(tail.exampleInput, '.');
-      assert.deepEqual({
-        text: prepreTail.searchModule.bestExample.text + preTail.searchModule.bestExample.text,
-        p: prepreTail.searchModule.bestExample.p * preTail.searchModule.bestExample.p
-      }, baseTokenization.tail.searchModule.bestExample);
     });
   });
 

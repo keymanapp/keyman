@@ -250,7 +250,8 @@ export class ContextState {
     // into subsets.
     const bestProb = transformDistribution.reduce((best, curr) => Math.max(best, curr.p), 0);
     // Should gain one per subsetBuilder.subsets entry.
-    const resultTokenization = baseTokenization.evaluateTransition(tokenizationAnalysis, trueInput.id, bestProb, appliedSuggestionId);
+    const realignedTokenization = baseTokenization.realign(tokenizationAnalysis.alignment);
+    const resultTokenization = realignedTokenization.evaluateTransition(tokenizationAnalysis, trueInput.id, bestProb, appliedSuggestionId);
 
     // ------------
 
