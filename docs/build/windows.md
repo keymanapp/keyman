@@ -345,7 +345,7 @@ SETX KEYMAN_CEF4DELPHI_ROOT "c:\Projects\keyman\CEF4Delphi_Binary"
 ```ps1
 # Elevated PowerShell
 choco install 7zip html-help-workshop
-choco install wixtoolset --version=3.11.1
+choco install wixtoolset --version=3.14.1
 git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
 ```
 

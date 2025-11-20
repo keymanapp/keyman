@@ -395,7 +395,7 @@ var
 begin
   // On developer machines, if we are running within the source repo, then use
   // those paths
-  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT').Replace('/', '\');
   if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
   begin
     // Source repo, bin folder
