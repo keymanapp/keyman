@@ -29,11 +29,10 @@ function do_build() {
   # TODO: why no manifest?
   # build_manifest.res
   delphi_msbuild insthelp.dproj "//p:Platform=Win32"
-  sentrytool_delphiprep "$WIN32_TARGET" insthelp.dpr
-  tds2dbg "$WIN32_TARGET"
+  do_map2pdb "$WIN32_TARGET_PATH/insthelp.map" "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  builder_if_release_build_level cp "$WIN32_TARGET_PATH/insthelp.dbg" "$WINDOWS_DEBUGPATH_APP/insthelp.dbg"
+  cp_if_exists "$WIN32_TARGET_PATH/insthelp.pdb" "$WINDOWS_DEBUGPATH_APP"
 }
 
 function do_publish() {
@@ -43,7 +42,7 @@ function do_publish() {
 
   wrap-signcode //d "Keyman for Windows Install Helper" "$WINDOWS_PROGRAM_APP/insthelp.exe"
   wrap-symstore "$WINDOWS_PROGRAM_APP/insthelp.exe" //t keyman-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_APP/insthelp.dbg" //t keyman-windows
+  wrap-symstore "$WINDOWS_DEBUGPATH_APP/insthelp.pdb" //t keyman-windows
 }
 
 builder_run_action clean:project        clean_windows_project_files
