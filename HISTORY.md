@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 19.0.163 alpha 2025-11-17
+
+* chore(linux): Update debian changelog (#15133)
+* fix(windows): handle exceptions when walking stack in exception handler (#15150)
+* fix(windows): disable OutputDebugString from DllMain (#15151)
+* change(windows): include map2pdb generation for relevant Delphi projects (#14799)
+* change(windows): use circular buffer for logging (#15163)
+* fix(windows): handle forward slash for KEYMAN_ROOT env var (#15156)
+* maint(mac): handle hdiutil detach failure correctly in make-km-dmg.sh (#15176)
+
+## 19.0.162 alpha 2025-11-14
+
+* chore(linux): use `devel` for next Ubuntu release (#15157)
+* maint(resources): add build timing report to builder (#15114)
+* maint(resources): add `builder_launch` function (#15129)
+* fix(web): improve determination of default path (#15159)
+* maint(linux): free disk space before running autopkgtests (#15172)
+
+## 19.0.161 alpha 2025-11-13
+
+* docs(android): Document disclaimer of Keyman NOT containing adware/spyware (#15136)
+
+## 19.0.160 alpha 2025-11-12
+
+* fix(android): Change Alert Dialog instead of Toast if package missing keyboard and lexical-model files (#15098)
+* chore(linux): add support for Ubuntu 26.04 LTS Resolute (#15137)
+
+## 19.0.159 alpha 2025-11-11
+
+* maint(core): fix option defaults for Meson >= 1.1 (#15131)
+
+## 19.0.158 alpha 2025-11-10
+
+* fix(web): add unit tests for DeadkeyTracker and fix a few bugs (#15113)
+
 ## 19.0.157 alpha 2025-11-06
 
 * chore(common): Consolidate platformtest.js keyboard to `/common/test/keyboards/` (#15034)
