@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import {
   // Exposed within the engine/attachment bundle b/c of unit tests requiring `instanceof` relations.
   ContentEditableElementTextStore,
@@ -42,6 +45,7 @@ function promiseForIframeLoad(iframe: HTMLIFrameElement) {
   }
 }
 
+// NOTE: these tests are  included and run through textStoreForElement.tests.html!
 describe('textStoreForElement()', function () {
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
