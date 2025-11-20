@@ -1,12 +1,12 @@
-import { type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
+import { JSKeyboard, type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
-import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
+import { textStoreForEvent, textStoreForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
-import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
+import { DesignIFrameElementTextStore, AbstractElementTextStore, nestedInstanceOf } from 'keyman/engine/element-text-stores';
 import {
   ContextManagerBase,
-  type KeyboardInterface,
+  type KeyboardInterfaceBase,
   LegacyAPIEvents
 } from 'keyman/engine/main';
 import { BrowserConfiguration } from './configuration.js';
@@ -23,10 +23,12 @@ export interface KeyboardCookie {
  * has the same directionality, text runs will be re-ordered which is confusing and causes
  * incorrect caret positioning
  *
- * @param       {Object}      Ptarg      Target element
+ * @param       {Object}      Ptarg           Target element
+ * @param       {Keyboard}    activeKeyboard  The active keyboard
  */
 function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
-  const elDir = activeKeyboard?.isRTL ? 'rtl' : 'ltr';
+  // TODO-web-core: do we need to support RTL in Core?
+  const elDir = activeKeyboard instanceof JSKeyboard && activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
   if(Ptarg) {
     if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
@@ -40,13 +42,13 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
   }
 }
 
-export default class ContextManager extends ContextManagerBase<BrowserConfiguration> {
+export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant(() => this.activeTarget?.isForcingScroll());
   readonly page: PageContextAttachment;
-  private mostRecentTarget: OutputTarget<any>;
-  private currentTarget: OutputTarget<any>;
+  private mostRecentTarget: AbstractElementTextStore<any>;
+  private currentTarget: AbstractElementTextStore<any>;
 
   private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
 
@@ -90,7 +92,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
       // For any elements being attached, or being enabled after having been disabled...
       this.page.on('enabled', (elem) => {
-        if(!(elem._kmwAttachment.interface instanceof DesignIFrame)) {
+        if(!(elem._kmwAttachment.textStore instanceof DesignIFrameElementTextStore)) {
           // For anything attached but (design-mode) iframes...
 
           // This block:  has to do with maintaining focus.
@@ -124,7 +126,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
         }
 
         if(elem.ownerDocument.activeElement == elem) {
-          this.setActiveTarget(outputTargetForElement(elem), true);
+          this.setActiveTarget(textStoreForElement(elem), true);
         }
       });
 
@@ -173,7 +175,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     });
   }
 
-  get activeTarget(): OutputTarget<any> {
+  get activeTarget(): AbstractElementTextStore<any> {
     /*
      * Assumption:  the maintainingFocus flag may only be set when there is a current target.
      * This is not enforced proactively at present, but the assumption should hold.  (2023-05-03)
@@ -182,7 +184,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return this.currentTarget || (maintainingFocus ? this.mostRecentTarget : null);
   }
 
-  get lastActiveTarget(): OutputTarget<any> {
+  get lastActiveTarget(): AbstractElementTextStore<any> {
     return this.mostRecentTarget;
   }
 
@@ -227,7 +229,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public setActiveTarget(target: OutputTarget<any>, sendEvents?: boolean) {
+  public setActiveTarget(target: AbstractElementTextStore<any>, sendEvents?: boolean) {
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
@@ -259,7 +261,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
        * and trigger a contextReset DURING keyboard rule processing without this
        * guard.
        *
-       * The #2 reason:  the `forceScroll` method used within the Input and Textarea
+       * The #2 reason:  the `forceScroll` method used within the InputElementTextStore and TextAreaTextStore
        * types whenever the selection must be programatically updated.  The blur
        * is 'swallowed', preventing it from being dropped as 'active'. However, the
        * corresponding focus is not swallowed... until this if-condition's check.
@@ -288,7 +290,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Set element directionality (but only if element is empty)
     let focusedElement = target?.getElement();
-    if(target instanceof DesignIFrame) {
+    if(target instanceof DesignIFrameElementTextStore) {
       focusedElement = target.docRoot;
     }
     if(focusedElement && focusedElement.ownerDocument && focusedElement instanceof focusedElement.ownerDocument.defaultView.HTMLElement) {
@@ -302,7 +304,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     //Execute external (UI) code needed on focus if required
     if(sendEvents) {
       let blurredElement = previousTarget?.getElement();
-      if(previousTarget instanceof DesignIFrame) {
+      if(previousTarget instanceof DesignIFrameElementTextStore) {
         blurredElement = previousTarget.docRoot;
       }
 
@@ -342,19 +344,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.focusAssistant.restoringFocus = false;
   }
 
-  insertText(kbdInterface: KeyboardInterface<ContextManager>, Ptext: string, PdeadKey: number) {
+  insertText(kbdInterface: KeyboardInterfaceBase<ContextManager>, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.  The user has likely be interacting with a
     // 'help page' keyboard, like desktop `sil_euro_latin`, and active browser focus on the
     // original context element may have been lost.
     this.restoreLastActiveTarget();
 
-    let outputTarget = this.activeTarget;
+    let textStore = this.activeTarget;
 
-    if(outputTarget == null && this.mostRecentTarget) {
-      outputTarget = this.activeTarget;
+    if(textStore == null && this.mostRecentTarget) {
+      textStore = this.activeTarget;
     }
 
-    if(outputTarget != null) {
+    if(textStore != null) {
       return super.insertText(kbdInterface, Ptext, PdeadKey);
     }
     return false;
@@ -367,7 +369,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *
    * This is based on the current `.activeTarget` and its related attachment metadata.
    */
-  protected currentKeyboardSrcTarget(): OutputTarget<any> {
+  protected currentKeyboardSrcTarget(): AbstractElementTextStore<any> {
     const target = this.currentTarget || this.mostRecentTarget;
 
     if(this.isTargetKeyboardIndependent(target)) {
@@ -377,15 +379,15 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  private isTargetKeyboardIndependent(target: OutputTarget<any>): boolean {
-    const attachmentInfo = target?.getElement()._kmwAttachment;
+  private isTargetKeyboardIndependent(textStore: AbstractElementTextStore<any>): boolean {
+    const attachment = textStore?.getElement()._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
-    return !!(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '');
+    return !!(attachment?.keyboard || attachment?.keyboard === '');
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
-  activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget<any>) {
+  activateKeyboardForTarget(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, target: AbstractElementTextStore<any>) {
     const attachment = target?.getElement()._kmwAttachment;
 
     if(!attachment) {
@@ -419,8 +421,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * @param target
    * @param metadata
    */
-  public setKeyboardForTarget(target: OutputTarget<any>, kbdId: string, langId: string) {
-    if(target instanceof DesignIFrame) {
+  public setKeyboardForTarget(target: AbstractElementTextStore<any>, kbdId: string, langId: string) {
+    if(target instanceof DesignIFrameElementTextStore) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
     }
@@ -454,7 +456,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public getKeyboardStubForTarget(target: OutputTarget<any>) {
+  public getKeyboardStubForTarget(target: AbstractElementTextStore<any>) {
     if(!this.isTargetKeyboardIndependent(target)) {
       return this.globalKeyboard.metadata;
     } else {
@@ -612,16 +614,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *                      The return value indicates whether (true) or not (false) the calling event handler
    *                      should be terminated immediately after the call.
    */
-  _CommonFocusHelper(outputTarget: OutputTarget<any>): boolean {
+  _CommonFocusHelper(textStore: AbstractElementTextStore<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
     const activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
-      outputTarget?.deadkeys().clear();
-      activeKeyboard?.notify(0, outputTarget, 1);  // I2187
+      textStore?.deadkeys().clear();
+      activeKeyboard?.notify(0, textStore, 1);  // I2187
     }
 
-    if(!focusAssistant.restoringFocus && this.mostRecentTarget != outputTarget) {
+    if(!focusAssistant.restoringFocus && this.mostRecentTarget != textStore) {
       focusAssistant.maintainingFocus = false;
     }
     focusAssistant.restoringFocus = false;
@@ -640,19 +642,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * Respond to KeymanWeb-aware input element receiving focus
    */
   _ControlFocus = (e: FocusEvent): boolean => {
-    // Step 1: determine the corresponding OutputTarget instance.
-    const target = eventOutputTarget(e);
+    // Step 1: determine the corresponding TextStore instance.
+    const target = textStoreForEvent(e);
     if(!target) {
       // Probably should also make a warning or error?
       return true;
     }
 
     // ???? ?: ensure it's properly active?
-    // if(target instanceof DesignIFrame) { //**TODO: check case reference
+    // if(target instanceof DesignIFrameElementTextStore) { //**TODO: check case reference
     //   // But... the following should already have been done during attachment...
     //   // attachmentEngine._AttachToIframe(Ltarg as HTMLIFrameElement);
     //   target.docRoot
-    //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the OutputTarget.
+    //   Ltarg=Ltarg.contentWindow.document.body; // And we only care about Ltarg b/c of finding the TextStore.
     // }
 
     // Step 2:  Make the newly-focused control the active control, and thus the active context.
@@ -683,8 +685,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       return true;
     }
 
-    // Step 1: determine the corresponding OutputTarget instance.
-    const target = eventOutputTarget(e);
+    // Step 1: determine the corresponding TextStore instance.
+    const target = textStoreForEvent(e);
     if (target == null) {
       return true;
     }
@@ -736,7 +738,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return true;
   }
 
-  doChangeEvent(target: OutputTarget<any>) {
+  doChangeEvent(target: AbstractElementTextStore<any>) {
     if(target.changed) {
       const event = new Event('change', {"bubbles": true, "cancelable": false});
       target.getElement().dispatchEvent(event);

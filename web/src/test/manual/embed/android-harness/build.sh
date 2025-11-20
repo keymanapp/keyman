@@ -10,8 +10,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Builds a debug-host page simulating Keyman Android's WebView setup for KMW use" \
   "@/common/web/keyman-version" \
+  "@/common/web/sentry-manager" \
   "@/web/src/app/webview" \
-  "@/web/src/engine/sentry-manager" \
   clean configure build
 
 builder_describe_outputs \
@@ -45,7 +45,7 @@ if builder_start_action build; then
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/keymanweb-osk.ttf" "host/keymanweb-osk.ttf"
 
   # We shouldn't rely on a prior Android build for these files!  We can retrieve them separately.
-  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js" "host/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "host/keyman-sentry.js"
   cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "host/es6-shim.min.js"
 
   # Test keyboards

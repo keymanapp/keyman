@@ -13,13 +13,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/web/common.inc.sh"
 
-WORKER_OUTPUT=build/obj
-WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
-
 INTERMEDIATE=./build/intermediate
 LIB=./build/lib
-
-bundle_cmd="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 SRCMAP_CLEANER="node $KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js"
 
@@ -29,11 +24,11 @@ SUBPROJECT_NAME=engine/predictive-text/worker-thread
 
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
-  "@/common/web/keyman-version" \
-  "@/web/src/tools/building/sourcemap-root" \
-  "@/web/src/tools/es-bundling" \
-  "@../wordbreakers" \
-  "@../templates" \
+  "@/common/tools/es-bundling   build" \
+  "@/common/web/keyman-version  build" \
+  "@/web/src/tools/building/sourcemap-root build" \
+  "@../wordbreakers build" \
+  "@../templates build" \
   configure clean build test \
   "--inspect  Runs browser-based tests in a locally-inspectable mode"
 
@@ -62,7 +57,7 @@ function do_build() {
 
 
   # The ES6 target needs no polyfills - we go straight to the wrapped version.
-  $bundle_cmd src/main/worker-main.ts \
+  node_es_bundle src/main/worker-main.ts \
     --out $INTERMEDIATE/worker-main.js \
     --charset "utf8" \
     --target "es6" \
@@ -73,7 +68,7 @@ function do_build() {
     $INTERMEDIATE/worker-main.js.map \
     --clean
 
-  $bundle_cmd src/main/worker-main.ts \
+  node_es_bundle src/main/worker-main.ts \
     --out $INTERMEDIATE/worker-main.min.js \
     --minify \
     --charset "utf8" \

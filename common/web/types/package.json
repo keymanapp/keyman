@@ -79,7 +79,6 @@
       "src/schemas/*",
       "tests/",
       "src/keyboard-object.ts",
-      "src/outputTarget.interface.ts",
       "src/*.d.ts",
       "src/main.ts",
       "src/schema-validators.ts",
