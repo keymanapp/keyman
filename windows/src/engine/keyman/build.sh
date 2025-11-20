@@ -47,6 +47,7 @@ function do_build() {
   # Also copy sentry files here
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" \
      "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.x64.dll" \
+     "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.arm64.dll" \
      "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/crashpad_handler.exe" \
      "$KEYMAN_ROOT/windows/bin/engine/"
 }
@@ -62,6 +63,7 @@ function do_publish() {
   # Also sign sentry files here
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/sentry.dll"
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/sentry.x64.dll"
+  wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/sentry.arm64.dll"
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/crashpad_handler.exe"
 
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/keyman.exe" //t keyman-engine-windows

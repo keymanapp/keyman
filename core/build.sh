@@ -195,8 +195,9 @@ if builder_start_action test:win; then
   meson test -C "$MESON_PATH" $testparams
   MESON_PATH="$KEYMAN_ROOT/core/build/x64/$BUILDER_CONFIGURATION"
   meson test -C "$MESON_PATH" $testparams
-  MESON_PATH="$KEYMAN_ROOT/core/build/arm64/$BUILDER_CONFIGURATION"
-  meson test -C "$MESON_PATH" $testparams
+  # We do not yet have CI/build hardware support for arm64 Windows testing
+  #MESON_PATH="$KEYMAN_ROOT/core/build/arm64/$BUILDER_CONFIGURATION"
+  #meson test -C "$MESON_PATH" $testparams
 
   builder_finish_action success test:win
 fi
