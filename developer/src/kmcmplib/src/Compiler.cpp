@@ -1208,6 +1208,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
       sp->dpString = q;
     }
     break;
+
   case TSS_KMW_RTL:
   case TSS_KMW_HELPTEXT:
     if(!VerifyKeyboardVersion(fk, VERSION_70)) {
@@ -1298,6 +1299,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
       return FALSE;
     }
     // Used by KMW compiler
+    fk->extra->touchLayoutFilename = string_from_u16string(sp->dpString);
     break;
 
   case TSS_KEYBOARDVERSION:   // I4140

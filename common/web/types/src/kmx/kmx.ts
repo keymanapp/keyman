@@ -52,8 +52,8 @@ export function versionStringToKmxVersion(version: string): KMX_Version {
     return null;
   }
 
-  // Version number is 16 bit number with MINOR in lower 8 bits, 
-  // MAJOR in upper 8 bits. In practice, we now only use MAJOR 
+  // Version number is 16 bit number with MINOR in lower 8 bits,
+  // MAJOR in upper 8 bits. In practice, we now only use MAJOR
   // version for Keyman versions.
   const num = major << 8;
 
@@ -510,7 +510,7 @@ export class KMXFile {
       dpGroupArray: r.uint32le,   // 0024 [LPGROUP] address of first item in group array
 
       StartGroup_ANSI: r.uint32le,     // 0028 index of starting ANSI group
-      StartGroup_Unicode: r.uint32le,  // 0028 index of starting Unicode groups
+      StartGroup_Unicode: r.uint32le,  // 002C index of starting Unicode groups
 
       dwFlags: r.uint32le,        // 0030 Flags for the keyboard file
 

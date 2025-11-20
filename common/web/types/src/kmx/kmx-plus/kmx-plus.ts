@@ -712,7 +712,7 @@ export { ListItem as ListItem };
  * `KMXPlusFile`.
  */
 export interface KMXPlusData {
-    sect?: Strs; // sect is ignored in-memory
+    sect?: Sect; // sect is ignored in-memory
     bksp?: Bksp;
     disp?: Disp;
     elem?: Elem; // elem is ignored in-memory

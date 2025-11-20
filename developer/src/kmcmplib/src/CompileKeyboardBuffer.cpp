@@ -53,6 +53,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->extra->displayMapFilename = "";
   fk->extra->stores.clear();
   fk->extra->groups.clear();
+  fk->extra->targetVersion = VERSION_60;
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;
@@ -197,5 +198,7 @@ namespace kmcmp {
       extraGroup.name = string_from_u16string(group->szName);
       fk->extra->groups.push_back(extraGroup);
     }
+
+    fk->extra->targetVersion = fk->version;
   }
 }
