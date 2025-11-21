@@ -38,19 +38,25 @@ function do_clean_arm64() {
 function do_build_x64() {
   create-windows-output-folders
   build_version.res
+  sed "s/Keyman Engine HP/Keyman Engine x64/g;
+       s/arch64/amd64/g" manifesthp.in > manifest.in
   build_manifest.res
   vs_msbuild keymanhp.vcxproj //t:Build "//p:Platform=x64"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   builder_if_release_build_level cp "$X64_TARGET_PATH/keymanhp.x64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  rm manifest.in
 }
 
 function do_build_arm64() {
   create-windows-output-folders
   build_version.res
+  sed "s/Keyman Engine HP/Keyman Engine arm64/g;
+       s/arch64/arm64/g" manifesthp.in > manifest.in
   build_manifest.res
   vs_msbuild keymanhp.vcxproj //t:Build "//p:Platform=arm64"
   cp "$ARM64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   builder_if_release_build_level cp "$ARM64_TARGET_PATH/keymanhp.arm64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  rm manifest.in
 }
 
 function do_publish_x64() {
