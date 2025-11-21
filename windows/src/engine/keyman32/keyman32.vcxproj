@@ -361,6 +361,7 @@
     <ClCompile Include="kmprocess.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
     <ClCompile Include="kmprocessactions.cpp" />
+    <ClCompile Include="LowLevelHookWatchDog.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -450,6 +451,7 @@
     <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
+    <ClInclude Include="LowLevelHookWatchDog.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h" />
     <ClInclude Include="security.h" />
     <ClInclude Include="serialkeyeventclient.h" />
