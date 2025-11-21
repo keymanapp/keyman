@@ -32,7 +32,8 @@ describe('Compiler OSK Embedding', function() {
 
     const expectedHeaderSize = KMX.KMXFile.COMP_KEYBOARD_SIZE + KMX.KMXFile.COMP_KEYBOARD_KMXPLUSINFO_SIZE;
 
-    // We'll check that hte stores and groups start after the KMX+ struct
+    // We'll check that the stores and groups start after the KMX+ struct
+
 
     assert.isAtLeast(result.artifacts.kmx.data.byteLength, expectedHeaderSize);
 
