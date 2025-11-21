@@ -63,7 +63,7 @@ function do_publish() {
   # Build the installation archive
   #
   do_candle
-  #do_wix_build
+
   # ICE82: we suppress because it reports spurious errors with merge module
   #        keymanengine to do with duplicate sequence numbers.  Safely ignored.
   # ICE80: we suppress because it reports x64 components without targeting x64.
@@ -135,46 +135,6 @@ function test-releaseexists() {
   fi
 }
 
-
-function do_wix_build_OLD() {
-  #"${WIXCOMPRESSION}" \ this line was in the wix build cli     -culture en-us \
-  local GUID1=$(generate_uuid)
-  DESKTOP_UI_SRC="../kmshell/xml"
-  LOCALE_SRC="../kmshell/locale"
-$WIX6BUILD \
-    -d KEYMAN_VERSION_WITH_TAG="${KEYMAN_VERSION_WITH_TAG}" \
-    -d KEYMAN_VERSION="${KEYMAN_VERSION_WIN}" \
-    -d RELEASE="${KEYMAN_VERSION_RELEASE}" \
-    -d PRODUCTID="${GUID1}" \
-    -d CefSourceDir="${KEYMAN_CEF4DELPHI_ROOT}" \
-    -d DesktopUISource="${DESKTOP_UI_SRC}" \
-    -d LocaleSource="${LOCALE_SRC}" \
-    -d HarvestFileGenerateGuidsNow=true \
-    keymandesktop.wxs \
-    -ext WixToolset.Util.wixext \
-    -o "KeymanDesktop-${KEYMAN_VERSION_WITH_TAG}.msi" \
-
-}
-
-function do_wix_build() {
-  #"${WIXCOMPRESSION}" \ this line was in the wix build cli     -culture en-us \
-  exclude-cef
-  local GUID1=$(generate_uuid)
-  DESKTOPUISOURCE="../kmshell/xml"
-  LOCALESOURCE="../kmshell/locale"
-echo "Building with ProductID: $GUID1"
-  dotnet build KeymanDesktop.wixproj \
-  -p:PRODUCTID="$GUID1" \
-  -p:RELEASE="$KEYMAN_VERSION_RELEASE" \
-  -p:KEYMAN_VERSION="$KEYMAN_VERSION_WIN" \
-  -p:KEYMAN_VERSION_WITH_TAG="$KEYMAN_VERSION_WITH_TAG" \
-  -p:KEYMAN_VERSION_WIN="$KEYMAN_VERSION_WIN" \
-  -p:CefSourceDir="$KEYMAN_WIX_TEMP_CEF" \
-  -p:DESKTOPUISOURCE="$DESKTOPUISOURCE" \
-  -p:LOCALESOURCE="$LOCALESOURCE"
-}
-
-
 function do_candle() {
   heat-cef
 
@@ -191,7 +151,7 @@ function do_candle() {
 function heat-cef() {
   builder_heading heat-cef
 
-  # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+  # We copy the files to a temp folder in order to exclude .git from harvesting
   rm -rf "$KEYMAN_WIX_TEMP_CEF"
   mkdir -p "$KEYMAN_WIX_TEMP_CEF"
   cp -r "$KEYMAN_CEF4DELPHI_ROOT"/* "$KEYMAN_WIX_TEMP_CEF"
@@ -199,16 +159,6 @@ function heat-cef() {
   # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
   rm -rf "$KEYMAN_WIX_TEMP_CEF"
 }
-
-function exclude-cef() {
-  builder_heading exclude-cef
-
-  # We copy the files to a temp folder in order to exclude .git  from harvesting
-  rm -rf "$KEYMAN_WIX_TEMP_CEF"
-  mkdir -p "$KEYMAN_WIX_TEMP_CEF"
-  cp -r "$KEYMAN_CEF4DELPHI_ROOT"/* "$KEYMAN_WIX_TEMP_CEF"
-}
-
 
 function create-setup-inf() {
   builder_heading create-setup-inf
