@@ -10,7 +10,7 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchPath } from "./search-path.js";
-import { SearchSpace, PathInputProperties } from "./search-space.js";
+import { isSearchSpace, SearchSpace } from "./search-space.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 import { generateSubsetId } from './tokenization-subsets.js';
 
@@ -69,7 +69,7 @@ export class ContextToken {
    * Constructs a new, empty instance for use with the specified LexicalModel.
    * @param model
    */
-  constructor(model: LexicalModel);
+  constructor(model: SearchSpace | LexicalModel);
   /**
    * Constructs a new instance with pre-existing text for use with the specified LexicalModel.
    * @param model
@@ -81,7 +81,7 @@ export class ContextToken {
    * @param baseToken
    */
   constructor(baseToken: ContextToken);
-  constructor(param: ContextToken | LexicalModel, rawText?: string, isPartial?: boolean) {
+  constructor(param: ContextToken | SearchSpace | LexicalModel, rawText?: string, isPartial?: boolean) {
     if(param instanceof ContextToken) {
       const priorToken = param;
       Object.assign(this, priorToken);
@@ -92,7 +92,7 @@ export class ContextToken {
       // we need to ensure that only fully-utilized keystrokes are considered.
       this._searchSpace = priorToken.searchSpace;
     } else {
-      const model = param;
+      const baseSpace = isSearchSpace(param) ? param as SearchSpace : new SearchPath(param as LexicalModel);
 
       // May be altered outside of the constructor.
       this.isWhitespace = false;
@@ -105,7 +105,7 @@ export class ContextToken {
         return [{sample: transform, p: 1.0}];
       });
 
-      let searchSpace = new SearchPath(model);
+      let searchSpace = baseSpace;
 
       rawTransformDistributions.forEach((entry) => {
         searchSpace = new SearchPath(searchSpace, entry, {
@@ -120,14 +120,6 @@ export class ContextToken {
 
       this._searchSpace = searchSpace;
     }
-  }
-
-  /**
-   * Call this to record the original keystroke Transforms for the context range
-   * corresponding to this token.
-   */
-  addInput(inputSource: PathInputProperties, distribution: Distribution<Transform>) {
-    this._searchSpace = new SearchPath(this._searchSpace, distribution, inputSource);
   }
 
   get inputCount() {

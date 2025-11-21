@@ -15,6 +15,7 @@ import { SearchPath } from "./search-path.js";
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
+import { SearchCluster } from "./search-cluster.js";
 
 export let SPACE_ID_SEED = 0;
 
@@ -93,6 +94,10 @@ export interface PathInputProperties {
    * @see TokenizationPath.inputSubsetId
    */
   subsetId: number;
+}
+
+export function isSearchSpace(obj: unknown): boolean {
+  return obj instanceof SearchPath || obj instanceof SearchCluster;
 }
 
 /**

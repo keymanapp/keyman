@@ -121,36 +121,45 @@ describe('ContextToken', function() {
       const srcTransform = { insert: "can't", deleteLeft: 0, deleteRight: 0, id: 1 };
       const srcSubsetId = generateSubsetId();
 
-      const token1 = new ContextToken(plainModel);
-      const token2 = new ContextToken(plainModel);
-      const token3 = new ContextToken(plainModel);
+      let token1 = new ContextToken(plainModel);
+      let token2 = new ContextToken(plainModel);
+      let token3 = new ContextToken(plainModel);
 
-      token1.addInput({
-        segment: {
-          transitionId: srcTransform.id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetId
-      }, [{sample: {insert: 'can', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
+      token1 = new ContextToken(new SearchPath(
+        token1.searchSpace,
+        [{sample: {insert: 'can', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}], {
+          segment: {
+            transitionId: srcTransform.id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetId
+        }
+      ));
 
-      token2.addInput({
-        segment: {
-          transitionId: srcTransform.id,
-          start: 3
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetId
-      }, [{sample: {insert: "'", deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
+      token2 = new ContextToken(new SearchPath(
+        token2.searchSpace,
+        [{sample: {insert: "'", deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}], {
+          segment: {
+            transitionId: srcTransform.id,
+            start: 3
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetId
+        }
+      ));
 
-      token3.addInput({
-        segment: {
-          transitionId: srcTransform.id,
-          start: 4
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetId
-      }, [{sample: {insert: 't', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
+      token3 = new ContextToken(new SearchPath(
+        token3.searchSpace,
+        [{sample: {insert: 't', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}], {
+          segment: {
+            transitionId: srcTransform.id,
+            start: 4
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetId
+        }
+      ));
 
       const merged = ContextToken.merge([token1, token2, token3]);
       assert.equal(merged.exampleInput, "can't");
@@ -179,67 +188,85 @@ describe('ContextToken', function() {
       ];
 
       // apples
-      const token1 = new ContextToken(plainModel);
+      let token1 = new ContextToken(plainModel);
       // and
-      const token2 = new ContextToken(plainModel);
+      let token2 = new ContextToken(plainModel);
       // sour
-      const token3 = new ContextToken(plainModel);
+      let token3 = new ContextToken(plainModel);
       // grapes
-      const token4 = new ContextToken(plainModel);
-      const tokensToMerge = [token1, token2, token3, token4]
+      let token4 = new ContextToken(plainModel);
 
-      token1.addInput({
-        segment: {
-          transitionId: srcTransforms[0].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[0]
-      }, [{sample: srcTransforms[0], p: 1}]);
-      token1.addInput({
-        segment: {
-          transitionId: srcTransforms[1].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[1]
-      }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+      token1 = new ContextToken(new SearchPath(
+        token1.searchSpace,
+        [{sample: srcTransforms[0], p: 1}], {
+          segment: {
+            transitionId: srcTransforms[0].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[0]
+        }
+      ));
+      token1 = new ContextToken(new SearchPath(
+        token1.searchSpace,
+        [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}], {
+          segment: {
+            transitionId: srcTransforms[1].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[1]
+        }
+      ));
 
-      token2.addInput({
-        segment: {
-          transitionId: srcTransforms[1].id,
-          start: 1
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[1]
-      }, [{sample: {insert: "and", deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+      token2 = new ContextToken(new SearchPath(
+        token2.searchSpace,
+        [{sample: {insert: "and", deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}], {
+          segment: {
+            transitionId: srcTransforms[1].id,
+            start: 1
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[1]
+        }
+      ));
 
-      token3.addInput({
-        segment: {
-          transitionId: srcTransforms[1].id,
-          start: 4
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[1]
-      }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
-      token3.addInput({
-        segment: {
-          transitionId: srcTransforms[2].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[2]
-      }, [{sample: srcTransforms[2], p: 1}]);
+      token3 = new ContextToken(new SearchPath(
+        token3.searchSpace,
+        [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}], {
+          segment: {
+            transitionId: srcTransforms[1].id,
+            start: 4
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[1]
+        }
+      ));
+      token3 = new ContextToken(new SearchPath(
+        token3.searchSpace,
+        [{sample: srcTransforms[2], p: 1}], {
+          segment: {
+            transitionId: srcTransforms[2].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[2]
+        }
+      ));
 
-      token4.addInput({
-        segment: {
-          transitionId: srcTransforms[3].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[3]
-      }, [{sample: srcTransforms[3], p: 1}]);
+      token4 = new ContextToken(new SearchPath(
+        token4.searchSpace,
+        [{sample: srcTransforms[3], p: 1}], {
+          segment: {
+            transitionId: srcTransforms[3].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[3]
+        }
+      ));
 
+      const tokensToMerge = [token1, token2, token3, token4];
       const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
       assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
@@ -267,68 +294,86 @@ describe('ContextToken', function() {
         generateSubsetId()
       ];
 
-      // apples
-      const token1 = new ContextToken(plainModel);
+            // apples
+      let token1 = new ContextToken(plainModel);
       // and
-      const token2 = new ContextToken(plainModel);
+      let token2 = new ContextToken(plainModel);
       // sour
-      const token3 = new ContextToken(plainModel);
+      let token3 = new ContextToken(plainModel);
       // grapes
-      const token4 = new ContextToken(plainModel);
-      const tokensToMerge = [token1, token2, token3, token4]
+      let token4 = new ContextToken(plainModel);
 
-      token1.addInput({
-        segment: {
-          transitionId: srcTransforms[0].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[0]
-      }, [{sample: srcTransforms[0], p: 1}]);
-      token1.addInput({
-        segment: {
-          transitionId: srcTransforms[1].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[1]
-      }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+      token1 = new ContextToken(new SearchPath(
+        token1.searchSpace,
+        [{sample: srcTransforms[0], p: 1}], {
+          segment: {
+            transitionId: srcTransforms[0].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[0]
+        }
+      ));
+      token1 = new ContextToken(new SearchPath(
+        token1.searchSpace,
+        [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}], {
+          segment: {
+            transitionId: srcTransforms[1].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[1]
+        }
+      ));
 
-      token2.addInput({
-        segment: {
-          transitionId: srcTransforms[1].id,
-          start: 1
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[1]
-      }, [{sample: {insert: toMathematicalSMP("and"), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
+      token2 = new ContextToken(new SearchPath(
+        token2.searchSpace,
+        [{sample: {insert: toMathematicalSMP("and"), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}], {
+          segment: {
+            transitionId: srcTransforms[1].id,
+            start: 1
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[1]
+        }
+      ));
 
-      token3.addInput({
-        segment: {
-          transitionId: srcTransforms[1].id,
-          start: 4
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[1]
-      }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
-      token3.addInput({
-        segment: {
-          transitionId: srcTransforms[2].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[2]
-      }, [{sample: srcTransforms[2], p: 1}]);
+      token3 = new ContextToken(new SearchPath(
+        token3.searchSpace,
+        [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}], {
+          segment: {
+            transitionId: srcTransforms[1].id,
+            start: 4
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[1]
+        }
+      ));
+      token3 = new ContextToken(new SearchPath(
+        token3.searchSpace,
+        [{sample: srcTransforms[2], p: 1}], {
+          segment: {
+            transitionId: srcTransforms[2].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[2]
+        }
+      ));
 
-      token4.addInput({
-        segment: {
-          transitionId: srcTransforms[3].id,
-          start: 0
-        },
-        bestProbFromSet: 1,
-        subsetId: srcSubsetIds[3]
-      }, [{sample: srcTransforms[3], p: 1}]);
+      token4 = new ContextToken(new SearchPath(
+        token4.searchSpace,
+        [{sample: srcTransforms[3], p: 1}], {
+          segment: {
+            transitionId: srcTransforms[3].id,
+            start: 0
+          },
+          bestProbFromSet: 1,
+          subsetId: srcSubsetIds[3]
+        }
+      ));
 
+      const tokensToMerge = [token1, token2, token3, token4];
       const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
       assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
@@ -363,15 +408,18 @@ describe('ContextToken', function() {
         ]
       ]
 
-      const tokenToSplit = new ContextToken(plainModel);
+      let tokenToSplit = new ContextToken(plainModel);
       for(let i = 0; i < keystrokeDistributions.length; i++) {
-        tokenToSplit.addInput({
-          segment: {
-            transitionId: keystrokeDistributions[i][0].sample.id,
-            start: 0
-          }, bestProbFromSet: .75,
-          subsetId: generateSubsetId()
-        }, keystrokeDistributions[i]);
+        tokenToSplit = new ContextToken(new SearchPath(
+          tokenToSplit.searchSpace,
+          keystrokeDistributions[i], {
+            segment: {
+              transitionId: keystrokeDistributions[i][0].sample.id,
+              start: 0
+            }, bestProbFromSet: .75,
+            subsetId: generateSubsetId()
+          }
+        ));
       };
 
       tokenToSplit.searchSpace.hasInputs(keystrokeDistributions);
@@ -405,16 +453,19 @@ describe('ContextToken', function() {
       const splitTextArray = ['big', 'large', 'transform'];
       const subsetId = generateSubsetId();
 
-      const tokenToSplit = new ContextToken(plainModel);
+      let tokenToSplit = new ContextToken(plainModel);
       for(let i = 0; i < keystrokeDistributions.length; i++) {
-        tokenToSplit.addInput({
-          segment: {
-            transitionId: keystrokeDistributions[i][0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: 1,
-          subsetId
-        }, keystrokeDistributions[i]);
+        tokenToSplit = new ContextToken(new SearchPath(
+          tokenToSplit.searchSpace,
+          keystrokeDistributions[i], {
+            segment: {
+              transitionId: keystrokeDistributions[i][0].sample.id,
+              start: 0
+            },
+            bestProbFromSet: 1,
+            subsetId
+          }
+        ));
       };
 
       assert.isTrue(tokenToSplit.searchSpace.hasInputs(keystrokeDistributions));
@@ -474,16 +525,19 @@ describe('ContextToken', function() {
         generateSubsetId()
       ];
 
-      const tokenToSplit = new ContextToken(plainModel);
+      let tokenToSplit = new ContextToken(plainModel);
       for(let i = 0; i < keystrokeDistributions.length; i++) {
-        tokenToSplit.addInput({
-          segment: {
-            transitionId: keystrokeDistributions[i][0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[i]
-        }, keystrokeDistributions[i]);
+        tokenToSplit = new ContextToken(new SearchPath(
+          tokenToSplit.searchSpace,
+          keystrokeDistributions[i], {
+            segment: {
+              transitionId: keystrokeDistributions[i][0].sample.id,
+              start: 0
+            },
+            bestProbFromSet: 1,
+            subsetId: subsetIds[i]
+          }
+        ));
       };
 
       assert.equal(tokenToSplit.exampleInput, 'largelongtransforms');
@@ -595,16 +649,19 @@ describe('ContextToken', function() {
         generateSubsetId()
       ];
 
-      const tokenToSplit = new ContextToken(plainModel);
+      let tokenToSplit = new ContextToken(plainModel);
       for(let i = 0; i < keystrokeDistributions.length; i++) {
-        tokenToSplit.addInput({
-          segment: {
-            transitionId: keystrokeDistributions[i][0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: 1,
-          subsetId: subsetIds[i]
-        }, keystrokeDistributions[i]);
+        tokenToSplit = new ContextToken(new SearchPath(
+          tokenToSplit.searchSpace,
+          keystrokeDistributions[i], {
+            segment: {
+              transitionId: keystrokeDistributions[i][0].sample.id,
+              start: 0
+            },
+            bestProbFromSet: 1,
+            subsetId: subsetIds[i]
+          }
+        ));
       };
 
       assert.equal(tokenToSplit.exampleInput, toMathematicalSMP('largelongtransforms'));
