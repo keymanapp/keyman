@@ -41,6 +41,7 @@ function enableControls(enable) {
   });
 }
 
+let shouldSetupKeyman = false;
 let keymanInitialized = false;
 enableControls(false);
 
@@ -58,7 +59,13 @@ keyman.init({
 }).then(function() {
   keyman.attachToControl(document.getElementById('ta1'));
   enableControls(true);
+
   keymanInitialized = true;
+
+  if(shouldSetupKeyman) {
+    console.log('keyman.init after window.onload');
+    setupKeyman();
+  }
 });
 
 /* Initialization */
@@ -190,6 +197,15 @@ document.getElementById('ta1').addEventListener('input', logContent, false);
 */
 
 window.onload = function() {
+  if(keymanInitialized) {
+    console.log('keyman.init before window.onload');
+    setupKeyman();
+  } else {
+    shouldSetupKeyman = true;
+  }
+}
+
+function setupKeyman() {
   window.setTimeout(
     function () {
       keyman.moveToElement('ta1');
@@ -199,6 +215,8 @@ window.onload = function() {
   let newOSK = null;
   let deviceDropdown = null;
   let currentDevice = null;
+
+  checkKeyboardsAndModels(false);
 
   buildKeyboardList();
 
@@ -333,6 +351,10 @@ function handleKeyboardsAndModelsResponse(responseText, shouldReload) {
 }
 
 function checkKeyboardsAndModels(shouldReload) {
+  if(!keymanInitialized) {
+    // setupKeyman will run the check after initialization
+    return false;
+  }
   let req=new XMLHttpRequest();
   console.log('Checking for updated keyboards and models ('+shouldReload+')');
   req.onreadystatechange = function() {
@@ -344,9 +366,8 @@ function checkKeyboardsAndModels(shouldReload) {
   }
   req.open("GET", "inc/keyboards.js", true);
   req.send(null);
+  return true;
 }
-
-checkKeyboardsAndModels(false);
 
 /* Lexical models */
 
