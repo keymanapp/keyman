@@ -9,7 +9,7 @@ import {
 } from 'keyman/engine/keyboard';
 
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { KeyboardStub } from 'keyman/engine/keyboard-storage';
+import { KeyboardInfoPair } from 'keyman/engine/main';
 
 const loader = new DOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal));
 
@@ -17,14 +17,13 @@ export function loadKeyboardFromPath(path: string) {
   return loader.loadKeyboardFromPath(path);
 }
 
+export type KeyboardMap = {
+  [key: string]: KeyboardInfoPair & { keyboard: JSKeyboard }
+};
+
 export function loadKeyboardsFromStubs(apiStubs: any, baseDir: string) {
   baseDir = baseDir || './';
-  const keyboards: {
-    [key: string]: {
-      keyboard: JSKeyboard,
-      metadata: KeyboardStub
-    }
-  } = {};
+  const keyboards: KeyboardMap = {};
   let priorPromise: Promise<void | JSKeyboard> = Promise.resolve();
   for(const stub of apiStubs) {
     // We are keeping this strictly sequential because we don't have sandboxed

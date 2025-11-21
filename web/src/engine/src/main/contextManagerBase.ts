@@ -5,6 +5,8 @@ import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/keyboard-
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { EngineConfiguration } from './engineConfiguration.js';
 
+export type KeyboardInfoPair = { keyboard: Keyboard, metadata: KeyboardStub };
+
 interface EventMap {
   // textStore, then keyboard.
   'textstorechange': (textStore: TextStore) => boolean;
@@ -99,6 +101,18 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     this.keyboardCache = config.keyboardCache;
   }
 
+  /**
+   * Inserts the specified text and/or deadkey into the currently active text store
+   * using the provided keyboard interface.
+   *
+   * @param {JSKeyboardInterface}  kbdInterface  The keyboard interface used to
+   *                                             output text and deadkeys.
+   * @param {string}               text          The text string to insert.
+   * @param {number}               deadkey       The deadkey code to insert.
+   *
+   * @returns {boolean} True if the insertion was successful, false if there is
+   *                    no active text store.
+   */
   public insertText(kbdInterface: JSKeyboardInterface, text: string, deadkey: number): boolean {
     // Find the correct textStore to manipulate.
     const textStore = this.activeTextStore;
@@ -143,7 +157,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param kbd
    * @param textStore
    */
-  protected abstract activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: TextStore): void;
+  protected abstract activateKeyboardForTextStore(kbd: KeyboardInfoPair, textStore: TextStore): void;
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
@@ -263,7 +277,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       this.emit('beforekeyboardchange', activatingKeyboard.metadata);
     }
 
-    let kbdStubPair: { keyboard: Keyboard, metadata: KeyboardStub } = null;
+    let kbdStubPair: KeyboardInfoPair = null;
     if(keyboard) {
       kbdStubPair = {
         keyboard: keyboard,
