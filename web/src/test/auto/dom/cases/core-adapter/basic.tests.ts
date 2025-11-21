@@ -1,21 +1,10 @@
 import { assert } from 'chai';
 import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
-
-const coreurl = '/build/engine/obj/core-adapter/import/core';
+import { coreurl, loadKeyboardBlob } from '../../test_utils.js';
 
 // Test the KM_Core interface.
 describe('KM_Core', function () {
   this.timeout(5000); // increased timeout for async loading
-
-  async function loadKeyboardBlob(uri: string) {
-    const response = await fetch(uri);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} ${response.statusText}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-    return new Uint8Array(buffer);
-  }
 
   it('can initialize without errors', async function () {
     const km_core = await KM_Core.createCoreProcessor(coreurl);
