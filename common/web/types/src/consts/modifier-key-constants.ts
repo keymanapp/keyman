@@ -76,7 +76,7 @@ export function translateLdmlModifiersToVisualKeyboardShift(modifiers: number): 
 }
 
 export function translateVisualKeyboardShiftToLdmlModifiers(shift: VisualKeyboardShiftState): number {
-  if(shift == 0) {
+  if(shift == VisualKeyboardShiftState.KVKS_NORMAL) {
     return 0;
   }
 
