@@ -495,24 +495,92 @@ COMP_KMXPLUS_META::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unuse
 }
 
 bool
-COMP_KMXPLUS_DISP::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+COMP_KMXPLUS_DISP::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const {
+  if(header.version == LDML_KMXPLUS_VERSION_17) {
+    return valid_17(header, length);
+  }
+
+  if(header.version == LDML_KMXPLUS_VERSION_19) {
+    return valid_19(header, length);
+  }
+
+  assert(false);
+  return false;
+}
+
+bool
+COMP_KMXPLUS_DISP::valid_19(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+  if(header.version != LDML_KMXPLUS_VERSION_19) {
+    assert(false);
+    return false;
+  }
+
   DebugLog("disp: count 0x%X\n", count);
+
   if (!is_block_valid(header, header.headerSize(), sizeof(*this)+(sizeof(entries[0])*count))) {
     DebugLog("header.size < expected size");
     assert(false);
     return false;
   }
+
   if (baseCharacter != 0) {
     DebugLog("disp: baseCharacter str#0x%X", baseCharacter);
   }
   for (KMX_DWORD i=0; i<count; i++) {
-    DebugLoad("disp#%d: id: str0x%X to: str0x%X -> str0x%X", i, entries[i].id, entries[i].to, entries[i].display);
-    if ((entries[i].to == 0 && entries[i].id == 0) || entries[i].display == 0) {
+    DebugLoad("disp#%d: toId: str0x%X -> str0x%X, flags: 0x%x", i, entries[i].toId, entries[i].display, entries[i].flags);
+    if (entries[i].toId == 0 || entries[i].display == 0) {
+      DebugLog("disp must have output/keyId, and must have display");
+      assert(false);
+      return false;
+    }
+    //TODO-EMBED-OSK-IN-KMX: validate flags
+  }
+  return true;
+}
+
+bool
+COMP_KMXPLUS_DISP::valid_17(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+  if(header.version != LDML_KMXPLUS_VERSION_17) {
+    assert(false);
+    return false;
+  }
+
+  DebugLog("disp: count 0x%X\n", count);
+
+  if (!is_block_valid(header, header.headerSize(), sizeof(*this)+(sizeof(entries[0])*count))) {
+    DebugLog("header.size < expected size");
+    assert(false);
+    return false;
+  }
+
+  if (baseCharacter != 0) {
+    DebugLog("disp: baseCharacter str#0x%X", baseCharacter);
+  }
+
+  const COMP_KMXPLUS_DISP_ENTRY_17 *entries17 = reinterpret_cast<const COMP_KMXPLUS_DISP_ENTRY_17 *>(&entries[0]);
+  for (KMX_DWORD i=0; i<count; i++) {
+    DebugLoad("disp#%d: id: str0x%X to: str0x%X -> str0x%X", i, entries17[i].id, entries17[i].to, entries17[i].display);
+    if ((entries17[i].to == 0 && entries17[i].id == 0) || entries17[i].display == 0) {
       DebugLog("disp must have either keyId/output, and must have display");
       assert(false);
       return false;
     }
   }
+  return true;
+}
+
+bool
+COMP_KMXPLUS_DISP_Helper::set(const COMP_KMXPLUS_DISP *newDisp) {
+  if(header.version != LDML_KMXPLUS_VERSION_17 && header.version != LDML_KMXPLUS_VERSION_19) {
+    return false;
+  }
+
+  // TODO-EMBED-OSK-IN-KMX - more transforms required for in-memory representation of OSK; convert v17 to v19 in memory
+
+  if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_DISP>::set(newDisp)) {
+    return false;
+  }
+
   return true;
 }
 
@@ -898,18 +966,34 @@ COMP_KMXPLUS_TRAN_Helper::set(const COMP_KMXPLUS_TRAN *newTran) {
   return is_valid;
 }
 
-
+bool
+COMP_KMXPLUS_LAYR::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD length) const {
+  if(header.version == LDML_KMXPLUS_VERSION_17) {
+    return valid_17(header, length);
+  }
+  if(header.version == LDML_KMXPLUS_VERSION_19) {
+    return valid_19(header, length);
+  }
+  assert(false);
+  return false;
+}
 
 bool
-COMP_KMXPLUS_LAYR::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+COMP_KMXPLUS_LAYR::valid_19(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+  if(header.version != LDML_KMXPLUS_VERSION_19) {
+    assert(false);
+    return false;
+  }
+
   if(!is_block_valid(header, header.headerSize(),
     sizeof(*this)
-      + (formCount  * sizeof(COMP_KMXPLUS_LAYR_FORM))
+      + (formCount  * sizeof(COMP_KMXPLUS_LAYR_FORM_V19))
       + (layerCount * sizeof(COMP_KMXPLUS_LAYR_ENTRY))
       + (rowCount   * sizeof(COMP_KMXPLUS_LAYR_ROW))
       + (keyCount   * sizeof(COMP_KMXPLUS_LAYR_KEY)))) {
     return false;
   }
+
   DebugLog("layr header is valid");
   // Note: We only do minimal validation here because of the
   // dynamic structure. See COMP_KMXPLUS_LAYR_Helper.set()  (below)
@@ -917,7 +1001,30 @@ COMP_KMXPLUS_LAYR::valid(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unuse
   return true;
 }
 
-COMP_KMXPLUS_LAYR_Helper::COMP_KMXPLUS_LAYR_Helper() : is_valid(false) {
+bool
+COMP_KMXPLUS_LAYR::valid_17(COMP_KMXPLUS_HEADER const &header, KMX_DWORD _kmn_unused(length)) const {
+  if(header.version != LDML_KMXPLUS_VERSION_17) {
+    assert(false);
+    return false;
+  }
+
+  if(!is_block_valid(header, header.headerSize(),
+    sizeof(*this)
+      + (formCount  * sizeof(COMP_KMXPLUS_LAYR_FORM_V17))
+      + (layerCount * sizeof(COMP_KMXPLUS_LAYR_ENTRY))
+      + (rowCount   * sizeof(COMP_KMXPLUS_LAYR_ROW))
+      + (keyCount   * sizeof(COMP_KMXPLUS_LAYR_KEY)))) {
+    return false;
+  }
+
+  DebugLog("layr header is valid");
+  // Note: We only do minimal validation here because of the
+  // dynamic structure. See COMP_KMXPLUS_LAYR_Helper.set()  (below)
+  // all remaining checks
+  return true;
+}
+
+COMP_KMXPLUS_LAYR_Helper::COMP_KMXPLUS_LAYR_Helper() : is_valid(false), own_forms(false) {
 }
 
 bool
@@ -927,6 +1034,10 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
   entries = nullptr;
   rows = nullptr;
   keys = nullptr;
+
+  if(header.version != LDML_KMXPLUS_VERSION_17 && header.version != LDML_KMXPLUS_VERSION_19) {
+    return false;
+  }
 
   if(!COMP_KMXPLUS_Section_Helper<COMP_KMXPLUS_LAYR>::set(newLayr)) {
     return false;
@@ -940,11 +1051,34 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
   }
   KMX_DWORD offset = this->header.calculateBaseSize(LDML_LENGTH_LAYR);  // skip past non-dynamic portion
 
-  // forms (required)
-  is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_FORM>(
-      data(), header, data()->formCount, offset, forms);
-  assert(is_valid);
+  own_forms = false;
+  if(header.version == LDML_KMXPLUS_VERSION_17) {
+    // forms (required)
+    const COMP_KMXPLUS_LAYR_FORM_V17 *forms_v17;
+    is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_FORM_V17>(
+        data(), header, data()->formCount, offset, forms_v17);
+    assert(is_valid);
+    if(is_valid) {
+      own_forms = true;
+      COMP_KMXPLUS_LAYR_FORM_V19 *localForms = new COMP_KMXPLUS_LAYR_FORM_V19[data()->formCount];
+      for(KMX_DWORD i = 0; i < data()->formCount; i++) {
+        localForms[i].hardware = forms_v17[i].hardware;
+        localForms[i].layer = forms_v17[i].layer;
+        localForms[i].count = forms_v17[i].count;
+        localForms[i].minDeviceWidth = forms_v17[i].minDeviceWidth;
 
+        localForms[i].baseLayout = 0;
+        localForms[i].fontFaceName = 0;
+        localForms[i].fontSizePct = 100;
+        localForms[i].flags = 0;
+      }
+      forms = localForms;
+    }
+  } else { // header.version == LDML_KMXPLUS_VERSION_19
+    is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_FORM_V19>(
+        data(), header, data()->formCount, offset, forms);
+    assert(is_valid);
+  }
   // entries (required) - note, "entryCount" is called "layerCount" in COMP_KMXPLUS_LAYR
   is_valid = is_valid && get_required_section_data_at_offset_and_increment<COMP_KMXPLUS_LAYR, COMP_KMXPLUS_LAYR_ENTRY>(
       data(), header, data()->layerCount, offset, entries);
@@ -963,7 +1097,7 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
   // Now, validate offsets by walking
   if (is_valid) {
     for(KMX_DWORD i = 0; is_valid && i < data()->formCount; i++) {
-      const COMP_KMXPLUS_LAYR_FORM &form = forms[i];
+      const COMP_KMXPLUS_LAYR_FORM_V19 &form = forms[i];
       // is the count off the end?
       DebugLog(
           "<layers> %d: hardware s#0x%X, layers %d..%d, minDeviceWidth %.1fmm", i, form.hardware, form.layer,
@@ -974,6 +1108,7 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
         is_valid = false;
         assert(is_valid);
       }
+      // TODO-EMBED-OSK-IN-KMX: other validations needed?
     }
     for(KMX_DWORD i = 0; is_valid && i < data()->layerCount; i++) {
       const COMP_KMXPLUS_LAYR_ENTRY &entry = entries[i];
@@ -1013,7 +1148,7 @@ bool COMP_KMXPLUS_LAYR_Helper::valid() const {
   return is_valid;
 }
 
-const COMP_KMXPLUS_LAYR_FORM *
+const COMP_KMXPLUS_LAYR_FORM_V19 *
 COMP_KMXPLUS_LAYR_Helper::getForm(KMX_DWORD form) const {
   if (!valid() || form >= data()->formCount) {
     assert(false);
@@ -1518,7 +1653,11 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     assert(valid);
     return;
   }
-  if ( ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
+  // check individual components to avoid overflow on sum (we'll never get even
+  // a 2GB file so if both components are < length then we are okay to sum)
+  if (ex->kmxplus.dpKMXPlus > length ||
+      ex->kmxplus.dwKMXPlusSize > length ||
+      ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
     DebugLog("dpKMXPlus + dwKMXPlusSize is past the end of the file");
     valid = false;
     assert(valid);

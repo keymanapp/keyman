@@ -1,5 +1,10 @@
-import { KMXPlus, KMX } from '@keymanapp/common-types';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Build a full KMX+ file
+ */
 import * as r from 'restructure';
+import { KMXPlus, KMX } from '@keymanapp/common-types';
 import KMXPlusBuilder from './kmx-plus-builder/kmx-plus-builder.js';
 
 import KMXPlusFile = KMXPlus.KMXPlusFile;
@@ -14,22 +19,18 @@ import BUILDER_COMP_GROUP = KMX.BUILDER_COMP_GROUP;
 import BUILDER_COMP_KEY = KMX.BUILDER_COMP_KEY;
 
 export default class KMXBuilder {
-  file: KMXFile;
-  base_keyboard: number = 0;
-  base_kmxplus: number = 0;
-  comp_header: BUILDER_COMP_KEYBOARD;
-  comp_kmxplus: BUILDER_COMP_KEYBOARD_KMXPLUSINFO;
-  comp_stores: {base: number, store: STORE, obj: BUILDER_COMP_STORE}[] = [];
-  comp_groups: {base: number, group: GROUP, obj: BUILDER_COMP_GROUP, keys: {base: number, key: KEY, obj: BUILDER_COMP_KEY}[]}[] = [];
-  comp_kmxplus_data: Uint8Array;
-  writeDebug: boolean = false;
+  private base_keyboard: number = 0;
+  private base_kmxplus: number = 0;
+  private comp_header: BUILDER_COMP_KEYBOARD;
+  private comp_kmxplus: BUILDER_COMP_KEYBOARD_KMXPLUSINFO;
+  private comp_stores: {base: number, store: STORE, obj: BUILDER_COMP_STORE}[] = [];
+  private comp_groups: {base: number, group: GROUP, obj: BUILDER_COMP_GROUP, keys: {base: number, key: KEY, obj: BUILDER_COMP_KEY}[]}[] = [];
+  private comp_kmxplus_data: Uint8Array;
 
-  constructor(file: KMXFile, writeDebug: boolean) {
-    this.file = file;
-    this.writeDebug = writeDebug;
+  constructor(private file: KMXFile, private writeDebug: boolean) {
   }
 
-  calculateStringOffsetAndSize(string: string, base: number, requireString: boolean = false) {
+  private calculateStringOffsetAndSize(string: string, base: number, requireString: boolean = false) {
     if(string.length == 0 && !requireString) {
       // Zero length strings take up no space in the file, and
       // are treated as a 'null string'
@@ -150,17 +151,17 @@ export default class KMXBuilder {
     return size;
   }
 
-  buildBitmap() {
+  private buildBitmap() {
     // TODO
     return 0;
   }
 
-  buildKMXPlus(base: number) {
+  private buildKMXPlus(base: number) {
     if(!(this.file instanceof KMXPlusFile)) {
       return 0;
     }
 
-    const plusbuilder: KMXPlusBuilder = new KMXPlusBuilder(this.file, this.writeDebug);
+    const plusbuilder: KMXPlusBuilder = new KMXPlusBuilder(this.file);
     this.comp_kmxplus_data = plusbuilder.compile();
     this.comp_kmxplus = {
       dpKMXPlus: base,
@@ -170,7 +171,7 @@ export default class KMXBuilder {
     return this.comp_kmxplus.dwKMXPlusSize;
   }
 
-  setString(file: Uint8Array, pos: number, str: string, requireString: boolean = false): void {
+  private setString(file: Uint8Array, pos: number, str: string, requireString: boolean = false): void {
     if(requireString && !str.length) {
       // Just write zero terminator, as r.String for a zero-length string
       // seems to fail.
