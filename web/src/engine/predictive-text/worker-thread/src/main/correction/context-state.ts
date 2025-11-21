@@ -14,10 +14,12 @@ import { applyTransform } from '@keymanapp/models-templates';
 import { KMWString } from '@keymanapp/web-utils';
 
 import { ContextToken } from './context-token.js';
-import { ContextTokenization } from './context-tokenization.js';
+import { ContextTokenization, determineTaillessTrueKeystroke } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
 import { determineModelTokenizer } from '../model-helpers.js';
-import { legacySubsetKeyer, TokenizationSubsetBuilder } from './tokenization-subsets.js';
+import { SearchQuotientCluster } from './search-quotient-cluster.js';
+import { SearchQuotientNode } from './search-quotient-node.js';
+import { precomputationSubsetKeyer, TokenizationSubsetBuilder } from './tokenization-subsets.js';
 import TransformUtils from '../transformUtils.js';
 
 import Context = LexicalModelTypes.Context;
@@ -45,7 +47,7 @@ export class ContextState {
   /**
    * Denotes the most likely tokenization for the represented Context.
    */
-  tokenization: ContextTokenization;
+  tokenizations: ContextTokenization[];
 
   /**
    * Denotes the keystroke-sourced Transform that was last applied to a
@@ -118,13 +120,13 @@ export class ContextState {
    * @param tokenization Precomputed tokenization for the context, leveraging previous
    * correction-search progress and results
    */
-  constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization);
-  constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization) {
+  constructor(context: Context, model: LexicalModel, tokenizations?: ContextTokenization[]);
+  constructor(param1: Context | ContextState, model?: LexicalModel, tokenizations?: ContextTokenization[]) {
     if(!(param1 instanceof ContextState)) {
       this.context = param1;
       this.model = model;
-      if(tokenization) {
-        this.tokenization = tokenization;
+      if(tokenizations) {
+        this.tokenizations = tokenizations;
       } else {
         this.initFromReset();
       }
@@ -133,7 +135,7 @@ export class ContextState {
 
       Object.assign(this, stateToClone);
       this.inputTransforms = new Map(stateToClone.inputTransforms);
-      this.tokenization = new ContextTokenization(stateToClone.tokenization);
+      this.tokenizations = stateToClone.tokenizations.map(t => new ContextTokenization(t));
 
       // A shallow copy of the array is fine, but we'd be best off
       // not aliasing the array itself.
@@ -164,7 +166,7 @@ export class ContextState {
     if(baseTokens.length == 0) {
       baseTokens.push(new ContextToken(this.model));
     }
-    this.tokenization = new ContextTokenization(baseTokens);
+    this.tokenizations = [new ContextTokenization(baseTokens)];
     this.inputTransforms = new Map();
   }
 
@@ -198,19 +200,25 @@ export class ContextState {
     appliedSuggestionId?: number
   ): ContextTransition {
     const lexicalModel = this.model;
-
     const trueInput = transformDistribution[0].sample;
+
+    // Determine the best probability from among ALL available inputs, before they're split
+    // into subsets.
+    const bestProb = transformDistribution.reduce((best, cur) => best < cur.p ? cur.p : best, 0);
     const transition = new ContextTransition(this, this.appliedInput?.id);
 
     // From here on, we work toward the common-case - re-using old info when
     // context (and its tokenization) is changed by an input Transform.
-
-    let trueInputSubsetKey: string;
     const slideUpdateTransform = determineContextSlideTransform(this.context, context);
 
     // Goal:  allow multiple base tokenizations.
-    const startTokenizations = [this.tokenization];
-    const startTokenizationsAfterSlide = startTokenizations.map(t => t.applyContextSlide(lexicalModel, slideUpdateTransform));
+    const startTokenizations: Set<ContextTokenization> = new Set();
+    const keyedTokenizations: Map<string, ContextTokenization> = new Map();
+    this.tokenizations.forEach(t => {
+      const slidTokenization = t.applyContextSlide(lexicalModel, slideUpdateTransform);
+      startTokenizations.add(slidTokenization);
+      keyedTokenizations.set(t.clusteringKey, slidTokenization)
+    });
 
     // Easy case - no net change to the tokenizations whatsoever; the actual request
     // aims to save-state the most recent results.
@@ -220,38 +228,90 @@ export class ContextState {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
       const state = new ContextState(this);
-      state.tokenization = startTokenizationsAfterSlide[0];
+      state.tokenizations = [...startTokenizations.values()];
       transition.finalize(state, transformDistribution);
       return transition;
     }
 
-    const subsetBuilder = new TokenizationSubsetBuilder(legacySubsetKeyer);
-    for(let baseTokenization of startTokenizationsAfterSlide) {
-
+    const subsetBuilder = new TokenizationSubsetBuilder(precomputationSubsetKeyer);
+    for(let baseTokenization of startTokenizations.values()) {
       for(let mass of transformDistribution) {
+        // Handle the splits and merges early, here.
         const tokenizationAnalysis = baseTokenization.mapWhitespacedTokenization(lexicalModel, mass.sample);
-        subsetBuilder.addPrecomputation(baseTokenization, tokenizationAnalysis, mass.p);
+        const alignment = tokenizationAnalysis.alignment;
 
-        if(mass.sample == trueInput) {
-          trueInputSubsetKey = subsetBuilder.keyer(tokenizationAnalysis);
-        }
+        // Pre-process any splits and merges; the result of these operations may
+        // have the same properties as other base tokenizations within the
+        // subset if compatible.
+        const needsRealignment = (alignment.merges.length > 0 || alignment.splits.length > 0 || alignment.unmappedEdits.length > 0);
+        const sourceTokenization = needsRealignment ? baseTokenization.realign(alignment) : baseTokenization;
+
+        subsetBuilder.addPrecomputation(sourceTokenization, tokenizationAnalysis, mass.p);
       }
     }
 
-    // And now to (partly) detransform from a multiple-tokenization paradigm.
-    const trueInputSubset = subsetBuilder.subsets.get(trueInputSubsetKey);
-    // Right now, we only have one base tokenization, so we just fetch it.
-    const baseTokenization = startTokenizationsAfterSlide[0];
-    // For multiple tokenizations, we'd retrieve each, use the "most likely" one as base,
-    // and then fold all resulting search spaces (on the final token) into one.
-    const tokenizationAnalysis = trueInputSubset.transitionEdges.get(baseTokenization);
+    // For all target tokenizations - each transition subset...
+    const finalTokenizations = [...subsetBuilder.subsets.values()].map((subset) => {
+      // Iterate over all _source_ tokenizations and the changes used to transition them
+      // to that target tokenization.
+      const transitionSets = [...subset.transitionEdges.entries()];
+      const isolatedSubsetResults = transitionSets.map((precomp) => {
+        const rootTokenization = precomp[0];
 
-    // Determine the best probability from among ALL available inputs, before they're split
-    // into subsets.
-    const bestProb = transformDistribution.reduce((best, curr) => Math.max(best, curr.p), 0);
-    // Should gain one per subsetBuilder.subsets entry.
-    const realignedTokenization = baseTokenization.realign(tokenizationAnalysis.alignment);
-    const resultTokenization = realignedTokenization.evaluateTransition(tokenizationAnalysis, trueInput.id, bestProb, appliedSuggestionId);
+        return rootTokenization.evaluateTransition(precomp[1], trueInput.id, bestProb, appliedSuggestionId);
+      });
+
+      // Super-easy case:  there's only the one tokenization anyway.
+      if(isolatedSubsetResults.length == 1) {
+        return isolatedSubsetResults[0];
+      }
+
+      // Assumption:  all produced "isolatedSubsetResults" should essentially be
+      // the same tokenization. That said, tail entries will likely not be
+      // perfect matches; we need to splice them together, without duplicates.
+      // We also cannot rely on tokens before the standard tail index having
+      // been unmodified; merges and splits may have been applied earlier in the
+      // sequence.
+
+      const tokenCount = isolatedSubsetResults[0].tokens.length;
+      if(isolatedSubsetResults.find(sr => sr.tokens.length != tokenCount)) {
+        throw new Error("Assumption invalidated:  incoming tokenization paths do not converge");
+      }
+
+      const finalizedTokenization: ContextToken[] = [];
+      for(let i = 0; i < tokenCount; i++) {
+        const spaceSet: Set<SearchQuotientNode> = new Set();
+        let isWhitespace = true;
+        let isPartial = false;
+
+        isolatedSubsetResults.map((sr) => sr.tokens[i]).forEach((token) => {
+          const searchSpace = token.searchModule;
+          isWhitespace &&= token.isWhitespace;
+          isPartial ||= token.isPartial;
+
+          if(searchSpace instanceof SearchQuotientCluster) {
+            searchSpace.parents.forEach(p => spaceSet.add(p));
+          } else {
+            spaceSet.add(searchSpace);
+          }
+        });
+
+        const setVals = [...spaceSet.values()]
+        const finalizedSpace = setVals.length > 1 ? new SearchQuotientCluster(setVals) : setVals[0];
+
+        const token = new ContextToken(finalizedSpace);
+        token.isWhitespace = isWhitespace;
+        token.isPartial = isPartial;
+
+        finalizedTokenization.push(token)
+      }
+
+      return new ContextTokenization(
+        finalizedTokenization,
+        transitionSets[0][1],
+        determineTaillessTrueKeystroke(transitionSets[0][1])
+      );
+    });
 
     // ------------
 
@@ -261,17 +321,26 @@ export class ContextState {
     // epic/dict-breaker:  if ANY decently-likely tokenization satisfies this, we still
     // have a reasonable candidate for display of a delayed reversion.  (Not 'all' -
     // 'any'.)
-    const tokens = resultTokenization.tokens;
-    const lastIndex = tokens.length - 1;
-    // Ignore a context-final empty '' token; the interesting one is what comes before.
-    const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
-    const appliedSuggestionTransitionId = nonEmptyTail?.appliedTransitionId;
 
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
-    state.tokenization =  new ContextTokenization(resultTokenization.tokens, tokenizationAnalysis, resultTokenization.taillessTrueKeystroke);
+    // Set tokenizations from above.
+    // TODO:
+    // - sort by most .tail.searchSpace.bestExample.p?
+    // - threshold to the N most likely tokenizations?
+    state.tokenizations = finalTokenizations;
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution);
-    transition.revertableTransitionId = appliedSuggestionTransitionId;
+
+    // Maybe sort the tokenizations in some manner, first?
+    transition.revertableTransitionId = state.tokenizations.map((tokenization) => {
+      const tokens = tokenization.tokens;
+      const lastIndex = tokens.length - 1;
+      // Ignore a context-final empty '' token; the interesting one is what comes before.
+      const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
+      return nonEmptyTail?.appliedTransitionId;
+    }).find((transitionId) => {
+      return transitionId !== undefined;
+    });
     return transition;
   }
 }

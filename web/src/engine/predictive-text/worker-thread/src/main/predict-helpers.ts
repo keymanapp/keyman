@@ -299,8 +299,11 @@ export function determineContextTransition(
   if(inputIsEmpty) {
     // Directly build a simple empty transition that duplicates the last seen state.
     // This should also clear the preservation transform if it exists!
-    const tokenization = new ContextTokenization(contextTracker.latest.final.tokenization.tokens);
-    const priorState = new ContextState(context, transition.final.model, tokenization);
+    const priorState = new ContextState(
+      context,
+      transition.final.model,
+      contextTracker.latest.final.tokenizations.map(t => new ContextTokenization(t))
+    );
     transition = new ContextTransition(priorState, inputTransform.id);
     transition.finalize(priorState, transformDistribution);
   } else if(
@@ -460,7 +463,7 @@ export async function correctAndEnumerate(
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  const tokenizations = [transition.final.tokenization];
+  const tokenizations = transition.final.tokenizations;
   const searchModules = tokenizations.map(t => t.tail.searchModule);
 
   // If corrections are not enabled, bypass the correction search aspect
@@ -471,7 +474,7 @@ export async function correctAndEnumerate(
   if(!searchModules.find(s => s.correctionsEnabled)) {
     const wordbreak = determineModelWordbreaker(lexicalModel);
     // The one true tokenization:  no corrections permitted.
-    const tokenization = transition.final.tokenization;
+    const tokenization = transition.final.tokenizations[0];
 
     // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
     // same amount of text.  We can handle this before the big 'prediction root' loop.

@@ -9,10 +9,12 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
+import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 import { PathInputProperties } from './search-quotient-node.js';
@@ -608,11 +610,6 @@ export class ContextTokenization {
       }
 
       affectedToken.isPartial = true;
-      if(appliedSuggestionId !== undefined) {
-        affectedToken.appliedTransitionId = appliedSuggestionId;
-      } else {
-        delete affectedToken.appliedTransitionId;
-      }
 
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
@@ -634,11 +631,18 @@ export class ContextTokenization {
         inputSource.segment.end = appliedLength;
       }
 
-      affectedToken = new ContextToken(affectedToken);
-      affectedToken.addInput(inputSource, distribution);
+      const searchPath = new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
+      affectedToken = new ContextToken(searchPath);
+
+      if(appliedSuggestionId !== undefined) {
+        affectedToken.appliedTransitionId = appliedSuggestionId;
+      } else {
+        delete affectedToken.appliedTransitionId;
+      }
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
+
       // Do not re-use the previous token; the mutation may have unexpected
       // results (say, in unit-testing)
       tailTokenization[tokenIndex] = affectedToken;
@@ -651,6 +655,11 @@ export class ContextTokenization {
       transitionEdge,
       determineTaillessTrueKeystroke(transitionEdge)
     );
+  }
+
+  get clusteringKey(): string {
+    // Note:  SENTINEL_CODE_UNIT is not leveraged by SearchPath.sourceRangeKey.
+    return this.tokens.map(t => `${t.sourceRangeKey}L${t.searchModule.codepointLength}`).join(SENTINEL_CODE_UNIT);
   }
 }
 

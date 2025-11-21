@@ -103,12 +103,13 @@ describe('determineContextTransition', () => {
       assert.isOk(transition);
       assert.equal(transition, tracker.latest);
       assert.isFalse(warningEmitterSpy.called);
-      assert.sameOrderedMembers(transition.final.tokenization.exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
-      assert.isOk(transition.final.tokenization.transitionEdits);
+      assert.equal(transition.final.tokenizations.length, 1);
+      assert.sameOrderedMembers(transition.final.tokenizations[0].exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
+      assert.isOk(transition.final.tokenizations[0].transitionEdits);
       assert.equal(transition.final.context.left, targetContext.left);
       assert.equal(transition.final.context.right ?? "", targetContext.right ?? "");
       assert.sameDeepOrderedMembers(transition.inputDistribution, inputDistribution);
-      assert.isNotOk(transition.final.tokenization.taillessTrueKeystroke);
+      assert.isNotOk(transition.final.tokenizations[0].taillessTrueKeystroke);
       assert.equal(transition.transitionId, 1);
     } finally {
       warningEmitterSpy.restore();
@@ -225,8 +226,9 @@ describe('determineContextTransition', () => {
       assert.notEqual(extendingTransition, baseTransition);
 
       // These values support delayed reversions.
-      assert.equal(extendingTransition.final.tokenization.tokens[6].appliedTransitionId, pred_testing.transformId);
-      assert.equal(extendingTransition.final.tokenization.tokens[7].appliedTransitionId, pred_testing.transformId);
+      assert.equal(extendingTransition.final.tokenizations.length, 1);
+      assert.equal(extendingTransition.final.tokenizations[0].tokens[6].appliedTransitionId, pred_testing.transformId);
+      assert.equal(extendingTransition.final.tokenizations[0].tokens[7].appliedTransitionId, pred_testing.transformId);
 
       // We start a new token here, rather than continue (and/or replace) an old one;
       // this shouldn't be set here yet.
