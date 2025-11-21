@@ -34,8 +34,7 @@ export class HostTextStore extends SyntheticTextStore {
       let transform: TextTransform = null;
 
       if(transcription) {
-        //TODO-web-core: shouldn't need cast in the future?
-        const preInput = transcription.preInput as SyntheticTextStore;
+        const { preInput } = transcription;
         // If our saved state matches the `preInput` from the incoming transcription, just reuse its transform.
         // Will generally not match during multitap operations, though.
         //
