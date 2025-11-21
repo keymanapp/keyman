@@ -3363,6 +3363,12 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
     wcslen(fk->szMessage)*2 + 2 +*/
     fk->dwBitmapSize;
 
+  if(fk->version >= VERSION_190) {
+    // For version 19+, we always reserve space for the KMX+
+    // header, but we'll write it out as null in kmcmplib
+    size += sizeof(COMP_KEYBOARD_KMXPLUSINFO);
+  }
+
   for (i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++)
   {
     if (kmcmp::FSaveDebug) size += u16len(fgp->szName) * 2 + 2;
@@ -3404,21 +3410,13 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
 
   offset = sizeof(COMP_KEYBOARD);
 
-  /*ck->dpLanguageName = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szLanguageName);
-  offset += wcslen(fk->szLanguageName)*2 + 2;
-
-  ck->dpName = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szName);
-  offset += wcslen(fk->szName)*2 + 2;
-
-  ck->dpCopyright = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szCopyright);
-  offset += wcslen(fk->szCopyright)*2 + 2;
-
-  ck->dpMessage = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szMessage);
-  offset += wcslen(fk->szMessage)*2 + 2;*/
+  if(fk->version >= VERSION_190) {
+    // Reserved space for KMX+ data
+    COMP_KEYBOARD_KMXPLUSINFO *kmxPlusInfo = reinterpret_cast<COMP_KEYBOARD_KMXPLUSINFO *>(buf + offset);
+    kmxPlusInfo->dpKMXPlus = 0;
+    kmxPlusInfo->dwKMXPlusSize = 0;
+    offset += sizeof(COMP_KEYBOARD_KMXPLUSINFO);
+  }
 
   ck->dpStoreArray = (KMX_DWORD)offset;
   sp = (PCOMP_STORE)(buf + offset);
