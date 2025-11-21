@@ -9,7 +9,7 @@ import { coreurl, loadKeyboardBlob } from '../../test_utils.js';
 import { Deadkey, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
 
-// These tests would run headless if we'd additionally build WASM for node
+// TODO-web-core: These tests would run headless if we'd additionally build WASM for node
 
 describe('CoreKeyboardProcessor', function () {
   const loadKeyboard = async function (name: string): Promise<km_core_keyboard> {
