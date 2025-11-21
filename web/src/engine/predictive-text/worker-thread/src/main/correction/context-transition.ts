@@ -154,7 +154,7 @@ export class ContextTransition {
     ) => {
       const appliedDistribution = [{sample: transformToApply, p: 1}];
       const { subsets: applicationSubsets, keyMatchingUserContext } = precomputeTransitions(
-        [rootTokenization], appliedDistribution
+        [rootTokenization], appliedDistribution, rootTokenization.clusteringKey
       );
 
       // Filter out insert and delete edges here!  ONLY the primary substitution

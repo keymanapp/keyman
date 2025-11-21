@@ -103,6 +103,7 @@ describe('determineContextTransition', () => {
       assert.isOk(transition);
       assert.equal(transition, tracker.latest);
       assert.isFalse(warningEmitterSpy.called);
+      assert.equal(transition.final.tokenizations.length, 1);
       assert.sameOrderedMembers(transition.final.displayTokenization.exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
       assert.equal(transition.final.context.left, targetContext.left);
       assert.equal(transition.final.context.right ?? "", targetContext.right ?? "");
@@ -224,6 +225,7 @@ describe('determineContextTransition', () => {
       assert.notEqual(extendingTransition, baseTransition);
 
       // These values support delayed reversions.
+      assert.equal(extendingTransition.final.tokenizations.length, 1);
       assert.equal(extendingTransition.final.displayTokenization.tokens[6].appliedTransitionId, pred_testing.transformId);
       assert.equal(extendingTransition.final.displayTokenization.tokens[7].appliedTransitionId, pred_testing.transformId);
 

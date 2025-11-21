@@ -126,14 +126,6 @@ describe('ContextTokenization', function() {
         baseTokenization.tokens.map((token) => token.searchModule)
       );
 
-      // The `.searchModule` instances will not be deep-equal; there are class properties
-      // that hold functions with closures, configured at runtime.
-
-      // @ts-ignore - TS2704 b/c deleting a readonly property.
-      baseTokenization.tokens.forEach((token) => delete token.searchModule);
-      // @ts-ignore - TS2704 b/c deleting a readonly property.
-      cloned.tokens.forEach((token) => delete token.searchModule);
-
       assert.deepEqual(cloned, baseTokenization);
     });
   });

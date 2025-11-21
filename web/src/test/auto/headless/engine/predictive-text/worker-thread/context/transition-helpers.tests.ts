@@ -392,7 +392,7 @@ describe('precomputeTransitions', () => {
   it('handles the "cafe" fixture\'s first input correctly', () => {
     const { cafe } = generateFixturesForTransitionSource();
 
-    const precomputation = precomputeTransitions([cafe.base], cafe.key1.dist, precomputationSubsetKeyer);
+    const precomputation = precomputeTransitions([cafe.base], cafe.key1.dist, cafe.base.clusteringKey, precomputationSubsetKeyer);
     assert.sameOrderedMembers([...precomputation.subsets.keys()], [...cafe.key1.subsets.keys()]);
 
       // Note:  subset id entries won't match due to how they're generated!
@@ -421,6 +421,7 @@ describe('precomputeTransitions', () => {
     const precomputation = precomputeTransitions(
       key1Tokenizations,
       cafe.key2.dist,
+      key1Tokenizations[0].clusteringKey,
       precomputationSubsetKeyer
     );
     assert.sameOrderedMembers([...precomputation.subsets.keys()], [...cafe.key2.subsets.keys()]);

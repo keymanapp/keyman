@@ -33,6 +33,7 @@ import Transform = LexicalModelTypes.Transform;
 export function precomputeTransitions(
   startTokenizations: ContextTokenization[],
   transformDistribution: Distribution<Transform>,
+  baseDisplayKey: string,
   keyer?: typeof legacySubsetKeyer
 ): {
   /**
@@ -92,7 +93,7 @@ export function precomputeTransitions(
 
       subsetBuilder.addPrecomputation(sourceTokenization, tokenizationAnalysis, mass.p);
 
-      if(mass.sample == trueInput) {
+      if(mass.sample == trueInput && baseDisplayKey == baseTokenization.clusteringKey) {
         keyMatchingUserContext = subsetBuilder.keyer(tokenizationAnalysis);
       }
     }

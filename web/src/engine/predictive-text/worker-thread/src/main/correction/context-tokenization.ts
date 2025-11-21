@@ -8,15 +8,16 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { KMWString } from 'keyman/common/web-utils';
 
 import { ContextToken, ContextTokenLike } from './context-token.js';
 import { TransformUtils } from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
+import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
-import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { PathInputProperties } from './search-quotient-node.js';
 import { TransitionEdge } from './tokenization-subsets.js';
 
@@ -455,13 +456,12 @@ export class ContextTokenization {
         inputSource.segment.end = appliedLength;
       }
 
-      affectedToken = new ContextToken(
-        new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource),
-        affectedToken.isPartial
-      );
+      const searchPath = new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
+      affectedToken = new ContextToken(searchPath, affectedToken.isPartial);
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
+
       // Do not re-use the previous token; the mutation may have unexpected
       // results (say, in unit-testing)
       tailTokenization[tokenIndex] = affectedToken;
@@ -470,6 +470,11 @@ export class ContextTokenization {
     }
 
     return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tailTokenization));
+  }
+
+  get clusteringKey(): string {
+    // Note:  SENTINEL_CODE_UNIT is not leveraged by SearchPath.sourceRangeKey.
+    return this.tokens.map(t => `${t.sourceRangeKey}L${t.searchModule.codepointLength}`).join(SENTINEL_CODE_UNIT);
   }
 }
 

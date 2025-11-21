@@ -9,7 +9,7 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchQuotientNode, PathInputProperties } from "./search-quotient-node.js";
+import { PathInputProperties, SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";

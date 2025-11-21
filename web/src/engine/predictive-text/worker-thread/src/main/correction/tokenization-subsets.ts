@@ -214,7 +214,7 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
     }
   }
 
-  return components.concat(editKeyer(tokenizationEdits)).join(SENTINEL_CODE_UNIT);
+  return components /*.concat(editKeyer(tokenizationEdits))*/ .join(SENTINEL_CODE_UNIT);
 }
 
 export class TokenizationSubsetBuilder {
@@ -253,6 +253,8 @@ export class TokenizationSubsetBuilder {
     // Also ensures that the target tokenization's data (accumulating the pairings)
     // is made available within the top-level map.
     this._subsets.set(key, entry);
+
+    return key;
   }
 
   get subsets(): ReadonlyMap<string, TokenizationSubset> {

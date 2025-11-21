@@ -300,7 +300,7 @@ describe('ContextToken', function() {
         generateSubsetId()
       ];
 
-            // apples
+      // apples
       let token1 = new ContextToken(new LegacyQuotientRoot(plainModel));
       // and
       let token2 = new ContextToken(new LegacyQuotientRoot(plainModel));
