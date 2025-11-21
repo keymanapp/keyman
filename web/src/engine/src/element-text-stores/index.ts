@@ -4,4 +4,4 @@ export { DesignIFrameElementTextStore } from './designIFrameTextStore.js';
 export { InputElementTextStore } from './inputTextStore.js';
 export { AbstractElementTextStore } from './abstractElementTextStore.js';
 export { TextAreaElementTextStore } from './textareaTextStore.js';
-export { nestedInstanceOf } from './utils.js';
+export { nestedInstanceOf } from './nestedInstanceOf.js';
