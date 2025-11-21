@@ -534,7 +534,7 @@ class Constants {
    */
   readonly layr_form_flags_show_base_layout              = 0x00000001;
   /**
-   * in layr.form.flags, if set, then left/righ tCtrl and Alt keys function independently
+   * in layr.form.flags, if set, then left/right Ctrl and Alt keys function independently
    */
   readonly layr_form_flags_chiral_separate               = 0x00000002;
 

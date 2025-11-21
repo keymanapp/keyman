@@ -10,7 +10,7 @@ Note that counts and headers will need to merge both .kvks and .keyman-touch-lay
 
 ```
 touch-layout
-  tablet|phone|desktop -> determines minDeviceWidth or hardware
+  tablet|phone|desktop -> determines minDeviceWidth and hardware
     font: meta.fontFaceName
     fontsize: meta.fontSize
     displayUnderlying: lay2.forms.flags.showBaseLayout
@@ -102,7 +102,7 @@ For each `key` element in .ktl:
 | ∆ | Bits | Name             | Description                                              | Content
 |---|------|----------------  |----------------------------------------------------------|-----------------------
 | 0+|  32  | to               | str: output string OR UTF-32LE codepoint                 | `key.text`*
-| 4+|  32  | flags            | int: per-key flags                                       | bit 1 if gap
+| 4+|  32  | flags            | int: per-key flags                                       | bit 1 set if gap
 | 8+|  32  | id               | str: key id                                              | `key.layer` + ':' + `key.id`?
 |12+|  32  | switch           | str: layer id to switch to                               | `key.nextlayer`
 |16+|  32  | width            | int: key width*10 (supports 0.1 as min width)            | `key.width / 10`
@@ -112,9 +112,6 @@ For each `key` element in .ktl:
 |32+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
 
 * specials will be mapped to the corresponding `dis2`.flags.specialKeyCap value
-
-## `dis2`
-
 
 
 ## `layr`

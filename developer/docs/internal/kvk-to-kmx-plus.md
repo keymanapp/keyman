@@ -67,8 +67,9 @@ Graphical keys should have a corresponding element added to `dis2`.
 
 Each layer corresponds to a .kvks `visualkeyboard/encoding[@name=unicode]/layer` element.
 
-The `layer[@shift]` mapping is from [`VisualKeyboardLegalShiftStates[].name`](https://github.com/keymanapp/keyman/blob/7ac6bfc189333c5758fb14ef1cc0c810e1460b59/common/web/types/src/kvk/visual-keyboard.ts#L63) to keys.key.mod
-and `K_MODIFIERFLAG` bitmask (this is not the same as the KVK bitmasks, which shall be deprecated)
+The `layer[@shift]` mapping is from [`VisualKeyboardLegalShiftStates[].name`](https://github.com/keymanapp/keyman/blob/7ac6bfc189333c5758fb14ef1cc0c810e1460b59/common/web/types/src/kvk/visual-keyboard.ts#L63)
+to keys.key.mod and `K_MODIFIERFLAG` bitmask (this is not the same as the KVK bitmasks,
+which shall be deprecated)
 
 The compiler starts by filling out a blank representation of each modifier layer, then
 iterates through the .kvk `visualkeyboard/encoding/layer/key`, keying off the attribute `vkey`.
