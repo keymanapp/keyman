@@ -37,14 +37,14 @@ export default class DefaultBrowserRules extends DefaultRules {
 
     const moveToNext = (back: boolean) => {
       const contextManager = this.contextManager;
-      const activeElement = contextManager.activeTarget?.getElement();
+      const activeElement = contextManager.activeTextStore?.getElement();
       const nextElement = contextManager.page.findNeighboringInput(activeElement, back);
       nextElement?.focus();
     }
 
     switch(code) {
       // This method will be handled between `ContextManager` and PageContextAttachment:
-      // pageContextAttachment.findNeighboringInput(contextManager.activeTarget.getElement(), <same flag>)
+      // pageContextAttachment.findNeighboringInput(contextManager.activeTextStore.getElement(), <same flag>)
       case Codes.keyCodes['K_TAB']:
         moveToNext((Lkc.Lmodifiers & ModifierKeyConstants.K_SHIFTFLAG) != 0);
         break;

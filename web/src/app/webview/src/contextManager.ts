@@ -69,8 +69,8 @@ export class HostTextStore extends SyntheticTextStore {
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
-    const tempMock = new SyntheticTextStore(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
-    const newLeft = tempMock.getTextBeforeCaret();
+    const tempTextStore = new SyntheticTextStore(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
+    const newLeft = tempTextStore.getTextBeforeCaret();
     const oldLeft = this.getTextBeforeCaret();
 
     if(text != this.text) {
@@ -129,11 +129,11 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
 
   initialize(): void {
     this._hostTextStore = new HostTextStore(this.engineConfig.oninserttext);
-    this.predictionContext.setCurrentTarget(this.activeTarget);
+    this.predictionContext.setCurrentTextStore(this.activeTextStore);
     this.resetContext();
   }
 
-  get activeTarget(): SyntheticTextStore {
+  get activeTextStore(): SyntheticTextStore {
     return this._hostTextStore;
   }
 
@@ -141,18 +141,18 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTarget(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, target: TextStore) {
-    // `target` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
+  activateKeyboardForTextStore(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, textStore: TextStore) {
+    // `textStore` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.
     this._activeKeyboard = {...kbd};
   }
 
   /**
-   * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
-   * For app/webview... there's only one target, thus only a "global default" matters.
+   * Reflects the active 'textStore' upon which any `set activeKeyboard` operation will take place.
+   * For app/webview... there's only one textStore, thus only a "global default" matters.
    */
-  protected currentKeyboardSrcTarget(): SyntheticTextStore {
+  protected currentKeyboardSrcTextStore(): SyntheticTextStore {
     return null;
   }
 

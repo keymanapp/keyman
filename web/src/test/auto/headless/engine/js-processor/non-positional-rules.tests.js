@@ -41,7 +41,7 @@ describe('Engine - rule processing', function() {
 
     it('matches rules with mnemonic-specced KeyEvents', () => {
       // Note:  plain 'n' is produced from default key outputs for sil_ipa, not a keyboard rule.
-      let mockMnemonic = new SyntheticTextStore('n');
+      let mnemonicTextStore = new SyntheticTextStore('n');
       let mnemonicEvent = new KeyEvent({
         // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
         Lcode: '>'.charCodeAt(0), // 62
@@ -53,16 +53,16 @@ describe('Engine - rule processing', function() {
         device: device
       });
 
-      const mnemonicResult = keyboardWithHarness.processKeystroke(mockMnemonic, mnemonicEvent);
+      const mnemonicResult = keyboardWithHarness.processKeystroke(mnemonicTextStore, mnemonicEvent);
 
       assert.isOk(mnemonicResult);
       assert.isFalse(mnemonicResult.triggerKeyDefault);
-      assert.equal(mockMnemonic.getText(), 'ŋ');
+      assert.equal(mnemonicTextStore.getText(), 'ŋ');
     });
 
     it('requires correct modifiers', () => {
       // Note:  plain 'n' is produced from default key outputs for sil_ipa, not a keyboard rule.
-      let mockMnemonic = new SyntheticTextStore('n');
+      let mnemonicTextStore = new SyntheticTextStore('n');
       let mnemonicEvent = new KeyEvent({
         // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
         Lcode: '>'.charCodeAt(0), // 62
@@ -74,14 +74,14 @@ describe('Engine - rule processing', function() {
         device: device
       });
 
-      const mnemonicResult = keyboardWithHarness.processKeystroke(mockMnemonic, mnemonicEvent);
+      const mnemonicResult = keyboardWithHarness.processKeystroke(mnemonicTextStore, mnemonicEvent);
 
       assert.isOk(mnemonicResult);
       assert.isTrue(mnemonicResult.triggerKeyDefault);
     });
 
     it('does not match rules with positional-specced KeyEvents', () => {
-      let mockPositional = new SyntheticTextStore('n');
+      let positionalTextStore = new SyntheticTextStore('n');
       let positionalEvent = new KeyEvent({
         // If it were positional, we'd use this instead:
         Lcode: Codes.keyCodes.K_COMMA, // 188
@@ -93,11 +93,11 @@ describe('Engine - rule processing', function() {
         device: device
       });
 
-      const positionalResult = keyboardWithHarness.processKeystroke(mockPositional, positionalEvent);
+      const positionalResult = keyboardWithHarness.processKeystroke(positionalTextStore, positionalEvent);
 
       assert.isOk(positionalResult);
       assert.isTrue(positionalResult.triggerKeyDefault);
-      assert.notEqual(mockPositional.getText(), 'ŋ');
+      assert.notEqual(positionalTextStore.getText(), 'ŋ');
     });
   });
 
@@ -119,7 +119,7 @@ describe('Engine - rule processing', function() {
     });
 
     it('matches rules with legacy-specced KeyEvents', () => {
-      let mockLegacy = new SyntheticTextStore('');
+      let legacyTextStore = new SyntheticTextStore('');
       let legacyEvent = new KeyEvent({
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
@@ -131,15 +131,15 @@ describe('Engine - rule processing', function() {
         device: device
       });
 
-      const legacyResult = keyboardWithHarness.processKeystroke(mockLegacy, legacyEvent);
+      const legacyResult = keyboardWithHarness.processKeystroke(legacyTextStore, legacyEvent);
 
       assert.isOk(legacyResult);
       assert.isFalse(legacyResult.triggerKeyDefault);
-      assert.equal(mockLegacy.getText(), 'ա');
+      assert.equal(legacyTextStore.getText(), 'ա');
     });
 
     it('ignores current modifiers and states', () => {
-      let mockLegacy = new SyntheticTextStore('');
+      let legacyTextStore = new SyntheticTextStore('');
       let legacyEvent = new KeyEvent({
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
@@ -151,15 +151,15 @@ describe('Engine - rule processing', function() {
         device: device
       });
 
-      const legacyResult = keyboardWithHarness.processKeystroke(mockLegacy, legacyEvent);
+      const legacyResult = keyboardWithHarness.processKeystroke(legacyTextStore, legacyEvent);
 
       assert.isOk(legacyResult);
       assert.isFalse(legacyResult.triggerKeyDefault);
-      assert.equal(mockLegacy.getText(), 'ա');
+      assert.equal(legacyTextStore.getText(), 'ա');
     });
 
     it('does not match rules with mnemonic-specced KeyEvents', () => {
-      let mockMnemonic = new SyntheticTextStore('');
+      let mnemonicTextStore = new SyntheticTextStore('');
       let mnemonicEvent = new KeyEvent({
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
@@ -171,14 +171,14 @@ describe('Engine - rule processing', function() {
         device: device
       });
 
-      const mnemonicResult = keyboardWithHarness.processKeystroke(mockMnemonic, mnemonicEvent);
+      const mnemonicResult = keyboardWithHarness.processKeystroke(mnemonicTextStore, mnemonicEvent);
 
       assert.isOk(mnemonicResult);
       assert.isTrue(mnemonicResult.triggerKeyDefault);
     });
 
     it('does not match rules with positional-specced KeyEvents', () => {
-      let mockPositional = new SyntheticTextStore('');
+      let positionalTextStore = new SyntheticTextStore('');
       let positionalEvent = new KeyEvent({
         // If it were positional, we'd use this instead:
         Lcode: Codes.keyCodes.K_A,
@@ -190,7 +190,7 @@ describe('Engine - rule processing', function() {
         device: device
       });
 
-      const positionalResult = keyboardWithHarness.processKeystroke(mockPositional, positionalEvent);
+      const positionalResult = keyboardWithHarness.processKeystroke(positionalTextStore, positionalEvent);
 
       assert.isOk(positionalResult);
       assert.isTrue(positionalResult.triggerKeyDefault);

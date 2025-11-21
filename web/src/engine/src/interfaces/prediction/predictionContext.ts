@@ -41,17 +41,17 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   /**
    * Represents the active context used when requesting and applying predictive-text operations.
    */
-  private _currentTarget: TextStore;
+  private _currentTextStore: TextStore;
 
-  public get currentTarget(): TextStore {
-    return this._currentTarget;
+  public get currentTextStore(): TextStore {
+    return this._currentTextStore;
   }
 
-  public setCurrentTarget(target: TextStore): Promise<Suggestion[]> {
-    const originalTarget = this._currentTarget;
-    this._currentTarget = target;
+  public setCurrentTextStore(textStore: TextStore): Promise<Suggestion[]> {
+    const originalTextStore = this._currentTextStore;
+    this._currentTextStore = textStore;
 
-    if(originalTarget != target) {
+    if(originalTextStore != textStore) {
       // Note:  should be triggered after the corresponding new-context event rule has been processed,
       // as that may affect the value of layerId here.
       return this.resetContext();
@@ -70,11 +70,11 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.getLayerId = getLayerId;
 
     const validSuggestionState: () => boolean = () =>
-      this.currentTarget && langProcessor.state == 'configured';
+      this.currentTextStore && langProcessor.state == 'configured';
 
     this.suggestionApplier = (suggestion) => {
       if(validSuggestionState()) {
-        return langProcessor.applySuggestion(suggestion, this.currentTarget, getLayerId);
+        return langProcessor.applySuggestion(suggestion, this.currentTextStore, getLayerId);
       } else {
         return null;
       }
@@ -82,7 +82,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     this.suggestionReverter = async (reversion) => {
       if(validSuggestionState()) {
-        const suggestions = await langProcessor.applyReversion(reversion, this.currentTarget);
+        const suggestions = await langProcessor.applyReversion(reversion, this.currentTextStore);
         // We want to avoid altering flags that indicate our post-reversion state.
         this.swallowPrediction = true;
         this.updateSuggestions(new ReadySuggestions(suggestions, reversion.id ? -reversion.id : undefined));
@@ -215,7 +215,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       this.accept(this.selected);
       // If there is right-context, DO emit the space instead of swallowing it.
       // It's not auto-added by the predictive-text worker for such cases.
-      returnObj.shouldSwallow = !this.currentTarget.getTextAfterCaret();
+      returnObj.shouldSwallow = !this.currentTextStore.getTextAfterCaret();
 
       // doTryAccept is the path for keystroke-based auto-acceptance.
       // Overwrite the cause to reflect this.
@@ -235,7 +235,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       // If the model doesn't insert wordbreaks, there's no space to alias, so
       // don't swallow the space.  If it does, we consider that insertion to be
       // the results of the first post-accept space.
-      returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions && !this.currentTarget.getTextAfterCaret();; // can be handed outside
+      returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions && !this.currentTextStore.getTextAfterCaret();; // can be handed outside
     } else {
       returnObj.shouldSwallow = false;
     }
@@ -351,12 +351,12 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   }
 
   public resetContext(): Promise<Suggestion[]> {
-    const target = this.currentTarget;
+    const textStore = this.currentTextStore;
 
-    if(target) {
+    if(textStore) {
       // Note:  should be triggered after the corresponding new-context event rule has been processed,
       // as that may affect the value of layerId here.
-      return this.langProcessor.invalidateContext(target, this.getLayerId());
+      return this.langProcessor.invalidateContext(textStore, this.getLayerId());
     } else {
       return Promise.resolve([]);
     }

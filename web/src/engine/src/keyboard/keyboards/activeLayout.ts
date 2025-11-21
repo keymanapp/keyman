@@ -72,9 +72,9 @@ const KeyTypesOfFlickList = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as cons
 function assignDefaultsWithPropDefs<RawType, Type extends RawType>(rawObj: RawType, defaults: Type) {
   const proto = Object.getPrototypeOf(defaults);
 
-  for(let prop in defaults) {
+  for(const prop in defaults) {
     if(!rawObj.hasOwnProperty(prop)) {
-      let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+      const descriptor = Object.getOwnPropertyDescriptor(proto, prop);
       if(descriptor) {
         // It's a computed property!  Copy the descriptor onto the key's object.
         Object.defineProperty(rawObj, prop, descriptor);

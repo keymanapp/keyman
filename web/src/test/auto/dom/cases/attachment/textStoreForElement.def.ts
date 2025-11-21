@@ -67,38 +67,38 @@ describe('textStoreForElement()', function () {
 
     it('<input> => InputElementTextStore', () => {
       const inputElement = document.getElementById('input');
-      const inputTarget = textStoreForElement(inputElement);
+      const textStore = textStoreForElement(inputElement);
 
-      assert.isTrue(inputTarget instanceof InputElementTextStore);
+      assert.isTrue(textStore instanceof InputElementTextStore);
     });
 
     it('<iframe>.<input> => InputElementTextStore', async () => {
       const iframe = document.getElementById('iframe') as HTMLIFrameElement;
       const iframeInput = iframe.contentDocument.getElementById('iframe-input');
-      const inputTarget = textStoreForElement(iframeInput);
+      const textStore = textStoreForElement(iframeInput);
 
-      assert.isTrue(inputTarget instanceof InputElementTextStore);
+      assert.isTrue(textStore instanceof InputElementTextStore);
     });
 
     it('<textarea> => TextAreaElementTextStore', () => {
       const textElement = document.getElementById('textarea');
-      const textTarget = textStoreForElement(textElement);
+      const textStore = textStoreForElement(textElement);
 
-      assert.isTrue(textTarget instanceof TextAreaElementTextStore);
+      assert.isTrue(textStore instanceof TextAreaElementTextStore);
     });
 
     it('<iframe>.#doc.designMode = "on" => DesignIFrameElementTextStore', () => {
       const designElement = document.getElementById('design-iframe');
-      const designTarget = textStoreForElement(designElement);
+      const textStore = textStoreForElement(designElement);
 
-      assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
+      assert.isTrue(textStore instanceof DesignIFrameElementTextStore);
     });
 
     it('<div contenteditable="true"/> => ContentEditableElementTextStore', () => {
       const divElement = document.getElementById('editable');
-      const divTarget = textStoreForElement(divElement);
+      const textStore = textStoreForElement(divElement);
 
-      assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
+      assert.isTrue(textStore instanceof ContentEditableElementTextStore);
     });
   });
 
@@ -108,20 +108,20 @@ describe('textStoreForElement()', function () {
 
     it('DesignIFrameElementTextStore: from .contentDocument.body', () => {
       const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
-      const designTarget = textStoreForElement(designElement.contentDocument.body);
+      const textStore = textStoreForElement(designElement.contentDocument.body);
 
-      assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
-      assert.strictEqual(designTarget.getElement(), designElement);
-      assert.strictEqual(designTarget, textStoreForElement(designElement));
+      assert.isTrue(textStore instanceof DesignIFrameElementTextStore);
+      assert.strictEqual(textStore.getElement(), designElement);
+      assert.strictEqual(textStore, textStoreForElement(designElement));
     });
 
     it('DesignIFrameElementTextStore: from .contentDocument', () => {
       const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
-      const designTarget = textStoreForElement(designElement.contentDocument as any as HTMLElement);
+      const textStore = textStoreForElement(designElement.contentDocument as any as HTMLElement);
 
-      assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
-      assert.strictEqual(designTarget.getElement(), designElement);
-      assert.strictEqual(designTarget, textStoreForElement(designElement));
+      assert.isTrue(textStore instanceof DesignIFrameElementTextStore);
+      assert.strictEqual(textStore.getElement(), designElement);
+      assert.strictEqual(textStore, textStoreForElement(designElement));
     });
 
     it('ContentEditableElementTextStore: from direct #text child', () => {
@@ -131,11 +131,11 @@ describe('textStoreForElement()', function () {
       // Text node!  Corresponds to a `// defeat Safari bug` comment in the codebase.
       assert.equal(textNode.nodeType, 3);
 
-      const divTarget = textStoreForElement(textNode);
+      const textStore = textStoreForElement(textNode);
 
-      assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
-      assert.strictEqual(divTarget.getElement(), divElement);
-      assert.strictEqual(divTarget, textStoreForElement(divElement));
+      assert.isTrue(textStore instanceof ContentEditableElementTextStore);
+      assert.strictEqual(textStore.getElement(), divElement);
+      assert.strictEqual(textStore, textStoreForElement(divElement));
     });
   });
 });
@@ -178,9 +178,9 @@ describe('textStoreForEvent()', function () {
       inputElement.removeEventListener('keydown', fake);
     }
 
-    const inputTarget = textStoreForElement(inputElement);
+    const textStore = textStoreForElement(inputElement);
 
-    assert.isTrue(inputTarget instanceof InputElementTextStore);
+    assert.isTrue(textStore instanceof InputElementTextStore);
   });
 
   it('FocusEvent on <textarea> => TextAreaElementTextStore', () => {
@@ -200,9 +200,9 @@ describe('textStoreForEvent()', function () {
       textElement.blur();
     }
 
-    const textTarget = textStoreForEvent(fake.firstCall.args[0]);
+    const textStore = textStoreForEvent(fake.firstCall.args[0]);
 
-    assert.isTrue(textTarget instanceof TextAreaElementTextStore);
+    assert.isTrue(textStore instanceof TextAreaElementTextStore);
   });
 
   it('FocusEvent on design iframe .contentDocument => DesignIFrameElementTextStore', () => {
@@ -220,9 +220,9 @@ describe('textStoreForEvent()', function () {
       designElement.contentDocument.removeEventListener('focus', fake, true);
     }
 
-    const designTarget = textStoreForEvent(fake.firstCall.args[0]);
+    const textStore = textStoreForEvent(fake.firstCall.args[0]);
 
-    assert.isTrue(designTarget instanceof DesignIFrameElementTextStore);
+    assert.isTrue(textStore instanceof DesignIFrameElementTextStore);
   });
 
   it('KeyEvent on ContentEditableElementTextStore', () => {
@@ -245,8 +245,8 @@ describe('textStoreForEvent()', function () {
       divElement.removeEventListener('keydown', fake);
     }
 
-    const divTarget = textStoreForElement(divElement);
+    const textStore = textStoreForElement(divElement);
 
-    assert.isTrue(divTarget instanceof ContentEditableElementTextStore);
+    assert.isTrue(textStore instanceof ContentEditableElementTextStore);
   });
 });

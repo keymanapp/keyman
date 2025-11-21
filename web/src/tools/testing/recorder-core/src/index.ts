@@ -216,15 +216,15 @@ export abstract class TestSequence<KeyRecord extends RecordedKeystroke | InputEv
 
   abstract hasOSKInteraction(): boolean;
 
-  async test(proctor: Proctor, target?: TextStore): Promise<{success: boolean, result: string}> {
+  async test(proctor: Proctor, textStore?: TextStore): Promise<{success: boolean, result: string}> {
     // Start with an empty TextStore and a fresh KeyboardProcessor.
-    if(!target) {
-      target = new SyntheticTextStore();
+    if(!textStore) {
+      textStore = new SyntheticTextStore();
     }
 
     proctor.before();
 
-    let result = await proctor.simulateSequence(this, target);
+    const result = await proctor.simulateSequence(this, textStore);
     proctor.assertEquals(result, this.output, this.msg);
 
     return {success: (result == this.output), result: result};

@@ -255,7 +255,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
         // // If using the version from lm-layer:
         // let mappedReversion = reversion;
         // mappedReversion.transformId = reversionTranscription.token;
-        this.predictFromTarget(textStore, getLayerId());
+        this.predictFromTextStore(textStore, getLayerId());
         return mappedReversion;
       });
 
@@ -305,7 +305,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return promise;
   }
 
-  public predictFromTarget(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<Suggestion[]> {
+  public predictFromTextStore(textStore: TextStoreLanguageProcessorInterface, layerId: string): Promise<Suggestion[]> {
     if(!this.isActive || !textStore) {
       return null;
     }

@@ -23,8 +23,8 @@ function runEngineRuleSet(ruleSet) {
     // Prepare the context!
     const ruleSeq = new RecordedKeystrokeSequence(ruleDef);
     const proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
-    const target = new SyntheticTextStore();
-    ruleSeq.test(proctor, target);
+    const textStore = new SyntheticTextStore();
+    ruleSeq.test(proctor, textStore);
   }
 }
 

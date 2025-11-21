@@ -186,7 +186,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   cachedContextEx: CachedContextEx = new CachedContextEx();
   ruleContextEx: CachedContextEx;
 
-  activeTargetOutput: TextStore;
+  activeTextStore: TextStore;
   ruleBehavior: ProcessorAction;
 
   systemStores: {[storeID: number]: SystemStore};
@@ -588,7 +588,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
       retVal = (keyCode == Lrulekey); // I3318, I3555
     }
     if(!retVal) {
-      this.activeTargetOutput.deadkeys().resetMatched();  // I3318
+      this.activeTextStore.deadkeys().resetMatched();  // I3318
     }
     return retVal; // I3318
   };
@@ -623,7 +623,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Function     deadkeyMatch  KDM
    * Scope        Public
    * @param       {number}      n             offset from current cursor position
-   * @param       {Object}      textStore  target element
+   * @param       {Object}      textStore     TextStore
    * @param       {number}      d             deadkey
    * @return      {boolean}                   True if deadkey found selected context matches val
    * Description  Match deadkey at current cursor position
@@ -839,7 +839,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @alias       KCXO
    * @public
    * @param       {number}        Pdn            number of characters to delete left of cursor
-   * @param       {TextStore}  textStore   target to output to
+   * @param       {TextStore}     textStore      textStore to output to
    * @param       {number}        contextLength  length of current rule context to retrieve
    * @param       {number}        contextOffset  offset from start of current rule context, 1-based
    */
@@ -992,8 +992,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     processNewContextEvent
    * Scope        Private
-   * @param       {Object}        textStore   The target receiving input
-   * @param       {Object}        keystroke      The input keystroke (with its properties) to be mapped by the keyboard.
+   * @param       {TextStore}       textStore   The textStore receiving input
+   * @param       {KeyEvent}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
    * Description  Calls the keyboard's `begin newContext` group
    * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin NewContext`
    */
@@ -1007,8 +1007,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     processPostKeystroke
    * Scope        Private
-   * @param       {Object}        textStore   The target receiving input
-   * @param       {Object}        keystroke      The input keystroke with relevant properties to be mapped by the keyboard.
+   * @param       {TextStore}       textStore   The textStore receiving input
+   * @param       {KeyEvent}        keystroke   The input keystroke with relevant properties to be mapped by the keyboard.
    * Description  Calls the keyboard's `begin postKeystroke` group
    * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin PostKeystroke`
    */
@@ -1022,8 +1022,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     processKeystroke
    * Scope        Private
-   * @param       {Object}        textStore   The target receiving input
-   * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
+   * @param       {TextStore}       textStore   The textStore receiving input
+   * @param       {KeyEvent}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
    * Description  Encapsulates calls to keyboard input processing.
    * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin Unicode`
    */
@@ -1037,7 +1037,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   private process(callee: (textStore: TextStore, keystroke: KeyEvent) => boolean, textStore: TextStore, keystroke: KeyEvent, readonly: boolean): ProcessorAction {
     // Clear internal state tracking data from prior keystrokes.
     if(!textStore) {
-      throw "No target specified for keyboard output!";
+      throw "No textStore specified for keyboard output!";
     } else if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     } else if(!callee) {
@@ -1063,9 +1063,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.activeDevice = keystroke.device;
 
     // Calls the start-group of the active keyboard.
-    this.activeTargetOutput = textStore;
+    this.activeTextStore = textStore;
     const matched = callee(textStore, keystroke);
-    this.activeTargetOutput = null;
+    this.activeTextStore = null;
 
     // Finalize the rule's results.
     this.ruleBehavior.transcription = textStore.buildTranscriptionFrom(preInput, keystroke, readonly);

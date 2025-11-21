@@ -207,14 +207,14 @@ export class InputProcessor {
 
     // // ...end I3363 (Build 301)
 
-    // Create a "mock" backup of the current textStore in its pre-input state.
+    // Create a backup of the current textStore in its pre-input state.
     // Current, long-existing assumption - it's DOM-backed.
-    const preInputMock = SyntheticTextStore.from(textStore, true);
+    const preInputTextStore = SyntheticTextStore.from(textStore, true);
 
     const startingLayerId = this.keyboardProcessor.layerId;
 
     // We presently need the true keystroke to run on the FULL context.  That index is still
-    // needed for some indexing operations when comparing two different output targets.
+    // needed for some indexing operations when comparing two different textStores.
     let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, textStore);
 
     // Swap layer as appropriate.
@@ -247,7 +247,7 @@ export class InputProcessor {
     if(keepRuleBehavior) {
       // alternates are our fat-finger alternate outputs. We don't build these for keys we detect as
       // layer switch keys
-      const alternates = isOnlyLayerSwitchKey ? null : this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
+      const alternates = isOnlyLayerSwitchKey ? null : this.buildAlternates(ruleBehavior, keyEvent, preInputTextStore);
 
       // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
       // by the actual keystroke occur.
@@ -291,14 +291,14 @@ export class InputProcessor {
 
     // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
     if(!ruleBehavior.triggersDefaultCommand) {
-      // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
+      // For DOM-aware textStores, this will trigger a DOM event page designers may listen for.
       textStore.doInputEvent();
     }
 
     return keepRuleBehavior ? ruleBehavior : null;
   }
 
-  private buildAlternates(ruleBehavior: ProcessorAction, keyEvent: KeyEvent, preInputMock: SyntheticTextStore): Alternate[] {
+  private buildAlternates(ruleBehavior: ProcessorAction, keyEvent: KeyEvent, preInputTextStore: SyntheticTextStore): Alternate[] {
     let alternates: Alternate[];
 
     // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
@@ -310,8 +310,8 @@ export class InputProcessor {
       // only position-relative, so it's better to use a sliding window for context
       // when making alternates.  (Slightly worse for short text, matters greatly
       // for long text.)
-      const contextWindow = new ContextWindow(preInputMock, ContextWindow.ENGINE_RULE_WINDOW, this.keyboardProcessor.layerId);
-      const windowedMock = contextWindow.toMock();
+      const contextWindow = new ContextWindow(preInputTextStore, ContextWindow.ENGINE_RULE_WINDOW, this.keyboardProcessor.layerId);
+      const contextWindowTextStore = contextWindow.toSyntheticTextStore();
 
       // Note - we don't yet do fat-fingering with longpress keys.
       if(this.languageProcessor.isActive && keyDistribution && keyEvent.kbdLayer) {
@@ -366,7 +366,7 @@ export class InputProcessor {
             break;
           }
 
-          const mock = SyntheticTextStore.from(windowedMock, false);
+          const textStore = SyntheticTextStore.from(contextWindowTextStore, false);
 
           const altKey = pair.keySpec;
           if(!altKey) {
@@ -375,7 +375,7 @@ export class InputProcessor {
           }
 
           const altEvent = this.keyboardProcessor.activeKeyboard.constructKeyEvent(altKey, keyEvent.device, this.keyboardProcessor.stateKeys);
-          const alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
+          const alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, textStore);
 
           // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
           // so we expect users to never intend their use.

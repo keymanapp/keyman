@@ -91,7 +91,7 @@ export default class NodeProctor extends Proctor {
 
         if (this.debugMode) {
           console.log("Processing %d:", keyEvent.Lcode);
-          console.log("target=%s", JSON.stringify(textStore, null, '  '));
+          console.log("textStore=%s", JSON.stringify(textStore, null, '  '));
           console.log("ruleBehavior=%s", JSON.stringify(ruleBehavior, null, '  '));
         }
       }

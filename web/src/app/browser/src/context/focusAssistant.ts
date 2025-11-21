@@ -69,7 +69,7 @@ export class FocusAssistant extends EventEmitter<EventMap> {
    * its element's loss of focus within the page unless setting a different TextStore as active.
    *
    * TODO: (potential) Future enhancement - this should not be possible to set if there is no currently-active
-   * context target to maintain.
+   * textStore to maintain.
    */
   // Formerly `isActivating`.
   public get maintainingFocus(): boolean {
@@ -80,7 +80,7 @@ export class FocusAssistant extends EventEmitter<EventMap> {
     const priorValue = this._maintainingFocus;
     this._maintainingFocus = value;
 
-    // Needed to properly update .activeTarget upon loss of maintaining-focus state.
+    // Needed to properly update .activeTextStore upon loss of maintaining-focus state.
     if(priorValue && !value) {
       this.emit('maintainingfocusend');
     }

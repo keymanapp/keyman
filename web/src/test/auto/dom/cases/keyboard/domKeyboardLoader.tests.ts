@@ -82,8 +82,8 @@ describe('Keyboard loading in DOM', function() {
 
     // TODO:  verify actual rule processing.
     const nullKeyEvent = jsKeyboard.constructNullKeyEvent(device);
-    const mock = new SyntheticTextStore();
-    const result = jsHarness.processKeystroke(mock, nullKeyEvent);
+    const textStore = new SyntheticTextStore();
+    const result = jsHarness.processKeystroke(textStore, nullKeyEvent);
 
     assert.isOk(result);
     assert.isOk(KeymanWeb);

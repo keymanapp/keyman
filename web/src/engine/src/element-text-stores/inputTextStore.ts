@@ -214,7 +214,7 @@ export class InputElementTextStore extends AbstractElementTextStore<EventMap> {
 
   handleNewlineAtCaret(): void {
     const inputEle = this.root;
-    // Can't occur for Mocks - just Input types.
+    // Can't occur for SyntheticTextStores - just Input types.
     if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
       inputEle.disabled=false;
       inputEle.form.submit();

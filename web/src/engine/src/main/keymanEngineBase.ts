@@ -54,9 +54,9 @@ export class KeymanEngineBase<
   protected keyEventRefocus?: () => void;
 
   private keyEventListener: KeyEventFullHandler = (event, callback) => {
-    const textStore = this.contextManager.activeTarget;
+    const textStore = this.contextManager.activeTextStore;
 
-    if(!this.contextManager.activeKeyboard || !textStore) {
+    if (!this.contextManager.activeKeyboard || !textStore) {
       if(callback) {
         callback(null, null);
       }
@@ -91,7 +91,7 @@ export class KeymanEngineBase<
     const result = this.core.processKeyEvent(event, textStore);
 
     if(result && result.transcription?.transform) {
-      this.config.onRuleFinalization(result, this.contextManager.activeTarget);
+      this.config.onRuleFinalization(result, this.contextManager.activeTextStore);
     }
 
     if(callback) {
@@ -250,15 +250,15 @@ export class KeymanEngineBase<
     const keyboardProcessor = this.core.keyboardProcessor;
     const predictionContext = new PredictionContext(this.core.languageProcessor, () => keyboardProcessor.layerId);
     this.contextManager.configure({
-      resetContext: (target) => {
-        // Could reset the target's deadkeys here, but it's really more of a 'core' task.
+      resetContext: (textStore) => {
+        // Could reset the textStore's deadkeys here, but it's really more of a 'core' task.
         // So we delegate that to keyboard.
         if(this.osk) {
           this.osk.batchLayoutAfter(() => {
-            this.core.resetContext(target);
+            this.core.resetContext(textStore);
           })
         } else {
-          this.core.resetContext(target);
+          this.core.resetContext(textStore);
         }
       },
       predictionContext: predictionContext,
@@ -276,11 +276,11 @@ export class KeymanEngineBase<
       keyboardProcessor.newLayerStore.set('');
       keyboardProcessor.oldLayerStore.set('');
       // Call the keyboard's entry point.
-      const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget)
-      // If we have a ProcessorAction as a result, run it on the target. This should
+      const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTextStore)
+      // If we have a ProcessorAction as a result, run it on the textStore. This should
       // only change system store and variable store values.
       if (data) {
-        keyboardProcessor.finalizeProcessorAction(data, predictionContext.currentTarget);
+        keyboardProcessor.finalizeProcessorAction(data, predictionContext.currentTextStore);
       }
     });
 

@@ -117,9 +117,9 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
    * Get the default ProcessorAction for the specified key, attempting to mimic standard browser defaults
    * where and when appropriate.
    *
-   * @param   {object}  Lkc           The pre-analyzed KeyEvent object
-   * @param   {TextStore} textStore  The output target receiving the KeyEvent
-   * @param   {boolean}  readonly      True if the target is read-only
+   * @param   {KeyEvent}  Lkc           The pre-analyzed KeyEvent object
+   * @param   {TextStore} textStore     The textStore receiving the KeyEvent
+   * @param   {boolean}   readonly      True if the textStore is read-only
    * @return  {string}
    */
   private defaultRuleBehavior(Lkc: KeyEvent, textStore: TextStore, readonly: boolean): ProcessorAction {
@@ -234,7 +234,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
 
       // Handle unmapped keys, including special keys
       // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-      this.keyboardInterface.activeTargetOutput = textStore;
+      this.keyboardInterface.activeTextStore = textStore;
 
       // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
       // Many keyboards rely upon these 'implied rules'.
@@ -248,7 +248,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
         matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
       } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
 
-      this.keyboardInterface.activeTargetOutput = null;
+      this.keyboardInterface.activeTextStore = null;
     }
 
     return matchBehavior;
@@ -576,18 +576,18 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     return ruleBehavior;
   }
 
-  public resetContext(target?: TextStore) {
+  public resetContext(textStore?: TextStore) {
     this.layerId = 'default';
 
     // Make sure all deadkeys for the context get cleared properly.
-    target?.resetContext();
+    textStore?.resetContext();
     this.keyboardInterface.resetContextCache();
 
     // May be null if it's a keyboard swap.
     // Performed before _UpdateVKShift since the op may modify the displayed layer
     // Also updates the layer for predictions.
-    if(target) {
-      this.performNewContextEvent(target);
+    if(textStore) {
+      this.performNewContextEvent(textStore);
     }
 
     if(!this.contextDevice.touchable) {
@@ -668,11 +668,11 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
 
     first.triggersDefaultCommand = first.triggersDefaultCommand || other.triggersDefaultCommand;
 
-    const mergingMock = SyntheticTextStore.from(first.transcription.preInput, false);
-    mergingMock.apply(first.transcription.transform);
-    mergingMock.apply(other.transcription.transform);
+    const mergingTextStore = SyntheticTextStore.from(first.transcription.preInput, false);
+    mergingTextStore.apply(first.transcription.transform);
+    mergingTextStore.apply(other.transcription.transform);
 
-    first.transcription = mergingMock.buildTranscriptionFrom(first.transcription.preInput, keystroke, false, first.transcription.alternates);
+    first.transcription = mergingTextStore.buildTranscriptionFrom(first.transcription.preInput, keystroke, false, first.transcription.alternates);
   }
 
 }

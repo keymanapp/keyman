@@ -100,7 +100,7 @@ export class KMXKeyboard {
 
   /**
    * @param       {number}    eventCode     event code (16,17,18) or 0 // TODO-web-core: document meaning of these!
-   * @param       {TextStore} textStore     target element
+   * @param       {TextStore} textStore     textStore
    * @param       {number}    data          1 or 0
    * Notifies keyboard of keystroke or other event
    */

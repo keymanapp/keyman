@@ -19,7 +19,7 @@ export abstract class TextStore {
 
   /**
    * Signifies that this TextStore has no default key processing behaviors.  This should be false
-   * for OutputTargets backed by web elements like HTMLInputElement or HTMLTextAreaElement.
+   * for TextStores backed by web elements like HTMLInputElement or HTMLTextAreaElement.
    */
   get isSynthetic(): boolean {
     return true;
@@ -43,7 +43,7 @@ export abstract class TextStore {
   }
 
   /**
-   * Should be called by each output target immediately before text mutation operations occur.
+   * Should be called by each textStore immediately before text mutation operations occur.
    *
    * Maintains solutions to old issues:  I3318,I3319
    * @param {number} delta  Use negative values if characters were deleted, positive if characters were added.
@@ -73,13 +73,13 @@ export abstract class TextStore {
    *
    * This is designed for use as a "before and after" comparison to determine the effect of a single keyboard rule at a time.
    * As such, it assumes that the caret is immediately after any inserted text.
-   * @param from An output target (preferably a SyntheticTextStore) representing the prior state of the input/output system.
+   * @param textStore   A text store (preferably a SyntheticTextStore) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: TextStoreLanguageProcessorInterface): TextTransform {
-    TextStore.assertIsTextStore(original);
+  buildTransformFrom(textStore: TextStoreLanguageProcessorInterface): TextTransform {
+    TextStore.assertIsTextStore(textStore);
 
     const toLeft = this.getTextBeforeCaret();
-    const fromLeft = original.getTextBeforeCaret();
+    const fromLeft = textStore.getTextBeforeCaret();
 
     const leftDivergenceIndex = findCommonSubstringEndIndex(fromLeft, toLeft, false);
     const deletedLeft = KMWString.length(fromLeft.substring(leftDivergenceIndex));
@@ -87,7 +87,7 @@ export abstract class TextStore {
     const insertedText = toLeft.substring(leftDivergenceIndex);
 
     const toRight = this.getTextAfterCaret();
-    const fromRight = original.getTextAfterCaret();
+    const fromRight = textStore.getTextAfterCaret();
     const rightDivergenceIndex = findCommonSubstringEndIndex(fromRight, toRight, true);
 
     // Right insertions aren't supported, but right deletions will matter in some scenarios.
@@ -95,7 +95,7 @@ export abstract class TextStore {
     // caret mid-word..
     const deletedRight = KMWString.length(fromRight.substring(0, rightDivergenceIndex + 1));
 
-    return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
+    return new TextTransform(insertedText, deletedLeft, deletedRight, textStore.getSelectedText() && !this.getSelectedText());
   }
 
   buildTranscriptionFrom(original: TextStore, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
@@ -113,7 +113,7 @@ export abstract class TextStore {
   restoreTo(original: TextStore) {
     this.clearSelection();
     // We currently do not restore selected text; the mechanism isn't supported at present for
-    // all output target types - especially in regard to re-selecting the text if restored.
+    // all TextStore types - especially in regard to re-selecting the text if restored.
     //
     // I believe this would mostly matter if/when reverting predictions based upon selected text.
     // That pattern isn't well-supported yet, though.
