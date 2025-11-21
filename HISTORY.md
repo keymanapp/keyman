@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.165 alpha 2025-11-21
+
+* chore(mac): add keyTrace log (#14972)
+* fix(developer): avoid race in page.onload vs kmw.init in Server (#15087)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15179)
+
 ## 19.0.164 alpha 2025-11-20
 
 * feat(windows): update wix to 3.14.1 (#15194)
