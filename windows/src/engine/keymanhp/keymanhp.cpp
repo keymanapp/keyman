@@ -68,7 +68,7 @@ BOOL KeymanStarted = FALSE;
   #define ARCH_LOG_FILE ".keymanhp-x64"
 #elif defined(_M_ARM64)
   #define WINDOW_TITLE  L"Keymanhp-arm64"
-  #define EXECUTABLE_TITLE L"Keyman Engine arm64"
+  #define EXECUTABLE_TITLE L"Keyman Engine Arm64"
   #define ARCH_LOG_FILE ".keymanhp-arm64"
 #else
   #error Unknown architecture

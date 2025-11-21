@@ -37,7 +37,7 @@ function do_clean_arm64() {
 
 function do_build_x64() {
   create-windows-output-folders
-  build_version.res
+  run_in_vs_env rc versionx64.rc
   sed "s/Keyman Engine HP/Keyman Engine x64/g;
        s/arch64/amd64/g" manifesthp.in > manifest.in
   build_manifest.res
@@ -49,7 +49,7 @@ function do_build_x64() {
 
 function do_build_arm64() {
   create-windows-output-folders
-  build_version.res
+  run_in_vs_env rc versionarm64.rc
   sed "s/Keyman Engine HP/Keyman Engine arm64/g;
        s/arch64/arm64/g" manifesthp.in > manifest.in
   build_manifest.res
