@@ -90,10 +90,6 @@ function do_publish() {
   rm -f setup.inf
   cat "$WINDOWS_PROGRAM_APP/setup-redist.exe" keymandesktop.zip > keymandesktop.exe
   rm -f keymandesktop.zip
-
-  #
-  # Sign the installer
-  #
   wrap-signcode //d "Keyman for Windows" keymandesktop.exe
 
   builder_if_release_build_level copy-installer
