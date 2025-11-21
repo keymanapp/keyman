@@ -157,7 +157,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <LibraryPath>$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\ARM64\$(Configuration);$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\arm64\$(Configuration)\include;$(IncludePath)</IncludePath>
     <TargetName>keymanarm64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

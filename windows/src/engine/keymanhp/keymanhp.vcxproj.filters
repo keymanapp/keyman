@@ -34,7 +34,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="keymanhp.rc">
+    <ResourceCompile Include="keymanx64.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="keymanarm64.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
