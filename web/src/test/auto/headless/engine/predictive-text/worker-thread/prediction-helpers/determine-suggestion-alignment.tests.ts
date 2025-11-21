@@ -48,7 +48,7 @@ describe('determineSuggestionAlignment', () => {
     transition.finalize(transition.base, [{sample: { insert: '', deleteLeft: 0 }, p: 1}]);
 
     // transition, model
-    const results = determineSuggestionAlignment(transition, transition.final.tokenization, plainCasedModel);
+    const results = determineSuggestionAlignment(transition, transition.final.tokenizations[0], plainCasedModel);
 
     assert.deepEqual(results.predictionContext, context);
     assert.equal(results.deleteLeft, "techn".length);
@@ -65,7 +65,7 @@ describe('determineSuggestionAlignment', () => {
     const transition = baseState.analyzeTransition(context, [{sample: { insert: '', deleteLeft: 1 }, p: 1}])
 
     // transition, model
-    const results = determineSuggestionAlignment(transition, transition.final.tokenization, plainCasedModel);
+    const results = determineSuggestionAlignment(transition, transition.final.tokenizations[0], plainCasedModel);
 
     assert.deepEqual(results.predictionContext, context);
     assert.equal(results.deleteLeft, "tech".length + 1 /* for the deleted whitespace */);
@@ -82,7 +82,7 @@ describe('determineSuggestionAlignment', () => {
     const transition = baseState.analyzeTransition(context, [{sample: { insert: 'n', deleteLeft: 1 }, p: 1}])
 
     // transition, model
-    const results = determineSuggestionAlignment(transition, transition.final.tokenization, plainCasedModel);
+    const results = determineSuggestionAlignment(transition, transition.final.tokenizations[0], plainCasedModel);
 
     assert.deepEqual(results.predictionContext, context);
     assert.equal(results.deleteLeft, "techn".length + 1 /* for the deleted whitespace */);

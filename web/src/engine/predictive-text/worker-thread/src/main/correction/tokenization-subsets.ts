@@ -249,7 +249,7 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
     }
   }
 
-  return components.concat(editKeyer(tokenizationEdits)).join(SENTINEL_CODE_UNIT);
+  return components /*.concat(editKeyer(tokenizationEdits))*/ .join(SENTINEL_CODE_UNIT);
 }
 
 export class TokenizationSubsetBuilder {

@@ -35,14 +35,10 @@ function toTransformToken(text: string, transformId?: number) {
   let idSeed = transformId === undefined ? TOKEN_TRANSFORM_SEED++ : transformId;
   let isWhitespace = text == ' ';
   let token = new ContextToken(plainModel);
-  const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
-  token.addInput({
-    segment: {
-      transitionId: textAsTransform.id,
-      start: 0
-    }, bestProbFromSet: 1,
-    subsetId: generateSubsetId()
-  }, [ { sample: textAsTransform, p: 1 } ]);
+  const textAsDist = [{sample: { insert: text, deleteLeft: 0, id: idSeed }, p: 1}];
+  const space = new SearchPath(token.searchSpace, textAsDist, textAsDist[0]);
+
+  token = new ContextToken(space);
   token.isWhitespace = isWhitespace;
   return token;
 }
@@ -154,14 +150,6 @@ describe('ContextTokenization', function() {
         cloned.tokens.map((token) => token.searchSpace),
         baseTokenization.tokens.map((token) => token.searchSpace)
       );
-
-      // The `.searchSpace` instances will not be deep-equal; there are class properties
-      // that hold functions with closures, configured at runtime.
-
-      // @ts-ignore - TS2704 b/c deleting a readonly property.
-      baseTokenization.tokens.forEach((token) => delete token.searchSpace);
-      // @ts-ignore - TS2704 b/c deleting a readonly property.
-      cloned.tokens.forEach((token) => delete token.searchSpace);
 
       assert.deepEqual(cloned, baseTokenization);
     });
