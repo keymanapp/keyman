@@ -86,7 +86,7 @@
     <None Include="kmtiparm64.def">
       <Filter>Source Files\Framework</Filter>
     </None>
-    <None Include="kmtiparm64EC.def">
+    <None Include="kmtiparm64X.def">
       <Filter>Source Files\Framework</Filter>
     </None>
   </ItemGroup>

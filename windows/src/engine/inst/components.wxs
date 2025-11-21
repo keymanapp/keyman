@@ -243,9 +243,9 @@
         <!-- we will register post-install? -->
       </Component>
 
-      <Component Id="kmtiparm64EC.dll" Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}" SharedDllRefCount="yes"  Win64="yes">
+      <Component Id="kmtiparm64X.dll" Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}" SharedDllRefCount="yes"  Win64="yes">
         <Condition>WIX_NATIVE_MACHINE = "43620"</Condition>
-        <File Id="kmtiparm64EC.dll" Name="kmtiparm64EC.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtiparm64EC.dll">
+        <File Id="kmtiparm64X.dll" Name="kmtiparm64X.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtiparm64X.dll">
           <Class Id="FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7" Context="InprocServer32" ThreadingModel="apartment" Description="Keyman Engine Text Service ARM64" />
         </File>
       </Component>
