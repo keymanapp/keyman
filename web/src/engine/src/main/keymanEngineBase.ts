@@ -176,7 +176,7 @@ export class KeymanEngineBase<
         If possible, we want to only perform layout operations once the correct layer is
         set to active.
       */
-      if(this.osk && (!kbdData || kbdData.keyboard instanceof JSKeyboard)) { // TODO-web-core: add support for OSK for KMX keyboards
+      if(this.osk && (!kbdData || kbdData.keyboard instanceof JSKeyboard)) { // TODO-embed-osk-in-kmx: add support for OSK for KMX keyboards
         this.osk.batchLayoutAfter(() => {
           prepareKeyboardSwap();
           this.osk.activeKeyboard = kbdData ? { keyboard: kbdData.keyboard as JSKeyboard, metadata: kbdData.metadata } : undefined;
@@ -386,7 +386,7 @@ export class KeymanEngineBase<
     this.core.keyboardProcessor.contextDevice = value?.targetDevice ?? this.config.softDevice;
     if(value) {
       // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
-      if (this.contextManager.activeKeyboard && this.contextManager.activeKeyboard instanceof JSKeyboardData) { // TODO-web-core: add support for OSK for KMX keyboards
+      if (this.contextManager.activeKeyboard && this.contextManager.activeKeyboard instanceof JSKeyboardData) { // TODO-embed-osk-in-kmx: add support for OSK for KMX keyboards
         value.activeKeyboard = this.contextManager.activeKeyboard;
       }
       value.on('keyevent', this.keyEventListener);
