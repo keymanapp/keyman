@@ -103,9 +103,6 @@ build_tests_action() {
 
   builder_echo "Copying some files"
 
-  mkdir -p "${KEYMAN_ROOT}/web/build/test/dom/cases/core-adapter/import/core/"
-  cp "${KEYMAN_ROOT}/web/src/engine/src/core-adapter/import/core/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/test/dom/cases/core-adapter/import/core/"
-
   for dir in \
     "${KEYMAN_ROOT}/web/build/test/dom/cases"/*/ \
     "${KEYMAN_ROOT}/web/build/test/integrated/" \

@@ -49,8 +49,14 @@ export class KM_Core {
     return this.km_core;
   }
 
+  private static isNode() {
+    // from https://stackoverflow.com/a/31456668
+    return (typeof process !== "undefined" && process?.versions?.node);
+  }
+
   public static async createCoreProcessor(baseurl: string): Promise<KMXCoreModule> {
-    const module = await import(baseurl + '/km-core.js');
+    const coreModuleName = this.isNode() ? 'km-core-node.mjs' : 'km-core.js';
+    const module = await import(`${baseurl}/${coreModuleName}`);
     const createCoreProcessor = module.default;
     const km_core = createCoreProcessor({
       locateFile: function (path: string, scriptDirectory: string) {

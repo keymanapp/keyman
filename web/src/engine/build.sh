@@ -44,6 +44,7 @@ copy_deps() {
   mkdir -p "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"
   cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"
   cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core{.js,.wasm} "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"
+  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core-node{.mjs,.wasm} "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"
 
   cp "${KEYMAN_ROOT}/common/resources/fonts/keymanweb-osk.ttf" "${KEYMAN_ROOT}/web/src/resources/osk/"
 }

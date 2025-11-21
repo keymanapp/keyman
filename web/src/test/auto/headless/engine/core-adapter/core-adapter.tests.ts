@@ -1,6 +1,10 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 import { assert } from 'chai';
 import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
-import { coreurl, loadKeyboardBlob } from '../../test_utils.js';
+import { coreurl, loadKeyboardBlob } from '../loadKeyboardHelper.js';
 
 // Test the KM_Core interface.
 describe('KM_Core', function () {
