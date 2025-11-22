@@ -2415,7 +2415,7 @@ public final class KMManager {
       }
       height = defaultHeightForContext;
     } else {
-      // Applying gating to 50%-200% of default height (following Keyman)
+      // Ensure keyboard height stay within min/max bounds
       int minKeyboardHeight = KMManager.getKeyboardHeightMin(context, orientation);
       int maxKeyboardHeight = KMManager.getKeyboardHeightMax(context, orientation);
       height = Math.max(minKeyboardHeight, height);
