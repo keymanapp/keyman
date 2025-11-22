@@ -2437,7 +2437,9 @@ public final class KMManager {
     }
     editor.commit();
 
-    // Track whether height was successfully applied
+    // Track whether height was successfully applied; if the 
+    // keyboard is not currently loaded, then the height will
+    // not be set
     boolean heightApplied = false;
 
     // Confirm new LayoutParams for in-app or system keyboards
