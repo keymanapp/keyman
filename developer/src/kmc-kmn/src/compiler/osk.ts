@@ -1,6 +1,8 @@
-import { TouchLayout } from "@keymanapp/common-types";
+import { KvkFileReader, TouchLayout } from "@keymanapp/common-types";
 import { VisualKeyboard } from "@keymanapp/common-types";
 import { SchemaValidators } from "@keymanapp/common-types";
+import { KmnCompilerMessages } from "./kmn-compiler-messages.js";
+import { CompilerCallbacks, KvksFileReader } from "@keymanapp/developer-utils";
 
 export interface StringRefUsage {
   filename: string;
@@ -122,4 +124,42 @@ export function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMa
   scanPlatform(source.tablet);
 
   return dirty;
+}
+
+export function loadKvkFile(kvksFilename: string, callbacks: CompilerCallbacks): VisualKeyboard.VisualKeyboard {
+  const data = callbacks.loadFile(kvksFilename);
+  if(!data) {
+    callbacks.reportMessage(KmnCompilerMessages.Error_FileNotFound({filename: kvksFilename}));
+    return null;
+  }
+
+  const filename = callbacks.path.basename(kvksFilename);
+  let vk: VisualKeyboard.VisualKeyboard = null;
+  if(filename.endsWith('.kvk')) {
+    /* Legacy keyboards may reference a binary .kvk. That's not an error */
+    // TODO: (lowpri) add hint to convert to .kvks?
+    const reader = new KvkFileReader();
+    try {
+      vk = reader.read(data);
+    } catch(e) {
+      callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvkFile({filename, e}));
+      return null;
+    }
+  } else {
+    const reader = new KvksFileReader();
+    let kvks = null;
+    try {
+      kvks = reader.read(data);
+      reader.validate(kvks);
+    } catch(e) {
+      callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
+      return null;
+    }
+    const invalidVkeys: string[] = [];
+    vk = reader.transform(kvks, invalidVkeys);
+    for(const invalidVkey of invalidVkeys) {
+      callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
+    }
+  }
+  return vk;
 }

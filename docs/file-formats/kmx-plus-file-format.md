@@ -9,7 +9,7 @@
 This document discusses the binary format for KMXPlus, which contains keyboards
 converted from source LDML data.
 
-Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
+Specification: <https://unicode.org/reports/tr35/tr35-keyboards.html>
 
 ## C7043.1 Principles
 
