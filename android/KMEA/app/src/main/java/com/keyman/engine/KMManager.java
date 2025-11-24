@@ -2440,20 +2440,21 @@ public final class KMManager {
     // Track whether height was successfully applied; if the 
     // keyboard is not currently loaded, then the height will
     // not be set
-    boolean heightApplied = false;
 
     // Confirm new LayoutParams for in-app or system keyboards
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
-      heightApplied = true;
-    }
+    } else {
+      setPendingHeightUpdate(KeyboardType.KEYBOARD_TYPE_INAPP, orientation);
+     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
-      heightApplied = true;
+    } else {
+      setPendingHeightUpdate(KeyboardType.KEYBOARD_TYPE_SYSTEM, orientation);
     }
 
     // If keyboard wasn't loaded, set a pending flag so height gets applied when keyboard loads
