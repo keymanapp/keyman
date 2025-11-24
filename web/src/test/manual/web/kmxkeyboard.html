@@ -12,7 +12,7 @@
     <!-- Enable IE9 Standards mode -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <title>KeymanWeb Sample Page - Unminified Source</title>
+    <title>KeymanWeb Khmer KMX/JS test page</title>
 
     <!-- Your page CSS -->
     <style type='text/css'>
@@ -36,19 +36,35 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      window.addEventListener('load', function () {
-        keyman.init().then(function () {
-          keyman.addKeyboards({
+        const searchParams = new URLSearchParams(window.location.search);
+        const kmx = {
             id: 'khmer_angkor',
             name: 'Khmer Angkor',
-            languages: {
-              id: 'km',
-              name: 'Khmer'
-            },
-            filename: '/build/test-resources/keyboards/khmer_angkor.kmx'
+            languages: { id: 'km', name: 'Khmer' }, filename: '/build/test-resources/keyboards/khmer_angkor.kmx' };
+        let keyboard;
+        switch (searchParams.get('keyboard')) {
+          case 'js':
+            keyboard = { id: 'khmer_angkor', name: 'Khmer Angkor', languages: { id: 'km' } };
+            break;
+          case 'kmx':
+          default:
+            keyboard = kmx;
+            break;
+        };
+        // allow to wait on KMW being fully initialized
+        window.KmwLoaded = new Promise((resolve) => {
+          window.addEventListener('load', async function () {
+            await keyman.init();
+            await keyman.addKeyboards(keyboard);
+            // allow to wait on OSK being visible
+            window.OskShown = new Promise((resolve) => {
+              keyman.osk.addEventListener('show', async function () {
+                resolve(true);
+              });
+            });
+            resolve(true);
           });
         });
-      });
     </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
@@ -58,7 +74,7 @@
 
 <!-- Sample page HTML -->
   <body>
-    <h2>KeymanWeb Sample Page - KMX Keyboards</h2>
+    <h2>KeymanWeb Sample Page - Khmer Angkor KMX and JS Keyboards</h2>
 
     <div>
     <!--
@@ -68,24 +84,13 @@
     -->
     <div id='KeymanWebControl'></div>
 
-    <h3>Type in your language in this text area:</h3>
-    <textarea id='ta1' class='test' placeholder='Type here'></textarea>
-
-    <h3>or in this input field:</h3>
-    <input class='test' value='' placeholder='or here'/>
-
-    <!--  The following elements show how the language menu can be dynamically extended at any time -->
-    <h3>Add a keyboard by keyboard name:</h3>
-    <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
-    <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
-
-    <h3>Add a keyboard by BCP-47 language code:</h3>
-    <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
-    <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
-
-    <h3>Add a keyboard by language name(s):</h3>
-    <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
-    <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
+    <p>This page allows to use either the .kmx or the .js version of the Khmer Angkor keyboard.
+      Which one can be selected by the <code>keyboard</code> query parameter:
+      append <code>?keyboard=kmx</code> or <code>?keyboard=js</code> to the URL..
+      The default is to use the .kmx version.
+    </p>
+    <h3>Type Khmer in this text area:</h3>
+    <textarea id='inputarea' class='test' placeholder='Type here'></textarea>
 
     <h3><a href="./">Return to testing home page</a></h3>
   </div>

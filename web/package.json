@@ -104,6 +104,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
+    "@playwright/test": "^1.46.1",
     "@sentry/cli": "^2.31.0",
     "@zip.js/zip.js": "^2.7.32",
     "c8": "^7.12.0",
@@ -116,9 +117,9 @@
     "test": "gosh ./test.sh"
   },
   "dependencies": {
+    "@keymanapp/common-types": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
-    "@keymanapp/common-types": "*",
     "@keymanapp/recorder-core": "*",
     "core-js": "^3.34.0",
     "eventemitter3": "^5.0.0",
