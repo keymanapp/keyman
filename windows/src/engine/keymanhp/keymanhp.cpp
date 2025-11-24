@@ -22,7 +22,9 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
 #include "keymanhp.h"   // I5136
-#include "../../../../common/windows/cpp/include/keymansentry.h"
+#if defined(_M_X64)
+  #include "../../../../common/windows/cpp/include/keymansentry.h"
+#endif
 
 // Forward declarations of functions included in this code module
 
@@ -283,7 +285,9 @@ BOOL Fail(HWND hwnd, PWSTR msg)
 
   if (WideCharToMultiByte(CP_UTF8, 0, outbuf, -1, buffer, (int) sz, NULL, NULL) != 0) {
     buffer[sz - 1] = 0;
-    keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, buffer, true);
+    #if defined(_M_X64)
+      keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, buffer, true);
+    #endif
   }
 
   free(buffer);
