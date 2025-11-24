@@ -265,7 +265,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\..\common\windows\delphi\ext\sentry\sentry.arm64.lib;keymanarm64.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>keymanarm64.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -372,7 +372,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\..\common\windows\delphi\ext\sentry\sentry.arm64.lib;keymanarm64.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>keymanarm64.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -393,11 +393,17 @@
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="keymanhp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keymansentry.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keymansentry.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="keymanhp.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
