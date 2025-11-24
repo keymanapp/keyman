@@ -145,7 +145,12 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (keyboardInfo != null) {
       String fontName = keyboardInfo.getFont();
 
-      Intent intent = new Intent("com.keyman.android.keyboard_changed");
+      Intent intent;
+      if  (BuildConfig.DEBUG) {
+        intent = new Intent("com.tavultesoft.kmapro.debug.keyboard_changed");
+      } else {
+        intent = new Intent("com.tavultesoft.kmapro.keyboard_changed");
+      }
       intent.putExtra("fontName", fontName);
       sendBroadcast(intent);
     }
