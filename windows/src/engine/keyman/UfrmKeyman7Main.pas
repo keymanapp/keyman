@@ -269,7 +269,7 @@ type
     procedure RecreateTaskbarIcons;
     function StartKeymanEngine: Boolean;
     procedure StartKeymanHPX64;
-    procedure StartKeymanHParm64; // TODO could combine this function
+    procedure StartKeymanHParm64; // TODO-WIN-ARM: could combine this function
     procedure OpenTextEditor;
     //function GetCachedKeymanID(hkl: DWORD): DWORD;
     procedure ShowLanguageSwitchForm;
@@ -1327,7 +1327,7 @@ begin
     kmint.KeymanEngineControl.RestartEngine; // I1486
 
   StartKeymanHPX64;
-  StartKeymanHPARM64
+  StartKeymanHPARM64;
 
 end;
 
