@@ -47,7 +47,7 @@ or
     import android.content.res.Configuration;
     ...
     // Get the minimum allowed Keyman keyboard height for landscape mode.
-    int maxKeyboardHeightLandscape = KMManager.getKeyboardHeightMin(this, Configuration.ORIENTATION_LANDSCAPE);
+    int minKeyboardHeightLandscape = KMManager.getKeyboardHeightMin(this, Configuration.ORIENTATION_LANDSCAPE);
 ```
 
 ## See also
