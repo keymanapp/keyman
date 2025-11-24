@@ -2,17 +2,18 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 import {
-  // Exposed within the engine/attachment bundle b/c of unit tests requiring `instanceof` relations.
-  ContentEditableElementTextStore,
-  DesignIFrameElementTextStore,
-  InputElementTextStore,
-  TextAreaElementTextStore,
-
   textStoreForEvent,
   textStoreForElement,
   PageContextAttachment,
   PageAttachmentOptions,
 } from 'keyman/engine/attachment';
+
+import {
+  ContentEditableElementTextStore,
+  DesignIFrameElementTextStore,
+  InputElementTextStore,
+  TextAreaElementTextStore,
+} from 'keyman/engine/element-text-stores';
 
 import { timedPromise } from 'keyman/common/web-utils';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';

@@ -1,6 +1,7 @@
 // import { BrowserConfiguration, ContextManager } from 'keyman/app/browser';
 import { ContextManager } from 'keyman/app/browser';
-import { TextAreaElementTextStore, textStoreForElement } from 'keyman/engine/attachment';
+import { textStoreForElement } from 'keyman/engine/attachment';
+import { TextAreaElementTextStore } from 'keyman/engine/element-text-stores';
 import { LegacyEventEmitter } from 'keyman/engine/events';
 import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 import { KeyboardInterfaceBase } from 'keyman/engine/main';
