@@ -30,7 +30,7 @@
 
 ## 19.0.161 alpha 2025-11-13
 
-* docs(android): Document disclaimer of Keyman NOT containing adware/spyware (#15136)
+* docs(android): Add documentation explaining Android keyboard safety warning dialog (#15136)
 
 ## 19.0.160 alpha 2025-11-12
 
