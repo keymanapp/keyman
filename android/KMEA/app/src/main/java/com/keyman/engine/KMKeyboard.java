@@ -457,21 +457,12 @@ final class KMKeyboard extends WebView {
     // Get the correct keyboard height for current orientation
     int kbHeight = KMManager.getKeyboardHeight(context);
 
-    // Check if there's a pending height update that needs to be applied
-    SharedPreferences prefs = context.getSharedPreferences(
-        context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    // Check if there's a pending height update for this specific keyboard type and orientation
     int currentOrientation = KMManager.getOrientation(context);
-    String pendingKey = (currentOrientation == Configuration.ORIENTATION_LANDSCAPE)
-        ? "pendingHeightUpdate_landscape"
-        : "pendingHeightUpdate_portrait";
-
-    if (prefs.getBoolean(pendingKey, false)) {
+    if (KMManager.getAndClearPendingHeightUpdate(this.keyboardType, currentOrientation)) {
       // There was a pending height update - force apply it now
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
       this.setLayoutParams(params);
-
-      // Clear the pending flag
-      prefs.edit().remove(pendingKey).commit();
     }
 
     // Ensure window is loaded for javascript functions
