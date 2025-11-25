@@ -254,9 +254,6 @@
         <File Id="sentry.x64.dll" KeyPath="yes" />
       </Component>
       <Component>
-        <File Id="sentry.arm64.dll" KeyPath="yes" />
-      </Component>
-      <Component>
         <File Id="crashpad_handler.exe" KeyPath="yes" />
       </Component>
     </ComponentGroup>

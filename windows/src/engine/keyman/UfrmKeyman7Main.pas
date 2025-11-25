@@ -268,8 +268,7 @@ type
     //procedure SnapToolHelp;
     procedure RecreateTaskbarIcons;
     function StartKeymanEngine: Boolean;
-    procedure StartKeymanHPX64;
-    procedure StartKeymanHParm64; // TODO could combine this function
+    procedure StartKeymanHostProcess(ProcessName: string);
     procedure OpenTextEditor;
     //function GetCachedKeymanID(hkl: DWORD): DWORD;
     procedure ShowLanguageSwitchForm;
@@ -377,6 +376,10 @@ const
   skSelectHKL = 2; // Select the requested Windows language (and therefore the most appropriate Keyman keyboard)
   skSelectHKLOnly = 3; // Select the requested Windows language and turn Keyman keyboard off
   skTSF = 4;       // A TSF TIP
+
+const
+  KM_HP_X64 = 'keymanhp.x64.exe';
+  KM_HP_ARM64 = 'keymanhp.arm64.exe';
 
 implementation
 
@@ -1326,8 +1329,8 @@ begin
   else
     kmint.KeymanEngineControl.RestartEngine; // I1486
 
-  StartKeymanHPX64;
-  StartKeymanHPARM64
+  if IsWow64 then StartKeymanHostProcess(KM_HP_X64);   // I4374
+  if IsNativeMachineArm64 then StartKeymanHostProcess(KM_HP_ARM64);
 
 end;
 
@@ -1956,17 +1959,16 @@ begin
   FLangSwitchRefreshWatcher.Start;
 end;
 
-procedure TfrmKeyman7Main.StartKeymanHPX64;
+procedure TfrmKeyman7Main.StartKeymanHostProcess(ProcessName: string);
 var
   cmd, dir, params: string;
   sei: TShellExecuteInfoW;
 begin
-  if not IsWow64 then Exit;   // I4374
 
   try
-    // TODO: use TKeymanPaths to find keymanx64?
-    dir := ExtractFilePath(ParamStr(0));
-    cmd := dir + 'keymanhp.x64.exe';
+    dir := TKeymanPaths.KeymanEngineInstallDir;
+    cmd := TKeymanPaths.KeymanEngineInstallPath(ProcessName);
+
     params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
 
     if not FileExists(cmd) then
@@ -1990,47 +1992,7 @@ begin
     begin
       // We're going to handle any exceptions here but we'd like to know that
       // they happened
-      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanhp.x64', True);
-    end;
-  end;
-end;
-
-procedure TfrmKeyman7Main.StartKeymanHPARM64;
-var
-  cmd, dir, params: string;
-  sei: TShellExecuteInfoW;
-begin
-
-  if not IsNativeMachineArm64 then Exit;
-
-  try
-    // TODO: use TKeymanPaths to find keymanx64?
-    dir := ExtractFilePath(ParamStr(0));
-    cmd := dir + 'keymanhp.arm64.exe';
-    params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
-
-    if not FileExists(cmd) then
-      // We'll get notification of the issue but it won't
-      // crash the process
-      raise Exception.Create(cmd+' could not be found');
-
-    FillChar(sei, SizeOf(sei), 0);
-    sei.cbSize := SizeOf(sei);
-    sei.Wnd := Handle;
-    sei.lpVerb := 'open';
-    sei.lpFile := PWideChar(cmd);
-    sei.lpParameters := PChar(params);
-    sei.lpDirectory := PWideChar(dir);
-    sei.nShow := SW_SHOW;
-
-    if not ShellExecuteExW(@sei) then
-      RaiseLastOSError;
-  except
-    on E:Exception do
-    begin
-      // We're going to handle any exceptions here but we'd like to know that
-      // they happened
-      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanhp.x64', True);
+      TKeymanSentryClient.ReportHandledException(E, 'Error starting ' + ProcessName, True);
     end;
   end;
 end;
