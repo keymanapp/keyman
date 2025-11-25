@@ -150,6 +150,33 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   }
 
   /**
+   * Adds context items from the given text to the contextItems collection, up
+   * to the caret position or the deadKey if present.
+   *
+   * @param {object}  contextInfo    The context information including textIndex,
+   *                                 caretPosition, and text.
+   * @param {Deadkey} deadkey        The deadkey to insert if present at the current index.
+   * @param {km_core_context_items}
+   *                  contextItems   The collection to which context items are added.
+   */
+  private addContextItemsFromText(contextInfo: { textIndex: number, caretPosition: number, text: string }, deadkey: Deadkey, contextItems: km_core_context_items): void {
+    for (; contextInfo.textIndex < contextInfo.text.length && (deadkey == null ? contextInfo.textIndex < contextInfo.caretPosition : contextInfo.textIndex <= contextInfo.caretPosition); contextInfo.textIndex++) {
+      const contextItem = new KM_Core.instance.km_core_context_item();
+      if (deadkey?.p == contextInfo.textIndex) {
+        contextItem.marker = deadkey.d;
+        contextItems.push_back(contextItem);
+        return;
+      }
+      contextItem.character = contextInfo.text.codePointAt(contextInfo.textIndex);
+      if (contextItem.character > 0xFFFF) {
+        // we have a surrogate pair, skip other half of surrogate
+        contextInfo.textIndex++;
+      }
+      contextItems.push_back(contextItem);
+    }
+  }
+
+  /**
    * Retrieve context including deadkeys from TextStore and apply to Core's context
    *
    * @param context     Context from Keyman Core
@@ -174,23 +201,11 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     const deadkeys = textStore.deadkeys().dks.sort((a, b) => a.p != b.p ? a.p - b.p : a.o - b.o);
     const contextItems = new KM_Core.instance.km_core_context_items();
     const caretPosition = textStore.getCaret();
-    let textIndex = 0;
+    const contextInfo = { textIndex: 0, caretPosition: caretPosition, text: text };
     for (const deadkey of deadkeys) {
-      for (; textIndex < text.length && textIndex <= caretPosition; textIndex++) {
-        const contextItem = new KM_Core.instance.km_core_context_item();
-        if (deadkey.p == textIndex) {
-          contextItem.marker = deadkey.d;
-          contextItems.push_back(contextItem);
-          break;
-        }
-        contextItem.character = text.codePointAt(textIndex);
-        if (contextItem.character > 0xFFFF) {
-          // we have a surrogate pair, skip other half of surrogate
-          textIndex++;
-        }
-        contextItems.push_back(contextItem);
-      }
+      this.addContextItemsFromText(contextInfo, deadkey, contextItems);
     }
+    this.addContextItemsFromText(contextInfo, null, contextItems);
 
     // Add end element
     contextItems.push_back(KM_Core.instance.create_end_context());
