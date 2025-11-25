@@ -5,6 +5,7 @@
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
 #include <vector>
+#include <sstream>
 
 #ifdef __cplusplus
 #define EXTERN extern "C" EMSCRIPTEN_KEEPALIVE
@@ -87,6 +88,15 @@ public:
 };
 
 class km_core_actions_wasm {
+private:
+  std::string getCodePoints(const std::u32string& str) const {
+    std::stringstream result;
+    for (char32_t codePoint : str) {
+      result << "U+" << std::hex << codePoint << " ";
+    }
+    return result.str();
+  }
+
 public:
   unsigned int code_points_to_delete;
   std::u32string output;
@@ -95,6 +105,26 @@ public:
   bool emit_keystroke;
   int new_caps_lock_state;
   std::u32string deleted_context;
+
+  std::string toString() const {
+    std::string result = "Actions(delete=" + std::to_string(this->code_points_to_delete) +
+                         ", output=\"" + std::string(this->output.begin(), this->output.end()) + "\" (" + getCodePoints(this->output) + ")" +
+                         ", do_alert=" + (this->do_alert ? "true" : "false") +
+                         ", emit_keystroke=" + (this->emit_keystroke ? "true" : "false") +
+                         ", new_caps_lock_state=" + std::to_string(this->new_caps_lock_state) +
+                         ", deleted_context=\"" + std::string(this->deleted_context.begin(), this->deleted_context.end()) + "\"" +
+                         ", persist_options=[";
+    for (size_t i = 0; i < this->persist_options.size(); ++i) {
+      result += "{" + std::string(this->persist_options[i].key.begin(), this->persist_options[i].key.end()) +
+                ": " + std::string(this->persist_options[i].value.begin(), this->persist_options[i].value.end()) +
+                ", scope=" + std::to_string(this->persist_options[i].scope) + "}";
+      if (i + 1 < this->persist_options.size()) {
+        result += ", ";
+      }
+    }
+    result += "])";
+    return result;
+  }
 };
 
 class km_core_context_item_wasm: public km_core_context_item {
@@ -396,7 +426,8 @@ EMSCRIPTEN_BINDINGS(core_interface) {
     .property("do_alert", &km_core_actions_wasm::do_alert)
     .property("emit_keystroke", &km_core_actions_wasm::emit_keystroke)
     .property("new_caps_lock_state", &km_core_actions_wasm::new_caps_lock_state)
-    .property("deleted_context", &km_core_actions_wasm::deleted_context);
+    .property("deleted_context", &km_core_actions_wasm::deleted_context)
+    .function("toString", &km_core_actions_wasm::toString);
 
   em::class_<km_core_state>("km_core_state");
   em::class_<CoreReturn<km_core_state>>("CoreStateReturn")
