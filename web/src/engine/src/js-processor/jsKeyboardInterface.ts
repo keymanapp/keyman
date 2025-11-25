@@ -808,8 +808,6 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.output(dn, textStore, '');
   }
 
-  // TODO-web-core: Why is this function on the keyboard interface and not the
-  // text store or context manager?
   /**
    * Function     output        KO
    * Scope        Public
@@ -817,6 +815,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}      textStore     element to output to
    * @param       {string}      s             string to output
    * Description  Keyboard output
+   *
+   * Note: it might seem more logical for this function to be part of TextStore
+   * or context manager, but it is here because it implements the JS-keyboard API function KO,
+   * used for the "output" portion of JS keyboard rule implementations for Keyman keyboards.
    */
   output(dn: number, textStore: TextStore, s: string): void {
     this.resetContextCache();
