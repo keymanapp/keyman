@@ -40,7 +40,7 @@ Use this method to get the minimum allowed height of the keyboard frame.
 The following script illustrate the use of `getKeyboardHeightMin()`:
 
 ``` javascript
-    int maxKeyboardHeight = KMManager.getKeyboardHeightMin(this);
+    int minKeyboardHeight = KMManager.getKeyboardHeightMin(this);
 ```
 or
 ```java
