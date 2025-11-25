@@ -230,3 +230,27 @@ export function CLDRScanToVkey(scan: number, badScans?: Set<number>): number {
   }
 }
 
+const USVirtualKeyCodeNames = new Map<number, string>();
+
+function fillVirtualKeyNames() {
+  Object.keys(USVirtualKeyCodes).forEach(name => {
+    USVirtualKeyCodeNames.set((<any>USVirtualKeyCodes)[name], name);
+  });
+
+  // These three keys have multiple definitions
+  USVirtualKeyCodeNames.set(USVirtualKeyCodes.K_oE2, 'K_oE2');
+  USVirtualKeyCodeNames.set(USVirtualKeyCodes.K_oC1, 'K_oC1');
+  USVirtualKeyCodeNames.set(USVirtualKeyCodes.K_oDF, 'K_oDF');
+}
+
+/**
+ * Get the defined name of a virtual key
+ * @param vk A defined Keyman virtual key
+ * @returns the name of the virtual key, or undefined if not found
+ */
+export function usVirtualKeyName(vk: number): string {
+  if(USVirtualKeyCodeNames.size == 0) {
+    fillVirtualKeyNames();
+  }
+  return USVirtualKeyCodeNames.get(vk);
+}

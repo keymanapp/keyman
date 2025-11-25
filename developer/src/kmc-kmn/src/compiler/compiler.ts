@@ -17,6 +17,7 @@ import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { loadKvkFile } from './osk.js';
 import { KmnCompilerMessages } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
+import { EmbedOskInKmx } from './embed-osk/embed-osk.js';
 
 //
 // Matches kmcmplibapi.h definitions
@@ -356,7 +357,14 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
         }
       }
 
+      if(result.extra.targetVersion >= KMX.KMXFile.VERSION_190) {
+        if(!this.embedOskInKmx(infile, result)) {
+          return null;
+        }
+      }
+
       if(result.extra.kvksFilename) {
+        // TODO-EMBED-OSK-IN-KMX: skip this once we support embedded OSK in all desktop targets
         result.artifacts.kvk = this.runKvkCompiler(result.extra.kvksFilename, infile, outfile, result.displayMap);
         if(!result.artifacts.kvk) {
           return null;
@@ -425,6 +433,23 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
 
   private keyboardIdFromKmnFilename(kmnFilename: string): string {
     return this.callbacks.path.basename(kmnFilename, KeymanFileTypes.Source.KeymanKeyboard);
+  }
+
+  private embedOskInKmx(kmnFilename: string, result: KmnCompilerResult): boolean {
+    const embedder = new EmbedOskInKmx(this.callbacks, this.options);
+    const newData = embedder.embed(
+      result.artifacts.kmx.data,
+      result.extra.kvksFilename ? this.callbacks.resolveFilename(kmnFilename, result.extra.kvksFilename) : null,
+      result.extra.touchLayoutFilename ? this.callbacks.resolveFilename(kmnFilename, result.extra.touchLayoutFilename) : null,
+      result.displayMap
+    );
+    if(!newData) {
+      // messages will have been raised in .embed
+      return false;
+    }
+
+    result.artifacts.kmx.data = newData;
+    return true;
   }
 
   private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {

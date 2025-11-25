@@ -6,9 +6,14 @@
 
 import { VisualKeyboardShiftState } from "../kvk/visual-keyboard.js";
 
+/**
+ * This type is declared as a `const` rather than as an `enum` for
+ * historical reasons. Use instead `ModifierKeyConstant` where possible.
+ */
 export const ModifierKeyConstants = {
-  // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
-  // Compare against /common/include/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
+  // Define Keyman Developer modifier bit-flags (exposed for use by other
+  // modules) Compare against /common/include/kmx_file.h.  CTRL+F "#define
+  // LCTRLFLAG" to find the section.
   LCTRLFLAG:      0x0001, // Left Control flag
   RCTRLFLAG:      0x0002, // Right Control flag
   LALTFLAG:       0x0004, // Left Alt flag
@@ -34,7 +39,31 @@ export const ModifierKeyConstants = {
   // See keys_mod_other in keyman_core_ldml.ts
 };
 
-export const LDML_MODIFIER_TO_KVK_MODIFIER = new Map<number, number>();
+/**
+ * Defines the standard modifier key flags used by Keyman. Note that some keys
+ * are chiral, and toggle key state is ignored if niether the __FLAG nor the
+ * corresponding NOT__FLAG are set.
+ */
+export enum ModifierKeyConstant {
+  LCTRLFLAG =      ModifierKeyConstants.LCTRLFLAG,
+  RCTRLFLAG =      ModifierKeyConstants.RCTRLFLAG,
+  LALTFLAG =       ModifierKeyConstants.LALTFLAG,
+  RALTFLAG =       ModifierKeyConstants.RALTFLAG,
+  K_SHIFTFLAG =    ModifierKeyConstants.K_SHIFTFLAG,
+  K_CTRLFLAG =     ModifierKeyConstants.K_CTRLFLAG,
+  K_ALTFLAG =      ModifierKeyConstants.K_ALTFLAG,
+  K_METAFLAG =     ModifierKeyConstants.K_METAFLAG,
+  CAPITALFLAG =    ModifierKeyConstants.CAPITALFLAG,
+  NOTCAPITALFLAG = ModifierKeyConstants.NOTCAPITALFLAG,
+  NUMLOCKFLAG =    ModifierKeyConstants.NUMLOCKFLAG,
+  NOTNUMLOCKFLAG = ModifierKeyConstants.NOTNUMLOCKFLAG,
+  SCROLLFLAG =     ModifierKeyConstants.SCROLLFLAG,
+  NOTSCROLLFLAG =  ModifierKeyConstants.NOTSCROLLFLAG,
+  ISVIRTUALKEY =   ModifierKeyConstants.ISVIRTUALKEY,
+  VIRTUALCHARKEY = ModifierKeyConstants.VIRTUALCHARKEY,
+};
+
+export const LDML_MODIFIER_TO_KVK_MODIFIER = new Map<ModifierKeyConstant, VisualKeyboardShiftState>();
 LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LCTRLFLAG,      VisualKeyboardShiftState.KVKS_LCTRL);
 LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.RCTRLFLAG,      VisualKeyboardShiftState.KVKS_RCTRL);
 LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LALTFLAG,       VisualKeyboardShiftState.KVKS_LALT);
@@ -43,7 +72,7 @@ LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_SHIFTFLAG,    VisualKey
 LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_CTRLFLAG,     VisualKeyboardShiftState.KVKS_CTRL);
 LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_ALTFLAG,      VisualKeyboardShiftState.KVKS_ALT);
 
-export const KVK_MODIFIER_TO_LDML_MODIFIER = new Map<number, number>();
+export const KVK_MODIFIER_TO_LDML_MODIFIER = new Map<VisualKeyboardShiftState, ModifierKeyConstant>();
 KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_LCTRL, ModifierKeyConstants.LCTRLFLAG);
 KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_RCTRL, ModifierKeyConstants.RCTRLFLAG);
 KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_LALT,  ModifierKeyConstants.LALTFLAG);
@@ -52,13 +81,13 @@ KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_SHIFT, ModifierK
 KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_CTRL,  ModifierKeyConstants.K_CTRLFLAG);
 KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_ALT,   ModifierKeyConstants.K_ALTFLAG);
 
-export function translateLdmlModifiersToVisualKeyboardShift(modifiers: number): VisualKeyboardShiftState {
+export function translateLdmlModifiersToVisualKeyboardShift(modifiers: ModifierKeyConstant): VisualKeyboardShiftState {
   if(modifiers == 0) {
     return VisualKeyboardShiftState.KVKS_NORMAL;
   }
 
   if(modifiers &
-    (ModifierKeyConstants.CAPITALFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.SCROLLFLAG)
+    (ModifierKeyConstant.CAPITALFLAG | ModifierKeyConstant.NUMLOCKFLAG | ModifierKeyConstant.SCROLLFLAG)
   ) {
     // Caps/Num/Scroll are not supported in .kvk, in combination or alone
     return null;
@@ -75,7 +104,7 @@ export function translateLdmlModifiersToVisualKeyboardShift(modifiers: number): 
   return shift;
 }
 
-export function translateVisualKeyboardShiftToLdmlModifiers(shift: VisualKeyboardShiftState): number {
+export function translateVisualKeyboardShiftToLdmlModifiers(shift: VisualKeyboardShiftState): ModifierKeyConstant {
   if(shift == VisualKeyboardShiftState.KVKS_NORMAL) {
     return 0;
   }
@@ -88,4 +117,65 @@ export function translateVisualKeyboardShiftToLdmlModifiers(shift: VisualKeyboar
   }
 
   return mod;
+}
+
+
+
+function VkShiftStateToKmxShiftState(ShiftState: number): number {
+
+  interface TVKToKMX {
+    VK: VisualKeyboardShiftState; KMX: ModifierKeyConstant;
+  }
+
+  const Map: TVKToKMX[] = [
+    {VK: VisualKeyboardShiftState.KVKS_SHIFT, KMX: ModifierKeyConstant.K_SHIFTFLAG},
+    {VK: VisualKeyboardShiftState.KVKS_CTRL,  KMX: ModifierKeyConstant.K_CTRLFLAG},
+    {VK: VisualKeyboardShiftState.KVKS_ALT,   KMX: ModifierKeyConstant.K_ALTFLAG},
+    {VK: VisualKeyboardShiftState.KVKS_LCTRL, KMX: ModifierKeyConstant.LCTRLFLAG},
+    {VK: VisualKeyboardShiftState.KVKS_RCTRL, KMX: ModifierKeyConstant.RCTRLFLAG},
+    {VK: VisualKeyboardShiftState.KVKS_LALT,  KMX: ModifierKeyConstant.LALTFLAG},
+    {VK: VisualKeyboardShiftState.KVKS_RALT,  KMX: ModifierKeyConstant.RALTFLAG}
+  ];
+
+  let result = 0;
+  for(let i = 0; i < Map.length; i++) {
+    if (ShiftState & Map[i].VK) {
+      result |= Map[i].KMX;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Convert a VK modifier combination bitmask to a hyphen-separated string of
+ * modifier names, e.g. for use in layer names and key identifiers. The name
+ * order matches the bit flag order from ModifierKeyConstant, not the bit flag
+ * order from VisualKeyboardShiftState, for historical reasons.
+ */
+export function visualKeyboardShiftToLayerName(shift: VisualKeyboardShiftState): string {
+
+  // index is ModifierKeyConstant, not VisualKeyboardShiftState
+  const modifierNames: string[] = [
+      'leftctrl',
+      'rightctrl',
+      'leftalt',
+      'rightalt',
+      'shift',
+      'ctrl',
+      'alt'
+    ];
+
+  const mod = VkShiftStateToKmxShiftState(shift);
+  if(mod == 0) {
+    return 'default';
+  }
+
+  let result = '';
+  for(let i = 0; i < modifierNames.length; i++) {
+    if(mod & (1 << i)) {
+      result += modifierNames[i] + '-';
+    }
+  }
+  return result.substring(0, result.length - 1);
 }

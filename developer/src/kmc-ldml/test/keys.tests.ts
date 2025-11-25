@@ -49,7 +49,7 @@ describe('keys', function () {
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
-        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(q.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
         assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
@@ -92,7 +92,7 @@ describe('keys', function () {
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
-        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(q.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
         assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
@@ -134,7 +134,7 @@ describe('keys', function () {
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
-        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(q.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(q.width, 32); // ceil(3.1 * 10)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
         assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
@@ -163,11 +163,11 @@ describe('keys', function () {
 
         const [Qgap] = keys.keys.filter(({ id }) => id.value === 'Q');
         assert.ok(Qgap);
-        assert.isTrue(!!(Qgap.flags & constants.keys_key_flags_gap), 'Q’s gap=');
+        assert.isTrue(!!(Qgap.flags & KMXPlus.KeysKeysFlags.gap), 'Q’s gap=');
 
         const [Wshift] = keys.keys.filter(({ id }) => id.value === 'W');
         assert.isNotNull(Wshift);
-        assert.isFalse(!!(Wshift.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(Wshift.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(Wshift.switch.value, 'shift');
       },
     },
