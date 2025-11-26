@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.166 alpha 2025-11-26
+
+* chore(android): Clarify PR title for #15136 (#15224)
+* fix(windows): escape backslashes in path in debugging message (#15236)
+
 ## 19.0.165 alpha 2025-11-21
 
 * chore(mac): add keyTrace log (#14972)
