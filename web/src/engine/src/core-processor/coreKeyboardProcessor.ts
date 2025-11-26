@@ -160,9 +160,33 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    *                  contextItems   The collection to which context items are added.
    */
   private addContextItemsFromText(contextInfo: { textIndex: number, caretPosition: number, text: string }, deadkey: Deadkey, contextItems: km_core_context_items): void {
-    for (; contextInfo.textIndex < contextInfo.text.length && (deadkey == null ? contextInfo.textIndex < contextInfo.caretPosition : contextInfo.textIndex <= contextInfo.caretPosition); contextInfo.textIndex++) {
+    const textLim = (() => {
+      // Determine the first index that should not be included in context. This value is the
+      // minimum of the text length and the caret position (or caret position + 1 if we have a
+      // deadkey). If we don't have a deadkey we know that the last context item will be a
+      // character and the last possible index for that is before the caret. If we do have a
+      // deadkey it could be after the last character, i.e. at the caret position so we have to
+      // use caret position + 1 so that the caret position itself is a possible index.
+      const caretPosition = deadkey === null
+        ? contextInfo.caretPosition
+        : contextInfo.caretPosition + 1;
+      return Math.min(contextInfo.text.length, caretPosition);
+    })();
+
+    if (deadkey !== null && textLim === 0) {
       const contextItem = new KM_Core.instance.km_core_context_item();
-      if (deadkey?.p == contextInfo.textIndex) {
+      if (deadkey?.p === contextInfo.textIndex) {
+        contextItem.marker = deadkey.d;
+        contextItems.push_back(contextItem);
+      } else {
+        console.warn(`Can't add deadkey at position ${deadkey.p} when text limit is 0`);
+      }
+      return;
+    }
+
+    for (; contextInfo.textIndex < textLim; contextInfo.textIndex++) {
+      const contextItem = new KM_Core.instance.km_core_context_item();
+      if (deadkey?.p === contextInfo.textIndex) {
         contextItem.marker = deadkey.d;
         contextItems.push_back(contextItem);
         return;
