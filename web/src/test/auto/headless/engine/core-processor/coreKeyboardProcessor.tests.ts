@@ -178,6 +178,32 @@ describe('CoreKeyboardProcessor', function () {
       // Verify
       assert.equal(textStore.deadkeys().count(), 0, 'Should have 0 deadkeys');
     });
+
+    it('saves markers to TextStore for empty text', function () {
+      // Setup
+      textStore = new SyntheticTextStore('', 0);
+      // Text index   : 0   0   0
+      // context index: 0   1   2
+      // ContextItems : dk1 dk2 END
+      const contextItems = new KM_Core.instance.km_core_context_items();
+      addContextItem(contextItems, 1, true); // deadkey 1
+      addContextItem(contextItems, 2, true); // deadkey 2
+      contextItems.push_back(KM_Core.instance.create_end_context());
+
+      sandbox.stub(KM_Core.instance, 'context_get').returns({
+        status: KM_CORE_STATUS.OK,
+        object: contextItems,
+        delete: function (): void { }
+      });
+
+      // Execute
+      coreProcessor.unitTestEndPoints.saveMarkersToTextStore(context, textStore);
+
+      // Verify
+      assert.equal(textStore.deadkeys().count(), 2, 'Should have 2 deadkeys');
+      assert.equal(textStore.deadkeys().dks[0].toString(), 'Deadkey { p: 0, d: 1, o: 0, matched: 0}', 'dks[0]');
+      assert.equal(textStore.deadkeys().dks[1].toString(), 'Deadkey { p: 0, d: 2, o: 1, matched: 0}', 'dks[1]');
+    });
   });
 
 
