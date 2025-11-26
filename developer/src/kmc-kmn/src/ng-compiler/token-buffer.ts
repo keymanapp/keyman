@@ -14,18 +14,18 @@ import { Token } from "./lexer.js";
  * by the Lexer, and is used by the Parser
  */
 export class TokenBuffer {
-  private list: Token[];
-  private _currentPosition: number; // index into the Token list
-  private eof: Token = new Token(TokenType.EOF, ""); // end-of-file Token
+  /** index into the Token list */
+  private _currentPosition: number=0;
+  /** end-of-file Token */
+  private readonly eof: Token = new Token(TokenType.EOF, "");
 
 /**
  * Construct a TokenBuffer
- *
- * @param list the list of Tokens produced by the Lexer
  */
-  public constructor(list: Token[]) {
-    this.list             = list;
-    this._currentPosition = 0;
+  public constructor(
+    /** the list of Tokens produced by the Lexer */
+    private readonly list: Token[]
+  ) {
   }
 
   public get currentPosition() { return this._currentPosition; }
@@ -55,6 +55,11 @@ export class TokenBuffer {
     this._currentPosition = Math.min(Math.max(0, save), this.list.length);
   }
 
+  /**
+   * The source code (text) represented by the Token array
+   *
+   * @returns the source code (text)
+   */
   public toText(): string {
     let text: string = '';
     for (const token of this.list) {
