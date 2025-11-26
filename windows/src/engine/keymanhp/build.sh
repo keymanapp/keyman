@@ -60,8 +60,8 @@ function do_build_arm64() {
 }
 
 function do_publish_x64() {
-  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keyman.exe" -validate_manifest
-  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keyman.exe" -out:temp.manifest
+  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keymanhp.x64.exe" -validate_manifest
+  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keymanhp.x64.exe" -out:temp.manifest
   grep -q 'uiAccess="true"' temp.manifest || builder_die 'uiAccess must be set to true in manifest.xml'
   rm -f temp.manifest
 
@@ -71,8 +71,8 @@ function do_publish_x64() {
 }
 
 function do_publish_arm64() {
-  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keyman.exe" -validate_manifest
-  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keyman.exe" -out:temp.manifest
+  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keymanhp.arm64.exe" -validate_manifest
+  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_ENGINE/keymanhp.arm64.exe" -out:temp.manifest
   grep -q 'uiAccess="true"' temp.manifest || builder_die 'uiAccess must be set to true in manifest.xml'
   rm -f temp.manifest
 
@@ -82,7 +82,7 @@ function do_publish_arm64() {
 }
 
 function do_install_x64() {
-  cp "$WINDOWS_PROGRAM_ENGINE/keymanhp.x64.exe" "$INSTALLPATH_KEYMANENGINE/keymanx64.exe"
+  cp "$WINDOWS_PROGRAM_ENGINE/keymanhp.x64.exe" "$INSTALLPATH_KEYMANENGINE/keymanhp.x64.exe"
 }
 
 function do_install_arm64() {

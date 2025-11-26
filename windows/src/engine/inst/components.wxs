@@ -266,9 +266,6 @@
       <Component Guid="{3E5DACB3-055A-41EC-8890-15A30A40548B}">
         <File Id="sentry.x64.dll" Name="sentry.x64.dll" KeyPath="yes" />
       </Component>
-      <Component Guid="{B63B5989-7303-469E-AD00-BFAEEE38D1D3}">
-        <File Id="sentry.arm64.dll" Name="sentry.arm64.dll" KeyPath="yes" />
-      </Component>
       <Component Guid="{AA5AF288-4D67-49F4-A10B-E5725A42599B}">
         <File Id="crashpad_handler.exe" Name="crashpad_handler.exe" KeyPath="yes" />
       </Component>
