@@ -883,7 +883,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Les informations de débogage de Keyman seront stockées dans un fichier journal appelé %LOCALAPPDATA%\Keyman\Diag\system#.etl (où # est un nombre). Vous devriez quitter Keyman avant d\'essayer de supprimer ce fichier.\n\n\AVERTISSEMENT : Ce fichier peut grossir très rapidement. L\'activation du débogage peut ralentir votre système et ne devrait se faire que si le support technique le conseille.\n\nAVERTISSEMENT DE CONFIDENTIALITÉ : Veuillez noter que le fichier journal de débogage enregistre tous les traits de touches que vous tapez. Vous ne devriez activer le journal de débogage que pour la durée d\'une session de débogage ou de diagnostic.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Les informations de débogage de Keyman seront stockées dans un fichier journal appelé %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (où # est un nombre). Vous devriez quitter Keyman avant d\'essayer de supprimer ce fichier.\n\n\AVERTISSEMENT : Ce fichier peut grossir très rapidement. L\'activation du débogage peut ralentir votre système et ne devrait se faire que si le support technique le conseille.\n\nAVERTISSEMENT DE CONFIDENTIALITÉ : Veuillez noter que le fichier journal de débogage enregistre tous les traits de touches que vous tapez. Vous ne devriez activer le journal de débogage que pour la durée d\'une session de débogage ou de diagnostic.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

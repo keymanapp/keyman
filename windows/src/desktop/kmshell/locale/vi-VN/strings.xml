@@ -948,7 +948,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Thông tin gỡ lỗi Keyman sẽ được lưu trữ trong tệp nhật ký có tên %LOCALAPPDATA%\Keyman\Diag\system#.etl (trong đó # là một số). Bạn nên thoát khỏi Keyman trước khi cố gắng xóa tệp này.\n\n\CẢNH BÁO: Tệp này có thể tăng kích thước rất nhanh. Việc bật gỡ lỗi có thể làm chậm hệ thống của bạn và chỉ nên thực hiện nếu được bộ phận hỗ trợ kỹ thuật khuyên dùng.\n\nCẢNH BÁO VỀ QUYỀN RIÊNG TƯ: Xin lưu ý rằng tệp nhật ký gỡ lỗi ghi lại tất cả các lần nhấn phím mà bạn nhập. Bạn chỉ nên bật nhật ký gỡ lỗi trong thời gian diễn ra phiên gỡ lỗi hoặc chẩn đoán.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Thông tin gỡ lỗi Keyman sẽ được lưu trữ trong tệp nhật ký có tên %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (trong đó # là một số). Bạn nên thoát khỏi Keyman trước khi cố gắng xóa tệp này.\n\n\CẢNH BÁO: Tệp này có thể tăng kích thước rất nhanh. Việc bật gỡ lỗi có thể làm chậm hệ thống của bạn và chỉ nên thực hiện nếu được bộ phận hỗ trợ kỹ thuật khuyên dùng.\n\nCẢNH BÁO VỀ QUYỀN RIÊNG TƯ: Xin lưu ý rằng tệp nhật ký gỡ lỗi ghi lại tất cả các lần nhấn phím mà bạn nhập. Bạn chỉ nên bật nhật ký gỡ lỗi trong thời gian diễn ra phiên gỡ lỗi hoặc chẩn đoán.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
