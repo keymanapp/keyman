@@ -22,9 +22,9 @@ export class EmbedOskInKmx {
    * have space pre-allocated for the KMX+ header, and injects the prebuilt KMX+
    * kmxPlusBinary data blob, and updates the header flag to indicate that the
    * file now includes OSK data.
-   * @param inputFile
-   * @param kmxPlusBinary
-   * @returns
+   * @param inputFile         existing KMX file
+   * @param kmxPlusBinary     KMX+ data blob
+   * @returns new KMX file with embedded KMX+ data
    */
   private injectKmxPlusIntoKmxFile(inputFile: Uint8Array, kmxPlusBinary: Uint8Array): Uint8Array {
     const kmx = new KMX.KMXFile();
