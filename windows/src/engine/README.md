@@ -21,7 +21,9 @@ Message library for Windows events.
 
 ## keymanhp - keymanhp.x64.exe | keymanhp.arm64.exe
 
-64-bit versions of keyman.exe. All UI is in keyman.exe, so this is a thin wrapper around the keyman32 build. One is for x64 CPU architecture and the other Arm64
+64-bit versions of keyman.exe. All UI is in keyman.exe, so this is a thin wrapper around the keyman32 build. One is for x64 CPU architecture and the other Arm64.
+
+In v18.0 and earlier, this was called keymanx64.exe.
 
 ## kmcomapi - kmcomapi.dll | kmcomapi.x64.dll
 
