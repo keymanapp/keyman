@@ -864,7 +864,7 @@ keyboard do suro Windows ye dǝlan faidatǝmin ma.  Keyman keyboards dǝye adai 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.\n\n\WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.\n\nPRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.\n\n\WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.\n\nPRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
