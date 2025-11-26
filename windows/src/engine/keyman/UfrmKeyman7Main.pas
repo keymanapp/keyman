@@ -268,7 +268,7 @@ type
     //procedure SnapToolHelp;
     procedure RecreateTaskbarIcons;
     function StartKeymanEngine: Boolean;
-    procedure StartKeymanX64;
+    procedure StartKeymanHostProcess(ProcessName: string);
     procedure OpenTextEditor;
     //function GetCachedKeymanID(hkl: DWORD): DWORD;
     procedure ShowLanguageSwitchForm;
@@ -376,6 +376,10 @@ const
   skSelectHKL = 2; // Select the requested Windows language (and therefore the most appropriate Keyman keyboard)
   skSelectHKLOnly = 3; // Select the requested Windows language and turn Keyman keyboard off
   skTSF = 4;       // A TSF TIP
+
+const
+  KM_HP_X64 = 'keymanhp.x64.exe';
+  KM_HP_ARM64 = 'keymanhp.arm64.exe';
 
 implementation
 
@@ -1325,7 +1329,8 @@ begin
   else
     kmint.KeymanEngineControl.RestartEngine; // I1486
 
-  StartKeymanX64;
+  if IsWow64 then StartKeymanHostProcess(KM_HP_X64);   // I4374
+  if IsNativeMachineArm64 then StartKeymanHostProcess(KM_HP_ARM64);
 
 end;
 
@@ -1954,17 +1959,16 @@ begin
   FLangSwitchRefreshWatcher.Start;
 end;
 
-procedure TfrmKeyman7Main.StartKeymanX64;
+procedure TfrmKeyman7Main.StartKeymanHostProcess(ProcessName: string);
 var
   cmd, dir, params: string;
   sei: TShellExecuteInfoW;
 begin
-  if not IsWow64 then Exit;   // I4374
 
   try
-    // TODO: use TKeymanPaths to find keymanx64?
-    dir := ExtractFilePath(ParamStr(0));
-    cmd := dir + 'keymanx64.exe';
+    dir := TKeymanPaths.KeymanEngineInstallDir;
+    cmd := TKeymanPaths.KeymanEngineInstallPath(ProcessName);
+
     params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
 
     if not FileExists(cmd) then
@@ -1988,7 +1992,7 @@ begin
     begin
       // We're going to handle any exceptions here but we'd like to know that
       // they happened
-      TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanx64', True);
+      TKeymanSentryClient.ReportHandledException(E, 'Error starting ' + ProcessName, True);
     end;
   end;
 end;

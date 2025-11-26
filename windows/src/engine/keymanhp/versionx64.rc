@@ -16,10 +16,10 @@
         VALUE "CompanyName", KV_COMPANY_NAME
         VALUE "FileDescription", "Keyman Engine x64\0"
         VALUE "FileVersion", KV_VERSION_STRING
-        VALUE "InternalName", "KEYMANX64\0"
+        VALUE "InternalName", "KEYMANHP.X64\0"
         VALUE "LegalCopyright", KV_LEGAL_COPYRIGHT
         VALUE "LegalTrademarks", KV_LEGAL_TRADEMARKS
-        VALUE "OriginalFilename", "KEYMANX64.EXE\0"
+        VALUE "OriginalFilename", "KEYMANHP.X64.EXE\0"
         VALUE "ProductName", "Keyman Engine\0"
         VALUE "ProductVersion", KV_VERSION_STRING
         VALUE "Comments", "\0"
