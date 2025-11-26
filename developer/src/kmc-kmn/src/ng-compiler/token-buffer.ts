@@ -56,7 +56,7 @@ export class TokenBuffer {
   }
 
   /**
-   * The source code (text) represented by the Token array
+   * The source code (text) represented by the Token list
    *
    * @returns the source code (text)
    */
