@@ -150,57 +150,6 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   }
 
   /**
-   * Adds context items from the given text to the contextItems collection, up
-   * to the caret position or the deadKey if present.
-   *
-   * @param {object}  contextInfo    The context information including textIndex,
-   *                                 caretPosition, and text.
-   * @param {Deadkey} deadkey        The deadkey to insert if present at the current index.
-   * @param {km_core_context_items}
-   *                  contextItems   The collection to which context items are added.
-   */
-  private addContextItemsFromText(contextInfo: { textIndex: number, caretPosition: number, text: string }, deadkey: Deadkey, contextItems: km_core_context_items): void {
-    const textLim = (() => {
-      // Determine the first index that should not be included in context. This value is the
-      // minimum of the text length and the caret position (or caret position + 1 if we have a
-      // deadkey). If we don't have a deadkey we know that the last context item will be a
-      // character and the last possible index for that is before the caret. If we do have a
-      // deadkey it could be after the last character, i.e. at the caret position so we have to
-      // use caret position + 1 so that the caret position itself is a possible index.
-      const caretPosition = deadkey === null
-        ? contextInfo.caretPosition
-        : contextInfo.caretPosition + 1;
-      return Math.min(contextInfo.text.length, caretPosition);
-    })();
-
-    if (deadkey !== null && textLim === 0) {
-      const contextItem = new KM_Core.instance.km_core_context_item();
-      if (deadkey?.p === contextInfo.textIndex) {
-        contextItem.marker = deadkey.d;
-        contextItems.push_back(contextItem);
-      } else {
-        console.warn(`Can't add deadkey at position ${deadkey.p} when text limit is 0`);
-      }
-      return;
-    }
-
-    for (; contextInfo.textIndex < textLim; contextInfo.textIndex++) {
-      const contextItem = new KM_Core.instance.km_core_context_item();
-      if (deadkey?.p === contextInfo.textIndex) {
-        contextItem.marker = deadkey.d;
-        contextItems.push_back(contextItem);
-        return;
-      }
-      contextItem.character = contextInfo.text.codePointAt(contextInfo.textIndex);
-      if (contextItem.character > 0xFFFF) {
-        // we have a surrogate pair, skip other half of surrogate
-        contextInfo.textIndex++;
-      }
-      contextItems.push_back(contextItem);
-    }
-  }
-
-  /**
    * Retrieve context including deadkeys from TextStore and apply to Core's context
    *
    * @param context     Context from Keyman Core
@@ -221,15 +170,50 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     // managed entirely within Core, KeymanWeb does not need to have knowledge
     // of markers, and then we better align with the desktop Engines.
 
-    const text = textStore.getText();
+    const caretPosition = textStore.getCaret();
+    const text = textStore.getText().substring(0, caretPosition);
     const deadkeys = textStore.deadkeys().dks.sort((a, b) => a.p != b.p ? a.p - b.p : a.o - b.o);
     const contextItems = new KM_Core.instance.km_core_context_items();
-    const caretPosition = textStore.getCaret();
-    const contextInfo = { textIndex: 0, caretPosition: caretPosition, text: text };
-    for (const deadkey of deadkeys) {
-      this.addContextItemsFromText(contextInfo, deadkey, contextItems);
+
+    const deadkeyIterator = deadkeys.values();
+    let deadkey = deadkeyIterator.next();
+    const textMax = Math.min(text.length, caretPosition + 1);
+    let textIndex = 0;
+    while (!deadkey.done || textIndex < textMax) {
+      // insert 0 or more deadkeys at current index
+      while (!deadkey.done && deadkey.value.p <= textIndex) {
+        if (deadkey.value.p < textIndex) {
+          // this should never happen -- it would mean that
+          // a deadkey position was < 0 or in the middle of a
+          // surrogate pair. We'll silently drop it
+          console.warn(`invalid deadkey '${deadkey.value.d}' position ${deadkey.value.p}`);
+        } else {
+          const contextItem = new KM_Core.instance.km_core_context_item();
+          contextItem.marker = deadkey.value.d;
+          contextItems.push_back(contextItem);
+        }
+        deadkey = deadkeyIterator.next();
+      }
+
+      // flush out invalid deadkeys
+      while (!deadkey.done && deadkey.value.p > textMax) {
+        console.warn(`invalid deadkey '${deadkey.value.d}' position ${deadkey.value.p} after end of text ${textMax}`);
+        deadkey = deadkeyIterator.next();
+      }
+
+      // insert next character
+      if (textIndex < textMax) {
+        const contextItem = new KM_Core.instance.km_core_context_item();
+        contextItem.character = text.codePointAt(textIndex);
+        contextItems.push_back(contextItem);
+        textIndex++;
+        if (contextItem.character > 0xFFFF) {
+          // we have a surrogate pair, skip other half of surrogate, codePointAt()
+          // already handled that for us
+          textIndex++;
+        }
+      }
     }
-    this.addContextItemsFromText(contextInfo, null, contextItems);
 
     // Add end element
     contextItems.push_back(KM_Core.instance.create_end_context());
