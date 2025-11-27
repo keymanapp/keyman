@@ -5,23 +5,21 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { KM_Core, km_core_context, km_core_keyboard, km_core_state, KM_CORE_CT, KM_CORE_STATUS, km_core_context_items } from 'keyman/engine/core-adapter';
-import { coreurl, loadKeyboardBlob } from '../../test_utils.js';
+import { coreurl, loadKeyboardBlob } from '../loadKeyboardHelper.js';
 import { Deadkey, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
 
-// TODO-web-core: These tests would run headless if we'd additionally build WASM for node
-
 describe('CoreKeyboardProcessor', function () {
-  const loadKeyboard = async function (name: string): Promise<km_core_keyboard> {
-    const blob = await loadKeyboardBlob(name)
+  const loadKeyboard = function (name: string): km_core_keyboard {
+    const blob = loadKeyboardBlob(name);
     const result = KM_Core.instance.keyboard_load_from_blob(name, blob);
     assert.equal(result.status, 0);
     assert.isOk(result.object);
     return result.object;
   };
 
-  const createState = async function (keyboardName: string): Promise<km_core_state> {
-    const keyboard = await loadKeyboard(keyboardName);
+  const createState = function (keyboardName: string): km_core_state {
+    const keyboard = loadKeyboard(keyboardName);
     const state = KM_Core.instance.state_create(keyboard, []);
     assert.equal(state.status, 0);
     assert.isOk(state.object);
@@ -52,7 +50,7 @@ describe('CoreKeyboardProcessor', function () {
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
       await coreProcessor.init(coreurl);
-      state = await createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
+      state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
       sandbox = sinon.createSandbox();
       Deadkey.ordinalSeed = 0;
@@ -133,7 +131,7 @@ describe('CoreKeyboardProcessor', function () {
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
       await coreProcessor.init(coreurl);
-      state = await createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
+      state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
     });
 

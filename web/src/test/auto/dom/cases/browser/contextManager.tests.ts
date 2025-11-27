@@ -1,4 +1,3 @@
-// import { BrowserConfiguration, ContextManager } from 'keyman/app/browser';
 import { ContextManager } from 'keyman/app/browser';
 import { textStoreForElement } from 'keyman/engine/attachment';
 import { TextAreaElementTextStore } from 'keyman/engine/element-text-stores';
