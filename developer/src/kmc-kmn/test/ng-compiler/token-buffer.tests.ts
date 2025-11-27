@@ -11,8 +11,8 @@ import { assert } from 'chai';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BASELINE_KEYBOARD_NAMES, REPOSITORY_KEYBOARD_NAMES } from '../../src/ng-compiler/keyboard-names.js';
-import { readFileSync } from 'fs';
+import { BASELINE_KEYBOARD_NAMES, PATH_TO_BASELINE, PATH_TO_REPOSITORY, REPOSITORY_KEYBOARD_NAMES } from '../../src/ng-compiler/keyboard-names.js';
+import { existsSync, readFileSync } from 'fs';
 
 // nomatch > layer('default')
 const LIST: Token[] = [
@@ -170,7 +170,7 @@ describe("TokenBuffer Tests", () => {
     });
     it("can provide round trip text for baseline keyboards", () => {
       BASELINE_KEYBOARD_NAMES.forEach((name) => {
-        const buffer: string = readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`).toString();
+        const buffer: string = readFileSync(`${PATH_TO_BASELINE}${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
@@ -181,9 +181,12 @@ describe("TokenBuffer Tests", () => {
     for (let i = 0; i < REPOSITORY_KEYBOARD_NAMES.length; i+=100) {
       const start = i;
       const end   = Math.min(i+100, REPOSITORY_KEYBOARD_NAMES.length);
-      it(`can provide round trip text for repository keyboards (${start}-${end-1})`, () => {
+      it(`can provide round trip text for repository keyboards (${start}-${end-1})`, function() {
+        if (!existsSync(PATH_TO_REPOSITORY)) {
+          this.skip();
+        }
         REPOSITORY_KEYBOARD_NAMES.slice(start, end).forEach((name) => {
-        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
+        const buffer: string = readFileSync(`${PATH_TO_REPOSITORY}${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);

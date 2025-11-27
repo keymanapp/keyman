@@ -6,6 +6,8 @@
  * Keyboard names for KMC KMN Next Generation Compiler
  */
 
+export const PATH_TO_BASELINE = '../../../common/test/keyboards/baseline/';
+
 export const BASELINE_KEYBOARD_NAMES = [
   'k_000___null_keyboard',
   'k_001___basic_input_unicodei',
@@ -59,6 +61,8 @@ export const BASELINE_KEYBOARD_NAMES = [
   'k_054___nul_and_contextex',
   'k_055___deadkey_cancelled_by_arrow',
 ];
+
+export const PATH_TO_REPOSITORY = '../../../../keyboards/';
 
 export const REPOSITORY_KEYBOARD_NAMES = [
   'experimental/a/alephwithbeth/source/alephwithbeth',
