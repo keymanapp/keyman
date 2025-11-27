@@ -35,7 +35,7 @@ export class TokenBuffer {
    *
    * @returns the current token or the EOF token
    */
-  public nextToken(): Token {
+  public currentToken(): Token {
     return this._currentPosition == this.list.length ? this.eof : this.list[this._currentPosition];
   }
 
