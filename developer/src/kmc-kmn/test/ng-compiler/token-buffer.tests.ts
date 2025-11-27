@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BASELINE_KEYBOARD_NAMES, PATH_TO_BASELINE, PATH_TO_REPOSITORY, REPOSITORY_KEYBOARD_NAMES } from '../../src/ng-compiler/keyboard-names.js';
+import { BASELINE_KEYBOARD_NAMES, PATH_TO_BASELINE, PATH_TO_REPOSITORY, REPOSITORY_KEYBOARD_NAMES } from './keyboard-names.tests.js';
 import { existsSync, readFileSync } from 'fs';
 
 // nomatch > layer('default')
