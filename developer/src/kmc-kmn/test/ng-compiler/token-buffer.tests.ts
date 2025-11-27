@@ -178,46 +178,19 @@ describe("TokenBuffer Tests", () => {
         assert.equal(output, buffer, `${name}.kmn`);
       });
     });
-    it("can provide round trip text for repository keyboards (0-99)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(0, 100));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (100-199)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(100, 200));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (200-299)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(200, 300));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (300-399)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(300, 400));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (400-499)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(400, 500));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (500-599)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(500, 600));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (600-699)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(600, 700));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (700-799)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(700, 800));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (800-899)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(800, 900));
-    }).timeout(50000);
-    it("can provide round trip text for repository keyboards (900-end)", () => {
-      testRepositoryKeyboards(REPOSITORY_KEYBOARD_NAMES.slice(900));
-    }).timeout(50000);
+    for (let i = 0; i < REPOSITORY_KEYBOARD_NAMES.length; i+=100) {
+      const start = i;
+      const end   = Math.min(i+100, REPOSITORY_KEYBOARD_NAMES.length);
+      it(`can provide round trip text for repository keyboards (${start}-${end-1})`, () => {
+        REPOSITORY_KEYBOARD_NAMES.slice(start, end).forEach((name) => {
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
+        });
+      }).timeout(50000);
+    }
   });
 });
-
-function testRepositoryKeyboards(names: string[]) {
-  names.forEach((name) => {
-    const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
-    const lexer = new Lexer(buffer);
-    const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
-    const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-    const output: string = tokenBuffer.toText();
-    assert.equal(output, buffer, `${name}.kmn`);
-  });
-}
