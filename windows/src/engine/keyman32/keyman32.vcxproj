@@ -683,14 +683,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Static Library|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="preservedkeymap.cpp" />
+    <ClCompile Include="RightAltEmulationCheck.cpp" />
     <ClCompile Include="security.cpp" />
     <ClCompile Include="selectkeyboard.cpp" />
     <ClCompile Include="serialkeyeventclient.cpp" />
     <ClCompile Include="serialkeyeventserver.cpp" />
     <ClCompile Include="SharedBuffers.cpp" />
     <ClCompile Include="syskbd.cpp" />
-    <ClCompile Include="syskbdnt.cpp" />
-    <ClCompile Include="syskbdnt64.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp" />
     <ClCompile Include="versioninfo.cpp" />
     <ClCompile Include="VKScanCodes.cpp" />
