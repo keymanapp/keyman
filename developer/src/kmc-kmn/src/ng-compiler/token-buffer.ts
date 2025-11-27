@@ -63,7 +63,7 @@ export class TokenBuffer {
   public toText(): string {
     let text: string = '';
     for (const token of this.list) {
-      text = text.concat(token.text)
+      text += token.text;
     }
     return text;
   }
