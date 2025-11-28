@@ -168,7 +168,10 @@ describe("TokenBuffer Tests", () => {
       const output: string = tokenBuffer.toText();
       assert.equal(output, buffer);
     });
-    it("can provide round trip text for baseline keyboards", () => {
+    it("can provide round trip text for baseline keyboards", function() {
+      if (!existsSync(PATH_TO_BASELINE)) {
+        this.skip();
+      }
       BASELINE_KEYBOARD_NAMES.forEach((name) => {
         const buffer: string = readFileSync(`${PATH_TO_BASELINE}${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
@@ -178,13 +181,12 @@ describe("TokenBuffer Tests", () => {
         assert.equal(output, buffer, `${name}.kmn`);
       });
     });
+    // if the keyboard repository is absent, this loop will not execute as it will be of
+    // zero length, so all repository keyboard round trip tests will be (silently) skipped
     for (let i = 0; i < REPOSITORY_KEYBOARD_NAMES.length; i+=100) {
       const start = i;
       const end   = Math.min(i+100, REPOSITORY_KEYBOARD_NAMES.length);
       it(`can provide round trip text for repository keyboards (${start}-${end-1})`, function() {
-        if (!existsSync(PATH_TO_REPOSITORY)) {
-          this.skip();
-        }
         REPOSITORY_KEYBOARD_NAMES.slice(start, end).forEach((name) => {
         const buffer: string = readFileSync(`${PATH_TO_REPOSITORY}${name}.kmn`).toString();
         const lexer = new Lexer(buffer);

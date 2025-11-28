@@ -6,7 +6,7 @@
  * Keyboard names for KMC KMN Next Generation Compiler
  */
 
-import { readdirSync, statSync } from 'fs';
+import { existsSync, readdirSync, statSync } from 'fs';
 import path from 'path';
 
 export const PATH_TO_BASELINE = '../../../common/test/keyboards/baseline/';
@@ -29,6 +29,10 @@ export const REPOSITORY_KEYBOARD_NAMES = findKeyboardNames(PATH_TO_REPOSITORY);
  * @returns the names
  */
 function findKeyboardNames(dir: string, baseLength: number = dir.length, names: string[] = []): string[] {
+  if (!existsSync(dir)) {
+    return [];
+  }
+
   const files = readdirSync(dir);
 
   files.forEach((file) => {
