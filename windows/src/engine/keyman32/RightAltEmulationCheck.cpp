@@ -162,7 +162,6 @@ BOOL IsWow64() {
   if(fStored) {
 		return bIsWow64;
 	}
-  bIsWow64 = FALSE;
 	if(!IsWow64Process(GetCurrentProcess(), &bIsWow64)) {
 		// Assume 32 bit machine on failure
 		bIsWow64 = FALSE;
