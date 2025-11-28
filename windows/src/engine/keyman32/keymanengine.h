@@ -140,8 +140,6 @@ BOOL LoadlpKeyboard(int i);
 PSTR wstrtostr(PCWSTR in);
 PWSTR strtowstr(PSTR in);
 
-WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags);
-
 void SelectApplicationIntegration();   // I4287
 
 void PostDummyKeyEvent();  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
