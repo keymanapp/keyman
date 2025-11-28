@@ -31,7 +31,7 @@ class TrueRule extends Rule {
   }
 
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    if (tokenBuffer.nextToken().isTokenType(TokenType.EOF))
+    if (tokenBuffer.currentToken().isTokenType(TokenType.EOF))
       return false;
     tokenBuffer.popToken();
     node.addChild(new ASTNode(NodeType.TMP));

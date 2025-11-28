@@ -419,7 +419,7 @@ export class TokenRule extends Rule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    const token: Token = tokenBuffer.nextToken();
+    const token: Token = tokenBuffer.currentToken();
 
     if (token.isTokenType(this.tokenType)) {
       parseSuccess = true;
@@ -480,7 +480,7 @@ export class AlternateTokenRule extends Rule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    const token: Token = tokenBuffer.nextToken();
+    const token: Token = tokenBuffer.currentToken();
 
     if (this.tokenTypes.has(token.tokenType)) {
       parseSuccess = true;
@@ -512,14 +512,14 @@ export class AlternateTokenRule extends Rule {
 export function tokenSequence(tokenBuffer: TokenBuffer, tokens: Token[], tokenType: TokenType, numExpected: number): boolean {
   let parseSuccess: boolean = true;
   const save: number = tokenBuffer.currentPosition;
-  let token: Token = tokenBuffer.nextToken();
+  let token: Token = tokenBuffer.currentToken();
   const tmpTokens: Token[] = [];
 
   for (let num=0; num<numExpected; num++) {
     if (token.isTokenType(tokenType)) {
       tokenBuffer.popToken();
       tmpTokens.push(token);
-      token = tokenBuffer.nextToken();
+      token = tokenBuffer.currentToken();
     } else {
       parseSuccess = false;
       break;
