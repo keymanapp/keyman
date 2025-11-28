@@ -37,7 +37,7 @@ function findKeyboardNames(dir: string, baseLength: number = dir.length, names: 
 
   files.forEach((file) => {
     const filePath = path.join(dir, file);
-    if (statSync(filePath).isDirectory() && !/extras$/.test(dir) && !/legacy$/.test(dir)) {
+    if (statSync(filePath).isDirectory() && !/extras$/.test(filePath) && !/legacy$/.test(filePath)) {
       findKeyboardNames(filePath, baseLength, names);
     } else if (/\.kmn$/.test(file)) {
       names.push(filePath.slice(baseLength, -4)); // remove base directory and file type
