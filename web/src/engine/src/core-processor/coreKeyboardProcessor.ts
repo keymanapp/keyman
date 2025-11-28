@@ -177,32 +177,26 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
 
     const deadkeyIterator = deadkeys.values();
     let deadkey = deadkeyIterator.next();
-    const textMax = Math.min(text.length, caretPosition + 1);
     let textIndex = 0;
-    while (!deadkey.done || textIndex < textMax) {
-      // insert 0 or more deadkeys at current index
-      while (!deadkey.done && deadkey.value.p <= textIndex) {
-        if (deadkey.value.p < textIndex) {
-          // this should never happen -- it would mean that
-          // a deadkey position was < 0 or in the middle of a
-          // surrogate pair. We'll silently drop it
-          console.warn(`invalid deadkey '${deadkey.value.d}' position ${deadkey.value.p}`);
-        } else {
-          const contextItem = new KM_Core.instance.km_core_context_item();
-          contextItem.marker = deadkey.value.d;
-          contextItems.push_back(contextItem);
-        }
+    while (!deadkey.done || textIndex < text.length) {
+      // flush out invalid deadkeys
+      while (!deadkey.done && (deadkey.value.p < textIndex || deadkey.value.p > text.length)) {
+        // this should never happen -- it would mean that a deadkey position was < 0, in the
+        // middle of a surrogate pair, or after the caret.
+        console.warn(`invalid deadkey '${deadkey.value.d}' position ${deadkey.value.p}`);
         deadkey = deadkeyIterator.next();
       }
 
-      // flush out invalid deadkeys
-      while (!deadkey.done && deadkey.value.p > textMax) {
-        console.warn(`invalid deadkey '${deadkey.value.d}' position ${deadkey.value.p} after end of text ${textMax}`);
+      // insert 0 or more deadkeys at current index
+      while (!deadkey.done && deadkey.value.p == textIndex) {
+        const contextItem = new KM_Core.instance.km_core_context_item();
+        contextItem.marker = deadkey.value.d;
+        contextItems.push_back(contextItem);
         deadkey = deadkeyIterator.next();
       }
 
       // insert next character
-      if (textIndex < textMax) {
+      if (textIndex < text.length) {
         const contextItem = new KM_Core.instance.km_core_context_item();
         contextItem.character = text.codePointAt(textIndex);
         contextItems.push_back(contextItem);

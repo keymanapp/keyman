@@ -454,5 +454,37 @@ describe('CoreKeyboardProcessor', function () {
       assert.equal(items.get(2).type, KM_CORE_CT.END, 'Item 2 should be END');
       result.delete();
     });
+
+    it('skips invalid deadkeys', function () {
+      // Setup
+      textStore = new SyntheticTextStore('abcde', 3);
+      textStore.deadkeys().add(new Deadkey(-1, 1)); // invalid
+      textStore.deadkeys().add(new Deadkey(1, 2));  // after 'b'
+      textStore.deadkeys().add(new Deadkey(4, 3));  // invalid (after caret)
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0 1   1 2 3
+      // Text:        :           |
+      // context index: 0 1   2 3 4
+      // ContextItems : a dk2 b c END
+      assert.equal(items.size(), 5, 'Should have 5 context items');
+      assert.equal(items.get(0).type, KM_CORE_CT.CHAR, 'Item 0 should be CHAR');
+      assert.equal(items.get(0).character, 'a'.charCodeAt(0), 'Item 0 should be "a"');
+      assert.equal(items.get(1).type, KM_CORE_CT.MARKER, 'Item 1 should be MARKER');
+      assert.equal(items.get(1).marker, 2, 'Item 1 should be marker 2');
+      assert.equal(items.get(2).type, KM_CORE_CT.CHAR, 'Item 2 should be CHAR');
+      assert.equal(items.get(2).character, 'b'.charCodeAt(0), 'Item 2 should be "b"');
+      assert.equal(items.get(3).type, KM_CORE_CT.CHAR, 'Item 3 should be CHAR');
+      assert.equal(items.get(3).character, 'c'.charCodeAt(0), 'Item 3 should be "c"');
+      assert.equal(items.get(4).type, KM_CORE_CT.END, 'Item 4 should be END');
+      result.delete();
+    });
   });
 });
