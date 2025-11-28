@@ -262,6 +262,7 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "..\..\..\..\common\windows\cpp\include\crc32.h"
 
 #include "k32_tsf.h"
+#include "LowLevelHookWatchDog.h"
 
 void ReportActiveKeyboard(WORD wCommand);   // I3933   // I3949
 void SelectKeyboardHKL(DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
@@ -271,5 +272,7 @@ void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
 BOOL SetupCoreEnvironment(km_core_option_item **test_env_opts);
 void DeleteCoreEnvironment(km_core_option_item *test_env_opts);
+
+BOOL RestartLowLevelHook();
 
 #endif  // _KEYMANENGINE_H
