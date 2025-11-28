@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.167 alpha 2025-11-28
+
+* change(windows): add unit testing to keyman32 build (#15244)
+* refactor(windows): merge syskbdnt.cpp and syskbdnt64.cpp into RightAltEmulationCheck.cpp (#15245)
+* chore(windows): add wow64kbd support app for researching WOW64 reqs (#15246)
+
 ## 19.0.166 alpha 2025-11-26
 
 * chore(android): Clarify PR title for #15136 (#15224)
