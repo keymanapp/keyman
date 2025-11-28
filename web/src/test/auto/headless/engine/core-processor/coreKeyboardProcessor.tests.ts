@@ -125,7 +125,87 @@ describe('CoreKeyboardProcessor', function () {
       assert.equal(textStore.deadkeys().dks[1].toString(), 'Deadkey { p: 2, d: 2, o: 1, matched: 0}', 'dks[1]');
       assert.equal(textStore.deadkeys().dks[2].toString(), 'Deadkey { p: 6, d: 3, o: 2, matched: 0}', 'dks[2]');
     });
+
+    it('can save to TextStore without markers (BMP)', function () {
+      // Setup
+      textStore = new SyntheticTextStore('abcd', 3);
+      // Text index   : 0 1 2 3
+      // context index: 0 1 2 3
+      // ContextItems : a b c d
+      const contextItems = new KM_Core.instance.km_core_context_items();
+      addContextItem(contextItems, 'a', false);
+      addContextItem(contextItems, 'b', false);
+      addContextItem(contextItems, 'c', false);
+      addContextItem(contextItems, 'd', false);
+      contextItems.push_back(KM_Core.instance.create_end_context());
+
+      sandbox.stub(KM_Core.instance, 'context_get').returns({
+        status: KM_CORE_STATUS.OK,
+        object: contextItems,
+        delete: function (): void { }
+      });
+
+      // Execute
+      coreProcessor.unitTestEndPoints.saveMarkersToTextStore(context, textStore);
+
+      // Verify
+      assert.equal(textStore.deadkeys().count(), 0, 'Should have 0 deadkeys');
+    });
+
+    it('can save to TextStore without markers (SMP)', function () {
+      // Setup
+      textStore = new SyntheticTextStore('𐌀𐌁𐌂𐌃', 6); // U+10300 U+10301 U+10302 U+10303
+      // Text index   : 0 1 2 3 4 5
+      // context index: 0   1   2   3
+      // ContextItems : 𐌀   𐌁   𐌂   END
+      // ContextItem.character is a UTF-32 value!
+      const contextItems = new KM_Core.instance.km_core_context_items();
+      addContextItem(contextItems, '𐌀', false);
+      addContextItem(contextItems, '𐌁', false);
+      addContextItem(contextItems, '𐌂', false);
+      addContextItem(contextItems, '𐌃', false);
+      contextItems.push_back(KM_Core.instance.create_end_context());
+
+      sandbox.stub(KM_Core.instance, 'context_get').returns({
+        status: KM_CORE_STATUS.OK,
+        object: contextItems,
+        delete: function (): void { }
+      });
+
+      // Execute
+      coreProcessor.unitTestEndPoints.saveMarkersToTextStore(context, textStore);
+
+      // Verify
+      assert.equal(textStore.deadkeys().count(), 0, 'Should have 0 deadkeys');
+    });
+
+    it('saves markers to TextStore for empty text', function () {
+      // Setup
+      textStore = new SyntheticTextStore('', 0);
+      // Text index   : 0   0   0
+      // context index: 0   1   2
+      // ContextItems : dk1 dk2 END
+      const contextItems = new KM_Core.instance.km_core_context_items();
+      addContextItem(contextItems, 1, true); // deadkey 1
+      addContextItem(contextItems, 2, true); // deadkey 2
+      contextItems.push_back(KM_Core.instance.create_end_context());
+
+      sandbox.stub(KM_Core.instance, 'context_get').returns({
+        status: KM_CORE_STATUS.OK,
+        object: contextItems,
+        delete: function (): void { }
+      });
+
+      // Execute
+      coreProcessor.unitTestEndPoints.saveMarkersToTextStore(context, textStore);
+
+      // Verify
+      assert.equal(textStore.deadkeys().count(), 2, 'Should have 2 deadkeys');
+      assert.equal(textStore.deadkeys().dks[0].toString(), 'Deadkey { p: 0, d: 1, o: 0, matched: 0}', 'dks[0]');
+      assert.equal(textStore.deadkeys().dks[1].toString(), 'Deadkey { p: 0, d: 2, o: 1, matched: 0}', 'dks[1]');
+    });
   });
+
 
   describe('applyContextFromTextStore', function () {
     beforeEach(async function () {
@@ -207,6 +287,203 @@ describe('CoreKeyboardProcessor', function () {
       assert.equal(items.get(5).type, KM_CORE_CT.MARKER, 'Item 5 should be MARKER');
       assert.equal(items.get(5).marker, 3, 'Item 5 should be marker 3');
       assert.equal(items.get(6).type, KM_CORE_CT.END, 'Item 6 should be END');
+      result.delete();
+    });
+
+    it('applies text from TextStore to Core context without deadkeys (BMP)', function () {
+      // Setup
+      textStore = new SyntheticTextStore('abcd', 3);
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0 1 2   3
+      // Text:        : a b c | d
+      // context index: 0 1 2 3
+      // ContextItems : a b c END
+      assert.equal(items.size(), 4, 'Should have 4 context items');
+      assert.equal(items.get(0).type, KM_CORE_CT.CHAR, 'Item 0 should be CHAR');
+      assert.equal(items.get(0).character, 'a'.charCodeAt(0), 'Item 0 should be "a"');
+      assert.equal(items.get(1).type, KM_CORE_CT.CHAR, 'Item 1 should be CHAR');
+      assert.equal(items.get(1).character, 'b'.charCodeAt(0), 'Item 1 should be "b"');
+      assert.equal(items.get(2).type, KM_CORE_CT.CHAR, 'Item 2 should be CHAR');
+      assert.equal(items.get(2).character, 'c'.charCodeAt(0), 'Item 2 should be "c"');
+      assert.equal(items.get(3).type, KM_CORE_CT.END, 'Item 3 should be END');
+      result.delete();
+    });
+
+    it('applies text from TextStore to Core context without deadkeys  (SMP)', function () {
+      // Setup
+      // Use a string with Old Italic letters which will consist of surrogate pairs
+      // in a UTF-16 string.
+      textStore = new SyntheticTextStore('𐌀𐌁𐌂𐌃', 6); // U+10300 U+10301 U+10302 U+10303
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0 1 2 3 4 5   6 7
+      // Text:        : 𐌀   𐌁   𐌂   | 𐌃
+      // context index: 0   1   2   3
+      // ContextItems : 𐌀   𐌁   𐌂   END
+      // ContextItem.character is a UTF-32 value!
+      assert.equal(items.size(), 4, 'Should have 4 context items');
+      assert.equal(items.get(0).type, KM_CORE_CT.CHAR, 'Item 0 should be CHAR');
+      assert.equal(items.get(0).character, 0x10300, 'Item 0 should be "𐌀"');
+      assert.equal(items.get(1).type, KM_CORE_CT.CHAR, 'Item 1 should be CHAR');
+      assert.equal(items.get(1).character, 0x10301, 'Item 1 should be "𐌁"');
+      assert.equal(items.get(2).type, KM_CORE_CT.CHAR, 'Item 2 should be CHAR');
+      assert.equal(items.get(2).character, 0x10302, 'Item 2 should be "𐌂"');
+      assert.equal(items.get(3).type, KM_CORE_CT.END, 'Item 3 should be END');
+      result.delete();
+    });
+
+    it('applies text from TextStore to Core context also after deadkeys', function () {
+      // Setup
+      textStore = new SyntheticTextStore('abcd', 3);
+      textStore.deadkeys().add(new Deadkey(1, 1)); // before 'b'
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0 1   1 2   3
+      // Text:        : a     b c | d
+      // context index: 0 1   2 3 4
+      // ContextItems : a dk1 b c END
+      assert.equal(items.size(), 5, 'Should have 5 context items');
+      assert.equal(items.get(0).type, KM_CORE_CT.CHAR, 'Item 0 should be CHAR');
+      assert.equal(items.get(0).character, 'a'.charCodeAt(0), 'Item 0 should be "a"');
+      assert.equal(items.get(1).type, KM_CORE_CT.MARKER, 'Item 1 should be MARKER');
+      assert.equal(items.get(1).marker, 1, 'Item 1 should be marker 1');
+      assert.equal(items.get(2).type, KM_CORE_CT.CHAR, 'Item 2 should be CHAR');
+      assert.equal(items.get(2).character, 'b'.charCodeAt(0), 'Item 2 should be "b"');
+      assert.equal(items.get(3).type, KM_CORE_CT.CHAR, 'Item 3 should be CHAR');
+      assert.equal(items.get(3).character, 'c'.charCodeAt(0), 'Item 3 should be "c"');
+      assert.equal(items.get(4).type, KM_CORE_CT.END, 'Item 4 should be END');
+      result.delete();
+    });
+
+    it('works with empty text', function () {
+      // Setup
+      textStore = new SyntheticTextStore('', 0);
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0
+      // Text:        : |
+      // context index: 0
+      // ContextItems : END
+      assert.equal(items.size(), 1, 'Should have 1 context item');
+      assert.equal(items.get(0).type, KM_CORE_CT.END, 'Item 0 should be END');
+      result.delete();
+    });
+
+    it('works with deadkey before the text', function () {
+      // Setup
+      textStore = new SyntheticTextStore('abcd', 3);
+      textStore.deadkeys().add(new Deadkey(0, 1)); // before 'a'
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0   0 1 2   3
+      // Text:        :     a b c | d
+      // context index: 0   1 2 3 4
+      // ContextItems : dk1 a b c END
+      assert.equal(items.size(), 5, 'Should have 5 context items');
+      assert.equal(items.get(0).type, KM_CORE_CT.MARKER, 'Item 0 should be MARKER');
+      assert.equal(items.get(0).marker, 1, 'Item 0 should be marker 1');
+      assert.equal(items.get(1).type, KM_CORE_CT.CHAR, 'Item 1 should be CHAR');
+      assert.equal(items.get(1).character, 'a'.charCodeAt(0), 'Item 1 should be "a"');
+      assert.equal(items.get(2).type, KM_CORE_CT.CHAR, 'Item 2 should be CHAR');
+      assert.equal(items.get(2).character, 'b'.charCodeAt(0), 'Item 2 should be "b"');
+      assert.equal(items.get(3).type, KM_CORE_CT.CHAR, 'Item 3 should be CHAR');
+      assert.equal(items.get(3).character, 'c'.charCodeAt(0), 'Item 3 should be "c"');
+      assert.equal(items.get(4).type, KM_CORE_CT.END, 'Item 4 should be END');
+      result.delete();
+    });
+
+    it('works with deadkeys before empty text', function () {
+      // Setup
+      textStore = new SyntheticTextStore('', 0);
+      textStore.deadkeys().add(new Deadkey(0, 1)); // before caret
+      textStore.deadkeys().add(new Deadkey(0, 2)); // before caret
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0
+      // Text:        : |
+      // context index: 0   1   2
+      // ContextItems : dk1 dk2 END
+      assert.equal(items.size(), 3, 'Should have 3 context items');
+      assert.equal(items.get(0).type, KM_CORE_CT.MARKER, 'Item 0 should be MARKER');
+      assert.equal(items.get(0).marker, 1, 'Item 0 should be marker 1');
+      assert.equal(items.get(1).type, KM_CORE_CT.MARKER, 'Item 1 should be MARKER');
+      assert.equal(items.get(1).marker, 2, 'Item 1 should be marker 2');
+      assert.equal(items.get(2).type, KM_CORE_CT.END, 'Item 2 should be END');
+      result.delete();
+    });
+
+    it('skips invalid deadkeys', function () {
+      // Setup
+      textStore = new SyntheticTextStore('abcde', 3);
+      textStore.deadkeys().add(new Deadkey(-1, 1)); // invalid
+      textStore.deadkeys().add(new Deadkey(1, 2));  // after 'b'
+      textStore.deadkeys().add(new Deadkey(4, 3));  // invalid (after caret)
+
+      // Execute
+      coreProcessor.unitTestEndPoints.applyContextFromTextStore(context, textStore);
+
+      // Verify
+      const result = KM_Core.instance.context_get(context);
+      assert.equal(result.status, KM_CORE_STATUS.OK);
+      const items = result.object;
+
+      // Text index   : 0 1   1 2 3
+      // Text:        :           |
+      // context index: 0 1   2 3 4
+      // ContextItems : a dk2 b c END
+      assert.equal(items.size(), 5, 'Should have 5 context items');
+      assert.equal(items.get(0).type, KM_CORE_CT.CHAR, 'Item 0 should be CHAR');
+      assert.equal(items.get(0).character, 'a'.charCodeAt(0), 'Item 0 should be "a"');
+      assert.equal(items.get(1).type, KM_CORE_CT.MARKER, 'Item 1 should be MARKER');
+      assert.equal(items.get(1).marker, 2, 'Item 1 should be marker 2');
+      assert.equal(items.get(2).type, KM_CORE_CT.CHAR, 'Item 2 should be CHAR');
+      assert.equal(items.get(2).character, 'b'.charCodeAt(0), 'Item 2 should be "b"');
+      assert.equal(items.get(3).type, KM_CORE_CT.CHAR, 'Item 3 should be CHAR');
+      assert.equal(items.get(3).character, 'c'.charCodeAt(0), 'Item 3 should be "c"');
+      assert.equal(items.get(4).type, KM_CORE_CT.END, 'Item 4 should be END');
       result.delete();
     });
   });

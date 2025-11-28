@@ -170,25 +170,42 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     // managed entirely within Core, KeymanWeb does not need to have knowledge
     // of markers, and then we better align with the desktop Engines.
 
-    const text = textStore.getText();
+    const caretPosition = textStore.getCaret();
+    const text = textStore.getText().substring(0, caretPosition);
     const deadkeys = textStore.deadkeys().dks.sort((a, b) => a.p != b.p ? a.p - b.p : a.o - b.o);
     const contextItems = new KM_Core.instance.km_core_context_items();
-    const caretPosition = textStore.getCaret();
+
+    const deadkeyIterator = deadkeys.values();
+    let deadkey = deadkeyIterator.next();
     let textIndex = 0;
-    for (const deadkey of deadkeys) {
-      for (; textIndex < text.length && textIndex <= caretPosition; textIndex++) {
+    while (!deadkey.done || textIndex < text.length) {
+      // flush out invalid deadkeys
+      while (!deadkey.done && (deadkey.value.p < textIndex || deadkey.value.p > text.length)) {
+        // this should never happen -- it would mean that a deadkey position was < 0, in the
+        // middle of a surrogate pair, or after the caret.
+        console.warn(`invalid deadkey '${deadkey.value.d}' position ${deadkey.value.p}`);
+        deadkey = deadkeyIterator.next();
+      }
+
+      // insert 0 or more deadkeys at current index
+      while (!deadkey.done && deadkey.value.p == textIndex) {
         const contextItem = new KM_Core.instance.km_core_context_item();
-        if (deadkey.p == textIndex) {
-          contextItem.marker = deadkey.d;
-          contextItems.push_back(contextItem);
-          break;
-        }
+        contextItem.marker = deadkey.value.d;
+        contextItems.push_back(contextItem);
+        deadkey = deadkeyIterator.next();
+      }
+
+      // insert next character
+      if (textIndex < text.length) {
+        const contextItem = new KM_Core.instance.km_core_context_item();
         contextItem.character = text.codePointAt(textIndex);
+        contextItems.push_back(contextItem);
+        textIndex++;
         if (contextItem.character > 0xFFFF) {
-          // we have a surrogate pair, skip other half of surrogate
+          // we have a surrogate pair, skip other half of surrogate, codePointAt()
+          // already handled that for us
           textIndex++;
         }
-        contextItems.push_back(contextItem);
       }
     }
 
