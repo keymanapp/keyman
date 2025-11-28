@@ -141,10 +141,8 @@ export const USVirtualKeyCodes = {
   K_TABFWD:50012
 };
 
-const k = USVirtualKeyCodes;
-
 /** Map a CLDR scancode to a US VKey ala USVirtualKeyCodes */
-export const CLDRScanToUSVirtualKeyCodes = {
+export const CLDRScanToUSVirtualKeyCodes = /* @__PURE__ */ ((k) => ({
   0x02: k.K_1,
   0x03: k.K_2,
   0x04: k.K_3,
@@ -202,7 +200,7 @@ export const CLDRScanToUSVirtualKeyCodes = {
   0x73: k.K_oC1,
   0x7D: k.K_oE2, // << Same as 0x56; found on jis
 
-};
+}))(USVirtualKeyCodes);
 
 export type KeyMap = number[][];
 

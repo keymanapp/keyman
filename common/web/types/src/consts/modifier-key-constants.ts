@@ -45,44 +45,54 @@ export const ModifierKeyConstants = {
  * corresponding NOT__FLAG are set.
  */
 export enum ModifierKeyConstant {
-  LCTRLFLAG =      ModifierKeyConstants.LCTRLFLAG,
-  RCTRLFLAG =      ModifierKeyConstants.RCTRLFLAG,
-  LALTFLAG =       ModifierKeyConstants.LALTFLAG,
-  RALTFLAG =       ModifierKeyConstants.RALTFLAG,
-  K_SHIFTFLAG =    ModifierKeyConstants.K_SHIFTFLAG,
-  K_CTRLFLAG =     ModifierKeyConstants.K_CTRLFLAG,
-  K_ALTFLAG =      ModifierKeyConstants.K_ALTFLAG,
-  K_METAFLAG =     ModifierKeyConstants.K_METAFLAG,
-  CAPITALFLAG =    ModifierKeyConstants.CAPITALFLAG,
-  NOTCAPITALFLAG = ModifierKeyConstants.NOTCAPITALFLAG,
-  NUMLOCKFLAG =    ModifierKeyConstants.NUMLOCKFLAG,
-  NOTNUMLOCKFLAG = ModifierKeyConstants.NOTNUMLOCKFLAG,
-  SCROLLFLAG =     ModifierKeyConstants.SCROLLFLAG,
-  NOTSCROLLFLAG =  ModifierKeyConstants.NOTSCROLLFLAG,
-  ISVIRTUALKEY =   ModifierKeyConstants.ISVIRTUALKEY,
-  VIRTUALCHARKEY = ModifierKeyConstants.VIRTUALCHARKEY,
+  NO_MODIFIER =    0,
+  LCTRLFLAG =      0x0001, // Left Control flag
+  RCTRLFLAG =      0x0002, // Right Control flag
+  LALTFLAG =       0x0004, // Left Alt flag
+  RALTFLAG =       0x0008, // Right Alt flag
+  K_SHIFTFLAG =    0x0010, // Either shift flag
+  K_CTRLFLAG =     0x0020, // Either ctrl flag
+  K_ALTFLAG =      0x0040, // Either alt flag
+  K_METAFLAG =     0x0080, // Either Meta-key flag (tentative).  Not usable in keyboard rules;
+                           // Used internally (currently, only by KMW) to ensure Meta-key
+                           // shortcuts safely bypass rules
+                           // Meta key = Command key on macOS, Windows key on Windows/Linux
+  CAPITALFLAG =    0x0100, // Caps lock on
+  NOTCAPITALFLAG = 0x0200, // Caps lock NOT on
+  NUMLOCKFLAG =    0x0400, // Num lock on
+  NOTNUMLOCKFLAG = 0x0800, // Num lock NOT on
+  SCROLLFLAG =     0x1000, // Scroll lock on
+  NOTSCROLLFLAG =  0x2000, // Scroll lock NOT on
+  ISVIRTUALKEY =   0x4000, // It is a Virtual Key Sequence
+  VIRTUALCHARKEY = 0x8000, // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 };
 
-export const LDML_MODIFIER_TO_KVK_MODIFIER = new Map<ModifierKeyConstant, VisualKeyboardShiftState>();
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LCTRLFLAG,      VisualKeyboardShiftState.KVKS_LCTRL);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.RCTRLFLAG,      VisualKeyboardShiftState.KVKS_RCTRL);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LALTFLAG,       VisualKeyboardShiftState.KVKS_LALT);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.RALTFLAG,       VisualKeyboardShiftState.KVKS_RALT);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_SHIFTFLAG,    VisualKeyboardShiftState.KVKS_SHIFT);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_CTRLFLAG,     VisualKeyboardShiftState.KVKS_CTRL);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_ALTFLAG,      VisualKeyboardShiftState.KVKS_ALT);
+export const LDML_MODIFIER_TO_KVK_MODIFIER = /* @__PURE__ */ (() => {
+  const m = new Map<ModifierKeyConstant, VisualKeyboardShiftState>();
+  m.set(ModifierKeyConstants.LCTRLFLAG,      VisualKeyboardShiftState.KVKS_LCTRL);
+  m.set(ModifierKeyConstants.RCTRLFLAG,      VisualKeyboardShiftState.KVKS_RCTRL);
+  m.set(ModifierKeyConstants.LALTFLAG,       VisualKeyboardShiftState.KVKS_LALT);
+  m.set(ModifierKeyConstants.RALTFLAG,       VisualKeyboardShiftState.KVKS_RALT);
+  m.set(ModifierKeyConstants.K_SHIFTFLAG,    VisualKeyboardShiftState.KVKS_SHIFT);
+  m.set(ModifierKeyConstants.K_CTRLFLAG,     VisualKeyboardShiftState.KVKS_CTRL);
+  m.set(ModifierKeyConstants.K_ALTFLAG,      VisualKeyboardShiftState.KVKS_ALT);
+  return m;
+})();
 
-export const KVK_MODIFIER_TO_LDML_MODIFIER = new Map<VisualKeyboardShiftState, ModifierKeyConstant>();
-KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_LCTRL, ModifierKeyConstants.LCTRLFLAG);
-KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_RCTRL, ModifierKeyConstants.RCTRLFLAG);
-KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_LALT,  ModifierKeyConstants.LALTFLAG);
-KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_RALT,  ModifierKeyConstants.RALTFLAG);
-KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_SHIFT, ModifierKeyConstants.K_SHIFTFLAG);
-KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_CTRL,  ModifierKeyConstants.K_CTRLFLAG);
-KVK_MODIFIER_TO_LDML_MODIFIER.set(VisualKeyboardShiftState.KVKS_ALT,   ModifierKeyConstants.K_ALTFLAG);
+export const KVK_MODIFIER_TO_LDML_MODIFIER = /* @__PURE__ */ (() => {
+  const m = new Map<VisualKeyboardShiftState, ModifierKeyConstant>();
+  m.set(VisualKeyboardShiftState.KVKS_LCTRL, ModifierKeyConstants.LCTRLFLAG);
+  m.set(VisualKeyboardShiftState.KVKS_RCTRL, ModifierKeyConstants.RCTRLFLAG);
+  m.set(VisualKeyboardShiftState.KVKS_LALT,  ModifierKeyConstants.LALTFLAG);
+  m.set(VisualKeyboardShiftState.KVKS_RALT,  ModifierKeyConstants.RALTFLAG);
+  m.set(VisualKeyboardShiftState.KVKS_SHIFT, ModifierKeyConstants.K_SHIFTFLAG);
+  m.set(VisualKeyboardShiftState.KVKS_CTRL,  ModifierKeyConstants.K_CTRLFLAG);
+  m.set(VisualKeyboardShiftState.KVKS_ALT,   ModifierKeyConstants.K_ALTFLAG);
+  return m;
+})();
 
 export function translateLdmlModifiersToVisualKeyboardShift(modifiers: ModifierKeyConstant): VisualKeyboardShiftState {
-  if(modifiers == 0) {
+  if(modifiers == ModifierKeyConstant.NO_MODIFIER) {
     return VisualKeyboardShiftState.KVKS_NORMAL;
   }
 
