@@ -79,8 +79,12 @@ run_in_delphi_env() {
 # in debuggers such as WinDbg, or profilers such as VTune.
 #
 do_map2pdb() {
+  local map="$1"
+  local exe="$2"
+  # echo "prev '$map'"
+  map="${map//\//\\}"
   if hash map2pdb 2>/dev/null; then
-    map2pdb "$1" -bind:"$2"
+    map2pdb "${map}" -bind:"${exe}"
   fi
 }
 
