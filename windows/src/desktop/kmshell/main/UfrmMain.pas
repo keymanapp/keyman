@@ -840,6 +840,9 @@ begin
     if not FResult then
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
         'TrmfMain: Shell Execute Update_ApplyNow Failed');
+      Close;
+      // Application.Terminate;
+
   end;
 end;
 

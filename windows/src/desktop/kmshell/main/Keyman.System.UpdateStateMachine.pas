@@ -774,7 +774,10 @@ end;
 procedure UpdateAvailableState.HandleInstallNow;
 begin
   bucStateContext.SetApplyNow(True);
-  ChangeState(DownloadingState);
+  //ChangeState(DownloadingState);
+  // we will use a new kmshell process to enable
+  // the download as background process.
+  StartDownloadProcess;
 end;
 
 { DownloadingState }
