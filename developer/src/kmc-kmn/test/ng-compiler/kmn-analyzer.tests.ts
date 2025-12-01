@@ -19,8 +19,9 @@ import { RuleBlockRule, SimpleTextRule, TextRangeRule, TextRule, UseStatementRul
 import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 import { BASELINE_KEYBOARD_NAMES, PATH_TO_BASELINE, PATH_TO_REPOSITORY, REPOSITORY_KEYBOARD_NAMES } from './keyboard-names.tests.js';
+import { readFile } from './token-buffer.tests.js';
 
 let tokenBuffer: TokenBuffer = null;
 let root: ASTNode            = null;
@@ -1623,7 +1624,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(parser);
     });
     it("can parse Khmer Angkor correctly", () => {
-      const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
+      const buffer: string = readFile('test/fixtures/keyboards/khmer_angkor.kmn');
       tokenBuffer          = stringToTokenBuffer(buffer);
       const parser: Parser = new Parser(tokenBuffer);
       root = parser.parse();
@@ -1684,7 +1685,7 @@ describe("KMN Analyser Tests", () => {
       //assert.equal(root.toString(), '');
     });
     it("can parse Khmer Angkor correctly (round trip text)", () => {
-      const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
+      const buffer: string = readFile('test/fixtures/keyboards/khmer_angkor.kmn');
       tokenBuffer = stringToTokenBuffer(buffer);
       const parser: Parser = new Parser(tokenBuffer);
       root = parser.parse();
@@ -1695,7 +1696,7 @@ describe("KMN Analyser Tests", () => {
         this.skip();
       }
       BASELINE_KEYBOARD_NAMES.forEach((name) => {
-        const buffer: string = readFileSync(`${PATH_TO_BASELINE}${name}.kmn`).toString();
+        const buffer: string = readFile(`${PATH_TO_BASELINE}${name}.kmn`);
         tokenBuffer = stringToTokenBuffer(buffer);
         const parser: Parser = new Parser(tokenBuffer);
         root = parser.parse();
@@ -1709,7 +1710,7 @@ describe("KMN Analyser Tests", () => {
       const end   = Math.min(i+100, REPOSITORY_KEYBOARD_NAMES.length);
       it(`can provide round trip text for repository keyboards (${start}-${end-1})`, function() {
         REPOSITORY_KEYBOARD_NAMES.slice(start, end).forEach((name) => {
-          const buffer: string = readFileSync(`${PATH_TO_REPOSITORY}${name}.kmn`).toString();
+          const buffer: string = readFile(`${PATH_TO_REPOSITORY}${name}.kmn`);
           tokenBuffer = stringToTokenBuffer(buffer);
           const parser: Parser = new Parser(tokenBuffer);
           root = parser.parse();

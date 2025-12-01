@@ -161,7 +161,7 @@ describe("TokenBuffer Tests", () => {
   });
   describe("TokenBuffer round trip tests [toText()]", () => {
     it("can provide round trip text for khmer_angkor.kmn", () => {
-      const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
+      const buffer: string = readFile('test/fixtures/keyboards/khmer_angkor.kmn');
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
       const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
@@ -173,7 +173,7 @@ describe("TokenBuffer Tests", () => {
         this.skip();
       }
       BASELINE_KEYBOARD_NAMES.forEach((name) => {
-        const buffer: string = readFileSync(`${PATH_TO_BASELINE}${name}.kmn`).toString();
+        const buffer: string = readFile(`${PATH_TO_BASELINE}${name}.kmn`);
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
@@ -188,7 +188,7 @@ describe("TokenBuffer Tests", () => {
       const end   = Math.min(i+100, REPOSITORY_KEYBOARD_NAMES.length);
       it(`can provide round trip text for repository keyboards (${start}-${end-1})`, function() {
         REPOSITORY_KEYBOARD_NAMES.slice(start, end).forEach((name) => {
-        const buffer: string = readFileSync(`${PATH_TO_REPOSITORY}${name}.kmn`).toString();
+        const buffer: string = readFile(`${PATH_TO_REPOSITORY}${name}.kmn`);
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
@@ -199,3 +199,33 @@ describe("TokenBuffer Tests", () => {
     }
   });
 });
+
+/**
+ * Read a file as a string, handling utf-8, utf16-le or cp1252 encodings
+ *
+ * @param path the path to the file
+ * @returns the file contents
+ */
+export function readFile(path: string): string {
+  return bufferToString(readFileSync(path) as Uint8Array);
+}
+
+function bufferToString(buffer: Uint8Array): string {
+  let decoder: TextDecoder;
+  if (buffer.at(0) === 0xff && buffer.at(1) === 0xfe) {
+    // we don't fail on encoding errors for UTF16 w/BOM
+    decoder = new TextDecoder('utf-16le', { ignoreBOM: true, fatal: false });
+  } else {
+    // attempt to read as UTF8, fallback to cp1252
+    decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+  }
+
+  try {
+    return decoder.decode(buffer);
+  } catch(e) {
+    // fallback to ANSI
+    // TODO: emit a hint KmnCompilerMessages::HINT_NonUnicodeFile
+    decoder = new TextDecoder('cp1252', { fatal: false });
+    return decoder.decode(buffer);
+  }
+}
