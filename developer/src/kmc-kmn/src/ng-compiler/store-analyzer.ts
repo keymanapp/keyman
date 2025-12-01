@@ -242,7 +242,7 @@ abstract class CapsLockStatementRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
     if (parseSuccess) {
-      // TODO: warning deprecated
+      // TODO-NG-COMPILER: warning deprecated
       const token: Token = new Token(this.tokenType, '1');
       node.addNewChildWithToken(this.nodeType, token);
     }

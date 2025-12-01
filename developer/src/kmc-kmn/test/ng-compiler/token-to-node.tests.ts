@@ -12,7 +12,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { TokenType } from "../../src/ng-compiler/token-type.js";
 import { TOKEN_TO_NODE } from '../../src/ng-compiler/token-to-node.js';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 
 describe("TOKEN_TO_NODE Tests", () => {
   it("is sorted in alphabetical order", () => {

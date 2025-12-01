@@ -17,7 +17,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 
 interface Dictionary {

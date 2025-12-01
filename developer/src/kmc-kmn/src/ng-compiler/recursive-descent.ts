@@ -186,7 +186,7 @@ export abstract class MultiChildRule extends Rule {
   protected rules: Rule[];
 
   public constructor(rules: Rule[]) {
-    // TODO error if rules is null
+    // TODO-NG-COMPILER error if rules is null
     super();
     this.rules = rules;
   }
@@ -298,7 +298,7 @@ export class OptionalRule extends SingleChildRule {
       node.addChildren(tmp.getChildren());
     } else {
       tokenBuffer.resetCurrentPosition(save);
-      // TODO generate warning as parse returns true
+      // TODO-NG-COMPILER generate warning as parse returns true
     }
 
     return true;
@@ -428,7 +428,7 @@ export class TokenRule extends Rule {
         const nodeType: NodeType = TokenRule.tokenToNodeMap.get(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
-          // TODO: warning if there is no valid mapping
+          // TODO-NG-COMPILER: warning if there is no valid mapping
         }
       }
     } else {
@@ -463,7 +463,7 @@ export class AlternateTokenRule extends Rule {
   public constructor(tokenTypes: TokenType[], addNode: boolean=false) {
     super();
     this.tokenTypes = new Set<TokenType>(tokenTypes);
-    // TODO: warning if there is a duplicate TokenType in the supplied array
+    // TODO-NG-COMPILER: warning if there is a duplicate TokenType in the supplied array
     this.addNode    = addNode;
   }
 
@@ -489,7 +489,7 @@ export class AlternateTokenRule extends Rule {
         const nodeType: NodeType = TokenRule.getNodeType(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
-          // TODO: warning if there is no valid mapping
+          // TODO-NG-COMPILER: warning if there is no valid mapping
         }
       }
     }

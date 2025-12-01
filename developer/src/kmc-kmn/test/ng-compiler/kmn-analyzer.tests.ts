@@ -19,8 +19,8 @@ import { RuleBlockRule, SimpleTextRule, TextRangeRule, TextRule, UseStatementRul
 import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
-import { existsSync } from 'fs';
-import { BASELINE_KEYBOARD_NAMES, PATH_TO_BASELINE, PATH_TO_REPOSITORY, REPOSITORY_KEYBOARD_NAMES } from './keyboard-names.tests.js';
+import { existsSync } from 'node:fs';
+import { baselineKeyboardNames, PATH_TO_BASELINE, PATH_TO_REPOSITORY, repositoryKeyboardNames } from './keyboard-names.js';
 import { readFile } from './token-buffer.tests.js';
 
 let tokenBuffer: TokenBuffer = null;
@@ -1695,7 +1695,7 @@ describe("KMN Analyser Tests", () => {
       if (!existsSync(PATH_TO_BASELINE)) {
         this.skip();
       }
-      BASELINE_KEYBOARD_NAMES.forEach((name) => {
+      baselineKeyboardNames().forEach((name) => {
         const buffer: string = readFile(`${PATH_TO_BASELINE}${name}.kmn`);
         tokenBuffer = stringToTokenBuffer(buffer);
         const parser: Parser = new Parser(tokenBuffer);
@@ -1705,11 +1705,11 @@ describe("KMN Analyser Tests", () => {
     });
     // if the keyboard repository is absent, this loop will not execute as it will be of
     // zero length, so all repository keyboard round trip tests will be (silently) skipped
-    for (let i = 0; i < REPOSITORY_KEYBOARD_NAMES.length; i+=100) {
+    for (let i = 0; i < repositoryKeyboardNames().length; i+=100) {
       const start = i;
-      const end   = Math.min(i+100, REPOSITORY_KEYBOARD_NAMES.length);
+      const end   = Math.min(i+100, repositoryKeyboardNames().length);
       it(`can provide round trip text for repository keyboards (${start}-${end-1})`, function() {
-        REPOSITORY_KEYBOARD_NAMES.slice(start, end).forEach((name) => {
+        repositoryKeyboardNames().slice(start, end).forEach((name) => {
           const buffer: string = readFile(`${PATH_TO_REPOSITORY}${name}.kmn`);
           tokenBuffer = stringToTokenBuffer(buffer);
           const parser: Parser = new Parser(tokenBuffer);
