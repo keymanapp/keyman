@@ -6,16 +6,18 @@
  * Keyboard names for KMC KMN Next Generation Compiler
  */
 
-import { existsSync, readdirSync, statSync } from 'fs';
-import path from 'path';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import path from 'node:path';
 
 export const PATH_TO_BASELINE = '../../../common/test/keyboards/baseline/';
 
-export const BASELINE_KEYBOARD_NAMES = findKeyboardNames(PATH_TO_BASELINE);
+let baselineKeyboardNamesCache: string[] = null;
+export const baselineKeyboardNames = () => baselineKeyboardNamesCache ??= findKeyboardNames(PATH_TO_BASELINE);
 
 export const PATH_TO_REPOSITORY = '../../../../keyboards/';
 
-export const REPOSITORY_KEYBOARD_NAMES = findKeyboardNames(PATH_TO_REPOSITORY);
+let repositoryKeyboardNamesCache: string[] = null;
+export const repositoryKeyboardNames = () => repositoryKeyboardNamesCache ??= findKeyboardNames(PATH_TO_REPOSITORY);
 
 /**
  * Find the names of all the .kmn keyboard files in a directory
@@ -37,7 +39,7 @@ function findKeyboardNames(dir: string, baseLength: number = dir.length, names: 
 
   files.forEach((file) => {
     const filePath = path.join(dir, file);
-    if (statSync(filePath).isDirectory() && !/extras$/.test(filePath) && !/legacy$/.test(filePath)) {
+    if (statSync(filePath).isDirectory() && !/(extras|legacy)$/.test(filePath)) {
       findKeyboardNames(filePath, baseLength, names);
     } else if (/\.kmn$/.test(file)) {
       names.push(filePath.slice(baseLength, -4)); // remove base directory and file type

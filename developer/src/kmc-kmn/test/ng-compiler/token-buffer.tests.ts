@@ -11,8 +11,8 @@ import { assert } from 'chai';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BASELINE_KEYBOARD_NAMES, PATH_TO_BASELINE, PATH_TO_REPOSITORY, REPOSITORY_KEYBOARD_NAMES } from './keyboard-names.tests.js';
-import { existsSync, readFileSync } from 'fs';
+import { baselineKeyboardNames, PATH_TO_BASELINE, PATH_TO_REPOSITORY, repositoryKeyboardNames } from './keyboard-names.js';
+import { existsSync, readFileSync } from 'node:fs';
 
 // nomatch > layer('default')
 const LIST: Token[] = [
@@ -172,7 +172,7 @@ describe("TokenBuffer Tests", () => {
       if (!existsSync(PATH_TO_BASELINE)) {
         this.skip();
       }
-      BASELINE_KEYBOARD_NAMES.forEach((name) => {
+      baselineKeyboardNames().forEach((name) => {
         const buffer: string = readFile(`${PATH_TO_BASELINE}${name}.kmn`);
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
@@ -183,11 +183,11 @@ describe("TokenBuffer Tests", () => {
     });
     // if the keyboard repository is absent, this loop will not execute as it will be of
     // zero length, so all repository keyboard round trip tests will be (silently) skipped
-    for (let i = 0; i < REPOSITORY_KEYBOARD_NAMES.length; i+=100) {
+    for (let i = 0; i < repositoryKeyboardNames().length; i+=100) {
       const start = i;
-      const end   = Math.min(i+100, REPOSITORY_KEYBOARD_NAMES.length);
+      const end   = Math.min(i+100, repositoryKeyboardNames().length);
       it(`can provide round trip text for repository keyboards (${start}-${end-1})`, function() {
-        REPOSITORY_KEYBOARD_NAMES.slice(start, end).forEach((name) => {
+        repositoryKeyboardNames().slice(start, end).forEach((name) => {
         const buffer: string = readFile(`${PATH_TO_REPOSITORY}${name}.kmn`);
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
@@ -224,7 +224,7 @@ function bufferToString(buffer: Uint8Array): string {
     return decoder.decode(buffer);
   } catch(e) {
     // fallback to ANSI
-    // TODO: emit a hint KmnCompilerMessages::HINT_NonUnicodeFile
+    // TODO-NG-COMPILER: emit a hint KmnCompilerMessages::HINT_NonUnicodeFile
     decoder = new TextDecoder('cp1252', { fatal: false });
     return decoder.decode(buffer);
   }
