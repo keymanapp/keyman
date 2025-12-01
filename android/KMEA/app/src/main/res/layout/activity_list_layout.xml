@@ -9,6 +9,7 @@
     android:orientation="vertical">
 
     <include layout="@layout/list_toolbar"
+      android:id="@+id/list_appbar"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintStart_toStartOf="parent" />
 

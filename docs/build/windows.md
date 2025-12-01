@@ -267,17 +267,35 @@ of appropriate node versions during builds.
     copying the relevant Delphi-built components into windows/bin folders from a
     compatible installed version of Keyman for testing and debugging purposes.
 
-* Visual C++ 2019 Community or Professional
+* Visual Studio 2022 Community (C++ native desktop workload)
 
-  ```ps1
-  choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
+  ```cmd
+  winget install --id=Microsoft.VisualStudio.2022.Community -e --override "--passive --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.CppBuildInsights --add Microsoft.VisualStudio.Component.Debugger.JustInTime --add Microsoft.VisualStudio.Component.VC.ASAN --add Microsoft.VisualStudio.Component.VC.DiagnosticTools --add Microsoft.VisualStudio.Component.VC.TestAdapterForGoogleTest --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.26100 --add Microsoft.VisualStudio.Component.Windows11Sdk.WindowsPerformanceToolkit --add Microsoft.VisualStudio.Component.Windows10SDK.19041"
   ```
 
-  * Verify required build tools are installed
-    * Run `Visual Studio Installer`
-    * Check the `Individual components` tab
-    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed.
-      If not, install it.
+  * You can omit the `--passive` parameter to open the installer dialog and
+    modify the selection before continuing with the install.
+
+  * You can replace `--passive` with `--quiet` for a silent install (note that
+    the winget command returns before the Visual Studio Installer finishes, so
+    you won't be able to easily tell when installation completes; check Task
+    Manager for setup.exe).
+
+  * If you prefer to use the Visual Studio Installer instead of the command
+    line install, then the following workloads and components should be included:
+    * Visual Studio core editor
+    * Desktop development with C++
+      - C++ core desktop features
+      - MSVC v143 - VS 2022 C++ x64/x86 build tools (latest)
+      - C++ Build Insights
+      - Just-In-Time debugger
+      - C++ profiling tools
+      - Test Adapter for Google Test
+      - C++ AddressSanitizer
+      - Windows 10 SDK (10.0.19041.0)
+      - Windows 11 SDK (10.0.26100.6584)
+    * Under individual components, add:
+      - MSVC v143 - VS 2022 C++ ARM64/ARM64EC build tools (latest)
 
   Recommended: configure Visual Studio to use two-space tab stops:
   1. Open the options dialog: Tools > Options.
@@ -287,7 +305,7 @@ of appropriate node versions during builds.
 
 * Windows SDK (C++ Desktop Development)
 
-  https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+  This should be installed as a part of Visual Studio above
 
 **Required environment variables**:
 * `PATH`
@@ -327,7 +345,7 @@ SETX KEYMAN_CEF4DELPHI_ROOT "c:\Projects\keyman\CEF4Delphi_Binary"
 ```ps1
 # Elevated PowerShell
 choco install 7zip html-help-workshop
-choco install wixtoolset --version=3.11.1
+choco install wixtoolset --version=3.14.1
 git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
 ```
 

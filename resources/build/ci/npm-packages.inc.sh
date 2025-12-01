@@ -1,0 +1,23 @@
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# List of all NPM packages that need to be published
+#
+
+readonly PACKAGES=(
+  common/web/keyman-version
+  common/web/langtags
+  common/web/types
+  core/include/ldml
+  developer/src/common/web/utils
+  developer/src/kmc-analyze
+  developer/src/kmc-copy
+  developer/src/kmc-generate
+  developer/src/kmc-keyboard-info
+  developer/src/kmc-kmn
+  developer/src/kmc-ldml
+  developer/src/kmc-model
+  developer/src/kmc-model-info
+  developer/src/kmc-package
+  developer/src/kmc
+)

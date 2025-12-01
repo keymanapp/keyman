@@ -36,15 +36,16 @@ function do_build() {
   run_in_vs_env gentlb -Tkmcomapi.tlb kmcomapi.ridl
 
   delphi_msbuild kmcomapi.dproj "//p:Platform=Win32"
-  sentrytool_delphiprep "$WIN32_TARGET" kmcomapi.dpr
-  tds2dbg "$WIN32_TARGET"
+  do_map2pdb "$WIN32_TARGET_PATH/kmcomapi.map" "$WIN32_TARGET"
+  # TODO: map2pdb for .x64
 
   delphi_msbuild kmcomapi.dproj "//p:Platform=Win64"
   # Delphi does not allow us to build to a different target filename so we rename after build
   mv -f "$WIN64_TARGET_PATH/kmcomapi.dll" "$WIN64_TARGET_PATH/kmcomapi.x64.dll"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmcomapi.dbg" "$WINDOWS_DEBUGPATH_ENGINE/kmcomapi.dbg"
+  cp_if_exists "$WIN32_TARGET_PATH/kmcomapi.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+
   cp "$WIN64_TARGET_PATH/kmcomapi.x64.dll" "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dll"
 
   # x64 Delphi symbols not supported: cp "$WIN64_TARGET_PATH/kmcomapi.dbg" "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dbg"
@@ -56,7 +57,7 @@ function do_publish() {
 
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/kmcomapi.dll" //t keyman-engine-windows
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dll" //t keyman-engine-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/kmcomapi.dbg" //t keyman-engine-windows
+  wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/kmcomapi.pdb" //t keyman-engine-windows
   # No support for 64-bit delphi symbols
 }
 
@@ -64,6 +65,8 @@ function do_install() {
   regsvr32 //s //u "$INSTALLPATH_KEYMANENGINE/kmcomapi.dll"
   cp "$WINDOWS_PROGRAM_ENGINE/kmcomapi.dll" "$INSTALLPATH_KEYMANENGINE/kmcomapi.dll"
   regsvr32 //s "$INSTALLPATH_KEYMANENGINE/kmcomapi.dll"
+
+  cp_if_exists "$WINDOWS_DEBUGPATH_ENGINE/kmcomapi.pdb" "$INSTALLPATH_KEYMANENGINE/kmcomapi.pdb"
 
   regsvr32 //s //u "$INSTALLPATH_KEYMANENGINE/kmcomapi.x64.dll"
   cp "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dll" "$INSTALLPATH_KEYMANENGINE/kmcomapi.x64.dll"
@@ -76,5 +79,5 @@ builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
 builder_run_action install:project      do_install
-builder_run_action edit:project         start kmcompapi.dproj
+builder_run_action edit:project         start kmcomapi.dproj
 

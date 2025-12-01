@@ -2,7 +2,8 @@
 # Keyman is copyright (C) SIL Global. MIT License.
 
 ARG BASE_VERSION=default
-FROM keymanapp/keyman-base-ci:${BASE_VERSION}
+ARG REGISTRY=
+FROM ${REGISTRY}keymanapp/keyman-base-ci:${BASE_VERSION}
 LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Linux Build Image"
@@ -11,7 +12,7 @@ LABEL org.opencontainers.image.title="Keyman Linux Build Image"
 ADD control /tmp/control
 # Answer 'yes' to install questions
 RUN apt-get update && \
-  apt-get install -qy python3 python3-setuptools python3-coverage \
+  apt-get install -qy python3 python3-setuptools python3-coverage jq \
       devscripts equivs libdatetime-perl lcov gcovr xvfb \
       xserver-xephyr metacity mutter dbus-x11 weston xwayland && \
   (yes | mk-build-deps --install /tmp/control) || true && \
@@ -41,10 +42,27 @@ COPY run-tests.sh /usr/bin/run-tests.sh
 # Finish bashwrapper script and adjust permissions
 RUN <<EOF cat >> /usr/bin/bashwrapper
 
+if [[ -v CHANGE_PERMISSIONS ]]; then
+  uid=\$(stat -c "%u" /home/build/build)
+  gid=\$(stat -c "%g" /home/build/build)
+
+  if [[ "\${uid}" != "\$(id -u)" && "\${gid}" != "\$(id -g)" ]]; then
+    echo "Adjusting build directory ownership to uid/gid \$(id -un):\$(id -gn)"
+    sudo chown -R build:build /home/build/build
+  fi
+fi
+
 if [[ "\$@" =~ test ]] && [ -f /usr/bin/run-tests.sh ]; then
   /usr/bin/run-tests.sh "\${@:-bash}"
 else
   "\${@:-bash}"
+fi
+
+if [[ -v CHANGE_PERMISSIONS ]]; then
+  if [[ "\${uid}" != "\$(id -u)" && "\${gid}" != "\$(id -g)" ]]; then
+    echo "Reverting build directory ownership to uid/gid \${uid}:\${gid}"
+    sudo chown -R \${uid}:\${gid} /home/build/build
+  fi
 fi
 EOF
 

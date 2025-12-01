@@ -43,7 +43,6 @@ PUSH=
 DEBKEYID=
 REVISION=1
 IS_BETA=false
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 while (( $# )); do
     case $1 in
@@ -109,31 +108,73 @@ function push_to_github_and_create_pr() {
     if [[ -n ${PR_NUMBER} ]]; then
       builder_echo "PR #${PR_NUMBER} already exists"
     else
-      ${NOOP} gh pr create --draft --base "${BASE}" --title "${PR_TITLE}" --body "${PR_BODY}"
-      sleep 2s
-      PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+      local PR_URL
+      PR_URL=$(gh pr create --draft --base "${BASE}" --title "${PR_TITLE}" --body "${PR_BODY}")
+      PR_NUMBER="${PR_URL##*/}"
     fi
   else
     PR_NUMBER=""
   fi
 }
 
+function cleanup_worktree() {
+  if [[ -d "${WORKTREE_DIR}/linux/debianpackage" ]]; then
+    cp -r "${WORKTREE_DIR}/linux/debianpackage" "${KEYMAN_ROOT}/linux"
+  fi
+
+  cd "${PREV_DIR}"
+
+  if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
+    builder_echo "Removing temporary worktree"
+    git worktree remove -f "${WORKTREE_DIR}"
+    git branch -D "${WORKTREE_BRANCH}"
+  fi
+
+  local TEMP_DIR
+  TEMP_DIR=$(dirname "${WORKTREE_DIR}")
+  rm -rf "${TEMP_DIR}"
+}
+
 builder_heading "Fetching latest changes"
 git fetch -p origin
 
 if ${IS_BETA}; then
-  DEPLOY_BRANCH=origin/beta
+  ORIGIN_DEPLOY_BRANCH=origin/beta
 else
   # shellcheck disable=2311
-  DEPLOY_BRANCH=$(get_latest_stable_branch_name)
+  ORIGIN_DEPLOY_BRANCH=$(get_latest_stable_branch_name)
 fi
 
-# Checkout stable/beta branch so that `scripts/debian.sh` picks up correct version
-git checkout "${DEPLOY_BRANCH#origin/}"
-git pull origin "${DEPLOY_BRANCH#origin/}"
+DEPLOY_BRANCH="${ORIGIN_DEPLOY_BRANCH#origin/}"
+BRANCH_BASENAME="tmp-packaging-${DEPLOY_BRANCH}"
+WORKTREE_BRANCH="maint/linux/${BRANCH_BASENAME}"
+PREV_DIR="${PWD}"
+
+# cleanup any residues of previous runs
+WORKTREE_DIR="$(git worktree list --porcelain | awk -v name="${BRANCH_BASENAME}" \
+  '$1 == "worktree" && $2 ~ name { print $2 }')"
+if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
+  git worktree remove -f "${WORKTREE_DIR}"
+fi
+if git branch | grep -q "${WORKTREE_BRANCH}"; then
+  git branch -D "${WORKTREE_BRANCH}"
+fi
+
+# Create a temporary worktree so that we start with a clean copy of the
+# target branch (stable/beta). Checkout stable/beta branch so that
+# scripts/debian.sh picks up correct version
+WORKTREE_DIR="$(mktemp -d)/${BRANCH_BASENAME}"
+builder_heading "Creating temporary worktree at ${WORKTREE_DIR}"
+git worktree add -f -b "${WORKTREE_BRANCH}" "${WORKTREE_DIR}" "${DEPLOY_BRANCH}"
+
+cd "${WORKTREE_DIR}"
+
+trap cleanup_worktree EXIT
+
+git pull origin "${DEPLOY_BRANCH}"
 
 builder_heading "Building source package"
-cd "${KEYMAN_ROOT}/linux"
+cd "${WORKTREE_DIR}/linux"
 DIST=unstable DEBREVISION=${REVISION} scripts/debian.sh
 cd debianpackage/
 builder_heading "Signing source package"
@@ -145,19 +186,21 @@ cd ..
 builder_heading "Updating changelog"
 
 # base changelog branch on remote stable/beta branch
-git checkout -B chore/linux/changelog "${DEPLOY_BRANCH}"
+git checkout -B chore/linux/changelog "${ORIGIN_DEPLOY_BRANCH}"
 cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
 COMMIT_MESSAGE="chore(linux): Update debian changelog"
 git commit -m "${COMMIT_MESSAGE}"
-push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH#origin/}" "${COMMIT_MESSAGE} 🏠" "Test-bot: skip"
+push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH}" "${COMMIT_MESSAGE} 🏠" "Build-bot: skip
+Test-bot: skip"
 
 # Create cherry-pick on master branch
 git checkout -B chore/linux/cherry-pick/changelog origin/master
 git cherry-pick -x chore/linux/changelog
 push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_MESSAGE} 🍒" \
   "Cherry-pick-of: #${PR_NUMBER}
+Build-bot: skip
 Test-bot: skip"
 
 builder_heading "Finishing"
-git checkout "${CURRENT_BRANCH}"
+cleanup_worktree

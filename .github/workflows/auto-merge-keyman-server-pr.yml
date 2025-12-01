@@ -1,10 +1,9 @@
 #
-# Automatically merges pull requests opened by keyman-server
-# The initial use of this action is to increment the patch
-# version of Keyman with resources/build/increment-version.sh.
-# That script creates a PR and then this workflow will be
-# triggered to approve the PR (from github-actions account), and
-# then automerge it.
+# Automatically merges pull requests opened by keyman-server The initial use of
+# this action is to increment the patch version of Keyman with
+# resources/teamcity/triggers/trigger-release-builds.sh. That script creates a PR and
+# then this workflow will be triggered to approve the PR (from github-actions
+# account), and then automerge it.
 #
 name: Auto Merge PRs from keyman-server
 on:
@@ -14,7 +13,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'keymanapp/keyman' && github.actor == 'keyman-server' && startsWith(github.event.pull_request.title, 'auto:') }}
+    if: ${{ github.repository == 'keymanapp/keyman' && github.actor == 'keyman-server' && startsWith(github.head_ref, 'auto/') }}
     steps:
     - name: auto approve PR from keyman-server
       shell: bash
@@ -24,7 +23,6 @@ jobs:
         gh pr review -R keymanapp/keyman --approve ${{ github.event.pull_request.number }}
     - name: mark PR for auto-merge from keyman-server
       shell: bash
-      if: contains(github.event.pull_request.labels.*.name, 'automerge')
       env:
         GH_TOKEN: "${{ secrets.AUTOINC_GITHUB_TOKEN }}"
       run: |

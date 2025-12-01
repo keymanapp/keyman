@@ -8,8 +8,8 @@ We use different channels to build and distribute the Linux packages:
 - Launchpad repo for [stable](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman),
   [beta](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-beta) and
   [alpha](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-alpha) versions
-- [pso](http://packages.sil.org/) and [llso](http://linux.lsdev.sil.org/ubuntu/)
-  for stable, beta, and alpha versions
+- [pso](http://packages.sil.org/) for stable versions
+- [llso](http://linux.lsdev.sil.org/ubuntu/) for stable, beta, and alpha versions
 - artifacts on [GitHub](https://github.com/keymanapp/keyman/actions/workflows/deb-packaging.yml)
   for pull requests
 
@@ -18,60 +18,37 @@ intended as a staging environment for testing. Packages on [pso](http://packages
 are uploaded manually after the packages received some testing. End users usually have only
 pso enabled.
 
-## Package builds
+## Building packages locally
 
-Package builds happen on [Launchpad](#package-builds-on-launchpad) and
-[GitHub](#github-actions-package-builds). Package builds for the official Ubuntu/Debian
-repos happen outside of our control. However, we
-[upload source packages](#uploading-debian-source-packages) to the Debian community.
+It is possible to build packages locally. This can be done either directly on the machine,
+or in a Docker container which is more similar to the CI environment.
 
-## GitHub Actions package builds
+### Building packages locally directly on the machine
 
-### Build jobs
+To build packages locally, you'll have to have the dependencies installed.
 
-The [Keyman GitHub repo](https://github.com/keymanapp/keyman) contains various
-scripts that are used to trigger a build and as part of the package build,
-and of course the source code for the packages:
+The easiest way to achieve this is to use the `mk-build-deps` tool:
 
-- [.github/workflows/deb-packaging.yml](https://github.com/keymanapp/keyman/blob/master/.github/workflows/deb-packaging.yml)
-  contains the definition of the packaging GHA
-- [resources/build/run-required-test-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/run-required-test-builds.sh)
-  runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_Test?)
-  to trigger the builds for the various platforms, among them the GHA package build.
-- [resources/build/increment-version.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/increment-version.sh)
-  runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsMaster?)
-  and increments the version number before triggering the builds for the
-  various platforms.
-- The [linux/scripts](https://github.com/keymanapp/keyman/tree/master/linux/scripts)
-  subdirectory contains `bash` scripts that are used during the package build.
-  Some are only needed for Launchpad builds.
+```bash
+sudo apt install dh-python python3-all debhelper help2man devscripts \
+  equivs jq quilt
+sudo mk-build-deps --install linux/debian/control
+```
 
-  - [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
-    gets called by the packaging GHA to install dependencies, create the source
-    package and to verify the API.
+Then you can build the Debian package with:
 
-- [linux/debian](https://github.com/keymanapp/keyman/tree/master/linux/debian) -
-  this is the `debian` subdirectory for Keyman for Linux with the meta data
-  for the Linux package.
-  See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/)
-  for details to the various files in the `debian` directory.
-
-### Flow of a Linux package build
-
-- TeamCity jobs [Keyman_Test](https://build.palaso.org/buildConfiguration/Keyman_Test)
-  or [Keyman_TriggerReleaseBuilds*](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsBeta)
-  trigger a packaging GHA build
-- packaging GHA calls [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
-  which installs dependencies and creates the source package
-- packaging GHA creates the binary package for each linux package on each
-  distribution
-- packaging GHA verifies that the API didn't change with the help of
-  [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
-- at the end of the build if it is not a build of a PR, the `.deb` files get
-  uploaded to llso (alpha packages to e.g. `jammy-experimental`, beta
-  packages to `jammy-proposed` and packages build from the stable branch
-  to the main section `jammy`)
-- if the build is successful the job archives the artifacts
+```bash
+KEYMAN_TIER=$(cat TIER.md)
+export KEYMAN_TIER
+cd linux
+./scripts/deb-packaging.sh source
+mkdir -p make_deb
+cd make_deb
+dpkg-source --extract ../../keyman_*.dsc
+cd keyman-*
+dch -v$(cat VERSION.md)-1 ""
+debuild -us -uc
+```
 
 ### Local package builds with Docker
 
@@ -118,6 +95,61 @@ You'll have to create the docker image.
   ```
 
   This will create the binary packages in `$KEYMAN_ROOT/artifacts`.
+
+## Package builds
+
+Package builds happen on [Launchpad](#package-builds-on-launchpad) and
+[GitHub](#github-actions-package-builds). Package builds for the official Ubuntu/Debian
+repos happen outside of our control. However, we
+[upload source packages](#uploading-debian-source-packages) to the Debian community.
+
+## GitHub Actions package builds
+
+### Build jobs
+
+The [Keyman GitHub repo](https://github.com/keymanapp/keyman) contains various
+scripts that are used to trigger a build and as part of the package build,
+and of course the source code for the packages:
+
+- [.github/workflows/deb-packaging.yml](https://github.com/keymanapp/keyman/blob/master/.github/workflows/deb-packaging.yml)
+  contains the definition of the packaging GHA
+- [resources/teamcity/triggers/trigger-test-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/teamcity/triggers/trigger-test-builds.sh)
+  runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_Test?)
+  to trigger the builds for the various platforms, among them the GHA package build.
+- [resources/teamcity/triggers/trigger-release-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/teamcity/triggers/trigger-release-builds.sh)
+  runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsMaster?)
+  and increments the version number before triggering the builds for the
+  various platforms.
+- The [linux/scripts](https://github.com/keymanapp/keyman/tree/master/linux/scripts)
+  subdirectory contains `bash` scripts that are used during the package build.
+  Some are only needed for Launchpad builds.
+
+  - [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
+    gets called by the packaging GHA to install dependencies, create the source
+    package and to verify the API.
+
+- [linux/debian](https://github.com/keymanapp/keyman/tree/master/linux/debian) -
+  this is the `debian` subdirectory for Keyman for Linux with the meta data
+  for the Linux package.
+  See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/)
+  for details to the various files in the `debian` directory.
+
+### Flow of a Linux package build
+
+- TeamCity jobs [Keyman_Test](https://build.palaso.org/buildConfiguration/Keyman_Test)
+  or [Keyman_TriggerReleaseBuilds*](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsBeta)
+  trigger a packaging GHA build
+- packaging GHA calls [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
+  which installs dependencies and creates the source package
+- packaging GHA creates the binary package for each linux package on each
+  distribution
+- packaging GHA verifies that the API didn't change with the help of
+  [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
+- at the end of the build if it is not a build of a PR, the `.deb` files get
+  uploaded to llso (alpha packages to e.g. `jammy-experimental`, beta
+  packages to `jammy-proposed` and packages build from the stable branch
+  to the main section `jammy`)
+- if the build is successful the job archives the artifacts
 
 ## Package builds on Launchpad
 

@@ -86,7 +86,7 @@ describe('KmpCompiler', function () {
               assert.deepEqual(kmpJsonOutput, kmpJsonZippedFixture);
             }),
             zipFile.file(`${modelID}.model.js`).async('uint8array').then(modelJsFile => {
-              assert.deepEqual(modelJsFile, fs.readFileSync(jsPath));
+              assert.deepEqual(modelJsFile, new Uint8Array(fs.readFileSync(jsPath)));
             })
           ]);
         });
@@ -278,8 +278,13 @@ describe('KmpCompiler', function () {
   it(`should load a package with missing keyboard ID metadata`, function () {
     const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_id.kps'));
     assert.isNull(kmpJson); // with a missing keyboard_id, the package shouldn't load, but it shouldn't crash either
-    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_KeyboardContentFileNotFound);
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_MissingKeyboardId);
+  });
 
+  it(`should load a package with missing model ID metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_model_id.kps'));
+    assert.isNull(kmpJson); // with a missing model_id, the package shouldn't load, but it shouldn't crash either
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_MissingModelId);
   });
 
   it(`should load a package with missing keyboard name metadata`, function () {

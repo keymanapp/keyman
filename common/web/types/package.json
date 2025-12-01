@@ -54,7 +54,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "common/web/types"
   },
   "c8": {
     "all": true,
@@ -74,6 +75,7 @@
       "src/ldml-keyboard/unicodeset-parser-api.ts",
       "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
       "src/osk/osk.ts",
+      "src/util/types.ts",
       "src/schemas/*",
       "tests/",
       "src/keyboard-object.ts",

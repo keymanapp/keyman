@@ -2,7 +2,9 @@ package com.keyman.kmsample1;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -25,6 +27,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   public static Context context;
   private ConstraintLayout constraintLayout;
   private KMTextView textView;
+  private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,18 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   protected void onResume() {
     super.onResume();
     KMManager.onResume();
+
+    // onConfigurationChanged() only triggers when device is rotated while app is in foreground
+    // This handles when device is rotated while app is in background
+    // using KMManager.getOrientation() since getConfiguration().orientation is unreliable #10241
+    int newOrientation = KMManager.getOrientation(context);
+    if (newOrientation != lastOrientation) {
+      lastOrientation = newOrientation;
+      Configuration newConfig = this.getResources().getConfiguration();
+      KMManager.onConfigurationChanged(newConfig);
+    }
+    resizeTextView(textView.isKeyboardVisible());
+
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
   }
@@ -116,6 +131,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
+  	KMManager.onConfigurationChanged(newConfig);
+	
+	  resizeTextView(textView.isKeyboardVisible());
+	  lastOrientation = newConfig.orientation;
   }
 
   @Override
@@ -131,11 +150,39 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onKeyboardShown() {
     // Handle Keyman keyboard shown event here if needed
+    resizeTextView(true);
   }
 
   @Override
   public void onKeyboardDismissed() {
     // Handle Keyman keyboard dismissed event here if needed
+    resizeTextView(false);
+  }
+
+  public void resizeTextView(boolean isKeyboardVisible) {
+    int bannerHeight = 0;
+    int keyboardHeight = 0;
+    if (isKeyboardVisible) {
+      bannerHeight = KMManager.getBannerHeight(this);
+      keyboardHeight = KMManager.getKeyboardHeight(this);
+    }
+
+    TypedValue outValue = new TypedValue();
+    getTheme().resolveAttribute(android.R.attr.actionBarSize, outValue, true);
+    int actionBarHeight = getResources().getDimensionPixelSize(outValue.resourceId);
+
+    // *** TO DO: Try to check if status bar is visible, set statusBarHeight to 0 if it is not visible ***
+    int statusBarHeight = 0;
+    int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+    }
+    int navigationBarHeight = KMManager.getNavigationBarHeight(context, KeyboardType.KEYBOARD_TYPE_INAPP);
+
+    Point size = KMManager.getWindowSize(context);
+    int screenHeight = size.y;
+    textView.setHeight(
+      screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
   }
 
   @Override

@@ -125,8 +125,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     }
 
     ViewGroup parent = (ViewGroup) inputView.getParent();
-    if (parent != null)
+    if (parent != null) {
       parent.removeView(inputView);
+    }
 
     return inputView;
   }
@@ -258,7 +259,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       KMManager.onConfigurationChanged(newConfig);
     }
 
-    // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
+    // Update the touchable region of the Keyman keyboard
     Point size = KMManager.getWindowSize(getApplicationContext());
 
     int inputViewHeight = 0;
@@ -266,9 +267,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       inputViewHeight = inputView.getHeight();
     }
 
+    int navigationHeight = KMManager.getNavigationBarHeight(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);
-    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight;
+    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight - navigationHeight;
     outInsets.visibleTopInsets = outInsets.contentTopInsets;
     outInsets.touchableInsets = InputMethodService.Insets.TOUCHABLE_INSETS_REGION;
     outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);
@@ -284,6 +286,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardChanged(String newKeyboard) {
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.showSystemKeyboard();
     sendCurrentFontName();
   }

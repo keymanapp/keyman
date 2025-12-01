@@ -27,7 +27,7 @@ The DLL should be placed in any of the following locations:
 The best option is the first, as you can then include the DLL in a
 Keyman package for easy installation and uninstallation.
 
-Full x64 support for IMX DLLs was introduced in Keyman Desktop
+Full x64 support for IMX DLLs was introduced in Keyman for Windows
 8.0.333.0. An x64 version of the DLL may be included simply by giving it
 the file extension .x64.dll, with the same base name as the x86 DLL.
 Keyman will call the appropriate DLL.

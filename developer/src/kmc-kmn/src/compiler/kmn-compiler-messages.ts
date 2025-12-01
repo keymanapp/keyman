@@ -773,6 +773,58 @@ export class KmnCompilerMessages {
     * [\`use()\`](https://help.keyman.com/developer/language/reference/use)`
   );
 
+  static ERROR_NameMustBeAtLeastOneCharLong                   = SevError | 0x0B4;
+  static Error_NameMustBeAtLeastOneCharLong                   = () => m(
+    this.ERROR_NameMustBeAtLeastOneCharLong,
+    `The name parameter is required`,
+  );
+
+  static ERROR_NameMustBeAtMostNCharsLong                     = SevError | 0x0B5;
+  static Error_NameMustBeAtMostNCharsLong                     = (o:{name:string,length:string}) => m(
+    this.ERROR_NameMustBeAtMostNCharsLong,
+    `The referenced name '${def(o.name)}' must be at most ${def(o.length)} characters long`,
+  );
+
+  static ERROR_NameContainsInvalidCharacter                   = SevError | 0x0B6;
+  static Error_NameContainsInvalidCharacter                   = (o:{name:string}) => m(
+    this.ERROR_NameContainsInvalidCharacter,
+    `The referenced name '${def(o.name)}' contains an invalid character`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainSpaces                       = SevError | 0x0B7;
+  static Error_NameMustNotContainSpaces                       = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainSpaces,
+    `The referenced name '${def(o.name)}' must not contain spaces`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainComma                        = SevError | 0x0B8;
+  static Error_NameMustNotContainComma                        = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainComma,
+    `The referenced name '${def(o.name)}' must not contain commas`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainParentheses                  = SevError | 0x0B9;
+  static Error_NameMustNotContainParentheses                  = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainParentheses,
+    `The referenced name '${def(o.name)}' must not contain opening or closing parentheses`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainSquareBrackets               = SevError | 0x0BA;
+  static Error_NameMustNotContainSquareBrackets               = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainSquareBrackets,
+    `The referenced name '${def(o.name)}' must not contain opening or closing square brackets`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
   static Fatal_BufferOverflow                                 = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 
