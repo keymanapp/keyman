@@ -4,7 +4,7 @@ title: Guide: build an in-app keyboard
 
 Keyman Engine for iPhone and iPad allows you to use any Keyman touch
 keyboard in your iOS app, or even to create your own system keyboard app
-for purchase in the App Store.  
+for purchase in the App Store.
 This guide will walk you through the steps for creating your first iOS
 app with Keyman Engine for iPhone and iPad.
 
@@ -38,23 +38,23 @@ Use Keyman Developer to build a touch layout. The following documents walk throu
 
 When your keyboard is ready, you should have a compiled keyboard package. The example below shows the Thamizha Tamil99 touch layout.
 
-![Keyman-developer](/cdn/deploy/img/engine/ios/16.0/guides/in-app/keyboard-layout-in-developer-800wi.png "Keyman-developer")
+![Keyman-developer](/cdn/dev/img/engine/ios/16.0/guides/in-app/keyboard-layout-in-developer-800wi.png "Keyman-developer")
 
 Open the package tab for your keyboard and compile it. Then, open the folder containing your package
 
-![Keyman-developer-open-containing-folder](/cdn/deploy/img/engine/ios/16.0/guides/in-app/find-package-via-developer-800wi.png "Keyman-developer-open-containing-folder")
+![Keyman-developer-open-containing-folder](/cdn/dev/img/engine/ios/16.0/guides/in-app/find-package-via-developer-800wi.png "Keyman-developer-open-containing-folder")
 
-![Compiled-keyboard-file](/cdn/deploy/img/engine/ios/16.0/guides/in-app/package-file-800wi.png "Compiled-keyboard-file")
+![Compiled-keyboard-file](/cdn/dev/img/engine/ios/16.0/guides/in-app/package-file-800wi.png "Compiled-keyboard-file")
 
 ### 4. Add your keyboard package to the project
 
 Copy your compiled keyboard package (in this example **ekwtamil99uni.kmp**) to your macOS machine within the **KMSample1\Keyboards** folder.
 
-![Copy-keyboard-file](/cdn/deploy/img/engine/ios/16.0/guides/in-app/package-import.png "Copy-keyboard-file")
+![Copy-keyboard-file](/cdn/dev/img/engine/ios/16.0/guides/in-app/package-import.png "Copy-keyboard-file")
 
 When you switch back into Xcode, use the right-click context menu to "Add Files to 'KMSample1'":
 
-![Android-studio-assets](/cdn/deploy/img/engine/ios/16.0/guides/in-app/xcode-package-import-800wi.png "Android-studio-assets")
+![Android-studio-assets](/cdn/dev/img/engine/ios/16.0/guides/in-app/xcode-package-import-800wi.png "Android-studio-assets")
 
 Next, edit `ViewController.viewDidLoad()` to add the keyboard (ekwtamil99uni) with `Manager.shared` from KeymanEngine.framework.
 
@@ -73,7 +73,7 @@ Next, edit `ViewController.viewDidLoad()` to add the keyboard (ekwtamil99uni) wi
   }
 ```
 
-![Android-studio-adding-keyboard](/cdn/deploy/img/engine/ios/16.0/guides/in-app/fully-imported-800wi.png "Android-studio-adding-keyboard")
+![Android-studio-adding-keyboard](/cdn/dev/img/engine/ios/16.0/guides/in-app/fully-imported-800wi.png "Android-studio-adding-keyboard")
 
 ### 5. Build and run the app
 
@@ -82,7 +82,7 @@ emulate a number of iOS devices. Simply choose a target device to test
 against from the drop-down toward the top-left. For example, in the
 previous image, you can see "iPod Touch (7th generation)" selected.
 
-![Android-emulator-tamil](/cdn/deploy/img/engine/ios/16.0/guides/in-app/ios-simulator-tamil.png "Android-emulator-tamil")
+![Android-emulator-tamil](/cdn/dev/img/engine/ios/16.0/guides/in-app/ios-simulator-tamil.png "Android-emulator-tamil")
 
 And there you have it: your first Keyman Engine for iPhone and iPad app!
 
