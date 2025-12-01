@@ -218,7 +218,8 @@ describe('Compiler OSK Embedding', function() {
     });
 
     describe('EmbedOskKvkInKmx.buildForm', function() {
-      it('should a layout of keys from a layer bag, from an in-memory .kvks structure', async function() {
+      it('should transform a layout of keys from a layer bag, from an in-memory .kvks structure', async function() {
+
         const vk: VisualKeyboard.VisualKeyboard = {
           header: NullVisualKeyboardHeader,
           keys: [
@@ -301,7 +302,7 @@ describe('Compiler OSK Embedding', function() {
         assert.equal(kmxPlus.kmxplus.layr.forms[0].layers[0].rows[0].keys.length, 13);
         assert.equal(kmxPlus.kmxplus.layr.forms[0].layers[0].rows[0].keys[0].value, 'rightalt-K_BKQUOTE');
 
-        // Finally, pass the through KMXPlusBuilder, there should be no errors,
+        // Finally, pass the kmxPlus data through KMXPlusBuilder, there should be no errors,
         // hints, or warnings for this file
 
         const builder = new KMXPlusBuilder(kmxPlus);

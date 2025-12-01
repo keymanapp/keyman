@@ -19,7 +19,10 @@ export class EmbedOskKvkInKmx {
   }
 
   /**
-   * Transform a .kvk file to the KMX+ format
+   * Transform a visual keyboard from a .kvk file to the KMX+ format by setting the appropriate fields in the KMX+ data structure
+   *
+   * @param vk      content of a .kvk file
+   * @param kmx
    */
   public transformVisualKeyboardToKmxPlus(kmx: KMXPlus.KMXPlusFile, vk: VisualKeyboard.VisualKeyboard): void {
 
@@ -41,7 +44,7 @@ export class EmbedOskKvkInKmx {
    * either ANSI (US) or ISO (EU), which are the only two supported layouts in
    * .kvk
    */
-  private buildForm(vk: VisualKeyboard.VisualKeyboard, layerBags: Map<number, LayerBag>, strs: KMXPlus.Strs) {
+  private buildForm(vk: VisualKeyboard.VisualKeyboard, layerBags: Map<number, LayerBag>, strs: KMXPlus.Strs): KMXPlus.LayrForm {
     const baseLayoutName = 'en-us'; // This is the only value we support for 19.0
     const formName: KMXPlus.LayrFormHardware =
       vk.header.flags & VisualKeyboard.VisualKeyboardHeaderFlags.kvkh102

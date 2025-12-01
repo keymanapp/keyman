@@ -55,12 +55,12 @@ export class EmbedOskInKmx {
    * @param displayMap
    * @returns
    */
-  public embed(kmx: Uint8Array, kvksFilename: string, touchLayoutFilename: string, displayMap: PuaMap) {
+  public embed(kmx: Uint8Array, kvksFilename: string, touchLayoutFilename: string, displayMap: PuaMap): Uint8Array {
     const kmxPlus = this.createEmptyKmxPlusFile();
 
     if(kvksFilename) {
       const embedKvk = new EmbedOskKvkInKmx(this.callbacks);
-    const vk = loadKvkFile(kvksFilename, this.callbacks);
+      const vk = loadKvkFile(kvksFilename, this.callbacks);
       if(!vk) {
         // error will have been reported by loadKvkFile
         return null;

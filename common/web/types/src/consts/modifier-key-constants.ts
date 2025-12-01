@@ -8,7 +8,7 @@ import { VisualKeyboardShiftState } from "../kvk/visual-keyboard.js";
 
 /**
  * This type is declared as a `const` rather than as an `enum` for
- * historical reasons. Use instead `ModifierKeyConstant` where possible.
+ * historical reasons. Use `ModifierKeyConstant` instead where possible.
  */
 export const ModifierKeyConstants = {
   // Define Keyman Developer modifier bit-flags (exposed for use by other
@@ -41,7 +41,7 @@ export const ModifierKeyConstants = {
 
 /**
  * Defines the standard modifier key flags used by Keyman. Note that some keys
- * are chiral, and toggle key state is ignored if niether the __FLAG nor the
+ * are chiral, and toggle key state is ignored if neither the __FLAG nor the
  * corresponding NOT__FLAG are set.
  */
 export enum ModifierKeyConstant {

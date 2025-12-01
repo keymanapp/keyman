@@ -206,18 +206,18 @@ export class KmnCompilerMessages {
   static WARN_EmbeddedOskDoesNotSupportBitmaps               = SevWarn | 0x90D;
   static Warn_EmbeddedOskDoesNotSupportBitmaps               = (o:{keyId: string}) => m(
     this.WARN_EmbeddedOskDoesNotSupportBitmaps,
-    `The On Screen Keyboard key '${def(o.keyId)}' uses a bitmap, which is not supported in v19+ embedded On Screen Keyboards`, `
-    The v19+ On Screen Keyboard is embedded into the .kmx file. However, bitmap
+    `The On-Screen Keyboard key '${def(o.keyId)}' uses a bitmap, which is not supported in v19+ embedded On-Screen Keyboards`, `
+    The v19+ On-Screen Keyboard is embedded into the .kmx file. However, bitmap
     images are not supported for key caps. To support arbitrary images, use a
-    custom font for the On Screen Keyboard.
+    custom font for the On-Screen Keyboard.
   `);
 
   static HINT_EmbeddedOskDoesNotSupportNonUnicode               = SevHint | 0x90E;
   static Hint_EmbeddedOskDoesNotSupportNonUnicode               = (o:{keyId: string}) => m(
     this.HINT_EmbeddedOskDoesNotSupportNonUnicode,
-    `The On Screen Keyboard key '${def(o.keyId)}' is not Unicode, and will be ignored`, `
-    The v19+ On Screen Keyboard is embedded into the .kmx file. However,
-    non-Unicode key caps are not supported in the .kmx embedded On Screen
+    `The On-Screen Keyboard key '${def(o.keyId)}' is not Unicode, and will be ignored`, `
+    The v19+ On-Screen Keyboard is embedded into the .kmx file. However,
+    non-Unicode key caps are not supported in the .kmx embedded On-Screen
     Keyboard. Only the first non-Unicode key cap found will be reported.
   `);
 

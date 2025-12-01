@@ -6,7 +6,7 @@
 import { USVirtualKeyCodes as V } from "@keymanapp/common-types";
 
 /**
- * On Screen Keyboard virtual key codes and positions for the Windows "kbdus"
+ * On-Screen Keyboard virtual key codes and positions for the Windows "kbdus"
  * hardware layout which Keyman for Windows uses as its basic positional layout,
  * mapped against the LDML supported base layouts. Only the character-producing
  * keys are included; frame keys are excluded.
