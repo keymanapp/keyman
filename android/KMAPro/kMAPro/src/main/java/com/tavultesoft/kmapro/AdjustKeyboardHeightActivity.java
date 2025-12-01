@@ -31,6 +31,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
 
   private static Button resetButton = null;
   private static ImageView sampleKeyboard = null;
+  private static TextView percentageDisplay = null;
 
   // Keeps track of the adjusted keyboard height for saving
   private static int currentHeight = 0;
@@ -67,6 +68,9 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     adjustKeyboardHeightActivityTitle.setText(titleStr);
 
     sampleKeyboard = (ImageView) findViewById(R.id.sample_keyboard);
+    percentageDisplay = (TextView) findViewById(R.id.keyboard_height_percentage);
+    View resizeHandle = findViewById(R.id.resize_handle);
+
     layoutParams = sampleKeyboard.getLayoutParams();
     currentHeight = KMManager.getKeyboardHeight(context);
     refreshSampleKeyboard(context);
@@ -83,16 +87,24 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
       }
     });
 
-    sampleKeyboard.setOnTouchListener(new View.OnTouchListener() {
+    // Set up touch listener on both the resize handle and keyboard container
+    View.OnTouchListener touchListener = new View.OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent event) {
-        int y = (int)event.getY();
-
-        switch(event.getAction()) {
+        switch (event.getAction()) {
+          case MotionEvent.ACTION_DOWN:
+            view.setPressed(true);
+            break;
           case MotionEvent.ACTION_MOVE:
-            // Update currentHeight as the user drags (moves)
-            // Increasing the keyboard height is a negative y
-            currentHeight -= y;
+            // Get the touch position relative to the screen bottom
+            // The keyboard top should align with the touch point
+            int[] location = new int[2];
+            sampleKeyboard.getLocationOnScreen(location);
+            int viewBottom = location[1] + sampleKeyboard.getHeight();
+            int touchY = (int) event.getRawY();
+
+            // Calculate height: distance from touch point to bottom of screen
+            currentHeight = viewBottom - touchY;
 
             // Apply lower and upper bounds on currentHeight
             int minKeyboardHeight = KMManager.getKeyboardHeightMin(context);
@@ -103,22 +115,37 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             refreshSampleKeyboard(context);
             break;
           case MotionEvent.ACTION_UP:
+          case MotionEvent.ACTION_CANCEL:
+            view.setPressed(false);
             // Save the currentHeight when the user releases
             KMManager.applyKeyboardHeight(context, currentHeight);
             break;
         }
         return true;
       }
-    });
+    };
+
+    // Apply touch listener to both the resize handle and keyboard container
+    // This allows dragging from anywhere in the keyboard preview area
+    resizeHandle.setOnTouchListener(touchListener);
+    sampleKeyboard.setOnTouchListener(touchListener);
   }
 
   /**
-   * Refresh the layout for the sample keyboard
+   * Refresh the layout for the sample keyboard and update percentage display
    * @param context
    */
   private void refreshSampleKeyboard(Context context) {
     layoutParams.height = currentHeight;
     sampleKeyboard.setLayoutParams(layoutParams);
+
+    // Update percentage display
+    String percentageText = KMManager.createKeyboardHeightString(
+        context,
+        getString(R.string.portrait),
+        getString(R.string.landscape)
+    );
+    percentageDisplay.setText(percentageText);
   }
 
   @Override

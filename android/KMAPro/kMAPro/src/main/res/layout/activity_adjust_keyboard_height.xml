@@ -57,6 +57,70 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Percentage Display -->
+    <TextView
+      android:id="@+id/keyboard_height_percentage"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:textSize="14sp"
+      android:textColor="@color/keyman_blue"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:text="100% Portrait | 100% Landscape"
+      app:layout_constraintTop_toBottomOf="@id/button_layout"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Grabbable Resize Handle Bar -->
+    <LinearLayout
+      android:id="@+id/resize_handle"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:background="@drawable/resize_handle_bar"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:clickable="true"
+      android:focusable="true"
+      android:contentDescription="@string/drag_the_keyboard"
+      app:layout_constraintTop_toBottomOf="@id/keyboard_height_percentage"
+      app:layout_constraintStart_toStartOf="parent">
+
+      <!-- Up arrow on left -->
+      <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_arrow_up"
+        android:contentDescription="Resize up" />
+
+      <!-- Spacer to center -->
+      <View
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+      <!-- Center grip lines (visual from background drawable) -->
+      <View
+        android:layout_width="60dp"
+        android:layout_height="match_parent" />
+
+      <!-- Spacer to right -->
+      <View
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+      <!-- Down arrow on right -->
+      <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_arrow_down"
+        android:contentDescription="Resize down" />
+
+    </LinearLayout>
+
     <!-- Resizable keyboard "image -->
     <ImageView
       android:id="@+id/sample_keyboard"
@@ -71,7 +135,7 @@
       android:paddingEnd="@dimen/blank_osk_padding"
       android:paddingTop="@dimen/blank_osk_padding"
       android:paddingBottom="@dimen/blank_osk_padding"
-      app:layout_constraintTop_toBottomOf="@id/button_layout"
+      app:layout_constraintTop_toBottomOf="@id/resize_handle"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintVertical_bias="1.0" />

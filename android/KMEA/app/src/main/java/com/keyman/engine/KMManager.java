@@ -2609,6 +2609,80 @@ public final class KMManager {
   }
 
   /**
+   * Get keyboard height as percentage of default for current orientation
+   * @param context Context
+   * @return Percentage (e.g., 120 for 120%)
+   */
+  public static int getKeyboardHeightPercentage(Context context) {
+    int orientation = getOrientation(context);
+    return getKeyboardHeightPercentage(context, orientation);
+  }
+
+  /**
+   * Get keyboard height as percentage of default for specified orientation
+   * @param context Context
+   * @param orientation Configuration.ORIENTATION_PORTRAIT or ORIENTATION_LANDSCAPE
+   * @return Percentage (e.g., 120 for 120%)
+   */
+  public static int getKeyboardHeightPercentage(Context context, int orientation) {
+    int currentHeight = getKeyboardHeight(context, orientation);
+    int defaultHeight = getDefaultKeyboardHeight(orientation);
+    if (defaultHeight == 0) return 100;
+    return (int) Math.round((currentHeight * 100.0) / defaultHeight);
+  }
+
+  /**
+   * Create a string showing the keyboard height as percentages for both orientations.
+   * This method reads directly from SharedPreferences to ensure accurate percentages,
+   * especially after app reinstall or when the static context variables may be stale.
+   *
+   * @param context Context
+   * @param portraitLabel Label for portrait (e.g., "Portrait")
+   * @param landscapeLabel Label for landscape (e.g., "Landscape")
+   * @return String in format "100% Portrait | 100% Landscape"
+   */
+  public static String createKeyboardHeightString(Context context, String portraitLabel, String landscapeLabel) {
+    Integer landscapePercent = 100;
+    Integer portraitPercent = 100;
+
+    // Read the current keyboard heights directly from SharedPreferences
+    // This ensures we get the actual stored values, not the potentially stale static variables
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+
+    // Get default heights (these should be set during KMManager initialization)
+    int landscapeDefault = KMManager.KeyboardHeight_Context_Landscape_Default;
+    int portraitDefault = KMManager.KeyboardHeight_Context_Portrait_Default;
+
+    // Read current heights from SharedPreferences, using defaults as fallback
+    int landscapeHeight = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, landscapeDefault);
+    int portraitHeight = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, portraitDefault);
+
+    // Calculate landscape percentage
+    if (landscapeDefault != 0 && landscapeHeight > 0) {
+      double landscapeBase = landscapeDefault * 1.0;
+      double landscapeFactor = ((double) landscapeHeight / landscapeBase);
+      landscapePercent = (int) Math.ceil(landscapeFactor * 100);
+      if (landscapePercent == 0) {
+        landscapePercent = 100;
+      }
+    }
+
+    // Calculate portrait percentage
+    if (portraitDefault != 0 && portraitHeight > 0) {
+      double portraitBase = portraitDefault * 1.0;
+      double portraitFactor = ((double) portraitHeight / portraitBase);
+      portraitPercent = (int) Math.ceil(portraitFactor * 100);
+      if (portraitPercent == 0) {
+        portraitPercent = 100;
+      }
+    }
+
+    String percentages = portraitPercent.toString() + "% " + portraitLabel + " | " +
+                        landscapePercent.toString() + "% " + landscapeLabel;
+    return percentages;
+  }
+
+  /**
    * Returns the preference key for tracking pending keyboard height updates.
    * This allows separate tracking for each keyboard type (in-app/system) and orientation.
    *
