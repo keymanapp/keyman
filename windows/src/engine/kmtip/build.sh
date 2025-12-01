@@ -17,14 +17,12 @@ builder_parse "$@"
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/kmtip.dll"
 X64_TARGET="$X64_TARGET_PATH/kmtip64.dll"
-ARM64_TARGET="$ARM64_TARGET_PATH/kmtiparm64.dll"
 ARM64EC_TARGET="$ARM64EC_TARGET_PATH/kmtiparm64X.dll"
 
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
   build:x86    /windows/src/engine/kmtip/$WIN32_TARGET \
   build:x64    /windows/src/engine/kmtip/$X64_TARGET \
-  build:arm64  /windows/src/engine/kmtip/$ARM64_TARGET \
   build:arm64ec  /windows/src/engine/kmtip/$ARM64EC_TARGET \
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -39,14 +37,11 @@ function do_build() {
   build_version.res
   vs_msbuild kmtip.vcxproj //t:Build "//p:Platform=Win32"
   vs_msbuild kmtip.vcxproj //t:Build "//p:Platform=x64"
-  vs_msbuild kmtip.vcxproj //t:Build "//p:Platform=arm64"
   vs_msbuild kmtip.vcxproj //t:Build "//p:Platform=arm64EC"
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmtip.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   builder_if_release_build_level cp "$X64_TARGET_PATH/kmtip64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
-  cp "$ARM64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  builder_if_release_build_level cp "$ARM64_TARGET_PATH/kmtiparm64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
   cp "$ARM64EC_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   builder_if_release_build_level cp "$ARM64EC_TARGET_PATH/kmtiparm64X.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 
@@ -55,13 +50,11 @@ function do_build() {
 function do_publish() {
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/kmtip.dll"
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/kmtip64.dll"
-  wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/kmtiparm64.dll"
+  wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/kmtiparm64X.dll"
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/kmtip.dll" //t keyman-engine-windows
   wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/kmtip.pdb" //t keyman-engine-windows
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/kmtip64.dll" //t keyman-engine-windows
   wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/kmtip64.pdb" //t keyman-engine-windows
-  wrap-symstore "$WINDOWS_PROGRAM_ENGINE/kmtiparm64.dll" //t keyman-engine-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/kmtiparm64.pdb" //t keyman-engine-windows
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/kmtiparm64X.dll" //t keyman-engine-windows
   wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/kmtiparm64X.pdb" //t keyman-engine-windows
 }
@@ -69,7 +62,6 @@ function do_publish() {
 function do_install() {
   cp "$WINDOWS_PROGRAM_ENGINE/kmtip.dll" "$INSTALLPATH_KEYMANENGINE/kmtip.dll"
   cp "$WINDOWS_PROGRAM_ENGINE/kmtip64.dll" "$INSTALLPATH_KEYMANENGINE/kmtip64.dll"
-  cp "$WINDOWS_PROGRAM_ENGINE/kmtiparm64.dll" "$INSTALLPATH_KEYMANENGINE/kmtiparm64.dll"
   cp "$WINDOWS_PROGRAM_ENGINE/kmtiparm64X.dll" "$INSTALLPATH_KEYMANENGINE/kmtiparm64X.dll"
 }
 
