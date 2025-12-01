@@ -124,12 +124,12 @@ export class Lexer {
     if (!emitAll && (this.tokenList.length >= 2) &&
       this.tokenList.at(-1).isTokenType(TokenType.RIGHT_BR) &&
       this.tokenList.at(-2).isTokenType(TokenType.LEFT_BR)) {
-      // TODO: syntax error or warning for empty brackets
+      // TODO-NG-COMPILER: syntax error or warning for empty brackets
       this.tokenList.pop();
       this.tokenList.pop();
     }
 
-    // TODO: fatal error if this.offset > this.buffer.length
+    // TODO-NG-COMPILER: fatal error if this.offset > this.buffer.length
 
     // add a newline and end-of-file tokens if required
     if (this.offset >= this.buffer.length && addEOF) {
@@ -170,11 +170,11 @@ export class Token {
     /** the filename */
     public readonly filename: string=null
   ) {
-    // TODO: fatal error if lineNum < 1
+    // TODO-NG-COMPILER: fatal error if lineNum < 1
     this.lineNum   = (lineNum < 1 ) ? 1 : lineNum;
-    // TODO: fatal error if charNum < 1
+    // TODO-NG-COMPILER: fatal error if charNum < 1
     this.charNum   = (charNum < 1 ) ? 1 : charNum;
-    // TODO: fatal error if line is non-null for non-NEWLINE
+    // TODO-NG-COMPILER: fatal error if line is non-null for non-NEWLINE
     this.line      = (tokenType === TokenType.NEWLINE) ? line : null;
   }
 

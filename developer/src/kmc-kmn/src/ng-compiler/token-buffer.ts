@@ -43,7 +43,7 @@ export class TokenBuffer {
    * Advances the current position without exceeding the length of the list
    */
   public popToken(): void {
-    // TODO: consider if a warning is justified for popToken() when we are already at list.length
+    // TODO-NG-COMPILER: consider if a warning is justified for popToken() when we are already at list.length
     this._currentPosition = Math.min(this._currentPosition + 1, this.list.length);
   }
 
@@ -53,7 +53,7 @@ export class TokenBuffer {
    * @param save the desired current position
    */
   public resetCurrentPosition(save: number): void {
-    // TODO: fatal error if save < 0 or > length
+    // TODO-NG-COMPILER: fatal error if save < 0 or > length
     this._currentPosition = Math.min(Math.max(0, save), this.list.length);
   }
 
