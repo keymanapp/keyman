@@ -12,7 +12,7 @@ import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { baselineKeyboardNames, PATH_TO_BASELINE, PATH_TO_REPOSITORY, repositoryKeyboardNames } from './keyboard-names.js';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 // nomatch > layer('default')
 const LIST: Token[] = [
@@ -224,7 +224,7 @@ function bufferToString(buffer: Uint8Array): string {
     return decoder.decode(buffer);
   } catch(e) {
     // fallback to ANSI
-    // TODO: emit a hint KmnCompilerMessages::HINT_NonUnicodeFile
+    // TODO-NG-COMPILER: emit a hint KmnCompilerMessages::HINT_NonUnicodeFile
     decoder = new TextDecoder('cp1252', { fatal: false });
     return decoder.decode(buffer);
   }
