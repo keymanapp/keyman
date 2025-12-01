@@ -29,9 +29,7 @@ builder_parse "$@"
 cd "${KEYMAN_ROOT}/android"
 
 function do_build() {
-  "${KEYMAN_ROOT}/android/build.sh" \
-    configure,build:engine,sample1,sample2,keyboardharness \
-    --debug
+  builder_launch /android/build.sh  configure,build:engine,sample1,sample2,keyboardharness
 }
 
 if builder_has_action all; then

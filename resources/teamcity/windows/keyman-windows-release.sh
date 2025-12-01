@@ -102,7 +102,7 @@ function windows_publish_action() {
   export RSYNC_HOST
   export RSYNC_ROOT
 
-  "${KEYMAN_ROOT}/windows/build.sh" publish
+  builder_launch /windows/build.sh publish
   windows_upload_symbols_to_sentry
   ba_win_download_symbol_server_index
   ba_win_publish_new_symbols

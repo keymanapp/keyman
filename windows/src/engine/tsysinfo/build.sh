@@ -36,7 +36,7 @@ function do_build() {
 
   # Embed tsysinfox64 into a resource; we have to do a special signcode for
   # tsysinfox64.exe as we embed the executable into tsysinfo.exe
-  ../tsysinfox64/build.sh publish --no-deps
+  builder_launch /windows/src/engine/tsysinfox64/build.sh publish
   cp "$WINDOWS_PROGRAM_ENGINE/tsysinfox64.exe" tsysinfox64.bin
   run_in_vs_env rc tsysinfo_x64.rc
   rm -f tsysinfox64.bin
