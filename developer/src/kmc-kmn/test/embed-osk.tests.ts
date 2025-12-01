@@ -248,5 +248,16 @@ describe('Compiler OSK Embedding', function() {
         );
       });
     });
+
+    describe('EmbedOskInKmx.embed', function() {
+      // const embedder = new EmbedOskInKmx(callbacks, {});
+
+      it('should embed a .kvks file correctly into a .kmx file', function() {
+        //
+        // TODO-EMBED-OSK-IN-KMX: implement
+        // const result = embedder.embed(kmx, kvksFilename, '', null);
+        this.skip();
+      });
+    });
   });
 });

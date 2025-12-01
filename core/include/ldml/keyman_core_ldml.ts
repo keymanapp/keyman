@@ -513,10 +513,32 @@ class Constants {
    *  Length of each layer form in the 'layr' section variable part (v19+)
    */
   readonly length_layr_form_v19 = 32;
+
   /**
    * for the 'hardware' field indicating a touch keyboard, non-hardware
    */
   readonly layr_form_hardware_touch = 'touch';
+  /**
+   * for the 'hardware' field indicating a Brazilian 103 key ABNT2 layout (iso + extra key near right shift)
+   */
+  readonly layr_form_hardware_abnt2 = 'abnt2';
+  /**
+   * for the 'hardware' field indicating a European 102 key layout (extra key near left shift)
+   */
+  readonly layr_form_hardware_iso = 'iso';
+  /**
+   * for the 'hardware' field indicating a Japanese 109 key layout
+   */
+  readonly layr_form_hardware_jis = 'jis';
+  /**
+   * for the 'hardware' field indicating a Korean KS layout
+   */
+  readonly layr_form_hardware_ks = 'ks';
+  /**
+   * for the 'hardware' field indicating a US ANSI 101 key keyboard
+   */
+  readonly layr_form_hardware_us = 'us';
+
   /**
    * Length of each layer entry in the 'layr' section variable part
    */

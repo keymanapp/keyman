@@ -6,15 +6,76 @@
  * Convert Keyman .kvks and .keyman-touch-layout files to KMX+ format and embed
  * in .kmx.
  */
-import { CompilerCallbacks } from "@keymanapp/developer-utils";
+import { KMX, KMXPlus } from "@keymanapp/common-types";
+import { CompilerCallbacks, KMXPlusBuilder } from "@keymanapp/developer-utils";
+import { KMXPlusVersion } from "@keymanapp/ldml-keyboard-constants";
 import { KmnCompilerOptions } from "../compiler.js";
-import { KMX } from "@keymanapp/common-types";
+import { PuaMap, loadKvkFile } from "../osk.js";
+import { EmbedOskKvkInKmx } from "./embed-osk-kvk.js";
+
+// import { EmbedOskTouchLayoutInKmx } from "./embed-osk-touch-layout.js";
 
 export class EmbedOskInKmx {
   constructor(
     public callbacks: CompilerCallbacks, //TODO-EMBED-OSK-IN-KMX: private
     public options: KmnCompilerOptions //TODO-EMBED-OSK-IN-KMX: private
   ) {
+  }
+
+  private createEmptyKmxPlusFile() {
+    // TODO-EMBED-OSK-IN-KMX: merge this default construction with LDML compiler
+    // start to write the ldml format
+    const kmx = new KMXPlus.KMXPlusFile(KMXPlusVersion.Version19);
+    const strs = kmx.kmxplus.strs = new KMXPlus.Strs();
+    kmx.kmxplus.layr = new KMXPlus.Layr();
+    kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus);
+    kmx.kmxplus.disp = new KMXPlus.Disp();
+    kmx.kmxplus.keys = new KMXPlus.Keys(strs);
+    // list?
+    kmx.kmxplus.loca = new KMXPlus.Loca();
+    kmx.kmxplus.meta = new KMXPlus.Meta();
+    kmx.kmxplus.meta.author = strs.allocString();
+    kmx.kmxplus.meta.conform = strs.allocString();
+    kmx.kmxplus.meta.indicator = strs.allocString();
+    kmx.kmxplus.meta.layout = strs.allocString();
+    kmx.kmxplus.meta.name = strs.allocString();
+    kmx.kmxplus.meta.settings = 0;
+    kmx.kmxplus.meta.version = strs.allocString();
+
+    return kmx;
+  }
+
+  /**
+   * Take .kvks and .keyman-touch-layout files, merge them and build them as
+   * KMX+ data, and embed into the provided KMX
+   * @param kmx     .kmx file, v19 or later
+   * @param kmnFilename   source filename for .kmn, only used for path resolution
+   * @param kvksFilename
+   * @param touchLayoutFilename
+   * @param displayMap
+   * @returns
+   */
+  public embed(kmx: Uint8Array, kvksFilename: string, touchLayoutFilename: string, displayMap: PuaMap): Uint8Array {
+    const kmxPlus = this.createEmptyKmxPlusFile();
+
+    if(kvksFilename) {
+      const embedKvk = new EmbedOskKvkInKmx(this.callbacks);
+      const vk = loadKvkFile(kvksFilename, this.callbacks);
+      if(!vk) {
+        // error will have been reported by loadKvkFile
+        return null;
+      }
+      embedKvk.transformVisualKeyboardToKmxPlus(kmxPlus, vk);
+    }
+
+
+    // TODO-EMBED-OSK-IN-KMX: touch layout to ldml
+    // TODO-EMBED-OSK-IN-KMX: display map remapping
+
+    const builder = new KMXPlusBuilder(kmxPlus);
+    const data = builder.compile();
+
+    return this.injectKmxPlusIntoKmxFile(kmx, data);
   }
 
   /**
@@ -77,6 +138,7 @@ export class EmbedOskInKmx {
 
   public readonly unitTestEndpoints = {
     injectKmxPlusIntoKmxFile: this.injectKmxPlusIntoKmxFile.bind(this),
+    createEmptyKmxPlusFile: this.createEmptyKmxPlusFile.bind(this),
   };
 
 };

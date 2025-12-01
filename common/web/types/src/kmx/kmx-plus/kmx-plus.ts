@@ -584,6 +584,15 @@ export enum LayrFormFlags {
    chiralSeparate = constants.layr_form_flags_chiral_separate,
 };
 
+export enum LayrFormHardware {
+  touch = 'touch', // layr_form_hardware_touch
+  abnt2 = 'abnt2', // layr_form_hardware_abnt2
+  iso = 'iso',     // layr_form_hardware_iso
+  jis = 'jis',     // layr_form_hardware_jis
+  ks = 'ks',       // layr_form_hardware_ks
+  us = 'us',       // layr_form_hardware_us
+};
+
 /**
  * In-memory `<layers>`
  */
@@ -617,8 +626,20 @@ export class Layr extends Section {
   forms: LayrForm[] = [];
 };
 
+export enum KeysKeysFlags {
+  /**
+   * 0 if to is a char, 1 if it is a string
+   */
+  extend = constants.keys_key_flags_extend,
+
+  /**
+   * 1 if the key is a gap
+   */
+  gap = constants.keys_key_flags_gap,
+};
+
 export class KeysKeys {
-  flags: number;
+  flags: KeysKeysFlags;
   flicks: string; // for in-memory only
   id: StrsItem;
   longPress: ListItem;
