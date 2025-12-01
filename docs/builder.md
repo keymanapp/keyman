@@ -559,7 +559,7 @@ builder_describe_internal_dependency \
 ```
 
 **Note:** actions and targets must be fully specified, and this _must_ be called
-before either [`builder_describe_outputs`] or [`builder_parse`] in order for
+before both of [`builder_describe_outputs`] and [`builder_parse`] in order for
 dependencies to be resolved.
 
 --------------------------------------------------------------------------------
