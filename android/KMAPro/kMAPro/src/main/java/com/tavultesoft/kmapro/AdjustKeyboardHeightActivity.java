@@ -97,20 +97,13 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             break;
           case MotionEvent.ACTION_MOVE:
             // Get the touch position relative to the screen bottom
-            // The keyboard top should align with the touch point
             int[] location = new int[2];
             sampleKeyboard.getLocationOnScreen(location);
             int viewBottom = location[1] + sampleKeyboard.getHeight();
             int touchY = (int) event.getRawY();
 
-            // Calculate height: distance from touch point to bottom of screen
-            currentHeight = viewBottom - touchY;
-
-            // Apply lower and upper bounds on currentHeight
-            int minKeyboardHeight = KMManager.getKeyboardHeightMin(context);
-            int maxKeyboardHeight = KMManager.getKeyboardHeightMax(context);
-            currentHeight = Math.max(minKeyboardHeight, currentHeight);
-            currentHeight = Math.min(maxKeyboardHeight, currentHeight);
+            // Calculate height with bounds checking
+            currentHeight = KMManager.calculateKeyboardHeightFromTouch(context, touchY, viewBottom);
 
             refreshSampleKeyboard(context);
             break;
@@ -136,25 +129,58 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
    * @param context
    */
   private void refreshSampleKeyboard(Context context) {
-    layoutParams.height = currentHeight;
-    sampleKeyboard.setLayoutParams(layoutParams);
+    if (layoutParams != null && sampleKeyboard != null) {
+      layoutParams.height = currentHeight;
+      sampleKeyboard.requestLayout();
 
-    // Update percentage display
-    String percentageText = KMManager.createKeyboardHeightString(
+      // Update percentage display based on current (unsaved) height
+      if (percentageDisplay != null) {
+        String percentageText = createLiveKeyboardHeightString(context);
+        percentageDisplay.setText(percentageText);
+      }
+    }
+  }
+
+  /**
+   * Create a string showing keyboard height percentages for both orientations.
+   * Uses the current (unsaved) height for the active orientation and saved height for the other.
+   * @param context Context
+   * @return String in format "100% Portrait | 100% Landscape"
+   */
+  private String createLiveKeyboardHeightString(Context context) {
+    int currentOrientation = KMManager.getOrientation(context);
+    return KMManager.createKeyboardHeightString(
         context,
+        currentHeight,
+        currentOrientation,
         getString(R.string.portrait),
         getString(R.string.landscape)
     );
-    percentageDisplay.setText(percentageText);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    // Ensure height is saved even if user switches tasks or navigates away abnormally
+    // This prevents the touch zone from being out of sync with the keyboard visual
+    if (currentHeight > 0) {
+      KMManager.applyKeyboardHeight(this, currentHeight);
+    }
   }
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
 
+    // IMPORTANT: Apply current height BEFORE switching orientations
+    // This ensures the old orientation's height is saved before loading the new one
+    if (currentHeight > 0) {
+      KMManager.applyKeyboardHeight(this, currentHeight);
+    }
+
     layoutParams = sampleKeyboard.getLayoutParams();
 
-    // When the user rotates the device, restore currentHeight
+    // When the user rotates the device, restore currentHeight for the new orientation
     currentHeight = KMManager.getKeyboardHeight(this);
     refreshSampleKeyboard(this);
   }

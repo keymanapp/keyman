@@ -44,6 +44,9 @@ The KMManager is the core class which provides most of the methods and constants
 [`applyKeyboardHeight()`](applyKeyboardHeight)
 : sets the height of keyboard frame
 
+[`calculateKeyboardHeightFromTouch()`](calculateKeyboardHeightFromTouch)
+: calculates the keyboard height from a touch Y coordinate, applying min/max bounds
+
 [`canAddNewKeyboard()`](canAddNewKeyboard)
 : returns whether adding a new keyboard is enabled, like in the keyboard picker menu
 
@@ -58,6 +61,9 @@ The KMManager is the core class which provides most of the methods and constants
 
 [`createInputView()`](createInputView)
 : creates the input view to be used in InputMethodService
+
+[`createKeyboardHeightString()`](createKeyboardHeightString)
+: creates a formatted string showing keyboard height percentages for both orientations
 
 [`deregisterLexicalModel()`](deregisterLexicalModel)
 : deregisters the specified lexical model from the LMLayer so it isn't used
@@ -106,6 +112,9 @@ The KMManager is the core class which provides most of the methods and constants
 
 [`getKeyboardHeightMin()`](getKeyboardHeightMin)
 : returns the minimum allowed height of the keyboard frame
+
+[`getKeyboardHeightPercentage()`](getKeyboardHeightPercentage)
+: returns the keyboard height as a percentage of the default height
 
 [`getKeyboardIndex()`](getKeyboardIndex)
 : returns index number of the specified keyboard in keyboards list

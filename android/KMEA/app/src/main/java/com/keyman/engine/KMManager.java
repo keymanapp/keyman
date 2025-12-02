@@ -2619,16 +2619,34 @@ public final class KMManager {
   }
 
   /**
-   * Get keyboard height as percentage of default for specified orientation
+   * Get keyboard height as percentage of default for specified orientation.
+   *
+   * <p>The percentage is calculated using Math.ceil() to round up to the nearest integer.
+   * This ensures consistency with {@link #createKeyboardHeightString(Context, String, String)}
+   * and prevents percentages from being displayed as 0%.
+   *
+   * <p>Example: If current height is 288px and default is 200px:
+   * <pre>
+   * percentage = ceil(288 * 100.0 / 200) = ceil(144.0) = 144%
+   * </pre>
+   *
    * @param context Context
-   * @param orientation Configuration.ORIENTATION_PORTRAIT or ORIENTATION_LANDSCAPE
-   * @return Percentage (e.g., 120 for 120%)
+   * @param orientation Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE
+   * @return Percentage (e.g., 120 for 120%), minimum value is 100
+   * @see #getKeyboardHeight(Context, int)
+   * @see #getDefaultKeyboardHeight(int)
+   * @see #createKeyboardHeightString(Context, String, String)
    */
   public static int getKeyboardHeightPercentage(Context context, int orientation) {
     int currentHeight = getKeyboardHeight(context, orientation);
     int defaultHeight = getDefaultKeyboardHeight(orientation);
     if (defaultHeight == 0) return 100;
-    return (int) Math.round((currentHeight * 100.0) / defaultHeight);
+    // Use Math.ceil to match createKeyboardHeightString() calculation
+    int percent = (int) Math.ceil((currentHeight * 100.0) / defaultHeight);
+    if (percent == 0) {
+      percent = 100;
+    }
+    return percent;
   }
 
   /**
@@ -2680,6 +2698,114 @@ public final class KMManager {
     String percentages = portraitPercent.toString() + "% " + portraitLabel + " | " +
                         landscapePercent.toString() + "% " + landscapeLabel;
     return percentages;
+  }
+
+  /**
+   * Create a string showing keyboard height percentages for both orientations.
+   * Uses a live (unsaved) height for the specified orientation and reads saved height for the other.
+   * This is useful for displaying real-time percentages during keyboard height adjustment.
+   *
+   * <p>The percentage is calculated using Math.ceil() to ensure consistency with
+   * {@link #createKeyboardHeightString(Context, String, String)} and
+   * {@link #getKeyboardHeightPercentage(Context, int)}.
+   *
+   * <p>Example usage during drag operation:
+   * <pre>{@code
+   * // User is dragging to adjust portrait height
+   * int currentOrientation = KMManager.getOrientation(context);
+   * String display = KMManager.createKeyboardHeightString(
+   *     context,
+   *     currentHeight,  // Live height being adjusted
+   *     currentOrientation,
+   *     "Portrait",
+   *     "Landscape"
+   * );
+   * // Result: "145% Portrait | 100% Landscape"
+   * }</pre>
+   *
+   * @param context Context
+   * @param liveHeight The current keyboard height in pixels (not yet saved to SharedPreferences)
+   * @param liveOrientation The orientation for which liveHeight applies
+   *                        (Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE)
+   * @param portraitLabel Label for portrait orientation (e.g., "Portrait")
+   * @param landscapeLabel Label for landscape orientation (e.g., "Landscape")
+   * @return String in format "100% Portrait | 100% Landscape"
+   * @see #createKeyboardHeightString(Context, String, String)
+   * @see #getKeyboardHeightPercentage(Context, int)
+   * @see #calculateKeyboardHeightFromTouch(Context, int, int)
+   */
+  public static String createKeyboardHeightString(Context context, int liveHeight, int liveOrientation,
+                                                   String portraitLabel, String landscapeLabel) {
+    int portraitPercent = 100;
+    int landscapePercent = 100;
+
+    // Calculate percentage for the live orientation
+    int liveDefaultHeight = getDefaultKeyboardHeight(liveOrientation);
+    if (liveDefaultHeight > 0 && liveHeight > 0) {
+      int livePercent = (int) Math.ceil((liveHeight * 100.0) / liveDefaultHeight);
+      if (livePercent == 0) {
+        livePercent = 100;
+      }
+
+      if (liveOrientation == Configuration.ORIENTATION_PORTRAIT) {
+        portraitPercent = livePercent;
+        landscapePercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_LANDSCAPE);
+      } else {
+        landscapePercent = livePercent;
+        portraitPercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_PORTRAIT);
+      }
+    } else {
+      // Fallback: read both from saved preferences
+      portraitPercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_PORTRAIT);
+      landscapePercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_LANDSCAPE);
+    }
+
+    return portraitPercent + "% " + portraitLabel + " | " +
+           landscapePercent + "% " + landscapeLabel;
+  }
+
+  /**
+   * Calculate keyboard height from a touch Y coordinate, applying min/max bounds.
+   * This is used during interactive keyboard height adjustment (e.g., dragging a resize handle).
+   *
+   * <p>The height is calculated as the distance from the touch point to the bottom of the screen,
+   * then clamped to the valid range defined by {@link #getKeyboardHeightMin(Context)} and
+   * {@link #getKeyboardHeightMax(Context)}.
+   *
+   * <p>Example usage in touch listener:
+   * <pre>{@code
+   * case MotionEvent.ACTION_MOVE:
+   *     int[] location = new int[2];
+   *     keyboardView.getLocationOnScreen(location);
+   *     int viewBottom = location[1] + keyboardView.getHeight();
+   *     int touchY = (int) event.getRawY();
+   *
+   *     int newHeight = KMManager.calculateKeyboardHeightFromTouch(
+   *         context, touchY, viewBottom);
+   *     // newHeight is guaranteed to be within min/max bounds
+   *     break;
+   * }</pre>
+   *
+   * @param context Context
+   * @param touchY The Y coordinate of the touch event in screen coordinates (from event.getRawY())
+   * @param viewBottom The bottom Y coordinate of the keyboard view in screen coordinates
+   *                   (typically: view.getLocationOnScreen()[1] + view.getHeight())
+   * @return The calculated keyboard height in pixels, clamped to valid range
+   * @see #getKeyboardHeightMin(Context)
+   * @see #getKeyboardHeightMax(Context)
+   * @see #applyKeyboardHeight(Context, int)
+   */
+  public static int calculateKeyboardHeightFromTouch(Context context, int touchY, int viewBottom) {
+    // Calculate height: distance from touch point to bottom of screen
+    int height = viewBottom - touchY;
+
+    // Apply lower and upper bounds
+    int minKeyboardHeight = getKeyboardHeightMin(context);
+    int maxKeyboardHeight = getKeyboardHeightMax(context);
+    height = Math.max(minKeyboardHeight, height);
+    height = Math.min(maxKeyboardHeight, height);
+
+    return height;
   }
 
   /**
