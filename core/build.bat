@@ -86,23 +86,7 @@ if not exist "!VsDevCmd_Path!" (
 
 echo === Configuring VC++ ===
 set VSCMD_SKIP_SENDTELEMETRY=1
-rem vsdevcmd.bat -arch parameter for 2019 is can only be x86 or amd64. (arm64 is not supported till 2022)
-rem -host_arch does support is required for arm64 builds on x86/amd64 hosts.
-rem However on arm64 host we cant even use vsdevcmd -arch=arm64 as it fails.(2019)
-rem for now we will have workaround this untill updating to VS2022
-if /I "%HOST_ARCH%"=="arm64" (
-  if /I "%ARCH%"=="arm64" (
-    call "!VsDevCmd_Path!" -no_logo -startdir=none || exit !errorlevel!
-  ) else (
-    call "!VsDevCmd_Path!" -arch=!ARCH! -no_logo -startdir=none || exit !errorlevel!
-  )
-) else (
-  if /I "%ARCH%"=="arm64" (
-    call "!VsDevCmd_Path!" -arch=!ARCH! -host_arch=!HOST_ARCH! -no_logo -startdir=none || exit !errorlevel!
-  ) else (
-    call "!VsDevCmd_Path!" -arch=!ARCH! -no_logo -startdir=none || exit !errorlevel!
-  )
-)
+call "!VsDevCmd_Path!" -arch=!ARCH! -host_arch=!HOST_ARCH! -no_logo -startdir=none || exit !errorlevel!
 cd %KEYMAN_ROOT%\core
 
 set BUILDTYPE=%1
