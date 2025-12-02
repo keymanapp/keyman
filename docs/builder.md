@@ -1049,13 +1049,13 @@ Do not use builder standard options such as `--deps` or `--debug`.
 
 ### Parameters
 
-* 1: `script`      path to script, relative to root of repo
+* 1: `script`      path to script, relative to root of repo, with leading slash
 * 2+: `parameters` action(s), target(s), parameters for the child script to run
 
 ### Example
 
 ```bash
-  builder_launch core/build.sh configure,build:wasm --no-tests
+  builder_launch /core/build.sh configure,build:wasm --no-tests
 ```
 
 --------------------------------------------------------------------------------
