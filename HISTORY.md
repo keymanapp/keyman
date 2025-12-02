@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.169 alpha 2025-12-02
+
+* maint(core): verify that keyman_core_ldml.h is in sync (#15256)
+* chore(common): Update FirstVoices keyboard versions in keyboards.csv (#15261)
+
 ## 19.0.168 alpha 2025-12-01
 
 * chore(android): add intent to broadcast font name (#15193)
