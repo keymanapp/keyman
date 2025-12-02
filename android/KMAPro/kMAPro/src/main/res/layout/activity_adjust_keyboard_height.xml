@@ -10,32 +10,22 @@
   <include layout="@layout/titlebar" />
 
   <TextView
-    android:id="@+id/drag_the_keyboard"
+    android:id="@+id/adjust_instructions"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@+id/titlebar"
     android:layout_marginStart="@dimen/activity_horizontal_margin"
-    android:text="@string/drag_the_keyboard"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="8dp"
+    android:text="@string/adjust_keyboard_instructions"
     android:textSize="@dimen/adjust_keyboard_height_label_textsize"
     app:layout_constraintTop_toBottomOf="@id/titlebar" />
-
-  <TextView
-    android:id="@+id/rotate_the_device"
-    android:layout_below="@id/drag_the_keyboard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/activity_horizontal_margin"
-    android:text="@string/rotate_the_device"
-    android:textSize="@dimen/adjust_keyboard_height_label_textsize"
-    app:layout_constraintTop_toBottomOf="@id/drag_the_keyboard" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/button_layout"
       android:orientation="horizontal"
-      android:layout_below="@id/rotate_the_device"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toBottomOf="@id/rotate_the_device">
+      app:layout_constraintTop_toBottomOf="@id/adjust_instructions">
 
       <Button
         android:id="@+id/reset_to_defaults"
@@ -82,7 +72,7 @@
       android:gravity="center_vertical"
       android:clickable="true"
       android:focusable="true"
-      android:contentDescription="@string/drag_the_keyboard"
+      android:contentDescription="@string/adjust_keyboard_instructions"
       app:layout_constraintBottom_toTopOf="@id/sample_keyboard"
       app:layout_constraintStart_toStartOf="parent">
 
