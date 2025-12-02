@@ -1,4 +1,4 @@
-LIBRARY kmtiparm64X.dll
+LIBRARY kmtiparm64x.dll
 
 EXPORTS
         DllGetClassObject               PRIVATE

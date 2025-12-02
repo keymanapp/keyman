@@ -190,10 +190,10 @@
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'">.dll</TargetExt>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">.dll</TargetExt>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">kmtip64</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64EC'">kmtiparm64X</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64EC'">kmtiparm64x</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">kmtiparm64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">kmtip64</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'">kmtiparm64X</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'">kmtiparm64x</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">kmtiparm64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64EC'">
@@ -319,7 +319,7 @@
     <Link>
       <AdditionalDependencies>..\..\..\lib\keyman64.lib;..\..\..\lib\keymanarm64.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\kmtiparm64X.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\kmtiparm64x.def</ModuleDefinitionFile>
       <GenerateMapFile>true</GenerateMapFile>
       <BaseAddress>0x140000000</BaseAddress>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -486,7 +486,7 @@
     <Link>
       <AdditionalDependencies>..\..\..\lib\keyman64.lib;..\..\..\lib\keymanarm64.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\kmtiparm64X.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\kmtiparm64x.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <BaseAddress>0x140000000</BaseAddress>
@@ -770,7 +770,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64EC'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64EC'">true</ExcludedFromBuild>
     </None>
-    <None Include="kmtiparm64X.def">
+    <None Include="kmtiparm64x.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
