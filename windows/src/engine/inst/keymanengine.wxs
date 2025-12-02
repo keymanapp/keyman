@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Module Id="engine" Version="$(var.KEYMAN_VERSION)" Language="1033">
-  <Package Id="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" Keywords="Keyman,Keyboard,Engine"
+    <Package Id="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" Keywords="Keyman,Keyboard,Engine"
              Description="Keyman Engine $(var.RELEASE)" Comments="Contact:  Your local administrator"
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
 

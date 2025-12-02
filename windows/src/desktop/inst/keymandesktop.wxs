@@ -81,6 +81,8 @@
     <Property Id='OnlineProductID' Value='30' />
 
 
+    <!-- CE38CB16_4448_4432_851B_B3FCE3AF464F is the GUID for the keymaneengine merge 
+         module package; this makes the WIX_NATIVE_MACHINE property available to it -->
     <SetProperty Id="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE]" Before="LaunchConditions"/>
 
     <Directory Id="TARGETDIR" Name="SourceDir" DiskId="1">
