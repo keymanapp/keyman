@@ -21,10 +21,9 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.KEYMAN_IS_CI_BUILD ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  // reporter: process.env.KEYMAN_IS_CI_BUILD ? [
-  //   [KEYMAN_ROOT + '/common/test/resources/playwright-TC-reporter.ts', { parentFlow: 'web_tests' }]
-  // ] : [
-  reporter: [
+  reporter: process.env.KEYMAN_IS_CI_BUILD ? [
+    [KEYMAN_ROOT + '/common/test/resources/playwright-TC-reporter.ts', { parentFlow: 'web_tests' }]
+  ] : [
     ['list'],
     ['html', { open: 'never' }],
   ],
