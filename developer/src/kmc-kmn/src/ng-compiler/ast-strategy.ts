@@ -9,10 +9,11 @@
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 
+/**
+ * An abstract strategy for rebuilding an AST
+ */
 export abstract class ASTStrategy {
-  public apply(node: ASTNode): ASTNode {
-    return node;
-  };
+  public abstract apply(node: ASTNode): ASTNode;
 }
 
 /**
