@@ -9,7 +9,7 @@
 import { TokenType } from "./token-type.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToNewNodeOrTree, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
 import { Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
-import { SingleChildRuleParseToTreeFromNewNode, TokenRule } from "./recursive-descent.js";
+import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
 import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
@@ -17,7 +17,7 @@ import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStore
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { GivenNode } from "./ast-strategy.js";
+import { GivenNode, NewNode } from "./ast-strategy.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -262,9 +262,9 @@ export class SimpleTextRule extends SingleChildRule {
 /**
  * (BNF) textRange: simpleText rangeEnd+
  */
-export class TextRangeRule extends SingleChildRuleParseToTreeFromNewNode {
+export class TextRangeRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.RANGE);
+    super(new NewNode(NodeType.RANGE));
     const simpleText: Rule        = new SimpleTextRule();
     const rangeEnd: Rule          = new RangeEndRule();
     const oneOrManyRangeEnd: Rule = new OneOrManyRule(rangeEnd);
@@ -287,9 +287,9 @@ export class RangeEndRule extends SingleChildRule {
 /**
  * (BNF) virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
  */
-export class VirtualKeyRule extends SingleChildRuleParseToTreeFromNewNode {
+export class VirtualKeyRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.VIRTUAL_KEY);
+    super(new NewNode(NodeType.VIRTUAL_KEY));
     const leftSquare: Rule   = new TokenRule(TokenType.LEFT_SQ);
     const modifier: Rule     = new ModifierRule();
     const manyModifier: Rule = new ManyRule(modifier);
@@ -572,9 +572,9 @@ export class ProductionBlockRule extends SingleChildRule {
 /**
  * (BNF) lhsBlock: MATCH|NOMATCH|inputBlock
  */
-export class LhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
+export class LhsBlockRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.LHS);
+    super(new NewNode(NodeType.LHS));
     const match: Rule      = new TokenRule(TokenType.MATCH, true);
     const nomatch: Rule    = new TokenRule(TokenType.NOMATCH, true);
     const inputBlock: Rule = new InputBlockRule();
@@ -605,9 +605,9 @@ export class InputBlockRule extends SingleChildRule {
 /**
  * (BNF) inputContext: inputElement+
  */
-export class InputContextRule extends SingleChildRuleParseToTreeFromNewNode {
+export class InputContextRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.INPUT_CONTEXT);
+    super(new NewNode(NodeType.INPUT_CONTEXT));
     const inputElement = new InputElementRule();
     this.rule = new OneOrManyRule(inputElement);
   }
@@ -637,9 +637,9 @@ export class InputElementRule extends SingleChildRule {
 /**
  * (BNF) keystroke: PLUS inputElement+
  */
-export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
+export class KeystrokeRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.KEYSTROKE);
+    super(new NewNode(NodeType.KEYSTROKE));
     const plus: Rule            = new TokenRule(TokenType.PLUS);
     const inputElement          = new InputElementRule();
     const oneOrManyInputElement = new OneOrManyRule(inputElement);
@@ -650,9 +650,9 @@ export class KeystrokeRule extends SingleChildRuleParseToTreeFromNewNode {
 /**
  * (BNF) rhsBlock: outputStatement+
  */
-export class RhsBlockRule extends SingleChildRuleParseToTreeFromNewNode {
+export class RhsBlockRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.RHS);
+    super(new NewNode(NodeType.RHS));
     const outputStatement: Rule = new OutputStatementRule();
     this.rule = new OneOrManyRule(outputStatement);
   }

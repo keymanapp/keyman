@@ -42,3 +42,28 @@ export class GivenNode extends ASTStrategy {
     return node;
   };
 }
+
+/**
+ * An ASTStrategy that rebuilds the tree to be rooted at a new node
+ */
+export class NewNode extends ASTStrategy {
+  public constructor(
+    /** the type of the new node at which to root the tree */
+    protected readonly nodeType: NodeType
+  ) {
+    super();
+  }
+
+  /**
+   * Rebuilds the tree to be rooted at a new node
+   *
+   * @param node the tree to be rebuilt
+   * @returns the rebuilt tree, rooted at the new node
+   */
+  public apply(node: ASTNode): ASTNode {
+    const newNode: ASTNode = new ASTNode(this.nodeType);
+    newNode.addChildren(node.removeChildren());
+    node.addChild(newNode)
+    return node;
+  };
+}
