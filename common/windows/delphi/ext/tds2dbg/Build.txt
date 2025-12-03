@@ -1,0 +1,8 @@
+Get the free Borland C++ Builder 5.5 from
+ https://downloads.embarcadero.com/free/c_builder
+
+Ensure that the location of bcc32.exe is in your path
+and type "make.exe" in a command prompt with the
+current working directory set to the directory
+holder the sources for tds2dbg.
+

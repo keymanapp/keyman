@@ -30,4 +30,5 @@ DEVELOPER_DEBUGPATH="$DEVELOPER_ROOT/debug"
 # Delphi build tool macros
 
 SENTRYTOOL="$COMMON_ROOT/tools/sentrytool/$WIN32_TARGET_PATH/sentrytool.exe"
+TDS2DBG="$KEYMAN_ROOT/common/windows/bin/tools/tds2dbg"
 DEVTOOLS="$COMMON_ROOT/tools/devtools/$WIN32_TARGET_PATH/devtools.exe"
