@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.170 alpha 2025-12-03
+
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.1.1 in /resources/build/pr-build-status (#15173)
+* chore(deps-dev): bump glob from 10.4.5 to 10.5.0 in /resources/build/pr-build-status (#15184)
+* chore(deps): bump js-yaml and @microsoft/api-documenter (#15185)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#15186)
+* docs(developer): add/update API docs (#15275)
+
 ## 19.0.169 alpha 2025-12-02
 
 * maint(core): verify that keyman_core_ldml.h is in sync (#15256)
