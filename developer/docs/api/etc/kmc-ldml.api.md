@@ -4,17 +4,18 @@
 
 ```ts
 
-import { CompilerCallbacks } from '@keymanapp/common-types';
-import { CompilerEvent } from '@keymanapp/common-types';
-import { CompilerOptions } from '@keymanapp/common-types';
-import { KeymanCompiler } from '@keymanapp/common-types';
-import { KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
-import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
-import { KeymanCompilerResult } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerOptions } from '@keymanapp/developer-utils';
+import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifactOptional } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
+import { KeymanCompilerResult } from '@keymanapp/developer-utils';
 import { KMXPlus } from '@keymanapp/common-types';
-import { LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
-import { LDMLKeyboardXMLSourceFileReaderOptions } from '@keymanapp/common-types';
-import { UnicodeSetParser } from '@keymanapp/common-types';
+import { LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/developer-utils';
+import { LdmlKeyboardTypes } from '@keymanapp/common-types';
+import { LDMLKeyboardXMLSourceFileReaderOptions } from '@keymanapp/developer-utils';
+import { ObjectWithCompileContext } from '@keymanapp/common-types';
 
 // Warning: (ae-internal-missing-underscore) The name "LdmlCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -25,43 +26,47 @@ export class LdmlCompilerMessages {
     // (undocumented)
     static Error_CantReferenceSetFromUnicodeSet: (o: {
         id: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_DisplayIsRepeated: number;
     // (undocumented)
     static Error_DisplayIsRepeated: (o: {
-        output?: string;
-        keyId?: string;
-    }) => CompilerEvent;
+        display?: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_DisplayNeedsToOrId: number;
     // (undocumented)
     static Error_DisplayNeedsToOrId: (o: {
-        output?: string;
-        keyId?: string;
-    }) => CompilerEvent;
+        display?: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
+    // (undocumented)
+    static ERROR_DuplicateLayerWidth: number;
+    // (undocumented)
+    static Error_DuplicateLayerWidth: (o: {
+        minDeviceWidth: number;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_DuplicateTransformsType: number;
     // (undocumented)
     static Error_DuplicateTransformsType: (o: {
-        types: string[];
-    }) => CompilerEvent;
+        type: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_DuplicateVariable: number;
     // (undocumented)
     static Error_DuplicateVariable: (o: {
-        ids: string;
-    }) => CompilerEvent;
+        id: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_EmptyTransformGroup: number;
     // (undocumented)
-    static Error_EmptyTransformGroup: () => CompilerEvent;
+    static Error_EmptyTransformGroup: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_ExcessHardware: number;
     // (undocumented)
     static Error_ExcessHardware: (o: {
         formId: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_GestureKeyNotFoundInKeyBag: number;
     // (undocumented)
@@ -69,36 +74,42 @@ export class LdmlCompilerMessages {
         keyId: string;
         parentKeyId: string;
         attribute: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_HardwareLayerHasTooManyRows: number;
     // (undocumented)
-    static Error_HardwareLayerHasTooManyRows: () => CompilerEvent;
+    static Error_HardwareLayerHasTooManyRows: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_IllegalCharacters: number;
     // (undocumented)
     static Error_IllegalCharacters: (o: {
         count: number;
-        lowestCh: number;
-    }) => CompilerEvent;
+        lowestCh: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_IllegalTransformAsterisk: number;
     // (undocumented)
     static Error_IllegalTransformAsterisk: (o: {
         from: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_IllegalTransformDollarsign: number;
     // (undocumented)
     static Error_IllegalTransformDollarsign: (o: {
         from: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_IllegalTransformPlus: number;
     // (undocumented)
     static Error_IllegalTransformPlus: (o: {
         from: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
+    // (undocumented)
+    static ERROR_IllegalTransformToUset: number;
+    // (undocumented)
+    static Error_IllegalTransformToUset: (o: {
+        to: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidFile: number;
     // (undocumented)
@@ -110,51 +121,69 @@ export class LdmlCompilerMessages {
     // (undocumented)
     static Error_InvalidHardware: (o: {
         formId: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidLayerWidth: number;
+    // (undocumented)
+    static Error_InvalidLayerWidth: (o: {
+        minDeviceWidth: number;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidLocale: number;
     // (undocumented)
     static Error_InvalidLocale: (o: {
         tag: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidMarkerIdentifier: number;
+    // (undocumented)
+    static Error_InvalidMarkerIdentifier: (o: {
+        id: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidModifier: number;
     // (undocumented)
     static Error_InvalidModifier: (o: {
-        layer: string;
         modifiers: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidQuadEscape: number;
     // (undocumented)
     static Error_InvalidQuadEscape: (o: {
-        cp: number;
-    }) => CompilerEvent;
+        cp: string;
+        recommended: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidScanCode: number;
     // (undocumented)
     static Error_InvalidScanCode: (o: {
-        form?: string;
-        codes?: string[];
-    }) => CompilerEvent;
+        codes: string;
+        id: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidTransformsType: number;
     // (undocumented)
     static Error_InvalidTransformsType: (o: {
-        types: string[];
-    }) => CompilerEvent;
+        type: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidVariableIdentifier: number;
+    // (undocumented)
+    static Error_InvalidVariableIdentifier: (o: {
+        id: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidVersion: number;
     // (undocumented)
     static Error_InvalidVersion: (o: {
         version: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_KeyMissingToGapOrSwitch: number;
     // (undocumented)
     static Error_KeyMissingToGapOrSwitch: (o: {
         keyId: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_KeyNotFoundInKeyBag: number;
     // (undocumented)
@@ -164,52 +193,52 @@ export class LdmlCompilerMessages {
         row: number;
         layer: string;
         form: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_MissingFlicks: number;
     // (undocumented)
     static Error_MissingFlicks: (o: {
-        flickId: string;
         id: string;
-    }) => CompilerEvent;
+        flickId: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_MissingMarkers: number;
     // (undocumented)
     static Error_MissingMarkers: (o: {
-        ids: string[];
-    }) => CompilerEvent;
+        ids: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_MissingSetVariable: number;
     // (undocumented)
     static Error_MissingSetVariable: (o: {
         id: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_MissingStringVariable: number;
     // (undocumented)
     static Error_MissingStringVariable: (o: {
         id: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_MissingUnicodeSetVariable: number;
     // (undocumented)
     static Error_MissingUnicodeSetVariable: (o: {
         id: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_MixedTransformGroup: number;
     // (undocumented)
-    static Error_MixedTransformGroup: () => CompilerEvent;
+    static Error_MixedTransformGroup: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_MustBeAtLeastOneLayerElement: number;
     // (undocumented)
-    static Error_MustBeAtLeastOneLayerElement: () => CompilerEvent;
+    static Error_MustBeAtLeastOneLayerElement: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_NeedSpacesBetweenSetVariables: number;
     // (undocumented)
     static Error_NeedSpacesBetweenSetVariables: (o: {
         item: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_RowOnHardwareLayerHasTooManyKeys: number;
     // (undocumented)
@@ -217,86 +246,92 @@ export class LdmlCompilerMessages {
         row: number;
         hardware: string;
         modifiers: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_TransformFromMatchesNothing: number;
     // (undocumented)
     static Error_TransformFromMatchesNothing: (o: {
         from: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static ERROR_UnparseableReorderSet: number;
-    // (undocumented)
-    static Error_UnparseableReorderSet: (o: {
-        from: string;
-        set: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_UnparseableTransformFrom: number;
     // (undocumented)
     static Error_UnparseableTransformFrom: (o: {
         from: string;
         message: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
+    // (undocumented)
+    static ERROR_UnparseableTransformTo: number;
+    // (undocumented)
+    static Error_UnparseableTransformTo: (o: {
+        to: string;
+        message: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_CharClassImplicitDenorm: number;
     // (undocumented)
     static Hint_CharClassImplicitDenorm: (o: {
         lowestCh: number;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_LocaleIsNotMinimalAndClean: number;
     // (undocumented)
     static Hint_LocaleIsNotMinimalAndClean: (o: {
         sourceLocale: string;
         locale: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_NoDisplayForMarker: number;
     // (undocumented)
     static Hint_NoDisplayForMarker: (o: {
         id: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_NoDisplayForSwitch: number;
     // (undocumented)
     static Hint_NoDisplayForSwitch: (o: {
         id: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_NormalizationDisabled: number;
     // (undocumented)
-    static Hint_NormalizationDisabled: () => CompilerEvent;
+    static Hint_NormalizationDisabled: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_OneOrMoreRepeatedLocales: number;
     // (undocumented)
-    static Hint_OneOrMoreRepeatedLocales: () => CompilerEvent;
+    static Hint_OneOrMoreRepeatedLocales: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_PUACharacters: number;
     // (undocumented)
     static Hint_PUACharacters: (o: {
         count: number;
-        lowestCh: number;
-    }) => CompilerEvent;
+        lowestCh: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static WARN_CharClassExplicitDenorm: number;
     // (undocumented)
     static Warn_CharClassExplicitDenorm: (o: {
         lowestCh: number;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static WARN_CustomForm: number;
     // (undocumented)
     static Warn_CustomForm: (o: {
         id: string;
-    }) => CompilerEvent;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
+    // (undocumented)
+    static WARN_StringDenorm: number;
+    // (undocumented)
+    static Warn_StringDenorm: (o: {
+        s: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static WARN_UnassignedCharacters: number;
     // (undocumented)
     static Warn_UnassignedCharacters: (o: {
         count: number;
-        lowestCh: number;
-    }) => CompilerEvent;
+        lowestCh: string;
+    }, compileContext?: ObjectWithCompileContext) => CompilerEvent;
 }
 
 // @public
@@ -309,7 +344,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     // @internal
     compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile>;
     // @internal
-    getUsetParser(): Promise<UnicodeSetParser>;
+    getUsetParser(): Promise<LdmlKeyboardTypes.UnicodeSetParser>;
     init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean>;
     // Warning: (ae-forgotten-export) The symbol "LDMLKeyboardXMLSourceFile" needs to be exported by the entry point main.d.ts
     //
