@@ -90,6 +90,15 @@ export class ASTNode {
   }
 
   /**
+   * Count the number of children.
+   *
+   * @returns the number of children
+   */
+  public numberOfChildren(): number {
+    return this.children.length;
+  }
+
+  /**
    * Check if this node has any children.
    *
    * @returns true if there is at least one child node

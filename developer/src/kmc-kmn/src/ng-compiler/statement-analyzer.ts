@@ -15,7 +15,7 @@ import { DeadkeyNameRule, NormalStoreNameRule, StoreNameRule, SystemStoreNameRul
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { GivenNode } from "./ast-strategy.js";
+import { GivenNode, StackedPair } from "./ast-strategy.js";
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   protected leftBracket: Rule;
@@ -65,9 +65,9 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
-export class DeadkeyStatementRule extends SingleChildRule {
+export class DeadkeyStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new StackedPair(NodeType.DEADKEY, NodeType.DEADKEYNAME));
     const deadkey: Rule      = new TokenRule(TokenType.DEADKEY, true);
     const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
     const deadkeyName: Rule  = new DeadkeyNameRule();
@@ -75,18 +75,6 @@ export class DeadkeyStatementRule extends SingleChildRule {
     this.rule = new SequenceRule([
       deadkey, leftBracket, deadkeyName, rightBracket
     ]);
-  }
-
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const deadkeyNode     = tmp.getSoleChildOfType(NodeType.DEADKEY);
-      const deadkeyNameNode = tmp.getSoleChildOfType(NodeType.DEADKEYNAME);
-      deadkeyNode.addChild(deadkeyNameNode);
-      node.addChild(deadkeyNode);
-    }
-    return parseSuccess;
   }
 }
 

@@ -16,7 +16,7 @@ import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { FirstNode, GivenNode, NewNodeOrTree } from "./ast-strategy.js";
+import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-strategy.js";
 
 export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -87,26 +87,14 @@ export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
-export class NormalStoreRule extends SingleChildRule {
+export class NormalStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new StackedPair(NodeType.STORE, NodeType.STORENAME));
     const store: Rule           = new TokenRule(TokenType.STORE, true);
     const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
     const rightBracket: Rule    = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([store, leftBracket, normalStoreName, rightBracket]);
-  }
-
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const storeNode     = tmp.getSoleChildOfType(NodeType.STORE);
-      const storeNameNode = tmp.getSoleChildOfType(NodeType.STORENAME);
-      storeNode.addChild(storeNameNode);
-      node.addChild(storeNode);
-    }
-    return parseSuccess;
   }
 }
 
@@ -208,26 +196,14 @@ export class SystemStoreNameForSetRule extends SingleChildRule {
   }
 }
 
-export class ResetStoreRule extends SingleChildRule {
+export class ResetStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new StackedPair(NodeType.RESET, NodeType.STORENAME));
     const reset: Rule           = new TokenRule(TokenType.RESET, true);
     const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
     const rightBracket: Rule    = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([reset, leftBracket, normalStoreName, rightBracket]);
-  }
-
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const resetNode = tmp.getSoleChildOfType(NodeType.RESET);
-      const storeNameNode = tmp.getSoleChildOfType(NodeType.STORENAME);
-      resetNode.addChild(storeNameNode);
-      node.addChild(resetNode);
-    }
-    return parseSuccess;
   }
 }
 

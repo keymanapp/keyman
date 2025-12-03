@@ -44,6 +44,38 @@ export class GivenNode extends ASTStrategy {
 }
 
 /**
+ * An ASTStrategy that rebuilds the tree as given parent and child nodes
+ */
+export class StackedPair extends ASTStrategy {
+  public constructor(
+    /** the type of the node at which to root the tree */
+    protected readonly parentType: NodeType,
+    /** the type of the child node */
+    protected readonly childType: NodeType
+  ) {
+    super();
+  }
+
+  /**
+   * Rebuilds the tree to consist of the given parent and child nodes
+   *
+   * @param node the tree to be rebuilt
+   * @returns the rebuilt tree, rooted at the given parent node
+   */
+  public apply(node: ASTNode): ASTNode {
+    if (node.numberOfChildren() == 2 &&
+        node.hasSoleChildOfType(this.parentType) &&
+        node.hasSoleChildOfType(this.childType)) {
+      const parentNode = node.removeSoleChildOfType(this.parentType);
+      const childNode  = node.removeSoleChildOfType(this.childType);
+      parentNode.addChild(childNode);
+      node.addChild(parentNode);
+    }
+    return node;
+  };
+}
+
+/**
  * An ASTStrategy that rebuilds the tree to be rooted at a new node
  */
 export class NewNode extends ASTStrategy {
