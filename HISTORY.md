@@ -1026,6 +1026,16 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.245 stable 2025-12-03
+
+* chore(windows): VS2022 patch for stable-18.0 (#15081)
+* maint(resources): use VERSION_ENVIRONMENT var for v18 (#15068)
+* chore(linux): Update debian changelog (#14964)
+* fix(windows): add check a fix for registry datatypes (#15175)
+* chore(linux): Update debian changelog (#15132)
+* feat(windows): update wix to 3.14.1 (#15195)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15219)
+
 ## 18.0.244 stable 2025-10-31
 
 * fix(linux): use `ibus` command to restart ibus (#14975)
