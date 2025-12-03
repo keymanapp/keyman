@@ -7,7 +7,7 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToNewNodeOrTree, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
 import { Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
@@ -17,7 +17,7 @@ import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStore
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { GivenNode, NewNode } from "./ast-strategy.js";
+import { GivenNode, NewNode, NewNodeOrTree } from "./ast-strategy.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -431,9 +431,9 @@ export class GroupStatementRule extends SingleChildRuleWithASTStrategy {
 /**
  * (BNF) groupName: groupNameElement+
  */
-export class GroupNameRule extends SingleChildRuleParseToNewNodeOrTree {
+export class GroupNameRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.GROUPNAME);
+    super(new NewNodeOrTree(NodeType.GROUPNAME));
     const groupNameElement: Rule = new GroupNameElementRule();
     this.rule = new OneOrManyRule(groupNameElement);
   }

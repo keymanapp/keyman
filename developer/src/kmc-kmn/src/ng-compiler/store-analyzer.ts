@@ -11,12 +11,12 @@
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleParseToNewNodeOrTree, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
 import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { FirstNode, GivenNode } from "./ast-strategy.js";
+import { FirstNode, GivenNode, NewNodeOrTree } from "./ast-strategy.js";
 
 export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -110,9 +110,9 @@ export class NormalStoreRule extends SingleChildRule {
   }
 }
 
-export class NormalStoreNameRule extends SingleChildRuleParseToNewNodeOrTree {
+export class NormalStoreNameRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.STORENAME);
+    super(new NewNodeOrTree(NodeType.STORENAME));
     const normalStoreNameElement: Rule = new NormalStoreNameElementRule();
     this.rule = new OneOrManyRule(normalStoreNameElement);
   }
@@ -128,9 +128,9 @@ export class NormalStoreNameElementRule extends SingleChildRule {
   }
 }
 
-export class DeadkeyNameRule extends SingleChildRuleParseToNewNodeOrTree {
+export class DeadkeyNameRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.DEADKEYNAME);
+    super(new NewNodeOrTree(NodeType.DEADKEYNAME));
     const deadkeyNameElement: Rule = new DeadkeyNameElementRule();
     this.rule = new OneOrManyRule(deadkeyNameElement);
   }

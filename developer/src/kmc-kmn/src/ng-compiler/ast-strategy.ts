@@ -69,6 +69,38 @@ export class NewNode extends ASTStrategy {
 }
 
 /**
+ * An ASTStrategy that adds either a single new node or builds a tree rooted
+ * at a new node, depending on the number of children found (one or more)
+ */
+export class NewNodeOrTree extends ASTStrategy {
+  public constructor(
+    /** the type of the new node at which to root the tree */
+    protected readonly nodeType: NodeType
+  ) {
+    super();
+  }
+  /**
+   * Adds a single new node of the given type (for one child found) or
+   * rearranges the tree to be rooted at a new node of the given type
+   *
+   * @param node the tree to be rebuilt
+   * @returns the rebuilt tree, rooted at the first node found
+   */
+  public apply(node: ASTNode): ASTNode {
+    const children = node.removeChildren();
+    // two structures depending on number of children
+    if (children.length === 1) {
+      node.addNewChildWithToken(this.nodeType, children[0].token);
+    } else {
+      const newNode: ASTNode = new ASTNode(this.nodeType);
+      newNode.addChildren(children);
+      node.addChild(newNode);
+    }
+    return node;
+  };
+}
+
+/**
  * An ASTStrategy that rebuilds the tree to be rooted at the first node found
  */
 export class FirstNode extends ASTStrategy {
