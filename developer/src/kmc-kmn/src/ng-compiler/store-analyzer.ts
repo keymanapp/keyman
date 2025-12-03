@@ -11,11 +11,12 @@
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleParseToNewNodeOrTree } from "./recursive-descent.js";
-import { SingleChildRule, SingleChildRuleParseToTreeFromFirstNode, SingleChildRuleParseToTreeFromGivenNode, SequenceRule, TokenRule } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleParseToNewNodeOrTree, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
+import { SingleChildRule, SingleChildRuleParseToTreeFromFirstNode, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
+import { GivenNode } from "./ast-strategy.js";
 
 export class SystemStoreAssignRule extends SingleChildRuleParseToTreeFromFirstNode {
   public constructor() {
@@ -76,9 +77,9 @@ export class SystemStoreNameRule extends AlternateTokenRule {
   }
 }
 
-export class NormalStoreAssignRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.STORE);
+    super(new GivenNode(NodeType.STORE));
     const normalStore: Rule = new NormalStoreRule();
     const text: Rule        = new TextRule();
     const manyText: Rule    = new ManyRule(text);
@@ -154,9 +155,9 @@ export class StoreNameRule extends SingleChildRule {
   }
 }
 
-export class SetNormalStoreRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class SetNormalStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.SET);
+    super(new GivenNode(NodeType.SET));
     const set: Rule             = new TokenRule(TokenType.SET, true);
     const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
@@ -176,9 +177,9 @@ export class SetNormalStoreRule extends SingleChildRuleParseToTreeFromGivenNode 
   }
 }
 
-export class SetSystemStoreRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class SetSystemStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.SET);
+    super(new GivenNode(NodeType.SET));
     const set: Rule                   = new TokenRule(TokenType.SET, true);
     const leftBracket: Rule           = new TokenRule(TokenType.LEFT_BR);
     const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();

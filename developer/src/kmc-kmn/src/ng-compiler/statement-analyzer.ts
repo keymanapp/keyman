@@ -10,11 +10,12 @@
 
 import { TokenType } from "./token-type.js";
 import { PlainTextRule } from "./kmn-analyzer.js";
-import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode, TokenRule } from "./recursive-descent.js";
+import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleWithASTStrategy, TokenRule } from "./recursive-descent.js";
 import { DeadkeyNameRule, NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
+import { GivenNode } from "./ast-strategy.js";
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   protected leftBracket: Rule;
@@ -111,14 +112,14 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
-abstract class AbstractShortcutRule extends SingleChildRuleParseToTreeFromGivenNode {
+abstract class AbstractShortcutRule extends SingleChildRuleWithASTStrategy {
   protected leftBracket: Rule;
   protected plainText: Rule;
   protected oneOrManyPlainText: Rule;
   protected rightBracket: Rule;
 
   public constructor(nodeType: NodeType) {
-    super(nodeType);
+    super(new GivenNode(nodeType));
     this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
     this.plainText          = new PlainTextRule();
     this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
@@ -177,7 +178,7 @@ export class IfStatementRule extends SingleChildRule {
   }
 }
 
-abstract class AbstractIfStoreStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTStrategy {
   protected ifRule: Rule;
   protected leftBracket: Rule;
   protected comparison: Rule;
@@ -186,7 +187,7 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRuleParseToTreeFr
   protected oneOrManyPlainText: Rule;
 
   public constructor() {
-    super(NodeType.IF);
+    super(new GivenNode(NodeType.IF));
     this.ifRule             = new TokenRule(TokenType.IF, true);
     this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
     this.comparison         = new ComparisonRule();
@@ -247,9 +248,9 @@ export class ComparisonRule extends SingleChildRule {
   }
 }
 
-export class ContextStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class ContextStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.CONTEXT);
+    super(new GivenNode(NodeType.CONTEXT));
     const context: Rule       = new TokenRule(TokenType.CONTEXT, true);
     const leftBracket: Rule   = new TokenRule(TokenType.LEFT_BR);
     const offset: Rule        = new OffsetRule();
@@ -263,9 +264,9 @@ export class ContextStatementRule extends SingleChildRuleParseToTreeFromGivenNod
   }
 }
 
-export class IndexStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.INDEX);
+    super(new GivenNode(NodeType.INDEX));
     const index: Rule           = new TokenRule(TokenType.INDEX, true);
     const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
@@ -301,9 +302,9 @@ export class OffsetRule extends SingleChildRule {
   };
 }
 
-export class OutsStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class OutsStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.OUTS);
+    super(new GivenNode(NodeType.OUTS));
     const outs: Rule         = new TokenRule(TokenType.OUTS, true);
     const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
     const storeName: Rule    = new StoreNameRule();

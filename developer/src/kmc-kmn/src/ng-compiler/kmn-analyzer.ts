@@ -7,8 +7,8 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToNewNodeOrTree } from "./recursive-descent.js";
-import { Rule, SequenceRule, SingleChildRule, SingleChildRuleParseToTreeFromGivenNode } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleParseToNewNodeOrTree, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
+import { Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { SingleChildRuleParseToTreeFromNewNode, TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
@@ -17,6 +17,7 @@ import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStore
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
+import { GivenNode } from "./ast-strategy.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -365,9 +366,9 @@ export class RuleBlockRule extends SingleChildRule {
 /**
  * (BNF) beginStatement: BEGIN entryPoint? CHEVRON useStatement
  */
-export class BeginStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class BeginStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.BEGIN);
+    super(new GivenNode(NodeType.BEGIN));
     const begin: Rule          = new TokenRule(TokenType.BEGIN, true);
     const entryPointRule: Rule = new EntryPointRule();
     const optEntryPoint: Rule  = new OptionalRule(entryPointRule);
@@ -394,9 +395,9 @@ export class EntryPointRule extends SingleChildRule {
 /**
  * (BNF) useStatement: USE LEFT_BR groupName RIGHT_BR
  */
-export class UseStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class UseStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.USE);
+    super(new GivenNode(NodeType.USE));
     const use: Rule          = new TokenRule(TokenType.USE, true);
     const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
     const groupName: Rule    = new GroupNameRule();
@@ -408,9 +409,9 @@ export class UseStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
 /**
  * (BNF) groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
  */
-export class GroupStatementRule extends SingleChildRuleParseToTreeFromGivenNode {
+export class GroupStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super(NodeType.GROUP);
+    super(new GivenNode(NodeType.GROUP));
     const group: Rule              = new TokenRule(TokenType.GROUP, true);
     const leftBracket: Rule        = new TokenRule(TokenType.LEFT_BR);
     const groupName: Rule          = new GroupNameRule();

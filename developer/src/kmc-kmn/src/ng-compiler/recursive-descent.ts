@@ -12,6 +12,7 @@ import { TokenBuffer } from "./token-buffer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TOKEN_TO_NODE } from "./token-to-node.js";
+import { ASTStrategy } from "./ast-strategy.js";
 
 /**
  * Rule is the abstract base class of all the recursive-descent
@@ -45,33 +46,18 @@ export abstract class SingleChildRule extends Rule {
   }
 }
 
-/**
- * SingleChildRuleParseToTreeFromGivenNode extends SingleChildRule with a parse()
- * method that builds a tree rooted at the given node.
- */
-export abstract class SingleChildRuleParseToTreeFromGivenNode extends SingleChildRule {
-  protected nodeType: NodeType = null;
-
-  public constructor(nodeType: NodeType) {
+export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
+  public constructor(
+    protected readonly strategy: ASTStrategy
+  ) {
     super();
-    this.nodeType = nodeType;
   }
 
-  /**
-   * Parses the stored rule. If successful, rearranges the resulting tree
-   * to be rooted at the node of given type.
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess && tmp.hasSoleChildOfType(this.nodeType)) {
-      const givenNode: ASTNode = tmp.removeSoleChildOfType(this.nodeType);
-      givenNode.addChildren(tmp.getChildren());
-      node.addChild(givenNode);
+    if (parseSuccess) {
+      node.addChild(this.strategy.apply(tmp).getSoleChild());
     }
     return parseSuccess;
   };
