@@ -12,15 +12,15 @@ import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleParseToNewNodeOrTree, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
-import { SingleChildRule, SingleChildRuleParseToTreeFromFirstNode, SequenceRule, TokenRule } from "./recursive-descent.js";
+import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { GivenNode } from "./ast-strategy.js";
+import { FirstNode, GivenNode } from "./ast-strategy.js";
 
-export class SystemStoreAssignRule extends SingleChildRuleParseToTreeFromFirstNode {
+export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new FirstNode());
     const systemStore: Rule = new SystemStoreRule();
     const text: Rule        = new TextRule();
     const manyText: Rule    = new ManyRule(text);
@@ -287,9 +287,9 @@ export class ShiftFreesCapsRule extends CapsLockStatementRule {
   }
 }
 
-export class HeaderAssignRule extends SingleChildRuleParseToTreeFromFirstNode {
+export class HeaderAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new FirstNode());
     const headerName: Rule  = new HeaderNameRule();
     const headerValue: Rule = new HeaderValueRule();
     this.rule = new SequenceRule([headerName, headerValue]);

@@ -67,3 +67,24 @@ export class NewNode extends ASTStrategy {
     return node;
   };
 }
+
+/**
+ * An ASTStrategy that rebuilds the tree to be rooted at the first node found
+ */
+export class FirstNode extends ASTStrategy {
+  /**
+   * Rebuilds the tree to be rooted at the first node found
+   * or leaves the tree unchanged if there are no children
+   *
+   * @param node the tree to be rebuilt
+   * @returns the rebuilt tree, rooted at the first node found
+   */
+  public apply(node: ASTNode): ASTNode {
+    if (node.hasChild()) {
+      const firstNode: ASTNode = node.removeFirstChild();
+      firstNode.addChildren(node.removeChildren());
+      node.addChild(firstNode);
+    }
+    return node;
+  };
+}

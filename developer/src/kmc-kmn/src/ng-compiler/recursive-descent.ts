@@ -104,35 +104,6 @@ export abstract class SingleChildRuleParseToNewNodeOrTree extends SingleChildRul
 }
 
 /**
- * SingleChildRuleParseToTreeFromFirstNode extends SingleChildRule with a parse()
- * method that builds a tree rooted at the first node found.
- */
-export abstract class SingleChildRuleParseToTreeFromFirstNode extends SingleChildRule {
-  public constructor() {
-    super();
-  }
-
-  /**
-   * Parses the stored rule. If successful, rearranges the resulting tree
-   * to be rooted at the first node found.
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess && tmp.hasChild()) {
-      const firstNode: ASTNode = tmp.removeFirstChild();
-      firstNode.addChildren(tmp.getChildren());
-      node.addChild(firstNode);
-    }
-    return parseSuccess;
-  };
-}
-
-/**
  * MultiChildRule is the abstract base class of all the recursive-descent
  * syntax analyzer rules with multiple children.
  */
