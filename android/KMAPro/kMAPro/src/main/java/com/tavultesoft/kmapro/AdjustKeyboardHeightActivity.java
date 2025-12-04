@@ -162,11 +162,9 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   /**
    * Create a string showing the keyboard height as percentages for both orientations.
    * @param context Context
-   * @param portraitLabel Label for portrait (e.g., "Portrait")
-   * @param landscapeLabel Label for landscape (e.g., "Landscape")
    * @return String in format "100% Portrait | 100% Landscape"
    */
-  public static String createKeyboardHeightString(Context context, String portraitLabel, String landscapeLabel) {
+  public static String createKeyboardHeightString(Context context) {
     android.content.SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
     int landscapeDefault = KMManager.getDefaultKeyboardHeight(Configuration.ORIENTATION_LANDSCAPE);
@@ -178,35 +176,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     int landscapePercent = calculatePercentage(landscapeHeight, landscapeDefault);
     int portraitPercent = calculatePercentage(portraitHeight, portraitDefault);
 
-    return context.getString(R.string.keyboard_height_format, portraitPercent, portraitLabel, landscapePercent, landscapeLabel);
-  }
-
-  /**
-   * Create a string showing keyboard height percentages for both orientations,
-   * using a live (unsaved) height for the specified orientation.
-   * @param context Context
-   * @param liveHeight Current keyboard height in pixels (not yet saved)
-   * @param liveOrientation Orientation for liveHeight (ORIENTATION_PORTRAIT or ORIENTATION_LANDSCAPE)
-   * @param portraitLabel Label for portrait
-   * @param landscapeLabel Label for landscape
-   * @return String in format "100% Portrait | 100% Landscape"
-   */
-  private static String createKeyboardHeightString(Context context, int liveHeight, int liveOrientation,
-                                                   String portraitLabel, String landscapeLabel) {
-    int liveDefaultHeight = KMManager.getDefaultKeyboardHeight(liveOrientation);
-    int livePercent = calculatePercentage(liveHeight, liveDefaultHeight);
-
-    int portraitPercent;
-    int landscapePercent;
-    if (liveOrientation == Configuration.ORIENTATION_PORTRAIT) {
-      portraitPercent = livePercent;
-      landscapePercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_LANDSCAPE);
-    } else {
-      landscapePercent = livePercent;
-      portraitPercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_PORTRAIT);
-    }
-
-    return context.getString(R.string.keyboard_height_format, portraitPercent, portraitLabel, landscapePercent, landscapeLabel);
+    return context.getString(R.string.keyboard_height_format, portraitPercent, landscapePercent);
   }
 
   /**
@@ -231,13 +201,20 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
    */
   private String createLiveKeyboardHeightString(Context context) {
     int currentOrientation = KMManager.getOrientation(context);
-    return createKeyboardHeightString(
-        context,
-        currentHeight,
-        currentOrientation,
-        getString(R.string.portrait),
-        getString(R.string.landscape)
-    );
+    int liveDefaultHeight = KMManager.getDefaultKeyboardHeight(currentOrientation);
+    int livePercent = calculatePercentage(currentHeight, liveDefaultHeight);
+
+    int portraitPercent;
+    int landscapePercent;
+    if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+      portraitPercent = livePercent;
+      landscapePercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_LANDSCAPE);
+    } else {
+      landscapePercent = livePercent;
+      portraitPercent = getKeyboardHeightPercentage(context, Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    return context.getString(R.string.keyboard_height_format, portraitPercent, landscapePercent);
   }
 
   @Override
