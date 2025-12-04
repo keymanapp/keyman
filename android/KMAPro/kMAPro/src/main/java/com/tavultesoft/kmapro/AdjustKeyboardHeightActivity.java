@@ -26,29 +26,24 @@ import com.keyman.engine.KMManager;
  * is saved in shared preferences.
  */
 public class AdjustKeyboardHeightActivity extends BaseActivity {
-  private static final String TAG = "AdjustKbdHeight";
   public static final String adjustKeyboardHeightKey = "AdjustKeyboardHeight";
 
-  private static Button resetButton = null;
-  private static ImageView sampleKeyboard = null;
-  private static TextView percentageDisplay = null;
-
-  // Keeps track of the adjusted keyboard height for saving
-  private static int currentHeight = 0;
-  private static ViewGroup.LayoutParams layoutParams;
+  private Button resetButton;
+  private ImageView sampleKeyboard;
+  private TextView percentageDisplay;
+  private int currentHeight;
+  private ViewGroup.LayoutParams layoutParams;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    final Context context = this;
 
     setContentView(R.layout.activity_adjust_keyboard_height);
 
     setupEdgeToEdge(R.id.adjust_keyboard_layout);
     setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.titlebar);
+    Toolbar toolbar = findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
@@ -61,33 +56,27 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
       actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.keyman_blue)));
     }
 
-    TextView adjustKeyboardHeightActivityTitle = (TextView) findViewById(R.id.bar_title);
-
-    String titleStr = getString(R.string.adjust_keyboard_height);
+    TextView adjustKeyboardHeightActivityTitle = findViewById(R.id.bar_title);
     adjustKeyboardHeightActivityTitle.setTextColor(ContextCompat.getColor(this, R.color.ms_white));
-    adjustKeyboardHeightActivityTitle.setText(titleStr);
+    adjustKeyboardHeightActivityTitle.setText(getString(R.string.adjust_keyboard_height));
 
-    sampleKeyboard = (ImageView) findViewById(R.id.sample_keyboard);
-    percentageDisplay = (TextView) findViewById(R.id.keyboard_height_percentage);
+    sampleKeyboard = findViewById(R.id.sample_keyboard);
+    percentageDisplay = findViewById(R.id.keyboard_height_percentage);
     View resizeHandle = findViewById(R.id.resize_handle);
 
     layoutParams = sampleKeyboard.getLayoutParams();
-    currentHeight = KMManager.getKeyboardHeight(context);
-    refreshSampleKeyboard(context);
+    currentHeight = KMManager.getKeyboardHeight(this);
+    refreshSampleKeyboard(this);
 
-    resetButton = (Button) findViewById(R.id.reset_to_defaults);
+    resetButton = findViewById(R.id.reset_to_defaults);
     resetButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        // Clear the keyboard height preferences to reset
-        KMManager.applyKeyboardHeight(context, KMManager.KeyboardHeight_Reset);
-
-        // Restore default height
-        currentHeight = KMManager.getKeyboardHeight(context);
-        refreshSampleKeyboard(context);
+        KMManager.applyKeyboardHeight(AdjustKeyboardHeightActivity.this, KMManager.KeyboardHeight_Reset);
+        currentHeight = KMManager.getKeyboardHeight(AdjustKeyboardHeightActivity.this);
+        refreshSampleKeyboard(AdjustKeyboardHeightActivity.this);
       }
     });
 
-    // Set up touch listener on both the resize handle and keyboard container
     View.OnTouchListener touchListener = new View.OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent event) {
@@ -96,37 +85,30 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             view.setPressed(true);
             break;
           case MotionEvent.ACTION_MOVE:
-            // Get the touch position relative to the screen bottom
             int[] location = new int[2];
             sampleKeyboard.getLocationOnScreen(location);
             int viewBottom = location[1] + sampleKeyboard.getHeight();
             int touchY = (int) event.getRawY();
-
-            // Calculate height with bounds checking
-            currentHeight = calculateKeyboardHeightFromTouch(context, touchY, viewBottom);
-
-            refreshSampleKeyboard(context);
+            currentHeight = calculateKeyboardHeightFromTouch(AdjustKeyboardHeightActivity.this, touchY, viewBottom);
+            refreshSampleKeyboard(AdjustKeyboardHeightActivity.this);
             break;
           case MotionEvent.ACTION_UP:
           case MotionEvent.ACTION_CANCEL:
             view.setPressed(false);
-            // Save the currentHeight when the user releases
-            KMManager.applyKeyboardHeight(context, currentHeight);
+            KMManager.applyKeyboardHeight(AdjustKeyboardHeightActivity.this, currentHeight);
             break;
         }
         return true;
       }
     };
 
-    // Apply touch listener to both the resize handle and keyboard container
-    // This allows dragging from anywhere in the keyboard preview area
     resizeHandle.setOnTouchListener(touchListener);
     sampleKeyboard.setOnTouchListener(touchListener);
   }
 
   /**
-   * Refresh the layout for the sample keyboard and update percentage display
-   * @param context
+   * Refresh the layout for the sample keyboard and update percentage display.
+   * @param context Context
    */
   private void refreshSampleKeyboard(Context context) {
     if (layoutParams != null && sampleKeyboard != null) {
@@ -142,7 +124,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   }
 
   /**
-   * Get keyboard height as percentage of default for current orientation
+   * Get keyboard height as percentage of default for current orientation.
    * @param context Context
    * @return Percentage (e.g., 120 for 120%)
    */
@@ -200,8 +182,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   }
 
   /**
-   * Create a string showing keyboard height percentages for both orientations.
-   * Uses a live (unsaved) height for the specified orientation.
+   * Create a string showing keyboard height percentages for both orientations,
+   * using a live (unsaved) height for the specified orientation.
    * @param context Context
    * @param liveHeight Current keyboard height in pixels (not yet saved)
    * @param liveOrientation Orientation for liveHeight (ORIENTATION_PORTRAIT or ORIENTATION_LANDSCAPE)
@@ -228,11 +210,11 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   }
 
   /**
-   * Calculate keyboard height from touch Y coordinate, clamped to min/max bounds.
+   * Calculate keyboard height from touch Y coordinate.
    * @param context Context
    * @param touchY Touch Y coordinate in screen coordinates
    * @param viewBottom Bottom Y coordinate of keyboard view
-   * @return Keyboard height in pixels
+   * @return Keyboard height in pixels, clamped to min/max bounds
    */
   private static int calculateKeyboardHeightFromTouch(Context context, int touchY, int viewBottom) {
     int height = viewBottom - touchY;
@@ -242,8 +224,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   }
 
   /**
-   * Create a string showing keyboard height percentages for both orientations.
-   * Uses the current (unsaved) height for the active orientation and saved height for the other.
+   * Create a string showing keyboard height percentages for both orientations,
+   * using the current (unsaved) height for the active orientation.
    * @param context Context
    * @return String in format "100% Portrait | 100% Landscape"
    */
