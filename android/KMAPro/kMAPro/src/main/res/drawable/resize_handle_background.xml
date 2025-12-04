@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Resize handle bar background with gradient and grip lines -->
+<!-- Resize handle bar background with grip lines -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Base background with Keyman blue gradient -->
+    <!-- Base background with Keyman blue -->
     <item>
         <shape android:shape="rectangle">
-            <gradient
-                android:type="linear"
-                android:angle="135"
-                android:startColor="#1565C0"
-                android:centerColor="@color/keyman_blue"
-                android:endColor="#1565C0" />
+            <solid android:color="@color/keyman_blue" />
             <corners
                 android:topLeftRadius="8dp"
                 android:topRightRadius="8dp" />

@@ -212,6 +212,9 @@
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="landscape" comment="Landscape orientation label">Landscape</string>
 
+  <!-- Context: Keyboard height display format. %1$d = portrait percentage, %2$s = portrait label, %3$d = landscape percentage, %4$s = landscape label -->
+  <string name="keyboard_height_format" comment="Format for displaying keyboard height percentages">%1$d%% %2$s | %3$d%% %4$s</string>
+
   <!-- Context: Adjust Longpress Delay Time menu -->
   <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Delay Time: %1$.1f seconds</string>
 
