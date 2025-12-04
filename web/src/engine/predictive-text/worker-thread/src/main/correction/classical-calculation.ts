@@ -1,5 +1,3 @@
-import { SENTINEL_CODE_UNIT } from "@keymanapp/models-templates";
-
 /**
  * The human-readable names for legal edit-operation edges on the edit path.
  */
@@ -859,23 +857,6 @@ export class ClassicalDistanceCalculation<
         this.propagateUpdateFrom(buffer, nextInputIndex, nextMatchIndex, transpositionCost, (buffer.diagonalWidth - 1) + nextMatchIndex - nextInputIndex);
       }
     }
-  }
-
-  /* Is unused! */
-  get mapKey(): string {
-    let inputString = this.inputSequence.join('');
-    let matchString =  this.matchSequence.join('');
-    return inputString + SENTINEL_CODE_UNIT + matchString + SENTINEL_CODE_UNIT + this.diagonalWidth;
-  }
-
-  /* Is just a unit-test helper! */
-  get lastInputEntry(): TUnit {
-    return this.inputSequence[this.inputSequence.length-1];
-  }
-
-  /* Is just a unit-test helper! */
-  get lastMatchEntry(): TUnit {
-    return this.matchSequence[this.matchSequence.length-1];
   }
 
   // /**
