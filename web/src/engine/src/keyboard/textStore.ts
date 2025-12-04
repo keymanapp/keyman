@@ -123,7 +123,7 @@ export abstract class TextStore {
     this.setTextAfterCaret(original.getTextAfterCaret());
 
     // Also, restore the deadkeys!
-    // TODO-web-core: km_core_context_set or similar?
+    // TODO-web-core: km_core_context_set or similar? (#15291)
     this.setDeadkeys(original._deadkeys);
   }
 

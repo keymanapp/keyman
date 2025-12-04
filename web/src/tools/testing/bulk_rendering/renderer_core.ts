@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
 import { DeviceDetector } from 'keyman/engine/main';
 import { type DeviceSpec } from 'keyman/common/web-utils';
@@ -141,22 +142,22 @@ export class BatchRenderer {
   }
 
   private processKeyboard(kbd: KeyboardData) {
-    let p: Promise<any> = keyman.setActiveKeyboard(kbd.InternalName);
-    const formFactor = keyman.config.hostDevice.formFactor;
-    let isMobile = formFactor != 'desktop';
+    const p: Promise<any> = keyman.setActiveKeyboard(kbd.InternalName);
+    const {formFactor} = keyman.config.hostDevice;
+    const isMobile = formFactor != 'desktop';
 
     // Establish common keyboard header info.
-    let divSummary = document.createElement('div');
+    const divSummary = document.createElement('div');
     // Establishes a linkable target for this keyboard's data.
     divSummary.id = "summary-" + kbd.InternalName;
     BatchRenderer.divMaster.insertAdjacentElement('afterbegin', divSummary);
 
     // A nice, closure-friendly reference for use in our callbacks.
-    let renderer = this;
+    const renderer = this;
 
     // Once the keyboard's loaded, we can really get started.
     return p.then(function() {
-      let box: HTMLDivElement = keyman.osk._Box;
+      const box: HTMLDivElement = keyman.osk._Box;
 
       BatchRenderer.boundingRect = box.getBoundingClientRect();
 
@@ -167,7 +168,7 @@ export class BatchRenderer {
 
       divSummary.appendChild(renderer.createKeyboardHeader(kbd, formFactor, true));
 
-      let divRenders = document.createElement('div');
+      const divRenders = document.createElement('div');
       divSummary.appendChild(divRenders);
 
       // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
@@ -184,7 +185,7 @@ export class BatchRenderer {
       // Note:  vkbd will be null for keyboards with desktop help-text, such as sil_euro_latin.
       layers = layers || Object.keys(keyman.osk.vkbd?.layerGroup.layers);
 
-      let renderLayer = function(i: number) {
+      const renderLayer = function(i: number) {
         return new Promise(function(resolve) {
           // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
           if(keyman.osk.vkbd) {

@@ -20,7 +20,7 @@ export class KMXKeyboard {
         {
           scope: KM_CORE_OPTION_SCOPE.OPT_ENVIRONMENT,
           key: KM_CORE_KMX_ENV.PLATFORM,
-          // TODO-web-core: Turn touch off for non-touch targets; read proper platform string from web
+          // TODO-web-core: Turn touch off for non-touch targets; read proper platform string from web (#15289)
           value: "web iphone ipad androidphone androidtablet mobile touch hardware android phone"
         }, {
           scope: KM_CORE_OPTION_SCOPE.OPT_ENVIRONMENT,
@@ -54,7 +54,7 @@ export class KMXKeyboard {
   }
 
   public constructKeyEvent(key: ActiveKey | ActiveSubKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
-    // TODO-web-core: Implement this method
+    // TODO-web-core: Implement this method (#15290)
     return null;
   }
 
@@ -85,7 +85,7 @@ export class KMXKeyboard {
   }
 
   public get isChiral(): boolean {
-    // TODO-web-core: Implement this method
+    // TODO-web-core: Implement this method (#15290)
     return false;
   }
 
@@ -94,18 +94,18 @@ export class KMXKeyboard {
    * @return  {boolean}
    */
   public get emulatesAltGr(): boolean {
-    // TODO-web-core: Implement this method
+    // TODO-web-core: Implement this method (#15290)
     return false;
   }
 
   /**
-   * @param       {number}    eventCode     event code (16,17,18) or 0 // TODO-web-core: document meaning of these!
+   * @param       {number}    eventCode     event code (16,17,18) or 0 // TODO-web-core: document meaning of these! (#15290)
    * @param       {TextStore} textStore     textStore
    * @param       {number}    data          1 or 0
    * Notifies keyboard of keystroke or other event
    */
   public notify(eventCode: 16|17|18|0, textStore: TextStore, data: number) { // I2187
-    // TODO-web-core: do we need to support this?
+    // TODO-web-core: do we need to support this? (#15290)
   }
 
 }
