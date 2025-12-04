@@ -107,7 +107,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     adjustKeyboardHeight.setTitle(getString(R.string.adjust_keyboard_height));
     adjustKeyboardHeight.setWidgetLayoutResource(R.layout.preference_height_icon_layout);
     // Set summary to show current keyboard height percentages
-    String heightPercentages = KMManager.createKeyboardHeightString(
+    String heightPercentages = AdjustKeyboardHeightActivity.createKeyboardHeightString(
         context,
         getString(R.string.portrait),
         getString(R.string.landscape)
@@ -277,7 +277,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     languagesPreference.setTitle(getInstalledLanguagesText());
 
     // Update the keyboard height percentages
-    String heightPercentages = KMManager.createKeyboardHeightString(
+    String heightPercentages = AdjustKeyboardHeightActivity.createKeyboardHeightString(
         context,
         getString(R.string.portrait),
         getString(R.string.landscape)
