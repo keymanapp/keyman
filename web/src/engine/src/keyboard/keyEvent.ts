@@ -112,7 +112,7 @@ export class KeyEvent implements KeyEventSpec {
   isSynthetic: boolean = true;
 
   public constructor(keyEventSpec: KeyEventSpec) {
-    for(let key in keyEventSpec) {
+    for(const key in keyEventSpec) {
       // @ts-ignore
       if(keyEventSpec[key] !== undefined) {
         // @ts-ignore
@@ -122,16 +122,15 @@ export class KeyEvent implements KeyEventSpec {
   }
 
   public static constructNullKeyEvent(device: DeviceSpec): KeyEvent {
-    const keyEvent = new KeyEvent({
-      Lcode: 0,
-      kName: '',
-      device: device,
-      Lstates: undefined,
-      Lmodifiers: undefined,
-      vkCode: undefined,
-      LisVirtualKey: undefined
-    });
-    return keyEvent;
+    return new KeyEvent({
+          Lcode: 0,
+          kName: '',
+          device: device,
+          Lstates: undefined,
+          Lmodifiers: undefined,
+          vkCode: undefined,
+          LisVirtualKey: undefined
+        });
   }
 
   get isModifier(): boolean {

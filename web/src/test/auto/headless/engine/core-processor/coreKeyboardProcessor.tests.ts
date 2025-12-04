@@ -6,7 +6,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import { KM_Core, km_core_context, km_core_keyboard, km_core_state, KM_CORE_CT, KM_CORE_STATUS, km_core_context_items } from 'keyman/engine/core-adapter';
 import { coreurl, loadKeyboardBlob } from '../loadKeyboardHelper.js';
-import { Deadkey, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { Codes, Deadkey, KeyEvent, KMXKeyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
 
 describe('CoreKeyboardProcessor', function () {
@@ -486,5 +486,52 @@ describe('CoreKeyboardProcessor', function () {
       assert.equal(items.get(4).type, KM_CORE_CT.END, 'Item 4 should be END');
       result.delete();
     });
+  });
+
+  describe('processKeystroke', function () {
+    let process_event_spy: any;
+
+    beforeEach(async function () {
+      coreProcessor = new CoreKeyboardProcessor();
+      await coreProcessor.init(coreurl);
+      state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
+      context = KM_Core.instance.state_context(state);
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+      sandbox = null;
+    })
+
+    for (const eventType of ['keydown', 'keyup']) {
+      const isKeyDown = eventType === 'keydown';
+
+      it(`passes the correct value for a ${eventType} event`, function () {
+        // Setup
+        const keyEvent = new KeyEvent({
+          Lcode: Codes.keyCodes.K_A,
+          Lmodifiers: Codes.modifierCodes.SHIFT,
+          Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+          LisVirtualKey: true,
+          device: null,
+          kName: 'K_A'
+        });
+        keyEvent.source = { type: eventType };
+
+        const coreKeyboard = loadKeyboard('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
+        const kmxKeyboard = new KMXKeyboard(coreKeyboard);
+        sandbox.replaceGetter(coreProcessor, 'activeKeyboard', () => { return kmxKeyboard; });
+        // We return a non-ok value just so that we can return early from
+        // processKeyStroke()
+        process_event_spy = sandbox.spy(KM_Core.instance, 'process_event');
+
+        // Execute
+        coreProcessor.processKeystroke(keyEvent, new SyntheticTextStore());
+
+        // Verify - check fourth argument (is_key_down)
+        assert.equal(process_event_spy.args[0][3], isKeyDown);
+      });
+    }
   });
 });

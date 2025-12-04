@@ -11,6 +11,7 @@ import {
   StateKeyMap,
   Deadkey
 } from "keyman/engine/keyboard";
+import { KM_CORE_EVENT_FLAG } from '../core-adapter/KM_Core.js';
 
 export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   public activeKeyboard: Keyboard;
@@ -261,8 +262,8 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
 
     this.applyContextFromTextStore(coreContext, textStore);
 
-    const status = KM_Core.instance.process_event(activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, 1, 0);
-    // TODO-web-core: properly set keyDown and flags
+    const status = KM_Core.instance.process_event(activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, keyEvent.source?.type === 'keydown', KM_CORE_EVENT_FLAG.DEFAULT);
+    // TODO-web-core: properly set flags
     if (status != KM_CORE_STATUS.OK) {
       console.error('KeymanWeb: km_core_process_event failed with status: ' + status);
       return null;
