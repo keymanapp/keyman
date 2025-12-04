@@ -341,11 +341,11 @@ public final class KMManager {
   public static final String KMDefault_LexicalModelPackages = "models";
 
   // Default Keyboard Info
-  public static final String KMDefault_PackageID = "sil_euro_latin";
-  public static final String KMDefault_KeyboardID = "sil_euro_latin";
-  public static final String KMDefault_LanguageID = "en";
-  public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
-  public static final String KMDefault_LanguageName = "English";
+  public static final String KMDefault_PackageID = "arabic_izza";
+  public static final String KMDefault_KeyboardID = "arabic_izza";
+  public static final String KMDefault_LanguageID = "ar";
+  public static final String KMDefault_KeyboardName = "Arabic Izza";
+  public static final String KMDefault_LanguageName = "Arabic";
   public static final String KMDefault_KeyboardFont = "DejaVuSans.ttf";
   public static final String KMDefault_KeyboardKMP = KMDefault_PackageID + FileUtils.KEYMANPACKAGE;
 

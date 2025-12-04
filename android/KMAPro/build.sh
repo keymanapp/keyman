@@ -40,7 +40,7 @@ if builder_is_debug_build; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 
-KEYBOARD_PACKAGE_ID="sil_euro_latin"
+KEYBOARD_PACKAGE_ID="arabic_izza"
 KEYBOARDS_TARGET="android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 MODEL_PACKAGE_ID="nrc.en.mtnt"
 MODELS_TARGET="android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
