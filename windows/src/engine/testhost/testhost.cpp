@@ -306,14 +306,18 @@ Fail(PCWSTR message) {
   MessageBox(0, buf.c_str(), L"Error starting Keyman", MB_OK | MB_ICONERROR);
 }
 
-#ifdef _WIN64
-#define KEYMAN32 "keyman64.dll"
-#define KEYMAN32_DEBUG "keyman32" / "bin" / "x64" / "Debug" / "keyman64.dll"
-#define KEYMAN32_RELEASE "keyman32" / "bin" / "x64" / "Release" / "keyman64.dll"
+#if defined(_M_ARM64)
+  #define KEYMAN32 "keymanarm64.dll"
+  #define KEYMAN32_DEBUG "keyman32" / "bin" / "arm64" / "Debug" / "keymanarm64.dll"
+  #define KEYMAN32_RELEASE "keyman32" / "bin" / "arm64" / "Release" / "keyman64.dll"
+#elif defined(_M_X64)
+  #define KEYMAN32 "keyman64.dll"
+  #define KEYMAN32_DEBUG "keyman32" / "bin" / "x64" / "Debug" / "keyman64.dll"
+  #define KEYMAN32_RELEASE "keyman32" / "bin" / "x64" / "Release" / "keyman64.dll"
 #else
-#define KEYMAN32 "keyman32.dll"
-#define KEYMAN32_DEBUG "keyman32" / "bin" / "Win32" / "Debug" / "keyman32.dll"
-#define KEYMAN32_RELEASE "keyman32" / "bin" / "Win32" / "Release" / "keyman32.dll"
+  #define KEYMAN32 "keyman32.dll"
+  #define KEYMAN32_DEBUG "keyman32" / "bin" / "Win32" / "Debug" / "keyman32.dll"
+  #define KEYMAN32_RELEASE "keyman32" / "bin" / "Win32" / "Release" / "keyman32.dll"
 #endif
 
 bool

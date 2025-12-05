@@ -1,5 +1,5 @@
 /*
-  Name:             keymanx64
+  Name:             keymanhp
   Copyright:        Copyright (C) SIL International.
   Documentation:
   Description:
@@ -21,8 +21,10 @@
                     17 Jan 2013 - mcdurdin - I3758 - V9.0 - keymanx64 can find incorrect window handle for keyman.exe
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
-#include "keymanx64.h"   // I5136
-#include "../../../../common/windows/cpp/include/keymansentry.h"
+#include "keymanhp.h"   // I5136
+#if defined(_M_X64)
+  #include "../../../../common/windows/cpp/include/keymansentry.h"
+#endif
 
 // Forward declarations of functions included in this code module
 
@@ -62,25 +64,36 @@ HANDLE hWatcherThreadTerminateEvent = NULL;
 BOOL KeymanStarted = FALSE;
 
 // Global strings
+#if defined(_M_X64)
+  #define WINDOW_TITLE  L"Keymanhp-x64"
+  #define EXECUTABLE_TITLE L"Keyman Engine x64"
+  #define ARCH_LOG_FILE ".keymanhp-x64"
+#elif defined(_M_ARM64)
+  #define WINDOW_TITLE  L"Keymanhp-arm64"
+  #define EXECUTABLE_TITLE L"Keyman Engine Arm64"
+  #define ARCH_LOG_FILE ".keymanhp-arm64"
+#else
+  #error Unknown architecture
+#endif
 
 const PWSTR
-  szWindowClass = L"Keymanx64", // Do not localize
-  szWindowTitle = L"Keymanx64", // Do not localize
+  szWindowClass = WINDOW_TITLE, // Do not localize
+  szWindowTitle = WINDOW_TITLE, // Do not localize
 
-  szTitle = L"Keyman Engine x64",
-  szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanx64.exe -- it must be started by Keyman Engine x86",
-  szError_Keymanx86NotFound_Comms = L"Keyman Engine x86 has closed unexpectedly.  Closing down Keyman Engine x64",
+  szTitle = EXECUTABLE_TITLE,
+  szError_Keymanx86NotFound = L"Keyman Engine x86 is not running.  Do not run keymanhp.*.exe -- it must be started by Keyman Engine x86",
+  szError_Keymanx86NotFound_Comms = L"Keyman Engine x86 has closed unexpectedly.  Closing down Keyman Engine hp64",
   szError_FailedToRegisterController = L"Failed to register controller window",
-  szError_FailedToInitialise = L"Failed to initialise Keyman Engine x64",
+  szError_FailedToInitialise = L"Failed to initialise Keyman Engine hp",
   szError_FailedToFindParentProcess = L"Unable to open parent process; it may have disappeared",
 
   szError_ChangeWindowMessageFilter = L"Failed to prepare message filters",
 
-  szError_CannotRunMultipleInstances = L"Only one instance of Keyman Engine x64 can run at a time",
+  szError_CannotRunMultipleInstances = L"Only one instance of Keyman Engine hp can run at a time",
   szError_FailedToRegister = L"Failed to register window class",
   szError_FailedToInitInstance = L"Failed to initialise application",
 
-  szError_InvalidCommandline = L"Incorrect command line for Keyman Engine x64; should be passed handle of Keyman Engine x86",
+  szError_InvalidCommandline = L"Incorrect command line for Keyman Engine hp; should be passed handle of Keyman Engine x86",
   szError_WatcherThreadFailed = L"Failed to create watcher thread",
 
   szFail_UnknownError = L"Unknown error %d",
@@ -90,8 +103,7 @@ const PWSTR
   szWindowClass_x86_Wnd = L"TfrmKeyman7Main"; // Do not localize
 
 //const char *szGPA_ChangeWindowMessageFilter = "ChangeWindowMessageFilter"; // Do not localize
-
-#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64 KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".keymanx64"
+#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANHP KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ARCH_LOG_FILE
 
 //
 //   FUNCTION: _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int
@@ -100,7 +112,8 @@ const PWSTR
 //
 //   COMMENTS:
 //
-//        A mutex is used to ensure only one instance of Keyman Engine x64
+//        A mutex is used to ensure only one instance of Keyman Engine HP
+//        for each architecture.
 //
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -108,8 +121,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-
-  keyman_sentry_init(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
+#if defined(_M_X64)
+  keyman_sentry_init(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANHP);
   keyman_sentry_setexceptionfilter();
 
   // We used the 'Started' event when testing Sentry integration in 14.0 alpha
@@ -119,10 +132,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
   if (!wcscmp(lpCmdLine, L"-sentry-client-test-exception")) {
     keyman_sentry_test_crash();
   }
+#endif
 
   BOOL result = Run(hInstance, lpCmdLine, nCmdShow);
-
+#if defined(_M_X64)
   keyman_sentry_shutdown();
+#endif
 
   return result ? 0 : 1;
 }
@@ -270,7 +285,9 @@ BOOL Fail(HWND hwnd, PWSTR msg)
 
   if (WideCharToMultiByte(CP_UTF8, 0, outbuf, -1, buffer, (int) sz, NULL, NULL) != 0) {
     buffer[sz - 1] = 0;
-    keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, buffer, true);
+    #if defined(_M_X64)
+      keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, buffer, true);
+    #endif
   }
 
   free(buffer);

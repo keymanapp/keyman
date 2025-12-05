@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="keymanx64.cpp">
+    <ClCompile Include="keymanhp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp">
@@ -23,7 +23,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="keymanx64.h">
+    <ClInclude Include="keymanhp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -35,6 +35,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="keymanx64.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="keymanarm64.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
