@@ -96,8 +96,7 @@ describe("Recursive Descent Tests", () => {
       assert.isTrue(newNodeRule.parse(tokenBuffer, root));
       const parent = root.getSoleChildOfType(NodeType.STRING); // from NewNode strategy
       assert.isNotNull(parent);
-      const child = parent.getSoleChildOfType(NodeType.TMP); // from trueRule
-      assert.isNotNull(child);
+      assert.isNotNull(parent.getSoleChildOfType(NodeType.TMP)); // from trueRule
     });
   });
   describe("SequenceRule Tests", () => {
