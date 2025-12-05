@@ -16,12 +16,12 @@ builder_parse "$@"
 
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
+builder_describe_internal_dependency \
+  prepublish:project   build:project
+
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
   build:project        /common/windows/delphi/tools/devtools/$WIN32_TARGET_PATH/devtools.exe
-
-builder_describe_internal_dependency \
-  prepublish:project   build:project
 
 #-------------------------------------------------------------------------------------------------------------------
 
