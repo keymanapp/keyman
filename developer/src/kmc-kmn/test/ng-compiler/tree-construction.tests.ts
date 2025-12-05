@@ -152,15 +152,15 @@ describe("Tree Construction Tests", () => {
         initVariables();
       });
       it("can handle if there are no children", () => {
-        assert.isFalse(root.hasChild());
+        assert.isFalse(root.hasChildren());
       });
       it("can check if there is at least one child (one child)", () => {
         root.addChild(bitmap);
-        assert.isTrue(root.hasChild());
+        assert.isTrue(root.hasChildren());
       });
       it("can check if there is at least one child (two children)", () => {
         root.addChildren([bitmap, copyright]);
-        assert.isTrue(root.hasChild());
+        assert.isTrue(root.hasChildren());
       });
     });
     describe("ASTNode.hasChildOfType()", () => {
@@ -169,24 +169,24 @@ describe("Tree Construction Tests", () => {
       });
       it("can handle a null type", () => {
         root.addChildren([copyright, version]);
-        assert.isFalse(root.hasChildOfType(null));
+        assert.isFalse(root.hasChildrenOfType(null));
       });
       it("can handle if there are no children", () => {
-        assert.isFalse(root.hasChildOfType(NodeType.BITMAP));
+        assert.isFalse(root.hasChildrenOfType(NodeType.BITMAP));
       });
       it("can handle if there are non-matching children", () => {
         root.addChildren([copyright, version]);
-        assert.isFalse(root.hasChildOfType(NodeType.BITMAP));
+        assert.isFalse(root.hasChildrenOfType(NodeType.BITMAP));
       });
       it("can check if there is at least one child of a given type (one match)", () => {
         root.addChildren([bitmap, copyright, version]);
-        assert.isTrue(root.hasChildOfType(NodeType.BITMAP));
+        assert.isTrue(root.hasChildrenOfType(NodeType.BITMAP));
       });
       it("can check if there is at least one child of a given type (two matching children)", () => {
         const version1 = new ASTNode(NodeType.VERSION, new Token(TokenType.VERSION, '1'));
         const version2 = new ASTNode(NodeType.VERSION, new Token(TokenType.VERSION, '2'));
         root.addChildren([bitmap, copyright, version1, version2]);
-        assert.isTrue(root.hasChildOfType(NodeType.VERSION));
+        assert.isTrue(root.hasChildrenOfType(NodeType.VERSION));
       });
     });
     describe("ASTNode.hasSoleChildOfType()", () => {

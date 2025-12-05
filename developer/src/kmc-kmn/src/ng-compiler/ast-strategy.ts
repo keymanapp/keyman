@@ -145,7 +145,7 @@ export class FirstNode extends ASTStrategy {
    * @returns the rebuilt tree, rooted at the first node found
    */
   public apply(node: ASTNode): ASTNode {
-    if (node.hasChild()) {
+    if (node.hasChildren()) {
       const firstNode: ASTNode = node.removeFirstChild();
       firstNode.addChildren(node.removeChildren());
       node.addChild(firstNode);

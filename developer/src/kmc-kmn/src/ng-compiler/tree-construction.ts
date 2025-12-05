@@ -15,8 +15,7 @@ import { NodeType } from "./node-type.js";
  * and using the AST to build the in-memory semantic model.
  */
 export class ASTNode {
-  private _nodeType: NodeType; // the node type
-  private _token: Token; // a token (if appropriate) from the input
+  /** the children of this node */
   private children: ASTNode[] = [];
 
   /**
@@ -25,13 +24,16 @@ export class ASTNode {
    * @param nodeType the node type
    * @param token a token from the input (or null)
    */
-  public constructor(nodeType: NodeType, token: Token=null) {
-    this._nodeType = nodeType;
-    this._token    = token;
+  public constructor(
+    /** the node type */
+    public readonly nodeType: NodeType,
+    /** a token (if appropriate) from the input */
+    public readonly token: Token=null
+  ) {
   }
 
   /**
-   * Add a child node.
+   * Add a child node (has no effect if child is null).
    *
    * @param child the node to add
    * @returns this
@@ -44,7 +46,7 @@ export class ASTNode {
   }
 
   /**
-   * Add an array of child nodes.
+   * Add an array of child nodes (has no effect if array is null).
    *
    * @param children the array of nodes to add
    * @returns this
@@ -82,6 +84,12 @@ export class ASTNode {
     return result;
   }
 
+  /**
+   * Recursively collect an array of all nodes in a tree of a given type.
+   *
+   * @param result an array used to accumulate matching nodes
+   * @param requiredType the required type
+   */
   private collectDescendents(result: ASTNode[], requiredType: NodeType): void {
     if (this.nodeType === requiredType)
       result.push(this);
@@ -90,7 +98,7 @@ export class ASTNode {
   }
 
   /**
-   * Count the number of children.
+   * The number of children this node has.
    *
    * @returns the number of children
    */
@@ -103,7 +111,7 @@ export class ASTNode {
    *
    * @returns true if there is at least one child node
    */
-  public hasChild(): boolean {
+  public hasChildren(): boolean {
     return this.children.length > 0;
   }
 
@@ -113,7 +121,7 @@ export class ASTNode {
    * @param requiredType the required type
    * @returns true if there is at least one child of the required type
    */
-  public hasChildOfType(requiredType: NodeType): boolean  {
+  public hasChildrenOfType(requiredType: NodeType): boolean  {
     return this.getChildrenOfType(requiredType).length > 0;
   }
 
@@ -133,7 +141,7 @@ export class ASTNode {
    * @returns token text or an empty string
    */
   public getText(): String {
-    return (this._token != null) ? this._token.text : '';
+    return (this.token != null) ? this.token.text : '';
   }
 
   /**
@@ -203,7 +211,7 @@ export class ASTNode {
    * @returns the first child node or null
    */
   public removeFirstChild(): ASTNode {
-    return this.hasChild() ? this.children.shift() : null;
+    return this.hasChildren() ? this.children.shift() : null;
   }
 
   /**
@@ -286,13 +294,10 @@ export class ASTNode {
     return blocks;
   }
 
-  public get nodeType() { return this._nodeType; }
-  public get token() { return this._token; }
-
   public toString(): string {
-    let buf: string = `[${this._nodeType}`;
-    if (this._token != null) {
-      buf = buf.concat(`,${this._token}`);
+    let buf: string = `[${this.nodeType}`;
+    if (this.token != null) {
+      buf = buf.concat(`,${this.token}`);
     }
     if (this.children.length > 0) {
       buf = buf.concat(',{');
