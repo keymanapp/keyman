@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe \
   "Keyman common third party Delphi components" \
   clean configure build test reset \
-  :cef4delphi :dcpcrypt :jwa :sentry
+  :cef4delphi :dcpcrypt :jwa :sentry :tds2dbg
 
 builder_parse "$@"
 builder_run_child_actions clean configure build test

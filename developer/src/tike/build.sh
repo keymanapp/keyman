@@ -68,15 +68,16 @@ function do_build() {
   cp -R "$DEVELOPER_ROOT/src/tike/xml/"* "$DEVELOPER_PROGRAM/xml/"
 
   delphi_msbuild tike.dproj "//p:Platform=Win32"
-  do_map2pdb "$WIN32_TARGET_PATH/tike.map" "$WIN32_TARGET"
+  sentrytool_delphiprep "$WIN32_TARGET" tike.dpr
+  tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  cp_if_exists "$WIN32_TARGET_PATH/tike.pdb" "$DEVELOPER_DEBUGPATH"
   cp kmc.cmd "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$DEVELOPER_PROGRAM"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/tike.dbg" "$DEVELOPER_DEBUGPATH"
 
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$WIN32_TARGET_PATH"
-  builder_if_release_build_level cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_PDB" "$DEVELOPER_DEBUGPATH"
+  builder_if_release_build_level cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_PDB" "$WIN32_TARGET_PATH"
 
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" "$DEVELOPER_PROGRAM/"
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.x64.dll" "$DEVELOPER_PROGRAM/"
@@ -95,12 +96,11 @@ function do_publish() {
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/sentry.x64.dll"
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/crashpad_handler.exe"
   wrap-symstore "$DEVELOPER_PROGRAM/tike.exe" //t keyman-developer
-  wrap-symstore "$DEVELOPER_DEBUGPATH/tike.pdb" //t keyman-developer
+  wrap-symstore "$DEVELOPER_DEBUGPATH/tike.dbg" //t keyman-developer
 }
 
 function do_install() {
   cp "$DEVELOPER_PROGRAM/tike.exe" "$INSTALLPATH_KEYMANDEVELOPER/tike.exe"
-  cp_if_exists "$DEVELOPER_DEBUGPATH/tike.pdb" "$INSTALLPATH_KEYMANDEVELOPER/tike.pdb"
   cp "$DEVELOPER_PROGRAM/$KEYMANCORE_DLL" "$INSTALLPATH_KEYMANDEVELOPER/$KEYMANCORE_DLL"
 }
 
