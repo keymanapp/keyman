@@ -48,7 +48,7 @@ export const unitTestEndpoints = {
   DeadkeyTracker,
 };
 
-// TODO-web-core: why do we export these here?
+// TODO-web-core: why do we export these here? (#15292)
 export * from "keyman/common/web-utils";
 
 // At the top level, there should be no default export.

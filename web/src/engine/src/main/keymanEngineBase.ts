@@ -1,6 +1,6 @@
 import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction, KMXKeyboard } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
-// TODO-web-core: remove alias
+// TODO-web-core: remove alias (#15292)
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
