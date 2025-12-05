@@ -32,7 +32,7 @@ cd "${KEYMAN_ROOT}/developer/src"
 function build_developer_action() {
   builder_echo start "build developer" "Building Keyman Developer"
 
-  "${KEYMAN_ROOT}/developer/src/build.sh" configure build test
+  builder_launch /developer/src/build.sh configure build test
 
   builder_echo end "build developer" success "Finished building Keyman Developer"
 }

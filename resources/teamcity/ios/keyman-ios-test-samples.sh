@@ -25,13 +25,13 @@ cd "${KEYMAN_ROOT}/ios"
 
 function _build_sample1() {
   builder_echo start "kmsample1" "Building KMSample1"
-  "${KEYMAN_ROOT}/ios/samples/KMSample1/build.sh" clean configure build --debug
+  builder_launch /ios/samples/KMSample1/build.sh clean configure build
   builder_echo end "kmsample1" success "Finished building KMSample1"
 }
 
 function _build_sample2() {
   builder_echo start "kmsample2" "Building KMSample2"
-  "${KEYMAN_ROOT}/ios/samples/KMSample2/build.sh" clean configure build --debug
+  builder_launch /ios/samples/KMSample2/build.sh clean configure build
   builder_echo end "kmsample2" success "Finished building KMSample2"
 }
 
