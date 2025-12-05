@@ -54,6 +54,9 @@ const
 
   KMC_HINTRESPONSE = 19;  // 14.0 HIWORD(wParam) = ModalResult, lParam = hint enum
 
+  KMC_WATCHDOG_FAKEFREEZE = 20; // 19.0 - pause Keyman for 5 seconds for debug purposes to test stability
+  KMC_WATCHDOG_KEYEVENT   = 21; // 19.0 - let the LowLevelHookWatchDog know that input has happened on another thread
+
   PC_UPDATE = 0;
   PC_UPDATE_LANGUAGESWITCH = 1;
   PC_HOTKEYCHANGE = 2;

@@ -34,7 +34,8 @@ else
 fi
 
 function do_all() {
-  "${KEYMAN_ROOT}/core/build.sh" configure,build,test:${ARCH}
+  builder_launch /core/tools/ldml-const-builder/build.sh clean,configure,build,run,test
+  builder_launch /core/build.sh configure,build,test:${ARCH}
 }
 
 builder_run_action  all  do_all

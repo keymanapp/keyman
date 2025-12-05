@@ -864,7 +864,7 @@ której używasz w systemie Windows.  Klawiatury Keyman automatycznie dostosują
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Informacje debugowania Keyman będą przechowywane w pliku dziennika o nazwie %LOCALAPPDATA%\Keyman\Diag\system#.etl (gdzie # jest liczbą). Powinieneś wyjść z Keyman zanim spróbujesz usunąć ten plik.\n\n\UWAGA: Ten plik może się rozwinąć bardzo szybko. Włączenie debugowania może spowolnić Twój system i powinno być wykonane tylko wtedy, gdy zostanie to zalecone przez wsparcie techniczne.\n\nOSTRZEŻENIE PRYWATNE: Pamiętaj, że plik debugowania zapisuje wszystkie klawisze które wpisujesz. Powinieneś włączyć tylko dziennik debugowania na czas trwania sesji debugowania lub diagnostyki.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Informacje debugowania Keyman będą przechowywane w pliku dziennika o nazwie %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (gdzie # jest liczbą). Powinieneś wyjść z Keyman zanim spróbujesz usunąć ten plik.\n\n\UWAGA: Ten plik może się rozwinąć bardzo szybko. Włączenie debugowania może spowolnić Twój system i powinno być wykonane tylko wtedy, gdy zostanie to zalecone przez wsparcie techniczne.\n\nOSTRZEŻENIE PRYWATNE: Pamiętaj, że plik debugowania zapisuje wszystkie klawisze które wpisujesz. Powinieneś włączyć tylko dziennik debugowania na czas trwania sesji debugowania lub diagnostyki.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

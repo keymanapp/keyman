@@ -22,14 +22,13 @@ builder_parse "$@"
 mac_verify_on_mac
 
 function do_build() {
-  ./build.sh                         clean configure build:engine build:app --sim-artifact
+  builder_launch /ios/build.sh                         clean configure build:engine build:app --sim-artifact
 
   # Since we may be disabling it via build-agent environment variable at times...
   if [ ! -z "${RELEASE_OEM+x}" ]; then
-    "$KEYMAN_ROOT/oem/firstvoices/ios/build.sh"  clean configure build --sim-artifact
+    builder_launch /oem/firstvoices/ios/build.sh  clean configure build --sim-artifact
   fi
 }
 
 builder_run_action build          do_build
-# The script called below isn't builder-based, but... eh, "if it ain't broke."
-builder_run_action prep_release   tools/prepRelease.sh
+builder_run_action prep_release   builder_launch /ios/tools/prepRelease.sh

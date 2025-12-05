@@ -448,13 +448,13 @@ _builder_cleanup_deps() {
 #
 # ### Parameters
 #
-# * 1: `script`      path to script, relative to root of repo
+# * 1: `script`      path to script, relative to root of repo, with leading slash
 # * 2+: `parameters` action(s), target(s), parameters for the child script to run
 #
 # ### Example
 #
 # ```bash
-#   builder_launch core/build.sh configure,build:wasm --no-tests
+#   builder_launch /core/build.sh configure,build:wasm --no-tests
 # ```
 #
 builder_launch() {
@@ -1408,10 +1408,16 @@ _builder_define_default_internal_dep() {
 #     build:mac build:mac-x86_64 \
 #     build:mac build:mac-arm64
 #
-# Note: actions and targets must be fully specified, and this _must_
-# be called before either builder_describe_outputs or builder_parse in
-# order for dependencies to be resolved.
+# Note: actions and targets must be fully specified, and this _must_ be called
+# before both of builder_describe_outputs and builder_parse in order for
+# dependencies to be resolved.
 builder_describe_internal_dependency() {
+  _builder_record_function_call builder_describe_internal_dependency
+
+  if _builder_has_function_been_called builder_parse && _builder_has_function_been_called builder_describe_outputs; then
+    builder_warn "WARNING: builder_describe_internal_dependency needs to be called before builder_parse and builder_describe_outputs have both been called"
+  fi
+
   while [[ $# -gt 0 ]]; do
     local action_target=$1 dep_action_target=$2
     [[ -z ${_builder_internal_dep[$action_target]+x} ]] &&

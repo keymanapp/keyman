@@ -949,7 +949,7 @@ che usi in Windows. Le tastiere Keyman si adatteranno automaticamente al layout 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Le informazioni di debug di Keyman saranno memorizzate in un file di log chiamato %LOCALAPPDATA%\Keyman\Diag\system#.etl (dove # è un numero). Devi uscire da Keyman prima di tentare di eliminare questo file.\n\n\ATTENZIONE: Questo file può crescere molto velocemente. Abilitare il debug potrebbe rallentare il sistema e dovrebbe essere fatto solo se consigliato dal supporto tecnico.\n\nATTENZIONE PRIVACY: Si prega di notare che il file di registro di debug registra tutte le sequenze di tasti che digitate. È necessario attivare il registro di debug solo per la durata di una sessione di debug o di diagnostica.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Le informazioni di debug di Keyman saranno memorizzate in un file di log chiamato %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (dove # è un numero). Devi uscire da Keyman prima di tentare di eliminare questo file.\n\n\ATTENZIONE: Questo file può crescere molto velocemente. Abilitare il debug potrebbe rallentare il sistema e dovrebbe essere fatto solo se consigliato dal supporto tecnico.\n\nATTENZIONE PRIVACY: Si prega di notare che il file di registro di debug registra tutte le sequenze di tasti che digitate. È necessario attivare il registro di debug solo per la durata di una sessione di debug o di diagnostica.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

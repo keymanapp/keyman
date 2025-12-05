@@ -204,7 +204,7 @@ builder_run_action build:_all build_action
 
 # Run tests
 builder_run_child_actions test
-builder_run_action test:_all ./test.sh
+builder_run_action test:_all builder_launch /web/test.sh test
 
 function do_test_help() {
   check-markdown  "$KEYMAN_ROOT/web/docs/engine"
