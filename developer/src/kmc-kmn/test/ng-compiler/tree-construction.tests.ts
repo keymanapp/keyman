@@ -163,6 +163,22 @@ describe("Tree Construction Tests", () => {
         assert.equal(root.numberOfChildren(), 2);
       });
     });
+    describe("ASTNode.numberOfChildrenOfType()", () => {
+      beforeEach(() => {
+        initVariables();
+      });
+      it("can handle if there are no children", () => {
+        assert.equal(root.numberOfChildrenOfType(NodeType.BITMAP), 0);
+      });
+      it("can handle one child (amongst two)", () => {
+        root.addChildren([bitmap, copyright]);
+        assert.equal(root.numberOfChildrenOfType(NodeType.BITMAP), 1);
+      });
+      it("can handle two children (amongst three)", () => {
+        root.addChildren([bitmap, copyright, bitmap]);
+        assert.equal(root.numberOfChildrenOfType(NodeType.BITMAP), 2);
+      });
+    });
     describe("ASTNode.hasChildren()", () => {
       beforeEach(() => {
         initVariables();
