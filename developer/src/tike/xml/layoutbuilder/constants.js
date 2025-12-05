@@ -552,7 +552,14 @@ $(function() {
   this.lookupKeyNames.sort();
 
   // Defines the PUA code mapping for the various 'special' modifier/control/non-printing keys on keyboards.
-  // This is lifted directly from specialCharacters.ts and must be kept in sync. See also CompileKeymanWeb.pas: CSpecialText10
+  // This is lifted directly from web/.../specialCharacters.ts and must be kept in sync.
+  //
+  // `specialCharacters` must be kept in sync with the same values in:
+  // * /web/src/engine/osk/src/specialCharacters.ts
+  // * /developer/src/kmc-kmn/src/kmw-compiler/constants.ts
+  // * /core/include/ldml/keyman_core_ldml.ts
+  //
+  // More information, and unit test, in /developer/src/kmc-kmn/tests/kmw/constants.tests.ts
   this.specialCharacters = {
     '*Shift*':    8,
     '*Enter*':    5,

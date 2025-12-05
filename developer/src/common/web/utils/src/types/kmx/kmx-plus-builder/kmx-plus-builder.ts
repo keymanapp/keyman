@@ -1,6 +1,6 @@
 import * as r from 'restructure';
 import { KMXPlus } from "@keymanapp/common-types";
-import { constants, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 import { BUILDER_SECTION } from './builder-section.js';
 import { BUILDER_SECT, build_sect } from './build-sect.js';
 import { BUILDER_DISP, build_disp } from './build-disp.js';
@@ -20,7 +20,7 @@ import KMXPlusFile = KMXPlus.KMXPlusFile;
 type BUILDER_BKSP = BUILDER_TRAN;
 // type BUILDER_FINL = BUILDER_TRAN;
 
-type SectionBuilders = {
+export type SectionBuilders = {
   // [id in SectionIdent]: BUILDER_SECTION;
   sect?: BUILDER_SECT;
   bksp?: BUILDER_BKSP;
@@ -38,16 +38,12 @@ type SectionBuilders = {
 };
 
 export default class KMXPlusBuilder {
-  private file: KMXPlusFile;
-  //private writeDebug: boolean;
-
   sect : SectionBuilders = {
 
   };
 
-  constructor(file: KMXPlusFile, _writeDebug: boolean) {
+  constructor(private file: KMXPlusFile) {
     this.file = file;
-    //this.writeDebug = _writeDebug;
   }
 
   public compile(): Uint8Array {
@@ -57,11 +53,18 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect.sect);
     // Keep the rest of these in order.
     this.emitSection(file, this.file.COMP_PLUS_BKSP, this.sect.bksp);
-    this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect.disp);
+    this.emitSection(
+      file,
+      this.file.version == KMXPlusVersion.Version17 ? this.file.COMP_PLUS_DISP_v17 : this.file.COMP_PLUS_DISP_v19,
+      this.sect.disp
+    );
     this.emitSection(file, this.file.COMP_PLUS_ELEM, this.sect.elem);
     this.emitElements(file);
     this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect.keys);
-    this.emitSection(file, this.file.COMP_PLUS_LAYR, this.sect.layr);
+    this.emitSection(file,
+      this.file.version == KMXPlusVersion.Version17 ? this.file.COMP_PLUS_LAYR_v17 : this.file.COMP_PLUS_LAYR_v19,
+      this.sect.layr
+    );
     this.emitSection(file, this.file.COMP_PLUS_LIST, this.sect.list);
     this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect.loca);
     this.emitSection(file, this.file.COMP_PLUS_META, this.sect.meta);
@@ -79,17 +82,17 @@ export default class KMXPlusBuilder {
 
     // We must prepare the strs, list, and elem sections early so that other sections can
     // reference them. However, they will be emitted in alpha order.
-    this.sect.strs = build_strs(this.file.kmxplus.strs);
+    this.sect.strs = build_strs(this.file.kmxplus.strs, this.file.version);
     this.sect.list = build_list(this.file.kmxplus.list, this.sect.strs);
     this.sect.uset = build_uset(this.file.kmxplus, this.sect.strs);
-    this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs, this.sect.uset);
+    this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs, this.sect.uset, this.file.version);
 
     const build_bksp = build_tran;
 
     this.sect.bksp = build_bksp(this.file.kmxplus.bksp, this.sect.strs, this.sect.elem);
-    this.sect.disp = build_disp(this.file.kmxplus, this.sect.strs);
+    this.sect.disp = build_disp(this.file.kmxplus, this.sect.strs, this.file.version);
     this.sect.keys = build_keys(this.file.kmxplus, this.sect.strs, this.sect.list);
-    this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list);
+    this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.file.version);
     this.sect.loca = build_loca(this.file.kmxplus, this.sect.strs);
     this.sect.meta = build_meta(this.file.kmxplus, this.sect.strs);
     this.sect.tran = build_tran(this.file.kmxplus.tran, this.sect.strs, this.sect.elem);
@@ -98,7 +101,7 @@ export default class KMXPlusBuilder {
 
     // Finalize the sect (index) section
 
-    this.sect.sect = build_sect();
+    this.sect.sect = build_sect(this.file.version);
     this.finalize_sect(); // must be done last
     return this.sect.sect.total;
   }
@@ -115,9 +118,9 @@ export default class KMXPlusBuilder {
       }
     });
 
-    this.sect.sect.size = constants.length_sect + constants.length_sect_item * this.sect.sect.count;
+    this.sect.sect.header.size = constants.length_sect + constants.length_sect_item * this.sect.sect.count + constants.headerSizeDelta(this.file.version);
 
-    let offset = this.sect.sect.size;
+    let offset = this.sect.sect.header.size;
     // Note: in order! Everyone's here except 'sect' which is at offset 0
     offset = this.finalize_sect_item(this.sect.bksp, offset);
     offset = this.finalize_sect_item(this.sect.disp, offset);
@@ -140,17 +143,24 @@ export default class KMXPlusBuilder {
       // Don't include null sections
       return offset;
     }
+    // in order to avoid changing size calculation in every section builder,
+    // we adjust the size here before writing. We'd need to pass version info
+    // into each builder, otherwise, and make this call in each header, which
+    // we could choose to do in the future if it makes other things easier.
+    sect.header.size += constants.headerSizeDelta(this.file.version);
     sect._offset = offset;
-    this.sect.sect.items.push({sect: sect.ident, offset: offset});
-    return offset + sect.size;
+    this.sect.sect.items.push({sect: sect.header.ident, offset: offset});
+    return offset + sect.header.size;
   }
 
   private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION) {
     if(sect) {
+      sect.header.version = sect.header.version ?? KMXPlusVersion.Version17;
+
       const buf = comp.toBuffer(sect);
-      if (buf.length > sect.size) {
+      if (buf.length > sect.header.size) {
         // buf.length may be < sect.size if there is a variable part (i.e. elem)
-        throw new RangeError(`Internal Error: Section ${constants.str_section_id(sect.ident)} claimed size ${sect.size} but produced buffer of size ${buf.length}.`);
+        throw new RangeError(`Internal Error: Section ${constants.str_section_id(sect.header.ident)} claimed size ${sect.header.size} but produced buffer of size ${buf.length}.`);
       }
       file.set(buf, sect._offset);
     }

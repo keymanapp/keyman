@@ -1,25 +1,12 @@
 #
 # Keyman is copyright (C) SIL International. MIT License.
 #
-# basic.txt describes the expected output of running kmc against basic.xml. It is used in
-# the end-to-end test test-compiler-e2e.ts.
+# basic-17.txt describes the expected output of running kmc against basic.xml
+# with v17 schema and v17 target version. It is used in the end-to-end test
+# test-compiler-e2e.ts.
 #
-# Any changes to the compiler or basic.xml will likely result in changes to the compiled file.
-# While structural differences should be updated manually in this file to ensure that we are
-# getting the expected result for the e2e test, the checksum can be safely retrieved from the
-# updated compilation result. The following may be helpful for working with this file when
-# updating the binary format:
+# See README.md for more information.
 #
-#    cd developer/src/kmc
-#    ./build.sh configure build # if needed
-#    ./build.sh build-fixtures
-#
-#  This will compile both the .xml and the .txt to build/test/fixtures and also emit the
-#  checksum for basic-xml.kmx so you can patch that into this file.
-#
-# For the format of this file, see “hextobin.ts”
-#
-# P.S. surprisingly, the Dart language highlighter in VSCode does a helpful job on this file.
 
 block(kmxheader)  #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
@@ -96,7 +83,7 @@ block(store_vk_path_string)
   62 00 61 00 73 00 69 00 63 00 2d 00 78 00 6d 00 6c 00 2e 00 6b 00 76 00 6b 00 00 00 # 'basic-xml.kvk'
 
 block(sect)                         #  struct COMP_KMXPLUS_SECT {
-  73 65 63 74                       #    KMX_DWORD header.ident;   // 0000 Section name
+  73 65 63 74                       #    KMX_DWORD header.ident;   // 0000 Section name 'sect'
   diff(sect,endsect)                #    KMX_DWORD header.size;    // 0004 Section length
   diff(sect,eof)                    #    KMX_DWORD total;          // 0008 KMXPlus entire length
   sizeof(sectitems,8)               #    KMX_DWORD count;          // 000C number of section headers
@@ -427,7 +414,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
 
 # TODO-LDML: lots of comment-out ahead. Need to revisit.
 
-block(list)                         # struct COMP_KMXPLUS_LAYR_LIST {
+block(list)                         # struct COMP_KMXPLUS_LIST {
   6c 69 73 74                       #   KMX_DWORD header.ident;   // 0000 Section name - list
   diff(list,endList)                #   KMX_DWORD header.size;    // 0004 Section length
   03 00 00 00                       #   KMX_DWORD listCount (should be 2)

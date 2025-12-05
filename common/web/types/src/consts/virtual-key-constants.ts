@@ -141,10 +141,8 @@ export const USVirtualKeyCodes = {
   K_TABFWD:50012
 };
 
-const k = USVirtualKeyCodes;
-
 /** Map a CLDR scancode to a US VKey ala USVirtualKeyCodes */
-export const CLDRScanToUSVirtualKeyCodes = {
+export const CLDRScanToUSVirtualKeyCodes = /* @__PURE__ */ ((k) => ({
   0x02: k.K_1,
   0x03: k.K_2,
   0x04: k.K_3,
@@ -202,7 +200,7 @@ export const CLDRScanToUSVirtualKeyCodes = {
   0x73: k.K_oC1,
   0x7D: k.K_oE2, // << Same as 0x56; found on jis
 
-};
+}))(USVirtualKeyCodes);
 
 export type KeyMap = number[][];
 
@@ -230,3 +228,27 @@ export function CLDRScanToVkey(scan: number, badScans?: Set<number>): number {
   }
 }
 
+const USVirtualKeyCodeNames = new Map<number, string>();
+
+function fillVirtualKeyNames() {
+  Object.keys(USVirtualKeyCodes).forEach(name => {
+    USVirtualKeyCodeNames.set((<any>USVirtualKeyCodes)[name], name);
+  });
+
+  // These three keys have multiple definitions
+  USVirtualKeyCodeNames.set(USVirtualKeyCodes.K_oE2, 'K_oE2');
+  USVirtualKeyCodeNames.set(USVirtualKeyCodes.K_oC1, 'K_oC1');
+  USVirtualKeyCodeNames.set(USVirtualKeyCodes.K_oDF, 'K_oDF');
+}
+
+/**
+ * Get the defined name of a virtual key
+ * @param vk A defined Keyman virtual key
+ * @returns the name of the virtual key, or undefined if not found
+ */
+export function usVirtualKeyName(vk: number): string {
+  if(USVirtualKeyCodeNames.size == 0) {
+    fillVirtualKeyNames();
+  }
+  return USVirtualKeyCodeNames.get(vk);
+}

@@ -27,7 +27,7 @@ import { StrsCompiler, ElemCompiler, ListCompiler, UsetCompiler } from './empty-
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import DependencySections = KMXPlus.DependencySections;
-import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
+import { KMXPlusVersion, SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
@@ -93,6 +93,7 @@ export interface LdmlKeyboardCompilerResult extends KeymanCompilerResult {
 export class LdmlKeyboardCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: LdmlCompilerOptions;
+  private kmxPlusTargetVersion: KMXPlusVersion;
 
   // uset parser
   private usetparser?: LdmlKeyboardTypes.UnicodeSetParser = undefined;
@@ -111,6 +112,14 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     this.reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, callbacks);
     // wrap the callbacks so that the eventresolver is called
     this.callbacks = new ResolvingCompilerCallbacks(this.reader, this.options, callbacks);
+
+    // resolve and check command line parameters
+
+    this.kmxPlusTargetVersion = this.targetVersionToKmxPlusVersion(this.options.targetVersion);
+    if(!this.kmxPlusTargetVersion) {
+      return false;
+    }
+
     return true;
   }
 
@@ -165,7 +174,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       });
     }
 
-    const kmxBinary = kmxBuilder.compile();
+    const kmxBinary = kmxBuilder.compile(this.kmxPlusTargetVersion);
 
     const kvkWriter = new KvkFileWriter();
     const kvkBinary = vkData ? kvkWriter.write(vkData) : null;
@@ -232,7 +241,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   }
 
   private buildSections(source: LDMLKeyboardXMLSourceFile) {
-    return SECTION_COMPILERS.map(c => new c(source, this.callbacks));
+    return SECTION_COMPILERS.map(c => new c(source, this.callbacks, this.kmxPlusTargetVersion));
   }
 
   /**
@@ -357,10 +366,12 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns          KMXPlusFile intermediate file
    */
   public async compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile> {
+    // TODO-EMBED-OSK-IN-KMX: add a unitTestEndpoints prop and make this private
+
     const sections = this.buildSections(source);
     let passed = true;
 
-    const kmx = new KMXPlusFile();
+    const kmx = new KMXPlusFile(this.kmxPlusTargetVersion);
 
     for (const section of sections) {
       if (!section.validate()) {
@@ -423,6 +434,21 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     }
 
     return passed ? kmx : null;
+  }
+
+  private targetVersionToKmxPlusVersion(version?: KMX.KMX_Version): KMXPlusVersion {
+    if(version === undefined || version === null) {
+      return KMXPlusVersion.Version17;
+    }
+    if(version === KMX.KMX_Version.VERSION_170) {
+      return KMXPlusVersion.Version17;
+    }
+    if(version === KMX.KMX_Version.VERSION_190) {
+      return KMXPlusVersion.Version19;
+    }
+
+    this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidTargetVersion({ version }));
+    return null;
   }
 }
 
