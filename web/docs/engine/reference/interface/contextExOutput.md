@@ -11,13 +11,13 @@ gap between desktop and web core functionality for `context(n)` matching on `not
 ## Syntax
 
 ```js
-  keyman.interface.contextExOutput(dn, outputTarget, contextLength, contextOffset);
+  keyman.interface.contextExOutput(dn, textStore, contextLength, contextOffset);
 ```
 
 or
 
 ```js
-  KeymanWeb.KCXO(dn, outputTarget, contextLength, contextOffset); // Shorthand
+  KeymanWeb.KCXO(dn, textStore, contextLength, contextOffset); // Shorthand
 ```
 
 ## Parameters
@@ -26,8 +26,8 @@ or
 : Type: `number`
 : number of characters to delete left of cursor
 
-`outputTarget`
-: Type: `OutputTarget`
+`textStore`
+: Type: `TextStore`
 : target to output to
 
 `contextLength`

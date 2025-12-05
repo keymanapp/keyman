@@ -1,4 +1,4 @@
-import { gestures } from '@keymanapp/gesture-recognizer';
+import { gestures } from 'keyman/engine/gesture-processor';
 import specTypeDefs = gestures.specs;
 
 type ContactModel = specTypeDefs.ContactModel<string>;

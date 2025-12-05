@@ -1,5 +1,5 @@
 import * as models from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import TransformUtils from './transformUtils.js';

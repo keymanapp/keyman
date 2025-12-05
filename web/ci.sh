@@ -24,6 +24,7 @@ cd "${THIS_SCRIPT_PATH}"
 S_KEYMAN_COM=
 
 builder_describe "CI processes for Keyman Engine for Web releases (KMW)." \
+  "@/common/web/sentry-manager" \
   "@/web/src/tools/building/sourcemap-root prepare:s.keyman.com" \
   "build" \
   "test                         Runs all unit tests" \
@@ -69,10 +70,10 @@ function build_action() {
   if builder_is_ci_build && builder_is_ci_build_level_release; then
     # Upload the sentry-configuration engine used by the mobile apps to sentry
     # Also, clean 'em first.
-    for sourcemap in "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"*.map; do
+    for sourcemap in "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/"*.map; do
       node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
     done
-    web_sentry_upload "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"
+    web_sentry_upload "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/"
 
     # And, of course, the main build-products too
     web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #
 
-BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 # Compiles all build products corresponding to the specified target.
 # This should be called from the working directory of a child project's
 # build script.
@@ -109,6 +107,7 @@ function test-headless() {
     TEST_OPTS+=(--extension "${TEST_EXTENSIONS}")
   fi
 
+  builder_echo '> ' mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   if [[ -e .c8rc.json ]]; then
     c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   else

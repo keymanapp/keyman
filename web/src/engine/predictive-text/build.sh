@@ -20,27 +20,19 @@ builder_describe "Builds predictive-text components used within Keyman Engine fo
   ":templates                Builds the model templates utilized by compiled lexical models" \
   ":wordbreakers             Builds the wordbreakers provided for lexical model use" \
   ":worker-main              Builds the predictive-text worker interface module" \
-  ":worker-thread            Builds the predictive-text worker" \
-  ":_all                     (Meta build target used when targets are not specified)"
+  ":worker-thread            Builds the predictive-text worker"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_parse "$@"
 
-config=release
-if builder_is_debug_build; then
-  config=debug
-fi
-
 builder_describe_outputs \
   configure                     "/node_modules" \
-  build:templates               "/web/src/engine/predictive-text/build/obj/index.js" \
-  build:wordbreakers            "/web/src/engine/wordbreakers/build/main/obj/index.js" \
-  build:worker-main             "/web/src/engine/worker-main/build/obj/lmlayer.js" \
-  build:worker-thread           "/web/src/engine/worker-thread/build/obj/worker-main.wrapped.js"
-
-BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
+  build:templates               "/web/src/engine/predictive-text/templates/build/obj/index.js" \
+  build:wordbreakers            "/web/src/engine/predictive-text/wordbreakers/build/main/obj/index.js" \
+  build:worker-main             "/web/src/engine/predictive-text/worker-main/build/lib/index.mjs" \
+  build:worker-thread           "/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.wrapped.js"
 
 #### Build action definitions ####
 

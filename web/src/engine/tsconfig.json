@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "outDir": "../../build/engine/obj/",
+    "tsBuildInfoFile": "../../build/engine/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src",
+  },
+
+  "include": [ "src/**/*.ts", "src/core-processor/import/*.js" ],
+
+  "references": [
+    { "path": "../common/web-utils" }
+  ]
+}

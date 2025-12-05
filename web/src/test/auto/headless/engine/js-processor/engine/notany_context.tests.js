@@ -3,9 +3,9 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 
 const device = {
@@ -23,8 +23,8 @@ function runEngineRuleSet(ruleSet) {
     // Prepare the context!
     const ruleSeq = new RecordedKeystrokeSequence(ruleDef);
     const proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
-    const target = new Mock();
-    ruleSeq.test(proctor, target);
+    const textStore = new SyntheticTextStore();
+    ruleSeq.test(proctor, textStore);
   }
 }
 
@@ -52,7 +52,7 @@ function runStringRuleSet(input, output) {
 
 describe('Engine - notany() and context()', function() {
   before(async function() {
-    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
     const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_917.js'));
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;
