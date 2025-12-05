@@ -171,28 +171,28 @@ describe("KMN Analyser Tests", () => {
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(tokenBuffer, root));
       assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
-      assert.isFalse(root.getSoleChild().hasChild());
+      assert.isFalse(root.getSoleChild().hasChildren());
     });
     it("can parse correctly (blank, no comment, space before newline)", () => {
       tokenBuffer = stringToTokenBuffer(' \n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(tokenBuffer, root));
       assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
-      assert.isFalse(root.getSoleChild().hasChild());
+      assert.isFalse(root.getSoleChild().hasChildren());
     });
     it("can parse correctly (blank, comment)", () => {
       tokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(tokenBuffer, root));
       assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
-      assert.isFalse(root.getSoleChild().hasChild());
+      assert.isFalse(root.getSoleChild().hasChildren());
     });
     it("can parse correctly (blank, space before comment)", () => {
       tokenBuffer = stringToTokenBuffer(' c This tells Keyman which keys should have casing behavior applied\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(tokenBuffer, root));
       assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
-      assert.isFalse(root.getSoleChild().hasChild());
+      assert.isFalse(root.getSoleChild().hasChildren());
     });
     it("can parse correctly (compile target)", () => {
       tokenBuffer = stringToTokenBuffer('$keyman: store(&bitmap) "filename"\n');
@@ -226,7 +226,7 @@ describe("KMN Analyser Tests", () => {
   //     tokenBuffer = stringToTokenBuffer('');
   //     const line: Rule = new FinalLineRule();
   //     assert.isTrue(line.parse(tokenBuffer, root));
-  //     assert.isFalse(root.hasChild());
+  //     assert.isFalse(root.hasChildren());
   //   });
   //   it("can parse correctly (space)", () => {
   //     tokenBuffer = stringToTokenBuffer(' ');
@@ -1678,9 +1678,9 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(groupNodes[3].getSoleChildOfType(NodeType.USING_KEYS));
       assert.equal(groupNodes[3].getChildrenOfType(NodeType.PRODUCTION).length, 54);
       assert.equal(groupNodes[4].getSoleChildOfType(NodeType.GROUPNAME).getText(), 'normalise');
-      assert.isFalse(groupNodes[4].hasChildOfType(NodeType.USING_KEYS));
+      assert.isFalse(groupNodes[4].hasChildrenOfType(NodeType.USING_KEYS));
       assert.equal(groupNodes[4].getChildrenOfType(NodeType.PRODUCTION).length, 208);
-      assert.isFalse(groupNodes[4].hasChildOfType(NodeType.READONLY));
+      assert.isFalse(groupNodes[4].hasChildrenOfType(NodeType.READONLY));
       assert.isNotNull(root.getSoleChildOfType(NodeType.SOURCE_CODE));
       //assert.equal(root.toString(), '');
     });
