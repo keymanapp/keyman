@@ -66,26 +66,20 @@ describe("Recursive Descent Tests", () => {
     parameters  = [];
   });
   describe("SingleChildRule Tests", () => {
+    class ConcreteSingleChildRule extends SingleChildRule {
+      public constructor(rule: Rule=null) {
+        super(rule);
+      }
+      public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+        return super.parse(tokenBuffer, node);
+      }
+    }
     it("returns false without a rule to parse", () => {
-      const noRule: Rule = new class extends SingleChildRule {
-        public constructor() {
-          super(); // no rule supplied
-        }
-        public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-          return super.parse(tokenBuffer, node);
-        }
-      }();
+      const noRule: Rule = new ConcreteSingleChildRule(); // no rule supplied
       assert.isFalse(noRule.parse(tokenBuffer, root));
     });
     it("returns true with a valid rule to parse", () => {
-      const validRule: Rule = new class extends SingleChildRule {
-        public constructor() {
-          super(trueRule);
-        }
-        public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-          return super.parse(tokenBuffer, node);
-        }
-      }();
+      const validRule: Rule = new ConcreteSingleChildRule(trueRule);
       assert.isTrue(validRule.parse(tokenBuffer, root));
     });
   });
