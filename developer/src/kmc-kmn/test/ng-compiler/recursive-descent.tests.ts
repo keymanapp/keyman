@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Rule, SequenceRule, parameterSequence, AlternateTokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { NodeType } from "../../src/ng-compiler/node-type.js";
@@ -63,6 +63,19 @@ describe("Recursive Descent Tests", () => {
     trueRule    = new TrueRule();
     falseRule   = new FalseRule();
     parameters  = [];
+  });
+  describe("SingleChildRule Tests", () => {
+    it("returns false without a rule to parse", () => {
+      const noRule: Rule = new class extends SingleChildRule {
+        public constructor() {
+          super(); // no rule supplied
+        }
+        public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+          return super.parse(tokenBuffer, node);
+        }
+      }();
+      assert.isFalse(noRule.parse(tokenBuffer, root));
+    });
   });
   describe("SequenceRule Tests", () => {
     it("can construct a SequenceRule", () => {
