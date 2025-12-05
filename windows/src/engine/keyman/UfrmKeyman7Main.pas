@@ -292,6 +292,8 @@ type
     procedure UnregisterControllerWindows;   // I4731
     function IsSysTrayWindow(AHandle: THandle): Boolean;
     procedure GetTrayIconHandle;   // I4731
+    procedure WatchDogKeyEvent;
+
   protected
     procedure DoInterfaceHotkey(Target: Integer);
 
@@ -853,12 +855,27 @@ begin
         if (TKeymanHint(lParam) = KH_EXITPRODUCT) and (wParam = mrOk) then
           UnloadProduct;
       end;
+    KMC_WATCHDOG_KEYEVENT:
+      WatchDogKeyEvent;
+    KMC_WATCHDOG_FAKEFREEZE:
+      begin
+        TDebugLogClient.Instance.WriteMessage('kmc_fakefreeze begin', []);
+        Sleep(5000);
+        TDebugLogClient.Instance.WriteMessage('kmc_fakefreeze end', []);
+      end;
 //TOUCH    KMC_CONTEXT:
 //TOUCH      begin
 //TOUCH        if LParam <> 0 then
 //TOUCH          ProcessContextChange(LParam);
 //TOUCH      end;
   end;
+end;
+
+procedure TfrmKeyman7Main.WatchDogKeyEvent;
+begin
+  TDebugLogClient.Instance.WriteMessage('Attempting to send WatchDogKeyEvent', []);
+  if kmint.KeymanEngineControl <> nil then
+    kmint.KeymanEngineControl.WatchDogKeyEvent;
 end;
 
 procedure TfrmKeyman7Main.DoInterfaceHotkey(Target: Integer);

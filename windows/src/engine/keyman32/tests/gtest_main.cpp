@@ -42,9 +42,10 @@ private:
 };
 }  // namespace testing
 
-GTEST_API_ int
+//GTEST_API_
+int
 main(int argc, char** argv) {
-  cout << "Running main() from gtest_main.cpp" << endl;
+  cout << "Running main() from gtest_main.cpp with memory leak detection" << endl;
 
   InitGoogleTest(&argc, argv);
   UnitTest::GetInstance()->listeners().Append(new MemoryLeakDetector());
