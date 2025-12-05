@@ -4,23 +4,21 @@
 
 ```ts
 
-import { CompilerCallbacks } from '@keymanapp/common-types';
-import { CompilerEvent } from '@keymanapp/common-types';
-import { CompilerOptions } from '@keymanapp/common-types';
-import { KeymanCompiler } from '@keymanapp/common-types';
-import { KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
-import { KeymanCompilerResult } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerOptions } from '@keymanapp/developer-utils';
+import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifact } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
+import { KeymanCompilerResult } from '@keymanapp/developer-utils';
 import { KmpJsonFile } from '@keymanapp/common-types';
-import { KpsFile } from '@keymanapp/common-types';
+import { KpsFile } from '@keymanapp/developer-utils';
 
 // @public
 export class KmpCompiler implements KeymanCompiler {
     // @internal
     buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<Uint8Array>;
     init(callbacks: CompilerCallbacks, options: KmpCompilerOptions): Promise<boolean>;
-    // @internal (undocumented)
-    loadKpsFile(kpsFilename: string): KpsFile.KpsFile;
     // (undocumented)
     readonly normalizePath: (path: string) => string;
     run(inputFilename: string, outputFilename?: string): Promise<KmpCompilerResult>;
@@ -83,12 +81,6 @@ export class PackageCompilerMessages {
         email: string;
     }) => CompilerEvent;
     // (undocumented)
-    static ERROR_InvalidPackageFile: number;
-    // (undocumented)
-    static Error_InvalidPackageFile: (o: {
-        e: any;
-    }) => CompilerEvent;
-    // (undocumented)
     static ERROR_KeyboardContentFileNotFound: number;
     // (undocumented)
     static Error_KeyboardContentFileNotFound: (o: {
@@ -117,6 +109,18 @@ export class PackageCompilerMessages {
         e: any;
     }) => CompilerEvent;
     // (undocumented)
+    static ERROR_MissingKeyboardId: number;
+    // (undocumented)
+    static Error_MissingKeyboardId: (o: {
+        index: number;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_MissingModelId: number;
+    // (undocumented)
+    static Error_MissingModelId: (o: {
+        index: number;
+    }) => CompilerEvent;
+    // (undocumented)
     static ERROR_ModelMustHaveAtLeastOneLanguage: number;
     // (undocumented)
     static Error_ModelMustHaveAtLeastOneLanguage: (o: {
@@ -127,13 +131,29 @@ export class PackageCompilerMessages {
     // (undocumented)
     static Error_PackageCannotContainBothModelsAndKeyboards: () => CompilerEvent;
     // (undocumented)
+    static ERROR_PackageFileHasEmptyVersion: number;
+    // (undocumented)
+    static Error_PackageFileHasEmptyVersion: () => CompilerEvent;
+    // (undocumented)
     static ERROR_PackageMustContainAModelOrAKeyboard: number;
     // (undocumented)
     static Error_PackageMustContainAModelOrAKeyboard: () => CompilerEvent;
     // (undocumented)
+    static ERROR_PackageMustNotContainItself: number;
+    // (undocumented)
+    static Error_PackageMustNotContainItself: (o: {
+        outputFilename: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static ERROR_PackageNameCannotBeBlank: number;
     // (undocumented)
     static Error_PackageNameCannotBeBlank: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_RequiredParameterMissing: number;
+    // (undocumented)
+    static Error_RequiredParameterMissing: (o: {
+        param: string;
+    }) => CompilerEvent;
     // (undocumented)
     static FATAL_UnexpectedException: number;
     // (undocumented)
@@ -182,6 +202,25 @@ export class PackageCompilerMessages {
     // (undocumented)
     static Warn_AbsolutePath: (o: {
         filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_CannotFindFontForKeyboard: number;
+    // (undocumented)
+    static Warn_CannotFindFontForKeyboard: (o: {
+        id: string;
+        fontFilename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_CannotFindMatchingKeyboardForVisualKeyboard: number;
+    // (undocumented)
+    static Warn_CannotFindMatchingKeyboardForVisualKeyboard: (o: {
+        filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_CannotReadFont: number;
+    // (undocumented)
+    static Warn_CannotReadFont: (o: {
+        fontFilename: string;
     }) => CompilerEvent;
     // (undocumented)
     static WARN_DocFileDangerous: number;
@@ -235,9 +274,21 @@ export class PackageCompilerMessages {
         filename: string;
     }) => CompilerEvent;
     // (undocumented)
+    static WARN_PackageVersionIsUnrecognizedFormat: number;
+    // (undocumented)
+    static Warn_PackageVersionIsUnrecognizedFormat: (o: {
+        version: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static WARN_RedistFileShouldNotBeInPackage: number;
     // (undocumented)
     static Warn_RedistFileShouldNotBeInPackage: (o: {
+        filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_VisualKeyboardFileIsInvalid: number;
+    // (undocumented)
+    static Warn_VisualKeyboardFileIsInvalid: (o: {
         filename: string;
     }) => CompilerEvent;
 }
@@ -248,7 +299,7 @@ export class PackageCompilerMessages {
 export class PackageValidation {
     constructor(callbacks: CompilerCallbacks, options: CompilerOptions);
     // (undocumented)
-    validate(filename: string, kmpJson: KmpJsonFile.KmpJsonFile): boolean;
+    validate(filename: string, outputFilename: string, kmpJson: KmpJsonFile.KmpJsonFile): boolean;
 }
 
 // @public

@@ -24,8 +24,10 @@ function do_test() {
   delphi_msbuild SentryClientTest.dproj "//p:Platform=Win32"
   delphi_msbuild SentryClientVclTest.dproj "//p:Platform=Win32"
 
-  do_map2pdb "$WIN32_TARGET_PATH/SentryClientTest.map" "$WIN32_TARGET"
-  do_map2pdb "$WIN32_TARGET_PATH/SentryClientVclTest.map" "$WIN32_TARGET"
+  sentrytool_delphiprep "$WIN32_TARGET_PATH/SentryClientTest.exe" -dpr SentryClientTest.dpr
+  sentrytool_delphiprep "$WIN32_TARGET_PATH/SentryClientVclTest.exe" -dpr SentryClientVclTest.dpr
+  tds2dbg "$WIN32_TARGET_PATH/SentryClientTest.exe"
+  tds2dbg "$WIN32_TARGET_PATH/SentryClientVclTest.exe"
 
   sentry-cli upload-dif -p keyman-windows --wait --include-sources .
 
