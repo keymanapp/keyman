@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "kmprocessactions.cpp"
+#include "kmprocessactions.cpp" // TODO: should this be pulled in from keyman32/64.lib and use externs? seems cleaner?
 
 // Test the Process Actions private functions
 // TODO: The following actions are not tested KM_CORE_IT_ALERT, KM_CORE_IT_PERSIST_OPT, KM_CORE_IT_EMIT_KEYSTROKE
@@ -29,7 +29,6 @@ public:
 // action queue
 TEST_F(KMPROCESSACTIONS, processUnicodeChartest) {
  // just check something has been added to the que
-  WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   int expectedQueueSize           = 3; // 1 + surrogate pair
   km_core_usv output_string[] = {0x0041, 0x010000, 0};

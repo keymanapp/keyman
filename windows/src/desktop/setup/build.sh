@@ -37,32 +37,13 @@ function do_build() {
   "$DEVTOOLS" -buildsetupstrings locale\\ .\\
 
   delphi_msbuild setup.dproj "//p:Platform=Win32"
-  do_map2pdb "$WIN32_TARGET_PATH/setup.map" "$WIN32_TARGET"
-
-  #
-  # The installer needs to be a multiple of 512 bytes in order for the SFX code
-  # to find the ZIP header. After map2pdb appends its header, the file may not
-  # be the right size. So take the file size of setup.exe and generate a nul
-  # file that would expand it to nearest 512 bytes, and append it to the
-  # executable. This will make the file 512 bytes larger if its size is already
-  # on a 512 byte boundary.
-  #
-
-  local file_size expansion_size expansion_file
-
-  file_size=$(stat -c %s "$WIN32_TARGET")
-  expansion_size=$(( 512 - ( $file_size % 512 ) ))
-  expansion_file="$(mktemp)"
-  dd if=/dev/zero of="${expansion_file}" bs=1 count="${expansion_size}"
-  cat "$WIN32_TARGET" "$expansion_file" > "$WIN32_TARGET.out"
-  mv -f "$WIN32_TARGET.out" "$WIN32_TARGET"
-  rm -f "${expansion_file}"
+  sentrytool_delphiprep "$WIN32_TARGET" setup.dpr
+  tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  cp_if_exists "$WIN32_TARGET_PATH/setup.pdb" "$WINDOWS_DEBUGPATH_APP"
-
   # setup-redist.exe does not get signed as it is intended for a bundled installer
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP/setup-redist.exe"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/setup.dbg" "$WINDOWS_DEBUGPATH_APP/setup.dbg"
 }
 
 function do_build_debug_manifest() {
@@ -80,7 +61,7 @@ function do_publish() {
 
   wrap-signcode //d "Keyman for Windows Setup" "$WINDOWS_PROGRAM_APP/setup.exe"
   wrap-symstore "$WINDOWS_PROGRAM_APP/setup.exe" //t keyman-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_APP/setup.pdb" //t keyman-windows
+  wrap-symstore "$WINDOWS_DEBUGPATH_APP/setup.dbg" //t keyman-windows
 }
 
 builder_run_action clean:project        do_clean

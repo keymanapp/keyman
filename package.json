@@ -2,7 +2,7 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "@microsoft/api-documenter": "^7.23.31",
+    "@microsoft/api-documenter": "^7.28.0",
     "@microsoft/api-extractor": "^7.47.3",
     "@types/chai": "^4.3.14",
     "@types/node": "^20.4.1",

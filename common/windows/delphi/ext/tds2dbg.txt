@@ -1,0 +1,49 @@
+Keyman Third Party Package Readme: Tds2Dbg
+===========================================
+
+Name:              Tds2Dbg
+Purpose:           Tds2Dbg converts .tds to .dbg files
+Source:            https://sourceforge.net/projects/tds2dbg/
+Version:           2014-12-22
+License:           ISC (MIT compatible)
+Updated for:       N/A
+Documentation:     https://sourceforge.net/projects/tds2dbg/
+Download location: https://sourceforge.net/projects/tds2dbg/
+Licensed For:      Unlimited developers
+Include Paths:     N/A
+
+
+Installation notes
+------------------
+
+Download from site above.  
+
+Build notes
+-----------
+
+tds2dbg is used for building .dbg files from .tds files so that Delphi
+projects can be debugged in WinDbg/Visual Studio and with dump files.
+
+This project builds with Borland C++ 5.5 and not other compilers;
+while it may build successfully with other compilers, there appear to 
+be alignment issues. Hence, the executable is included in the repository
+to avoid requiring another build tool.
+
+License - ISC
+-------------
+
+Copyright (c) 2009-2010, Bjarne Juul Pasgaard
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice, this permission notice and the following disclaimer
+appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
