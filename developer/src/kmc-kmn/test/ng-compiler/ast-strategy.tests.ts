@@ -10,13 +10,29 @@ import 'mocha';
 import { assert } from 'chai';
 import { NodeType } from '../../src/ng-compiler/node-type.js';
 import { FirstNode, GivenNode, NewNode, NewNodeOrTree, StackedPair } from '../../src/ng-compiler/ast-strategy.js';
+import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 
 describe("ASTStrategy Tests", () => {
   describe("GivenNode", () => {
     it("can construct a GivenNode", () => {
-      const givenNode = new GivenNode(NodeType.STORE);
+      const givenNode = new GivenNode(NodeType.GROUP);
       assert.isNotNull(givenNode);
-      assert.equal(givenNode['nodeType'], NodeType.STORE);
+      assert.equal(givenNode['nodeType'], NodeType.GROUP);
+    });
+    it("can rebuild the AST", () => {
+      const root: ASTNode = new ASTNode(NodeType.TMP);
+      root.addChildren([
+        new ASTNode(NodeType.GROUP),
+        new ASTNode(NodeType.PRODUCTION),
+        new ASTNode(NodeType.PRODUCTION),
+      ]);
+      const givenNode = new GivenNode(NodeType.GROUP);
+      givenNode.apply(root);
+      const parent = root.getSoleChildOfType(NodeType.GROUP);
+      assert.isNotNull(parent);
+      assert.equal(parent.numberOfChildren(), 2);
+      const children = parent.getChildrenOfType(NodeType.PRODUCTION);
+      assert.equal(children.length, 2);
     });
   });
   describe("StackedPair", () => {
@@ -45,7 +61,6 @@ describe("ASTStrategy Tests", () => {
     it("can construct a FirstNode", () => {
       const firstNode = new FirstNode();
       assert.isNotNull(firstNode);
-
     });
   });
 });
