@@ -41,7 +41,7 @@ function build_developer_action() {
 function _build_developer() {
   builder_echo start "build developer" "Building and testing Keyman Developer"
 
-  ./build.sh configure build test
+  builder_launch /developer/src/build.sh configure build test
 
   builder_echo end "build developer" success "Finished building and testing Keyman Developer"
 }
@@ -49,19 +49,19 @@ function _build_developer() {
 function _build_testkeyboards() {
   builder_echo start "build testkeyboards" "Building test keyboards"
 
-  "${KEYMAN_ROOT}/common/test/keyboards/build.sh" --zip-source --index
+  builder_launch /common/test/keyboards/build.sh --zip-source --index
 
   builder_echo end "build testkeyboards" success "Finished building test keyboards"
 }
 
 function publish_sentry_action() {
   builder_echo start "publish" "publish modules locally and prep api"
-  ./build.sh api publish
+  builder_launch /developer/src/build.sh api publish
   builder_echo end "publish" "publish modules locally and prep api"
 
   builder_echo start "publish sentry" "Publishing debug information files to Sentry"
   # TODO: move this into build.sh publish?
-  "${KEYMAN_ROOT}/developer/src/tools/sentry-upload-difs.sh"
+  builder_launch /developer/src/tools/sentry-upload-difs.sh
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
 

@@ -884,7 +884,7 @@ tangentbord som du använder i Windows. Keyman tangentbord kommer att anpassas a
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information kommer att lagras i en loggfil som heter %LOCALAPPDATA%\Keyman\Diag\system#.etl (där # är ett nummer). Du bör avsluta Keyman innan du försöker ta bort filen.\n\n\VARNING: Denna fil kan växa sig stor mycket snabbt. Aktivering av felsökning kan sakta ner ditt system och bör endast göras om det rekommenderas av teknisk support.\n\nINTEGRITET VARNING: Observera att felsökningsloggfilen registrerar alla tangenttryckningar som du skriver. Du bör bara aktivera felsökningsloggen under hela en felsöknings- eller diagnostisk session.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information kommer att lagras i en loggfil som heter %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (där # är ett nummer). Du bör avsluta Keyman innan du försöker ta bort filen.\n\n\VARNING: Denna fil kan växa sig stor mycket snabbt. Aktivering av felsökning kan sakta ner ditt system och bör endast göras om det rekommenderas av teknisk support.\n\nINTEGRITET VARNING: Observera att felsökningsloggfilen registrerar alla tangenttryckningar som du skriver. Du bör bara aktivera felsökningsloggen under hela en felsöknings- eller diagnostisk session.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

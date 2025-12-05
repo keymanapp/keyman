@@ -39,10 +39,10 @@ fi
 
 if builder_has_action all; then
   android_clean_action
-  android_build_action "${TARGETS}" --debug
-  android_publish_symbols "${TARGETS}" --debug
+  android_build_action "${TARGETS}"
+  android_publish_symbols "${TARGETS}"
 else
   builder_run_action  clean     android_clean_action
-  builder_run_action  build     android_build_action "${TARGETS}" --debug
-  builder_run_action  publish   android_publish_symbols "${TARGETS}" --debug
+  builder_run_action  build     android_build_action "${TARGETS}"
+  builder_run_action  publish   android_publish_symbols "${TARGETS}"
 fi
