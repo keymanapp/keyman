@@ -1,4 +1,6 @@
-/* eslint-disable prefer-const */
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
 import { DeviceDetector } from 'keyman/engine/main';
 import { type DeviceSpec } from 'keyman/common/web-utils';
@@ -6,7 +8,7 @@ import { type DeviceSpec } from 'keyman/common/web-utils';
 import type { KeymanEngine } from 'keyman/app/browser';
 import { JSKeyboard, type FloatingOSKView } from 'keyman/engine/osk';
 
-declare var keyman: KeymanEngine;
+declare const keyman: KeymanEngine;
 
 type KeyboardData = ReturnType<KeymanEngine['getKeyboard']>;
 type KeyboardMap = {[id: string]: KeyboardData};
@@ -54,12 +56,12 @@ export class BatchRenderer {
 
   // Filters the keyboard array to ensure only a single entry remains, rather than an entry per language.
   private filterKeyboards(): KeyboardMap {
-    let kbds = keyman.getKeyboards();
+    const kbds = keyman.getKeyboards();
 
-    let keyboardMap: Record<string, ReturnType<typeof keyman['getKeyboards']>[0]> = {};
+    const keyboardMap: Record<string, ReturnType<typeof keyman['getKeyboards']>[0]> = {};
 
-    for(var i = 0; i < kbds.length; i++) {
-      let id: string = kbds[i].InternalName;
+    for(let i = 0; i < kbds.length; i++) {
+      const id: string = kbds[i].InternalName;
       if(!id.match(BatchRenderer.keyboardMatch)) continue;
       if(id.match(/^Keyboard_bod/)) continue; // bod keyboards currently don't load on Chrome and break the test run; they need rebuild.
       if(keyboardMap[id]) {
@@ -74,7 +76,7 @@ export class BatchRenderer {
 
   private render(ele: HTMLElement, isMobile?: boolean): Promise<HTMLImageElement> {
     const capture = async () => {
-      const result = await new Promise<HTMLImageElement>((resolve, reject) => {
+      return await new Promise<HTMLImageElement>((resolve, reject) => {
         // from: https://github.com/kasprownik/electron-screencapture/blob/master/index.js
         const canvas = document.createElement('canvas');
         canvas.width = BatchRenderer.boundingRect.width;
@@ -88,26 +90,24 @@ export class BatchRenderer {
             0, 0, canvas.width, canvas.height);
 
         const frame = canvas.toDataURL("image/png");
-        let imgOut = document.createElement('img');
+        const imgOut = document.createElement('img');
         imgOut.src = frame;
 
         resolve(imgOut);
       });
-
-      return result;
     }
 
     return capture();
   }
 
   createKeyboardHeader(kbd: KeyboardData, formFactor: DeviceSpec.FormFactor, loaded: boolean): HTMLDivElement {
-    let divHeader = document.createElement('div');
-    let eleName = document.createElement('h2');
+    const divHeader = document.createElement('div');
+    const eleName = document.createElement('h2');
 
     eleName.textContent = 'ID:  ' + kbd.InternalName;
     divHeader.appendChild(eleName);
 
-    let eleDescription = document.createElement('p');
+    const eleDescription = document.createElement('p');
 
     if(loaded) {
 
@@ -143,7 +143,7 @@ export class BatchRenderer {
 
   private processKeyboard(kbd: KeyboardData) {
     const p: Promise<any> = keyman.setActiveKeyboard(kbd.InternalName);
-    const {formFactor} = keyman.config.hostDevice;
+    const formFactor = keyman.config.hostDevice.formFactor;
     const isMobile = formFactor != 'desktop';
 
     // Establish common keyboard header info.
@@ -203,8 +203,8 @@ export class BatchRenderer {
           (document as any).fonts.ready.then(function() {
             window.setTimeout(function() {
               renderer.render(box, isMobile).then(function(imgEle: HTMLImageElement) {
-                let eleLayer = document.createElement('div');
-                let eleLayerId = document.createElement('p');
+                const eleLayer = document.createElement('div');
+                const eleLayerId = document.createElement('p');
                 eleLayerId.textContent = 'Layer ID:  ' + Object.keys(layers)[i];
 
                 eleLayer.appendChild(eleLayerId);
@@ -232,9 +232,9 @@ export class BatchRenderer {
   // Synchronously performs asynchronous operations across a loop, one at a time.
   // Necessary due to the nature of KMW OSK rendering.
   private arrayPromiseIteration(promiseGenerator: (i: number) => Promise<any>, length: number): Promise<any> {
-    let iteration = function(index: number): Promise<any> {
+    const iteration = function(index: number): Promise<any> {
       if(index < length) {
-        var promise = promiseGenerator(index);
+        const promise = promiseGenerator(index);
         return promise.then(function(index: number) {
           return iteration(++index);
         })
@@ -247,8 +247,8 @@ export class BatchRenderer {
   }
 
   fillDeviceNotes() {
-    let description = document.createElement('p');
-    let device = new DeviceDetector();
+    const description = document.createElement('p');
+    const device = new DeviceDetector();
     device.detect();
 
     description.appendChild(document.createTextNode('Browser: ' + device.browser));
@@ -271,7 +271,7 @@ export class BatchRenderer {
     BatchRenderer.keyboardMatch = new RegExp('^Keyboard_('+filter+')', 'i');
 
     if(keyman) {
-      let cc = await this.startCapture();
+      const cc = await this.startCapture();
       BatchRenderer.captureStream = cc.captureStream;
       BatchRenderer.video = cc.video;
 
@@ -293,13 +293,13 @@ export class BatchRenderer {
       }
 
       // Assumes that the keyboards have been preloaded for us.
-      let kbds = this.filterKeyboards();
+      const kbds = this.filterKeyboards();
 
       console.log("Unique keyboard ids detected: " + Object.keys(kbds).length);
 
-      let renderer = this;
+      const renderer = this;
 
-      let keyboardIterator = function(i: number) {
+      const keyboardIterator = function(i: number) {
         return new Promise(function(resolve) {
           renderer.processKeyboard(kbds[Object.keys(kbds)[i]]).then(function () {
             //console.log("Keyboard " + i + " processed!");
