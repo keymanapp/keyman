@@ -864,7 +864,7 @@ dat u in Windows gebruikt. Keyman toetsenborden worden automatisch aangepast aan
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug informatie zal worden opgeslagen in een log bestand genaamd %LOCALAPPDATA%\Keyman\Diag\system#.etl (waar # een nummer is). U moet Keyman afsluiten voordat u probeert dit bestand te verwijderen.\n\n\WAARSCHUWING: Dit bestand kan zeer snel groot worden. Het inschakelen van debugging kan uw systeem vertragen en moet alleen worden gedaan als het wordt aangeraden door technische ondersteuning.\n\nPRIVACY WAARSCHUWING: Houd er rekening mee dat het debuglogbestand alle toetsaanslagen opslaat die u typt. U moet alleen het debuglogboek inschakelen voor de duur van een foutopsporings- of diagnostische sessie.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug informatie zal worden opgeslagen in een log bestand genaamd %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (waar # een nummer is). U moet Keyman afsluiten voordat u probeert dit bestand te verwijderen.\n\n\WAARSCHUWING: Dit bestand kan zeer snel groot worden. Het inschakelen van debugging kan uw systeem vertragen en moet alleen worden gedaan als het wordt aangeraden door technische ondersteuning.\n\nPRIVACY WAARSCHUWING: Houd er rekening mee dat het debuglogbestand alle toetsaanslagen opslaat die u typt. U moet alleen het debuglogboek inschakelen voor de duur van een foutopsporings- of diagnostische sessie.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

@@ -1,5 +1,47 @@
 # Keyman Version History
 
+## 19.0.170 alpha 2025-12-03
+
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.1.1 in /resources/build/pr-build-status (#15173)
+* chore(deps-dev): bump glob from 10.4.5 to 10.5.0 in /resources/build/pr-build-status (#15184)
+* chore(deps): bump js-yaml and @microsoft/api-documenter (#15185)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#15186)
+* docs(developer): add/update API docs (#15275)
+
+## 19.0.169 alpha 2025-12-02
+
+* maint(core): verify that keyman_core_ldml.h is in sync (#15256)
+* chore(common): Update FirstVoices keyboard versions in keyboards.csv (#15261)
+
+## 19.0.168 alpha 2025-12-01
+
+* chore(android): add intent to broadcast font name (#15193)
+* docs(android): Document Keyman API for keyboard font change (#15247)
+* docs(ios): Use /cdn/dev assets for Engine guides (#15253)
+* fix(developer): handle errors in .keyman-touch-layout file when loading (#15243)
+* fix(android): address keyboard height vs touch height race after keyboard height preference change (also min max heights + docs) (#13663)
+
+## 19.0.167 alpha 2025-11-28
+
+* change(windows): add unit testing to keyman32 build (#15244)
+* refactor(windows): merge syskbdnt.cpp and syskbdnt64.cpp into RightAltEmulationCheck.cpp (#15245)
+* chore(windows): add wow64kbd support app for researching WOW64 reqs (#15246)
+
+## 19.0.166 alpha 2025-11-26
+
+* chore(android): Clarify PR title for #15136 (#15224)
+* fix(windows): escape backslashes in path in debugging message (#15236)
+
+## 19.0.165 alpha 2025-11-21
+
+* chore(mac): add keyTrace log (#14972)
+* fix(developer): avoid race in page.onload vs kmw.init in Server (#15087)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15179)
+
+## 19.0.164 alpha 2025-11-20
+
+* feat(windows): update wix to 3.14.1 (#15194)
+
 ## 19.0.163 alpha 2025-11-17
 
 * chore(linux): Update debian changelog (#15133)
@@ -20,7 +62,7 @@
 
 ## 19.0.161 alpha 2025-11-13
 
-* docs(android): Document disclaimer of Keyman NOT containing adware/spyware (#15136)
+* docs(android): Add documentation explaining Android keyboard safety warning dialog (#15136)
 
 ## 19.0.160 alpha 2025-11-12
 
@@ -996,6 +1038,16 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.245 stable 2025-12-03
+
+* chore(windows): VS2022 patch for stable-18.0 (#15081)
+* maint(resources): use VERSION_ENVIRONMENT var for v18 (#15068)
+* chore(linux): Update debian changelog (#14964)
+* fix(windows): add check a fix for registry datatypes (#15175)
+* chore(linux): Update debian changelog (#15132)
+* feat(windows): update wix to 3.14.1 (#15195)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15219)
 
 ## 18.0.244 stable 2025-10-31
 

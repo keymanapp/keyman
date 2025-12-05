@@ -863,7 +863,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman ayıklama məlumatları %LOCALAPPDATA%\Keyman\Diag\system#.etl adlı bir günlük sənədində saxlanacaqdır (burada # bir rəqəm bilidirir). Bu faylı silməyə başlamazdan əvvəl Keyman-dan çıxmalısınız. \n\n\XƏBƏRDARLIQ: Bu fayl çox sürətlə böyüyə bilər. Həta ayıklamanın aktivləşdirilməsi sisteminizi ləngidə bilər və yalnız texniki dəstək tərəfindən tövsiyə edildikdə edilməlidir.\n\nGİZLİLİK XƏBƏRDARLIĞI: Nəzərə alın ki, ayıklama qeyd sənədində yazdığınız bütün vuruşları qeyd edir Hata ayıklama jurnalını yalnız bir ayıklama və ya diaqnostik seans müddətində açmalısınız.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman ayıklama məlumatları %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl adlı bir günlük sənədində saxlanacaqdır (burada # bir rəqəm bilidirir). Bu faylı silməyə başlamazdan əvvəl Keyman-dan çıxmalısınız. \n\n\XƏBƏRDARLIQ: Bu fayl çox sürətlə böyüyə bilər. Həta ayıklamanın aktivləşdirilməsi sisteminizi ləngidə bilər və yalnız texniki dəstək tərəfindən tövsiyə edildikdə edilməlidir.\n\nGİZLİLİK XƏBƏRDARLIĞI: Nəzərə alın ki, ayıklama qeyd sənədində yazdığınız bütün vuruşları qeyd edir Hata ayıklama jurnalını yalnız bir ayıklama və ya diaqnostik seans müddətində açmalısınız.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

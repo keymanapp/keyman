@@ -95,9 +95,10 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             currentHeight -= y;
 
             // Apply lower and upper bounds on currentHeight
-            int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
-            currentHeight = Math.max(defaultHeight/2, currentHeight);
-            currentHeight = Math.min(defaultHeight*2, currentHeight);
+            int minKeyboardHeight = KMManager.getKeyboardHeightMin(context);
+            int maxKeyboardHeight = KMManager.getKeyboardHeightMax(context);
+            currentHeight = Math.max(minKeyboardHeight, currentHeight);
+            currentHeight = Math.min(maxKeyboardHeight, currentHeight);
 
             refreshSampleKeyboard(context);
             break;
