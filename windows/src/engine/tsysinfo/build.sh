@@ -42,11 +42,12 @@ function do_build() {
   rm -f tsysinfox64.bin
 
   delphi_msbuild tsysinfo.dproj "//p:Platform=Win32"
-  do_map2pdb "$WIN32_TARGET_PATH/tsysinfo.map" "$WIN32_TARGET"
+  sentrytool_delphiprep "$WIN32_TARGET" tsysinfo.dpr
+  tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   cp *.xslt "$WINDOWS_PROGRAM_ENGINE/"
-  cp_if_exists "$WIN32_TARGET_PATH/tsysinfo.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/tsysinfo.dbg" "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg"
 }
 
 function do_publish() {
@@ -56,12 +57,11 @@ function do_publish() {
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/tsysinfo.exe"
 
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/tsysinfo.exe" //t keyman-engine-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.pdb" //t keyman-engine-windows
+  wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg" //t keyman-engine-windows
 }
 
 function do_install() {
   cp "$WINDOWS_PROGRAM_ENGINE/tsysinfo.exe" "$INSTALLPATH_KEYMANENGINE/tsysinfo.exe"
-  cp_if_exists "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.pdb" "$INSTALLPATH_KEYMANENGINE/tsysinfo.pdb"
   cp *.xslt "$INSTALLPATH_KEYMANENGINE/"
 }
 
