@@ -81,12 +81,6 @@
     <ClCompile Include="syskbd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syskbdnt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="syskbdnt64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -142,6 +136,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="k32_visualkeyboardinterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LowLevelHookWatchDog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RightAltEmulationCheck.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -262,6 +262,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="k32_visualkeyboardinterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LowLevelHookWatchDog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

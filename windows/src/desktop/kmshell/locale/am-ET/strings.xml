@@ -884,7 +884,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">ኪይማን ማረሚያ መረጃ  %LOCALAPPDATA%\Keyman\Diag\system#.etl (# ቁጥር ባለበት) ተብሎ በሚጠራው መዝገብ ውስጥ ይቀመጣል። ይህንን ፋይል ለመሰረዝ ከመሞከርዎ በፊት ከኪማን መውጣት አለብዎት። \n\nማስጠንቀቂያ: ይህ ፋይል በፍጥነት ሊያድግ ይችላል። ኢኔብሊንግ ዲበጊንግ (enabling debugging) ሲስተምዎን ሊያዘገይ ይችላል እና መደረግ ያለበት በቴክኒክ ድጋፍ ብቻ ከሆነ ነው። \n\nየግል ማስጠንቀቂያ: እባክዎን ዲበጊንግ ሎግ ፋይል ሪከርድስ (debug logfile records) ሁሉንም የሚተይቡትን ቁልፍ ጭነቶች ይመዘግባል። ዲበጊንግ ሎግ (debug log) ማስታወሻውን ለምርመራ ወይም ለምርመራ ክፍለ ጊዜ ብቻ ማብራት አለብዎት።</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">ኪይማን ማረሚያ መረጃ  %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (# ቁጥር ባለበት) ተብሎ በሚጠራው መዝገብ ውስጥ ይቀመጣል። ይህንን ፋይል ለመሰረዝ ከመሞከርዎ በፊት ከኪማን መውጣት አለብዎት። \n\nማስጠንቀቂያ: ይህ ፋይል በፍጥነት ሊያድግ ይችላል። ኢኔብሊንግ ዲበጊንግ (enabling debugging) ሲስተምዎን ሊያዘገይ ይችላል እና መደረግ ያለበት በቴክኒክ ድጋፍ ብቻ ከሆነ ነው። \n\nየግል ማስጠንቀቂያ: እባክዎን ዲበጊንግ ሎግ ፋይል ሪከርድስ (debug logfile records) ሁሉንም የሚተይቡትን ቁልፍ ጭነቶች ይመዘግባል። ዲበጊንግ ሎግ (debug log) ማስታወሻውን ለምርመራ ወይም ለምርመራ ክፍለ ጊዜ ብቻ ማብራት አለብዎት።</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
