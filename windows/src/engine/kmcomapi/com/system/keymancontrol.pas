@@ -76,6 +76,7 @@ type
   TKeyman32ControllerSendMessageFunction = function(msg: UINT; wParam: WPARAM; lParam: LPARAM): LRESULT; stdcall;
   TKeyman32ControllerPostMessageFunction = procedure(msg: UINT; wParam: WPARAM; lParam: LPARAM); stdcall;
   TKeyman32UpdateTouchPanelVisibilityFunction = procedure(Value: BOOL); stdcall;
+  TKeyman32WatchDogKeyEvent = procedure; stdcall;
 
   TKeymanControl = class(TKeymanAutoObject, IKeymanCustomisationAccess, IIntKeymanControl, IKeymanControl, IKeymanEngineControl)
   private
@@ -97,6 +98,7 @@ type
     FKeyman_PostMasterController: TKeyman32ControllerPostMessageFunction;
     FKeyman_StartExit: TKeyman32ExitFunction;  // I3092
     FKeyman_UpdateTouchPanelVisibility: TKeyman32UpdateTouchPanelVisibilityFunction;
+    FKeyman_WatchDogKeyEvent: TKeyman32WatchDogKeyEvent;
     procedure LoadKeyman32;
     procedure StartKeyman32;
     procedure Do_Keyman_Exit;
@@ -148,6 +150,7 @@ type
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
+    procedure WatchDogKeyEvent; safecall;    // 32 bit only
 
     procedure DiagnosticTestException; safecall;
 
@@ -524,6 +527,25 @@ begin
 {$ENDIF}
 end;
 
+(**
+ * Tell the LowLevelHookWatchDog that a key event has been received
+ *)
+procedure TKeymanControl.WatchDogKeyEvent;
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  KL.MethodEnter(Self, 'WatchDogKeyEvent', []);
+  try
+    LoadKeyman32;
+    FKeyman_WatchDogKeyEvent;
+  finally
+    KL.MethodExit(Self, 'WatchDogKeyEvent');
+  end;
+{$ENDIF}
+end;
+
+
 procedure TKeymanControl.RegisterControllerThread(Value: LongWord);
 begin
 {$IFDEF WIN64}
@@ -750,6 +772,9 @@ begin
     @FKeyman_SendMasterController := ProcAddr('Keyman_SendMasterController');
     @FKeyman_PostMasterController := ProcAddr('Keyman_PostMasterController');
     @FKeyman_UpdateTouchPanelVisibility := ProcAddr('Keyman_UpdateTouchPanelVisibility');
+{$IFNDEF WIN64}
+    @FKeyman_WatchDogKeyEvent := ProcAddr('Keyman_WatchDogKeyEvent');
+{$ENDIF}
   end;
 end;
 

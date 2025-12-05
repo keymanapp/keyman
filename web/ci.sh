@@ -65,7 +65,7 @@ function build_action() {
   #               - also useful when validating this script on a local dev machine!
   # - build:      then do the ACTUAL build.
   # one option:
-  ./build.sh configure clean build
+  builder_launch /web/build.sh configure clean build
 
   if builder_is_ci_build && builder_is_ci_build_level_release; then
     # Upload the sentry-configuration engine used by the mobile apps to sentry
@@ -82,7 +82,7 @@ function build_action() {
 }
 
 function test_action() {
-  ./build.sh test
+  builder_launch /web/build.sh test
 }
 
 function post_test_action() {

@@ -58,7 +58,11 @@ generate_uuid() {
 
 run_in_vs_env() {
   (
-    builder_echo heading "### visual_studio: $@"
+    if [[ "${1-x}" == "--quiet" ]]; then
+      shift
+    else
+      builder_echo heading "### visual_studio: $*"
+    fi
     source "$KEYMAN_ROOT/resources/build/win/visualstudio_environment.inc.sh"
     "$@"
   )
@@ -66,31 +70,33 @@ run_in_vs_env() {
 
 run_in_delphi_env() {
   (
-    builder_echo heading "### delphi: $@"
+    if [[ "${1-x}" == "--quiet" ]]; then
+      shift
+    else
+      builder_echo heading "### delphi: $*"
+    fi
     source "$KEYMAN_ROOT/resources/build/win/delphi_environment.inc.sh"
     "$@"
   )
 }
 
-#
-# If map2pdb is on the path, then run it. Note: we do not include it in the repo
-# because it can have false positives in malware scans. map2pdb is used to
-# generate .pdb files for Delphi-generated executables, which can then be used
-# in debuggers such as WinDbg, or profilers such as VTune.
-#
-do_map2pdb() {
-  if hash map2pdb 2>/dev/null; then
-    map2pdb "$1" -bind:"$2"
+sentrytool_delphiprep() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping sentrytool_delphiprep - buildLevel=build: $@"
+    return 0
   fi
+
+  local EXE_PATH="$1"
+  local DPR_PATH="$2"
+  (
+    builder_echo heading "### delphi: sentrytool_delphiprep $1 $2"
+    source "$KEYMAN_ROOT/resources/build/win/delphi_environment.inc.sh"
+    "$SENTRYTOOL" delphiprep -r "$KEYMAN_ROOT" -i "$DELPHIINCLUDES" "$(cygpath -w "$EXE_PATH")" -dpr "$DPR_PATH"
+  )
 }
 
-#
-# If the first parameter is a file that exists, do the copy, otherwise, no-op.
-#
-cp_if_exists() {
-  if [[ -f "$1" ]]; then
-    cp "$@"
-  fi
+tds2dbg() {
+  builder_if_release_build_level "$TDS2DBG" "$@"
 }
 
 delphi_msbuild() {
