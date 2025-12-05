@@ -34,13 +34,23 @@ export abstract class Rule { // equivalent to a no-child rule
  * syntax analyzer rules with a single child.
  */
 export abstract class SingleChildRule extends Rule {
-  protected rule: Rule;
-
-  public constructor(rule: Rule=null) {
+  /**
+   * Construct a SingleChildRule
+   */
+  public constructor(
+    /** the single child rule */
+    protected rule: Rule=null
+  ) {
     super();
-    this.rule = rule;
   }
 
+  /**
+   * Parse the tokenBuffer, building it into an abstract syntax tree (AST).
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed (null if there is no rule)
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     return this.rule === null ? false : this.rule.parse(tokenBuffer, node);
   }
@@ -49,18 +59,27 @@ export abstract class SingleChildRule extends Rule {
 /**
  * SingleChildRule is the abstract base class of all the recursive-descent
  * syntax analyzer rules with a single child that use an ASTStrategy to
- * rearrange the tree after a successful parse.
+ * rebuild the tree after a successful parse.
  */
 export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
+  /**
+   * Construct a SingleChildRuleWithASTStrategy
+   */
   public constructor(
     /** the strategy used on the tree after a successful parse */
-    protected readonly strategy: ASTStrategy
+    protected readonly strategy: ASTStrategy,
+    /** the single child rule */
+    rule: Rule=null
   ) {
-    super();
+    super(rule);
   }
 
   /**
    * Parse the rule and, if successful, apply the ASTStrategy
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
@@ -77,12 +96,15 @@ export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
  * syntax analyzer rules with multiple children.
  */
 export abstract class MultiChildRule extends Rule {
-  protected rules: Rule[];
-
-  public constructor(rules: Rule[]) {
+  /**
+   * Construct a MultiChildRule
+   */
+  public constructor(
+    /** the array of child rules */
+    protected rules: Rule[]
+  ) {
     // TODO-NG-COMPILER error if rules is null
     super();
-    this.rules = rules;
   }
 }
 
@@ -91,7 +113,13 @@ export abstract class MultiChildRule extends Rule {
  * syntax analyzer (rules eparated by spaces in the BNF).
  */
 export class SequenceRule extends MultiChildRule {
-  public constructor(rules: Rule[]) {
+  /**
+   * Construct a SequenceRule
+   */
+  public constructor(
+    /** the array of sequential child rules */
+    rules: Rule[]
+  ) {
     super(rules);
   }
 
@@ -130,7 +158,13 @@ export class SequenceRule extends MultiChildRule {
  * syntax analyzer (rules eparated by '|' in the BNF).
  */
 export class AlternateRule extends MultiChildRule {
-  public constructor(rules: Rule[]) {
+  /**
+   * Construct an AlternateRule
+   */
+  public constructor(
+    /** the array of alternate child rules */
+    rules: Rule[]
+  ) {
     super(rules);
   }
 
@@ -169,7 +203,13 @@ export class AlternateRule extends MultiChildRule {
  * syntax analyzer ('?' in the BNF).
  */
 export class OptionalRule extends SingleChildRule {
-  public constructor(rule: Rule) {
+  /**
+   * Construct an OptionalRule
+   */
+  public constructor(
+    /** the optional single child rule */
+    rule: Rule
+  ) {
     super(rule);
   }
 
@@ -204,7 +244,13 @@ export class OptionalRule extends SingleChildRule {
  * syntax analyzer ('*' in the BNF).
  */
 export class ManyRule extends SingleChildRule {
-  public constructor(rule: Rule) {
+  /**
+   * Construct a ManyRule
+   */
+  public constructor(
+    /** the single child rule */
+    rule: Rule
+  ) {
     super(rule);
   }
 
@@ -239,7 +285,13 @@ export class ManyRule extends SingleChildRule {
  * syntax analyzer ('+' in the BNF).
  */
 export class OneOrManyRule extends SingleChildRule {
-  public constructor(rule: Rule) {
+  /**
+   * Construct a OneOrManyRule
+   */
+  public constructor(
+    /** the single child rule */
+    rule: Rule
+  ) {
     super(rule);
   }
 
