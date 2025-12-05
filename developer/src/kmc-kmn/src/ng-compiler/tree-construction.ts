@@ -107,6 +107,16 @@ export class ASTNode {
   }
 
   /**
+   * The number of children this node has of a given type.
+   *
+   * @param requiredType the required type
+   * @returns the number of children of the required type
+   */
+  public numberOfChildrenOfType(requiredType: NodeType): number {
+    return this.getChildrenOfType(requiredType).length;
+  }
+
+  /**
    * Check if this node has any children.
    *
    * @returns true if there is at least one child node

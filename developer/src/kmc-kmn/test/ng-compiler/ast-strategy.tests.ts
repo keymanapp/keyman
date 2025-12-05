@@ -31,8 +31,7 @@ describe("ASTStrategy Tests", () => {
       const parent = root.getSoleChildOfType(NodeType.GROUP);
       assert.isNotNull(parent);
       assert.equal(parent.numberOfChildren(), 2);
-      const children = parent.getChildrenOfType(NodeType.PRODUCTION);
-      assert.equal(children.length, 2);
+      assert.equal(parent.numberOfChildrenOfType(NodeType.PRODUCTION), 2);
     });
   });
   describe("StackedPair", () => {
