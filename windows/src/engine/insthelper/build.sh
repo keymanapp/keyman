@@ -27,17 +27,18 @@ function do_build() {
   create-windows-output-folders
   build_version.res
   delphi_msbuild insthelper.dproj "//p:Platform=Win32"
-  do_map2pdb "$WIN32_TARGET_PATH/insthelper.map" "$WIN32_TARGET"
+  sentrytool_delphiprep "$WIN32_TARGET" insthelper.dpr
+  tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp_if_exists "$WIN32_TARGET_PATH/insthelper.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/insthelper.dbg" "$WINDOWS_DEBUGPATH_ENGINE/insthelper.dbg"
 }
 
 function do_publish() {
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/insthelper.dll"
 
   wrap-symstore "$WINDOWS_PROGRAM_ENGINE/insthelper.dll" //t keyman-engine-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/insthelper.pdb" //t keyman-engine-windows
+  wrap-symstore "$WINDOWS_DEBUGPATH_ENGINE/insthelper.dbg" //t keyman-engine-windows
 }
 
 builder_run_action clean:project        clean_windows_project_files

@@ -453,10 +453,22 @@ final class KMKeyboard extends WebView {
   public void onResume() {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
+
+    // Get the correct keyboard height for current orientation
+    int kbHeight = KMManager.getKeyboardHeight(context);
+
+    // Check if there's a pending height update for this specific keyboard type and orientation
+    int currentOrientation = KMManager.getOrientation(context);
+    if (KMManager.getAndClearPendingHeightUpdate(this.keyboardType, currentOrientation)) {
+      // There was a pending height update - force apply it now
+      RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
+      this.setLayoutParams(params);
+    }
+
     // Ensure window is loaded for javascript functions
     loadJavascript(KMString.format(
       "window.onload = function(){ setOskWidth(\"%d\");"+
-      "setOskHeight(\"0\"); };", kbWidth));
+      "setOskHeight(\"%d\"); };", kbWidth, kbHeight));
     if (this.getShouldShowHelpBubble()) {
       this.showHelpBubbleAfterDelay(2000);
     }
