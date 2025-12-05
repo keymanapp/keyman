@@ -147,7 +147,23 @@ describe("Tree Construction Tests", () => {
         assert.deepEqual(root.getDescendents(NodeType.VERSION), [version1, version2, version3]);
       });
     });
-    describe("ASTNode.hasChild()", () => {
+    describe("ASTNode.numberOfChildren()", () => {
+      beforeEach(() => {
+        initVariables();
+      });
+      it("can handle if there are no children", () => {
+        assert.equal(root.numberOfChildren(), 0);
+      });
+      it("can handle one child", () => {
+        root.addChild(bitmap);
+        assert.equal(root.numberOfChildren(), 1);
+      });
+      it("can handle two children", () => {
+        root.addChildren([bitmap, copyright]);
+        assert.equal(root.numberOfChildren(), 2);
+      });
+    });
+    describe("ASTNode.hasChildren()", () => {
       beforeEach(() => {
         initVariables();
       });
@@ -163,7 +179,7 @@ describe("Tree Construction Tests", () => {
         assert.isTrue(root.hasChildren());
       });
     });
-    describe("ASTNode.hasChildOfType()", () => {
+    describe("ASTNode.hasChildrenOfType()", () => {
       beforeEach(() => {
         initVariables();
       });
