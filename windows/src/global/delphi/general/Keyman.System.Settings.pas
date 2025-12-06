@@ -95,7 +95,7 @@ const
       ValueType: kstInteger
   );
 
-  BaseKeymanSettings: array[0..31] of TKeymanSettingBase = (
+  BaseKeymanSettings: array[0..30] of TKeymanSettingBase = (
 
     // TIKE:UTikeDebugMode.TikeDebugMode
     (
@@ -161,16 +161,6 @@ const
       DefaultDesc: '%ProgramData%\Keyman\Keyman Engine\Keyboard'
     ),
 
-    // kmcomapi:keymancontrol.TKeymanControl.LoadKeyman32.GetKeymanInstallPath
-    // keyman32_int.GetKeymanInstallPath
-    (
-      ID: 'development.paths.keyman32';
-      Name: 'Debug_Keyman32Path';
-      RootKey: HKCU;
-      Key: SRegKey_KeymanDebug_CU;
-      Description: 'Path for keyman32.dll; use this when debugging Keyman Core'
-    ),
-
     // KeymanPaths.TKeymanPaths.KeymanEngineInstallPath
     (
       ID: 'development.paths.keyman_engine_home';
@@ -178,7 +168,7 @@ const
       RootKey: HKCU;
       Key: SRegKey_KeymanDebug_CU;
       Description: 'Path for keyman.exe and related resources; use this when '+
-                   'debugging Keyman Configuration';
+                   'debugging Keyman Configuration or Keyman Engine';
       DefaultDesc: '%CommonProgramFiles(x86)%\Keyman\Keyman Engine'
     ),
 

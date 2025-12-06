@@ -710,32 +710,6 @@ end;
 
 procedure TKeymanControl.LoadKeyman32;
 
-    function GetKeymanInstallPath: string;   // I3598
-    var
-      buf: array[0..260] of char;
-      RootPath: string;
-    begin
-      RootPath := '';
-      with TRegistryErrorControlled.Create do  // I2890
-      try
-        RootKey := HKEY_LOCAL_MACHINE;
-        if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootPath) then
-            RootPath := ReadString(SRegValue_RootPath);
-      finally
-        Free;
-      end;
-
-      RootPath := GetDebugPath('Debug_Keyman32Path', RootPath);  // I2825
-
-      if RootPath = '' then
-      begin
-        GetModuleFileName(HInstance, buf, 260);
-        RootPath := ExtractFilePath(buf);
-      end;
-
-      Result := IncludeTrailingPathDelimiter(RootPath);
-    end;
-
     function ProcAddr(const Name: string): FARPROC;
     begin
       Result := GetProcAddress(hlibKeyman32, PChar(Name));
@@ -748,7 +722,7 @@ begin
   if hlibKeyman32 = 0 then
   begin
 
-    s := GetKeymanInstallPath+SKeyman32Filename;   // I3598
+    s := TKeymanPaths.KeymanEngineInstallPath(SKeyman32Filename);   // I3598
     if not FileExists(s) then
       ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find '+SKeyman32Filename+' at "'+s+'", '+SysErrorMessage(GetLastError)]));
 
