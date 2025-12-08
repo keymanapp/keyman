@@ -148,7 +148,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   }
 
   /**
-   * Calculate keyboard height from touch Y coordinate.
+   * Calculate keyboard height from touch Y coordinate and clamp 
+   * within min-max bounds.
    * @param touchY Touch Y coordinate in screen coordinates
    * @param viewBottom Bottom Y coordinate of keyboard view
    * @return Keyboard height in pixels, clamped to min/max bounds
