@@ -11,9 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmtip", "kmtip\kmtip.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mcompile", "mcompile\mcompile.vcxproj", "{5C22DDDA-CEAD-45F1-96B0-1473111156AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine-tests", "keyman32\tests\keyman-engine-tests\keyman-engine-tests.vcxproj", "{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine", "keyman32\keyman-engine.vcxproj", "{A7069186-5AE7-4504-8926-861B7A34BA9E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman32.tests", "keyman32\tests\keyman32.tests.vcxproj", "{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testhost", "testhost\testhost.vcxproj", "{12818DA3-0472-49A5-96FC-A4808A1A77FA}"
 EndProject

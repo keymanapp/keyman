@@ -1,5 +1,168 @@
 # Keyman Version History
 
+## 19.0.171 alpha 2025-12-08
+
+* maint(resources): verify order of builder_describe_internal_dependency (#15257)
+* maint(common): use `builder_launch` for child builds (#15258)
+* change(windows): Revert "change(windows): include map2pdb generation for relevant Delphi projects" (#15276)
+* change(windows): add shortcuts to 'Update Available' dialog (#15280)
+* maint(resources): roll back builder_launch for trigger-release-builds.sh (#15316)
+
+## 19.0.170 alpha 2025-12-03
+
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.1.1 in /resources/build/pr-build-status (#15173)
+* chore(deps-dev): bump glob from 10.4.5 to 10.5.0 in /resources/build/pr-build-status (#15184)
+* chore(deps): bump js-yaml and @microsoft/api-documenter (#15185)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#15186)
+* docs(developer): add/update API docs (#15275)
+
+## 19.0.169 alpha 2025-12-02
+
+* maint(core): verify that keyman_core_ldml.h is in sync (#15256)
+* chore(common): Update FirstVoices keyboard versions in keyboards.csv (#15261)
+
+## 19.0.168 alpha 2025-12-01
+
+* chore(android): add intent to broadcast font name (#15193)
+* docs(android): Document Keyman API for keyboard font change (#15247)
+* docs(ios): Use /cdn/dev assets for Engine guides (#15253)
+* fix(developer): handle errors in .keyman-touch-layout file when loading (#15243)
+* fix(android): address keyboard height vs touch height race after keyboard height preference change (also min max heights + docs) (#13663)
+
+## 19.0.167 alpha 2025-11-28
+
+* change(windows): add unit testing to keyman32 build (#15244)
+* refactor(windows): merge syskbdnt.cpp and syskbdnt64.cpp into RightAltEmulationCheck.cpp (#15245)
+* chore(windows): add wow64kbd support app for researching WOW64 reqs (#15246)
+
+## 19.0.166 alpha 2025-11-26
+
+* chore(android): Clarify PR title for #15136 (#15224)
+* fix(windows): escape backslashes in path in debugging message (#15236)
+
+## 19.0.165 alpha 2025-11-21
+
+* chore(mac): add keyTrace log (#14972)
+* fix(developer): avoid race in page.onload vs kmw.init in Server (#15087)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15179)
+
+## 19.0.164 alpha 2025-11-20
+
+* feat(windows): update wix to 3.14.1 (#15194)
+
+## 19.0.163 alpha 2025-11-17
+
+* chore(linux): Update debian changelog (#15133)
+* fix(windows): handle exceptions when walking stack in exception handler (#15150)
+* fix(windows): disable OutputDebugString from DllMain (#15151)
+* change(windows): include map2pdb generation for relevant Delphi projects (#14799)
+* change(windows): use circular buffer for logging (#15163)
+* fix(windows): handle forward slash for KEYMAN_ROOT env var (#15156)
+* maint(mac): handle hdiutil detach failure correctly in make-km-dmg.sh (#15176)
+
+## 19.0.162 alpha 2025-11-14
+
+* chore(linux): use `devel` for next Ubuntu release (#15157)
+* maint(resources): add build timing report to builder (#15114)
+* maint(resources): add `builder_launch` function (#15129)
+* fix(web): improve determination of default path (#15159)
+* maint(linux): free disk space before running autopkgtests (#15172)
+
+## 19.0.161 alpha 2025-11-13
+
+* docs(android): Add documentation explaining Android keyboard safety warning dialog (#15136)
+
+## 19.0.160 alpha 2025-11-12
+
+* fix(android): Change Alert Dialog instead of Toast if package missing keyboard and lexical-model files (#15098)
+* chore(linux): add support for Ubuntu 26.04 LTS Resolute (#15137)
+
+## 19.0.159 alpha 2025-11-11
+
+* maint(core): fix option defaults for Meson >= 1.1 (#15131)
+
+## 19.0.158 alpha 2025-11-10
+
+* fix(web): add unit tests for DeadkeyTracker and fix a few bugs (#15113)
+
+## 19.0.157 alpha 2025-11-06
+
+* chore(common): Consolidate platformtest.js keyboard to `/common/test/keyboards/` (#15034)
+* chore(common): Consolidate test9469.js keyboard to `/common/test/keyboards/` (#15053)
+
+## 19.0.156 alpha 2025-11-05
+
+* chore(linux): Update debian changelog (#14965)
+* maint(resources): Docker container changes permissions to match the file owner uid and gid (#14900)
+* fix(developer): remove package version if FollowKeyboardVersion is set in Package Editor (#15088)
+* maint(windows): new timestamp server for test signing (#15091)
+
+## 19.0.155 alpha 2025-11-03
+
+* maint(resources): auto merge on branch name rather than label (#15084)
+* change(developer): remove kmlmc and kmlmp (#15083)
+
+## 19.0.154 alpha 2025-10-31
+
+* chore(developer): further debugging for assertion failure (#15056)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15058)
+* fix(developer): handle exceptions loading .keyman-touch-layout files (#15060)
+* chore(developer): fix always-false nullish coalescing (#15061)
+* chore(windows): upgrade VC++ projects to v143 (VS2022) (#15062)
+
+## 19.0.153 alpha 2025-10-30
+
+* test(developer): add kmc-analyze tests for AnalyzeOskCharacterUse output formats (#15030)
+
+## 19.0.152 alpha 2025-10-30
+
+* maint(resources): include sourcemaps in npm publish (#15051)
+
+## 19.0.151 alpha 2025-10-29
+
+* maint(resources): add repository record for all published packages (#15049)
+
+## 19.0.150 alpha 2025-10-29
+
+* maint(resources): set build flags for npm-publish (#15047)
+
+## 19.0.149 alpha 2025-10-29
+
+* maint(resources): don't report status check on release builds for npm-publish (#15045)
+
+## 19.0.148 alpha 2025-10-29
+
+* chore(web,android): Consolidate chirality.js test keyboard to `/common/test/resources/keyboards/` (#14989)
+* maint(resources): npm publish - build all packages first (#15042)
+
+## 19.0.147 alpha 2025-10-28
+
+* maint(resources): move npm package publishing to GitHub Actions (#15029)
+* maint(resources): use actions/setup-node to upgrade npm (#15035)
+* maint(resources): use a string for version, rather than number (#15036)
+* maint(resources): set env variables in npm publish GHA (#15037)
+* maint(mac): minor tweaks to mac setup, using build.sh (#15028)
+* maint(resources): add build and test for npm packaging and add status check results (#15038)
+* maint(resources): add write permission for statuses for npm-publish (#15039)
+* maint(resources): skip nvm in npm-publish script (#15041)
+
+## 19.0.146 alpha 2025-10-27
+
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15008)
+* fix(developer): prevent ANSI keyboards crashing debugger (#15022)
+* test(developer): add coverage tests for warning messages in kmc-analyze/AnalyzeOskCharacterUse (#15021)
+
+## 19.0.145 alpha 2025-10-24
+
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15001)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15002)
+* test(developer): add test to kmc-analyze for Warn_PreviousMapFileCouldNotBeLoaded (#14038)
+
+## 19.0.144 alpha 2025-10-23
+
+* chore(deps-dev): bump playwright from 1.46.1 to 1.56.1 (#14984)
+* chore(web): revert "chore(deps-dev): bump playwright from 1.46.1 to 1.56.1" (#15000)
+
 ## 19.0.143 alpha 2025-10-20
 
 * fix(android): Set the main app background white (#14935)
@@ -883,6 +1046,27 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.245 stable 2025-12-03
+
+* chore(windows): VS2022 patch for stable-18.0 (#15081)
+* maint(resources): use VERSION_ENVIRONMENT var for v18 (#15068)
+* chore(linux): Update debian changelog (#14964)
+* fix(windows): add check a fix for registry datatypes (#15175)
+* chore(linux): Update debian changelog (#15132)
+* feat(windows): update wix to 3.14.1 (#15195)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15219)
+
+## 18.0.244 stable 2025-10-31
+
+* fix(linux): use `ibus` command to restart ibus (#14975)
+* fix(android): Set the main app background white (#14982)
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15005)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15006)
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15009)
+* maint(resources): move NPM package publishing to GitHub Actions (#15054)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15059)
+* chore(developer): further debugging for assertion failure (#15057)
 
 ## 18.0.243 stable 2025-10-15
 

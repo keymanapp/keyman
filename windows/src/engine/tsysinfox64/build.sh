@@ -39,15 +39,10 @@ function do_publish() {
   wrap-signcode //d "Keyman Engine for Windows" "$WINDOWS_PROGRAM_ENGINE/tsysinfox64.exe"
 }
 
-function do_install() {
-  cp "$WINDOWS_PROGRAM_ENGINE/tsysinfox64.exe" "$INSTALLPATH_KEYMANENGINE/tsysinfox64.exe"
-  cp *.xslt "$INSTALLPATH_KEYMANENGINE/"
-}
-
 builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
-# builder_run_action test:project         do_test
+# builder_run_action test:project       (no current tests)
 builder_run_action publish:project      do_publish
-builder_run_action install:project      do_install
+# builder_run_action install:project    (installed as part of tsysinfo)
 builder_run_action edit:project         start tsysinfox64.dproj

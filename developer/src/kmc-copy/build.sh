@@ -11,16 +11,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
-. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 builder_describe "Build Keyman kmc-copy module" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
   "@/developer/src/common/web/utils" \
-  clean configure build api test publish \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  clean configure build api test
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -42,5 +39,3 @@ builder_run_action api        api-extractor run --local --verbose
 # note: `export TEST_SAVE_FIXTURES=1` to get a copy of cloud-based fixtures saved to online/
 # TODO: -skip-full
 builder_run_action test       typescript_run_eslint_mocha_tests 75
-
-builder_run_action publish    ci_publish_npm
