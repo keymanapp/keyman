@@ -38,7 +38,7 @@ Note: For 32-bit there exists a WOW6432Node in windows registry that allows diff
 When an application loads `kmtiparm64x.dll`:
 * The Windows loader automatically detects the process architecture.
 * **Automatic Selection:**
-    * If the host process is **x64**, Windows exposes the **Arm64EC** section. The Arm64EC section is built against the **keyman64.dll** keyman engine causing it to be loaded dynamically.
+    * If the host process is **x64**, Windows exposes the **Arm64EC** section. The **Arm64EC** section is built against the **keyman64.dll** keyman engine causing it to be loaded dynamically.
     * If the host process is **Arm64**, Windows exposes the **Arm64** section. The **Arm64** section is built against the **keymanarm64.dll** keyman engine causing it to be loaded dynamically.
 
 * **Transparency:** The host application is unaware that the binary contains code for other platforms; it sees only what it expects
