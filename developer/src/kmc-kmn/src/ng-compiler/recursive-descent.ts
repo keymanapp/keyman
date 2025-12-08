@@ -105,7 +105,7 @@ export abstract class MultiChildRule extends Rule {
     /** the array of child rules */
     protected rules: Rule[]
   ) {
-    // TODO-NG-COMPILER error if rules is null
+    // TODO-NG-COMPILER fatal error if rules is null
     super();
   }
 }
@@ -125,23 +125,18 @@ export class SequenceRule extends MultiChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    let parseSuccess: boolean = true;
     const save: number = tokenBuffer.currentPosition;
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
 
     for (const rule of this.rules) {
       if (!rule.parse(tokenBuffer, tmp)) {
-        parseSuccess = false;
-        break;
+        tokenBuffer.resetCurrentPosition(save);
+        return false;
       }
     }
-    if (parseSuccess) {
-      node.addChildren(tmp.getChildren());
-    } else {
-      tokenBuffer.resetCurrentPosition(save);
-    }
 
-    return parseSuccess;
+    node.addChildren(tmp.getChildren());
+    return true;
   }
 }
 
@@ -159,24 +154,19 @@ export class AlternateRule extends MultiChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    let parseSuccess: boolean = false;
     const save: number = tokenBuffer.currentPosition;
     let tmp: ASTNode;
 
     for (const rule of this.rules) {
       tmp = new ASTNode(NodeType.TMP);
       if (rule.parse(tokenBuffer, tmp)) {
-        parseSuccess = true;
-        break;
+        node.addChildren(tmp.getChildren());
+        return true;
       }
     }
-    if (parseSuccess) {
-      node.addChildren(tmp.getChildren());
-    } else {
-      tokenBuffer.resetCurrentPosition(save);
-    }
 
-    return parseSuccess;
+    tokenBuffer.resetCurrentPosition(save);
+    return false;
   }
 }
 
@@ -205,12 +195,11 @@ export class OptionalRule extends SingleChildRule {
    * @returns true
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    let parseSuccess: boolean = true;
     const save: number = tokenBuffer.currentPosition;
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    parseSuccess = this.rule.parse(tokenBuffer, tmp);
 
-    if (parseSuccess) {
+    // TODO-NG-COMPILER: fatal error if rule is null
+    if (this.rule?.parse(tokenBuffer, tmp)) {
       node.addChildren(tmp.getChildren());
     } else {
       tokenBuffer.resetCurrentPosition(save);
@@ -247,17 +236,18 @@ export class ManyRule extends SingleChildRule {
    * @returns true
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    let parseSuccess: boolean = true;
-    while (parseSuccess) {
+    while (true) {
       const save: number = tokenBuffer.currentPosition;
       const tmp: ASTNode = new ASTNode(NodeType.TMP);
-      parseSuccess       = this.rule.parse(tokenBuffer, tmp);
-      if (parseSuccess) {
+
+      // TODO-NG-COMPILER: fatal error if rule is null
+      if (this.rule?.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
       } else {
         tokenBuffer.resetCurrentPosition(save);
+        break;
       }
-    };
+    }
     return true;
   }
 }
@@ -289,18 +279,17 @@ export class OneOrManyRule extends SingleChildRule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     let anyParseSuccess: boolean = false;
-    let parseSuccess: boolean    = true;
     do {
       const save: number = tokenBuffer.currentPosition;
       const tmp: ASTNode = new ASTNode(NodeType.TMP);
-      parseSuccess       = this.rule.parse(tokenBuffer, tmp);
-      if (parseSuccess) {
+      if (this.rule.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
         anyParseSuccess = true;
       } else {
         tokenBuffer.resetCurrentPosition(save);
+        break;
       }
-    } while (parseSuccess);
+    } while (true);
     return anyParseSuccess;
   }
 }
@@ -345,11 +334,9 @@ export class TokenRule extends Rule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    let parseSuccess: boolean = false;
     const token: Token = tokenBuffer.currentToken();
 
     if (token.isTokenType(this.tokenType)) {
-      parseSuccess = true;
       tokenBuffer.popToken();
       if (this.addNode) {
         const nodeType: NodeType = TokenRule.tokenToNodeMap.get(token.tokenType);
@@ -358,11 +345,10 @@ export class TokenRule extends Rule {
           // TODO-NG-COMPILER: warning if there is no valid mapping
         }
       }
-    } else {
-      parseSuccess = false;
+      return true;
     }
 
-    return parseSuccess;
+    return false;
   }
 
   public static getNodeType(tokenType: TokenType): NodeType {
@@ -408,11 +394,9 @@ export class AlternateTokenRule extends Rule {
    * @returns true if the current token was successfully matched
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    let parseSuccess: boolean = false;
     const token: Token = tokenBuffer.currentToken();
 
     if (this.tokenTypes.has(token.tokenType)) {
-      parseSuccess = true;
       tokenBuffer.popToken();
       if (this.addNode) {
         const nodeType: NodeType = TokenRule.getNodeType(token.tokenType);
@@ -421,9 +405,10 @@ export class AlternateTokenRule extends Rule {
           // TODO-NG-COMPILER: warning if there is no valid mapping
         }
       }
+      return true;
     }
 
-    return parseSuccess;
+    return false;
   }
 }
 
