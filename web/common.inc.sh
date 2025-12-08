@@ -91,7 +91,7 @@ function test-headless() {
   TEST_FOLDER=$1
   TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
   TEST_EXTENSIONS=${2:-}
-  if [ ! -z "${2:-}" ]; then
+  if [[ ! -z "${2:-}" ]]; then
     TEST_BASE="${KEYMAN_ROOT}/web/build/test/headless/"
 
     # Ensure the compiled tests are available.
@@ -104,6 +104,7 @@ function test-headless() {
     echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
   if [[ -n "${TEST_EXTENSIONS}" ]]; then
+    # file extension of test files
     TEST_OPTS+=(--extension "${TEST_EXTENSIONS}")
   fi
 
