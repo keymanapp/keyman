@@ -66,8 +66,7 @@ export class ASTNode {
    * @returns this
    */
   public addNewChildWithToken(nodeType: NodeType, token: Token=null): ASTNode {
-    this.addChild(new ASTNode(nodeType, token));
-    return this;
+    return this.addChild(new ASTNode(nodeType, token));
   }
 
   /**
@@ -91,10 +90,12 @@ export class ASTNode {
    * @param requiredType the required type
    */
   private collectDescendents(result: ASTNode[], requiredType: NodeType): void {
-    if (this.nodeType === requiredType)
+    if (this.nodeType === requiredType) {
       result.push(this);
-    for (const child of this.children)
+    }
+    for (const child of this.children) {
       child.collectDescendents(result, requiredType);
+    }
   }
 
   /**
@@ -142,7 +143,7 @@ export class ASTNode {
    * @returns true if there is one and only one child of the required type
    */
   public hasSoleChildOfType(requiredType: NodeType): boolean  {
-    return this.getChildrenOfType(requiredType).length == 1
+    return this.getChildrenOfType(requiredType).length == 1;
   }
 
   /**
@@ -151,7 +152,7 @@ export class ASTNode {
    * @returns token text or an empty string
    */
   public getText(): String {
-    return (this.token != null) ? this.token.text : '';
+    return this.token?.text ?? '';
   }
 
   /**
@@ -163,7 +164,7 @@ export class ASTNode {
    */
   public getTextOfType(requiredType: NodeType): String  {
     const child: ASTNode = this.getSoleChildOfType(requiredType);
-    return (child != null) ? child.getText() : '';
+    return child?.getText() ?? '';
   }
 
   /**
@@ -192,7 +193,7 @@ export class ASTNode {
    * @returns the child nodes or an empty array
    */
   public getChildren(): ASTNode[] {
-    return Array(...this.children);
+    return [...this.children];
   }
 
   /**
