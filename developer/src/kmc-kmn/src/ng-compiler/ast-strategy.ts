@@ -96,7 +96,7 @@ export class NewNode extends ASTStrategy {
   public apply(node: ASTNode): ASTNode {
     const newNode: ASTNode = new ASTNode(this.nodeType);
     newNode.addChildren(node.removeChildren());
-    node.addChild(newNode)
+    node.addChild(newNode);
     return node;
   };
 }

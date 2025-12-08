@@ -52,7 +52,8 @@ export abstract class SingleChildRule extends Rule {
    * @returns true if this rule was successfully parsed (null if there is no rule)
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    return this.rule === null ? false : this.rule.parse(tokenBuffer, node);
+    // TODO-NG-COMPILER: fatal error if rule is null
+    return this.rule?.parse(tokenBuffer, node) ?? false;
   }
 }
 
@@ -83,7 +84,8 @@ export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    // TODO-NG-COMPILER: fatal error if rule is null
+    const parseSuccess: boolean = this.rule?.parse(tokenBuffer, tmp) ?? false;
     if (parseSuccess) {
       node.addChild(this.strategy.apply(tmp).getSoleChild());
     }
@@ -113,16 +115,6 @@ export abstract class MultiChildRule extends Rule {
  * syntax analyzer (rules eparated by spaces in the BNF).
  */
 export class SequenceRule extends MultiChildRule {
-  /**
-   * Construct a SequenceRule
-   */
-  public constructor(
-    /** the array of sequential child rules */
-    rules: Rule[]
-  ) {
-    super(rules);
-  }
-
   /**
    * Parse each rule in turn, succeeding only if all succeed.
    * In the event of failure, reset the tokenBuffer to the position
@@ -158,16 +150,6 @@ export class SequenceRule extends MultiChildRule {
  * syntax analyzer (rules eparated by '|' in the BNF).
  */
 export class AlternateRule extends MultiChildRule {
-  /**
-   * Construct an AlternateRule
-   */
-  public constructor(
-    /** the array of alternate child rules */
-    rules: Rule[]
-  ) {
-    super(rules);
-  }
-
   /**
    * Parse each rule in turn, succeeding if any succeed. In the event of failure,
    * reset the tokenBuffer to the position saved at the start of the attempted parse.
@@ -293,7 +275,7 @@ export class OneOrManyRule extends SingleChildRule {
     rule: Rule
   ) {
     super(rule);
-  }
+  };
 
   /**
    * Parses the stored rule as many times as possible, succeeding if the
