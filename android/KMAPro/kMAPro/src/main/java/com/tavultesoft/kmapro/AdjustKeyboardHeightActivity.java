@@ -154,10 +154,10 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
    * @param viewBottom Bottom Y coordinate of keyboard view
    * @return Keyboard height in pixels, clamped to min/max bounds
    */
-  private static int calculateKeyboardHeightFromTouch(Context context, int touchY, int viewBottom) {
+  private int calculateKeyboardHeightFromTouch(int touchY, int viewBottom) {
     int height = viewBottom - touchY;
-    int minKeyboardHeight = KMManager.getKeyboardHeightMin(context);
-    int maxKeyboardHeight = KMManager.getKeyboardHeightMax(context);
+    int minKeyboardHeight = KMManager.getKeyboardHeightMin(this);
+    int maxKeyboardHeight = KMManager.getKeyboardHeightMax(this);
     return Math.max(minKeyboardHeight, Math.min(maxKeyboardHeight, height));
   }
 
