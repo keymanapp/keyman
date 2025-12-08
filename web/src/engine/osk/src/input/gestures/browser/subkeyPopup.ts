@@ -61,6 +61,7 @@ export default class SubkeyPopup implements GestureHandler {
 
   private callout: HTMLDivElement;
   private readonly menuWidth: number;
+  private readonly numColumns: number;
 
   public readonly baseKey: KeyElement;
   public readonly subkeys: KeyElement[];
@@ -154,6 +155,7 @@ export default class SubkeyPopup implements GestureHandler {
     // Put a maximum of 9 keys in a row to reduce travel distance
     const nRows=Math.ceil(nKeys/9);
     const nCols=Math.ceil(nKeys/nRows);
+    this.numColumns = nCols;
 
     // Add nested button elements for each sub-key
     this.subkeys = [];
@@ -307,6 +309,19 @@ export default class SubkeyPopup implements GestureHandler {
     const ss=subKeys.style;
     const parentOffsetLeft = e.offsetParent ? (<HTMLElement>e.offsetParent).offsetLeft : 0;
     let x = e.offsetLeft + parentOffsetLeft + 0.5*(e.offsetWidth-subKeys.offsetWidth);
+
+    // Issue #9768: Realign subkey menu when columns are even to avoid ambiguous default selection
+    // With even-numbered columns, shift the menu by half a key width to ensure one option
+    // sits unambiguously under the default touch position (like Google's Gboard)
+    if (this.numColumns % 2 === 0) {
+      const keyCenter = e.offsetLeft + parentOffsetLeft + e.offsetWidth / 2;
+      const keyboardCenter = vkbd.width / 2;
+      const halfKeyShift = e.offsetWidth / 2;
+
+      // Shift left if key is on right side, right if on left side
+      x += (keyCenter > keyboardCenter) ? -halfKeyShift : halfKeyShift;
+    }
+
     const xMax = vkbd.width - subKeys.offsetWidth;
 
     if(x > xMax) {
