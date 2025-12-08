@@ -117,21 +117,15 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
 
   /**
    * Calculate percentage from height and default height.
-   * Rounds away from 100% to make changes more visible.
    * @param height Current height
    * @param defaultHeight Default height
-   * @return Percentage
+   * @return Percentage rounded to nearest integer
    */
   private static int calculatePercentage(int height, int defaultHeight) {
     if (defaultHeight == 0 || height == 0) {
       return 100;
     }
-    double exactPercent = (double) height / defaultHeight * 100;
-
-    // Round away from 100 to make changes more visible
-    return exactPercent >= 100.0
-        ? (int) Math.ceil(exactPercent)   // Round up when >= 100
-        : (int) Math.floor(exactPercent); // Round down when < 100
+    return (int) Math.round((double) height / defaultHeight * 100);
   }
 
   /**
