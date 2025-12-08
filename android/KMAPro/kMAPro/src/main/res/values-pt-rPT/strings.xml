@@ -120,9 +120,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Todos os idiomas já instalados</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Arraste o teclado para redimensionar a altura</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Gire o dispositivo para ajustar o retrato e a paisagem</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Arraste o teclado para redimensionar a altura. Gire o dispositivo para ajustar o retrato e a paisagem.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Restaurar padrões</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
