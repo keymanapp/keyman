@@ -85,7 +85,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
           sampleKeyboard.getLocationOnScreen(location);
           int viewBottom = location[1] + sampleKeyboard.getHeight();
           int touchY = (int) event.getRawY();
-          currentHeight = calculateKeyboardHeightFromTouch(this, touchY, viewBottom);
+          currentHeight = calculateKeyboardHeightFromTouch(touchY, viewBottom);
           refreshSampleKeyboard();
           break;
         case MotionEvent.ACTION_UP:
@@ -149,15 +149,14 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
 
   /**
    * Calculate keyboard height from touch Y coordinate.
-   * @param context Context
    * @param touchY Touch Y coordinate in screen coordinates
    * @param viewBottom Bottom Y coordinate of keyboard view
    * @return Keyboard height in pixels, clamped to min/max bounds
    */
-  private static int calculateKeyboardHeightFromTouch(Context context, int touchY, int viewBottom) {
+  private int calculateKeyboardHeightFromTouch(int touchY, int viewBottom) {
     int height = viewBottom - touchY;
-    int minKeyboardHeight = KMManager.getKeyboardHeightMin(context);
-    int maxKeyboardHeight = KMManager.getKeyboardHeightMax(context);
+    int minKeyboardHeight = KMManager.getKeyboardHeightMin(this);
+    int maxKeyboardHeight = KMManager.getKeyboardHeightMax(this);
     return Math.max(minKeyboardHeight, Math.min(maxKeyboardHeight, height));
   }
 
