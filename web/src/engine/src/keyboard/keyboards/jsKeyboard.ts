@@ -358,12 +358,12 @@ export class JSKeyboard {
    *
    * @param       {number}    command     event code (16,17,18) or 0
    * @param       {TextStore} textStore   textStore
-   * @param       {number}    data        1 or 0
+   * @param       {boolean}   data        1 or 0
    */
-  public notify(command: number, textStore: TextStore, data: number): void { // I2187
+  public notify(command: number, textStore: TextStore, data: boolean): void { // I2187
     // Good example use case - the Japanese CJK-picker keyboard
     if(typeof(this.scriptObject['KNS']) == 'function') {
-      this.scriptObject['KNS'](command, textStore, data);
+      this.scriptObject['KNS'](command, textStore, data ? 1 : 0);
     }
   }
 

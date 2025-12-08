@@ -539,7 +539,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     }
 
     if(Levent.isModifier) {
-      this.activeKeyboard.notify(Levent.Lcode, textStore, isKeyDown ? 1 : 0);
+      this.activeKeyboard.notify(Levent.Lcode, textStore, isKeyDown);
       // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
       if(!Levent.device.touchable) {
         return this._UpdateVKShift(Levent); // I2187
@@ -549,7 +549,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     }
 
     if(Levent.LmodifierChange) {
-      this.activeKeyboard.notify(0, textStore, 1);
+      this.activeKeyboard.notify(0, textStore, true);
       if(!Levent.device.touchable) {
         this._UpdateVKShift(Levent);
       }

@@ -99,12 +99,15 @@ export class KMXKeyboard {
   }
 
   /**
-   * @param       {number}    eventCode     event code (16,17,18) or 0 // TODO-web-core: document meaning of these! (#15290)
-   * @param       {TextStore} textStore     textStore
-   * @param       {number}    data          1 or 0
    * Notifies keyboard of keystroke or other event
+   *
+   * @param       {number}    eventCode     key code (16-18: Shift, Control or Alt),
+   *                                        or 0 for focus
+   * @param       {TextStore} textStore     textStore
+   * @param       {number}    boolean       true for KeyDown or FocusReceived,
+   *                                        false for KeyUp or FocusLost
    */
-  public notify(eventCode: 16|17|18|0, textStore: TextStore, data: number) { // I2187
+  public notify(eventCode: number, textStore: TextStore, data: boolean): void { // I2187
     // TODO-web-core: do we need to support this? (#15290)
   }
 
