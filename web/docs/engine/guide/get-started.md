@@ -42,7 +42,7 @@ The source code for the page may be seen below.
   src='https://s.keyman.com/kmw/engine/17.0.330/keymanweb.js'></script>` loads the Keyman Engine
   for Web script for the page.
 
-- `(function() { keyman.init(); });` serves to initialize the web engine with default settings.
+- `(function() { ... keyman.init( ... ); ... })(keyman);` serves to initialize the web engine with default settings.
   By adding the object `{attachType:'auto'}` as a parameter to our `keyman.init()` call, the
   KeymanWeb engine will then link into any detected input elements automatically, regardless of
   browser or device, as part of its initialization.
