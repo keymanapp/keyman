@@ -19,8 +19,8 @@ The source code for the page may be seen below.
   <meta charset="UTF-8">
   <title>KeymanWeb - A First Example</title>
 
-  <script src='https://s.keyman.com/kmw/engine/17.0.330/keymanweb.js'></script>
-  <script src='https://s.keyman.com/kmw/engine/17.0.330/kmwuitoggle.js'></script>
+  <script src='https://s.keyman.com/kmw/engine/18.0.245/keymanweb.js'></script>
+  <script src='https://s.keyman.com/kmw/engine/18.0.245/kmwuitoggle.js'></script>
   <script>
     (function() {
       keyman.init({attachType:'auto'}).then(function() {
@@ -39,7 +39,7 @@ The source code for the page may be seen below.
 ## The Breakdown
 
 - The `<script>` inclusion `<script
-  src='https://s.keyman.com/kmw/engine/17.0.330/keymanweb.js'></script>` loads the Keyman Engine
+  src='https://s.keyman.com/kmw/engine/18.0.245/keymanweb.js'></script>` loads the Keyman Engine
   for Web script for the page.
 
 - `(function() { ... keyman.init( ... ); ... })(keyman);` serves to initialize the web engine with default settings.
@@ -48,7 +48,7 @@ The source code for the page may be seen below.
   browser or device, as part of its initialization.
 
 - The other `<script>` inclusion, `<script
-  src='https://s.keyman.com/kmw/engine/17.0.330/kmwuitoggle.js'></script>`, creates the language
+  src='https://s.keyman.com/kmw/engine/18.0.245/kmwuitoggle.js'></script>`, creates the language
   menu seen on non-mobile devices and the on-screen keyboard toggle button. For other options,
   see our [User Interface Design](user-interface-design) page.
 
