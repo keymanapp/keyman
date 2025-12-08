@@ -313,6 +313,9 @@ export default class SubkeyPopup implements GestureHandler {
     // Issue #9768: Realign subkey menu when columns are even to avoid ambiguous default selection
     // With even-numbered columns, shift the menu by half a key width to ensure one option
     // sits unambiguously under the default touch position (like Google's Gboard)
+    // Note: This uses the idealized column count and assumes uniform key widths. If subkeys
+    // have significantly different widths, the actual layout may already be unambiguous,
+    // but applying this shift won't cause harm (bounds checking prevents overflow).
     if (this.numColumns % 2 === 0) {
       const keyCenter = e.offsetLeft + parentOffsetLeft + e.offsetWidth / 2;
       const keyboardCenter = vkbd.width / 2;
