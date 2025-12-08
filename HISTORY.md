@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.172 alpha 2025-12-08
+
+* docs(web): add links to next/previous page to web guide (#15311)
+* fix(developer): verify project file loaded successfully in analyze (#15318)
+
 ## 19.0.171 alpha 2025-12-08
 
 * maint(resources): verify order of builder_describe_internal_dependency (#15257)
