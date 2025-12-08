@@ -8,13 +8,14 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRule, SingleChildRuleWithASTStrategy } from '../../src/ng-compiler/recursive-descent.js';
 import { Rule, SequenceRule, parameterSequence, AlternateTokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
+import { NewNode } from '../../src/ng-compiler/ast-strategy.js';
 
 const LIST_OF_ONE: Token[] = [
   new Token(TokenType.STRING, ''),
@@ -63,6 +64,40 @@ describe("Recursive Descent Tests", () => {
     trueRule    = new TrueRule();
     falseRule   = new FalseRule();
     parameters  = [];
+  });
+  describe("SingleChildRule Tests", () => {
+    class ConcreteSingleChildRule extends SingleChildRule {
+      public constructor(rule: Rule=null) {
+        super(rule);
+      }
+      public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+        return super.parse(tokenBuffer, node);
+      }
+    }
+    it("returns false without a rule to parse", () => {
+      const noRule: Rule = new ConcreteSingleChildRule(); // no rule supplied
+      assert.isFalse(noRule.parse(tokenBuffer, root));
+    });
+    it("returns true with a valid rule to parse", () => {
+      const validRule: Rule = new ConcreteSingleChildRule(trueRule);
+      assert.isTrue(validRule.parse(tokenBuffer, root));
+    });
+  });
+  describe("SingleChildRuleWithASTStrategy Tests", () => {
+    it("can apply a strategy (NewNode)", () => {
+      const newNodeRule: Rule = new class extends SingleChildRuleWithASTStrategy {
+        public constructor() {
+          super(new NewNode(NodeType.STRING), trueRule);
+        }
+        public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+          return super.parse(tokenBuffer, node);
+        }
+      }();
+      assert.isTrue(newNodeRule.parse(tokenBuffer, root));
+      const parent = root.getSoleChildOfType(NodeType.STRING); // from NewNode strategy
+      assert.isNotNull(parent);
+      assert.isNotNull(parent.getSoleChildOfType(NodeType.TMP)); // from trueRule
+    });
   });
   describe("SequenceRule Tests", () => {
     it("can construct a SequenceRule", () => {

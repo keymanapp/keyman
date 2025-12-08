@@ -52,7 +52,8 @@ export abstract class SingleChildRule extends Rule {
    * @returns true if this rule was successfully parsed (null if there is no rule)
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    return this.rule === null ? false : this.rule.parse(tokenBuffer, node);
+    // TODO-NG-COMPILER: fatal error if rule is null
+    return this.rule?.parse(tokenBuffer, node) ?? false;
   }
 }
 
@@ -83,7 +84,8 @@ export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+    // TODO-NG-COMPILER: fatal error if rule is null
+    const parseSuccess: boolean = this.rule?.parse(tokenBuffer, tmp) ?? false;
     if (parseSuccess) {
       node.addChild(this.strategy.apply(tmp).getSoleChild());
     }
@@ -113,16 +115,6 @@ export abstract class MultiChildRule extends Rule {
  * syntax analyzer (rules eparated by spaces in the BNF).
  */
 export class SequenceRule extends MultiChildRule {
-  /**
-   * Construct a SequenceRule
-   */
-  public constructor(
-    /** the array of sequential child rules */
-    rules: Rule[]
-  ) {
-    super(rules);
-  }
-
   /**
    * Parse each rule in turn, succeeding only if all succeed.
    * In the event of failure, reset the tokenBuffer to the position
@@ -158,16 +150,6 @@ export class SequenceRule extends MultiChildRule {
  * syntax analyzer (rules eparated by '|' in the BNF).
  */
 export class AlternateRule extends MultiChildRule {
-  /**
-   * Construct an AlternateRule
-   */
-  public constructor(
-    /** the array of alternate child rules */
-    rules: Rule[]
-  ) {
-    super(rules);
-  }
-
   /**
    * Parse each rule in turn, succeeding if any succeed. In the event of failure,
    * reset the tokenBuffer to the position saved at the start of the attempted parse.
@@ -293,7 +275,7 @@ export class OneOrManyRule extends SingleChildRule {
     rule: Rule
   ) {
     super(rule);
-  }
+  };
 
   /**
    * Parses the stored rule as many times as possible, succeeding if the
@@ -327,20 +309,19 @@ export class OneOrManyRule extends SingleChildRule {
  * TokenRule represents a Token (terminal) in the BNF.
  */
 export class TokenRule extends Rule {
+  /** mapping from the TokenType to a NodeType to use in the AST */
   private static tokenToNodeMap: Map<TokenType, NodeType>;
-  private tokenType: TokenType;
-  private addNode: boolean; // whether to add an ASTNode if the rule succeeds
 
   /**
    * Construct a TokenRule
-   *
-   * @param tokenType the TokenType to potentially match
-   * @param addNode whether to add an ASTNode if the rule succeeds
    */
-  public constructor(tokenType: TokenType, addNode: boolean=false) {
+  public constructor(
+    /** the TokenType to potentially match */
+    private readonly tokenType: TokenType,
+    /** whether to add an ASTNode if the rule succeeds */
+    private readonly addNode: boolean=false
+  ) {
     super();
-    this.tokenType = tokenType;
-    this.addNode   = addNode;
   }
 
   private static tokenToNode = TOKEN_TO_NODE;
@@ -353,7 +334,7 @@ export class TokenRule extends Rule {
   }
 
   /**
-   * Parse the next token looking to match the stored TokenType.
+   * Parse the current token looking to match the stored TokenType.
    * If matched, the rule succeeds.  Moreover, if adding an ASTNode has
    * been requested (addNode), and there is a valid mapping from the
    * TokenType to a NodeType, then add the ASTNode. If there is no match,
@@ -397,20 +378,22 @@ export class TokenRule extends Rule {
  * for the first match.
  */
 export class AlternateTokenRule extends Rule {
-  private tokenTypes: Set<TokenType>; // a Set is used to avoid unnecessary duplicates
-  private addNode: boolean;
+  /** a Set of TokenType to be potentially matched */
+  private readonly tokenTypes: Set<TokenType>;
 
   /**
    * Construct an AlternateTokenRule
-   *
-   * @param tokenTypes the array of TokenType to be potentially matched
-   * @param addNode whether to add an ASTNode if the rule succeeds
    */
-  public constructor(tokenTypes: TokenType[], addNode: boolean=false) {
+  public constructor(
+    /** the array of TokenType to be potentially matched */
+    tokenTypes: TokenType[],
+    /** whether to add an ASTNode if the rule succeeds */
+    private readonly addNode: boolean=false
+  ) {
     super();
+    // a Set is used to avoid unnecessary duplicates
     this.tokenTypes = new Set<TokenType>(tokenTypes);
     // TODO-NG-COMPILER: warning if there is a duplicate TokenType in the supplied array
-    this.addNode    = addNode;
   }
 
   /**
