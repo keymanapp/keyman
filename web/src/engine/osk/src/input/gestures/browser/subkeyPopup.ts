@@ -61,7 +61,7 @@ export default class SubkeyPopup implements GestureHandler {
 
   private callout: HTMLDivElement;
   private readonly menuWidth: number;
-  private readonly numColumns: number;
+  private readonly maxRowColumns: number;
 
   public readonly baseKey: KeyElement;
   public readonly subkeys: KeyElement[];
@@ -155,13 +155,14 @@ export default class SubkeyPopup implements GestureHandler {
     // Put a maximum of 9 keys in a row to reduce travel distance
     const nRows=Math.ceil(nKeys/9);
     const nCols=Math.ceil(nKeys/nRows);
-    this.numColumns = nCols;
 
     // Add nested button elements for each sub-key
     this.subkeys = [];
     let thisRowWidth = SUBKEY_DEFAULT_MARGIN_LEFT;
     let iRow = 0;
-    for(let i=0, iCol=0; i<nKeys; i++, iCol++) {
+    let iCol = 0;
+    let rowColumnCounts: number[] = []; // Track columns per row
+    for(let i=0; i<nKeys; i++) {
       let subkeyWidth = (typeof subKeySpec[i]['width'] != 'undefined') ?
         subKeySpec[i]['width'] * e.offsetWidth / 100 :
         e.offsetWidth;
@@ -175,6 +176,7 @@ export default class SubkeyPopup implements GestureHandler {
         // TODO: currently we don't check that the rows fit vertically,
         // so it's possible that the top or bottom of the subkey menu
         // is not visible.
+        rowColumnCounts[iRow] = iCol; // Save column count for the completed row
         iRow++;
         iCol = 0;
         thisRowWidth = SUBKEY_DEFAULT_MARGIN_LEFT;
@@ -186,7 +188,12 @@ export default class SubkeyPopup implements GestureHandler {
       this.subkeys.push(kDiv.firstChild as KeyElement);
 
       elements.appendChild(kDiv);
+      iCol++;
     }
+    // Save column count for the last row
+    rowColumnCounts[iRow] = iCol;
+    // Find the maximum row column count (the widest row determines menu width and shift logic)
+    this.maxRowColumns = Math.max(...rowColumnCounts);
 
     ss.width = this.menuWidth + 'px';
 
@@ -313,10 +320,18 @@ export default class SubkeyPopup implements GestureHandler {
     // Issue #9768: Realign subkey menu when columns are even to avoid ambiguous default selection
     // With even-numbered columns, shift the menu by half a key width to ensure one option
     // sits unambiguously under the default touch position (like Google's Gboard)
-    // Note: This uses the idealized column count and assumes uniform key widths. If subkeys
-    // have significantly different widths, the actual layout may already be unambiguous,
-    // but applying this shift won't cause harm (bounds checking prevents overflow).
-    if (this.numColumns % 2 === 0) {
+    // Note: We check the widest row (which determines the menu width), not the idealized column
+    // count. Since rows are left-aligned within the popup, the widest row determines the overall
+    // centering. For uneven distributions (e.g., 11 keys as 6+5), the widest row has 6 columns
+    // (even), so we apply the shift even though the bottom row has 5 (odd), because all rows are
+    // left-aligned and the shorter bottom row is also offset left from the base key center.
+    // In rare constrained cases (3+ row popup on top keyboard row where the popup shifts down),
+    // a middle row may actually be closest to the finger. However, since the entire popup shifts
+    // horizontally as a unit, there will still be a key positioned under the finger.
+    // This assumes uniform key widths. If subkeys have significantly different widths,
+    // the actual layout may already be unambiguous, but applying this shift won't cause harm
+    // (bounds checking prevents overflow).
+    if (this.maxRowColumns % 2 === 0) {
       const keyCenter = e.offsetLeft + parentOffsetLeft + e.offsetWidth / 2;
       const keyboardCenter = vkbd.width / 2;
       const halfKeyShift = e.offsetWidth / 2;

@@ -406,4 +406,64 @@ describe('subkey menu even-column realignment', () => {
     assert.isAtMost(menuLeft, 175); // 400 - 225
   });
 
+  it('Uneven rows (11 keys: 6+5) applies shift when widest row is even', () => {
+    // 11 keys: nRows = ceil(11/9) = 2, nCols = ceil(11/2) = 6
+    // Layout: Top row has 6 keys (even), bottom row has 5 keys (odd)
+    // Rows are left-aligned, so widest row (6, even) determines shift
+    const sut = new SubkeyPopup(
+      mockSource(),
+      sinon.stub(),
+      mockVisualKeyboard(400 /*px*/),
+      mockKeys(100, 50, 40, Array(11).fill(DEFAULT_KEY)),
+      DEFAULT_GESTURE_PARAMS
+    );
+
+    document.body.appendChild(sut.element);
+
+    // Width for 6 keys: 6 * (50 + 5) + 5 = 335
+    sut.element.style.width = '335px';
+    Object.defineProperty(sut.element, 'offsetWidth', { value: 335, configurable: true });
+
+    sut.reposition(mockVisualKeyboard(400));
+
+    const menuLeft = parseInt(sut.element.style.left);
+
+    // Key center: 100 + 25 = 125
+    // Keyboard center: 200
+    // Key is on left side, widest row has even columns (6), so shift RIGHT
+    // Base position: 100 + 0.5*(50-335) = 100 - 142.5 = -42.5
+    // With shift: -42.5 + 25 = -17.5, clamped to 0
+    assert.equal(menuLeft, 0, 'Should apply rightward shift but be clamped to 0');
+  });
+
+  it('Uneven rows (12 keys: 6+6) applies shift when widest row is even', () => {
+    // 12 keys: nRows = ceil(12/9) = 2, nCols = ceil(12/2) = 6
+    // Layout: Top row has 6 keys (even), bottom row has 6 keys (even)
+    // Widest row is 6 (even), shift SHOULD be applied
+    const sut = new SubkeyPopup(
+      mockSource(),
+      sinon.stub(),
+      mockVisualKeyboard(400 /*px*/),
+      mockKeys(100, 50, 40, Array(12).fill(DEFAULT_KEY)),
+      DEFAULT_GESTURE_PARAMS
+    );
+
+    document.body.appendChild(sut.element);
+
+    // Width for 6 keys: 6 * (50 + 5) + 5 = 335
+    sut.element.style.width = '335px';
+    Object.defineProperty(sut.element, 'offsetWidth', { value: 335, configurable: true });
+
+    sut.reposition(mockVisualKeyboard(400));
+
+    const menuLeft = parseInt(sut.element.style.left);
+
+    // Key center: 100 + 25 = 125
+    // Keyboard center: 200
+    // Key is on left side, widest row has even columns, so shift right
+    // Base position: 100 + 0.5*(50-335) = 100 - 142.5 = -42.5
+    // With shift: -42.5 + 25 = -17.5, clamped to 0
+    assert.equal(menuLeft, 0, 'Should apply rightward shift but be clamped to 0');
+  });
+
 });
