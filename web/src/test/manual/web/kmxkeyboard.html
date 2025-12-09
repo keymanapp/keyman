@@ -56,7 +56,8 @@
           window.addEventListener('load', async function () {
             await keyman.init();
             await keyman.addKeyboards(keyboard);
-            // allow to wait on OSK being visible
+            // allow to wait on OSK being visible; `window.OskShown` waited on
+            // by keyboard.tests.ts
             window.OskShown = new Promise((resolve) => {
               keyman.osk.addEventListener('show', async function () {
                 resolve(true);
