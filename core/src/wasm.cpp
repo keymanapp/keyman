@@ -106,6 +106,7 @@ public:
   int new_caps_lock_state;
   std::u32string deleted_context;
 
+#ifndef NDEBUG
   std::string toString() const {
     std::string result = "Actions(delete=" + std::to_string(this->code_points_to_delete) +
                          ", output=\"" + std::string(this->output.begin(), this->output.end()) + "\" (" + getCodePoints(this->output) + ")" +
@@ -125,6 +126,7 @@ public:
     result += "])";
     return result;
   }
+#endif
 };
 
 class km_core_context_item_wasm: public km_core_context_item {
@@ -420,14 +422,16 @@ EMSCRIPTEN_BINDINGS(core_interface) {
     .property("id", &km_core_keyboard_attrs_wasm::id)
     .property("default_options", &km_core_keyboard_attrs_wasm::default_options);
   em::class_<km_core_actions_wasm>("km_core_actions")
+#ifndef NDEBUG
+    .function("toString", &km_core_actions_wasm::toString)
+#endif
     .property("code_points_to_delete", &km_core_actions_wasm::code_points_to_delete)
     .property("output", &km_core_actions_wasm::output)
     .property("persist_options", &km_core_actions_wasm::persist_options)
     .property("do_alert", &km_core_actions_wasm::do_alert)
     .property("emit_keystroke", &km_core_actions_wasm::emit_keystroke)
     .property("new_caps_lock_state", &km_core_actions_wasm::new_caps_lock_state)
-    .property("deleted_context", &km_core_actions_wasm::deleted_context)
-    .function("toString", &km_core_actions_wasm::toString);
+    .property("deleted_context", &km_core_actions_wasm::deleted_context);
 
   em::class_<km_core_state>("km_core_state");
   em::class_<CoreReturn<km_core_state>>("CoreStateReturn")

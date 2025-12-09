@@ -52,18 +52,16 @@
             break;
         };
         // allow to wait on KMW being fully initialized
-        window.KmwLoaded = new Promise((resolve) => {
+        window.KmwLoaded = new Promise((resolveKmwLoaded) => {
           window.addEventListener('load', async function () {
             await keyman.init();
             await keyman.addKeyboards(keyboard);
             // allow to wait on OSK being visible; `window.OskShown` waited on
             // by keyboard.tests.ts
-            window.OskShown = new Promise((resolve) => {
-              keyman.osk.addEventListener('show', async function () {
-                resolve(true);
-              });
+            window.OskShown = new Promise(resolveOskShown => {
+              keyman.osk.addEventListener('show', resolveOskShown);
             });
-            resolve(true);
+            resolveKmwLoaded(true);
           });
         });
     </script>
