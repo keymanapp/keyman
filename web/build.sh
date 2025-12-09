@@ -40,6 +40,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   \
   "--test-dom-only           For test, run only DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
   "--test-integrated-only    For test, run only KMW's integration test suite" \
+  "--test-e2e-only           For test, run only KMW's end-to-end test suite" \
   "--test-inspect            For test, run browser-based unit tests in an inspectable mode"
 
 builder_parse "$@"
@@ -168,6 +169,24 @@ builder_run_action build:_all build_tests_action
 # Run tests
 builder_run_child_actions test
 
+function is_test_included() {
+  local test_opt=$1
+  local run_dom_tests=true run_integrated_tests=true run_e2e_tests=true
+  local var_name="run_${test_opt}_tests"
+
+  if builder_has_option --test-integrated-only || builder_has_option --test-e2e-only; then
+    run_dom_tests=false
+  fi
+  if builder_has_option --test-dom-only || builder_has_option --test-e2e-only; then
+    run_integrated_tests=false
+  fi
+  if builder_has_option --test-dom-only || builder_has_option --test-integrated-only; then
+    run_e2e_tests=false
+  fi
+
+  ${!var_name}
+}
+
 function do_browser_tests() {
   # Browser-based tests: common configs & kill-switches
 
@@ -175,6 +194,7 @@ function do_browser_tests() {
   local WTR_CONFIG=
   if builder_is_ci_build; then
     WTR_CONFIG=.CI
+    export KEYMAN_IS_CI_BUILD=1
   fi
 
   # Prepare the flags for the karma command.
@@ -184,11 +204,14 @@ function do_browser_tests() {
   fi
 
   pushd "${KEYMAN_ROOT}"
-  if builder_has_option --test-dom-only || ! builder_has_option --test-integrated-only; then
+  if is_test_included dom; then
     web-test-runner --config "web/src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
   fi
-  if builder_has_option --test-integrated-only || ! builder_has_option --test-dom-only; then
+  if is_test_included integrated; then
     web-test-runner --config "web/src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
+  fi
+  if is_test_included e2e; then
+    npx playwright test --config "web/src/test/auto/e2e/playwright.config.ts"
   fi
   popd
 }
