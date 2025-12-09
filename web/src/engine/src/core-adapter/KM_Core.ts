@@ -42,6 +42,11 @@ export enum KM_CORE_CT {
   MARKER = 2,
 }
 
+export enum KM_CORE_EVENT_FLAG {
+  DEFAULT = 0,
+  TOUCH = 1,
+};
+
 export class KM_Core {
   private static km_core: KMXCoreModule = null;
 

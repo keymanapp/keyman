@@ -372,6 +372,17 @@ km_core_context_set_wasm(
   return km_core_context_set((km_core_context*)context, items.data());
 }
 
+km_core_status
+km_core_process_event_wasm(
+  km_core_state const *state_,
+  km_core_virtual_key vk,
+  uint16_t modifier_state,
+  bool is_key_down,
+  uint16_t event_flags
+) {
+  return km_core_process_event(state_, vk, modifier_state, is_key_down ? 1 : 0, event_flags);
+}
+
 EMSCRIPTEN_BINDINGS(core_interface) {
 
   em::value_object<km_core_attr>("km_core_attr")
@@ -464,7 +475,7 @@ EMSCRIPTEN_BINDINGS(core_interface) {
   em::function("state_create(keyboard, env)", &km_core_state_create_wasm, em::allow_raw_pointers());
   em::function("state_clone(state)", &km_core_state_clone_wasm, em::allow_raw_pointers());
   em::function("state_dispose(state)", &km_core_state_dispose, em::allow_raw_pointers());
-  em::function("process_event(state, vk, modifier_state, is_key_down, event_flags)", &km_core_process_event, em::allow_raw_pointers());
+  em::function("process_event(state, vk, modifier_state, is_key_down, event_flags)", &km_core_process_event_wasm, em::allow_raw_pointers());
 
   em::function("state_context(state)", &km_core_state_context, em::allow_raw_pointers());
   em::function("state_context_set_if_needed(state, application_context)", &km_core_state_context_set_if_needed_wasm, em::allow_raw_pointers());
