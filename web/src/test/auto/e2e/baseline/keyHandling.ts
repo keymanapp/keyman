@@ -172,13 +172,11 @@ function getKeySequences(keys: string): string[][] {
 export async function pressKeys(page: Page, keys: string): Promise<void> {
   const keySequences = getKeySequences(keys);
   for (const keySequence of keySequences) {
-    for (let i = 0; i < keySequence.length - 1; i++) {
+    for (let i = 0; i < keySequence.length; i++) {
       await page.keyboard.down(keySequence[i]);
     }
-    await page.keyboard.down(keySequence[keySequence.length - 1]);
 
-    await page.keyboard.up(keySequence[keySequence.length - 1]);
-    for (let i = keySequence.length - 2; i >= 0; i--) {
+    for (let i = keySequence.length - 1; i >= 0; i--) {
       await page.keyboard.up(keySequence[i]);
     }
   }

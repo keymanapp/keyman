@@ -114,7 +114,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @type {MutableSystemStore}
    */
   public get layerStore(): MutableSystemStore {
-    // TODO-web-core: link to .kmx layer store
+    // TODO-web-core: link to .kmx layer store (#15284)
     return this._layerStore;
   }
 
@@ -124,7 +124,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @type {MutableSystemStore}
    */
   public get newLayerStore(): MutableSystemStore {
-    // TODO-web-core: link to .kmx new-layer store
+    // TODO-web-core: link to .kmx new-layer store (#15284)
     return this._newLayerStore;
   }
 
@@ -134,7 +134,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @type {MutableSystemStore}
    */
   public get oldLayerStore(): MutableSystemStore {
-    // TODO-web-core: link to .kmx old-layer store
+    // TODO-web-core: link to .kmx old-layer store (#15284)
     return this._oldLayerStore;
   }
 
@@ -263,7 +263,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     this.applyContextFromTextStore(coreContext, textStore);
 
     const status = KM_Core.instance.process_event(activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, keyEvent.source?.type === 'keydown', KM_CORE_EVENT_FLAG.DEFAULT);
-    // TODO-web-core: properly set flags
+    // TODO-web-core: properly set flags (#15283)
     if (status != KM_CORE_STATUS.OK) {
       console.error('KeymanWeb: km_core_process_event failed with status: ' + status);
       return null;
@@ -280,7 +280,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
 
     // TODO-web-core: Implement options (#13426)
     // process_persist_action(engine, actions->persist_options);
-    // TODO-web-core: do we have to do anything with the new_caps_lock_state?
+    // TODO-web-core: do we have to do anything with the new_caps_lock_state? (#15285)
     // process_capslock_action(actions->new_caps_lock_state);
 
     processorAction.transcription = textStore.buildTranscriptionFrom(preInput, keyEvent, false);
@@ -298,7 +298,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @returns {ProcessorAction} The resulting processor action, or null if not applicable.
    */
   public processPostKeystroke(device: DeviceSpec, textStore: TextStore): ProcessorAction {
-    // TODO-web-core: Implement this method
+    // TODO-web-core: Implement this method (#15286)
     return null;
   }
 
@@ -313,7 +313,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @returns {boolean} True if the event is a modifier key press, false otherwise.
    */
   public doModifierPress(keyEvent: KeyEvent, textStore: TextStore, isKeyDown: boolean): boolean {
-    // TODO-web-core: Implement this method
+    // TODO-web-core: Implement this method (#15287)
     return false;
   }
 
@@ -343,7 +343,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @returns {boolean} True if the keyboard layer changed, false otherwise.
    */
   public selectLayer(keyEvent: KeyEvent): boolean {
-    // TODO-web-core: Implement this method
+    // TODO-web-core: Implement this method (#15284)
     return false;
   }
 
