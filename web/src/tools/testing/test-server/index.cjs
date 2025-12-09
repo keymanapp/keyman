@@ -4,6 +4,8 @@ const app = express()
 const port = 3000
 
 app.use(express.static(path.join(__dirname, '../../../../')))
+// Also serve /common for shared test resources
+app.use('/common', express.static(path.join(__dirname, '../../../../../common/')))
 
 // for testing timeout error in web/src/test/manual/web/keyboard-errors
 const router = express.Router()
@@ -21,5 +23,5 @@ router.get('/src/test/manual/web/keyboard-errors/timeout.js', async (req, res, n
 app.use(router)
 
 app.listen(port, () => {
-  console.log(`Keyman test app listening on port ${port}`)
+  console.log(`Keyman test app listening on port ${port}: http://localhost:${port}`)
 })

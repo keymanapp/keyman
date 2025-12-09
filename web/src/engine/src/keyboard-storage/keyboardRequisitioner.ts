@@ -145,7 +145,7 @@ export default class KeyboardRequisitioner {
           apiSpecEntry.languages ||= apiSpecEntry.language;
 
           if(typeof apiSpecEntry.languages === 'undefined') {
-            const msg = 'To use keyboard \'' + apiSpecEntry.id + '\', you must specify languages.';
+            const msg = `To use keyboard '${apiSpecEntry.id}', you must specify languages.`;
             errorStubs.push(convertToErrorStub(apiSpecEntry, msg));
           } else if(Array.isArray(apiSpecEntry.languages)) {
             const splitStubs = KeyboardStub.toStubs(apiSpecEntry, this.pathConfig.keyboards, this.pathConfig.fonts);
