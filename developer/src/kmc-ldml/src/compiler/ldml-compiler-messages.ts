@@ -292,6 +292,12 @@ export class LdmlCompilerMessages {
     `**Hint**: Use "${def(o.recommended)}"`,
   );
 
+  static ERROR_InvalidTargetVersion = SevError | 0x0031;
+  static Error_InvalidTargetVersion = (o: {version: number}) => m(
+    this.ERROR_InvalidTargetVersion,
+    `Target version ${def(o.version)} is not a valid version. Only 17.0 and 19.0 target versions are currently supported for LDML keyboards."`,
+  );
+
   //
   // Transform syntax errors begin at ...F00 (SevErrorTransform)
 

@@ -13,4 +13,8 @@
     "src/**/*.ts",
     "src/ttfmeta/lib/*.js",
   ],
+  "references": [
+    { "path": "../../../../../common/web/types/" },
+    { "path": "../../../../../core/include/ldml/tsconfig.json"},
+  ]
 }
