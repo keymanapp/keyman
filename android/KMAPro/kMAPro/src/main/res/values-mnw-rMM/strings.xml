@@ -120,9 +120,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">စုတ်ဘာသာသီုဖအိုတ်တုဲ</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">သ္ဂောံချိၚ်သမၠုၚ် ကဳဗုဒ်ဂှ် ဂြဲညိ</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">ဂွံချိၚ် လံက်သတိက် လံက်ဇမၠိၚ်ဂှ် ဗဂေတ်ကဵုစက်ပိုဲညိ။</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">သ္ဂောံချိၚ်သမၠုၚ် ကဳဗုဒ်ဂှ် ဂြဲညိ ဂွံချိၚ် လံက်သတိက် လံက်ဇမၠိၚ်ဂှ် ဗဂေတ်ကဵုစက်ပိုဲညိ။</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">ကလေၚ်သ္ပနူပကတိ</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
