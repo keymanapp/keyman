@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.173 alpha 2025-12-09
+
+* docs(developer): Clarify keystrokes in Step-1 of tutorial (#15326)
+* feat(android): Add Grabbable Bar and settings status for keyboard resizing (#15267)
+* chore(linux): Update debian changelog (#15282)
+* docs(web): fix typo in osk documentation (#15313)
+
 ## 19.0.172 alpha 2025-12-08
 
 * docs(web): add links to next/previous page to web guide (#15311)
