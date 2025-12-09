@@ -66,16 +66,13 @@ describe("Recursive Descent Tests", () => {
     parameters  = [];
   });
   describe("SingleChildRule Tests", () => {
-    class ConcreteSingleChildRule extends SingleChildRule {
-      public constructor(rule: Rule=null) {
-        super(rule);
-      }
-      public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-        return super.parse(tokenBuffer, node);
-      }
-    }
-    it("returns false without a rule to parse", () => {
-      const noRule: Rule = new ConcreteSingleChildRule(); // no rule supplied
+    class ConcreteSingleChildRule extends SingleChildRule {}
+    it("returns false without a rule to parse (no rule)", () => {
+      const noRule: Rule = new ConcreteSingleChildRule();
+      assert.isFalse(noRule.parse(tokenBuffer, root));
+    });
+    it("returns false without a rule to parse (null)", () => {
+      const noRule: Rule = new ConcreteSingleChildRule(null);
       assert.isFalse(noRule.parse(tokenBuffer, root));
     });
     it("returns true with a valid rule to parse", () => {
@@ -84,29 +81,20 @@ describe("Recursive Descent Tests", () => {
     });
   });
   describe("SingleChildRuleWithASTStrategy Tests", () => {
+    class ConcreteSingleChildRuleWithASTStrategy extends SingleChildRuleWithASTStrategy {}
     it("can apply a strategy (NewNode)", () => {
-      const newNodeRule: Rule = new class extends SingleChildRuleWithASTStrategy {
-        public constructor() {
-          super(new NewNode(NodeType.STRING), trueRule);
-        }
-        public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-          return super.parse(tokenBuffer, node);
-        }
-      }();
+      const newNodeRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING), trueRule);
       assert.isTrue(newNodeRule.parse(tokenBuffer, root));
       const parent = root.getSoleChildOfType(NodeType.STRING); // from NewNode strategy
       assert.isNotNull(parent);
       assert.isNotNull(parent.getSoleChildOfType(NodeType.TMP)); // from trueRule
     });
-    it("returns false without a rule to parse", () => {
-      const noRule: Rule = new class extends SingleChildRuleWithASTStrategy {
-        public constructor() {
-          super(new NewNode(NodeType.STRING));
-        }
-        public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-          return super.parse(tokenBuffer, node);
-        }
-      }(); // no rule supplied
+    it("returns false without a rule to parse (no rule)", () => {
+      const noRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING));
+      assert.isFalse(noRule.parse(tokenBuffer, root));
+    });
+    it("returns false without a rule to parse (null)", () => {
+      const noRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING), null);
       assert.isFalse(noRule.parse(tokenBuffer, root));
     });
   });
