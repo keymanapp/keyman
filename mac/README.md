@@ -109,3 +109,7 @@ Then run this command to fix the build environment:
 `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`
 
 [Install Keyman for macOS]: https://help.keyman.com/products/mac/current-version/start/install-keyman
+
+### New Mac Config App
+
+This is now in development.
