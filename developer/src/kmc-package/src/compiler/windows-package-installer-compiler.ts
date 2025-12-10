@@ -193,24 +193,15 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
   }
 
   private async buildZip(kps: KpsFile.KpsFile, kpsFilename: string, sources: WindowsPackageInstallerSources): Promise<Uint8Array> {
-    const kmpJson: KmpJsonFile.KmpJsonFile = this.kmpCompiler.transformKpsFileToKmpObject(kpsFilename, kps);
-    if(!kmpJson) {
-      // error will have been reported in transformKpsFileToKmpObject
-      return null;
-    }
-
-    if(!kmpJson.info?.name?.description) {
+    const { kmpJsonData, fileData } = await this.kmpCompiler.transformKpsFileToKmpObject(kpsFilename, kps) ?? {};
+    if(!kmpJsonData?.info?.name?.description) {
       this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageNameCannotBeBlank());
       return null;
     }
 
     const kmpFilename = this.callbacks.path.basename(kpsFilename, KeymanFileTypes.Source.Package) + KeymanFileTypes.Binary.Package;
-    const setupInfBuffer = this.buildSetupInf(sources, kmpJson, kmpFilename, kps);
-    const kmpBuffer = await this.kmpCompiler.buildKmpFile(kpsFilename, kmpJson);
-    if(!kmpBuffer) {
-      // error will have been reported in buildKmpFile
-      return null;
-    }
+    const setupInfBuffer = this.buildSetupInf(sources, kmpJsonData, kmpFilename, kps);
+    const kmpBuffer = await this.kmpCompiler.buildKmpFile(kmpJsonData, fileData);
 
     // Note that this does not technically generate a "valid" sfx according to
     // the zip spec, because the offsets in the .zip are relative to the start
