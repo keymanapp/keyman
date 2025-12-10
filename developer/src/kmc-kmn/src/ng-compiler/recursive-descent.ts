@@ -213,7 +213,7 @@ export class OptionalRule extends SingleChildRule {
       return false;
     }
 
-    if (this.rule?.parse(tokenBuffer, tmp)) {
+    if (this.rule.parse(tokenBuffer, tmp)) {
       node.addChildren(tmp.getChildren());
     } else {
       tokenBuffer.resetCurrentPosition(save);
@@ -259,7 +259,7 @@ export class ManyRule extends SingleChildRule {
       const save: number = tokenBuffer.currentPosition;
       const tmp: ASTNode = new ASTNode(NodeType.TMP);
 
-      if (this.rule?.parse(tokenBuffer, tmp)) {
+      if (this.rule.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
       } else {
         tokenBuffer.resetCurrentPosition(save);
