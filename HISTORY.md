@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.174 alpha 2025-12-10
+
+* chore(windows): simple bisect utility for checking setup-redist.exe file size (#15322)
+
 ## 19.0.173 alpha 2025-12-09
 
 * docs(developer): Clarify keystrokes in Step-1 of tutorial (#15326)
