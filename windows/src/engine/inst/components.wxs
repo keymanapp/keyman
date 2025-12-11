@@ -142,11 +142,11 @@
       </Component>
 
       <Component Guid="{6B6EF05E-E60A-4902-B5F5-EEB3F8AAB384}">
-        <File Id="keymanhp.x64.exe" Name='keymanhp.x64.exe' KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.x64.exe" />
+        <File Id="keymanhp.x64.exe" Name="keymanhp.x64.exe" KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.x64.exe" />
       </Component>
 
       <Component Guid="{65E99D02-6B68-4840-BEE2-0FADB0ED67A0}">
-        <File Id="keymanhp.arm64.exe" Name='keymanhp.arm64.exe' KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.arm64.exe" />
+        <File Id="keymanhp.arm64.exe" Name="keymanhp.arm64.exe" KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.arm64.exe" />
       </Component>
 
       <Component Guid="{FB88ED52-C8F9-44F8-91F2-D0E377504C0D}">
@@ -234,17 +234,19 @@
         </RegistryKey>
       </Component>
 
+
       <Component Id="kmtip64.dll" Guid="{7511B389-24C5-4C79-9050-934791014682}" SharedDllRefCount="yes" Win64="yes">
-        <Condition>VersionNT64</Condition>
+        <!-- 0x6664 = 34404 = AMD64 -->
+        <Condition>WIX_NATIVE_MACHINE = 34404</Condition>
         <File Id="kmtip64.dll" Name="kmtip64.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtip64.dll">
           <Class Id="FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7" Context="InprocServer32" ThreadingModel="apartment" Description="Keyman Engine Text Service x64" />
         </File>
-        <!-- we will register post-install? -->
       </Component>
 
-      <Component Id="kmtiparm64.dll" Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}" SharedDllRefCount="yes" Win64="yes">
-        <Condition>VersionNT64 AND ProcessorArchitecture="ARM64"</Condition>
-        <File Id="kmtiparm64.dll" Name="kmtiparm64.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtiparm64.dll">
+      <Component Id="kmtiparm64x.dll" Guid="{BDF0DAFB-09F9-4121-9859-90E847EA75F8}" SharedDllRefCount="yes"  Win64="yes">
+        <!-- 0xAA64 = 43620 = ARM64 -->
+        <Condition>WIX_NATIVE_MACHINE = 43620</Condition>
+        <File Id="kmtiparm64x.dll" Name="kmtiparm64x.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtiparm64x.dll">
           <Class Id="FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7" Context="InprocServer32" ThreadingModel="apartment" Description="Keyman Engine Text Service ARM64" />
         </File>
       </Component>
@@ -260,13 +262,13 @@
 
     <ComponentGroup Id="KeymanEngineSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\..\bin\engine">
       <Component Guid="{95AB1B5C-2556-4282-B327-E2E417B26926}">
-        <File Id="sentry.dll" KeyPath="yes" />
+        <File Id="sentry.dll" Name="sentry.dll" KeyPath="yes" />
       </Component>
       <Component Guid="{3E5DACB3-055A-41EC-8890-15A30A40548B}">
-        <File Id="sentry.x64.dll" KeyPath="yes" />
+        <File Id="sentry.x64.dll" Name="sentry.x64.dll" KeyPath="yes" />
       </Component>
       <Component Guid="{AA5AF288-4D67-49F4-A10B-E5725A42599B}">
-        <File Name="crashpad_handler.exe" KeyPath="yes" />
+        <File Id="crashpad_handler.exe" Name="crashpad_handler.exe" KeyPath="yes" />
       </Component>
     </ComponentGroup>
   </Fragment>
