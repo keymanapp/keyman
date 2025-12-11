@@ -544,44 +544,6 @@ export class SearchNode {
   }
 }
 
-/**
- * Categorizes Nodes by how many input Transforms (edges) deep they are within the search tree.
- */
-class SearchSpaceTier {
-  correctionQueue: PriorityQueue<SearchNode>;
-  processed: SearchNode[] = [];
-
-  /**
-   * Indicates the depth searched, in terms of number of inputs, by this tier of the search space.
-   */
-  index: number;
-
-  constructor(instance: SearchSpaceTier);
-  constructor(index: number, initialEdges?: SearchNode[]);
-  constructor(arg1: number | SearchSpaceTier, initialEdges?: SearchNode[]) {
-    if(typeof arg1 == 'number') {
-      this.index = arg1;
-      this.correctionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, initialEdges);
-      return;
-    } else {
-      this.index = arg1.index;
-      this.processed = [].concat(arg1.processed);
-      this.correctionQueue = new PriorityQueue(arg1.correctionQueue);
-    }
-  }
-
-  increaseMaxEditDistance() {
-    // By extracting the entries from the priority queue and increasing distance outside of it as a batch job,
-    // we get an O(N) implementation, rather than the O(N log N) that would result from maintaining the original queue.
-    let entries = this.correctionQueue.toArray();
-
-    entries.forEach(function(edge) { edge.calculation = edge.calculation.increaseMaxDistance(); });
-
-    // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
-    this.correctionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
-  }
-}
-
 export class SearchResult {
   private resultNode: SearchNode;
 
@@ -655,8 +617,6 @@ type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchSpace {
-  private QUEUE_SPACE_COMPARATOR: Comparator<SearchSpaceTier>;
-
   // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
   // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
   // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
@@ -664,8 +624,7 @@ export class SearchSpace {
   static readonly MIN_KEYSTROKE_PROBABILITY = 0.0001;
   static readonly DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL = 33; // in milliseconds.
 
-  private tierOrdering: SearchSpaceTier[] = [];
-  private selectionQueue: PriorityQueue<SearchSpaceTier>;
+  private selectionQueue: PriorityQueue<SearchNode>;
   private _inputSequence: Distribution<Transform>[] = [];
   private minInputCost: number[] = [];
   private rootNode: SearchNode;
@@ -694,6 +653,12 @@ export class SearchSpace {
   private processedEdgeSet: {[pathKey: string]: boolean} = {};
 
   /**
+   * Provides a heuristic for the base cost at each depth if the best
+   * individual input were taken at that level.
+   */
+  private lowestCostAtDepth: number[];
+
+  /**
    * Clone constructor.  Deep-copies its internal queues, but not search nodes.
    * @param instance
    */
@@ -705,21 +670,18 @@ export class SearchSpace {
    */
   constructor(model: LexicalModel);
   constructor(arg1: SearchSpace|LexicalModel) {
-    // Constructs the priority-queue comparator-closure needed for determining which
-    // tier should be searched next.
-    this.buildQueueSpaceComparator();
-
     if(arg1 instanceof SearchSpace) {
       this._inputSequence = [].concat(arg1._inputSequence);
       this.minInputCost = [].concat(arg1.minInputCost);
       this.rootNode = arg1.rootNode;
       // Re-use already-checked Nodes.
       this.completedPaths = [].concat(arg1.completedPaths);
+      this.lowestCostAtDepth = arg1.lowestCostAtDepth.slice();
       this.returnedValues = {...arg1.returnedValues};
       this.processedEdgeSet = {...arg1.processedEdgeSet};
 
-      this.tierOrdering   = arg1.tierOrdering.map((tier) => new SearchSpaceTier(tier));
-      this.selectionQueue = new PriorityQueue(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
+      this.selectionQueue = new PriorityQueue(QUEUE_NODE_COMPARATOR);
+      this.selectionQueue.enqueueAll([...arg1.selectionQueue.toArray()]);
       return;
     }
 
@@ -730,68 +692,12 @@ export class SearchSpace {
       throw new Error("The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.");
     }
 
-    this.selectionQueue = new PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
+    this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR);
     this.rootNode = new SearchNode(model.traverseFromRoot(), model.toKey ? model.toKey.bind(model) : null);
+    this.selectionQueue.enqueue(this.rootNode);
+    this.lowestCostAtDepth = [];
 
-    this.completedPaths = [this.rootNode];
-
-    // Adds a base level queue to handle initial insertions.
-    // Start with _just_ the root node.  Necessary for proper empty-token, empty-input handling!
-    let baseTier = new SearchSpaceTier(0, [this.rootNode]);
-    this.tierOrdering.push(baseTier);
-    this.selectionQueue.enqueue(baseTier);
-  }
-
-  private buildQueueSpaceComparator() {
-    let searchSpace = this;
-
-    this.QUEUE_SPACE_COMPARATOR = function(space1, space2) {
-      let node1 = space1.correctionQueue.peek();
-      let node2 = space2.correctionQueue.peek();
-
-      let index1 = space1.index;
-      let index2 = space2.index;
-
-      let sign = 1;
-
-      if(index2 < index1) {
-        let temp = index2;
-        index2 = index1;
-        index1 = temp;
-
-        sign = -1;
-      }
-
-      // Boost the cost of the lower tier by the minimum cost possible for the
-      // missing inputs between them. In essence, compare the nodes as if the
-      // lower tier had the most likely input appended for each such input
-      // missing at the lower tier.
-      //
-      // A 100% admissible heuristic to favor a deeper search assuming no
-      // deleteLefts follow as later inputs.  The added cost is guaranteed if
-      // the path is traversed further - even with subset use.  A subset that
-      // doesn't match the char instantly carries higher cost than this due to
-      // the edit distance, even if the bin has max probability.
-      //
-      // Remember, tier index i's last used input was from input index i-1. As a
-      // result, i is the first needed input index, with index2 - 1 the last
-      // entry needed to match them.
-      let tierMinCost: number = 0;
-      for(let i=index1; i < index2; i++) {
-        tierMinCost = tierMinCost + searchSpace.minInputCost[i];
-      }
-
-      // Guards, just in case one of the search spaces ever has an empty node.
-      if(node1 && node2) {
-        // If node1 is lower-tier, node1 is the one in need of boosted cost.
-        // `sign` flips it when node2 is lower tier.
-        return node1.currentCost - node2.currentCost + sign * tierMinCost;
-      } else if(node2) {
-        return 1;
-      } else {
-        return -1;
-      }
-    }
+    this.completedPaths = [];
   }
 
   /**
@@ -802,7 +708,14 @@ export class SearchSpace {
   }
 
   increaseMaxEditDistance() {
-    this.tierOrdering.forEach(function(tier) { tier.increaseMaxEditDistance() });
+    // By extracting the entries from the priority queue and increasing distance outside of it as a batch job,
+    // we get an O(N) implementation, rather than the O(N log N) that would result from maintaining the original queue.
+    const entries = this.selectionQueue.toArray();
+
+    entries.forEach(function(edge) { edge.calculation = edge.calculation.increaseMaxDistance(); });
+
+    // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
+    this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
   }
 
   get correctionsEnabled() {
@@ -817,8 +730,12 @@ export class SearchSpace {
    * @param inputDistribution The fat-finger distribution for the incoming keystroke (or
    * just the raw keystroke if corrections are disabled)
    */
-  addInput(inputDistribution: Distribution<Transform>) {
-    this._inputSequence.push(inputDistribution);
+  addInput(inputDistribution: Distribution<Transform>, bestProbFromSet: number) {
+    const input = inputDistribution;
+    this._inputSequence.push(input);
+    const lastDepthCost = this.lowestCostAtDepth[this.lowestCostAtDepth.length - 1] ?? 0;
+    const logTierCost = -Math.log(bestProbFromSet);
+    this.lowestCostAtDepth.push(lastDepthCost + logTierCost);
 
     // Assumes that `inputDistribution` is already sorted.
     this.minInputCost.push(-Math.log(inputDistribution[0].p));
@@ -845,10 +762,7 @@ export class SearchSpace {
       newlyAvailableEdges = newlyAvailableEdges.concat(batch);
     });
 
-    // Now that we've built the new edges, we can efficiently construct the new search tier.
-    let tier = new SearchSpaceTier(this.tierOrdering.length, newlyAvailableEdges);
-    this.tierOrdering.push(tier);
-    this.selectionQueue.enqueue(tier);
+    this.selectionQueue.enqueueAll(newlyAvailableEdges);
   }
 
   // TODO: will want eventually for reversions and/or backspaces
@@ -864,12 +778,15 @@ export class SearchSpace {
    * @returns
    */
   private hasNextMatchEntry(): boolean {
-    let topQueue = this.selectionQueue.peek();
-    if(topQueue) {
-      return topQueue.correctionQueue.count > 0;
-    } else {
-      return false;
+    return this.selectionQueue.count > 0 && this.selectionQueue.peek().currentCost < Number.POSITIVE_INFINITY;
+  }
+
+  public getCurrentCost(): number {
+    if(this.selectionQueue.count > 0) {
+      return this.selectionQueue.peek().currentCost;
     }
+
+    return Number.POSITIVE_INFINITY;
   }
 
   /**
@@ -883,8 +800,7 @@ export class SearchSpace {
       return { type: 'none' };
     }
 
-    let bestTier = this.selectionQueue.dequeue();
-    let currentNode = bestTier.correctionQueue.dequeue();
+    let currentNode = this.selectionQueue.dequeue();
 
     let unmatchedResult: IntermediateSearchPath = {
       type: 'intermediate',
@@ -894,7 +810,6 @@ export class SearchSpace {
     // Have we already processed a matching edge?  If so, skip it.
     // We already know the previous edge is of lower cost.
     if(this.processedEdgeSet[currentNode.pathKey]) {
-      this.selectionQueue.enqueue(bestTier);
       return unmatchedResult;
     } else {
       this.processedEdgeSet[currentNode.pathKey] = true;
@@ -913,15 +828,13 @@ export class SearchSpace {
       substitutionsOnly = true;
     }
 
-    let tierMinCost = 0;
-    for(let i = 0; i <= bestTier.index; i++) {
-      tierMinCost += this.minInputCost[i];
-    }
-
     // Thresholds _any_ path, partially based on currently-traversed distance.
     // Allows a little 'wiggle room' + 2 "hard" edits.
     // Can be important if needed characters don't actually exist on the keyboard
     // ... or even just not the then-current layer of the keyboard.
+    //
+    // TODO:  still consider the lowest-cost individual edges for THIS specific criterion.
+    const tierMinCost = this.lowestCostAtDepth[currentNode.priorInput.length-1];
     if(currentNode.currentCost > tierMinCost + 2.5 * SearchSpace.EDIT_DISTANCE_COST_SCALE) {
       return unmatchedResult;
     }
@@ -930,8 +843,7 @@ export class SearchSpace {
 
     if(currentNode.hasPartialInput) {
       // Re-use the current queue; the number of total inputs considered still holds.
-      bestTier.correctionQueue.enqueueAll(currentNode.processSubsetEdge());
-      this.selectionQueue.enqueue(bestTier);
+      this.selectionQueue.enqueueAll(currentNode.processSubsetEdge());
       return unmatchedResult;
     }
 
@@ -941,15 +853,19 @@ export class SearchSpace {
     // Always possible, as this does not require any new input.
     if(!substitutionsOnly) {
       let insertionEdges = currentNode.buildInsertionEdges();
-      bestTier.correctionQueue.enqueueAll(insertionEdges);
+      this.selectionQueue.enqueueAll(insertionEdges);
     }
 
-    if(bestTier.index == this.tierOrdering.length - 1) {
+    if(currentNode.calculation.inputSequence.length == this.inputSequence.length) {
       // It was the final tier - store the node for future reference.
       this.completedPaths.push(currentNode);
 
-      // Since we don't modify any other tier, we may simply reinsert the removed tier.
-      this.selectionQueue.enqueue(bestTier);
+      if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
+        this.returnedValues[currentNode.resultKey] = currentNode;
+      } else {
+        // Not a better cost, so reject it and move on to the next potential result.
+        return this.handleNextNode();
+      }
 
       return {
         type: 'complete',
@@ -958,15 +874,13 @@ export class SearchSpace {
       };
     } else {
       // Time to construct new edges for the next tier!
-      let nextTier = this.tierOrdering[bestTier.index+1];
-
-      let inputIndex = nextTier.index;
+      let inputIndex = currentNode.calculation.inputSequence.length;
 
       let deletionEdges: SearchNode[] = [];
       if(!substitutionsOnly) {
-        deletionEdges       = currentNode.buildDeletionEdges(this._inputSequence[inputIndex-1]);
+        deletionEdges       = currentNode.buildDeletionEdges(this._inputSequence[inputIndex]);
       }
-      const substitutionEdges = currentNode.buildSubstitutionEdges(this._inputSequence[inputIndex-1]);
+      const substitutionEdges = currentNode.buildSubstitutionEdges(this._inputSequence[inputIndex]);
       let batch = deletionEdges.concat(substitutionEdges);
 
       // Skip the queue for the first pass; there will ALWAYS be at least one pass,
@@ -974,11 +888,7 @@ export class SearchSpace {
       batch = batch.flatMap(e => e.processSubsetEdge());
 
       // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
-      nextTier.correctionQueue.enqueueAll(batch);
-
-      // So, we simply rebuild the selection queue.
-      // Also re-adds `bestTier`, which we'd de-queued.
-      this.selectionQueue = new PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
+      this.selectionQueue.enqueueAll(batch);
 
       // We didn't reach an end-node, so we just end the iteration and continue the search.
     }

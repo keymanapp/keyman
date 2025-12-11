@@ -24,6 +24,7 @@ import Transform = LexicalModelTypes.Transform;
 export interface TokenInputSource {
   trueTransform: Transform;
   inputStartIndex: number;
+  bestProbFromSet: number;
 }
 
 /**
@@ -123,15 +124,17 @@ export class ContextToken {
       rawText ||= '';
 
       // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
+      // Build a token that represents the current text with no ambiguity - probability at max (1.0)
       const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
         return [{sample: transform, p: 1.0}];
       });
       rawTransformDistributions.forEach((entry) => {
         this._inputRange.push({
           trueTransform: entry[0].sample,
-          inputStartIndex: 0
+          inputStartIndex: 0,
+          bestProbFromSet: entry[0].p
         });
-        this.searchSpace.addInput(entry);
+        this.searchSpace.addInput(entry, entry[0].p);
       });
     }
   }
@@ -142,7 +145,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this.searchSpace.addInput(distribution);
+    this.searchSpace.addInput(distribution, inputSource.bestProbFromSet);
   }
 
   /**
@@ -350,7 +353,8 @@ export class ContextToken {
         backupToken = new ContextToken(constructingToken);
         constructingToken.addInput({
           trueTransform: priorSourceInput.trueTransform,
-          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded
+          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded,
+          bestProbFromSet: priorSourceInput.bestProbFromSet
         }, tailDistribution);
 
         const lenToCommit = lenBeforeLastApply + extraCharsAdded;
