@@ -220,7 +220,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   return processedEvent;
 }
 
-export default class HardwareEventKeyboard extends HardKeyboardBase {
+export class HardwareEventKeyboard extends HardKeyboardBase {
   private readonly hardDevice: DeviceSpec;
 
   // Needed properties & methods:
