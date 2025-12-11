@@ -251,23 +251,242 @@ Let us start with a simplified case - one without 'insert' or 'delete' edits.
 Instead, the only edges result from correcting keystrokes and matching them
 against the lexicon.
 
-TODO:  simplified keystroke-by-keystroke graph - single char outputs only
+For a first example, suppose we have the following scenario:
+- Keystroke 1:  outputs one of the following:
+    - `{insert: 'a', deleteLeft: 0}`
+    - `{insert: 'b', deleteLeft: 0}`
+- Keystroke 2:  outputs one of the following:
+    - `{insert: 'c', deleteLeft: 0}`
+    - `{insert: 'd', deleteLeft: 0}`
+- Keystroke 3:  outputs one of the following:
+    - `{insert: 'e', deleteLeft: 0}`
+    - `{insert: 'f', deleteLeft: 0}`
 
-Root node
--> keystroke 1 nodes (multiple, within same module)
--> keystroke 2 nodes (multiple, within same module)
--> keystroke 3 nodes (multiple, within same module), etc
+Assuming that all possible combinations are valid prefixes, correction-search's
+graph would then expand as follows:
 
-TODO:  two-layer simplified keystroke-by-keystroke module graph:  one + two char modules, grouping them based on final codepoint length
-- may wish to do 'insert' edits at this level?
-TODO:  simplified keystroke-by-keystroke graph - one + two char modules (no longer showing inner nodes) & the variations in total codelength @ each layer
-- may wish to do 'delete' edits at this level?
+```mermaid
+---
+title: Low-level Correction-Search graph expansion
+---
+flowchart LR;
+    subgraph Start
+        start{Empty token}
+    end
+
+    subgraph Keystroke 1:  a or b
+        start --> a
+        start --> b
+    end
+
+    subgraph Keystroke 2:  c or d
+        a --> ac
+        a --> ad
+        b --> bc
+        b --> bd
+    end
+
+    subgraph Keystroke 3:  e or f
+        ac --> ace
+        ac --> acf
+        ad --> ade
+        ad --> adf
+        bc --> bce
+        bc --> bcf
+        bd --> bde
+        bd --> bdf
+    end
+```
+
+The figure above represents a [**quotient
+graph**](https://en.wikipedia.org/wiki/Quotient_graph) of the search space for
+this example case.
+-  Note how there is a clear ordering of events and how the correction-search
+process goes through exactly four nodes in this scenario - the only point of
+differentiation is _which four_.
+- We know correction-search will go through up to one node from each column for
+any path, and _exactly_ one for any completed path.
+
+Furthermore, each _column_ represents a [**modular
+partition**](https://en.wikipedia.org/wiki/Modular_decomposition#Modular_quotients_and_factors)
+of the graph.
+- Each column, then, represents a graph
+  [**module**](https://en.wikipedia.org/wiki/Modular_decomposition#Modules)
+  while also being a partition of the graph.
+- Note that for every node on the graph not in a module (column), each other
+  node _either_ connects to _all_ of that module's nodes or to _none_ of them.
+
+The graph can thus be condensed as follows:
+
+```mermaid
+---
+title:  Correction-Search graph expansion - Condensed
+---
+flowchart LR;
+    start{Empty token}
+    start --> a(Keystroke 1: a or b)
+    a --> b(Keystroke 2:  c or d)
+    b --> c(Keystroke 3:  e or f)
+```
+
+### Handling Complex Transforms
+
+Let us now examine a case with a bit more complexity.  Suppose we have the
+following scenario:
+- Keystroke 1:  outputs one of the following:
+    - `{insert: 'a', deleteLeft: 0}`
+    - `{insert: 'b', deleteLeft: 0}`
+    - `{insert: 'cd', deleteLeft: 0}`
+- Keystroke 2:  outputs one of the following:
+    - `{insert: 'e', deleteLeft: 0}`
+    - `{insert: 'f', deleteLeft: 0}`
+    - `{insert: 'gh', deleteLeft: 0}`
+- Keystroke 3:  outputs one of the following:
+    - `{insert: 'i', deleteLeft: 0}`
+    - `{insert: 'jk', deleteLeft: 0}`
+    - `{insert: 'l', deleteLeft: 1}`
+
+Assuming that all possible combinations are valid prefixes, correction-search's
+graph would then expand as follows:
+
+```mermaid
+---
+title: Heterogenous keystroke correction-search graph (expanded)
+config:
+  flowchart:
+    curve: basis
+---
+flowchart LR;
+    subgraph Start
+        start{Empty token}
+    end
+
+    subgraph After Key 1
+        subgraph Codepoint length 1
+            start --> a
+            start --> b
+        end
+
+        subgraph Codepoint length 2
+            start --> cd
+        end
+    end
+
+    subgraph After Key 2
+        subgraph Codepoint length 2
+            a --> ae
+            a --> af
+            b --> be
+            b --> bf
+        end
+
+        subgraph Codepoint length 3
+            a --> agh
+            b --> bgh
+            cd --> cde
+            cd --> cdf
+        end
+
+        subgraph Codepoint length 4
+            cd --> cdgh
+        end
+    end
+
+    subgraph After Key 3
+        subgraph Codepoint length 2
+            ae ----> al
+            af ----> al
+            be ----> bl
+            bf ----> bl
+        end
+
+        subgraph Codepoint length 3
+            ae ----> aei
+            af ----> afi
+            be ----> bei
+            bf ----> bfi
+            agh ----> agl
+            bgh ----> bgl
+            cde ----> cdl
+            cdf ----> cdl
+        end
+
+        subgraph Codepoint length 4
+            ae ----> aejk
+            af ----> afjk
+            be ----> bejk
+            bf ----> bfjk
+            agh ----> aghi
+            bgh ----> bghi
+            cde ----> cdei
+            cdf ----> cdfi
+            cdgh ----> cdgl
+        end
+
+        subgraph Codepoint length 5
+            agh ----> aghjk
+            bgh ----> bghjk
+            cde ----> cdejk
+            cdf ----> cdfjk
+            cdgh ---> cdghi
+        end
+
+        subgraph Codepoint length 6
+            cdgh ----> cdghjk
+        end
+    end
+```
+
+In its condensed view, we get...
+
+
+```mermaid
+---
+title: Heterogenous keystroke correction-search graph (condensed)
+---
+flowchart LR;
+    subgraph Start
+        start{Empty token}
+    end
+
+    subgraph After Key 1
+        start --> K1C1(Codepoint length 1)
+        start --> K1C2(Codepoint length 2)
+    end
+
+    subgraph After Key 2
+        K1C1 -- [e, f] --> K2C2(Codepoint length 2)
+
+        K1C1 -- [gh] --> K2C3(Codepoint length 3)
+        K1C2 -- [e, f] --> K2C3
+
+        K1C2 -- [gh] --> K2C4(Codepoint length 4)
+    end
+
+    subgraph After Key 3
+        K2C2 -- [ -1 + l ] --> K3C2(Codepoint length 2)
+
+        K2C2 -- [i] --> K3C3(Codepoint length 3)
+        K2C3 -- [ -1 + l ] --> K3C3
+
+        K2C2 -- [jk] --> K3C4(Codepoint length 4)
+        K2C3 -- [i] --> K3C4
+        K2C4 -- [ -1 + l ] --> K3C4
+
+        K2C3 -- [jk] --> K3C5(Codepoint length 5)
+        K2C4 -- [i] --> K3C5
+
+        K2C4 -- [jk] --> K3C6(Codepoint length 6)
+    end
+```
 
 ### Placing Edit Operations
 
 TODO:  show the general pattern for edit-operation support within each keystroke module.
-- may need to additionally show how (insert) edits transition codepoint length
 - may need to additionally show how (delete) edits transition keystroke, but not codepoint length
+    - is relatively straightforward:  skip a key, but do not change codepoint length
+- may need to additionally show how (insert) edits transition codepoint length
+    - TODO:  FIX?  May need to jump to a NEW module reflecting the new codepoint length.
 
 # Correction-Search Implementation
 
