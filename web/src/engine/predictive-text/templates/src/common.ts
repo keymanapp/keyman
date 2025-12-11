@@ -55,13 +55,22 @@ export function buildMergedTransform(first: Transform, second: Transform): Trans
     }
   }
 
-  return {
+  const returnedObj: Transform = {
     insert: mergedFirstInsert + second.insert,
-    deleteLeft: first.deleteLeft + mergedSecondDelete,
+    deleteLeft: first.deleteLeft + mergedSecondDelete
+  }
+
+  if(first.id && first.id == second.id) {
+    returnedObj.id = first.id;
+  }
+
+  if(first.deleteRight != undefined || second.deleteRight != undefined) {
     // As `first` would affect the context before `second` could take effect,
     // this is the correct way to merge `deleteRight`.
-    deleteRight: (first.deleteRight || 0) + (second.deleteRight || 0)
+    returnedObj.deleteRight = (first.deleteRight || 0) + (second.deleteRight || 0)
   }
+
+  return returnedObj;
 }
 
 /**
