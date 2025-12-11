@@ -839,7 +839,11 @@ begin
     FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
     if not FResult then
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-        'TrmfMain: Shell Execute Update_ApplyNow Failed');
+        'TrmfMain: Shell Execute Update_ApplyNow Failed')
+    else
+      ModalResult := mrAbort;  // look into the most appropiate
+      // Application.Terminate;
+
   end;
 end;
 
