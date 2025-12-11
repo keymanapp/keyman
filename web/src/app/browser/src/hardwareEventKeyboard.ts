@@ -14,6 +14,12 @@ type KeyboardState = {
   baseLayout: string
 }
 
+const DOM_KEY_LOCATION = {
+  STANDARD: 0,
+  LEFT: 1,
+  RIGHT: 2,
+};
+
 // Important:  the following two lines should not cause a compile error if left uncommented.
 // let dummy1: KeyboardProcessor;
 // let dummy2: KeyboardState = dummy1;
@@ -51,9 +57,9 @@ export function _GetEventKeyCode(e: KeyboardEvent) {
  * @param  {KeyboardEvent}  e              Event object
  * @param  {KeyboardState}  keyboardState  Keyboard state object
  * @param  {DeviceSpec}     device         Device object
- * @return {KeyEvent}                      KeymanWeb KeyEvent object, or null
- *                                         for duplicate/spurious events or if
- *                                         there is no key code.
+ *
+ * @return {KeyEvent}       KeymanWeb KeyEvent object, or null for duplicate/spurious
+ *                          events or if there is no key code.
  */
 export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: KeyboardState, device: DeviceSpec): KeyEvent {
   if(e.cancelBubble === true) {
@@ -104,17 +110,21 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
    */
 
   let curModState = 0x0000;
-  curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
+  curModState |= (e.getModifierState("Shift") ? ModifierKeyConstants.K_SHIFTFLAG : 0);
 
   if(e.getModifierState("Control")) {
-    curModState |= ((e.location != 0 && ctrlEvent) ?
-      (e.location == 1 ? ModifierKeyConstants.LCTRLFLAG : ModifierKeyConstants.RCTRLFLAG) : // Condition 1
-      prevModState & 0x0003 /* LCTRLFLAG | RCTRLFLAG */);                                   // Condition 2
+    curModState |= ((e.location != DOM_KEY_LOCATION.STANDARD && ctrlEvent)
+      ? (e.location == DOM_KEY_LOCATION.LEFT
+        ? ModifierKeyConstants.LCTRLFLAG
+        : ModifierKeyConstants.RCTRLFLAG) // Condition 1
+      : prevModState & (ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG)); // Condition 2
   }
   if(e.getModifierState("Alt")) {
-    curModState |= ((e.location != 0 && altEvent) ?
-      (e.location == 1 ? ModifierKeyConstants.LALTFLAG : ModifierKeyConstants.RALTFLAG) :   // Condition 1
-      prevModState & 0x000C /* LALTFLAG | RALTFLAG */);                                     // Condition 2
+    curModState |= ((e.location != DOM_KEY_LOCATION.STANDARD && altEvent)
+      ? (e.location == DOM_KEY_LOCATION.LEFT
+        ? ModifierKeyConstants.LALTFLAG
+        : ModifierKeyConstants.RALTFLAG)   // Condition 1
+      : prevModState & (ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG));  // Condition 2
   }
 
   // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
@@ -143,7 +153,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     curModState &= ~ altGrMask;
   }
   // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-  if(curModState & ModifierKeyConstants.RALTFLAG) {
+  if((curModState & ModifierKeyConstants.RALTFLAG) != 0) {
     curModState &= ~ModifierKeyConstants.LCTRLFLAG;
   }
 
@@ -151,7 +161,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   const modifierBitmasks = Codes.modifierBitmasks;
   const activeKeyboard = keyboardState.activeKeyboard;
   let Lmodifiers: number;
-  if(activeKeyboard && activeKeyboard.isChiral) {
+  if(activeKeyboard?.isChiral) {
     Lmodifiers = curModState & modifierBitmasks.CHIRAL;
 
     // Note for future - embedding a kill switch here would facilitate disabling AltGr / Right-alt simulation.
@@ -162,9 +172,9 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   } else {
     // No need to sim AltGr here; we don't need chiral ALTs.
     Lmodifiers =
-      (curModState & 0x10) | // SHIFT
-      ((curModState & (ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG)) ? 0x20 : 0) |
-      ((curModState & (ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG))   ? 0x40 : 0);
+      (curModState & ModifierKeyConstants.K_SHIFTFLAG) |
+      ((curModState & (ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG)) != 0 ? ModifierKeyConstants.K_CTRLFLAG : 0) |
+      ((curModState & (ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG)) != 0 ? ModifierKeyConstants.K_ALTFLAG : 0);
   }
 
 
