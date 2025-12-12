@@ -6,7 +6,7 @@ In addition to handling keystroke events produced from hardware keyboards, Keyma
 
 Defined at [web/src/engine/keyboard/src/keyEvent.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/keyEvent.ts), the `KeyEvent` is used to represent incoming _and_ potential keystrokes.  This type is what the JS-keyboard processor references when evaluating keyboard rules during its keystroke processing.  For versions of the engine that support AltGr aliasing, such aliasing will be applied during generation of `KeyEvent` objects.
 
-Note that for predictive-text's fat-finger correction functionality, the engine will also generate versions of this type for nearby but _unpressed_ keys into the keystroke processing engine as well in order to facilitate predictions that follow context manipulations that could have resulted from specialized rules or reorders on neighboring keys.  `Mock`-cloned copies of the active context-state will be leveraged to prevent unwanted manipulation of the true context source.
+Note that for predictive-text's fat-finger correction functionality, the engine will also generate versions of this type for nearby but _unpressed_ keys into the keystroke processing engine as well in order to facilitate predictions that follow context manipulations that could have resulted from specialized rules or reorders on neighboring keys.  `SyntheticTextStore`-cloned copies of the active context-state will be leveraged to prevent unwanted manipulation of the true context source.
 
 ### `isSynthetic`
 `isSynthetic` should be set to `true` if generated through interaction with an on-screen-keyboard or for fat-finger simulation.  It should only be set to `false` if sending the basic key-event data through to the destination, without rule processing, leads to default handling picking up the slack.  Browsers provide default handling of keystrokes not directly defined within keyboards, but this is not available for keystrokes against the engine's OSK without internal support.
@@ -19,9 +19,9 @@ When `true`, the keystroke processor will need to simulate the results of "stand
 
 On-screen keyboard modules and hardware-keyboard event interception modules will produce instances of `KeyEvent` as noted above.  Once this is completed, both module types will _signal_ the keystroke event by raising an event with ID `keyevent` and provide the `KeyEvent` instance as its first parameter.  The main module of the engine will then forward that `KeyEvent` object to the input processing pipeline via `InputProcessor.processKeyEvent` (see below).
 
-## Output:  RuleBehavior
+## Output:  ProcessorAction
 
-Once keystroke processing is completed, the outward-facing components of the engine expect to receive a `RuleBehavior` object describing all primary and side effects of the keystroke.  Defined at [web/src/engine/js-processor/src/ruleBehavior.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/js-processor/src/ruleBehavior.ts), all of its fields aside from `transcription` are specific to existing JS-keyboard side effects.  (Certain Keyman language features can make permanent side-effect changes to state that should only be persisted for the "true" keystroke - not for any predictive-text 'alternative' keys.)
+Once keystroke processing is completed, the outward-facing components of the engine expect to receive a `ProcessorAction` object describing all primary and side effects of the keystroke.  Defined at [web/src/engine/keyboard/src/keyboards/processorAction.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/keyboards/processorAction.ts), all of its fields aside from `transcription` are specific to existing JS-keyboard side effects.  (Certain Keyman language features can make permanent side-effect changes to state that should only be persisted for the "true" keystroke - not for any predictive-text 'alternative' keys.)
 
 See also:  [context-state-management.md](context-state-management.md#js-keyboard-keystroke-processing)
 
@@ -31,7 +31,7 @@ See also:  [context-state-management.md](context-state-management.md#js-keyboard
 
 The "first stop" for incoming keystrokes is the `InputProcessor`, found at [web/src/engine/main/src/headless/inputProcessor.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/main/src/headless/.inputProcessor.ts), through its `processKeyEvent` method.  This class manages higher-level functionality triggered by keystroke events while deferring actual interpretation of the incoming keystroke further down the line.  Of particular note is that it also handles control-flows that require restoration of previously-occuring contexts.
 
-This class is the connection point for generating prediction requests and receiving corresponding suggestions.  In order to facilitate higher-quality predictive-text when enabled, the `InputProcessor` will _also_ generate and trigger processing for nearby keys.  This process allows transforms, reorders, and KMN keyboard rules to take effect and be used as alternative context roots for predictions.  These are generally run against `Mock`-based clones of the true context source and are additionally prevented from triggering long-term side-effects, such as changes to KMN-keyboard variable stores, by only calling `RuleBehavior.finalize` for the true input keystroke's result object.
+This class is the connection point for generating prediction requests and receiving corresponding suggestions.  In order to facilitate higher-quality predictive-text when enabled, the `InputProcessor` will _also_ generate and trigger processing for nearby keys.  This process allows transforms, reorders, and KMN keyboard rules to take effect and be used as alternative context roots for predictions.  These are generally run against `SyntheticTextStore`-based clones of the true context source and are additionally prevented from triggering long-term side-effects, such as changes to KMN-keyboard variable stores, by only calling `KeyboardProcessor.finalizeProcessorAction` for the true input keystroke's result object.
 
 Keys generated by OSK multitap need special handling here as well; they should always be applied to the context state as it existed at the time of the initial tap.  To facilitate this, the `InputProcessor` will directly rewind the active context-source to match the corresponding context state before requesting that the `KeyEvent` be processed.
 
@@ -64,18 +64,17 @@ The method linked above is the primary entrypoint for rule processing of individ
 
 #### JS-keyboard interfacing
 
-Certain Keyman language features can make permanent side-effect changes to state.  In order to prevent these from taking place for every keystroke, the method that interfaces with JS keyboards - `KeyboardInterface.process` - saves the context state (as a `Mock`) and current variable store values, then prepares a fresh `RuleBehavior` instance, before passing control off to the keyboard's backing script.  (Note that `KeyboardInterface` itself primarily consists of keyboard-script API called by JS-keyboard script.)
-- `epic/web-core` note:  renamed to `JSKeyboardInterface`.
+Certain Keyman language features can make permanent side-effect changes to state.  In order to prevent these from taking place for every keystroke, the method that interfaces with JS keyboards - `JSKeyboardInterface.process` - saves the context state (as a `SyntheticTextStore`) and current variable store values, then prepares a fresh `ProcessorAction` instance, before passing control off to the keyboard's backing script.  (Note that `JSKeyboardInterface` itself primarily consists of keyboard-script API called by JS-keyboard script.)
 
-A few of the keyboard-script API methods will mark `RuleBehavior` properties directly when called, but the bulk of its data will be set once the keyboard-script returns control to Keyman Engine for Web.  At this time, variable store values will also be reverted to prevent possible cross-contamination effects when predictive text is active - they're reapplied later if `RuleBehavior.finalize` is leveraged on the resulting instance.  Components documented in [context-state-management.md](./context-state-management.md) are then leveraged to determine the total change to context caused by the keystroke.
+A few of the keyboard-script API methods will mark `ProcessorAction` properties directly when called, but the bulk of its data will be set once the keyboard-script returns control to Keyman Engine for Web.  At this time, variable store values will also be reverted to prevent possible cross-contamination effects when predictive text is active - they're reapplied later if `KeyboardProcessor.finalizeProcessorAction` is leveraged on the resulting instance.  Components documented in [context-state-management.md](./context-state-management.md) are then leveraged to determine the total change to context caused by the keystroke.
 
 Note that for JS-keyboards, in 18.0 and before the true keystroke is processed against the _true_ context state, not a cloned copy, and thus its changes are applied immediately.
 
 #### Keystroke-default emulation
 
-Note that browser-default keystroke processing is defined within the `DefaultRules` class found at [web/src/engine/keyboard/src/defaultRules.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/defaultRules.ts).  It currently produces a (possibly `null`) string output rather than a `RuleBehavior`, but the latter can be easily constructed based on the returned string and the existing context state.
+Note that browser-default keystroke processing is defined within the `DefaultRules` class found at [web/src/engine/keyboard/src/defaultRules.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/defaultRules.ts).  It currently produces a (possibly `null`) string output rather than a `ProcessorAction`, but the latter can be easily constructed based on the returned string and the existing context state.
 - For `epic/web-core`, it may be wise to spin the `DefaultRules` component off as its own processor, serving as a backup for _all_ keystroke processing variants.
 
 ----
 
-In case referenced classes/files have moved:  this doc was last updated in 18.0-beta, based upon commit d1e45a0df49f81597887577a8c83af36d4a85283
+In case referenced classes/files have moved:  this doc was last updated in 19.0-alpha, based upon PR #14001.
