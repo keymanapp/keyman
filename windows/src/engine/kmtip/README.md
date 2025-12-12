@@ -31,19 +31,22 @@ devices.
 
 On 64-bit Windows, there is a single registry entry (COM CLSID) for a 64-bit
 TIP: **kmtip64.dll**.
+`HKLM\SOFTWARE\Classes\CLSID`
 
 For 32-bit applications, there exists a WOW6432Node in the Windows registry
 that allows a different DLL to be registered for the same Class ID:
-**kmtip.dll**. It is essentially two views of the registry depending on whether
+**kmtip.dll**.
+`HKLM\SOFTWARE\WOW6432Node\Classes\CLSID`
+It is essentially two views of the registry depending on whether
 the application is 32-bit or 64-bit.
 
 
 ## kmtiparm64x.dll - Arm64 Devices
 
-### Single Registry Entry Problem
+### Single Registry Entry Problem for the two 64-bit architecture
 
 On Windows on Arm there is a problem because there is only a single registry
-entry for the 64-bit CLSID. This means it is not possible to register both an
+entry for the **64-bit** CLSID. This means it is not possible to register both an
 amd64 DLL and an Arm64 DLL, for example **kmtip64.dll** and
 **kmtiparm64.dll**. (For 32-bit apps there is still the WOW6432Node that
 registers `kmtip.dll`.)
