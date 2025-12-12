@@ -520,8 +520,8 @@ describe('keyboard-info-compiler', function () {
       forPublishing: true,
     };
 
-    const kmx_filename_001 = 'k_001___basic_input_unicodei.kmx';
-    const kmx_filename_002 = 'k_002___basic_input_unicode.kmx';
+    const kmx_filename_001 = 'k_0100___basic_input_unicodei.kmx';
+    const kmx_filename_002 = 'k_0101___basic_input_unicode.kmx';
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
