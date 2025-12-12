@@ -50,7 +50,7 @@ do_configure() {
     STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
   fi
 
-  if [[ $target =~ ^(x86|x64)$ ]]; then
+  if [[ $target =~ ^(x86|x64|arm64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
@@ -69,7 +69,7 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-  if [[ $target =~ ^(x86|x64)$ ]]; then
+  if [[ $target =~ ^(x86|x64|arm64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION build "${builder_extra_params[@]}"
   elif $MESON_LOW_VERSION; then
     pushd "$MESON_PATH" > /dev/null
@@ -88,7 +88,7 @@ do_build() {
 do_test() {
   local target=$1
   builder_start_action test:$target || return 0
-  if [[ $target =~ ^(x86|x64)$ ]]; then
+  if [[ $target =~ ^(x86|x64|arm64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION test $testparams
   else
     if [[ $target == wasm ]] && builder_is_macos; then

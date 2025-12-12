@@ -83,6 +83,12 @@
     <None Include="kmtip64.def">
       <Filter>Source Files\Framework</Filter>
     </None>
+    <None Include="kmtiparm64.def">
+      <Filter>Source Files\Framework</Filter>
+    </None>
+    <None Include="kmtiparm64x.def">
+      <Filter>Source Files\Framework</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="kmtip.rc">

@@ -32,6 +32,7 @@ case $BUILDER_OS in
       ":win    Both x86 and x64"
       ":x86    32-bit Windows (x86) build"
       ":x64    64-bit Windows (x64) build"
+      ":arm64  64-bit Windows (arm64) build"
     )
     ;;
   mac)
@@ -96,12 +97,14 @@ builder_describe_internal_dependency \
   build:mac build:mac-x86_64 \
   build:mac build:mac-arm64 \
   build:win build:x86 \
-  build:win build:x64
+  build:win build:x64 \
+  build:win build:arm64 \
 
 builder_describe_outputs \
   configure:win             /core/build/win/$BUILDER_CONFIGURATION/ \
   configure:x86             /core/build/x86/$BUILDER_CONFIGURATION/build.ninja \
   configure:x64             /core/build/x64/$BUILDER_CONFIGURATION/build.ninja \
+  configure:arm64           /core/build/arm64/$BUILDER_CONFIGURATION/build.ninja \
   configure:mac             /core/build/mac/$BUILDER_CONFIGURATION/ \
   configure:mac-x86_64      /core/build/mac-x86_64/$BUILDER_CONFIGURATION/build.ninja \
   configure:mac-arm64       /core/build/mac-arm64/$BUILDER_CONFIGURATION/build.ninja \
@@ -110,6 +113,7 @@ builder_describe_outputs \
   build:win                 /core/build/win/$BUILDER_CONFIGURATION/BUILT \
   build:x86                 /core/build/x86/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:x64                 /core/build/x64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:arm64               /core/build/arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:mac                 /core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a \
   build:mac-x86_64          /core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:mac-arm64           /core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
@@ -130,7 +134,7 @@ fi
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets
 # settings above
-targets=(wasm x86 x64 mac-x86_64 mac-arm64 arch)
+targets=(wasm x86 x64 arm64 mac-x86_64 mac-arm64 arch)
 
 do_action() {
   local action_function=do_$1
@@ -191,6 +195,10 @@ if builder_start_action test:win; then
   meson test -C "$MESON_PATH" $testparams
   MESON_PATH="$KEYMAN_ROOT/core/build/x64/$BUILDER_CONFIGURATION"
   meson test -C "$MESON_PATH" $testparams
+  # We do not yet have CI/build hardware support for arm64 Windows testing
+  #MESON_PATH="$KEYMAN_ROOT/core/build/arm64/$BUILDER_CONFIGURATION"
+  #meson test -C "$MESON_PATH" $testparams
+
   builder_finish_action success test:win
 fi
 
