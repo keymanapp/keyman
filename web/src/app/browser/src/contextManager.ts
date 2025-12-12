@@ -613,7 +613,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     const activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
       textStore?.deadkeys().clear();
-      activeKeyboard?.notify(0, textStore, 1);  // I2187
+      activeKeyboard?.notify(0, textStore, true);  // I2187
     }
 
     if(!focusAssistant.restoringFocus && this.mostRecentTextStore != textStore) {
@@ -711,7 +711,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     const {activeKeyboard} = this;
     const {maintainingFocus} = this.focusAssistant;
     if(!maintainingFocus && activeKeyboard) {
-      activeKeyboard.keyboard.notify(0, textStore, 0);  // I2187
+      activeKeyboard.keyboard.notify(0, textStore, false);  // I2187
     }
     if(previousTextStore && !this.activeTextStore) {
       this.emit('textstorechange', null);
