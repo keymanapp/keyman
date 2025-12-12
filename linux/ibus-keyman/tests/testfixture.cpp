@@ -300,8 +300,8 @@ main(int argc, char *argv[]) {
 
     // Check for tests to skip - #3345
     const char *skipReason = NULL;
-    if (strcmp(filename->str, "k_026___system_stores") == 0 ||
-        strcmp(filename->str, "k_027___system_stores_2") == 0) {
+    if (strcmp(filename->str, "k_0600___system_stores") == 0 ||
+        strcmp(filename->str, "k_0601___system_stores_2") == 0) {
       skipReason = "mnemonic keyboards are not yet supported on Linux (#3345)";
     }
 

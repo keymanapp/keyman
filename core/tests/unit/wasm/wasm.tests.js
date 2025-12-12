@@ -30,10 +30,10 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can load keyboard from blob', function () {
     // Setup
-    const kmxdata = fs.readFileSync(path.join(__dirname, 'tests/unit/kmx/k_020___deadkeys_and_backspace.kmx'));
+    const kmxdata = fs.readFileSync(path.join(__dirname, 'tests/unit/kmx/k_0302___deadkeys_and_backspace.kmx'));
 
     // Execute
-    const result = km_core.keyboard_load_from_blob('k_020___deadkeys_and_backspace', kmxdata);
+    const result = km_core.keyboard_load_from_blob('k_0302___deadkeys_and_backspace', kmxdata);
 
     // Verify
     assert.equal(result.status, 0);
@@ -58,7 +58,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can dispose keyboard', function () {
     // Setup
-    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const keyboard = loadKeyboard('k_0302___deadkeys_and_backspace');
 
     // Execute
     km_core.keyboard_dispose(keyboard);
@@ -66,7 +66,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can get keyboard attributes', function () {
     // Setup
-    const keyboard = loadKeyboard('k_022___options_with_preset');
+    const keyboard = loadKeyboard('k_0501___options_with_preset');
 
     // Execute
     const result = km_core.keyboard_get_attrs(keyboard);
@@ -74,14 +74,14 @@ describe('Unit tests for wasm Core API', function () {
     // Verify
     assert.equal(result.status, 0);
     assert.isOk(result.object);
-    assert.equal(result.object.id, 'k_022___options_with_preset');
+    assert.equal(result.object.id, 'k_0501___options_with_preset');
     assert.equal(result.object.version_string, '0.0');
     assert.deepEqual(result.object.default_options, [{ key: 'foo', value: '0', scope: 1 }]);
   });
 
   it('can create the state object', function () {
     // Setup
-    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const keyboard = loadKeyboard('k_0302___deadkeys_and_backspace');
 
     // Execute
     const result = km_core.state_create(keyboard, []);
@@ -93,7 +93,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can dispose the state object', function () {
     // Setup
-    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const keyboard = loadKeyboard('k_0302___deadkeys_and_backspace');
     const state = km_core.state_create(keyboard, []);
 
     // Execute
@@ -102,7 +102,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can clone the state object', function () {
     // Setup
-    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const keyboard = loadKeyboard('k_0302___deadkeys_and_backspace');
     const state = km_core.state_create(keyboard, []);
 
     // Execute
@@ -116,7 +116,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can process event', function () {
     // Setup
-    const state = createState('k_020___deadkeys_and_backspace');
+    const state = createState('k_0302___deadkeys_and_backspace');
 
     // Execute
     const status = km_core.process_event(state, 0x20, 0, 1, 0);
@@ -135,7 +135,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can set the context', function () {
     // Setup
-    const state = createState('k_020___deadkeys_and_backspace');
+    const state = createState('k_0302___deadkeys_and_backspace');
 
     // Execute
     const status = km_core.state_context_set_if_needed(state, 'abc');
@@ -160,7 +160,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can get and set context items', function () {
     // Setup
-    const state = createState('k_020___deadkeys_and_backspace');
+    const state = createState('k_0302___deadkeys_and_backspace');
     const context = km_core.state_context(state);
     const data = "Hello, အရှောက်, मानव अधिकारों की सार्वभौम घोषणा";
     const contextItems = contextItemsFromString(data);
