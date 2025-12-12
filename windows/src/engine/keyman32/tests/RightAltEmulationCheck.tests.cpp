@@ -1,6 +1,6 @@
 #include "pch.h"
 
-extern BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName);
+extern BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName, BOOL& result);
 
 
 TEST(RightAltEmulationCheck, ReadAltGrFlagFromKbdDll) {
@@ -9,12 +9,23 @@ TEST(RightAltEmulationCheck, ReadAltGrFlagFromKbdDll) {
   // a known keyboard layout
 
   // These keyboards do not use AltGr
+  BOOL result = FALSE;
 
-  EXPECT_EQ(ReadAltGrFlagFromKbdDll("00000409"), FALSE); // kbdus.dll - English (US)
-  EXPECT_EQ(ReadAltGrFlagFromKbdDll("00000401"), FALSE); // kbda1.dll - Arabic 101
+  // kbdus.dll - English (US)
+  EXPECT_EQ(ReadAltGrFlagFromKbdDll("00000409", result), TRUE);
+  EXPECT_EQ(result, FALSE);
+
+  // kbda1.dll - Thai Kedmanee
+  EXPECT_EQ(ReadAltGrFlagFromKbdDll("0000041e", result), TRUE);
+  EXPECT_EQ(result, FALSE);
 
   // These keyboards use AltGr
 
-  EXPECT_EQ(ReadAltGrFlagFromKbdDll("0000040C"), TRUE); // kbdfr.dll - French AZERTY (Legacy)
-  EXPECT_EQ(ReadAltGrFlagFromKbdDll("00000405"), TRUE); // kbdcz.dll - Czech
+  // kbdfr.dll - French AZERTY (Legacy)
+  EXPECT_EQ(ReadAltGrFlagFromKbdDll("0000040C", result), TRUE);
+  EXPECT_EQ(result, TRUE);
+
+  // kbdcz.dll - Czech
+  EXPECT_EQ(ReadAltGrFlagFromKbdDll("00000405", result), TRUE);
+  EXPECT_EQ(result, TRUE);
 }
