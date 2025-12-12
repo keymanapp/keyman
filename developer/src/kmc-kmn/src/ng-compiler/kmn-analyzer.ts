@@ -17,7 +17,7 @@ import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStore
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { GivenNode, NewNode, NewNodeOrTree } from "./ast-strategy.js";
+import { ASTStrategy, GivenNode, NewNode, NewNodeOrTree } from "./ast-strategy.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -52,29 +52,29 @@ export class Parser {
 }
 
 /**
- * (BNF) kmnTree: line* finalLine?
+ * (BNF) kmnTree: line*
  */
-export class KmnTreeRule extends SingleChildRule {
+export class KmnTreeRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new KmnTreeStrategy());
     const line: Rule = new LineRule();
     this.rule = new ManyRule(line);
   }
+}
 
+/**
+ * An ASTStrategy that rebuilds the KMN tree after the initial parse
+ */
+export class KmnTreeStrategy extends ASTStrategy {
   /**
-   * Parse a KMNTreeRule, including gathering the source code,
-   * groups and stores and arranging these stores, other nodes,
-   * groups and then source code.
+   * Rebuilds the tree by gathering the source code, groups and
+   * stores and arranging these into stores, other nodes,
+   * groups and then source code
    *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
+   * @param node the tree to be rebuilt
+   * @returns the rebuilt tree, rooted at the first node found
    */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    if (this.rule === null) {
-      return false;
-    }
-    const parseSuccess = this.rule.parse(tokenBuffer, node);
+  public apply(node: ASTNode): ASTNode {
     const children: ASTNode[] = [];
     const sourceCodeNode: ASTNode = this.gatherSourceCode(node);
     const groupNodes: ASTNode[]   = this.gatherGroups(node);
@@ -84,8 +84,8 @@ export class KmnTreeRule extends SingleChildRule {
     children.push(...groupNodes);
     children.push(sourceCodeNode);
     node.addChildren(children);
-    return parseSuccess;
-  }
+    return node;
+  };
 
   private static STORES_NODETYPES = [
     NodeType.BITMAP,
@@ -125,7 +125,7 @@ export class KmnTreeRule extends SingleChildRule {
   ];
 
   private gatherStores(node: ASTNode): ASTNode {
-    const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeRule.STORES_NODETYPES);
+    const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeStrategy.STORES_NODETYPES);
     const storesNode: ASTNode   = new ASTNode(NodeType.STORES);
     storesNode.addChildren(storeNodes);
     return storesNode;

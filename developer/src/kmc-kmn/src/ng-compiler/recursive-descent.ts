@@ -87,7 +87,7 @@ export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
     // TODO-NG-COMPILER: fatal error if rule is null
     const parseSuccess: boolean = this.rule?.parse(tokenBuffer, tmp) ?? false;
     if (parseSuccess) {
-      node.addChild(this.strategy.apply(tmp).getSoleChild());
+      node.addChildren(this.strategy.apply(tmp).getChildren());
     }
     return parseSuccess;
   };
