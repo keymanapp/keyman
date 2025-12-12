@@ -43,14 +43,14 @@ back out to the main screen. From there, launch the Settings app and go
 to **General &gt; Keyboards &gt; Keyboards** to enable KMSample2 as a
 system keyboard.
 
-![Emulator](/cdn/deploy/img/engine/ios/16.0/guides/system-keyboard/set-sys-kbd.png "Emulator")
+![Emulator](/cdn/dev/img/engine/ios/16.0/guides/system-keyboard/set-sys-kbd.png "Emulator")
 
 Once that's done, open any app that can accept text input and select
 KMSample2 as your keyboard! Note that in this sample, the Thamizha
 Tamil99 keyboard can be accessed through the keyboard's "globe" key if
 it is not set active within KMSample2.
 
-![Emulator](/cdn/deploy/img/engine/ios/16.0/guides/system-keyboard/sys-kbd-active.png "Emulator")
+![Emulator](/cdn/dev/img/engine/ios/16.0/guides/system-keyboard/sys-kbd-active.png "Emulator")
 
 ### 3. Extending the app
 
@@ -60,7 +60,7 @@ one; again, follow the instructions from Part 1 to make this change.
 You can also customise the look and feel of the on screen keyboard by
 including a custom CSS file in your keyboard through Keyman Developer.
 
-![AddEmbeddedCSS](/cdn/deploy/img/engine/ios/16.0/guides/system-keyboard/developer-add-css-800wi.png "AddEmbeddedCSS")
+![AddEmbeddedCSS](/cdn/dev/img/engine/ios/16.0/guides/system-keyboard/developer-add-css-800wi.png "AddEmbeddedCSS")
 
 The CSS rules required to style your keyboard are beyond the scope of
 this post, but the **kmwosk.css** file included in the Keyman Developer
