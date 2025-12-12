@@ -38,8 +38,9 @@ A helper app to refresh Windows language settings, due to a bug in Windows; read
 Implementation of a Text Service for the Text Services Framework (TSF). This implementation is named Keyman TIP.
 Architecturally it sits between the TSF Manager and Keyman.exe
 
-kmtiparm64x.dll is built as an Arm64X, file it supports both x64 and arm64 on a
-Windows on Arm machine. kmtip64.dll is therefore only used only on Windows x64 Machines. See the [kmtip README](kmtip/README.md) for deeper description of kmtiparm64x.dll.
+kmtiparm64x.dll is built as an Arm64X file. It supports both x64 and arm64 on a
+Windows on Arm machine. kmtip64.dll is therefore only used on Windows x64 Machines.
+See the [kmtip README](kmtip/README.md) for deeper description of kmtip*.dll.
 
 ## mcompile - mcompile.exe
 

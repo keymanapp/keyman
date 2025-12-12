@@ -2,8 +2,8 @@
 ## Overview
 
 `kmtip` is an implementation of a Text Service for the Text Services Framework
-(TSF). This implementation is named Keyman TIP. Architecturally it sits between
-the TSF Manager and Keyman.exe.
+(TSF). This implementation is named Keyman Text Input Processor (TIP). Architecturally
+it sits between the TSF Manager and Keyman.exe.
 
 ## Background
 
@@ -45,7 +45,8 @@ the application is 32-bit or 64-bit.
 On Windows on Arm there is a problem because there is only a single registry
 entry for the 64-bit CLSID. This means it is not possible to register both an
 amd64 DLL and an Arm64 DLL, for example **kmtip64.dll** and
-**kmtiparm64.dll**.
+**kmtiparm64.dll**. (For 32-bit apps there is still the WOW6432Node that
+registers `kmtip.dll`.)
 
 * If we register a standard **Arm64** DLL, x64 apps will crash or fail to load
   it because they cannot load a pure Arm64 binary.
@@ -55,8 +56,7 @@ amd64 DLL and an Arm64 DLL, for example **kmtip64.dll** and
 ### The Solution: Arm64X
 
 **Arm64X** is a PE (Portable Executable) binary format. It is a dual-architecture
-library
-capable of servicing both native Arm64 applications and emulated x64
+library capable of servicing both native Arm64 applications and emulated x64
 applications on Windows on Arm (WoA) devices.
 
 `kmtiparm64x.dll` solves this problem by using the **Arm64X** format. It
@@ -87,8 +87,8 @@ When an application loads `kmtiparm64x.dll`:
 
 ### Build Composition
 
-This binary is the result of merging two distinct build targets from the
-source:
+The `kmtiparm64x.dll` binary is the result of merging two distinct build
+targets from the source:
 
 1. **kmtip (arm64)**: The pure native target.
 2. **kmtip (arm64EC)**: The hybrid target for x64 compatibility.
