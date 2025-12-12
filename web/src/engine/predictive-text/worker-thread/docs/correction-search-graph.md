@@ -450,8 +450,8 @@ flowchart LR;
     end
 
     subgraph After Key 1
-        start --> K1C1(Codepoint length 1)
-        start --> K1C2(Codepoint length 2)
+        start -- [a, b] --> K1C1(Codepoint length 1)
+        start -- [cd] --> K1C2(Codepoint length 2)
     end
 
     subgraph After Key 2
@@ -480,13 +480,106 @@ flowchart LR;
     end
 ```
 
+Note that this graph _itself_ has an implied modular partition, with modules for
+each keystroke containing submodules for each codepoint length resulting from
+following the search path through to that node.
+
+We maintain the graph in this manner in order to properly handle left-deletions
+for all cases. Should a later left-deletion erase _all_ of the search path's
+codepoint length, or worse - go negative - there will be special handling
+required.  For cases where the left-deletions exceed currently-modeled codepoint
+length, the most straightforward model for excess left-deletions is to edit and
+correct text that lands before the caret after the final left-deletion is
+applied.
+
 ### Placing Edit Operations
 
-TODO:  show the general pattern for edit-operation support within each keystroke module.
-- may need to additionally show how (delete) edits transition keystroke, but not codepoint length
-    - is relatively straightforward:  skip a key, but do not change codepoint length
-- may need to additionally show how (insert) edits transition codepoint length
-    - TODO:  FIX?  May need to jump to a NEW module reflecting the new codepoint length.
+`insert` edits increase the codepoint length of the represented path, but do not
+include data from extra keystrokes.  Thus, the search-graph with `insert` edits,
+for the first two keys, may be visualized as follows:
+
+<!-- TODO - PR enforcing this model - it doesn't actually match reality at present; the 'present' form is an error. -->
+
+```mermaid
+---
+title: Heterogenous keystroke correction-search graph (with 'insert' edits)
+config:
+  flowchart:
+    htmlLabels: false
+---
+flowchart TD;
+    subgraph Start
+        start{Empty token} -- _insert_ --> SC1(Codepoint length 1)
+        SC1 -- _insert_ --> SC2@{ shape: processes, label: "..." }
+    end
+
+    subgraph After Key 1
+        start -- [a, b] --> K1C1(Codepoint length 1)
+        start -- [cd] --> K1C2(Codepoint length 2)
+        K1C1 -- _insert_ --> K1C2(Codepoint length 2)
+        SC1 -- [a, b] --> K1C2
+        SC1 -- [cd] --> K1C3(Codepoint length 3)
+        K1C2 -- _insert_ --> K1C3
+        K1C3 -- _insert_ --> K1C4@{ shape: processes, label: "..." }
+    end
+
+    subgraph After Key 2
+        K1C1 -- [e, f] --> K2C2(Codepoint length 2)
+
+        K1C1 -- [gh] --> K2C3(Codepoint length 3)
+        K2C2 -- _insert_ --> K2C3
+
+        K1C2 -- [e, f] --> K2C3
+
+        K1C2 -- [gh] --> K2C4(Codepoint length 4)
+        K2C3 -- _insert_ --> K2C4
+        K1C3 -- [e, f] --> K2C4
+
+        K1C3 -- [gh] --> K2C5(Codepoint length 5)
+        K2C4 -- _insert_ --> K2C5
+
+        K2C5 -- _insert_ --> K2C6@{ shape: processes, label: "..." }
+    end
+```
+
+`delete` edits increase the range of represented keystrokes, but do not increase
+the codepoint length of resulting suggestions.  Thus, the search-graph with
+`delete` edits, for the first two keys, may be visualized as follows:
+
+```mermaid
+---
+title: Heterogenous keystroke correction-search graph (with 'delete' edits)
+config:
+  flowchart:
+    htmlLabels: false
+---
+flowchart LR;
+    subgraph Start
+        start{Empty token}
+    end
+
+    subgraph After Key 1
+        start -- _delete_ --> K1C0(Codepoint length 0)
+        start -- [a, b] --> K1C1(Codepoint length 1)
+        start -- [cd] --> K1C2(Codepoint length 2)
+    end
+
+    subgraph After Key 2
+        K1C0 -- _delete_ --> K2C0(Codepoint length 0)
+        K1C0 -- [e, f] --> K2C1(Codepoint length 1)
+        K1C0 -- [gh] --> K2C2(Codepoint length 2)
+
+        K1C1 -- _delete_ --> K2C1
+        K1C1 -- [e, f] --> K2C2
+        K1C1 -- [gh] --> K2C3(Codepoint length 3)
+
+        K1C2 -- _delete_ --> K2C2
+        K1C2 -- [e, f] --> K2C3
+        K1C2 -- [gh] --> K2C4(Codepoint length 4)
+    end
+```
+
+<!-- TODO - everything after this point. -->
 
 # Correction-Search Implementation
 
@@ -501,21 +594,24 @@ The `SearchNode` class of the predictive-text engine represents one traversed pa
   - also represents the current path tail node / state
   - helps resolve the "overlapping subproblems" aspect
 
-<!-- The fact that we can design for these and apply them is WHY we can DO dynamic programming; it motivates the modules! -->
-
 ## The `SearchSpace` type
 
-Represents one of the modules defined above (codepoint length + keystrokes represented)
+Represents one of the modules defined above (codepoint length + keystrokes
+represented)
 
-Shift module definitions:  now define modules for "from root through to keystroke K with codepoint length N"
+Shift module definitions:  now define modules for "from root through to
+keystroke K with codepoint length N"
 
 ## The `SearchPath` type
 
-Represents the search-graph subspace corresponding to a single inbound quotient graph path to a single quotient graph module
-- "inbound path" = single parent quotient-graph module (optimal subproblem) to the destination quotient-graph module
+Represents the search-graph subspace corresponding to a single inbound quotient
+graph path to a single quotient graph module
+- "inbound path" = single parent quotient-graph module (optimal subproblem) to
+  the destination quotient-graph module
 
 ## The `SearchCluster` type
 
-Represents the search-graph subspace corresponding to ALL inbound paths to a single quotient graph module
+Represents the search-graph subspace corresponding to ALL inbound paths to a
+single quotient graph module
 
 Is a superset of SearchPath.
