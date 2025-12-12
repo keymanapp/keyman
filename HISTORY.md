@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.175 alpha 2025-12-12
+
+* fix(windows): use Thai Kedmanee instead of Arabic 101 in RightAltEmulationCheck.tests.cpp (#15346)
+
 ## 19.0.174 alpha 2025-12-10
 
 * chore(windows): simple bisect utility for checking setup-redist.exe file size (#15322)
