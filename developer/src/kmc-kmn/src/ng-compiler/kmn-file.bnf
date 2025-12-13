@@ -31,7 +31,8 @@ lhsBlock: MATCH|NOMATCH|inputBlock
 inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 inputContext: inputElement+
 inputElement: anyStatement|notanyStatement|contextStatement|indexStatement|text
-keystroke: PLUS inputElement+
+keystroke: PLUS keystrokeElement+
+keystrokeElement: anyStatement|text
 rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|setSystemStore|layerStatement|indexStatement|

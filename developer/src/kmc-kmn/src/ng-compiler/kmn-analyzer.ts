@@ -715,9 +715,21 @@ export class KeystrokeRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new NewNode(NodeType.KEYSTROKE));
     const plus: Rule            = new TokenRule(TokenType.PLUS);
-    const inputElement          = new InputElementRule();
-    const oneOrManyInputElement = new OneOrManyRule(inputElement);
-    this.rule = new SequenceRule([plus, oneOrManyInputElement]);
+    const keystrokeElement      = new KeystrokeElementRule();
+    const oneOrManyKeystrokeElement = new OneOrManyRule(keystrokeElement);
+    this.rule = new SequenceRule([plus, oneOrManyKeystrokeElement]);
+  }
+}
+
+/**
+ * (BNF) keystrokeElement: anyStatement|text
+ */
+export class KeystrokeElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const anyStatement: Rule = new AnyStatementRule();
+    const text: Rule         = new TextRule();
+    this.rule = new AlternateRule([anyStatement, text]);
   }
 }
 
