@@ -26,15 +26,15 @@ import { ASTStrategy, GivenNode, NewNode, NewNodeOrTree } from "./ast-strategy.j
  *
  */
 export class Parser {
-  private readonly tokenBuffer: TokenBuffer;
-
   /**
    * Construct a Parser
    *
-   * @param tokenBuffer the TokenBuffer to parse
+   * @param tokenBuffer 
    */
-  public constructor(tokenBuffer: TokenBuffer) {
-    this.tokenBuffer = tokenBuffer;
+  public constructor(
+    /** the TokenBuffer to parse */
+    private readonly tokenBuffer: TokenBuffer
+  ) {
   }
 
   /**
@@ -46,8 +46,8 @@ export class Parser {
   public parse(): ASTNode {
     const kmnTreeRule: Rule = new KmnTreeRule();
     const root: ASTNode = new ASTNode(NodeType.TMP);
-    kmnTreeRule.parse(this.tokenBuffer, root);
-    return root;
+    // TODO-NG-COMPILER: fatal error if parse returns false
+    return kmnTreeRule.parse(this.tokenBuffer, root) ? root : null;
   }
 }
 
@@ -124,6 +124,13 @@ export class KmnTreeStrategy extends ASTStrategy {
     NodeType.STORE,
   ];
 
+  /**
+   * Removes the all store nodes (i.e. matching STORES_NODETYPES) from
+   * the abstract syntax tree (AST) and returns them
+   *
+   * @param node the abstract syntax tree (AST)
+   * @returns the stores nodes removed from the tree
+   */
   private gatherStores(node: ASTNode): ASTNode {
     const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeStrategy.STORES_NODETYPES);
     const storesNode: ASTNode   = new ASTNode(NodeType.STORES);
@@ -131,10 +138,24 @@ export class KmnTreeStrategy extends ASTStrategy {
     return storesNode;
   }
 
+  /**
+   * Removes all groups from the abstract syntax tree (AST) and returns them
+   *
+   * @param node the abstract syntax tree (AST)
+   * @returns the groups removed from the tree
+   */
   private gatherGroups(node: ASTNode): ASTNode[] {
-    return node.removeBlocks(NodeType.GROUP, NodeType.PRODUCTION);;
+    return node.removeBlocks(NodeType.GROUP, NodeType.PRODUCTION);
   }
 
+  /**
+   * Removes all source code nodes (i.e LINE nodes) from the
+   * abstract syntax tree (AST) and returns them as a tree
+   * rooted at a SOURCE_CODE node
+   *
+   * @param node the abstract syntax tree (AST)
+   * @returns the removed source code nodes as a SOURCE_CODE tree
+   */
   private gatherSourceCode(node: ASTNode): ASTNode {
     const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeType.LINE);
     const sourceCodeNode: ASTNode = new ASTNode(NodeType.SOURCE_CODE);
