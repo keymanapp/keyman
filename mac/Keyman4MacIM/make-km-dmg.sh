@@ -200,7 +200,7 @@ while (( DETACH_SUCCESS < 10 )); do
         echo "hdiutil detach reported failure code ${DETACH_RESULT}"
     fi
     if [[ $DETACH_RESULT != 0 ]] || [[ -d "$STAGING_DIR" ]] ; then
-        (( DETACH_SUCCESS++ ))
+        (( DETACH_SUCCESS++ )) || true
         echo "Failed to unmount: \"$STAGING_DIR\" on attempt #$DETACH_SUCCESS. Waiting 5 seconds to try again."
         if (( DETACH_SUCCESS == 6 )); then
             echo "  Note: Detach failed first five times, so now attempting with '-force'"
