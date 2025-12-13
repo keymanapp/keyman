@@ -15,7 +15,7 @@ TEST(RightAltEmulationCheck, ReadAltGrFlagFromKbdDll) {
   EXPECT_EQ(ReadAltGrFlagFromKbdDll("00000409", result), TRUE);
   EXPECT_EQ(result, FALSE);
 
-  // kbda1.dll - Thai Kedmanee
+  // kbdth0.dll - Thai Kedmanee
   EXPECT_EQ(ReadAltGrFlagFromKbdDll("0000041e", result), TRUE);
   EXPECT_EQ(result, FALSE);
 
