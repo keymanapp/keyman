@@ -81,7 +81,7 @@ bool LowLevelHookWatchDog::CheckIfHookIsAlive() {
 void LowLevelHookWatchDog::ReinstallHook() {
   //keyman32.cpp:
   SendDebugMessageFormat(
-    "Attempting to reinstall hook because watchdog threshold exceeded by %llu msec (last LL=%llu last GM=%llu)",
+    "Attempting to reinstall hook because watchdog threshold exceeded at %llu msec (last LL=%llu last GM=%llu)",
     LastGetMessageEventTick - LastLowLevelEventTick,
     LastLowLevelEventTick,
     LastGetMessageEventTick
@@ -92,6 +92,8 @@ void LowLevelHookWatchDog::ReinstallHook() {
   } else {
     SendDebugMessage("Attempt to reinstall low level hook succeeded");
   }
+
+  Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_TIMING), (LPARAM)(LastGetMessageEventTick - LastLowLevelEventTick));
 
   // We should assume the hook is alive at this point to avoid repeated resets
   HookIsAlive();

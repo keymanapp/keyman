@@ -488,11 +488,15 @@ BOOL RestartLowLevelHook() {
   }
 
   if(!UninitLowLevelHook()) {
-    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", GetLastError());
+    DWORD error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_UNINIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", error);
     result = FALSE;
   }
   if(!InitLowLevelHook()) {
-    SendDebugMessageFormat("Failed to install low level hook.  GetLastError = %d", GetLastError());
+    DWORD error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_INIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to install low level hook.  GetLastError = %d", error);
     result = FALSE;
   }
 
