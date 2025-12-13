@@ -709,7 +709,7 @@ export class InputElementRule extends SingleChildRule {
 }
 
 /**
- * (BNF) keystroke: PLUS inputElement+
+ * (BNF) keystroke: PLUS keystrokeElement+
  */
 export class KeystrokeRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
