@@ -182,10 +182,11 @@ export class LineRule extends SingleChildRule {
 /**
  * (BNF) compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
  *
- * // https://help.keyman.com/developer/language/guide/compile-targets
+ * https://help.keyman.com/developer/language/guide/compile-targets
  */
 export class CompileTargetRule extends AlternateTokenRule {
-    public constructor() {
+  // TODO-NG-COMPILER: warning/error for compile targets
+  public constructor() {
     super([
       TokenType.KEYMAN,
       TokenType.KEYMANONLY,
@@ -249,8 +250,15 @@ export class PlainTextRule extends SingleChildRule {
 /**
  * (BNF) simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
  * DECIMAL|HEXADECIMAL|OCTAL|NUL|deadkeyStatement|BEEP
+ *
+ * https://help.keyman.com/developer/language/guide/strings
+ * https://help.keyman.com/developer/language/guide/unicode
+ * https://help.keyman.com/developer/language/guide/constants
+ * https://help.keyman.com/developer/language/reference/_nul
+ * https://help.keyman.com/developer/language/reference/beep
  */
 export class SimpleTextRule extends SingleChildRule {
+  // TODO-NG-COMPILER: warning/error for DECIMAL, HEXADECIMAL and OCTAL
   public constructor() {
     super();
     const stringRule: Rule       = new TokenRule(TokenType.STRING, true);
@@ -282,6 +290,8 @@ export class SimpleTextRule extends SingleChildRule {
 
 /**
  * (BNF) textRange: simpleText rangeEnd+
+ *
+ * https://help.keyman.com/developer/language/guide/expansions
  */
 export class TextRangeRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -295,6 +305,8 @@ export class TextRangeRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) rangeEnd: RANGE simpleText
+ *
+ * https://help.keyman.com/developer/language/guide/expansions
  */
 export class RangeEndRule extends SingleChildRule {
   public constructor() {
@@ -307,6 +319,8 @@ export class RangeEndRule extends SingleChildRule {
 
 /**
  * (BNF) virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
+ *
+ * https://help.keyman.com/developer/language/guide/virtual-keys
  */
 export class VirtualKeyRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -324,6 +338,12 @@ export class VirtualKeyRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) modifier: SHIFT|CAPS|MODIFIER
+ *
+ * https://help.keyman.com/developer/language/guide/virtual-keys
+ *
+ * SHIFT and CAPS are distinct from other modifiers because
+ * they are also used in 'CAPS ALWAYS OFF', 'CAPS ON ONLY' and
+ * 'SHIFT FREES CAPS'
  */
 export class ModifierRule extends SingleChildRule {
   public constructor() {
@@ -359,9 +379,13 @@ export class ModifierRule extends SingleChildRule {
 
 /**
  * (BNF) keyCode: KEY_CODE|STRING|DECIMAL
+ *
+ * https://help.keyman.com/developer/language/guide/virtual-keys
+ * https://help.keyman.com/developer/language/guide/strings
+ *
+ * DECIMAL is included because of e.g. d10, which could be ISO9995 code
  */
 export class KeyCodeRule extends SingleChildRule {
-  // DECIMAL is included because of e.g. d10, which could be ISO9995 code
   public constructor() {
     super();
     const keyCode: Rule    = new TokenRule(TokenType.KEY_CODE, true);
@@ -386,6 +410,8 @@ export class RuleBlockRule extends SingleChildRule {
 
 /**
  * (BNF) beginStatement: BEGIN entryPoint? CHEVRON useStatement
+ *
+ * https://help.keyman.com/developer/language/reference/begin
  */
 export class BeginStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -401,6 +427,8 @@ export class BeginStatementRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
+ *
+ * https://help.keyman.com/developer/language/reference/begin
  */
 export class EntryPointRule extends SingleChildRule {
   public constructor() {
@@ -415,6 +443,8 @@ export class EntryPointRule extends SingleChildRule {
 
 /**
  * (BNF) useStatement: USE LEFT_BR groupName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/use
  */
 export class UseStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -429,6 +459,8 @@ export class UseStatementRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
+ *
+ * https://help.keyman.com/developer/language/reference/group
  */
 export class GroupStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -451,8 +483,11 @@ export class GroupStatementRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) groupName: groupNameElement+
+ *
+ * https://help.keyman.com/developer/language/reference/group
  */
 export class GroupNameRule extends SingleChildRuleWithASTStrategy {
+  // TODO-NG-COMPILER: warning/error if group name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.GROUPNAME));
     const groupNameElement: Rule = new GroupNameElementRule();
@@ -462,6 +497,11 @@ export class GroupNameRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) groupNameElement: PARAMETER|OCTAL|permittedKeyword
+ *
+ * https://help.keyman.com/developer/language/reference/group
+ *
+ * OCTAL and permitted keywords are included as these could be
+ * valid group name elements
  */
 export class GroupNameElementRule extends SingleChildRule {
   public constructor() {
@@ -475,6 +515,8 @@ export class GroupNameElementRule extends SingleChildRule {
 
 /**
  * (BNF) see the BNF file (kmn-file.bnf)
+ *
+ * These keywords may all be valid normal store, deadkey or group name elements
  */
 export class PermittedKeywordRule extends AlternateTokenRule {
   public constructor() {
@@ -518,6 +560,8 @@ export class PermittedKeywordRule extends AlternateTokenRule {
 
 /**
  * (BNF) groupQualifier: usingKeys|READONLY
+ *
+ * https://help.keyman.com/developer/language/reference/group
  */
 export class GroupQualifierRule extends SingleChildRule {
   public constructor() {
@@ -530,6 +574,8 @@ export class GroupQualifierRule extends SingleChildRule {
 
 /**
  * (BNF) usingKeys: USING KEYS
+ *
+ * https://help.keyman.com/developer/language/reference/group
  */
 export class UsingKeysRule extends SingleChildRule {
   public constructor() {
@@ -558,6 +604,8 @@ export class UsingKeysRule extends SingleChildRule {
 
 /**
  * (BNF) productionBlock: lhsBlock CHEVRON rhsBlock
+ *
+ * https://help.keyman.com/developer/language/guide/rules
  */
 export class ProductionBlockRule extends SingleChildRule {
   public constructor() {
@@ -592,6 +640,9 @@ export class ProductionBlockRule extends SingleChildRule {
 
 /**
  * (BNF) lhsBlock: MATCH|NOMATCH|inputBlock
+ *
+ * https://help.keyman.com/developer/language/reference/match
+ * https://help.keyman.com/developer/language/reference/nomatch
  */
 export class LhsBlockRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -605,6 +656,8 @@ export class LhsBlockRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
+ *
+ * https://help.keyman.com/developer/language/reference/_nul
  */
 export class InputBlockRule extends SingleChildRule {
   public constructor() {
