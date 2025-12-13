@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.176 alpha 2025-12-13
+
+* chore(windows): remove unused variable (#15334)
+
 ## 19.0.175 alpha 2025-12-12
 
 * fix(windows): use Thai Kedmanee instead of Arabic 101 in RightAltEmulationCheck.tests.cpp (#15346)
