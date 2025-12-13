@@ -181,18 +181,18 @@ export class LineRule extends SingleChildRule {
 
 /**
  * (BNF) compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
+ *
+ * // https://help.keyman.com/developer/language/guide/compile-targets
  */
-export class CompileTargetRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const keyman: Rule     = new TokenRule(TokenType.KEYMAN, true);
-    const keymanonly: Rule = new TokenRule(TokenType.KEYMANONLY, true);
-    const keymanweb: Rule  = new TokenRule(TokenType.KEYMANWEB, true);
-    const kmfl: Rule       = new TokenRule(TokenType.KMFL, true);
-    const weaver: Rule     = new TokenRule(TokenType.WEAVER, true);
-    this.rule = new AlternateRule([
-      keyman, keymanonly, keymanweb, kmfl, weaver,
-    ]);
+export class CompileTargetRule extends AlternateTokenRule {
+    public constructor() {
+    super([
+      TokenType.KEYMAN,
+      TokenType.KEYMANONLY,
+      TokenType.KEYMANWEB,
+      TokenType.KMFL,
+      TokenType.WEAVER,
+    ], true);
   }
 }
 
