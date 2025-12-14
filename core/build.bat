@@ -133,19 +133,11 @@ if "!COMMAND!" == "build" (
 )
 
 if "!COMMAND!" == "test" (
-  if /I "%HOST_ARCH%"=="arm64" if /I "%ARCH%"=="arm64" (
-    echo === Testing Keyman Core for Windows !ARCH! !BUILDTYPE! ===
-    cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
-    meson test --print-errorlogs %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
-    cd ..\..\..
-    shift
-  ) else (
-    echo === Testing Keyman Core for Windows !ARCH! !BUILDTYPE! ===
-    cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
-    meson test --print-errorlogs %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
-    cd ..\..\..
-    shift
-  )
+  echo === Testing Keyman Core for Windows !ARCH! !BUILDTYPE! ===
+  cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
+  meson test --print-errorlogs %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+  cd ..\..\..
+  shift
 )
 goto :eof
 

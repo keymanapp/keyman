@@ -4,7 +4,7 @@ export const testBuildConfigurations = {
   'ios': ['Keyman_iOS_TestPullRequests', 'Keyman_iOS_TestSamplesAndTestProjects'],
   'linux': ['KeymanLinux_TestPullRequests', 'Keyman_Linux_Test_Integration', 'Keyman_Common_KPAPI_TestPullRequests_Linux', 'deb-pr-packaging_GitHub'],
   'mac': ['Keyman_KeymanMac_PullRequests', 'Keyman_Common_KPAPI_TestPullRequests_macOS'],
-  'windows': ['KeymanDesktop_TestPullRequests', 'KeymanDesktop_TestPrRenderOnScreenKeyboards', 'Keyman_Common_KPAPI_TestPullRequests_Windows'],
+  'windows': ['KeymanDesktop_TestPullRequests', 'KeymanDesktop_TestPrRenderOnScreenKeyboards', 'Keyman_Common_KPAPI_TestPullRequests_Windows', 'core-arm64-test_GitHub'],
   'web': ['Keymanweb_TestPullRequests', 'Keyman_Common_KPAPI_TestPullRequests_WASM'],
   'developer': ['Keyman_Developer_Test', 'npm-publish_GitHub'],
 
