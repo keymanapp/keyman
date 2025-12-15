@@ -32,7 +32,7 @@ inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 inputContext: inputElement+
 inputElement: anyStatement|notanyStatement|contextStatement|indexStatement|text
 keystroke: PLUS keystrokeElement+
-keystrokeElement: anyStatement|text
+keystrokeElement: anyStatement|simpleText|outsStatement
 rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|setSystemStore|layerStatement|indexStatement|

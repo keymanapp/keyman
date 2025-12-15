@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
+import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule, KeystrokeElementRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
 import { GroupQualifierRule, GroupStatementRule, InputBlockRule, InputContextRule, InputElementRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { KeystrokeRule, KmnTreeRule, LhsBlockRule, LineRule, ModifierRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { OutputStatementRule, PermittedKeywordRule, PlainTextRule, ProductionBlockRule, RhsBlockRule } from '../../src/ng-compiler/kmn-analyzer.js';
@@ -408,7 +408,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(plainText.parse(tokenBuffer, root));
       assert.isNotNull(root.getSoleChildOfType(NodeType.STRING));
     });
-    it("can parse correctly (outs statement)", () => {
+    it("can handle invalid element (outs statement)", () => {
       tokenBuffer = stringToTokenBuffer('outs(digit)');
       const plainText: Rule = new PlainTextRule();
       assert.isFalse(plainText.parse(tokenBuffer, root));
@@ -1469,6 +1469,41 @@ describe("KMN Analyser Tests", () => {
       const keystrokeNode = root.getSoleChildOfType(NodeType.KEYSTROKE);
       assert.isNotNull(keystrokeNode);
       assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeType.U_CHAR));
+    });
+  });
+  describe("KeystrokeElementRule Tests", () => {
+    it("can construct an KeystrokeElementRule", () => {
+      tokenBuffer = stringToTokenBuffer('');
+      const inputElement: Rule = new KeystrokeElementRule();
+      assert.isNotNull(inputElement);
+    });
+    it("can parse correctly (any)", () => {
+      tokenBuffer = stringToTokenBuffer('any(digit)');
+      const inputElement: Rule = new KeystrokeElementRule();
+      assert.isTrue(inputElement.parse(tokenBuffer, root));
+      const anyNode = root.getSoleChildOfType(NodeType.ANY);
+      assert.isNotNull(anyNode);
+      assert.isNotNull(anyNode.getSoleChildOfType(NodeType.STORENAME));
+    });
+    it("can parse correctly (deadKey [as text])", () => {
+      tokenBuffer = stringToTokenBuffer('dk(deadkeyName)');
+      const inputElement: Rule = new KeystrokeElementRule();
+      assert.isTrue(inputElement.parse(tokenBuffer, root));
+      const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
+      assert.isNotNull(deadKeyNode);
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.DEADKEYNAME));
+    });
+    it("can parse correctly (uchar [simple text])", () => {
+      tokenBuffer = stringToTokenBuffer('U+1780');
+      const inputElement: Rule = new KeystrokeElementRule();
+      assert.isTrue(inputElement.parse(tokenBuffer, root));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.U_CHAR));
+    });
+    it("can parse correctly (outs statement)", () => {
+      tokenBuffer = stringToTokenBuffer('outs(digit)');
+      const inputElement: Rule = new KeystrokeElementRule();
+      assert.isTrue(inputElement.parse(tokenBuffer, root));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.OUTS));
     });
   });
   describe("RhsBlockRule Tests", () => {

@@ -722,14 +722,15 @@ export class KeystrokeRule extends SingleChildRuleWithASTStrategy {
 }
 
 /**
- * (BNF) keystrokeElement: anyStatement|text
+ * (BNF) keystrokeElement: anyStatement|simpleText|outsStatement
  */
 export class KeystrokeElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const anyStatement: Rule = new AnyStatementRule();
-    const text: Rule         = new TextRule();
-    this.rule = new AlternateRule([anyStatement, text]);
+    const anyStatement: Rule  = new AnyStatementRule();
+    const simpleText: Rule    = new SimpleTextRule();
+    const outsStatement: Rule = new OutsStatementRule()
+    this.rule = new AlternateRule([anyStatement, simpleText, outsStatement]);
   }
 }
 
