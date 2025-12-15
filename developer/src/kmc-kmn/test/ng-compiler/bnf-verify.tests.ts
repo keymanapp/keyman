@@ -96,7 +96,8 @@ function getSourceRules(buffer:string): Dictionary {
     let matches = buffer.matchAll(/export\s+class\s+(\S+)Rule\s+extends\s+AlternateTokenRule.+?super\(\[([^\]]+)/sg);
     for (const match of matches) {
       const name  = lowerCaseFirstLetter(match[1]);
-      rules[name] = removeWhiteSpace(match[2]);
+      rules[name] = removeOneLineComments(match[2]);
+      rules[name] = removeWhiteSpace(rules[name]);
       rules[name] = replaceCommas(rules[name]);
       rules[name] = replaceTokenElements(rules[name]);
       rules[name] = replaceElementNames(rules[name]);
@@ -122,6 +123,10 @@ function getSourceRules(buffer:string): Dictionary {
 function lowerCaseFirstLetter(str: string): string {
   return (str == null || str.length < 1) ? str :
     str.charAt(0).toLowerCase() + str.slice(1);
+}
+
+function removeOneLineComments(str: string): string {
+  return str.replaceAll(/\/\/[^\r\n]*/g, '');
 }
 
 function removeWhiteSpace(str: string): string {

@@ -246,6 +246,8 @@ export class SetSystemStoreRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) systemStoreNameForSet: systemStoreName|LAYER
+ *
+ * https://help.keyman.com/developer/language/reference/set
  */
 export class SystemStoreNameForSetRule extends SingleChildRule {
   public constructor() {
