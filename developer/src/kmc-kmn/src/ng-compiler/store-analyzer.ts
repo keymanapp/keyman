@@ -280,13 +280,24 @@ export class ResetStoreRule extends SingleChildRuleWithASTStrategy {
 }
 
 abstract class CapsLockStatementRule extends SingleChildRule {
-  protected tokenType: TokenType;
-  protected nodeType: NodeType;
-
-  public constructor() {
+  public constructor(
+    /** type of token that will be created */
+    protected tokenType: TokenType,
+    /** type of node that will be added to the tree */
+    protected nodeType: NodeType,
+  ) {
     super();
   }
 
+  /**
+   * Parse a CapsLockStatementRule. A child class needs to identify
+   * the nodeType and tokenType that will be added to the AST if
+   * the parse is successful.
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
@@ -307,9 +318,7 @@ abstract class CapsLockStatementRule extends SingleChildRule {
  */
 export class CapsAlwaysOffRule extends CapsLockStatementRule {
   public constructor() {
-    super();
-    this.tokenType     = TokenType.CAPSALWAYSOFF;
-    this.nodeType      = NodeType.CAPSALWAYSOFF;
+    super(TokenType.CAPSALWAYSOFF, NodeType.CAPSALWAYSOFF);
     const caps: Rule   = new TokenRule(TokenType.CAPS);
     const always: Rule = new TokenRule(TokenType.ALWAYS);
     const off: Rule    = new TokenRule(TokenType.OFF);
@@ -325,9 +334,7 @@ export class CapsAlwaysOffRule extends CapsLockStatementRule {
  */
 export class CapsOnOnlyRule extends CapsLockStatementRule {
   public constructor() {
-    super();
-    this.tokenType   = TokenType.CAPSONONLY;
-    this.nodeType    = NodeType.CAPSONONLY;
+    super(TokenType.CAPSONONLY, NodeType.CAPSONONLY);
     const caps: Rule = new TokenRule(TokenType.CAPS);
     const on: Rule   = new TokenRule(TokenType.ON);
     const only: Rule = new TokenRule(TokenType.ONLY);
@@ -343,9 +350,7 @@ export class CapsOnOnlyRule extends CapsLockStatementRule {
  */
 export class ShiftFreesCapsRule extends CapsLockStatementRule {
   public constructor() {
-    super();
-    this.tokenType    = TokenType.SHIFTFREESCAPS;
-    this.nodeType     = NodeType.SHIFTFREESCAPS;
+    super(TokenType.SHIFTFREESCAPS, NodeType.SHIFTFREESCAPS);
     const shift: Rule = new TokenRule(TokenType.SHIFT);
     const frees: Rule = new TokenRule(TokenType.FREES);
     const caps: Rule  = new TokenRule(TokenType.CAPS);
