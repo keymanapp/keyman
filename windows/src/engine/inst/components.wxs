@@ -138,6 +138,8 @@
       </Component>
 
       <Component Guid="{5D0A2A8F-5C34-4B28-A19E-62A40C7EDC12}">
+        <!-- 0xAA64 = 43620 = ARM64 -->
+        <Condition>WIX_NATIVE_MACHINE = 43620</Condition>
         <File Id="keymanarm64.dll" Name="keymanarm64.dll" KeyPath="yes" Source="..\..\..\bin\engine\keymanarm64.dll" />
       </Component>
 
@@ -146,6 +148,8 @@
       </Component>
 
       <Component Guid="{65E99D02-6B68-4840-BEE2-0FADB0ED67A0}">
+        <!-- 0xAA64 = 43620 = ARM64 -->
+        <Condition>WIX_NATIVE_MACHINE = 43620</Condition>
         <File Id="keymanhp.arm64.exe" Name="keymanhp.arm64.exe" KeyPath="yes" Source="..\..\..\bin\engine\keymanhp.arm64.exe" />
       </Component>
 
