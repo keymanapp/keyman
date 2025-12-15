@@ -33,6 +33,8 @@ export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) systemStore: STORE LEFT_BR systemStoreName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/store
  */
 export class SystemStoreRule extends SingleChildRule {
   public constructor() {
@@ -54,34 +56,35 @@ export class SystemStoreRule extends SingleChildRule {
  * (BNF) see the BNF file (kmn-file.bnf)
  */
 export class SystemStoreNameRule extends AlternateTokenRule {
+  // TODO-NG-COMPILER: warning/error for OLDCHARPOSMATCHING
   public constructor() {
     super([
-      TokenType.BITMAP,
-      TokenType.CASEDKEYS,
-      TokenType.COPYRIGHT,
-      TokenType.DISPLAYMAP,
-      TokenType.ETHNOLOGUECODE,
-      TokenType.HOTKEY,
-      TokenType.INCLUDECODES,
-      TokenType.KEYBOARDVERSION,
-      TokenType.KMW_EMBEDCSS,
-      TokenType.KMW_EMBEDJS,
-      TokenType.KMW_HELPFILE,
-      TokenType.KMW_HELPTEXT,
-      TokenType.KMW_RTL,
-      TokenType.LANGUAGE,
-      TokenType.LAYOUTFILE,
-      TokenType.MESSAGE,
-      TokenType.MNEMONICLAYOUT,
-      TokenType.NAME,
-      TokenType.OLDCHARPOSMATCHING,
-      TokenType.TARGETS,
-      TokenType.VERSION,
-      TokenType.VISUALKEYBOARD,
-      TokenType.WINDOWSLANGUAGES,
-      TokenType.CAPSALWAYSOFF,
-      TokenType.CAPSONONLY,
-      TokenType.SHIFTFREESCAPS,
+      TokenType.BITMAP,             // https://help.keyman.com/developer/language/reference/bitmap
+      TokenType.CASEDKEYS,          // https://help.keyman.com/developer/language/reference/casedkeys
+      TokenType.COPYRIGHT,          // https://help.keyman.com/developer/language/reference/copyright
+      TokenType.DISPLAYMAP,         // https://help.keyman.com/developer/language/reference/displaymap
+      TokenType.ETHNOLOGUECODE,     // https://help.keyman.com/developer/language/reference/ethnologuecode
+      TokenType.HOTKEY,             // https://help.keyman.com/developer/language/reference/hotkey
+      TokenType.INCLUDECODES,       // https://help.keyman.com/developer/language/reference/includecodes
+      TokenType.KEYBOARDVERSION,    // https://help.keyman.com/developer/language/reference/keyboardversion
+      TokenType.KMW_EMBEDCSS,       // https://help.keyman.com/developer/language/reference/kmw_embedcss
+      TokenType.KMW_EMBEDJS,        // https://help.keyman.com/developer/language/reference/kmw_embedjs
+      TokenType.KMW_HELPFILE,       // https://help.keyman.com/developer/language/reference/kmw_helpfile
+      TokenType.KMW_HELPTEXT,       // https://help.keyman.com/developer/language/reference/kmw_helptext
+      TokenType.KMW_RTL,            // https://help.keyman.com/developer/language/reference/kmw_rtl
+      TokenType.LANGUAGE,           // https://help.keyman.com/developer/language/reference/language
+      TokenType.LAYOUTFILE,         // https://help.keyman.com/developer/language/reference/layoutfile
+      TokenType.MESSAGE,            // https://help.keyman.com/developer/language/reference/message
+      TokenType.MNEMONICLAYOUT,     // https://help.keyman.com/developer/language/reference/mnemoniclayout
+      TokenType.NAME,               // https://help.keyman.com/developer/language/reference/name
+      TokenType.OLDCHARPOSMATCHING, // https://help.keyman.com/developer/language/reference/oldcharposmatching
+      TokenType.TARGETS,            // https://help.keyman.com/developer/language/reference/targets
+      TokenType.VERSION,            // https://help.keyman.com/developer/language/reference/version
+      TokenType.VISUALKEYBOARD,     // https://help.keyman.com/developer/language/reference/visualkeyboard
+      TokenType.WINDOWSLANGUAGES,   // https://help.keyman.com/developer/language/reference/windowslanguages
+      TokenType.CAPSALWAYSOFF,      // https://help.keyman.com/developer/language/reference/caps
+      TokenType.CAPSONONLY,         // https://help.keyman.com/developer/language/reference/caps
+      TokenType.SHIFTFREESCAPS,     // https://help.keyman.com/developer/language/reference/caps
     ], true);
   }
 }
@@ -101,6 +104,8 @@ export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
+ *
+ *  https://help.keyman.com/developer/language/reference/store
  */
 export class NormalStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -114,7 +119,7 @@ export class NormalStoreRule extends SingleChildRuleWithASTStrategy {
 }
 
 /**
- * (BNF) normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
+ * (BNF) normalStoreName: normalStoreNameElement+
  */
 export class NormalStoreNameRule extends SingleChildRuleWithASTStrategy {
   // TODO-NG-COMPILER: warning/error if normal store name consists of multiple elements
@@ -126,7 +131,9 @@ export class NormalStoreNameRule extends SingleChildRuleWithASTStrategy {
 }
 
 /**
- * (BNF) normalStoreName: normalStoreNameElement+
+ * (BNF) normalStoreNameElement: PARAMETER|OCTAL|permittedKeyword
+ *
+ * https://help.keyman.com/developer/language/guide/strings
  *
  * OCTAL and permitted keywords are included as these could be
  * valid normal store name elements
@@ -156,6 +163,8 @@ export class DeadkeyNameRule extends SingleChildRuleWithASTStrategy {
 /**
  * (BNF) deadkeyNameElement: PARAMETER|OCTAL|permittedKeyword
  *
+ * https://help.keyman.com/developer/language/guide/strings
+ *
  * OCTAL and permitted keywords are included as these could be
  * valid deadkey name elements
  */
@@ -183,6 +192,8 @@ export class StoreNameRule extends SingleChildRule {
 
 /**
  * (BNF) setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/set
  */
 export class SetNormalStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -208,6 +219,8 @@ export class SetNormalStoreRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/set
  */
 export class SetSystemStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
