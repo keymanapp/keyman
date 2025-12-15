@@ -437,8 +437,12 @@ flowchart LR;
     end
 ```
 
-In its condensed view, we get...
+Note that each member of the "keystroke count" set of modules (i.e, each column)
+is comprised of one or more sets of entries of specific codepoint lengths.  It
+is reasonable to consider each such subset (of equal codepoint length +
+processed keystroke count) as its own module.
 
+In this graph's condensed view, we get...
 
 ```mermaid
 ---
@@ -480,9 +484,12 @@ flowchart LR;
     end
 ```
 
-Note that this graph _itself_ has an implied modular partition, with modules for
-each keystroke containing submodules for each codepoint length resulting from
-following the search path through to that node.
+Note that this quotient graph has an implied modular partition, with modules for
+each keystroke containing (condensed) submodules for each codepoint length
+resulting from following the search path through to that node.  These condensed
+submodules may represent multiple different internal nodes, each reachable by
+slightly different paths that all exhibit the same critical qualities:  they
+produce the same codepoint length with the same set of processed keystrokes.
 
 We maintain the graph in this manner in order to properly handle left-deletions
 for all cases. Should a later left-deletion erase _all_ of the search path's
@@ -498,11 +505,12 @@ applied.
 include data from extra keystrokes.  Thus, the search-graph with `insert` edits,
 for the first two keys, may be visualized as follows:
 
-<!-- TODO - PR enforcing this model - it doesn't actually match reality at present; the 'present' form is an error. -->
+<!-- TODO - PR enforcing this model - it doesn't actually match reality at present,
+as the 'present' form is essentially an error. -->
 
 ```mermaid
 ---
-title: Heterogenous keystroke correction-search graph (with 'insert' edits)
+title: Condensed graph with 'insert' edits
 config:
   flowchart:
     htmlLabels: false
@@ -548,7 +556,7 @@ the codepoint length of resulting suggestions.  Thus, the search-graph with
 
 ```mermaid
 ---
-title: Heterogenous keystroke correction-search graph (with 'delete' edits)
+title: Condensed graph with 'delete' edits
 config:
   flowchart:
     htmlLabels: false
@@ -579,39 +587,199 @@ flowchart LR;
     end
 ```
 
-<!-- TODO - everything after this point. -->
-
 # Correction-Search Implementation
 
 ## The `SearchNode` Class
 
-The `SearchNode` class of the predictive-text engine represents one traversed path.
+The `SearchNode` class of the predictive-text engine represents the progress
+taken on one path through the correction-search graph's nodes and edges.  To be
+clear, this is on the _expanded_ path, thus on the level of individual nodes and
+edges that are implied by the condensed versions of the graph.  When starting
+the correction-search for a new token, a `SearchNode` representing an empty-text
+correction root, with no contributing keystrokes, is constructed.
 
-- graph does not actually build nodes
-  - we keep 'em virtual
-- SearchNode:
-  - traverses the path
-  - also represents the current path tail node / state
-  - helps resolve the "overlapping subproblems" aspect
+The `SearchNode` class provides the following methods that may be used to
+traverse graph edges and extend the search path during the correction-search
+process:
+- `buildDeletionEdges()`
+- `buildInsertionEdges()`
+- `buildSubstitutionEdges()`
+
+Instances of `SearchNode` that result from the use of the methods above
+represent the complete path taken to reach the _expanded_ graph node they
+represent _and_ the node itself.  As it is possible for the node to be reached
+by different paths, the `.resultKey` property may be used to determine if this
+has occurred at a lower path cost.  Should this occur, the instance may be
+discarded, as the optimal version has already been evaluated.
+
+`SearchNode` also provides the property `.currentCost`, which calculates the
+cost of the path traversed to reach it via the necessary sequence of calls to
+the methods above.  This may then be used to queue all nodes for a classical
+graph search (such as [Dijkstra's
+algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)) via priority
+queue.
+
+The trick, then, is to track what each `SearchNode` represents and to ensure
+that the methods above are utilized correctly when expanding the search graph.
+For this, we need a way to track each node's "path state" during the search
+process.  To do so, we turn to the quotient-graph representations above and
+leverage each node's association with specific modules.
+
+<!-- TODO - everything after this point. -->
 
 ## The `SearchSpace` type
 
-Represents one of the modules defined above (codepoint length + keystrokes
-represented)
+Let us examine the manner in which correction-search nodes are visited and
+search paths are built:
 
-Shift module definitions:  now define modules for "from root through to
-keystroke K with codepoint length N"
+```mermaid
+---
+title: Condensed correction-search graph with edit operations
+---
+flowchart LR;
+    subgraph Start
+        start{Empty token} -- _insert_ --> SC1(SC1: Codepoint length 1)
+        SC1 -- _insert_ --> SC2@{ shape: processes, label: "..." }
+    end
+
+    subgraph After Key 1
+        start -- _delete_ --> K1C0(K1C0: Codepoint length 0)
+
+        SC1 -- _delete_ --> K1C1
+        start -- [a, b] --> K1C1(K1C1: Codepoint length 1)
+        K1C0 -- _insert_ --> K1C1
+
+        SC1 -- [a, b] --> K1C2
+        start -- [cd] --> K1C2(K1C2: Codepoint length 2)
+        K1C1 -- _insert_ --> K1C2
+        SC2 -.-> K1C2
+
+
+        SC1 -- [cd] --> K1C3(K1C3: Codepoint length 3)
+        K1C2 -- _insert_ --> K1C3
+        SC2 -.-> K1C3
+
+        K1C3 -- _insert_ --> K1C4@{ shape: processes, label: "..." }
+        SC2 -.-> K1C4
+    end
+
+    subgraph After Key 2
+        K1C0 -- _delete_ --> K2C0(K2C0: Codepoint length 0)
+
+        K1C1 -- _delete_ --> K2C1
+        K1C0 -- [e, f] --> K2C1(K2C1: Codepoint length 1)
+        K2C0 -- _insert_ --> K2C1
+
+        K1C2 -- _delete_ --> K2C2
+        K1C1 -- [e, f] --> K2C2
+        K1C0 -- [gh] --> K2C2(K2C2: Codepoint length 2)
+        K2C1 -- _insert_ --> K2C2
+
+        K1C3 -- _delete_ --> K2C3
+        K1C2 -- [e, f] --> K2C3
+        K1C1 -- [gh] --> K2C3(K2C3: Codepoint length 3)
+        K2C2 -- _insert_ --> K2C3
+
+        K1C4 -- _delete_ --> K2C4
+        K1C3 -- [e, f] --> K2C4
+        K1C2 -- [gh] --> K2C4(K2C4: Codepoint length 4)
+        K2C3 -- _insert_ --> K2C4
+        K1C4 -.-> K2C4
+
+        K1C3 -- [gh] --> K2C5(K2C5: Codepoint length 5)
+        K2C4 -- _insert_ --> K2C5
+        K1C4 -.-> K2C5
+
+        K2C5 -- _insert_ --> K2C6@{ shape: processes, label: "..." }
+        K1C4 -.-> K2C6
+    end
+```
+
+As a search path is extended by the operations above, its evaluated state will
+correspond to one of the submodules in the graph above.  That submodule then
+determines which operations and keystroke data may be used to further extend the
+search path in order to yield a more complete correction-search search-path
+result.
+
+As the way paths are extended is dependent upon which submodule contains their
+final node, the `SearchSpace` interface exists to model individual submodules,
+manage the extension of paths that pass through them, and cache intermediate
+calculations for future reuse.
 
 ## The `SearchPath` type
 
-Represents the search-graph subspace corresponding to a single inbound quotient
-graph path to a single quotient graph module
-- "inbound path" = single parent quotient-graph module (optimal subproblem) to
-  the destination quotient-graph module
+The transition from one submodule to another is marked by specific edge types
+corresponding to received keystrokes or to `insert` or `delete` edit operations.
+Whatever the edge type is, this transition is modeled by the `SearchPath` type,
+extending all `SearchNode` paths passing through it via the specified edge type
+in order to reach the next submodule.
+
+`SearchPath` itself _also_ implements `SearchSpace`; for cases where only a
+single parent node and edge exists that may transition to a new submodule,
+`SearchPath` is sufficient to module the destination submodule.
 
 ## The `SearchCluster` type
 
-Represents the search-graph subspace corresponding to ALL inbound paths to a
-single quotient graph module
+As there are many cases where more than one parent node + edge combination may
+transition to a child submodule, `SearchCluster` exists to connect all such
+combinations (and their corresponding `SearchPath` representations) together.
+It then exposes them as a single common instance to represent the destination
+submodule.
 
-Is a superset of SearchPath.
+Revisiting the prior quotient graph visualization, the following graph
+represents the full range of representation for submodule `K2C3` as a
+`SearchCluster`:
+
+```mermaid
+---
+title: Submodule inspection:  all quotient-graph paths to K2C3
+---
+flowchart LR;
+    subgraph Start
+        start{Empty token} -- _insert_ --> SC1(SC1: Codepoint length 1)
+        SC1 -- _insert_ --> SC2@{ shape: processes, label: "..." }
+    end
+
+    subgraph After Key 1
+        start -- _delete_ --> K1C0(K1C0: Codepoint length 0)
+
+        SC1 -- _delete_ --> K1C1
+        start -- [a, b] --> K1C1(K1C1: Codepoint length 1)
+        K1C0 -- _insert_ --> K1C1
+
+        SC1 -- [a, b] --> K1C2
+        start -- [cd] --> K1C2(K1C2: Codepoint length 2)
+        K1C1 -- _insert_ --> K1C2
+        SC2 -.-> K1C2
+
+
+        SC1 -- [cd] --> K1C3(K1C3: Codepoint length 3)
+        K1C2 -- _insert_ --> K1C3
+        SC2 -.-> K1C3
+    end
+
+    subgraph After Key 2
+        K1C0 -- _delete_ --> K2C0(K2C0: Codepoint length 0)
+
+        K1C1 -- _delete_ --> K2C1
+        K1C0 -- [e, f] --> K2C1(K2C1: Codepoint length 1)
+        K2C0 -- _insert_ --> K2C1
+
+        K1C2 -- _delete_ --> K2C2
+        K1C1 -- [e, f] --> K2C2
+        K1C0 -- [gh] --> K2C2(K2C2: Codepoint length 2)
+        K2C1 -- _insert_ --> K2C2
+
+        K1C3 -- _delete_ --> K2C3
+        K1C2 -- [e, f] --> K2C3
+        K1C1 -- [gh] --> K2C3(K2C3: Codepoint length 3)
+        K2C2 -- _insert_ --> K2C3
+    end
+```
+
+Each of the inbound paths to the final quotient-path graph node for the K2C3
+submodule may each individually be modeled as `SearchPath`s.  Each such
+`SearchPath` has a single parent submodule, represented by an earlier
+`SearchSpace` instance, whose paths are extended by an edge representing a
+single keystroke input type (all with matching insertion codepoint length and
+left-deletion count) or edit operation type.
