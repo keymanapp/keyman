@@ -43,6 +43,9 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
+ */
 export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
@@ -54,6 +57,9 @@ export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
+/**
+ * (BNF) callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
+ */
 export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
@@ -65,6 +71,9 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
+/**
+ * (BNF) deadkeyStatement: DEADKEY LEFT_BR deadkeyName RIGHT_BR
+ */
 export class DeadkeyStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new StackedPair(NodeType.DEADKEY, NodeType.DEADKEYNAME));
@@ -78,6 +87,9 @@ export class DeadkeyStatementRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) notanyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
+ */
 export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
@@ -89,6 +101,9 @@ export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule
   }
 }
 
+/**
+ * (BNF) saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
+ */
 export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
@@ -115,6 +130,9 @@ abstract class AbstractShortcutRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ */
 export class BaselayoutStatementRule extends AbstractShortcutRule {
   public constructor() {
     super(NodeType.BASELAYOUT_SHORTCUT);
@@ -125,6 +143,9 @@ export class BaselayoutStatementRule extends AbstractShortcutRule {
   }
 }
 
+/**
+ * (BNF) layerStatement: LAYER_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ */
 export class LayerStatementRule extends AbstractShortcutRule {
   public constructor() {
     super(NodeType.LAYER_SHORTCUT);
@@ -135,6 +156,9 @@ export class LayerStatementRule extends AbstractShortcutRule {
   }
 }
 
+/**
+ * (BNF) platformStatement: PLATFORM_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ */
 export class PlatformStatementRule extends AbstractShortcutRule {
   public constructor() {
     super(NodeType.PLATFORM_SHORTCUT);
@@ -145,6 +169,9 @@ export class PlatformStatementRule extends AbstractShortcutRule {
   }
 }
 
+/**
+ * (BNF) ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
+ */
 export class IfLikeStatementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -157,6 +184,9 @@ export class IfLikeStatementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
+ */
 export class IfStatementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -185,6 +215,9 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTStrate
   }
 }
 
+/**
+ * (BNF) ifNormalStoreStatement: IF LEFT_BR normalStoreName comparison plainText+ RIGHT_BR
+ */
 export class IfNormalStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
@@ -196,6 +229,9 @@ export class IfNormalStoreStatementRule extends AbstractIfStoreStatementRule {
   }
 }
 
+/**
+ * (BNF) ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf comparison plainText+ RIGHT_BR
+ */
 export class IfSystemStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
@@ -207,6 +243,9 @@ export class IfSystemStoreStatementRule extends AbstractIfStoreStatementRule {
   }
 }
 
+/**
+ * (BNF) systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
+ */
 export class SystemStoreNameForIfRule extends SingleChildRule {
   public constructor() {
     super();
@@ -227,6 +266,9 @@ export class SystemStoreNameForIfRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) comparison:EQUAL|NOT_EQUAL
+ */
 export class ComparisonRule extends SingleChildRule {
   public constructor() {
     super();
@@ -236,6 +278,9 @@ export class ComparisonRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
+ */
 export class ContextStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new GivenNode(NodeType.CONTEXT));
@@ -252,6 +297,9 @@ export class ContextStatementRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
+ */
 export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new GivenNode(NodeType.INDEX));
@@ -272,6 +320,11 @@ export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) offset: OCTAL|PARAMETER
+ *
+ * OCTAL is included as this could be a valid offset
+ */
 export class OffsetRule extends SingleChildRule {
   public constructor() {
     super();
@@ -290,6 +343,9 @@ export class OffsetRule extends SingleChildRule {
   };
 }
 
+/**
+ * (BNF) outsStatement: OUTS LEFT_BR storeName RIGHT_BR
+ */
 export class OutsStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new GivenNode(NodeType.OUTS));
