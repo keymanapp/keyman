@@ -20,6 +20,8 @@ import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-strategy
 
 /**
  * (BNF) systemStoreAssign: systemStore text*
+ *
+ * https://help.keyman.com/developer/language/reference/store
  */
 export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -91,6 +93,8 @@ export class SystemStoreNameRule extends AlternateTokenRule {
 
 /**
  * (BNF) normalStoreAssign: normalStore text*
+ *
+ * https://help.keyman.com/developer/language/reference/store
  */
 export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -248,6 +252,7 @@ export class SetSystemStoreRule extends SingleChildRuleWithASTStrategy {
  * (BNF) systemStoreNameForSet: systemStoreName|LAYER
  *
  * https://help.keyman.com/developer/language/reference/set
+ * https://help.keyman.com/developer/language/reference/layer
  */
 export class SystemStoreNameForSetRule extends SingleChildRule {
   public constructor() {
@@ -260,6 +265,8 @@ export class SystemStoreNameForSetRule extends SingleChildRule {
 
 /**
  * (BNF) resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/reset
  */
 export class ResetStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -294,6 +301,9 @@ abstract class CapsLockStatementRule extends SingleChildRule {
 
 /**
  * (BNF) capsAlwaysOff: CAPS ALWAYS OFF
+ *
+ * https://help.keyman.com/developer/language/reference/_keywordsbytype
+ * https://help.keyman.com/developer/language/reference/caps
  */
 export class CapsAlwaysOffRule extends CapsLockStatementRule {
   public constructor() {
@@ -309,6 +319,9 @@ export class CapsAlwaysOffRule extends CapsLockStatementRule {
 
 /**
  * (BNF) capsOnOnly: CAPS ON ONLY
+ *
+ * https://help.keyman.com/developer/language/reference/_keywordsbytype
+ * https://help.keyman.com/developer/language/reference/caps
  */
 export class CapsOnOnlyRule extends CapsLockStatementRule {
   public constructor() {
@@ -324,6 +337,9 @@ export class CapsOnOnlyRule extends CapsLockStatementRule {
 
 /**
  * (BNF) shiftFreesCaps: SHIFT FREES CAPS
+ *
+ * https://help.keyman.com/developer/language/reference/_keywordsbytype
+ * https://help.keyman.com/developer/language/reference/caps
  */
 export class ShiftFreesCapsRule extends CapsLockStatementRule {
   public constructor() {
@@ -365,8 +381,11 @@ export class HeaderValueRule extends SingleChildRule {
 
 /**
  * (BNF) see the BNF file (kmn-file.bnf)
+ *
+ * https://help.keyman.com/developer/language/reference/_keywordsbytype
  */
 export class HeaderNameRule extends AlternateTokenRule {
+  // TODO-NG-COMPILER: warning/error for header statements
   public constructor() {
     super([
       TokenType.BITMAP_HEADER,
