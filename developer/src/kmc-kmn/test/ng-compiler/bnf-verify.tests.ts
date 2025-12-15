@@ -24,9 +24,11 @@ interface Dictionary {
   [key: string]: string;
 }
 
+const BNF_FILENAME = '../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf';
+
 describe("Verify Parser Against BNF Tests", () => {
   it("matches the BNF grammar rules", () => {
-    const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString();
+    const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
     const bnfRules: Dictionary = getBnfRules(bnfBuffer);
     const sourceBuffer: string = [
       '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
@@ -39,7 +41,7 @@ describe("Verify Parser Against BNF Tests", () => {
 });
 describe("Verify BNF Against Lexer Tests", () => {
   it("contains all the Lexer tokens", () => {
-    const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString()
+    const bnfBuffer: string = readFileSync(BNF_FILENAME).toString()
     const match = [...bnfBuffer.matchAll(/[A-Z_]{2,}/g)];
     const bnfTokens = match.map((x) => x[0]);
     bnfTokens.push('COMMENT', 'CONTINUATION', 'EOF', 'WHITESPACE');
