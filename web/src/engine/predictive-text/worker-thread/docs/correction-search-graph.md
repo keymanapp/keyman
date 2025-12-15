@@ -736,7 +736,7 @@ represents the full range of representation for submodule `K2C3` as a
 
 ```mermaid
 ---
-title: Submodule inspection:  all quotient-graph paths to K2C3
+title: Submodule inspection - all quotient-graph paths to K2C3
 ---
 flowchart LR;
     subgraph Start
