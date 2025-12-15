@@ -1485,15 +1485,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(anyNode);
       assert.isNotNull(anyNode.getSoleChildOfType(NodeType.STORENAME));
     });
-    it("can parse correctly (deadKey [as text])", () => {
-      tokenBuffer = stringToTokenBuffer('dk(deadkeyName)');
-      const inputElement: Rule = new KeystrokeElementRule();
-      assert.isTrue(inputElement.parse(tokenBuffer, root));
-      const deadKeyNode = root.getSoleChildOfType(NodeType.DEADKEY);
-      assert.isNotNull(deadKeyNode);
-      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeType.DEADKEYNAME));
-    });
-    it("can parse correctly (uchar [simple text])", () => {
+    it("can parse correctly (uchar [as simple text])", () => {
       tokenBuffer = stringToTokenBuffer('U+1780');
       const inputElement: Rule = new KeystrokeElementRule();
       assert.isTrue(inputElement.parse(tokenBuffer, root));
@@ -1503,7 +1495,24 @@ describe("KMN Analyser Tests", () => {
       tokenBuffer = stringToTokenBuffer('outs(digit)');
       const inputElement: Rule = new KeystrokeElementRule();
       assert.isTrue(inputElement.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.OUTS));
+      const outsNode = root.getSoleChildOfType(NodeType.OUTS);
+      assert.isNotNull(outsNode);
+      assert.isNotNull(outsNode.getSoleChildOfType(NodeType.STORENAME));
+    });
+    it("can handle invalid element (notAny)", () => {
+      tokenBuffer = stringToTokenBuffer('notany(digit)');
+      const keystrokeElement: Rule = new KeystrokeElementRule();
+      assert.isFalse(keystrokeElement.parse(tokenBuffer, root));
+    });
+    it("can handle invalid element (contextStatement)", () => {
+      tokenBuffer = stringToTokenBuffer('context(1)');
+      const keystrokeElement: Rule = new  KeystrokeElementRule();
+      assert.isFalse(keystrokeElement.parse(tokenBuffer, root));
+    });
+    it("can handle invalid element (indexStatement)", () => {
+      tokenBuffer = stringToTokenBuffer('index(cons, 1)');
+      const keystrokeElement: Rule = new  KeystrokeElementRule();
+      assert.isFalse(keystrokeElement.parse(tokenBuffer, root));
     });
   });
   describe("RhsBlockRule Tests", () => {
