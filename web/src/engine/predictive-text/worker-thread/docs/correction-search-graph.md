@@ -492,12 +492,16 @@ slightly different paths that all exhibit the same critical qualities:  they
 produce the same codepoint length with the same set of processed keystrokes.
 
 We maintain the graph in this manner in order to properly handle left-deletions
-for all cases. Should a later left-deletion erase _all_ of the search path's
-codepoint length, or worse - go negative - there will be special handling
-required.  For cases where the left-deletions exceed currently-modeled codepoint
-length, the most straightforward model for excess left-deletions is to edit and
-correct text that lands before the caret after the final left-deletion is
-applied.
+for all cases.  If any input keystrokes include left-deletion effects, it is
+possible to have paths that _decrease_ the total represented codepoint length.
+
+Of particular note:  should a later left-deletion eventually erase _all_ of the
+search path's codepoint length, or worse - go negative - there will be special
+handling required.  (This is the specific reason that the submodules require
+matching codepoint lengths.)  For cases where the left-deletions exceed
+currently-modeled codepoint length, the most straightforward model for excess
+left-deletions is to edit and correct text that lands before the caret after the
+final left-deletion is applied.
 
 ### Placing Edit Operations
 
