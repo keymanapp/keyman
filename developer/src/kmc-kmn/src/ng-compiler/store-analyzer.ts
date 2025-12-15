@@ -18,6 +18,9 @@ import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-strategy.js";
 
+/**
+ * (BNF) systemStoreAssign: systemStore text*
+ */
 export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new FirstNode());
@@ -28,6 +31,9 @@ export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) systemStore: STORE LEFT_BR systemStoreName RIGHT_BR
+ */
 export class SystemStoreRule extends SingleChildRule {
   public constructor() {
     super();
@@ -44,6 +50,9 @@ export class SystemStoreRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) see the BNF file (kmn-file.bnf)
+ */
 export class SystemStoreNameRule extends AlternateTokenRule {
   public constructor() {
     super([
@@ -77,6 +86,9 @@ export class SystemStoreNameRule extends AlternateTokenRule {
   }
 }
 
+/**
+ * (BNF) normalStoreAssign: normalStore text*
+ */
 export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new GivenNode(NodeType.STORE));
@@ -87,6 +99,9 @@ export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
+ */
 export class NormalStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new StackedPair(NodeType.STORE, NodeType.STORENAME));
@@ -98,7 +113,11 @@ export class NormalStoreRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
+ */
 export class NormalStoreNameRule extends SingleChildRuleWithASTStrategy {
+  // TODO-NG-COMPILER: warning/error if normal store name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.STORENAME));
     const normalStoreNameElement: Rule = new NormalStoreNameElementRule();
@@ -106,6 +125,12 @@ export class NormalStoreNameRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) normalStoreName: normalStoreNameElement+
+ *
+ * OCTAL and permitted keywords are included as these could be
+ * valid normal store name elements
+ */
 export class NormalStoreNameElementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -116,7 +141,11 @@ export class NormalStoreNameElementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) deadkeyName: deadkeyNameElement+
+ */
 export class DeadkeyNameRule extends SingleChildRuleWithASTStrategy {
+  // TODO-NG-COMPILER: warning/error if deadkey name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.DEADKEYNAME));
     const deadkeyNameElement: Rule = new DeadkeyNameElementRule();
@@ -124,6 +153,12 @@ export class DeadkeyNameRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) deadkeyNameElement: PARAMETER|OCTAL|permittedKeyword
+ *
+ * OCTAL and permitted keywords are included as these could be
+ * valid deadkey name elements
+ */
 export class DeadkeyNameElementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -134,6 +169,9 @@ export class DeadkeyNameElementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) storeName: systemStoreName|normalStoreName
+ */
 export class StoreNameRule extends SingleChildRule {
   public constructor() {
     super();
@@ -143,6 +181,9 @@ export class StoreNameRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
+ */
 export class SetNormalStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new GivenNode(NodeType.SET));
@@ -165,6 +206,9 @@ export class SetNormalStoreRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
+ */
 export class SetSystemStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new GivenNode(NodeType.SET));
@@ -187,6 +231,9 @@ export class SetSystemStoreRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) systemStoreNameForSet: systemStoreName|LAYER
+ */
 export class SystemStoreNameForSetRule extends SingleChildRule {
   public constructor() {
     super();
@@ -196,6 +243,9 @@ export class SystemStoreNameForSetRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
+ */
 export class ResetStoreRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new StackedPair(NodeType.RESET, NodeType.STORENAME));
@@ -227,6 +277,9 @@ abstract class CapsLockStatementRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) capsAlwaysOff: CAPS ALWAYS OFF
+ */
 export class CapsAlwaysOffRule extends CapsLockStatementRule {
   public constructor() {
     super();
@@ -239,6 +292,9 @@ export class CapsAlwaysOffRule extends CapsLockStatementRule {
   }
 }
 
+/**
+ * (BNF) capsOnOnly: CAPS ON ONLY
+ */
 export class CapsOnOnlyRule extends CapsLockStatementRule {
   public constructor() {
     super();
@@ -251,6 +307,9 @@ export class CapsOnOnlyRule extends CapsLockStatementRule {
   }
 }
 
+/**
+ * (BNF) shiftFreesCaps: SHIFT FREES CAPS
+ */
 export class ShiftFreesCapsRule extends CapsLockStatementRule {
   public constructor() {
     super();
@@ -263,6 +322,9 @@ export class ShiftFreesCapsRule extends CapsLockStatementRule {
   }
 }
 
+/**
+ * (BNF) headerAssign: headerName headerValue
+ */
 export class HeaderAssignRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
     super(new FirstNode());
@@ -272,6 +334,9 @@ export class HeaderAssignRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
+/**
+ * (BNF) headerValue: text+|PARAMETER?
+ */
 export class HeaderValueRule extends SingleChildRule {
   public constructor() {
     super();
@@ -283,6 +348,9 @@ export class HeaderValueRule extends SingleChildRule {
   }
 }
 
+/**
+ * (BNF) see the BNF file (kmn-file.bnf)
+ */
 export class HeaderNameRule extends AlternateTokenRule {
   public constructor() {
     super([
