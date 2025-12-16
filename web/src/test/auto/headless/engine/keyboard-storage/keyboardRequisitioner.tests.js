@@ -3,13 +3,13 @@ import sinon from 'sinon';
 import fs from 'fs';
 
 import { KeyboardHarness, ManagedPromise, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import {
   KeyboardRequisitioner,
   toPrefixedKeyboardId as prefixed
 } from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
-import NodeCloudRequester from 'keyman/engine/keyboard-storage/node-requester';
+import NodeCloudRequester from '../../../resources/loader/nodeCloudRequester.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';

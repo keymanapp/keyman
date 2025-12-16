@@ -1,16 +1,20 @@
-import { type Keyboard  } from 'keyman/engine/keyboard';
-import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/js-processor';
+import { JSKeyboard, Keyboard, TextStore, Transcription, TextTransform, SyntheticTextStore, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString, isEmptyTransform } from 'keyman/common/web-utils';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 
-export class ContextHost extends Mock {
+/**
+ * WebView-specific synthetic TextStore implementation that can
+ * communicate and synchronize with the host app despite not being
+ * backed by any sort of Web element.
+ */
+export class HostTextStore extends SyntheticTextStore {
   readonly oninserttext?: OnInsertTextFunc;
-  private savedState: Mock;
+  private savedState: SyntheticTextStore;
 
   constructor(oninserttext: OnInsertTextFunc) {
     super();
@@ -30,7 +34,7 @@ export class ContextHost extends Mock {
       let transform: TextTransform = null;
 
       if(transcription) {
-        const preInput = transcription.preInput;
+        const { preInput } = transcription;
         // If our saved state matches the `preInput` from the incoming transcription, just reuse its transform.
         // Will generally not match during multitap operations, though.
         //
@@ -55,18 +59,18 @@ export class ContextHost extends Mock {
   }
 
   saveState() {
-    this.savedState = Mock.from(this);
+    this.savedState = SyntheticTextStore.from(this);
   }
 
-  restoreTo(original: OutputTarget): void {
-    this.savedState = Mock.from(this);
+  restoreTo(original: TextStore): void {
+    this.savedState = SyntheticTextStore.from(this);
     super.restoreTo(original);
   }
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
-    const tempMock = new Mock(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
-    const newLeft = tempMock.getTextBeforeCaret();
+    const tempTextStore = new SyntheticTextStore(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
+    const newLeft = tempTextStore.getTextBeforeCaret();
     const oldLeft = this.getTextBeforeCaret();
 
     if(text != this.text) {
@@ -107,48 +111,48 @@ export class ContextHost extends Mock {
     // and we want a consistent interface for context synchronization between
     // host app + app/webview KMW.
     this.setSelection(KMWString.length(this.text));
-    this.savedState = Mock.from(this);
+    this.savedState = SyntheticTextStore.from(this);
   }
 }
 
-export default class ContextManager extends ContextManagerBase<WebviewConfiguration> {
-  // Change of context?  Just replace the Mock.  Context will be ENTIRELY controlled
+export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
+  // Change of context?  Just replace the SyntheticTextStore.  Context will be ENTIRELY controlled
   // by whatever is hosting the WebView.  (Some aspects of this context replacement have
   // yet to be modularized at this time, though.)
-  private _rawContext: ContextHost;
+  private _hostTextStore: HostTextStore;
 
-  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
 
   constructor(engineConfig: WebviewConfiguration) {
     super(engineConfig);
   }
 
   initialize(): void {
-    this._rawContext = new ContextHost(this.engineConfig.oninserttext);
-    this.predictionContext.setCurrentTarget(this.activeTarget);
+    this._hostTextStore = new HostTextStore(this.engineConfig.oninserttext);
+    this.predictionContext.setCurrentTextStore(this.activeTextStore);
     this.resetContext();
   }
 
-  get activeTarget(): Mock {
-    return this._rawContext;
+  get activeTextStore(): SyntheticTextStore {
+    return this._hostTextStore;
   }
 
   get activeKeyboard() {
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget) {
-    // `target` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
+  activateKeyboardForTextStore(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, textStore: TextStore) {
+    // `textStore` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.
     this._activeKeyboard = {...kbd};
   }
 
   /**
-   * Reflects the active 'target' upon which any `set activeKeyboard` operation will take place.
-   * For app/webview... there's only one target, thus only a "global default" matters.
+   * Reflects the active 'textStore' upon which any `set activeKeyboard` operation will take place.
+   * For app/webview... there's only one textStore, thus only a "global default" matters.
    */
-  protected currentKeyboardSrcTarget(): Mock {
+  protected currentKeyboardSrcTextStore(): SyntheticTextStore {
     return null;
   }
 
@@ -204,7 +208,10 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     // That said, it's best to keep it around for now and verify later.
     if(originalKeyboard?.metadata?.id == activatingKeyboard?.metadata?.id) {
       activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
-        kbd.refreshLayouts()
+        // TODO-embed-osk-in-kmx: Do we need to refresh layouts for KMX keyboards also?
+        if (kbd instanceof JSKeyboard) {
+          kbd.refreshLayouts();
+        }
         return kbd;
       });
     }
@@ -214,6 +221,6 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
 
   public resetContext(): void {
     super.resetContext();
-    this._rawContext.saveState();
+    this._hostTextStore.saveState();
   }
 }
