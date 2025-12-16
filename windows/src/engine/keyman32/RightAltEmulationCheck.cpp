@@ -65,7 +65,7 @@ typedef PKBDTABLES_WOW64 (WINAPI *PKBDLAYERDESCRIPTORWOW64FUNC)(VOID);
 #endif
 
 HMODULE LoadKbdLibrary(const char* keyboardLayoutName);
-BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName);
+BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName, BOOL& result);
 
 typedef PKBDTABLES (WINAPI *PKBDLAYERDESCRIPTORFUNC)(VOID);
 
@@ -92,14 +92,15 @@ BOOL KeyboardGivesCtrlRAltForRAlt() {
 		char keyboardLayoutName[KL_NAMELENGTH+1];
 		GetKeyboardLayoutName(keyboardLayoutName);
 
-		altGrFlag = ReadAltGrFlagFromKbdDll(keyboardLayoutName);
+		ReadAltGrFlagFromKbdDll(keyboardLayoutName, altGrFlag);
   }
 
 	return altGrFlag;
 }
 
-BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName) {
-	BOOL result = FALSE;
+BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName, BOOL& result) {
+  BOOL success = FALSE;
+  result = FALSE;
 
   HMODULE hKbdLibrary = LoadKbdLibrary(keyboardLayoutName);
   if(!hKbdLibrary) {
@@ -118,6 +119,7 @@ BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName) {
 			PKBDTABLES_WOW64 KbdTables = (*KbdLayerDescriptorFunc)();
 			if(KbdTables) {
 				result = (KbdTables->fLocaleFlags & KLLF_ALTGR) ? TRUE : FALSE;
+        success = TRUE;
 			}
 		}
   }	else {
@@ -130,13 +132,14 @@ BOOL ReadAltGrFlagFromKbdDll(const char *keyboardLayoutName) {
 			PKBDTABLES KbdTables = (*KbdLayerDescriptorFunc)();
 			if(KbdTables) {
 				result = (KbdTables->fLocaleFlags & KLLF_ALTGR) ? TRUE : FALSE;
+        success = TRUE;
 			}
 		}
 	}
 
   FreeLibrary(hKbdLibrary);
 
-	return result;
+	return success;
 }
 
 HMODULE LoadKbdLibrary(const char* keyboardLayoutName) {
