@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.177 alpha 2025-12-16
+
+* feat(windows): report a sentry event when low level hook is reinstalled (#15335)
+* chore(linux): add manual test for localization (#15356)
+* feat(developer): show keyboard version in web debugger (#15339)
+
 ## 19.0.176 alpha 2025-12-13
 
 * chore(windows): remove unused variable (#15334)
