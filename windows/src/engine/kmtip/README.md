@@ -9,7 +9,7 @@ it sits between the TSF Manager and Keyman.exe.
 
 ### 1. The "Mixed Architecture" Environment
 
-Windows on both amd64(x86-64) and on Arm devices can run applications of differing architectures simultaneously:
+Windows on both amd64n(x86-64) and on Arm devices can run applications of differing architectures simultaneously:
 
 On amd64 Devices:
 * **Native x64 apps:** (e.g., Windows Explorer, Notepad, Edge).
@@ -43,7 +43,7 @@ the application is 32-bit or 64-bit.
 
 ## kmtiparm64x.dll - Arm64 Devices
 
-### Single Registry Entry Problem for the two 64-bit architecture
+### Single Registry Entry Problem for the two 64-bit architectures
 
 On Windows on Arm there is a problem because there is only a single registry
 entry for the **64-bit** CLSID. This means it is not possible to register both an
