@@ -45,6 +45,7 @@ tests = [
   'k_0107___punctkeys',
   'k_0200___ralt',
   'k_0201___ralt_2',
+  'k_0202___alt',
   'k_0203___generic_ctrlalt',
   'k_0300___deadkeys',
   'k_0301___multiple_deadkeys',
