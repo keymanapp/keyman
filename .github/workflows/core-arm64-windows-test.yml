@@ -1,26 +1,31 @@
 #
-# This workflow tests Keyman Core on ARM64; we cannot use our TeamCity agents
-# because we have no ARM64 Windows agents.
+# This workflow tests Keyman Core on ARM64/Windows; we cannot use our TeamCity
+# agents because we have no ARM64 Windows agents.
 #
 # It is triggered by a repository_dispatch event with the type
-# `core-arm64-test:*`.
+# `core-arm64-windows-test:*`.
 #
 
-name: "Keyman Core - ARM64 test"
-run-name: "Keyman Core - ARM64 test - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}, testbuild: ${{ github.event.client_payload.isTestBuild }}"
+name: "Keyman Core - ARM64/Windows test"
+run-name: "Keyman Core - ARM64/Windows test - ${{ github.event.client_payload.branch }} by @${{ github.event.client_payload.user }}"
 on:
   repository_dispatch:
-    types: ['core-arm64-test:*']
+    types: ['core-arm64-windows-test:*']
 
-  # pull-request:
-
-# Input:
-# buildSha:    The SHA of the commit to build, e.g. of the branch or
-#              refs/pull/1234/head for PR
-# branch:      The branch to build, for a PR in the form `PR-1234`
-# baseBranch:  For a PR the base branch, otherwise the same as `branch`
-# user:        The user that triggered the build or created the PR
-# isTestBuild: false for Releases, otherwise true
+# Inputs:
+#
+#   buildSha:    The SHA of the commit to build, e.g. of the branch or
+#                refs/pull/1234/head for PR
+#   isTestBuild: true for PR and test builds, false for release builds
+#   force:       true to run this action on a fork of keymanapp/keyman
+#
+# Descriptive inputs:
+#
+#   branch:      Name of the branch to build, generally, `master`, `beta`,
+#                `stable-x.y`, or for a PR `#1234`. Used only in the action
+#                title
+#   user:        The user that triggered the build or created the PR. Used
+#                only in the action title
 
 env:
   GH_TOKEN: ${{ github.token }}
@@ -28,8 +33,8 @@ env:
   _builder_timings: false
 
 jobs:
-  core-arm64-test:
-    name: Keyman Core ARM64 test
+  core-arm64-windows-test:
+    name: Keyman Core ARM64/Windows test
     if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
     runs-on: windows-11-arm
 
@@ -124,24 +129,24 @@ jobs:
 
   set_status:
     name: Set result status on PR builds
-    needs: [core-arm64-test]
+    needs: [core-arm64-windows-test]
     runs-on: windows-arm64
     if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
     steps:
     - name: Set success
-      if: needs.core-arm64-test.result == 'success'
+      if: needs.core-arm64-windows-test.result == 'success'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Keyman Core ARM64 test succeeded" >> $GITHUB_ENV
 
     - name: Set cancelled
-      if: needs.core-arm64-test.result == 'cancelled'
+      if: needs.core-arm64-windows-test.result == 'cancelled'
       run: |
         echo "RESULT=error" >> $GITHUB_ENV
         echo "MSG=Keyman Core ARM64 test cancelled" >> $GITHUB_ENV
 
     - name: Set failure
-      if: needs.core-arm64-test.result == 'failure'
+      if: needs.core-arm64-windows-test.result == 'failure'
       run: |
         echo "RESULT=failure" >> $GITHUB_ENV
         echo "MSG=Keyman Core ARM64 test failed" >> $GITHUB_ENV
