@@ -358,7 +358,7 @@ export class JSKeyboard {
    *
    * @param       {number}    command     event code (16,17,18) or 0
    * @param       {TextStore} textStore   textStore
-   * @param       {boolean}   data        1 or 0
+   * @param       {boolean}   data        true o false
    */
   public notify(command: number, textStore: TextStore, data: boolean): void { // I2187
     // Good example use case - the Japanese CJK-picker keyboard
