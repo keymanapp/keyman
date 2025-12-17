@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.178 alpha 2025-12-17
+
+* chore(windows): correct kbda1 to kbdth0 in comment in unit test (#15351)
+
 ## 19.0.177 alpha 2025-12-16
 
 * feat(windows): report a sentry event when low level hook is reinstalled (#15335)
