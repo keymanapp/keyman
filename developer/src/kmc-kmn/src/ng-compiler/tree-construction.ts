@@ -137,6 +137,15 @@ export class ASTNode {
   }
 
   /**
+   * Check if this node has one and only one child.
+   *
+   * @returns true if there is one and only one child
+   */
+  public hasSoleChild(): boolean  {
+    return this.getChildren().length == 1;
+  }
+
+  /**
    * Check if this node has one and only one child of a given type.
    *
    * @param requiredType the required type
@@ -223,6 +232,15 @@ export class ASTNode {
    */
   public removeFirstChild(): ASTNode {
     return this.hasChildren() ? this.children.shift() : null;
+  }
+
+  /**
+   * Remove the sole child node, if there is one and only one.
+   *
+   * @returns the sole child node or null
+   */
+  public removeSoleChild(): ASTNode {
+    return this.hasSoleChild() ? this.removeChildren()[0] : null;
   }
 
   /**

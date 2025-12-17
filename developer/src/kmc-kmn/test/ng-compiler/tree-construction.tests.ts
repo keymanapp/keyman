@@ -221,6 +221,22 @@ describe("Tree Construction Tests", () => {
         assert.isTrue(root.hasChildrenOfType(NodeType.VERSION));
       });
     });
+    describe("ASTNode.hasSoleChild()", () => {
+      beforeEach(() => {
+        initVariables();
+      });
+      it("can handle if there are no children", () => {
+        assert.isFalse(root.hasSoleChild());
+      });
+      it("can check if there is one child", () => {
+        root.addChild(bitmap);
+        assert.isTrue(root.hasSoleChild());
+      });
+      it("can handle if there are two children", () => {
+        root.addChildren([bitmap, copyright]);
+        assert.isFalse(root.hasSoleChild());
+      });
+    });
     describe("ASTNode.hasSoleChildOfType()", () => {
       beforeEach(() => {
         initVariables();
@@ -434,6 +450,25 @@ describe("Tree Construction Tests", () => {
         root.addChildren([bitmap, copyright, version]);
         assert.deepEqual(root.removeFirstChild(), bitmap);
         assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
+    });
+    describe("ASTNode.removeSoleChild()", () => {
+      beforeEach(() => {
+        initVariables();
+      });
+      it("can handle when there are no children", () => {
+        assert.deepEqual(root.removeSoleChild(), null);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can remove the child when there is only one child", () => {
+        root.addChild(bitmap);
+        assert.deepEqual(root.removeSoleChild(), bitmap);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can handle when there are two children", () => {
+        root.addChildren([bitmap, copyright]);
+        assert.deepEqual(root.removeSoleChild(), null);
+        assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
       });
     });
     describe("ASTNode.removeSoleChildOfType()", () => {
