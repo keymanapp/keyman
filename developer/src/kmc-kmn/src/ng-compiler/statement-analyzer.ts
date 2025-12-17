@@ -35,6 +35,8 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRuleWi
 
 /**
  * (BNF) anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/any
  */
 export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
@@ -48,6 +50,8 @@ export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
 
 /**
  * (BNF) callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/call
  */
 export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
@@ -61,6 +65,8 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
 
 /**
  * (BNF) deadkeyStatement: DEADKEY LEFT_BR deadkeyName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/deadkey
  */
 export class DeadkeyStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -77,6 +83,8 @@ export class DeadkeyStatementRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) notanyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/notany
  */
 export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
@@ -90,6 +98,8 @@ export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule
 
 /**
  * (BNF) saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/save
  */
 export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
@@ -118,6 +128,8 @@ abstract class AbstractShortcutRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/baselayout
  */
 export class BaselayoutStatementRule extends AbstractShortcutRule {
   public constructor() {
@@ -131,6 +143,8 @@ export class BaselayoutStatementRule extends AbstractShortcutRule {
 
 /**
  * (BNF) layerStatement: LAYER_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/layer
  */
 export class LayerStatementRule extends AbstractShortcutRule {
   public constructor() {
@@ -144,6 +158,8 @@ export class LayerStatementRule extends AbstractShortcutRule {
 
 /**
  * (BNF) platformStatement: PLATFORM_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/platform
  */
 export class PlatformStatementRule extends AbstractShortcutRule {
   public constructor() {
@@ -203,6 +219,8 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTStrate
 
 /**
  * (BNF) ifNormalStoreStatement: IF LEFT_BR normalStoreName comparison plainText+ RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/if
  */
 export class IfNormalStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
@@ -217,6 +235,8 @@ export class IfNormalStoreStatementRule extends AbstractIfStoreStatementRule {
 
 /**
  * (BNF) ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf comparison plainText+ RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/if
  */
 export class IfSystemStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
@@ -231,6 +251,12 @@ export class IfSystemStoreStatementRule extends AbstractIfStoreStatementRule {
 
 /**
  * (BNF) systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
+ *
+ * https://help.keyman.com/developer/language/reference/baselayout
+ * https://help.keyman.com/developer/language/reference/layer
+ * https://help.keyman.com/developer/language/reference/newlayer
+ * https://help.keyman.com/developer/language/reference/oldlayer
+ * https://help.keyman.com/developer/language/reference/platform
  */
 export class SystemStoreNameForIfRule extends SingleChildRule {
   public constructor() {
@@ -254,6 +280,8 @@ export class SystemStoreNameForIfRule extends SingleChildRule {
 
 /**
  * (BNF) comparison:EQUAL|NOT_EQUAL
+ *
+ * https://help.keyman.com/developer/language/reference/if
  */
 export class ComparisonRule extends SingleChildRule {
   public constructor() {
@@ -266,6 +294,8 @@ export class ComparisonRule extends SingleChildRule {
 
 /**
  * (BNF) contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/context
  */
 export class ContextStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -285,6 +315,8 @@ export class ContextStatementRule extends SingleChildRuleWithASTStrategy {
 
 /**
  * (BNF) indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/_index
  */
 export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
@@ -310,6 +342,8 @@ export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
  * (BNF) offset: OCTAL|PARAMETER
  *
  * OCTAL is included as this could be a valid offset
+ *
+ * https://help.keyman.com/developer/language/guide/strings
  */
 export class OffsetRule extends SingleChildRule {
   public constructor() {
@@ -319,6 +353,14 @@ export class OffsetRule extends SingleChildRule {
     this.rule = new AlternateRule([octal, parameter]);
   }
 
+  /**
+   * Parse an OffsetRule. If either an OCTAL or PARAMETER
+   * token are matched, an OFFSET node is created.
+   *
+   * @param tokenBuffer the TokenBuffer to parse
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
     const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
@@ -331,6 +373,8 @@ export class OffsetRule extends SingleChildRule {
 
 /**
  * (BNF) outsStatement: OUTS LEFT_BR storeName RIGHT_BR
+ *
+ * https://help.keyman.com/developer/language/reference/outs
  */
 export class OutsStatementRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
