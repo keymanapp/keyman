@@ -21,9 +21,11 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   protected leftBracket: Rule;
   protected normalStoreName: Rule;
   protected rightBracket: Rule;
-  protected cmdNodeType: NodeType;
 
-  public constructor() {
+  public constructor(
+    /** the node type of the command in a child class */
+    protected cmdNodeType: NodeType
+  ) {
     super();
     this.leftBracket     = new TokenRule(TokenType.LEFT_BR);
     this.normalStoreName = new NormalStoreNameRule();
@@ -48,9 +50,8 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
  */
 export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
-    super();
-    const any: Rule  = new TokenRule(TokenType.ANY, true);
-    this.cmdNodeType = NodeType.ANY;
+    super(NodeType.ANY);
+    const any: Rule = new TokenRule(TokenType.ANY, true);
     this.rule = new SequenceRule([
       any, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -62,9 +63,8 @@ export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
  */
 export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
-    super();
+    super(NodeType.CALL);
     const call: Rule = new TokenRule(TokenType.CALL, true);
-    this.cmdNodeType = NodeType.CALL;
     this.rule = new SequenceRule([
       call, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -92,9 +92,8 @@ export class DeadkeyStatementRule extends SingleChildRuleWithASTStrategy {
  */
 export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
-    super();
+    super(NodeType.NOTANY);
     const notany: Rule = new TokenRule(TokenType.NOTANY, true);
-    this.cmdNodeType   = NodeType.NOTANY;
     this.rule = new SequenceRule([
       notany, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
@@ -106,9 +105,8 @@ export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule
  */
 export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
-    super();
+    super(NodeType.SAVE);
     const save: Rule = new TokenRule(TokenType.SAVE, true);
-    this.cmdNodeType = NodeType.SAVE;
     this.rule = new SequenceRule([
       save, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
