@@ -279,7 +279,14 @@ export class ResetStoreRule extends SingleChildRuleWithASTStrategy {
   }
 }
 
-abstract class CapsLockStatementRule extends SingleChildRule {
+/**
+ * An abstract base class for rules that match multiword caps lock
+ * headers and map them to more modern caps lock system store commands.
+ *
+ * https://help.keyman.com/developer/language/reference/_keywordsbytype
+ * https://help.keyman.com/developer/language/reference/caps
+ */
+abstract class AbstractCapsLockStatementRule extends SingleChildRule {
   public constructor(
     /** type of token that will be created */
     protected tokenType: TokenType,
@@ -316,7 +323,7 @@ abstract class CapsLockStatementRule extends SingleChildRule {
  * https://help.keyman.com/developer/language/reference/_keywordsbytype
  * https://help.keyman.com/developer/language/reference/caps
  */
-export class CapsAlwaysOffRule extends CapsLockStatementRule {
+export class CapsAlwaysOffRule extends AbstractCapsLockStatementRule {
   public constructor() {
     super(TokenType.CAPSALWAYSOFF, NodeType.CAPSALWAYSOFF);
     const caps: Rule   = new TokenRule(TokenType.CAPS);
@@ -332,7 +339,7 @@ export class CapsAlwaysOffRule extends CapsLockStatementRule {
  * https://help.keyman.com/developer/language/reference/_keywordsbytype
  * https://help.keyman.com/developer/language/reference/caps
  */
-export class CapsOnOnlyRule extends CapsLockStatementRule {
+export class CapsOnOnlyRule extends AbstractCapsLockStatementRule {
   public constructor() {
     super(TokenType.CAPSONONLY, NodeType.CAPSONONLY);
     const caps: Rule = new TokenRule(TokenType.CAPS);
@@ -348,7 +355,7 @@ export class CapsOnOnlyRule extends CapsLockStatementRule {
  * https://help.keyman.com/developer/language/reference/_keywordsbytype
  * https://help.keyman.com/developer/language/reference/caps
  */
-export class ShiftFreesCapsRule extends CapsLockStatementRule {
+export class ShiftFreesCapsRule extends AbstractCapsLockStatementRule {
   public constructor() {
     super(TokenType.SHIFTFREESCAPS, NodeType.SHIFTFREESCAPS);
     const shift: Rule = new TokenRule(TokenType.SHIFT);
