@@ -9,7 +9,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { NodeType } from '../../src/ng-compiler/node-type.js';
-import { FirstNode, GivenNode, NewNode, NewNodeOrTree, StackedPair } from '../../src/ng-compiler/ast-strategy.js';
+import { ChangeNode, FirstNode, GivenNode, NewNode, NewNodeOrTree, StackedPair } from '../../src/ng-compiler/ast-strategy.js';
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
@@ -128,6 +128,23 @@ describe("ASTStrategy Tests", () => {
       assert.isNotNull(parent);
       assert.equal(parent.numberOfChildren(), 2);
       assert.equal(parent.numberOfChildrenOfType(NodeType.PRODUCTION), 2);
+    });
+  });
+  describe("ChangeNode", () => {
+    it("can construct a ChangeNode", () => {
+      const changeNode = new ChangeNode(NodeType.OFFSET);
+      assert.isNotNull(changeNode);
+      assert.equal(changeNode['nodeType'], NodeType.OFFSET);
+    });
+    it("can rebuild the AST", () => {
+      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const token = new Token(TokenType.OCTAL, '1');
+      root.addChild(new ASTNode(NodeType.OCTAL, token));
+      const changeNode = new ChangeNode(NodeType.OFFSET);
+      changeNode.apply(root);
+      const offsetNode = root.getSoleChildOfType(NodeType.OFFSET);
+      assert.isNotNull(offsetNode)
+      assert.deepEqual(offsetNode.token, token);
     });
   });
 });

@@ -153,3 +153,32 @@ export class FirstNode extends ASTStrategy {
     return node;
   };
 }
+
+/**
+ * An ASTStrategy that replaces the sole child node with
+ * a new node of given type but retaining the same Token
+ */
+export class ChangeNode extends ASTStrategy {
+  public constructor(
+    /** the new node type */
+    protected readonly nodeType: NodeType
+  ) {
+    super();
+  }
+
+  /**
+   * Replaces the sole child node with a new node
+   * of given type but retaining the same Token
+   *
+   * @param node the tree to be rebuilt
+   * @returns the rebuilt tree
+   */
+  public apply(node: ASTNode): ASTNode {
+    if (node.hasSoleChild()) {
+      const oldNode    = node.removeSoleChild();
+      const changeNode = new ASTNode(this.nodeType, oldNode.token);
+      node.addChild(changeNode);
+    }
+    return node;
+  };
+}
