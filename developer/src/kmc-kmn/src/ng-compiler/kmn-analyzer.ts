@@ -354,28 +354,6 @@ export class ModifierRule extends SingleChildRuleWithASTStrategy {
     const modifier: Rule = new TokenRule(TokenType.MODIFIER, true);
     this.rule = new AlternateRule([shift, caps, modifier]);
   }
-
-  // /**
-  //  * Parse a ModifierRule.  As SHIFT and CAPS are separately
-  //  * identified as they are used in other rules, a MODIFIER
-  //  * node must be created for them if needed.
-  //  *
-  //  * @param tokenBuffer the TokenBuffer to parse
-  //  * @param node where to build the AST
-  //  * @returns true if this rule was successfully parsed
-  //  */
-  // public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-  //   const tmp: ASTNode = new ASTNode(NodeType.TMP);
-  //   const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-  //   if (parseSuccess) {
-  //     let modifierNode = tmp.getSoleChildOfType(NodeType.MODIFIER);
-  //     if (modifierNode === null) {
-  //       modifierNode = new ASTNode(NodeType.MODIFIER, tmp.getSoleChild().token);
-  //     }
-  //     node.addChild(modifierNode);
-  //   }
-  //   return parseSuccess;
-  // }
 }
 
 /**

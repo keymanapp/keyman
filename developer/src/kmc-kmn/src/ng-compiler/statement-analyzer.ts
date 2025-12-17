@@ -15,6 +15,9 @@ import { DeadkeyNameRule, NormalStoreNameRule, StoreNameRule, SystemStoreNameRul
 import { NodeType } from "./node-type.js";
 import { ChangeNode, GivenNode, StackedPair } from "./ast-strategy.js";
 
+/**
+ * An abstract base class for rules that apply a command to a store name
+ */
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRuleWithASTStrategy {
   protected leftBracket: Rule;
   protected normalStoreName: Rule;
@@ -109,6 +112,9 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
+/**
+ * An abstract base class for shortcut rules (e.g. baselayout(), layer(), platform())
+ */
 abstract class AbstractShortcutRule extends SingleChildRuleWithASTStrategy {
   protected leftBracket: Rule;
   protected plainText: Rule;
@@ -171,6 +177,10 @@ export class PlatformStatementRule extends AbstractShortcutRule {
 
 /**
  * (BNF) ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
+ *
+ * https://help.keyman.com/developer/language/reference/if
+ * https://help.keyman.com/developer/language/reference/platform
+ * https://help.keyman.com/developer/language/reference/baselayout
  */
 export class IfLikeStatementRule extends SingleChildRule {
   public constructor() {
@@ -186,6 +196,8 @@ export class IfLikeStatementRule extends SingleChildRule {
 
 /**
  * (BNF) ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
+ *
+ * https://help.keyman.com/developer/language/reference/if
  */
 export class IfStatementRule extends SingleChildRule {
   public constructor() {
@@ -196,6 +208,9 @@ export class IfStatementRule extends SingleChildRule {
   }
 }
 
+/**
+ * An abstract base class for if() rules for both normal and system stores
+ */
 abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTStrategy {
   protected ifRule: Rule;
   protected leftBracket: Rule;
@@ -366,8 +381,6 @@ export class OutsStatementRule extends SingleChildRuleWithASTStrategy {
     const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
     const storeName: Rule    = new StoreNameRule();
     const rightBracket: Rule = new TokenRule(TokenType.RIGHT_BR);
-    this.rule = new SequenceRule([
-      outs, leftBracket, storeName, rightBracket
-    ]);
+    this.rule = new SequenceRule([outs, leftBracket, storeName, rightBracket]);
   }
 }
