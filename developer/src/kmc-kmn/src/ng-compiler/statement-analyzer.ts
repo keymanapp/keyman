@@ -17,7 +17,7 @@ import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { GivenNode, StackedPair } from "./ast-strategy.js";
 
-abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
+abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRuleWithASTStrategy {
   protected leftBracket: Rule;
   protected normalStoreName: Rule;
   protected rightBracket: Rule;
@@ -26,22 +26,10 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
     /** the node type of the command in a child class */
     protected cmdNodeType: NodeType
   ) {
-    super();
+    super(new StackedPair(cmdNodeType, NodeType.STORENAME));
     this.leftBracket     = new TokenRule(TokenType.LEFT_BR);
     this.normalStoreName = new NormalStoreNameRule();
     this.rightBracket    = new TokenRule(TokenType.RIGHT_BR);
-  }
-
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const cmdNode       = tmp.getSoleChildOfType(this.cmdNodeType);
-      const storeNameNode = tmp.getSoleChildOfType(NodeType.STORENAME);
-      cmdNode.addChild(storeNameNode);
-      node.addChild(cmdNode);
-    }
-    return parseSuccess;
   }
 }
 
