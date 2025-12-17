@@ -13,9 +13,7 @@ import { PlainTextRule } from "./kmn-analyzer.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleWithASTStrategy, TokenRule } from "./recursive-descent.js";
 import { DeadkeyNameRule, NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
-import { ASTNode } from "./tree-construction.js";
-import { TokenBuffer } from "./token-buffer.js";
-import { GivenNode, StackedPair } from "./ast-strategy.js";
+import { ChangeNode, GivenNode, StackedPair } from "./ast-strategy.js";
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRuleWithASTStrategy {
   protected leftBracket: Rule;
@@ -341,34 +339,19 @@ export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
 /**
  * (BNF) offset: OCTAL|PARAMETER
  *
- * OCTAL is included as this could be a valid offset
+ * OCTAL is included as this could be a valid offset.
+ * If either an OCTAL or PARAMETER token are matched,
+ * an OFFSET node is created.
  *
  * https://help.keyman.com/developer/language/guide/strings
  */
-export class OffsetRule extends SingleChildRule {
+export class OffsetRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new ChangeNode(NodeType.OFFSET));
     const octal: Rule     = new TokenRule(TokenType.OCTAL, true);
     const parameter: Rule = new TokenRule(TokenType.PARAMETER, true);
     this.rule = new AlternateRule([octal, parameter]);
   }
-
-  /**
-   * Parse an OffsetRule. If either an OCTAL or PARAMETER
-   * token are matched, an OFFSET node is created.
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      node.addNewChildWithToken(NodeType.OFFSET, tmp.getSoleChild().token);
-    }
-    return parseSuccess;
-  };
 }
 
 /**

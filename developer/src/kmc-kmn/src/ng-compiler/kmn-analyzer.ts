@@ -17,7 +17,7 @@ import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStore
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { ASTStrategy, GivenNode, NewNode, NewNodeOrTree } from "./ast-strategy.js";
+import { ASTStrategy, ChangeNode, GivenNode, NewNode, NewNodeOrTree } from "./ast-strategy.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -343,38 +343,39 @@ export class VirtualKeyRule extends SingleChildRuleWithASTStrategy {
  *
  * SHIFT and CAPS are distinct from other modifiers because
  * they are also used in 'CAPS ALWAYS OFF', 'CAPS ON ONLY' and
- * 'SHIFT FREES CAPS'
+ * 'SHIFT FREES CAPS'. As SHIFT and CAPS are separately identified,
+ *  a MODIFIER node must be created for them if needed.
  */
-export class ModifierRule extends SingleChildRule {
+export class ModifierRule extends SingleChildRuleWithASTStrategy {
   public constructor() {
-    super();
+    super(new ChangeNode(NodeType.MODIFIER));
     const shift: Rule    = new TokenRule(TokenType.SHIFT, true);
     const caps: Rule     = new TokenRule(TokenType.CAPS, true);
     const modifier: Rule = new TokenRule(TokenType.MODIFIER, true);
     this.rule = new AlternateRule([shift, caps, modifier]);
   }
 
-  /**
-   * Parse a ModifierRule.  As SHIFT and CAPS are separately
-   * identified as they are used in other rules, a MODIFIER
-   * node must be created for them if needed.
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      let modifierNode = tmp.getSoleChildOfType(NodeType.MODIFIER);
-      if (modifierNode === null) {
-        modifierNode = new ASTNode(NodeType.MODIFIER, tmp.getSoleChild().token);
-      }
-      node.addChild(modifierNode);
-    }
-    return parseSuccess;
-  }
+  // /**
+  //  * Parse a ModifierRule.  As SHIFT and CAPS are separately
+  //  * identified as they are used in other rules, a MODIFIER
+  //  * node must be created for them if needed.
+  //  *
+  //  * @param tokenBuffer the TokenBuffer to parse
+  //  * @param node where to build the AST
+  //  * @returns true if this rule was successfully parsed
+  //  */
+  // public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
+  //   const tmp: ASTNode = new ASTNode(NodeType.TMP);
+  //   const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
+  //   if (parseSuccess) {
+  //     let modifierNode = tmp.getSoleChildOfType(NodeType.MODIFIER);
+  //     if (modifierNode === null) {
+  //       modifierNode = new ASTNode(NodeType.MODIFIER, tmp.getSoleChild().token);
+  //     }
+  //     node.addChild(modifierNode);
+  //   }
+  //   return parseSuccess;
+  // }
 }
 
 /**
