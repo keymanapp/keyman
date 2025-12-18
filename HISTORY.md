@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.179 alpha 2025-12-18
+
+* fix(linux): fix persisting options (#15364)
+
 ## 19.0.178 alpha 2025-12-17
 
 * chore(windows): correct kbda1 to kbdth0 in comment in unit test (#15351)
