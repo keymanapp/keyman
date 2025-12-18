@@ -9,7 +9,7 @@ it sits between the TSF Manager and Keyman.exe.
 
 ### 1. The "Mixed Architecture" Environment
 
-Windows on both amd64n(x86-64) and on Arm devices can run applications of differing architectures simultaneously:
+Windows on both amd64(x86-64) and on Arm devices can run applications of differing architectures simultaneously:
 
 On amd64 Devices:
 * **Native x64 apps:** (e.g., Windows Explorer, Notepad, Edge).
