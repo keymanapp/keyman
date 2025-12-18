@@ -856,7 +856,7 @@ begin
 
     KMC_WATCHDOG_HOOK_REINSTALL:
       case wParam of
-        WHR_TIMING:         TKeymanSentryClient.ReportMessage('Watchdog: low level hook reinstalled, threshold exceedeed at '+IntToStr(lParam)+' msec');
+        WHR_TIMING:         TKeymanSentryClient.ReportMessage('Watchdog: low level hook reinstalled, threshold exceeded at '+IntToStr(lParam)+' msec');
         WHR_INIT_FAILURE:   TKeymanSentryClient.ReportMessage('Watchdog: low level hook install failed with error '+IntToStr(lParam));
         WHR_UNINIT_FAILURE: TKeymanSentryClient.ReportMessage('Watchdog: low level hook uninstall failed with error '+IntToStr(lParam));
       end;
