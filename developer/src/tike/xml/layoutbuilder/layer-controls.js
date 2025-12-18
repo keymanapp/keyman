@@ -4,7 +4,7 @@ $(function() {
     var layerName = $(this).val();
     $('#addLayerList').val(layerName);
     if($('#addLayerList')[0].selectedIndex < 0) {
-      $('#addLayerList').val('(custom)');
+      $('#addLayerList').val('');
       $('#addLayerNote').text('');
     } else {
       $('#addLayerNote').text(layerName+' is a recognised modifier-aware layer name.');
@@ -13,7 +13,7 @@ $(function() {
 
   $('#addLayerList').change(function() {
     var v = $(this).val();
-    if(v == '(custom)') {
+    if(v == '') {
       $('#addLayerName').val('');
       $('#addLayerNote').text('');
     } else {
