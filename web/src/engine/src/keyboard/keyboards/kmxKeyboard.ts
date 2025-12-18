@@ -104,7 +104,7 @@ export class KMXKeyboard {
    * @param       {number}    eventCode     key code (16-18: Shift, Control or Alt),
    *                                        or 0 for focus
    * @param       {TextStore} textStore     textStore
-   * @param       {number}    boolean       true for KeyDown or FocusReceived,
+   * @param       {boolean}   data          true for KeyDown or FocusReceived,
    *                                        false for KeyUp or FocusLost
    */
   public notify(eventCode: number, textStore: TextStore, data: boolean): void { // I2187
