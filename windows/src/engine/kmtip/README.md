@@ -43,7 +43,7 @@ the application is 32-bit or 64-bit.
 
 ## kmtiparm64x.dll - Arm64 Devices
 
-### Single Registry Entry Problem for the two 64-bit architecture
+### Single Registry Entry Problem for the two 64-bit architectures
 
 On Windows on Arm there is a problem because there is only a single registry
 entry for the **64-bit** CLSID. This means it is not possible to register both an
