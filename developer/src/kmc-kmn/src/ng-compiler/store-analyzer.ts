@@ -11,7 +11,7 @@
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleWithASTRebuild } from "./recursive-descent.js";
 import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
@@ -23,7 +23,7 @@ import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.
  *
  * https://help.keyman.com/developer/language/reference/store
  */
-export class SystemStoreAssignRule extends SingleChildRuleWithASTStrategy {
+export class SystemStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new FirstNode());
     const systemStore: Rule = new SystemStoreRule();
@@ -96,7 +96,7 @@ export class SystemStoreNameRule extends AlternateTokenRule {
  *
  * https://help.keyman.com/developer/language/reference/store
  */
-export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
+export class NormalStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.STORE));
     const normalStore: Rule = new NormalStoreRule();
@@ -111,7 +111,7 @@ export class NormalStoreAssignRule extends SingleChildRuleWithASTStrategy {
  *
  *  https://help.keyman.com/developer/language/reference/store
  */
-export class NormalStoreRule extends SingleChildRuleWithASTStrategy {
+export class NormalStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new StackedPair(NodeType.STORE, NodeType.STORENAME));
     const store: Rule           = new TokenRule(TokenType.STORE, true);
@@ -125,7 +125,7 @@ export class NormalStoreRule extends SingleChildRuleWithASTStrategy {
 /**
  * (BNF) normalStoreName: normalStoreNameElement+
  */
-export class NormalStoreNameRule extends SingleChildRuleWithASTStrategy {
+export class NormalStoreNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if normal store name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.STORENAME));
@@ -155,7 +155,7 @@ export class NormalStoreNameElementRule extends SingleChildRule {
 /**
  * (BNF) deadkeyName: deadkeyNameElement+
  */
-export class DeadkeyNameRule extends SingleChildRuleWithASTStrategy {
+export class DeadkeyNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if deadkey name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.DEADKEYNAME));
@@ -199,7 +199,7 @@ export class StoreNameRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/reference/set
  */
-export class SetNormalStoreRule extends SingleChildRuleWithASTStrategy {
+export class SetNormalStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.SET));
     const set: Rule             = new TokenRule(TokenType.SET, true);
@@ -226,7 +226,7 @@ export class SetNormalStoreRule extends SingleChildRuleWithASTStrategy {
  *
  * https://help.keyman.com/developer/language/reference/set
  */
-export class SetSystemStoreRule extends SingleChildRuleWithASTStrategy {
+export class SetSystemStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.SET));
     const set: Rule                   = new TokenRule(TokenType.SET, true);
@@ -268,7 +268,7 @@ export class SystemStoreNameForSetRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/reference/reset
  */
-export class ResetStoreRule extends SingleChildRuleWithASTStrategy {
+export class ResetStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new StackedPair(NodeType.RESET, NodeType.STORENAME));
     const reset: Rule           = new TokenRule(TokenType.RESET, true);
@@ -368,7 +368,7 @@ export class ShiftFreesCapsRule extends AbstractCapsLockStatementRule {
 /**
  * (BNF) headerAssign: headerName headerValue
  */
-export class HeaderAssignRule extends SingleChildRuleWithASTStrategy {
+export class HeaderAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new FirstNode());
     const headerName: Rule  = new HeaderNameRule();

@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRule, SingleChildRuleWithASTStrategy } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRule, SingleChildRuleWithASTRebuild } from '../../src/ng-compiler/recursive-descent.js';
 import { Rule, SequenceRule, parameterSequence, AlternateTokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { NodeType } from "../../src/ng-compiler/node-type.js";
@@ -81,7 +81,7 @@ describe("Recursive Descent Tests", () => {
     });
   });
   describe("SingleChildRuleWithASTStrategy Tests", () => {
-    class ConcreteSingleChildRuleWithASTStrategy extends SingleChildRuleWithASTStrategy {}
+    class ConcreteSingleChildRuleWithASTStrategy extends SingleChildRuleWithASTRebuild {}
     it("can apply a strategy (NewNode)", () => {
       const newNodeRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING), trueRule);
       assert.isTrue(newNodeRule.parse(tokenBuffer, root));

@@ -7,7 +7,7 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleWithASTStrategy } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleWithASTRebuild } from "./recursive-descent.js";
 import { Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
@@ -55,7 +55,7 @@ export class Parser {
 /**
  * (BNF) kmnTree: line*
  */
-export class KmnTreeRule extends SingleChildRuleWithASTStrategy {
+export class KmnTreeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new KmnTreeStrategy());
     const line: Rule = new LineRule();
@@ -294,7 +294,7 @@ export class SimpleTextRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/guide/expansions
  */
-export class TextRangeRule extends SingleChildRuleWithASTStrategy {
+export class TextRangeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.RANGE));
     const simpleText: Rule        = new SimpleTextRule();
@@ -323,7 +323,7 @@ export class RangeEndRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/guide/virtual-keys
  */
-export class VirtualKeyRule extends SingleChildRuleWithASTStrategy {
+export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.VIRTUAL_KEY));
     const leftSquare: Rule   = new TokenRule(TokenType.LEFT_SQ);
@@ -347,7 +347,7 @@ export class VirtualKeyRule extends SingleChildRuleWithASTStrategy {
  * 'SHIFT FREES CAPS'. As SHIFT and CAPS are separately identified,
  *  a MODIFIER node must be created for them if needed.
  */
-export class ModifierRule extends SingleChildRuleWithASTStrategy {
+export class ModifierRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new ChangeNode(NodeType.MODIFIER));
     const shift: Rule    = new TokenRule(TokenType.SHIFT, true);
@@ -393,7 +393,7 @@ export class RuleBlockRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/reference/begin
  */
-export class BeginStatementRule extends SingleChildRuleWithASTStrategy {
+export class BeginStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.BEGIN));
     const begin: Rule          = new TokenRule(TokenType.BEGIN, true);
@@ -426,7 +426,7 @@ export class EntryPointRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/reference/use
  */
-export class UseStatementRule extends SingleChildRuleWithASTStrategy {
+export class UseStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.USE));
     const use: Rule          = new TokenRule(TokenType.USE, true);
@@ -442,7 +442,7 @@ export class UseStatementRule extends SingleChildRuleWithASTStrategy {
  *
  * https://help.keyman.com/developer/language/reference/group
  */
-export class GroupStatementRule extends SingleChildRuleWithASTStrategy {
+export class GroupStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.GROUP));
     const group: Rule              = new TokenRule(TokenType.GROUP, true);
@@ -466,7 +466,7 @@ export class GroupStatementRule extends SingleChildRuleWithASTStrategy {
  *
  * https://help.keyman.com/developer/language/reference/group
  */
-export class GroupNameRule extends SingleChildRuleWithASTStrategy {
+export class GroupNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if group name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.GROUPNAME));
@@ -624,7 +624,7 @@ export class ProductionBlockRule extends SingleChildRule {
  * https://help.keyman.com/developer/language/reference/match
  * https://help.keyman.com/developer/language/reference/nomatch
  */
-export class LhsBlockRule extends SingleChildRuleWithASTStrategy {
+export class LhsBlockRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.LHS));
     const match: Rule      = new TokenRule(TokenType.MATCH, true);
@@ -659,7 +659,7 @@ export class InputBlockRule extends SingleChildRule {
 /**
  * (BNF) inputContext: inputElement+
  */
-export class InputContextRule extends SingleChildRuleWithASTStrategy {
+export class InputContextRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.INPUT_CONTEXT));
     const inputElement = new InputElementRule();
@@ -691,7 +691,7 @@ export class InputElementRule extends SingleChildRule {
 /**
  * (BNF) keystroke: PLUS keystrokeElement+
  */
-export class KeystrokeRule extends SingleChildRuleWithASTStrategy {
+export class KeystrokeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.KEYSTROKE));
     const plus: Rule            = new TokenRule(TokenType.PLUS);
@@ -717,7 +717,7 @@ export class KeystrokeElementRule extends SingleChildRule {
 /**
  * (BNF) rhsBlock: outputStatement+
  */
-export class RhsBlockRule extends SingleChildRuleWithASTStrategy {
+export class RhsBlockRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.RHS));
     const outputStatement: Rule = new OutputStatementRule();

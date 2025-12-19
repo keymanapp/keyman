@@ -59,12 +59,12 @@ export abstract class SingleChildRule extends Rule {
 
 /**
  * SingleChildRule is the abstract base class of all the recursive-descent
- * syntax analyzer rules with a single child that use an ASTStrategy to
+ * syntax analyzer rules with a single child that use an ASTRebuild to
  * rebuild the tree after a successful parse.
  */
-export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
+export abstract class SingleChildRuleWithASTRebuild extends SingleChildRule {
   /**
-   * Construct a SingleChildRuleWithASTStrategy
+   * Construct a SingleChildRuleWithASTRebuild
    */
   public constructor(
     /** the strategy used on the tree after a successful parse */
@@ -76,7 +76,7 @@ export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
   }
 
   /**
-   * Parse the rule and, if successful, apply the ASTStrategy
+   * Parse the rule and, if successful, apply the ASTRebuild
    *
    * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST

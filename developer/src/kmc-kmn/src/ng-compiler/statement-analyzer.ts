@@ -10,7 +10,7 @@
 
 import { TokenType } from "./token-type.js";
 import { PlainTextRule } from "./kmn-analyzer.js";
-import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleWithASTStrategy, TokenRule } from "./recursive-descent.js";
+import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleWithASTRebuild, TokenRule } from "./recursive-descent.js";
 import { DeadkeyNameRule, NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ChangeNode, GivenNode, StackedPair } from "./ast-rebuild.js";
@@ -18,7 +18,7 @@ import { ChangeNode, GivenNode, StackedPair } from "./ast-rebuild.js";
 /**
  * An abstract base class for rules that apply a command to a store name
  */
-abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRuleWithASTStrategy {
+abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRuleWithASTRebuild {
   protected leftBracket: Rule;
   protected normalStoreName: Rule;
   protected rightBracket: Rule;
@@ -69,7 +69,7 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
  *
  * https://help.keyman.com/developer/language/reference/deadkey
  */
-export class DeadkeyStatementRule extends SingleChildRuleWithASTStrategy {
+export class DeadkeyStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new StackedPair(NodeType.DEADKEY, NodeType.DEADKEYNAME));
     const deadkey: Rule      = new TokenRule(TokenType.DEADKEY, true);
@@ -115,7 +115,7 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
 /**
  * An abstract base class for shortcut rules (e.g. baselayout(), layer(), platform())
  */
-abstract class AbstractShortcutRule extends SingleChildRuleWithASTStrategy {
+abstract class AbstractShortcutRule extends SingleChildRuleWithASTRebuild {
   protected leftBracket: Rule;
   protected plainText: Rule;
   protected oneOrManyPlainText: Rule;
@@ -211,7 +211,7 @@ export class IfStatementRule extends SingleChildRule {
 /**
  * An abstract base class for if() rules for both normal and system stores
  */
-abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTStrategy {
+abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTRebuild {
   protected ifRule: Rule;
   protected leftBracket: Rule;
   protected comparison: Rule;
@@ -310,7 +310,7 @@ export class ComparisonRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/reference/context
  */
-export class ContextStatementRule extends SingleChildRuleWithASTStrategy {
+export class ContextStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.CONTEXT));
     const context: Rule       = new TokenRule(TokenType.CONTEXT, true);
@@ -331,7 +331,7 @@ export class ContextStatementRule extends SingleChildRuleWithASTStrategy {
  *
  * https://help.keyman.com/developer/language/reference/_index
  */
-export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
+export class IndexStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.INDEX));
     const index: Rule           = new TokenRule(TokenType.INDEX, true);
@@ -360,7 +360,7 @@ export class IndexStatementRule extends SingleChildRuleWithASTStrategy {
  *
  * https://help.keyman.com/developer/language/guide/strings
  */
-export class OffsetRule extends SingleChildRuleWithASTStrategy {
+export class OffsetRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new ChangeNode(NodeType.OFFSET));
     const octal: Rule     = new TokenRule(TokenType.OCTAL, true);
@@ -374,7 +374,7 @@ export class OffsetRule extends SingleChildRuleWithASTStrategy {
  *
  * https://help.keyman.com/developer/language/reference/outs
  */
-export class OutsStatementRule extends SingleChildRuleWithASTStrategy {
+export class OutsStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.OUTS));
     const outs: Rule         = new TokenRule(TokenType.OUTS, true);
