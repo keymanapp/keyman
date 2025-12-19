@@ -1,5 +1,47 @@
 # Keyman Version History
 
+## 19.0.178 alpha 2025-12-17
+
+* chore(windows): correct kbda1 to kbdth0 in comment in unit test (#15351)
+
+## 19.0.177 alpha 2025-12-16
+
+* feat(windows): report a sentry event when low level hook is reinstalled (#15335)
+* chore(linux): add manual test for localization (#15356)
+* feat(developer): show keyboard version in web debugger (#15339)
+
+## 19.0.176 alpha 2025-12-13
+
+* chore(windows): remove unused variable (#15334)
+
+## 19.0.175 alpha 2025-12-12
+
+* fix(windows): use Thai Kedmanee instead of Arabic 101 in RightAltEmulationCheck.tests.cpp (#15346)
+
+## 19.0.174 alpha 2025-12-10
+
+* chore(windows): simple bisect utility for checking setup-redist.exe file size (#15322)
+
+## 19.0.173 alpha 2025-12-09
+
+* docs(developer): Clarify keystrokes in Step-1 of tutorial (#15326)
+* feat(android): Add Grabbable Bar and settings status for keyboard resizing (#15267)
+* chore(linux): Update debian changelog (#15282)
+* docs(web): fix typo in osk documentation (#15313)
+
+## 19.0.172 alpha 2025-12-08
+
+* docs(web): add links to next/previous page to web guide (#15311)
+* fix(developer): verify project file loaded successfully in analyze (#15318)
+
+## 19.0.171 alpha 2025-12-08
+
+* maint(resources): verify order of builder_describe_internal_dependency (#15257)
+* maint(common): use `builder_launch` for child builds (#15258)
+* change(windows): Revert "change(windows): include map2pdb generation for relevant Delphi projects" (#15276)
+* change(windows): add shortcuts to 'Update Available' dialog (#15280)
+* maint(resources): roll back builder_launch for trigger-release-builds.sh (#15316)
+
 ## 19.0.170 alpha 2025-12-03
 
 * chore(deps-dev): bump js-yaml from 4.1.0 to 4.1.1 in /resources/build/pr-build-status (#15173)

@@ -1071,7 +1071,7 @@ end;
 
 procedure TLangSwitchConfiguration.RestoreWindowsHotkey;
 var
-  FReset, Changed: Boolean;
+  FReset: Boolean;
   KeyboardToggleReg: TRegistryErrorControlled;
 begin
   FReset := False;
