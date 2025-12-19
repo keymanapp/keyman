@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.180 alpha 2025-12-19
+
+* fix(mac): ensure retry for mac disk detach actually repeats (#15330)
+* fix(developer): handle Enter key in dialogs in Touch Layout Editor (#15338)
+* chore(windows): fix typo in error message (#15362)
+* chore(common): Update crowdin strings for PT (#15368)
+
 ## 19.0.179 alpha 2025-12-18
 
 * fix(linux): fix persisting options (#15364)
