@@ -3,7 +3,7 @@
  *
  * Created by Dr Mark C. Sinclair on 2025-12-05
  *
- * Tests for KMC KMN Next Generation Parser (Recursive Descent/ASTStrategy)
+ * Tests for KMC KMN Next Generation Parser (Recursive Descent/ASTRebuild)
  */
 
 import 'mocha';
@@ -14,7 +14,7 @@ import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 
-describe("ASTStrategy Tests", () => {
+describe("ASTRebuild Tests", () => {
   describe("GivenNode", () => {
     it("can construct a GivenNode", () => {
       const givenNode = new GivenNode(NodeType.GROUP);
