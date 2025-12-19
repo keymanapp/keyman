@@ -17,7 +17,7 @@ import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStore
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { ASTStrategy, ChangeNode, GivenNode, NewNode, NewNodeOrTree } from "./ast-strategy.js";
+import { ASTRebuild, ChangeNode, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -66,7 +66,7 @@ export class KmnTreeRule extends SingleChildRuleWithASTStrategy {
 /**
  * An ASTStrategy that rebuilds the KMN tree after the initial parse
  */
-export class KmnTreeStrategy extends ASTStrategy {
+export class KmnTreeStrategy extends ASTRebuild {
   /**
    * Rebuilds the tree by gathering the source code, groups and
    * stores and arranging these into stores, other nodes,

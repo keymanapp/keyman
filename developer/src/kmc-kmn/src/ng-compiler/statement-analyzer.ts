@@ -13,7 +13,7 @@ import { PlainTextRule } from "./kmn-analyzer.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, SingleChildRuleWithASTStrategy, TokenRule } from "./recursive-descent.js";
 import { DeadkeyNameRule, NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
-import { ChangeNode, GivenNode, StackedPair } from "./ast-strategy.js";
+import { ChangeNode, GivenNode, StackedPair } from "./ast-rebuild.js";
 
 /**
  * An abstract base class for rules that apply a command to a store name

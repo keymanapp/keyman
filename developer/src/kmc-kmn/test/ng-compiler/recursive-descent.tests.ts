@@ -15,7 +15,7 @@ import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
-import { NewNode } from '../../src/ng-compiler/ast-strategy.js';
+import { NewNode } from '../../src/ng-compiler/ast-rebuild.js';
 
 const LIST_OF_ONE: Token[] = [
   new Token(TokenType.STRING, ''),

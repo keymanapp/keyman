@@ -9,7 +9,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { NodeType } from '../../src/ng-compiler/node-type.js';
-import { ChangeNode, FirstNode, GivenNode, NewNode, NewNodeOrTree, StackedPair } from '../../src/ng-compiler/ast-strategy.js';
+import { ChangeNode, FirstNode, GivenNode, NewNode, NewNodeOrTree, StackedPair } from '../../src/ng-compiler/ast-rebuild.js';
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';

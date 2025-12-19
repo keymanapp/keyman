@@ -16,7 +16,7 @@ import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-strategy.js";
+import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.js";
 
 /**
  * (BNF) systemStoreAssign: systemStore text*

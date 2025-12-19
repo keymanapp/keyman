@@ -12,7 +12,7 @@ import { TokenBuffer } from "./token-buffer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TOKEN_TO_NODE } from "./token-to-node.js";
-import { ASTStrategy } from "./ast-strategy.js";
+import { ASTRebuild } from "./ast-rebuild.js";
 
 /**
  * Rule is the abstract base class of all the recursive-descent
@@ -68,7 +68,7 @@ export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
    */
   public constructor(
     /** the strategy used on the tree after a successful parse */
-    protected readonly strategy: ASTStrategy,
+    protected readonly strategy: ASTRebuild,
     /** the single child rule */
     rule: Rule=null
   ) {
