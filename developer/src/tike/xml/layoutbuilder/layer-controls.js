@@ -51,6 +51,12 @@ $(function() {
       alert('Layer name must contain only alphanumerics, underscore and hyphen.');
       return false;
     }
+    for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
+      if(i != builder.lastLayerIndex && KVKL[builder.lastPlatform].layer[i].id == newLayerName) {
+        alert('Layer name must not already be in use for the current platform.');
+        return false;
+      }
+    }
 
     builder.saveUndo();
     builder.generate();
