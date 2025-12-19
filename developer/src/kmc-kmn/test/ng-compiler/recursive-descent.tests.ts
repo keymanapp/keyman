@@ -80,21 +80,21 @@ describe("Recursive Descent Tests", () => {
       assert.isTrue(validRule.parse(tokenBuffer, root));
     });
   });
-  describe("SingleChildRuleWithASTStrategy Tests", () => {
-    class ConcreteSingleChildRuleWithASTStrategy extends SingleChildRuleWithASTRebuild {}
+  describe("SingleChildRuleWithASTRebuild Tests", () => {
+    class ConcreteSingleChildRuleWithASTRebuild extends SingleChildRuleWithASTRebuild {}
     it("can apply a strategy (NewNode)", () => {
-      const newNodeRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING), trueRule);
+      const newNodeRule: Rule = new ConcreteSingleChildRuleWithASTRebuild(new NewNode(NodeType.STRING), trueRule);
       assert.isTrue(newNodeRule.parse(tokenBuffer, root));
       const parent = root.getSoleChildOfType(NodeType.STRING); // from NewNode strategy
       assert.isNotNull(parent);
       assert.isNotNull(parent.getSoleChildOfType(NodeType.TMP)); // from trueRule
     });
     it("returns false without a rule to parse (no rule)", () => {
-      const noRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING));
+      const noRule: Rule = new ConcreteSingleChildRuleWithASTRebuild(new NewNode(NodeType.STRING));
       assert.isFalse(noRule.parse(tokenBuffer, root));
     });
     it("returns false without a rule to parse (null)", () => {
-      const noRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING), null);
+      const noRule: Rule = new ConcreteSingleChildRuleWithASTRebuild(new NewNode(NodeType.STRING), null);
       assert.isFalse(noRule.parse(tokenBuffer, root));
     });
   });

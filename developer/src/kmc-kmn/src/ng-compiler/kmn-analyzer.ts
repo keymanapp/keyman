@@ -7,8 +7,8 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRuleWithASTRebuild } from "./recursive-descent.js";
-import { Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
+import { SingleChildRuleWithASTRebuild, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
@@ -54,19 +54,21 @@ export class Parser {
 
 /**
  * (BNF) kmnTree: line*
+ *
+ * Uses a KmnTreeRebuild to rebuild the KMN tree after the initial parse
  */
 export class KmnTreeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
-    super(new KmnTreeStrategy());
+    super(new KmnTreeRebuild());
     const line: Rule = new LineRule();
     this.rule = new ManyRule(line);
   }
 }
 
 /**
- * An ASTStrategy that rebuilds the KMN tree after the initial parse
+ * Rebuilds the KMN tree after the initial parse
  */
-export class KmnTreeStrategy extends ASTRebuild {
+export class KmnTreeRebuild extends ASTRebuild {
   /**
    * Rebuilds the tree by gathering the source code, groups and
    * stores and arranging these into stores, other nodes,
@@ -133,7 +135,7 @@ export class KmnTreeStrategy extends ASTRebuild {
    * @returns the stores nodes removed from the tree
    */
   private gatherStores(node: ASTNode): ASTNode {
-    const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeStrategy.STORES_NODETYPES);
+    const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeRebuild.STORES_NODETYPES);
     const storesNode: ASTNode   = new ASTNode(NodeType.STORES);
     storesNode.addChildren(storeNodes);
     return storesNode;
@@ -293,6 +295,8 @@ export class SimpleTextRule extends SingleChildRule {
  * (BNF) textRange: simpleText rangeEnd+
  *
  * https://help.keyman.com/developer/language/guide/expansions
+ *
+ * Uses a NewNode to rebuild the tree to be rooted at a RANGE node
  */
 export class TextRangeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -322,6 +326,8 @@ export class RangeEndRule extends SingleChildRule {
  * (BNF) virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
  *
  * https://help.keyman.com/developer/language/guide/virtual-keys
+ *
+ * Uses a NewNode to rebuild the tree to be rooted at a VIRTUAL_KEY node
  */
 export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -346,6 +352,9 @@ export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
  * they are also used in 'CAPS ALWAYS OFF', 'CAPS ON ONLY' and
  * 'SHIFT FREES CAPS'. As SHIFT and CAPS are separately identified,
  *  a MODIFIER node must be created for them if needed.
+ *
+ * Uses a ChangeNode to replace the sole child node with a MODIFIER
+ * node but retaining the same Token
  */
 export class ModifierRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -392,6 +401,8 @@ export class RuleBlockRule extends SingleChildRule {
  * (BNF) beginStatement: BEGIN entryPoint? CHEVRON useStatement
  *
  * https://help.keyman.com/developer/language/reference/begin
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the BEGIN node
  */
 export class BeginStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -425,6 +436,8 @@ export class EntryPointRule extends SingleChildRule {
  * (BNF) useStatement: USE LEFT_BR groupName RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/use
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the USE node
  */
 export class UseStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -441,6 +454,8 @@ export class UseStatementRule extends SingleChildRuleWithASTRebuild {
  * (BNF) groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
  *
  * https://help.keyman.com/developer/language/reference/group
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the GROUP node
  */
 export class GroupStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -465,6 +480,10 @@ export class GroupStatementRule extends SingleChildRuleWithASTRebuild {
  * (BNF) groupName: groupNameElement+
  *
  * https://help.keyman.com/developer/language/reference/group
+ *
+ * Uses a NewNodeOrTree to add either a single new GROUPNAME
+ * node or build a tree rooted at a GROUPNAME node, depending
+ * on the number of children found (one or more)
  */
 export class GroupNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if group name consists of multiple elements
@@ -623,6 +642,8 @@ export class ProductionBlockRule extends SingleChildRule {
  *
  * https://help.keyman.com/developer/language/reference/match
  * https://help.keyman.com/developer/language/reference/nomatch
+ *
+ * Uses a NewNode to rebuild the tree to be rooted at a LHS node
  */
 export class LhsBlockRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -658,6 +679,8 @@ export class InputBlockRule extends SingleChildRule {
 
 /**
  * (BNF) inputContext: inputElement+
+ *
+ * Uses a NewNode to rebuild the tree to be rooted at an INPUT_CONTEXT node
  */
 export class InputContextRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -690,6 +713,8 @@ export class InputElementRule extends SingleChildRule {
 
 /**
  * (BNF) keystroke: PLUS keystrokeElement+
+ *
+ * Uses a NewNode to rebuild the tree to be rooted at a KEYSTROKE node
  */
 export class KeystrokeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -716,6 +741,8 @@ export class KeystrokeElementRule extends SingleChildRule {
 
 /**
  * (BNF) rhsBlock: outputStatement+
+ *
+ * Uses a NewNode to rebuild the tree to be rooted at a RHS node
  */
 export class RhsBlockRule extends SingleChildRuleWithASTRebuild {
   public constructor() {

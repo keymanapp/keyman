@@ -17,6 +17,8 @@ import { ChangeNode, GivenNode, StackedPair } from "./ast-rebuild.js";
 
 /**
  * An abstract base class for rules that apply a command to a store name
+ *
+ * Uses a StackedPair to rebuild the tree as cmdNodeType parent and STORENAME child nodes
  */
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRuleWithASTRebuild {
   protected leftBracket: Rule;
@@ -68,6 +70,8 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
  * (BNF) deadkeyStatement: DEADKEY LEFT_BR deadkeyName RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/deadkey
+ *
+ * Uses a StackedPair to rebuild the tree as DEADKEY parent and DEADKEYNAME child nodes
  */
 export class DeadkeyStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -114,6 +118,8 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
 
 /**
  * An abstract base class for shortcut rules (e.g. baselayout(), layer(), platform())
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the nodeType node
  */
 abstract class AbstractShortcutRule extends SingleChildRuleWithASTRebuild {
   protected leftBracket: Rule;
@@ -210,6 +216,8 @@ export class IfStatementRule extends SingleChildRule {
 
 /**
  * An abstract base class for if() rules for both normal and system stores
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the IF node
  */
 abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTRebuild {
   protected ifRule: Rule;
@@ -309,6 +317,8 @@ export class ComparisonRule extends SingleChildRule {
  * (BNF) contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/context
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the CONTEXT node
  */
 export class ContextStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -330,6 +340,8 @@ export class ContextStatementRule extends SingleChildRuleWithASTRebuild {
  * (BNF) indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/_index
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the INDEX node
  */
 export class IndexStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -359,6 +371,9 @@ export class IndexStatementRule extends SingleChildRuleWithASTRebuild {
  * an OFFSET node is created.
  *
  * https://help.keyman.com/developer/language/guide/strings
+ *
+ * Uses a ChangeNode to replace the sole child node with an OFFSET
+ * node but retaining the same Token
  */
 export class OffsetRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -373,6 +388,8 @@ export class OffsetRule extends SingleChildRuleWithASTRebuild {
  * (BNF) outsStatement: OUTS LEFT_BR storeName RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/outs
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the OUTS node
  */
 export class OutsStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {

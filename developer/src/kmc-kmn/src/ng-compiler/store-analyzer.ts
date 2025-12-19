@@ -22,6 +22,8 @@ import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.
  * (BNF) systemStoreAssign: systemStore text*
  *
  * https://help.keyman.com/developer/language/reference/store
+ *
+ * Uses a FirstNode to rebuild the tree to be rooted at the first node found
  */
 export class SystemStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -95,6 +97,8 @@ export class SystemStoreNameRule extends AlternateTokenRule {
  * (BNF) normalStoreAssign: normalStore text*
  *
  * https://help.keyman.com/developer/language/reference/store
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the STORE node
  */
 export class NormalStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -110,6 +114,8 @@ export class NormalStoreAssignRule extends SingleChildRuleWithASTRebuild {
  * (BNF) normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
  *
  *  https://help.keyman.com/developer/language/reference/store
+ *
+ * Uses a StackedPair to rebuild the tree as STORE parent and STORENAME child nodes
  */
 export class NormalStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -124,6 +130,10 @@ export class NormalStoreRule extends SingleChildRuleWithASTRebuild {
 
 /**
  * (BNF) normalStoreName: normalStoreNameElement+
+ *
+ * Uses a NewNodeOrTree to add either a single new STORENAME
+ * node or build a tree rooted at a STORENAME node, depending
+ * on the number of children found (one or more)
  */
 export class NormalStoreNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if normal store name consists of multiple elements
@@ -154,6 +164,10 @@ export class NormalStoreNameElementRule extends SingleChildRule {
 
 /**
  * (BNF) deadkeyName: deadkeyNameElement+
+ *
+ * Uses a NewNodeOrTree to add either a single new DEADKEYNAME
+ * node or build a tree rooted at a DEADKEYNAME node, depending
+ * on the number of children found (one or more)
  */
 export class DeadkeyNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if deadkey name consists of multiple elements
@@ -198,6 +212,8 @@ export class StoreNameRule extends SingleChildRule {
  * (BNF) setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/set
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the SET node
  */
 export class SetNormalStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -225,6 +241,8 @@ export class SetNormalStoreRule extends SingleChildRuleWithASTRebuild {
  * (BNF) setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/set
+ *
+ * Uses a GivenNode to rebuild the tree to be rooted at the SET node
  */
 export class SetSystemStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -267,6 +285,8 @@ export class SystemStoreNameForSetRule extends SingleChildRule {
  * (BNF) resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
  *
  * https://help.keyman.com/developer/language/reference/reset
+ *
+ * Uses a StackedPair to rebuild the tree as RESET parent and STORENAME child nodes
  */
 export class ResetStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
@@ -367,6 +387,8 @@ export class ShiftFreesCapsRule extends AbstractCapsLockStatementRule {
 
 /**
  * (BNF) headerAssign: headerName headerValue
+ *
+ * Uses a FirstNode to rebuild the tree to be rooted at the first node found
  */
 export class HeaderAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
