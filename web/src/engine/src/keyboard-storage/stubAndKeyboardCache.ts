@@ -1,11 +1,11 @@
 import { type Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader, KMXKeyboard } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
-import KeyboardStub from "./keyboardStub.js";
+import { KeyboardStub } from "./keyboardStub.js";
 
 const KEYBOARD_PREFIX = "Keyboard_";
 
-function prefixed(text: string) {
+export function toPrefixedKeyboardId(text: string) {
   if(!text.startsWith(KEYBOARD_PREFIX)) {
     return KEYBOARD_PREFIX + text;
   } else {
@@ -13,17 +13,13 @@ function prefixed(text: string) {
   }
 }
 
-export {prefixed as toPrefixedKeyboardId};
-
-function withoutPrefix(text: string) {
+export function toUnprefixedKeyboardId(text: string) {
   if(text.startsWith(KEYBOARD_PREFIX)) {
     return text.substring(KEYBOARD_PREFIX.length);
   } else {
     return text;
   }
 }
-
-export {withoutPrefix as toUnprefixedKeyboardId};
 
 interface EventMap {
   /**
@@ -41,7 +37,7 @@ interface EventMap {
   keyboardadded: (keyboard: Keyboard) => void;
 }
 
-export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
+export class StubAndKeyboardCache extends EventEmitter<EventMap> {
   private stubSetTable: Record<string, Record<string, KeyboardStub>> = {};
   private keyboardTable: Record<string, Keyboard | Promise<Keyboard>> = {};
 
@@ -70,7 +66,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     if(!keyboardID) {
       return null;
     }
-    const entry = this.keyboardTable[prefixed(keyboardID)];
+    const entry = this.keyboardTable[toPrefixedKeyboardId(keyboardID)];
 
     // Unit testing may 'trip up' in the DOM, as bundled versions of a class from one bundled
     // module will fail against an `instanceof` expecting the version bundled in a second.
@@ -123,7 +119,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   addKeyboard(keyboard: Keyboard) {
-    const keyboardID = prefixed(keyboard.id);
+    const keyboardID = toPrefixedKeyboardId(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
 
     this.emit('keyboardadded', keyboard);
@@ -138,7 +134,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
       throw new Error("Keyboard ID must be specified");
     }
 
-    keyboardID = prefixed(keyboardID);
+    keyboardID = toPrefixedKeyboardId(keyboardID);
 
     const cachedEntry = this.keyboardTable[keyboardID];
     return cachedEntry instanceof Promise;
@@ -153,7 +149,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
       throw new Error("Cannot load keyboards; this cache was configured without a loader");
     }
 
-    keyboardID = prefixed(keyboardID);
+    keyboardID = toPrefixedKeyboardId(keyboardID);
 
     const cachedEntry = this.keyboardTable[keyboardID];
     if(cachedEntry instanceof JSKeyboard) {
@@ -164,11 +160,11 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
 
     const stub = this.getStub(keyboardID, null);
     if(!stub) {
-      throw new Error(`No stub for ${withoutPrefix(keyboardID)} has been registered`);
+      throw new Error(`No stub for ${toUnprefixedKeyboardId(keyboardID)} has been registered`);
     }
 
     if(!stub.filename) {
-      throw new Error(`The registered stub for ${withoutPrefix(keyboardID)} lacks a path to the main keyboard file`);
+      throw new Error(`The registered stub for ${toUnprefixedKeyboardId(keyboardID)} lacks a path to the main keyboard file`);
     }
 
     const promise = this.keyboardLoader.loadKeyboardFromStub(stub);
@@ -189,7 +185,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   addStub(stub: KeyboardStub) {
-    const keyboardID = prefixed(stub.KI);
+    const keyboardID = toPrefixedKeyboardId(stub.KI);
     const stubTable = this.stubSetTable[keyboardID] = this.stubSetTable[keyboardID] ?? {};
     stubTable[stub.KLC] = stub;
 
@@ -213,7 +209,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     }
 
     if(keyboardID) {
-      keyboardID = prefixed(keyboardID);
+      keyboardID = toPrefixedKeyboardId(keyboardID);
     }
 
     const stubTable = this.stubSetTable[keyboardID] ?? {};
@@ -238,7 +234,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
    *              If `false`, only forgets the metadata (stubs).
    */
   forgetKeyboard(keyboard: string | JSKeyboard, purge: boolean = false) {
-    const id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : prefixed(keyboard);
+    const id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard);
 
     if(this.stubSetTable[id]) {
       delete this.stubSetTable[id];

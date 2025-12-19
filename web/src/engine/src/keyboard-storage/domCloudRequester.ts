@@ -1,8 +1,8 @@
 import { ManagedPromise } from 'keyman/engine/keyboard';
-import CloudRequesterInterface from './cloud/requesterInterface.js';
+import { CloudRequesterInterface } from './cloud/requesterInterface.js';
 import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './cloud/queryEngine.js';
 
-export default class DOMCloudRequester implements CloudRequesterInterface {
+export class DOMCloudRequester implements CloudRequesterInterface {
   private readonly fileLocal: boolean;
 
   constructor(fileLocal: boolean = false) {

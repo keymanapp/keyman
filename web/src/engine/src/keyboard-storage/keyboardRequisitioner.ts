@@ -17,7 +17,7 @@ import {
   mergeAndResolveStubPromises,
   toUnprefixedKeyboardId as unprefixed
  } from "./index.js";
-import { default as CloudRequesterInterface } from "./cloud/requesterInterface.js";
+import { CloudRequesterInterface } from "./cloud/requesterInterface.js";
 import { rejectErrorStubs } from "./keyboardStub.js";
 
 class CloudRequestEntry {
@@ -89,7 +89,7 @@ function isUniqueRequest(cache: StubAndKeyboardCache, cloudList: {id: string, la
 };
 
 // TODO:  Move to the keyboard-cache child project - we can test it headlessly there!
-export default class KeyboardRequisitioner {
+export class KeyboardRequisitioner {
   readonly cache: StubAndKeyboardCache;
   readonly cloudQueryEngine: CloudQueryEngine;
   readonly pathConfig: PathConfiguration;
