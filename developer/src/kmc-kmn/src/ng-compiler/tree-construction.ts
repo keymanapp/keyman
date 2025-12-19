@@ -20,13 +20,10 @@ export class ASTNode {
 
   /**
    * Construct an ASTNode
-   *
-   * @param nodeType the node type
-   * @param token a token from the input (or null)
    */
   public constructor(
-    /** the node type */
-    public readonly nodeType: NodeType,
+    /** the node type (default TMP) */
+    public readonly nodeType: NodeType=NodeType.TMP,
     /** a token (if appropriate) from the input */
     public readonly token: Token=null
   ) {

@@ -326,7 +326,7 @@ abstract class AbstractCapsLockStatementRule extends SingleChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    if (this.rule.parse(tokenBuffer, new ASTNode(NodeType.TMP))) {
+    if (this.rule.parse(tokenBuffer, new ASTNode())) {
       // TODO-NG-COMPILER: warning/error for caps lock statements
       node.addNewChildWithToken(this.nodeType, new Token(this.tokenType, '1'));
       return true;

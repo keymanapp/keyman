@@ -28,7 +28,7 @@ let root: ASTNode            = null;
 
 describe("KMN Analyser Tests", () => {
   beforeEach(() => {
-    root = new ASTNode(NodeType.TMP);
+    root = new ASTNode();
   });
   describe("KmnTreeRule Tests", () => {
     it("can construct a KmnTreeRule", () => {
@@ -654,7 +654,7 @@ describe("KMN Analyser Tests", () => {
       ].forEach((code) => {
         tokenBuffer = stringToTokenBuffer(`${code} `);
         const modifier: Rule = new ModifierRule();
-        root = new ASTNode(NodeType.TMP);
+        root = new ASTNode();
         assert.isTrue(modifier.parse(tokenBuffer, root));
         assert.equal(root.getSoleChildOfType(NodeType.MODIFIER).getText(), code);
       });
@@ -875,7 +875,7 @@ describe("KMN Analyser Tests", () => {
       ].forEach((testCase) => {
         tokenBuffer = stringToTokenBuffer(testCase.input);
         const permittedKeyword: Rule = new PermittedKeywordRule();
-        root = new ASTNode(NodeType.TMP);
+        root = new ASTNode();
         assert.isTrue(permittedKeyword.parse(tokenBuffer, root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType), `${testCase.input}`);
       });

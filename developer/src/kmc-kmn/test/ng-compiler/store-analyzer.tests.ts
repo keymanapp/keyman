@@ -25,7 +25,7 @@ let root: ASTNode = null;
 
 describe("KMN Store Analyser Tests", () => {
   beforeEach(() => {
-    root = new ASTNode(NodeType.TMP);
+    root = new ASTNode();
   });
   describe("SystemStoreAssignRule Tests", () => {
     it("can construct a SystemStoreAssignRule", () => {
@@ -184,7 +184,7 @@ describe("KMN Store Analyser Tests", () => {
       ].forEach((testCase) => {
         tokenBuffer = stringToTokenBuffer(`&${testCase.code}`);
         const systemStoreName: Rule = new SystemStoreNameRule();
-        root = new ASTNode(NodeType.TMP);
+        root = new ASTNode();
         assert.isTrue(systemStoreName.parse(tokenBuffer, root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType));
       });
@@ -531,7 +531,7 @@ describe("KMN Store Analyser Tests", () => {
       ].forEach((testCase) => {
         tokenBuffer = stringToTokenBuffer(`${testCase.code} "value"`);
         const headerName: Rule = new HeaderAssignRule();
-        root = new ASTNode(NodeType.TMP);
+        root = new ASTNode();
         assert.isTrue(headerName.parse(tokenBuffer, root));
         const headerNode = root.getSoleChildOfType(testCase.nodeType);
         assert.equal(headerNode.getSoleChildOfType(NodeType.STRING).getText(), '"value"');
@@ -570,7 +570,7 @@ describe("KMN Store Analyser Tests", () => {
       ].forEach((testCase) => {
         tokenBuffer = stringToTokenBuffer(`${testCase.code} `);
         const headerName: Rule = new HeaderNameRule();
-        root = new ASTNode(NodeType.TMP);
+        root = new ASTNode();
         assert.isTrue(headerName.parse(tokenBuffer, root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType));
       });

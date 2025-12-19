@@ -22,7 +22,7 @@ describe("ASTRebuild Tests", () => {
       assert.equal(givenNode['nodeType'], NodeType.GROUP);
     });
     it("can rebuild the AST", () => {
-      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const root: ASTNode = new ASTNode();
       root.addChildren([
         new ASTNode(NodeType.GROUP),
         new ASTNode(NodeType.PRODUCTION),
@@ -44,7 +44,7 @@ describe("ASTRebuild Tests", () => {
       assert.equal(stackedPair['childType'],  NodeType.STORENAME);
     });
     it("can rebuild the AST", () => {
-      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const root: ASTNode = new ASTNode();
       root.addChildren([
         new ASTNode(NodeType.STORE),
         new ASTNode(NodeType.STORENAME)
@@ -63,7 +63,7 @@ describe("ASTRebuild Tests", () => {
       assert.equal(newNode['nodeType'], NodeType.GROUP);
     });
     it("can rebuild the AST", () => {
-      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const root: ASTNode = new ASTNode();
       root.addChildren([
         new ASTNode(NodeType.PRODUCTION),
         new ASTNode(NodeType.PRODUCTION),
@@ -83,7 +83,7 @@ describe("ASTRebuild Tests", () => {
       assert.equal(newNodeOrTree['nodeType'], NodeType.STORE);
     });
     it("can rebuild the AST (one child)", () => {
-      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const root: ASTNode = new ASTNode();
       const token: Token  = new Token(TokenType.OCTAL, '1');
       root.addNewChildWithToken(NodeType.OCTAL, token);
       const newNodeOrTree = new NewNodeOrTree(NodeType.STORENAME);
@@ -94,7 +94,7 @@ describe("ASTRebuild Tests", () => {
       assert.isFalse(storeName.hasChildren());
     });
     it("can rebuild the AST (two children)", () => {
-      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const root: ASTNode = new ASTNode();
       const tokenOne: Token  = new Token(TokenType.OCTAL, '1');
       const tokenTwo: Token  = new Token(TokenType.OCTAL, '2');
       root.addNewChildWithToken(NodeType.OCTAL, tokenOne);
@@ -116,7 +116,7 @@ describe("ASTRebuild Tests", () => {
       assert.isNotNull(firstNode);
     });
     it("can rebuild the AST", () => {
-      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const root: ASTNode = new ASTNode();
       root.addChildren([
         new ASTNode(NodeType.GROUP),
         new ASTNode(NodeType.PRODUCTION),
@@ -137,7 +137,7 @@ describe("ASTRebuild Tests", () => {
       assert.equal(changeNode['nodeType'], NodeType.OFFSET);
     });
     it("can rebuild the AST", () => {
-      const root: ASTNode = new ASTNode(NodeType.TMP);
+      const root: ASTNode = new ASTNode();
       const token = new Token(TokenType.OCTAL, '1');
       root.addChild(new ASTNode(NodeType.OCTAL, token));
       const changeNode = new ChangeNode(NodeType.OFFSET);

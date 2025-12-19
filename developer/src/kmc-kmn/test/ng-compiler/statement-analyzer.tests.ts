@@ -26,7 +26,7 @@ let root: ASTNode = null;
 
 describe("KMN Statement Analyser Tests", () => {
   beforeEach(() => {
-    root = new ASTNode(NodeType.TMP);
+    root = new ASTNode();
   });
   describe("AnyStatementRule Tests", () => {
     it("can construct an AnyStatementRule", () => {

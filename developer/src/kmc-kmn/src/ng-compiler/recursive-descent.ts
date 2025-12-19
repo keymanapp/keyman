@@ -83,7 +83,7 @@ export abstract class SingleChildRuleWithASTRebuild extends SingleChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const tmp: ASTNode = new ASTNode();
     // TODO-NG-COMPILER: fatal error if rule is null
     const parseSuccess: boolean = this.rule?.parse(tokenBuffer, tmp) ?? false;
     if (parseSuccess) {
@@ -126,7 +126,7 @@ export class SequenceRule extends MultiChildRule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const save: number = tokenBuffer.currentPosition;
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const tmp: ASTNode = new ASTNode();
 
     // TODO-NG-COMPILER: fatal error if rules is null or empty
     if (!this.rules?.length) {
@@ -168,7 +168,7 @@ export class AlternateRule extends MultiChildRule {
     }
 
     for (const rule of this.rules) {
-      tmp = new ASTNode(NodeType.TMP);
+      tmp = new ASTNode();
       if (rule.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
         return true;
@@ -206,7 +206,7 @@ export class OptionalRule extends SingleChildRule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const save: number = tokenBuffer.currentPosition;
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const tmp: ASTNode = new ASTNode();
 
     // TODO-NG-COMPILER: fatal error if rule is null
     if (this.rule == null) {
@@ -257,7 +257,7 @@ export class ManyRule extends SingleChildRule {
 
     while (true) {
       const save: number = tokenBuffer.currentPosition;
-      const tmp: ASTNode = new ASTNode(NodeType.TMP);
+      const tmp: ASTNode = new ASTNode();
 
       if (this.rule.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
@@ -300,7 +300,7 @@ export class OneOrManyRule extends SingleChildRule {
     let anyParseSuccess: boolean = false;
     do {
       const save: number = tokenBuffer.currentPosition;
-      const tmp: ASTNode = new ASTNode(NodeType.TMP);
+      const tmp: ASTNode = new ASTNode();
       if (this.rule?.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
         anyParseSuccess = true;

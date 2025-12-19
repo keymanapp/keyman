@@ -589,7 +589,7 @@ export class UsingKeysRule extends SingleChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    if (this.rule.parse(tokenBuffer, new ASTNode(NodeType.TMP))) {
+    if (this.rule.parse(tokenBuffer, new ASTNode())) {
       node.addChild(new ASTNode(NodeType.USING_KEYS));
       return true;
     }
@@ -619,7 +619,7 @@ export class ProductionBlockRule extends SingleChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const tmp: ASTNode = new ASTNode();
     if (this.rule.parse(tokenBuffer, tmp)) {
       const productionNode = new ASTNode(NodeType.PRODUCTION);
       productionNode.addChild(tmp.getSoleChildOfType(NodeType.LHS));

@@ -19,7 +19,7 @@ let copyright: ASTNode = null;
 let version: ASTNode   = null;
 
 function initVariables(): void {
-  root      = new ASTNode(NodeType.TMP);
+  root      = new ASTNode();
   bitmap    = new ASTNode(NodeType.BITMAP);
   copyright = new ASTNode(NodeType.COPYRIGHT);
   version   = new ASTNode(NodeType.VERSION);
@@ -29,7 +29,7 @@ describe("Tree Construction Tests", () => {
   describe("ASTNode Tests", () => {
     describe("ASTNode.constructor()", () => {
       it("can construct an ASTNode", () => {
-        const root = new ASTNode(NodeType.TMP);
+        const root = new ASTNode();
         assert.isNotNull(root);
         assert.equal(root.toString(), '[TMP]');
       });

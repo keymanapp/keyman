@@ -35,7 +35,7 @@ class TrueRule extends Rule {
     if (tokenBuffer.currentToken().isTokenType(TokenType.EOF))
       return false;
     tokenBuffer.popToken();
-    node.addChild(new ASTNode(NodeType.TMP));
+    node.addChild(new ASTNode());
     return true;
   }
 }
@@ -60,7 +60,7 @@ let parameters: Token[]      = null;
 describe("Recursive Descent Tests", () => {
   beforeEach(() => {
     tokenBuffer = new TokenBuffer(LIST_OF_ONE);
-    root        = new ASTNode(NodeType.TMP);
+    root        = new ASTNode();
     trueRule    = new TrueRule();
     falseRule   = new FalseRule();
     parameters  = [];
