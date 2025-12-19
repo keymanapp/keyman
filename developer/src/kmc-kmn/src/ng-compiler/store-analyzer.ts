@@ -11,8 +11,8 @@
 import { TokenType } from "./token-type.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
-import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SingleChildRuleWithASTRebuild } from "./recursive-descent.js";
-import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
+import { Rule, SingleChildRule, SingleChildRuleWithASTRebuild, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
