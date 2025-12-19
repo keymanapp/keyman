@@ -16,7 +16,7 @@
     <script>
         const searchParams = new URLSearchParams(window.location.search);
         const keyboard = {
-          id: 'test',
+          id: searchParams.get('id'),
           name: 'Test Keyboard',
           languages: { id: 'en', name: 'English' },
           filename: searchParams.get('keyboard')

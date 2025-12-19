@@ -47,13 +47,14 @@ const testsToFix = {
     'k_0202___alt.kmn',
     'k_0203___generic_ctrlalt.kmn',
     'k_0400___groups_and_virtual_keys.kmn', // kmx only
-    'k_0501___options_with_preset.kmn',
-    'k_0503___options_with_save_and_preset.kmn',
-    'k_0504___options_with_reset.kmn',
-    'k_0505___options_double_set_reset.kmn',
-    'k_0506___options_double_set_staged.kmn',
-    'k_0507___options___double_reset_staged.kmn',
-    'k_0508___options___double_reset.kmn',
+    'k_0501___options_with_preset.kmn', // kmx only
+    'k_0502___options_with_save.kmn', // kmx only
+    'k_0503___options_with_save_and_preset.kmn', // kmx only
+    'k_0504___options_with_reset.kmn', // kmx only
+    'k_0505___options_double_set_reset.kmn', // kmx only
+    'k_0506___options_double_set_staged.kmn', // kmx only
+    'k_0507___options___double_reset_staged.kmn', // kmx only
+    'k_0508___options___double_reset.kmn', // kmx only
     'k_0600___system_stores.kmn',
     'k_0601___system_stores_2.kmn',
     'k_0700___caps_lock.kmn',
@@ -68,13 +69,6 @@ const testsToFix = {
     'k_0201___ralt_2.kmn',  // #15358
     'k_0202___alt.kmn',     // #15358
     'k_0203___generic_ctrlalt.kmn',
-    'k_0501___options_with_preset.kmn',
-    'k_0503___options_with_save_and_preset.kmn',
-    'k_0504___options_with_reset.kmn',
-    'k_0505___options_double_set_reset.kmn',
-    'k_0506___options_double_set_staged.kmn',
-    'k_0507___options___double_reset_staged.kmn',
-    'k_0508___options___double_reset.kmn',
     'k_0600___system_stores.kmn',
     'k_0601___system_stores_2.kmn',
     'k_0700___caps_lock.kmn',
@@ -108,6 +102,7 @@ test.describe('Baseline tests', () => {
             return;
           }
 
+          const kbdId = `Keyboard_${file.replace(/\.kmn$/, '')}`;
           const testSource = new KmxTestSource();
           const result = testSource.loadSource(path.join(KeymanRoot(), testDir, file));
           if (result !== 0) {
@@ -135,12 +130,31 @@ test.describe('Baseline tests', () => {
             return;
           }
 
-          await page.goto(`http://localhost:3000/src/test/auto/e2e/baseline/baseline.tests.html?keyboard=${testDir}/${kbdFile}`);
+          // Initialize option stores by setting cookies
+          if (testSource.options) {
+            const cookies = [];
+            for (const option of testSource.options) {
+              if (option.type === 'input') {
+                cookies.push({
+                  name: `KeymanWeb_${kbdId}_Option_${option.key}`,
+                  value: encodeURIComponent(`${option.key}=${option.value};`),
+                  domain: 'localhost',
+                  path: '/',
+                  expires: 1768672167
+                });
+              }
+            }
+            if (cookies.length > 0) {
+              await page.context().addCookies(cookies);
+            }
+          }
+
+          // Open page
+          await page.goto(`http://localhost:3000/src/test/auto/e2e/baseline/baseline.tests.html?keyboard=${testDir}/${kbdFile}&id=${kbdId}`);
           await page.evaluate(async () => { await window.KmwLoaded; });
           const textarea = page.locator('#inputarea');
           await textarea.click();
 
-          // TODO-web-core: set options from test source
           // TODO-web-core: set capslock state
 
           // set context
@@ -152,10 +166,25 @@ test.describe('Baseline tests', () => {
           await pressKeys(page, testSource.keys);
 
           // verify output
-          await expect(textarea).toHaveValue(testSource.expected, { timeout: 500 });
-        });
+          await expect(textarea, `Verify output is '${testSource.expected}'`).toHaveValue(testSource.expected, { timeout: 500 });
 
-      }
+          // verify persisted options
+          if (testSource.options) {
+            const cookies = await page.context().cookies();
+            for (const option of testSource.options) {
+              if (option.type === 'saved') {
+                const cookieName = `KeymanWeb_${kbdId}_Option_${option.key}`;
+                const cookie = cookies.find(c => c.name === cookieName);
+                expect(cookie, `Cookie '${cookieName}' not found`).toBeDefined();
+                if (cookie) {
+                  const decodedValue = decodeURIComponent(cookie.value);
+                  expect(decodedValue, `Cookie for '${option.key}' has unexpected value '${decodedValue}' instead of '${option.value}'`).toEqual(`${option.key}=${option.value};`);
+                }
+              }
+            }
+          }
+        });
+      };
     });
   }
 });
