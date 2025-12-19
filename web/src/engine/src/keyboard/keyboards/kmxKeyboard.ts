@@ -7,6 +7,7 @@ import { ActiveKey, ActiveSubKey } from './activeLayout.js';
 import { StateKeyMap } from './stateKeyMap.js';
 import { KeyEvent } from '../keyEvent.js';
 import { TextStore } from '../textStore.js';
+import { NotifyEventCode } from './keyboardLoaderBase.js';
 
 /**
  * Acts as a wrapper class for KMX(+) Keyman keyboards
@@ -101,13 +102,13 @@ export class KMXKeyboard {
   /**
    * Notifies keyboard of keystroke or other event
    *
-   * @param       {number}    eventCode     key code (16-18: Shift, Control or Alt),
-   *                                        or 0 for focus
-   * @param       {TextStore} textStore     textStore
-   * @param       {boolean}   data          true for KeyDown or FocusReceived,
-   *                                        false for KeyUp or FocusLost
+   * @param       {NotifyEventCode}  eventCode     key code (16-18: Shift, Control or Alt),
+   *                                               or 0 for focus
+   * @param       {TextStore}        textStore     textStore
+   * @param       {number}           data          1 for KeyDown or FocusReceived,
+   *                                               0 for KeyUp or FocusLost
    */
-  public notify(eventCode: number, textStore: TextStore, data: boolean): void { // I2187
+  public notify(eventCode: NotifyEventCode, textStore: TextStore, data: number): void { // I2187
     // TODO-web-core: do we need to support this? (#15290)
   }
 
