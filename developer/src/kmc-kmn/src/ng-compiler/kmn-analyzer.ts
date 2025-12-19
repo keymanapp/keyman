@@ -23,13 +23,10 @@ import { ASTRebuild, ChangeNode, GivenNode, NewNode, NewNodeOrTree } from "./ast
  * The Next Generation Parser for the Keyman Keyboard Language.
  *
  * The Parser builds an Abstract Syntax Tree from the supplied TokenBuffer.
- *
  */
 export class Parser {
   /**
    * Construct a Parser
-   *
-   * @param tokenBuffer 
    */
   public constructor(
     /** the TokenBuffer to parse */
@@ -351,7 +348,7 @@ export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
  * SHIFT and CAPS are distinct from other modifiers because
  * they are also used in 'CAPS ALWAYS OFF', 'CAPS ON ONLY' and
  * 'SHIFT FREES CAPS'. As SHIFT and CAPS are separately identified,
- *  a MODIFIER node must be created for them if needed.
+ * a MODIFIER node must be created for them if needed.
  *
  * Uses a ChangeNode to replace the sole child node with a MODIFIER
  * node but retaining the same Token
@@ -592,12 +589,11 @@ export class UsingKeysRule extends SingleChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
+    if (this.rule.parse(tokenBuffer, new ASTNode(NodeType.TMP))) {
       node.addChild(new ASTNode(NodeType.USING_KEYS));
+      return true;
     }
-    return parseSuccess;
+    return false;
   }
 }
 
@@ -624,16 +620,14 @@ export class ProductionBlockRule extends SingleChildRule {
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
-      const lhsNode        = tmp.getSoleChildOfType(NodeType.LHS);
-      const rhsNode        = tmp.getSoleChildOfType(NodeType.RHS);
+    if (this.rule.parse(tokenBuffer, tmp)) {
       const productionNode = new ASTNode(NodeType.PRODUCTION);
-      productionNode.addChild(lhsNode);
-      productionNode.addChild(rhsNode);
+      productionNode.addChild(tmp.getSoleChildOfType(NodeType.LHS));
+      productionNode.addChild(tmp.getSoleChildOfType(NodeType.RHS));
       node.addChild(productionNode);
+      return true;
     }
-    return parseSuccess;
+    return false;
   }
 }
 

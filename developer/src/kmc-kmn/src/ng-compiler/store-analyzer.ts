@@ -326,14 +326,12 @@ abstract class AbstractCapsLockStatementRule extends SingleChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
-    const parseSuccess: boolean = this.rule.parse(tokenBuffer, tmp);
-    if (parseSuccess) {
+    if (this.rule.parse(tokenBuffer, new ASTNode(NodeType.TMP))) {
       // TODO-NG-COMPILER: warning/error for caps lock statements
-      const token: Token = new Token(this.tokenType, '1');
-      node.addNewChildWithToken(this.nodeType, token);
+      node.addNewChildWithToken(this.nodeType, new Token(this.tokenType, '1'));
+      return true;
     }
-    return parseSuccess;
+    return false;
   }
 }
 
