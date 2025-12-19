@@ -47,7 +47,8 @@ export class Parser {
     const kmnTreeRule: Rule = new KmnTreeRule();
     const root: ASTNode = new ASTNode(NodeType.ROOT);
     // TODO-NG-COMPILER: fatal error if parse returns false
-    return kmnTreeRule.parse(this.tokenBuffer, root) ? root : null;
+    kmnTreeRule.parse(this.tokenBuffer, root);
+    return root;
   }
 }
 

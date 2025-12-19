@@ -216,35 +216,6 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[2].nodeType, NodeType.LINE);
     });
   });
-  // describe("FinalLineRule Tests", () => {
-  //   it("can construct a FinalLineRule", () => {
-  //     tokenBuffer = stringToTokenBuffer('');
-  //     const line: Rule = new FinalLineRule();
-  //     assert.isNotNull(line);
-  //   });
-  //   it("can parse correctly (empty line)", () => {
-  //     tokenBuffer = stringToTokenBuffer('');
-  //     const line: Rule = new FinalLineRule();
-  //     assert.isTrue(line.parse(tokenBuffer, root));
-  //     assert.isFalse(root.hasChildren());
-  //   });
-  //   it("can parse correctly (space)", () => {
-  //     tokenBuffer = stringToTokenBuffer(' ');
-  //     const line: Rule = new FinalLineRule();
-  //     assert.isTrue(line.parse(tokenBuffer, root));
-  //     const lineNode = root.getSoleChildOfType(NodeType.LINE);
-  //     assert.isNotNull(lineNode);
-  //     assert.deepEqual(lineNode.token.line, ' ');
-  //   });
-  //   it("can parse correctly (comment)", () => {
-  //     tokenBuffer = stringToTokenBuffer('c final line');
-  //     const line: Rule = new FinalLineRule();
-  //     assert.isTrue(line.parse(tokenBuffer, root));
-  //     const lineNode = root.getSoleChildOfType(NodeType.LINE);
-  //     assert.isNotNull(lineNode);
-  //     assert.deepEqual(lineNode.token.line, 'c final line');
-  //   });
-  // });
   describe("CompileTargetRule Tests", () => {
     it("can construct a CompileTargetRule", () => {
       tokenBuffer = stringToTokenBuffer('');
