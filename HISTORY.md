@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.181 alpha 2025-12-20
+
+* fix(developer): clear message when selecting custom layer name in touch layout editor (#15371)
+* fix(developer): prevent duplicate layer name in Layer Properties dialog (#15372)
+
 ## 19.0.180 alpha 2025-12-19
 
 * fix(mac): ensure retry for mac disk detach actually repeats (#15330)
