@@ -30,6 +30,19 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchPath implements SearchSpace {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
+
+  /**
+   * Holds all incoming Nodes generated from a parent `SearchSpace` that have not yet been
+   * extended with this `SearchSpace`'s input.
+   */
+  private incomingNodes: SearchNode[] = [];
+
+  /**
+   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
+   * this SearchPath but not yet by child SearchSpaces.
+   */
+  private childBuffers: SearchNode[][] = [];
+
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
@@ -135,6 +148,7 @@ export class SearchPath implements SearchSpace {
       this.codepointLength = baseLength + this.edgeLength - deleteLeft;
 
       this.addEdgesForNodes(parentSpace.previousResults.map(r => r.node));
+      parentSpace.addResultBuffer(this.incomingNodes);
 
       return;
     }
@@ -386,6 +400,14 @@ export class SearchPath implements SearchSpace {
   }
 
   public get currentCost(): number {
+    if(this.incomingNodes.length > 0) {
+      this.addEdgesForNodes(this.incomingNodes);
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
+    }
+
     const parentCost = this.parentSpace?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -416,10 +438,18 @@ export class SearchPath implements SearchSpace {
    * @returns
    */
   public handleNextNode(): PathResult {
+    if(this.incomingNodes.length > 0) {
+      this.addEdgesForNodes(this.incomingNodes);
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
+    }
+
     const parentCost = this.parentSpace?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
-    if(parentCost <= localCost) {
+    if(parentCost < localCost) {
       if(parentCost == Number.POSITIVE_INFINITY) {
         return {
           type: 'none'
@@ -427,6 +457,12 @@ export class SearchPath implements SearchSpace {
       }
 
       const result = this.parentSpace.handleNextNode();
+      // The parent will insert the node into our queue.  We don't need it, though
+      // any siblings certainly will.
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
 
       if(result.type == 'complete') {
         this.addEdgesForNodes([result.finalNode]);
@@ -492,6 +528,7 @@ export class SearchPath implements SearchSpace {
         }
       }
 
+      this.bufferNode(currentNode);
       return {
         type: 'complete',
         cost: currentNode.currentCost,
@@ -506,6 +543,14 @@ export class SearchPath implements SearchSpace {
 
   public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  }
+
+  public addResultBuffer(nodeBuffer: SearchNode[]): void {
+    this.childBuffers.push(nodeBuffer);
+  }
+
+  private bufferNode(node: SearchNode) {
+    this.childBuffers.forEach((buf) => buf.push(node));
   }
 
   public get inputSegments(): InputSegment[] {

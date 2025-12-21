@@ -653,6 +653,7 @@ export async function *getBestMatches(searchSpaces: SearchSpace[], timer: Execut
       let bestQueue = spaceQueue.dequeue();
       const newResult = bestQueue.handleNextNode();
       spaceQueue.enqueue(bestQueue);
+      spaceQueue.heapify();
 
       if(newResult.type == 'none') {
         return null;
