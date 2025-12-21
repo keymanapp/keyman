@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="23504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="KMInfoWindowController">
             <connections>
-                <outlet property="detailsView" destination="cVO-yK-1Qn" id="cmF-11-wQ4"/>
+                <outlet property="detailsWebview" destination="xyg-gW-IdZ" id="cRi-kx-bap"/>
                 <outlet property="imageView" destination="F1E-YB-Uhg" id="Gb3-lx-84K"/>
-                <outlet property="readmeView" destination="HAD-YI-C2y" id="GaJ-f3-vhy"/>
+                <outlet property="readmeWebView" destination="yrE-En-q6Q" id="2mb-8b-gvY"/>
                 <outlet property="tabView" destination="pMz-6U-hBH" id="Rtw-5e-A4E"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" nonactivatingPanel="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="700" height="280"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="700" height="280"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -36,16 +36,36 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
-                            <tabViewItem label="Details" identifier="1" id="Fvy-XJ-s38">
-                                <view key="view" ambiguous="YES" id="cVO-yK-1Qn" customClass="WebView">
-                                    <rect key="frame" x="10" y="7" width="140" height="0.0"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                </view>
-                            </tabViewItem>
-                            <tabViewItem label="Read Me" identifier="2" id="waA-IW-Qyn">
-                                <view key="view" id="HAD-YI-C2y" customClass="WebView">
+                            <tabViewItem label="Details" identifier="1" id="BUK-3Z-CVF" userLabel="Details">
+                                <view key="view" id="9II-Uz-JiR">
                                     <rect key="frame" x="10" y="7" width="526" height="233"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <wkWebView wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xyg-gW-IdZ">
+                                            <rect key="frame" x="10" y="7" width="526" height="233"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <wkWebViewConfiguration key="configuration">
+                                                <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                                <wkPreferences key="preferences"/>
+                                            </wkWebViewConfiguration>
+                                        </wkWebView>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Read Me" identifier="2" id="F7A-4f-0Fn" userLabel="Read Me">
+                                <view key="view" id="5BQ-7S-SzP">
+                                    <rect key="frame" x="10" y="7" width="526" height="233"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <wkWebView wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yrE-En-q6Q">
+                                            <rect key="frame" x="10" y="7" width="526" height="233"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <wkWebViewConfiguration key="configuration">
+                                                <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                                <wkPreferences key="preferences"/>
+                                            </wkWebViewConfiguration>
+                                        </wkWebView>
+                                    </subviews>
                                 </view>
                             </tabViewItem>
                         </tabViewItems>

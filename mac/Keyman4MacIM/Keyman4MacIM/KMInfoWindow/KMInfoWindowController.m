@@ -12,12 +12,13 @@
 #import "KMKeyboardInfo.h"
 #import "KMLogs.h"
 #import <WebKit/WebKit.h>
+@import Sentry;
 
 @interface KMInfoWindowController ()
 @property (nonatomic, weak) IBOutlet NSImageView *imageView;
 @property (nonatomic, weak) IBOutlet NSTabView *tabView;
-@property (nonatomic, weak) IBOutlet WebView *detailsView;
-@property (nonatomic, weak) IBOutlet WebView *readmeView;
+@property (nonatomic, strong) IBOutlet WKWebView *detailsWebView;
+@property (nonatomic, strong) IBOutlet WKWebView *readmeWebView;
 @property (nonatomic, strong) KMPackageInfo *packageInfo;
 @property (nonatomic, strong) NSTabViewItem *readMeTab;
 @end
@@ -32,10 +33,8 @@
   [super windowDidLoad];
   
   [self.tabView setDelegate:self];
-  [self.detailsView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-  [self.detailsView setPolicyDelegate:(id<WebPolicyDelegate>)self];
-  [self.readmeView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-  [self.readmeView setPolicyDelegate:(id<WebPolicyDelegate>)self];
+  self.detailsWebView.navigationDelegate = self;
+  self.readmeWebView.navigationDelegate = self;
 }
 
 // TODO: rename, refactor, reset PackageInfo directly rather than making getter do it?
@@ -55,21 +54,23 @@
     }
     
     NSString *detailsHtml = [self detailsHtml];
-    if (detailsHtml != nil)
-      [self.detailsView.mainFrame loadHTMLString:detailsHtml baseURL:[[NSBundle mainBundle] resourceURL]];
-    else
-      [self.detailsView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    if (detailsHtml != nil) {
+      [self.detailsWebView loadHTMLString:detailsHtml baseURL:[[NSBundle mainBundle] resourceURL]];
+    }
+    else {
+      [self.detailsWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    }
     
     NSString *readmeFilename = self.packageInfo.readmeFilename;
     if (readmeFilename != nil) {
-      [self.readmeView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[packagePath stringByAppendingPathComponent:readmeFilename]]]];
+      [self.readmeWebView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[packagePath stringByAppendingPathComponent:readmeFilename]]]];
       if (_readMeTab != nil && ![self.tabView.tabViewItems containsObject:_readMeTab]) {
         [self.tabView addTabViewItem:_readMeTab];
         _readMeTab = nil;
       }
     }
     else {
-      [self.readmeView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+      [self.readmeWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
       if ([self.tabView.tabViewItems count] > 1) {
         _readMeTab = [self.tabView tabViewItemAtIndex:1];
         [self.tabView removeTabViewItem:_readMeTab];
@@ -211,17 +212,39 @@
   return _packageInfo;
 }
 
-- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-  NSNumber *navType = [actionInformation objectForKey:WebActionNavigationTypeKey];
-  if (navType.integerValue == WebNavigationTypeLinkClicked && ![request.URL isFileURL]) {
-    NSString *urlStr = [[request URL] absoluteString];
-    if ([urlStr startsWith:@"link:"])
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+
+  os_log_debug([KMLogs uiLog], "KMInfoWindowController decidePolicyForNavigationAction, navigating to %{public}@", navigationAction.request.URL);
+
+  if (navigationAction.navigationType == WebNavigationTypeLinkClicked && ![navigationAction.request.URL isFileURL]) {
+    NSString *urlStr = [navigationAction.request.URL absoluteString];
+    if ([urlStr startsWith:@"link:"]) {
       urlStr = [urlStr substringFromIndex:5];
+    }
     
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlStr]];
   }
   else
-    [listener use];
+    decisionHandler(WKNavigationActionPolicyAllow);
+}
+
+- (void) webView:(WKWebView *) webView
+didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *) navigation {
+  os_log_debug([KMLogs uiLog], "KMInfoWindowController didReceiveServerRedirectForProvisionalNavigation");
+}
+
+- (void) webView:(WKWebView *) webView
+didFailProvisionalNavigation:(WKNavigation *) navigation
+       withError:(NSError *) error {
+  os_log_error([KMLogs uiLog], "KMInfoWindowController didFailProvisionalNavigation, error: %{public}@", error);
+  [SentrySDK captureError:(error)];
+}
+
+- (void) webView:(WKWebView *) webView
+didFailNavigation:(WKNavigation *) navigation
+       withError:(NSError *) error {
+  os_log_error([KMLogs uiLog], "KMInfoWindowController didFailNavigation, error: %{public}@", error);
+  [SentrySDK captureError:(error)];
 }
 
 @end
