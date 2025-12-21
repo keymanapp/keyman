@@ -1987,23 +1987,17 @@ begin
   if not IsWow64 then Exit;   // I4374
 
   try
-    // TODO: use TKeymanPaths to find keymanx64?
-    dir := ExtractFilePath(ParamStr(0));
-    cmd := dir + 'keymanx64.exe';
+    cmd := TKeymanPaths.KeymanEngineExecutablePath('keymanx64.exe');
+    dir := ExtractFileDir(cmd);
     params := Format('%d %d', [GetCurrentProcessId, Application.Handle]);
-
-    if not FileExists(cmd) then
-      // We'll get notification of the issue but it won't
-      // crash the process
-      raise Exception.Create(cmd+' could not be found');
 
     FillChar(sei, SizeOf(sei), 0);
     sei.cbSize := SizeOf(sei);
     sei.Wnd := Handle;
     sei.lpVerb := 'open';
-    sei.lpFile := PWideChar(cmd);
+    sei.lpFile := PChar(cmd);
     sei.lpParameters := PChar(params);
-    sei.lpDirectory := PWideChar(dir);
+    sei.lpDirectory := PChar(dir);
     sei.nShow := SW_SHOW;
 
     if not ShellExecuteExW(@sei) then
@@ -2014,6 +2008,8 @@ begin
       // We're going to handle any exceptions here but we'd like to know that
       // they happened
       TKeymanSentryClient.ReportHandledException(E, 'Error starting keymanx64', True);
+      // TODO: it might be important to tell the user that Keyman is not running
+      // normally - x64 processes will not receive mapping
     end;
   end;
 end;
