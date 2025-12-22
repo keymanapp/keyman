@@ -48,7 +48,7 @@ function configureFilePathing(path: string, configurationBasePath: string) {
   }
 }
 
-export default class KeyboardStub extends KeyboardProperties {
+export class KeyboardStub extends KeyboardProperties {
   KR: string;
   KRC: string;
   KF: string;

@@ -247,7 +247,7 @@ function deregisterModel(modelID) {
 }
 
 function enableSuggestions(model, suggestionType) {
-  // Set the options first so that KMW's ModelManager can properly handle model enablement states
+  // Set the options first so that KMW's ModelCache can properly handle model enablement states
   // the moment we actually register the new model.
   // Use console_debug
   console_debug('enableSuggestions(model, maySuggest='+suggestionType+')');
