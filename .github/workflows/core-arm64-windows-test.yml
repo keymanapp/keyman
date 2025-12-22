@@ -135,23 +135,27 @@ jobs:
     steps:
     - name: Set success
       if: needs.core-arm64-windows-test.result == 'success'
+      shell: bash
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Keyman Core ARM64 test succeeded" >> $GITHUB_ENV
 
     - name: Set cancelled
       if: needs.core-arm64-windows-test.result == 'cancelled'
+      shell: bash
       run: |
         echo "RESULT=error" >> $GITHUB_ENV
         echo "MSG=Keyman Core ARM64 test cancelled" >> $GITHUB_ENV
 
     - name: Set failure
       if: needs.core-arm64-windows-test.result == 'failure'
+      shell: bash
       run: |
         echo "RESULT=failure" >> $GITHUB_ENV
         echo "MSG=Keyman Core ARM64 test failed" >> $GITHUB_ENV
 
     - name: Set final status
+      shell: bash
       run: |
         gh api \
           --method POST \
