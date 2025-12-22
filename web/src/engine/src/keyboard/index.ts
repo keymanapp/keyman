@@ -4,7 +4,7 @@ export { JSKeyboard, LayoutState } from "./keyboards/jsKeyboard.js";
 export { KeyboardMinimalInterface } from './keyboards/keyboardMinimalInterface.js';
 export { KMXKeyboard } from './keyboards/kmxKeyboard.js';
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
-export { Keyboard, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
+export { NotifyEventCode, Keyboard, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
 export { BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
 export {

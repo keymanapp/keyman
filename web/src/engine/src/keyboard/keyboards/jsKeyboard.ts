@@ -14,6 +14,7 @@ type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
 import { Version, DeviceSpec } from "keyman/common/web-utils";
 import { StateKeyMap } from "./stateKeyMap.js";
+import { NotifyEventCode } from './keyboardLoaderBase.js';
 
 /**
  * Stores preprocessed properties of a keyboard for quick retrieval later.
@@ -356,11 +357,12 @@ export class JSKeyboard {
   /**
    * Notifies keyboard of keystroke or other event
    *
-   * @param       {number}    command     event code (16,17,18) or 0
-   * @param       {TextStore} textStore   textStore
-   * @param       {number}    data        1 or 0
+   * @param       {NotifyEventCode}  command     event code (16,17,18) or 0
+   * @param       {TextStore}        textStore   textStore
+   * @param       {number}           data        1 for KeyDown or FocusReceived,
+   *                                             0 for KeyUp or FocusLost
    */
-  public notify(command: number, textStore: TextStore, data: number): void { // I2187
+  public notify(command: NotifyEventCode, textStore: TextStore, data: number): void { // I2187
     // Good example use case - the Japanese CJK-picker keyboard
     if(typeof(this.scriptObject['KNS']) == 'function') {
       this.scriptObject['KNS'](command, textStore, data);
