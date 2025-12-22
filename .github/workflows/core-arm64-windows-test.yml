@@ -130,7 +130,7 @@ jobs:
   set_status:
     name: Set result status on PR builds
     needs: [core-arm64-windows-test]
-    runs-on: windows-arm64
+    runs-on: windows-11-arm
     if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
     steps:
     - name: Set success
