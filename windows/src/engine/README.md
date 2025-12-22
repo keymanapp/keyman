@@ -13,7 +13,7 @@ Host application for the Keyman Engine. Shows the Keyman icon, Keyman menu, OSK,
 
 ## keyman32 - keyman32.dll | keyman64.dll | keymanarm64.dll
 
-Main keyboard processing library and hook library (x86, x64, arm64).
+ Main keyboard processing library and hook library (x86, x64, arm64).
 
 ## keymanmc - keymanmc.dll
 
