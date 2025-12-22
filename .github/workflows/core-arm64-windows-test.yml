@@ -52,7 +52,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description='Keyman Core - ARM64 test started' \
@@ -156,7 +156,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state="$RESULT" \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description="$MSG" \
