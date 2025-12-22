@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.182 alpha 2025-12-22
+
+* maint(common): Fix crowdin sync version to v2.7.0 (#15373)
+* chore(linux): Update keyman-config.pot strings (#15366)
+* chore(windows): show architecture in support texteditor (#15378)
+
 ## 19.0.181 alpha 2025-12-20
 
 * fix(developer): clear message when selecting custom layer name in touch layout editor (#15371)
