@@ -633,7 +633,7 @@ void HandleRefresh(int code, LONG tag)
     if (UpdateRefreshTag(tag)) {
 #ifdef _WIN64
       if (Globals::get_InitialisingThread() == GetCurrentThreadId()) {
-        // If this is the keymanx64 thread, then we should
+        // If this is the keyman.x64 or keymanarm64 thread, then we should
         // go ahead and process the refresh immediately so
         // that global settings are updated
         RefreshKeyboards(FALSE);
