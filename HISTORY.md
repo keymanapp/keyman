@@ -1,5 +1,101 @@
 # Keyman Version History
 
+## 19.0.183 alpha 2025-12-22
+
+* maint(core): remove leading slash on gh api call parameter (#15381)
+* maint(core): fix test runner runs-on (#15382)
+
+## 19.0.182 alpha 2025-12-22
+
+* maint(common): Fix crowdin sync version to v2.7.0 (#15373)
+* chore(linux): Update keyman-config.pot strings (#15366)
+* chore(windows): show architecture in support texteditor (#15378)
+
+## 19.0.181 alpha 2025-12-20
+
+* fix(developer): clear message when selecting custom layer name in touch layout editor (#15371)
+* fix(developer): prevent duplicate layer name in Layer Properties dialog (#15372)
+
+## 19.0.180 alpha 2025-12-19
+
+* fix(mac): ensure retry for mac disk detach actually repeats (#15330)
+* fix(developer): handle Enter key in dialogs in Touch Layout Editor (#15338)
+* chore(windows): fix typo in error message (#15362)
+* chore(common): Update crowdin strings for PT (#15368)
+
+## 19.0.179 alpha 2025-12-18
+
+* fix(linux): fix persisting options (#15364)
+
+## 19.0.178 alpha 2025-12-17
+
+* chore(windows): correct kbda1 to kbdth0 in comment in unit test (#15351)
+
+## 19.0.177 alpha 2025-12-16
+
+* feat(windows): report a sentry event when low level hook is reinstalled (#15335)
+* chore(linux): add manual test for localization (#15356)
+* feat(developer): show keyboard version in web debugger (#15339)
+
+## 19.0.176 alpha 2025-12-13
+
+* chore(windows): remove unused variable (#15334)
+
+## 19.0.175 alpha 2025-12-12
+
+* fix(windows): use Thai Kedmanee instead of Arabic 101 in RightAltEmulationCheck.tests.cpp (#15346)
+
+## 19.0.174 alpha 2025-12-10
+
+* chore(windows): simple bisect utility for checking setup-redist.exe file size (#15322)
+
+## 19.0.173 alpha 2025-12-09
+
+* docs(developer): Clarify keystrokes in Step-1 of tutorial (#15326)
+* feat(android): Add Grabbable Bar and settings status for keyboard resizing (#15267)
+* chore(linux): Update debian changelog (#15282)
+* docs(web): fix typo in osk documentation (#15313)
+
+## 19.0.172 alpha 2025-12-08
+
+* docs(web): add links to next/previous page to web guide (#15311)
+* fix(developer): verify project file loaded successfully in analyze (#15318)
+
+## 19.0.171 alpha 2025-12-08
+
+* maint(resources): verify order of builder_describe_internal_dependency (#15257)
+* maint(common): use `builder_launch` for child builds (#15258)
+* change(windows): Revert "change(windows): include map2pdb generation for relevant Delphi projects" (#15276)
+* change(windows): add shortcuts to 'Update Available' dialog (#15280)
+* maint(resources): roll back builder_launch for trigger-release-builds.sh (#15316)
+
+## 19.0.170 alpha 2025-12-03
+
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.1.1 in /resources/build/pr-build-status (#15173)
+* chore(deps-dev): bump glob from 10.4.5 to 10.5.0 in /resources/build/pr-build-status (#15184)
+* chore(deps): bump js-yaml and @microsoft/api-documenter (#15185)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#15186)
+* docs(developer): add/update API docs (#15275)
+
+## 19.0.169 alpha 2025-12-02
+
+* maint(core): verify that keyman_core_ldml.h is in sync (#15256)
+* chore(common): Update FirstVoices keyboard versions in keyboards.csv (#15261)
+
+## 19.0.168 alpha 2025-12-01
+
+* chore(android): add intent to broadcast font name (#15193)
+* docs(android): Document Keyman API for keyboard font change (#15247)
+* docs(ios): Use /cdn/dev assets for Engine guides (#15253)
+* fix(developer): handle errors in .keyman-touch-layout file when loading (#15243)
+* fix(android): address keyboard height vs touch height race after keyboard height preference change (also min max heights + docs) (#13663)
+
+## 19.0.167 alpha 2025-11-28
+
+* change(windows): add unit testing to keyman32 build (#15244)
+* refactor(windows): merge syskbdnt.cpp and syskbdnt64.cpp into RightAltEmulationCheck.cpp (#15245)
+* chore(windows): add wow64kbd support app for researching WOW64 reqs (#15246)
+
 ## 19.0.166 alpha 2025-11-26
 
 * chore(android): Clarify PR title for #15136 (#15224)
@@ -1011,6 +1107,16 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.245 stable 2025-12-03
+
+* chore(windows): VS2022 patch for stable-18.0 (#15081)
+* maint(resources): use VERSION_ENVIRONMENT var for v18 (#15068)
+* chore(linux): Update debian changelog (#14964)
+* fix(windows): add check a fix for registry datatypes (#15175)
+* chore(linux): Update debian changelog (#15132)
+* feat(windows): update wix to 3.14.1 (#15195)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15219)
 
 ## 18.0.244 stable 2025-10-31
 

@@ -4,24 +4,30 @@
 
 ```ts
 
-import { CompilerCallbacks } from '@keymanapp/common-types';
-import { CompilerEvent } from '@keymanapp/common-types';
-import { CompilerOptions } from '@keymanapp/common-types';
-import { KeymanCompiler } from '@keymanapp/common-types';
-import { KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
-import { KeymanCompilerResult } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerOptions } from '@keymanapp/developer-utils';
+import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifact } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
+import { KeymanCompilerResult } from '@keymanapp/developer-utils';
 import { KmpJsonFile } from '@keymanapp/common-types';
 
 // @public
 export class KeyboardInfoCompiler implements KeymanCompiler {
-    constructor();
     // Warning: (ae-forgotten-export) The symbol "KeyboardInfoFileLanguageFont" needs to be exported by the entry point index.d.ts
     //
     // @internal (undocumented)
     fontSourceToKeyboardInfoFont(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile, source: string[]): Promise<KeyboardInfoFileLanguageFont>;
     init(callbacks: CompilerCallbacks, options: KeyboardInfoCompilerOptions): Promise<boolean>;
     run(inputFilename: string, outputFilename?: string): Promise<KeyboardInfoCompilerResult>;
+    // @internal (undocumented)
+    unitTestEndPoints: {
+        fillLanguageMetadata: (language: KeyboardInfoFileLanguage, bcp47: string, commonScript: string, firstBcp47: string) => {
+            commonScript: string;
+            firstBcp47: string;
+        };
+    };
     write(artifacts: KeyboardInfoCompilerArtifacts): Promise<boolean>;
 }
 
@@ -38,6 +44,12 @@ export class KeyboardInfoCompilerMessages {
     static ERROR_CannotBuildWithoutKmpFile: number;
     // (undocumented)
     static Error_CannotBuildWithoutKmpFile: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_DescriptionIsMissing: number;
+    // (undocumented)
+    static Error_DescriptionIsMissing: (o: {
+        filename: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_FileDoesNotExist: number;
     // (undocumented)
@@ -92,6 +104,28 @@ export class KeyboardInfoCompilerMessages {
     static Fatal_UnexpectedException: (o: {
         e: any;
     }) => CompilerEvent;
+    // (undocumented)
+    static HINT_ScriptDoesNotMatch: number;
+    // (undocumented)
+    static Hint_ScriptDoesNotMatch: (o: {
+        script: string;
+        bcp47: string;
+        commonScript: string;
+        firstBcp47: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_LanguageTagNotFound: number;
+    // (undocumented)
+    static Warn_LanguageTagNotFound: (o: {
+        bcp47: string;
+        langSubtag: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_LanguageTagNotFound2: number;
+    // (undocumented)
+    static Warn_LanguageTagNotFound2: (o: {
+        bcp47: string;
+    }) => CompilerEvent;
 }
 
 // @public
@@ -113,6 +147,10 @@ export interface KeyboardInfoSources {
     lastCommitDate?: string;
     sourcePath: string;
 }
+
+// Warnings were encountered during analysis:
+//
+// src/keyboard-info-compiler.ts:674:14 - (ae-forgotten-export) The symbol "KeyboardInfoFileLanguage" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -49,26 +49,31 @@ $(function() {
   // Platform dialogs
   //
 
+  function addPlatformSubmit() {
+    builder.saveUndo();
+
+    var platform = $('#selAddPlatform').val();
+    KVKL[platform] = $.extend(true, {}, KVKL[builder.lastPlatform]);  // copy existing platform
+
+    builder.preparePlatforms();
+    $('#selPlatform').val(platform);
+    builder.selectPlatform();
+
+    builder.generate(false,true);
+
+    $('#addPlatformDialog').dialog('close');
+    return false;
+  }
+
+  $('#addPlatformForm').on('submit', addPlatformSubmit);
+
   $('#addPlatformDialog').dialog({
     autoOpen: false,
     height: 300,
     width: 350,
     modal: true,
     buttons: {
-      "OK": function () {
-        builder.saveUndo();
-
-        var platform = $('#selAddPlatform').val();
-        KVKL[platform] = $.extend(true, {}, KVKL[builder.lastPlatform]);  // copy existing platform
-
-        builder.preparePlatforms();
-        $('#selPlatform').val(platform);
-        builder.selectPlatform();
-
-        builder.generate(false,true);
-
-        $(this).dialog('close');
-      },
+      "OK": addPlatformSubmit,
       "Cancel": function () {
         $(this).dialog('close');
       }
@@ -115,6 +120,10 @@ $(function() {
     builder.generate();
     builder.prepareLayer();
     builder.restoreSelection(selection);
+  });
+
+  $('#platformPropertiesForm').on('submit', function() {
+    $('#platformPropertiesDialog').dialog('close');
   });
 
   $('#platformPropertiesDialog').dialog({
