@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.184 alpha 2025-12-23
+
+* maint(resources): set shell for steps in core-arm64-windows-test.yml (#15387)
+* feat(developer): write UTF-8 .kmn file in kmdecomp (#15390)
+
 ## 19.0.183 alpha 2025-12-22
 
 * maint(core): remove leading slash on gh api call parameter (#15381)
