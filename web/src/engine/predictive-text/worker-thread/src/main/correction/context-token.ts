@@ -24,6 +24,7 @@ import Transform = LexicalModelTypes.Transform;
 export interface TokenInputSource {
   trueTransform: Transform;
   inputStartIndex: number;
+  bestProbFromSet: number;
 }
 
 /**
@@ -123,15 +124,15 @@ export class ContextToken {
       rawText ||= '';
 
       // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
-      const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
-        return [{sample: transform, p: 1.0}];
-      });
-      rawTransformDistributions.forEach((entry) => {
+      // Build a token that represents the current text with no ambiguity - probability at max (1.0)
+      const BASE_PROBABILITY = 1;
+      textToCharTransforms(rawText).forEach((transform) => {
         this._inputRange.push({
-          trueTransform: entry[0].sample,
-          inputStartIndex: 0
+          trueTransform: transform,
+          inputStartIndex: 0,
+          bestProbFromSet: BASE_PROBABILITY
         });
-        this.searchSpace.addInput(entry);
+        this.searchSpace.addInput([{sample: transform, p: BASE_PROBABILITY}], 1);
       });
     }
   }
@@ -142,7 +143,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this.searchSpace.addInput(distribution);
+    this.searchSpace.addInput(distribution, inputSource.bestProbFromSet);
   }
 
   /**
@@ -350,7 +351,8 @@ export class ContextToken {
         backupToken = new ContextToken(constructingToken);
         constructingToken.addInput({
           trueTransform: priorSourceInput.trueTransform,
-          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded
+          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded,
+          bestProbFromSet: priorSourceInput.bestProbFromSet
         }, tailDistribution);
 
         const lenToCommit = lenBeforeLastApply + extraCharsAdded;
