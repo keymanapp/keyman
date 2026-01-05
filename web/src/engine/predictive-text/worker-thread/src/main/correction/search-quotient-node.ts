@@ -3,7 +3,7 @@
  *
  * Created by jahorton on 2025-10-09
  *
- * This file the predictive-text engine's SearchSpace class, which is used to
+ * This file defines the predictive-text engine's SearchSpace class, which is used to
  * manage the search-space(s) for text corrections within the engine.
  */
 
