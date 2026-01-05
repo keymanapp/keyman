@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, models, SearchPath } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
@@ -21,7 +21,7 @@ function buildTestTimer() {
   return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
 
-describe('SearchSpace', () => {
+describe('getBestMatches', () => {
   const checkRepeatableResults_teh = async (iter: AsyncGenerator<correction.SearchResult, any, any>) => {
     const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
     assert.isFalse(firstIterResult.done);
@@ -96,7 +96,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchQuotientSpur(testModel);
 
     const iter = getBestMatches(searchSpace, buildTestTimer());
     const firstResult = await iter.next();
@@ -109,7 +109,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchQuotientSpur(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -139,7 +139,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchQuotientSpur(testModel);
 
 
     // VERY artificial distributions.
@@ -175,7 +175,7 @@ describe('SearchSpace', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchPath(testModel);
+    const searchSpace = new SearchQuotientSpur(testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches(searchSpace, timer);
 
