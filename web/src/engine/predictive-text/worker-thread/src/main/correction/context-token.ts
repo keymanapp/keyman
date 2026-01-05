@@ -124,16 +124,15 @@ export class ContextToken {
       rawText ||= '';
 
       // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
-      const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
-        return [{sample: transform, p: 1.0}];
-      });
-      rawTransformDistributions.forEach((entry) => {
+      // Build a token that represents the current text with no ambiguity - probability at max (1.0)
+      const BASE_PROBABILITY = 1;
+      textToCharTransforms(rawText).forEach((transform) => {
         this._inputRange.push({
-          trueTransform: entry[0].sample,
+          trueTransform: transform,
           inputStartIndex: 0,
-          bestProbFromSet: 1
+          bestProbFromSet: BASE_PROBABILITY
         });
-        this.searchSpace.addInput(entry, 1);
+        this.searchSpace.addInput([{sample: transform, p: BASE_PROBABILITY}], 1);
       });
     }
   }
