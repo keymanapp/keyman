@@ -7,7 +7,7 @@ import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalize
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
-import { SearchPath } from './correction/search-path.js';
+import { SearchQuotientSpur } from './correction/search-quotient-spur.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Configuration = LexicalModelTypes.Configuration;
@@ -146,7 +146,7 @@ export class ModelCompositor {
     // Section 1:  determine 'prediction roots' - enumerate corrections from most to least likely,
     // searching for results that yield viable predictions from the model.
 
-    const SEARCH_TIMEOUT = SearchPath.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
+    const SEARCH_TIMEOUT = SearchQuotientSpur.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
     const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
 
     const { postContextState, rawPredictions, revertableTransitionId } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);

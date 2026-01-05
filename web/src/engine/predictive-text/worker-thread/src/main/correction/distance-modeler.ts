@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { QUEUE_NODE_COMPARATOR, SearchPath } from './search-path.js';
+import { QUEUE_NODE_COMPARATOR, SearchQuotientSpur } from './search-quotient-spur.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -180,7 +180,7 @@ export class SearchNode {
     if(this._inputCost !== undefined) {
       return this._inputCost;
     } else {
-      let MIN_P = SearchPath.MIN_KEYSTROKE_PROBABILITY;
+      let MIN_P = SearchQuotientSpur.MIN_KEYSTROKE_PROBABILITY;
       // Should technically re-normalize the sampling distribution.
       // -ln(p) is smaller for larger probabilities, as ln(p) is always <= 0.  Approaches infinity as p => 0.
 
@@ -214,7 +214,7 @@ export class SearchNode {
     // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
     // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
     // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
-    return SearchPath.EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
+    return SearchQuotientSpur.EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
   }
 
   /**
@@ -611,7 +611,7 @@ type CompleteSearchPath = {
 export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 // Current best guesstimate of how compositor will retrieve ideal corrections.
-export async function *getBestMatches(searchSpace: SearchPath, timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+export async function *getBestMatches(searchSpace: SearchQuotientSpur, timer: ExecutionTimer): AsyncGenerator<SearchResult> {
   let currentReturns: {[resultKey: string]: SearchNode} = {};
 
   // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
