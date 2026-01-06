@@ -8,12 +8,12 @@ import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.
 import { QUEUE_NODE_COMPARATOR, SearchQuotientSpur } from './search-quotient-spur.js';
 import { PathResult } from './search-quotient-node.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
+import TransformUtils from '../transformUtils.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
-import TransformUtils from '#./transformUtils.js';
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
