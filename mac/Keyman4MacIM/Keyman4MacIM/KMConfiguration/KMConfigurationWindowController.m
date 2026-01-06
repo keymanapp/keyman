@@ -11,10 +11,11 @@
 #import "KMDataRepository.h"
 #import "KMLogs.h"
 #import "KMSentryHelper.h"
+@import Sentry;
 
 @interface KMConfigurationWindowController ()
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
-@property (nonatomic, weak) IBOutlet WebView *webView;
+@property (nonatomic, strong) IBOutlet WKWebView *webView;
 @property (nonatomic, weak) IBOutlet NSButton *supportBack;
 @property (nonatomic, weak) IBOutlet NSButton *supportForward;
 @property (nonatomic, weak) IBOutlet NSButton *supportHome;
@@ -62,28 +63,43 @@
   _lastReloadDate = [NSDate date];
   [self startTimer];
   
-  [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-  [self.webView setPolicyDelegate:(id<WebPolicyDelegate>)self];
-  
+  self.webView.navigationDelegate = self;
+
   NSURL *homeUrl = [[NSBundle mainBundle] URLForResource:@"index" withExtension:@"html" subdirectory:@"Help"];
-  [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:homeUrl]];
+  [self.webView loadRequest:[NSURLRequest requestWithURL:homeUrl]];
 }
 
-- (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
-  [[NSWorkspace sharedWorkspace] openURL:[actionInformation objectForKey:WebActionOriginalURLKey]];
-  [listener ignore];
-}
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 
-- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-  NSString* url = [[request URL] absoluteString];
-  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %{public}@", url);
-  
+  os_log_debug([KMLogs uiLog], "KMConfigurationWindowController decidePolicyForNavigationAction, navigating to %{public}@", navigationAction.request.URL);
+
+  NSString* url = [navigationAction.request.URL absoluteString];
+
   if([url hasPrefix: @"file:"]) {
-    [listener use];
+    decisionHandler(WKNavigationActionPolicyAllow);
   } else {
-    [listener ignore];
-    [[NSWorkspace sharedWorkspace] openURL: [request URL]];
+    decisionHandler(WKNavigationActionPolicyCancel);
+    [[NSWorkspace sharedWorkspace] openURL: navigationAction.request.URL];
   }
+}
+
+- (void) webView:(WKWebView *) webView
+didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *) navigation {
+  os_log_debug([KMLogs uiLog], "KMConfigurationWindowController didReceiveServerRedirectForProvisionalNavigation");
+}
+
+- (void) webView:(WKWebView *) webView
+didFailProvisionalNavigation:(WKNavigation *) navigation
+       withError:(NSError *) error {
+  os_log_error([KMLogs uiLog], "KMConfigurationWindowController didFailProvisionalNavigation, error: %{public}@", error);
+  [SentrySDK captureError:(error)];
+}
+
+- (void) webView:(WKWebView *) webView
+didFailNavigation:(WKNavigation *) navigation
+       withError:(NSError *) error {
+  os_log_error([KMLogs uiLog], "KMConfigurationWindowController didFailNavigation, error: %{public}@", error);
+  [SentrySDK captureError:(error)];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame; {
@@ -101,8 +117,7 @@
 
 - (IBAction)supportHomeAction:(id)sender {
   NSURL *homeUrl = [[NSBundle mainBundle] URLForResource:@"index" withExtension:@"html" subdirectory:@"Help"];
-  [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:homeUrl]];
-  
+  [self.webView loadRequest:[NSURLRequest requestWithURL:homeUrl]];
 }
 
 - (void)setTableView:(NSTableView *)tableView {
@@ -451,7 +466,9 @@
   
   if (self.AppDelegate.kbHelpWindow_.window != nil)
     [self.AppDelegate.kbHelpWindow_ close];
-  
+
+  os_log_debug([KMLogs uiLog], "KMConfigurationWindowController downloadAction called");
+
   [self.window addChildWindow:self.AppDelegate.downloadKBWindow.window ordered:NSWindowAbove];
   [self.AppDelegate.downloadKBWindow.window centerInParent];
   [self.AppDelegate.downloadKBWindow.window makeKeyAndOrderFront:nil];
