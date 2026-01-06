@@ -34,6 +34,13 @@ enum TimedTaskTypes {
   CORRECTING = 2
 }
 
+enum PathEdge {
+  ROOT = 'root',
+  INSERTION = 'insertion',
+  DELETION = 'deletion',
+  SUBSTITUTION = 'substitution'
+}
+
 /**
  * This type models a partially-processed subset of Transforms to be processed
  * as a batch due to sharing similar properties.
@@ -138,14 +145,14 @@ export class SearchNode {
   readonly spaceId: number;
 
   /**
-   * Notes if the most recent edit processed in the node's represented search path
-   * was not a deletion.  Root nodes are considered to meet this condition.
+   * Notes the edit operation used for the most recent edge in the node's
+   * represented search path.
    */
-  readonly nonDeletion: boolean;
+  private readonly lastEdgeType: PathEdge;
 
   constructor(rootTraversal: LexiconTraversal, spaceId: number, toKey?: (arg0: string) => string);
-  constructor(node: SearchNode, spaceId?: number, isSubstitution?: boolean);
-  constructor(param1: LexiconTraversal | SearchNode, spaceId?: number, param2?: boolean | ((arg0: string) => string)) {
+  constructor(node: SearchNode, spaceId?: number, edgeType?: PathEdge);
+  constructor(param1: LexiconTraversal | SearchNode, spaceId?: number, param2?: PathEdge | ((arg0: string) => string)) {
     if(param1 instanceof SearchNode) {
       const priorNode = param1;
 
@@ -156,7 +163,7 @@ export class SearchNode {
       this.priorInput = priorNode.priorInput.slice(0);
       this.matchedTraversals = priorNode.matchedTraversals.slice();
 
-      this.nonDeletion = param2 as boolean;
+      this.lastEdgeType = param2 as PathEdge;
 
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
@@ -172,7 +179,7 @@ export class SearchNode {
       const toKey = param2 as ((arg0: string) => string);
       this.toKey = toKey || (x => x);
       this.spaceId = spaceId;
-      this.nonDeletion = true;
+      this.lastEdgeType = PathEdge.ROOT;
     }
   }
 
@@ -272,7 +279,7 @@ export class SearchNode {
     // match/substitution.
     if(this.priorInput.length > 0) {
       const priorInput = this.priorInput[this.priorInput.length - 1].sample;
-      if(TransformUtils.isEmpty(priorInput) || !this.nonDeletion) {
+      if(TransformUtils.isEmpty(priorInput) || this.lastEdgeType == PathEdge.DELETION) {
         return [];
       }
     }
@@ -282,7 +289,7 @@ export class SearchNode {
     for(let lexicalChild of this.currentTraversal.children()) {
       let childCalc = this.calculation.addMatchChar(lexicalChild.char);
 
-      let searchChild = new SearchNode(this, this.spaceId, true);
+      let searchChild = new SearchNode(this, this.spaceId, PathEdge.INSERTION);
       searchChild.calculation = childCalc;
       searchChild.priorInput = this.priorInput;
       searchChild.matchedTraversals.push(lexicalChild.traversal());
@@ -394,7 +401,7 @@ export class SearchNode {
 
       keySet.add(char);
 
-      const node = new SearchNode(this, this.spaceId, this.nonDeletion);
+      const node = new SearchNode(this, this.spaceId, this.lastEdgeType);
       node.calculation = calculation;
       node.partialEdge.subsetSubindex++;
       // Append the newly-processed char to the subset's `insert` string.
@@ -442,7 +449,7 @@ export class SearchNode {
       // `insert` string.
       childSubset.insert += SENTINEL_CODE_UNIT;
 
-      const node = new SearchNode(this, this.spaceId, this.nonDeletion);
+      const node = new SearchNode(this, this.spaceId, this.lastEdgeType);
       node.calculation = childCalc;
       node.matchedTraversals.push(childTraversal);
       node.partialEdge.subsetSubindex++;
@@ -491,7 +498,7 @@ export class SearchNode {
           continue;
         }
 
-        const node = new SearchNode(this, edgeId, isSubstitution);
+        const node = new SearchNode(this, edgeId, isSubstitution ? PathEdge.SUBSTITUTION : PathEdge.DELETION);
         node.calculation = edgeCalc;
         node.partialEdge = {
           doSubsetMatching: isSubstitution,
