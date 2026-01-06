@@ -2,9 +2,9 @@ import { EventEmitter } from 'eventemitter3';
 
 import { JSKeyboard } from 'keyman/engine/keyboard';
 
-import OSKViewComponent from './oskViewComponent.interface.js';
+import { OSKViewComponent } from './oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
-import MouseDragOperation from '../input/mouseDragOperation.js';
+import { MouseDragOperation } from '../input/mouseDragOperation.js';
 
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
@@ -30,7 +30,7 @@ interface EventMap {
   unpin: () => void
 }
 
-export default class TitleBar extends EventEmitter<EventMap, TitleBar> implements OSKViewComponent {
+export class TitleBar extends EventEmitter<EventMap, TitleBar> implements OSKViewComponent {
   private _element: HTMLDivElement;
   private _unpinButton: HTMLDivElement;
   private _closeButton: HTMLDivElement;

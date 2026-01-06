@@ -1,6 +1,6 @@
 // Defines the PUA code mapping for the various 'special' modifier/control/non-printing keys on keyboards.
 // `specialCharacters` must be kept in sync with the same variable in constants.js. See also CompileKeymanWeb.pas: CSpecialText10
-const specialCharacters = {
+export const specialCharacters = {
   '*Shift*':    8,
   '*Enter*':    5,
   '*Tab*':      6,
@@ -68,5 +68,3 @@ const specialCharacters = {
   // TODO: Skipping size references
 
 };
-
-export default specialCharacters;

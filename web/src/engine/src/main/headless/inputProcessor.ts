@@ -1,6 +1,6 @@
 // Defines a 'polyfill' of sorts for NPM's events module
 
-import ContextWindow from "./contextWindow.js";
+import { ContextWindow } from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec, isEmptyTransform } from "keyman/common/web-utils";
@@ -172,9 +172,9 @@ export class InputProcessor {
     // The default OSK layout for desktop devices does not include nextlayer info, relying on
     // modifier detection here.
     // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-    if ((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || 
-      (this.activeKeyboard instanceof JSKeyboard && 
-      this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) && 
+    if ((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard ||
+      (this.activeKeyboard instanceof JSKeyboard &&
+      this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) &&
       keyEvent.isSynthetic
     ) {
       // If it's a desktop OSK style and this triggers a layer change,

@@ -3,7 +3,7 @@ import { EventEmitter } from 'eventemitter3';
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 import { Banner } from './banner.js';
-import OSKViewComponent from '../components/oskViewComponent.interface.js';
+import { OSKViewComponent } from '../components/oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { BlankBanner } from './blankBanner.js';
 

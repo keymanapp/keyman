@@ -78,7 +78,7 @@ class MouseStartSnapshot {
   }
 }
 
-export default abstract class MouseDragOperation {
+export abstract class MouseDragOperation {
   private _enabled: boolean;
   private _startCoord: InputEventCoordinate;
   private _mouseStartSnapshot: MouseStartSnapshot;

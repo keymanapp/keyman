@@ -1,7 +1,7 @@
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 // Dotted-decimal version
-export default class Version {
+export class Version {
   public static readonly CURRENT = new Version(KEYMAN_VERSION.VERSION_RELEASE);
 
   // Represents a default version value for keyboards compiled before this was compiled into keyboards.

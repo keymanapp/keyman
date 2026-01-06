@@ -2,14 +2,14 @@ import { DeviceSpec, ManagedPromise, Version } from 'keyman/engine/keyboard';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
 import { EmitterListenerSpy } from 'keyman/engine/events';
 
-import OSKView, { EventMap, type LegacyOSKEventMap, OSKPos, OSKRect } from './oskView.js';
-import TitleBar from '../components/titleBar.js';
-import ResizeBar from '../components/resizeBar.js';
+import { OSKView, EventMap, type LegacyOSKEventMap, OSKPos, OSKRect } from './oskView.js';
+import { TitleBar } from '../components/titleBar.js';
+import { ResizeBar } from '../components/resizeBar.js';
 
-import MouseDragOperation from '../input/mouseDragOperation.js';
+import { MouseDragOperation } from '../input/mouseDragOperation.js';
 import { getViewportScale } from '../screenUtils.js';
-import Configuration from '../config/viewConfiguration.js';
-import TwoStateActivator from './twoStateActivator.js';
+import { ViewConfiguration } from '../config/viewConfiguration.js';
+import { TwoStateActivator } from './twoStateActivator.js';
 import { FloatingOSKCookie, FloatingOSKCookieSerializer } from './floatingOskCookie.js';
 
 /***
@@ -17,11 +17,11 @@ import { FloatingOSKCookie, FloatingOSKCookieSerializer } from './floatingOskCoo
    Copyright 2017 SIL International
 ***/
 
-export interface FloatingOSKViewConfiguration extends Configuration {
+export interface FloatingOSKViewConfiguration extends ViewConfiguration {
   activator?: TwoStateActivator<HTMLElement>;
 }
 
-export default class FloatingOSKView extends OSKView {
+export class FloatingOSKView extends OSKView {
   // OSK positioning fields
   userPositioned: boolean = false;
   specifiedPosition: boolean = false;

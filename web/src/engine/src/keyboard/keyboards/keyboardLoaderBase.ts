@@ -2,7 +2,7 @@ import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
 import { JSKeyboard } from "./jsKeyboard.js";
 import { KMXKeyboard } from './kmxKeyboard.js';
 import { KeyboardHarness } from "./keyboardHarness.js";
-import KeyboardProperties from "./keyboardProperties.js";
+import { KeyboardProperties } from "./keyboardProperties.js";
 import { KeyboardLoadErrorBuilder, StubBasedErrorBuilder, UriBasedErrorBuilder } from './keyboardLoadError.js';
 import { Codes } from '../codes.js';
 

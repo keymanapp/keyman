@@ -3,8 +3,8 @@ import { EventEmitter } from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
-import { PhoneKeyTipOrientation } from "../input/gestures/browser/keytip.js";
-import { default as VisualKeyboard } from "../visualKeyboard.js";
+import { PhoneKeyTipOrientation } from "../input/gestures/browser/phoneKeytip.js";
+import { VisualKeyboard } from "../visualKeyboard.js";
 import { renameSpecialKey } from "./oskKey.js";
 
 /**With edge lengths of 1, to keep flick-text invisible at the start, the

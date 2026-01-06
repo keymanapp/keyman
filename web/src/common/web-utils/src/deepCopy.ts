@@ -6,7 +6,7 @@
  * Description  Makes an actual copy (not a reference) of an object, copying simple members,
  *              arrays and member objects but not functions, so use with care!
  */
-export default function deepCopy<T extends ({[key: string | number | symbol]: any} | Array<any>)>(p:T): T {
+export function deepCopy<T extends ({[key: string | number | symbol]: any} | Array<any>)>(p:T): T {
   // typeof undefined == 'undefined', ![] == false, !{} == false
   if(typeof p != 'object' || !p) {
     return p;

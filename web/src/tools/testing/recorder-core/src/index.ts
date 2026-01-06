@@ -1,9 +1,9 @@
 import { KeyDistribution, KeyEvent, type TextStore, SyntheticTextStore } from "keyman/engine/keyboard";
 
-import Proctor from "./proctor.js";
+import { Proctor } from "./proctor.js";
 
-export { default as Proctor } from "./proctor.js";
-export { default as NodeProctor } from "./nodeProctor.js";
+export { Proctor } from "./proctor.js";
+export { NodeProctor } from "./nodeProctor.js";
 
 import * as utils from "keyman/common/web-utils";
 

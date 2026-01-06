@@ -1,11 +1,11 @@
 import { ActiveKey, ActiveSubKey, ButtonClass, ButtonClasses, DeviceSpec } from 'keyman/engine/keyboard';
 
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
-import specialChars from '../specialCharacters.js';
-import buttonClassNames from '../buttonClassNames.js';
+import { specialCharacters as specialChars } from '../specialCharacters.js';
+import { BUTTON_CLASSES as buttonClassNames } from '../buttonClassNames.js';
 
 import { KeyElement } from '../keyElement.js';
-import VisualKeyboard from '../visualKeyboard.js';
+import { VisualKeyboard } from '../visualKeyboard.js';
 import { getTextMetrics } from './getTextMetrics.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 
@@ -50,7 +50,7 @@ export function renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string 
    oldText;
 }
 
-export default abstract class OSKKey {
+export abstract class OSKKey {
   // Only set here to act as an alias for code built against legacy versions.
   static readonly specialCharacters = specialChars;
 

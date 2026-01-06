@@ -1,6 +1,6 @@
-import Activator from './activator.js';
+import { Activator } from './activator.js';
 
-export default class SimpleActivator extends Activator {
+export class SimpleActivator extends Activator {
   private flag: boolean = true;
 
   get enabled(): boolean {

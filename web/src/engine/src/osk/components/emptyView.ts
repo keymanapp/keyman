@@ -1,7 +1,7 @@
-import KeyboardView from "./keyboardView.interface.js";
+import { KeyboardView } from "./keyboardView.interface.js";
 import { ParsedLengthStyle } from "../lengthStyle.js";
 
-export default class EmptyView implements KeyboardView {
+export class EmptyView implements KeyboardView {
   readonly element: HTMLDivElement;
 
   constructor() {

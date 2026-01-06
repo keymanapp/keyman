@@ -2,7 +2,7 @@ import { DeviceSpec, Keyboard, KeyEvent, ManagedPromise } from 'keyman/engine/ke
 
 import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 
-export default class PassthroughKeyboard extends HardKeyboardBase {
+export class PassthroughKeyboard extends HardKeyboardBase {
   readonly baseDevice: DeviceSpec;
   public activeKeyboard: Keyboard;
 

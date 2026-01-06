@@ -1,7 +1,7 @@
-import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
+import { OSKBaseKey } from '../../../keyboard-layout/oskBaseKey.js';
 import { KeyElement } from '../../../keyElement.js';
-import KeyTipInterface from '../../../keytip.interface.js';
-import VisualKeyboard from '../../../visualKeyboard.js';
+import { KeyTip } from '../../../keytip.interface.js';
+import { VisualKeyboard } from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 import { ParsedLengthStyle } from '../../../lengthStyle.js';
 
@@ -10,7 +10,7 @@ const DEFAULT_TIP_ORIENTATION: PhoneKeyTipOrientation = 'top';
 
 export type PhoneKeyTipOrientation = 'top' | 'bottom';
 
-export default class KeyTip implements KeyTipInterface {
+export class PhoneKeyTip implements KeyTip {
   public readonly element: HTMLDivElement;
   public key: KeyElement;
   public state: boolean = false;

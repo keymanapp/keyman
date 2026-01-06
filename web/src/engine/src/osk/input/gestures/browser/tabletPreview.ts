@@ -1,13 +1,13 @@
 import { KeyElement } from '../../../keyElement.js';
-import KeyTipInterface from '../../../keytip.interface.js';
-import VisualKeyboard from '../../../visualKeyboard.js';
+import { KeyTip } from '../../../keytip.interface.js';
+import { VisualKeyboard } from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
 const BASE_CLASS = 'kmw-keypreview';
 const OVERLAY_CLASS = 'kmw-preview-overlay';
 const BASE_ID = 'kmw-keytip';
 
-export class TabletKeyTip implements KeyTipInterface {
+export class TabletKeyTip implements KeyTip {
   public readonly element: HTMLDivElement;
   public key: KeyElement;
   public state: boolean = false;

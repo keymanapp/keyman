@@ -1,8 +1,8 @@
 import { ActiveLayer, ActiveLayout } from 'keyman/engine/keyboard';
 
-import OSKRow from './oskRow.js';
-import OSKBaseKey from './oskBaseKey.js';
-import VisualKeyboard from '../visualKeyboard.js';
+import { OSKRow } from './oskRow.js';
+import { OSKBaseKey } from './oskBaseKey.js';
+import { VisualKeyboard } from '../visualKeyboard.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 
 export interface LayerLayoutParams {
@@ -14,7 +14,7 @@ export interface LayerLayoutParams {
   layoutFontSize: ParsedLengthStyle;
   spacebarText: string;
 }
-export default class OSKLayer {
+export class OSKLayer {
   public readonly element: HTMLDivElement;
   public readonly rows: OSKRow[];
   public readonly spec: ActiveLayer;

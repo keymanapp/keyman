@@ -1,12 +1,12 @@
 import { ActiveSubKey } from 'keyman/engine/keyboard';
-import OSKKey from '../../../keyboard-layout/oskKey.js';
+import { OSKKey } from '../../../keyboard-layout/oskKey.js';
 import { KeyData, KeyElement, link } from '../../../keyElement.js';
-import VisualKeyboard from '../../../visualKeyboard.js';
+import { VisualKeyboard } from '../../../visualKeyboard.js';
 
 // Typing is to ensure that the keys specified below actually are on the type...
 // and to gain Intellisense if more need to be added.
 
-export default class OSKSubKey extends OSKKey {
+export class OSKSubKey extends OSKKey {
   constructor(spec: ActiveSubKey, layer: string) {
     if(typeof(layer) != 'string' || layer == '') {
       throw "The 'layer' parameter for subkey construction must be properly defined.";

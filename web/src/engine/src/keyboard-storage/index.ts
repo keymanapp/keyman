@@ -1,4 +1,3 @@
-// TODO-web-core: remove 'export default' to eliminate more aliases (#15292)
 export {
   ErrorStub,
   type KeyboardAPISpec,

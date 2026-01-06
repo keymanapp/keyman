@@ -13,7 +13,7 @@ import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
 import { ContextManager } from './contextManager.js';
-import DefaultBrowserRules from './defaultBrowserRules.js';
+import { DefaultBrowserRules } from './defaultBrowserRules.js';
 import { HardwareEventKeyboard } from './hardwareEventKeyboard.js';
 import { FocusStateAPIObject } from './context/focusAssistant.js';
 import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
