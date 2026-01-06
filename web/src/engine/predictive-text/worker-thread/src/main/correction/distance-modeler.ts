@@ -288,9 +288,12 @@ export class SearchNode {
     //
     // Following previous insertions is fine, as is following a proper
     // match/substitution.
+    if(this.lastEdgeType == PathEdge.DELETION) {
+      return [];
+    }
     if(this.priorInput.length > 0) {
       const priorInput = this.priorInput[this.priorInput.length - 1].sample;
-      if(TransformUtils.isEmpty(priorInput) || this.lastEdgeType == PathEdge.DELETION) {
+      if(TransformUtils.isEmpty(priorInput)) {
         return [];
       }
     }
@@ -309,25 +312,6 @@ export class SearchNode {
     }
 
     return edges;
-  }
-
-  /**
-   * This method is used while stepping through intermediate deletion 'edges'
-   * for transforms with multi-character insert strings.
-   * @returns
-   */
-  private processDeletionSubset(): SearchNode {
-    // We're on easy street:  all transforms are already essentially merged into
-    // a single mass here.
-    let calculation = this.calculation.addInputChar(SENTINEL_CODE_UNIT);
-
-    // If on a 'delete' style path, we just build out the paths into a single
-    // merged path.
-    const node = new SearchNode(this);
-    node.calculation = calculation;
-    // no update to the match string or traversal to be found here...
-    node.partialEdge.subsetSubindex++;
-    return node;
   }
 
   /**
@@ -376,10 +360,6 @@ export class SearchNode {
     // For raw backspaces - if no insert string, we can already finalize!
     if(partialEdge.subsetSubindex >= partialEdge.transformSubset.key) {
       return [this.tryFinalize()];
-    }
-
-    if(!partialEdge.doSubsetMatching) {
-      return [this.processDeletionSubset().tryFinalize()];
     }
 
     // After this, it's all substitution / matching.
@@ -472,20 +452,20 @@ export class SearchNode {
   }
 
   /**
-   * Called by `buildDeletionEdges` and `buildSubstitutionEdges` to construct
-   * intermediate TransformSubset-based nodes that extend the search path one
-   * step into the incoming input transforms in an efficiently-batched manner.
+   * Called by `buildSubstitutionEdges` to construct intermediate
+   * TransformSubset-based nodes that extend the search path one step into the
+   * incoming input transforms in an efficiently-batched manner.
    *
    * When an incoming character cannot match the next character for the node's
-   * represented lexicon prefix - be it due to not adding one (deletions) or
-   * due to not being the same character, all mismatching cases are merged into
-   * one, reducing the rate of expansion for the search graph.
+   * represented lexicon prefix - be it due to not adding one (deletions) or due
+   * to not being the same character, all mismatching cases are merged into one,
+   * reducing the rate of expansion for the search graph.
    * @param dist
    * @param isSubstitution
    * @param edgeId
    * @returns
    */
-  private setupSubsetProcessing(dist: Distribution<Transform>, isSubstitution: boolean, edgeId: number) {
+  private setupSubsetProcessing(dist: Distribution<Transform>, edgeId: number) {
     if(this.hasPartialInput) {
       throw new Error("Invalid state:  will not take new input while still processing Transform subset");
     }
@@ -509,16 +489,13 @@ export class SearchNode {
           continue;
         }
 
-        const node = new SearchNode(this, edgeId, isSubstitution ? PathEdge.SUBSTITUTION : PathEdge.DELETION);
+        const node = new SearchNode(this, edgeId, PathEdge.SUBSTITUTION);
         node.calculation = edgeCalc;
         node.partialEdge = {
-          doSubsetMatching: isSubstitution,
+          doSubsetMatching: true,
           subsetSubindex: 0,
-          transformSubset: isSubstitution ? insSubset : {
-            ...insSubset,
-            entries: [ { sample: { insert: SENTINEL_CODE_UNIT.repeat(ins), deleteLeft: dl }, p: insSubset.cumulativeMass}]
-          }
-        }
+          transformSubset: insSubset
+        };
         // Get the traversal at the new end location.  (Root is always at index 0.)
         node.matchedTraversals = this.matchedTraversals.slice(0, newMatchLength+1);
 
@@ -539,7 +516,20 @@ export class SearchNode {
    * input keystroke.
    */
   buildDeletionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
-    return this.setupSubsetProcessing(dist, false, edgeId);
+    const deletedSample = {
+      sample: {
+        insert: SENTINEL_CODE_UNIT,
+        deleteLeft: 0
+      },
+      p: dist.reduce((accum, curr) => curr.p + accum, 0)
+    };
+
+    const node = new SearchNode(this, edgeId, PathEdge.DELETION);
+    node.calculation = this.calculation.addInputChar(SENTINEL_CODE_UNIT);
+    // Mark that we've "processed" the input distribution, even if just by deleting it.
+    node.priorInput.push(deletedSample);
+
+    return [node];
   }
 
   /**
@@ -556,7 +546,7 @@ export class SearchNode {
     // substitutions are _not_ adequately represented by one 'insertion' + one
     // 'deletion' step. Explicit substitution / match-oriented processing is
     // required.
-    return this.setupSubsetProcessing(dist, true, edgeId);
+    return this.setupSubsetProcessing(dist, edgeId);
   }
 
   /**
