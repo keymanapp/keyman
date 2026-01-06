@@ -30,7 +30,7 @@ type
      *)
     function DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse): Boolean;
     // pseduo code name this something more appropriate
-    procedure MyEventHandler(const Message: string; Position: Int64; Total: Int64);
+    //procedure MyEventHandler(const Message: string; Position: Int64; Total: Int64);
 
   public
 
@@ -102,7 +102,7 @@ var
           http.Request.Agent := API_UserAgent;
 
           http.Request.SetURL(url);
-          http.OnStatus := myeventhandler;
+          //http.OnStatus := myeventhandler;
           http.Upload;
           if http.Response.StatusCode = 200 then
           begin

@@ -139,6 +139,8 @@ begin
 end;
 
 procedure TfrmSplash.WMUser_FormShown(var Message: TMessage);
+var
+  configFrmResult: Integer;
 begin
   if (GetForegroundWindow <> Handle) and
     (GetWindowThreadProcessId(GetForegroundWindow) <> GetCurrentThreadId) then   // I3730
@@ -152,15 +154,27 @@ begin
 
   if FShowConfigurationOnLoad then
   begin
-    Main(Self);
-    Do_Content_Render;
+    configFrmResult := Main(Self);
+    if configFrmResult = mrAbort then
+      Command_Exit
+    else
+      Do_Content_Render;
   end;
 end;
 
 procedure TfrmSplash.FireCommand(const command: WideString; params: TStringList);
+var
+  configFrmResult: Integer;
 begin
   if command = 'start' then Command_Start
-  else if command = 'config' then begin Main(Self); Do_Content_Render; end   // I4393   // I4396
+  else if command = 'config' then
+  begin
+    configFrmResult := Main(Self);
+    if configFrmResult = mrAbort then
+      Command_Exit
+    else
+      Do_Content_Render;
+  end   // I4393   // I4396
   else if command = 'hidesplash' then FShouldDisplay := False
   else if command = 'showsplash' then FShouldDisplay := True
   else if command = 'exit' then Command_Exit

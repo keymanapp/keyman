@@ -70,7 +70,7 @@ uses
   Windows, Controls, SysUtils, Classes, ErrorControlledRegistry, Forms, MessageIdentifiers, MessageIdentifierConsts, keymanapi_TLB;
 
 procedure Run;
-procedure Main(Owner: TComponent = nil);
+function Main(Owner: TComponent = nil): Integer;
 
 
 type
@@ -164,7 +164,7 @@ procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
 
-procedure Main(Owner: TComponent = nil);
+function Main(Owner: TComponent = nil): Integer;
 var
   frmMain: TfrmMain;
 begin

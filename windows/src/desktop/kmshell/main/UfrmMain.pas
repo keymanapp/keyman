@@ -842,7 +842,9 @@ begin
         'TrmfMain: Shell Execute Update_ApplyNow Failed')
     else
       ModalResult := mrAbort;  // look into the most appropiate
-      // Application.Terminate;
+      // Maybe mrYes and mrNo. What we are after is that if we have a splash screen
+      // open when Install Now has run we want the result be value that the splash
+      // screen will be closed.
 
   end;
 end;
