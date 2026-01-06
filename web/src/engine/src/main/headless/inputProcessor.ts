@@ -168,26 +168,29 @@ export class InputProcessor {
    */
   private _processKeyEvent(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
     const formFactor = keyEvent.device.formFactor;
-    const fromOSK = keyEvent.isSynthetic;
 
-    // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
+    // The default OSK layout for desktop devices does not include nextlayer info, relying on
+    // modifier detection here.
     // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || (this.activeKeyboard instanceof JSKeyboard && this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) && fromOSK) {
+    if ((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || 
+      (this.activeKeyboard instanceof JSKeyboard && 
+      this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) && 
+      keyEvent.isSynthetic
+    ) {
       // If it's a desktop OSK style and this triggers a layer change,
       // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
-      if(this.keyboardProcessor.selectLayer(keyEvent)) {
+      if (this.keyboardProcessor.selectLayer(keyEvent)) {
         return new ProcessorAction();
       }
     }
 
-    // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
-    // of state management.  `doModifierPress` must always run.
-    if (this.keyboardProcessor.doModifierPress(keyEvent, textStore, !fromOSK)) {
+    // Will handle keystroke-based non-layer change modifier & state keys, mapping them through
+    // the physical keyboard's version of state management.  `doModifierPress` must always run.
+    const wasModifierPress = this.keyboardProcessor.doModifierPress(keyEvent, textStore, !keyEvent.isSynthetic);
+    if (wasModifierPress && !keyEvent.isSynthetic) {
       // If run on a desktop platform, we know that modifier & state key presses may not
       // produce output, so we may make an immediate return safely.
-      if(!fromOSK) {
-        return new ProcessorAction();
-      }
+      return new ProcessorAction();
     }
 
     // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.

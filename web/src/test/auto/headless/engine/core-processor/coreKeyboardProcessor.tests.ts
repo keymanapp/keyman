@@ -30,12 +30,10 @@ describe('CoreKeyboardProcessor', function () {
     const item = new KM_Core.instance.km_core_context_item();
     if (isMarker) {
       item.marker = c as number;
+    } else if (typeof c == 'number') {
+      item.character = c;
     } else {
-      if (typeof (c) == 'number') {
-        item.character = c;
-      } else {
-        item.character = c.codePointAt(0);
-      }
+      item.character = c.codePointAt(0);
     }
     contextItems.push_back(item);
   };

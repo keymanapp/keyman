@@ -1,10 +1,10 @@
 import { ManagedPromise } from 'keyman/engine/keyboard';
-import CloudRequesterInterface from '../../../../engine/src/keyboard-storage/cloud/requesterInterface.js';
+import { CloudRequesterInterface } from '../../../../engine/src/keyboard-storage/cloud/requesterInterface.js';
 import {
   CLOUD_TIMEOUT_ERR,
   CLOUD_STUB_REGISTRATION_ERR,
   CloudQueryResult,
-  default as CloudQueryEngine
+  CloudQueryEngine
 } from '../../../../engine/src/keyboard-storage/cloud/queryEngine.js';
 
 import fs from 'node:fs';
