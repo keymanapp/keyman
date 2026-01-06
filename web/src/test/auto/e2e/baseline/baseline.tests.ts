@@ -63,12 +63,8 @@ const testsToFix = {
   // TODO: fix these tests (#15342)
   '.js': [
     'k_0000___null_keyboard.kmn',
-    // 'k_0103___vkey_input__shift_ctrl_.kmn',
     'k_0104___vkey_input__ctrl_alt_.kmn',
-    // 'k_0105___vkey_input__ctrl_alt_2_.kmn',
-    // 'k_0200___ralt.kmn',
     'k_0203___generic_ctrlalt.kmn',
-    // 'k_0400___groups_and_virtual_keys.kmn',
     'k_0501___options_with_preset.kmn',
     'k_0503___options_with_save_and_preset.kmn',
     'k_0504___options_with_reset.kmn',
