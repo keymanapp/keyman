@@ -58,7 +58,7 @@ const testsToFix = {
     'k_037___options___double_reset.kmn',
     'k_039___generic_ctrlalt.kmn',
     'k_049___enter_invalidates_context.kmn',
-    'k_055___deadkey_cancelled_by_arrow.kmn',
+    'k_055___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
   ],
   // TODO: fix these tests (#15342)
   '.js': [
@@ -85,7 +85,7 @@ const testsToFix = {
     'k_049___enter_invalidates_context.kmn',
     'k_050___nul_and_context.kmn', // js only
     'k_052___nul_and_index.kmn', // js only
-    'k_055___deadkey_cancelled_by_arrow.kmn',
+    'k_055___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
   ]
 };
 
