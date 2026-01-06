@@ -559,16 +559,6 @@ describe('CoreKeyboardProcessor', function () {
       { code: Codes.keyCodes.K_CAPS, name: 'CapsLock' },
       { code: Codes.keyCodes.K_NUMLOCK, name: 'NumLock' },
       { code: Codes.keyCodes.K_SCROLL, name: 'ScrollLock' },
-      // TODO-web-core: should LSHIFT/RSHIFT etc also be detected as modifier?
-      // Currently .js keyboards don't don't support distinguishing
-      // between left and right keys, but should KMX keyboards in Web?
-      // { code: Codes.keyCodes.K_LSHIFT, name: 'LeftShift' },
-      // { code: Codes.keyCodes.K_RSHIFT, name: 'RightShift' },
-      // { code: Codes.keyCodes.K_LCTRL, name: 'LeftControl' },
-      // { code: Codes.keyCodes.K_RCTRL, name: 'RightControl' },
-      // { code: Codes.keyCodes.K_LALT, name: 'LeftAlt' },
-      // { code: Codes.keyCodes.K_RALT, name: 'RightAlt' },
-      // { code: Codes.keyCodes.K_ALTGR, name: 'AltGr'},
     ]) {
       it(`recognizes ${key.name} as modifier`, function () {
         // Setup

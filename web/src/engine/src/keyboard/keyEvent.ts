@@ -141,13 +141,6 @@ export class KeyEvent implements KeyEventSpec {
       case Codes.keyCodes.K_CAPS:
       case Codes.keyCodes.K_NUMLOCK:
       case Codes.keyCodes.K_SCROLL:
-      case Codes.keyCodes.K_LSHIFT:
-      case Codes.keyCodes.K_RSHIFT:
-      case Codes.keyCodes.K_LCTRL:
-      case Codes.keyCodes.K_RCTRL:
-      case Codes.keyCodes.K_LALT:
-      case Codes.keyCodes.K_RALT:
-      case Codes.keyCodes.K_ALTGR:
         return true;
       default:
         return false;
