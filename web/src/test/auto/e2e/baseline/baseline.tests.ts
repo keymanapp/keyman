@@ -24,12 +24,12 @@ function KeymanRoot(): string {
 // Tests that are not supported in Web due to missing functionality
 const testsToSkip = {
   'all': new Map([
-    ['k_038___punctkeys.kmn', 'Playwright does not support 102nd key']
+    ['k_0107___punctkeys.kmn', 'Playwright does not support 102nd key']
   ]),
   '.kmx': new Map([
   ]),
   '.js': new Map([
-    ['k_054___nul_and_contextex.kmn', 'contextex is not supported in context() match in Web']
+    ['k_0812___nul_and_contextex.kmn', 'contextex is not supported in context() match in Web']
   ]),
 };
 
@@ -37,55 +37,51 @@ const testsToSkip = {
 const testsToFix = {
   // TODO-web-core: fix these tests
   '.kmx': [
-    'k_000___null_keyboard.kmn',
-    'k_006___vkey_input__shift_ctrl_.kmn',
-    'k_007___vkey_input__ctrl_alt_.kmn',
-    'k_008___vkey_input__ctrl_alt_2_.kmn',
-    'k_012___ralt.kmn',
-    'k_014___groups_and_virtual_keys.kmn',
-    'k_015___ralt_2.kmn', // kmx only
-    'k_022___options_with_preset.kmn',
-    'k_024___options_with_save_and_preset.kmn',
-    'k_025___options_with_reset.kmn',
-    'k_026___system_stores.kmn',
-    'k_027___system_stores_2.kmn',
-    'k_028___smp.kmn', // kmx only
-    'k_031___caps_lock.kmn',
-    'k_032___caps_control.kmn',
-    'k_034___options_double_set_reset.kmn',
-    'k_035___options_double_set_staged.kmn',
-    'k_036___options___double_reset_staged.kmn',
-    'k_037___options___double_reset.kmn',
-    'k_039___generic_ctrlalt.kmn',
-    'k_049___enter_invalidates_context.kmn',
-    'k_055___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
+    'k_0000___null_keyboard.kmn',
+    'k_0103___vkey_input__shift_ctrl_.kmn', // kmx only
+    'k_0104___vkey_input__ctrl_alt_.kmn',
+    'k_0105___vkey_input__ctrl_alt_2_.kmn', // kmx only
+    'k_0106___smp.kmn', // kmx only
+    'k_0200___ralt.kmn', // kmx only
+    'k_0201___ralt_2.kmn', // kmx only
+    'k_0203___generic_ctrlalt.kmn',
+    'k_0400___groups_and_virtual_keys.kmn', // kmx only
+    'k_0501___options_with_preset.kmn',
+    'k_0503___options_with_save_and_preset.kmn',
+    'k_0504___options_with_reset.kmn',
+    'k_0505___options_double_set_reset.kmn',
+    'k_0506___options_double_set_staged.kmn',
+    'k_0507___options___double_reset_staged.kmn',
+    'k_0508___options___double_reset.kmn',
+    'k_0600___system_stores.kmn',
+    'k_0601___system_stores_2.kmn',
+    'k_0700___caps_lock.kmn',
+    'k_0701___caps_control.kmn',
+    'k_0807___enter_invalidates_context.kmn',
+    'k_0813___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
   ],
   // TODO: fix these tests (#15342)
   '.js': [
-    'k_000___null_keyboard.kmn',
-    'k_006___vkey_input__shift_ctrl_.kmn',
-    'k_007___vkey_input__ctrl_alt_.kmn',
-    'k_008___vkey_input__ctrl_alt_2_.kmn',
-    'k_012___ralt.kmn',
-    'k_014___groups_and_virtual_keys.kmn',
-    'k_022___options_with_preset.kmn',
-    'k_024___options_with_save_and_preset.kmn',
-    'k_025___options_with_reset.kmn',
-    'k_026___system_stores.kmn',
-    'k_027___system_stores_2.kmn',
-    'k_031___caps_lock.kmn',
-    'k_032___caps_control.kmn',
-    'k_034___options_double_set_reset.kmn',
-    'k_035___options_double_set_staged.kmn',
-    'k_036___options___double_reset_staged.kmn',
-    'k_037___options___double_reset.kmn',
-    'k_039___generic_ctrlalt.kmn',
-    'k_041___long_context_and_deadkeys.kmn', // js only
-    'k_042___long_context_and_split_deadkeys.kmn', // js only
-    'k_049___enter_invalidates_context.kmn',
-    'k_050___nul_and_context.kmn', // js only
-    'k_052___nul_and_index.kmn', // js only
-    'k_055___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
+    'k_0000___null_keyboard.kmn',
+    'k_0104___vkey_input__ctrl_alt_.kmn',
+    'k_0203___generic_ctrlalt.kmn',
+    'k_0501___options_with_preset.kmn',
+    'k_0503___options_with_save_and_preset.kmn',
+    'k_0504___options_with_reset.kmn',
+    'k_0505___options_double_set_reset.kmn',
+    'k_0506___options_double_set_staged.kmn',
+    'k_0507___options___double_reset_staged.kmn',
+    'k_0508___options___double_reset.kmn',
+    'k_0600___system_stores.kmn',
+    'k_0601___system_stores_2.kmn',
+    'k_0700___caps_lock.kmn',
+    'k_0701___caps_control.kmn',
+    'k_0801___long_context_and_deadkeys.kmn', // js only
+    'k_0802___long_context_and_split_deadkeys.kmn', // js only
+    'k_0807___enter_invalidates_context.kmn',
+    'k_0808___nul_and_context.kmn', // js only
+    'k_0810___nul_and_index.kmn', // js only
+    'k_0813___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
   ]
 };
 

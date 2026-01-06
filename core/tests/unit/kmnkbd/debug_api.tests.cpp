@@ -76,7 +76,7 @@ void setup(const char *keyboard) {
  * Test 1: Start with debugging disabled
  */
 void test_debugging_disabled() {
-  setup("k_000___null_keyboard.kmx");
+  setup("k_0000___null_keyboard.kmx");
   try_status(km_core_state_debug_set(test_state, 0));
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_S, KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
   test_assert(debug_items(test_state, {
@@ -93,7 +93,7 @@ void test_debugging_disabled() {
  * Test 2: Debugging enabled, no rule match
  */
 void test_debugging_no_rule_match() {
-  setup("k_000___null_keyboard.kmx");
+  setup("k_0000___null_keyboard.kmx");
   DEBUG_GROUP gp = {u"Main"};
   try_status(km_core_state_debug_set(test_state, 1));
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_S, KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
@@ -114,7 +114,7 @@ void test_debugging_no_rule_match() {
  * Test 3: Debugging enabled, function key pressed, no rule match
  */
 void test_debugging_function_key() {
-  setup("k_000___null_keyboard.kmx");
+  setup("k_0000___null_keyboard.kmx");
   DEBUG_GROUP gp = {u"Main"};
   try_status(km_core_state_debug_set(test_state, 1));
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_F1, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
@@ -136,7 +136,7 @@ void test_debugging_function_key() {
  * Test 4: basic rule match
  */
 void test_basic_rule_matches() {
-  setup("k_002___basic_input_unicode.kmx");
+  setup("k_0101___basic_input_unicode.kmx");
   DEBUG_GROUP gp = {u"Main"};
   DEBUG_KEY kp = { 'F', /*line*/17, /*shift*/0 }; // vkey is a char
   try_status(km_core_state_debug_set(test_state, 1));
@@ -202,7 +202,7 @@ void test_basic_rule_matches() {
  * Test 5: Multiple groups
  */
 void test_multiple_groups() {
-  setup("k_030___multiple_groups.kmx");
+  setup("k_0401___multiple_groups.kmx");
   DEBUG_GROUP gp = {u"Main"}, gpa = {u"a"}, gpb = {u"b"};
   DEBUG_KEY kp1 = { KM_CORE_VKEY_1, /*line*/13, /*shift*/KM_CORE_MODIFIER_VIRTUALKEY },
             kp2 = { KM_CORE_VKEY_2, /*line*/14, /*shift*/KM_CORE_MODIFIER_VIRTUALKEY },
@@ -283,7 +283,7 @@ void test_multiple_groups() {
  * Test 6: store offsets
  */
 void test_store_offsets() {
-  setup("k_044___if_and_context.kmx");
+  setup("k_0803___if_and_context.kmx");
   DEBUG_GROUP gp = {u"Main"};
   DEBUG_KEY kpa = { 'a', /*line*/16, },
             kpb = { 'b', /*line*/20, };
@@ -357,7 +357,7 @@ void test_store_offsets() {
  * Test 7: set option
  */
 void test_set_option() {
-  setup("k_021___options.kmx");
+  setup("k_0500___options.kmx");
   DEBUG_GROUP gp = {u"Main"};
   DEBUG_KEY kp1 = { '1', /*line*/17, };
   DEBUG_STORE sp = {0, u"foo", u"1"};
@@ -384,7 +384,7 @@ void test_set_option() {
  * Test 8: save option
  */
 void test_save_option() {
-  setup("k_023___options_with_save.kmx");
+  setup("k_0502___options_with_save.kmx");
   DEBUG_GROUP gp = {u"Main"};
   DEBUG_KEY kp1 = { '2', /*line*/21, };
   // DEBUG_STORE sp = {0, u"foo", u"0"};
@@ -420,7 +420,7 @@ void test_save_option() {
  * an 'unknown' backspace because we are at start-of-context
  */
 void test_backspace_markers() {
-  setup("k_000___null_keyboard.kmx");
+  setup("k_0000___null_keyboard.kmx");
   km_core_context_item marker_context[] = {
     {KM_CORE_CT_MARKER, {0,}, {1}},
     {KM_CORE_CT_MARKER, {0,}, {1}},
