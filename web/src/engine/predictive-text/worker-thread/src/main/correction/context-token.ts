@@ -164,7 +164,7 @@ export class ContextToken {
    * a correction-search result.
    */
   get spaceId(): number {
-    return this.searchSpace.spaceId;
+    return this.searchModule.spaceId;
   }
 
   /**
