@@ -8,6 +8,7 @@
 
 using namespace km::core;
 using namespace kmx;
+using namespace km_vk;
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <share.h>
