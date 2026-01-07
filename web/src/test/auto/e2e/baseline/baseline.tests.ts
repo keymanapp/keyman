@@ -43,7 +43,8 @@ const testsToFix = {
     'k_0105___vkey_input__ctrl_alt_2_.kmn', // kmx only
     'k_0106___smp.kmn', // kmx only
     'k_0200___ralt.kmn', // kmx only
-    'k_0201___ralt_2.kmn', // kmx only
+    'k_0201___ralt_2.kmn',
+    'k_0202___alt.kmn',
     'k_0203___generic_ctrlalt.kmn',
     'k_0400___groups_and_virtual_keys.kmn', // kmx only
     'k_0501___options_with_preset.kmn',
@@ -64,6 +65,8 @@ const testsToFix = {
   '.js': [
     'k_0000___null_keyboard.kmn',
     'k_0104___vkey_input__ctrl_alt_.kmn',
+    'k_0201___ralt_2.kmn',  // #15358
+    'k_0202___alt.kmn',     // #15358
     'k_0203___generic_ctrlalt.kmn',
     'k_0501___options_with_preset.kmn',
     'k_0503___options_with_save_and_preset.kmn',
