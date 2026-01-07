@@ -3,7 +3,7 @@
  *
  * Created by jahorton on 2025-10-09
  *
- * This file defines tests for the SearchSpace class of the
+ * This file defines tests for the correction-searching process of the
  * predictive-text correction-search engine.
  */
 
