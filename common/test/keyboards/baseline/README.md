@@ -26,3 +26,21 @@ The keyboards can be built with:
 
 This builds the keyboards with debug information and no compiler version
 embedded.
+
+## Grouping of the test fixtures
+
+Fixtures that test similar functionality are roughly grouped together.
+There is some overlap between different groups, so this was done
+mainly by test name.
+
+| Name     | Test group                               |
+|----------|------------------------------------------|
+| k_00xx_* | Tests that didn't fit in any other group |
+| k_01xx_* | Basic rules                              |
+| k_02xx_* | RALT                                     |
+| k_03xx_* | deadkeys                                 |
+| k_04xx_* | Using multiple groups                    |
+| k_05xx_* | Options                                  |
+| k_06xx_* | System stores                            |
+| k_07xx_* | Caps related tests                       |
+| k_08xx_* | Context related                          |

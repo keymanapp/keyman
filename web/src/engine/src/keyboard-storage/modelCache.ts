@@ -1,6 +1,6 @@
 import { ModelSpec } from 'keyman/engine/interfaces';
 
-export default class ModelManager {
+export class ModelCache {
   // Tracks registered models by ID.
   private registeredModels: {[id: string]: ModelSpec} = {};
 

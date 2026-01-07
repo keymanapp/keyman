@@ -87,7 +87,7 @@ tests = [
   'k_0810___nul_and_index',
   'k_0811___if_and_index',
   'k_0812___nul_and_contextex',
-  # Skipped: 'k_0813___deadkey_cancelled_by_arrow',
+  # TODO-web-core: Skipped: 'k_0813___deadkey_cancelled_by_arrow',
 ]
 
 

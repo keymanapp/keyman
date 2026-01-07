@@ -5,4 +5,4 @@ under `src`.
 
 For example, `src/test/auto/headless/engine/js-processor` are the tests
 for `src/engine/js-processor` and will be run from
-`src/engine/js-processor/build.sh`.
+`src/engine/build.sh`.

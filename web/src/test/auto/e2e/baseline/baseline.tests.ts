@@ -59,7 +59,7 @@ const testsToFix = {
     'k_0700___caps_lock.kmn',
     'k_0701___caps_control.kmn',
     'k_0807___enter_invalidates_context.kmn',
-    'k_0813___deadkey_cancelled_by_arrow.kmn',
+    'k_0813___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
   ],
   // TODO: fix these tests (#15342)
   '.js': [
@@ -84,7 +84,7 @@ const testsToFix = {
     'k_0807___enter_invalidates_context.kmn',
     'k_0808___nul_and_context.kmn', // js only
     'k_0810___nul_and_index.kmn', // js only
-    'k_0813___deadkey_cancelled_by_arrow.kmn',
+    'k_0813___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
   ]
 };
 

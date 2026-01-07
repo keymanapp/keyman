@@ -2,9 +2,9 @@ import { EventEmitter } from 'eventemitter3';
 
 import { PathConfiguration } from 'keyman/engine/interfaces';
 
-import { default as KeyboardStub, ErrorStub, KeyboardAPISpec } from '../keyboardStub.js';
+import { KeyboardStub, ErrorStub, KeyboardAPISpec } from '../keyboardStub.js';
 import { LanguageAPIPropertySpec, ManagedPromise, Version } from 'keyman/engine/keyboard';
-import CloudRequesterInterface from './requesterInterface.js';
+import { CloudRequesterInterface } from './requesterInterface.js';
 
 // For when the API call straight-up times out.
 export const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";
@@ -56,7 +56,7 @@ interface EventMap {
   'unboundregister': (registration: ReturnType<CloudQueryEngine['_registerCore']>) => void
 }
 
-export default class CloudQueryEngine extends EventEmitter<EventMap> {
+export class CloudQueryEngine extends EventEmitter<EventMap> {
   private cloudResolutionPromises: Map<number, ManagedPromise<KeyboardStub[] | LanguageAPIPropertySpec[]>> = new Map();
 
   private _languageListPromise: ManagedPromise<LanguageAPIPropertySpec[]>;

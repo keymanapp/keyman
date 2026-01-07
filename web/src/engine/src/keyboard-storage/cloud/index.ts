@@ -1,2 +1,2 @@
-export { CloudQueryResult, default as QueryEngine } from './queryEngine.js';
-export { default as RequesterInterface } from './requesterInterface.js';
+export { CloudQueryResult, CloudQueryEngine as QueryEngine } from './queryEngine.js';
+export { CloudRequesterInterface as RequesterInterface } from './requesterInterface.js';
