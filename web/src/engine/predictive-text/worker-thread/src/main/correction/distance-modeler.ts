@@ -435,8 +435,9 @@ export class SearchNode {
    * represented lexicon prefix - be it due to not adding one (deletions) or
    * due to not being the same character, all mismatching cases are merged into
    * one, reducing the rate of expansion for the search graph.
-   * @param input
+   * @param dist
    * @param isSubstitution
+   * @param edgeId
    * @returns
    */
   private setupSubsetProcessing(dist: Distribution<Transform>, isSubstitution: boolean, edgeId: number) {
