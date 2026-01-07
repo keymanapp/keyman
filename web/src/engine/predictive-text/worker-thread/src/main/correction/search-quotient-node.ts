@@ -9,7 +9,7 @@
 
 import { SearchNode, SearchResult } from "./distance-modeler.js";
 
-export let SPACE_ID_SEED = 0;
+let SPACE_ID_SEED = 0;
 
 export function generateSpaceSeed(): number {
   return SPACE_ID_SEED++;
