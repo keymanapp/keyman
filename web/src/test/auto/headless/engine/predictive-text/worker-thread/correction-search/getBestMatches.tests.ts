@@ -126,9 +126,9 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = searchPath.addInput(synthInput1, 1);
-    const searchPath2 = searchPath1.addInput(synthInput2, .75);
-    const searchPath3 = searchPath2.addInput(synthInput3, .75);
+    const searchPath1 = new SearchQuotientSpur(searchPath, synthInput1, 1);
+    const searchPath2 = new SearchQuotientSpur(searchPath1, synthInput2, .75);
+    const searchPath3 = new SearchQuotientSpur(searchPath2, synthInput3, .75);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -160,9 +160,9 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = searchPath.addInput(synthInput1, 1);
-    const searchPath2 = searchPath1.addInput(synthInput2, .75);
-    const searchPath3 = searchPath2.addInput(synthInput3, .75);
+    const searchPath1 = new SearchQuotientSpur(searchPath, synthInput1, 1);
+    const searchPath2 = new SearchQuotientSpur(searchPath1, synthInput2, .75);
+    const searchPath3 = new SearchQuotientSpur(searchPath2, synthInput3, .75);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
