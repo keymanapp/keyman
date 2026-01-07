@@ -4,17 +4,17 @@ type FilteredRecordEncoder = (value: DecodedCookieFieldValue, key: string) => st
 type FilteredRecordDecoder = (value: string, key: string) => DecodedCookieFieldValue;
 
 export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieFieldValue>> {
-  readonly name: string;
+  private readonly name: string;
 
-  constructor(name: string) {
+  public constructor(name: string) {
     this.name = name;
   }
 
-  load(decoder?: FilteredRecordDecoder): Type {
+  public load(decoder?: FilteredRecordDecoder): Type {
     return this.loadCookie(this.name, decoder || ((val: string) => val as DecodedCookieFieldValue)) as Type;
   }
 
-  save(cookie: Type, encoder?: FilteredRecordEncoder) {
+  public save(cookie: Type, encoder?: FilteredRecordEncoder) {
     this.saveCookie(this.name, cookie, encoder || ((val: DecodedCookieFieldValue) => val as string));
   }
 
