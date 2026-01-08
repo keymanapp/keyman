@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, LegacyQuotientSpur, models, SearchQuotientRoot } from '@keymanapp/lm-worker/test-index';
 
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
@@ -96,7 +96,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchQuotientSpur(testModel);
+    const searchSpace = new SearchQuotientRoot(testModel);
 
     const iter = getBestMatches(searchSpace, buildTestTimer());
     const firstResult = await iter.next();
@@ -109,7 +109,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    let searchPath = new SearchQuotientSpur(testModel);
+    let searchPath = new SearchQuotientRoot(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -126,9 +126,9 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new SearchQuotientSpur(searchPath, synthInput1, 1);
-    const searchPath2 = new SearchQuotientSpur(searchPath1, synthInput2, .75);
-    const searchPath3 = new SearchQuotientSpur(searchPath2, synthInput3, .75);
+    const searchPath1 = new LegacyQuotientSpur(searchPath, synthInput1, 1);
+    const searchPath2 = new LegacyQuotientSpur(searchPath1, synthInput2, .75);
+    const searchPath3 = new LegacyQuotientSpur(searchPath2, synthInput3, .75);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -143,7 +143,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    let searchPath = new SearchQuotientSpur(testModel);
+    let searchPath = new SearchQuotientRoot(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -160,9 +160,9 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new SearchQuotientSpur(searchPath, synthInput1, 1);
-    const searchPath2 = new SearchQuotientSpur(searchPath1, synthInput2, .75);
-    const searchPath3 = new SearchQuotientSpur(searchPath2, synthInput3, .75);
+    const searchPath1 = new LegacyQuotientSpur(searchPath, synthInput1, 1);
+    const searchPath2 = new LegacyQuotientSpur(searchPath1, synthInput2, .75);
+    const searchPath3 = new LegacyQuotientSpur(searchPath2, synthInput3, .75);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -182,7 +182,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchQuotientSpur(testModel);
+    const searchSpace = new SearchQuotientRoot(testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches(searchSpace, timer);
 

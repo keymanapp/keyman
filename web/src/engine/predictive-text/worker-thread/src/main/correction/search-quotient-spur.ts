@@ -15,7 +15,6 @@ import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-m
 import { generateSpaceSeed, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 
 import Distribution = LexicalModelTypes.Distribution;
-import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
@@ -24,7 +23,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientSpur implements SearchQuotientNode {
+export abstract class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   readonly inputs?: Distribution<Readonly<Transform>>;
 
@@ -51,42 +50,27 @@ export class SearchQuotientSpur implements SearchQuotientNode {
    * @param baseSpaceId
    * @param model
    */
-  constructor(model: LexicalModel);
-  constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, bestProbFromSet: number);
-  constructor(arg1: LexicalModel | SearchQuotientNode, inputs?: Distribution<Transform>, bestProbFromSet?: number) {
+  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Readonly<Transform>>, costHeuristic: number) {
     this.spaceId = generateSpaceSeed();
 
-    if(arg1 instanceof SearchQuotientSpur) {
-      const parentNode = arg1 as SearchQuotientNode;
-      const logTierCost = -Math.log(bestProbFromSet);
+    this.parentNode = parentNode;
+    this.lowestPossibleSingleCost = costHeuristic;
+    this.inputs = inputs?.length > 0 ? inputs : null;
+    this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
 
-      this.inputs = inputs;
-      this.inputCount = parentNode.inputCount + 1;
-      this.lowestPossibleSingleCost = parentNode.lowestPossibleSingleCost + logTierCost;
-      this.parentNode = parentNode;
-
-      this.addEdgesForNodes(parentNode.previousResults.map(r => r.node));
-
-      return;
-    }
-
-    const model = arg1 as LexicalModel;
-    this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
-    this.lowestPossibleSingleCost = 0;
-    this.inputCount = 0;
+    // // generate and queue up nodes.
+    // const priorResults = parentNode?.previousResults;
+    // const nodes = this.buildEdgesForNodes(!priorResults ? [] : priorResults.map(r => r.node));
+    // this.selectionQueue.enqueueAll(nodes);
   }
 
   /**
    * Retrieves the sequences of inputs that led to this SearchPath.
    */
   public get inputSequence(): Distribution<Transform>[] {
-    if(this.parentNode) {
-      return [...this.parentNode.inputSequence, this.inputs];
-    } else if(this.inputs) {
-      return [this.inputs];
-    } else {
-      return [];
-    }
+    const parentInputs = this.parentNode?.inputSequence.slice() ?? [];
+    const localInputs = this.inputs ? [this.inputs.slice()] : [];
+    return parentInputs.concat(localInputs);
   }
 
   public hasInputs(keystrokeDistributions: Distribution<Transform>[]): boolean {
@@ -137,7 +121,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   public get lastInput(): Distribution<Readonly<Transform>> {
     // Shallow-copies the array to prevent external modification; the Transforms
     // are marked Readonly to prevent their modification as well.
-    return [...this.inputs];
+    return this.inputs ?? null;
   }
 
   public get bestExample(): {text: string, p: number} {
@@ -181,26 +165,10 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     return Math.min(localCost, parentCost);
   }
 
-  private addEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>) {
-    // With a newly-available input, we can extend new input-dependent paths from
-    // our previously-reached 'extractedResults' nodes.
-    let outboundNodes = baseNodes.map((node) => {
-      // Hard restriction:  no further edits will be supported.  This helps keep the search
-      // more narrowly focused.
-      const substitutionsOnly = node.editCount == 2;
+  protected abstract buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>): SearchNode[];
 
-      let deletionEdges: SearchNode[] = [];
-      if(!substitutionsOnly) {
-        deletionEdges         = node.buildDeletionEdges(this.inputs, this.spaceId);
-      }
-      const substitutionEdges = node.buildSubstitutionEdges(this.inputs, this.spaceId);
-
-      // Skip the queue for the first pass; there will ALWAYS be at least one pass,
-      // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
-      return substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
-    }).flat();
-
-    this.selectionQueue.enqueueAll(outboundNodes);
+  protected queueNodes(nodes: SearchNode[]) {
+    this.selectionQueue.enqueueAll(nodes);
   }
 
   /**
@@ -223,7 +191,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       const result = this.parentNode.handleNextNode();
 
       if(result.type == 'complete') {
-        this.addEdgesForNodes([result.finalNode]);
+        this.queueNodes(this.buildEdgesForNodes([result.finalNode]));
       }
 
       return {

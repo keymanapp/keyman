@@ -11,13 +11,14 @@ import { applyTransform, buildMergedTransform } from "@keymanapp/models-template
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
-import { SearchQuotientSpur } from "./search-quotient-spur.js";
 import { SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
+import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
+import { SearchQuotientRoot } from "./search-quotient-root.js";
 
 /**
  * Notes critical properties of the inputs comprising each ContextToken.
@@ -121,7 +122,7 @@ export class ContextToken {
 
       // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
       // Build a token that represents the current text with no ambiguity - probability at max (1.0)
-      let searchSpace = new SearchQuotientSpur(model);
+      let searchSpace: SearchQuotientNode = new SearchQuotientRoot(model);
       const BASE_PROBABILITY = 1;
       textToCharTransforms(rawText).forEach((transform) => {
         this._inputRange.push({
@@ -129,7 +130,7 @@ export class ContextToken {
           inputStartIndex: 0,
           bestProbFromSet: BASE_PROBABILITY
         });
-        searchSpace = new SearchQuotientSpur(searchSpace, [{sample: transform, p: BASE_PROBABILITY}], 1);
+        searchSpace = new LegacyQuotientSpur(searchSpace, [{sample: transform, p: BASE_PROBABILITY}], 1);
       });
 
       this._searchModule = searchSpace;
@@ -142,7 +143,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this._searchModule = new SearchQuotientSpur(this._searchModule, distribution, inputSource.bestProbFromSet);
+    this._searchModule = new LegacyQuotientSpur(this._searchModule, distribution, inputSource.bestProbFromSet);
   }
 
   /**
