@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.186 alpha 2026-01-07
+
+* maint: add script to report on recent changes to stable release (#15389)
+
 ## 19.0.185 alpha 2026-01-06
 
 * chore(web): escape some additional values in TC service messages (#15384)
