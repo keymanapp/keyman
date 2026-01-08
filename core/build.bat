@@ -83,7 +83,7 @@ if "!COMMAND!" == "configure" (
   if "%1" == "--no-tests" (
     meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! -Dkeyman_core_tests=false --werror %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
   ) else (
-    meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+    meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! -Dkeyman_core_tests=true --werror %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
   )
   shift
 )

@@ -475,6 +475,10 @@ private:
 
           There is a possibility that some apps may try and sniff that 0x21D scan code and get confused because Keyman
           doesn't emit it. Hopefully this is rare.
+
+          See also:
+          * PostVisualKeyboardModifierEvent in k32_visualkeyboardinterface.cpp
+          * TfrmOSKOnScreenKeyboard.OskModifierEvent in UfrmOSKOnScreenKeyboard.cpp
         */
         INPUT input[2];
         input[0].type = INPUT_KEYBOARD;

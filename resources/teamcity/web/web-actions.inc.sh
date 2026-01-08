@@ -52,7 +52,7 @@ web_test_action() {
     trap ERR
   fi
 
-  "${KEYMAN_ROOT}/web/build.sh" coverage
+  builder_launch /web/build.sh coverage
 
   builder_echo end web_test success "Finished running tests for native KeymanWeb"
 }

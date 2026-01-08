@@ -2,7 +2,7 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "@microsoft/api-documenter": "^7.23.31",
+    "@microsoft/api-documenter": "^7.28.0",
     "@microsoft/api-extractor": "^7.47.3",
     "@types/chai": "^4.3.14",
     "@types/node": "^20.4.1",
@@ -22,7 +22,6 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^11.2.2",
-    "mocha-teamcity-reporter": "^4.0.0",
     "playwright": "^1.46.1",
     "sinon": "^17.0.1",
     "source-map-support": "^0.5.21",
@@ -62,17 +61,21 @@
   ],
   "dependencies": {
     "@keymanapp/common-types": "file:common/web/types",
-    "@keymanapp/langtags": "file:common/web/langtags",
     "@keymanapp/developer-test-helpers": "file:developer/src/common/web/test-helpers",
     "@keymanapp/developer-utils": "file:developer/src/common/web/utils",
     "@keymanapp/hextobin": "file:common/tools/hextobin",
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
+    "@keymanapp/langtags": "file:common/web/langtags",
     "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
   },
   "overrides": {
     "ajv-cli": {
       "fast-json-patch": "^3.1.1"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "engines": {
     "node": "20.16.0"

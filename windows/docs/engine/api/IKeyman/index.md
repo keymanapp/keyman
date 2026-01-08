@@ -74,7 +74,7 @@ for Windows API. The `IKeyman` interface can be instantiated with the
 ### VBScript
 
 This example can be saved with a .vbs extension to run through Windows
-Scripting. This is similar to the uninstall script that Keyman Desktop
+Scripting. This is similar to the uninstall script that Keyman for Windows
 generates for packages which have a Start Menu Uninstall entry.
 
 ``` basic
@@ -83,7 +83,7 @@ Set kmcom = CreateObject("keymanapi.Keyman")
 n = kmcom.Packages.IndexOf("SamplePackage")
 if n >= 0 then
   Set package = kmcom.Packages(n)
-  if msgbox("Uninstall package "+package.Description+"?", vbOKCancel, "Keyman Desktop") = vbOK then
+  if msgbox("Uninstall package "+package.Description+"?", vbOKCancel, "Keyman for Windows") = vbOK then
     package.Uninstall(True)
   end if
 else

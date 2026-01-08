@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">Nya Nasara</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Nya Nasara</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
   <string name="ssTitle">Vu $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION ndǝ kurta vu tǝni kuraka bwanai.</string>

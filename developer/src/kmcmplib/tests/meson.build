@@ -163,7 +163,10 @@ test('uset-api-tests', usetapitest)
 
 # Google Test
 
-gtestcompilertest = executable('gtest-compiler-tests', 'gtest-compiler.tests.cpp',
+gtestcompilertest = executable('gtest-compiler-tests', [
+    'gtest-compiler.tests.cpp',
+    'gtest-validation.tests.cpp',
+  ],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,

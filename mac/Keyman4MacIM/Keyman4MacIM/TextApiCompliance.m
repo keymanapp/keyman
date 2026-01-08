@@ -365,7 +365,8 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
                             [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
                             [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
                             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
-                            //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
+                            [clientAppId isEqual: @"com.microsoft.Word"] ||
+                            // Microsoft Word removed on 2020-11-24 but added back on 2025-10-10 for issue #14160
                             [clientAppId isEqual: @"org.openoffice.script"] ||
                             // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant
                             //[clientAppId isEqual: @"com.adobe.illustrator"] ||

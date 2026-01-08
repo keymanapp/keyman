@@ -23,10 +23,7 @@ builder_describe "Keyman kmc Keyboard Compiler module" \
   "api                       analyze API and prepare API documentation" \
   "clean" \
   "test" \
-  "build-fixtures            builds test fixtures for manual examination" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "build-fixtures            builds test fixtures for manual examination"
 
 builder_describe_outputs \
   configure     /developer/src/kmc-ldml/src/util/abnf/46/transform-from-required.js \
@@ -90,9 +87,3 @@ builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
 builder_run_action test            typescript_run_eslint_mocha_tests  90
-
-#-------------------------------------------------------------------------------------------------------------------
-
-. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
-
-builder_run_action publish     ci_publish_npm

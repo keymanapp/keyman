@@ -100,18 +100,24 @@ function test-headless() {
     tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
   fi
 
-  TEST_OPTS=
-  if builder_is_ci_build; then
-    TEST_OPTS="--reporter mocha-teamcity-reporter"
+  TEST_OPTS=()
+  if builder_is_running_on_teamcity; then
+    TEST_OPTS+=(--reporter "${KEYMAN_ROOT}/common/test/resources/mocha-teamcity-reporter/teamcity.cjs" --reporter-options parentFlowId="unit_tests")
+    echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
-  if [[ -n "$TEST_EXTENSIONS" ]]; then
-    TEST_OPTS="$TEST_OPTS --extension $TEST_EXTENSIONS"
+  if [[ -n "${TEST_EXTENSIONS}" ]]; then
+    TEST_OPTS+=(--extension "${TEST_EXTENSIONS}")
   fi
 
   if [[ -e .c8rc.json ]]; then
-    c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" $TEST_OPTS
+    c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   else
-    mocha --recursive "${TEST_BASE}${TEST_FOLDER}" $TEST_OPTS
+    mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
+  fi
+
+  if builder_is_running_on_teamcity; then
+    # we're running in TeamCity
+    echo "##teamcity[flowFinished flowId='unit_tests']"
   fi
 }
 

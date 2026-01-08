@@ -84,7 +84,7 @@ function _publish_to_downloads_keyman_com() {
     # TODO: is this still needed?
     if [[ -f "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
       cp "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}"
-      write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Desktop and Keyman Developer debug files" zip win
+      write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman for Windows and Keyman Developer debug files" zip win
     fi
 
     cd upload
@@ -102,7 +102,7 @@ function windows_publish_action() {
   export RSYNC_HOST
   export RSYNC_ROOT
 
-  "${KEYMAN_ROOT}/windows/build.sh" publish
+  builder_launch /windows/build.sh publish
   windows_upload_symbols_to_sentry
   ba_win_download_symbol_server_index
   ba_win_publish_new_symbols

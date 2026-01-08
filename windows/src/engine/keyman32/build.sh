@@ -36,6 +36,12 @@ function do_clean_x64() {
   clean_windows_project_files
 }
 
+function do_configure() {
+  # Install NuGet packages for keyman32.test.vcxproj
+  run_in_vs_env msbuild.exe tests/keyman32.tests.vcxproj -t:Restore "-clp:Verbosity=minimal" -nologo "-p:RestorePackagesConfig=true"
+  configure_windows_build_environment
+}
+
 function do_build_x86() {
   create-windows-output-folders
   build_version.res
@@ -74,12 +80,40 @@ function do_install_x64() {
   cp "$WINDOWS_PROGRAM_ENGINE/keyman64.dll" "$INSTALLPATH_KEYMANENGINE/keyman64.dll"
 }
 
+# Parameters:
+#   1: Platform = Win32 | x64
+# Note Platform should not be 'x86' but rather 'Win32' for 32-bit
+function do_test() {
+  local Platform="$1"
+  local Configuration=Release
+  if builder_is_debug_build; then
+    Configuration=Debug
+  fi
+
+  # We run these builds with minimal verbosity because generally any
+  # environmental details that could be helpful in logs will have been revealed
+  # in the build action, and it's cleaner when running testing locally to have
+  # minimal logs.
+  #
+  # This is a non-standard build target, e.g. "Debug Static Library", so we
+  # can't use our vs_msbuild wrapper here.
+  run_in_vs_env --quiet msbuild.exe keyman32.vcxproj "-clp:Verbosity=minimal" -noLogo "//p:Configuration=${Configuration} Static Library" "//t:Build" "//p:Platform=${Platform}"
+  # pushd tests >/dev/null
+  run_in_vs_env --quiet msbuild.exe tests/keyman32.tests.vcxproj "-clp:Verbosity=minimal" -noLogo "//p:Configuration=${Configuration}" //t:Build "//p:Platform=${Platform}"
+  # popd >/dev/null
+  echo
+
+  "./tests/bin/${Platform}/${Configuration}/keyman32.tests.exe"
+}
+
 builder_run_action clean:x86        do_clean_x86
 builder_run_action clean:x64        do_clean_x64
-builder_run_action configure        configure_windows_build_environment
+builder_run_action configure        do_configure
+
 builder_run_action build:x86        do_build_x86
 builder_run_action build:x64        do_build_x64
-# builder_run_action test:project         do_test
+builder_run_action test:x86         do_test Win32
+builder_run_action test:x64         do_test x64
 builder_run_action publish:x86      do_publish_x86
 builder_run_action publish:x64      do_publish_x64
 builder_run_action install:x86      do_install_x86

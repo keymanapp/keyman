@@ -23,6 +23,7 @@ on:
 # baseRef:     The ref of the previous commit. For a PR the same as `baseBranch`.
 # user:        The user that triggered the build or created the PR
 # isTestBuild: false for Releases, otherwise true
+# skipApiCheck: true to skip the API check, otherwise false
 
 env:
   COLOR_GREEN: "\e[32m"
@@ -30,11 +31,12 @@ env:
   STATUS_CONTEXT: 'Ubuntu Packaging'
   DEBFULLNAME: 'Keyman GHA packager'
   DEBEMAIL: 'support@keyman.com'
+  _builder_timings: false
 
 jobs:
   sourcepackage:
     name: Build source package
-    if: github.repository == 'keymanapp/keyman'
+    if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
     runs-on: ubuntu-24.04
     outputs:
       KEYMAN_VERSION: ${{ steps.version_step.outputs.KEYMAN_VERSION }}
@@ -134,7 +136,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [jammy, noble, plucky]
+        dist: [jammy, noble, plucky, questing]
 
     steps:
     - name: Checkout
@@ -160,7 +162,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [questing]
+        dist: [devel]
 
     steps:
     - name: Checkout
@@ -184,28 +186,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Download Artifacts
-    #   uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-    #   with:
-    #     path: artifacts
-    #     merge-multiple: true
-
-    # - name: Install dependencies
-    #   run: |
-    #     sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
-
-    # - name: Build test image
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest-buildvm-ubuntu-cloud -v --release=jammy
-
-    # - name: Run tests
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
-    - name: Ignore
+    - name: Free disk space
       run: |
-        echo "Ignored for now - until working solution is in place (#13777)"
+        # Free disk space by removing some large directories that we don't use (#15171)
+        # see https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+
+        # Remove Android SDKs (frees 12 GB on Ubuntu 24.04)
+        sudo rm -rf /usr/local/lib/android
+
+        # Remove Haskell (GHC) (frees 6.4 GB)
+        sudo rm -rf /usr/local/.ghcup
+
+        # Remove CodeQL and other toolcaches (frees 5.8 GB)
+        sudo rm -rf /opt/hostedtoolcache
+
+        # Remove .NET SDKs (frees 4.0 GB)
+        sudo rm -rf /usr/share/dotnet
+
+    - name: Download Source Artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        name: keyman-srcpkg
+        path: artifacts
+
+    - name: Download Binary Artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        path: artifacts
+        pattern: keyman-binarypkgs-*
+        merge-multiple: true
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
+
+    - name: Build test image
+      run: |
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        sudo chown ${USER} /dev/kvm
+        autopkgtest-buildvm-ubuntu-cloud -v --release=$(lsb_release -c -s)
+
+    - name: Run tests
+      run: |
+        # Tests are defined in linux/debian/tests/test-build
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        DIST="$(lsb_release -c -s)"
+        autopkgtest -B *${DIST}*.deb keyman_*.dsc -- qemu autopkgtest-${DIST}-amd64.img
 
   deb_signing:
     name: Sign source and binary packages
@@ -332,6 +359,7 @@ jobs:
         echo "GIT_BRANCH=${{ github.event.client_payload.branch }}" >> artifacts/env
         echo "GIT_BASE_BRANCH=${{ github.event.client_payload.baseBranch }}" >> artifacts/env
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
+        echo "SKIP_API_CHECK=${{ github.event.client_payload.skipApiCheck }}" >> artifacts/env
 
     - name: Cache artifacts
       uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3

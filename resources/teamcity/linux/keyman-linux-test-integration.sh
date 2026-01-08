@@ -33,7 +33,7 @@ cd "${KEYMAN_ROOT}/linux"
 function clean_action() {
   builder_heading "Cleaning up"
   # shellcheck disable=SC2154
-  "${KEYMAN_ROOT}/linux/build.sh" clean
+  builder_launch /linux/build.sh clean
 }
 
 if builder_has_action all; then
@@ -41,7 +41,9 @@ if builder_has_action all; then
   linux_install_dependencies_action
   linux_additional_test_dependencies_action
   tc_set_variables_for_nvm
+  # shellcheck disable=SC2119
   linux_build_action
+  # shellcheck disable=SC2119
   linux_unit_tests_action
 else
   builder_run_action  clean       clean_action

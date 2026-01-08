@@ -36,11 +36,11 @@ needed to display correctly.
 | Tibetan   | ![](images/TibetanSample.png) | བོད་ཡུལ།         | བོད་ཡུལ། |
 
 ---
-**If the embedded font display for a language is not exactly the same as in the corresponding image,** 
+**If the embedded font display for a language is not exactly the same as in the corresponding image,**
 for example, with script characters shown
 but incorrectly positioned or ordered, you will need to install the
-Keyman Desktop package for your language onto your computer. You can
-download the Keyman Desktop package by clicking the "Help on this
+Keyman for Windows package for your language onto your computer. You can
+download the Keyman for Windows package by clicking the "Help on this
 keyboard" link in the On Screen Keyboard. This is likely to be observed
 with scripts such as Burmese, Khmer or Tibetan if your operating system
 does not fully support the display of the font used for those scripts.

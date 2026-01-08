@@ -455,6 +455,7 @@ type
     procedure DoSaveJSON(ARoot: TJSONObject); virtual;
     procedure DoLoadIni(ini: TIniFile); virtual;
     procedure DoSaveIni(ini: TIniFile); virtual;
+    procedure Cleanup; virtual;
   public
     Options: TPackageOptions;
     StartMenu: TPackageStartMenu;
@@ -635,6 +636,11 @@ begin
   Result := ReplaceStr(ReplaceStr(Trim(VarToStr(v)), #$D#$A, #$A), #$A, #$D#$A);
 end;
 
+function TransformSlashes(filename: string): string;
+begin
+  Result := ReplaceStr(filename, '/', '\');
+end;
+
 {-------------------------------------------------------------------------------
  - TPackageOptions                                                             -
  ------------------------------------------------------------------------------}
@@ -697,10 +703,10 @@ procedure TPackageOptions.LoadXML(ARoot: IXMLNode);
 begin
   FileVersion :=                XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
   ExecuteProgram :=             XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ExecuteProgram'].NodeValue);
-  ReadmeFile :=                 Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
-  GraphicFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
-  LicenseFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue));
-  WelcomeFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue));
+  ReadmeFile :=                 Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue)));
+  GraphicFile :=                Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue)));
+  LicenseFile :=                Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue)));
+  WelcomeFile :=                Package.Files.FromFileName(TransformSlashes(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue)));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
   if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
@@ -1425,7 +1431,7 @@ begin
     with ANode.ChildNodes[i] do
     begin
       subfile := TPackageContentFile.Create(Package);
-      subfile.FileName := XmlVarToStr(ChildNodes['Name'].NodeValue);
+      subfile.FileName := TransformSlashes(XmlVarToStr(ChildNodes['Name'].NodeValue));
       subfile.Description := XmlVarToStr(ChildNodes['Description'].NodeValue);
       subfile.FCopyLocation := TPackageFileCopyLocation(StrToIntDef(XmlVarToStr(ChildNodes['Location'].NodeValue), 0));
       Add(subfile);
@@ -1884,11 +1890,18 @@ begin
   end;
 end;
 
+procedure TPackage.Cleanup;
+begin
+  // No op in basic package
+end;
+
 procedure TPackage.SaveXML;
 var
   doc: IXMLDocument;
   root: IXMLNode;
 begin
+  Cleanup;
+
   doc := NewXMLDocument;
   doc.Encoding := 'utf-8';
 
@@ -1909,6 +1922,8 @@ var
   doc: IXMLDocument;
   root: IXMLNode;
 begin
+  Cleanup;
+
   doc := NewXMLDocument;
   doc.Encoding := 'utf-8';
 
@@ -2238,8 +2253,8 @@ begin
 
     keyboard := TPackageKeyboard.Create(Package);
     keyboard.ID := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_ID]);
-    keyboard.OSKFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont]));
-    keyboard.DisplayFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont]));
+    keyboard.OSKFont := Package.Files.FromFileNameEx(TransformSlashes(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont])));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(TransformSlashes(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont])));
 
     keyboard.Languages.LoadXML(AKeyboard);
     keyboard.Examples.LoadXML(AKeyboard);
@@ -2877,7 +2892,7 @@ begin
   for i := 0 to ARoot.ChildNodes.Count - 1 do
   begin
     ANode := ARoot.ChildNodes[i];
-    f := Package.Files.FromFileNameEx(ANode.Attributes[SXML_PackageKeyboardFont_Filename]);
+    f := Package.Files.FromFileNameEx(TransformSlashes(XmlVarToStr(ANode.Attributes[SXML_PackageKeyboardFont_Filename])));
     if Assigned(f) then
       Add(f);
   end;
