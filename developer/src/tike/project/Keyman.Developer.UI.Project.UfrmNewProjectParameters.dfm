@@ -2,17 +2,17 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'New Basic Keyboard Project'
-  ClientHeight = 444
-  ClientWidth = 625
+  ClientHeight = 582
+  ClientWidth = 693
   Position = poScreenCenter
   OnDestroy = FormDestroy
-  ExplicitWidth = 631
-  ExplicitHeight = 473
+  ExplicitWidth = 699
+  ExplicitHeight = 611
   PixelsPerInch = 96
   TextHeight = 13
-  object lblFileName: TLabel
+  object lblKeyboardID: TLabel
     Left = 12
-    Top = 390
+    Top = 496
     Width = 64
     Height = 13
     Caption = '&Keyboard ID:'
@@ -20,7 +20,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblPath: TLabel
     Left = 12
-    Top = 363
+    Top = 469
     Width = 26
     Height = 13
     Caption = '&Path:'
@@ -36,7 +36,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblCoypright: TLabel
     Left = 12
-    Top = 180
+    Top = 150
     Width = 51
     Height = 13
     Caption = '&Copyright:'
@@ -44,7 +44,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblVersion: TLabel
     Left = 12
-    Top = 233
+    Top = 203
     Width = 39
     Height = 13
     Caption = '&Version:'
@@ -52,7 +52,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblAuthor: TLabel
     Left = 12
-    Top = 153
+    Top = 123
     Width = 37
     Height = 13
     Caption = 'A&uthor:'
@@ -60,15 +60,15 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblTargets: TLabel
     Left = 12
-    Top = 260
+    Top = 230
     Width = 41
     Height = 13
     Caption = '&Targets:'
     FocusControl = clbTargets
   end
   object lblKeyboardLanguages: TLabel
-    Left = 339
-    Top = 152
+    Left = 12
+    Top = 332
     Width = 52
     Height = 13
     Caption = '&Languages'
@@ -76,21 +76,21 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblProjectFilename: TLabel
     Left = 12
-    Top = 417
+    Top = 523
     Width = 77
     Height = 13
     Caption = 'Project &filename'
     FocusControl = editProjectFilename
   end
-  object Label1: TLabel
+  object lblFullCopyright: TLabel
     Left = 12
-    Top = 206
+    Top = 176
     Width = 68
     Height = 13
     Caption = 'Fu&ll copyright:'
     FocusControl = editFullCopyright
   end
-  object Label2: TLabel
+  object lblDescription: TLabel
     Left = 12
     Top = 38
     Width = 53
@@ -98,17 +98,136 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Caption = '&Description'
     FocusControl = memoDescription
   end
+  object lblKeyboardNameValidation: TLabel
+    Left = 424
+    Top = 11
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editKeyboardName
+    WordWrap = True
+  end
+  object lblDescriptionValidation: TLabel
+    Left = 424
+    Top = 38
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = memoDescription
+    WordWrap = True
+  end
+  object lblKeyboardIDValidation: TLabel
+    Left = 424
+    Top = 496
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editKeyboardID
+    WordWrap = True
+  end
+  object lblPathValidation: TLabel
+    Left = 424
+    Top = 469
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editPath
+    WordWrap = True
+  end
+  object lblCopyrightValidation: TLabel
+    Left = 424
+    Top = 150
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editCopyright
+    WordWrap = True
+  end
+  object lblVersionValidation: TLabel
+    Left = 424
+    Top = 203
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editVersion
+    WordWrap = True
+  end
+  object lblAuthorValidation: TLabel
+    Left = 424
+    Top = 123
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editAuthor
+    WordWrap = True
+  end
+  object lblTargetsValidation: TLabel
+    Left = 424
+    Top = 230
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = clbTargets
+    WordWrap = True
+  end
+  object lblLanguagesValidation: TLabel
+    Left = 424
+    Top = 332
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = gridKeyboardLanguages
+    WordWrap = True
+  end
+  object lblProjectFilenameValidation: TLabel
+    Left = 424
+    Top = 523
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editProjectFilename
+    WordWrap = True
+  end
+  object lblFullCopyrightValidation: TLabel
+    Left = 424
+    Top = 176
+    Width = 250
+    Height = 26
+    AutoSize = False
+    Caption = '(validation)'
+    FocusControl = editFullCopyright
+    WordWrap = True
+  end
+  object lblDescriptionMarkdown: TLabel
+    Left = 121
+    Top = 101
+    Width = 197
+    Height = 13
+    Caption = 'Markdown accepted, no embedded HTML'
+    Transparent = True
+  end
   object editKeyboardID: TEdit
     Left = 120
-    Top = 387
-    Width = 205
+    Top = 493
+    Width = 293
     Height = 21
     TabOrder = 13
     OnChange = editKeyboardIDChange
+    OnExit = ControlExit
   end
   object cmdBrowse: TButton
     Left = 340
-    Top = 360
+    Top = 466
     Width = 73
     Height = 21
     Caption = '&Browse...'
@@ -117,49 +236,54 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object editPath: TEdit
     Left = 120
-    Top = 360
+    Top = 466
     Width = 205
     Height = 21
     TabOrder = 11
     OnChange = editPathChange
+    OnExit = ControlExit
   end
   object editKeyboardName: TEdit
     Left = 120
     Top = 8
-    Width = 205
+    Width = 293
     Height = 21
     TabOrder = 0
     OnChange = editKeyboardNameChange
+    OnExit = ControlExit
   end
   object editCopyright: TEdit
     Left = 120
-    Top = 176
-    Width = 205
+    Top = 146
+    Width = 293
     Height = 21
     TabOrder = 3
     Text = 'Copyright '#169
     OnChange = editCopyrightChange
+    OnExit = ControlExit
   end
   object editVersion: TEdit
     Left = 120
-    Top = 230
-    Width = 205
+    Top = 200
+    Width = 293
     Height = 21
     TabOrder = 5
     Text = '1.0'
     OnChange = editVersionChange
+    OnExit = ControlExit
   end
   object editAuthor: TEdit
     Left = 120
-    Top = 150
-    Width = 205
+    Top = 120
+    Width = 293
     Height = 21
     TabOrder = 2
     OnChange = editAuthorChange
+    OnExit = ControlExit
   end
   object cmdOK: TButton
-    Left = 463
-    Top = 412
+    Left = 120
+    Top = 549
     Width = 73
     Height = 25
     Caption = 'OK'
@@ -168,8 +292,8 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
-    Left = 542
-    Top = 412
+    Left = 199
+    Top = 549
     Width = 73
     Height = 25
     Cancel = True
@@ -179,18 +303,19 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object clbTargets: TCheckListBox
     Left = 120
-    Top = 257
-    Width = 205
+    Top = 227
+    Width = 293
     Height = 97
     OnClickCheck = clbTargetsClickCheck
     ItemHeight = 13
     TabOrder = 6
+    OnExit = ControlExit
   end
   object gridKeyboardLanguages: TStringGrid
-    Left = 339
-    Top = 173
-    Width = 278
-    Height = 120
+    Left = 120
+    Top = 330
+    Width = 293
+    Height = 94
     ColCount = 2
     DefaultRowHeight = 16
     FixedCols = 0
@@ -204,8 +329,8 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
       64)
   end
   object cmdKeyboardAddLanguage: TButton
-    Left = 340
-    Top = 299
+    Left = 120
+    Top = 430
     Width = 73
     Height = 25
     Caption = '&Add...'
@@ -213,8 +338,8 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     OnClick = cmdKeyboardAddLanguageClick
   end
   object cmdKeyboardEditLanguage: TButton
-    Left = 419
-    Top = 299
+    Left = 199
+    Top = 430
     Width = 73
     Height = 25
     Caption = 'Ed&it...'
@@ -222,8 +347,8 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     OnClick = cmdKeyboardEditLanguageClick
   end
   object cmdKeyboardRemoveLanguage: TButton
-    Left = 498
-    Top = 299
+    Left = 278
+    Top = 430
     Width = 72
     Height = 25
     Caption = '&Remove'
@@ -232,30 +357,31 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object editProjectFilename: TEdit
     Left = 120
-    Top = 414
+    Top = 520
     Width = 293
     Height = 21
     TabStop = False
     ParentColor = True
     ReadOnly = True
     TabOrder = 14
-    OnChange = editKeyboardIDChange
   end
   object editFullCopyright: TEdit
     Left = 120
-    Top = 203
-    Width = 205
+    Top = 173
+    Width = 293
     Height = 21
     TabOrder = 4
     Text = 'Copyright '#169' YYYY'
     OnChange = editFullCopyrightChange
+    OnExit = ControlExit
   end
   object memoDescription: TMemo
     Left = 120
     Top = 35
-    Width = 497
-    Height = 109
+    Width = 293
+    Height = 62
     TabOrder = 1
     OnChange = memoDescriptionChange
+    OnExit = ControlExit
   end
 end

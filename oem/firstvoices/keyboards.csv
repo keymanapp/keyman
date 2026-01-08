@@ -2,7 +2,7 @@ Shortname,ID,Name,Region,9.0 Web Keyboard,Version,Language ID,Language Name
 fv,fv_inuvialuktun,Inuvialuktun,Arctic,fv_inuvialuktun_kmw-9.0.js,9.1.1,ikt-Latn,Inuinnaqtun (Latin)
 i,inuktitut_pirurvik,Kiputtijjut | ᑭᐳᑦᑎᔾᔪᑦ,Arctic,inuktitut_pirurvik-1.1.js,1.4.1,ike-Cans,Eastern Canadian Inuktitut (Unified Canadian Aboriginal Syllabics)
 i,inuktitut_latin,Qaliujaaqpait | ᖃᓕᐅᔮᖅᐸᐃᑦ,Arctic,inuktitut_latin-1.1.js,1.4,ike-Latn,Eastern Canadian Inuktitut (Latin)
-i,inuktitut_naqittaut,Qaniujaaqpait | ᖃᓂᐅᔮᖅᐸᐃᑦ,Arctic,inuktitut_naqittaut-1.3.js,1.6,ike-Cans,Eastern Canadian Inuktitut (Unified Canadian Aboriginal Syllabics)
+i,inuktitut_naqittaut,Qaniujaaqpait | ᖃᓂᐅᔮᖅᐸᐃᑦ,Arctic,inuktitut_naqittaut-1.3.js,1.6.1,ike-Cans,Eastern Canadian Inuktitut (Unified Canadian Aboriginal Syllabics)
 fv,fv_uummarmiutun,Uummarmiutun,Arctic,fv_uummarmiutun_kmw-9.0.js,9.1.1,ikt-Latn,Inuinnaqtun (Latin)
 fv,fv_eastern_canadian_inuktitut,ᐃᓄᒃᑎᑐᑦ (Eastern Canadian Inuktitut),Arctic,fv_eastern_canadian_inuktitut_kmw-9.0.js,9.2.1,ike-Cans,Eastern Canadian Inuktitut (Unified Canadian Aboriginal Syllabics)
 fv,fv_migmaq,Mi'gmawi'simg / Mi'kmawi'simk,Atlantic,fv_migmaq_kmw-9.0.js,9.1.2,mic-Latn,Mi'kmaq (Latin)
@@ -21,7 +21,7 @@ fv,fv_hulquminum_combine,Hul̓q̓umin̓um̓,BC Coast,fv_hulquminum_combine_kmw-9
 fv,fv_kwakwala_liqwala,Kʷak̓ʷala,BC Coast,fv_kwakwala_liqwala_kmw-9.0.js,9.3,kwk-Latn,Kwakiutl (Latin)
 fv,fv_kwakwala,Kwak̕wala,BC Coast,fv_kwakwala_kmw-9.0.js,9.2,kwk-Latn,Kwakiutl (Latin)
 fv,fv_lekwungen,Lekwungen (Lək̓ʷəŋən),BC Coast,fv_lekwungen_kmw-9.0.js,1.0.1,str,Straits Salish
-fv,fv_nexwslayemucen,Nəxʷsƛ̓ay̓əmúcən,BC Coast,fv_nexwslayemucen_kmw-9.0.js,11.0,clm,Clallam
+fv,fv_nexwslayemucen,Nəxʷsƛ̓ay̓əmúcən,BC Coast,fv_nexwslayemucen_kmw-9.0.js,11.0.1,clm,Clallam
 fv,fv_nisgaa,Nisg̱a'a,BC Coast,fv_nisgaa_kmw-9.0.js,9.2.1,ncg-Latn,Nisga'a (Latin)
 fv,fv_nuucaanul,Nuučaan̓uł,BC Coast,fv_nuucaanul_kmw-9.0.js,9.2,nuk-Latn,Nuu-chah-nulth (Latin)
 fv,fv_nuxalk,Nuxalk,BC Coast,fv_nuxalk_kmw-9.0.js,10.0.1,blc-Latn,Bella Coola (Latin)
@@ -53,14 +53,14 @@ fv,fv_ilnu_innu_aimun,Ilnu-Innu Aimun,Eastern Subarctic,fv_ilnu_innu_aimun_kmw-9
 fv,fv_swampy_cree,ᐃᓂᓂᒧᐎᐣ (Swampy Cree),Eastern Subarctic,fv_swampy_cree_kmw-9.0.js,9.2.1,csw-Cans,Swampy Cree (Unified Canadian Aboriginal Syllabics)
 fv,fv_moose_cree,ᐃᓕᓖᒧᐎᓐ (Moose Cree),Eastern Subarctic,fv_moose_cree_kmw-9.0.js,9.2.1,crm-Cans,Moose Cree (Unified Canadian Aboriginal Syllabics)
 fv,fv_northern_east_cree,ᐄᔨᔫ-ᐄᓅ ᐊᔨᒨᓐ (Northern East Cree),Eastern Subarctic,fv_northern_east_cree_kmw-9.0.js,9.2.1,crl-Cans,Northern East Cree (Unified Canadian Aboriginal Syllabics)
-fv,fv_severn_ojibwa,ᐊᓂᔑᓂᓂᒧᐎᐣ (Severn Ojibwa),Eastern Subarctic,fv_severn_ojibwa_kmw-9.0.js,10.1.1,ojs-Cans,Severn Ojibwa (Unified Canadian Aboriginal Syllabics)
+fv,fv_severn_ojibwa,ᐊᓂᔑᓂᓂᒧᐎᐣ (Severn Ojibwa),Eastern Subarctic,fv_severn_ojibwa_kmw-9.0.js,10.1.2,ojs-Cans,Severn Ojibwa (Unified Canadian Aboriginal Syllabics)
 fv,fv_severn_ojibwa_rdot,ᐊᓂᔑᓂᓂᒧᐏᐣ (Severn Ojibwa right w-dot),Eastern Subarctic,fv_severn_ojibwa_kmw-9.0.js,1.1.1,ojs,Oji-Cree
-fv,fv_ojibwa,ᐊᓂᔑᓇᐯᒧᐎᓐ (a-finals),Eastern Subarctic,fv_ojibwa_kmw-9.0.js,10.1,ojb-Cans,Northwestern Ojibwa (Unified Canadian Aboriginal Syllabics)
+fv,fv_ojibwa,ᐊᓂᔑᓇᐯᒧᐎᓐ (a-finals),Eastern Subarctic,fv_ojibwa_kmw-9.0.js,10.1.1,ojb-Cans,Northwestern Ojibwa (Unified Canadian Aboriginal Syllabics)
 fv,fv_ojibwa_rdot,ᐁᓂᔑᓇᐯᒧᐏᓐ (a-finals right w-dot),Eastern Subarctic,fv_ojibwa_rdot_kmw-9.0.js,1.0.3,oj,Ojibwa
-fv,fv_ojibwa_ifinal,ᐊᓂᔑᓇᐯᒧᐎᣙ (i-finals),Eastern Subarctic,fv_ojibwa_ifinal_kmw-9.0.js,1.0.2,oj,Ojibwa
-fv,fv_ojibwa_ifinal_rdot,ᐊᓂᔑᓇᐯᒧᐏᣙ (i-finals right w-dot),Eastern Subarctic,fv_ojibwa_ifinal_rdot_kmw-9.0.js,1.0.2,oj,Ojibwa
+fv,fv_ojibwa_ifinal,ᐊᓂᔑᓇᐯᒧᐎᣙ (i-finals),Eastern Subarctic,fv_ojibwa_ifinal_kmw-9.0.js,1.0.3,oj,Ojibwa
+fv,fv_ojibwa_ifinal_rdot,ᐊᓂᔑᓇᐯᒧᐏᣙ (i-finals right w-dot),Eastern Subarctic,fv_ojibwa_ifinal_rdot_kmw-9.0.js,1.0.3,oj,Ojibwa
 fv,fv_naskapi,ᓇᔅᑲᐱ (Naskapi),Eastern Subarctic,fv_naskapi_kmw-9.0.js,9.3.1,nsk-Cans,Naskapi (Unified Canadian Aboriginal Syllabics)
-sil,sil_euro_latin,English,European,european2-1.6.js,3.0.2,en,English
+sil,sil_euro_latin,English,European,european2-1.6.js,3.0.3,en,English
 basic,basic_kbdcan,Français,European,canadian_french-1.0.js,1.1.1,fr-CA,French (Canada)
 fv,fv_anishinaabemowin,Anishinaabemowin,Great Lakes - St. Lawrence,fv_anishinaabemowin_kmw-9.0.js,10.2,oj,Ojibwa
 fv,fv_bodewadminwen,Bodéwadminwen-Nishnabémwen,Great Lakes - St. Lawrence,fv_bodewadminwen_kmw-9.0.js,9.1.1,pot-Latn,Potawatomi (Latin)
@@ -83,7 +83,7 @@ fv,fv_isga_iabi,Isga Iʔabi,Prairies,fv_isga_iabi_kmw-9.0.js,9.1.1,sto-Latn,Ston
 fv,fv_lakota,Lak̇ot̄a,Prairies,fv_lakota-9.0.js,9.1.1,lkt-Latn,Lakota (Latin)
 fv,fv_nakoda,Nakoda,Prairies,fv_nakoda_kmw-9.0.js,9.1.1,asb-Latn,Assiniboine (Latin)
 fv,fv_tsuutina,Tsúùt'ínà,Prairies,fv_tsuutina_kmw-9.0.js,9.1.1,srs-Latn,Sarsi (Latin)
-fv,fv_plains_cree,ᓀᐦᐃᔭᐍᐏᐣ (Plains Cree),Prairies,fv_plains_cree_kmw-9.0.js,11.1,crk-Cans,ᓀᐦᐃᔭᐍᐏᐣ (Cree syllabics)
+fv,fv_plains_cree,ᓀᐦᐃᔭᐍᐏᐣ (Plains Cree),Prairies,fv_plains_cree_kmw-9.0.js,11.1.1,crk-Cans,ᓀᐦᐃᔭᐍᐏᐣ (Cree syllabics)
 fv,fv_dine_bizaad,Diné Bizaad,South West,fv_dine_bizaad_kmw-9.0.js,9.1.1,nv-Latn,Navajo (Latin)
 fv,fv_dane_zaa_zaage,Dane-Z̲aa Z̲áágéʔ,Western Subarctic,fv_dane_zaa_zaage_kmw-9.0.js,9.4.1,bea,Beaver
 fv,fv_dene_dzage,Danezāgéʼ,Western Subarctic,fv_dene_dzage_kmw-9.0.js,11.0.1,kkz-Latn,Kaska (Latin)

@@ -58,8 +58,6 @@ Depends:
  ibus-keyman (>= ${binary:Version}),
  ibus-keyman (<< ${binary:Version}.1~),
  ${misc:Depends},
-Recommends:
- onboard-keyman,
 Description: Type in your language with Keyman for Linux
  Keyman makes it possible for you to type in over 2,000 languages on Windows,
  macOS, Linux, iPhone, iPad, Android tablets and phones, and even instantly
@@ -88,7 +86,7 @@ Package: python3-keyman-config
 Section: python
 Architecture: all
 Depends:
- dbus-x11,
+ default-dbus-session-bus | dbus-session-bus,
  dconf-cli,
  gir1.2-webkit2-4.1,
  keyman-engine,

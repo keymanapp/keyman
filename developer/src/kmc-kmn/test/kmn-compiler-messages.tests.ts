@@ -80,7 +80,7 @@ describe('KmnCompilerMessages', function () {
   // Message tests
   //
 
-  async function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
+  async function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number | number[]) {
     context.timeout(10000);
 
     callbacks.clear();
@@ -94,7 +94,9 @@ describe('KmnCompilerMessages', function () {
     // Note: throwing away compile results (just to memory)
     await compiler.run(kmnPath, null);
 
-    if(messageId) {
+    if(Array.isArray(messageId)) {
+      assert.sameMembers(messageId, callbacks.messages.map(m=>m.code));
+    } else if(messageId) {
       assert.isTrue(callbacks.hasMessage(messageId), `messageId ${messageId.toString(16)} not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
       assert.lengthOf(callbacks.messages, 1, `messages should have 1 entry, instead has: `+JSON.stringify(callbacks.messages,null,2));
     } else {
@@ -221,6 +223,66 @@ describe('KmnCompilerMessages', function () {
   it('should generate ERROR_TextBeforeOrAfterNulInOutput if text before or after nul in output', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_text_before_or_after_nul_in_output_before.kmn'], KmnCompilerMessages.ERROR_TextBeforeOrAfterNulInOutput);
     await testForMessage(this, ['invalid-keyboards', 'error_text_before_or_after_nul_in_output_after.kmn'], KmnCompilerMessages.ERROR_TextBeforeOrAfterNulInOutput);
+  });
+
+  // Note: for historical reasons, invalid deadkeys can generate two errors: one
+  // for the name itself, the second being the return value from GetXString.
+
+  // ERROR_NameMustBeAtLeastOneCharLong
+
+  it('should generate ERROR_NameMustBeAtLeastOneCharLong if a required name is empty', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_be_at_least_one_char_long-group.kmn'], KmnCompilerMessages.ERROR_NameMustBeAtLeastOneCharLong);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_be_at_least_one_char_long-store.kmn'], KmnCompilerMessages.ERROR_NameMustBeAtLeastOneCharLong);
+    // Note, currently caught earlier by invalid deadkey check, keeping (misleadingly-named) test here anyway
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_be_at_least_one_char_long-deadkey.kmn'], KmnCompilerMessages.ERROR_InvalidDeadkey);
+  });
+
+  // ERROR_NameMustBeAtMostNCharsLong
+
+  it('should generate ERROR_NameMustBeAtMostNCharsLong if a name is too long', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_be_at_most_n_chars_long-group.kmn'], KmnCompilerMessages.ERROR_NameMustBeAtMostNCharsLong);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_be_at_most_n_chars_long-store.kmn'], KmnCompilerMessages.ERROR_NameMustBeAtMostNCharsLong);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_be_at_most_n_chars_long-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameMustBeAtMostNCharsLong, KmnCompilerMessages.ERROR_InvalidDeadkey]);
+  });
+
+  // ERROR_NameContainsInvalidCharacter
+
+  it('should generate ERROR_NameContainsInvalidCharacter if the name contains a Unicode invalid/control character', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_name_contains_invalid_character-group.kmn'], KmnCompilerMessages.ERROR_NameContainsInvalidCharacter);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_contains_invalid_character-store.kmn'], KmnCompilerMessages.ERROR_NameContainsInvalidCharacter);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_contains_invalid_character-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameContainsInvalidCharacter, KmnCompilerMessages.ERROR_InvalidDeadkey]);
+  });
+
+  // ERROR_NameMustNotContainSpaces
+
+  it('should generate ERROR_NameMustNotContainSpaces if the name has a space', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_spaces-group.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainSpaces);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_spaces-store.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainSpaces);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_spaces-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameMustNotContainSpaces, KmnCompilerMessages.ERROR_InvalidDeadkey]);
+  });
+
+  // ERROR_NameMustNotContainComma
+
+  it('should generate ERROR_NameMustNotContainComma if the name has a comma', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_comma-group.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainComma);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_comma-store.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainComma);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_comma-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameMustNotContainComma, KmnCompilerMessages.ERROR_InvalidDeadkey]);
+  });
+
+  // ERROR_NameMustNotContainParentheses
+
+  it('should generate ERROR_NameMustNotContainParentheses if the name has parentheses', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_parentheses-group.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainParentheses);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_parentheses-store.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainParentheses);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_parentheses-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameMustNotContainParentheses, KmnCompilerMessages.ERROR_InvalidDeadkey]);
+  });
+
+  // ERROR_NameMustNotContainSquareBrackets
+
+  it('should generate ERROR_NameMustNotContainSquareBrackets if the name has square brackets', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_square_brackets-group.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainSquareBrackets);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_square_brackets-store.kmn'], KmnCompilerMessages.ERROR_NameMustNotContainSquareBrackets);
+    await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_square_brackets-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameMustNotContainSquareBrackets, KmnCompilerMessages.ERROR_InvalidDeadkey]);
   });
 
 });

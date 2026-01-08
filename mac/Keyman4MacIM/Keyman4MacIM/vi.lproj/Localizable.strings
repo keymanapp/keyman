@@ -67,8 +67,11 @@
 /* copyright label in the Package Information window */
 "copyright-label" = "Bản quyền:";
 
-/* message displayed to alert user to need grant accessibility permission */
+/* message displayed to alert user to grant accessibility permission in Preferences, pre-Ventura */
 "privacy-alert-text" = "Để hoạt động đúng, Keyman yêu cầu tính năng trợ năng:\n\nCấp quyền truy cập trong Thông tin Hệ thống, Bảo mật & Riêng tư.\nKhởi động lại hệ thống của bạn.";
+
+/* message displayed to alert user to grant accessibility permission in Settings, for macOS Ventura and later */
+"privacy-alert-text-ventura" = "Để hoạt động đúng, Keyman yêu cầu tính năng trợ năng:\n\nCấp quyền truy cập trong Thông tin Hệ thống, Bảo mật & Riêng tư.\nKhởi động lại hệ thống của bạn.";
 
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
 "no-keyboard-configured-menu-placeholder" = "(Không có bàn phím được cấu hình)";

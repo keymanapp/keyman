@@ -79,7 +79,7 @@ builder_parse "$@"
 # if we don't plan to run them, for example when doing a dependency build
 # in CI
 #
-MESON_OPTION_keyman_core_tests=
+MESON_OPTION_keyman_core_tests="-Dkeyman_core_tests=true"
 BUILD_BAT_keyman_core_tests=
 
 if builder_is_dep_build || builder_has_option --no-tests; then

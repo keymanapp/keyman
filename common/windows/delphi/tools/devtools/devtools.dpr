@@ -11,17 +11,18 @@ uses
   DevUtils in 'DevUtils.pas',
   DevReleaseBuildCheck in 'DevReleaseBuildCheck.pas',
   DevCheckGitStatus in 'DevCheckGitStatus.pas',
-  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  utilsystem in '..\..\..\..\..\common\windows\delphi\general\utilsystem.pas',
-  utilexecute in '..\..\..\..\..\common\windows\delphi\general\utilexecute.pas',
-  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
+  RegistryKeys in '..\..\general\RegistryKeys.pas',
+  KeymanVersion in '..\..\general\KeymanVersion.pas',
+  utilsystem in '..\..\general\utilsystem.pas',
+  utilexecute in '..\..\general\utilexecute.pas',
+  Unicode in '..\..\general\Unicode.pas',
+  GetOsVersion in '..\..\general\GetOsVersion.pas',
   SourceRootPath in 'SourceRootPath.pas',
   Keyman.System.DevTools.BuildMessageConstants in 'Keyman.System.DevTools.BuildMessageConstants.pas',
   Keyman.System.DevTools.BuildSetupStringTranslations in 'Keyman.System.DevTools.BuildSetupStringTranslations.pas',
   SetupStrings in '..\..\..\..\..\windows\src\desktop\setup\SetupStrings.pas',
-  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
+  Keyman.System.DevTools.BuildLocaleIndex in 'Keyman.System.DevTools.BuildLocaleIndex.pas';
 
 begin
   try

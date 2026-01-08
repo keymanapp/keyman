@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 set -eu
-TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
+TESTDIR=${XDG_DATA_HOME:-${HOME}/.local/share}/keyman/test_kmx
 
 . "$(dirname "$0")"/test-helper.inc.sh
 
-if [ -v KEYMAN_PKG_BUILD ]; then
+if [[ -v KEYMAN_PKG_BUILD ]]; then
   # During package builds we skip these tests that require to start ibus because
   # ibus requires to find /var/lib/dbus/machine-id or /etc/machine-id, otherwise it fails with:
   # "Bail out! IBUS-FATAL-WARNING: Unable to load /var/lib/dbus/machine-id: Failed to open file
-  # “/var/lib/dbus/machine-id”: No such file or directory"
+  # "/var/lib/dbus/machine-id": No such file or directory"
   echo "TAP version 14"
   echo "1..0  # SKIP on package build"
   exit 0
 fi
 
-if ! which Xvfb > /dev/null || ! which Xephyr > /dev/null || ! which metacity > /dev/null || ! which mutter > /dev/null; then
+if ! command -v Xvfb > /dev/null || ! command -v Xephyr > /dev/null || ! command -v metacity > /dev/null || ! command -v mutter > /dev/null; then
   echo "Please install Xvfb, Xephyr, metacity and mutter before running these tests!"
   echo "sudo apt install xvfb xserver-xephyr metacity mutter"
   exit 1
@@ -53,7 +53,7 @@ function run_tests() {
   # shellcheck disable=SC2086
   "${G_TEST_BUILDDIR:-.}"/ibus-keyman-tests ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
-    --directory "$TESTDIR" ${ARG_DISPLAY_SERVER} "$TESTFILE"
+    --directory "${TESTDIR}" ${ARG_DISPLAY_SERVER} "${TESTFILE}"
   echo "# Finished tests."
 }
 
@@ -79,14 +79,14 @@ while (( $# )); do
 done
 
 # shellcheck disable=SC2236
-if [ -n "${ARG_PIDS:-}" ] && [ ! -n "${ARG_CLEANUP:-}" ]; then
+if [[ -n "${ARG_PIDS:-}" ]] && [[ ! -n "${ARG_CLEANUP:-}" ]]; then
   echo "Error: '--check' also requires '--cleanup'. Exiting."
   exit 6
 fi
 
-check_processes_running "$ARG_DISPLAY_SERVER" "$ARG_ENV" "$ARG_CLEANUP" "$ARG_PIDS" "$ARG_TESTNAME" >&2
+check_processes_running "${ARG_DISPLAY_SERVER}" "${ARG_ENV}" "${ARG_CLEANUP}" "${ARG_PIDS}" "${ARG_TESTNAME}" >&2
 
 # shellcheck source=/dev/null
-. "$ARG_ENV"
+. "${ARG_ENV}"
 
 run_tests

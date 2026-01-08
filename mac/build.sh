@@ -293,7 +293,7 @@ do_publish() {
   "${KM4MIM_BASE_PATH}/make-km-dmg.sh"
 
   local UPLOAD_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
-  write_download_info "${UPLOAD_PATH}" "keyman-${KEYMAN_VERSION}.dmg" "Keyman4MacIM" dmg mac
+  write_download_info "${UPLOAD_PATH}" "keyman-${KEYMAN_VERSION_FOR_FILENAME}.dmg" "Keyman4MacIM" dmg mac
 
   if builder_is_ci_build && builder_is_ci_build_level_release; then
     do_sentry

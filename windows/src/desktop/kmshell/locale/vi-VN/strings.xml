@@ -466,14 +466,22 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
   <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">Các bản cập nhật hiện có sẽ được áp dụng khi Windows được khởi động lại lần tiếp theo:</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_Current_Version" comment="Update tab Currently Installed Version">Phiên bản hiện tại</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_New_Version" comment="Update tab New Version">Phiên bản mới</string>
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Việc cập nhật ngay bây giờ yêu cầu khởi động lại máy tính.</string>
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Cài đặt bản cập nhật ngay bây giờ sẽ yêu cầu khởi động lại máy tính của bạn trước khi bạn có thể sử dụng Keyman một lần nữa. Bạn có cập nhật ngay bây giờ không?</string>
   <!-- Context: Configuration Dialog - Update on boot pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Bản cập nhật Keyman đã sẵn sàng để cài đặt.</string>
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Bản cập nhật Keyman đã được tải xuống và sẵn sàng cài đặt.</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -569,6 +577,10 @@
   <string name="S_Update" comment="Update tab name">Cập nhật</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update_Now" comment="Update now button">Cập nhật ngay</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">Các thành phần Keyman đã cập nhật khả dụng</string>
   <!-- Context: Online Update Dialog -->
@@ -638,10 +650,18 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">Thoát &amp;kiểm tra cập nhật trực tuyến</string>
+  <!-- Context: Install Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Later" comment="Apply Update Later">Để sau</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
   <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Áp dụng cập nhật ngay</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Button_Update_InstallNow" comment="Install update now button - update dialog">Cài đặt bản cập nhật ngay</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
@@ -928,7 +948,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Thông tin gỡ lỗi Keyman sẽ được lưu trữ trong tệp nhật ký có tên %LOCALAPPDATA%\Keyman\Diag\system#.etl (trong đó # là một số). Bạn nên thoát khỏi Keyman trước khi cố gắng xóa tệp này.\n\n\CẢNH BÁO: Tệp này có thể tăng kích thước rất nhanh. Việc bật gỡ lỗi có thể làm chậm hệ thống của bạn và chỉ nên thực hiện nếu được bộ phận hỗ trợ kỹ thuật khuyên dùng.\n\nCẢNH BÁO VỀ QUYỀN RIÊNG TƯ: Xin lưu ý rằng tệp nhật ký gỡ lỗi ghi lại tất cả các lần nhấn phím mà bạn nhập. Bạn chỉ nên bật nhật ký gỡ lỗi trong thời gian diễn ra phiên gỡ lỗi hoặc chẩn đoán.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Thông tin gỡ lỗi Keyman sẽ được lưu trữ trong tệp nhật ký có tên %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (trong đó # là một số). Bạn nên thoát khỏi Keyman trước khi cố gắng xóa tệp này.\n\n\CẢNH BÁO: Tệp này có thể tăng kích thước rất nhanh. Việc bật gỡ lỗi có thể làm chậm hệ thống của bạn và chỉ nên thực hiện nếu được bộ phận hỗ trợ kỹ thuật khuyên dùng.\n\nCẢNH BÁO VỀ QUYỀN RIÊNG TƯ: Xin lưu ý rằng tệp nhật ký gỡ lỗi ghi lại tất cả các lần nhấn phím mà bạn nhập. Bạn chỉ nên bật nhật ký gỡ lỗi trong thời gian diễn ra phiên gỡ lỗi hoặc chẩn đoán.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

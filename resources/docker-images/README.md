@@ -57,9 +57,9 @@ reason is that the Docker images use a different user, so that paths
 will be different.
 
 **Warning:** On Windows, don't mix building in Windows/git-bash and WSL/Docker
-without a full clean (`git clean -fdx`) of the repository. Mixed building will 
+without a full clean (`git clean -fdx`) of the repository. Mixed building will
 fail for many reasons, including, among others:
-* many CLI tools have different names, and references are cached in configure 
+* many CLI tools have different names, and references are cached in configure
   steps
 * cached paths may be stored with backslashes which work only on Windows
 * Keyman Core has varying targets based on the build platform
@@ -74,3 +74,87 @@ To run the tests locally, use the `run.sh` script:
 # Run common/web tests
 resources/docker-images/run.sh :web -- common/web/build.sh --debug test
 ```
+
+## Using a Docker container registry
+
+It is possible to keep the Docker images in a container registry.
+
+The parameters for `run.sh` and `build.sh` are
+* `--registry`
+
+  the container registry used to keep the images
+* `--username`
+
+  a user name for the container registry
+* `--password`
+
+  the user's password
+
+`--username` and `--password` are not required, if the registry can be
+accessed without username and password.
+
+The default for the registry is `ghcr.io`.
+
+Building the images for a registry and pushing them to it, looks like:
+
+```shell
+resources/docker-images/build.sh --registry 'myregistry:5678' --username 'user' --password 'password' build,publish:
+```
+
+Running tests locally with the `run.sh` looks like:
+
+```shell
+resources/docker-images/run.sh :web --registry 'myregistry:5678' --username 'user' --password 'password' -- web/build.sh test
+```
+
+## Running GitHub Actions locally
+
+There exist [GitHub actions for building the Docker images](../../.github/workflows/build-test-publish-docker.yml).
+For testing and developing the workflow can be started locally.
+As a prerequisite [act](https://nektosact.com/) must be installed.
+
+This is an exmaple for running the workflow with act:
+
+```bash
+#!/bin/bash
+# runs GitHub workflow locally for building, testing and publishing Docker images
+# requires act (https://nektosact.com/)
+# requires a GitHub token with repo permissions (e.g. GITHUB_TOKEN from a personal access token)
+# requires Docker with buildx support
+
+tempfile=/tmp/event.json
+
+cat > ${tempfile} <<EOF
+{
+  "client_payload": {
+  },
+  "action": "build-test-publish-docker",
+  "act": true
+}
+EOF
+
+act repository_dispatch \
+  -e /tmp/event.json \
+  --actor='<username>' \
+  -s GITHUB_TOKEN='<GitHub token>' \
+  --container-options "--user runner:$(getent group docker | cut -d: -f3)" \
+   -W '.github/workflows/build-test-publish-docker.yml'
+
+rm -f ${tempfile}
+```
+
+## Remote Debugging in Docker Container
+
+It is possible to remote debug in the Docker container by passing `--remote-debug`
+to the `run.sh` script.
+
+For example to debug the integration tests in Docker:
+
+* Run Docker container with:
+
+  ```bash
+  resources/docker-images/run.sh --remote-debug :linux -- linux/ibus-keyman/tests/scripts/run-tests.sh \
+    --no-x11 --remote-debug -- --directory /home/build/.local/share/keyman/test_kmx k_001___basic_input_unicodei
+  ```
+
+* then attach debugger in vscode

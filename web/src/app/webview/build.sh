@@ -78,7 +78,7 @@ compile_and_copy() {
   node map-polyfill-bundler.js
 
   # For dependent test pages.
-  "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
+  builder_launch /web/src/test/manual/embed/android-harness/build.sh configure,build
 }
 
 builder_run_action configure node_select_version_and_npm_ci

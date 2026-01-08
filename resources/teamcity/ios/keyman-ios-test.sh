@@ -52,16 +52,14 @@ function __do_upload_to_testflight() {
     local FASTLANE_ITC_PROVIDER="$1"
     local FASTLANE_API_KEY_ID="$2"
     local APP_IPA_DST
-    local BUILD_NUMBER
 
     export FASTLANE_ITC_TEAM_ID="$3"
     export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
 
-    BUILD_NUMBER=$(cat ../VERSION.md)
-    APP_IPA_DST="$4-ios-${BUILD_NUMBER}.ipa"
+    APP_IPA_DST="$4-ios-${KEYMAN_VERSION_FOR_FILENAME}.ipa"
 
-    cd "upload/${BUILD_NUMBER}"
+    cd "upload/${KEYMAN_VERSION}"
     command -v fastlane
     # shellcheck disable=SC2154
     fastlane pilot upload \
