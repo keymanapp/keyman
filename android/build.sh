@@ -62,11 +62,12 @@ function do_test_help() {
 
 function archive_artifacts() {
   local UPLOAD_PATH KEYMAN_ENGINE_ANDROID_ZIP KEYMAN_APK FIRSTVOICES_APK
+  local KEYMAN_FULLY_VERSIONED_APK FIRSTVOICES_FULLY_VERSIONED_APK
 
   UPLOAD_PATH="${KEYMAN_ROOT}/android/upload/${KEYMAN_VERSION}"
   KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
-  KEYMAN_APK="keyman-${KEYMAN_VERSION}.apk"
-  FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION}.apk"
+  KEYMAN_APK="keyman-${KEYMAN_VERSION_FOR_FILENAME}.apk"
+  FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.apk"
 
   rm -rf "${UPLOAD_PATH}"
   mkdir -p "${UPLOAD_PATH}"
@@ -87,12 +88,12 @@ function archive_artifacts() {
   )
 
   # Copy release APK
-  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
+  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}/${KEYMAN_APK}"
 
   # FirstVoices app
 
   if [[ "${RELEASE_OEM_FIRSTVOICES-false}" = true ]]; then
-    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}"
+    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}/${FIRSTVOICES_APK}"
   fi
 
   #

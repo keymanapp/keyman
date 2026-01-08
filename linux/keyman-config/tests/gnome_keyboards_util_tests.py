@@ -4,7 +4,7 @@ import unittest
 from unittest import mock
 from unittest.mock import patch
 
-from keyman_config.gnome_keyboards_util import is_gnome_desktop, _reset_gnome_shell
+from keyman_config.gnome_keyboards_util import get_ibus_keyboard_id, is_gnome_desktop, _reset_gnome_shell
 
 
 class GnomeKeyboardsUtilTests(unittest.TestCase):
@@ -34,6 +34,37 @@ class GnomeKeyboardsUtilTests(unittest.TestCase):
         mockSystem.return_value = 1
         # Execute/Verify
         self.assertEqual(is_gnome_desktop(), True)
+
+    def test_GetIbusKeyboardId_NoKeyboard(self):
+        self.assertIsNone(get_ibus_keyboard_id(None, '/tmp'))
+
+    def test_GetIbusKeyboardId_IgnoreLanguage(self):
+        keyboard = {'id': 'foo'}
+        self.assertEqual(get_ibus_keyboard_id(keyboard, '/tmp', ignore_language=True), '/tmp/foo.kmx')
+
+    def test_GetIbusKeyboardId_NoLanguage(self):
+        keyboard = {'id': 'foo'}
+        self.assertEqual(get_ibus_keyboard_id(keyboard, '/tmp'), '/tmp/foo.kmx')
+
+    def test_GetIbusKeyboardId_EmptyLanguage(self):
+        keyboard = {'id': 'foo'}
+        self.assertEqual(get_ibus_keyboard_id(keyboard, '/tmp', ''), '/tmp/foo.kmx')
+
+    def test_GetIbusKeyboardId_Language(self):
+        keyboard = {'id': 'foo'}
+        self.assertEqual(get_ibus_keyboard_id(keyboard, '/tmp', 'en'), 'en:/tmp/foo.kmx')
+
+    def test_GetIbusKeyboardId_LanguagesInKeyboard(self):
+        keyboard = {'id': 'foo', 'languages': [ {'id': 'fr'}]}
+        self.assertEqual(get_ibus_keyboard_id(keyboard, '/tmp'), 'fr:/tmp/foo.kmx')
+
+    def test_GetIbusKeyboardId_MultipleLanguagesInKeyboard(self):
+        keyboard = {'id': 'foo', 'languages': [{'id': 'km'}, {'id': 'fr'}]}
+        self.assertEqual(get_ibus_keyboard_id(keyboard, '/tmp'), 'km:/tmp/foo.kmx')
+
+    def test_GetIbusKeyboardId_InvalidLanguagesInKeyboard(self):  # 14748
+        keyboard = {'id': 'foo', 'languages': ['es']}
+        self.assertEqual(get_ibus_keyboard_id(keyboard, '/tmp'), '/tmp/foo.kmx')
 
 
 if __name__ == '__main__':

@@ -5,4 +5,7 @@ set -eu
 
 exit_on_package_build
 
-cleanup "$1"
+CLEANUP_FILE="$1"
+DISPLAY_SERVER="$2"
+
+cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER}"

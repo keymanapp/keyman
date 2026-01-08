@@ -84,31 +84,34 @@ function triggerTeamCityBuild() {
 #   2: 'skip' - don't run build; 'build' - run build and unit tests; 'test' - run build, unit tests, and deploy
 #   3: Action name
 #   4: branch name in git
+#   5: 'true' to skip API checks, 'false' to run them (optional, default 'false')
 #
 function triggerGitHubActionsBuild() {
   local IS_TEST_BUILD="$1"
   local BUILD_LEVEL="$2"
   local GITHUB_ACTION="$3"
   local GIT_BRANCH="$4"
+  local SKIP_API_CHECK="${5:-"false"}"
   local GIT_BASE_BRANCH="${GIT_BRANCH}"
   local GIT_USER="keyman-server"
   local GIT_BUILD_SHA GIT_BASE_REF JSON
 
   local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman
 
-  if [ "${action:-""}" == "commit" ]; then
+  if [[ "${action:-""}" == "commit" ]]; then
     # This will only be true if we created and pushed a tag
-    GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@$KEYMAN_VERSION_WITH_TAG")"
+    GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@${KEYMAN_VERSION_WITH_TAG}")"
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${KEYMAN_VERSION_WITH_TAG}"
-  elif [[ $GIT_BRANCH =~ ^[0-9]+$ ]]; then
+  elif [[ ${GIT_BRANCH} =~ ^[0-9]+$ ]]; then
     # pull request
-    local JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token $GITHUB_TOKEN")
-    GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
+    local JSON
+    JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token ${GITHUB_TOKEN}")
+    GIT_BUILD_SHA="$(echo "${JSON}" | ${JQ} -r '.head.sha')"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
-    GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"
-    GIT_BASE_BRANCH="$(echo "$JSON" | $JQ -r '.base.ref')"
-    GIT_BASE_REF="$(echo "$JSON" | $JQ -r '.base.sha')"
+    GIT_USER="$(echo "${JSON}" | ${JQ} -r '.user.login')"
+    GIT_BASE_BRANCH="$(echo "${JSON}" | ${JQ} -r '.base.ref')"
+    GIT_BASE_REF="$(echo "${JSON}" | ${JQ} -r '.base.sha')"
     GIT_BRANCH="PR-${GIT_BRANCH}"
   else
     # another branch: stable-x.y, beta, or master
@@ -118,20 +121,21 @@ function triggerGitHubActionsBuild() {
   fi
 
   local DATA="{
-    \"event_type\": \"$GIT_EVENT_TYPE\", \
+    \"event_type\": \"${GIT_EVENT_TYPE}\", \
     \"client_payload\": { \
-      \"buildSha\": \"$GIT_BUILD_SHA\", \
-      \"branch\": \"$GIT_BRANCH\", \
-      \"baseBranch\": \"$GIT_BASE_BRANCH\", \
-      \"baseRef\": \"$GIT_BASE_REF\", \
-      \"user\": \"$GIT_USER\", \
-      \"isTestBuild\": \"$IS_TEST_BUILD\", \
-      \"buildLevel\": \"$BUILD_LEVEL\" \
+      \"buildSha\": \"${GIT_BUILD_SHA}\", \
+      \"branch\": \"${GIT_BRANCH}\", \
+      \"baseBranch\": \"${GIT_BASE_BRANCH}\", \
+      \"baseRef\": \"${GIT_BASE_REF}\", \
+      \"user\": \"${GIT_USER}\", \
+      \"isTestBuild\": \"${IS_TEST_BUILD}\", \
+      \"buildLevel\": \"${BUILD_LEVEL}\", \
+      \"skipApiCheck\": \"${SKIP_API_CHECK}\" \
     }}"
 
-  echo "GitHub Action Data: $DATA"
+  echo "GitHub Action Data: ${DATA}"
 
-  if [[ "$GIT_BUILD_SHA" == null ]]; then
+  if [[ "${GIT_BUILD_SHA}" == null ]]; then
     echo "Invalid GIT_BUILD_SHA"
     exit 1
   fi
@@ -141,8 +145,8 @@ function triggerGitHubActionsBuild() {
   call_curl "${GITHUB_SERVER}/dispatches" \
     --request POST \
     --header "Accept: application/vnd.github+json" \
-    --header "Authorization: token $GITHUB_TOKEN" \
-    --data "$DATA"
+    --header "Authorization: token ${GITHUB_TOKEN}" \
+    --data "${DATA}"
   echo
 }
 
@@ -157,31 +161,32 @@ function call_curl() {
 
   local curl_result
   local http_code
-  local output_file=$(mktemp)
+  local output_file
+  output_file=$(mktemp)
 
   set +e
   if [[ $# -gt 0 ]]; then
-    http_code=$(curl --silent --output $output_file --no-progress-meter --write-out "%{http_code}" "$@" "$url")
+    http_code=$(curl --silent --output "${output_file}" --no-progress-meter --write-out "%{http_code}" "$@" "${url}")
   else
-    http_code=$(curl --silent --output $output_file --no-progress-meter --write-out "%{http_code}" "$url")
+    http_code=$(curl --silent --output "${output_file}" --no-progress-meter --write-out "%{http_code}" "${url}")
   fi
   curl_result=$?
   if [[ ${curl_result} != 0 ]]; then
     echo "curl call to '${url}' failed with code '${curl_result}'" >& 2
-    >&2 cat $output_file
-    rm -f $output_file
-    exit $curl_result
+    >&2 cat "${output_file}"
+    rm -f "${output_file}"
+    exit ${curl_result}
   fi
 
   if [[ ${http_code} -lt 200 || ${http_code} -gt 299 ]] ; then
     echo "curl call to '${url}' failed with HTTP error code '${http_code}'" >& 2
-    >&2 cat $output_file
-    rm -f $output_file
+    >&2 cat "${output_file}"
+    rm -f "${output_file}"
     exit 22
   fi
 
   set -e
 
-  cat $output_file
-  rm -f $output_file
+  cat "${output_file}"
+  rm -f "${output_file}"
 }

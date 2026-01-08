@@ -23,6 +23,8 @@ public final class KeyboardListActivity extends BaseActivity {
         final Context context = this;
 
         setContentView(R.layout.activity_list_layout);
+        setupEdgeToEdge(R.id.activity_list_layout);
+
         final Toolbar toolbar = findViewById(R.id.list_toolbar);
         TextView title = findViewById(R.id.bar_title);
         title.setText(getIntent().getStringExtra("regionName"));

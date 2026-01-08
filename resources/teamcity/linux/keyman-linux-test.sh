@@ -30,10 +30,14 @@ builder_parse "$@"
 cd "${KEYMAN_ROOT}/linux"
 
 function make_source_tarball_action() {
-  builder_echo start "make source tarball" "Make source tarball"
-  rm -rf dist
-  make tmpsources
-  builder_echo end "make source tarball" success "Finished making source tarball"
+  if builder_is_ci_build_level_release; then
+    builder_echo start "make source tarball" "Make source tarball"
+    rm -rf dist
+    PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" "${KEYMAN_ROOT}/linux/scripts/dist.sh"
+    builder_echo end "make source tarball" success "Finished making source tarball"
+  else
+    builder_echo "Skipping source tarball creation - not release build level"
+  fi
 }
 
 if builder_has_action all; then

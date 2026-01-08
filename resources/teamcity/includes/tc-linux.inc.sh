@@ -95,15 +95,15 @@ ba_linux_start_xvfb() {
   local PID_FILE=/tmp/keymanweb-pids
   builder_echo "Starting Xvfb..."
   Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
-  echo "kill -9 $! || true" > "${PID_FILE}"
+  echo "kill -9 $! &> /dev/null || true" > "${PID_FILE}"
   sleep 1
   builder_echo "Starting Xephyr..."
   DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
-  echo "kill -9 $! || true" >> "${PID_FILE}"
+  echo "kill -9 $! &> /dev/null || true" >> "${PID_FILE}"
   sleep 1
   builder_echo "Starting metacity"
   metacity --display=:32 &> /dev/null &
-  echo "kill -9 $! || true" >> "${PID_FILE}"
+  echo "kill -9 $! &> /dev/null || true" >> "${PID_FILE}"
   export DISPLAY=:32
 }
 

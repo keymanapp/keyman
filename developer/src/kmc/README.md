@@ -175,14 +175,6 @@ The temp_path must be a path outside the repository to avoid npm getting
 confused by the root package.json. This is called by inst/download.in.mak
 normally when building the Keyman Developer installer.
 
-## Publishing to NPM
-
-```shell
-./build.sh publish [--dry-run]
-```
-
-Publishes the current release to NPM. This should only be run from CI.
-
 
 [kmc]: https://help.keyman.com/developer/current-version/reference/kmc/cli
 [file-layout]: https://help.keyman.com/developer/current-version/reference/file-layout

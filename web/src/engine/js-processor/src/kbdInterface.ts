@@ -613,6 +613,8 @@ export default class KeyboardInterface extends KeyboardHarness {
    * @param       {number}      d       deadkey
    * @return      {boolean}             True if deadkey found selected context matches val
    * Description  Match deadkey at current cursor position
+   *
+   * Deprecated:  use `fullContextMatch` instead.
    */
   deadkeyMatch(n: number, outputTarget: OutputTarget, d: number): boolean {
     return outputTarget.hasDeadkeyMatch(n, d);

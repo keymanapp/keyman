@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">አማርኛ</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Amharic</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION አዘገጃጀት</string>
   <string name="ssTitle">ጫን $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION በጥሩ ሁኔታ ተጭኗል።</string>

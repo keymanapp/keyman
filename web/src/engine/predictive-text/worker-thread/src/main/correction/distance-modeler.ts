@@ -1,10 +1,11 @@
-import { isHighSurrogate, SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
+import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
+import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -29,30 +30,98 @@ enum TimedTaskTypes {
   CORRECTING = 2
 }
 
-// Represents a processed node for the correction-search's search-space's tree-like graph.  May represent
-// internal and 'leaf' nodes on said graph, as well as the overall root of the search.  Also used to represent
-// edges on the graph TO said nodes - there's a bit of overloading here.  Either way, it stores the cost of the
-// optimum path used to reach the ndoe.
-//
-// The stored path cost may be an overestimate when the edit distance is greater than the current search threshold.  The
-// first version of the node to be dequeued from SearchSpace's priority queue hierarchy 'wins' and is taken as the absolute
-// minimum; subsequent versions are ignored as suboptimal.
-//
-// Provides functions usable to enumerate across the node's outward edges to new nodes for continued search.
-// Most of the actual calculations occur as part of this process.
-//
-// For nodes with raw edit-distance cost within the current threshold for correction searches, we do have admissibility.
-// If not enough nodes are available within that threshold, however, admissibility may be lost, leaving our search as a
-// heuristic.
-//
-export class SearchNode {
-  calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
+/**
+ * This type models a partially-processed subset of Transforms to be processed
+ * as a batch due to sharing similar properties.
+ */
+export interface PartialSearchEdge {
+  /**
+   * A set of `Transform`s all sharing matching, batchable properties for the full portion
+   * that has been processed, including the portions of the `.insert` property preceding
+   * `subsetSubindex` but not those after.
+   */
+  transformSubset: TransformSubset<number>;
 
-  currentTraversal: LexiconTraversal;
-  toKey: (wordform: string) => string = str => str;
+  /**
+   * Indicates the depth in the insert string of the most recently added input
+   * that should next be incorporated into the search path.
+   */
+  subsetSubindex: number;
+
+  /**
+   * Indicates whether the subset is for a substitution/match edge pattern (true) or
+   * a deletion pattern (false) of the dynamic search-graph construction.
+   */
+  doSubsetMatching: boolean;
+}
+
+// Represents a processed node for the correction-search's search-space's
+// tree-like graph.  May represent internal and 'leaf' nodes on said graph, as
+// well as the overall root of the search.  Also used to represent edges on the
+// graph TO said nodes - there's a bit of overloading here.  Either way, it
+// stores the cost of the optimum path used to reach the node.
+//
+// For cases where incoming transforms have multiple inserted characters, this
+// class can step through the characters, one at a time, in an
+// efficiently-batched manner. Also of note:  this class will use the "sentinel"
+// character in the calculation input sequence for any path where the input does
+// not match the corresponding character from the lexicon, even for deletions -
+// batching _mismatches_ efficiently.
+//
+// The stored path cost may be an overestimate when the edit distance is greater
+// than the current search threshold.  The first version of the node to be
+// dequeued from SearchSpace's priority queue hierarchy 'wins' and is taken as
+// the absolute minimum; subsequent versions are ignored as suboptimal.
+//
+// Provides functions usable to enumerate across the node's outward edges to new
+// nodes for continued search. Most of the actual calculations occur as part of
+// this process.
+//
+// For nodes with raw edit-distance cost within the current threshold for
+// correction searches, we do have admissibility. If not enough nodes are
+// available within that threshold, however, admissibility may be lost, leaving
+// our search as a heuristic.
+
+/**
+ * Represents a step in a correction-search path used to match potential input sequences
+ * against entries in the active LexicalModel's lexicon and the functionality used to take
+ * more steps until valid search endpoints are reached.
+ */
+export class SearchNode {
+  /**
+   * The search-term keying method used by the active LexicalModel
+   * @param str
+   * @returns
+   */
+  readonly toKey: (wordform: string) => string = str => str;
+
+  /**
+   * Calculations used to determine the edit-distance required for the path represented by
+   * this SearchNode instance.
+   */
+  calculation: ClassicalDistanceCalculation<string>;
+
+  /**
+   * The Traversals (2d lexicon iterator) representing each prior step into the
+   * lexicon for the prefix currently represented by this SearchNode instance's
+   * represented search path.
+   */
+  matchedTraversals: LexiconTraversal[];
+
+  /**
+   * The actual Transform input sequence being considered as a potential correction.
+   */
   priorInput: RealizedInput;
 
-  // Internal lazy-cache for .inputSamplingCost, as it's a bit expensive to re-compute.
+  /**
+   * When defined, indicates that this instance models a set of transforms that have not
+   * yet been fully input into the search path.
+   */
+  private partialEdge?: PartialSearchEdge;
+
+  /**
+   * Internal lazy-cache for .inputSamplingCost; it's a bit expensive to re-compute.
+   */
   private _inputCost?: number;
 
   constructor(rootTraversal: LexiconTraversal, toKey?: (arg0: string) => string);
@@ -61,16 +130,21 @@ export class SearchNode {
     toKey = toKey || (x => x);
 
     if(rootTraversal instanceof SearchNode) {
-      let priorNode = rootTraversal;
-      this.calculation = priorNode.calculation;
-      this.currentTraversal = priorNode.currentTraversal;
-      this.priorInput = priorNode.priorInput;
-      this.toKey = priorNode.toKey;
+      const priorNode = rootTraversal;
+
+      Object.assign(this, priorNode);
+      if(this.partialEdge) {
+        this.partialEdge = Object.assign({}, this.partialEdge);
+      }
+      this.priorInput = priorNode.priorInput.slice(0);
+      this.matchedTraversals = priorNode.matchedTraversals.slice();
+
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
+      delete this._inputCost;
     } else {
       this.calculation = new ClassicalDistanceCalculation();
-      this.currentTraversal = rootTraversal;
+      this.matchedTraversals = [rootTraversal];
       this.priorInput = [];
       this.toKey = toKey;
     }
@@ -81,8 +155,25 @@ export class SearchNode {
    * by the correction-search in order to match the input with the lexical path represented
    * by the current node.
    */
-  get knownCost(): number {
+  get editCount(): number {
     return this.calculation.getHeuristicFinalCost();
+  }
+
+  /**
+   * Indicates this search node has only processed _part_ of a recent input set; no new
+   * inputs should be received or processed while this returns `true`.
+   */
+  get hasPartialInput(): boolean {
+    return !!this.partialEdge;
+  }
+
+  /**
+   * The Traversal (2d lexicon iterator) representing the lexicon's contents for
+   * the prefix currently represented by this SearchNode instance's represented
+   * search path.
+   */
+  get currentTraversal(): LexiconTraversal {
+    return this.matchedTraversals[this.matchedTraversals.length - 1];
   }
 
   /**
@@ -99,6 +190,11 @@ export class SearchNode {
 
       // TODO:  probably more efficient to instead use actual 'probability space'... but that'll involve extra changes.
       this._inputCost = this.priorInput.map(mass => mass.p > MIN_P ? mass.p : MIN_P).reduce((previous, current) => previous - Math.log(current), 0);
+      // For a partially-processed set, we do include the set's full modelled probability mass.
+      if(this.partialEdge) {
+        const mass = this.partialEdge.transformSubset.cumulativeMass;
+        this._inputCost -= Math.log(mass > MIN_P ? mass : MIN_P);
+      }
       return this._inputCost;
     }
   }
@@ -122,33 +218,32 @@ export class SearchNode {
     // p = 1 / (e^4) = 0.01831563888.  This still exceeds many neighboring keys!
     // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
     // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
-    return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.knownCost + this.inputSamplingCost;
+    return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
   }
 
   /**
-   * Adds outbound paths from the current Node that model the insertion of a character
-   * not seen in the input, as if the user accidentally skipped typing it.  No new input
-   * will be expected, but the search will continue one character deeper in the backing
-   * lexicon.
-   * @returns An array of SearchNodes corresponding to lexical entries that are prefixed
-   * with the lexicon entry represented by the current Node's matchSequence text.
+   * Adds outbound paths from the current Node that model the insertion of a
+   * character not seen in the input, as if the user accidentally skipped typing
+   * it.  No new input will be expected, but the search will continue one
+   * character deeper in the backing lexicon.
+   * @returns An array of SearchNodes corresponding to lexical entries that are
+   * prefixed with the lexicon entry represented by the current Node's
+   * matchSequence text.
    */
   buildInsertionEdges(): SearchNode[] {
+    if(this.hasPartialInput) {
+      throw new Error("Invalid state:  will not take new input while still processing Transform subset");
+    }
+
     let edges: SearchNode[] = [];
 
     for(let lexicalChild of this.currentTraversal.children()) {
-      let traversal = lexicalChild.traversal();
-      let matchToken = {
-        key: lexicalChild.char,
-        traversal: traversal
-      }
-
-      let childCalc = this.calculation.addMatchChar(matchToken);
+      let childCalc = this.calculation.addMatchChar(lexicalChild.char);
 
       let searchChild = new SearchNode(this);
       searchChild.calculation = childCalc;
       searchChild.priorInput = this.priorInput;
-      searchChild.currentTraversal = traversal;
+      searchChild.matchedTraversals.push(lexicalChild.traversal());
 
       edges.push(searchChild);
     }
@@ -157,68 +252,235 @@ export class SearchNode {
   }
 
   /**
-   * Adds paths that delete the next Transform from the input to better match words from
-   * the lexicon.  This aims to model (and ignore) when the user accidentally double-taps
-   * an input key.
-   *
-   * @returns An array of SearchNodes corresponding to search paths that skip the next
-   * input keystroke.
+   * This method is used while stepping through intermediate deletion 'edges'
+   * for transforms with multi-character insert strings.
+   * @returns
    */
-  buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
-    let edges: SearchNode[] = [];
+  private processDeletionSubset(): SearchNode {
+    // We're on easy street:  all transforms are already essentially merged into
+    // a single mass here.
+    let calculation = this.calculation.addInputChar(SENTINEL_CODE_UNIT);
 
-    /*
-      * If the probability of an input is less than the highest probability * the base edit-distance likelihood,
-      * don't build an edge for it; just rely on edits from the highest-probability edge.
-      *
-      * We may be able to be stricter, but this should be a decent start.
-      *
-      * Note:  thanks to ModelCompositor.predict, we know the distribution is pre-sorted.
-      */
-    for(let probMass of inputDistribution) {
-      if(probMass.p < inputDistribution[0].p * Math.exp(-SearchSpace.EDIT_DISTANCE_COST_SCALE)) {
-        // Again, we're pre-sorted.  All further entries will be too low-cost to consider.
-        break;
-      }
+    // If on a 'delete' style path, we just build out the paths into a single
+    // merged path.
+    const node = new SearchNode(this);
+    node.calculation = calculation;
+    // no update to the match string or traversal to be found here...
+    node.partialEdge.subsetSubindex++;
+    return node;
+  }
 
-      let edgeCalc = this.calculation;
-      let transform = probMass.sample;
-      if(transform.deleteLeft) {
-        edgeCalc = edgeCalc.getSubset(edgeCalc.inputSequence.length - transform.deleteLeft, edgeCalc.matchSequence.length);
-      }
+  /**
+   * Finalizes the results of search nodes that represent the last step for
+   * processing multi-character insert transforms.
+   * @returns
+   */
+  private tryFinalize() {
+    const subset = this.partialEdge?.transformSubset;
+    if(!subset || subset.key > this.partialEdge.subsetSubindex) {
+      // Not yet ready for finalization.  Just exit.
+      return this;
+    }
 
-      // TODO:  transform.deleteRight currently not supported.
+    // Finalization time!  We can safely transition the result node out
+    // of 'subset' mode.
+    delete this.partialEdge;
 
-      let inputPath = this.priorInput.slice(0);
-      inputPath.push(probMass);
-      // Tokenize and iterate over input chars, adding them into the calc.
-      for(let i=0; i < transform.insert.length; i++) {
-        let char = transform.insert[i];
-        if(isHighSurrogate(char)) {
-          i++;
-          char = char + transform.insert[i];
+    // Whatever entries are in the subset, they actually resolve down to the
+    // same net edit, as specified here.  It's more efficient to build the
+    // transform insert string on the subset, rather than mass-editing a group
+    // at each step and then consolidating them at the end.
+    this.priorInput.push({
+      sample: { insert: subset.insert, deleteLeft: subset.entries[0]?.sample.deleteLeft ?? 0 },
+      p: subset.cumulativeMass
+    });
+    return this;
+  }
+
+  /**
+   * For nodes modeling partially-processed inputs (partway through a
+   * multi-character insert Transform), this method will build the next step of
+   * the search path, iterating one character deeper within the
+   * partially-processed input.
+   * @returns
+   */
+  processSubsetEdge(): SearchNode[] {
+    const partialEdge = this.partialEdge;
+    if(!partialEdge) {
+      throw new Error("Invalid state:  not currently processing a Transform subset");
+    }
+
+    const startSubset = partialEdge.transformSubset;
+    const subIndex = partialEdge.subsetSubindex;
+
+    // For raw backspaces - if no insert string, we can already finalize!
+    if(partialEdge.subsetSubindex >= partialEdge.transformSubset.key) {
+      return [this.tryFinalize()];
+    }
+
+    if(!partialEdge.doSubsetMatching) {
+      return [this.processDeletionSubset().tryFinalize()];
+    }
+
+    // After this, it's all substitution / matching.
+    const traversal = this.currentTraversal;
+    let nodesToReturn: SearchNode[] = [];
+    let keySet: Set<string> = new Set();
+
+    const subsetMap = subsetByChar(startSubset, subIndex, this.toKey);
+    for(const [char, subset] of subsetMap.entries()) {
+      // build new node for the next char.
+      let calculation = this.calculation;
+      let childTraversal: LexiconTraversal;
+      if(char) {
+        childTraversal = traversal.child(char);
+        // These cases - where there's no match in the lexicon - are bundled
+        // after this for-loop.
+        //
+        // ... except for when there ARE no children at all.  But, for those
+        // cases... a substitution would be invalid - we can't substitute for
+        // each char in the insert string, so abort.  It's better matched by an
+        // 'insert' edge or a by different input from a sibling subset.
+        if(!childTraversal) {
+          continue;
         }
 
-        // In case of NFD input, filter out any empty-strings that may arise
-        // when 'keying' raw diacritics.
-        let keyedChar = this.toKey(char);
-        if(keyedChar) {
-          edgeCalc = edgeCalc.addInputChar({key: keyedChar});
-        }
+        calculation = calculation.addInputChar(char);
+        calculation = calculation.addMatchChar(char);
+      } // else we COULD bundle these as a single subset... but it's likely not that important.
+      // after all, the cost ISN'T shifting, so we'll process 'em almost immediately and move on.
+
+      keySet.add(char);
+
+      const node = new SearchNode(this);
+      node.calculation = calculation;
+      node.partialEdge.subsetSubindex++;
+      // Append the newly-processed char to the subset's `insert` string.
+      node.partialEdge.transformSubset = {...subset, key: startSubset.key, insert: subset.insert + char};
+      // '' inserts do not traverse deeper; do not add an empty traversal entry!
+      if(childTraversal) {
+        node.matchedTraversals.push(childTraversal);
+      }
+      nodesToReturn.push(node);
+    };
+
+    // These come at a notably higher cost (due to required edit) and are less likely to be processed.
+    // It's best to batch them so we only need a single in-memory node to represent them, rather than
+    // one node per transform / subset, which can scale very rapidly.
+    let calculation = this.calculation.addInputChar(SENTINEL_CODE_UNIT);
+
+    for(const child of traversal.children()) {
+      const childTraversal = child.traversal();
+      let childCalc =  calculation.addMatchChar(child.char);
+      let childSubset: TransformSubset<number>;
+
+      if(keySet.has(child.char)) {
+        // OK, so we built a set that successfully matched this char.  Other paths that
+        // emit a char after keying don't match it - we want to combine that path here.
+        // If there are multiple 'insert' chars, missing on one shouldn't force a 'miss'
+        // on the other subpaths that may follow this with valid char matches.
+        const nonMatchSubsets = [...subsetMap.values()].filter(c => {
+          // Ignore entries that 'key out' - there's no char left to act as a substitute.
+          // Also ignore the entry that actually did match - it's a match, not substitute.
+          return c.key != child.char && c.key != '';
+        });
+        childSubset = mergeSubset(nonMatchSubsets, startSubset.key);
+      } else {
+        // We didn't build any that match?  Guess nothing matched, then.
+        // Clone so that our .insert tweak below does not have unintended effects.
+        childSubset = {...startSubset};
       }
 
-      let childEdge = new SearchNode(this);
-      childEdge.calculation = edgeCalc;
-      childEdge.priorInput = inputPath;
+      // May happen in unit tests or when corrections are disabled.
+      if(!childSubset.entries.length) {
+        continue;
+      }
 
-      edges.push(childEdge);
+      // Append a match-failure marker for the non-matching char set onto the subset's
+      // `insert` string.
+      childSubset.insert += SENTINEL_CODE_UNIT;
+
+      const node = new SearchNode(this);
+      node.calculation = childCalc;
+      node.matchedTraversals.push(childTraversal);
+      node.partialEdge.subsetSubindex++;
+      node.partialEdge.transformSubset = childSubset;
+      nodesToReturn.push(node);
+    }
+
+    return nodesToReturn.map(n => n.tryFinalize());
+  }
+
+  /**
+   * Called by `buildDeletionEdges` and `buildSubstitutionEdges` to construct
+   * intermediate TransformSubset-based nodes that extend the search path one
+   * step into the incoming input transforms in an efficiently-batched manner.
+   *
+   * When an incoming character cannot match the next character for the node's
+   * represented lexicon prefix - be it due to not adding one (deletions) or
+   * due to not being the same character, all mismatching cases are merged into
+   * one, reducing the rate of expansion for the search graph.
+   * @param inputDistribution
+   * @param isSubstitution
+   * @returns
+   */
+  private setupSubsetProcessing(inputDistribution: Distribution<Transform>, isSubstitution: boolean ) {
+    if(this.hasPartialInput) {
+      throw new Error("Invalid state:  will not take new input while still processing Transform subset");
+    }
+
+    const edges: SearchNode[] = [];
+    const subsets = subsetByInterval(inputDistribution);
+
+    for(let dl = 0; dl < subsets.length; dl++) {
+      const dlSubset = subsets[dl];
+      if(!dlSubset) {
+        continue;
+      }
+
+      const calc = this.calculation;
+      const newMatchLength = Math.max(0, calc.matchSequence.length - dl);
+      const edgeCalc = calc.getSubset(calc.inputSequence.length - dl, newMatchLength);
+
+      for(let ins = 0; ins < dlSubset.length; ins++) {
+        const insSubset = dlSubset[ins];
+        if(!insSubset) {
+          continue;
+        }
+
+        const node = new SearchNode(this);
+        node.calculation = edgeCalc;
+        node.partialEdge = {
+          doSubsetMatching: isSubstitution,
+          subsetSubindex: 0,
+          transformSubset: isSubstitution ? insSubset : {
+            ...insSubset,
+            entries: [ { sample: { insert: SENTINEL_CODE_UNIT.repeat(ins), deleteLeft: dl }, p: insSubset.cumulativeMass}]
+          }
+        }
+        // Get the traversal at the new end location.  (Root is always at index 0.)
+        node.matchedTraversals = this.matchedTraversals.slice(0, newMatchLength+1);
+
+        edges.push(node);
+      }
     }
 
     return edges;
   }
 
-  // While this may SEEM to be unnecessary, note that sometimes substitutions (which are computed
-  // via insert + delete) may be lower cost than both just-insert and just-delete.
+  /**
+   * Adds paths that consider the next Transform from the input without matching it to
+   * extended paths from the lexicon.  This aims to model (and ignore) when the user
+   * accidentally double-taps an input key by not extending the match string alongside
+   * the input.
+   *
+   * @returns An array of SearchNodes corresponding to search paths that skip the next
+   * input keystroke.
+   */
+  buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
+    return this.setupSubsetProcessing(inputDistribution, false);
+  }
+
   /**
    * Adds paths that seek to:
    * 1.  Match the next input transform in the sequence with matching prefixes
@@ -229,30 +491,11 @@ export class SearchNode {
    * replace the next currently-unprocessed input.
    */
   buildSubstitutionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
-    // Handles the 'input' component.
-    let intermediateEdges = this.buildDeletionEdges(inputDistribution);
-    let edges: SearchNode[] = [];
-
-    for(let lexicalChild of this.currentTraversal.children()) {
-      for(let edge of intermediateEdges) {
-        let traversal = lexicalChild.traversal();
-        let matchToken = {
-          key: lexicalChild.char,
-          traversal: traversal
-        }
-
-        let childCalc = edge.calculation.addMatchChar(matchToken);
-
-        let searchChild = new SearchNode(this);
-        searchChild.calculation = childCalc;
-        searchChild.priorInput = edge.priorInput;
-        searchChild.currentTraversal = traversal;
-
-        edges.push(searchChild);
-      }
-    }
-
-    return edges;
+    // Note:  due to the batching approach used via TransformSubsets,
+    // substitutions are _not_ adequately represented by one 'insertion' + one
+    // 'deletion' step. Explicit substitution / match-oriented processing is
+    // required.
+    return this.setupSubsetProcessing(inputDistribution, true);
   }
 
   /**
@@ -264,11 +507,20 @@ export class SearchNode {
    * completed paths are possible, and so children can be re-built in such a case.
    */
   get pathKey(): string {
-    let inputString = this.priorInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
-    let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
+    // Note:  deleteLefts apply before inserts, so order them that way.
+    let inputString = this.priorInput.map((value) => '-' + value.sample.deleteLeft + '+' + value.sample.insert).join('');
+    const partialEdge = this.partialEdge;
+    // Make sure the subset progress contributes to the key!
+    if(partialEdge) {
+      const subset = partialEdge.transformSubset;
+      // We need a copy of at least one insert string in the subset here.  Without that, all subsets
+      // at the same level of the search, against the same match, look identical - not cool!
+      inputString += `-${subset.entries[0].sample.deleteLeft}+<${subset.key},${partialEdge.subsetSubindex},${subset.entries[0].sample.insert}>`;
+    }
+    let matchString =  this.calculation.matchSequence.join('');
 
     // TODO:  might should also track diagonalWidth.
-    return inputString + SENTINEL_CODE_UNIT + matchString;
+    return inputString + ' @@ ' + matchString;
   }
 
   /**
@@ -278,7 +530,7 @@ export class SearchNode {
   get resultKey(): string {
     // Filter out any duplicated match sequences.  The same match sequence may be reached via
     // different input sequences, after all.
-    return this.calculation.matchSequence.map(value => value.key).join('');
+    return this.calculation.matchSequence.join('');
   }
 
   /**
@@ -288,10 +540,13 @@ export class SearchNode {
    */
   get isFullReplacement(): boolean {
     // Logic exception:  0 cost, 0 length != a "replacement".
-    return this.knownCost && this.knownCost == this.priorInput.length;
+    return (!!this.editCount) && this.editCount == this.priorInput.length;
   }
 }
 
+/**
+ * Categorizes Nodes by how many input Transforms (edges) deep they are within the search tree.
+ */
 class SearchSpaceTier {
   correctionQueue: PriorityQueue<SearchNode>;
   processed: SearchNode[] = [];
@@ -339,7 +594,7 @@ export class SearchResult {
   }
 
   get matchSequence(): TraversableToken<string>[] {
-    return this.resultNode.calculation.matchSequence;
+    return this.resultNode.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.resultNode.matchedTraversals[i+1]}));
   };
 
   get matchString(): string {
@@ -354,7 +609,7 @@ export class SearchResult {
    * `totalCost`.)
    */
   get knownCost(): number {
-    return this.resultNode.knownCost;
+    return this.resultNode.editCount;
   }
 
   /**
@@ -497,7 +752,6 @@ export class SearchSpace {
       let index1 = space1.index;
       let index2 = space2.index;
 
-      let tierMinCost: number = 0;
       let sign = 1;
 
       if(index2 < index1) {
@@ -508,15 +762,21 @@ export class SearchSpace {
         sign = -1;
       }
 
-      // Boost the cost of the lower tier by the minimum cost possible for the missing inputs between them.
-      // In essence, compare the nodes as if the lower tier had the most likely input appended for each such
-      // input missing at the lower tier.
+      // Boost the cost of the lower tier by the minimum cost possible for the
+      // missing inputs between them. In essence, compare the nodes as if the
+      // lower tier had the most likely input appended for each such input
+      // missing at the lower tier.
       //
-      // A 100% admissible heuristic to favor a deeper search, since the added cost is guaranteed if the path
-      // is traversed further.
+      // A 100% admissible heuristic to favor a deeper search assuming no
+      // deleteLefts follow as later inputs.  The added cost is guaranteed if
+      // the path is traversed further - even with subset use.  A subset that
+      // doesn't match the char instantly carries higher cost than this due to
+      // the edit distance, even if the bin has max probability.
       //
-      // Remember, tier index i's last used input was from input index i-1.
-      // As a result, i is the first needed input index, with index2 - 1 the last entry needed to match them.
+      // Remember, tier index i's last used input was from input index i-1. As a
+      // result, i is the first needed input index, with index2 - 1 the last
+      // entry needed to match them.
+      let tierMinCost: number = 0;
       for(let i=index1; i < index2; i++) {
         tierMinCost = tierMinCost + searchSpace.minInputCost[i];
       }
@@ -563,7 +823,11 @@ export class SearchSpace {
       let deletions = node.buildDeletionEdges(inputDistribution);
       let substitutions = node.buildSubstitutionEdges(inputDistribution);
 
-      return deletions.concat(substitutions);
+      const batch = deletions.concat(substitutions);
+
+      // Skip the queue for the first pass; there will ALWAYS be at least one pass,
+      // and queue-enqueing does come with a cost.  Avoid the unnecessary overhead.
+      return batch.flatMap(e => e.processSubsetEdge());
     });
 
     // Don't forget to reset the array; the contained nodes no longer reach the search's end.
@@ -634,9 +898,9 @@ export class SearchSpace {
     // Forbid a raw edit-distance of greater than 2.
     // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
     let substitutionsOnly = false;
-    if(currentNode.knownCost > 2) {
+    if(currentNode.editCount > 2) {
       return unmatchedResult;
-    } else if(currentNode.knownCost == 2) {
+    } else if(currentNode.editCount == 2) {
       // Hard restriction:  no further edits will be supported.  This helps keep the search
       // more narrowly focused.
       substitutionsOnly = true;
@@ -655,7 +919,17 @@ export class SearchSpace {
       return unmatchedResult;
     }
 
-    // Stage 2:  build remaining edges
+    // Stage 2:  process subset further OR build remaining edges
+
+    if(currentNode.hasPartialInput) {
+      // Re-use the current queue; the number of total inputs considered still holds.
+      bestTier.correctionQueue.enqueueAll(currentNode.processSubsetEdge());
+      this.selectionQueue.enqueue(bestTier);
+      return unmatchedResult;
+    }
+
+    // OK, we fully crossed a graph edge and have landed on a transition point;
+    // time to build more edges / edge batches.
 
     // Always possible, as this does not require any new input.
     if(!substitutionsOnly) {
@@ -685,12 +959,18 @@ export class SearchSpace {
       if(!substitutionsOnly) {
         deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
       }
-      let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
+      const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
+      let batch = deletionEdges.concat(substitutionEdges);
+
+      // Skip the queue for the first pass; there will ALWAYS be at least one pass,
+      // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
+      batch = batch.flatMap(e => e.processSubsetEdge());
 
       // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
-      nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));
+      nextTier.correctionQueue.enqueueAll(batch);
 
       // So, we simply rebuild the selection queue.
+      // Also re-adds `bestTier`, which we'd de-queued.
       this.selectionQueue = new PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
 
       // We didn't reach an end-node, so we just end the iteration and continue the search.

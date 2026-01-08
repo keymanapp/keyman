@@ -619,22 +619,19 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getTheme().resolveAttribute(android.R.attr.actionBarSize, outValue, true);
     int actionBarHeight = getResources().getDimensionPixelSize(outValue.resourceId);
 
-    // *** TO DO: Try to check if status bar is visible, set statusBarHeight to 0 if it is not visible ***
+    // Status bar height only used for portrait orientation
     int statusBarHeight = 0;
-    int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-    if (resourceId > 0)
-      statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-
-    // Navigation bar height
-    int navigationBarHeight = 0;
-    resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-    if (resourceId > 0) {
-      navigationBarHeight = getResources().getDimensionPixelSize(resourceId);
+    if (lastOrientation == Configuration.ORIENTATION_PORTRAIT) {
+      // *** TO DO: Try to check if status bar is visible, set statusBarHeight to 0 if it is not visible ***
+      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+      if (resourceId > 0) {
+        statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+      }
     }
+    int navigationBarHeight = KMManager.getNavigationBarHeight(context, KeyboardType.KEYBOARD_TYPE_INAPP);
 
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
-    Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
     textView.setHeight(
       screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
   }
