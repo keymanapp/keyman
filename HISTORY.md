@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.187 alpha 2026-01-08
+
+* maint(resources): add new ARM64 test status check to PR build status check (#15409)
+* docs(windows): update OS support to include Arm64 Win11 (#15396)
+* chore(windows,android): Update Crowdin strings for Portuguese (#15406)
+
 ## 19.0.186 alpha 2026-01-07
 
 * maint: add script to report on recent changes to stable release (#15389)
