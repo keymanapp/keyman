@@ -64,7 +64,7 @@ itself:
 
 ....
 
-# crowdin.yml: Upload translation sources to Crowdin translate.keyman.com
+# crowdin.yml: Upload translation sources to [Crowdin](translate.keyman.com)
 
 This action automatically updates the English source strings on Crowdin
 https://crowdin.com/project/keyman/sources/files
