@@ -9,6 +9,10 @@
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcesData, Rule } from './keylayout-to-kmn-converter.js';
+
+//_S2 TODO use module see PR 14666
+// import { kmcConvertutil } from '@keymanapp/common-types';
+
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
@@ -139,8 +143,10 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        // const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
-        // const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);
+
+        //_S2 TODO use module see PR 14666
+        //const output_Unicode_Character = kmcConvertutil.convertToUnicodeCharacter(output_character);
+        //const output_Unicode_CodePoint = kmcConvertutil.convertToUnicodeCodePoint(output_character);
         const output_Unicode_Character = this.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = this.convertToUnicodeCodePoint(output_character);
 
@@ -206,8 +212,10 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        // const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
-        // const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);
+
+        //_S2 TODO use module see PR 14666
+        //const output_Unicode_Character = kmcConvertutil.convertToUnicodeCharacter(output_character);
+        //const output_Unicode_CodePoint = kmcConvertutil.convertToUnicodeCodePoint(output_character);
         const output_Unicode_Character = this.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = this.convertToUnicodeCodePoint(output_character);
 
@@ -294,8 +302,10 @@ export class KmnFileWriter {
 
         const warn_text = this.reviewRules(unique_data_Rules, k);
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        //const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
-        //const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);
+
+        //_S2 TODO use module see PR 14666
+        //const output_Unicode_Character = kmcConvertutil.convertToUnicodeCharacter(output_character);
+        //const output_Unicode_CodePoint = kmcConvertutil.convertToUnicodeCodePoint(output_character);
         const output_Unicode_Character = this.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = this.convertToUnicodeCodePoint(output_character);
 
@@ -884,6 +894,7 @@ export class KmnFileWriter {
   }
 
 
+  //_S2 TODO use module see PR 14666
   /**
    * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
    * @param  inputString the value that will converted
@@ -957,8 +968,6 @@ export class KmnFileWriter {
     else
       return instr;
   }
-
-
 
 
 }
