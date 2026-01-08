@@ -43,7 +43,7 @@ export class KeymanEngineBase<
   readonly config: ConfigurationT;
   contextManager: ContextManagerT;
   interface: KeyboardInterfaceBase<ContextManagerT>;
-  readonly core: InputProcessor;
+  readonly inputProcessor: InputProcessor;
   keyboardRequisitioner: KeyboardRequisitioner;
   modelCache: ModelCache;
 
@@ -63,7 +63,7 @@ export class KeymanEngineBase<
       return;
     }
 
-    if(!this.core.languageProcessor.mayCorrect) {
+    if(!this.inputProcessor.languageProcessor.mayCorrect) {
       event.keyDistribution = [];
     }
 
@@ -84,11 +84,11 @@ export class KeymanEngineBase<
       const oskLayer = this.osk.vkbd.layerId;
 
       // In case of modipresses.
-      if(oskLayer && oskLayer != this.core.keyboardProcessor.layerId) {
-        this.core.keyboardProcessor.layerId = oskLayer;
+      if(oskLayer && oskLayer != this.inputProcessor.keyboardProcessor.layerId) {
+        this.inputProcessor.keyboardProcessor.layerId = oskLayer;
       }
     }
-    const result = this.core.processKeyEvent(event, textStore);
+    const result = this.inputProcessor.processKeyEvent(event, textStore);
 
     if(result && result.transcription?.transform) {
       this.config.onRuleFinalization(result, this.contextManager.activeTextStore);
@@ -125,9 +125,9 @@ export class KeymanEngineBase<
     const processorConfiguration = processorConfigInitializer(this);
     processorConfiguration.baseLayout = determineBaseLayout();
     this.interface = processorConfiguration.keyboardInterface as KeyboardInterfaceBase<ContextManagerT>;
-    this.core = new InputProcessor(config.hostDevice, workerFactory, processorConfiguration);
+    this.inputProcessor = new InputProcessor(config.hostDevice, workerFactory, processorConfiguration);
 
-    this.core.languageProcessor.on('statechange', (state) => {
+    this.inputProcessor.languageProcessor.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,
       // so we handle that here.
       this.osk?.bannerController.selectBanner(state);
@@ -137,7 +137,7 @@ export class KeymanEngineBase<
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
     // management object; this event + handler allow us to keep the OSK's related states
     // in sync.
-    this.core.keyboardProcessor.on('statekeychange', (stateKeys) => {
+    this.inputProcessor.keyboardProcessor.on('statekeychange', (stateKeys) => {
       this.osk?.vkbd?.updateStateKeys(stateKeys);
     })
 
@@ -160,7 +160,7 @@ export class KeymanEngineBase<
         this.refreshModel();
         // Triggers context resets that can trigger layout stuff.
         // It's not the final such context-reset, though.
-        this.core.activeKeyboard = kbdData?.keyboard;
+        this.inputProcessor.activeKeyboard = kbdData?.keyboard;
 
         this.legacyAPIEvents.callEvent('keyboardchange', {
           internalName: kbdData?.metadata.id ?? '',
@@ -247,18 +247,18 @@ export class KeymanEngineBase<
     this.modelCache = new ModelCache();
     const kbdCache = this.keyboardRequisitioner.cache;
 
-    const keyboardProcessor = this.core.keyboardProcessor;
-    const predictionContext = new PredictionContext(this.core.languageProcessor, () => keyboardProcessor.layerId);
+    const keyboardProcessor = this.inputProcessor.keyboardProcessor;
+    const predictionContext = new PredictionContext(this.inputProcessor.languageProcessor, () => keyboardProcessor.layerId);
     this.contextManager.configure({
       resetContext: (textStore) => {
         // Could reset the textStore's deadkeys here, but it's really more of a 'core' task.
         // So we delegate that to keyboard.
         if(this.osk) {
           this.osk.batchLayoutAfter(() => {
-            this.core.resetContext(textStore);
+            this.inputProcessor.resetContext(textStore);
           })
         } else {
-          this.core.resetContext(textStore);
+          this.inputProcessor.resetContext(textStore);
         }
       },
       predictionContext: predictionContext,
@@ -271,7 +271,7 @@ export class KeymanEngineBase<
      * This is called after the suggestion is applied but _before_ new
      * predictions are requested based on the resulting context.
      */
-    this.core.languageProcessor.on('suggestionapplied', () => {
+    this.inputProcessor.languageProcessor.on('suggestionapplied', () => {
       // Tell the keyboard that the current layer has not changed
       keyboardProcessor.newLayerStore.set('');
       keyboardProcessor.oldLayerStore.set('');
@@ -337,7 +337,7 @@ export class KeymanEngineBase<
     //
     // #endregion
 
-    await this.core.init(config.paths);
+    await this.inputProcessor.init(config.paths);
   }
 
   /**
@@ -377,20 +377,20 @@ export class KeymanEngineBase<
   public set osk(value: OSKView) {
     if(this._osk) {
       this._osk.off('keyevent', this.keyEventListener);
-      this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
+      this.inputProcessor.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
     // As the `new context` ruleset is designed to facilitate OSK layer-change updates
     // based on the context being entered, we want the keyboard processor's current
     // contextDevice to match that of the active OSK.  See #11740.
-    this.core.keyboardProcessor.contextDevice = value?.targetDevice ?? this.config.softDevice;
+    this.inputProcessor.keyboardProcessor.contextDevice = value?.targetDevice ?? this.config.softDevice;
     if(value) {
       // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
       if (this.contextManager.activeKeyboard && this.contextManager.activeKeyboard instanceof JSKeyboardData) { // TODO-embed-osk-in-kmx: add support for OSK for KMX keyboards
         value.activeKeyboard = this.contextManager.activeKeyboard;
       }
       value.on('keyevent', this.keyEventListener);
-      this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
+      this.inputProcessor.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
     }
   }
 
@@ -405,7 +405,7 @@ export class KeymanEngineBase<
         version: activeKbd?.keyboard?.version ?? ''
       },
       model: {
-        id: this.core?.activeModel?.id || ''
+        id: this.inputProcessor?.activeModel?.id || ''
       },
       osk: {
         banner: this.osk?.banner?.banner.type ?? '',
@@ -422,14 +422,14 @@ export class KeymanEngineBase<
     const kbd = this.contextManager.activeKeyboard;
     const model = this.modelCache.modelForLanguage(kbd?.metadata.langId);
 
-    if(this.core.activeModel != model) {
-      if(this.core.activeModel) {
-        this.core.languageProcessor.unloadModel();
+    if(this.inputProcessor.activeModel != model) {
+      if(this.inputProcessor.activeModel) {
+        this.inputProcessor.languageProcessor.unloadModel();
       }
 
       // Semi-hacky management of banner display state.
       if(model) {
-        return this.core.languageProcessor.loadModel(model).then(() => {
+        return this.inputProcessor.languageProcessor.loadModel(model).then(() => {
           return model;
         });
       }
@@ -501,8 +501,8 @@ export class KeymanEngineBase<
     this.modelCache.unregister(modelId);
 
     // Is it the active model?
-    if(this.core.activeModel && this.core.activeModel.id == modelId) {
-      this.core.languageProcessor.unloadModel();
+    if(this.inputProcessor.activeModel && this.inputProcessor.activeModel.id == modelId) {
+      this.inputProcessor.languageProcessor.unloadModel();
     }
   }
 
@@ -575,7 +575,7 @@ export class KeymanEngineBase<
 
       jsKbd = k0;
     } else {
-      const kbd = this.core.activeKeyboard;
+      const kbd = this.inputProcessor.activeKeyboard;
       if (kbd instanceof JSKeyboard) {
         jsKbd = kbd;
       } else {
@@ -603,7 +603,7 @@ export class KeymanEngineBase<
    * Description  Set OSK to numeric layer if it exists
    */
   setNumericLayer() {
-    this.core.keyboardProcessor.setNumericLayer(this.config.softDevice);
+    this.inputProcessor.keyboardProcessor.setNumericLayer(this.config.softDevice);
   };
 }
 

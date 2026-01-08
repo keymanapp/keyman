@@ -64,7 +64,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
     }
 
     if(this.beepKeyboard) {
-      this.core.keyboardProcessor.beepHandler = this.beepKeyboard;
+      this.inputProcessor.keyboardProcessor.beepHandler = this.beepKeyboard;
     }
 
     this.contextManager.on('keyboardchange', (kbd) => {

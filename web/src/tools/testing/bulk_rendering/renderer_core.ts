@@ -114,7 +114,7 @@ export class BatchRenderer {
       eleDescription.appendChild(document.createTextNode('Name: ' + kbd.Name));
       eleDescription.appendChild(document.createElement('br'));
 
-      const keyboard = keyman.core.activeKeyboard;
+      const keyboard = keyman.inputProcessor.activeKeyboard;
       if (keyboard instanceof JSKeyboard) {
         // Some keyboards, such as sil_euro_latin and sil_ipa, no longer specify this property.
         if (keyboard['_legacyLayoutSpec']) {
@@ -173,12 +173,12 @@ export class BatchRenderer {
 
       // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
       let layers: string[];
-      if(!isMobile && keyman.core.activeKeyboard instanceof JSKeyboard) {
+      if(!isMobile && keyman.inputProcessor.activeKeyboard instanceof JSKeyboard) {
         // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
         // We instead rely upon the KLS definition to ensure we keep the renders sparse.
         //
         // _legacyLayoutSpec is technically private, but it's what we've been using, so... yeah.
-        layers = Object.keys(keyman.core.activeKeyboard['_legacyLayoutSpec']?.KLS);
+        layers = Object.keys(keyman.inputProcessor.activeKeyboard['_legacyLayoutSpec']?.KLS);
       }
 
       // If mobile, or if the desktop definition lacks a `_legacyLayoutSpec` entry.
@@ -189,7 +189,7 @@ export class BatchRenderer {
         return new Promise(function(resolve) {
           // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
           if(keyman.osk.vkbd) {
-            keyman.core.keyboardProcessor.layerId = layers[i];
+            keyman.inputProcessor.keyboardProcessor.layerId = layers[i];
           } else {
             // Again, occurs for keyboards with desktop help-text.
             console.error(`Error - keyman.osk.vkbd is undefined for ${kbd.InternalName}!`);

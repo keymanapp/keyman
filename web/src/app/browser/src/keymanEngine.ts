@@ -69,10 +69,10 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     });
 
     this._util = new UtilApiEndpoint(config);
-    this.beepHandler = new BeepHandler(this.core.keyboardInterface);
-    this.core.keyboardProcessor.beepHandler = () => this.beepHandler.beep(this.contextManager.activeTextStore);
+    this.beepHandler = new BeepHandler(this.inputProcessor.keyboardInterface);
+    this.inputProcessor.keyboardProcessor.beepHandler = () => this.beepHandler.beep(this.contextManager.activeTextStore);
 
-    this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
+    this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.inputProcessor.keyboardProcessor, this.contextManager);
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('textstorechange', (textStore) => {
@@ -444,7 +444,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
         kbd = new JSKeyboard(k0);
       }
     } else {
-      kbd = this.core.activeKeyboard;
+      kbd = this.inputProcessor.activeKeyboard;
     }
 
     // We only support isCJK on legacy .js keyboards; see #7928
@@ -695,7 +695,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       PKbd = this.keyboardRequisitioner.cache.getKeyboard(PInternalName);
     }
 
-    PKbd = PKbd || this.core.activeKeyboard;
+    PKbd = PKbd || this.inputProcessor.activeKeyboard;
     if (PKbd instanceof KMXKeyboard) {
       // TODO-web-core: implement for KMX keyboards (epic/embed-osk-in-kmx)
       return null;
@@ -733,7 +733,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     this.pageIntegration.shutdown();
     this.contextManager.shutdown();
     this.osk?.shutdown();
-    this.core.languageProcessor.shutdown();
+    this.inputProcessor.languageProcessor.shutdown();
     this.hardKeyboard.shutdown();
     this.util.shutdown(); // For tracked dom events, stylesheets.
 
