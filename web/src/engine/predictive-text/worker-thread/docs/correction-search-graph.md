@@ -730,7 +730,7 @@ via the specified edge type in order to reach the next submodule.
 
 `SearchQuotientSpur` itself _also_ implements `SearchQuotientNode`; for cases
 where only a single parent node and edge exists that may transition to a new
-submodule, `SearchQuotientSpur` is sufficient to module the destination
+submodule, `SearchQuotientSpur` is sufficient to model the destination
 submodule.
 
 ## The `SearchQuotientCluster` type
