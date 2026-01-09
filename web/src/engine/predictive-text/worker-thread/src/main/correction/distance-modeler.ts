@@ -5,8 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { QUEUE_NODE_COMPARATOR, SearchQuotientSpur } from './search-quotient-spur.js';
-import { PathResult } from './search-quotient-node.js';
+import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 import TransformUtils from '../transformUtils.js';
 
@@ -571,22 +570,22 @@ export class SearchNode {
 }
 
 export class SearchResult {
-  private resultNode: SearchNode;
+  readonly node: SearchNode;
 
   constructor(node: SearchNode) {
-    this.resultNode = node;
+    this.node = node;
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
-    return this.resultNode.priorInput;
+    return this.node.priorInput;
   }
 
   get matchSequence(): TraversableToken<string>[] {
-    return this.resultNode.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.resultNode.matchedTraversals[i+1]}));
+    return this.node.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.node.matchedTraversals[i+1]}));
   };
 
   get matchString(): string {
-    return this.resultNode.resultKey;
+    return this.node.resultKey;
   }
 
   /**
@@ -597,7 +596,7 @@ export class SearchResult {
    * `totalCost`.)
    */
   get knownCost(): number {
-    return this.resultNode.editCount;
+    return this.node.editCount;
   }
 
   /**
@@ -605,7 +604,7 @@ export class SearchResult {
    * negative log-likelihood of the input path taken to reach the node.
    */
   get inputSamplingCost(): number {
-    return this.resultNode.inputSamplingCost;
+    return this.node.inputSamplingCost;
   }
 
   /**
@@ -615,41 +614,34 @@ export class SearchResult {
    * to the resulting output.
    */
   get totalCost(): number {
-    return this.resultNode.currentCost;
+    return this.node.currentCost;
   }
 
   get finalTraversal(): LexiconTraversal {
-    return this.resultNode.currentTraversal;
+    return this.node.currentTraversal;
   }
 
   get spaceId(): number {
-    return this.resultNode.spaceId;
+    return this.node.spaceId;
   }
 }
 
 // Current best guesstimate of how compositor will retrieve ideal corrections.
-export async function *getBestMatches(searchSpace: SearchQuotientSpur, timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+export async function *getBestMatches(searchSpace: SearchQuotientNode, timer: ExecutionTimer): AsyncGenerator<SearchResult> {
   let currentReturns: {[resultKey: string]: SearchNode} = {};
 
   // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
-  const returnedValues = Object.values(searchSpace.returnedValues);
+  const returnedValues = Object.values(searchSpace.previousResults);
   if(returnedValues.length > 0) {
-    let preprocessedQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
+    let preprocessedQueue = new PriorityQueue<SearchResult>((a, b) => a.totalCost - b.totalCost, returnedValues);
 
     while(preprocessedQueue.count > 0) {
       const entryFromCache = timer.time(() => {
         let entry = preprocessedQueue.dequeue();
 
-        // Is the entry a reasonable result?
-        if(entry.isFullReplacement) {
-          // If the entry's 'match' fully replaces the input string, we consider it
-          // unreasonable and ignore it.
-          return null;
-        }
-
-        currentReturns[entry.resultKey] = entry;
+        currentReturns[entry.node.resultKey] = entry.node;
         // Do not track yielded time.
-        return new SearchResult(entry);
+        return entry;
       }, TimedTaskTypes.CACHED_RESULT);
 
       if(entryFromCache) {

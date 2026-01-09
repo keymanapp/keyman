@@ -33,22 +33,11 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   private parentPath: SearchQuotientSpur;
   readonly spaceId: number;
 
-  // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
-  // is cheaper than iteratively building a priority queue.
-  /**
-   * This tracks all paths that have reached the end of a viable input-matching path - even
-   * those of lower cost that produce the same correction as other paths.
-   *
-   * When new input is received, its entries are then used to append edges to the path in order
-   * to find potential paths to reach a new viable end.
-   */
-  private completedPaths?: SearchNode[] = [];
-
   /**
    * Marks all results that have already been returned since the last input was received.
    * Is cleared after .addInput() calls.
    */
-  public returnedValues?: {[resultKey: string]: SearchNode} = {}; // TODO:  make it private again!
+  private returnedValues?: {[resultKey: string]: SearchNode} = {};
 
   /**
    * Provides a heuristic for the base cost at each depth if the best
@@ -75,7 +64,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       this.lowestCostAtDepth = parentNode.lowestCostAtDepth.concat(logTierCost);
       this.parentPath = parentNode;
 
-      this.addEdgesForNodes(parentNode.completedPaths);
+      this.addEdgesForNodes(parentNode.previousResults.map(v => v.node));
 
       return;
     }
@@ -83,7 +72,6 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     const model = arg1 as LexicalModel;
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestCostAtDepth = [];
-    this.completedPaths = [];
   }
 
   /**
@@ -236,9 +224,6 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       this.selectionQueue.enqueueAll(insertionEdges);
     }
 
-    // It was the final tier - store the node for future reference.
-    this.completedPaths?.push(currentNode);
-
     if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
       this.returnedValues[currentNode.resultKey] = currentNode;
     } else {
@@ -255,6 +240,6 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get previousResults(): SearchResult[] {
-    return Object.values(this.returnedValues).map(v => new SearchResult(v));
+    return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 }
