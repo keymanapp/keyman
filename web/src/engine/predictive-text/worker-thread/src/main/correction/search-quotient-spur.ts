@@ -8,10 +8,11 @@
  * engine.
  */
 
-import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
+import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { EDIT_DISTANCE_COST_SCALE, PathResult, SearchNode, SearchResult } from './distance-modeler.js';
+import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -25,7 +26,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientSpur {
+export class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   private inputs: Distribution<Transform>;
 
@@ -111,6 +112,20 @@ export class SearchQuotientSpur {
       return [this.inputs];
     } else {
       return [];
+    }
+  }
+
+  public get inputCount(): number {
+    return (this.parentPath?.inputCount ?? 0) + (this.inputs ? 1 : 0);
+  }
+
+  public get bestExample(): {text: string, p: number} {
+    const bestPrefix = this.parentPath?.bestExample ?? { text: '', p: 1 };
+    const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
+
+    return {
+      text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      p: bestPrefix.p * bestLocalInput.p
     }
   }
 
@@ -308,7 +323,7 @@ export class SearchQuotientSpur {
     };
   }
 
-  public previousResults(): SearchResult[] {
+  public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues).map(v => new SearchResult(v));
   }
 }
