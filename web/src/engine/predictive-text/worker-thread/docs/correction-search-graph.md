@@ -4,7 +4,7 @@ The Keyman predictive-text correction-search process is designed to consider all
 of the most-likely possible input corrections when suggesting words from the
 active lexical-model.  To do so, it dynamically builds portions of the search
 graph as needed to generate corrections to the most recent token in the context.
-This token lies immediately before the caret.
+This token lies immediately before the text insertion point (caret).
 
 There is one major, notable simplifying assumption in the current
 text-correction design:  we assume that each keystroke's `Transform` is 100%
@@ -115,6 +115,18 @@ correction-search path:
     `Transform` will apply.
 2.  Modify by the cost of correcting the current keystroke with the specified
     `Transform` or applying a keystroke-level edit.
+
+Cost is comprised of two main components:
+1.  Edit-distance cost - the cost of:
+    - inserting characters not typed
+    - deleting keystrokes that should not have been typed
+    - substituting one output character with another
+        - Each of these three versions are of constant, equal cost per instance.
+2.  Fat-finger cost:  the cost of selecting one variant of keystroke output from
+    the input
+    - Here, the cost is the negative log-probability of the keystroke.
+    - Note that any keystroke output with higher cost than the edit-distance
+      cost will not be considered.
 
 ### Optimal Substructure
 
@@ -741,50 +753,51 @@ title: Submodule inspection - all quotient-graph paths to K2C3
 ---
 flowchart LR;
     subgraph Start
-        start{Empty token} -- _insert_ --> SC1(SC1: Codepoint length 1)
+        start{Empty token} -- _insert_ --> SC1(Codepoint length 1)
         SC1 -- _insert_ --> SC2@{ shape: processes, label: "..." }
     end
 
     subgraph After Key 1
-        start -- _delete_ --> K1C0(K1C0: Codepoint length 0)
+        start -- _delete_ --> K1C0(Codepoint length 0)
 
         SC1 -- _delete_ --> K1C1
-        start -- [a, b] --> K1C1(K1C1: Codepoint length 1)
+        start -- [a, b] --> K1C1(Codepoint length 1)
         K1C0 -- _insert_ --> K1C1
 
         SC1 -- [a, b] --> K1C2
-        start -- [cd] --> K1C2(K1C2: Codepoint length 2)
+        start -- [cd] --> K1C2(Codepoint length 2)
         K1C1 -- _insert_ --> K1C2
         SC2 -.-> K1C2
 
 
-        SC1 -- [cd] --> K1C3(K1C3: Codepoint length 3)
+        SC1 -- [cd] --> K1C3(Codepoint length 3)
         K1C2 -- _insert_ --> K1C3
         SC2 -.-> K1C3
     end
 
     subgraph After Key 2
-        K1C0 -- _delete_ --> K2C0(K2C0: Codepoint length 0)
+        K1C0 -- _delete_ --> K2C0(Codepoint length 0)
 
         K1C1 -- _delete_ --> K2C1
-        K1C0 -- [e, f] --> K2C1(K2C1: Codepoint length 1)
+        K1C0 -- [e, f] --> K2C1(Codepoint length 1)
         K2C0 -- _insert_ --> K2C1
 
         K1C2 -- _delete_ --> K2C2
         K1C1 -- [e, f] --> K2C2
-        K1C0 -- [gh] --> K2C2(K2C2: Codepoint length 2)
+        K1C0 -- [gh] --> K2C2(Codepoint length 2)
         K2C1 -- _insert_ --> K2C2
 
         K1C3 -- _delete_ --> K2C3
         K1C2 -- [e, f] --> K2C3
-        K1C1 -- [gh] --> K2C3(K2C3: Codepoint length 3)
+        K1C1 -- [gh] --> K2C3(Destination: Codepoint length 3)
         K2C2 -- _insert_ --> K2C3
     end
 ```
 
-Each of the inbound paths to the final quotient-path graph node for the K2C3
-submodule may each individually be modeled as `SearchQuotientSpur`s.  Each such
-`SearchQuotientSpur` has a single parent submodule, represented by an earlier
-`SearchQuotientNode` instance, whose paths are extended by an edge representing
-a single keystroke input type (all with matching insertion codepoint length and
-left-deletion count) or edit operation type.
+Each of the inbound paths to the final quotient-path graph node for the
+submodule labeled "Destination" may each individually be modeled as
+`SearchQuotientSpur`s.  Each such `SearchQuotientSpur` has a single parent
+submodule, represented by an earlier `SearchQuotientNode` instance, whose paths
+are extended by an edge representing a single keystroke input type (all with
+matching insertion codepoint length and left-deletion count) or edit operation
+type.
