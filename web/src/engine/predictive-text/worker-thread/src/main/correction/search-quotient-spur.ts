@@ -28,9 +28,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  private inputs: Distribution<Transform>;
-
-  readonly rootPath: SearchQuotientSpur;
+  readonly inputs?: Distribution<Readonly<Transform>>;
 
   private parentPath: SearchQuotientSpur;
   readonly spaceId: number;
@@ -59,44 +57,37 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   private lowestCostAtDepth: number[];
 
   /**
-   * Clone constructor.  Deep-copies its internal queues, but not search nodes.
-   * @param instance
-   */
-  constructor(instance: SearchQuotientSpur);
-  /**
    * Constructs a fresh SearchSpace instance for used in predictive-text correction
    * and suggestion searches.
    * @param baseSpaceId
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(arg1: SearchQuotientSpur|LexicalModel) {
+  constructor(space: SearchQuotientSpur, inputs: Distribution<Transform>, bestProbFromSet: number);
+  constructor(arg1: LexicalModel | SearchQuotientSpur, inputs?: Distribution<Transform>, bestProbFromSet?: number) {
     this.spaceId = generateSpaceSeed();
 
     if(arg1 instanceof SearchQuotientSpur) {
-      const parentSpace = arg1;
-      this.lowestCostAtDepth = parentSpace.lowestCostAtDepth.slice();
-      this.rootPath = parentSpace.rootPath;
-      this.parentPath = parentSpace;
+      const parentNode = arg1 as SearchQuotientSpur;
+      const logTierCost = -Math.log(bestProbFromSet);
+
+      this.inputs = inputs;
+      this.lowestCostAtDepth = parentNode.lowestCostAtDepth.concat(logTierCost);
+      this.parentPath = parentNode;
+
+      this.addEdgesForNodes(parentNode.completedPaths);
 
       return;
     }
 
-    const model = arg1;
-    if(!model.traverseFromRoot) {
-      throw new Error("The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.");
-    }
-
-    const rootNode = new SearchNode(model.traverseFromRoot(), this.spaceId, model.toKey ? model.toKey.bind(model) : null);
-    this.selectionQueue.enqueue(rootNode);
+    const model = arg1 as LexicalModel;
+    this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestCostAtDepth = [];
-    this.rootPath = this;
-
     this.completedPaths = [];
   }
 
   /**
-   * Retrieves the sequence of inputs
+   * Retrieves the sequences of inputs that led to this SearchPath.
    */
   public get inputSequence(): Distribution<Transform>[] {
     if(this.parentPath) {
@@ -141,46 +132,6 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     return this.parentPath?.correctionsEnabled || this.inputs?.length > 1;
   }
 
-  /**
-   * Extends the correction-search process embodied by this SearchPath by an extra
-   * input character, according to the characters' likelihood in the distribution.
-   * @param inputDistribution The fat-finger distribution for the incoming keystroke (or
-   * just the raw keystroke if corrections are disabled)
-   */
-  addInput(inputDistribution: Distribution<Transform>, bestProbFromSet: number): SearchQuotientSpur {
-    const input = inputDistribution;
-
-    const childSpace = new SearchQuotientSpur(this);
-
-    childSpace.inputs = inputDistribution;
-    const lastDepthCost = this.lowestCostAtDepth[this.lowestCostAtDepth.length - 1] ?? 0;
-    const logTierCost = -Math.log(bestProbFromSet);
-    childSpace.lowestCostAtDepth.push(lastDepthCost + logTierCost);
-
-    // With a newly-available input, we can extend new input-dependent paths from
-    // our previously-reached 'extractedResults' nodes.
-    let newlyAvailableEdges: SearchNode[] = [];
-    let batches = this.completedPaths?.map(function(node) {
-      let deletions = node.buildDeletionEdges(input, childSpace.spaceId);
-      let substitutions = node.buildSubstitutionEdges(input, childSpace.spaceId);
-
-      // Skip the queue for the first pass; there will ALWAYS be at least one pass,
-      // and queue-enqueing does come with a cost.  Avoid the unnecessary overhead.
-      return substitutions.flatMap(e => e.processSubsetEdge()).concat(deletions);
-    });
-
-    childSpace.completedPaths = [];
-    childSpace.returnedValues = {};
-
-    batches?.forEach(function(batch) {
-      newlyAvailableEdges = newlyAvailableEdges.concat(batch);
-    });
-
-    childSpace.selectionQueue.enqueueAll(newlyAvailableEdges);
-
-    return childSpace;
-  }
-
   public get currentCost(): number {
     const parentCost = this.parentPath?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
@@ -188,29 +139,26 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     return Math.min(localCost, parentCost);
   }
 
-  /**
-   * Given an incoming SearchNode, this method will build all outgoing edges
-   * from the node that correspond to processing this SearchPath instance's
-   * input distribution.
-   * @param currentNode
-   */
-  private addEdgesForNodes(currentNode: SearchNode) {
-    // Hard restriction:  no further edits will be supported.  This helps keep the search
-    // more narrowly focused.
-    const substitutionsOnly = currentNode.editCount == 2;
+  private addEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>) {
+    // With a newly-available input, we can extend new input-dependent paths from
+    // our previously-reached 'extractedResults' nodes.
+    let outboundNodes = baseNodes.map((node) => {
+      // Hard restriction:  no further edits will be supported.  This helps keep the search
+      // more narrowly focused.
+      const substitutionsOnly = node.editCount == 2;
 
-    let deletionEdges: SearchNode[] = [];
-    if(!substitutionsOnly) {
-      deletionEdges         = currentNode.buildDeletionEdges(this.inputs, this.spaceId);
-    }
-    const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputs, this.spaceId);
+      let deletionEdges: SearchNode[] = [];
+      if(!substitutionsOnly) {
+        deletionEdges         = node.buildDeletionEdges(this.inputs, this.spaceId);
+      }
+      const substitutionEdges = node.buildSubstitutionEdges(this.inputs, this.spaceId);
 
-    // Skip the queue for the first pass; there will ALWAYS be at least one pass,
-    // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
-    let batch = substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
+      // Skip the queue for the first pass; there will ALWAYS be at least one pass,
+      // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
+      return substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
+    }).flat();
 
-    this.selectionQueue.enqueueAll(batch);
-    // We didn't reach an end-node, so we just end the iteration and continue the search.
+    this.selectionQueue.enqueueAll(outboundNodes);
   }
 
   /**
@@ -233,7 +181,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       const result = this.parentPath.handleNextNode();
 
       if(result.type == 'complete') {
-        this.addEdgesForNodes(result.finalNode);
+        this.addEdgesForNodes([result.finalNode]);
       }
 
       return {

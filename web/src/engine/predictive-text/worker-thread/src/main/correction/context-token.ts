@@ -128,7 +128,7 @@ export class ContextToken {
           inputStartIndex: 0,
           bestProbFromSet: BASE_PROBABILITY
         });
-        searchSpace = searchSpace.addInput([{sample: transform, p: BASE_PROBABILITY}], 1);
+        searchSpace = new SearchQuotientSpur(searchSpace, [{sample: transform, p: BASE_PROBABILITY}], 1);
       });
 
       this._searchModule = searchSpace;
@@ -141,7 +141,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this._searchModule = this._searchModule.addInput(distribution, inputSource.bestProbFromSet);
+    this._searchModule = new SearchQuotientSpur(this._searchModule, distribution, inputSource.bestProbFromSet);
   }
 
   /**
