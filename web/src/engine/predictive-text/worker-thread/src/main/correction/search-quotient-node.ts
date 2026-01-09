@@ -65,6 +65,16 @@ export interface SearchQuotientNode {
   readonly currentCost: number;
 
   /**
+   * Provides a heuristic for the base cost at this path's depth if the best
+   * individual input were taken here, regardless of whether or not that's
+   * possible.
+   *
+   * This cost is based on the negative log-likelihood of the probability and
+   * includes the cost from the lowest possible parent nodes visited.
+   */
+  readonly lowestPossibleSingleCost: number;
+
+  /**
    * Returns the set of previously-processed results under this batcher's domain.
    */
   readonly previousResults: SearchResult[];

@@ -34,16 +34,16 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   readonly spaceId: number;
 
   /**
-   * Marks all results that have already been returned since the last input was received.
-   * Is cleared after .addInput() calls.
+   * Marks all results that have already been returned from this instance of SearchPath.
+   * Should be deleted and cleared if any paths consider this one as a parent.
    */
   private returnedValues?: {[resultKey: string]: SearchNode} = {};
 
   /**
-   * Provides a heuristic for the base cost at each depth if the best
-   * individual input were taken at that level.
+   * Provides a heuristic for the base cost at this path's depth if the best
+   * individual input were taken here, regardless of whether or not that's possible.
    */
-  private lowestCostAtDepth: number[];
+  readonly lowestPossibleSingleCost: number;
 
   /**
    * Constructs a fresh SearchSpace instance for used in predictive-text correction
@@ -61,7 +61,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       const logTierCost = -Math.log(bestProbFromSet);
 
       this.inputs = inputs;
-      this.lowestCostAtDepth = parentNode.lowestCostAtDepth.concat(logTierCost);
+      this.lowestPossibleSingleCost = parentNode.lowestPossibleSingleCost + logTierCost;
       this.parentPath = parentNode;
 
       this.addEdgesForNodes(parentNode.previousResults.map(v => v.node));
@@ -71,7 +71,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
 
     const model = arg1 as LexicalModel;
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
-    this.lowestCostAtDepth = [];
+    this.lowestPossibleSingleCost = 0;
   }
 
   /**
@@ -202,8 +202,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     // ... or even just not the then-current layer of the keyboard.
     //
     // TODO:  still consider the lowest-cost individual edges for THIS specific criterion.
-    const tierMinCost = this.lowestCostAtDepth[currentNode.priorInput.length-1];
-    if(currentNode.currentCost > tierMinCost + 2.5 * EDIT_DISTANCE_COST_SCALE) {
+    if(currentNode.currentCost > this.lowestPossibleSingleCost + 2.5 * EDIT_DISTANCE_COST_SCALE) {
       return unmatchedResult;
     }
 
