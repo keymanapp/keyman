@@ -59,7 +59,7 @@ describe('ContextToken', function() {
       assert.isFalse(token.isWhitespace);
 
       // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
-      let searchIterator = getBestMatches(token.searchModule, new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+      let searchIterator = getBestMatches([token.searchModule], new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
       let firstEntry = await searchIterator.next();
       assert.isFalse(firstEntry.done);
     });
