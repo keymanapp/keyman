@@ -19,7 +19,7 @@ preserve_hierarchy: true
 #
 # Files configuration
 #
-files: [{
+files:
   # source: local path of file that gets uploaded to crowdin
   # dest: crowdin path in https://crowdin.com/project/keyman
   # translation: local path where downloaded translations from crowdin go
@@ -28,183 +28,146 @@ files: [{
   # Android files
   # Reference: https://developer.android.com/guide/topics/resources/multilingual-support
 
-  "source": "/android/KMEA/app/src/main/res/values/strings.xml",
-  "dest": "/android/engine/strings.xml",
-  "translation": "/android/KMEA/app/src/main/res/values-%android_code%/strings.xml",
-  "languages_mapping": {
-    # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
-    "android_code": {
-      #"el-polyton": "b+el", # TODO: figure out polyton variant
-      "es-419": "b+es+419",
-      "pap": "pap",
-      #"shu-latn-n": "b+shu+latn"
-    }
-  }
-}, { 
-  "source": "/android/KMAPro/kMAPro/src/main/res/values/strings.xml",
-  "dest": "/android/app/strings.xml",
-  "translation": "/android/KMAPro/kMAPro/src/main/res/values-%android_code%/strings.xml",
-  "languages_mapping": {
-    # Prevent invalid region pap-rPAP
-    "android_code": {
-      #"el-polyton": "b+el", # TODO: figure out polyton variant
-      "es-419": "b+es+419",
-      "pap": "pap",
-      #"shu-latn-n": "b+shu+latn"
-    }
-  },
-}, {
+  - source: /android/KMEA/app/src/main/res/values/strings.xml
+    dest: /android/engine/strings.xml
+    translation: /android/KMEA/app/src/main/res/values-%android_code%/strings.xml
+    languages_mapping:
+      # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
+      android_code:
+        #el-polyton: b+el # TODO: figure out polyton variant
+        es-419: b+es+419
+        pap: pap
+        #shu-latn-n: b+shu+latn
+
+  - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
+    dest: /android/app/strings.xml
+    translation: /android/KMAPro/kMAPro/src/main/res/values-%android_code%/strings.xml
+    languages_mapping:
+      # Prevent invalid region pap-rPAP
+      android_code:
+        #el-polyton: b+el # TODO: figure out polyton variant
+        es-419: b+es+419
+        pap: pap
+        #shu-latn-n: b+shu+latn
 
   # Windows files
-  # Note: we use type: android for the Windows project files#
+  # Note: we use type: android for the Windows project files
 
-  "source": "/windows/src/desktop/kmshell/xml/strings.xml",
-  "dest": "/windows/strings.xml",
-  "translation": "/windows/src/desktop/kmshell/locale/%locale%/%original_file_name%",
-  "type": "android",
-  "languages_mapping": {
-    "locale": {
-      "de": "de",
-      "fr": "fr",
-      "kn": "kn"
-    } 
-  },
-}, {
-  "source": "/windows/src/desktop/setup/locale/en/strings.xml",
-  "dest": "/windows/setup/strings.xml",
-  "translation": "/windows/src/desktop/setup/locale/%locale%/%original_file_name%",
-  "type": "android",
-  "languages_mapping": {
-    "locale": {
-      "de": "de",
-      "fr": "fr",
-      "kn": "kn"
-    }
-  },
-}, {
+  - source: /windows/src/desktop/kmshell/xml/strings.xml
+    dest: /windows/strings.xml
+    translation: /windows/src/desktop/kmshell/locale/%locale%/%original_file_name%
+    type: android
+    languages_mapping:
+      locale:
+        de: de
+        fr: fr
+        kn: kn
 
-  # iOS files#
+  - source: /windows/src/desktop/setup/locale/en/strings.xml
+    dest: /windows/setup/strings.xml
+    translation: /windows/src/desktop/setup/locale/%locale%/%original_file_name%
+    type: android
+    languages_mapping:
+      locale:
+        de: de
+        fr: fr
+        kn: kn
 
-  "source": "/ios/engine/KMEI/KeymanEngine/Classes/en.lproj/ResourceInfoView.strings",
-  "dest": "/ios/engine/ResourceInfoView.strings",
-  "translation": "/ios/engine/KMEI/KeymanEngine/Classes/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings",
-  "dest": "/ios/engine/Localizable.strings",
-  "translation": "/ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.stringsdict",
-  "dest": "/ios/engine/Localizable.stringsdict",
-  "translation": "/ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings",
-  "dest": "/ios/app/Localizable.strings",
-  "translation": "/ios/keyman/Keyman/Keyman/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
+  # iOS files
 
-}, {
+  - source: /ios/engine/KMEI/KeymanEngine/Classes/en.lproj/ResourceInfoView.strings
+    dest: /ios/engine/ResourceInfoView.strings
+    translation: /ios/engine/KMEI/KeymanEngine/Classes/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
 
-  # Linux files#
+  - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
+    dest: /ios/engine/Localizable.strings
+    translation: /ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
 
-  "source": "/linux/keyman-config/locale/keyman-config.pot",
-  "dest": "/linux/keyman-config.pot",
-  "translation": "/linux/keyman-config/locale/%locale_with_underscore%.po",
-  "type": "gettext",
-  "update_option": "update_as_unapproved",
-  "languages_mapping": {
-    "locale_with_underscore": {
-#      "shu-latn-n": "shu@latin",
-      "ha": "ha"
-    }
-  },
+  - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.stringsdict
+    dest: /ios/engine/Localizable.stringsdict
+    translation: /ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
 
-}, {
+  - source: /ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings
+    dest: /ios/app/Localizable.strings
+    translation: /ios/keyman/Keyman/Keyman/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
 
-  # macOS files#
+  # Linux files
 
-  "source": "/mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/en.lproj/KMAboutWindowController.strings",
-  "dest": "/mac/app/KMAboutWindowController.strings",
-  "translation": "/mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/en.lproj/preferences.strings",
-  "dest": "/mac/app/preferences.strings",
-  "translation":  "/mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/en.lproj/KMInfoWindowController.strings",
-  "dest": "/mac/app/KMInfoWindowController.strings",
-  "translation": "/mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings",
-  "dest": "/mac/app/KMKeyboardHelpWindowController.strings",
-  "translation": "/mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/mac/Keyman4MacIM/Keyman4MacIM/en.lproj/Localizable.strings",
-  "dest": "/mac/app/Localizable.strings",
-  "translation": "/mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-      #"el-polyton": "el.lproj"
-    }
-  },
-}, {
-  "source": "/mac/Keyman4MacIM/Keyman4MacIM/en.lproj/MainMenu.strings",
-  "dest": "/mac/app/MainMenu.strings",
-  "translation": "/mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%",
-  "languages_mapping": {
-    "osx_code": {
-      "pt-PT": "pt-PT.lproj",
-#      "el-polyton": "el.lproj"
-    }
-  }
-}]
+  - source: /linux/keyman-config/locale/keyman-config.pot
+    dest: /linux/keyman-config.pot
+    translation: /linux/keyman-config/locale/%locale_with_underscore%.po
+    type: gettext
+    update_option: update_as_unapproved
+    languages_mapping:
+      locale_with_underscore:
+        #shu-latn-n: shu@latin
+        ha: ha
+
+  # macOS files
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/en.lproj/KMAboutWindowController.strings
+    dest: /mac/app/KMAboutWindowController.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/en.lproj/preferences.strings
+    dest: /mac/app/preferences.strings
+    translation:  /mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/en.lproj/KMInfoWindowController.strings
+    dest: /mac/app/KMInfoWindowController.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings
+    dest: /mac/app/KMKeyboardHelpWindowController.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/Localizable.strings
+    dest: /mac/app/Localizable.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/MainMenu.strings
+    dest: /mac/app/MainMenu.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
+        #el-polyton: el.lproj
 
   # crowdin parameters descriptions:
 
