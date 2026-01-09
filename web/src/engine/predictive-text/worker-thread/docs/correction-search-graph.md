@@ -631,7 +631,7 @@ leverage each node's association with specific modules.
 
 <!-- TODO - everything after this point. -->
 
-## The `SearchSpace` type
+## The `SearchQuotientNode` type
 
 Let us examine the manner in which correction-search nodes are visited and
 search paths are built:
@@ -706,33 +706,34 @@ search path in order to yield a more complete correction-search search-path
 result.
 
 As the way paths are extended is dependent upon which submodule contains their
-final node, the `SearchSpace` interface exists to model individual submodules,
+final node, the `SearchQuotientNode` interface exists to model individual submodules,
 manage the extension of paths that pass through them, and cache intermediate
 calculations for future reuse.
 
-## The `SearchPath` type
+## The `SearchQuotientSpur` type
 
 The transition from one submodule to another is marked by specific edge types
 corresponding to received keystrokes or to `insert` or `delete` edit operations.
-Whatever the edge type is, this transition is modeled by the `SearchPath` type,
-extending all `SearchNode` paths passing through it via the specified edge type
-in order to reach the next submodule.
+Whatever the edge type is, this transition is modeled by the
+`SearchQuotientSpur` type, extending all `SearchNode` paths passing through it
+via the specified edge type in order to reach the next submodule.
 
-`SearchPath` itself _also_ implements `SearchSpace`; for cases where only a
-single parent node and edge exists that may transition to a new submodule,
-`SearchPath` is sufficient to module the destination submodule.
+`SearchQuotientSpur` itself _also_ implements `SearchQuotientNode`; for cases
+where only a single parent node and edge exists that may transition to a new
+submodule, `SearchQuotientSpur` is sufficient to module the destination
+submodule.
 
-## The `SearchCluster` type
+## The `SearchQuotientCluster` type
 
 As there are many cases where more than one parent node + edge combination may
-transition to a child submodule, `SearchCluster` exists to connect all such
-combinations (and their corresponding `SearchPath` representations) together.
-It then exposes them as a single common instance to represent the destination
-submodule.
+transition to a child submodule, `SearchQuotientCluster` exists to connect all such
+combinations (and their corresponding `SearchQuotientSpur` representations)
+together. It then exposes them as a single common instance to represent the
+destination submodule.
 
 Revisiting the prior quotient graph visualization, the following graph
 represents the full range of representation for submodule `K2C3` as a
-`SearchCluster`:
+`SearchQuotientCluster`:
 
 ```mermaid
 ---
@@ -782,8 +783,8 @@ flowchart LR;
 ```
 
 Each of the inbound paths to the final quotient-path graph node for the K2C3
-submodule may each individually be modeled as `SearchPath`s.  Each such
-`SearchPath` has a single parent submodule, represented by an earlier
-`SearchSpace` instance, whose paths are extended by an edge representing a
-single keystroke input type (all with matching insertion codepoint length and
+submodule may each individually be modeled as `SearchQuotientSpur`s.  Each such
+`SearchQuotientSpur` has a single parent submodule, represented by an earlier
+`SearchQuotientNode` instance, whose paths are extended by an edge representing
+a single keystroke input type (all with matching insertion codepoint length and
 left-deletion count) or edit operation type.
