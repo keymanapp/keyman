@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.188 alpha 2026-01-09
+
+* fix(mac): correct memory width mismatch in keyCodeForChar (#15393)
+* docs(common): document `api-verification` GHA (#15410)
+
 ## 19.0.187 alpha 2026-01-08
 
 * maint(resources): add new ARM64 test status check to PR build status check (#15409)
