@@ -4,6 +4,8 @@ export * from './correction/context-token.js';
 export * from './correction/context-tokenization.js';
 export { ContextTracker } from './correction/context-tracker.js';
 export { ContextTransition } from './correction/context-transition.js';
+export * from './correction/distance-modeler.js';
+export * from './correction/search-quotient-spur.js';
 export { ExtendedEditOperation, SegmentableDistanceCalculation } from './correction/segmentable-calculation.js';
 export * from './correction/tokenization-subsets.js';
 export * as correction from './correction/index.js';
