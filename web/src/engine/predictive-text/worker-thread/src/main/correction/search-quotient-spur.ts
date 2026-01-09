@@ -121,7 +121,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   public get lastInput(): Distribution<Readonly<Transform>> {
     // Shallow-copies the array to prevent external modification; the Transforms
     // are marked Readonly to prevent their modification as well.
-    return this.inputs ?? null;
+    return this.inputs ?? [];
   }
 
   public get bestExample(): {text: string, p: number} {
