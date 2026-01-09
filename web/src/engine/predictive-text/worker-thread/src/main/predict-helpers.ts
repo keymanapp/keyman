@@ -460,7 +460,7 @@ export async function correctAndEnumerate(
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  const searchSpace = transition.final.tokenization.tail.searchSpace;
+  const searchSpace = transition.final.tokenization.tail.searchModule;
 
   // If corrections are not enabled, bypass the correction search aspect
   // entirely. No need to 'search' - just do a direct lookup.

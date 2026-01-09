@@ -139,16 +139,16 @@ describe('ContextTokenization', function() {
       let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
       let cloned = new ContextTokenization(baseTokenization);
 
-      assert.deepEqual(cloned.tokens.map((token) => token.searchSpace.inputSequence),
-        baseTokenization.tokens.map((token) => token.searchSpace.inputSequence));
+      assert.deepEqual(cloned.tokens.map((token) => token.searchModule.inputSequence),
+        baseTokenization.tokens.map((token) => token.searchModule.inputSequence));
 
-      // The `.searchSpace` instances will not be deep-equal; there are class properties
+      // The `.searchModule` instances will not be deep-equal; there are class properties
       // that hold functions with closures, configured at runtime.
 
       // @ts-ignore - TS2704 b/c deleting a readonly property.
-      baseTokenization.tokens.forEach((token) => delete token.searchSpace);
+      baseTokenization.tokens.forEach((token) => delete token.searchModule);
       // @ts-ignore - TS2704 b/c deleting a readonly property.
-      cloned.tokens.forEach((token) => delete token.searchSpace);
+      cloned.tokens.forEach((token) => delete token.searchModule);
 
       assert.deepEqual(cloned, baseTokenization);
     });
@@ -199,11 +199,11 @@ describe('ContextTokenization', function() {
         targetTokens
       );
       assert.includeDeepMembers(
-        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence,
+        tokenization.tokens[tokenization.tokens.length - 2].searchModule.inputSequence,
         [[{sample: inputTransformMap.get(1), p: 1}]]
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
+        tokenization.tail.searchModule.inputSequence,
         [[{sample: inputTransformMap.get(2), p: 1}]]
       );
     });
@@ -282,7 +282,7 @@ describe('ContextTokenization', function() {
         targetTokens
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
+        tokenization.tail.searchModule.inputSequence,
         [[{sample: inputTransformMap.get(0), p: 1}]]
       );
     });
@@ -323,7 +323,7 @@ describe('ContextTokenization', function() {
         targetTokens
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
+        tokenization.tail.searchModule.inputSequence,
         // As we fully deleted the old token, the new one "starts" after the deleteLeft.
         // The deleteLeft component should not be included here.
         [[{sample: { insert: 'week', deleteLeft: 0 /* NOT 3 */ }, p: 1}]]
@@ -377,7 +377,7 @@ describe('ContextTokenization', function() {
         }
 
         assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          tokenization.tokens[tailIndex + i].searchModule.inputSequence,
           [[{sample: transform, p: 1}]]
         );
       }
@@ -439,7 +439,7 @@ describe('ContextTokenization', function() {
         }
 
         assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          tokenization.tokens[tailIndex + i].searchModule.inputSequence,
           [[{sample: transform, p: 1}]]
         );
       }
@@ -493,7 +493,7 @@ describe('ContextTokenization', function() {
         }
 
         assert.includeDeepMembers(
-          tokenization.tokens[tailIndex + i].searchSpace.inputSequence,
+          tokenization.tokens[tailIndex + i].searchModule.inputSequence,
           [[{sample: transform, p: 1}]]
         );
       }
@@ -553,8 +553,8 @@ describe('ContextTokenization', function() {
         [...baseTokenization.tokens[baseTokenization.tokens.length - 2].inputRange]
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchSpace.inputSequence
+        tokenization.tail.searchModule.inputSequence,
+        baseTokenization.tokens[baseTokenization.tokens.length - 2].searchModule.inputSequence
       );
 
       assert.includeDeepMembers(
@@ -562,8 +562,8 @@ describe('ContextTokenization', function() {
         [...baseTokenization.tokens[baseTokenization.tokens.length - 1].inputRange]
       );
       assert.includeDeepMembers(
-        tokenization.tail.searchSpace.inputSequence,
-        baseTokenization.tokens[baseTokenization.tokens.length - 1].searchSpace.inputSequence
+        tokenization.tail.searchModule.inputSequence,
+        baseTokenization.tokens[baseTokenization.tokens.length - 1].searchModule.inputSequence
       );
     });
 
@@ -624,8 +624,8 @@ describe('ContextTokenization', function() {
         [...tokenization.tokens[tokenization.tokens.length - 2].inputRange]
       );
       assert.includeDeepMembers(
-        baseTokenization.tail.searchSpace.inputSequence,
-        tokenization.tokens[tokenization.tokens.length - 2].searchSpace.inputSequence
+        baseTokenization.tail.searchModule.inputSequence,
+        tokenization.tokens[tokenization.tokens.length - 2].searchModule.inputSequence
       );
 
       // We've also appended a '.' to the final split-off token.  Thus, we need
@@ -635,8 +635,8 @@ describe('ContextTokenization', function() {
         [...tokenization.tokens[tokenization.tokens.length - 1].inputRange]
       );
       assert.includeDeepMembers(
-        [...baseTokenization.tail.searchSpace.inputSequence, [{sample: { insert: '.', deleteLeft: 0 }, p: 1}]],
-        tokenization.tokens[tokenization.tokens.length - 1].searchSpace.inputSequence
+        [...baseTokenization.tail.searchModule.inputSequence, [{sample: { insert: '.', deleteLeft: 0 }, p: 1}]],
+        tokenization.tokens[tokenization.tokens.length - 1].searchModule.inputSequence
       );
     });
   });
