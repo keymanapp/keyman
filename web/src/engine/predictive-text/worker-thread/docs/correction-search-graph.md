@@ -641,8 +641,6 @@ For this, we need a way to track each node's "path state" during the search
 process.  To do so, we turn to the quotient-graph representations above and
 leverage each node's association with specific modules.
 
-<!-- TODO - everything after this point. -->
-
 ## The `SearchQuotientNode` type
 
 Let us examine the manner in which correction-search nodes are visited and
