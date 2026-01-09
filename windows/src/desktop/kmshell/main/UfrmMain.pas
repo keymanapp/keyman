@@ -839,7 +839,12 @@ begin
     FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
     if not FResult then
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-        'TrmfMain: Shell Execute Update_ApplyNow Failed');
+        'TrmfMain: Shell Execute Update_ApplyNow Failed')
+    else
+      ModalResult := mrAbort;
+      // If a splash screen is currently open when "Install Now" is executed,
+      // setting mrAbort ensures the splash screen is closed on the
+      // return of "Keyman Configuration".
   end;
 end;
 
