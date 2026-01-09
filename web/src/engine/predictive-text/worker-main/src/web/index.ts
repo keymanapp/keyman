@@ -1,5 +1,5 @@
 export { LMLayer } from '../lmlayer.js';
-export { DefaultWorker as Worker } from './worker.js'; // TODO: eliminate rename
+export { Worker } from './worker.js';
 export { SourcemappedWorker } from './sourcemappedWorker.js';
 
 export interface WorkerFactory {
