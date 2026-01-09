@@ -30,6 +30,9 @@ export * as LDMLKeyboard from './types/ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './types/ldml-keyboard/ldml-keyboard-xml-reader.js';
 
+export * as Keylayout from './types/keylayout/keylayout-xml.js';
+export { KeylayoutXMLSourceFile } from './types/keylayout/keylayout-xml.js';
+
 export {
   CompilerAsyncCallbacks,
   CompilerCallbacks,
