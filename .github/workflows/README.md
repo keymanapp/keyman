@@ -79,8 +79,14 @@ itself:
 
 ....
 
-# crowdin.yml
-TODO
+# crowdin.yml: Upload translation sources to [Crowdin](translate.keyman.com)
+
+This action automatically updates the English source strings on Crowdin
+https://crowdin.com/project/keyman/sources/files
+
+based on the root [crowdin.yml](../../crowdin.yml) configuration file. The daily cron job currently runs at 6:00AM.
+
+This should match the behavior of locally using the [Crowdin CLI to upload sources](https://crowdin.github.io/crowdin-cli/commands/crowdin-upload-sources).
 
 # deb-packaging.yml: Ubuntu Packaging GitHub Action
 
