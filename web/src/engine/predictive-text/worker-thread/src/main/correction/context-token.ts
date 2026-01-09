@@ -58,10 +58,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  public get searchSpace(): SearchQuotientSpur {
-    return this._searchSpace;
+  public get searchModule(): SearchQuotientSpur {
+    return this._searchModule;
   }
-  private _searchSpace: SearchQuotientSpur;
+  private _searchModule: SearchQuotientSpur;
 
   isPartial: boolean;
 
@@ -107,7 +107,7 @@ export class ContextToken {
       //
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
-      this._searchSpace = priorToken.searchSpace;
+      this._searchModule = priorToken.searchModule;
       this._inputRange = priorToken._inputRange.slice();
 
       // Preserve any annotated applied-suggestion transition ID data; it's useful
@@ -138,7 +138,7 @@ export class ContextToken {
         searchSpace = searchSpace.addInput([{sample: transform, p: BASE_PROBABILITY}], 1);
       });
 
-      this._searchSpace = searchSpace;
+      this._searchModule = searchSpace;
     }
   }
 
@@ -148,7 +148,7 @@ export class ContextToken {
    */
   addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
     this._inputRange.push(inputSource);
-    this._searchSpace = this._searchSpace.addInput(distribution, inputSource.bestProbFromSet);
+    this._searchModule = this._searchModule.addInput(distribution, inputSource.bestProbFromSet);
   }
 
   /**
@@ -210,7 +210,7 @@ export class ContextToken {
      * If not possible, find the best of the deepest search paths and append the
      * most likely keystroke data afterward.
      */
-    const transforms = this.searchSpace.inputSequence.map((dist) => dist[0].sample)
+    const transforms = this.searchModule.inputSequence.map((dist) => dist[0].sample)
     const composite = transforms.reduce((accum, current) => buildMergedTransform(accum, current), {insert: '', deleteLeft: 0});
     return composite.insert;
   }
@@ -248,7 +248,7 @@ export class ContextToken {
 
         lastInputDistrib = lastInputDistrib?.map((entry, index) => {
           return {
-            sample: buildMergedTransform(entry.sample, token.searchSpace.inputSequence[0][index].sample),
+            sample: buildMergedTransform(entry.sample, token.searchModule.inputSequence[0][index].sample),
             p: entry.p
           }
         });
@@ -267,10 +267,10 @@ export class ContextToken {
       // Ignore the last entry for now - it may need to merge with a matching
       // entry in the next token!
       for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.inputRange[i], token.searchSpace.inputSequence[i]);
+        resultToken.addInput(token.inputRange[i], token.searchModule.inputSequence[i]);
       }
       lastSourceInput = token.inputRange[inputCount-1];
-      lastInputDistrib = token.searchSpace.inputSequence[inputCount-1];
+      lastInputDistrib = token.searchModule.inputSequence[inputCount-1];
     }
 
     resultToken.addInput(lastSourceInput, lastInputDistrib);
@@ -326,7 +326,7 @@ export class ContextToken {
         const totalLenBeforeLastApply = committedLen + lenBeforeLastApply;
         // We read the start position for the NEXT token to know the split position.
         const extraCharsAdded = splitSpecs[1].textOffset - totalLenBeforeLastApply;
-        const tokenSequence = overextendedToken.searchSpace.inputSequence;
+        const tokenSequence = overextendedToken.searchModule.inputSequence;
         const lastInputIndex = tokenSequence.length - 1;
         const inputDistribution = tokenSequence[lastInputIndex];
         const headDistribution = inputDistribution.map((m) => {
@@ -374,7 +374,7 @@ export class ContextToken {
       backupToken = new ContextToken(constructingToken);
       lenBeforeLastApply = KMWString.length(currentText.left);
       currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
-      constructingToken.addInput(this.inputRange[transformIndex], this.searchSpace.inputSequence[transformIndex]);
+      constructingToken.addInput(this.inputRange[transformIndex], this.searchModule.inputSequence[transformIndex]);
       transformIndex++;
     }
 

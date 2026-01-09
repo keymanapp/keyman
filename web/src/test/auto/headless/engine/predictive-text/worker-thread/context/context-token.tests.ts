@@ -54,12 +54,12 @@ describe('ContextToken', function() {
     it("(model: LexicalModel)", async () => {
       let token = new ContextToken(plainModel);
 
-      assert.isEmpty(token.searchSpace.inputSequence);
+      assert.isEmpty(token.searchModule.inputSequence);
       assert.isEmpty(token.exampleInput);
       assert.isFalse(token.isWhitespace);
 
       // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
-      let searchIterator = getBestMatches(token.searchSpace, new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+      let searchIterator = getBestMatches(token.searchModule, new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
       let firstEntry = await searchIterator.next();
       assert.isFalse(firstEntry.done);
     });
@@ -67,11 +67,11 @@ describe('ContextToken', function() {
     it("(model: LexicalModel, text: string)", () => {
       let token = new ContextToken(plainModel, "and");
 
-      assert.isNotEmpty(token.searchSpace.inputSequence);
+      assert.isNotEmpty(token.searchModule.inputSequence);
 
-      assert.equal(token.searchSpace.inputSequence.map((entry) => entry[0].sample.insert).join(''), 'and');
-      token.searchSpace.inputSequence.forEach((entry) => assert.equal(entry[0].sample.deleteLeft, 0));
-      assert.deepEqual(token.searchSpace.inputSequence, [..."and"].map((char) => {
+      assert.equal(token.searchModule.inputSequence.map((entry) => entry[0].sample.insert).join(''), 'and');
+      token.searchModule.inputSequence.forEach((entry) => assert.equal(entry[0].sample.deleteLeft, 0));
+      assert.deepEqual(token.searchModule.inputSequence, [..."and"].map((char) => {
         return [{
           sample: {
             insert: char,
@@ -90,14 +90,14 @@ describe('ContextToken', function() {
       let baseToken = new ContextToken(plainModel, "and");
       let clonedToken = new ContextToken(baseToken);
 
-      assert.equal(clonedToken.searchSpace, baseToken.searchSpace);
-      // Deep equality on .searchSpace can't be directly checked due to the internal complexities involved.
+      assert.equal(clonedToken.searchModule, baseToken.searchModule);
+      // Deep equality on .searchModule can't be directly checked due to the internal complexities involved.
       // We CAN check for the most important members, though.
-      assert.notEqual(clonedToken.searchSpace.inputSequence, baseToken.searchSpace.inputSequence);
-      assert.deepEqual(clonedToken.searchSpace.inputSequence, baseToken.searchSpace.inputSequence);
+      assert.notEqual(clonedToken.searchModule.inputSequence, baseToken.searchModule.inputSequence);
+      assert.deepEqual(clonedToken.searchModule.inputSequence, baseToken.searchModule.inputSequence);
 
       assert.notEqual(clonedToken, baseToken);
-      // Perfectly deep-equal when we ignore .searchSpace.
+      // Perfectly deep-equal when we ignore .searchModule.
       assert.deepEqual({...clonedToken, searchSpace: null}, {...baseToken, searchSpace: null});
     });
   });
@@ -114,9 +114,9 @@ describe('ContextToken', function() {
       token2.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
       token3.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
 
-      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(0, 3), token1.searchSpace.inputSequence);
-      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(3, 4), token2.searchSpace.inputSequence);
-      assert.sameOrderedMembers(merged.searchSpace.inputSequence.slice(4), token3.searchSpace.inputSequence);
+      assert.sameOrderedMembers(merged.searchModule.inputSequence.slice(0, 3), token1.searchModule.inputSequence);
+      assert.sameOrderedMembers(merged.searchModule.inputSequence.slice(3, 4), token2.searchModule.inputSequence);
+      assert.sameOrderedMembers(merged.searchModule.inputSequence.slice(4), token3.searchModule.inputSequence);
     });
 
     it("merges three tokens from single previously-split transforms", () => {
@@ -147,7 +147,7 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge([token1, token2, token3], plainModel);
       assert.equal(merged.exampleInput, "can't");
       assert.deepEqual(merged.inputRange, [ { trueTransform: srcTransform, inputStartIndex: 0, bestProbFromSet: 1 } ]);
-      assert.deepEqual(merged.searchSpace.inputSequence, [[{sample: srcTransform, p: 1}]]);
+      assert.deepEqual(merged.searchModule.inputSequence, [[{sample: srcTransform, p: 1}]]);
     });
 
     it("merges four tokens with previously-split transforms", () => {
@@ -206,7 +206,7 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
       assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0, bestProbFromSet: 1 }) ));
-      assert.deepEqual(merged.searchSpace.inputSequence, srcTransforms.map((t) => [{sample: t, p: 1}]));
+      assert.deepEqual(merged.searchModule.inputSequence, srcTransforms.map((t) => [{sample: t, p: 1}]));
     });
 
     it("merges four tokens with previously-split transforms - non-BMP text", () => {
@@ -265,7 +265,7 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
       assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0, bestProbFromSet: 1 }) ));
-      assert.deepEqual(merged.searchSpace.inputSequence, srcTransforms.map((t) => [{sample: t, p: 1}]));
+      assert.deepEqual(merged.searchModule.inputSequence, srcTransforms.map((t) => [{sample: t, p: 1}]));
     });
   });
 
@@ -297,7 +297,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.sourceText, 'can\'');
-      assert.deepEqual(tokenToSplit.searchSpace.inputSequence, keystrokeDistributions);
+      assert.deepEqual(tokenToSplit.searchModule.inputSequence, keystrokeDistributions);
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -314,7 +314,7 @@ describe('ContextToken', function() {
 
       assert.equal(resultsOfSplit.length, 2);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), ['can', '\'']);
-      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.searchSpace.inputSequence), [
+      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.searchModule.inputSequence), [
         keystrokeDistributions.slice(0, 3),
         [keystrokeDistributions[3]]
       ]);
@@ -335,7 +335,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.sourceText, 'biglargetransform');
-      assert.deepEqual(tokenToSplit.searchSpace.inputSequence, keystrokeDistributions);
+      assert.deepEqual(tokenToSplit.searchModule.inputSequence, keystrokeDistributions);
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -362,7 +362,7 @@ describe('ContextToken', function() {
         inputStartIndex: i,
         bestProbFromSet: 1
       })));
-      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.searchSpace.inputSequence[0]), splitTextArray.map(t => [{
+      assert.sameDeepOrderedMembers(resultsOfSplit.map(t => t.searchModule.inputSequence[0]), splitTextArray.map(t => [{
         sample: { insert: t, deleteLeft: 0, deleteRight: 0 }, p: 1
       }]));
     });
@@ -386,7 +386,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.exampleInput, 'largelongtransforms');
-      assert.deepEqual(tokenToSplit.searchSpace.inputSequence, keystrokeDistributions);
+      assert.deepEqual(tokenToSplit.searchModule.inputSequence, keystrokeDistributions);
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -416,7 +416,7 @@ describe('ContextToken', function() {
         { trueTransform: keystrokeDistributions[2][0].sample, inputStartIndex: 'ng'.length, bestProbFromSet: 1 }
       ]);
 
-      assert.deepEqual(resultsOfSplit[0].searchSpace.inputSequence, [
+      assert.deepEqual(resultsOfSplit[0].searchModule.inputSequence, [
         keystrokeDistributions[0],
         keystrokeDistributions[1].map((entry) => {
           return {
@@ -428,7 +428,7 @@ describe('ContextToken', function() {
         }),
       ]);
 
-      assert.deepEqual(resultsOfSplit[1].searchSpace.inputSequence, [
+      assert.deepEqual(resultsOfSplit[1].searchModule.inputSequence, [
         keystrokeDistributions[1].map((entry) => {
           return {
             sample: {
@@ -448,7 +448,7 @@ describe('ContextToken', function() {
         }),
       ]);
 
-      assert.deepEqual(resultsOfSplit[2].searchSpace.inputSequence, [
+      assert.deepEqual(resultsOfSplit[2].searchModule.inputSequence, [
         keystrokeDistributions[2].map((entry) => {
           return {
             sample: {
@@ -480,7 +480,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.exampleInput, toMathematicalSMP('largelongtransforms'));
-      assert.deepEqual(tokenToSplit.searchSpace.inputSequence, keystrokeDistributions);
+      assert.deepEqual(tokenToSplit.searchModule.inputSequence, keystrokeDistributions);
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -510,7 +510,7 @@ describe('ContextToken', function() {
         { trueTransform: keystrokeDistributions[2][0].sample, inputStartIndex: 'ng'.length, bestProbFromSet: 1 }
       ]);
 
-      assert.deepEqual(resultsOfSplit[0].searchSpace.inputSequence, [
+      assert.deepEqual(resultsOfSplit[0].searchModule.inputSequence, [
         keystrokeDistributions[0],
         keystrokeDistributions[1].map((entry) => {
           return {
@@ -522,7 +522,7 @@ describe('ContextToken', function() {
         }),
       ]);
 
-      assert.deepEqual(resultsOfSplit[1].searchSpace.inputSequence, [
+      assert.deepEqual(resultsOfSplit[1].searchModule.inputSequence, [
         keystrokeDistributions[1].map((entry) => {
           return {
             sample: {
@@ -542,7 +542,7 @@ describe('ContextToken', function() {
         }),
       ]);
 
-      assert.deepEqual(resultsOfSplit[2].searchSpace.inputSequence, [
+      assert.deepEqual(resultsOfSplit[2].searchModule.inputSequence, [
         keystrokeDistributions[2].map((entry) => {
           return {
             sample: {
