@@ -19,7 +19,7 @@ export class SearchQuotientRoot extends SearchQuotientSpur {
    * @param model
    */
   constructor(model: LexicalModel) {
-    super(/* parent */ null, /* inputs */ null, /* cost heuristic */ 0);
+    super(/* parent */ null, /* inputs */ null, /* cost heuristic */ null);
     this.rootNode = new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t));
     this.queueNodes([this.rootNode]);
   }
