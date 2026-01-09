@@ -154,7 +154,7 @@ describe('SearchPath', () => {
     });
 
     it('throws if input and input-source transition IDs mismatch', () => {
-      const rootPath = new SearchPath(testModel);
+      const rootPath = new SearchQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -162,7 +162,7 @@ describe('SearchPath', () => {
         {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
       ];
 
-      assert.throws(() => new SearchPath(rootPath, leadEdgeDistribution, {
+      assert.throws(() => new LegacyQuotientSpur(rootPath, leadEdgeDistribution, {
         ...leadEdgeDistribution[0],
         sample: {...leadEdgeDistribution[0].sample, id: 15}
       }));
