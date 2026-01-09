@@ -1,9 +1,9 @@
 import { ActiveKey, ActiveLayer, ActiveRow } from 'keyman/engine/keyboard';
 
-import OSKBaseKey from './oskBaseKey.js';
+import { OSKBaseKey } from './oskBaseKey.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
-import VisualKeyboard from '../visualKeyboard.js';
-import OSKKey, { KeyLayoutParams } from './oskKey.js';
+import { VisualKeyboard } from '../visualKeyboard.js';
+import { OSKKey, KeyLayoutParams } from './oskKey.js';
 import { LayerLayoutParams } from './oskLayer.js';
 
 /*
@@ -16,7 +16,7 @@ export const KEY_BTN_Y_PAD_RATIO = 0.15;
 /**
  * Models one row of one layer of the OSK (`VisualKeyboard`) for a keyboard.
  */
-export default class OSKRow {
+export class OSKRow {
   public readonly element: HTMLDivElement;
   public readonly keys: OSKBaseKey[];
   public readonly heightFraction: number;

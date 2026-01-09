@@ -1,11 +1,11 @@
-import OSKViewComponent from "./oskViewComponent.interface.js";
+import { OSKViewComponent } from "./oskViewComponent.interface.js";
 
 /**
  * An abstract representation for visualizations of the active keyboard within an
  * OSKManager / OSKView.  Most keyboards will default to use of a VisualKeyboard,
  * though some will use HelpPage for certain form factors.
  */
-export default interface KeyboardView extends OSKViewComponent {
+export interface KeyboardView extends OSKViewComponent {
   readonly element: HTMLDivElement;
 
   /**

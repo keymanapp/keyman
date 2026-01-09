@@ -14,13 +14,13 @@ export {
   KeyboardAPIPropertyMultilangSpec,
   KeyboardAPIPropertySpec,
   KeyboardInternalPropertySpec,
-  default as KeyboardProperties,
+  KeyboardProperties,
   KeyboardFont,
   MetadataObj as RawKeyboardMetadata,
   LanguageAPIPropertySpec
 } from "./keyboards/keyboardProperties.js";
 export { ProcessorAction as ProcessorAction } from "./keyboards/processorAction.js";
-export { default as SpacebarText } from "./keyboards/spacebarText.js";
+export { SpacebarText } from "./keyboards/spacebarText.js";
 export { StateKeyMap } from "./keyboards/stateKeyMap.js";
 export { type Alternate, TextTransform } from "./keyboards/textTransform.js";
 export { Transcription } from "./keyboards/transcription.js";

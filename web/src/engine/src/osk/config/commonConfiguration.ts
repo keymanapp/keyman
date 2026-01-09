@@ -1,10 +1,10 @@
 import { DeviceSpec } from "keyman/common/web-utils";
 
-import EmbeddedGestureConfig from './embeddedGestureConfig.js';
+import { EmbeddedGestureConfig } from './embeddedGestureConfig.js';
 import { OSKResourcePathConfiguration } from "keyman/engine/interfaces";
 import { GestureParams } from "../input/gestures/specsForLayout.js";
 
-export default interface CommonConfiguration {
+export interface CommonConfiguration {
   /**
    * Metadata for the type of device to emulate and target with the on-screen keyboard.
    * When not specified, the metadata specified for `hostDevice` will be used by default.

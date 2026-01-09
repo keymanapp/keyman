@@ -1,6 +1,6 @@
 import { ManagedPromise } from "keyman/common/web-utils";
 
-export default class TouchEventPromiseMap {
+export class TouchEventPromiseMap {
   private map: Map<number, ManagedPromise<void>> = new Map();
 
   // Used to

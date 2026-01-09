@@ -2,11 +2,11 @@ import { EventEmitter } from 'eventemitter3';
 
 import { BannerView } from '../banner/bannerView.js';
 import { BannerController } from '../banner/bannerController.js';
-import OSKViewComponent from '../components/oskViewComponent.interface.js';
-import EmptyView from '../components/emptyView.js';
-import HelpPageView from '../components/helpPageView.js';
-import KeyboardView from '../components/keyboardView.interface.js';
-import VisualKeyboard from '../visualKeyboard.js';
+import { OSKViewComponent } from '../components/oskViewComponent.interface.js';
+import { EmptyView } from '../components/emptyView.js';
+import { HelpPageView } from '../components/helpPageView.js';
+import { KeyboardView } from '../components/keyboardView.interface.js';
+import { VisualKeyboard } from '../visualKeyboard.js';
 import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
 import { type KeyElement } from '../keyElement.js';
 
@@ -22,9 +22,9 @@ import {
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 import { EventListener, LegacyEventEmitter } from 'keyman/engine/events';
 
-import Configuration from '../config/viewConfiguration.js';
-import Activator, { StaticActivator } from './activator.js';
-import TouchEventPromiseMap from './touchEventPromiseMap.js';
+import { ViewConfiguration } from '../config/viewConfiguration.js';
+import { Activator, StaticActivator } from './activator.js';
+import { TouchEventPromiseMap } from './touchEventPromiseMap.js';
 import { KeyEventHandler, KeyEventSourceInterface } from './keyEventSource.interface.js';
 import { DEFAULT_GESTURE_PARAMS, GestureParams } from '../input/gestures/specsForLayout.js';
 
@@ -125,7 +125,7 @@ export interface EventMap {
   pointerinteraction: (promise: Promise<void>) => void;
 }
 
-export function getResourcePath(config: Configuration) {
+export function getResourcePath(config: ViewConfiguration) {
   let resourcePathExt = 'osk/';
   if(config.isEmbedded) {
     resourcePathExt = '';
@@ -133,7 +133,7 @@ export function getResourcePath(config: Configuration) {
   return `${config.pathConfig.resources}/${resourcePathExt}`
 }
 
-export default abstract class OSKView
+export abstract class OSKView
   extends EventEmitter<EventMap>
   implements MinimalCodesInterface, KeyEventSourceInterface<EventMap> {
   _Box: HTMLDivElement;
@@ -167,7 +167,7 @@ export default abstract class OSKView
   private kbdStyleSheetManager: StylesheetManager;
   private uiStyleSheetManager: StylesheetManager;
 
-  private config: Configuration;
+  private config: ViewConfiguration;
   private deferLayout: boolean;
 
   private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
@@ -226,7 +226,7 @@ export default abstract class OSKView
 
   static readonly STYLESHEET_FILES = ['kmwosk.css', 'globe-hint.css'];
 
-  constructor(configuration: Configuration) {
+  constructor(configuration: ViewConfiguration) {
     super();
 
     // Clone the config; do not allow object references to be altered later.
@@ -278,7 +278,7 @@ export default abstract class OSKView
     this._Box.style.display = 'none';
   }
 
-  protected get configuration(): Configuration {
+  protected get configuration(): ViewConfiguration {
     return this.config;
   }
 

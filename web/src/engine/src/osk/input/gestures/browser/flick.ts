@@ -1,5 +1,5 @@
 import { type KeyElement } from '../../../keyElement.js';
-import VisualKeyboard from '../../../visualKeyboard.js';
+import { VisualKeyboard } from '../../../visualKeyboard.js';
 
 import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution, KeyEvent } from 'keyman/engine/keyboard';
 import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, GestureSourceSubview, InputSample, RecognitionZoneSource } from 'keyman/engine/gesture-processor';
@@ -85,7 +85,7 @@ export const MAX_TOLERANCE_ANGLE_SKEW = Math.PI / 3;
  * Represents a flick gesture's implementation within KeymanWeb, including
  * its predictive-text correction aspects.
  */
-export default class Flick implements GestureHandler {
+export class Flick implements GestureHandler {
   readonly directlyEmitsKeys = true;
 
   private readonly sequence: GestureSequence<KeyElement, string>;

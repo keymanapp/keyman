@@ -269,7 +269,7 @@ export class Traversal implements LexiconTraversal {
  * prefix searches within words, however they are not very good
  * at predicting the next word.
  */
-export default class TrieModel implements LexicalModel {
+export class TrieModel implements LexicalModel {
   configuration?: Configuration;
   private _trie: Trie;
   readonly breakWords: WordBreakingFunction;

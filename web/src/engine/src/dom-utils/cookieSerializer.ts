@@ -3,7 +3,7 @@ type DecodedCookieFieldValue = string | number | boolean;
 type FilteredRecordEncoder = (value: DecodedCookieFieldValue, key: string) => string;
 type FilteredRecordDecoder = (value: string, key: string) => DecodedCookieFieldValue;
 
-export default class CookieSerializer<Type extends Record<keyof Type, DecodedCookieFieldValue>> {
+export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieFieldValue>> {
   readonly name: string;
 
   constructor(name: string) {

@@ -1,5 +1,5 @@
 import { type KeyElement } from '../../../keyElement.js';
-import VisualKeyboard from '../../../visualKeyboard.js';
+import { VisualKeyboard } from '../../../visualKeyboard.js';
 
 import { KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
 import { GestureSequence } from 'keyman/engine/gesture-processor';
@@ -11,7 +11,7 @@ import { GestureHandler } from '../gestureHandler.js';
  *
  * This involves "locking" the current layer in place until the modipress is complete.
  */
-export default class Modipress implements GestureHandler {
+export class Modipress implements GestureHandler {
   readonly directlyEmitsKeys = true;
 
   private completionCallback: () => void;

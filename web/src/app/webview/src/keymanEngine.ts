@@ -6,7 +6,7 @@ import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyb
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
 import { ContextManager, HostTextStore } from './contextManager.js';
-import PassthroughKeyboard from './passthroughKeyboard.js';
+import { PassthroughKeyboard } from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer';
 

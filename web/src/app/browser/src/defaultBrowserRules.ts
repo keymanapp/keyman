@@ -8,7 +8,7 @@ import {
 
 import { ContextManager } from './contextManager.js';
 
-export default class DefaultBrowserRules extends DefaultRules {
+export class DefaultBrowserRules extends DefaultRules {
   private contextManager: ContextManager;
 
   constructor(contextManager: ContextManager) {

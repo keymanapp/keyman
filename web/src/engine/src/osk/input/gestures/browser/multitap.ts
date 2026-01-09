@@ -1,11 +1,11 @@
 import { type KeyElement } from '../../../keyElement.js';
-import VisualKeyboard from '../../../visualKeyboard.js';
+import { VisualKeyboard } from '../../../visualKeyboard.js';
 
 import { ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
 import { GestureSequence, GestureStageReport } from 'keyman/engine/gesture-processor';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '../../../corrections.js';
-import Modipress from './modipress.js';
+import { Modipress } from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 import { correctionKeyFilter } from '../../../correctionLayout.js';
@@ -18,7 +18,7 @@ import { correctionKeyFilter } from '../../../correctionLayout.js';
  * * UI feedback regarding the state of the ongoing multitap, as appropriate
  * * Proper selection of the appropriate multitap key for subsequent taps.
  */
-export default class Multitap implements GestureHandler {
+export class Multitap implements GestureHandler {
   readonly directlyEmitsKeys = true;
 
   public readonly baseKey: KeyElement;

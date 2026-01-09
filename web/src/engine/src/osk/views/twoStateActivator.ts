@@ -1,10 +1,10 @@
-import Activator from './activator.js';
+import { Activator } from './activator.js';
 
 interface TriggerEventMap<Type> {
   triggerchange: (trigger: Type) => void;
 }
 
-export default class TwoStateActivator<Type> extends Activator<TriggerEventMap<Type>> {
+export class TwoStateActivator<Type> extends Activator<TriggerEventMap<Type>> {
   private _enabled: boolean = true;
   private actValue: Type = null;
 

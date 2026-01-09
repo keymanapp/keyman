@@ -1,18 +1,18 @@
 import { DeviceSpec } from 'keyman/engine/keyboard';
 import { landscapeView } from 'keyman/engine/dom-utils';
 
-import OSKView, { OSKPos, OSKRect } from './oskView.js';
+import { OSKView, OSKPos, OSKRect } from './oskView.js';
 import { getViewportScale } from '../screenUtils.js';
-import Configuration from '../config/viewConfiguration.js';
+import { ViewConfiguration } from '../config/viewConfiguration.js';
 import { StaticActivator } from './activator.js';
-import TwoStateActivator from './twoStateActivator.js';
+import { TwoStateActivator } from './twoStateActivator.js';
 
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
 
-export default class AnchoredOSKView extends OSKView {
+export class AnchoredOSKView extends OSKView {
 
   // OSK positioning fields
   x: number;
@@ -20,7 +20,7 @@ export default class AnchoredOSKView extends OSKView {
 
   private isResizing: boolean = false;
 
-  public constructor(config: Configuration) {
+  public constructor(config: ViewConfiguration) {
     if(config.isEmbedded) {
       config.activator = config.activator || new StaticActivator();
     } else {

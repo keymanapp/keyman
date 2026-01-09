@@ -1,9 +1,9 @@
 import { JSKeyboard } from 'keyman/engine/keyboard';
 
-import KeyboardView from './keyboardView.interface.js';
+import { KeyboardView } from './keyboardView.interface.js';
 import { ParsedLengthStyle } from "../lengthStyle.js";
 
-export default class HelpPageView implements KeyboardView {
+export class HelpPageView implements KeyboardView {
   private readonly kbd: JSKeyboard;
   public readonly element: HTMLDivElement;
 

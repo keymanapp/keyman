@@ -60,7 +60,7 @@ self.importScripts = importScripts;
  * cross-platform Worker support in the future, it may be wise to swap to use of
  * that package.
  */
-export default class MappedWorker extends worker.Worker implements Worker {
+export class MappedWorker extends worker.Worker implements Worker {
   constructor(scriptStr: string) {
     const concatenatedScript = `
     ${nodeWorkerToWebWorkerMappingSource}

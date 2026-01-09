@@ -2,7 +2,7 @@
 /**
  * Maps 'sp' properties on a touch-layout spec to their corresponding CSS class names.
  */
-const BUTTON_CLASSES = [
+export const BUTTON_CLASSES = [
   'default',
   'shift',
   'shift-on',
@@ -15,5 +15,3 @@ const BUTTON_CLASSES = [
   'blank',
   'hidden'
 ];
-
-export default BUTTON_CLASSES;

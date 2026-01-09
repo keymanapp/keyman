@@ -3,13 +3,13 @@ import { type DeviceSpec, JSKeyboard, ActiveLayout, ButtonClasses } from 'keyman
 import { InputSample } from 'keyman/engine/gesture-processor';
 
 import { KeyElement } from '../keyElement.js';
-import OSKLayer, { LayerLayoutParams } from './oskLayer.js';
-import VisualKeyboard from '../visualKeyboard.js';
-import OSKBaseKey from './oskBaseKey.js';
+import { OSKLayer, LayerLayoutParams } from './oskLayer.js';
+import { VisualKeyboard } from '../visualKeyboard.js';
+import { OSKBaseKey } from './oskBaseKey.js';
 
 const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
-export default class OSKLayerGroup {
+export class OSKLayerGroup {
   public readonly element: HTMLDivElement;
   private readonly _layers: {[layerID: string]: OSKLayer} = {};
   public readonly spec: ActiveLayout;

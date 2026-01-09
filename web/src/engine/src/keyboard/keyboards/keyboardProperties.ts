@@ -1,4 +1,4 @@
-import SpacebarText from './spacebarText.js';
+import { SpacebarText } from './spacebarText.js';
 
 export interface InternalKeyboardFont {
   family: string;
@@ -109,7 +109,7 @@ export type KeyboardAPIPropertyMultilangSpec = {
 
 export type MetadataObj = KeyboardInternalPropertySpec | KeyboardAPIPropertySpec | KeyboardAPIPropertyMultilangSpec;
 
-export default class KeyboardProperties implements KeyboardInternalPropertySpec {
+export class KeyboardProperties implements KeyboardInternalPropertySpec {
   KI: string;
   KN: string;
   KL: string;

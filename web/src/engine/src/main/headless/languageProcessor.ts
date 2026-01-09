@@ -2,7 +2,7 @@ import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
-import ContextWindow from "./contextWindow.js";
+import { ContextWindow } from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Capabilities = LexicalModelTypes.Capabilities;
