@@ -136,6 +136,14 @@ export class SearchNode {
   private _inputCost?: number;
 
   /**
+   * Counts the number of delete edits modeled directly after insert edits in
+   * this SearchNode's path.  Such a sequence shows up within the calculation
+   * matrix as a substitution rather than two separate edits; we use this count
+   * to adjust accordingly.
+   */
+  private readonly deleteAfterInsertEditPairs: number;
+
+  /**
    * A unique identifier corresponding to the earliest SearchPath containing
    * the correction-search graph edge represented by this instance.
    *
@@ -164,6 +172,8 @@ export class SearchNode {
       this.matchedTraversals = priorNode.matchedTraversals.slice();
 
       this.lastEdgeType = param2 as PathEdge;
+      const isInsertAfterDelete = priorNode.lastEdgeType == PathEdge.INSERTION && this.lastEdgeType == PathEdge.DELETION;
+      this.deleteAfterInsertEditPairs = priorNode.deleteAfterInsertEditPairs + (isInsertAfterDelete ? 1 : 0);
 
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
@@ -180,6 +190,7 @@ export class SearchNode {
       this.toKey = toKey || (x => x);
       this.spaceId = spaceId;
       this.lastEdgeType = PathEdge.ROOT;
+      this.deleteAfterInsertEditPairs = 0;
     }
   }
 
@@ -189,7 +200,7 @@ export class SearchNode {
    * by the current node.
    */
   get editCount(): number {
-    return this.calculation.getHeuristicFinalCost();
+    return this.calculation.getHeuristicFinalCost() + this.deleteAfterInsertEditPairs;
   }
 
   /**
