@@ -1,8 +1,8 @@
 import { ActiveKey, ActiveSubKey, ButtonClass, ButtonClasses, DeviceSpec } from 'keyman/engine/keyboard';
 
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
-import { specialCharacters as specialChars } from '../specialCharacters.js';
-import { BUTTON_CLASSES as buttonClassNames } from '../buttonClassNames.js';
+import { specialCharacters as specialChars } from '../specialCharacters.js'; // TODO: eliminate 'as specialChars'
+import { BUTTON_CLASSES as buttonClassNames } from '../buttonClassNames.js'; // TODO: eliminate 'as buttonClasNames'
 
 import { KeyElement } from '../keyElement.js';
 import { VisualKeyboard } from '../visualKeyboard.js';
