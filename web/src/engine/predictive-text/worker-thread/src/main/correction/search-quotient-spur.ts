@@ -18,8 +18,6 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
-export const DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL = 33; // in milliseconds.
-
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
   return arg1.currentCost - arg2.currentCost;
 }
@@ -30,8 +28,10 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   readonly inputs?: Distribution<Readonly<Transform>>;
 
-  private parentPath: SearchQuotientSpur;
+  private parentNode: SearchQuotientNode;
   readonly spaceId: number;
+
+  readonly inputCount: number;
 
   /**
    * Marks all results that have already been returned from this instance of SearchPath.
@@ -52,19 +52,20 @@ export class SearchQuotientSpur implements SearchQuotientNode {
    * @param model
    */
   constructor(model: LexicalModel);
-  constructor(space: SearchQuotientSpur, inputs: Distribution<Transform>, bestProbFromSet: number);
-  constructor(arg1: LexicalModel | SearchQuotientSpur, inputs?: Distribution<Transform>, bestProbFromSet?: number) {
+  constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, bestProbFromSet: number);
+  constructor(arg1: LexicalModel | SearchQuotientNode, inputs?: Distribution<Transform>, bestProbFromSet?: number) {
     this.spaceId = generateSpaceSeed();
 
     if(arg1 instanceof SearchQuotientSpur) {
-      const parentNode = arg1 as SearchQuotientSpur;
+      const parentNode = arg1 as SearchQuotientNode;
       const logTierCost = -Math.log(bestProbFromSet);
 
       this.inputs = inputs;
+      this.inputCount = parentNode.inputCount + 1;
       this.lowestPossibleSingleCost = parentNode.lowestPossibleSingleCost + logTierCost;
-      this.parentPath = parentNode;
+      this.parentNode = parentNode;
 
-      this.addEdgesForNodes(parentNode.previousResults.map(v => v.node));
+      this.addEdgesForNodes(parentNode.previousResults.map(r => r.node));
 
       return;
     }
@@ -72,14 +73,15 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     const model = arg1 as LexicalModel;
     this.selectionQueue.enqueue(new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t)));
     this.lowestPossibleSingleCost = 0;
+    this.inputCount = 0;
   }
 
   /**
    * Retrieves the sequences of inputs that led to this SearchPath.
    */
   public get inputSequence(): Distribution<Transform>[] {
-    if(this.parentPath) {
-      return [...this.parentPath.inputSequence, this.inputs];
+    if(this.parentNode) {
+      return [...this.parentNode.inputSequence, this.inputs];
     } else if(this.inputs) {
       return [this.inputs];
     } else {
@@ -87,12 +89,59 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     }
   }
 
-  public get inputCount(): number {
-    return (this.parentPath?.inputCount ?? 0) + (this.inputs ? 1 : 0);
+  public hasInputs(keystrokeDistributions: Distribution<Transform>[]): boolean {
+    if(this.inputCount == 0) {
+      return keystrokeDistributions.length == 0;
+    } else if(keystrokeDistributions.length != this.inputCount) {
+      return false;
+    }
+
+    const tailInput = [...keystrokeDistributions[keystrokeDistributions.length - 1]];
+    keystrokeDistributions = keystrokeDistributions.slice(0, keystrokeDistributions.length - 1);
+    const localInput = this.lastInput;
+
+    const parentHasInput = () => !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
+
+    // Actual reference match?  Easy mode.
+    if(localInput == tailInput) {
+      return parentHasInput();
+    } else if(localInput.length != tailInput.length) {
+      return false;
+    } else {
+      for(let entry of tailInput) {
+        const matchIndex = localInput.findIndex((x) => {
+          const s1 = x.sample;
+          const s2 = entry.sample;
+          // Check for equal reference first before the other checks; it makes a nice shortcut.
+          if(x == entry) {
+            return true;
+          } if(x.p == entry.p && s1.deleteLeft == s2.deleteLeft
+            && s1.id == s2.id && ((s1.deleteRight ?? 0) == (s2.deleteRight ?? 0)) && s1.insert == s2.insert
+          ) {
+            return true;
+          }
+          return false;
+        });
+
+        if(matchIndex == -1) {
+          return false;
+        } else {
+          tailInput.splice(matchIndex, 1);
+        }
+      }
+
+      return parentHasInput();
+    }
+  }
+
+  public get lastInput(): Distribution<Readonly<Transform>> {
+    // Shallow-copies the array to prevent external modification; the Transforms
+    // are marked Readonly to prevent their modification as well.
+    return [...this.inputs];
   }
 
   public get bestExample(): {text: string, p: number} {
-    const bestPrefix = this.parentPath?.bestExample ?? { text: '', p: 1 };
+    const bestPrefix = this.parentNode?.bestExample ?? { text: '', p: 1 };
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
@@ -101,8 +150,13 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     }
   }
 
+  get parents() {
+    // The SearchPath class may only have a single parent.
+    return this.parentNode ? [this.parentNode] : [];
+  }
+
   increaseMaxEditDistance() {
-    this.parentPath.increaseMaxEditDistance();
+    this.parentNode.increaseMaxEditDistance();
 
     // By extracting the entries from the priority queue and increasing distance outside of it as a batch job,
     // we get an O(N) implementation, rather than the O(N log N) that would result from maintaining the original queue.
@@ -117,11 +171,11 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   get correctionsEnabled(): boolean {
     // When corrections are disabled, the Web engine will only provide individual Transforms
     // for an input, not a distribution.  No distributions means we shouldn't do corrections.
-    return this.parentPath?.correctionsEnabled || this.inputs?.length > 1;
+    return this.parentNode?.correctionsEnabled || this.inputs?.length > 1;
   }
 
   public get currentCost(): number {
-    const parentCost = this.parentPath?.currentCost ?? Number.POSITIVE_INFINITY;
+    const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
     return Math.min(localCost, parentCost);
@@ -156,7 +210,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
    * @returns
    */
   public handleNextNode(): PathResult {
-    const parentCost = this.parentPath?.currentCost ?? Number.POSITIVE_INFINITY;
+    const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
     if(parentCost <= localCost) {
@@ -166,7 +220,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
         };
       }
 
-      const result = this.parentPath.handleNextNode();
+      const result = this.parentNode.handleNextNode();
 
       if(result.type == 'complete') {
         this.addEdgesForNodes([result.finalNode]);
@@ -178,9 +232,10 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       } as PathResult
     }
 
+    // will have equal .spaceId.
     let currentNode = this.selectionQueue.dequeue();
 
-    let unmatchedResult: PathResult = {
+    let unmatchedResult = {
       type: 'intermediate',
       cost: currentNode.currentCost
     }
@@ -191,7 +246,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
     let substitutionsOnly = false;
     if(currentNode.editCount > 2) {
-      return unmatchedResult;
+      return unmatchedResult as PathResult;
     } else if(currentNode.editCount == 2) {
       substitutionsOnly = true;
     }
@@ -200,10 +255,8 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     // Allows a little 'wiggle room' + 2 "hard" edits.
     // Can be important if needed characters don't actually exist on the keyboard
     // ... or even just not the then-current layer of the keyboard.
-    //
-    // TODO:  still consider the lowest-cost individual edges for THIS specific criterion.
     if(currentNode.currentCost > this.lowestPossibleSingleCost + 2.5 * EDIT_DISTANCE_COST_SCALE) {
-      return unmatchedResult;
+      return unmatchedResult as PathResult;
     }
 
     // Stage 2:  process subset further OR build remaining edges
@@ -211,7 +264,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     if(currentNode.hasPartialInput) {
       // Re-use the current queue; the number of total inputs considered still holds.
       this.selectionQueue.enqueueAll(currentNode.processSubsetEdge());
-      return unmatchedResult;
+      return unmatchedResult as PathResult;
     }
 
     // OK, we fully crossed a graph edge and have landed on a transition point;
@@ -223,19 +276,26 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       this.selectionQueue.enqueueAll(insertionEdges);
     }
 
-    if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
-      this.returnedValues[currentNode.resultKey] = currentNode;
-    } else {
-      // Not a better cost, so reject it and move on to the next potential result.
-      return this.handleNextNode();
+    if(currentNode.spaceId == this.spaceId) {
+      if(this.returnedValues) {
+        if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
+          this.returnedValues[currentNode.resultKey] = currentNode;
+        } else {
+          // Not a better cost, so reject it and move on to the next potential result.
+          return this.handleNextNode();
+        }
+      }
+
+      return {
+        type: 'complete',
+        cost: currentNode.currentCost,
+        finalNode: currentNode,
+        spaceId: this.spaceId
+      };
     }
 
-    return {
-      type: 'complete',
-      cost: currentNode.currentCost,
-      finalNode: currentNode,
-      spaceId: this.spaceId
-    };
+    // If we've somehow fully exhausted all search options, indicate that none remain.
+    return unmatchedResult as PathResult;
   }
 
   public get previousResults(): SearchResult[] {

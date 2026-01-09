@@ -7,7 +7,7 @@ import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalize
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
-import { DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL } from './correction/search-quotient-spur.js';
+import { DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL } from './correction/distance-modeler.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Configuration = LexicalModelTypes.Configuration;
