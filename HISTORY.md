@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.189 alpha 2026-01-12
+
+* maint(common): Update `crowdin.yml` to work with Crowdin CLI 4.0+ (#15407)
+
 ## 19.0.188 alpha 2026-01-09
 
 * fix(mac): correct memory width mismatch in keyCodeForChar (#15393)
