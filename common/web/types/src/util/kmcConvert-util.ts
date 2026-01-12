@@ -7,6 +7,7 @@
  *
  */
 
+
 /**
  * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
  * @param  inputString the value that will converted
