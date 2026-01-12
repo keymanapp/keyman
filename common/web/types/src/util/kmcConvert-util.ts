@@ -13,46 +13,79 @@
  * @param  inputString the value that will converted
  * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
  */
-export function convertToUnicodeCharacter(inputString: string): string {
-
+export function convertToUnicodeCharacter(inputString: string): string | undefined {
+  
   if ((inputString === null) || (inputString === undefined)) {
     return undefined;
   }
 
+
   // e.g. U+0061 U+1234 U+1F60E
-  else if (inputString.match(/^U\+([0-9a-f]{2,6})$/i)) {
+  let m = inputString.match(/^U\+([0-9a-f]{2,6})$/i)
+  if (m) return String.fromCodePoint(parseInt(m[1], 16));
+  /*let m = rgx_u.exec(inputString);
+  if (m) return String.fromCodePoint(parseInt(m[1], 16));*/
+  /*else if (inputString.match(/^U\+([0-9a-f]{2,6})$/i)) {
     return String.fromCodePoint(parseInt((inputString.match(/^U\+([0-9a-f]{2,6})$/i))[1], 16));
-  }
+  }*/
 
   // e.g. &#x61;  &#x1234; &#x1F60E;
-  else if (inputString.match(/^&#x([0-9a-f]{2,6});$/i)) {
+  m = inputString.match(/^&#x([0-9a-f]{2,6});$/i)
+  if (m) return String.fromCodePoint(parseInt(m[1], 16));
+  /*else if (inputString.match(/^&#x([0-9a-f]{2,6});$/i)) {
     return String.fromCodePoint(parseInt((inputString.match(/^&#x([0-9a-f]{2,6});$/i))[1], 16));
-  }
+  }*/
 
   // e.g. &#97; &#4660; &#128518;
-  else if (inputString.match(/^&#([0-9a-f]{2,6});$/i)) {
+  m = inputString.match(/^&#([0-9a-f]{2,6});$/i)
+  if (m) return String.fromCodePoint(parseInt(m[1], 10));
+  /*else if (inputString.match(/^&#([0-9a-f]{2,6});$/i)) {
     return String.fromCodePoint(parseInt((inputString.match(/^&#([0-9a-f]{2,6});$/i))[1], 10));
-  }
+  }*/
 
   // e.g. &gt; &quot;
-  else if (inputString.match(/^&([a-z]{1,4});$/i)) {
+  m = inputString.match(/^&([a-z]{1,4});$/i)
+  if (m) {
+    switch (m[1].toLowerCase()) {
+      case 'gt': return '>';
+      case 'lt': return '<';
+      case 'amp': return '&';
+      case 'apos': return "'";
+      case 'quot': return '"';
+      default: return undefined;
+    }
+  }
+
+  /*else if (inputString.match(/^&([a-z]{1,4});$/i)) {
     if (inputString === '&gt;') { return '>'; }
     else if (inputString === '&lt;') { return '<'; }
     else if (inputString === '&amp;') { return '&'; }
     else if (inputString === '&apos;') { return "'"; }
     else if (inputString === '&quot;') { return '"'; }
     else return undefined;
-  }
+  }*/
 
   // 'A'  or  "B" have length=1 and segment-length=1 and will be used. 
   // "ẘ"  or  "😎" have length=2 but segment-length=1 and will be used. 
-  // "ab" has length=2 and segment-length=2 and will not be used. 
-  else if ([...new Intl.Segmenter().segment(inputString)].length <= 1) {
+  // "ab" has length=2 and segment-length=2 and will not be used.
+
+  // Safe Intl.Segmenter usage with fallback
+  if (typeof Intl !== 'undefined' && typeof (Intl as any).Segmenter === 'function') {
+    if ([...new (Intl as any).Segmenter().segment(inputString)].length <= 1) return inputString;
+  } else {
+    // fallback: treat single Unicode code point as acceptable
+    if ([...inputString].length <= 1) return inputString;
+  }
+
+  /*else if ([...new Intl.Segmenter().segment(inputString)].length <= 1) {
     return inputString;
   }
-  else {
+    else {
     return undefined;
-  }
+  }*/
+  return undefined;
+
+
 }
 
 /**
