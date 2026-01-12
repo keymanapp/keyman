@@ -13,7 +13,7 @@
  * @param  inputString the value that will converted
  * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
  */
-export function convertToUnicodeCharacter(inputString: string): string | undefined {
+/*export function convertToUnicodeCharacter(inputString: string): string | undefined {
 
   let m: RegExpMatchArray | null;
 
@@ -55,14 +55,14 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
   else {
     return undefined;
   }
-}
+}*/
 
 /**
  * @brief  function to convert a numeric character reference to a unicode Code Point e.g. &#4660 -> U+1234;  &#x10F601 -> U+1F60E
  * @param  instr the value that will converted
  * @return returns a unicode Code Point like U+0063, U+1234, U+1F60E; returns the input character if a non-numeric reference is used or returns 'undefined' if instr is not recognized
  */
-export function convertToUnicodeCodePoint(instr: string): string {
+/*export function convertToUnicodeCodePoint(instr: string): string {
 
   if ((instr === null) || (instr === undefined)) {
     return undefined;
@@ -81,5 +81,5 @@ export function convertToUnicodeCodePoint(instr: string): string {
   }
   else
     return instr;
-}
+}*/
 

@@ -883,7 +883,7 @@ export class KmnFileWriter {
     return warningTextArray;
   }
 
-
+// TODO: move to util
   /**
    * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
    * @param  inputString the value that will converted
@@ -930,7 +930,7 @@ export class KmnFileWriter {
       return undefined;
     }
   }
-
+// TODO: move to util
   /**
    * @brief  function to convert a numeric character reference to a unicode Code Point e.g. &#4660 -> U+1234;  &#x10F601 -> U+1F60E
    * @param  instr the value that will converted
