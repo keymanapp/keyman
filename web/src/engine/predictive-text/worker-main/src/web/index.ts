@@ -1,5 +1,5 @@
 export { LMLayer } from '../lmlayer.js';
-export { Worker } from './worker.js';
+export { WebWorker } from './web-worker.js';
 export { SourcemappedWorker } from './sourcemappedWorker.js';
 
 export interface WorkerFactory {

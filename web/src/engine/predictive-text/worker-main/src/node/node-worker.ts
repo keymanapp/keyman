@@ -1,9 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { MappedWorker } from "./mappedWorker.js";
 import { unwrap } from '../unwrap.js';
 
 import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/worker-main.wrapped.min.js";
 
-export class Worker {
+export class NodeWorker {
   static constructInstance(): Worker {
     let scriptStr = unwrap(LMLayerWorkerCode);
     const srcMapUrlIndex = scriptStr.indexOf("//# sourceMappingURL")
@@ -12,8 +15,6 @@ export class Worker {
     }
 
     scriptStr += '\n' + LMLayerWorkerSourcemapComment;
-    let worker = new MappedWorker(scriptStr);
-
-    return worker as any as Worker;
+    return new MappedWorker(scriptStr);
   }
 }

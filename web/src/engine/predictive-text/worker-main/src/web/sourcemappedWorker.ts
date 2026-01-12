@@ -2,7 +2,7 @@ import { unwrap } from '../unwrap.js';
 import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/worker-main.wrapped.js";
 
 export class SourcemappedWorker {
-  // the only difference to DefaultWorker is that this class uses
+  // the only difference to WebWorker is that this class uses
   // the unminified LM* blobs
 
   static constructInstance(): Worker {

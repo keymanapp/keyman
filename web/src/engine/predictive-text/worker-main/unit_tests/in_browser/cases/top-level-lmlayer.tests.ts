@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { LMLayer, Worker as WorkerBuilder }  from "@keymanapp/lexical-model-layer/web";
+import { LMLayer, WebWorker }  from "@keymanapp/lexical-model-layer/web";
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import { defaultCapabilities } from '../helpers.mjs';
@@ -10,7 +10,7 @@ describe('LMLayer', function () {
 
   describe('[[constructor]]', function () {
     it('should construct with a single argument', function () {
-      let lmLayer = new LMLayer(defaultCapabilities, WorkerBuilder.constructInstance(), true);
+      let lmLayer = new LMLayer(defaultCapabilities, WebWorker.constructInstance(), true);
       assert.instanceOf(lmLayer, LMLayer);
       lmLayer.shutdown();
     });
@@ -31,7 +31,7 @@ describe('LMLayer', function () {
       // Note:  the full declaration exists; the code we want is wrapped within the func.
       // So... let's just call the func.
       const workerSrc = dummyHandler.toString() + "\ndummyHandler()";
-      let uri = WorkerBuilder.asBlobURI(workerSrc);
+      let uri = WebWorker.asBlobURI(workerSrc);
       assert.match(uri, /^blob:/);
 
       let worker = new Worker(uri);
