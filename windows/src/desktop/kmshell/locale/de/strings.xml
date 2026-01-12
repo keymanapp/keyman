@@ -883,7 +883,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman Debug-Informationen werden in einer Protokolldatei mit dem Namen %LOCALAPPDATA%\Keyman\Diag\system#.etl gespeichert (wobei # eine Nummer ist). Sie sollten Keyman beenden, bevor Sie diese Datei löschen.\n\nWARNUNG: Diese Datei kann sehr schnell groß werden. Das Aktivieren der Debug-Protokollierung kann Ihr System verlangsamen und sollte nur auf Anweisung durch den technischen Support erfolgen.\n\nDATENSCHUTZ-HINWEIS: Bitte beachten Sie, dass die Debug-Logdatei alle von Ihnen eingegebenen Tastenanschläge aufzeichnet. Sie sollten das Debug-Log nur für die Dauer einer Debugging- oder Diagnosesitzung aktivieren.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman Debug-Informationen werden in einer Protokolldatei mit dem Namen %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl gespeichert (wobei # eine Nummer ist). Sie sollten Keyman beenden, bevor Sie diese Datei löschen.\n\nWARNUNG: Diese Datei kann sehr schnell groß werden. Das Aktivieren der Debug-Protokollierung kann Ihr System verlangsamen und sollte nur auf Anweisung durch den technischen Support erfolgen.\n\nDATENSCHUTZ-HINWEIS: Bitte beachten Sie, dass die Debug-Logdatei alle von Ihnen eingegebenen Tastenanschläge aufzeichnet. Sie sollten das Debug-Log nur für die Dauer einer Debugging- oder Diagnosesitzung aktivieren.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

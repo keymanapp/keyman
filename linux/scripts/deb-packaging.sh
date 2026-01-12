@@ -6,6 +6,9 @@
 set -eu
 shopt -s inherit_errexit
 
+# Avoid timing reports as we don't have node in this script
+export _builder_timings=false
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"

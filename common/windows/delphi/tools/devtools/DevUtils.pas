@@ -39,6 +39,7 @@ uses
   DevInstallPackages,
   DevIncludePaths,
   DevReleaseBuildCheck,
+  Keyman.System.DevTools.BuildLocaleIndex,
   Keyman.System.DevTools.BuildMessageConstants,
   Keyman.System.DevTools.BuildSetupStringTranslations,
   RegistryKeys;
@@ -75,6 +76,7 @@ begin
       writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087   //TODO: remove as unused
       writeln('  -buildmessageconstants <strings.xml> <messageidentifierconsts.pas>: build MessageIdentifierConsts.pas from current strings.xml');
       writeln('  -buildsetupstrings <sourcepath> <destinationpath>: build Keyman.Setup.System.Locale.*.pas from strings.xml found in sourcepath');
+      writeln('  -buildlocaleindex <locale-folder> <destination.xml>: build index.xml from strings.xml found in locale-folder');
       ExitCode := 1;
       Exit;
     end;
@@ -97,6 +99,8 @@ begin
       Success := TBuildMessageConstants.Run(ParamStr(2), ParamStr(3))
     else if (ParamStr(1) = '-buildsetupstrings') and (ParamCount = 3) then
       Success := TBuildSetupStringTranslations.Run(ParamStr(2), ParamStr(3))
+    else if (ParamStr(1) = '-buildlocaleindex') and (ParamCount = 3) then
+      Success := TBuildLocaleIndex.Run(ParamStr(2), ParamStr(3))
     else
     begin
       writeln('Invalid parameters');
