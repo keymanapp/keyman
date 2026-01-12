@@ -16,7 +16,15 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { buildEdgeWindow, ContextToken, ContextTokenization, models, precomputationSubsetKeyer, TokenizationTransitionEdits, TokenizationSubsetBuilder } from '@keymanapp/lm-worker/test-index';
+import {
+  buildEdgeWindow,
+  ContextToken,
+  ContextTokenization,
+  models,
+  precomputationSubsetKeyer,
+  TokenizationTransitionEdits,
+  TokenizationSubsetBuilder
+} from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -172,10 +180,18 @@ describe('precomputationSubsetKeyer', function() {
             [...tokenization.tokens, (() => {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
-            token.addInput(
-              {segment: {trueTransform: {insert: 'te', deleteLeft: 0, id: 13}, transitionId: 13, start: 0}, bestProbFromSet: 1},
-              [{sample: {insert: 'te', deleteLeft: 0, id: 13}, p: 1}]
-            );
+            token.addInput({
+              segment: {
+                trueTransform: {
+                  insert: 'te',
+                  deleteLeft: 0,
+                  id: 13
+                }, transitionId: 13,
+                start: 0
+              }, bestProbFromSet: 1
+            }, [
+              {sample: {insert: 'te', deleteLeft: 0, id: 13}, p: 1}
+            ]);
             return token;
           })()],
             { insert: 's', deleteLeft: 0, deleteRight: 0 },
@@ -199,10 +215,18 @@ describe('precomputationSubsetKeyer', function() {
           [...tokenization.tokens, (() => {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
-            token.addInput(
-              {segment: {trueTransform: {insert: 'te', deleteLeft: 0, id: 13}, transitionId: 13, start: 0}, bestProbFromSet: 1},
-              [{sample: {insert: 't', deleteLeft: 0}, p: 1}]
-            );
+            token.addInput({
+              segment: {
+                trueTransform: {
+                  insert: 'te',
+                  deleteLeft: 0,
+                  id: 13
+                }, transitionId: 13,
+                start: 0
+              }, bestProbFromSet: 1
+            }, [
+              {sample: {insert: 't', deleteLeft: 0}, p: 1}
+            ]);
             return token;
           })()],
         { insert: 'es', deleteLeft: 0, deleteRight: 0, id: 14 },
@@ -240,10 +264,17 @@ describe('precomputationSubsetKeyer', function() {
               const token = new ContextToken(plainModel, 'da');
               token.isPartial = true;
               // source text:  'dat'
-              token.addInput(
-                {segment: {trueTransform: {insert: 't', deleteLeft: 0, id: 13}, transitionId: 13, start: 0}, bestProbFromSet: 1},
-                [{sample: {insert: 'ts', deleteLeft: 0, id: 13}, p: 1}]
-              );
+              token.addInput({
+                segment: {
+                  trueTransform: {
+                    insert: 't',
+                    deleteLeft: 0,
+                    id: 13
+                  }, transitionId: 13,
+                  start: 0
+                }, bestProbFromSet: 1
+              }, [{sample: {insert: 'ts', deleteLeft: 0, id: 13}, p: 1}
+              ]);
               return token;
             })()],
             { insert: 'e', deleteLeft: 1, deleteRight: 0, id: 14 },
@@ -268,10 +299,18 @@ describe('precomputationSubsetKeyer', function() {
           const token = new ContextToken(plainModel, 'da');
           token.isPartial = true;
           // source text:  'dat'
-          token.addInput(
-            {segment: {trueTransform: {insert: 't', deleteLeft: 0, id: 13}, transitionId: 13, start: 0}, bestProbFromSet: 1},
-            [{sample: {insert: 't', deleteLeft: 0, id: 13}, p: 1}]
-          );
+          token.addInput({
+            segment: {
+              trueTransform: {
+                insert: 't',
+                deleteLeft: 0,
+                id: 13
+              }, transitionId: 13,
+              start: 0
+            }, bestProbFromSet: 1
+          }, [
+            {sample: {insert: 't', deleteLeft: 0, id: 13}, p: 1}
+          ]);
           return token;
         })()],
         { insert: 'e', deleteLeft: 0, deleteRight: 0, id: 14 },
@@ -720,16 +759,32 @@ describe('TokenizationSubsetBuilder', function() {
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1, id: 13 };
 
     const fourCharTailToken = new ContextToken(baseTokenization.tail);
-    fourCharTailToken.addInput(
-      {segment: {trueTransform: { insert: 'é', deleteLeft: 1, id: 13 }, transitionId: 13, start: 0}, bestProbFromSet: 1},
-      [{ sample: trueSourceTransform, p: .6 }]
-    );
+    fourCharTailToken.addInput({
+      segment: {
+        trueTransform: {
+          insert: 'é',
+          deleteLeft: 1,
+          id: 13
+        }, transitionId: 13,
+        start: 0
+      }, bestProbFromSet: 1
+    }, [
+      { sample: trueSourceTransform, p: .6 }
+    ]);
 
     const fiveCharTailToken = new ContextToken(baseTokenization.tail);
-    fiveCharTailToken.addInput(
-      {segment: {trueTransform: { insert: 'é', deleteLeft: 1, id: 13 }, transitionId: 13, start: 0}, bestProbFromSet: 1},
-      [{ sample: { insert: 's', deleteLeft: 0, id: 13 }, p: .4 }]
-    );
+    fiveCharTailToken.addInput({
+      segment: {
+        trueTransform: {
+          insert: 'é',
+          deleteLeft: 1,
+          id: 13
+        }, transitionId: 13,
+        start: 0
+      }, bestProbFromSet: 1
+    }, [
+      { sample: { insert: 's', deleteLeft: 0, id: 13 }, p: .4 }
+    ]);
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const fourCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), fourCharTailToken]);
@@ -759,16 +814,31 @@ describe('TokenizationSubsetBuilder', function() {
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1, id: 13 };
 
     const twoCharTailToken = new ContextToken(baseTokenization.tail);
-    twoCharTailToken.addInput(
-      {segment: {trueTransform: { insert: 'é', deleteLeft: 1, id: 13 }, transitionId: 13, start: 0}, bestProbFromSet: .6},
-      [{ sample: trueSourceTransform, p: .6 }]
-    );
+    twoCharTailToken.addInput({
+      segment: {
+        trueTransform: {
+          insert: 'é',
+          deleteLeft: 1,
+          id: 13
+        }, transitionId: 13,
+        start: 0
+      }, bestProbFromSet: .6
+    }, [
+      { sample: trueSourceTransform, p: .6 }
+    ]);
 
     const threeCharTailToken = new ContextToken(baseTokenization.tail);
-    threeCharTailToken.addInput(
-      {segment: {trueTransform: { insert: 'é', deleteLeft: 1 }, transitionId: 13, start: 0}, bestProbFromSet: .6},
-      [{ sample: { insert: 'a', deleteLeft: 0, id: 13}, p: .4 }]
-    );
+    threeCharTailToken.addInput({
+      segment: {
+        trueTransform: {
+          insert: 'é',
+          deleteLeft: 1
+        }, transitionId: 13,
+        start: 0
+      }, bestProbFromSet: .6
+    }, [
+      { sample: { insert: 'a', deleteLeft: 0, id: 13}, p: .4 }
+    ]);
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const twoCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), twoCharTailToken]);
