@@ -157,7 +157,13 @@ describe('ContextToken', function() {
 
       const merged = ContextToken.merge([token1, token2, token3], plainModel);
       assert.equal(merged.exampleInput, "can't");
-      assert.deepEqual(merged.inputSegments, [ { segment: {trueTransform: srcTransform, transitionId: srcTransform.id, start: 0}, bestProbFromSet: 1 } ]);
+      assert.deepEqual(merged.inputSegments, [ {
+        segment: {
+          trueTransform: srcTransform,
+          transitionId: srcTransform.id,
+          start: 0
+        }, bestProbFromSet: 1
+      } ]);
       assert.equal(merged.searchModule.inputCount, 1);
       assert.deepEqual((merged.searchModule as SearchQuotientSpur).lastInput, [{sample: srcTransform, p: 1}]);
     });
@@ -165,11 +171,12 @@ describe('ContextToken', function() {
     it("merges four tokens with previously-split transforms", () => {
       // TODO:  need another case - pref where there are two diff boundary transforms
       // and where each token has multiple constituent transforms.
-      const srcTransform1 = { insert: "apple", deleteLeft: 0, deleteRight: 0, id: 1 };
-      const srcTransform2 = { insert: "sands", deleteLeft: 0, deleteRight: 0, id: 2 };
-      const srcTransform3 = { insert: "our", deleteLeft: 0, deleteRight: 0, id: 3 };
-      const srcTransform4 = { insert: "grapes", deleteLeft: 0, deleteRight: 0, id: 4 };
-      const srcTransforms = [srcTransform1, srcTransform2, srcTransform3, srcTransform4];
+      const srcTransforms = [
+        { insert: "apple", deleteLeft: 0, deleteRight: 0, id: 1 },
+        { insert: "sands", deleteLeft: 0, deleteRight: 0, id: 2 },
+        { insert: "our", deleteLeft: 0, deleteRight: 0, id: 3 },
+        { insert: "grapes", deleteLeft: 0, deleteRight: 0, id: 4 }
+      ];
 
       // apples
       const token1 = new ContextToken(plainModel);
@@ -183,16 +190,16 @@ describe('ContextToken', function() {
 
       token1.addInput({
         segment: {
-          trueTransform: srcTransform1,
-          transitionId: srcTransform1.id,
+          trueTransform: srcTransforms[0],
+          transitionId: srcTransforms[0].id,
           start: 0
         },
         bestProbFromSet: 1
-      }, [{sample: srcTransform1, p: 1}]);
+      }, [{sample: srcTransforms[0], p: 1}]);
       token1.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 0
         },
         bestProbFromSet: 1
@@ -200,8 +207,8 @@ describe('ContextToken', function() {
 
       token2.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 1
         },
         bestProbFromSet: 1
@@ -209,33 +216,39 @@ describe('ContextToken', function() {
 
       token3.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 4
         },
         bestProbFromSet: 1
       }, [{sample: {insert: 's', deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
       token3.addInput({
         segment: {
-          trueTransform: srcTransform3,
-          transitionId: srcTransform3.id,
+          trueTransform: srcTransforms[2],
+          transitionId: srcTransforms[2].id,
           start: 0
         },
         bestProbFromSet: 1
-      }, [{sample: srcTransform3, p: 1}]);
+      }, [{sample: srcTransforms[2], p: 1}]);
 
       token4.addInput({
         segment: {
-          trueTransform: srcTransform4,
-          transitionId: srcTransform4.id,
+          trueTransform: srcTransforms[3],
+          transitionId: srcTransforms[3].id,
           start: 0
         },
         bestProbFromSet: 1
-      }, [{sample: srcTransform4, p: 1}]);
+      }, [{sample: srcTransforms[3], p: 1}]);
 
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
-      assert.deepEqual(merged.inputSegments, srcTransforms.map((t) => ({ segment: {trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
+        assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
+        segment: {
+          trueTransform: t,
+          transitionId: t.id,
+          start: 0
+        }, bestProbFromSet: 1
+      })));
       assert.isTrue(quotientPathHasInputs(
         merged.searchModule,
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
@@ -245,11 +258,12 @@ describe('ContextToken', function() {
     it("merges four tokens with previously-split transforms - non-BMP text", () => {
       // TODO:  need another case - pref where there are two diff boundary transforms
       // and where each token has multiple constituent transforms.
-      const srcTransform1 = { insert: toMathematicalSMP("apple"), deleteLeft: 0, deleteRight: 0, id: 1 };
-      const srcTransform2 = { insert: toMathematicalSMP("sands"), deleteLeft: 0, deleteRight: 0, id: 2 };
-      const srcTransform3 = { insert: toMathematicalSMP("our"), deleteLeft: 0, deleteRight: 0, id: 3 };
-      const srcTransform4 = { insert: toMathematicalSMP("grapes"), deleteLeft: 0, deleteRight: 0, id: 4 };
-      const srcTransforms = [srcTransform1, srcTransform2, srcTransform3, srcTransform4];
+      const srcTransforms = [
+        { insert: toMathematicalSMP("apple"), deleteLeft: 0, deleteRight: 0, id: 1 },
+        { insert: toMathematicalSMP("sands"), deleteLeft: 0, deleteRight: 0, id: 2 },
+        { insert: toMathematicalSMP("our"), deleteLeft: 0, deleteRight: 0, id: 3 },
+        { insert: toMathematicalSMP("grapes"), deleteLeft: 0, deleteRight: 0, id: 4 }
+      ];
 
       // apples
       const token1 = new ContextToken(plainModel);
@@ -263,16 +277,16 @@ describe('ContextToken', function() {
 
       token1.addInput({
         segment: {
-          trueTransform: srcTransform1,
-          transitionId: srcTransform1.id,
+          trueTransform: srcTransforms[0],
+          transitionId: srcTransforms[0].id,
           start: 0
         },
         bestProbFromSet: 1
-      }, [{sample: srcTransform1, p: 1}]);
+      }, [{sample: srcTransforms[0], p: 1}]);
       token1.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 0
         },
         bestProbFromSet: 1
@@ -280,8 +294,8 @@ describe('ContextToken', function() {
 
       token2.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 1
         },
         bestProbFromSet: 1
@@ -289,33 +303,39 @@ describe('ContextToken', function() {
 
       token3.addInput({
         segment: {
-          trueTransform: srcTransform2,
-          transitionId: srcTransform2.id,
+          trueTransform: srcTransforms[1],
+          transitionId: srcTransforms[1].id,
           start: 4
         },
         bestProbFromSet: 1
       }, [{sample: {insert: toMathematicalSMP('s'), deleteLeft: 0, deleteRight: 0, id: 2}, p: 1}]);
       token3.addInput({
         segment: {
-          trueTransform: srcTransform3,
-          transitionId: srcTransform3.id,
+          trueTransform: srcTransforms[2],
+          transitionId: srcTransforms[2].id,
           start: 0
         },
         bestProbFromSet: 1
-      }, [{sample: srcTransform3, p: 1}]);
+      }, [{sample: srcTransforms[2], p: 1}]);
 
       token4.addInput({
         segment: {
-          trueTransform: srcTransform4,
-          transitionId: srcTransform4.id,
+          trueTransform: srcTransforms[3],
+          transitionId: srcTransforms[3].id,
           start: 0
         },
         bestProbFromSet: 1
-      }, [{sample: srcTransform4, p: 1}]);
+      }, [{sample: srcTransforms[3], p: 1}]);
 
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
-      assert.deepEqual(merged.inputSegments, srcTransforms.map((t) => ({segment: { trueTransform: t, transitionId: t.id, start: 0}, bestProbFromSet: 1 }) ));
+      assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
+        segment: {
+          trueTransform: t,
+          transitionId: t.id,
+          start: 0
+        }, bestProbFromSet: 1
+      })));
       assert.isTrue(quotientPathHasInputs(
         merged.searchModule,
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
@@ -726,7 +746,7 @@ describe('preprocessInputSources', () => {
       { insert: 'ngtransforms', deleteLeft: 4, deleteRight: 0, id: 13 }
     ];
 
-    const results = preprocessInputSources(transforms.map((t) => ({
+    const results = preprocessInputSources(transforms.map((t, i) => ({
       segment: {
         trueTransform: t,
         transitionId: t.id,
