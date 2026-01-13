@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 19.0.189 alpha 2026-01-12
+
+* maint(common): Update `crowdin.yml` to work with Crowdin CLI 4.0+ (#15407)
+
+## 19.0.188 alpha 2026-01-09
+
+* fix(mac): correct memory width mismatch in keyCodeForChar (#15393)
+* docs(common): document `api-verification` GHA (#15410)
+
+## 19.0.187 alpha 2026-01-08
+
+* maint(resources): add new ARM64 test status check to PR build status check (#15409)
+* docs(windows): update OS support to include Arm64 Win11 (#15396)
+* chore(windows,android): Update Crowdin strings for Portuguese (#15406)
+
+## 19.0.186 alpha 2026-01-07
+
+* maint: add script to report on recent changes to stable release (#15389)
+
+## 19.0.185 alpha 2026-01-06
+
+* chore(web): escape some additional values in TC service messages (#15384)
+
+## 19.0.184 alpha 2025-12-23
+
+* maint(resources): set shell for steps in core-arm64-windows-test.yml (#15387)
+* feat(developer): write UTF-8 .kmn file in kmdecomp (#15390)
+
 ## 19.0.183 alpha 2025-12-22
 
 * maint(core): remove leading slash on gh api call parameter (#15381)

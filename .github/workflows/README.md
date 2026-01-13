@@ -1,5 +1,20 @@
-# api-verification.yml
-TODO
+# api-verification.yml: checks Core API for incompatible changes
+
+This action automatically verifies that the API of Keyman Core did not
+change in incompatible ways without incrementing the API version number.
+It applies to all platforms that use Core, even though we only run it on
+Linux.
+
+- The action gets triggered by the completion of the Ubuntu packaging
+  workflow (`deb-packaging.yml`).
+- The API version is defined in `core/CORE_API_VERSION.md`.
+- The baseline file for comparing the API is
+  `linux/debian/libkeymancore${API_VERSION}.symbols`. The action will
+  re-create this file and and makes it available as an artifact.
+- The API checks are implemented in `linux/scripts/verify_api.inc.sh`.
+
+More information about the API verification can be found in
+`docs/core-api-verification.md`.
 
 # auto-merge-keyman-server-pr.yml
 TODO
@@ -64,8 +79,14 @@ itself:
 
 ....
 
-# crowdin.yml
-TODO
+# crowdin.yml: Upload translation sources to [Crowdin](translate.keyman.com)
+
+This action automatically updates the English source strings on Crowdin
+https://crowdin.com/project/keyman/sources/files
+
+based on the root [crowdin.yml](../../crowdin.yml) configuration file. The daily cron job currently runs at 6:00AM.
+
+This should match the behavior of locally using the [Crowdin CLI to upload sources](https://crowdin.github.io/crowdin-cli/commands/crowdin-upload-sources).
 
 # deb-packaging.yml: Ubuntu Packaging GitHub Action
 
