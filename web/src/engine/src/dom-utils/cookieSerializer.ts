@@ -18,6 +18,21 @@ export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieField
     this.saveCookie(this.name, cookie, encoder || ((val: DecodedCookieFieldValue) => val as string));
   }
 
+  public static loadAllMatching<Type extends Record<keyof Type, DecodedCookieFieldValue>>(pattern: RegExp, decoder?: FilteredRecordDecoder): { name: string, value: Type }[] {
+    const cookieSerializer = new CookieSerializer('');
+    const allCookies = cookieSerializer._loadRawCookies();
+    const matchingCookies: { name: string, value: Type }[] = [];
+
+    for (const cookieName in allCookies) {
+      if (pattern.test(cookieName)) {
+        const cookieValue = cookieSerializer.loadCookie(cookieName, decoder || ((val: string) => val as DecodedCookieFieldValue)) as Type;
+        matchingCookies.push({ name: cookieName, value: cookieValue });
+      }
+    }
+
+    return matchingCookies;
+  }
+
   /**
    * Document cookie parsing for use by kernel, OSK, UI etc.
    *

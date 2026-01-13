@@ -15,6 +15,10 @@ describe('CookieSerializer', function () {
       assert.deepEqual(cookieLoader.load(), {});
     });
 
+    afterEach(() => {
+      document.cookie = `${COOKIE_ID}=; ${RESET}`;
+    })
+
     it('serializes & reloads when all values are strings', () => {
       const cookieWriter = new CookieSerializer(COOKIE_ID);
       const obj = {
@@ -92,6 +96,52 @@ describe('CookieSerializer', function () {
 
       assert.deepEqual(reloadedObj, obj);
       assert.notStrictEqual(reloadedObj, obj);
+    });
+  });
+
+  describe('loadAllMatching', () => {
+    type TestStore = { [name: string]: string; };
+    const COOKIE_ID_1 = "TestCookie_One";
+    const COOKIE_ID_2 = "TestCookie_Two";
+    const NONMATCHING_COOKIE_ID = "NonmatchingCookie";
+
+    beforeEach(() => {
+      const cookieSerializer1 = new CookieSerializer<TestStore>(COOKIE_ID_1);
+      cookieSerializer1.save({ COOKIE_ID_1: 'foobar1' });
+
+      const cookieSerializer2 = new CookieSerializer<TestStore>(COOKIE_ID_2);
+      cookieSerializer2.save({ COOKIE_ID_2: 'foobar2' });
+
+      const nonmatchingCookieSerializer = new CookieSerializer<TestStore>(NONMATCHING_COOKIE_ID);
+      nonmatchingCookieSerializer.save({ NONMATCHING_COOKIE_ID: 'foobar3' });
+    });
+
+    afterEach(() => {
+      document.cookie = `${COOKIE_ID_1}=; ${RESET}`;
+      document.cookie = `${COOKIE_ID_2}=; ${RESET}`;
+      document.cookie = `${NONMATCHING_COOKIE_ID}=; ${RESET}`;
+    });
+
+    it('finds all matching cookies starting with TestCookie_', () => {
+      const result = CookieSerializer.loadAllMatching(/^TestCookie_/);
+      assert.deepEqual(result, [
+        { name: COOKIE_ID_1, value: { COOKIE_ID_1: 'foobar1' } },
+        { name: COOKIE_ID_2, value: { COOKIE_ID_2: 'foobar2' } }
+      ]);
+    });
+
+    it('finds all matching cookies containing Cookie', () => {
+      const result = CookieSerializer.loadAllMatching(/Cookie/);
+      assert.deepEqual(result, [
+        { name: COOKIE_ID_1, value: { COOKIE_ID_1: 'foobar1' } },
+        { name: COOKIE_ID_2, value: { COOKIE_ID_2: 'foobar2' } },
+        { name: NONMATCHING_COOKIE_ID, value: { NONMATCHING_COOKIE_ID: 'foobar3' } }
+      ]);
+    });
+
+    it('returns empty array if no matching cookies', () => {
+      const result = CookieSerializer.loadAllMatching(/^UnknownCookie_/);
+      assert.deepEqual(result, []);
     });
   });
 });
