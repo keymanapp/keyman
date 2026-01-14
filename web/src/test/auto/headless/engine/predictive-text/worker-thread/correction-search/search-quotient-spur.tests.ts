@@ -49,7 +49,7 @@ export function buildSimplePathSplitFixture() {
   };
 }
 
-describe('SearchPath', () => {
+describe('SearchQuotientSpur', () => {
   describe('constructor', () => {
     it('initializes from a lexical model', () => {
       const path = new LegacyQuotientRoot(testModel);
