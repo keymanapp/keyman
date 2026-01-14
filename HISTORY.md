@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.190 alpha 2026-01-14
+
+* Update link to PrimerPrep in step-3.md (#15426)
+* chore(common): Update Crowdin strings for Italian (#15418)
+* maint(common): Handle custom languages in Crowdin CLI v4 (#15420)
+
 ## 19.0.189 alpha 2026-01-12
 
 * maint(common): Update `crowdin.yml` to work with Crowdin CLI 4.0+ (#15407)
