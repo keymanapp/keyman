@@ -19,8 +19,9 @@
   <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Installa Aggiornamenti</string>
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">Versione: %1$s</string>
-  <!-- Context: Text label when old Chrome version installed -->
+  <!-- Context: Text label when old Chrome version installed. Label replaced in Keyman 19.0 -->
   <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    Keyman richiede la versione 57 di Chrome o superiore.</string>
+  <string name="text_require_chrome_version" comment="Banner text when old version of Chrome is installed">    Keyman richiede Chrome versione %1$s o superiore.</string>
   <!-- Context: Button label -->
   <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">Aggiorna Chrome</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
@@ -87,6 +88,10 @@
   <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Lingua e tastiera nella barra spaziatrice</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Non mostrare la didascalia sulla barra spaziatrice</string>
+  <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard -->
+  <string name="show_osk" comment="show OSK when physical keyboard is connected">Mostra tastiera a schermo</string>
+  <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard hint -->
+  <string name="show_osk_hint" comment="When physical keyboard is connected">Quando la tastiera fisica è connessa</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Vibra durante la digitazione</string>
   <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
@@ -120,9 +125,11 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Tutte le lingue già installate</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Trascina la tastiera per ridimensionare l\'altezza. Ruota il dispositivo per regolare verticale e orizzontale.</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Trascina la tastiera per ridimensionarne l\'altezza. Ruota il dispositivo per regolare verticale e orizzontale.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Ripristina impostazioni predefinite</string>
+  <!-- Context: Keyboard height display format. %1$d = portrait percentage, %2$d = landscape percentage -->
+  <string name="keyboard_height_format" comment="Format for displaying keyboard height percentages">Altezza %1$d%% | Larghezza %2$d%%</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
   <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Tempo ritardo: %1$.1f secondi</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
