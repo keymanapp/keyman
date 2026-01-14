@@ -10,14 +10,14 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, SearchQuotientRoot } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientSpur, models, LegacyQuotientRoot } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
 export function buildSimplePathSplitFixture() {
-  const rootPath = new SearchQuotientRoot(testModel);
+  const rootPath = new LegacyQuotientRoot(testModel);
 
   const distrib1 = [
     { sample: {insert: 'c', deleteLeft: 0, id: 11}, p: 0.5 },
@@ -52,16 +52,15 @@ export function buildSimplePathSplitFixture() {
 describe('SearchPath', () => {
   describe('constructor', () => {
     it('initializes from a lexical model', () => {
-      const path = new SearchQuotientRoot(testModel);
+      const path = new LegacyQuotientRoot(testModel);
       assert.equal(path.inputCount, 0);
       assert.isNumber(path.spaceId);
       assert.deepEqual(path.bestExample, {text: '', p: 1});
       assert.deepEqual(path.parents, []);
-      assert.isNotOk(path.inputs);
     });
 
     it('may be extended from root path', () => {
-      const rootPath = new SearchQuotientRoot(testModel);
+      const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -83,11 +82,10 @@ describe('SearchPath', () => {
       // Should (still) have codepointLength == 0 once it's defined.
       assert.deepEqual(rootPath.bestExample, {text: '', p: 1});
       assert.deepEqual(rootPath.parents, []);
-      assert.isNotOk(rootPath.inputs);
     });
 
     it('may be built from arbitrary prior SearchPath', () => {
-      const rootPath = new SearchQuotientRoot(testModel);
+      const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -133,7 +131,7 @@ describe('SearchPath', () => {
     });
 
     it('may extend with a Transform inserting multiple codepoints', () => {
-      const rootPath = new SearchQuotientRoot(testModel);
+      const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -201,7 +199,7 @@ describe('SearchPath', () => {
 
   describe('hasInputs()', () => {
     it('matches an empty array on root SearchPaths', () => {
-      assert.isTrue(new SearchQuotientRoot(testModel).hasInputs([]));
+      assert.isTrue(new LegacyQuotientRoot(testModel).hasInputs([]));
     });
 
     it('matches all path inputs when provided in proper order', () => {

@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, LegacyQuotientSpur, models, SearchQuotientRoot } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, LegacyQuotientSpur, models, LegacyQuotientRoot } from '@keymanapp/lm-worker/test-index';
 
 import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
@@ -96,7 +96,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchQuotientRoot(testModel);
+    const searchSpace = new LegacyQuotientRoot(testModel);
 
     const iter = getBestMatches(searchSpace, buildTestTimer());
     const firstResult = await iter.next();
@@ -109,7 +109,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    let searchPath = new SearchQuotientRoot(testModel);
+    let searchPath = new LegacyQuotientRoot(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -143,7 +143,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    let searchPath = new SearchQuotientRoot(testModel);
+    let searchPath = new LegacyQuotientRoot(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -182,7 +182,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchQuotientRoot(testModel);
+    const searchSpace = new LegacyQuotientRoot(testModel);
     const timer = buildTestTimer();
     const iter = getBestMatches(searchSpace, timer);
 

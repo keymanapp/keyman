@@ -45,23 +45,20 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   readonly lowestPossibleSingleCost: number;
 
   /**
-   * Constructs a fresh SearchSpace instance for used in predictive-text correction
-   * and suggestion searches.
-   * @param baseSpaceId
-   * @param model
+   * Extends an existing SearchQuotientNode (and its correction data) by a keystroke based
+   * on a subset of the incoming keystroke's fat-finger distribution.
+   *
+   * @param parentNode
+   * @param inputs
+   * @param costHeuristic
    */
-  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Readonly<Transform>>, costHeuristic: number) {
+  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Transform>, costHeuristic: number) {
     this.spaceId = generateSpaceSeed();
 
     this.parentNode = parentNode;
-    this.lowestPossibleSingleCost = costHeuristic;
+    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(costHeuristic);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
-
-    // // generate and queue up nodes.
-    // const priorResults = parentNode?.previousResults;
-    // const nodes = this.buildEdgesForNodes(!priorResults ? [] : priorResults.map(r => r.node));
-    // this.selectionQueue.enqueueAll(nodes);
   }
 
   /**

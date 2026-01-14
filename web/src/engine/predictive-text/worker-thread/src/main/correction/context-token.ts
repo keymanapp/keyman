@@ -13,12 +13,12 @@ import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
+import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
+import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
-import { SearchQuotientRoot } from "./search-quotient-root.js";
 
 /**
  * Notes critical properties of the inputs comprising each ContextToken.
@@ -122,7 +122,7 @@ export class ContextToken {
 
       // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
       // Build a token that represents the current text with no ambiguity - probability at max (1.0)
-      let searchSpace: SearchQuotientNode = new SearchQuotientRoot(model);
+      let searchModule: SearchQuotientNode = new LegacyQuotientRoot(model);
       const BASE_PROBABILITY = 1;
       textToCharTransforms(rawText).forEach((transform) => {
         this._inputRange.push({
@@ -130,10 +130,10 @@ export class ContextToken {
           inputStartIndex: 0,
           bestProbFromSet: BASE_PROBABILITY
         });
-        searchSpace = new LegacyQuotientSpur(searchSpace, [{sample: transform, p: BASE_PROBABILITY}], 1);
+        searchModule = new LegacyQuotientSpur(searchModule, [{sample: transform, p: BASE_PROBABILITY}], 1);
       });
 
-      this._searchModule = searchSpace;
+      this._searchModule = searchModule;
     }
   }
 

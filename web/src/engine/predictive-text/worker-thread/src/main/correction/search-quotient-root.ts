@@ -1,16 +1,23 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchNode } from './distance-modeler.js';
-import { SearchQuotientSpur } from './search-quotient-spur.js';
-import { PathResult } from './search-quotient-node.js';
+import { SearchNode, SearchResult } from './distance-modeler.js';
+import { generateSpaceSeed, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientRoot extends SearchQuotientSpur {
+export class SearchQuotientRoot implements SearchQuotientNode {
   readonly rootNode: SearchNode;
+  private readonly rootResult: SearchResult;
+
+  readonly lowestPossibleSingleCost: number = 0;
+
+  readonly inputCount: number = 0;
+  readonly correctionsEnabled: boolean = false;
+
+  private hasBeenProcessed: boolean = false;
 
   /**
    * Constructs a fresh SearchSpace instance for used in predictive-text correction
@@ -19,18 +26,37 @@ export class SearchQuotientRoot extends SearchQuotientSpur {
    * @param model
    */
   constructor(model: LexicalModel) {
-    super(/* parent */ null, /* inputs */ null, /* cost heuristic */ 0);
-    this.rootNode = new SearchNode(model.traverseFromRoot(), this.spaceId, t => model.toKey(t));
-    this.queueNodes([this.rootNode]);
+    this.rootNode = new SearchNode(model.traverseFromRoot(), generateSpaceSeed(), t => model.toKey(t));
+    this.rootResult = new SearchResult(this.rootNode);
   }
 
-  protected buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>): SearchNode[] {
+  get spaceId(): number {
+    return this.rootNode.spaceId;
+  }
+
+  hasInputs(keystrokeDistributions: LexicalModelTypes.Distribution<LexicalModelTypes.Transform>[]): boolean {
+    return keystrokeDistributions.length == 0;
+  }
+
+  // Return a new array each time; avoid aliasing potential!
+  get parents(): SearchQuotientNode[] {
     return [];
   }
 
-  // TODO:  Remove when removing LegacyQuotientSpur!
-  // At that time, inserts should have their own devoted 'Spur' type and not be managed
-  // within the same pre-existing instance.
+  // Return a new array each time; avoid aliasing potential!
+  get inputSequence(): LexicalModelTypes.Distribution<LexicalModelTypes.Transform>[] {
+    return [];
+  }
+
+  // Return a new instance each time; avoid aliasing potential!
+  get bestExample(): { text: string; p: number; }  {
+    return { text: '', p: 1 };
+  }
+
+  increaseMaxEditDistance(): void {
+    this.rootNode.calculation = this.rootNode.calculation.increaseMaxDistance();
+  }
+
   /**
    * Retrieves the lowest-cost / lowest-distance edge from the selection queue,
    * checks its validity as a correction to the input text, and reports on what
@@ -38,19 +64,29 @@ export class SearchQuotientRoot extends SearchQuotientSpur {
    * @returns
    */
   public handleNextNode(): PathResult {
-    const result = super.handleNextNode();
-
-    if(result.type == 'complete') {
-      const currentNode = result.finalNode;
-
-      // Forbid a raw edit-distance of greater than 2.
-      // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.      const currentNode = result.finalNode;
-      if(currentNode.editCount < 2) {
-        let insertionEdges = currentNode.buildInsertionEdges();
-        this.queueNodes(insertionEdges);
-      }
+    if(this.hasBeenProcessed) {
+      return null;
     }
 
-    return result;
+    this.hasBeenProcessed = true;
+
+    return {
+      type: 'complete',
+      cost: 0,
+      finalNode: this.rootNode,
+      spaceId: this.spaceId
+    };
+  }
+
+  public get currentCost(): number {
+    return this.hasBeenProcessed ? Number.POSITIVE_INFINITY : 0;
+  }
+
+  get previousResults(): SearchResult[] {
+    if(!this.hasBeenProcessed) {
+      return [];
+    } else {
+      return [this.rootResult];
+    }
   }
 }
