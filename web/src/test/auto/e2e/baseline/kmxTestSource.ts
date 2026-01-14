@@ -2,7 +2,6 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 import * as fs from 'fs';
-import * as path from 'path';
 
 // Helper types
 type KmxOptionType = 'input' | 'output' | 'saved';

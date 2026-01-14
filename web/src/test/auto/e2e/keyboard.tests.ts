@@ -1,7 +1,7 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
-import { test, expect, Page, Locator } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 
 test.describe('KMX keyboards', function () {
   let textarea: Locator;
