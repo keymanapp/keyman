@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.191 alpha 2026-01-14
+
+* maint(linux): remove EOL Ubuntu 25.04 Plucky (#15423)
+* maint(common): fix build when using different default node version (#15422)
+
 ## 19.0.190 alpha 2026-01-14
 
 * Update link to PrimerPrep in step-3.md (#15426)
