@@ -20,6 +20,7 @@ import {
   buildEdgeWindow,
   ContextToken,
   ContextTokenization,
+  generateSubsetId,
   models,
   precomputationSubsetKeyer,
   TokenizationTransitionEdits,
@@ -188,7 +189,8 @@ describe('precomputationSubsetKeyer', function() {
                   id: 13
                 }, transitionId: 13,
                 start: 0
-              }, bestProbFromSet: 1
+              }, bestProbFromSet: 1,
+              subsetId: generateSubsetId()
             }, [
               {sample: {insert: 'te', deleteLeft: 0, id: 13}, p: 1}
             ]);
@@ -223,7 +225,8 @@ describe('precomputationSubsetKeyer', function() {
                   id: 13
                 }, transitionId: 13,
                 start: 0
-              }, bestProbFromSet: 1
+              }, bestProbFromSet: 1,
+              subsetId: generateSubsetId()
             }, [
               {sample: {insert: 't', deleteLeft: 0}, p: 1}
             ]);
@@ -272,7 +275,8 @@ describe('precomputationSubsetKeyer', function() {
                     id: 13
                   }, transitionId: 13,
                   start: 0
-                }, bestProbFromSet: 1
+                }, bestProbFromSet: 1,
+                subsetId: generateSubsetId()
               }, [{sample: {insert: 'ts', deleteLeft: 0, id: 13}, p: 1}
               ]);
               return token;
@@ -307,7 +311,8 @@ describe('precomputationSubsetKeyer', function() {
                 id: 13
               }, transitionId: 13,
               start: 0
-            }, bestProbFromSet: 1
+            }, bestProbFromSet: 1,
+            subsetId: generateSubsetId()
           }, [
             {sample: {insert: 't', deleteLeft: 0, id: 13}, p: 1}
           ]);
@@ -767,7 +772,8 @@ describe('TokenizationSubsetBuilder', function() {
           id: 13
         }, transitionId: 13,
         start: 0
-      }, bestProbFromSet: 1
+      }, bestProbFromSet: 1,
+      subsetId: generateSubsetId()
     }, [
       { sample: trueSourceTransform, p: .6 }
     ]);
@@ -781,7 +787,8 @@ describe('TokenizationSubsetBuilder', function() {
           id: 13
         }, transitionId: 13,
         start: 0
-      }, bestProbFromSet: 1
+      }, bestProbFromSet: 1,
+      subsetId: generateSubsetId()
     }, [
       { sample: { insert: 's', deleteLeft: 0, id: 13 }, p: .4 }
     ]);
@@ -822,7 +829,8 @@ describe('TokenizationSubsetBuilder', function() {
           id: 13
         }, transitionId: 13,
         start: 0
-      }, bestProbFromSet: .6
+      }, bestProbFromSet: .6,
+      subsetId: generateSubsetId()
     }, [
       { sample: trueSourceTransform, p: .6 }
     ]);
@@ -835,7 +843,8 @@ describe('TokenizationSubsetBuilder', function() {
           deleteLeft: 1
         }, transitionId: 13,
         start: 0
-      }, bestProbFromSet: .6
+      }, bestProbFromSet: .6,
+      subsetId: generateSubsetId()
     }, [
       { sample: { insert: 'a', deleteLeft: 0, id: 13}, p: .4 }
     ]);
