@@ -395,7 +395,7 @@ function cleanup() {
     # So we kill the remaining lonely ibus-daemon and start ibus again.
     if [[ ! "$(ibus engine &> /dev/null)" ]]; then
       echo "# Stopping and starting ibus-daemon"
-      ibus exit &> /dev/null || true
+      ibus exit &> /dev/null || kill -9 $(pgrep -u "${USER:-$(whoami)}" ibus-daemon) &> /dev/null || true
       ibus start -d
     fi
   fi
