@@ -13,6 +13,7 @@ import { KeyboardInterfaceBase } from "./keyboardInterfaceBase.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
 import { HardKeyboardBase } from "./hardKeyboardBase.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
+import { VariableStoreCookieSerializer } from './variableStoreCookieSerializer.js';
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KMWString } from "keyman/common/web-utils";
@@ -337,7 +338,7 @@ export class KeymanEngineBase<
     //
     // #endregion
 
-    await this.core.init(config.paths);
+    await this.core.init(config.paths, new VariableStoreCookieSerializer());
   }
 
   /**
