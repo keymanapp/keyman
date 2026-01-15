@@ -3,19 +3,19 @@
  */
 
 import { EventEmitter } from 'eventemitter3';
-import { KM_Core, KM_CORE_STATUS, KM_CORE_CT, km_core_context, km_core_context_items } from 'keyman/engine/core-adapter';
+import { KM_Core, KM_CORE_STATUS, KM_CORE_CT, km_core_context, km_core_context_items, km_core_option_item } from 'keyman/engine/core-adapter';
 import {
   BeepHandler,
   DeviceSpec, EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
   KeyEvent, KMXKeyboard, SyntheticTextStore, MutableSystemStore, TextStore, ProcessorAction,
   StateKeyMap,
-  Deadkey
+  Deadkey,
+  VariableStore,
+  VariableStoreSerializer
 } from "keyman/engine/keyboard";
-import { KM_CORE_EVENT_FLAG } from '../core-adapter/KM_Core.js';
-
-export class CoreKeyboardInterface implements KeyboardMinimalInterface {
-  public activeKeyboard: Keyboard;
-}
+import { KM_CORE_EVENT_FLAG, KM_CORE_OPTION_SCOPE } from '../core-adapter/KM_Core.js';
+import { CoreKeyboardInterface } from './coreKeyboardInterface.js';
+import { toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 /**
  * Implements the core keyboard processing engine that interacts with the
@@ -25,18 +25,21 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   private _newLayerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
   private _oldLayerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
   private _layerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
-  private _keyboardInterface: CoreKeyboardInterface = new CoreKeyboardInterface();
+  private _keyboardInterface: CoreKeyboardInterface;
 
   /**
    * Initialize the core processor with the provided base path.
    * Sets up the necessary environment for processing keyboard events.
    *
-   * @param {string}  basePath    The path for the core processor resources, i.e. where the
-   *                              km-core.js file is located.
+   * @param {string}                   basePath         The path for the core processor
+   *                                                    resources, i.e. where the
+   *                                                    km-core.js file is located.
+   * @param {VariableStoreSerializer}  storeSerializer  Optional serializer for variable stores.
    * @returns {Promise<void>} A promise that resolves when initialization is complete.
    */
-  public async init(basePath: string): Promise<void> {
+  public async init(basePath: string, storeSerializer?: VariableStoreSerializer): Promise<void> {
     await KM_Core.createCoreProcessor(basePath);
+    this._keyboardInterface = new CoreKeyboardInterface(storeSerializer);
   }
 
   /**
@@ -276,16 +279,34 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     this.saveMarkersToTextStore(coreContext, textStore);
 
     processorAction.beep = core_actions.do_alert;
+    if (this.beepHandler && processorAction.beep) {
+      this.beepHandler(textStore);
+    }
+
     processorAction.triggerKeyDefault = core_actions.emit_keystroke;
 
-    // TODO-web-core: Implement options (#13426)
-    // process_persist_action(engine, actions->persist_options);
+    this.process_persist_action(core_actions.persist_options);
+
     // TODO-web-core: do we have to do anything with the new_caps_lock_state? (#15285)
     // process_capslock_action(actions->new_caps_lock_state);
 
     processorAction.transcription = textStore.buildTranscriptionFrom(preInput, keyEvent, false);
 
     return processorAction;
+  }
+
+  private process_persist_action(options: km_core_option_item[]): void {
+    if (this.keyboardInterface.variableStoreSerializer) {
+      for (const option of options) {
+        console.assert(option.scope === KM_CORE_OPTION_SCOPE.OPT_KEYBOARD);
+        if (option.scope !== KM_CORE_OPTION_SCOPE.OPT_KEYBOARD) {
+          continue;
+        }
+        const valueObj: VariableStore = {};
+        valueObj[option.key] = option.value;
+        this.keyboardInterface.variableStoreSerializer.saveStore(toPrefixedKeyboardId(this.activeKeyboard.id), option.key, valueObj);
+      }
+    }
   }
 
   /**
