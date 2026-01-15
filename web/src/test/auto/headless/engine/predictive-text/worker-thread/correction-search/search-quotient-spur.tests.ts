@@ -54,6 +54,7 @@ describe('SearchQuotientSpur', () => {
     it('initializes from a lexical model', () => {
       const path = new LegacyQuotientRoot(testModel);
       assert.equal(path.inputCount, 0);
+      assert.equal(path.codepointLength, 0);
       assert.isNumber(path.spaceId);
       assert.deepEqual(path.bestExample, {text: '', p: 1});
       assert.deepEqual(path.parents, []);
@@ -71,6 +72,7 @@ describe('SearchQuotientSpur', () => {
       const extendedPath = new LegacyQuotientSpur(rootPath, leadEdgeDistribution, leadEdgeDistribution[0]);
 
       assert.equal(extendedPath.inputCount, 1);
+      assert.equal(extendedPath.codepointLength, 1);
       assert.isNumber(extendedPath.spaceId);
       assert.notEqual(extendedPath.spaceId, rootPath.spaceId);
       assert.deepEqual(extendedPath.bestExample, {text: 't', p: 0.5});
@@ -96,7 +98,7 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(rootPath.parents, []);
     });
 
-    it('may be built from arbitrary prior SearchPath', () => {
+    it('may be built from arbitrary prior SearchQuotientSpur', () => {
       const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
@@ -128,6 +130,7 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(leadEdgeDistribution, inputClone);
 
       assert.equal(length2Path.inputCount, 2);
+      assert.equal(length2Path.codepointLength, 2);
       assert.isNumber(length2Path.spaceId);
       assert.notEqual(length2Path.spaceId, length1Path.spaceId);
       assert.deepEqual(length2Path.bestExample, {text: 'tr', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
@@ -156,6 +159,7 @@ describe('SearchQuotientSpur', () => {
       ]);
 
       assert.equal(length1Path.inputCount, 1);
+      assert.equal(length1Path.codepointLength, 1);
       assert.isNumber(length1Path.spaceId);
       assert.notEqual(length1Path.spaceId, rootPath.spaceId);
       assert.deepEqual(length1Path.bestExample, {text: 't', p: 0.5});
@@ -210,6 +214,7 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(leadEdgeDistribution, inputClone);
 
       assert.equal(length2Path.inputCount, 2);
+      assert.equal(length2Path.codepointLength, 3);
       assert.isNumber(length2Path.spaceId);
       assert.notEqual(length2Path.spaceId, length1Path.spaceId);
       assert.deepEqual(length2Path.bestExample, {text: 'tri', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
@@ -238,6 +243,7 @@ describe('SearchQuotientSpur', () => {
       ]);
 
       assert.equal(length1Path.inputCount, 1);
+      assert.equal(length1Path.codepointLength, 1);
       assert.isNumber(length1Path.spaceId);
       assert.notEqual(length1Path.spaceId, rootPath.spaceId);
       assert.deepEqual(length1Path.bestExample, {text: 't', p: 0.5});
@@ -253,6 +259,7 @@ describe('SearchQuotientSpur', () => {
 
       assert.equal(pathToSplit.inputCount, 4);
       assert.equal(distributions.length, pathToSplit.inputCount);
+      assert.equal(pathToSplit.codepointLength, 4); // one char per input, no deletions anywhere
       // Per assertions documented in the setup above.
       assert.deepEqual(pathToSplit.bestExample, distributions.reduce(
         (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),

@@ -34,6 +34,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   readonly spaceId: number;
 
   readonly inputCount: number;
+  private _codepointLength: number;
+  protected abstract readonly insertLength: number;
+  protected abstract readonly leftDeleteLength: number
 
   /**
    * Marks all results that have already been returned from this instance of SearchPath.
@@ -102,6 +105,14 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return parentInputs.concat(localInputs);
   }
 
+  get codepointLength(): number {
+    if(this._codepointLength === undefined) {
+      this._codepointLength = this.parentNode.codepointLength + this.insertLength - this.leftDeleteLength;
+    }
+
+    return this._codepointLength;
+  }
+
   public get lastInput(): Distribution<Readonly<Transform>> {
     // Shallow-copies the array to prevent external modification; the Transforms
     // are marked Readonly to prevent their modification as well.
@@ -113,7 +124,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
-      text: KMWString.substring(bestPrefix.text, 0, KMWString.length(bestPrefix.text) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      text: KMWString.substring(bestPrefix.text, 0, (this.parentNode?.codepointLength ?? 0) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
   }

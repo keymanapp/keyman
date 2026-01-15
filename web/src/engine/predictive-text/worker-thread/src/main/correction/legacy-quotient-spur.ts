@@ -9,6 +9,7 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { KMWString } from '@keymanapp/web-utils';
 
 import { SearchNode } from './distance-modeler.js';
 import { PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
@@ -21,6 +22,9 @@ import Transform = LexicalModelTypes.Transform;
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class LegacyQuotientSpur extends SearchQuotientSpur {
+  protected readonly insertLength: number;
+  protected readonly leftDeleteLength: number;
+
   /**
    * Constructs a fresh SearchQuotientNode instance for use in predictive-text
    * correction and suggestion searches.
@@ -31,6 +35,12 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
   constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: PathInputProperties | ProbabilityMass<Transform>) {
     super(space, inputs, inputSource);
     this.queueNodes(this.buildEdgesForNodes(space.previousResults.map(r => r.node)));
+
+    // Compute this SearchPath's codepoint length & edge length.
+    const insert = this.inputs?.[0].sample.insert ?? '';
+    this.insertLength = KMWString.length(insert);
+
+    this.leftDeleteLength = this.inputs?.[0].sample.deleteLeft ?? 0;
     return;
   }
 
