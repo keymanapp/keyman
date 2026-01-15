@@ -44,3 +44,8 @@ mainly by test name.
 | k_06xx_* | System stores                            |
 | k_07xx_* | Caps related tests                       |
 | k_08xx_* | Context related                          |
+
+## Description of file format
+
+See [README.md](/core/tests/unit/kmx/README.md) in core for a description
+of the file format.
