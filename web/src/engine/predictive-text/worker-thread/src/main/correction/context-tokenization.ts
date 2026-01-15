@@ -159,16 +159,6 @@ export class ContextTokenization {
   }
 
   /**
-   * Returns plain-text strings representing the most probable representation for all
-   * tokens represented by this tokenization instance.
-   *
-   * Intended for debugging use only.
-   */
-  get sourceText() {
-    return this.tokens.map(token => token.sourceText);
-  }
-
-  /**
    * Returns a plain-text string representing the most probable representation for all
    * tokens represented by this tokenization instance.
    */
