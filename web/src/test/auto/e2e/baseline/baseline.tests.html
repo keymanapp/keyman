@@ -15,11 +15,20 @@
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
         const searchParams = new URLSearchParams(window.location.search);
+        const keyboardFile = searchParams.get('keyboard');
+        let keyboardId = searchParams.get('id');
+
+        // If id is not set, extract from basename of keyboardFile
+        if (!keyboardId && keyboardFile) {
+          const basename = keyboardFile.split('/').pop(); // Get last part after /
+          keyboardId = basename.replace(/\.[^.]+$/, ''); // Remove file extension
+        }
+
         const keyboard = {
-          id: searchParams.get('id'),
+          id: keyboardId,
           name: 'Test Keyboard',
           languages: { id: 'en', name: 'English' },
-          filename: searchParams.get('keyboard')
+          filename: keyboardFile
         };
         // allow to wait on KMW being fully initialized
         window.KmwLoaded = new Promise((resolve) => {
