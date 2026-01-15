@@ -19,6 +19,31 @@ export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieField
   }
 
   /**
+   * Finds and loads all cookies whose names match the given pattern into typed records.
+   *
+   * @param   {RegExp}                  pattern   Regex for cookie names to include
+   * @param   {FilteredRecordDecoder}   [decoder] Optional decoder applied to each cookie
+   *                                              field value before returning.
+   *
+   * @returns {{ name: string, value: Type }[]}   Array of objects containing each matching
+   *                                              cookie's name and decoded value.
+   */
+  public static loadAllMatching<Type extends Record<keyof Type, DecodedCookieFieldValue>>(pattern: RegExp, decoder?: FilteredRecordDecoder): { name: string, value: Type }[] {
+    const cookieSerializer = new CookieSerializer('');
+    const allCookies = cookieSerializer._loadRawCookies();
+    const matchingCookies: { name: string, value: Type }[] = [];
+
+    for (const cookieName in allCookies) {
+      if (pattern.test(cookieName)) {
+        const cookieValue = cookieSerializer.loadCookie(cookieName, decoder || ((val: string) => val as DecodedCookieFieldValue)) as Type;
+        matchingCookies.push({ name: cookieName, value: cookieValue });
+      }
+    }
+
+    return matchingCookies;
+  }
+
+  /**
    * Document cookie parsing for use by kernel, OSK, UI etc.
    *
    * @return      {Object}                  array of names and strings
