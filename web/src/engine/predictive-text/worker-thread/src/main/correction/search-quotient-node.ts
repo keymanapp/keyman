@@ -10,10 +10,10 @@
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchNode, SearchResult } from "./distance-modeler.js";
+import { SearchQuotientSpur } from "./search-quotient-spur.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
-import { SearchQuotientSpur } from "./search-quotient-spur.js";
 
 let SPACE_ID_SEED = 0;
 
@@ -62,20 +62,20 @@ export interface InputSegment {
 }
 
 /**
- * Models the properties and portion of an input event applied by a SearchSpace for
- * correction-search purposes.
+ * Models the properties and portion of an input event applied by a
+ * SearchQuotientNode for correction-search purposes.
  */
 export interface PathInputProperties {
   /**
    * Denotes the portion of the ongoing input stream represented by the corresponding
-   * input distribution(s) of a SearchSpace.
+   * input distribution(s) of a SearchQuotientNode.
    */
   segment: InputSegment;
 
   /**
    * Notes the highest probability found in the input event's transform
    * distribution, regardless of whether or not that specific corresponding
-   * input is included within the SearchSpace's correction space.
+   * input is included within the SearchQuotientNode's correction space.
    */
   bestProbFromSet: number;
 
@@ -103,8 +103,8 @@ export interface SearchQuotientNode {
   readonly spaceId: number;
 
   /**
-   * Notes the SearchQuotientNode(s) whose correction-search paths are extended
-   * by this SearchQuotientNode.
+   * Notes the SearchQuotientNode(s) whose correction-search paths are extended by this
+   * SearchQuotientNode.
    */
   readonly parents: SearchQuotientNode[];
 
@@ -163,7 +163,9 @@ export interface SearchQuotientNode {
   /**
    * Retrieves the sequence of inputs that led to this SearchSpace.
    *
-   * THIS WILL BE REMOVED SHORTLY.  (Once SearchQuotientNode takes on merging &
+   * THIS WILL BE REMOVED SHORTLY in favor of `constituentPaths` below, which
+   * provides an improved view into the data and models multiple paths to the
+   * space when they exist.  (Once SearchQuotientNode takes on merging &
    * splitting)
    */
   readonly inputSequence: Distribution<Transform>[];
@@ -193,6 +195,14 @@ export interface SearchQuotientNode {
    * maps compatible token source ranges to each other.
    */
   get sourceRangeKey(): string;
+
+  /**
+   * Enumerates the different potential SearchQuotientSpur sequences that lead
+   * to the current SearchQuotientNode.
+   *
+   * Intended only for use during unit testing.  Does not include the root node.
+   */
+  readonly constituentPaths: SearchQuotientSpur[][];
 }
 
 /**

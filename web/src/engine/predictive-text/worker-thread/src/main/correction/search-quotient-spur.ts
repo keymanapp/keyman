@@ -30,6 +30,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
+  readonly bestProbInEdge: number;
   private parentNode: SearchQuotientNode;
   readonly spaceId: number;
 
@@ -111,6 +112,18 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
 
     return this._codepointLength;
+  }
+
+  public get constituentPaths(): SearchQuotientSpur[][] {
+    const parentPaths = this.parents[0]?.constituentPaths ?? [];
+    if(parentPaths.length > 0) {
+      return parentPaths.map(p => {
+        p.push(this);
+        return p;
+      });
+    } else {
+      return [[this]];
+    }
   }
 
   public get lastInput(): Distribution<Readonly<Transform>> {

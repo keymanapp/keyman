@@ -44,7 +44,7 @@ export function buildSimplePathSplitFixture() {
   const path4 = new LegacyQuotientSpur(path3, distrib4, distrib4[0]);
 
   return {
-    paths: [rootPath, path1, path2, path3, path4],
+    paths: [null, path1, path2, path3, path4],
     distributions: [distrib1, distrib2, distrib3, distrib4]
   };
 }
@@ -270,6 +270,23 @@ describe('SearchQuotientSpur', () => {
         {text: '', p: 1})
       );
       assert.isTrue(quotientPathHasInputs(pathToSplit, distributions));
+      assert.equal(pathToSplit.constituentPaths.length, 1);
     });
+  });
+
+  describe('constituentPaths', () => {
+    it('includes a single entry array when all parents are SearchPaths', () => {
+      const { paths } = buildSimplePathSplitFixture();
+      const finalPath = paths[4];
+
+      assert.equal(finalPath.constituentPaths.length, 1);
+
+      const pathSequence = finalPath.constituentPaths[0];
+      assert.equal(pathSequence.length, 4); // 4 inputs; does not include root node
+
+      assert.sameOrderedMembers(pathSequence, paths.slice(1));
+    });
+
+    // TODO:  add a test for mixed SearchPath / SearchCluster cases.
   });
 });
