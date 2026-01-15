@@ -279,20 +279,20 @@ describe('ContextToken', function() {
       // Setup phase
       const keystrokeDistributions: Distribution<Transform>[] = [
         [
-          { sample: { insert: 'c', deleteLeft: 0 }, p: 0.75 },
-          { sample: { insert: 't', deleteLeft: 0 }, p: 0.25 }
+          { sample: { insert: 'c', deleteLeft: 0, id: 11 }, p: 0.75 },
+          { sample: { insert: 't', deleteLeft: 0, id: 11 }, p: 0.25 }
         ],
         [
-          { sample: { insert: 'a', deleteLeft: 0 }, p: 0.75 },
-          { sample: { insert: 'o', deleteLeft: 0 }, p: 0.25 }
+          { sample: { insert: 'a', deleteLeft: 0, id: 12 }, p: 0.75 },
+          { sample: { insert: 'o', deleteLeft: 0, id: 12 }, p: 0.25 }
         ],
         [
-          { sample: { insert: 'n', deleteLeft: 0 }, p: 0.75 },
-          { sample: { insert: 'r', deleteLeft: 0 }, p: 0.25 }
+          { sample: { insert: 'n', deleteLeft: 0, id: 13 }, p: 0.75 },
+          { sample: { insert: 'r', deleteLeft: 0, id: 13 }, p: 0.25 }
         ],
         [
-          { sample: { insert: '\'', deleteLeft: 0 }, p: 0.75 },
-          { sample: { insert: 't', deleteLeft: 0 }, p: 0.25 }
+          { sample: { insert: '\'', deleteLeft: 0, id: 14 }, p: 0.75 },
+          { sample: { insert: 't', deleteLeft: 0, id: 14 }, p: 0.25 }
         ]
       ]
 
@@ -301,7 +301,7 @@ describe('ContextToken', function() {
         tokenToSplit.addInput({trueTransform: keystrokeDistributions[i][0].sample, inputStartIndex: 0, bestProbFromSet: .75}, keystrokeDistributions[i]);
       };
 
-      assert.equal(tokenToSplit.sourceText, 'can\'');
+      assert.equal(tokenToSplit.sourceRangeKey, 'T11+T12+T13+T14');
       tokenToSplit.searchModule.hasInputs(keystrokeDistributions);
 
       // And now for the "fun" part.
@@ -327,7 +327,7 @@ describe('ContextToken', function() {
       // Setup phase
       const keystrokeDistributions: Distribution<Transform>[] = [
         [
-          { sample: { insert: 'biglargetransform', deleteLeft: 0, deleteRight: 0 }, p: 1 },
+          { sample: { insert: 'biglargetransform', deleteLeft: 0, deleteRight: 0, id: 42 }, p: 1 },
         ]
       ];
       const splitTextArray = ['big', 'large', 'transform'];
@@ -337,7 +337,7 @@ describe('ContextToken', function() {
         tokenToSplit.addInput({trueTransform: keystrokeDistributions[i][0].sample, inputStartIndex: 0, bestProbFromSet: 1}, keystrokeDistributions[i]);
       };
 
-      assert.equal(tokenToSplit.sourceText, 'biglargetransform');
+      assert.equal(tokenToSplit.sourceRangeKey, `T${keystrokeDistributions[0][0].sample.id}`);
       assert.isTrue(tokenToSplit.searchModule.hasInputs(keystrokeDistributions));
 
       // And now for the "fun" part.
@@ -360,7 +360,8 @@ describe('ContextToken', function() {
         trueTransform: {
           insert: 'biglargetransform',
           deleteLeft: 0,
-          deleteRight: 0
+          deleteRight: 0,
+          id: keystrokeDistributions[0][0].sample.id
         },
         inputStartIndex: i,
         bestProbFromSet: 1
@@ -368,7 +369,7 @@ describe('ContextToken', function() {
 
       for(let i = 0; i < resultsOfSplit.length; i++) {
         assert.isTrue(resultsOfSplit[i].searchModule.hasInputs([
-          [{sample: { insert: splitTextArray[i], deleteLeft: 0, deleteRight: 0 }, p: 1}]
+          [{sample: { insert: splitTextArray[i], deleteLeft: 0, deleteRight: 0, id: keystrokeDistributions[0][0].sample.id }, p: 1}]
         ]));
       }
     });
