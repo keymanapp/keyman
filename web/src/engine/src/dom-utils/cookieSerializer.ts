@@ -18,6 +18,16 @@ export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieField
     this.saveCookie(this.name, cookie, encoder || ((val: DecodedCookieFieldValue) => val as string));
   }
 
+  /**
+   * Finds and loads all cookies whose names match the given pattern into typed records.
+   *
+   * @param   {RegExp}                  pattern   Regex for cookie names to include
+   * @param   {FilteredRecordDecoder}   [decoder] Optional decoder applied to each cookie
+   *                                              field value before returning.
+   *
+   * @returns {{ name: string, value: Type }[]}   Array of objects containing each matching
+   *                                              cookie's name and decoded value.
+   */
   public static loadAllMatching<Type extends Record<keyof Type, DecodedCookieFieldValue>>(pattern: RegExp, decoder?: FilteredRecordDecoder): { name: string, value: Type }[] {
     const cookieSerializer = new CookieSerializer('');
     const allCookies = cookieSerializer._loadRawCookies();

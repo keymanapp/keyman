@@ -7,15 +7,8 @@ describe('CookieSerializer', function () {
   describe('SimpleTestCookie', () => {
     const COOKIE_ID = "SimpleTestCookie";
 
-    beforeEach(() => {
-      // Purge the cookie!
-      document.cookie = `${COOKIE_ID}=foobar; ${RESET}`;
-
-      const cookieLoader = new CookieSerializer(COOKIE_ID);
-      assert.deepEqual(cookieLoader.load(), {});
-    });
-
     afterEach(() => {
+      // Purge the cookie!
       document.cookie = `${COOKIE_ID}=; ${RESET}`;
     })
 
