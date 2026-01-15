@@ -57,7 +57,6 @@ describe('SearchQuotientSpur', () => {
       assert.isNumber(path.spaceId);
       assert.deepEqual(path.bestExample, {text: '', p: 1});
       assert.deepEqual(path.parents, []);
-      assert.equal(path.likeliestSourceText, '');
     });
 
     it('may be extended from root path', () => {
@@ -77,11 +76,13 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(extendedPath.bestExample, {text: 't', p: 0.5});
       assert.deepEqual(extendedPath.parents, [rootPath]);
       assert.deepEqual(extendedPath.inputs, leadEdgeDistribution);
-      assert.equal(extendedPath.likeliestSourceText, 't');
-      assert.deepEqual(extendedPath.sourceIdentifiers, [
+      assert.deepEqual(extendedPath.inputSegments, [
         {
-          trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
+          segment: {
+            trueTransform: leadEdgeDistribution[0].sample,
+            transitionId: leadEdgeDistribution[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: leadEdgeDistribution[0].p
         }
       ]);
@@ -130,15 +131,20 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tr', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
-      assert.equal(length2Path.likeliestSourceText, 'tr');
-      assert.deepEqual(length2Path.sourceIdentifiers, [
+      assert.deepEqual(length2Path.inputSegments, [
         {
-          trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
+          segment: {
+            trueTransform: leadEdgeDistribution[0].sample,
+            transitionId: leadEdgeDistribution[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: leadEdgeDistribution[0].p
         }, {
-          trueTransform: tailEdgeDistribution[0].sample,
-          inputStartIndex: 0,
+          segment: {
+            trueTransform: tailEdgeDistribution[0].sample,
+            transitionId: tailEdgeDistribution[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: tailEdgeDistribution[0].p
         }
       ]);
@@ -203,15 +209,20 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(length2Path.bestExample, {text: 'tri', p: leadEdgeDistribution[0].p * tailEdgeDistribution[0].p});
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
-      assert.equal(length2Path.likeliestSourceText, 'tri');
-      assert.deepEqual(length2Path.sourceIdentifiers, [
+      assert.deepEqual(length2Path.inputSegments, [
         {
-          trueTransform: leadEdgeDistribution[0].sample,
-          inputStartIndex: 0,
+          segment: {
+            trueTransform: leadEdgeDistribution[0].sample,
+            transitionId: leadEdgeDistribution[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: leadEdgeDistribution[0].p
         }, {
-          trueTransform: tailEdgeDistribution[0].sample,
-          inputStartIndex: 0,
+          segment: {
+            trueTransform: tailEdgeDistribution[0].sample,
+            transitionId: tailEdgeDistribution[0].sample.id,
+            start: 0
+          },
           bestProbFromSet: tailEdgeDistribution[0].p
         }
       ]);

@@ -11,7 +11,7 @@ import { applyTransform, buildMergedTransform } from "@keymanapp/models-template
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
-import { SearchQuotientNode, TokenInputSource } from "./search-quotient-node.js";
+import { SearchQuotientNode, PathInputProperties } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
@@ -107,9 +107,12 @@ export class ContextToken {
       let searchModule: SearchQuotientNode = new LegacyQuotientRoot(model);
       const BASE_PROBABILITY = 1;
       textToCharTransforms(rawText).forEach((transform) => {
-        let inputMetadata: TokenInputSource = {
-          trueTransform: transform,
-          inputStartIndex: 0,
+        let inputMetadata: PathInputProperties = {
+          segment: {
+            trueTransform: transform,
+            start: 0,
+            transitionId: undefined
+          },
           bestProbFromSet: BASE_PROBABILITY
         };
         searchModule = new LegacyQuotientSpur(searchModule, [{sample: transform, p: BASE_PROBABILITY}], inputMetadata);
@@ -123,7 +126,7 @@ export class ContextToken {
    * Call this to record the original keystroke Transforms for the context range
    * corresponding to this token.
    */
-  addInput(inputSource: TokenInputSource, distribution: Distribution<Transform>) {
+  addInput(inputSource: PathInputProperties, distribution: Distribution<Transform>) {
     this._searchModule = new LegacyQuotientSpur(this._searchModule, distribution, inputSource);
   }
 
@@ -142,8 +145,8 @@ export class ContextToken {
    * Denotes the original keystroke Transforms comprising the range corresponding
    * to this token.
    */
-  get inputRange() {
-    return this.searchModule.sourceIdentifiers;
+  get inputSegments() {
+    return this.searchModule.inputSegments;
   }
 
   /**
@@ -160,11 +163,11 @@ export class ContextToken {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.searchModule.sourceIdentifiers;
+    const sources = this.searchModule.inputSegments;
 
     for(const source of sources) {
-      const i = source.inputStartIndex;
-      components.push(`T${source.trueTransform.id}${i != 0 ? '@' + i : ''}`);
+      const i = source.segment.start;
+      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
     }
 
     return components.join('+');
@@ -190,7 +193,7 @@ export class ContextToken {
     // Thus, we don't set the .isWhitespace flag field.
     const resultToken = new ContextToken(lexicalModel);
 
-    let lastSourceInput: TokenInputSource;
+    let lastSourceInput: PathInputProperties;
     let lastInputDistrib: Distribution<Transform>;
     for(const token of tokensToMerge) {
       const inputCount = token.inputCount;
@@ -201,7 +204,7 @@ export class ContextToken {
       }
 
       // Are we re-merging on a previously split transform?
-      if(lastSourceInput?.trueTransform != token.inputRange[0].trueTransform) {
+      if(lastSourceInput?.segment.trueTransform != token.inputSegments[0].segment.trueTransform) {
         if(lastSourceInput) {
           resultToken.addInput(lastSourceInput, lastInputDistrib);
         } // else:  there's nothing to add as input
@@ -230,9 +233,9 @@ export class ContextToken {
       // Ignore the last entry for now - it may need to merge with a matching
       // entry in the next token!
       for(let i = startIndex; i < inputCount - 1; i++) {
-        resultToken.addInput(token.inputRange[i], token.searchModule.inputSequence[i]);
+        resultToken.addInput(token.inputSegments[i], token.searchModule.inputSequence[i]);
       }
-      lastSourceInput = token.inputRange[inputCount-1];
+      lastSourceInput = token.inputSegments[inputCount-1];
       lastInputDistrib = token.searchModule.inputSequence[inputCount-1];
     }
 
@@ -255,7 +258,7 @@ export class ContextToken {
 
     // Build an alternate version of the transforms:  if we preprocess all deleteLefts,
     // what text remains from each?
-    const alteredSources = preprocessInputSources(this.inputRange);
+    const alteredSources = preprocessInputSources(this.inputSegments);
 
     const blankContext = { left: '', startOfBuffer: true, endOfBuffer: true };
     const splitSpecs = split.matches.slice();
@@ -311,15 +314,17 @@ export class ContextToken {
           };
         });
 
-        const priorSourceInput = overextendedToken.inputRange[lastInputIndex];
+        const priorSourceInput = overextendedToken.inputSegments[lastInputIndex];
         constructingToken.addInput(priorSourceInput, headDistribution);
         tokensFromSplit.push(constructingToken);
 
         constructingToken = new ContextToken(lexicalModel);
         backupToken = new ContextToken(constructingToken);
         constructingToken.addInput({
-          trueTransform: priorSourceInput.trueTransform,
-          inputStartIndex: priorSourceInput.inputStartIndex + extraCharsAdded,
+          segment: {
+            ...priorSourceInput.segment,
+            start: priorSourceInput.segment.start + extraCharsAdded
+          },
           bestProbFromSet: priorSourceInput.bestProbFromSet
         }, tailDistribution);
 
@@ -336,8 +341,8 @@ export class ContextToken {
 
       backupToken = new ContextToken(constructingToken);
       lenBeforeLastApply = KMWString.length(currentText.left);
-      currentText = applyTransform(alteredSources[transformIndex].trueTransform, currentText);
-      constructingToken.addInput(this.inputRange[transformIndex], this.searchModule.inputSequence[transformIndex]);
+      currentText = applyTransform(alteredSources[transformIndex].segment.trueTransform, currentText);
+      constructingToken.addInput(this.inputSegments[transformIndex], this.searchModule.inputSequence[transformIndex]);
       transformIndex++;
     }
 
@@ -345,25 +350,25 @@ export class ContextToken {
   }
 }
 
-export function preprocessInputSources(inputSources: ReadonlyArray<TokenInputSource>) {
+export function preprocessInputSources(inputSources: ReadonlyArray<PathInputProperties>) {
   const alteredSources = deepCopy(inputSources);
   let trickledDeleteLeft = 0;
   for(let i = alteredSources.length - 1; i >= 0; i--) {
     const source = alteredSources[i];
     if(trickledDeleteLeft) {
-      const insLen = KMWString.length(source.trueTransform.insert);
+      const insLen = KMWString.length(source.segment.trueTransform.insert);
       if(insLen <= trickledDeleteLeft) {
-        source.trueTransform.insert = '';
+        source.segment.trueTransform.insert = '';
         trickledDeleteLeft -= insLen;
       } else {
-        source.trueTransform.insert = KMWString.substring(source.trueTransform.insert, 0, insLen - trickledDeleteLeft);
+        source.segment.trueTransform.insert = KMWString.substring(source.segment.trueTransform.insert, 0, insLen - trickledDeleteLeft);
         trickledDeleteLeft = 0;
       }
     }
-    trickledDeleteLeft += source.trueTransform.deleteLeft;
-    source.trueTransform.deleteLeft = 0;
+    trickledDeleteLeft += source.segment.trueTransform.deleteLeft;
+    source.segment.trueTransform.deleteLeft = 0;
   }
 
-  alteredSources[0].trueTransform.deleteLeft = trickledDeleteLeft;
+  alteredSources[0].segment.trueTransform.deleteLeft = trickledDeleteLeft;
   return alteredSources;
 }
