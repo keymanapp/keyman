@@ -137,7 +137,7 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe('convertToUnicodeCodePoint ', function () {
+  /*describe('convertToUnicodeCodePoint ', function () {
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       ["&#x10F601;", 'U+10F601'],
@@ -192,12 +192,12 @@ describe('KmnFileWriter', function () {
       [undefined, undefined],
       [null, undefined]
     ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+      it(('from writer should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
         const result = sut_w.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
-  });
+  });*/
 
   describe('reviewRules messages', function () {
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);

@@ -37,7 +37,30 @@ export class KmnFileWriter {
       return null;
     }
   }
+/**
+   * @brief  member function to write data from object to a kmn file
+   * @param  data_ukelele the array holding all keyboard data
+   * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
+   * @return true if data has been written; false if not
+   */
+  public writeToFile(data_ukelele: ProcesData): boolean {
 
+    let data: string = "\n";
+
+    // add top part of kmn file: STORES
+    data += this.write_KmnFileHeader(data_ukelele);
+
+    // add bottom part of kmn file: RULES
+    data += this.writeData_Rules(data_ukelele);
+
+    try {
+      this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
+      return true;
+    } catch (err) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
+      return false;
+    }
+  }
   /**
    * @brief  member function to create data for the header (stores) that will be printed to the resulting kmn file
    * @param  data_ukelele an object containing all data read from a .keylayout file
@@ -889,7 +912,7 @@ export class KmnFileWriter {
    * @param  inputString the value that will converted
    * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
    */
-  public convertToUnicodeCharacter(inputString: string): string {
+  public convertToUnicodeCharacter_old(inputString: string): string {
 
     if ((inputString === null) || (inputString === undefined)) {
       return undefined;
@@ -929,8 +952,66 @@ export class KmnFileWriter {
     else {
       return undefined;
     }
+
+
+
+
+
+    
   }
 
+  //--------------------------------------------------------- 
+
+ public convertToUnicodeCharacter(inputString: string): string | undefined {
+
+  let m: RegExpMatchArray | null;
+
+  if ((inputString === null) || (inputString === undefined)) {
+    return undefined;
+  }
+
+  // e.g. U+0061 U+1234 U+1F60E
+  m = inputString.match(/^U\+([0-9a-f]{2,6})$/i);
+  if (m) 
+    return String.fromCodePoint(parseInt(m[1], 16));
+
+  // e.g. &#x61;  &#x1234; &#x1F60E;
+  m = inputString.match(/^&#x([0-9a-f]{2,6});$/i);
+  if (m) 
+    return String.fromCodePoint(parseInt(m[1], 16));
+
+  // e.g. &#97; &#4660; &#128518;
+  m = inputString.match(/^&#([0-9]{2,6});$/);
+  if (m) 
+    return String.fromCodePoint(parseInt(m[1], 10));
+
+  // e.g. &gt; &quot;
+  m = inputString.match(/^&([a-z]{2,4});$/i);
+  if (m) {
+    switch (inputString) {
+      case '&gt;': return '>';
+      case '&lt;': return '<';
+      case '&amp;': return '&';
+      case '&apos;': return "'";
+      case '&quot;': return '"';
+      default: return undefined;
+    }
+  }
+
+  // 'A'  or  "B" have length=1 and segment-length=1 and will be used.
+  // "ẘ"  or  "😎" have length=2 but segment-length=1 and will be used.
+  // "ab" has length=2 and segment-length=2 and will not be used.
+  else if ([...new Intl.Segmenter().segment(inputString)].length <= 1) {
+    return inputString;
+  }
+  else {
+    return undefined;
+  }
+}
+
+
+
+//---------------------------------------------------------
   /**
    * @brief  function to convert a numeric character reference to a unicode Code Point e.g. &#4660 -> U+1234;  &#x10F601 -> U+1F60E
    * @param  instr the value that will converted

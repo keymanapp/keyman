@@ -80,7 +80,7 @@ describe('kmcConvertutil', function () {
       [undefined, undefined],
       [null, undefined]
     ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+      it(('from utils should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
         const result = kmcConvertutil.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
