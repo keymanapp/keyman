@@ -6,7 +6,7 @@ import { QUEUE_NODE_COMPARATOR } from './search-quotient-spur.js';
 import { SearchNode, SearchResult } from './distance-modeler.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
-import { PathResult } from './search-quotient-node.js';
+import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
 
 export class LegacyQuotientRoot extends SearchQuotientRoot {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
@@ -57,5 +57,9 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
 
   get previousResults(): SearchResult[] {
     return this.processed.slice();
+  }
+
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
+    return [this, new LegacyQuotientRoot(this.model)];
   }
 }
