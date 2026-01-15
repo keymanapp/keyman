@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.192 alpha 2026-01-15
+
+* fix(linux): issues when running ./build.sh test:linux (#15434)
+
 ## 19.0.191 alpha 2026-01-14
 
 * maint(linux): remove EOL Ubuntu 25.04 Plucky (#15423)
