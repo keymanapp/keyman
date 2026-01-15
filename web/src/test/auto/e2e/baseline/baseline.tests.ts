@@ -3,7 +3,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { expect, test, /*expect, Page, Locator */} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { KmxTestSource } from './kmxTestSource.js';
 import { pressKeys } from './keyHandling';
 
