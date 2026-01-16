@@ -157,7 +157,22 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
   }
 
-  /** Allows the base class to construct instances of the derived class. */
+  /**
+   * Allows construction of new spur instances matching this spur's edge type.
+   *
+   * Target use cases:
+   * - `SearchQuotientNode.split()`
+   *     - an edge may need to be split into two parts
+   *     - edges may need to be recreated on a shortened search path (for the
+   *       split's right-hand side)
+   * - `SearchQuotientNode.merge()`
+   *     - two parts may need to be recombined into a single edge
+   *     - edges from the 'right-hand side' may need to be recreated on the
+   *       left-hand side for the merged quotient path
+   * @param parentNode
+   * @param inputs
+   * @param inputSource
+   */
   abstract construct(
     parentNode: SearchQuotientNode,
     inputs: Distribution<Transform>,
