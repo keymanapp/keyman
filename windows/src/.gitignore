@@ -7,9 +7,13 @@
 **/obj/Win32/
 **/obj/Win64/
 **/obj/x64/
+**/obj/arm64/
+**/obj/ARM64EC/
 **/bin/Win32/
 **/bin/Win64/
 **/bin/x64/
+**/bin/arm64/
+**/bin/ARM64EC/
 
 # Temporary build files for VC++
 **/*.FileListAbsolute.txt
@@ -17,7 +21,7 @@
 # These files are generated during build
 engine/keyman32/KEYMAN32.res
 engine/keyman32/Keyman64.res
-engine/keymanx64/keymanx64.res
+engine/keymanhp/keymanx64.res
 engine/mcompile/Release/
 tds_file.txt
 global/delphi/cust/MessageIdentifierConsts.pas

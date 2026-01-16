@@ -117,9 +117,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Luggat chatta dakhalo</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Ajubdal keyboard ley badalan tula</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Barrumal shu\'ul ley badalan shaba binshaf</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Ajubdal keyboard ley badalan tula. Barrumal shu\'ul ley badalan shaba binshaf.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Eingalab ley shaba gabul</string>
   <!-- Context: Keyman Web Browser -->
