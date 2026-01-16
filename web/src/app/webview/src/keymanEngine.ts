@@ -1,4 +1,4 @@
-import { DeviceSpec, DefaultRules, ProcessorAction } from 'keyman/engine/keyboard';
+import { DeviceSpec, DefaultOutputRules, ProcessorAction } from 'keyman/engine/keyboard';
 import { KeymanEngineBase, KeyboardInterfaceBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
@@ -35,7 +35,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
         // The `engine` parameter cannot be supplied with the constructing instance before calling
         // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
         keyboardInterface: new KeyboardInterfaceBase(window, engine, config.stubNamespacer),
-        defaultOutputRules: new DefaultRules()
+        defaultOutputRules: new DefaultOutputRules()
       };
     });
 

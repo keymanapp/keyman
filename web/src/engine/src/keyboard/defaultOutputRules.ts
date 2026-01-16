@@ -22,9 +22,9 @@ export class LogMessages {
 /**
  * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
  */
-export class DefaultRules {
-  codeForEvent(Lkc: KeyEvent) {
-    return Codes.keyCodes[Lkc.kName] || Lkc.Lcode;;
+export class DefaultOutputRules {
+  protected codeForEvent(Lkc: KeyEvent) {
+    return Codes.keyCodes[Lkc.kName] || Lkc.Lcode;
   }
 
   /**
@@ -32,7 +32,7 @@ export class DefaultRules {
    * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
    */
   public forAny(Lkc: KeyEvent, isMnemonic: boolean, logMessages?: LogMessages): string {
-    var char = '';
+    let char = '';
 
     // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
     if((char = this.forSpecialEmulation(Lkc)) != null) {
@@ -48,7 +48,7 @@ export class DefaultRules {
       // // Not originally defined for text output within defaultKeyOutput.
       // // We can't enable it yet, as it'll cause hardware keystrokes in the DOM to output '\t' rather
       // // than rely on the browser-default handling.
-      let code = this.codeForEvent(Lkc);
+      const code = this.codeForEvent(Lkc);
       switch(code) {
       //   case Codes.keyCodes['K_TAB']:
       //   case Codes.keyCodes['K_TABBACK']:
@@ -64,7 +64,7 @@ export class DefaultRules {
    * isCommand - returns a boolean indicating if a non-text event should be triggered by the keystroke.
    */
   public isCommand(Lkc: KeyEvent): boolean {
-    let code = this.codeForEvent(Lkc);
+    const code = this.codeForEvent(Lkc);
 
     switch(code) {
       // Should we ever implement them:
@@ -115,7 +115,7 @@ export class DefaultRules {
    * for 'synthetic' `TextStore`s like `SyntheticTextStore`s, which have no default text handling.
    */
   public forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
-    let code = this.codeForEvent(Lkc);
+    const code = this.codeForEvent(Lkc);
 
     switch(code) {
       case Codes.keyCodes['K_BKSP']:
@@ -141,13 +141,13 @@ export class DefaultRules {
     // Translate numpad keystrokes into their non-numpad equivalents
     if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"]) {
       // Number pad, numlock on
+      let Lch: number;
       if(Lkc.Lcode < 106) {
-        var Lch = Lkc.Lcode-48;
+        Lch = Lkc.Lcode-48;
       } else {
         Lch = Lkc.Lcode-64;
       }
-      let ch = String.fromCodePoint(Lch);
-      return ch;
+      return String.fromCodePoint(Lch);
     } else {
       return null;
     }
@@ -166,7 +166,7 @@ export class DefaultRules {
 
     let result = '';
     const codePoints = keyName.substr(2).split('_');
-    for(let codePoint of codePoints) {
+    for(const codePoint of codePoints) {
       const codePointValue = parseInt(codePoint, 16);
       if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || isNaN(codePointValue)) {
         // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
@@ -181,13 +181,13 @@ export class DefaultRules {
         result += String.fromCodePoint(codePointValue);
       }
     }
-    return result ? result : null;
+    return result ||  null;
   }
 
   // Test for otherwise unimplemented keys on the the base default & shift layers.
   // Those keys must be blocked by keyboard rules if intentionally unimplemented; otherwise, this function will trigger.
   public forBaseKeys(Lkc: KeyEvent, logMessages?: LogMessages) {
-    let n = Lkc.Lcode;
+    const n = Lkc.Lcode;
     let keyShiftState = Lkc.Lmodifiers;
 
     // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.

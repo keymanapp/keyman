@@ -72,8 +72,13 @@ Note that for JS-keyboards, in 18.0 and before the true keystroke is processed a
 
 #### Keystroke-default emulation
 
-Note that browser-default keystroke processing is defined within the `DefaultRules` class found at [web/src/engine/keyboard/src/defaultRules.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/defaultRules.ts).  It currently produces a (possibly `null`) string output rather than a `ProcessorAction`, but the latter can be easily constructed based on the returned string and the existing context state.
-- For `epic/web-core`, it may be wise to spin the `DefaultRules` component off as its own processor, serving as a backup for _all_ keystroke processing variants.
+Note that browser-default keystroke processing is defined within the `DefaultOutputRules` class
+found at
+[web/src/engine/keyboard/src/defaultOutputRules.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/keyboard/src/defaultOutputRules.ts).
+It currently produces a (possibly `null`) string output rather than a `ProcessorAction`, but the
+latter can be easily constructed based on the returned string and the existing context state.
+- For `epic/web-core`, it may be wise to spin the `DefaultOutputRules` component off as its own
+  processor, serving as a backup for _all_ keystroke processing variants.
 
 ----
 
