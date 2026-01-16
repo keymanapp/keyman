@@ -9,7 +9,7 @@
 import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
-  Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
+  Codes, type JSKeyboard, KeyEvent, Layouts,
   DefaultOutputRules, EmulationKeystrokes, type MutableSystemStore,
   TextStore, ProcessorAction, SystemStoreIDs, SyntheticTextStore,
   KeyboardProcessor,
@@ -17,17 +17,12 @@ import {
   BeepHandler,
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
-import { DeviceSpec, globalObject, KMWString } from "keyman/common/web-utils";
+import { DeviceSpec, KMWString } from "keyman/common/web-utils";
+import { ProcessorInitOptions } from './processorInitOptions.js';
 
 // #endregion
 
 export type LogMessageHandler = (str: string) => void;
-
-export interface ProcessorInitOptions {
-  baseLayout: string;
-  keyboardInterface?: JSKeyboardInterface; // for tests, replace keyboardInterface with a mock, TODO-web-core: refactor into a unit test pattern
-  defaultOutputRules: DefaultOutputRules; // Takes the class def object, not an instance thereof.
-}
 
 export class JSKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
 
@@ -68,7 +63,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     this.contextDevice = device;
 
     this.baseLayout = options.baseLayout;
-    this.keyboardInterface = options.keyboardInterface || new JSKeyboardInterface(globalObject(), MinimalKeymanGlobal);
+    this.keyboardInterface = options.keyboardInterface;
     this.defaultOutputRules = options.defaultOutputRules;
   }
 

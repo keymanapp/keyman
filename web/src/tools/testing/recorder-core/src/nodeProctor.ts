@@ -57,9 +57,9 @@ export class NodeProctor extends Proctor {
     // Establish a fresh processor, setting its keyboard appropriately for the test.
     const processor = new JSKeyboardProcessor(this.device, {
       baseLayout: 'us',
+      keyboardInterface: this.keyboardWithHarness as JSKeyboardInterface,
       defaultOutputRules: new DefaultOutputRules()
     });
-    processor.keyboardInterface = this.keyboardWithHarness as JSKeyboardInterface;
     const keyboard = processor.activeKeyboard;
 
     if(sequence instanceof RecordedKeystrokeSequence) {
