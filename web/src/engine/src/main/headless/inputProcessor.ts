@@ -18,8 +18,7 @@ import {
   type Alternate,
   type Keyboard,
   type KeyEvent,
-  KeyboardProcessor,
-  DefaultOutputRules
+  KeyboardProcessor
 } from "keyman/engine/keyboard";
 import {
   JSKeyboardProcessor,
@@ -31,11 +30,6 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { WorkerFactory } from "@keymanapp/lexical-model-layer";
 
 export class InputProcessor {
-  public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
-    baseLayout: 'us',
-    defaultOutputRules: new DefaultOutputRules()
-  }
-
   /**
    * Indicates the device (platform) to be used for non-keystroke events,
    * such as those sent to `begin postkeystroke` and `begin newcontext`
@@ -50,13 +44,9 @@ export class InputProcessor {
 
   private readonly contextCache = new TranscriptionCache();
 
-  constructor(device: DeviceSpec, predictiveWorkerFactory: WorkerFactory, options?: ProcessorInitOptions) {
+  constructor(device: DeviceSpec, predictiveWorkerFactory: WorkerFactory, options: ProcessorInitOptions) {
     if(!device) {
       throw new Error('device must be defined');
-    }
-
-    if(!options) {
-      options = InputProcessor.DEFAULT_OPTIONS;
     }
 
     this.contextDevice = device;
