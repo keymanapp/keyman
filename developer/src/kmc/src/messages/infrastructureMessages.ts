@@ -197,5 +197,10 @@ export class InfrastructureMessages {
     `Failed to generate new project '${def(o.id)}'.`,
   )});
 
+  static ERROR_InvalidTargetVersion = SevError | 0x0029;
+  static Error_InvalidTargetVersion = (o:{targetVersion:string}) => m(
+    this.ERROR_InvalidTargetVersion,
+    `Target version parameter '${def(o.targetVersion)}' is not a valid Keyman version.`,
+  );
 }
 
