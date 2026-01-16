@@ -21,7 +21,7 @@ describe('model-info-compiler', function () {
 
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(kpsFilename) ?? {};
     const modelFileName = makePathToFixture('sil.cmo.bw', 'build', 'sil.cmo.bw.model.js');
 
     const sources = {
