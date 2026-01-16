@@ -2,7 +2,9 @@
 // Microsoft Visual C++ generated include file.
 // Used by Editor.rc
 
-#define IDS_APP_TITLE     103
+#define IDS_APP_TITLE_X86 103
+#define IDS_APP_TITLE_X64 104
+#define IDS_APP_TITLE_ARM64 105
 
 #define IDR_MAINFRAME     128
 #define IDD_EDITOR_DIALOG 102

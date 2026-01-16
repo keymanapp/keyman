@@ -264,7 +264,7 @@
   </div>
 
   <div id='addPlatformDialog' title='Add platform'>
-    <form>
+    <form id='addPlatformForm'>
       <fieldset>
         Platform: <select id='selAddPlatform'></select>
       </fieldset>
@@ -276,7 +276,7 @@
   </div>
 
   <div id='addLayerDialog' title='Add layer'>
-    <form>
+    <form id='addLayerForm'>
       <fieldset>
         <label for='addLayerList'>Modifier-based layer:</label> <select id='addLayerList'></select><br />
       </fieldset>
@@ -292,7 +292,7 @@
   </div>
 
   <div id='viewOptionsDialog' title='View options'>
-    <form>
+    <form id='viewOptionsForm'>
       <fieldset>
         <div>By default, only common modifiers are shown in the modifier lists. If
           access to more unusual modifier combinations are required, check this option.<br/><br/>
@@ -305,7 +305,7 @@
   </div>
 
   <div id='platformPropertiesDialog' title='Platform properties'>
-    <form>
+    <form id='platformPropertiesForm'>
       <fieldset>
         <div>Displays the underlying keyboard label on top-left of the key<br/><br/></div>
         <input type='checkbox' id='chkDisplayUnderlying'/>
@@ -337,7 +337,7 @@
   </div>
 
   <div id='layerPropertiesDialog' title='Layer properties'>
-    <form>
+    <form id='layerPropertiesForm'>
       <fieldset>
         Name: <input type='text' id='layerName' size='16' maxlength='64' />
       </fieldset>
