@@ -85,10 +85,15 @@ export default {
       files: ['web/build/test/dom/cases/keyboard-storage/**/*.tests.mjs']
     },
     {
+      name: 'engine/main',
+      // Relative, from the containing package.json
+      files: ['web/build/test/dom/cases/main/**/*.tests.mjs']
+    },
+    {
       name: 'engine/osk',
       // Relative, from the containing package.json
       files: ['web/build/test/dom/cases/osk/**/*.tests.mjs']
-    }
+    },
   ],
   middleware: [
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.
