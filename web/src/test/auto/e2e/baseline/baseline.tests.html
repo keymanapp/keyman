@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>KeymanWeb Baseline Tests</title>
+
+    <!-- Insert uncompiled KeymanWeb source scripts -->
+    <script src="../../../../../build/publish/debug/keymanweb.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+        const searchParams = new URLSearchParams(window.location.search);
+        const keyboard = {
+          id: searchParams.get('id'),
+          name: 'Test Keyboard',
+          languages: { id: 'en', name: 'English' },
+          filename: searchParams.get('keyboard')
+        };
+        // allow to wait on KMW being fully initialized
+        window.KmwLoaded = new Promise((resolve) => {
+          window.addEventListener('load', async function () {
+            await keyman.init();
+            await keyman.addKeyboards(keyboard);
+            resolve(true);
+          });
+        });
+    </script>
+  </head>
+
+  <body>
+    <h2>KeymanWeb Baseline Tests</h2>
+
+    <div>
+      <div id='KeymanWebControl'></div>
+      <textarea id='inputarea' class='test' placeholder='Type here'></textarea>
+    </div>
+
+    <!-- include a blank div to enable scrolling -->
+    <div style="height:1000px"></div>
+    <p>--End of Document--</p>
+  </body>
+</html>

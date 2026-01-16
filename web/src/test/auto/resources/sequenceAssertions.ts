@@ -5,7 +5,7 @@ import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import { assertingPromiseStatus as promiseStatus } from './assertingPromiseStatus.js';
 
-import { GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { GestureSource, gestures } from 'keyman/engine/gesture-processor';
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?
@@ -13,7 +13,7 @@ const { GestureSequence, GestureStageReport } = matchers;
 type GestureSequence<Type> = gestures.matchers.GestureSequence<Type>;
 type GestureStageReport<Type> = gestures.matchers.GestureStageReport<Type>;
 
-import { ManagedPromise } from '@keymanapp/web-utils';
+import { ManagedPromise } from 'keyman/common/web-utils';
 
 export interface StageReportAssertion<Type> {
   matchedId: string,

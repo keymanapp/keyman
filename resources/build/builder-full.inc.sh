@@ -14,7 +14,7 @@ set -eu
 # Prevents 'clear' on exit of mingw64 bash shell
 SHLVL=0
 
-function _builder_full_not_a_builder_script() {
+function __builder_full_not_a_builder_script() {
   if ! _builder_has_function_been_called builder_describe; then
     builder_echo warning "builder_describe was never called; script is not a valid builder script"
     exit 1
@@ -25,7 +25,7 @@ function _builder_full_not_a_builder_script() {
   fi
 }
 
-trap _builder_full_not_a_builder_script exit
+trap __builder_full_not_a_builder_script exit
 
 # This will also import /resources/builder.inc.sh
 . "${BASH_SOURCE[0]%/*}/builder-basic.inc.sh"

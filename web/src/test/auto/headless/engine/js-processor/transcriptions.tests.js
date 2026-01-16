@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
-import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/js-processor';
-import { KMWString } from '@keymanapp/web-utils';
+import { SyntheticTextStore, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
+import { KMWString } from 'keyman/common/web-utils';
 
 // A unicode-coding like alias for use in constructing non-BMP strings.
 const u = String.fromCodePoint;
@@ -154,44 +154,45 @@ describe("Transcriptions and Transforms", function() {
   // Built in-line via function.  Looks functionally equivalent to "apple", but with non-BMP characters.
   let smpApple = u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be);
 
-  it("does not store an alias for related OutputTargets", function() {
-    // We have other texts validating Mocks; by using them as our base 'element', this unit test file
-    // could eventually run in 'headless' mode.
-    var target = new Mock("apple");
-    var original = Mock.from(target);
-    target.insertTextBeforeCaret("s");
+  it("does not store an alias for related TextStores", function() {
+    // We have other texts validating SyntheticTextStores; by using them
+    // as our base 'element', this unit test file could eventually run
+    // in 'headless' mode.
+    const textStore = new SyntheticTextStore("apple");
+    const originalTextStore = SyntheticTextStore.from(textStore);
+    textStore.insertTextBeforeCaret("s");
 
     /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
      * Other modules coming later will need it, though.
      */
-    var transcription = target.buildTranscriptionFrom(original, null);
+    const transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
-    assert.notEqual(transcription.preInput, original, "The transcription's input snapshot is an alias");
-    assert.notEqual(transcription.preInput, target, "The transcription's input snapshot is an alias");
+    assert.notEqual(transcription.preInput, originalTextStore, "The transcription's input snapshot is an alias");
+    assert.notEqual(transcription.preInput, textStore, "The transcription's input snapshot is an alias");
   })
 
   describe("Plain text operations", function() {
     it("handles context-free single-char output rules", function() {
-      // We have other texts validating Mocks; by using them as our base 'element', this unit test file
+      // We have other texts validating SyntheticTextStores; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
-      var target = new Mock("apple");
-      var original = Mock.from(target);
-      target.insertTextBeforeCaret("s");
+      const textStore = new SyntheticTextStore("apple");
+      const originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.insertTextBeforeCaret("s");
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
       * Other modules coming later will need it, though.
       */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      let transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "s", "Failed to recognize inserted text");
       assert.equal(transcription.transform.deleteLeft, 0, "Incorrectly detected left-of-caret deletions");
       assert.equal(transcription.transform.deleteRight, 0, "Incorrectly detected right-of-caret deletions");
 
-      target = new Mock("apple", 3);
-      original = Mock.from(target);
-      target.insertTextBeforeCaret("s"); // "appsle"
+      textStore = new SyntheticTextStore("apple", 3);
+      originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.insertTextBeforeCaret("s"); // "appsle"
 
-      var transcription = target.buildTranscriptionFrom(original, null);
+      transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "s", "Failed to recognize inserted text when right-of-caret text exists");
       assert.equal(transcription.transform.deleteLeft, 0);
@@ -199,16 +200,16 @@ describe("Transcriptions and Transforms", function() {
     });
 
     it("handles operations with moderately long text", function() {
-      var target = new Mock("The quick brown cat jumped onto the lazy dog.", 19);
-      var original = Mock.from(target);
-      target.setSelection(30); // 19 + 11:  moves it to after "onto".
-      target.deleteCharsBeforeCaret(14); // delete:  "cat jumped onto"
-      target.insertTextBeforeCaret("fox jumped over");
+      const textStore = new SyntheticTextStore("The quick brown cat jumped onto the lazy dog.", 19);
+      const originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.setSelection(30); // 19 + 11:  moves it to after "onto".
+      textStore.deleteCharsBeforeCaret(14); // delete:  "cat jumped onto"
+      textStore.insertTextBeforeCaret("fox jumped over");
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
       * Other modules coming later will need it, though.
       */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      const transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "fox jumped over", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 3, "Incorrect count for left-of-caret deletions");
@@ -228,15 +229,15 @@ he did. Unfortunately, he taught his apprentice everything he knew, then his
 apprentice killed him in his sleep. It's ironic he could save others from death,
 but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
-      var target = new Mock(text, text.length);
-      var original = Mock.from(target);
-      target.deleteCharsBeforeCaret(1);
-      target.insertTextBeforeCaret("!");
+      const textStore = new SyntheticTextStore(text, text.length);
+      const originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.deleteCharsBeforeCaret(1);
+      textStore.insertTextBeforeCaret("!");
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
       * Other modules coming later will need it, though.
       */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      const transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "!", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -244,15 +245,15 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     });
 
     it("handles deletions around the caret without text insertion", function() {
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
-      target.setSelection(3);
-      target.deleteCharsBeforeCaret(2); // "ale"
+      const textStore = new SyntheticTextStore("apple", 2);
+      const originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.setSelection(3);
+      textStore.deleteCharsBeforeCaret(2); // "ale"
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
       * Other modules coming later will need it, though.
       */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      const transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -262,15 +263,15 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     it("handles deletions around the caret without text insertion (non-BMP text)", function() {
       try {
         KMWString.enableSupplementaryPlane(true);
-        var target = new Mock(smpApple, 2);
-        var original = Mock.from(target);
-        target.setSelection(3);
-        target.deleteCharsBeforeCaret(2); // "ale"
+        const textStore = new SyntheticTextStore(smpApple, 2);
+        const originalTextStore = SyntheticTextStore.from(textStore);
+        textStore.setSelection(3);
+        textStore.deleteCharsBeforeCaret(2); // "ale"
 
         /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
         * Other modules coming later will need it, though.
         */
-        var transcription = target.buildTranscriptionFrom(original, null);
+        const transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
         assert.equal(transcription.transform.insert, "", "Reported inserted text when only deletions exist");
         assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -281,18 +282,18 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     });
 
     it("handles deletions around the caret with text insertion", function() {
-      // We have other texts validating Mocks; by using them as our base 'element', this unit test file
+      // We have other texts validating SyntheticTextStores; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
-      target.setSelection(3);
-      target.deleteCharsBeforeCaret(2);
-      target.insertTextBeforeCaret("PP"); // "aPPle"
+      let textStore = new SyntheticTextStore("apple", 2);
+      let originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.setSelection(3);
+      textStore.deleteCharsBeforeCaret(2);
+      textStore.insertTextBeforeCaret("PP"); // "aPPle"
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
       * Other modules coming later will need it, though.
       */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      let transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "PP", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -300,16 +301,16 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       // CASE 2
 
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
-      target.setSelection(4);
-      target.deleteCharsBeforeCaret(3);
-      target.insertTextBeforeCaret("P"); // "aPe"
+      textStore = new SyntheticTextStore("apple", 2);
+      originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.setSelection(4);
+      textStore.deleteCharsBeforeCaret(3);
+      textStore.insertTextBeforeCaret("P"); // "aPe"
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
       * Other modules coming later will need it, though.
       */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "P", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -317,16 +318,16 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       // CASE 3
 
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
-      target.setSelection(4);
-      target.deleteCharsBeforeCaret(3);
-      target.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
+      textStore = new SyntheticTextStore("apple", 2);
+      originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.setSelection(4);
+      textStore.deleteCharsBeforeCaret(3);
+      textStore.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
       * Other modules coming later will need it, though.
       */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "aaaaaaaaaaaaaa", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -334,18 +335,18 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       // CASE 4
 
-      var target = new Mock("apple", 2);
-      var original = Mock.from(target);
-      target.setSelection(5);
-      target.deleteCharsBeforeCaret(4);
-      target.insertTextBeforeCaret("les"); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
+      textStore = new SyntheticTextStore("apple", 2);
+      originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.setSelection(5);
+      textStore.deleteCharsBeforeCaret(4);
+      textStore.insertTextBeforeCaret("les"); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
         * Other modules coming later will need it, though.
         */
-      var transcription = target.buildTranscriptionFrom(original, null);
+      transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
-      // Again, while the "le" portion is original text, the appended "s" means it must have been re-inserted.
+      // Again, while the "le" portion is originalTextStore text, the appended "s" means it must have been re-inserted.
       assert.equal(transcription.transform.insert, "les", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
       assert.equal(transcription.transform.deleteRight, 3, "Incorrect count for right-of-caret deletions");
@@ -355,21 +356,21 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       try {
         KMWString.enableSupplementaryPlane(true);
 
-        // We have other texts validating Mocks; by using them as our base 'element', this unit test file
+        // We have other texts validating SyntheticTextStores; by using them as our base 'element', this unit test file
         // could eventually run in 'headless' mode.
-        var target = new Mock(smpApple, 2);
+        let textStore = new SyntheticTextStore(smpApple, 2);
         let smpLE = u(0x1d5c5)+u(0x1d5be);
-        var original = Mock.from(target);
-        target.setSelection(3);
-        target.deleteCharsBeforeCaret(2);
-        target.insertTextBeforeCaret(smpLE); // "alele"
+        let originalTextStore = SyntheticTextStore.from(textStore);
+        textStore.setSelection(3);
+        textStore.deleteCharsBeforeCaret(2);
+        textStore.insertTextBeforeCaret(smpLE); // "alele"
 
         /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
         * Other modules coming later will need it, though.
         *
         * This will trigger the "step 1.2" component of buildTransformFrom.
         */
-        var transcription = target.buildTranscriptionFrom(original, null);
+        let transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
         assert.equal(transcription.transform.insert, smpLE, "Reported inserted text when only deletions exist");
         assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -377,17 +378,17 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         // CASE 2
 
-        var target = new Mock(smpApple, 2);
+        textStore = new SyntheticTextStore(smpApple, 2);
         let smpB = u(0x1d5bb);
-        var original = Mock.from(target);
-        target.setSelection(4);
-        target.deleteCharsBeforeCaret(3);
-        target.insertTextBeforeCaret(smpB); // "aPe"
+        originalTextStore = SyntheticTextStore.from(textStore);
+        textStore.setSelection(4);
+        textStore.deleteCharsBeforeCaret(3);
+        textStore.insertTextBeforeCaret(smpB); // "aPe"
 
         /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
         * Other modules coming later will need it, though.
         */
-        var transcription = target.buildTranscriptionFrom(original, null);
+        transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
         assert.equal(transcription.transform.insert, smpB, "Reported inserted text when only deletions exist");
         assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -395,16 +396,16 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         // CASE 3
 
-        var target = new Mock(smpApple, 2);
-        var original = Mock.from(target);
-        target.setSelection(4);
-        target.deleteCharsBeforeCaret(3);
-        target.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
+        textStore = new SyntheticTextStore(smpApple, 2);
+        originalTextStore = SyntheticTextStore.from(textStore);
+        textStore.setSelection(4);
+        textStore.deleteCharsBeforeCaret(3);
+        textStore.insertTextBeforeCaret("aaaaaaaaaaaaaa"); // "aaaaaaaaaaaaaaae"
 
         /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
         * Other modules coming later will need it, though.
         */
-        var transcription = target.buildTranscriptionFrom(original, null);
+        transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
         assert.equal(transcription.transform.insert, "aaaaaaaaaaaaaa", "Reported inserted text when only deletions exist");
         assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
@@ -412,19 +413,19 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
         // CASE 4
 
-        var target = new Mock(smpApple, 2);
+        textStore = new SyntheticTextStore(smpApple, 2);
         let smpLES = u(0x1d5c5)+u(0x1d5be)+u(0x1d5cb);
-        var original = Mock.from(target);
-        target.setSelection(5);
-        target.deleteCharsBeforeCaret(4);
-        target.insertTextBeforeCaret(smpLES); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
+        originalTextStore = SyntheticTextStore.from(textStore);
+        textStore.setSelection(5);
+        textStore.deleteCharsBeforeCaret(4);
+        textStore.insertTextBeforeCaret(smpLES); // "ales" - since we've appended a letter at the very end, the whole right-hand is indeed an insertion.
 
         /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
           * Other modules coming later will need it, though.
           */
-        var transcription = target.buildTranscriptionFrom(original, null);
+        transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
-        // Again, while the "le" portion is original text, the appended "s" means it must have been re-inserted.
+        // Again, while the "le" portion is originalTextStore text, the appended "s" means it must have been re-inserted.
         assert.equal(transcription.transform.insert, smpLES, "Reported inserted text when only deletions exist");
         assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
         assert.equal(transcription.transform.deleteRight, 3, "Incorrect count for right-of-caret deletions");
@@ -433,14 +434,14 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       }
     });
 
-    it('from targets with existing selection', () => {
+    it('from textStores with existing selection', () => {
       //                              |            |
-      const target = new Mock("testing testing one two three");
-      target.setSelection(8, 20)
-      const original = Mock.from(target);
-      target.clearSelection();
+      const textStore = new SyntheticTextStore("testing testing one two three");
+      textStore.setSelection(8, 20)
+      const originalTextStore = SyntheticTextStore.from(textStore);
+      textStore.clearSelection();
 
-      const transform = target.buildTransformFrom(original);
+      const transform = textStore.textStore(originalTextStore);
       assert.deepEqual(transform, {
         insert: '',
         deleteLeft: 0,
@@ -449,10 +450,10 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       });
     });
 
-    it('to targets with existing selection', () => {
+    it('to textStore with existing selection', () => {
       //                              |            |
-      const target = new Mock("testing testing one two three");
-      target.setSelection(8, 20)
+      const textStore = new SyntheticTextStore("testing testing one two three");
+      textStore.setSelection(8, 20)
       const transform = {
         insert: '',
         deleteLeft: 0,
@@ -460,8 +461,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         erasedSelection: true
       };
 
-      target.apply(transform);
-      assert.equal(target.getText(), 'testing two three');
+      textStore.apply(transform);
+      assert.equal(textStore.getText(), 'testing two three');
     });
   });
 
@@ -469,29 +470,29 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     // Just one, less nuanced/subdivided; it's not a present priority for our work, but it should provide a decent basis if/when it's needed.
     it("Correctly recognizes deadkey set mutations", function() {
 
-      // We have other texts validating Mocks; by using them as our base 'element', this unit test file
+      // We have other texts validating SyntheticTextStores; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
-      var target = new Mock("apple");
-      var original = Mock.from(target);
+      var textStore = new SyntheticTextStore("apple");
+      var originalTextStore = SyntheticTextStore.from(textStore);
 
-      target.setSelection(4);
-      target.insertDeadkeyBeforeCaret(0);
-      target.setSelection(1);
-      target.insertDeadkeyBeforeCaret(1);
-      target.setSelection(2);
-      target.insertDeadkeyBeforeCaret(2); // 'a' dk(1) 'p' dk(2) | 'p' 'l' dk(0) 'e'
+      textStore.setSelection(4);
+      textStore.insertDeadkeyBeforeCaret(0);
+      textStore.setSelection(1);
+      textStore.insertDeadkeyBeforeCaret(1);
+      textStore.setSelection(2);
+      textStore.insertDeadkeyBeforeCaret(2); // 'a' dk(1) 'p' dk(2) | 'p' 'l' dk(0) 'e'
 
-      var original = Mock.from(target);
+      var originalTextStore = SyntheticTextStore.from(textStore);
 
-      target.hasDeadkeyMatch(0, 2);
-      target.deadkeys().deleteMatched();
+      textStore.hasDeadkeyMatch(0, 2);
+      textStore.deadkeys().deleteMatched();
 
-      target.setSelection(3);
-      target.deleteCharsBeforeCaret(2);
-      target.insertTextBeforeCaret("b");
-      target.insertDeadkeyBeforeCaret(3); // In effect: 'a' dk(1) 'b' dk(3) | 'l' dk(0) 'e'
+      textStore.setSelection(3);
+      textStore.deleteCharsBeforeCaret(2);
+      textStore.insertTextBeforeCaret("b");
+      textStore.insertDeadkeyBeforeCaret(3); // In effect: 'a' dk(1) 'b' dk(3) | 'l' dk(0) 'e'
 
-      var transcription = target.buildTranscriptionFrom(original, null);
+      var transcription = textStore.buildTranscriptionFrom(originalTextStore, null);
 
       assert.equal(transcription.transform.insert, "b", "Reported inserted text when only deletions exist");
       assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");

@@ -2,13 +2,13 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,
   DefaultRules,
-  type KeyEvent
+  type KeyEvent,
+  type TextStore
 } from 'keyman/engine/keyboard';
-import { type OutputTarget } from 'keyman/engine/js-processor';
 
-import ContextManager from './contextManager.js';
+import { ContextManager } from './contextManager.js';
 
-export default class DefaultBrowserRules extends DefaultRules {
+export class DefaultBrowserRules extends DefaultRules {
   private contextManager: ContextManager;
 
   constructor(contextManager: ContextManager) {
@@ -30,21 +30,21 @@ export default class DefaultBrowserRules extends DefaultRules {
   }
 
   /**
-   * applyCommand - used when a RuleBehavior represents a non-text "command" within the Engine.
+   * applyCommand - used when a ProcessorAction represents a non-text "command" within the Engine.
    */
-  applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
+  applyCommand(Lkc: KeyEvent, textStore: TextStore): void {
     const code = this.codeForEvent(Lkc);
 
     const moveToNext = (back: boolean) => {
       const contextManager = this.contextManager;
-      const activeElement = contextManager.activeTarget?.getElement();
+      const activeElement = contextManager.activeTextStore?.getElement();
       const nextElement = contextManager.page.findNeighboringInput(activeElement, back);
       nextElement?.focus();
     }
 
     switch(code) {
       // This method will be handled between `ContextManager` and PageContextAttachment:
-      // pageContextAttachment.findNeighboringInput(contextManager.activeTarget.getElement(), <same flag>)
+      // pageContextAttachment.findNeighboringInput(contextManager.activeTextStore.getElement(), <same flag>)
       case Codes.keyCodes['K_TAB']:
         moveToNext((Lkc.Lmodifiers & ModifierKeyConstants.K_SHIFTFLAG) != 0);
         break;
@@ -56,6 +56,6 @@ export default class DefaultBrowserRules extends DefaultRules {
         break;
     }
 
-    super.applyCommand(Lkc, outputTarget);
+    super.applyCommand(Lkc, textStore);
   }
 }

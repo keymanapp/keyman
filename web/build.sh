@@ -9,42 +9,39 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # ################################ Main script ################################
 
 builder_set_child_base src
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   \
+  "@/common/tools/es-bundling        build" \
   "@/resources/tools/check-markdown  test:help" \
   \
   "clean" \
   "configure" \
   "build" \
+  "start                     Starts the test server" \
   "test" \
-  "coverage                  Create an HTML page with code coverage" \
-  ":app/browser              The form of Keyman Engine for Web for use on websites" \
-  ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
-  ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
-  ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
-  ":engine/common/web-utils  Low-level, headless utility methods and classes used across multiple modules" \
-  ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
-  ":engine/events            Specialized classes utilized to support KMW API events" \
-  ":engine/element-wrappers  Subset used to integrate with website elements" \
-  ":engine/interfaces        Subset used to configure KMW" \
-  ":engine/js-processor      Build JS processor for KMW" \
-  ":engine/keyboard          Builds KMW's keyboard-loading and caching code" \
-  ":engine/keyboard-storage  Subset used to collate keyboards and request them from the cloud" \
-  ":engine/main              Builds all common code used by KMW's app/-level targets" \
-  ":engine/osk               Builds the Web OSK module" \
-  ":engine/predictive-text   Builds KMW's predictive text module" \
+  "coverage                  Create an HTML page with code coverage report" \
+  \
+  ":app/browser              KeymanWeb build for use on websites" \
+  ":app/webview              KeymanWeb build for embedding in Keyman for Android and Keyman for iOS" \
+  ":app/ui                   KeymanWeb desktop form-factor keyboard-selection UI modules" \
+  ":common/web-utils         Shared utils" \
+  ":engine                   Keyman Engine for Web" \
   ":help                     Online documentation" \
-  ":samples                  Builds all needed resources for the KMW sample-page set" \
-  ":tools                    Builds engine-related development resources" \
+  ":samples                  Resources for the KMW sample-page set" \
+  ":tools/building           Build tools" \
+  ":tools/testing            Test tools" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
-  ":_all                     (Meta build target used when targets are not specified)"
-
-# Possible TODO?
-# "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
+  ":_all                     (Meta build target used when targets are not specified)" \
+  \
+  "--test-dom-only           For test, run only DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
+  "--test-integrated-only    For test, run only KMW's integration test suite" \
+  "--test-e2e-only           For test, run only KMW's end-to-end test suite" \
+  "--test-inspect            For test, run browser-based unit tests in an inspectable mode"
 
 builder_parse "$@"
 
@@ -55,43 +52,26 @@ fi
 
 builder_describe_outputs \
   configure                     "/node_modules" \
-  build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.tests.html" \
+  build                         "/web/build/test/dom/cases/attachment/textStoreForElement.tests.html" \
   build:app/browser             "/web/build/app/browser/lib/index.mjs" \
   build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
   build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
-  build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
-  build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
-  build:engine/events           "/web/build/engine/events/lib/index.mjs" \
-  build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
-  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
-  build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
-  build:engine/keyboard         "/web/build/engine/keyboard/lib/index.mjs" \
-  build:engine/keyboard-storage "/web/build/engine/keyboard-storage/lib/index.mjs" \
-  build:engine/main             "/web/build/engine/main/lib/index.mjs" \
-  build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
-  build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
-  build:engine/common/web-utils "/web/src/engine/common/web-utils/build/lib/index.mjs" \
+  build:common/web-utils        "/web/build/common/web-utils/lib/index.mjs" \
+  build:engine                  "/web/build/engine/lib/index.mjs" \
   build:samples                 "/web/src/samples/simplest/keymanweb.js" \
-  build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
+  build:tools/building          "/web/build/tools/building/sourcemap-root/index.js" \
+  build:tools/testing           "/web/build/tools/testing/test-utils/lib/index.d.ts" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"
-
-BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 #### Build action definitions ####
 
-##################### TODO:  call child action, verify things work as expected!
-
 # We can run all clean & configure actions at once without much issue.
+
+## Clean actions
 
 builder_run_action clean:_all rm -rf build/
 
 builder_run_child_actions clean
-
-## Clean actions
-
-###--- Future tie-in:  if #8831 gets accepted, uncomment the next two lines. ---###
-# # If a full-on general clean was requested, we can nuke the entire build folder.
-# builder_run_action clean:project rm -rf ./build
 
 builder_run_child_actions configure
 
@@ -107,20 +87,22 @@ precompile() {
   # types built-in to Node aren't available, and @web/test-runner doesn't do
   # treeshaking when loading the imports. We work around by pre-compiling.
   for f in "${DIR}"/*.js; do
-    ${BUNDLE_CMD}   "${f}" \
+    node_es_bundle  "${f}" \
       --out         "${f%.js}".mjs \
       --format esm
   done
 }
 
-build_action() {
+build_tests_action() {
   builder_echo "Building auto tests..."
 
   # The currently-bundled declaration file for gesture-processor generates
   # errors when compiling against it with current tsc versions.
   rm -f "${KEYMAN_ROOT}/node_modules/promise-status-async/lib/index.d.ts"
 
-  tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+  tsc -b "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+
+  builder_echo "Copying some files"
 
   for dir in \
     "${KEYMAN_ROOT}/web/build/test/dom/cases"/*/ \
@@ -130,7 +112,7 @@ build_action() {
     precompile "${dir}"
   done
 
-  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.tests.html" \
+  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/textStoreForElement.tests.html" \
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 
@@ -158,31 +140,14 @@ coverage_action() {
   rm -rf build/coverage/tmp
 }
 
-builder_run_child_actions build:engine/common/web-utils
-builder_run_child_actions build:engine/dom-utils
+builder_run_child_actions build:tools/building
 
-builder_run_child_actions build:engine/keyboard
-builder_run_child_actions build:engine/js-processor
-builder_run_child_actions build:engine/element-wrappers
-builder_run_child_actions build:engine/events
-builder_run_child_actions build:engine/interfaces
+builder_run_child_actions build:common/web-utils
 
-# Uses engine/dom-utils and engine/interfaces
-builder_run_child_actions build:engine/osk
+builder_run_child_actions build:engine
+# builder_run_child_actions build:engine/predictive-text
 
-# Uses engine/element-wrappers
-builder_run_child_actions build:engine/attachment
-
-# Uses engine/interfaces (due to resource-path config interface)
-builder_run_child_actions build:engine/keyboard-storage
-
-# Builds the predictive-text components
-builder_run_child_actions build:engine/predictive-text
-
-# Uses engine/interfaces, engine/keyboard-storage, engine/predictive-text, & engine/osk
-builder_run_child_actions build:engine/main
-
-# Uses all but engine/element-wrappers and engine/attachment
+# Uses all but engine/element-text-stores and engine/attachment
 builder_run_child_actions build:app/webview
 
 # Uses literally everything `engine/` above
@@ -194,17 +159,64 @@ builder_run_child_actions build:app/ui
 # Needs both app/browser and app/ui.
 builder_run_child_actions build:samples
 
-builder_run_child_actions build:tools
-
 # Some test pages refer to KMW tools.
 builder_run_child_actions build:test-pages
 
 # Build tests
-builder_run_action build:_all build_action
+builder_run_child_actions build:tools/testing
+builder_run_action build:_all build_tests_action
 
 # Run tests
 builder_run_child_actions test
-builder_run_action test:_all builder_launch /web/test.sh test
+
+function is_test_included() {
+  local test_opt=$1
+  local run_dom_tests=true run_integrated_tests=true run_e2e_tests=true
+  local var_name="run_${test_opt}_tests"
+
+  if builder_has_option --test-integrated-only || builder_has_option --test-e2e-only; then
+    run_dom_tests=false
+  fi
+  if builder_has_option --test-dom-only || builder_has_option --test-e2e-only; then
+    run_integrated_tests=false
+  fi
+  if builder_has_option --test-dom-only || builder_has_option --test-integrated-only; then
+    run_e2e_tests=false
+  fi
+
+  ${!var_name}
+}
+
+function do_browser_tests() {
+  # Browser-based tests: common configs & kill-switches
+
+  # Select the right CONFIG file.
+  local WTR_CONFIG=
+  if builder_is_ci_build; then
+    WTR_CONFIG=.CI
+    export KEYMAN_IS_CI_BUILD=1
+  fi
+
+  # Prepare the flags for the karma command.
+  local WTR_INSPECT=
+  if builder_has_option --test-inspect; then
+    WTR_INSPECT="--manual"
+  fi
+
+  pushd "${KEYMAN_ROOT}"
+  if is_test_included dom; then
+    web-test-runner --config "web/src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
+  fi
+  if is_test_included integrated; then
+    web-test-runner --config "web/src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
+  fi
+  if is_test_included e2e; then
+    npx playwright test --config "web/src/test/auto/e2e/playwright.config.ts"
+  fi
+  popd
+}
+
+builder_run_action test:_all do_browser_tests
 
 function do_test_help() {
   check-markdown  "$KEYMAN_ROOT/web/docs/engine"
@@ -214,3 +226,6 @@ builder_run_action test:help do_test_help
 
 # Create coverage report
 builder_run_action coverage:_all coverage_action
+
+# Start the test server
+builder_run_action start node src/tools/testing/test-server/index.cjs
