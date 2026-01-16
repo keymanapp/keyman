@@ -34,6 +34,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
       return {
         // The `engine` parameter cannot be supplied with the constructing instance before calling
         // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
+        baseLayout: 'us',
         keyboardInterface: new KeyboardInterfaceBase(window, engine, config.stubNamespacer),
         defaultOutputRules: new DefaultOutputRules()
       };

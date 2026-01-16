@@ -24,16 +24,12 @@ import { DeviceSpec, globalObject, KMWString } from "keyman/common/web-utils";
 export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
-  baseLayout?: string;
+  baseLayout: string;
   keyboardInterface?: JSKeyboardInterface; // for tests, replace keyboardInterface with a mock, TODO-web-core: refactor into a unit test pattern
-  defaultOutputRules?: DefaultOutputRules; // Takes the class def object, not an instance thereof.
+  defaultOutputRules: DefaultOutputRules; // Takes the class def object, not an instance thereof.
 }
 
 export class JSKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
-  private static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
-    baseLayout: 'us',
-    defaultOutputRules: new DefaultOutputRules()  // TODO-web-core: move this out of here and only in keymanEngine.ts, rename to DefaultOutputRules
-  };
 
   // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
   // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
@@ -66,18 +62,14 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
   public warningLogger?: LogMessageHandler;
   public errorLogger?: LogMessageHandler;
 
-  constructor(device: DeviceSpec, options?: ProcessorInitOptions) {
+  constructor(device: DeviceSpec, options: ProcessorInitOptions) {
     super();
-
-    if(!options) {
-      options = JSKeyboardProcessor.DEFAULT_OPTIONS;
-    }
 
     this.contextDevice = device;
 
-    this.baseLayout = options.baseLayout || JSKeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
+    this.baseLayout = options.baseLayout;
     this.keyboardInterface = options.keyboardInterface || new JSKeyboardInterface(globalObject(), MinimalKeymanGlobal);
-    this.defaultOutputRules = options.defaultOutputRules || JSKeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
+    this.defaultOutputRules = options.defaultOutputRules;
   }
 
   public get activeKeyboard(): JSKeyboard {

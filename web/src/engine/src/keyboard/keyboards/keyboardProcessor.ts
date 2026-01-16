@@ -33,11 +33,6 @@ export type BeepHandler = (textStore: TextStore) => void;
  *   results against a TextStore.
  */
 export interface KeyboardProcessor extends EventEmitter<EventMap> {
-  // public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
-  //   baseLayout: 'us',
-  //   defaultOutputRules: new DefaultOutputRules()
-  // };
-
   /**
    * Tracks the simulated values for supported state keys (e.g. CapsLock, NumLock)
    * so that the OSK can reflect a physical keyboard's state. Keys are referenced

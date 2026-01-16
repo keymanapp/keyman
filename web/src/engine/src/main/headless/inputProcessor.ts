@@ -18,7 +18,8 @@ import {
   type Alternate,
   type Keyboard,
   type KeyEvent,
-  KeyboardProcessor
+  KeyboardProcessor,
+  DefaultOutputRules
 } from "keyman/engine/keyboard";
 import {
   JSKeyboardProcessor,
@@ -31,7 +32,8 @@ import { WorkerFactory } from "@keymanapp/lexical-model-layer";
 
 export class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
-    baseLayout: 'us'
+    baseLayout: 'us',
+    defaultOutputRules: new DefaultOutputRules()
   }
 
   /**
