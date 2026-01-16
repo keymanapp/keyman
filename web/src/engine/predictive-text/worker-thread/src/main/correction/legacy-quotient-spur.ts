@@ -21,10 +21,11 @@ import Transform = LexicalModelTypes.Transform;
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class LegacyQuotientSpur extends SearchQuotientSpur {
   /**
-   * Constructs a fresh SearchSpace instance for used in predictive-text correction
-   * and suggestion searches.
-   * @param baseSpaceId
-   * @param model
+   * Constructs a fresh SearchQuotientNode instance for use in predictive-text
+   * correction and suggestion searches.
+   * @param space
+   * @param inputs
+   * @param bestProbFromSet
    */
   constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, bestProbFromSet: number) {
     super(space, inputs, space.lowestPossibleSingleCost - Math.log(bestProbFromSet));
@@ -67,7 +68,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
       const currentNode = result.finalNode;
 
       // Forbid a raw edit-distance of greater than 2.
-      // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.      const currentNode = result.finalNode;
+      // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
       if(currentNode.editCount < 2) {
         let insertionEdges = currentNode.buildInsertionEdges();
         this.queueNodes(insertionEdges);

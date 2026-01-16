@@ -20,8 +20,8 @@ export class SearchQuotientRoot implements SearchQuotientNode {
   private hasBeenProcessed: boolean = false;
 
   /**
-   * Constructs a fresh SearchSpace instance for used in predictive-text correction
-   * and suggestion searches.
+   * Constructs a fresh SearchQuotientRoot instance to be used as the root of
+   * the predictive-text correction / suggestion search process.
    * @param baseSpaceId
    * @param model
    */
