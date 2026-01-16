@@ -6,12 +6,12 @@ import sinon from 'sinon';
 import { GesturePath, GestureSequence, GestureSource, GestureSourceSubview } from 'keyman/engine/gesture-processor';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { ActiveSubKey } from 'keyman/engine/keyboard';
-import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard, testIndex } from 'keyman/engine/osk';
+import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard, unitTestEndpoints } from 'keyman/engine/osk';
 
-import OSKBaseKey = testIndex.OSKBaseKey;
-import OSKRow = testIndex.OSKRow;
-import SubkeyPopup = testIndex.SubkeyPopup;
-import link = testIndex.link;
+const OSKBaseKey = unitTestEndpoints.OSKBaseKey;
+const OSKRow = unitTestEndpoints.OSKRow;
+const SubkeyPopup = unitTestEndpoints.SubkeyPopup;
+const link = unitTestEndpoints.link;
 
 // Tests for #10126
 describe('subkey menu width', () => {
