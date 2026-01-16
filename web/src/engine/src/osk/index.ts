@@ -35,7 +35,13 @@ export {
     correctionKeyFilter, buildCorrectiveLayout
 } from './correctionLayout.js';
 
-// TODO-web-core: use a unitTestEndpoints pattern here (#15292)
-export * as testIndex from './test-index.js';
-
-// More things will likely need to be added.
+import { OSKBaseKey } from './keyboard-layout/oskBaseKey.js';
+import { OSKRow } from './keyboard-layout/oskRow.js';
+import { SubkeyPopup } from './input/gestures/browser/subkeyPopup.js'
+import { link } from './keyElement.js'
+export const unitTestEndpoints = {
+    OSKBaseKey,
+    OSKRow,
+    SubkeyPopup,
+    link
+};
