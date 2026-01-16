@@ -4,7 +4,7 @@ import Keep = LexicalModelTypes.Keep;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
-import { type OutputTarget } from "keyman/engine/keyboard";
+import { type OutputTarget, type RuleBehavior } from 'keyman/engine/js-processor';
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;
@@ -23,16 +23,28 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private initNewContext: boolean = true;
 
   private _currentSuggestions: Suggestion[] = [];
-  private keepSuggestion: Keep;
-  private revertSuggestion: Reversion;
+  private _keepSuggestion: Keep;
+  private _revertSuggestion: Reversion;
+
+  public get keepSuggestion(): Keep {
+    return this._keepSuggestion;
+  }
+
+  private _immediateReversion: Reversion;
+
+  public get immediateReversion(): Reversion {
+    return this._immediateReversion;
+  }
 
   // Set to null/undefined if there was no recent acceptance.
-  private recentAcceptCause: 'key' | 'banner';
-  private revertAcceptancePromise: Promise<Reversion>;
+  private _recentAcceptCause: 'key' | 'banner';
+
+  public get recentAcceptCause(): 'key' | 'banner' {
+    return this._recentAcceptCause;
+  }
 
   private swallowPrediction: boolean = false;
 
-  private doRevert: boolean = false;
   private recentRevert: boolean = false;
 
   private langProcessor: LanguageProcessorSpec;
@@ -60,7 +72,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     }
   }
 
-  private readonly suggestionApplier: (suggestion: Suggestion) => Promise<Reversion>;
+  private readonly suggestionApplier: (suggestion: Suggestion, ruleBehavior?: RuleBehavior) => RuleBehavior;
   private readonly suggestionReverter: (reversion: Reversion) => void;
 
   public constructor(langProcessor: LanguageProcessorSpec, getLayerId: () => string) {
@@ -72,9 +84,11 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     const validSuggestionState: () => boolean = () =>
       this.currentTarget && langProcessor.state == 'configured';
 
-    this.suggestionApplier = (suggestion) => {
+    this.suggestionApplier = (suggestion, ruleBehavior) => {
       if(validSuggestionState()) {
-        return langProcessor.applySuggestion(suggestion, this.currentTarget, getLayerId);
+        const results = langProcessor.applySuggestion(suggestion, this.currentTarget, getLayerId, ruleBehavior);
+        results.reversion.then((reversion) => this._immediateReversion = reversion);
+        return results.appendedRuleBehavior;
       } else {
         return null;
       }
@@ -95,16 +109,12 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private connect() {
     this.langProcessor.addListener('invalidatesuggestions', this.invalidateSuggestions);
     this.langProcessor.addListener('suggestionsready', this.updateSuggestions);
-    this.langProcessor.addListener('tryaccept', this.doTryAccept);
-    this.langProcessor.addListener('tryrevert', this.doTryRevert);
     this.langProcessor.addListener('statechange', this.onModelStateChange);
   }
 
   public disconnect() {
     this.langProcessor.removeListener('invalidatesuggestions', this.invalidateSuggestions);
     this.langProcessor.removeListener('suggestionsready', this.updateSuggestions);
-    this.langProcessor.removeListener('tryaccept', this.doTryAccept);
-    this.langProcessor.removeListener('tryrevert', this.doTryRevert);
     this.langProcessor.removeListener('statechange', this.onModelStateChange);
     this.clearSuggestions();
   }
@@ -120,20 +130,31 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // we need to present the user a way to preserve the current context instead.
     const keepNeeded = this.selected && (this.keepSuggestion != this.selected);
 
+    if(this._revertSuggestion) {
+      suggestions.push(this._revertSuggestion);
+    }
+
     if(mayShowKeep && (keepNeeded || this.keepSuggestion.matchesModel)) {
       suggestions.push(this.keepSuggestion);
-    } else if(this.doRevert) {
-      suggestions.push(this.revertSuggestion);
     }
 
     return suggestions.concat(this._currentSuggestions);
+  }
+
+  public triggerPredictions() {
+    const outputTarget = this.currentTarget;
+    if(!outputTarget) {
+      return Promise.resolve([]);
+    }
+    const transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
+    return this.langProcessor.predict(transcription, this.getLayerId());
   }
 
   /**
    * Function apply
    * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
    */
-  private acceptInternal(suggestion: Suggestion): Promise<Reversion> {
+  private acceptInternal(suggestion: Suggestion, ruleBehavior?: RuleBehavior): RuleBehavior {
     if(!suggestion) {
       return null;
     }
@@ -142,125 +163,44 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // layerID can be obtained by whoever/whatever holds the InputProcessor instance.
     if(suggestion.tag == 'revert') {
       this.suggestionReverter(suggestion as Reversion);
+      this.recentRevert = true;
       return null;
     } else {
-      return this.suggestionApplier(suggestion);
+      return this.suggestionApplier(suggestion, ruleBehavior);
     }
   }
 
   /**
-   * Applies predictive-text suggestions and post-acceptance reversions to the current
-   * prediction context.
+   * Applies predictive-text suggestions and post-acceptance reversions to the
+   * current prediction context.
    *
-   * Note that both cases will additionally trigger a new asynchronous `predict` operation,
-   * though no corresponding Promise is returned by this function.  As such, the current
-   * suggestions should be considered outdated after calling this method, pending replacement
-   * upon the completed async `predict`.
+   * Note that both cases will additionally trigger a new asynchronous `predict`
+   * operation, though no corresponding Promise is returned by this function.
+   * As such, the current suggestions should be considered outdated after
+   * calling this method, pending replacement upon the completed async
+   * `predict`.
    *
    * @param suggestion Either a `Suggestion` or `Reversion`.
-   * @returns if `suggestion` is a `Suggestion`, will return a `Promise<Reversion>`; else, `null`.
+   * @param ruleBehavior When set with the results of applying an incoming
+   * keystroke, the effects of that keystroke will be appended to the suggestion
+   * being applied.
+   * @returns if `suggestion` is a `Suggestion` triggered via keystroke, will
+   * return a RuleBehavior.  Else returns null.ß
    */
-  public accept(suggestion: Suggestion): Promise<Reversion> | Promise<null> {
-    const _this = this;
-
+  public accept(suggestion: Suggestion, ruleBehavior?: RuleBehavior): RuleBehavior {
     // Selecting a suggestion or a reversion should both clear selection
     // and clear the reversion-displaying state of the banner.
     this.selected = null;
-    this.doRevert = false;
 
-    this.revertAcceptancePromise = this.acceptInternal(suggestion);
-    if(!this.revertAcceptancePromise) {
-      // We get here either if suggestion acceptance fails or if it was a reversion.
-      if(suggestion && suggestion.tag == 'revert') {
-        // Reversion state management
-        this.recentAcceptCause = null;
-        this.recentRevert = true;
-      }
-
-      return Promise.resolve(null);
-    }
-
-    this.revertAcceptancePromise.then(function(suggestion) {
-      // Always null-check!
-      if(suggestion) {
-        _this.revertSuggestion = suggestion;
-      }
-    });
+    const results = this.acceptInternal(suggestion, ruleBehavior);
 
     // By default, we assume we were triggered by the banner.
-    // Acceptance by keystroke will overwrite this later (in `tryAccept`)
-    this.recentAcceptCause = 'banner';
+    this._recentAcceptCause = ruleBehavior ? 'key' : 'banner';
     this.recentRevert = false;
 
     this.swallowPrediction = true;
 
-    return this.revertAcceptancePromise;
-  }
-
-  private showRevert() {
-    // Construct a 'revert suggestion' to facilitate a reversion UI component.
-    this.doRevert = true;
-    this.sendUpdateEvent();
-  }
-
-  /**
-   * Receives messages from the keyboard that the 'accept' keystroke has been entered.
-   * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
-   * Otherwise, return true.
-   */
-  private doTryAccept = (source: string, returnObj: {shouldSwallow: boolean}): void => {
-    const recentAcceptCause = this.recentAcceptCause;
-
-    if(!recentAcceptCause && this.selected) {
-      this.accept(this.selected);
-      // If there is right-context, DO emit the space instead of swallowing it.
-      // It's not auto-added by the predictive-text worker for such cases.
-      returnObj.shouldSwallow = !this.currentTarget.getTextAfterCaret();
-
-      // doTryAccept is the path for keystroke-based auto-acceptance.
-      // Overwrite the cause to reflect this.
-      this.recentAcceptCause = 'key';
-    } else if(recentAcceptCause && source == 'space') {
-      this.recentAcceptCause = null;
-      if(recentAcceptCause == 'key') {
-        // No need to swallow the keystroke's whitespace; we triggered the prior acceptance
-        // FROM a space, so we've already aliased the suggestion's built-in space.
-        returnObj.shouldSwallow = false;
-        return;
-      }
-
-      // Standard whitespace applications from the banner, those we DO want to
-      // swallow the first time.
-      //
-      // If the model doesn't insert wordbreaks, there's no space to alias, so
-      // don't swallow the space.  If it does, we consider that insertion to be
-      // the results of the first post-accept space.
-      returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions && !this.currentTarget.getTextAfterCaret();; // can be handed outside
-    } else {
-      returnObj.shouldSwallow = false;
-    }
-  }
-
-  /**
-   * Receives messages from the keyboard that the 'revert' keystroke has been entered.
-   * Should return 'false' if the current state allows reverting a recently-applied suggestion and act accordingly.
-   * Otherwise, return true.
-   */
-  private doTryRevert = (/*returnObj: {shouldSwallow: boolean}*/): void => {
-    // Has the revert keystroke (BKSP) already been sent once since the last accept?
-    if(this.doRevert) {
-      // If so, clear the 'revert' option and start doing normal predictions again.
-      this.doRevert = false;
-      this.recentAcceptCause = null;
-      // Otherwise, did we just accept something before the revert signal was received?
-    } else if(this.recentAcceptCause) {
-      this.showRevert();
-      this.swallowPrediction = true;
-    }
-
-    // // We don't yet actually do key-based reversions.
-    // returnObj.shouldSwallow = false;
-    return;
+    return results;
   }
 
   /**
@@ -274,9 +214,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.selected = null;
 
     if(!this.swallowPrediction || source == 'context') {
-      this.recentAcceptCause = null;
-      this.doRevert = false;
+      this._recentAcceptCause = null;
       this.recentRevert = false;
+      this._immediateReversion = null;
 
       if(source == 'context') {
         this.swallowPrediction = false;
@@ -313,15 +253,17 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private updateSuggestions = (prediction: ReadySuggestions): void => {
     const suggestions = prediction.suggestions;
 
-    this._currentSuggestions = suggestions;
     this.selected = null;
 
     // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
     // and prevent it from being hidden after reversion operations.
-    this.keepSuggestion = null;
+    this._keepSuggestion = null;
+    this._revertSuggestion = null;
     for (const s of suggestions) {
       if(s.tag == 'keep') {
-        this.keepSuggestion = s as Keep;
+        this._keepSuggestion = s as Keep;
+      } else if(s.tag == 'revert') {
+        this._revertSuggestion = s as Reversion;
       }
 
       if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
@@ -329,15 +271,18 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       }
     }
 
-    if(this.keepSuggestion) {
-      this._currentSuggestions.splice(this._currentSuggestions.indexOf(this.keepSuggestion), 1);
-    }
+    // Verify that the transition IDs are still valid and remove special entries.
+    this._currentSuggestions = suggestions.filter(s => {
+      return this.langProcessor.hasState(Math.abs(s.transformId)) &&
+      s != this._keepSuggestion &&
+      s != this._revertSuggestion
+    });
 
     // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
     if(!this.swallowPrediction) {
-      this.recentAcceptCause = null;
-      this.doRevert = false;
+      this._recentAcceptCause = null;
       this.recentRevert = false;
+      this._immediateReversion = null;
     } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
       this.swallowPrediction = false;
     }

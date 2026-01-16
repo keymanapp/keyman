@@ -1,5 +1,4 @@
 import * as models from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import * as correction from './correction/index.js'
@@ -7,7 +6,10 @@ import TransformUtils from './transformUtils.js';
 import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
+import { ContextTracker } from './correction/context-tracker.js';
+
 import CasingForm = LexicalModelTypes.CasingForm;
+import Configuration = LexicalModelTypes.Configuration;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Keep = LexicalModelTypes.Keep;
@@ -63,17 +65,27 @@ export class ModelCompositor {
 
   private testMode: boolean = false;
   private verbose: boolean = true;
+  private configuration: Configuration;
 
   constructor(
     lexicalModel: LexicalModel,
     testMode?: boolean
   ) {
     this.lexicalModel = lexicalModel;
-    if(lexicalModel.traverseFromRoot) {
-      this._contextTracker = new correction.ContextTracker();
-    }
     this.punctuation = determinePunctuationFromModel(lexicalModel);
     this.testMode = !!testMode;
+  }
+
+  setConfiguration(config: Configuration) {
+    this.configuration = config;
+  }
+
+  initContextTracker(context: Context, transformId: number) {
+    if(this.contextTracker || !this.lexicalModel.traverseFromRoot) {
+      return;
+    }
+
+    this._contextTracker = new ContextTracker(this.lexicalModel, context, transformId, this.configuration);
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Outcome<Suggestion|Keep>[]> {
@@ -106,15 +118,12 @@ export class ModelCompositor {
       })
     }
 
-    // Fulfill pre-condition:  the transform distribution should be sorted in
-    // descending order.
-    transformDistribution.sort(function(a, b) {
-      return b.p - a.p;
-    });
-
     // Only allow new-word suggestions if space was the most likely keypress.
     // const allowSpace = TransformUtils.isWhitespace(inputTransform);
     const inputTransform = transformDistribution[0].sample;
+    const transformId = inputTransform.id;
+    this.initContextTracker(context, transformId);
+
     const allowBksp = TransformUtils.isBackspace(inputTransform);
     const allowWhitespace = TransformUtils.isWhitespace(inputTransform);
 
@@ -139,7 +148,7 @@ export class ModelCompositor {
     const SEARCH_TIMEOUT = correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
     const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
 
-    const { postContextState, rawPredictions } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
+    const { postContextState, rawPredictions, revertableTransitionId } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
 
     if(this.activeTimer == timer) {
       this.activeTimer = null;
@@ -188,47 +197,49 @@ export class ModelCompositor {
       this.SUGGESTION_ID_SEED++;
     });
 
+    if(revertableTransitionId) {
+      const reversion = this.contextTracker.peek(revertableTransitionId)?.reversion;
+      if(reversion) {
+        if(suggestions[0]?.tag == 'keep') {
+          const keep = suggestions.shift();
+          suggestions.unshift(reversion);
+          suggestions.unshift(keep);
+        } else {
+          suggestions.unshift(reversion)
+        }
+      }
+    }
+
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(postContextState) {
-      postContextState.tail.replacements = suggestions.map(function(suggestion) {
-        return {
-          suggestion: suggestion,
-          tokenWidth: 1
-        }
-      });
+      postContextState.suggestions = suggestions;
     }
 
     return suggestions;
   }
 
-  acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
-    // Step 1:  generate and save the reversion's Transform.
-    let sourceTransform = suggestion.transform;
-    let deletedLeftChars = KMWString.substr(context.left, -sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    let insertedLength = KMWString.length(sourceTransform.insert);
-
-    let reversionTransform: Transform = {
-      insert: deletedLeftChars,
-      deleteLeft: insertedLength
-    };
+  /**
+   *
+   * @param suggestion Suggestion selected, whether automatically or by the user.
+   * @param context The context to which the suggestion should be applied.
+   * @param originalInput The original transform that is being replaced by the applied suggestion (!)
+   * @returns
+   */
+  acceptSuggestion(suggestion: Suggestion, context: Context, originalInput?: Transform): Reversion {
+    // Step 1:  re-use the original input Transform as the reversion's Transform.
+    // The Web engine will restore the original state of the context before accepting
+    // and before reverting; all we need to do is put the original keystroke back in place.
+    let reversionTransform: Transform = originalInput ?? { insert: '', deleteLeft: 0 };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
-    let postContext = context;
-    if(postTransform) {
-      // The code above restores the state to the context at the time the `Suggestion` was created.
-      // `postTransform` handles any missing context that came later.
-      reversionTransform = models.buildMergedTransform(reversionTransform, postTransform);
-
-      // Now that we've built the reversion based upon the Suggestion's original context,
-      // we manipulate it in order to get a proper 'displayAs' string.
-      postContext = models.applyTransform(postTransform, postContext);
-    }
+    const postContext = originalInput ? models.applyTransform(originalInput, context) : context;
 
     let revertedPrefix: string;
     let postContextTokenization = this.tokenize(postContext);
     if(postContextTokenization) {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
+      // In case we ever actually put that back in place.
       const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
       revertedPrefix = (preCaretToken && !preCaretToken.isWhitespace) ? preCaretToken.text : '';
       revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0].text : '';
@@ -257,27 +268,59 @@ export class ModelCompositor {
     }
 
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
-    if(this.contextTracker) {
-      let contextState = this.contextTracker.newest;
-      if(!contextState) {
-        contextState = this.contextTracker.analyzeState(this.lexicalModel, context).state;
+    if(!this.contextTracker) {
+      if(suggestion.appendedTransform) {
+        reversion.appendedTransform = {
+          insert: '',
+          deleteLeft: suggestion.appendedTransform.insert.length,
+          id: suggestion.appendedTransform.id
+        }
+      }
+    } else {
+      let originalTransition = this.contextTracker.latest;
+      if(originalTransition.transitionId != suggestion.transformId) {
+        originalTransition = this.contextTracker.findAndRevert(suggestion.transformId);
+      }
+      if(!originalTransition) {
+        this.contextTracker.reset(context, suggestion.transformId);
+        originalTransition = this.contextTracker.latest;
       }
 
-      contextState.tail.activeReplacementId = suggestion.id;
-      let acceptedContext = models.applyTransform(suggestion.transform, context);
-      this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
+      const transitions = originalTransition.applySuggestion(suggestion);
+      this.contextTracker.latest = transitions.base;
+      this.contextTracker.saveLatest();
+      if(transitions.appended) {
+        this.contextTracker.latest = transitions.appended;
+        this.contextTracker.saveLatest();
+        reversion.appendedTransform = {
+          insert: '',
+          deleteLeft: suggestion.appendedTransform.insert.length,
+          id: suggestion.appendedTransform.id
+        }
+      }
+
+      // Ensure the reversion is annotated on the base, suggested-altered transition that
+      // is cached!
+      transitions.base.reversion = reversion;
     }
 
     return reversion;
   }
 
-  async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
+  /**
+   * Reverts a recently applied suggestion.
+   * @param reversion The reversion to be applied
+   * @param context The original context when the reverted suggestion was applied, including
+   * the original keystroke's effects.
+   * @returns
+   */
+  async applyReversion(reversion: Reversion, context: Context, appendedOnly?: boolean): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
+    let suggestions: Promise<Suggestion[]>;
     let fallbackSuggestions = async function() {
-      let revertedContext = models.applyTransform(reversion.transform, context);
-      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, context);
       suggestions.forEach(function(suggestion) {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
@@ -295,40 +338,47 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    let contextMatchFound = false;
-    for(let c = this.contextTracker.count - 1; c >= 0; c--) {
-      let contextState = this.contextTracker.item(c);
+    // Note that the base reversion's .transformId will predate the appendedTransform id
+    // used to add whitespace (if one existed), so reverting to the base ID's associated
+    // context also reverts the appendedTransform.
+    let originalTransition = this.contextTracker.findAndRevert(-reversion.transformId);
 
-      if(contextState.tail.activeReplacementId == -reversion.id) {
-        contextMatchFound = true;
-        break;
+    if(appendedOnly) {
+      this.contextTracker.latest = originalTransition;
+      return Promise.resolve([]);
+    }
+
+    if(!originalTransition) {
+      this.contextTracker.reset(context, -reversion.transformId);
+      originalTransition = this.contextTracker.latest;
+
+      suggestions = fallbackSuggestions();
+    } else {
+      if(suggestions) {
+        suggestions = Promise.resolve([]);
+      } else {
+        // Will need to be modified a bit if/when phrase-level suggestions are implemented.
+        // Those will be tracked on the first token of the phrase, which won't be the tail
+        // if they cover multiple tokens.
+        let suggests = originalTransition.final.suggestions;
+
+        suggests.forEach(function(suggestion) {
+          // No need to muck around with the original associated transition ids here.
+          // But, we should clear any auto-acceptance flags.
+          suggestion.autoAccept = false;
+        });
+
+        suggestions = Promise.resolve(suggests);
       }
     }
 
-    if(!contextMatchFound) {
-      return fallbackSuggestions();
-    }
+    // An applied reversion should replace the original Transition's effects.
+    const revertedTransition = originalTransition.reproduceOriginal();
+    this.contextTracker.latest = revertedTransition;
+    this.contextTracker.saveLatest();
 
-    // Remove all contexts more recent than the one we're reverting to.
-    while(this.contextTracker.newest.tail.activeReplacementId != -reversion.id) {
-      this.contextTracker.popNewest();
-    }
-
-    this.contextTracker.newest.tail.activeReplacementId = -1;
-
-    // Will need to be modified a bit if/when phrase-level suggestions are implemented.
-    // Those will be tracked on the first token of the phrase, which won't be the tail
-    // if they cover multiple tokens.
-    let suggestions = this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
-      return trackedSuggestion.suggestion;
-    });
-
-    suggestions.forEach(function(suggestion) {
-      // A reversion's transform ID is the additive inverse of its original suggestion;
-      // we revert to the state of said original suggestion.
-      suggestion.transformId = -reversion.transformId;
-      suggestion.autoAccept = false;
-    });
+    // In case we needed the fallback strategy.
+    revertedTransition.final.suggestions = await suggestions;
     return suggestions;
   }
 
@@ -342,7 +392,7 @@ export class ModelCompositor {
     return tokenizer(context);
   }
 
-  public resetContext(context: Context) {
+  public resetContext(context: Context, stateId: number) {
     // If we're resetting the context, any active prediction requests are no
     // longer valid.
     this.activeTimer?.terminate();
@@ -350,8 +400,7 @@ export class ModelCompositor {
     // Designed for use when the caret has been directly moved and/or the context sourced from a different control
     // than before.
     if(this.contextTracker) {
-      this.contextTracker.clearCache();
-      this.contextTracker.analyzeState(this.lexicalModel, context, null);
+      this.contextTracker.reset(context, stateId);
     }
   }
 }
