@@ -106,6 +106,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     adjustKeyboardHeight.setKey(AdjustKeyboardHeightActivity.adjustKeyboardHeightKey);
     adjustKeyboardHeight.setTitle(getString(R.string.adjust_keyboard_height));
     adjustKeyboardHeight.setWidgetLayoutResource(R.layout.preference_height_icon_layout);
+    adjustKeyboardHeight.setSummary(AdjustKeyboardHeightActivity.createKeyboardHeightString(context));
     Intent adjustKeyboardHeightIntent = new Intent(context, AdjustKeyboardHeightActivity.class);
     adjustKeyboardHeight.setIntent(adjustKeyboardHeightIntent);
 
@@ -268,5 +269,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     // Update the language / keyboard count when we return to this menu from deeper levels.
     languagesPreference.setTitle(getInstalledLanguagesText());
+
+    adjustKeyboardHeight.setSummary(AdjustKeyboardHeightActivity.createKeyboardHeightString(context));
   }
 }

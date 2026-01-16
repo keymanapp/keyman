@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-	<assemblyIdentity type="win32" name="com.keyman.windows.engine.keymanx64" version="$VersionWin" processorArchitecture="amd64"/>
-	<description>Keyman Engine x64</description>
+	<assemblyIdentity type="win32" name="com.keyman.windows.engine.keymanhp" version="$VersionWin" processorArchitecture="arch64"/>
+	<description>Keyman Engine HP</description>
 	<trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
 		<security>
 			<requestedPrivileges>
