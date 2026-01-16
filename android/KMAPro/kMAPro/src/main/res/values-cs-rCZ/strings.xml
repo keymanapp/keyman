@@ -122,9 +122,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Všechny jazyky jsou již nainstalovány</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Přetažením klávesnice změníte výšku</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Otočit zařízení pro nastavení na výšku a na šířku</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Přetažením klávesnice změníte výšku. Otočit zařízení pro nastavení na výšku a na šířku.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Obnovit výchozí nastavení</string>
   <!-- Context: Adjust Longpress Delay Time menu -->

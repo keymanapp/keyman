@@ -488,11 +488,15 @@ BOOL RestartLowLevelHook() {
   }
 
   if(!UninitLowLevelHook()) {
-    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", GetLastError());
+    DWORD error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_UNINIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", error);
     result = FALSE;
   }
   if(!InitLowLevelHook()) {
-    SendDebugMessageFormat("Failed to install low level hook.  GetLastError = %d", GetLastError());
+    DWORD error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_INIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to install low level hook.  GetLastError = %d", error);
     result = FALSE;
   }
 
@@ -629,7 +633,7 @@ void HandleRefresh(int code, LONG tag)
     if (UpdateRefreshTag(tag)) {
 #ifdef _WIN64
       if (Globals::get_InitialisingThread() == GetCurrentThreadId()) {
-        // If this is the keymanx64 thread, then we should
+        // If this is the keyman.x64 or keymanarm64 thread, then we should
         // go ahead and process the refresh immediately so
         // that global settings are updated
         RefreshKeyboards(FALSE);
