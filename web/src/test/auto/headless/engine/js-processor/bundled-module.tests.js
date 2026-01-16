@@ -17,7 +17,7 @@ let u = toSupplementaryPairString;
 describe('Bundled ES Module for js-processor', function() {
   describe('JSKeyboardProcessor', function () {
     it('should initialize without errors', function () {
-      let kp = new JSProcessorModule.JSKeyboardProcessor();
+      let kp = new JSProcessorModule.JSKeyboardProcessor(null, JSProcessorModule.unitTestEndpoints.DEFAULT_OPTIONS);
       assert.isNotNull(kp);
     });
   });
