@@ -10,32 +10,22 @@
   <include layout="@layout/titlebar" />
 
   <TextView
-    android:id="@+id/drag_the_keyboard"
+    android:id="@+id/adjust_instructions"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@+id/titlebar"
     android:layout_marginStart="@dimen/activity_horizontal_margin"
-    android:text="@string/drag_the_keyboard"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="8dp"
+    android:text="@string/adjust_keyboard_instructions"
     android:textSize="@dimen/adjust_keyboard_height_label_textsize"
     app:layout_constraintTop_toBottomOf="@id/titlebar" />
-
-  <TextView
-    android:id="@+id/rotate_the_device"
-    android:layout_below="@id/drag_the_keyboard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/activity_horizontal_margin"
-    android:text="@string/rotate_the_device"
-    android:textSize="@dimen/adjust_keyboard_height_label_textsize"
-    app:layout_constraintTop_toBottomOf="@id/drag_the_keyboard" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/button_layout"
       android:orientation="horizontal"
-      android:layout_below="@id/rotate_the_device"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toBottomOf="@id/rotate_the_device">
+      app:layout_constraintTop_toBottomOf="@id/adjust_instructions">
 
       <Button
         android:id="@+id/reset_to_defaults"
@@ -57,6 +47,70 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Percentage Display -->
+    <TextView
+      android:id="@+id/keyboard_height_percentage"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:textSize="14sp"
+      android:textColor="?android:attr/textColorSecondary"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:text="100% Portrait | 100% Landscape"
+      app:layout_constraintTop_toBottomOf="@id/button_layout"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Grabbable Resize Handle Bar -->
+    <LinearLayout
+      android:id="@+id/resize_handle"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:background="@drawable/resize_handle_bar"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:clickable="true"
+      android:focusable="true"
+      android:contentDescription="@string/adjust_keyboard_instructions"
+      app:layout_constraintBottom_toTopOf="@id/sample_keyboard"
+      app:layout_constraintStart_toStartOf="parent">
+
+      <!-- Up arrow on left -->
+      <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_arrow_up"
+        android:contentDescription="Resize up" />
+
+      <!-- Spacer to center -->
+      <View
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+      <!-- Center grip lines (visual from background drawable) -->
+      <View
+        android:layout_width="60dp"
+        android:layout_height="match_parent" />
+
+      <!-- Spacer to right -->
+      <View
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+      <!-- Down arrow on right -->
+      <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_arrow_down"
+        android:contentDescription="Resize down" />
+
+    </LinearLayout>
+
     <!-- Resizable keyboard "image -->
     <ImageView
       android:id="@+id/sample_keyboard"
@@ -65,15 +119,7 @@
       android:contentDescription="@string/adjust_keyboard_height"
       android:scaleType="fitXY"
       android:src="@drawable/blank_osk"
-      android:background="@drawable/dash_border"
-      android:layout_alignParentBottom="true"
-      android:paddingStart="@dimen/blank_osk_padding"
-      android:paddingEnd="@dimen/blank_osk_padding"
-      android:paddingTop="@dimen/blank_osk_padding"
-      android:paddingBottom="@dimen/blank_osk_padding"
-      app:layout_constraintTop_toBottomOf="@id/button_layout"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintVertical_bias="1.0" />
+      app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
