@@ -184,8 +184,8 @@ In bash, run the following commands:
 cd /c/Projects/keyman
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
-emsdk install 3.1.58
-emsdk activate 3.1.58
+./emsdk install 3.1.58
+./emsdk activate 3.1.58
 cd upstream/emscripten
 npm install
 ```
@@ -360,23 +360,23 @@ git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4
 * Ant
 * Gradle
 * Maven
-* JDK 11 (Temurin11)
+* JDK 21
 
 #### JDK 11
 
-Use Powershell + Chocolatey to install JDK 11:
+Use Powershell + winget to install JDK:
 
 ```ps1
 # Elevated PowerShell
-
-# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
-$ProgressPreference = 'SilentlyContinue'
-choco install temurin11
+# For Keyman 17:
+winget install Microsoft.OpenJDK.11
+# For Keyman 18+:
+winget install Microsoft.OpenJDK.21
 ```
 
-**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or
+**Multiple versions of Java:** If you need to build Keyman for Android 17.0 or
 older versions, you can set `JAVA_HOME_11` to the JDK 11 path and
-`JAVA_HOME` to the JDK 8 path. This will build both versions correctly
+`JAVA_HOME_21` to the JDK 21 path. This will build both versions correctly
 from command line. But note that you do need to update your `JAVA_HOME` env
 var to the associated version before opening Android Studio and loading any
 Android projects. `JAVA_HOME_11` is mostly used by CI.
@@ -411,9 +411,5 @@ certificates for the build.
 
 * sentry-cli (optional)
   - Uploading symbols for Sentry-based error reporting
-
-  bash:
-  ```bash
-  # bash
-  curl -sL https://sentry.io/get-cli/ | bash
-  ```
+  - https://github.com/getsentry/sentry-cli/releases/tag/1.70.0
+    (TODO: update to newer version)

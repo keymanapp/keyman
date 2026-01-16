@@ -554,7 +554,7 @@ bool LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
 
   test_assert(kmxplus->key2Helper.valid());
   // First, find the string
-  KMX_DWORD strId = kmxplus->strs->find(id);
+  KMX_DWORD strId = kmxplus->strsHelper.find(id);
   if (strId == 0) {
     return false;
   }
@@ -744,7 +744,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
 
   // First, find the string as an id
   // TODO-LDML: will not work for multi string cases
-  KMX_DWORD strId = kmxplus->strs->find(chstr); // not an error if chstr is 0, may be single ch
+  KMX_DWORD strId = kmxplus->strsHelper.find(chstr); // not an error if chstr is 0, may be single ch
 
   // OK. Now we can search the keybag
   KMX_DWORD keyIndex = 0;
@@ -813,8 +813,8 @@ LdmlJsonTestSourceFactory::LdmlJsonTestSourceFactory() : test_map() {
 }
 
 km::core::path
-LdmlJsonTestSourceFactory::kmx_to_test_json(const km::core::path &kmx) {
-  km::core::path p = kmx;
+LdmlJsonTestSourceFactory::source_to_test_json(const km::core::path &source) {
+  km::core::path p = source;
   p.replace_extension(TEST_JSON_SUFFIX);
   return p;
 }

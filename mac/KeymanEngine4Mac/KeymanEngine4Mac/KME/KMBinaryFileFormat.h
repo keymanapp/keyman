@@ -52,8 +52,9 @@ struct COMP_KEYBOARD {
 #define VERSION_150 0x00000F00
 #define VERSION_160 0x00001000
 #define VERSION_170 0x00001100
+#define VERSION_190 0x00001300
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_170
+#define VERSION_MAX VERSION_190
 
 struct COMP_STORE {
   DWORD dwSystemID;
@@ -119,8 +120,10 @@ struct COMP_STORE {
 #define TSS_NEWLAYER                    42
 #define TSS_OLDLAYER                    43
 #define TSS__KEYMAN_150_MAX             43
+/* Keyman 17.0 system stores */
+#define TSS_DISPLAYMAP                  44
 
-#define TSS__MAX                        43
+#define TSS__MAX                        44
 
 /* KVK file format definitions */
 

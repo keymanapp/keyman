@@ -164,7 +164,7 @@ class LdmlJsonTestSourceFactory {
     */
     int load(const km::core::path &compiled, const km::core::path &path);
 
-    static km::core::path kmx_to_test_json(const km::core::path& kmx);
+    static km::core::path source_to_test_json(const km::core::path& kmx);
 
     const JsonTestMap& get_tests() const;
   private:

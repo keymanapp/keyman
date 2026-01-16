@@ -23,9 +23,46 @@ export enum KMX_Version {
   VERSION_140 = 0x00000E00,
   VERSION_150 = 0x00000F00,
   VERSION_160 = 0x00001000,
-  VERSION_170 = 0x00001100
+  VERSION_170 = 0x00001100,
+  VERSION_190 = 0x00001300,
 };
 
+/**
+ * Convert a version string from 6.0 - current Keyman version into a
+ * KMX_Version value. Earlier versions are not supported
+ * @param version
+ * @returns null if not matched, otherwise a valid KMX_Version
+ */
+export function versionStringToKmxVersion(version: string): KMX_Version {
+  // We allow version strings to be 'x.y' or just 'x'
+  if(typeof version !== 'string') {
+    return null;
+  }
+  if(!/^\d+(\.0)?$/.test(version)) {
+    return null;
+  }
+
+  const major = parseInt(version, 10);
+  if(Number.isNaN(major)) {
+    return null;
+  }
+
+  // assuming a reasonable range for Keyman versions for now
+  if(major < 6 || major > 999) {
+    return null;
+  }
+
+  // Version number is 16 bit number with MINOR in lower 8 bits,
+  // MAJOR in upper 8 bits. In practice, we now only use MAJOR
+  // version for Keyman versions.
+  const num = major << 8;
+
+  if(Object.values(KMX_Version).includes(num)) {
+    return num;
+  }
+
+  return null;
+}
 
 export class KEYBOARD {
   fileVersion?: number;  // dwFileVersion (TSS_FILEVERSION)
@@ -164,9 +201,10 @@ export class KMXFile {
   public static readonly VERSION_150 = KMX_Version.VERSION_150;
   public static readonly VERSION_160 = KMX_Version.VERSION_160;
   public static readonly VERSION_170 = KMX_Version.VERSION_170;
+  public static readonly VERSION_190 = KMX_Version.VERSION_190;
 
   public static readonly VERSION_MIN = this.VERSION_50;
-  public static readonly VERSION_MAX = this.VERSION_170;
+  public static readonly VERSION_MAX = this.VERSION_190;
 
   //
   // Backspace types
@@ -337,8 +375,14 @@ export class KMXFile {
   public static readonly KF_LOGICALLAYOUT =    0x0008;
   public static readonly KF_AUTOMATICVERSION = 0x0010;
 
-  // 16.0: Support for LDML Keyboards in KMXPlus file format
-  public static readonly KF_KMXPLUS =  0x0020;
+  /** 16.0+: A `COMP_KEYBOARD_KMXPLUSINFO` structure is present immediately after `COMP_KEYBOARD` */
+  public static readonly KF_KMXPLUS =          0x0020;
+
+  /**
+   * 19.0+: The `COMP_KEYBOARD_KMXPLUSINFO` structure contains only OSK, and not a
+   * LDML keyboard; KF_KMXPLUS should not be set
+   */
+  public static readonly KF_KMXPLUSOSK =       0x0040;
 
   public static readonly HK_ALT =      0x00010000;
   public static readonly HK_CTRL =     0x00020000;
@@ -466,7 +510,7 @@ export class KMXFile {
       dpGroupArray: r.uint32le,   // 0024 [LPGROUP] address of first item in group array
 
       StartGroup_ANSI: r.uint32le,     // 0028 index of starting ANSI group
-      StartGroup_Unicode: r.uint32le,  // 0028 index of starting Unicode groups
+      StartGroup_Unicode: r.uint32le,  // 002C index of starting Unicode groups
 
       dwFlags: r.uint32le,        // 0030 Flags for the keyboard file
 
