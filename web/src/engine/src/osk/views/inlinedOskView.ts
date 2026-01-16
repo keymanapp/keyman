@@ -1,4 +1,4 @@
-import { DeviceSpec } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
 
 import { OSKView, OSKPos, OSKRect } from './oskView.js';
 import { VisualKeyboard } from '../visualKeyboard.js';

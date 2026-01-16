@@ -10,12 +10,11 @@ import { VisualKeyboard } from '../visualKeyboard.js';
 import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
 import { type KeyElement } from '../keyElement.js';
 
+import { DeviceSpec, ManagedPromise } from 'keyman/common/web-utils';
 import {
   Codes,
-  DeviceSpec,
   JSKeyboard,
   KeyboardProperties,
-  ManagedPromise,
   type MinimalCodesInterface,
   type MutableSystemStore, type SystemStoreMutationHandler,
 } from 'keyman/engine/keyboard';

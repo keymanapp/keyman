@@ -3,7 +3,8 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardHarness, MinimalKeymanGlobal, DeviceSpec, JSKeyboard } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { KeyboardHarness, MinimalKeymanGlobal, JSKeyboard } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 
 

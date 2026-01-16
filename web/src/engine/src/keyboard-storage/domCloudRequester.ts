@@ -1,4 +1,4 @@
-import { ManagedPromise } from 'keyman/engine/keyboard';
+import { ManagedPromise } from 'keyman/common/web-utils';
 import { CloudRequesterInterface } from './cloud/requesterInterface.js';
 import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './cloud/queryEngine.js';
 

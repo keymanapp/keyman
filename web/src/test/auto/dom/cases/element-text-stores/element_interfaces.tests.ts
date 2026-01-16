@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 
-import { KMWString, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { KMWString } from 'keyman/common/web-utils';
+import { SyntheticTextStore } from 'keyman/engine/keyboard';
 import * as wrappers from 'keyman/engine/element-text-stores';
 
 import { DynamicElements } from '../../test_utils.js';

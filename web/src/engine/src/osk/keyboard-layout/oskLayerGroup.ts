@@ -1,4 +1,5 @@
-import { type DeviceSpec, JSKeyboard, ActiveLayout, ButtonClasses } from 'keyman/engine/keyboard';
+import { JSKeyboard, ActiveLayout, ButtonClasses } from 'keyman/engine/keyboard';
+import { type DeviceSpec } from 'keyman/common/web-utils';
 
 import { InputSample } from 'keyman/engine/gesture-processor';
 

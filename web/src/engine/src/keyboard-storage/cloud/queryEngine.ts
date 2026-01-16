@@ -3,8 +3,9 @@ import { EventEmitter } from 'eventemitter3';
 import { PathConfiguration } from 'keyman/engine/interfaces';
 
 import { KeyboardStub, ErrorStub, KeyboardAPISpec } from '../keyboardStub.js';
-import { LanguageAPIPropertySpec, ManagedPromise, Version } from 'keyman/engine/keyboard';
+import { LanguageAPIPropertySpec } from 'keyman/engine/keyboard';
 import { CloudRequesterInterface } from './requesterInterface.js';
+import { ManagedPromise, Version } from 'keyman/common/web-utils';
 
 // For when the API call straight-up times out.
 export const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";

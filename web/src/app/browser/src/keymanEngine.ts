@@ -7,7 +7,8 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
-import { DeviceSpec, JSKeyboard, Keyboard, KMXKeyboard } from "keyman/engine/keyboard";
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { JSKeyboard, Keyboard, KMXKeyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';

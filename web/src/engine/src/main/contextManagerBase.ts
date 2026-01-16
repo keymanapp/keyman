@@ -1,5 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
-import { ManagedPromise, type Keyboard, type TextStore } from 'keyman/engine/keyboard';
+import { ManagedPromise } from 'keyman/common/web-utils';
+import { type Keyboard, type TextStore } from 'keyman/engine/keyboard';
 import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { PredictionContext } from 'keyman/engine/interfaces';

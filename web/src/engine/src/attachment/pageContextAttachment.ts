@@ -1,6 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 
-import { DeviceSpec, InternalKeyboardFont } from "keyman/engine/keyboard";
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { InternalKeyboardFont } from "keyman/engine/keyboard";
 import { InputElementTextStore, nestedInstanceOf, createTextStoreForElement } from "keyman/engine/element-text-stores";
 import {
   arrayFromNodeList,

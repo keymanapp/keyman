@@ -13,7 +13,8 @@ import {
 
 import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
-import { DeviceSpec, JSKeyboard, KeyboardProperties, timedPromise } from 'keyman/engine/keyboard';
+import { DeviceSpec, timedPromise } from 'keyman/common/web-utils';
+import { JSKeyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 import { Banner } from './banner.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';

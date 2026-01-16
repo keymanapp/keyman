@@ -1,4 +1,5 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, KeyboardProcessor, Keyboard } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { Codes, KeyEvent, KeyMapping, KeyboardProcessor, Keyboard } from 'keyman/engine/keyboard';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
