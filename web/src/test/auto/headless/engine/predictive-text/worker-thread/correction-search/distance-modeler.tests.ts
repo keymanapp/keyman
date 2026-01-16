@@ -1259,9 +1259,9 @@ describe('Correction Distance Modeler', function() {
         {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
       ];
 
-      searchSpace.addInput(synthDistribution1);
-      searchSpace.addInput(synthDistribution2);
-      searchSpace.addInput(synthDistribution3);
+      searchSpace.addInput(synthDistribution1, 1);
+      searchSpace.addInput(synthDistribution2, .75);
+      searchSpace.addInput(synthDistribution3, .25);
 
       let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkRepeatableResults_teh(iter);
@@ -1289,9 +1289,9 @@ describe('Correction Distance Modeler', function() {
         {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
       ];
 
-      searchSpace.addInput(synthDistribution1);
-      searchSpace.addInput(synthDistribution2);
-      searchSpace.addInput(synthDistribution3);
+      searchSpace.addInput(synthDistribution1, 1);
+      searchSpace.addInput(synthDistribution2, .75);
+      searchSpace.addInput(synthDistribution3, .25);
 
       let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkRepeatableResults_teh(iter);
