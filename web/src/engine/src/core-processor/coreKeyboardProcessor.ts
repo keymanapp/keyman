@@ -290,7 +290,8 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
 
   /**
    * Processes post-keystroke actions for the given device and text store.
-   * Handles any actions that should occur after a keystroke is processed.
+   * Handles any actions that should occur after a keystroke is processed
+   * or after applying suggestions.
    *
    * @param {DeviceSpec}  device     The device specification.
    * @param {TextStore}   textStore  The current text store context.
@@ -298,7 +299,10 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @returns {ProcessorAction} The resulting processor action, or null if not applicable.
    */
   public processPostKeystroke(device: DeviceSpec, textStore: TextStore): ProcessorAction {
-    // TODO-web-core: Implement this method (#15286)
+    // TODO-embed-osk-in-kmx: Implement this method (#15286)
+    // This gets called after processing a keystroke to process the PostKeystroke group
+    // (irrelevant for web-core since that is handled in Core), but also after
+    // applying a suggestion, which we do need to handle.
     return null;
   }
 
@@ -343,7 +347,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @returns {boolean} True if the keyboard layer changed, false otherwise.
    */
   public selectLayer(keyEvent: KeyEvent): boolean {
-    // TODO-web-core: Implement this method (#15284)
+    // TODO-embed-osk-in-kmx: Implement this method (#15284)
     return false;
   }
 
