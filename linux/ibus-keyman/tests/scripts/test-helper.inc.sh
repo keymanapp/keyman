@@ -300,7 +300,7 @@ function _setup_ibus() {
 
   echo "Starting ibus-daemon..."
   #shellcheck disable=SC2086
-  ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
+  ibus-daemon ${ARG_VERBOSE-} --replace --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
 
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
   if [[ "${STANDALONE}" == "--standalone" ]] && [[ "${DOCKER_RUNNING:-false}" != "true" ]] && [[ -z "${TEAMCITY_GIT_PATH:-}" ]];  then
@@ -393,9 +393,9 @@ function cleanup() {
     # some other ibus processes that belong to the real ibus daemon to
     # be killed as well, leaving us with no way to type.
     # So we kill the remaining lonely ibus-daemon and start ibus again.
-    if [[ "$(ibus engine)" == ""  ]]; then
-      echo "# Killing and restarting ibus-daemon"
-      kill -9 "$(pgrep -u "${USER:-$(whoami)}" ibus-daemon)"
+    if [[ ! "$(ibus engine &> /dev/null)" ]]; then
+      echo "# Stopping and starting ibus-daemon"
+      ibus exit &> /dev/null || kill -9 $(pgrep -u "${USER:-$(whoami)}" ibus-daemon) &> /dev/null || true
       ibus start -d
     fi
   fi

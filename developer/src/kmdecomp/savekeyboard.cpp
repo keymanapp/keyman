@@ -28,6 +28,8 @@
 
 #include <stdio.h>
 
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+#include <codecvt>
 #include "../../../common/include/kmx_file.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/windows/cpp/include/vkeys.h"
@@ -367,7 +369,9 @@ PWCHAR ExtString(PWCHAR str)
 
 void wr(FILE *fp, PWSTR buf)
 {
-	fwrite(buf, wcslen(buf) * 2, 1, fp);
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+	std::string utf8_string = utf8_conv.to_bytes(buf);
+	fwrite(utf8_string.c_str(), utf8_string.size(), 1, fp);
 }
 
 int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char* filename, char* bmpfile)
@@ -389,8 +393,6 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char* fi
     Err("Unable to create output file.");
     return 3;
   }
-
-  fwrite(UTF16Sig, 2, 1, fp);
 
 	wsprintfW(buf, L"c Keyboard created by KMDECOMP\n"); wr(fp, buf);
 	wsprintfW(buf, L"c\n"); wr(fp, buf);

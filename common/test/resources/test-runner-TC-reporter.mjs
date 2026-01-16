@@ -26,7 +26,10 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
       .replace(/\|/g, '||')
       .replace(/\[/g, '|[')
       .replace(/\]/g, '|]')
-      .replace(/\'/g, '|\'');
+      .replace(/\'/g, '|\'')
+      .replace(/\n/g, '|n')
+      .replace(/\r/g, '|r')
+      .replace(/[\u0080-\uFFFF]/g, c => `|0x${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
   }
 
   const e = tcReportEscaping;
