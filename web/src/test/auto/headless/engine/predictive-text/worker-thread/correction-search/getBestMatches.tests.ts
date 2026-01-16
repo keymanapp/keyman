@@ -91,16 +91,36 @@ describe('getBestMatches', () => {
     await checkBatch(fifthBatch, secondCost);
   }
 
-  it('Simple search without input', async () => {
+  it('Empty search root, loaded model', async () => {
     // The combinatorial effect here is a bit much to fully test.
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
     const searchSpace = new LegacyQuotientRoot(testModel);
+    const timer = buildTestTimer();
+    const iter = getBestMatches(searchSpace, timer);
 
-    const iter = getBestMatches(searchSpace, buildTestTimer());
-    const firstResult = await iter.next();
-    assert.isFalse(firstResult.done);
+    // While there's no input, insertion operations can produce suggestions.
+    const resultState = await iter.next();
+    const result: SearchResult = resultState.value;
+
+    // Just one suggestion root should be returned as the first result.
+    assert.equal(result.totalCost, 0);             // Gives a perfect match
+    assert.equal(result.inputSequence.length, 0);  // for a state with no input and
+    assert.equal(result.matchString, '');          // an empty match string.
+    assert.isFalse(resultState.done);
+
+    // Should be able to reach more, though.
+    const laterResultState = await iter.next();
+    const laterResult: SearchResult = laterResultState.value;
+
+    // Edit required:  an 'insertion' edge (no input matched, but char pulled
+    // from lexicon)
+    assert.isOk(laterResult);
+    assert.isAbove(laterResult.totalCost, 0);
+    // The most likely word in the lexicon starts with 't'.
+    assert.equal(laterResult.matchString, 't');
+    assert.isFalse(resultState.done);
   });
 
   // Hmm... how best to update this...
@@ -175,36 +195,5 @@ describe('getBestMatches', () => {
     // Reset the iterator first...
     const iter2 = getBestMatches(searchPath3, buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter2);
-  });
-
-  it('Empty search space, loaded model', async () => {
-    // The combinatorial effect here is a bit much to fully test.
-    const rootTraversal = testModel.traverseFromRoot();
-    assert.isNotEmpty(rootTraversal);
-
-    const searchSpace = new LegacyQuotientRoot(testModel);
-    const timer = buildTestTimer();
-    const iter = getBestMatches(searchSpace, timer);
-
-    // While there's no input, insertion operations can produce suggestions.
-    const resultState = await iter.next();
-    const result: SearchResult = resultState.value;
-
-    // Just one suggestion root should be returned as the first result.
-    assert.equal(result.totalCost, 0);             // Gives a perfect match
-    assert.equal(result.inputSequence.length, 0);  // for a state with no input and
-    assert.equal(result.matchString, '');          // an empty match string.
-    assert.isFalse(resultState.done);
-
-    // Should be able to reach more, though.
-    const laterResultState = await iter.next();
-    const laterResult: SearchResult = laterResultState.value;
-
-    // Edit required:  an 'insertion' edge (no input matched, but char pulled
-    // from lexicon)
-    assert.isAbove(laterResult.totalCost, 0);
-    // The most likely word in the lexicon starts with 't'.
-    assert.equal(laterResult.matchString, 't');
-    assert.isFalse(resultState.done);
   });
 });
