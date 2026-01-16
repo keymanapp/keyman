@@ -43,7 +43,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     return;
   }
 
-  protected construct(parentNode: SearchQuotientNode, inputs?: Distribution<Transform>, inputSource?: PathInputProperties): this {
+  construct(parentNode: SearchQuotientNode, inputs?: Distribution<Transform>, inputSource?: PathInputProperties): this {
     return new LegacyQuotientSpur(parentNode, inputs, inputSource) as this;
   }
 

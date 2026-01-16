@@ -47,11 +47,6 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return [];
   }
 
-  // Return a new array each time; avoid aliasing potential!
-  get inputSequence(): LexicalModelTypes.Distribution<LexicalModelTypes.Transform>[] {
-    return [];
-  }
-
   // Return a new instance each time; avoid aliasing potential!
   get bestExample(): { text: string; p: number; }  {
     return { text: '', p: 1 };
@@ -107,7 +102,53 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return [];
   }
 
+  isSameSpace(space: SearchQuotientNode): boolean {
+    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // a perfect match.
+    if(this == space || this.spaceId == space.spaceId) {
+      return true;
+    }
+
+    // If it's falsy or a different SearchQuotientNode type, that's an easy filter.
+    if(!space || !(space instanceof SearchQuotientRoot)) {
+      return false;
+    }
+
+    // The two should be based upon the same LexicalModel.
+    if(this.model != space.model) {
+      return false;
+    }
+    return true;
+  }
+
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
     return [this, new SearchQuotientRoot(this.model)];
+  }
+
+  merge(space: SearchQuotientNode): SearchQuotientNode {
+    // Head node for the incoming path is empty, so skip it.
+    if(space.parents.length == 0 || space instanceof SearchQuotientRoot) {
+      return this;
+    }
+
+    // Merge any parents first as a baseline.  We have to come after their
+    // affects are merged in, anyway.
+    const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
+
+    // if parentMerges.length > 0, is a SearchCluster.
+    // const parentMerge = parentMerges.length > 0 ? new SearchCluster(parentMerges) : parentMerges[0];
+    const parentMerge = parentMerges[0];
+
+    // Special case:  if we've reached the head of the space to be merged, check
+    // for a split transform.
+    //  - we return `this` from the root, so if that's what we received, we're
+    //    on the first descendant - the first path component.
+    if(space instanceof SearchQuotientSpur) {
+      // Needs to construct a NEW version of whatever the same type is, on this root.
+      return space.construct(parentMerge, space.inputs, space.inputSource);
+    } else {
+      // If the parent was a cluster, the cluster itself is the merge.
+      return parentMerge;
+    }
   }
 }

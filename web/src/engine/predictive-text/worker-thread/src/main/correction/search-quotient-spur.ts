@@ -10,10 +10,12 @@
 
 import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
+import { SearchQuotientRoot } from './search-quotient-root.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -100,15 +102,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
   public get model(): LexicalModel {
     return this.parentNode.model;
-  }
-
-  /**
-   * Retrieves the sequences of inputs that led to this SearchPath.
-   */
-  public get inputSequence(): Distribution<Transform>[] {
-    const parentInputs = this.parentNode?.inputSequence.slice() ?? [];
-    const localInputs = this.inputs ? [this.inputs.slice()] : [];
-    return parentInputs.concat(localInputs);
   }
 
   get codepointLength(): number {
@@ -211,11 +204,83 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   /** Allows the base class to construct instances of the derived class. */
-  protected abstract construct(
+  abstract construct(
     parentNode: SearchQuotientNode,
-    inputs?: Distribution<Transform>,
-    inputSource?: PathInputProperties
+    inputs: Distribution<Transform>,
+    inputSource: PathInputProperties
   ): this;
+
+  // spaces are in sequence here.
+  // `this` = head 'space'.
+  public merge(space: SearchQuotientNode): SearchQuotientNode {
+    // Head node for the incoming path is empty, so skip it.
+    if(space.parents.length == 0 || space instanceof SearchQuotientRoot) {
+      return this;
+    }
+
+    // Merge any parents first as a baseline.  We have to come after their
+    // affects are merged in, anyway.
+    const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
+
+    // if parentMerges.length > 0, is a SearchCluster.
+    const parentMerge = parentMerges[0];
+
+    // Special case:  if we've reached the head of the space to be merged, check
+    // for a split transform.
+    //  - we return `this` from the root, so if that's what we received, we're
+    //    on the first descendant - the first path component.
+    if(space instanceof SearchQuotientSpur) {
+      if(parentMerge != this) {
+        return this.construct(parentMerge, space.inputs, space.inputSource);
+      }
+
+      const localInputId = this.inputSource?.segment.transitionId;
+      const spaceInputId = space.inputSource?.segment.transitionId;
+      // The 'id' may be undefined in some unit tests and for tokens
+      // reconstructed after a backspace.  In either case, we consider the
+      // related results as fully separate; our reconstructions are
+      // per-codepoint.
+      if(localInputId != spaceInputId || localInputId === undefined) {
+        return space.construct(parentMerge, space.inputs, space.inputSource);
+      }
+      // Get the twin halves that were split.
+      // Assumption:  the two halves are in their original order, etc.
+      const localInputs = this.inputs;
+      const spaceInputs = space.inputs;
+
+      // Sanity check - ensure that the input distributions have the same length;
+      // if not, this shouldn't represent a SearchPath split!
+      if(localInputs.length != spaceInputs.length) {
+        return space.construct(parentMerge, space.inputs, space.inputSource);
+      }
+
+      // Merge them!
+      const mergedInputs = localInputs?.map((entry, index) => {
+        return {
+          sample: buildMergedTransform(entry.sample, spaceInputs[index].sample),
+          p: entry.p
+        }
+      });
+
+      const mergedInputSource = {
+        ...this.inputSource,
+        segment: {
+          ...this.inputSource.segment,
+          end: space.inputSource.segment.end
+        }
+      };
+
+      if(mergedInputSource.segment.end == undefined) {
+        delete mergedInputSource.segment.end;
+      }
+
+      // Now to re-merge the two halves.
+      return space.construct(this.parentNode, mergedInputs, this.inputSource);
+    } else {
+      // If the parent was a cluster, the cluster itself is the merge.
+      return parentMerge;
+    }
+  }
 
   public split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
     const internalSplitIndex = charIndex - (this.codepointLength - this.insertLength);
@@ -432,5 +497,41 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
 
     return components.join('+');
+  }
+
+  isSameSpace(space: SearchQuotientNode): boolean {
+    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // a perfect match.
+    if(this == space || this.spaceId == space.spaceId) {
+      return true;
+    }
+
+    // If it's falsy or a different SearchSpace type, that's an easy filter.
+    if(!space || !(space instanceof SearchQuotientSpur)) {
+      return false;
+    }
+
+    // If the most recent 'input source' was not triggered from the same input
+    // subset, it's not a match.
+    if(this.inputSource?.subsetId != space.inputSource?.subsetId) {
+      return false;
+    }
+
+    // We check the indices of the input's split if one occurred.
+    if(this.inputSource?.segment.end != space.inputSource?.segment.end) {
+      return false;
+    }
+
+    if(this.inputSource?.segment.start != space.inputSource?.segment.start) {
+      return false;
+    }
+
+    return true;
+
+    // Commented out b/c parentSpace-checks cause unit-test ID issues after... a... split.
+    //
+    // // Finally, we recursively verify that the parent matches.  If there IS no parent,
+    // // we verify that _that_ aspect matches.
+    // return this.parentSpace?.isSameSpace(space.parentSpace) ?? this.parentSpace == space.parentSpace;
   }
 }

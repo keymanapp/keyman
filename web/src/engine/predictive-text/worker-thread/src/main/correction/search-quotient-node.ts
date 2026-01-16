@@ -191,16 +191,6 @@ export interface SearchQuotientNode {
   readonly inputCount: number;
 
   /**
-   * Retrieves the sequence of inputs that led to this SearchSpace.
-   *
-   * THIS WILL BE REMOVED SHORTLY in favor of `constituentPaths` below, which
-   * provides an improved view into the data and models multiple paths to the
-   * space when they exist.  (Once SearchQuotientNode takes on merging &
-   * splitting)
-   */
-  readonly inputSequence: Distribution<Transform>[];
-
-  /**
    * Reports the length in codepoints of corrected text represented by completed
    * paths from this instance.
    */
@@ -227,6 +217,14 @@ export interface SearchQuotientNode {
   get sourceRangeKey(): string;
 
   /**
+   * Appends this SearchSpace with the provided SearchSpace's search properties,
+   * extending the represented search range accordingly.  If this operation
+   * represents merging the result of a previous .split() call, the two halves
+   * of any split input components will be fully re-merged.
+   * @param space
+   */
+  merge(space: SearchQuotientNode): SearchQuotientNode;
+
   /**
    * Splits this SearchSpace into two halves at the specified codepoint index.
    * The 'head' component will maximally re-use existing cached data, while the
@@ -242,4 +240,6 @@ export interface SearchQuotientNode {
    * Intended only for use during unit testing.  Does not include the root node.
    */
   readonly constituentPaths: SearchQuotientSpur[][];
+
+  isSameSpace(space: SearchQuotientNode): boolean;
 }
