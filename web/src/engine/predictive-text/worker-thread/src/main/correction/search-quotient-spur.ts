@@ -255,7 +255,13 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       // don't append any part of it to the parent; it's actually clean.
       const hasActualSplit = internalSplitIndex > 0 || this.inputs?.[0].sample.deleteLeft > 0;
       const parent = hasActualSplit
-        ? this.construct(this.parentNode, firstSet, this.inputSource)
+        ? this.construct(this.parentNode, firstSet, {
+          ...this.inputSource,
+          segment: {
+            ...this.inputSource.segment,
+            end: this.inputSource.segment.start + internalSplitIndex
+          }
+        })
         : this.parentNode;
       // construct two SearchPath instances based on the two sets!
       return [
@@ -417,7 +423,12 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     for(const source of sources) {
       const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
+      const j = source.segment.end;
+      let component = (`T${source.segment.transitionId}${i != 0 || j !== undefined  ? '@' + i : ''}`);
+      if(j) {
+        component = component + '-' + j;
+      }
+      components.push(component);
     }
 
     return components.join('+');
