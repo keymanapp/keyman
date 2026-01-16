@@ -119,9 +119,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">ភាសា​ទាំង​អស់​ដែល​បាន​ដំឡើង​ហើយ</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">ទាញក្ដារចុចដើម្បីកែកម្ពស់</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">បង្វិលឧបករណ៍ដើម្បីកែបញ្ឈ និងផ្ដេក</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">ទាញក្ដារចុចដើម្បីកែកម្ពស់ បង្វិលឧបករណ៍ដើម្បីកែបញ្ឈ និងផ្ដេក</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">ប្ដូរ​កំណត់​ទៅលំនាំដើម</string>
   <!-- Context: Adjust Longpress Delay Time menu -->

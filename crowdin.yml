@@ -23,7 +23,8 @@ files:
   # source: local path of file that gets uploaded to crowdin
   # dest: crowdin path in https://crowdin.com/project/keyman
   # translation: local path where downloaded translations from crowdin go
-
+  # languages_mapping for custom language codes are configured in the Crowdin UI at
+  #   https://crowdin.com/project/keyman/settings#languages
 
   # Android files
   # Reference: https://developer.android.com/guide/topics/resources/multilingual-support
@@ -34,10 +35,8 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
       android_code:
-        el-polyton: b+el # TODO: figure out polyton variant
         es-419: b+es+419
         pap: pap
-        shu-latn-n: b+shu+latn
 
   - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
     dest: /android/app/strings.xml
@@ -45,10 +44,8 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
-        el-polyton: b+el # TODO: figure out polyton variant
         es-419: b+es+419
         pap: pap
-        shu-latn-n: b+shu+latn
 
   # Windows files
   # Note: we use type: android for the Windows project files
@@ -81,7 +78,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
     dest: /ios/engine/Localizable.strings
@@ -89,7 +85,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.stringsdict
     dest: /ios/engine/Localizable.stringsdict
@@ -97,7 +92,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings
     dest: /ios/app/Localizable.strings
@@ -105,7 +99,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   # Linux files
 
@@ -116,7 +109,6 @@ files:
     update_option: update_as_unapproved
     languages_mapping:
       locale_with_underscore:
-        shu-latn-n: shu@latin
         ha: ha
 
   # macOS files
@@ -127,7 +119,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/en.lproj/preferences.strings
     dest: /mac/app/preferences.strings
@@ -135,7 +126,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/en.lproj/KMInfoWindowController.strings
     dest: /mac/app/KMInfoWindowController.strings
@@ -143,7 +133,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings
     dest: /mac/app/KMKeyboardHelpWindowController.strings
@@ -151,7 +140,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/Localizable.strings
     dest: /mac/app/Localizable.strings
@@ -159,7 +147,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/MainMenu.strings
     dest: /mac/app/MainMenu.strings
@@ -167,7 +154,6 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
-        el-polyton: el.lproj
 
   # crowdin parameters descriptions:
 
