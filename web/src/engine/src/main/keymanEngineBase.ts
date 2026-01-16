@@ -1,4 +1,4 @@
-import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction, KMXKeyboard } from "keyman/engine/keyboard";
+import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 // TODO-web-core: remove alias (#15292)
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard";
@@ -553,36 +553,27 @@ export class KeymanEngineBase<
   /**
    * Function     isChiral
    * Scope        Public
-   * @param       {string|Object=}   k0
+   * @param       {string|Keyboard}   k0
    * @return      {boolean}
    * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isChiral
    */
-  public isChiral(k0?: string | JSKeyboard) {
-    let jsKbd: JSKeyboard;
+  public isChiral(k0?: string | Keyboard) {
+    let keyboard: Keyboard;
     if(k0) {
       if(typeof k0 == 'string') {
-        const kbdObj = this.keyboardRequisitioner.cache.getKeyboard(k0);
-        if (!kbdObj) {
+        keyboard = this.keyboardRequisitioner.cache.getKeyboard(k0);
+        if (!keyboard) {
           throw new Error(`Keyboard '${k0}' has not been loaded.`);
-        } else if (kbdObj instanceof KMXKeyboard) {
-          return false; // TODO-web-core: implement for KMX keyboards
-        } else {
-          k0 = kbdObj;
         }
-      }
-
-      jsKbd = k0;
-    } else {
-      const kbd = this.core.activeKeyboard;
-      if (kbd instanceof JSKeyboard) {
-        jsKbd = kbd;
       } else {
-        return false; // TODO-web-core: implement for KMX keyboards
+        keyboard = k0;
       }
+    } else {
+      keyboard = this.core.activeKeyboard;
     }
-    return jsKbd.isChiral;
+    return keyboard.isChiral;
   }
 
   /**
