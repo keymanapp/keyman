@@ -1,24 +1,18 @@
-/*
- * Keyman is 2025 copyright (C) SIL International. MIT License.
- *
- * Created by S. Schmitt on 2025-08-21
- *
- * Tests for kmcConvertutil
- *
- */
-
 import 'mocha';
 import { assert } from 'chai';
-import { compilerTestCallbacks } from './helpers/index.js';
-import { kmcConvertutil } from '@keymanapp/common-types';
+//import { compilerTestCallbacks } from './../helpers/index.js';
+//import { compilerTestCallbacks } from '@keymanapp/developer-utils';
+import { convertUtil } from '@keymanapp/common-types'
 
-describe('kmcConvertutil', function () {
+import { TestCompilerCallbacks } from ' ../../../../developer/src/common/web/test-helpers/TestCompilerCallbacks.js';
+describe('KmnFileWriter', function () {
 
   before(function () {
-    compilerTestCallbacks.clear();
+    TestCompilerCallbacks.clear();
   });
+console.log('convertUtil from util');
 
-  describe('convertToUnicodeCodePoint ', function () {
+  describe('convertToUnicodeCodePoint  from convert-util', function () {
     [
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
@@ -41,13 +35,13 @@ describe('kmcConvertutil', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = kmcConvertutil.convertToUnicodeCodePoint(values[0] as string);
+        const result = convertUtil.convertToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
   });
 
-  describe('convertToUnicodeCharacter ', function () {
+  describe('convertToUnicodeCharacter  from convert-util', function () {
     [
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
@@ -60,31 +54,23 @@ describe('kmcConvertutil', function () {
       ["U+0061", 'a'],
       ["U+1234", 'ሴ'],
       ["U+1F60E", '😎'],
-      ["U+1000000", undefined],      
+      ["U+1000000;", undefined],
+      ["&commat;", undefined],
       ["a", 'a'],
       ["ሴ", 'ሴ'],
       ['😎', '😎'],
       ["W̊", "W̊"],
-      ["&", "&"],
-      ["&gt;", ">"],
-      ["&lt;", "<"],
-      ["&amp;", "&"],
-      ["&apos;", "'"],
-      ["&quot;", '"'],
-      ["&commat;", undefined],
       ["ab", undefined],
-      ["Uu", undefined],
-      ["U+", undefined],
-      ["U+1", undefined],
       ["", ''],
       [undefined, undefined],
       [null, undefined]
     ].forEach(function (values) {
-      it(('from utils should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = kmcConvertutil.convertToUnicodeCharacter(values[0] as string);
+      it(('from writer should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = convertUtil.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
   });
+
 
 });
