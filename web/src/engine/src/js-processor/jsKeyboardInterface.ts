@@ -22,7 +22,6 @@ import {
   type KeyEvent,
   type TextStore,
   VariableStore,
-  VariableStoreDictionary,
   VariableStoreSerializer,
 } from "keyman/engine/keyboard";
 import { PlatformSystemStore } from './platformSystemStore.js';
@@ -1103,7 +1102,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param stores A dictionary of stores which should be found in the
    *               keyboard
    */
-  applyVariableStores(stores: VariableStoreDictionary): void {
+  applyVariableStores(stores: VariableStore): void {
     this.activeKeyboard.variableStores = stores;
   }
 

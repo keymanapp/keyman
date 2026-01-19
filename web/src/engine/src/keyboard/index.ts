@@ -30,7 +30,7 @@ export { EmulationKeystrokes, LogMessages, DefaultRules } from "./defaultRules.j
 export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";
 export { KeyMapping } from "./keyMapping.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
-export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } from "./variableStore.js";
+export { type VariableStore, VariableStoreSerializer } from "./variableStore.js";
 
 export { DOMKeyboardLoader } from './keyboards/loaders/domKeyboardLoader.js';
 export { SyntheticTextStore } from "./syntheticTextStore.js";
