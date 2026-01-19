@@ -36,7 +36,7 @@ namespace core
     using options_store = decltype(_default_opts);
 
     keyboard_attributes()
-    : km_core_keyboard_attrs {nullptr, nullptr, nullptr, nullptr} {}
+    : km_core_keyboard_attrs {nullptr, nullptr, nullptr} {}
     keyboard_attributes(keyboard_attributes const &) = delete;
     keyboard_attributes(keyboard_attributes &&);
 
