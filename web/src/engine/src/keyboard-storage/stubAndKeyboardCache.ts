@@ -6,7 +6,7 @@ import { KeyboardStub } from "./keyboardStub.js";
 const KEYBOARD_PREFIX = "Keyboard_";
 
 export function toPrefixedKeyboardId(text: string) {
-  if(!text?.startsWith(KEYBOARD_PREFIX)) {
+  if(!text.startsWith(KEYBOARD_PREFIX)) {
     return KEYBOARD_PREFIX + text;
   } else {
     return text;
@@ -14,7 +14,7 @@ export function toPrefixedKeyboardId(text: string) {
 }
 
 export function toUnprefixedKeyboardId(text: string) {
-  if(text?.startsWith(KEYBOARD_PREFIX)) {
+  if(text.startsWith(KEYBOARD_PREFIX)) {
     return text.substring(KEYBOARD_PREFIX.length);
   } else {
     return text;

@@ -8,7 +8,7 @@ import { toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   private _activeKeyboard: Keyboard;
 
-  public constructor(public variableStoreSerializer?: VariableStoreSerializer) {
+  public constructor(public variableStoreSerializer: VariableStoreSerializer) {
   }
 
   public get activeKeyboard(): Keyboard {
@@ -16,6 +16,16 @@ export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   }
   public set activeKeyboard(keyboard: Keyboard) {
     this._activeKeyboard = keyboard;
+    const options = this.loadSerializedOptions(keyboard);
+
+    if (options.length > 0) {
+      const kmxKeyboard = this._activeKeyboard as KMXKeyboard;
+      KM_Core.instance.state_options_update(kmxKeyboard.state, options);
+    }
+  }
+
+
+  private loadSerializedOptions(keyboard: Keyboard): km_core_option_item[] {
     const stores = this.variableStoreSerializer.findStores(toPrefixedKeyboardId(keyboard.id));
     const options: km_core_option_item[] = [];
     for (const store of stores) {
@@ -30,11 +40,6 @@ export class CoreKeyboardInterface implements KeyboardMinimalInterface {
         }
       }
     }
-
-    if (options.length > 0) {
-      const kmxKeyboard = this._activeKeyboard as KMXKeyboard;
-      KM_Core.instance.state_options_update(kmxKeyboard.state, options);
-    }
+    return options;
   }
-
 }

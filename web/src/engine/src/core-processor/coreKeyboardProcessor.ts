@@ -298,8 +298,8 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   private process_persist_action(options: km_core_option_item[]): void {
     if (this.keyboardInterface.variableStoreSerializer) {
       for (const option of options) {
-        console.assert(option.scope === KM_CORE_OPTION_SCOPE.OPT_KEYBOARD);
         if (option.scope !== KM_CORE_OPTION_SCOPE.OPT_KEYBOARD) {
+          console.error(`Unsupported option scope: ${option.scope}`);
           continue;
         }
         const valueObj: VariableStore = {};

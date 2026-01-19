@@ -60,7 +60,7 @@ export abstract class KeyboardLoaderBase {
 
     if (this.isKMXKeyboard(byteArray)) {
       // KMX or LDML (KMX+) keyboard
-      const name = uri.split('/').pop().replace(/\.[^/.]+$/, '');
+      const name = this.extractIdFromUrl(uri);
       const result = KM_Core.instance.keyboard_load_from_blob(name, byteArray);
       if (result.status == KM_CORE_STATUS.OK) {
         return new KMXKeyboard(result.object);
@@ -77,6 +77,11 @@ export abstract class KeyboardLoaderBase {
 
     // .js keyboard
     return await this.loadKeyboardFromScript(script, errorBuilder);
+  }
+
+  private extractIdFromUrl(uri: string): string {
+    // Extract filename without extension from the URL
+    return uri.split('/').pop().replace(/\.[^/.]+$/, '');
   }
 
   protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array>;
