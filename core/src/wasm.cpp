@@ -351,8 +351,10 @@ km_core_state_options_update_wasm(
     options_c[i].value = new_options[i].value.c_str();
     options_c[i].scope = new_options[i].scope;
   }
-  options_c[new_options.size()] = {nullptr, nullptr, 0};
-  return km_core_state_options_update(const_cast<km_core_state*>(state), options_c);
+  options_c[new_options.size()] = KM_CORE_OPTIONS_END;
+  km_core_status status = km_core_state_options_update(const_cast<km_core_state*>(state), options_c);
+  delete[] options_c;
+  return status;
 }
 
 const CoreReturn<km_core_context_items>*
