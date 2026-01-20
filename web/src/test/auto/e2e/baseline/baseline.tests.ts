@@ -140,7 +140,7 @@ test.describe('Baseline tests', () => {
                   value: encodeURIComponent(`${option.key}=${option.value};`),
                   domain: 'localhost',
                   path: '/',
-                  expires: 1768672167
+                  expires: Date.now() / 1000 + 60, // expire in 1 minute
                 });
               }
             }

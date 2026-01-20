@@ -9,27 +9,51 @@ import { CookieSerializer } from "keyman/engine/dom-utils";
 // dynamic property names; they'd have to be known at compile time to facilitate
 // strict type checking.
 class VarStoreSerializer extends CookieSerializer<VariableStore> {
-  constructor(keyboardID: string, storeName: string) {
+  public constructor(keyboardID: string, storeName: string) {
     super(`KeymanWeb_${keyboardID}_Option_${storeName}`);
   }
 
-  load() {
+  public load(): VariableStore {
     return super.load(decodeURIComponent);
   }
 
-  save(storeMap: VariableStore) {
+  public save(storeMap: VariableStore) {
     super.save(storeMap, encodeURIComponent);
+  }
+
+  /**
+   * Find all variable stores associated with a given keyboard.
+   *
+   * @param {string}  keyboardID  The keyboard ID whose variable stores are to be found.
+   *
+   * @returns An array of VariableStore objects found for the keyboard.
+   */
+  public static findStores(keyboardID: string): VariableStore[] {
+    const pattern = new RegExp(`^KeymanWeb_${keyboardID}_Option_`);
+    const matching = CookieSerializer.loadAllMatching<VariableStore>(pattern, decodeURIComponent);
+    return matching.map(m => m.value);
   }
 }
 
 export class VariableStoreCookieSerializer implements VariableStoreSerializer {
-  loadStore(keyboardID: string, storeName: string): VariableStore {
+  public loadStore(keyboardID: string, storeName: string): VariableStore {
     const storeCookieSerializer = new VarStoreSerializer(keyboardID, storeName);
     return storeCookieSerializer.load();
   }
 
-  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore) {
+  public saveStore(keyboardID: string, storeName: string, storeMap: VariableStore) {
     const storeCookieSerializer = new VarStoreSerializer(keyboardID, storeName);
     storeCookieSerializer.save(storeMap);
+  }
+
+  /**
+   * Find all variable stores associated with a given keyboard.
+   *
+   * @param {string}  keyboardID  The keyboard ID whose variable stores are to be found.
+   *
+   * @returns An array of VariableStore objects found for the keyboard.
+   */
+  public findStores(keyboardID: string): VariableStore[] {
+    return VarStoreSerializer.findStores(keyboardID);
   }
 }

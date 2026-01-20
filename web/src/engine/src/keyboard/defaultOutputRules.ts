@@ -141,13 +141,8 @@ export class DefaultOutputRules {
     // Translate numpad keystrokes into their non-numpad equivalents
     if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"]) {
       // Number pad, numlock on
-      let Lch: number;
-      if(Lkc.Lcode < 106) {
-        Lch = Lkc.Lcode-48;
-      } else {
-        Lch = Lkc.Lcode-64;
-      }
-      return String.fromCodePoint(Lch);
+      const cp = (Lkc.Lcode < 106) ? Lkc.Lcode - 48 : Lkc.Lcode - 64;
+      return String.fromCodePoint(cp);
     } else {
       return null;
     }
