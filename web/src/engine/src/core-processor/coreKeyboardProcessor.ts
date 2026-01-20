@@ -6,12 +6,13 @@ import { EventEmitter } from 'eventemitter3';
 import { KM_Core, KM_CORE_STATUS, KM_CORE_CT, km_core_context, km_core_context_items } from 'keyman/engine/core-adapter';
 import {
   BeepHandler,
-  DeviceSpec, EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
+  EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
   KeyEvent, KMXKeyboard, SyntheticTextStore, MutableSystemStore, TextStore, ProcessorAction,
   StateKeyMap,
   Deadkey
 } from "keyman/engine/keyboard";
 import { KM_CORE_EVENT_FLAG } from '../core-adapter/KM_Core.js';
+import { DeviceSpec } from 'keyman/common/web-utils';
 
 export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   public activeKeyboard: Keyboard;

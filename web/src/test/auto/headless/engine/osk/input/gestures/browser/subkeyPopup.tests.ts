@@ -4,9 +4,9 @@ import { JSDOM } from 'jsdom';
 import sinon from 'sinon';
 
 import { GesturePath, GestureSequence, GestureSource, GestureSourceSubview } from 'keyman/engine/gesture-processor';
-import { ActiveSubKey, DeviceSpec } from 'keyman/engine/keyboard';
-import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard } from 'keyman/engine/osk';
-import { testIndex } from 'keyman/engine/osk';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { ActiveSubKey } from 'keyman/engine/keyboard';
+import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard, testIndex } from 'keyman/engine/osk';
 
 import OSKBaseKey = testIndex.OSKBaseKey;
 import OSKRow = testIndex.OSKRow;
