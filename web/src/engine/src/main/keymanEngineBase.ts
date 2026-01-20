@@ -1,11 +1,10 @@
 import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
-// TODO-web-core: remove alias (#15292)
-import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard";
+import { DOMKeyboardLoader } from "keyman/engine/keyboard";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView, JSKeyboardData } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed, DOMCloudRequester } from "keyman/engine/keyboard-storage";
+import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId, DOMCloudRequester } from "keyman/engine/keyboard-storage";
 import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
@@ -242,7 +241,7 @@ export class KeymanEngineBase<
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     // All components initialized below require a properly-configured `config.paths` or similar.
-    const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);
+    const keyboardLoader = new DOMKeyboardLoader(this.interface, config.applyCacheBusting);
     this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
     this.modelCache = new ModelCache();
     const kbdCache = this.keyboardRequisitioner.cache;
@@ -400,7 +399,7 @@ export class KeymanEngineBase<
     const report = {
       configReport: this.config?.debugReport(),
       keyboard: {
-        id: unprefixed(activeKbd?.metadata?.id ?? ''),
+        id: toUnprefixedKeyboardId(activeKbd?.metadata?.id ?? ''),
         langId: activeKbd?.metadata?.langId || '',
         version: activeKbd?.keyboard?.version ?? ''
       },
