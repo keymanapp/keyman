@@ -9,10 +9,8 @@ import {
 } from '@keymanapp/common-types';
 import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 
-import {
-  ActiveLayout,
-  deepCopy
-} from 'keyman/engine/keyboard';
+import { deepCopy } from 'keyman/common/web-utils';
+import { ActiveLayout } from 'keyman/engine/keyboard';
 
 import { type KeyElement } from '../../keyElement.js';
 

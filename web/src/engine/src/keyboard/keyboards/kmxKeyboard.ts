@@ -34,7 +34,7 @@ export class KMXKeyboard {
         },{
           scope: KM_CORE_OPTION_SCOPE.OPT_ENVIRONMENT,
           key: KM_CORE_KMX_ENV.SIMULATEALTGR,
-          value: "0" // TODO: We won't support simulating AltGr option in v19
+          value: "0" // TODO: We won't support simulating AltGr option in v19 - see also emulatesAltGr
         }
       ]
     const result = KM_Core.instance.state_create(_keyboard, environment_opts);
@@ -55,7 +55,7 @@ export class KMXKeyboard {
   }
 
   public constructKeyEvent(key: ActiveKey | ActiveSubKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
-    // TODO-web-core: Implement this method (#15290)
+    // TODO-embed-osk-in-kmx: Implement this method (#15290)
     return null;
   }
 
@@ -86,7 +86,8 @@ export class KMXKeyboard {
   }
 
   public get isChiral(): boolean {
-    // TODO-web-core: Implement this method (#15290)
+    // TODO-embed-osk-in-kmx: Implement this method (#15290)
+    // Only relevant for OSK
     return false;
   }
 
@@ -95,7 +96,7 @@ export class KMXKeyboard {
    * @return  {boolean}
    */
   public get emulatesAltGr(): boolean {
-    // TODO-web-core: Implement this method (#15290)
+    // TODO: We won't support simulating AltGr option in v19 - see also c'tor
     return false;
   }
 
@@ -108,8 +109,8 @@ export class KMXKeyboard {
    * @param       {number}           data          1 for KeyDown or FocusReceived,
    *                                               0 for KeyUp or FocusLost
    */
-  public notify(eventCode: NotifyEventCode, textStore: TextStore, data: number): void { // I2187
-    // TODO-web-core: do we need to support this? (#15290)
+  public notify(eventCode: NotifyEventCode, textStore: TextStore, data: number): void {
+    // TODO: implement for IMX (cf #2239 and #7928)
   }
 
 }

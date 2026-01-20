@@ -5,17 +5,16 @@ import {
   ActiveKeyBase,
   ActiveLayout,
   ActiveSubKey,
-  DeviceSpec,
   JSKeyboard,
   KeyboardProperties,
   KeyDistribution,
   KeyEvent,
   Layouts,
   StateKeyMap,
-  timedPromise,
   type InternalKeyboardFont,
 } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from 'keyman/common/web-utils';
+import { DeviceSpec, timedPromise } from 'keyman/common/web-utils';
 
 import { buildCorrectiveLayout } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
