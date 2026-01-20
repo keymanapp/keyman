@@ -1,4 +1,6 @@
-export { Codes, DeviceSpec, JSKeyboard, KeyboardProperties, SpacebarText } from 'keyman/engine/keyboard';
+// TODO-web-core: why do we export these types from web-utils and keyboard here?
+export { DeviceSpec } from 'keyman/common/web-utils';
+export { Codes, JSKeyboard, KeyboardProperties, SpacebarText } from 'keyman/engine/keyboard';
 
 export { OSKView, JSKeyboardData } from './views/oskView.js';
 export { FloatingOSKView, FloatingOSKViewConfiguration } from './views/floatingOskView.js';
@@ -33,7 +35,13 @@ export {
     correctionKeyFilter, buildCorrectiveLayout
 } from './correctionLayout.js';
 
-// TODO-web-core: use a unitTestEndpoints pattern here (#15292)
-export * as testIndex from './test-index.js';
-
-// More things will likely need to be added.
+import { OSKBaseKey } from './keyboard-layout/oskBaseKey.js';
+import { OSKRow } from './keyboard-layout/oskRow.js';
+import { SubkeyPopup } from './input/gestures/browser/subkeyPopup.js'
+import { link } from './keyElement.js'
+export const unitTestEndpoints = {
+    OSKBaseKey,
+    OSKRow,
+    SubkeyPopup,
+    link
+};
