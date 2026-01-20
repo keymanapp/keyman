@@ -1,6 +1,6 @@
 // Defines a 'polyfill' of sorts for NPM's events module
 
-import ContextWindow from "./contextWindow.js";
+import { ContextWindow } from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec, isEmptyTransform } from "keyman/common/web-utils";
@@ -168,20 +168,26 @@ export class InputProcessor {
    */
   private _processKeyEvent(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
     const formFactor = keyEvent.device.formFactor;
-    const fromOSK = keyEvent.isSynthetic;
 
     // The default OSK layout for desktop devices does not include nextlayer info, relying on
     // modifier detection here.
     // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || (this.activeKeyboard instanceof JSKeyboard && this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) && fromOSK && this.keyboardProcessor.selectLayer(keyEvent)) {
+    if ((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard ||
+      (this.activeKeyboard instanceof JSKeyboard &&
+      this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) &&
+      keyEvent.isSynthetic
+    ) {
       // If it's a desktop OSK style and this triggers a layer change,
       // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
-      return new ProcessorAction();
+      if (this.keyboardProcessor.selectLayer(keyEvent)) {
+        return new ProcessorAction();
+      }
     }
 
     // Will handle keystroke-based non-layer change modifier & state keys, mapping them through
     // the physical keyboard's version of state management.  `doModifierPress` must always run.
-    if (this.keyboardProcessor.doModifierPress(keyEvent, textStore, !fromOSK) && !fromOSK) {
+    const wasModifierPress = this.keyboardProcessor.doModifierPress(keyEvent, textStore, !keyEvent.isSynthetic);
+    if (wasModifierPress && !keyEvent.isSynthetic) {
       // If run on a desktop platform, we know that modifier & state key presses may not
       // produce output, so we may make an immediate return safely.
       return new ProcessorAction();
@@ -212,7 +218,7 @@ export class InputProcessor {
 
     // We presently need the true keystroke to run on the FULL context.  That index is still
     // needed for some indexing operations when comparing two different textStores.
-    let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, textStore);
+    let processorAction = this.keyboardProcessor.processKeystroke(keyEvent, textStore);
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -235,37 +241,37 @@ export class InputProcessor {
     // If any of the four above conditions aren't met - no problem!
     // So it's a pretty niche scenario.
 
-    if(isEmptyTransform(ruleBehavior?.transcription?.transform) && keyEvent.kNextLayer) {
+    if(isEmptyTransform(processorAction?.transcription?.transform) && keyEvent.kNextLayer) {
       isOnlyLayerSwitchKey = true;
     }
 
-    const keepRuleBehavior = ruleBehavior != null;
+    const keepProcessorAction = processorAction != null;
     // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
-    if(keepRuleBehavior) {
+    if(keepProcessorAction) {
       // alternates are our fat-finger alternate outputs. We don't build these for keys we detect as
       // layer switch keys
-      const alternates = isOnlyLayerSwitchKey ? null : this.buildAlternates(ruleBehavior, keyEvent, preInputTextStore);
+      const alternates = isOnlyLayerSwitchKey ? null : this.buildAlternates(processorAction, keyEvent, preInputTextStore);
 
       // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
       // by the actual keystroke occur.
-      this.keyboardProcessor.finalizeProcessorAction(ruleBehavior, textStore);
+      this.keyboardProcessor.finalizeProcessorAction(processorAction, textStore);
 
       // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
 
       // Notify the ModelManager of new input - it's predictive text time!
       if(alternates && alternates.length > 0) {
-        ruleBehavior.transcription.alternates = alternates;
+        processorAction.transcription.alternates = alternates;
       }
     } else {
       // We need a dummy ProcessorAction for keys which have no output (e.g. Shift)
-      ruleBehavior = new ProcessorAction();
-      ruleBehavior.transcription = textStore.buildTranscriptionFrom(textStore, null, false);
-      ruleBehavior.triggersDefaultCommand = true;
+      processorAction = new ProcessorAction();
+      processorAction.transcription = textStore.buildTranscriptionFrom(textStore, null, false);
+      processorAction.triggersDefaultCommand = true;
     }
 
     // Multitaps operate in part by referencing 'committed' Transcriptions to rewind
     // the context as necessary.
-    this.contextCache.save(ruleBehavior.transcription); //
+    this.contextCache.save(processorAction.transcription); //
 
     // The keyboard may want to take an action after all other keystroke processing is
     // finished, for example to switch layers. This action may not have any output
@@ -274,33 +280,33 @@ export class InputProcessor {
 
     // We need to tell the keyboard if the layer has been changed, either by a keyboard rule itself,
     // or by the touch layout 'nextlayer' control.
-    const hasLayerChanged = ruleBehavior.setStore[SystemStoreIDs.TSS_LAYER] || keyEvent.kNextLayer;
+    const hasLayerChanged = processorAction.setStore[SystemStoreIDs.TSS_LAYER] || keyEvent.kNextLayer;
     this.keyboardProcessor.newLayerStore.set(hasLayerChanged ? this.keyboardProcessor.layerId : '');
     this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
-    const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, textStore);
-    if (postRuleBehavior) {
-      this.keyboardProcessor.finalizeProcessorAction(postRuleBehavior, textStore);
+    const postProcessorAction = this.keyboardProcessor.processPostKeystroke(this.contextDevice, textStore);
+    if (postProcessorAction) {
+      this.keyboardProcessor.finalizeProcessorAction(postProcessorAction, textStore);
     }
 
-    // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
-    ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription, this.keyboardProcessor.layerId);
+    // Yes, even for processorAction.triggersDefaultCommand.  Those tend to change the context.
+    processorAction.predictionPromise = this.languageProcessor.predict(processorAction.transcription, this.keyboardProcessor.layerId);
 
     // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
-    if(!ruleBehavior.triggersDefaultCommand) {
+    if(!processorAction.triggersDefaultCommand) {
       // For DOM-aware textStores, this will trigger a DOM event page designers may listen for.
       textStore.doInputEvent();
     }
 
-    return keepRuleBehavior ? ruleBehavior : null;
+    return keepProcessorAction ? processorAction : null;
   }
 
-  private buildAlternates(ruleBehavior: ProcessorAction, keyEvent: KeyEvent, preInputTextStore: SyntheticTextStore): Alternate[] {
+  private buildAlternates(processorAction: ProcessorAction, keyEvent: KeyEvent, preInputTextStore: SyntheticTextStore): Alternate[] {
     let alternates: Alternate[];
 
     // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
     // Also, don't do fat-finger stuff if predictive text isn't enabled.
-    if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
+    if(this.languageProcessor.isActive && !processorAction.triggersDefaultCommand) {
       const keyDistribution = keyEvent.keyDistribution;
 
       // We don't need to track absolute indexing during alternate-generation;
@@ -372,18 +378,18 @@ export class InputProcessor {
           }
 
           const altEvent = this.keyboardProcessor.activeKeyboard.constructKeyEvent(altKey, keyEvent.device, this.keyboardProcessor.stateKeys);
-          const alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, textStore);
+          const alternateProcessorAction = this.keyboardProcessor.processKeystroke(altEvent, textStore);
 
-          // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
+          // If alternateProcessorAction.beep == true, ignore it.  It's a disallowed key sequence,
           // so we expect users to never intend their use.
           //
           // Also possible that this set of conditions fail for all evaluated alternates.
-          if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
-            const transform: LexicalModelTypes.Transform = alternateBehavior.transcription.transform;
+          if(alternateProcessorAction && !alternateProcessorAction.beep && pair.p > 0) {
+            const transform: LexicalModelTypes.Transform = alternateProcessorAction.transcription.transform;
 
             // Ensure that the alternate's token id matches that of the current keystroke, as we only
             // record the matched rule's context (since they match)
-            transform.id = ruleBehavior.transcription.token;
+            transform.id = processorAction.transcription.token;
             alternates.push({sample: transform, 'p': pair.p});
             totalMass += pair.p;
           }

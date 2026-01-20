@@ -2,7 +2,7 @@ import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
-import ContextWindow from "./contextWindow.js";
+import { ContextWindow } from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Capabilities = LexicalModelTypes.Capabilities;
@@ -360,7 +360,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   /**
    * Retrieves the context and output state of KMW immediately before the prediction with
    * token `id` was generated.  Must correspond to a 'recent' one, as only so many are stored
-   * in `ModelManager`'s history buffer.
+   * in `ModelCache`'s history buffer.
    * @param id A unique identifier corresponding to a recent `Transcription`.
    * @returns The matching `Transcription`, or `null` none is found.
    */

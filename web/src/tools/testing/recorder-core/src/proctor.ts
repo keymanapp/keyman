@@ -11,7 +11,7 @@ export type AssertCallback = (s1: any, s2: any, msg?: string) => void;
  * Note that DOM-aware KeymanWeb will implement a Browser-based version, while
  * keyboard and input-processor will use a Node-based version instead.
  */
-export default abstract class Proctor {
+export abstract class Proctor {
   device: DeviceSpec;
 
   _assert: AssertCallback;

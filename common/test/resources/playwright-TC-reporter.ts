@@ -62,6 +62,15 @@ class TestNode {
     TestNode.OpenNodes.push(this.id);
   }
 
+  private escape(message: string): string {
+    // TeamCity escaping rules for: ' | [ ] \n \r \uNNNN
+    // See: https://www.jetbrains.com/help/teamcity/service-messages.html#Escaped+Values
+    return message?.replace(/['|\[\]]/g, (matched) => `|${matched}`)
+      .replace(/\n/g, '|n')
+      .replace(/\r/g, '|r')
+      .replace(/[\u0080-\uFFFF]/g, c => `|0x${c.charCodeAt(0).toString(16).padStart(4, '0')}`) ?? '';
+  }
+
   private getTestResult(result: TestResult): { msgTitle: string, details: string } {
     if (!result) {
       return null;
@@ -72,9 +81,9 @@ class TestNode {
       case 'failed':
       case 'interrupted':
       case 'timedOut':
-        return { msgTitle: 'testFailed', details: `message='${result.error?.message}' details='${result.error?.value ?? result.error?.cause}'` };
+        return { msgTitle: 'testFailed', details: `message='${this.escape(result.error?.message)}' details='${this.escape(result.error?.value ?? result.error?.cause)}'` };
       case 'skipped':
-        return { msgTitle: 'testIgnored', details: `message='${result.annotations?.toString() ?? ''}'` };
+        return { msgTitle: 'testIgnored', details: `message='${this.escape(result.annotations?.toString()) ?? ''}'` };
     }
   }
 

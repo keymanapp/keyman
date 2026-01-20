@@ -3,7 +3,7 @@
  *
  * @return      {boolean}
  */
-export default function landscapeView(): boolean	{ // new for I3363 (Build 301)
+export function landscapeView(): boolean	{ // new for I3363 (Build 301)
   let orientation: number;
 
   // Assume portrait mode if orientation undefined

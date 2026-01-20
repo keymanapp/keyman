@@ -1,8 +1,8 @@
 // References all utility includes from a single file, making import/export simple.
 
-export { default as deepCopy } from "./deepCopy.js";
+export { deepCopy } from "./deepCopy.js";
 
-export { default as DeviceSpec, physicalKeyDeviceAlias } from "./deviceSpec.js";
+export { DeviceSpec, physicalKeyDeviceAlias } from "./deviceSpec.js";
 
 /*
   // An example valid use, post-import:
@@ -12,16 +12,16 @@ export { default as DeviceSpec, physicalKeyDeviceAlias } from "./deviceSpec.js";
                                 true);
  */
 
-export { default as Version } from "./version.js";
+export { Version } from "./version.js";
 
-export { default as globalObject } from "./globalObject.js";
+export { globalObject } from "./globalObject.js";
 
 export * as KMWString from './kmwstring.js';
 
-export { default as ManagedPromise } from "./managedPromise.js";
-export { default as TimeoutPromise, timedPromise } from "./timeoutPromise.js";
+export { ManagedPromise } from "./managedPromise.js";
+export { TimeoutPromise, timedPromise } from "./timeoutPromise.js";
 
-export { default as PriorityQueue, QueueComparator } from "./priority-queue.js"
+export { PriorityQueue, QueueComparator } from "./priority-queue.js"
 
 export { isEmptyTransform } from './isEmptyTransform.js';
 

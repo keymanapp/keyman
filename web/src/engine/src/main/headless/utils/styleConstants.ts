@@ -7,7 +7,7 @@ import { DeviceSpec } from "keyman/common/web-utils";
 /**
  * Defines device-level constants used for CSS styling.
  */
-export default class StyleConstants {
+export class StyleConstants {
   constructor(device: DeviceSpec) {
     // popupCanvasBackgroundColor
     if(device.OS == DeviceSpec.OperatingSystem.Android) {

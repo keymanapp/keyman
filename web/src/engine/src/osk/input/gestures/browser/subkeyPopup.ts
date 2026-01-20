@@ -1,9 +1,10 @@
-import OSKSubKey from './oskSubKey.js';
+import { OSKSubKey } from './oskSubKey.js';
 import { type KeyElement } from '../../../keyElement.js';
-import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
-import VisualKeyboard from '../../../visualKeyboard.js';
+import { OSKBaseKey } from '../../../keyboard-layout/oskBaseKey.js';
+import { VisualKeyboard } from '../../../visualKeyboard.js';
 
-import { DeviceSpec, ActiveSubKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
+import { ActiveSubKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource, RecognitionZoneSource } from 'keyman/engine/gesture-processor';
 import { GestureHandler } from '../gestureHandler.js';
 import { CorrectionLayout, CorrectionLayoutEntry } from '../../../correctionLayout.js';
@@ -51,7 +52,7 @@ const CALLOUT_BASE_HEIGHT = 6 + SUBKEY_MENU_VERT_OFFSET;
  * As selection of the subkey occurs after the subkey popup is
  * displayed, selection of the subkey is inherently asynchronous.
  */
-export default class SubkeyPopup implements GestureHandler {
+export class SubkeyPopup implements GestureHandler {
   readonly directlyEmitsKeys = true;
 
   public readonly element: HTMLDivElement;

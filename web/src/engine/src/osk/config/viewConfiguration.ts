@@ -1,8 +1,8 @@
 import { type PredictionContext } from 'keyman/engine/interfaces';
-import type Activator from "../views/activator.js";
-import CommonConfiguration from "./commonConfiguration.js";
+import { type Activator } from "../views/activator.js";
+import { CommonConfiguration } from "./commonConfiguration.js";
 
-export default interface Configuration extends CommonConfiguration {
+export interface ViewConfiguration extends CommonConfiguration {
   /**
    * If set, the value returned by the function set here will be used instead of any automatic
    * width detection functionality.

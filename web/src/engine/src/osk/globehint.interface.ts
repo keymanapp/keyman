@@ -1,6 +1,6 @@
 import { type KeyElement } from "./keyElement.js";
 
-export default interface GlobeHint {
+export interface GlobeHint {
   text: string;
   state: boolean;
   element?: HTMLDivElement;

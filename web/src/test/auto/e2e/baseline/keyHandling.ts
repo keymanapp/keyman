@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 
-import { Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 function getKeycodeFromVk(vk: string): string {
   const virtualKeyToKeyCodeMap = new Map([

@@ -4,7 +4,7 @@
  * - In WebWorkers, returns `self`.
  * - In Node, returns `global`.
  */
-export default function getGlobalObject(): typeof globalThis {
+export function globalObject(): typeof globalThis {
   // Evergreen browsers have started defining 'globalThis'.
   // Refer to https://devblogs.microsoft.com/typescript/announcing-typescript-3-4/#type-checking-for-globalthis
   // and its referenced polyfill.  Said polyfill is very complex, so we opt for this far leaner variant.

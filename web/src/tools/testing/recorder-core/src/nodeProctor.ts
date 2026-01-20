@@ -1,4 +1,4 @@
-import Proctor, { AssertCallback } from "./proctor.js";
+import { Proctor, AssertCallback } from "./proctor.js";
 import {
   KeyboardTest,
   TestSet,
@@ -12,7 +12,7 @@ import { KeyEvent, KeyEventSpec, KeyboardHarness, SyntheticTextStore, TextStore 
 import { DeviceSpec } from "keyman/common/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
-export default class NodeProctor extends Proctor {
+export class NodeProctor extends Proctor {
   private keyboardWithHarness: KeyboardHarness;
   public __debug = false;
 

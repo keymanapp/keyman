@@ -13,7 +13,7 @@
  */
 export type QueueComparator<Type> = (a: Type, b: Type) => number;
 
-export default class PriorityQueue<Type> {
+export class PriorityQueue<Type> {
 
   private comparator: QueueComparator<Type>;
   private heap: Type[];

@@ -1,4 +1,4 @@
-import ManagedPromise from "./managedPromise.js";
+import { ManagedPromise } from "./managedPromise.js";
 
 /**
  * This class represents a cancelable timeout, wrapped in Promise form.
@@ -7,7 +7,7 @@ import ManagedPromise from "./managedPromise.js";
  * `reject` is called earlier.  Call `.resolve(false)` for early cancellation
  * or `.resolve(true)` to cancel the timer while resolving the Promise early.
  */
-export default class TimeoutPromise extends ManagedPromise<Boolean> {
+export class TimeoutPromise extends ManagedPromise<Boolean> {
   private timerHandle: number | NodeJS.Timeout;
   constructor(timeoutInMillis: number) {
     // Helps marshal the internal timer handle to its member field despite being

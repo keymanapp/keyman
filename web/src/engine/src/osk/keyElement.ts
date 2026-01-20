@@ -1,5 +1,5 @@
 import { ActiveSubKey } from 'keyman/engine/keyboard';
-import OSKKey from "./keyboard-layout/oskKey.js";
+import { OSKKey } from "./keyboard-layout/oskKey.js";
 
 export class KeyData {
   ['key']: OSKKey;

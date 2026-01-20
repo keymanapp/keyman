@@ -1,9 +1,9 @@
-import { DeviceSpec } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
 
-import OSKView, { OSKPos, OSKRect } from './oskView.js';
-import VisualKeyboard from '../visualKeyboard.js';
-import Configuration from '../config/viewConfiguration.js';
-import SimpleActivator from './simpleActivator.js';
+import { OSKView, OSKPos, OSKRect } from './oskView.js';
+import { VisualKeyboard } from '../visualKeyboard.js';
+import { ViewConfiguration } from '../config/viewConfiguration.js';
+import { SimpleActivator } from './simpleActivator.js';
 
 /*
  * Keyman is copyright (c) SIL International.  MIT License.
@@ -14,8 +14,8 @@ import SimpleActivator from './simpleActivator.js';
  * insertion into the DOM.  Rather than "floating" over the page, this version is inlined
  * as part of the host page's layout.
  */
-export default class InlinedOSKView extends OSKView {
-  public constructor(config: Configuration) {
+export class InlinedOSKView extends OSKView {
+  public constructor(config: ViewConfiguration) {
     config.activator = config.activator || new SimpleActivator();
     super(config);
   }

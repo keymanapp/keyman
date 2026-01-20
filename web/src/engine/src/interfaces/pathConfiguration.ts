@@ -10,7 +10,7 @@ const addDelimiter = (p: string) => {
   }
 }
 
-export default class PathConfiguration implements OSKResourcePathConfiguration {
+export class PathConfiguration implements OSKResourcePathConfiguration {
   private readonly sourcePath: string;
   private _root: string;
   private _resources: string;

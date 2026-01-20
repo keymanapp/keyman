@@ -2,8 +2,16 @@ import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
 import { JSKeyboard } from "./jsKeyboard.js";
 import { KMXKeyboard } from './kmxKeyboard.js';
 import { KeyboardHarness } from "./keyboardHarness.js";
-import KeyboardProperties from "./keyboardProperties.js";
+import { KeyboardProperties } from "./keyboardProperties.js";
 import { KeyboardLoadErrorBuilder, StubBasedErrorBuilder, UriBasedErrorBuilder } from './keyboardLoadError.js';
+import { Codes } from '../codes.js';
+
+export enum NotifyEventCode {
+  FocusEvent = 0,
+  ShiftKey = Codes.keyCodes.K_SHIFT,
+  ControlKey = Codes.keyCodes.K_CONTROL,
+  AltKey = Codes.keyCodes.K_ALT,
+};
 
 export type KeyboardStub = KeyboardProperties & { filename: string };
 export type Keyboard = JSKeyboard | KMXKeyboard;

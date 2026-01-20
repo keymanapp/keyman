@@ -5,17 +5,16 @@ import {
   ActiveKeyBase,
   ActiveLayout,
   ActiveSubKey,
-  DeviceSpec,
   JSKeyboard,
   KeyboardProperties,
   KeyDistribution,
   KeyEvent,
   Layouts,
   StateKeyMap,
-  timedPromise,
   type InternalKeyboardFont,
 } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from 'keyman/common/web-utils';
+import { DeviceSpec, timedPromise } from 'keyman/common/web-utils';
 
 import { buildCorrectiveLayout } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
@@ -33,31 +32,31 @@ import { createStyleSheet, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.interface.js';
 
-import GlobeHint from './globehint.interface.js';
-import KeyboardView from './components/keyboardView.interface.js';
+import { GlobeHint } from './globehint.interface.js';
+import { KeyboardView } from './components/keyboardView.interface.js';
 import { type KeyElement } from './keyElement.js';
-import KeyTip from './keytip.interface.js';
-import OSKKey from './keyboard-layout/oskKey.js';
-import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
-import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
-import OSKView from './views/oskView.js';
+import { KeyTip } from './keytip.interface.js';
+import { OSKKey } from './keyboard-layout/oskKey.js';
+import { OSKLayer, LayerLayoutParams } from './keyboard-layout/oskLayer.js';
+import { OSKLayerGroup } from './keyboard-layout/oskLayerGroup.js';
+import { OSKView } from './views/oskView.js';
 import { ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize } from './fontSizeUtils.js';
-import PhoneKeyTip from './input/gestures/browser/keytip.js';
+import { PhoneKeyTip } from './input/gestures/browser/phoneKeytip.js';
 import { TabletKeyTip } from './input/gestures/browser/tabletPreview.js';
-import CommonConfiguration from './config/commonConfiguration.js';
+import { CommonConfiguration } from './config/commonConfiguration.js';
 
 import { DEFAULT_GESTURE_PARAMS, GestureParams, gestureSetForLayout } from './input/gestures/specsForLayout.js';
 
 import { getViewportScale } from './screenUtils.js';
 import { HeldRepeater } from './input/gestures/heldRepeater.js';
-import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
-import Multitap from './input/gestures/browser/multitap.js';
+import { SubkeyPopup } from './input/gestures/browser/subkeyPopup.js';
+import { Multitap } from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
-import Modipress from './input/gestures/browser/modipress.js';
-import Flick from './input/gestures/browser/flick.js';
+import { Modipress } from './input/gestures/browser/modipress.js';
+import { Flick } from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
-import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
+import { OSKBaseKey } from './keyboard-layout/oskBaseKey.js';
 import { OSKResourcePathConfiguration } from 'keyman/engine/interfaces';
 import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
@@ -139,7 +138,7 @@ interface EventMap {
 }
 
 // #region VisualKeyboard
-export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
+export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
   /**
    * The gesture-engine used to support user interaction with this keyboard.
    *

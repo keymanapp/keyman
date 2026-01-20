@@ -1,11 +1,10 @@
-import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction, KMXKeyboard } from "keyman/engine/keyboard";
+import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
-// TODO-web-core: remove alias (#15292)
-import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard";
+import { DOMKeyboardLoader } from "keyman/engine/keyboard";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView, JSKeyboardData } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed, DOMCloudRequester } from "keyman/engine/keyboard-storage";
+import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId, DOMCloudRequester } from "keyman/engine/keyboard-storage";
 import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
@@ -242,7 +241,7 @@ export class KeymanEngineBase<
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     // All components initialized below require a properly-configured `config.paths` or similar.
-    const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);
+    const keyboardLoader = new DOMKeyboardLoader(this.interface, config.applyCacheBusting);
     this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
     this.modelCache = new ModelCache();
     const kbdCache = this.keyboardRequisitioner.cache;
@@ -400,7 +399,7 @@ export class KeymanEngineBase<
     const report = {
       configReport: this.config?.debugReport(),
       keyboard: {
-        id: unprefixed(activeKbd?.metadata?.id ?? ''),
+        id: toUnprefixedKeyboardId(activeKbd?.metadata?.id ?? ''),
         langId: activeKbd?.metadata?.langId || '',
         version: activeKbd?.keyboard?.version ?? ''
       },
@@ -553,36 +552,27 @@ export class KeymanEngineBase<
   /**
    * Function     isChiral
    * Scope        Public
-   * @param       {string|Object=}   k0
+   * @param       {string|Keyboard}   k0
    * @return      {boolean}
    * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isChiral
    */
-  public isChiral(k0?: string | JSKeyboard) {
-    let jsKbd: JSKeyboard;
+  public isChiral(k0?: string | Keyboard) {
+    let keyboard: Keyboard;
     if(k0) {
       if(typeof k0 == 'string') {
-        const kbdObj = this.keyboardRequisitioner.cache.getKeyboard(k0);
-        if (!kbdObj) {
+        keyboard = this.keyboardRequisitioner.cache.getKeyboard(k0);
+        if (!keyboard) {
           throw new Error(`Keyboard '${k0}' has not been loaded.`);
-        } else if (kbdObj instanceof KMXKeyboard) {
-          return false; // TODO-web-core: implement for KMX keyboards
-        } else {
-          k0 = kbdObj;
         }
-      }
-
-      jsKbd = k0;
-    } else {
-      const kbd = this.core.activeKeyboard;
-      if (kbd instanceof JSKeyboard) {
-        jsKbd = kbd;
       } else {
-        return false; // TODO-web-core: implement for KMX keyboards
+        keyboard = k0;
       }
+    } else {
+      keyboard = this.core.activeKeyboard;
     }
-    return jsKbd.isChiral;
+    return keyboard.isChiral;
   }
 
   /**

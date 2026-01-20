@@ -1,13 +1,13 @@
 import { ActiveKey, Codes } from 'keyman/engine/keyboard';
 
-import OSKKey, { KeyLayoutParams, renameSpecialKey } from './oskKey.js';
+import { OSKKey, KeyLayoutParams, renameSpecialKey } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
-import OSKRow from './oskRow.js';
-import VisualKeyboard from '../visualKeyboard.js';
+import { OSKRow } from './oskRow.js';
+import { VisualKeyboard } from '../visualKeyboard.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { GesturePreviewHost } from './gesturePreviewHost.js';
 
-export default class OSKBaseKey extends OSKKey {
+export class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
   private previewHost: GesturePreviewHost;
   private preview: HTMLDivElement;

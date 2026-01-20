@@ -8,7 +8,7 @@ interface EventMap {
  * Used to encapsulate activation logic for the on-screen keyboadr, conditionally activating
  * and deactivating it based on specified conditions.
  */
-export default abstract class Activator<ExtraEvents = void> extends EventEmitter<EventMap & ExtraEvents, Activator> {
+export abstract class Activator<ExtraEvents = void> extends EventEmitter<EventMap & ExtraEvents, Activator> {
   /**
    * For certain sub-types, this may be set to `false` to "turn activation off", putting
    * the `Activator` in a state that ignores changes to any other conditions.

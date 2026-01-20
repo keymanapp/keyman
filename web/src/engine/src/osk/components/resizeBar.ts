@@ -1,8 +1,8 @@
 import { EventEmitter } from 'eventemitter3';
 
-import OSKViewComponent from './oskViewComponent.interface.js';
+import { OSKViewComponent } from './oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
-import MouseDragOperation from '../input/mouseDragOperation.js';
+import { MouseDragOperation } from '../input/mouseDragOperation.js';
 
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
@@ -13,7 +13,7 @@ interface EventMap {
   showbuild: () => void;
 }
 
-export default class ResizeBar extends EventEmitter<EventMap, ResizeBar> implements OSKViewComponent {
+export class ResizeBar extends EventEmitter<EventMap, ResizeBar> implements OSKViewComponent {
   private _element: HTMLDivElement;
   private _resizeHandle: HTMLDivElement;
 

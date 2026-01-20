@@ -13,7 +13,7 @@ interface PredictionContextEventMap {
 /**
  * Maintains predictive-text state information corresponding to the current context.
  */
-export default class PredictionContext extends EventEmitter<PredictionContextEventMap> {
+export class PredictionContext extends EventEmitter<PredictionContextEventMap> {
   // Historical note:  before 17.0, this code was intertwined with /web/source/osk/banner.ts's
   // SuggestionBanner class.  This class serves as the main implementation of the banner's core logic.
 

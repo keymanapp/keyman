@@ -4,7 +4,7 @@ export { JSKeyboard, LayoutState } from "./keyboards/jsKeyboard.js";
 export { KeyboardMinimalInterface } from './keyboards/keyboardMinimalInterface.js';
 export { KMXKeyboard } from './keyboards/kmxKeyboard.js';
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
-export { Keyboard, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
+export { NotifyEventCode, Keyboard, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
 export { BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
 export {
@@ -14,13 +14,13 @@ export {
   KeyboardAPIPropertyMultilangSpec,
   KeyboardAPIPropertySpec,
   KeyboardInternalPropertySpec,
-  default as KeyboardProperties,
+  KeyboardProperties,
   KeyboardFont,
   MetadataObj as RawKeyboardMetadata,
   LanguageAPIPropertySpec
 } from "./keyboards/keyboardProperties.js";
 export { ProcessorAction as ProcessorAction } from "./keyboards/processorAction.js";
-export { default as SpacebarText } from "./keyboards/spacebarText.js";
+export { SpacebarText } from "./keyboards/spacebarText.js";
 export { StateKeyMap } from "./keyboards/stateKeyMap.js";
 export { type Alternate, TextTransform } from "./keyboards/textTransform.js";
 export { Transcription } from "./keyboards/transcription.js";
@@ -47,12 +47,3 @@ import { DeadkeyTracker } from './deadkeys.js';
 export const unitTestEndpoints = {
   DeadkeyTracker,
 };
-
-// TODO-web-core: why do we export these here? (#15292)
-export * from "keyman/common/web-utils";
-
-// At the top level, there should be no default export.
-
-// Without the line below... TextStore would likely be aliased there, as it's
-// the last `export { default as _ }` => `export * from` pairing seen above.
-export default undefined;

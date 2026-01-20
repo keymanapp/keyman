@@ -3,7 +3,7 @@ import { KMWString } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import * as correction from './correction/index.js'
-import TransformUtils from './transformUtils.js';
+import { TransformUtils } from './transformUtils.js';
 import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
@@ -355,5 +355,3 @@ export class ModelCompositor {
     }
   }
 }
-
-export default ModelCompositor;

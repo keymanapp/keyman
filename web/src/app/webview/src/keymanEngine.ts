@@ -1,4 +1,5 @@
-import { DeviceSpec, DefaultRules, ProcessorAction } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { DefaultRules, ProcessorAction } from 'keyman/engine/keyboard';
 import { KeymanEngineBase, KeyboardInterfaceBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
@@ -6,7 +7,7 @@ import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyb
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
 import { ContextManager, HostTextStore } from './contextManager.js';
-import PassthroughKeyboard from './passthroughKeyboard.js';
+import { PassthroughKeyboard } from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer';
 

@@ -3,7 +3,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { expect, test, /*expect, Page, Locator */} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { KmxTestSource } from './kmxTestSource.js';
 import { pressKeys } from './keyHandling';
 
@@ -22,88 +22,169 @@ function KeymanRoot(): string {
 }
 
 // Tests that are not supported in Web due to missing functionality
-const testsToSkip = new Map([
-  ['k_038___punctkeys.kmn', 'Playwright does not support 102nd key']
-]);
+const testsToSkip = {
+  'all': new Map([
+    ['k_0107___punctkeys.kmn', 'Playwright does not support 102nd key']
+  ]),
+  '.kmx': new Map([
+  ]),
+  '.js': new Map([
+    ['k_0812___nul_and_contextex.kmn', 'contextex is not supported in context() match in Web']
+  ]),
+};
 
 // Tests that should work but fail due to not-yet implemented functionality
-// TODO-web-core: fix these tests
-const testsToFix = [
-  'k_000___null_keyboard.kmn',
-  'k_006___vkey_input__shift_ctrl_.kmn',
-  'k_007___vkey_input__ctrl_alt_.kmn',
-  'k_008___vkey_input__ctrl_alt_2_.kmn',
-  'k_012___ralt.kmn',
-  'k_014___groups_and_virtual_keys.kmn',
-  'k_015___ralt_2.kmn',
-  'k_022___options_with_preset.kmn',
-  'k_024___options_with_save_and_preset.kmn',
-  'k_025___options_with_reset.kmn',
-  'k_026___system_stores.kmn',
-  'k_027___system_stores_2.kmn',
-  'k_028___smp.kmn',
-  'k_031___caps_lock.kmn',
-  'k_032___caps_control.kmn',
-  'k_034___options_double_set_reset.kmn',
-  'k_035___options_double_set_staged.kmn',
-  'k_036___options___double_reset_staged.kmn',
-  'k_037___options___double_reset.kmn',
-  'k_039___generic_ctrlalt.kmn',
-  'k_049___enter_invalidates_context.kmn',
-  'k_055___deadkey_cancelled_by_arrow.kmn',
-];
+const testsToFix = {
+  // TODO-web-core: fix these tests
+  '.kmx': [
+    'k_0000___null_keyboard.kmn',
+    'k_0103___vkey_input__shift_ctrl_.kmn', // kmx only
+    'k_0104___vkey_input__ctrl_alt_.kmn',
+    'k_0105___vkey_input__ctrl_alt_2_.kmn', // kmx only
+    'k_0106___smp.kmn', // kmx only
+    'k_0200___ralt.kmn', // kmx only
+    'k_0201___ralt_2.kmn',
+    'k_0202___alt.kmn',
+    'k_0203___generic_ctrlalt.kmn',
+    'k_0400___groups_and_virtual_keys.kmn', // kmx only
+    'k_0501___options_with_preset.kmn', // kmx only
+    'k_0502___options_with_save.kmn', // kmx only
+    'k_0503___options_with_save_and_preset.kmn', // kmx only
+    'k_0504___options_with_reset.kmn', // kmx only
+    'k_0505___options_double_set_reset.kmn', // kmx only
+    'k_0506___options_double_set_staged.kmn', // kmx only
+    'k_0507___options___double_reset_staged.kmn', // kmx only
+    'k_0508___options___double_reset.kmn', // kmx only
+    'k_0600___system_stores.kmn',
+    'k_0601___system_stores_2.kmn',
+    'k_0700___caps_lock.kmn',
+    'k_0701___caps_control.kmn',
+    'k_0807___enter_invalidates_context.kmn',
+    'k_0813___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
+  ],
+  // TODO: fix these tests (#15342)
+  '.js': [
+    'k_0000___null_keyboard.kmn',
+    'k_0104___vkey_input__ctrl_alt_.kmn',
+    'k_0201___ralt_2.kmn',  // #15358
+    'k_0202___alt.kmn',     // #15358
+    'k_0203___generic_ctrlalt.kmn',
+    'k_0600___system_stores.kmn',
+    'k_0601___system_stores_2.kmn',
+    'k_0700___caps_lock.kmn',
+    'k_0701___caps_control.kmn',
+    'k_0801___long_context_and_deadkeys.kmn', // js only
+    'k_0802___long_context_and_split_deadkeys.kmn', // js only
+    'k_0807___enter_invalidates_context.kmn',
+    'k_0808___nul_and_context.kmn', // js only
+    'k_0810___nul_and_index.kmn', // js only
+    'k_0813___deadkey_cancelled_by_arrow.kmn', // Keyman Engine for Web does not interpret arrow keys - #15397
+  ]
+};
 
 test.describe('Baseline tests', () => {
   const testDir = '/common/test/keyboards/baseline';
 
   // Find all k_*.kmn files in testDir
   const files = fs.readdirSync(KeymanRoot() + testDir).filter(f => f.match(/^k_.*\.kmn$/));
-  for (const file of files) {
-    test(file, async ({ page }) => {
-      const kmxFile = file.replace(/\.kmn$/, '.kmx');
-      const testSource = new KmxTestSource();
-      const result = testSource.loadSource(path.join(KeymanRoot(), testDir, file));
-      if (result !== 0) {
-        throw new Error(`Error loading KMX test source ${file} at line ${result}`);
-      }
+  for (const ext of ['.kmx', '.js']) {
+    test.describe(`${ext} tests`, () => {
+      for (const file of files) {
+        test(file, async ({ page }) => {
+          // Setup
+          test.info().annotations.push({ type: 'name', description: test.info().title });
 
-      // Setup
-      test.info().annotations.push({ type: 'name', description: test.info().title });
-      test.info().annotations.push({ type: 'description', description: testSource.description });
+          const kbdFile = file.replace(/\.kmn$/, ext);
+          if (!fs.existsSync(path.join(KeymanRoot(), testDir, kbdFile))) {
+            const msg = `Skipping ${file} test - ${ext} file doesn't exist`;
+            console.log(msg);
+            test.skip(true, msg);
+            return;
+          }
 
-      if (testsToSkip.has(file)) {
-        const msg = `Skipping ${file} test - ${testsToSkip.get(file)}`;
-        console.log(msg);
-        test.skip(true, msg);
-        return;
-      }
+          const kbdId = `Keyboard_${file.replace(/\.kmn$/, '')}`;
+          const testSource = new KmxTestSource();
+          const result = testSource.loadSource(path.join(KeymanRoot(), testDir, file));
+          if (result !== 0) {
+            throw new Error(`Error loading ${ext} test source ${file} at line ${result}`);
+          }
 
-      if (testsToFix.includes(file)) {
-        const msg = `Skipping ${file} test - requires not-yet implemented functionality`;
-        console.log(msg);
-        test.fixme(true, msg);
-        return;
-      }
+          test.info().annotations.push({ type: 'description', description: testSource.description });
 
-      await page.goto(`http://localhost:3000/src/test/auto/e2e/baseline/baseline.tests.html?keyboard=${testDir}/${kmxFile}`);
-      await page.evaluate(async () => { await window.KmwLoaded; });
-      const textarea = page.locator('#inputarea');
-      await textarea.click();
+          if (testsToSkip[ext].has(file)) {
+            const msg = `Skipping ${file} test - ${testsToSkip[ext].get(file)}`;
+            console.log(msg);
+            test.skip(true, msg);
+            return;
+          }
+          if (testsToSkip['all'].has(file)) {
+            const msg = `Skipping ${file} test - ${testsToSkip['all'].get(file)}`;
+            console.log(msg);
+            test.skip(true, msg);
+            return;
+          }
+          if (testsToFix[ext].includes(file)) {
+            const msg = `Skipping ${file} test - requires not-yet implemented functionality`;
+            console.log(msg);
+            test.fixme(true, msg);
+            return;
+          }
 
-      // TODO-web-core: set options from test source
-      // TODO-web-core: set capslock state
+          // Initialize option stores by setting cookies
+          if (testSource.options) {
+            const cookies = [];
+            for (const option of testSource.options) {
+              if (option.type === 'input') {
+                cookies.push({
+                  name: `KeymanWeb_${kbdId}_Option_${option.key}`,
+                  value: encodeURIComponent(`${option.key}=${option.value};`),
+                  domain: 'localhost',
+                  path: '/',
+                  expires: Date.now() / 1000 + 60, // expire in 1 minute
+                });
+              }
+            }
+            if (cookies.length > 0) {
+              await page.context().addCookies(cookies);
+            }
+          }
 
-      // set context
-      if (testSource.context) {
-        await textarea.fill(testSource.context);
-      }
+          // Open page
+          await page.goto(`http://localhost:3000/src/test/auto/e2e/baseline/baseline.tests.html?keyboard=${testDir}/${kbdFile}&id=${kbdId}`);
+          await page.evaluate(async () => { await window.KmwLoaded; });
+          const textarea = page.locator('#inputarea');
+          await textarea.click();
 
-      // type keys
-      await pressKeys(page, testSource.keys);
+          // TODO-web-core: set capslock state
 
-      // verify output
-      await expect(textarea).toHaveValue(testSource.expected, { timeout: 500 });
+          // set context
+          if (testSource.context) {
+            await textarea.fill(testSource.context);
+          }
+
+          // type keys
+          await pressKeys(page, testSource.keys);
+
+          // verify output
+          await expect(textarea, `Verify output is '${testSource.expected}'`).toHaveValue(testSource.expected, { timeout: 500 });
+
+          // verify persisted options
+          if (testSource.options) {
+            const cookies = await page.context().cookies();
+            for (const option of testSource.options) {
+              if (option.type === 'saved') {
+                const cookieName = `KeymanWeb_${kbdId}_Option_${option.key}`;
+                const cookie = cookies.find(c => c.name === cookieName);
+                expect(cookie, `Cookie '${cookieName}' not found`).toBeDefined();
+                if (cookie) {
+                  const decodedValue = decodeURIComponent(cookie.value);
+                  expect(decodedValue, `Cookie for '${option.key}' has unexpected value '${decodedValue}' instead of '${option.value}'`).toEqual(`${option.key}=${option.value};`);
+                }
+              }
+            }
+          }
+        });
+      };
     });
-
   }
 });
