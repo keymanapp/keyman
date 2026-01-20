@@ -141,7 +141,7 @@ describe('Engine - specialized backspace handling', function() {
 
     const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
-    }, unitTestEndpoints.DEFAULT_OPTIONS);
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isTrue(result.triggerKeyDefault);
@@ -172,7 +172,7 @@ describe('Engine - specialized backspace handling', function() {
     // like backspaces.
     const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: dummiedWithHarness
-    }, unitTestEndpoints.DEFAULT_OPTIONS);
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     // Did match a keyboard rule.
@@ -204,7 +204,7 @@ describe('Engine - specialized backspace handling', function() {
 
     const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
-    }, unitTestEndpoints.DEFAULT_OPTIONS);
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isFalse(result.triggerKeyDefault);
@@ -239,7 +239,7 @@ describe('Engine - specialized backspace handling', function() {
 
     const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
-    }, unitTestEndpoints.DEFAULT_OPTIONS);
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isTrue(result.triggerKeyDefault);
@@ -267,7 +267,7 @@ describe('Engine - specialized backspace handling', function() {
 
     const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: ipaWithHarness
-    }, unitTestEndpoints.DEFAULT_OPTIONS);
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isTrue(result.triggerKeyDefault);
@@ -298,7 +298,7 @@ describe('Engine - specialized backspace handling', function() {
 
     const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: bksp2xWithHarness
-    }, unitTestEndpoints.DEFAULT_OPTIONS);
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     // Did match a keyboard rule.
@@ -333,7 +333,7 @@ describe('Engine - specialized backspace handling', function() {
     // like backspaces.
     const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: dummiedWithHarness
-    }, unitTestEndpoints.DEFAULT_OPTIONS);
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isFalse(result.triggerKeyDefault);
