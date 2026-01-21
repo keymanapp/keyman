@@ -252,9 +252,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
       assert.sameDeepMembers(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
         [[{sample: { insert: '', deleteLeft: 0 }, p: 1}]]
       );
 
@@ -284,9 +284,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
       assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
         [[{ sample: {insert: '', deleteLeft: 0}, p: 1 }]]
       );
 
@@ -337,8 +337,8 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence);
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
       //   assert.fail("context alignment failed");
@@ -370,9 +370,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
       assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
         [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
       );
 
@@ -402,9 +402,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
       assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence,
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
         [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
       );
 
@@ -434,8 +434,8 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence);
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
       //   assert.fail("context alignment failed");
