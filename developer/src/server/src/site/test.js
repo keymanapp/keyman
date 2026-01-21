@@ -175,7 +175,6 @@ keyboardDropdown.onclick = (value) => {
   console.log('setting keyboard to '+value);
   keyman.setActiveKeyboard(value, 'en');
   ta1.focus();
-  refreshStatusKeyboard(value);
 };
 
 function buildKeyboardList() {
@@ -274,17 +273,14 @@ function setupKeyman() {
     }
     keyboardDropdown.set(keyboardProperties.internalName);
     window.sessionStorage.setItem('current-keyboard', keyboardProperties.internalName);
+    refreshStatusKeyboard();
   });
 }
 
-function refreshStatusKeyboard(keyboard, model) {
+function refreshStatusKeyboard() {
   let statusKeyboard = document.getElementById('status-keyboard');
-  let activeKeyboard = keyman.core.activeKeyboard ? keyman.core.activeKeyboard.id : '';
-  let keyboards = keyman.getKeyboards();
-  for(let k of keyboards) {
-    if(k.InternalName == keyboard) activeKeyboard = k.Name;
-  }
-  statusKeyboard.innerText = activeKeyboard;
+  const debugInfo = keyman.getDebugInfo();
+  statusKeyboard.innerText = debugInfo.keyboard.id + ' ' + debugInfo.keyboard.version;
 }
 
 function refreshStatusModel(model) {
@@ -344,7 +340,6 @@ function handleKeyboardsAndModelsResponse(responseText, shouldReload) {
       console.log('setting active model to '+lastModel);
       keyman.setActiveKeyboard(currentKeyboard, 'en')
       selectModel(lastModel);
-      refreshStatusKeyboard(currentKeyboard);
       refreshStatusModel(lastModel);
     }, 10);
   }

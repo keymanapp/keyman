@@ -33,7 +33,7 @@ else
 fi
 echo "ppa: ${ppa}"
 
-distributions="${DIST:-jammy noble plucky questing resolute}"
+distributions="${DIST:-jammy noble questing resolute}"
 packageversion="${PACKAGEVERSION:-1~sil1}"
 
 BASEDIR=$(pwd)

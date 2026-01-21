@@ -19,7 +19,7 @@ Following the comments are the normal rules of a Keyman keyboard.
 c Description: Tests Caps Lock env set
 ```
 
-- **option**: allows to put the system in a defined state. The example sets the platform:
+- **option**: allows to put the system in a defined state. The example below sets the platform:
 
 ```text
 c option: &platform=linux

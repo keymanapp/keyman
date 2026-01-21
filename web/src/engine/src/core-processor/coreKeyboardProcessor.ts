@@ -6,7 +6,7 @@ import { EventEmitter } from 'eventemitter3';
 import { KM_Core, KM_CORE_STATUS, KM_CORE_CT, km_core_context, km_core_context_items, km_core_option_item } from 'keyman/engine/core-adapter';
 import {
   BeepHandler,
-  DeviceSpec, EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
+  EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
   KeyEvent, KMXKeyboard, SyntheticTextStore, MutableSystemStore, TextStore, ProcessorAction,
   StateKeyMap,
   Deadkey,
@@ -14,6 +14,7 @@ import {
   VariableStoreSerializer
 } from "keyman/engine/keyboard";
 import { KM_CORE_EVENT_FLAG, KM_CORE_OPTION_SCOPE } from '../core-adapter/KM_Core.js';
+import { DeviceSpec } from 'keyman/common/web-utils';
 import { CoreKeyboardInterface } from './coreKeyboardInterface.js';
 import { toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
@@ -311,7 +312,8 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
 
   /**
    * Processes post-keystroke actions for the given device and text store.
-   * Handles any actions that should occur after a keystroke is processed.
+   * Handles any actions that should occur after a keystroke is processed
+   * or after applying suggestions.
    *
    * @param {DeviceSpec}  device     The device specification.
    * @param {TextStore}   textStore  The current text store context.
@@ -319,7 +321,10 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @returns {ProcessorAction} The resulting processor action, or null if not applicable.
    */
   public processPostKeystroke(device: DeviceSpec, textStore: TextStore): ProcessorAction {
-    // TODO-web-core: Implement this method (#15286)
+    // TODO-embed-osk-in-kmx: Implement this method (#15286)
+    // This gets called after processing a keystroke to process the PostKeystroke group
+    // (irrelevant for web-core since that is handled in Core), but also after
+    // applying a suggestion, which we do need to handle.
     return null;
   }
 
@@ -364,7 +369,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @returns {boolean} True if the keyboard layer changed, false otherwise.
    */
   public selectLayer(keyEvent: KeyEvent): boolean {
-    // TODO-web-core: Implement this method (#15284)
+    // TODO-embed-osk-in-kmx: Implement this method (#15284)
     return false;
   }
 

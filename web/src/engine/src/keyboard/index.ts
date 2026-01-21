@@ -26,7 +26,7 @@ export { type Alternate, TextTransform } from "./keyboards/textTransform.js";
 export { Transcription } from "./keyboards/transcription.js";
 
 export { Codes } from "./codes.js";
-export { EmulationKeystrokes, LogMessages, DefaultRules } from "./defaultRules.js";
+export { EmulationKeystrokes, LogMessages, DefaultOutputRules } from "./defaultOutputRules.js";
 export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";
 export { KeyMapping } from "./keyMapping.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
@@ -47,12 +47,3 @@ import { DeadkeyTracker } from './deadkeys.js';
 export const unitTestEndpoints = {
   DeadkeyTracker,
 };
-
-// TODO-web-core: why do we export these here? (#15292)
-export * from "keyman/common/web-utils";
-
-// At the top level, there should be no default export.
-
-// Without the line below... TextStore would likely be aliased there, as it's
-// the last `export { default as _ }` => `export * from` pairing seen above.
-export default undefined;
