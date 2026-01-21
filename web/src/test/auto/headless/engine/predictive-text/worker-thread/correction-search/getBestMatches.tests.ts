@@ -109,7 +109,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchQuotientSpur(testModel);
+    let searchPath = new SearchQuotientSpur(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -126,11 +126,11 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    searchSpace.addInput(synthInput1, 1);
-    searchSpace.addInput(synthInput2, .75);
-    searchSpace.addInput(synthInput3, .75);
+    searchPath = searchPath.addInput(synthInput1, 1);
+    searchPath = searchPath.addInput(synthInput2, .75);
+    searchPath = searchPath.addInput(synthInput3, .75);
 
-    const iter = getBestMatches(searchSpace, buildTestTimer()); // disables the correction-search timeout.
+    const iter = getBestMatches(searchPath, buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter);
   });
 
@@ -139,8 +139,7 @@ describe('getBestMatches', () => {
     const rootTraversal = testModel.traverseFromRoot();
     assert.isNotEmpty(rootTraversal);
 
-    const searchSpace = new SearchQuotientSpur(testModel);
-
+    let searchSpace = new SearchQuotientSpur(testModel);
 
     // VERY artificial distributions.
     const synthInput1 = [
@@ -157,9 +156,9 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    searchSpace.addInput(synthInput1, 1);
-    searchSpace.addInput(synthInput2, .75);
-    searchSpace.addInput(synthInput3, .75);
+    searchSpace = searchSpace.addInput(synthInput1, 1);
+    searchSpace = searchSpace.addInput(synthInput2, .75);
+    searchSpace = searchSpace.addInput(synthInput3, .75);
 
     const iter = getBestMatches(searchSpace, buildTestTimer()); // disables the correction-search timeout.
     await checkRepeatableResults_teh(iter);
