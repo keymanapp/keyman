@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextToken, correction, models, preprocessInputSources } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, getBestMatches, models, preprocessInputSources } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
@@ -59,7 +59,7 @@ describe('ContextToken', function() {
       assert.isFalse(token.isWhitespace);
 
       // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
-      let searchIterator = token.searchSpace.getBestMatches(new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+      let searchIterator = getBestMatches(token.searchSpace, new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
       let firstEntry = await searchIterator.next();
       assert.isFalse(firstEntry.done);
     });

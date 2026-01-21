@@ -11,7 +11,7 @@ import { applyTransform, buildMergedTransform } from "@keymanapp/models-template
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
-import { SearchSpace } from "./distance-modeler.js";
+import { SearchQuotientSpur } from "./search-quotient-spur.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -58,7 +58,7 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  readonly searchSpace: SearchSpace;
+  readonly searchSpace: SearchQuotientSpur;
 
   isPartial: boolean;
 
@@ -104,7 +104,7 @@ export class ContextToken {
       //
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
-      this.searchSpace = new SearchSpace(priorToken.searchSpace);
+      this.searchSpace = new SearchQuotientSpur(priorToken.searchSpace);
       this._inputRange = priorToken._inputRange.slice();
 
       // Preserve any annotated applied-suggestion transition ID data; it's useful
@@ -118,7 +118,7 @@ export class ContextToken {
       // May be altered outside of the constructor.
       this.isWhitespace = false;
       this.isPartial = !!isPartial;
-      this.searchSpace = new SearchSpace(model);
+      this.searchSpace = new SearchQuotientSpur(model);
       this._inputRange = [];
 
       rawText ||= '';

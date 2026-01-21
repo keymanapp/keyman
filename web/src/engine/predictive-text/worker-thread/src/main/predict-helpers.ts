@@ -23,7 +23,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
-import { ContextTransition } from './test-index.js';
+import { ContextTransition, getBestMatches } from './test-index.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -493,7 +493,7 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of searchSpace.getBestMatches(timer)) {
+  for await(const match of getBestMatches(searchSpace, timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
 
