@@ -18,7 +18,8 @@ import {
   type Alternate,
   type Keyboard,
   type KeyEvent,
-  KeyboardProcessor
+  KeyboardProcessor,
+  VariableStoreSerializer
 } from "keyman/engine/keyboard";
 import {
   JSKeyboardProcessor,
@@ -64,8 +65,8 @@ export class InputProcessor {
     this._languageProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
   }
 
-  public async init(paths: PathConfiguration): Promise<void> {
-    await this.coreKbdProcessor.init(paths.basePath);
+  public async init(paths: PathConfiguration, storeSerializer?: VariableStoreSerializer): Promise<void> {
+    await this.coreKbdProcessor.init(paths.basePath, storeSerializer);
   }
 
   public get languageProcessor(): LanguageProcessor {
@@ -258,7 +259,7 @@ export class InputProcessor {
 
       // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
 
-      // Notify the ModelManager of new input - it's predictive text time!
+      // Notify the ModelCache of new input - it's predictive text time!
       if(alternates && alternates.length > 0) {
         processorAction.transcription.alternates = alternates;
       }

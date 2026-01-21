@@ -197,7 +197,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   activeKeyboard: JSKeyboard;
   activeDevice: DeviceSpec;
 
-  variableStoreSerializer?: VariableStoreSerializer;
+  variableStoreSerializer: VariableStoreSerializer;
 
   // A 'reference point' that debug keyboards may use to access KMW's code constants.
   public get Codes(): typeof Codes {
