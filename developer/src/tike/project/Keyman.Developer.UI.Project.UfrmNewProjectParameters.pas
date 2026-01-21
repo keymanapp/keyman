@@ -17,15 +17,18 @@ uses
   Vcl.Grids,
   Vcl.StdCtrls,
 
+  Browse4Folder,
+
+  Keyman.Developer.UI.FormValidation,
   kpsfile,
   PackageInfo,
   UfrmTike,
   UKeymanTargets,
-  utilfiletypes, Browse4Folder;
+  utilfiletypes;
 
 type
   TfrmNewProjectParameters = class(TTikeForm)
-    lblFileName: TLabel;
+    lblKeyboardID: TLabel;
     lblPath: TLabel;
     editKeyboardID: TEdit;
     cmdBrowse: TButton;
@@ -49,10 +52,22 @@ type
     lblKeyboardLanguages: TLabel;
     lblProjectFilename: TLabel;
     editProjectFilename: TEdit;
-    Label1: TLabel;
+    lblFullCopyright: TLabel;
     editFullCopyright: TEdit;
-    Label2: TLabel;
+    lblDescription: TLabel;
     memoDescription: TMemo;
+    lblKeyboardNameValidation: TLabel;
+    lblDescriptionValidation: TLabel;
+    lblKeyboardIDValidation: TLabel;
+    lblPathValidation: TLabel;
+    lblCopyrightValidation: TLabel;
+    lblVersionValidation: TLabel;
+    lblAuthorValidation: TLabel;
+    lblTargetsValidation: TLabel;
+    lblLanguagesValidation: TLabel;
+    lblProjectFilenameValidation: TLabel;
+    lblFullCopyrightValidation: TLabel;
+    lblDescriptionMarkdown: TLabel;
     procedure cmdOKClick(Sender: TObject);
     procedure editKeyboardNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -71,7 +86,9 @@ type
     procedure cmdBrowseClick(Sender: TObject);
     procedure editFullCopyrightChange(Sender: TObject);
     procedure memoDescriptionChange(Sender: TObject);
+    procedure ControlExit(Sender: TObject);
   private
+    FormValidation: TFormValidation;
     dlgBrowse: TBrowse4Folder;
     pack: TKPSFile; // Used temporarily for storing language list
     FSetup: Integer;
@@ -84,7 +101,7 @@ type
     function GetTargets: TKeymanTargets;
     function GetVersion: string;
     function Validate: Boolean;
-    procedure EnableControls;
+    procedure EnableControls(ChangingControl: TControl);
     function SelectedKeyboardLanguage: TPackageKeyboardLanguage;
     procedure LanguageGrid_Fill;
     function SelectedKeyboard: TPackageKeyboard;
@@ -94,6 +111,9 @@ type
     procedure UpdateProjectFilename;
     function GetFullCopyright: string;
     function GetDescription: string;
+    procedure SetupValidation;
+
+    procedure EnableGridControls;
   protected
     function GetHelpTopic: string; override;
   public
@@ -167,9 +187,14 @@ begin
       try
         pt.Generate;
       except
-        on E:EFOpenError do
+        on E:EKeyboardProjectTemplate do
         begin
           ShowMessage('Unable to create project: '+E.Message);
+          Exit(False);
+        end;
+        on E:EFOpenError do
+        begin
+          ShowMessage('Unable to create project; template files may be missing: '+E.Message);
           Exit(False);
         end;
       end;
@@ -192,6 +217,9 @@ var
   i: TKeymanTarget;
 begin
   inherited;
+
+  SetupValidation;
+
   editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
   editFullCopyright.Text := 'Copyright '+Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' ';
 
@@ -210,18 +238,19 @@ begin
   clbTargets.Checked[0] := True;
 
   LanguageGrid_Fill;
-  EnableControls;
+  EnableControls(nil);
 end;
 
 procedure TfrmNewProjectParameters.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(pack);
+  FreeAndNil(FormValidation);
 end;
 
 procedure TfrmNewProjectParameters.clbTargetsClickCheck(Sender: TObject);
 begin
-  EnableControls;
+  EnableControls(clbTargets);
 end;
 
 procedure TfrmNewProjectParameters.cmdBrowseClick(Sender: TObject);
@@ -229,7 +258,10 @@ begin
   dlgBrowse.InitialDir := editPath.Text;
 
   if dlgBrowse.Execute and (dlgBrowse.FileName <> '') then
+  begin
     editPath.Text := ExcludeTrailingPathDelimiter(dlgBrowse.FileName);
+    EnableControls(editPath);
+  end;
 end;
 
 procedure TfrmNewProjectParameters.cmdKeyboardAddLanguageClick(
@@ -253,7 +285,7 @@ begin
       LanguageGrid_Fill;
       gridKeyboardLanguages.Row := gridKeyboardLanguages.RowCount - 1;
       gridKeyboardLanguagesClick(gridKeyboardLanguages);
-      EnableControls;
+      EnableControls(gridKeyboardLanguages);
     end;
   finally
     frm.Free;
@@ -282,7 +314,7 @@ begin
       lang.ID := frm.LanguageID;
       lang.Name := frm.LanguageName;
       LanguageGrid_Fill;
-      EnableControls;
+      EnableControls(gridKeyboardLanguages);
     end;
   finally
     frm.Free;
@@ -302,76 +334,71 @@ begin
 
   k.Languages.Remove(lang);
   LanguageGrid_Fill;
-  EnableControls;
+  EnableControls(gridKeyboardLanguages);
 end;
 
 procedure TfrmNewProjectParameters.cmdOKClick(Sender: TObject);
 begin
+  FormValidation.TouchAllFields;
   if Validate then
     ModalResult := mrOk;
 end;
 
+procedure TfrmNewProjectParameters.ControlExit(Sender: TObject);
+begin
+  EnableControls(Sender as TControl);
+end;
+
 procedure TfrmNewProjectParameters.editAuthorChange(Sender: TObject);
 begin
-  EnableControls;
   if not editCopyright.Modified then
+  begin
     editCopyright.Text := 'Copyright '+Char($00A9 {copyright})+' '+Author;
+    FormValidation.TouchField(editCopyright);
+  end;
   if not editFullCopyright.Modified then
+  begin
     editFullCopyright.Text := 'Copyright '+Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
+    FormValidation.TouchField(editFullCopyright);
+  end;
+  EnableControls(editAuthor);
 end;
 
 procedure TfrmNewProjectParameters.editCopyrightChange(Sender: TObject);
 begin
-  EnableControls;
+  EnableControls(editCopyright);
 end;
 
 procedure TfrmNewProjectParameters.editFullCopyrightChange(Sender: TObject);
 begin
-  EnableControls;
+  EnableControls(editFullCopyright);
 end;
 
 procedure TfrmNewProjectParameters.editKeyboardIDChange(Sender: TObject);
 begin
   UpdateProjectFilename;
-  EnableControls;
+  EnableControls(editKeyboardID);
 end;
 
 procedure TfrmNewProjectParameters.editKeyboardNameChange(Sender: TObject);
 begin
   if not editKeyboardID.Modified then
+  begin
     editKeyboardID.Text := TKeyboardUtils.CleanKeyboardID(Trim(editKeyboardName.Text));
-  EnableControls;
+    FormValidation.TouchField(editKeyboardID);
+  end;
+  EnableControls(editKeyboardName);
 end;
 
 procedure TfrmNewProjectParameters.editPathChange(Sender: TObject);
 begin
   UpdateProjectFilename;
-  EnableControls;
+  EnableControls(editPath);
 end;
 
 procedure TfrmNewProjectParameters.editVersionChange(Sender: TObject);
 begin
-  EnableControls;
-end;
-
-procedure TfrmNewProjectParameters.EnableControls;
-var
-  e: Boolean;
-begin
-  e := (Trim(editKeyboardName.Text) <> '') and
-    (Trim(editPath.Text) <> '') and
-    TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True) and
-    (GetTargets <> []) and
-    (Trim(memoDescription.Text) <> '');
-
-  cmdOK.Enabled := e;
-
-  e := gridKeyboardLanguages.RowCount > 1;
-  gridKeyboardLanguages.Enabled := e;
-  cmdKeyboardRemoveLanguage.Enabled := e;
-  cmdKeyboardEditLanguage.Enabled := e;
-  if e then
-    gridKeyboardLanguages.FixedRows := 1;
+  EnableControls(editVersion);
 end;
 
 function TfrmNewProjectParameters.GetAuthor: string;
@@ -444,7 +471,7 @@ end;
 procedure TfrmNewProjectParameters.gridKeyboardLanguagesClick(
   Sender: TObject);
 begin
-  EnableControls;
+  EnableGridControls;
 end;
 
 procedure TfrmNewProjectParameters.gridKeyboardLanguagesDblClick(
@@ -458,6 +485,12 @@ function TfrmNewProjectParameters.Validate: Boolean;
 var
   ProjectFolder: string;
 begin
+  if not FormValidation.Update then
+  begin
+    ShowMessage('One or more fields are missing or invalid. Please correct these fields and try again.');
+    Exit(False);
+  end;
+
   Result := TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True);
 
   if Result then
@@ -526,19 +559,19 @@ begin
     end;
   end;
   LanguageGrid_Fill;
-  EnableControls;
+  EnableGridControls;
 end;
 
 procedure TfrmNewProjectParameters.SetKeyboardID(const Value: string);
 begin
   editKeyboardID.Text := Value;
-  EnableControls;
+  EnableControls(nil);
 end;
 
 procedure TfrmNewProjectParameters.SetKeyboardName(const Value: string);
 begin
   editKeyboardName.Text := Value;
-  EnableControls;
+  EnableControls(nil);
 end;
 
 procedure TfrmNewProjectParameters.LanguageGrid_Fill;
@@ -557,7 +590,7 @@ begin
     if not Assigned(k) then
     begin
       gridKeyboardLanguages.RowCount := 1;
-      EnableControls;
+      EnableControls(nil);
       Exit;
     end;
 
@@ -571,7 +604,7 @@ begin
       gridKeyboardLanguages.Cells[1, i+1] := k.Languages[i].Name;
     end;
 
-    EnableControls;
+    EnableControls(nil);
   finally
     Dec(FSetup);
   end;
@@ -579,7 +612,7 @@ end;
 
 procedure TfrmNewProjectParameters.memoDescriptionChange(Sender: TObject);
 begin
-  EnableControls;
+  EnableControls(memoDescription);
 end;
 
 procedure TfrmNewProjectParameters.UpdateProjectFilename;
@@ -591,6 +624,87 @@ begin
   // Scroll to the end of the control to show the filename
   editProjectFilename.Perform(EM_SETSEL, Length(editProjectFilename.Text), Length(editProjectFilename.Text));
   editProjectFilename.Perform(EM_SCROLLCARET, 0, 0);
+  FormValidation.TouchField(editProjectFilename);
+end;
+
+////
+//// Validation
+////
+
+procedure TfrmNewProjectParameters.SetupValidation;
+begin
+  FormValidation := TFormValidation.Create;
+
+  FormValidation.Add(lblKeyboardName,      lblKeyboardNameValidation,    editKeyboardName);
+  FormValidation.Add(lblDescription,       lblDescriptionValidation,     memoDescription);
+  FormValidation.Add(lblAuthor,            lblAuthorValidation,          editAuthor);
+  FormValidation.Add(lblCoypright,         lblCopyrightValidation,       editCopyright);
+  FormValidation.Add(lblFullCopyright,     lblFullCopyrightValidation,   editFullCopyright);
+  FormValidation.Add(lblVersion,           lblVersionValidation,         editVersion);
+  FormValidation.Add(lblTargets,           lblTargetsValidation,         clbTargets);
+  FormValidation.Add(lblKeyboardLanguages, lblLanguagesValidation,       gridKeyboardLanguages);
+  FormValidation.Add(lblPath,              lblPathValidation,            editPath);
+  FormValidation.Add(lblKeyboardID,        lblKeyboardIDValidation,      editKeyboardID);
+  FormValidation.Add(lblProjectFilename,   lblProjectFilenameValidation, editProjectFilename);
+
+  FormValidation.AddMethod(
+    editKeyboardName,
+    function: Boolean begin Result := Trim(editKeyboardName.Text) <> '' end,
+    'Keyboard name cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editPath,
+    function: Boolean begin Result := (Trim(editPath.Text) <> '') end,
+    'Keyboard path cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editKeyboardID,
+    function: Boolean begin Result := Trim(editKeyboardID.Text) <> '' end,
+    'Keyboard ID cannot be empty'
+  );
+
+  FormValidation.AddMethod(
+    editKeyboardID,
+    function: Boolean begin Result := TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True) end,
+    'Keyboard ID can include only a-z, 0-9, and _, and must not start with a digit'
+  );
+
+  FormValidation.AddMethod(
+    clbTargets,
+    function: Boolean begin Result := GetTargets <> []; end,
+    'At least one target must be selected'
+  );
+
+  FormValidation.AddMethod(
+    memoDescription,
+    function: Boolean begin Result := Trim(memoDescription.Text) <> '' end,
+    'Description cannot be empty'
+  );
+end;
+
+procedure TfrmNewProjectParameters.EnableControls(ChangingControl: TControl);
+begin
+  if Assigned(ChangingControl) then
+  begin
+    FormValidation.TouchField(ChangingControl);
+  end;
+  FormValidation.Update;
+  EnableGridControls;
+end;
+
+procedure TfrmNewProjectParameters.EnableGridControls;
+var
+  e: Boolean;
+begin
+  e := gridKeyboardLanguages.RowCount > 1;
+  gridKeyboardLanguages.Enabled := e;
+  cmdKeyboardRemoveLanguage.Enabled := e;
+  cmdKeyboardEditLanguage.Enabled := e;
+  if e then
+    gridKeyboardLanguages.FixedRows := 1;
 end;
 
 end.
+

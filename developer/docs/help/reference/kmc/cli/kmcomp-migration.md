@@ -5,9 +5,8 @@ title: Migrating from kmcomp to kmc
 `kmcomp` was the command-line compiler for Keyman Developer through version
 16.0. Version 17.0 replaces `kmcomp` with `kmc`.
 
-The lexical model command-line tooling, `kmlmc`, `kmlmp`, and `kmlmi`, are all
-still present in version 17, but are deprecated, as the same tasks can be
-performed with `kmc`.
+The lexical model command-line tooling, `kmlmc`, `kmlmp`, and `kmlmi`, have
+been removed in version 19.0; instead use `kmc`.
 
 ## Benefits
 
@@ -98,21 +97,6 @@ kmcomp                 | kmc                                   | notes
 `-no-compiler-version` | `--no-compiler-version`               | Exclude compiler version metadata from output files
 
 ## Compiling a lexical model
-
-`kmlmc` and `kmlmp` were separate tools in earlier versions of Keyman Developer,
-for compiling lexical models and lexical model packages. They have both been
-replaced with `kmc`.
-
-Old method, using kmlmc and kmlmp:
-
-```bash
-kmlmc file.model.ts
-# or specifying output filename
-kmlmc -o output/path/file.model.js file.model.ts
-kmlmp file.model.kps
-```
-
-New method, using kmc:
 
 ```bash
 # recommended, build the model project:

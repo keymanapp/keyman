@@ -35,6 +35,7 @@ import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
+import android.content.Intent;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
@@ -124,8 +125,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     }
 
     ViewGroup parent = (ViewGroup) inputView.getParent();
-    if (parent != null)
+    if (parent != null) {
       parent.removeView(inputView);
+    }
 
     return inputView;
   }
@@ -137,6 +139,22 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   public void onUpdateSelection(int oldSelStart, int oldSelEnd, int newSelStart, int newSelEnd, int candidatesStart, int candidatesEnd) {
     super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd);
     KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM);
+  }
+
+  private void sendCurrentFontName() {
+    Keyboard keyboardInfo = KMManager.getCurrentKeyboardInfo(this);
+    if (keyboardInfo != null) {
+      String fontName = keyboardInfo.getFont();
+
+      Intent intent;
+      if  (BuildConfig.DEBUG) {
+        intent = new Intent("com.tavultesoft.kmapro.debug.keyboard_changed");
+      } else {
+        intent = new Intent("com.tavultesoft.kmapro.keyboard_changed");
+      }
+      intent.putExtra("fontName", fontName);
+      sendBroadcast(intent);
+    }
   }
 
   /**
@@ -197,6 +215,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (KMManager.isNumericField(inputType)) {
       KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
+
+    if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
+      sendCurrentFontName();
+    }
   }
 
   @Override
@@ -237,7 +259,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       KMManager.onConfigurationChanged(newConfig);
     }
 
-    // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
+    // Update the touchable region of the Keyman keyboard
     Point size = KMManager.getWindowSize(getApplicationContext());
 
     int inputViewHeight = 0;
@@ -245,9 +267,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       inputViewHeight = inputView.getHeight();
     }
 
+    int navigationHeight = KMManager.getNavigationBarHeight(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);
-    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight;
+    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight - navigationHeight;
     outInsets.visibleTopInsets = outInsets.contentTopInsets;
     outInsets.touchableInsets = InputMethodService.Insets.TOUCHABLE_INSETS_REGION;
     outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);
@@ -263,7 +286,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardChanged(String newKeyboard) {
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.showSystemKeyboard();
+    sendCurrentFontName();
   }
 
   @Override

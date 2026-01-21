@@ -15,8 +15,8 @@ builder_describe "Installation files for FirstVoices Keyboards" \
 # NOTE: not using deps here because we will only do this in the 'publish' phase
 # after all other builds complete
 
-builder_describe_outputs \
-  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe
+builder_if_release_build_level builder_describe_outputs \
+  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.exe
 
 builder_parse "$@"
 
@@ -95,7 +95,7 @@ function do_publish() {
   #
   wrap-signcode //d "FirstVoices Keyboards" firstvoices.exe
 
-  copy-installer
+  builder_if_release_build_level copy-installer
 }
 
 function copy-installer() {
@@ -103,9 +103,9 @@ function copy-installer() {
 
   mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
   cp firstvoices.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices.msi"
-  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe"
+  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.exe"
 
-  builder_if_release_build_level verify-installer-signatures
+  verify-installer-signatures
 }
 
 function verify-installer-signatures() {

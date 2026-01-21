@@ -3,6 +3,7 @@ import logging
 import os
 
 from keyman_config.gsettings import GSettings
+from keyman_config.sentry_handling import SentryErrorHandling
 
 
 # pylint: disable=global-statement
@@ -52,13 +53,20 @@ def _reset_gnome_shell():
 def get_ibus_keyboard_id(keyboard, packageDir, language=None, ignore_language=False):
     if not keyboard:
         return None
+    sentry = SentryErrorHandling()
     kmx_file = os.path.join(packageDir, keyboard['id'] + ".kmx")
     if ignore_language:
+        sentry.add_breadcrumb(category='keyboard', message=f'ibus_keyboard_id(1): {kmx_file}')
         return kmx_file
     if language is not None and language != '':
         logging.debug(language)
+        sentry.add_breadcrumb(category='keyboard', message=f'ibus_keyboard_id(2): {language}:{kmx_file}')
         return f"{language}:{kmx_file}"
     if "languages" in keyboard and len(keyboard["languages"]) > 0:
-        logging.debug(keyboard["languages"][0])
-        return f"{keyboard['languages'][0]['id']}:{kmx_file}"
+        firstLanguage = keyboard["languages"][0]
+        logging.debug(firstLanguage)
+        if 'id' in firstLanguage:
+            sentry.add_breadcrumb(category='keyboard', message=f'ibus_keyboard_id(3): {firstLanguage["id"]}:{kmx_file}')
+            return f"{firstLanguage['id']}:{kmx_file}"
+    sentry.add_breadcrumb(category='keyboard', message=f'ibus_keyboard_id(4): {kmx_file}')
     return kmx_file

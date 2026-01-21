@@ -366,14 +366,18 @@ def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
 
     info, system, options, keyboards, files = parsemetadata(kmpJsonFilename)
 
+    if not keyboards:
+        return None
+
     ldml = etree.Element("keyboard", locale="zzz-keyman")
+
     for keyboard in keyboards:
         if keyboard['id'] != keyboardName:
             continue
         if 'oskFont' in keyboard:
             fontFile = os.path.join(os.path.dirname(kmpJsonFilename), keyboard['oskFont'])
             font = _fontFacename(fontFile)
-            if font:
+            if font is not None and len(font) > 0:
                 ldml.set('keymanFacename', font)
         break
 

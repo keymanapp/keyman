@@ -1,3 +1,30 @@
+keyman (18.0.244-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 10 Nov 2025 17:06:33 +0100
+
+keyman (18.0.243-1) unstable; urgency=medium
+
+  * replace dbus-x11 dependency with default-dbus-session-bus | dbus-session-bus
+    (closes: 1117068)
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 15 Oct 2025 12:09:24 +0200
+
+keyman (18.0.242-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 29 Sep 2025 11:38:38 +0200
+
+keyman (18.0.241-1) unstable; urgency=medium
+
+  * remove onboard-keyman recommends (closes: 1115423)
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 18 Sep 2025 11:35:01 +0200
+
 keyman (18.0.240-1) unstable; urgency=medium
 
   * New upstream release.

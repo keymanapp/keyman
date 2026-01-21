@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">Deutsch</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">German</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
   <string name="ssTitle">Installiere $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION wurde erfolgreich installiert.</string>

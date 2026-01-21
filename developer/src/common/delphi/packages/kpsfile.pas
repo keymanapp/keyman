@@ -70,6 +70,7 @@ type
     procedure DoSaveJSON(ARoot: TJSONObject); override;
     procedure DoLoadIni(ini: TIniFile); override;
     procedure DoSaveIni(ini: TIniFile); override;
+    procedure Cleanup; override;
   public
 
     function KPSOptions: TKPSOptions;
@@ -108,6 +109,15 @@ begin
   inherited;
   if Source is TKPSFile then
     FStrings.Assign((Source as TKPSFile).Strings);
+end;
+
+procedure TKPSFile.Cleanup;
+begin
+  inherited;
+  if KPSOptions.FollowKeyboardVersion then
+  begin
+    Info.Desc[PackageInfo_Version] := '';
+  end;
 end;
 
 constructor TKPSFile.Create;

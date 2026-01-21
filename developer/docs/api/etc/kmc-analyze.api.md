@@ -4,8 +4,8 @@
 
 ```ts
 
-import { CompilerCallbacks } from '@keymanapp/common-types';
-import { CompilerEvent } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerEvent } from '@keymanapp/developer-utils';
 import { Osk } from '@keymanapp/kmc-kmn';
 
 // @public
@@ -14,11 +14,18 @@ export class AnalyzeOskCharacterUse {
     analyze(file: string): Promise<boolean>;
     clear(): void;
     getStrings(format?: '.txt' | '.md' | '.json'): string[];
+    // @internal (undocumented)
+    unitTestEndPoints: {
+        loadPreviousMap: (filename: string) => Osk.StringResult[];
+        addStrings: (strings: string[], filename: string) => void;
+        stringToUnicodeSequence: typeof AnalyzeOskCharacterUse.stringToUnicodeSequence;
+    };
 }
 
 // @public
 export interface AnalyzeOskCharacterUseOptions {
     includeCounts?: boolean;
+    mergeMapFile?: string;
     puaBase?: number;
     stripDottedCircle?: boolean;
 }
@@ -49,6 +56,31 @@ export class AnalyzerMessages {
     static readonly Info_ScanningFile: (o: {
         type: string;
         name: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static readonly WARN_PreviousMapDidIncludeCounts: number;
+    // (undocumented)
+    static readonly Warn_PreviousMapDidIncludeCounts: (o: {
+        filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static readonly WARN_PreviousMapDidNotIncludeCounts: number;
+    // (undocumented)
+    static readonly Warn_PreviousMapDidNotIncludeCounts: (o: {
+        filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static readonly WARN_PreviousMapFileCouldNotBeLoaded: number;
+    // (undocumented)
+    static readonly Warn_PreviousMapFileCouldNotBeLoaded: (o: {
+        filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static readonly WARN_PreviousMapFileCouldNotBeLoadedDueToError: number;
+    // (undocumented)
+    static readonly Warn_PreviousMapFileCouldNotBeLoadedDueToError: (o: {
+        filename: string;
+        e: any;
     }) => CompilerEvent;
 }
 

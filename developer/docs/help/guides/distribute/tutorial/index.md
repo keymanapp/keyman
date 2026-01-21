@@ -21,7 +21,7 @@ Welcome! In this tutorial, you will learn how to create a
 of files, compressed into a single file, just like a ZIP file. It is
 designed to make installation of keyboards, fonts and related
 documentation straightforward for the end user. When done, the package
-can be installed into Keyman Desktop through a simple dialog. Keyman for
+can be installed into Keyman for Windows through a simple dialog. Keyman for
 mobile apps can also download and install keyboards through the keyboard
 package.
 
