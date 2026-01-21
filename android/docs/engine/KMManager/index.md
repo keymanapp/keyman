@@ -101,6 +101,12 @@ The KMManager is the core class which provides most of the methods and constants
 [`getKeyboardHeight()`](getKeyboardHeight)
 : returns the height of the keyboard frame
 
+[`getKeyboardHeightMax()`](getKeyboardHeightMax)
+: returns the maximum allowed height of the keyboard frame
+
+[`getKeyboardHeightMin()`](getKeyboardHeightMin)
+: returns the minimum allowed height of the keyboard frame
+
 [`getKeyboardIndex()`](getKeyboardIndex)
 : returns index number of the specified keyboard in keyboards list
 

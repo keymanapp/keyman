@@ -87,7 +87,9 @@ setup_docker() {
   if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
     DOCKER_RUN_ARGS+=(--env DOCKER_RUN_AS_ROOT=1)
   fi
-  if ! builder_is_running_on_gha ; then
+  if builder_is_running_on_gha ; then
+    DOCKER_RUN_ARGS+=(--env CHANGE_PERMISSIONS=1)
+  else
     DOCKER_RUN_ARGS+=(-t)
   fi
 

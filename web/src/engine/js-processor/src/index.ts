@@ -9,3 +9,12 @@ export { default as OutputTarget } from "./outputTarget.js";
 export * from "./outputTarget.js";
 export { Mock } from "./mock.js";
 export * from "./stringDivergence.js";
+
+import { DeadkeyTracker } from './deadkeys.js';
+
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const unitTestEndpoints = {
+    DeadkeyTracker,
+};

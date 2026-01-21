@@ -322,7 +322,7 @@ on any key to edit it. There are a number of controls:
 
 Red circle with an X
 :   This button to the top right of the key will delete the key from the
-    row; if it is the last key on the row, the entire row will be
+    row; if it is the only remaining key on the row, the entire row will be
     deleted.
 
 Green arrow with a +

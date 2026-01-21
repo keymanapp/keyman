@@ -53,6 +53,7 @@ EOF
 # Install NVM
 RUN NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2) && \
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
+RUN chmod -R +x,+r $HOME/
 RUN <<EOF cat >> /usr/bin/bashwrapper
 PATH=/home/build/.keyman/node:\$PATH
 export NVM_DIR="$HOME/.nvm"

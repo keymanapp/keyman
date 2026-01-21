@@ -4,36 +4,49 @@ Code for `km-config` is in [linux/keyman-config](../../linux/keyman-config/).
 
 ## Preparing to run
 
+### Install Dependencies
+
 If you are running from the repo or installing keyman-config manually rather than from a package
 then you will need to:
 
 ```bash
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil \
     python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.1 dconf-cli \
-    python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl
+    python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl \
+    python3-build python3-fonttools python3-sentry-sdk
 ```
 
-Either `python3-raven` or `python3-sentry-sdk` (>= 1.4) is required as well.
-On Ubuntu 22.04 and later run:
+Newer Ubuntu versions (>= 24.04) don't allow to modify the environment and directly
+install non-Debian-packaged Python packages. Instead you'll have to
+run the commands in a virtual environment.
+
+This requires the installation of some additional dependencies:
 
 ```bash
-sudo apt install python3-sentry-sdk
+sudo apt install python3-venv libglib2.0-dev libdbus-1-dev pkg-config
+libcairo2-dev libgirepository-2.0-dev
 ```
 
-To install it on Ubuntu 18.04 and earlier run:
+Then create the virtual environment with `python3 -m venv km-venv` and activate
+it with `source km-venv/bin/activate`.
 
-```bash
-sudo apt install python3-raven
-```
+### Prepare code
 
-For Ubuntu versions that don't provide `python3-raven` but instead provide
-`python3-sentry-sdk` in a too old version (i.e. Ubuntu 20.04):
-Install `python3-sentry-sdk` from `packages.sil.org`,
-or install it with pip:
+Run `linux/keyman-config/build.sh build` to prepare the code.
 
-```bash
-pip3 install sentry-sdk
-```
+### Installation
+
+You can install the files with `linux/keyman-config/build.sh install`.
+This will install the files into `/usr/local`.
+
+To uninstall you can run `linux/keyman-config/build.sh uninstall`.
+
+## Manually installing
+
+If you prefer to manually copy the files you'll still have to run the
+build step above. In addition you'll have to copy the GSettings schema:
+
+### GSettings schema
 
 Copy and compile the GSettings schema:
 
@@ -47,15 +60,6 @@ sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 Running `km-config` requires a language tag mapping file
 `keyman_config/standards/lang_tags_map.py`. This file gets generated during a package
 build, and also when running `build.sh build`.
-
-## Installing manually from the repo
-
-`linux/keyman-config/build.sh build && sudo linux/keyman-config/build.sh install`
-will install locally to `/usr/local`.
-
-`pip3 help install` will give you more install options.
-
-To uninstall you can run `sudo linux/keyman-config/build.sh uninstall`.
 
 ## Things to run from the command line
 
@@ -119,15 +123,17 @@ Secondary-click gives you a menu including 'Back' to go back a page.
 
 ### km-kvk2ldml
 
-`km-kvk2ldml [-p] [-k] [-o LDMLFILE] <kvk file>` Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally print the details of the kvk file (`-p`) optionally with all keys (`-k`).
+`km-kvk2ldml [-p] [-k] [-o LDMLFILE] <kvk file>` Convert a Keyman kvk on-screen
+keyboard file to an LDML file. Optionally print the details of the kvk file
+(`-p`) optionally with all keys (`-k`).
+
+This command is run automatically when installing a keyboard package to create
+the necessary files for the onboard onscreen keyboard.
 
 ## Building the Debian package
 
-You will need the build dependencies as well as the runtime dependencies above
-
-`sudo apt install dh-python python3-all debhelper help2man`
-
-Run `make deb`. This will build the Debian package in the `make_deb` directory.
+See the [packaging.md](https://github.com/keymanapp/keyman/blob/master/docs/linux/packaging.md#L26)
+document.
 
 ## Internationalization
 
@@ -187,7 +193,18 @@ This will create `.mo` files, e.g. `locale/de/LC_MESSAGES/keyman-config.mo`.
 ### Testing localization
 
 ```bash
-LANGUAGE=de ./km-config
+TEXTDOMAINDIR=./locale LANGUAGE=de ./km-config
+```
+
+## Testing that all strings are localizable
+
+To test that all strings can be translated, you can run the following
+command. This will create and compile a TEST.po file
+which shows all localizable strings in uppercase, and then run
+km-config with the TEST.po file.
+
+```bash
+make test-po
 ```
 
 ## Debugging unit tests

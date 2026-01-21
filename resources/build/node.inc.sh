@@ -22,7 +22,12 @@ node_select_version_and_npm_ci() {
   # Also, a developer can set KEYMAN_USE_NVM variable to get this behaviour
   # automatically too (see /docs/build/node.md)
   if [[ "$KEYMAN_VERSION_ENVIRONMENT" != local || ! -z "${KEYMAN_USE_NVM+x}" ]]; then
-    _node_select_version_with_nvm
+    # For npm publishing, we currently need to use an alternate version of node
+    # that includes npm 11.5.1 or later (see #15040). Once we move to node v24,
+    # we can probably remove this check
+    if [[ -z "${KEYMAN_CI_SKIP_NVM+x}" ]]; then
+      _node_select_version_with_nvm
+    fi
   fi
 
   # Check if Node.JS/npm is installed.
@@ -64,6 +69,10 @@ _node_select_version_with_nvm() {
   else
     # launch nvm in a sub process, see _builder_nvm.sh for details
     "${KEYMAN_ROOT}/resources/build/_builder_nvm.sh" "${REQUIRED_NODE_VERSION}"
+
+    if ! echo "${PATH}" | grep -qF "${HOME}/.keyman/node"; then
+      export PATH="${HOME}/.keyman/node:${PATH}"
+    fi
   fi
 
   # Now, check that the node version is correct, on all systems
