@@ -1,7 +1,8 @@
 import { assert } from 'chai';
 
 import { JSKeyboard, KMWString } from 'keyman/engine/keyboard';
-import { JSKeyboardProcessor, unitTestEndpoints } from 'keyman/engine/js-processor';
+import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
 
 let device = {
   formFactor: 'desktop',

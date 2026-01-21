@@ -9,7 +9,7 @@ import { JSKeyboardInterface } from './jsKeyboardInterface.js';
  */
 export interface ProcessorInitOptions {
   /**
-   * The base layout identifier for the keyboard.
+   * The base layout identifier for the keyboard, currently always 'us'.
    */
   baseLayout: string;
 
