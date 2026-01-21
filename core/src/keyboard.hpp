@@ -26,8 +26,6 @@ namespace core
   {
     std::u16string      _keyboard_id;
     std::u16string      _version_string;
-    // unused and deprecated
-    core::path           _folder_path;
     std::vector<option> _default_opts;
 
     void render();
