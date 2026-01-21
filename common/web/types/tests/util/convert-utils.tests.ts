@@ -1,18 +1,13 @@
 import 'mocha';
 import { assert } from 'chai';
-//import { compilerTestCallbacks } from './../helpers/index.js';
-//import { compilerTestCallbacks } from '@keymanapp/developer-utils';
-import { convertUtil } from '@keymanapp/common-types'
+import { convertUtil } from '@keymanapp/common-types';
 
-import { TestCompilerCallbacks } from ' ../../../../developer/src/common/web/test-helpers/TestCompilerCallbacks.js';
-describe('KmnFileWriter', function () {
+describe('convert-utils', function () {
 
-  before(function () {
-    TestCompilerCallbacks.clear();
-  });
-console.log('convertUtil from util');
+  console.log('convertUtil from util');
+  console.log('TODO: copy kmc-convert util test fuctions from dev/src/kmc-convert to common/web/types/src/util and test them here');
 
-  describe('convertToUnicodeCodePoint  from convert-util', function () {
+  describe('convertToUnicodeCodePoint from convert-utils', function () {
     [
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
@@ -41,7 +36,7 @@ console.log('convertUtil from util');
     });
   });
 
-  describe('convertToUnicodeCharacter  from convert-util', function () {
+  describe('convertToUnicodeCharacter from convert-utils', function () {
     [
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
@@ -60,6 +55,7 @@ console.log('convertUtil from util');
       ["ሴ", 'ሴ'],
       ['😎', '😎'],
       ["W̊", "W̊"],
+      ["U+1E98", "ẘ"],
       ["ab", undefined],
       ["", ''],
       [undefined, undefined],
