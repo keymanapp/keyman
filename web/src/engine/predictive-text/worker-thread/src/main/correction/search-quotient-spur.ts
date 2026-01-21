@@ -39,8 +39,8 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
   readonly inputCount: number;
   readonly codepointLength: number;
-  protected abstract readonly insertLength: number;
-  protected abstract readonly leftDeleteLength: number
+  public abstract readonly insertLength: number;
+  public abstract readonly leftDeleteLength: number
 
   /**
    * Marks all results that have already been returned from this instance of SearchPath.
