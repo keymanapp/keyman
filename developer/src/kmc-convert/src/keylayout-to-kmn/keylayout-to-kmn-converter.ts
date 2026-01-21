@@ -128,6 +128,9 @@ export class KeylayoutToKmnConverter {
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
+    //writetoFile
+    if (!kmnFileWriter.writeToFile(outArray)) console.log("Error writing to file");
+
     // write to object/ConverterToKmnResult
     const out_Uint8: Uint8Array = kmnFileWriter.write(outArray);
     const result: ConverterToKmnResult = {

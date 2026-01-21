@@ -15,6 +15,7 @@ import { KeylayoutToKmnConverter, ProcesData, Rule } from '../src/keylayout-to-k
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
 
+import { convertUtil } from '@keymanapp/common-types'
 describe('KmnFileWriter', function () {
 
   before(function () {
@@ -138,7 +139,6 @@ describe('KmnFileWriter', function () {
   });
 
   describe('convertToUnicodeCodePoint ', function () {
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
@@ -161,14 +161,13 @@ describe('KmnFileWriter', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sut_w.convertToUnicodeCodePoint(values[0] as string);
+        const result = convertUtil.convertToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
   });
 
   describe('convertToUnicodeCharacter ', function () {
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
@@ -192,8 +191,8 @@ describe('KmnFileWriter', function () {
       [undefined, undefined],
       [null, undefined]
     ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sut_w.convertToUnicodeCharacter(values[0] as string);
+      it(('from writer should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = convertUtil.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
