@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
-const KEYMAN_ROOT = process.env['KEYMAN_ROOT'];
+const KEYMAN_ROOT = process.env['KEYMAN_ROOT'] ?? '.';
 export const coreurl = pathToFileURL(`${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core`).toString();
 
 export function loadKeyboardBlob(filename: string) {
