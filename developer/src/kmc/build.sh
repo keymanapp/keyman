@@ -8,11 +8,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
-. "$KEYMAN_ROOT/developer/src/packages.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/npm-packages.inc.sh"
 
 builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/include" \
@@ -35,10 +34,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "bundle                    creates a bundled version of kmc" \
   "api                       prepare compiler error documentation" \
   "test                      run automated tests for kmc" \
-  publish \
-  "--build-path=BUILD_PATH   build directory for bundle" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "--build-path=BUILD_PATH   build directory for bundle"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -57,7 +53,7 @@ function do_build() {
 
 function do_test() {
   typescript_run_eslint_mocha_tests 50
-  ./test/command-line-tests.sh test
+  builder_launch /developer/src/kmc/test/command-line-tests.sh test
 }
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -114,4 +110,3 @@ builder_run_action build      do_build
 builder_run_action test       do_test
 builder_run_action api        do_api
 builder_run_action bundle     do_bundle
-builder_run_action publish    ci_publish_npm

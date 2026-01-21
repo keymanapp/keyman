@@ -58,7 +58,11 @@ generate_uuid() {
 
 run_in_vs_env() {
   (
-    builder_echo heading "### visual_studio: $@"
+    if [[ "${1-x}" == "--quiet" ]]; then
+      shift
+    else
+      builder_echo heading "### visual_studio: $*"
+    fi
     source "$KEYMAN_ROOT/resources/build/win/visualstudio_environment.inc.sh"
     "$@"
   )
@@ -66,7 +70,11 @@ run_in_vs_env() {
 
 run_in_delphi_env() {
   (
-    builder_echo heading "### delphi: $@"
+    if [[ "${1-x}" == "--quiet" ]]; then
+      shift
+    else
+      builder_echo heading "### delphi: $*"
+    fi
     source "$KEYMAN_ROOT/resources/build/win/delphi_environment.inc.sh"
     "$@"
   )

@@ -74,7 +74,7 @@ function do_publish() {
     -nologo \
     -dWixUILicenseRtf=License.rtf \
     "$WIXLIGHTCOMPRESSION" \
-    -out keymandesktop.msi -ext WixUIExtension \
+    -out keymandesktop.msi -ext WixUIExtension -ext WixUtilExtension \
     keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
 
   #
@@ -90,10 +90,6 @@ function do_publish() {
   rm -f setup.inf
   cat "$WINDOWS_PROGRAM_APP/setup-redist.exe" keymandesktop.zip > keymandesktop.exe
   rm -f keymandesktop.zip
-
-  #
-  # Sign the installer
-  #
   wrap-signcode //d "Keyman for Windows" keymandesktop.exe
 
   builder_if_release_build_level copy-installer
@@ -151,7 +147,7 @@ function do_candle() {
 function heat-cef() {
   builder_heading heat-cef
 
-  # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+  # We copy the files to a temp folder in order to exclude .git from harvesting
   rm -rf "$KEYMAN_WIX_TEMP_CEF"
   mkdir -p "$KEYMAN_WIX_TEMP_CEF"
   cp -r "$KEYMAN_CEF4DELPHI_ROOT"/* "$KEYMAN_WIX_TEMP_CEF"
@@ -159,7 +155,6 @@ function heat-cef() {
   # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
   rm -rf "$KEYMAN_WIX_TEMP_CEF"
 }
-
 
 function create-setup-inf() {
   builder_heading create-setup-inf

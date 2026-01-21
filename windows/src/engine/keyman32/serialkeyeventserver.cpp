@@ -35,7 +35,7 @@
 
 //
 // Server application functionality
-// This runs only in the host applications keyman.exe and keymanx64.exe
+// This runs only in the host applications keyman.exe, keymanhp.x64.exe and keymanhp.arm64.exe
 //
 
 // TODO: refactor this into the SerialKeyEventServer class and provide getters for them
@@ -475,6 +475,10 @@ private:
 
           There is a possibility that some apps may try and sniff that 0x21D scan code and get confused because Keyman
           doesn't emit it. Hopefully this is rare.
+
+          See also:
+          * PostVisualKeyboardModifierEvent in k32_visualkeyboardinterface.cpp
+          * TfrmOSKOnScreenKeyboard.OskModifierEvent in UfrmOSKOnScreenKeyboard.cpp
         */
         INPUT input[2];
         input[0].type = INPUT_KEYBOARD;

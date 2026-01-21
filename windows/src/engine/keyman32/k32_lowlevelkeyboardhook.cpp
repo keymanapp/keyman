@@ -141,6 +141,8 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   SendDebugEntry();
 
+  LowLevelHookWatchDog::HookIsAlive();
+
   PKBDLLHOOKSTRUCT hs = (PKBDLLHOOKSTRUCT) lParam;
 
   BOOL extended = hs->flags & LLKHF_EXTENDED ? TRUE : FALSE;
@@ -176,8 +178,13 @@ LRESULT _kmnLowLevelKeyboardProc(
   if (GetKeyState(VK_LSHIFT) < 0) {
     FHotkeyShiftState |= HK_SHIFT;
   }
+
   if (GetKeyState(VK_RSHIFT) < 0) {
     FHotkeyShiftState |= AllowRightModifierHotkey ? HK_SHIFT : HK_RSHIFT_INVALID;
+  }
+
+  if(isModifierKey(hs->vkCode)) {
+    PostVisualKeyboardModifierEvent(hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
   }
 
   //TODO: #8064. Can remove debug message once issue #8064 is resolved
