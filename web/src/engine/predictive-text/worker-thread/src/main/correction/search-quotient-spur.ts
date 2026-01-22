@@ -53,16 +53,6 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   public returnedValues?: {[resultKey: string]: SearchNode} = {}; // TODO:  make it private again!
 
   /**
-   * Acts as a Map that prevents duplicating a correction-search path if reached
-   * more than once.
-   */
-  protected get processedEdgeSet(): {[pathKey: string]: boolean} {
-    return this._processedEdgeSet;
-  }
-
-  private _processedEdgeSet?: {[pathKey: string]: boolean} = {};
-
-  /**
    * Provides a heuristic for the base cost at each depth if the best
    * individual input were taken at that level.
    */
@@ -245,7 +235,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
 
       const result = this.parentPath.handleNextNode();
 
-      if(result.type == 'complete' && !this.processedEdgeSet[result.finalNode.pathKey]) {
+      if(result.type == 'complete') {
         this.addEdgesForNodes(result.finalNode);
       }
 
@@ -260,14 +250,6 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     let unmatchedResult: PathResult = {
       type: 'intermediate',
       cost: currentNode.currentCost
-    }
-
-    // Have we already processed a matching edge?  If so, skip it.
-    // We already know the previous edge is of lower cost.
-    if(this.processedEdgeSet[currentNode.pathKey]) {
-      return unmatchedResult;
-    } else {
-      this.processedEdgeSet[currentNode.pathKey] = true;
     }
 
     // Stage 1:  filter out nodes/edges we want to prune
