@@ -115,11 +115,14 @@ export class SearchQuotientSpur implements SearchQuotientNode {
           // Check for equal reference first before the other checks; it makes a nice shortcut.
           if(x == entry) {
             return true;
-          } if(x.p == entry.p && s1.deleteLeft == s2.deleteLeft
+          }
+
+          if(x.p == entry.p && s1.deleteLeft == s2.deleteLeft
             && s1.id == s2.id && ((s1.deleteRight ?? 0) == (s2.deleteRight ?? 0)) && s1.insert == s2.insert
           ) {
             return true;
           }
+
           return false;
         });
 
