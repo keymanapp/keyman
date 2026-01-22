@@ -27,7 +27,8 @@ type IntermediateSearchPath = {
 type CompleteSearchPath = {
   type: 'complete',
   cost: number,
-  finalNode: SearchNode
+  finalNode: SearchNode,
+  spaceId: number
 }
 
 export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
@@ -37,6 +38,12 @@ export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
  * for predictive-text corrections.
  */
 export interface SearchQuotientNode {
+  /**
+   * Returns an identifier uniquely identifying this search-batching structure
+   * by correction-search results.
+   */
+  readonly spaceId: number;
+
   /**
    * Retrieves the lowest-cost / lowest-distance edge from the batcher's search
    * area, checks its validity as a correction to the input text, and reports on
