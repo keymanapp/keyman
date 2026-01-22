@@ -45,6 +45,12 @@ describe('KmwCompilerMessages', function () {
     await testForMessage(this, ['kmw', 'validate_gesture.kmn'], KmwCompilerMessages.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel);
   });
 
+  // ERROR_InvalidBegin (from KmnCompilerMessages, but in KeymanWeb compiler context)
+
+  it('should generate ERROR_InvalidBegin if the keyboard has no "begin unicode" statement', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'ansi.kmn'], KmwCompilerMessages.ERROR_InvalidBegin);
+  });
+
   // TODO: other messages
 
   // WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb:

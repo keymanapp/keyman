@@ -22,7 +22,7 @@ Read only
 
 ### Return Value
 
-Presently set to [`"http://help.keymanweb.com/go"`]().
+Presently set to [`"https://help.keyman.com/go"`]().
 
 ## Description
 

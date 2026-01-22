@@ -883,7 +883,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Khabar hana debug hana Keyman bihuttu fi bikan albinadu %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). Taddar takharum min Keyman hadar tahawul channan da..\n\nAFKURU: Alshu\'ul da biddar bibga kabir aljala bas. Dassasan debugging biddar bingus ajala hana kompita hanak wa eisawwu bey nadum al\'aruf faoug da..\n\nAFKUR LAYL SYR: Albarak afkur debug bihut shu\'ul al\'assarta chatta. Taddar ta\'assural shu\'ul albihuttual debug fi waqat altasaw debugging walla waqat tasaw miwasa faouga.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Khabar hana debug hana Keyman bihuttu fi bikan albinadu %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (where # is a number). Taddar takharum min Keyman hadar tahawul channan da..\n\nAFKURU: Alshu\'ul da biddar bibga kabir aljala bas. Dassasan debugging biddar bingus ajala hana kompita hanak wa eisawwu bey nadum al\'aruf faoug da..\n\nAFKUR LAYL SYR: Albarak afkur debug bihut shu\'ul al\'assarta chatta. Taddar ta\'assural shu\'ul albihuttual debug fi waqat altasaw debugging walla waqat tasaw miwasa faouga.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

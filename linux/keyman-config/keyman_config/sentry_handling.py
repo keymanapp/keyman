@@ -40,7 +40,8 @@ class SentryErrorHandling:
     def initialize_sentry(self):
         (enabled, reason) = self.is_sentry_enabled()
         if not enabled:
-            print(reason, file=sys.stderr)
+            if not self._is_running_tests():
+                print(reason, file=sys.stderr)
             logging.info(reason)
             return (enabled, reason)
         else:
@@ -58,8 +59,8 @@ class SentryErrorHandling:
             return (True, '')
 
     def is_sentry_enabled(self):
-        if self._is_unit_test():
-            return (False, 'Running unit tests, not reporting to Sentry')
+        if self._is_running_tests():
+            return (False, 'Running tests, not reporting to Sentry')
         elif self._get_environ_nosentry():
             return (False, 'Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set')
         elif not __uploadsentry__:
@@ -94,12 +95,16 @@ class SentryErrorHandling:
         keyman_nosentry = os.environ.get('KEYMAN_NOSENTRY')
         return keyman_nosentry and (int(keyman_nosentry) == 1)
 
-    def _is_unit_test(self):  # sourcery skip: use-any, use-next
+    def _is_running_tests(self):  # sourcery skip: use-any, use-next
         # The suggested refactorings (using any() or next()) don't work
         # when testing on Ubuntu 20.04
         for line in traceback.format_stack():
             if '/unittest/' in line:
                 return True
+
+        if platform.node() == 'autopkgtest':
+            return True
+
         return False
 
     def _handle_enabled(self, enabled):

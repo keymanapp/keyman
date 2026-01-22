@@ -55,3 +55,5 @@ or
 ## See also
 
 -   [applyKeyboardHeight()](applyKeyboardHeight)
+-   [getKeyboardHeightMax](getKeyboardHeightMax)
+-   [getKeyboardHeightMin](getKeyboardHeightMin)
