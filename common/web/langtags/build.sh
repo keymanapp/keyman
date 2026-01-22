@@ -7,16 +7,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
-. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 builder_describe "Build Keyman langtags.js common module" \
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure   /common/web/langtags/src/imports/langtags.js \
@@ -43,4 +39,3 @@ builder_run_action clean      rm -rf ./build ./src/imports ./node_modules
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
 builder_run_action test       echo 'no tests for langtags'
-builder_run_action publish    ci_publish_npm

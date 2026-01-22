@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
     android:layout_above="@+id/KMKeyboard"
     android:orientation="vertical"
-    android:background="@color/yellow_background"
+    android:background="@android:color/white"
     tools:context=".MainActivity">
 
     <include layout="@layout/titlebar"

@@ -142,7 +142,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
   private addEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>) {
     // With a newly-available input, we can extend new input-dependent paths from
     // our previously-reached 'extractedResults' nodes.
-    let outboundNodes = baseNodes.map((node) => {
+    const outboundNodes = baseNodes.map((node) => {
       // Hard restriction:  no further edits will be supported.  This helps keep the search
       // more narrowly focused.
       const substitutionsOnly = node.editCount == 2;

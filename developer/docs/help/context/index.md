@@ -42,12 +42,6 @@ title: Context Help
 
 [kmc Command-line Options](kmc)
 
-[kmlmc Command-line Options](kmlmc)
-
-[kmlmi Command-line Options](kmlmi)
-
-[kmlmp Command-line Options](kmlmp)
-
 [Character Map](character-map)
 
 [Message Window](messages)

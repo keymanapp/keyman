@@ -11,9 +11,9 @@ text-correction design:  we assume that each keystroke's `Transform` is 100%
 independent from the `Transform` selected for every other keystroke.  This
 assumption is, of course, invalid: the output of keystroke A may selectively
 establish the context needed for a Keyman keyboard rule matched by one or more
-keys in keystroke B.  Efforts to address this limitation are considered
-out-of-scope at this time and will be addressed later in a future epic -
-epic/true-correction - documented as issue #14709.
+potential outputs for keystroke B.  Efforts to address this limitation are
+considered out-of-scope at this time and will be addressed later in a future
+epic - epic/true-correction - documented as issue #14709.
 
 ## Graph Structure
 

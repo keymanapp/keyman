@@ -4,13 +4,13 @@
 
 ```ts
 
-import { CompilerCallbacks } from '@keymanapp/common-types';
-import { CompilerEvent } from '@keymanapp/common-types';
-import { CompilerOptions } from '@keymanapp/common-types';
-import { KeymanCompiler } from '@keymanapp/common-types';
-import { KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
-import { KeymanCompilerResult } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerOptions } from '@keymanapp/developer-utils';
+import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifact } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
+import { KeymanCompilerResult } from '@keymanapp/developer-utils';
 import { KmpJsonFile } from '@keymanapp/common-types';
 
 // @public
@@ -30,6 +30,12 @@ export interface ModelInfoCompilerArtifacts extends KeymanCompilerArtifacts {
 //
 // @internal (undocumented)
 export class ModelInfoCompilerMessages {
+    // (undocumented)
+    static ERROR_DescriptionIsMissing: number;
+    // (undocumented)
+    static Error_DescriptionIsMissing: (o: {
+        filename: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_FileDoesNotExist: number;
     // (undocumented)

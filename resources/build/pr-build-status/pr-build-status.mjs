@@ -52,6 +52,10 @@
                   summary += addStatus(o, 'check', status.context, status.state);
                 } else if(status.context == 'Ubuntu Packaging') {
                   summary += addStatus(o, 'build', status.context, status.state);
+                } else if(status.context == 'npm pack/publish') {
+                  summary += addStatus(o, 'build', status.context, status.state);
+                } else if(status.context == 'Keyman Core - ARM64 test') {
+                  summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.context == 'check/web/file-size') {
                   // Ignore check/web/file-size -- we won't block automerge for this at this point
                   summary += addLog(`Skipping ${status.context}`);
@@ -79,9 +83,10 @@
                 const { state, type } = filtered_statuses[context];
                 if(type == 'unknown') {
                   // We special-case for unknown status checks, and never permit them
-                  console.error(`An unknown context ${context} was found, cannot calculate build status.`);
+                  // Note: function reduceStatuses() is where new status checks can be added
+                  console.error(`An unknown context "${context}" was found, cannot calculate build status.`);
                   return [
-                    'error', `An unknown context ${context} was found, cannot calculate build status.`, summary
+                    'error', `An unknown context "${context}" was found, cannot calculate build status.`, summary
                   ];
                 }
                 if(type == 'build') {

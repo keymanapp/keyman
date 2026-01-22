@@ -35,6 +35,7 @@ import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
+import android.content.Intent;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
@@ -140,6 +141,22 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
+  private void sendCurrentFontName() {
+    Keyboard keyboardInfo = KMManager.getCurrentKeyboardInfo(this);
+    if (keyboardInfo != null) {
+      String fontName = keyboardInfo.getFont();
+
+      Intent intent;
+      if  (BuildConfig.DEBUG) {
+        intent = new Intent("com.tavultesoft.kmapro.debug.keyboard_changed");
+      } else {
+        intent = new Intent("com.tavultesoft.kmapro.keyboard_changed");
+      }
+      intent.putExtra("fontName", fontName);
+      sendBroadcast(intent);
+    }
+  }
+
   /**
    * This is the main point where we do our initialization of the input method
    * to begin operating on an application.  At this point we have been
@@ -197,6 +214,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     // Select numeric layer if applicable
     if (KMManager.isNumericField(inputType)) {
       KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    }
+
+    if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
+      sendCurrentFontName();
     }
   }
 
@@ -268,6 +289,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     // Refresh banner theme
     BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.showSystemKeyboard();
+    sendCurrentFontName();
   }
 
   @Override

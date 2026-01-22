@@ -62,7 +62,7 @@ accent, and one for the vowel.
 | `Â, â, ...` | caret (<kbd>^</kbd>), then the vowel key.          |
 | `Ä, ä, ...` | double-quote (<kbd>"</kbd>), then the vowel key.   |
 | `Ç, ç`      | quote (<kbd>'</kbd>), then lower- or uppercase C.  |
-| `«, »`      | two less-than (<kbd>&lt;&lt;</kbd>) or greater-than (<kbd>&gt;&gt;</kbd>) symbols. |
+| `«, »`      | two less-than (<kbd>&lt;</kbd><kbd>&lt;</kbd>) or greater-than (<kbd>&gt;</kbd><kbd>&gt;</kbd>) symbols. |
 
 Now that we have decided which character to use and how the user can
 enter them, we can start to write the keyboard.
