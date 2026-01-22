@@ -10,7 +10,7 @@ import { type JSKeyboard } from "./keyboards/jsKeyboard.js";
 import { type DeviceSpec } from "keyman/common/web-utils";
 
 import { Codes } from './codes.js';
-import { DefaultRules } from "./defaultRules.js";
+import { DefaultOutputRules } from "./defaultOutputRules.js";
 import { ActiveKeyBase } from './keyboards/activeLayout.js';
 
 // Represents a probability distribution over a keyboard's keys.
@@ -19,9 +19,9 @@ export type KeyDistribution = { keySpec: ActiveKeyBase, p: number }[];
 
 /**
  * A simple instance of the standard 'default rules' for keystroke processing from the
- * DefaultRules base class.
+ * DefaultOutputRules base class.
  */
-const BASE_DEFAULT_RULES = new DefaultRules();
+const BASE_DEFAULT_RULES = new DefaultOutputRules();
 
 export interface KeyEventSpec {
 

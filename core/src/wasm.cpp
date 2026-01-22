@@ -340,6 +340,23 @@ km_core_state_get_actions_wasm(km_core_state const *state) {
   return actions_wasm;
 }
 
+int
+km_core_state_options_update_wasm(
+  km_core_state const *state,
+  const std::vector<km_core_option_item_wasm>& new_options
+) {
+  km_core_option_item* options_c = new km_core_option_item[new_options.size() + 1];
+  for (size_t i = 0; i < new_options.size(); ++i) {
+    options_c[i].key = new_options[i].key.c_str();
+    options_c[i].value = new_options[i].value.c_str();
+    options_c[i].scope = new_options[i].scope;
+  }
+  options_c[new_options.size()] = KM_CORE_OPTIONS_END;
+  km_core_status status = km_core_state_options_update(const_cast<km_core_state*>(state), options_c);
+  delete[] options_c;
+  return status;
+}
+
 const CoreReturn<km_core_context_items>*
 km_core_context_get_wasm(
   km_core_context const* context
@@ -483,6 +500,8 @@ EMSCRIPTEN_BINDINGS(core_interface) {
   em::function("state_context_debug(state, context_type)", &km_core_state_context_debug_wasm, em::allow_raw_pointers());
 
   em::function("state_get_actions(state)", &km_core_state_get_actions_wasm, em::allow_raw_pointers());
+
+  em::function("state_options_update(state, new_options)", &km_core_state_options_update_wasm, em::allow_raw_pointers());
 
   em::function("context_get(context)", &km_core_context_get_wasm, em::allow_raw_pointers());
   em::function("context_set(context, context_items)", &km_core_context_set_wasm, em::allow_raw_pointers());

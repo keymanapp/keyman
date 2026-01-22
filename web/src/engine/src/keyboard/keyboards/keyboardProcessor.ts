@@ -35,7 +35,7 @@ export type BeepHandler = (textStore: TextStore) => void;
 export interface KeyboardProcessor extends EventEmitter<EventMap> {
   // public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
   //   baseLayout: 'us',
-  //   defaultOutputRules: new DefaultRules()
+  //   defaultOutputRules: new DefaultOutputRules()
   // };
 
   /**
