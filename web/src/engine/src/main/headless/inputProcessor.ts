@@ -65,7 +65,7 @@ export class InputProcessor {
     this._languageProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
   }
 
-  public async init(paths: PathConfiguration, storeSerializer?: VariableStoreSerializer): Promise<void> {
+  public async init(paths: PathConfiguration, storeSerializer: VariableStoreSerializer): Promise<void> {
     await this.coreKbdProcessor.init(paths.basePath, storeSerializer);
   }
 

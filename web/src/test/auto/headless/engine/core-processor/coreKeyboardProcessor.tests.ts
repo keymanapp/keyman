@@ -6,8 +6,10 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import { KM_Core, km_core_context, km_core_keyboard, km_core_state, KM_CORE_CT, KM_CORE_STATUS, km_core_context_items } from 'keyman/engine/core-adapter';
 import { coreurl, loadKeyboardBlob } from '../loadKeyboardHelper.js';
+import { DeviceSpec } from 'keyman/common/web-utils';
 import { Codes, Deadkey, KeyEvent, KMXKeyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
+import { VariableStoreCookieSerializer } from 'keyman/engine/main';
 
 describe('CoreKeyboardProcessor', function () {
   const loadKeyboard = function (name: string): km_core_keyboard {
@@ -47,7 +49,7 @@ describe('CoreKeyboardProcessor', function () {
   describe('saveMarkersToTextStore', function () {
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
-      await coreProcessor.init(coreurl);
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
       sandbox = sinon.createSandbox();
@@ -208,7 +210,7 @@ describe('CoreKeyboardProcessor', function () {
   describe('applyContextFromTextStore', function () {
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
-      await coreProcessor.init(coreurl);
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
     });
@@ -491,7 +493,7 @@ describe('CoreKeyboardProcessor', function () {
 
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
-      await coreProcessor.init(coreurl);
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
       sandbox = sinon.createSandbox();
@@ -531,5 +533,78 @@ describe('CoreKeyboardProcessor', function () {
         assert.equal(process_event_spy.args[0][3], isKeyDown);
       });
     }
+  });
+
+  describe('doModifierPress', function () {
+    // const touchable = true;
+    const nonTouchable = false;
+
+    beforeEach(async function () {
+      coreProcessor = new CoreKeyboardProcessor();
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
+      state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
+      context = KM_Core.instance.state_context(state);
+      sandbox = sinon.createSandbox();
+      const coreKeyboard = loadKeyboard('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
+      coreProcessor.activeKeyboard = new KMXKeyboard(coreKeyboard);
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+      sandbox = null;
+    })
+
+    for (const key of [
+      { code: Codes.keyCodes.K_SHIFT, name: 'Shift' },
+      { code: Codes.keyCodes.K_CONTROL, name: 'Control' },
+      { code: Codes.keyCodes.K_ALT, name: 'Alt' },
+      { code: Codes.keyCodes.K_CAPS, name: 'CapsLock' },
+      { code: Codes.keyCodes.K_NUMLOCK, name: 'NumLock' },
+      { code: Codes.keyCodes.K_SCROLL, name: 'ScrollLock' },
+    ]) {
+      it(`recognizes ${key.name} as modifier`, function () {
+        // Setup
+        const keyEvent = new KeyEvent({
+          Lcode: key.code,
+          Lmodifiers: 0,
+          Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+          LisVirtualKey: true,
+          device: new DeviceSpec('chrome', 'desktop', 'windows', nonTouchable),
+          kName: key.name
+        });
+        keyEvent.source = { type: 'keydown' };
+
+        // Execute
+        const result = coreProcessor.doModifierPress(keyEvent, new SyntheticTextStore(), true);
+
+        // Verify
+        assert.isTrue(result);
+      });
+    }
+
+    for (const key of [
+      { modifiers: 0, name: 'a' },
+      { modifiers: Codes.modifierCodes.SHIFT, name: 'A' }
+    ]) {
+      it(`recognizes ${key.name} not as modifier`, function () {
+        // Setup
+        const keyEvent = new KeyEvent({
+          Lcode: Codes.keyCodes.K_A,
+          Lmodifiers: key.modifiers,
+          Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+          LisVirtualKey: true,
+          device: new DeviceSpec('chrome', 'desktop', 'windows', nonTouchable),
+          kName: 'K_A'
+        });
+        keyEvent.source = { type: 'keydown' };
+
+        // Execute
+        const result = coreProcessor.doModifierPress(keyEvent, new SyntheticTextStore(), true);
+
+        // Verify
+        assert.isFalse(result);
+      });
+    }
+
   });
 });

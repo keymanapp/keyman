@@ -135,12 +135,12 @@ export class KeyEvent implements KeyEventSpec {
 
   get isModifier(): boolean {
     switch(this.Lcode) {
-      case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
-      case 17:
-      case 18:
-      case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
-      case 144:
-      case 145:
+      case Codes.keyCodes.K_SHIFT:
+      case Codes.keyCodes.K_CONTROL:
+      case Codes.keyCodes.K_ALT:
+      case Codes.keyCodes.K_CAPS:
+      case Codes.keyCodes.K_NUMLOCK:
+      case Codes.keyCodes.K_SCROLL:
         return true;
       default:
         return false;
