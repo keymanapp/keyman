@@ -6,7 +6,8 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import { KM_Core, km_core_context, km_core_keyboard, km_core_state, KM_CORE_CT, KM_CORE_STATUS, km_core_context_items } from 'keyman/engine/core-adapter';
 import { coreurl, loadKeyboardBlob } from '../loadKeyboardHelper.js';
-import { Codes, Deadkey, DeviceSpec, KeyEvent, KMXKeyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { Codes, Deadkey, KeyEvent, KMXKeyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
 
 describe('CoreKeyboardProcessor', function () {

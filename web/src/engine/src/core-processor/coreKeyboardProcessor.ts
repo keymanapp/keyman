@@ -20,6 +20,11 @@ export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   public activeKeyboard: Keyboard;
 }
 
+const lockNames = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
+const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
+const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
+const noLockModifers = [ModifierKeyConstants.NOTCAPITALFLAG, ModifierKeyConstants.NOTNUMLOCKFLAG, ModifierKeyConstants.NOTSCROLLFLAG] as const;
+
 /**
  * Implements the core keyboard processing engine that interacts with the
  * shared Keyman Core component which handles .kmx keyboards.
@@ -332,7 +337,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     }
 
     if(keyEvent.isModifier) {
-      this.activeKeyboard.notify(keyEvent.Lcode, textStore, isKeyDown);
+      this.activeKeyboard.notify(keyEvent.Lcode, textStore, isKeyDown ? 1 : 0);
       // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
       if(!keyEvent.device.touchable) {
         return this._UpdateVKShift(keyEvent); // I2187
@@ -342,7 +347,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     }
 
     if(keyEvent.LmodifierChange) {
-      this.activeKeyboard.notify(0, textStore, true);
+      this.activeKeyboard.notify(0, textStore, 1);
       if(!keyEvent.device.touchable) {
         this._UpdateVKShift(keyEvent);
       }
@@ -364,10 +369,6 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    */
   private _UpdateVKShift(e: KeyEvent): boolean {
     let keyShiftState=0;
-
-    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
-    const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
-    const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
 
     if(!this.activeKeyboard) {
       return true;
@@ -414,10 +415,6 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
 
   // TODO-web-core: this could be shared with JsKeyboardProcessor
   private updateStates(): void {
-    const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
-    const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
-    const noLockModifers = [ModifierKeyConstants.NOTCAPITALFLAG, ModifierKeyConstants.NOTNUMLOCKFLAG, ModifierKeyConstants.NOTSCROLLFLAG] as const;
-
     for (let i = 0; i < lockKeys.length; i++) {
       const key = lockKeys[i];
       const flag = this.stateKeys[key];
