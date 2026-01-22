@@ -12,6 +12,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { deepCopy, KMWString } from "@keymanapp/web-utils";
 
 import { SearchQuotientSpur } from "./search-quotient-spur.js";
+import { SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -58,10 +59,10 @@ export class ContextToken {
    * Contains all relevant correction-search data for use in generating
    * corrections for this ContextToken instance.
    */
-  public get searchModule(): SearchQuotientSpur {
+  public get searchModule(): SearchQuotientNode {
     return this._searchModule;
   }
-  private _searchModule: SearchQuotientSpur;
+  private _searchModule: SearchQuotientNode;
 
   isPartial: boolean;
 

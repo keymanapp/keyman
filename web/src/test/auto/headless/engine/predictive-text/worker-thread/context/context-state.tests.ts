@@ -13,7 +13,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextState, determineContextSlideTransform, models } from '@keymanapp/lm-worker/test-index';
+import { ContextState, determineContextSlideTransform, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import Context = LexicalModelTypes.Context;
 import Transform = LexicalModelTypes.Transform;
@@ -252,11 +252,10 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
-      assert.sameDeepMembers(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
-        [[{sample: { insert: '', deleteLeft: 0 }, p: 1}]]
-      );
+      // space transform
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputCount, 1);
+      // empty transform
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputCount, 1);
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
       //   assert.fail("context alignment failed");
@@ -284,17 +283,11 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch?.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
-      assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
-        [[{ sample: {insert: '', deleteLeft: 0}, p: 1 }]]
-      );
-
-      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
-      //   assert.fail("context alignment failed");
-      // }
-      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
+      // Two whitespaces, one of which is new!
+      const preTail = state.tokenization.tokens[state.tokenization.tokens.length - 2];
+      assert.equal(preTail.searchModule.inputCount, 2);
+      assert.deepEqual((preTail.searchModule as SearchQuotientSpur).lastInput, [{sample: transform, p: 1}]);
+      assert.equal(state.tokenization.tail.searchModule.inputCount, 1);
     });
 
     it("properly matches and aligns when a 'wordbreak' is removed via backspace", function() {
@@ -337,8 +330,8 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence);
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputCount, 1);
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputCount, 1);
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
       //   assert.fail("context alignment failed");
@@ -370,10 +363,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
-      assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
-        [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputCount, 1);
+      assert.equal(
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputCount, 1
       );
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
@@ -402,10 +394,9 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
-      assert.deepEqual(
-        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence,
-        [[{sample: {insert: '', deleteLeft: 0}, p: 1}]]
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputCount, 1);
+      assert.equal(
+        state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputCount, 1
       );
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
@@ -434,8 +425,8 @@ describe('ContextState', () => {
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputSequence);
-      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputSequence);
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchModule.inputCount, 1);
+      assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputCount, 1);
 
       // if(!newContextMatch.final.tokenization.alignment.canAlign) {
       //   assert.fail("context alignment failed");
