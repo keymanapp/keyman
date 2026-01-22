@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { models, quotientPathHasInputs, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientRoot, models, quotientPathHasInputs } from '@keymanapp/lm-worker/test-index';
 
 import { buildSimplePathSplitFixture } from './search-quotient-spur.tests.js';
 
@@ -11,7 +11,7 @@ const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
 describe('quotientNodeHasParents()', () => {
   it('matches an empty array on root SearchPaths', () => {
-    assert.isTrue(quotientPathHasInputs(new SearchQuotientSpur(testModel), []));
+    assert.isTrue(quotientPathHasInputs(new LegacyQuotientRoot(testModel), []));
   });
 
   it('matches all path inputs when provided in proper order', () => {

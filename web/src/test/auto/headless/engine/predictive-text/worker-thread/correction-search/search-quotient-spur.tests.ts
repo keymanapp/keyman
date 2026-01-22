@@ -10,38 +10,38 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { models, quotientPathHasInputs, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientSpur, models, LegacyQuotientRoot, quotientPathHasInputs } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
 export function buildSimplePathSplitFixture() {
-  const rootPath = new SearchQuotientSpur(testModel);
+  const rootPath = new LegacyQuotientRoot(testModel);
 
   const distrib1 = [
     { sample: {insert: 'c', deleteLeft: 0, id: 11}, p: 0.5 },
     { sample: {insert: 'r', deleteLeft: 0, id: 11}, p: 0.4 },
     { sample: {insert: 't', deleteLeft: 0, id: 11}, p: 0.1 }
   ];
-  const path1 = new SearchQuotientSpur(rootPath, distrib1, distrib1[0].p);
+  const path1 = new LegacyQuotientSpur(rootPath, distrib1, distrib1[0].p);
 
   const distrib2 = [
     { sample: {insert: 'a', deleteLeft: 0, id: 12}, p: 0.7 },
     { sample: {insert: 'e', deleteLeft: 0, id: 12}, p: 0.3 }
   ];
-  const path2 = new SearchQuotientSpur(path1, distrib2, distrib2[0].p);
+  const path2 = new LegacyQuotientSpur(path1, distrib2, distrib2[0].p);
 
   const distrib3 = [
     { sample: {insert: 'n', deleteLeft: 0, id: 13}, p: 0.8 },
     { sample: {insert: 'r', deleteLeft: 0, id: 13}, p: 0.2 }
   ];
-  const path3 = new SearchQuotientSpur(path2, distrib3, distrib3[0].p);
+  const path3 = new LegacyQuotientSpur(path2, distrib3, distrib3[0].p);
 
   const distrib4 = [
     { sample: {insert: 't', deleteLeft: 0, id: 14}, p: 1 }
   ];
-  const path4 = new SearchQuotientSpur(path3, distrib4, distrib4[0].p);
+  const path4 = new LegacyQuotientSpur(path3, distrib4, distrib4[0].p);
 
   return {
     paths: [rootPath, path1, path2, path3, path4],
@@ -52,16 +52,15 @@ export function buildSimplePathSplitFixture() {
 describe('SearchQuotientSpur', () => {
   describe('constructor', () => {
     it('initializes from a lexical model', () => {
-      const path = new SearchQuotientSpur(testModel);
+      const path = new LegacyQuotientRoot(testModel);
       assert.equal(path.inputCount, 0);
       assert.isNumber(path.spaceId);
       assert.deepEqual(path.bestExample, {text: '', p: 1});
       assert.deepEqual(path.parents, []);
-      assert.isNotOk(path.inputs);
     });
 
     it('may be extended from root path', () => {
-      const rootPath = new SearchQuotientSpur(testModel);
+      const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -69,7 +68,7 @@ describe('SearchQuotientSpur', () => {
         {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
       ];
 
-      const extendedPath = new SearchQuotientSpur(rootPath, leadEdgeDistribution, leadEdgeDistribution[0].p);
+      const extendedPath = new LegacyQuotientSpur(rootPath, leadEdgeDistribution, leadEdgeDistribution[0].p);
 
       assert.equal(extendedPath.inputCount, 1);
       assert.isNumber(extendedPath.spaceId);
@@ -83,11 +82,10 @@ describe('SearchQuotientSpur', () => {
       // Should (still) have codepointLength == 0 once it's defined.
       assert.deepEqual(rootPath.bestExample, {text: '', p: 1});
       assert.deepEqual(rootPath.parents, []);
-      assert.isNotOk(rootPath.inputs);
     });
 
     it('may be built from arbitrary prior SearchPath', () => {
-      const rootPath = new SearchQuotientSpur(testModel);
+      const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -96,7 +94,7 @@ describe('SearchQuotientSpur', () => {
       ];
       const inputClone = leadEdgeDistribution.map(e => ({...e}));
 
-      const length1Path = new SearchQuotientSpur(
+      const length1Path = new LegacyQuotientSpur(
         rootPath,
         leadEdgeDistribution,
         leadEdgeDistribution[0].p
@@ -108,7 +106,7 @@ describe('SearchQuotientSpur', () => {
         {sample: {insert: 'h', deleteLeft: 0, id: 17 }, p: 0.15}
       ];
 
-      const length2Path = new SearchQuotientSpur(
+      const length2Path = new LegacyQuotientSpur(
         length1Path,
         tailEdgeDistribution,
         tailEdgeDistribution[0].p
@@ -133,7 +131,7 @@ describe('SearchQuotientSpur', () => {
     });
 
     it('may extend with a Transform inserting multiple codepoints', () => {
-      const rootPath = new SearchQuotientSpur(testModel);
+      const rootPath = new LegacyQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -142,7 +140,7 @@ describe('SearchQuotientSpur', () => {
       ];
       const inputClone = leadEdgeDistribution.map(e => ({...e}));
 
-      const length1Path = new SearchQuotientSpur(
+      const length1Path = new LegacyQuotientSpur(
         rootPath,
         leadEdgeDistribution,
         leadEdgeDistribution[0].p
@@ -154,7 +152,7 @@ describe('SearchQuotientSpur', () => {
         {sample: {insert: 'hi', deleteLeft: 0, id: 17 }, p: 0.15}
       ];
 
-      const length2Path = new SearchQuotientSpur(
+      const length2Path = new LegacyQuotientSpur(
         length1Path,
         tailEdgeDistribution,
         tailEdgeDistribution[0].p

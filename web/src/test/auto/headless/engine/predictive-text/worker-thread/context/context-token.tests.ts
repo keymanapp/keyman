@@ -87,7 +87,9 @@ describe('ContextToken', function() {
       let clonedToken = new ContextToken(baseToken);
 
       assert.equal(clonedToken.searchModule, baseToken.searchModule);
-      // Deep equality on .searchModule can't be directly checked due to the internal complexities involved.
+      // Deep equality on .searchModule can't be directly checked due to the
+      // internal complexities involved.
+      //
       // We CAN check for the most important members, though.
       assert.equal(clonedToken.searchModule, baseToken.searchModule);
 
