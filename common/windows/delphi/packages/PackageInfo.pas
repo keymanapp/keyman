@@ -455,6 +455,7 @@ type
     procedure DoSaveJSON(ARoot: TJSONObject); virtual;
     procedure DoLoadIni(ini: TIniFile); virtual;
     procedure DoSaveIni(ini: TIniFile); virtual;
+    procedure Cleanup; virtual;
   public
     Options: TPackageOptions;
     StartMenu: TPackageStartMenu;
@@ -1889,11 +1890,18 @@ begin
   end;
 end;
 
+procedure TPackage.Cleanup;
+begin
+  // No op in basic package
+end;
+
 procedure TPackage.SaveXML;
 var
   doc: IXMLDocument;
   root: IXMLNode;
 begin
+  Cleanup;
+
   doc := NewXMLDocument;
   doc.Encoding := 'utf-8';
 
@@ -1914,6 +1922,8 @@ var
   doc: IXMLDocument;
   root: IXMLNode;
 begin
+  Cleanup;
+
   doc := NewXMLDocument;
   doc.Encoding := 'utf-8';
 

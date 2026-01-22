@@ -18,6 +18,7 @@ builder_describe "Build Keyman Developer Server" \
   configure \
   build \
   test \
+  "run         Run Server in dev mode" \
   "installer   Prepare for Keyman Developer installer" \
   publish \
   ":server     Keyman Developer Server main program" \
@@ -165,11 +166,16 @@ function publish_server() {
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.x64.node"
 }
 
+function run_server() {
+  node .
+}
+
 builder_run_action clean:server        clean_server
 builder_run_action configure:server    configure_server
 builder_run_action build:addins        build_addins
 builder_run_action build:server        build_server
 builder_run_action test:server         test_server
+builder_run_action run:server          run_server
 # builder_run_action test:addins       # no op
 builder_run_action installer:server    installer_server # TODO: rename to install-prep
 builder_run_action publish:server      publish_server

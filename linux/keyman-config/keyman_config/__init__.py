@@ -111,6 +111,14 @@ def _set_dbus_started_for_session(value):
 
 
 def verify_dbus_running():
+    if os.environ.get('SUDO_USER'):
+        # If running with sudo we won't try to start dbus since it will
+        # not always work. The main reason we need dbus is so that we can
+        # notify other km-config processes that the keyboard list has changed.
+        # If running with sudo we call dbus-send instead of instantiating the
+        # KeymanConfigServiceManager class.
+        return
+
     if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
         # already running - nothing to do
         return
@@ -153,8 +161,10 @@ def add_standard_arguments(parser):
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
-
-gettext.bindtextdomain('keyman-config', '/usr/share/locale')
+if os.environ.get('TEXTDOMAINDIR'):
+    gettext.bindtextdomain('keyman-config', os.environ['TEXTDOMAINDIR'])
+else:
+    gettext.bindtextdomain('keyman-config', '/usr/share/locale')
 gettext.textdomain('keyman-config')
 
 

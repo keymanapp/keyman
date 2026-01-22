@@ -109,7 +109,7 @@ type
 
     procedure ResetEvents;
     procedure ExecuteEvent(n: Integer);
-    procedure ExecuteEventAction(n: Integer);
+    procedure ExecuteEventAction(EventNumber: Integer);
     procedure ExecuteEventRule(n: Integer);
     procedure SetExecutionPointLine(ALine: Integer);
     procedure SetUIStatus(const Value: TDebugUIStatus);
@@ -210,6 +210,7 @@ uses
   dmActionsMain,
   Glossary,
   Keyman.Developer.System.Project.ProjectLog,
+  Keyman.System.KeymanSentryClient,
   Keyman.UI.Debug.CharacterGridRenderer,
   KeyNames,
   kmxfile,
@@ -462,6 +463,10 @@ begin
     modifier := modifier and not KM_CORE_MODIFIER_LCTRL;
   end;
 
+  TKeymanSentryClient.Instance.Breadcrumb('default',
+    Format('ProcessKeyEvent: vk=%x mod=%x scan=%x beforeText="%s" beforeSelection=%s',[vkey, modifier, scan, Copy(memo.GetTextCR, 1, 256), memo.Selection.ToString]),
+    'debugger');
+
   if not SetKeyEventContext then
     Exit(False);
 
@@ -598,8 +603,14 @@ end;
 
 procedure TfrmDebug.ExecuteEvent(n: Integer);
 begin
+  TKeymanSentryClient.Instance.Breadcrumb('default',
+    Format('ExecuteEvent(%d/%d): [%s]; b:%s; s:%s',
+      [n, FEvents.Count, FEvents[n].ToString, memo.Selection.ToString, FSavedSelection.ToString]),
+      'debugger');
+
   memo.ReadOnly := False;
   memo.Selection := FSavedSelection;
+
   if FEvents[n].EventType = etAction
     then ExecuteEventAction(n)
     else ExecuteEventRule(n);
@@ -667,7 +678,7 @@ begin
 end;
 
 
-procedure TfrmDebug.ExecuteEventAction(n: Integer);
+procedure TfrmDebug.ExecuteEventAction(EventNumber: Integer);
   type
     TMemoSelectionState = record
       Selection: TMemoSelection;
@@ -711,24 +722,25 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
   procedure DoBackspace(BackspaceType: km_core_backspace_type; ExpectedValue: NativeUInt);
   var
     t: string;
-    m, n: Integer;
+    m, m1: Integer;
     dk: TDeadKeyInfo;
     state: TMemoSelectionState;
 
     function AssertionMessage: string;
     begin
       Result := 'Assertion failed. Extra data: '+
+      'EventNumber='+IntToStr(EventNumber)+'; '+
       'BackspaceType='+IntToStr(Ord(BackspaceType))+'; '+
       'ExpectedValue=U+'+IntToHex(ExpectedValue, 4)+'; '+
       'memo.SelStart='+IntToStr(memo.SelStart)+'; '+
       'memo.SelLength='+IntToStr(memo.SelLength)+'; '+
-      'memo.Text='+Copy(memo.GetTextCR, 1, 256);
+      'memo.Text="'+Copy(memo.GetTextCR, 1, 256)+'"';
     end;
   begin
     // Offset is zero-based, but string is 1-based. Beware!
     state := SaveMemoSelectionState;
-    n := memo.SelStart;
-    m := n;
+    m1 := memo.SelStart;
+    m := m1;
 
     if memo.SelLength > 0 then
     begin
@@ -800,7 +812,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 
     memo.Lines.BeginUpdate;
     try
-      memo.Text := Copy(t, 1, m) + Copy(t, n+1, MaxInt);
+      memo.Text := Copy(t, 1, m) + Copy(t, m1+1, MaxInt);
       memo.SelStart := m;
     finally
       memo.Lines.EndUpdate;
@@ -894,7 +906,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 begin
   DisableUI;
   frmDebugStatus.Elements.UpdateStores(nil);
-  with FEvents[n].Action do
+  with FEvents[EventNumber].Action do
   begin
     case ActionType of
       KM_CORE_IT_EMIT_KEYSTROKE: DoEmitKeystroke(dwData);

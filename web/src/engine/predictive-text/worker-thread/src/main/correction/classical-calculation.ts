@@ -1,5 +1,3 @@
-import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
-
 /**
  * The human-readable names for legal edit-operation edges on the edit path.
  */
@@ -209,8 +207,9 @@ export interface DistanceCalcOptions {
  * In short:  Used to optimize calculations for low edit-distance checks, then
  *            expanded if/as necessary if a greater edit distance is requested.
  *
- * Reference:
- * https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm#Possible_modifications
+ * References:
+ * - https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
+ * - https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm#Possible_modifications
  *    - Motivating statement:  "if we are only interested in the distance if it
  *      is smaller than a threshold..."
  */
@@ -306,6 +305,15 @@ export class ClassicalDistanceCalculation<
     return this._diagonalWidth;
   }
 
+  /**
+   * Determines the internal indices (within `this.resolvedDistances`)
+   * corresponding to the provided external (non-sparsified) indices and
+   * specified diagonal width.
+   * @param r
+   * @param c
+   * @param width
+   * @returns
+   */
   private getTrueIndex(r: number, c: number, width: number): {row: number, col: number, sparse: boolean} {
     let retVal = {
       row: r,
@@ -320,7 +328,16 @@ export class ClassicalDistanceCalculation<
     return retVal;
   }
 
+  /**
+   * Obtains the optimal intermediate edit-cost at the specified indices.
+   * @param i
+   * @param j
+   * @param width
+   * @returns
+   */
   public getCostAt(i: number, j: number, width: number = this.diagonalWidth): number {
+    // Note:  i and j are external, "non-sparsified" indices.
+
     // Check for and handle the set of fixed-value virtualized indices.
     if(i < 0 || j < 0) {
       if(i == -1 && j >= -1) {
@@ -502,6 +519,17 @@ export class ClassicalDistanceCalculation<
     return pathBuilder.validPaths;
   }
 
+  /**
+   * Checks the specified indices in order to determine the minimum edit cost
+   * required to reach them, saving the intermediate results within the internal
+   * `.resolvedDistances` buffer.
+   * @param buffer
+   * @param r
+   * @param c
+   * @param insertCost
+   * @param deleteCost
+   * @returns
+   */
   private static initialCostAt<TUnit, TOpSet>(
     buffer: ClassicalDistanceCalculation<TUnit, TOpSet>,
     r: number,
@@ -523,6 +551,17 @@ export class ClassicalDistanceCalculation<
     return Math.min(substitutionCost, deletionCost, insertionCost, transpositionCost);
   }
 
+  /**
+   * Trims this calculation object, yielding the version representing only the
+   * range of initial `input` and `match` entries specified.
+   *
+   * Note that this method cannot be used to trim entries from the start; only entries
+   * from the end of both the `input` and `match` sequences may be trimmed.
+   *
+   * @param inputLength The number of initial `input` entries to preserve
+   * @param matchLength The number of initial `match` entries to preserve
+   * @returns
+   */
   getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation<TUnit, TOpSet> {
     let trimmedInstance = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
 
@@ -558,13 +597,28 @@ export class ClassicalDistanceCalculation<
     return trimmedInstance;
   }
 
-  // Inputs add an extra row / first index entry.
+  /**
+   * Adds a new entry for the sequence labeled "input" for edit-distance calculations and
+   * calculates related edit-distance costs.
+   * @param token
+   * @returns
+   */
   addInputChar(token: TUnit): this {
     const returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._addInputChar(token);
     return returnBuffer as this;
   }
 
+  /**
+   * This helper to `addInputChar` is designed to facilitate calculation of
+   * subclass-specific functionality when new `input`-sequence characters are
+   * added while still supporting `public`-level immutable encapsulation for
+   * both parent and the child.
+   *
+   * This is leveraged by the `SegmentableDistanceCalculation` type.
+   * @param token
+   * @returns
+   */
   protected _addInputChar(token: TUnit) {
     // Insert a row, even if we don't actually do anything with it yet.
     // Initialize all entries with Number.MAX_VALUE, as `undefined` use leads to JS math issues.
@@ -584,12 +638,28 @@ export class ClassicalDistanceCalculation<
     return;
   }
 
+  /**
+   * Adds a new entry for the sequence labeled "match" for edit-distance calculations and
+   * calculates related edit-distance costs.
+   * @param token
+   * @returns
+   */
   addMatchChar(token: TUnit): this {
     const returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._addMatchChar(token);
     return returnBuffer as this;
   }
 
+  /**
+   * This helper to `addMatchChar` is designed to facilitate calculation of
+   * subclass-specific functionality when new `match`-sequence characters are
+   * added while still supporting `public`-level immutable encapsulation for
+   * both parent and the child.
+   *
+   * This is leveraged by the `SegmentableDistanceCalculation` type.
+   * @param token
+   * @returns
+   */
   protected _addMatchChar(token: TUnit) {
     this._matchSequence.push(token);
 
@@ -607,6 +677,11 @@ export class ClassicalDistanceCalculation<
     return;
   }
 
+  /**
+   * Increases the edit-distance diagonal's width, allowing a greater range of edits to be properly
+   * modeled and considered.
+   * @returns
+   */
   public increaseMaxDistance(): this {
     let returnBuffer = new ClassicalDistanceCalculation<TUnit, TOpSet>(this);
     returnBuffer._diagonalWidth++;
@@ -712,6 +787,18 @@ export class ClassicalDistanceCalculation<
     return returnBuffer as this;
   }
 
+  /**
+   * A helper method of `increaseMaxDistance`, this method helps to update
+   * existing edits should newly-considered edits provide a net lower cost than
+   * was previously visible due to the original limited range under
+   * consideration for edits.
+   * @param buffer
+   * @param r
+   * @param c
+   * @param value
+   * @param diagonalIndex
+   * @returns
+   */
   private static propagateUpdateFrom<TUnit, TOpSet>(
     buffer: ClassicalDistanceCalculation<TUnit, TOpSet>,
     r: number,
@@ -772,20 +859,6 @@ export class ClassicalDistanceCalculation<
     }
   }
 
-  get mapKey(): string {
-    let inputString = this.inputSequence.join('');
-    let matchString =  this.matchSequence.join('');
-    return inputString + SENTINEL_CODE_UNIT + matchString + SENTINEL_CODE_UNIT + this.diagonalWidth;
-  }
-
-  get lastInputEntry(): TUnit {
-    return this.inputSequence[this.inputSequence.length-1];
-  }
-
-  get lastMatchEntry(): TUnit {
-    return this.matchSequence[this.matchSequence.length-1];
-  }
-
   // /**
   //  * Produces a string-based visualization of this instance, the edit-distance
   //  * calculation it represents, and the corresponding best-ranked edit path.
@@ -842,6 +915,14 @@ export function forNewIndices<TUnit, TOpSet>(
   }
 }
 
+/**
+ * Given the input and match indices specified, finds the closest viable parent
+ * for a transposition, if one exists.  If none exists, returns [-1, -1].
+ * @param buffer
+ * @param r
+ * @param c
+ * @returns
+ */
 function getTransposeParent<TUnit, TOpSet>(
     buffer: ClassicalDistanceCalculation<TUnit, TOpSet>,
     r: number,
@@ -873,6 +954,14 @@ function getTransposeParent<TUnit, TOpSet>(
   return [lastInputIndex, lastMatchIndex];
 }
 
+/**
+ * Determines the edit path used to determine when and where transposition edits
+ * occur as part of the overall optimal cost.  Designed for use with
+ * `PathBuilder`.
+ * @param pathBuilder
+ * @param row
+ * @param col
+ */
 export function findTransposeEdges<TUnit, TOpSet>(
   pathBuilder: PathBuilder<TUnit, TOpSet>,
   row: number,
@@ -937,6 +1026,12 @@ export function findTransposeEdges<TUnit, TOpSet>(
   }
 }
 
+/**
+ * Defines an edge-finding functor for use with the `PathBuilder` type.  The
+ * functor should determine the parent indices for any edits it supports,
+ * calling the `.backtracePath` method on the `pathBuilder` parameter for each
+ * along with metadata about the detected edit.
+ */
 type EdgeFinder<TUnit, TOpSet> = (
   pathBuilder: PathBuilder<TUnit, TOpSet>,
   row: number,
@@ -944,8 +1039,9 @@ type EdgeFinder<TUnit, TOpSet> = (
 ) => void
 
 /**
- * Determines the edit path used to obtain the optimal cost, distinguishing between zero-cost
- * substitutions ('match' operations) and actual substitutions.
+ * Determines the edit path used to obtain the optimal cost, distinguishing
+ * between zero-cost substitutions ('match' operations) and actual
+ * substitutions.  Designed for use with `PathBuilder`.
  * @param row
  * @param col
  */
@@ -980,6 +1076,13 @@ export function findBaseEdges<TUnit, TOpSet>(
   }
 }
 
+/**
+ * A helper class designed to assist with determining the edit path for
+ * edit-distance calculations based upon the `ClassicalDistanceCalculator` type.
+ *
+ * The types of expected edits may be configured at construction time and via
+ * `addEdgeFinder`, restricting or extending the types of edits supported.
+ */
 export class PathBuilder<TUnit, TOpSet = EditOperation> {
   readonly calc: ClassicalDistanceCalculation<TUnit, TOpSet>;
   readonly edgeFinders: (EdgeFinder<TUnit, TOpSet>)[];
@@ -990,10 +1093,28 @@ export class PathBuilder<TUnit, TOpSet = EditOperation> {
     this.edgeFinders = edgeFinders;
   }
 
+  /**
+   * Adds a new edge-finding functor, allowing path-finding operations to
+   * support additional edit operation types.
+   * @param finder
+   */
   addEdgeFinder(finder: EdgeFinder<TUnit, TOpSet>) {
     this.edgeFinders.push(finder);
   }
 
+  /**
+   * Finds the edit-operation sequences of mimimal cost that end at the
+   * specified indices.
+   *
+   * The `recentEdge` parameter should provide metadata about the edit(s) used
+   * to reach the specified indices.  If no such edit(s) are required (say, at
+   * the start point for determining paths), an empty array may be provided
+   * instead.
+   *
+   * @param row
+   * @param col
+   * @param recentEdge
+   */
   backtracePath(row: number, col: number, recentEdge: EditTuple<TOpSet>[]) {
     const calc = this.calc;
 

@@ -40,8 +40,8 @@ Also include the following HTML code:
 ```html
 <head>
     <!-- Load the KeymanWeb engine -->
-    <script src="https://s.keyman.com/kmw/engine/17.0.330/keymanweb.js" type="text/javascript"></script>
-    <script src="https://s.keyman.com/kmw/engine/17.0.330/kmwuitoggle.js" type="text/javascript"></script>
+    <script src="js/keymanweb.js" type="text/javascript"></script>
+    <script src="js/kmwuitoggle.js" type="text/javascript"></script>
     <!-- // Also be sure to load your keyboards.  Note that stubs will not work with this
          // example without detailing paths precisely in the init() call's parameter.-->
 </head>

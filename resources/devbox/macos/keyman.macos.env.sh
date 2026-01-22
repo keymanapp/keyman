@@ -15,7 +15,7 @@ export PATH=$ANDROID_HOME/platform-tools:$PATH
 export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
 export PATH=$ANDROID_HOME/build-tools/30.0.3:$PATH
 
-if [ -z "$HOMEBREW_PREFIX" ]; then
+if [ -z "${HOMEBREW_PREFIX+x}" ]; then
   HOMEBREW_PREFIX=`brew --prefix`
 fi
 
