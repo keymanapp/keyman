@@ -7,7 +7,12 @@
  * manage the search-space(s) for text corrections within the engine.
  */
 
+import { LexicalModelTypes } from "@keymanapp/common-types";
+
 import { SearchNode, SearchResult } from "./distance-modeler.js";
+
+import Distribution = LexicalModelTypes.Distribution;
+import Transform = LexicalModelTypes.Transform;
 
 let SPACE_ID_SEED = 0;
 
@@ -79,6 +84,14 @@ export interface SearchQuotientNode {
    * they're associated with the original keystroke that affected the context.)
    */
   readonly inputCount: number;
+
+  /**
+   * Retrieves the sequence of inputs that led to this SearchSpace.
+   *
+   * THIS WILL BE REMOVED SHORTLY.  (Once SearchQuotientNode takes on merging &
+   * splitting)
+   */
+  readonly inputSequence: Distribution<Transform>[];
 
   /**
    * Determines the best example text representable by this batcher's portion of
