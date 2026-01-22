@@ -408,7 +408,7 @@ describe('Correction Distance Modeler', () => {
         const edges = rootNode.buildDeletionEdges([{
           sample: { insert: 'd', deleteLeft: 0 },
           p: 1
-        }], SEARCH_EDGE_SEED++).flatMap(n => n.processSubsetEdge());
+        }], SEARCH_EDGE_SEED++);
         assert.isAbove(edges.length, 0);
         const firstChild = edges[0];
 
@@ -467,7 +467,7 @@ describe('Correction Distance Modeler', () => {
       });
     });
 
-    describe('buildDeletionEdges @ token root', () => {
+    it('buildDeletionEdges @ token root: makes single mass deletion batch', () => {
       const synthDistribution = [
         //              Transform,            probability
         //         insert 1,   deleteLeft  0,  p: 0.50
@@ -483,113 +483,28 @@ describe('Correction Distance Modeler', () => {
         {sample: {insert: 'tr', deleteLeft: 1}, p: 0.15},
         // 4 distinct subsets.
       ];
+      const probSum = synthDistribution.reduce((accum, cur) => accum + cur.p, 0);
 
-      it('step 1: batches deletion edge(s) for input transforms', () => {
-        const rootTraversal = testModel.traverseFromRoot();
-        assert.isNotEmpty(rootTraversal);
+      const rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
 
-        const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
-        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+      const rootSeed = SEARCH_EDGE_SEED++;
+      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+      assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetSeed = SEARCH_EDGE_SEED++;
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution, subsetSeed);
-        assert.equal(subsetNodes.length, 4);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-        const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x))
-        // The known subs for the subsets defined above.
-        for(let i=0; i < expectedCosts.length; i++) {
-          assert.isTrue(subsetNodes[i].hasPartialInput);
-          // From root: the deleteLeft 1 entries have nothing to delete.
-          assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, '');
-          assert.equal(subsetNodes[i].spaceId, subsetSeed);
-
-          // Allow a little value wiggle due to double-precision limitations.
-          assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
-          // No actual edit-tracking is done yet, so these should also match.
-          assert.approximately(subsetNodes[i].currentCost, expectedCosts[i], 1e-8);
-        }
-      });
-
-      it('step 2: first processing layer resolves zero + one char inserts', () => {
-        // From "step 1" above, assertions removed
-        const rootTraversal = testModel.traverseFromRoot();
-        const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
-        const subsetSeed = SEARCH_EDGE_SEED++;
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution, subsetSeed);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        const processedNodes = subsetNodes.flatMap(n => n.processSubsetEdge());
-        // All delete-oriented Transform subsets condense down to a single
-        // transform (and edge) each.
-        assert.equal(processedNodes.length, 4);
-        processedNodes.forEach((n) => assert.equal(n.spaceId, subsetSeed));
-
-        // Sorted index 0:  1 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[0].hasPartialInput);
-        assert.equal(processedNodes[0].editCount, 1);
-        assert.equal(lastEntry(processedNodes[0].calculation.inputSequence), SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[0].inputSamplingCost, subsetNodes[0].inputSamplingCost);
-        assert.isAbove(processedNodes[0].currentCost, subsetNodes[0].currentCost);
-
-        // Sorted index 3:  0 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[3].hasPartialInput);
-        // No insert string => no sentinel char to delete.
-        assert.equal(processedNodes[3].editCount, 0);
-        assert.isUndefined(lastEntry(processedNodes[3].calculation.inputSequence));
-        assert.equal(processedNodes[3].inputSamplingCost, subsetNodes[3].inputSamplingCost);
-        assert.equal(processedNodes[3].currentCost, subsetNodes[3].currentCost);
-
-        // Sorted indices 2, 3:  both had 2 inserts.
-        assert.isTrue(processedNodes[1].hasPartialInput);
-        assert.equal(processedNodes[1].editCount, 1);
-        assert.equal(lastEntry(processedNodes[1].calculation.inputSequence), SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[1].inputSamplingCost, subsetNodes[1].inputSamplingCost);
-        assert.isAbove(processedNodes[1].currentCost, subsetNodes[1].currentCost);
-
-        assert.isTrue(processedNodes[2].hasPartialInput);
-        assert.equal(processedNodes[2].editCount, 1);
-        assert.equal(lastEntry(processedNodes[2].calculation.inputSequence), SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[2].inputSamplingCost, subsetNodes[2].inputSamplingCost);
-        assert.isAbove(processedNodes[2].currentCost, subsetNodes[2].currentCost);
-      });
-
-      it('step 3: second processing layer resolves two char inserts', () => {
-        // From "steps 0, 1" above, assertions removed
-        const rootTraversal = testModel.traverseFromRoot();
-        const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
-        const subsetSeed = SEARCH_EDGE_SEED++;
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution, subsetSeed);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        // Two nodes were unprocessed at the end of the last step; we handle
-        // them now and filter the others out.  We need the indices here to be
-        // aligned.
-        const step2Nodes = subsetNodes.flatMap(n => n.processSubsetEdge()).filter(n => n.hasPartialInput);
-        const processedNodes = step2Nodes.flatMap(n => n.processSubsetEdge());
-
-        // All delete-oriented Transform subsets condense down to a single
-        // transform (and edge) each.
-        assert.equal(processedNodes.length, 2);
-        // All nodes are now done processing.
-        processedNodes.forEach((processedNode, index) => {
-          assert.isFalse(processedNode.hasPartialInput);
-          assert.isFalse(processedNode.hasPartialInput);
-          assert.equal(processedNode.editCount, 2);
-          assert.equal(processedNode.spaceId, subsetSeed);
-          assert.equal(processedNode.calculation.inputSequence.length, 2);
-          assert.equal(lastEntry(processedNode.calculation.inputSequence), SENTINEL_CODE_UNIT);
-          assert.equal(processedNode.inputSamplingCost, step2Nodes[index].inputSamplingCost);
-          assert.isAbove(processedNode.currentCost, step2Nodes[index].currentCost);
-        });
-      });
+      const subsetSeed = SEARCH_EDGE_SEED++;
+      const subsetNodes = rootNode.buildDeletionEdges(synthDistribution, subsetSeed);
+      assert.equal(subsetNodes.length, 1);
+      assert.isFalse(subsetNodes[0].hasPartialInput);
+      // From root: deleted inputs don't perform their deletes OR inserts past a single
+      // sentinel char.
+      assert.equal((subsetNodes[0].currentTraversal as TrieTraversal).prefix, '');
+      assert.equal(subsetNodes[0].spaceId, subsetSeed);
+      assert.equal(subsetNodes[0].editCount, rootNode.editCount + 1);
+      assert.equal(subsetNodes[0].inputSamplingCost, rootNode.inputSamplingCost - Math.log(probSum));
     });
 
-    describe(`buildDeletionEdges starting @ 'te' prefix`, () => {
+    it(`buildDeletionEdges @ 'te' prefix: makes single mass deletion batch`, () => {
       // start prefix 'te'
 
       const synthDistribution = [
@@ -607,111 +522,21 @@ describe('Correction Distance Modeler', () => {
         {sample: {insert: 'al', deleteLeft: 1}, p: 0.15}, // tal(k)
         // 4 distinct subsets.
       ];
+      const probSum = synthDistribution.reduce((accum, cur) => accum + cur.p, 0);
 
-      it('step 1: batches deletion edge(s) for input transforms', () => {
-        const teNode = fetchCommonTENode();
-        assert.equal(teNode.calculation.getHeuristicFinalCost(), 0);
+      const teNode = fetchCommonTENode();
+      assert.equal(teNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetSeed = SEARCH_EDGE_SEED++;
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution, subsetSeed);
-        assert.equal(subsetNodes.length, 4);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-
-        const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x) + teNode.currentCost);
-        // The known subs for the subsets defined above.
-        for(let i=0; i < expectedCosts.length; i++) {
-          assert.isTrue(subsetNodes[i].hasPartialInput);
-          // From a 'te' prefix, the deleteLeft 1 entries do have something to delete.
-          assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, (i == 0 || i == 2) ? 'te' : 't');
-          assert.notEqual(subsetNodes[i].spaceId, teNode.spaceId);
-          assert.equal(subsetNodes[i].spaceId, subsetSeed);
-
-          // Allow a little value wiggle due to double-precision limitations.
-          assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
-          // No actual edit-tracking is done yet, so these should also match.
-          assert.approximately(subsetNodes[i].currentCost, expectedCosts[i], 1e-8);
-        }
-      });
-
-      it('step 2: first processing layer resolves zero + one char inserts', () => {
-        // From "step 1" above, assertions removed
-        const teNode = fetchCommonTENode();
-        const subsetSeed = SEARCH_EDGE_SEED++;
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution, subsetSeed);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        const processedNodes = subsetNodes.flatMap(n => n.processSubsetEdge());
-        // All delete-oriented Transform subsets condense down to a single
-        // transform (and edge) each.
-        assert.equal(processedNodes.length, 4);
-        processedNodes.forEach(n => assert.notEqual(n.spaceId, teNode.spaceId));
-        processedNodes.forEach(n => assert.equal(n.spaceId, subsetSeed));
-
-        // Sorted index 0:  1 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[0].hasPartialInput);
-        assert.equal(processedNodes[0].editCount, 1);
-        assert.equal(lastEntry(processedNodes[0].calculation.inputSequence), SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[0].inputSamplingCost, subsetNodes[0].inputSamplingCost);
-        assert.isAbove(processedNodes[0].currentCost, subsetNodes[0].currentCost);
-
-        // Sorted index 3:  0 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[3].hasPartialInput);
-        // No insert string => no sentinel char to delete.
-        assert.equal(processedNodes[3].editCount, 0);
-        // ... and a prior character exists.
-        assert.equal(lastEntry(processedNodes[3].calculation.inputSequence), 't');
-        assert.equal(processedNodes[3].inputSamplingCost, subsetNodes[3].inputSamplingCost);
-        assert.equal(processedNodes[3].currentCost, subsetNodes[3].currentCost);
-
-        // Sorted indices 2, 3:  both had 2 inserts.
-        assert.isTrue(processedNodes[1].hasPartialInput);
-        assert.equal(processedNodes[1].editCount, 1);
-        assert.equal(lastEntry(processedNodes[1].calculation.inputSequence), SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[1].inputSamplingCost, subsetNodes[1].inputSamplingCost);
-        assert.isAbove(processedNodes[1].currentCost, subsetNodes[1].currentCost);
-
-        assert.isTrue(processedNodes[2].hasPartialInput);
-        assert.equal(processedNodes[2].editCount, 1);
-        assert.equal(lastEntry(processedNodes[2].calculation.inputSequence), SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[2].inputSamplingCost, subsetNodes[2].inputSamplingCost);
-        assert.isAbove(processedNodes[2].currentCost, subsetNodes[2].currentCost);
-      });
-
-      it('step 3: second processing layer resolves two char inserts', () => {
-        const teNode = fetchCommonTENode();
-        const subsetSeed = SEARCH_EDGE_SEED++;
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution, subsetSeed);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        // Two nodes were unprocessed at the end of the last step; we handle
-        // them now and filter the others out.  We need the indices here to be
-        // aligned.
-        const step2Nodes = subsetNodes.flatMap(n => n.processSubsetEdge()).filter(n => n.hasPartialInput);
-
-        function assertExpectedProperties(processedNodes: SearchNode[], baseNode: SearchNode, dl: number) {
-          // All delete-oriented Transform subsets condense down to a single
-          // transform (and edge) each.
-          assert.equal(processedNodes.length, 1);
-          // All nodes are now done processing.
-          processedNodes.forEach((processedNode) => {
-            assert.isFalse(processedNode.hasPartialInput);
-            assert.isFalse(processedNode.hasPartialInput);
-            assert.equal(processedNode.editCount, 2);
-            assert.notEqual(processedNode.spaceId, teNode.spaceId);
-            assert.equal(processedNode.spaceId, subsetSeed);
-            assert.equal(processedNode.calculation.inputSequence.length, 4 - dl);
-            assert.equal(lastEntry(processedNode.calculation.inputSequence), SENTINEL_CODE_UNIT);
-            assert.equal(processedNode.inputSamplingCost, baseNode.inputSamplingCost);
-            assert.isAbove(processedNode.currentCost, baseNode.currentCost);
-          });
-        }
-
-        assertExpectedProperties(step2Nodes[0].processSubsetEdge(), step2Nodes[0], 1);
-        assertExpectedProperties(step2Nodes[1].processSubsetEdge(), step2Nodes[1], 0);
-      });
+      const subsetSeed = SEARCH_EDGE_SEED++;
+      const subsetNodes = teNode.buildDeletionEdges(synthDistribution, subsetSeed);
+      assert.equal(subsetNodes.length, 1);
+      assert.isFalse(subsetNodes[0].hasPartialInput);
+      // From root: deleted inputs don't perform their deletes OR inserts past a single
+      // sentinel char.
+      assert.equal((subsetNodes[0].currentTraversal as TrieTraversal).prefix, 'te');
+      assert.equal(subsetNodes[0].spaceId, subsetSeed);
+      assert.equal(subsetNodes[0].editCount, teNode.editCount + 1);
+      assert.equal(subsetNodes[0].inputSamplingCost, teNode.inputSamplingCost - Math.log(probSum));
     });
 
     describe('buildSubstitutionEdges @ token root', () => {

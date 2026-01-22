@@ -164,11 +164,9 @@ export class SearchQuotientSpur implements SearchQuotientNode {
       let deletions = node.buildDeletionEdges(input, childSpace.spaceId);
       let substitutions = node.buildSubstitutionEdges(input, childSpace.spaceId);
 
-      const batch = deletions.concat(substitutions);
-
       // Skip the queue for the first pass; there will ALWAYS be at least one pass,
       // and queue-enqueing does come with a cost.  Avoid the unnecessary overhead.
-      return batch.flatMap(e => e.processSubsetEdge());
+      return substitutions.flatMap(e => e.processSubsetEdge()).concat(deletions);
     });
 
     childSpace.completedPaths = [];
@@ -203,14 +201,13 @@ export class SearchQuotientSpur implements SearchQuotientNode {
 
     let deletionEdges: SearchNode[] = [];
     if(!substitutionsOnly) {
-      deletionEdges       = currentNode.buildDeletionEdges(this.inputs, this.spaceId);
+      deletionEdges         = currentNode.buildDeletionEdges(this.inputs, this.spaceId);
     }
     const substitutionEdges = currentNode.buildSubstitutionEdges(this.inputs, this.spaceId);
-    let batch = deletionEdges.concat(substitutionEdges);
 
     // Skip the queue for the first pass; there will ALWAYS be at least one pass,
     // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
-    batch = batch.flatMap(e => e.processSubsetEdge());
+    const batch = substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
 
     this.selectionQueue.enqueueAll(batch);
     // We didn't reach an end-node, so we just end the iteration and continue the search.
