@@ -9,7 +9,7 @@
 import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
-  Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
+  Codes, type JSKeyboard, KeyEvent, Layouts,
   DefaultOutputRules, EmulationKeystrokes, type MutableSystemStore,
   TextStore, ProcessorAction, SystemStoreIDs, SyntheticTextStore,
   KeyboardProcessor,
@@ -17,23 +17,14 @@ import {
   BeepHandler,
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
-import { DeviceSpec, globalObject, KMWString } from "keyman/common/web-utils";
+import { DeviceSpec, KMWString } from "keyman/common/web-utils";
+import { ProcessorInitOptions } from './processorInitOptions.js';
 
 // #endregion
 
 export type LogMessageHandler = (str: string) => void;
 
-export interface ProcessorInitOptions {
-  baseLayout?: string;
-  keyboardInterface?: JSKeyboardInterface; // for tests, replace keyboardInterface with a mock, TODO-web-core: refactor into a unit test pattern
-  defaultOutputRules?: DefaultOutputRules; // Takes the class def object, not an instance thereof.
-}
-
 export class JSKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
-  private static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
-    baseLayout: 'us',
-    defaultOutputRules: new DefaultOutputRules()  // TODO-web-core: move this out of here and only in keymanEngine.ts, rename to DefaultOutputRules
-  };
 
   // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
   // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
@@ -66,18 +57,14 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
   public warningLogger?: LogMessageHandler;
   public errorLogger?: LogMessageHandler;
 
-  constructor(device: DeviceSpec, options?: ProcessorInitOptions) {
+  constructor(device: DeviceSpec, options: ProcessorInitOptions) {
     super();
-
-    if(!options) {
-      options = JSKeyboardProcessor.DEFAULT_OPTIONS;
-    }
 
     this.contextDevice = device;
 
-    this.baseLayout = options.baseLayout || JSKeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
-    this.keyboardInterface = options.keyboardInterface || new JSKeyboardInterface(globalObject(), MinimalKeymanGlobal);
-    this.defaultOutputRules = options.defaultOutputRules || JSKeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
+    this.baseLayout = options.baseLayout;
+    this.keyboardInterface = options.keyboardInterface;
+    this.defaultOutputRules = options.defaultOutputRules;
   }
 
   public get activeKeyboard(): JSKeyboard {

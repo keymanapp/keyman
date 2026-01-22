@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url);
 
 import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
 
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
@@ -13,12 +14,12 @@ global.keyman = {}; // So that keyboard-based checks against the global `keyman`
 describe('JSKeyboardProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let kp = new JSKeyboardProcessor();
+      let kp = new JSKeyboardProcessor(null, DEFAULT_PROCESSOR_INIT_OPTIONS);
       assert.isNotNull(kp);
     });
 
     it('has expected default values after initialization', function () {
-      let kp = new JSKeyboardProcessor();
+      let kp = new JSKeyboardProcessor(null, DEFAULT_PROCESSOR_INIT_OPTIONS);
       assert.equal('us', kp.baseLayout, 'JSKeyboardProcessor has unexpected base layout')
       assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
       assert.equal('default', kp.layerId, 'Default layer is not set to "default"');
@@ -28,7 +29,7 @@ describe('JSKeyboardProcessor', function() {
 
   describe('activeKeyboard', function() {
     it('is automatically set (in headless) on keyboard load', async function () {
-      let kp = new JSKeyboardProcessor();
+      let kp = new JSKeyboardProcessor(null, DEFAULT_PROCESSOR_INIT_OPTIONS);
 
       // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
       // automatically set the keyboard as active.

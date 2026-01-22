@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
 import * as JSProcessorModule from "keyman/engine/js-processor";
 import * as KeyboardModule from "keyman/engine/keyboard";
 const KMWString = KeyboardModule.KMWString;
@@ -17,7 +18,7 @@ let u = toSupplementaryPairString;
 describe('Bundled ES Module for js-processor', function() {
   describe('JSKeyboardProcessor', function () {
     it('should initialize without errors', function () {
-      let kp = new JSProcessorModule.JSKeyboardProcessor();
+      let kp = new JSProcessorModule.JSKeyboardProcessor(null, DEFAULT_PROCESSOR_INIT_OPTIONS);
       assert.isNotNull(kp);
     });
   });

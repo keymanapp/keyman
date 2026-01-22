@@ -62,8 +62,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     super(workerFactory, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
       return {
-        // The `engine` parameter cannot be supplied with the constructing instance before calling
-        // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
+        baseLayout: 'us',
         keyboardInterface: new KeyboardInterface(window, engine as KeymanEngine),
         defaultOutputRules: new DefaultBrowserRules(engine.contextManager)
       };

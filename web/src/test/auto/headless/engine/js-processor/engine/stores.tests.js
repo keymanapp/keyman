@@ -2,6 +2,7 @@ import { assert } from 'chai';
 
 import { JSKeyboard, KMWString } from 'keyman/engine/keyboard';
 import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
 
 let device = {
   formFactor: 'desktop',
@@ -18,7 +19,7 @@ describe('Engine - Stores', function() {
   }
 
   it('Store \'Explosion\'', function() {
-    let processor = new JSKeyboardProcessor(device);
+    let processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
     // A 'hollow' Keyboard that only follows default rules.  That said, we need a Keyboard
     // instance to host cache data for our exploded store tests.
     processor.activeKeyboard = new JSKeyboard();

@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url);
 import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
 
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 
@@ -65,7 +66,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       ruleSeq.test(proctor, textStore);
 
       // Now for the real test!
-      let processor = new JSKeyboardProcessor(device);
+      let processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
       processor.keyboardInterface = keyboardWithHarness;
       var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, textStore, ruleDef.rule);
 
@@ -1121,7 +1122,7 @@ describe('Engine - Context Matching', function() {
       ruleSeq.test(proctor, textStore);
 
       // Now for the real test!
-      const processor = new JSKeyboardProcessor(device);
+      const processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
       processor.keyboardInterface = keyboardWithHarness;
       const res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, textStore);
 
