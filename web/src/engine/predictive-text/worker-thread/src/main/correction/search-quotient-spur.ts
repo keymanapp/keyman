@@ -89,54 +89,6 @@ export class SearchQuotientSpur implements SearchQuotientNode {
     }
   }
 
-  public hasInputs(keystrokeDistributions: Distribution<Transform>[]): boolean {
-    if(this.inputCount == 0) {
-      return keystrokeDistributions.length == 0;
-    } else if(keystrokeDistributions.length != this.inputCount) {
-      return false;
-    }
-
-    const tailInput = [...keystrokeDistributions[keystrokeDistributions.length - 1]];
-    keystrokeDistributions = keystrokeDistributions.slice(0, keystrokeDistributions.length - 1);
-    const localInput = this.lastInput;
-
-    const parentHasInput = () => !!this.parents.find(p => p.hasInputs(keystrokeDistributions));
-
-    // Actual reference match?  Easy mode.
-    if(localInput == tailInput) {
-      return parentHasInput();
-    } else if(localInput.length != tailInput.length) {
-      return false;
-    } else {
-      for(let entry of tailInput) {
-        const matchIndex = localInput.findIndex((x) => {
-          const s1 = x.sample;
-          const s2 = entry.sample;
-          // Check for equal reference first before the other checks; it makes a nice shortcut.
-          if(x == entry) {
-            return true;
-          }
-
-          if(x.p == entry.p && s1.deleteLeft == s2.deleteLeft
-            && s1.id == s2.id && ((s1.deleteRight ?? 0) == (s2.deleteRight ?? 0)) && s1.insert == s2.insert
-          ) {
-            return true;
-          }
-
-          return false;
-        });
-
-        if(matchIndex == -1) {
-          return false;
-        } else {
-          tailInput.splice(matchIndex, 1);
-        }
-      }
-
-      return parentHasInput();
-    }
-  }
-
   public get lastInput(): Distribution<Readonly<Transform>> {
     // Shallow-copies the array to prevent external modification; the Transforms
     // are marked Readonly to prevent their modification as well.
