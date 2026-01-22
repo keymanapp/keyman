@@ -45,7 +45,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
    * @param {VariableStoreSerializer}  storeSerializer  Optional serializer for variable stores.
    * @returns {Promise<void>} A promise that resolves when initialization is complete.
    */
-  public async init(basePath: string, storeSerializer?: VariableStoreSerializer): Promise<void> {
+  public async init(basePath: string, storeSerializer: VariableStoreSerializer): Promise<void> {
     await KM_Core.createCoreProcessor(basePath);
     this._keyboardInterface = new CoreKeyboardInterface(storeSerializer);
   }

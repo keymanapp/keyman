@@ -9,6 +9,7 @@ import { coreurl, loadKeyboardBlob } from '../loadKeyboardHelper.js';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { Codes, Deadkey, KeyEvent, KMXKeyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
+import { VariableStoreCookieSerializer } from 'keyman/engine/main';
 
 describe('CoreKeyboardProcessor', function () {
   const loadKeyboard = function (name: string): km_core_keyboard {
@@ -48,7 +49,7 @@ describe('CoreKeyboardProcessor', function () {
   describe('saveMarkersToTextStore', function () {
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
-      await coreProcessor.init(coreurl);
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
       sandbox = sinon.createSandbox();
@@ -209,7 +210,7 @@ describe('CoreKeyboardProcessor', function () {
   describe('applyContextFromTextStore', function () {
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
-      await coreProcessor.init(coreurl);
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
     });
@@ -492,7 +493,7 @@ describe('CoreKeyboardProcessor', function () {
 
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
-      await coreProcessor.init(coreurl);
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
       sandbox = sinon.createSandbox();
@@ -540,7 +541,7 @@ describe('CoreKeyboardProcessor', function () {
 
     beforeEach(async function () {
       coreProcessor = new CoreKeyboardProcessor();
-      await coreProcessor.init(coreurl);
+      await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
       sandbox = sinon.createSandbox();
