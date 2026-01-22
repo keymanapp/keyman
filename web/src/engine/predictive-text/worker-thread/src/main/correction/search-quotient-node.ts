@@ -142,7 +142,8 @@ export function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistrib
         return true;
       }
     }
-    return false;
+
+    return node.parents.length == 0 && keystrokeDistributions.length == 0;
   }
 
   if(node.inputCount == 0) {
