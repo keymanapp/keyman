@@ -207,7 +207,7 @@ export class SearchQuotientSpur implements SearchQuotientNode {
 
     // Skip the queue for the first pass; there will ALWAYS be at least one pass,
     // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
-    let batch = substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
+    const batch = substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
 
     this.selectionQueue.enqueueAll(batch);
     // We didn't reach an end-node, so we just end the iteration and continue the search.
