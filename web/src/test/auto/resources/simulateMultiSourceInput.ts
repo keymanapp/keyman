@@ -247,7 +247,7 @@ function simulateMultiSourceInput<OutputType, Type>(
 
   // -------
 
-  let flattenedSpecs = processedSetup.map(
+  const flattenedSpecs = processedSetup.map(
     (entry) => entry.sourceSpecs
   ).reduce((constructingArray, entries) => constructingArray.concat(entries), []);
 
@@ -365,7 +365,7 @@ export function simulateSelectorInput<Type>(
   selectorPromise: Promise<MatcherSelector<Type>>,
   executor: () => Promise<void>
 } {
-  let inputClone = [].concat(input);
+  const inputClone = [].concat(input);
 
   // We NEED the sequences specified to be in chronological order of their start.
   // We'll just check if it's done properly out-of-the-gate - by sorting a clone, then comparing.

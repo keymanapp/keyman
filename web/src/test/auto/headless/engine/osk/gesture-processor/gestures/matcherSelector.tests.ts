@@ -3,9 +3,8 @@ import sinon from 'sinon';
 
 import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
-import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
-import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../../../resources/simulateMultiSourceInput.js";
+import { assertingPromiseStatus as promiseStatus, simulateMultiSourceMatcherInput, simulateSelectorInput } from 'keyman/test/resources';
 
 import { timedPromise } from 'keyman/common/web-utils';
 import { gestures } from 'keyman/engine/gesture-processor';

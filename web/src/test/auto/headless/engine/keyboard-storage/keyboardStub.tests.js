@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
-import NodeCloudRequester from '../../../resources/loader/nodeCloudRequester.js';
+import { NodeCloudRequester } from 'keyman/test/resources';
 
 import path from 'path';
 import { fileURLToPath } from 'url';

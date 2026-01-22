@@ -6,12 +6,16 @@ const require = createRequire(import.meta.url);
 
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { NodeKeyboardLoader } from 'keyman/test/resources';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { env } from 'node:process';
-const KEYMAN_ROOT = env.KEYMAN_ROOT;
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const KEYMAN_ROOT = env.KEYMAN_ROOT ?? (__dirname + '/../../../../../../../');
 
 describe('Engine - Chirality', function() {
   let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/chirality.json'));

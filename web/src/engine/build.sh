@@ -68,11 +68,35 @@ do_build () {
   node src/osk/validate-gesture-specs.js
 }
 
-builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/engine"
+run_tests() {
+  local OUTPUT_FILE FAILURE_COUNT
+  # Remove stale coverage data
+  rm -rf "${KEYMAN_ROOT}/web/build/coverage/raw/engine"
+
+  # Unfortunately we get an error from the coverage report generation:
+  # "TypeError [ERR_INVALID_URL_SCHEME]: The URL must be of scheme file"
+  # The following lines ignore the exit code and instead check the number
+  # of failed tests from the output.
+  set +e
+  OUTPUT_FILE=$(mktemp)
+  test-headless engine "" 2>&1 | tee "${OUTPUT_FILE}"
+  set -e
+
+  FAILURE_COUNT=$(grep ' failing' "${OUTPUT_FILE}" | xargs | cut -f 1 -d' ')
+  rm "${OUTPUT_FILE}"
+  builder_echo "(The 'TypeError [ERR_INVALID_URL_SCHEME]: The URL must be of scheme file' is expected)"
+  if ((FAILURE_COUNT > 0)); then
+    builder_die "Headless engine tests failed (.js tests)"
+  fi
+
+  test-headless-typescript engine
+}
+
+builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/engine"
 builder_run_child_actions clean
 builder_run_action configure node_select_version_and_npm_ci
 builder_run_child_actions configure
 builder_run_child_actions build
 builder_run_action build do_build
-builder_run_action test test-headless-typescript engine
+builder_run_action test  run_tests
 builder_run_child_actions test

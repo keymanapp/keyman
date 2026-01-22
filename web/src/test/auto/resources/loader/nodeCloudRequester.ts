@@ -1,17 +1,16 @@
 import { ManagedPromise } from 'keyman/common/web-utils';
-import { CloudRequesterInterface } from '../../../../engine/src/keyboard-storage/cloud/requesterInterface.js';
 import {
-  CLOUD_TIMEOUT_ERR,
-  CLOUD_STUB_REGISTRATION_ERR,
+  CloudRequesterInterface,
   CloudQueryResult,
-  CloudQueryEngine
-} from '../../../../engine/src/keyboard-storage/cloud/queryEngine.js';
+  CloudQueryEngine,
+  unitTestEndpoints
+} from 'keyman/engine/keyboard-storage';
 
 import fs from 'node:fs';
 import https from 'node:https';
 import vm from 'node:vm';
 
-export default class NodeCloudRequester implements CloudRequesterInterface {
+export class NodeCloudRequester implements CloudRequesterInterface {
   private static QUERY_SEED = 1;
   private readonly fileLocal: boolean;
 
@@ -34,7 +33,7 @@ export default class NodeCloudRequester implements CloudRequesterInterface {
 
     // Set callback timer
     const timeoutObj = setTimeout(() => {
-      promise.reject(new Error(CLOUD_TIMEOUT_ERR));
+      promise.reject(new Error(unitTestEndpoints.CLOUD_TIMEOUT_ERR));
     }, 10000);
 
     const queryId = NodeCloudRequester.QUERY_SEED++;
@@ -56,7 +55,7 @@ export default class NodeCloudRequester implements CloudRequesterInterface {
       });
 
       if(!promise.isResolved) {
-        promise.reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
+        promise.reject(new Error(unitTestEndpoints.CLOUD_STUB_REGISTRATION_ERR));
       }
     }
 

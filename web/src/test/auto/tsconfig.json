@@ -11,11 +11,12 @@
     "dom/**/*.ts",
     "headless/**/*.ts",
     "integrated/**/*.ts",
-    "resources/**/*.ts",
+    "resources/@types/*.d.ts",
     "predictive-text/**/*.ts",
   ],
 
   "references": [
     { "path": "../../engine" },
+    { "path": "resources" }
   ]
 }

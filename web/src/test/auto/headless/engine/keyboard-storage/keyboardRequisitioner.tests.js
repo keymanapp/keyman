@@ -2,14 +2,11 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import fs from 'fs';
 
-import { KeyboardHarness, ManagedPromise, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
-import {
-  KeyboardRequisitioner,
-  toPrefixedKeyboardId as prefixed
-} from 'keyman/engine/keyboard-storage';
+import { ManagedPromise } from 'keyman/common/web-utils';
+import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { NodeKeyboardLoader, NodeCloudRequester } from 'keyman/test/resources';
+import { KeyboardRequisitioner, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
-import NodeCloudRequester from '../../../resources/loader/nodeCloudRequester.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -197,7 +194,7 @@ describe("KeyboardRequisitioner", () => {
 
         assert.equal(stubs.length, 2);
         for(let stub of stubs) {
-          assert.equal(stub.KI, prefixed('sil_euro_latin'));
+          assert.equal(stub.KI, toPrefixedKeyboardId('sil_euro_latin'));
           assert.equal(stub.KN, "EuroLatin (SIL)");
         }
 
@@ -216,7 +213,7 @@ describe("KeyboardRequisitioner", () => {
 
         assert.equal(stubs.length, 278);
         for(let stub of stubs) {
-          assert.equal(stub.KI, prefixed('sil_cameroon_azerty'));
+          assert.equal(stub.KI, toPrefixedKeyboardId('sil_cameroon_azerty'));
           assert.equal(stub.KN, "Cameroon AZERTY");
         }
 

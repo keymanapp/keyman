@@ -17,7 +17,7 @@
 #   compile engine/main
 # ```
 function compile() {
-  if [ $# -lt 1 ]; then
+  if [[ $# -lt 1 ]]; then
     builder_die "Scripting error: insufficient argument count!"
   fi
 
@@ -27,10 +27,10 @@ function compile() {
   local SRC_DIR=${2:-"${KEYMAN_ROOT}/web/src"}
   local BUILD_DIR=${3:-"${KEYMAN_ROOT}/web/build"}
 
-  tsc -b "${SRC_DIR}/$COMPILE_TARGET"
+  tsc -b "${SRC_DIR}/${COMPILE_TARGET}"
 
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-  tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/$COMPILE_TARGET/lib/index.d.ts" -p "${SRC_DIR}/$COMPILE_TARGET"
+  tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/${COMPILE_TARGET}/lib/index.d.ts" -p "${SRC_DIR}/${COMPILE_TARGET}"
 }
 
 function _copy_dir_if_exists() {
