@@ -14,7 +14,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextToken, correction, getBestMatches, models, preprocessInputSources, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, getBestMatches, models, preprocessInputSources, quotientPathHasInputs, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
@@ -71,7 +71,8 @@ describe('ContextToken', function() {
       assert.equal(token.exampleInput, 'and');
 
       assert.equal(token.searchModule.inputCount, 3);
-      assert.isTrue(token.searchModule.hasInputs([
+      assert.isTrue(quotientPathHasInputs(
+        token.searchModule, [
         [{sample: { insert: 'a', deleteLeft: 0 }, p: 1}],
         [{sample: { insert: 'n', deleteLeft: 0 }, p: 1}],
         [{sample: { insert: 'd', deleteLeft: 0 }, p: 1}]
@@ -110,7 +111,8 @@ describe('ContextToken', function() {
       token2.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
       token3.inputRange.forEach((entry) => assert.isTrue(merged.inputRange.indexOf(entry) > -1));
 
-      assert.isTrue(merged.searchModule.hasInputs([
+      assert.isTrue(quotientPathHasInputs(
+        merged.searchModule, [
         [{sample: { insert: 'c', deleteLeft: 0 }, p: 1}],
         [{sample: { insert: 'a', deleteLeft: 0 }, p: 1}],
         [{sample: { insert: 'n', deleteLeft: 0 }, p: 1}],
@@ -207,7 +209,8 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
       assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0, bestProbFromSet: 1 }) ));
-      assert.isTrue(merged.searchModule.hasInputs(
+      assert.isTrue(quotientPathHasInputs(
+        merged.searchModule,
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
       ));
     });
@@ -268,7 +271,8 @@ describe('ContextToken', function() {
       const merged = ContextToken.merge(tokensToMerge, plainModel);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
       assert.deepEqual(merged.inputRange, srcTransforms.map((t) => ({ trueTransform: t, inputStartIndex: 0, bestProbFromSet: 1 }) ));
-      assert.isTrue(merged.searchModule.hasInputs(
+      assert.isTrue(quotientPathHasInputs(
+        merged.searchModule,
         srcTransforms.map((t) => ([{sample: t, p: 1}]))
       ));
     });
@@ -302,7 +306,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.sourceText, 'can\'');
-      tokenToSplit.searchModule.hasInputs(keystrokeDistributions);
+      assert.isTrue(quotientPathHasInputs(tokenToSplit.searchModule, keystrokeDistributions));
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -319,8 +323,8 @@ describe('ContextToken', function() {
 
       assert.equal(resultsOfSplit.length, 2);
       assert.sameOrderedMembers(resultsOfSplit.map(t => t.exampleInput), ['can', '\'']);
-      assert.isTrue(resultsOfSplit[0].searchModule.hasInputs(keystrokeDistributions.slice(0, 3)));
-      assert.isTrue(resultsOfSplit[1].searchModule.hasInputs([keystrokeDistributions[3]]));
+      assert.isTrue(quotientPathHasInputs(resultsOfSplit[0].searchModule, keystrokeDistributions.slice(0, 3)));
+      assert.isTrue(quotientPathHasInputs(resultsOfSplit[1].searchModule, [keystrokeDistributions[3]]));
     });
 
     it("handles mid-transform splits correctly", () => {
@@ -338,7 +342,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.sourceText, 'biglargetransform');
-      assert.isTrue(tokenToSplit.searchModule.hasInputs(keystrokeDistributions));
+      assert.isTrue(quotientPathHasInputs(tokenToSplit.searchModule, keystrokeDistributions));
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -367,7 +371,8 @@ describe('ContextToken', function() {
       })));
 
       for(let i = 0; i < resultsOfSplit.length; i++) {
-        assert.isTrue(resultsOfSplit[i].searchModule.hasInputs([
+        assert.isTrue(quotientPathHasInputs(
+          resultsOfSplit[i].searchModule, [
           [{sample: { insert: splitTextArray[i], deleteLeft: 0, deleteRight: 0 }, p: 1}]
         ]));
       }
@@ -392,7 +397,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.exampleInput, 'largelongtransforms');
-      tokenToSplit.searchModule.hasInputs(keystrokeDistributions);
+      assert.isTrue(quotientPathHasInputs(tokenToSplit.searchModule, keystrokeDistributions));
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -422,49 +427,55 @@ describe('ContextToken', function() {
         { trueTransform: keystrokeDistributions[2][0].sample, inputStartIndex: 'ng'.length, bestProbFromSet: 1 }
       ]);
 
-      assert.isTrue(resultsOfSplit[0].searchModule.hasInputs([
-        keystrokeDistributions[0],
-        keystrokeDistributions[1].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: entry.sample.insert.slice(0, 4) // gets the 'arge' portion & the deleteLefts.
-            }, p: entry.p
-          }
-        }),
-      ]));
+      assert.isTrue(quotientPathHasInputs(
+        resultsOfSplit[0].searchModule,[
+          keystrokeDistributions[0],
+          keystrokeDistributions[1].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: entry.sample.insert.slice(0, 4) // gets the 'arge' portion & the deleteLefts.
+              }, p: entry.p
+            }
+          })
+        ]
+      ));
 
-      assert.isTrue(resultsOfSplit[1].searchModule.hasInputs([
-        keystrokeDistributions[1].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: entry.sample.insert.slice('arge'.length),
-              deleteLeft: 0
-            }, p: entry.p
-          }
-        }),
-        keystrokeDistributions[2].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: entry.sample.insert.slice(0, 'ng'.length), // gets the 'ng' portion.
-            }, p: entry.p
-          }
-        }),
-      ]));
+      assert.isTrue(quotientPathHasInputs(
+        resultsOfSplit[1].searchModule, [
+          keystrokeDistributions[1].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: entry.sample.insert.slice('arge'.length),
+                deleteLeft: 0
+              }, p: entry.p
+            }
+          }),
+          keystrokeDistributions[2].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: entry.sample.insert.slice(0, 'ng'.length), // gets the 'ng' portion.
+              }, p: entry.p
+            }
+          })
+        ]
+      ));
 
-      assert.isTrue(resultsOfSplit[2].searchModule.hasInputs([
-        keystrokeDistributions[2].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: entry.sample.insert.slice('ng'.length), // drops the 'ng' portion.
-              deleteLeft: 0
-            }, p: entry.p
-          }
-        }),
-      ]));
+      assert.isTrue(quotientPathHasInputs(
+        resultsOfSplit[2].searchModule, [
+          keystrokeDistributions[2].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: entry.sample.insert.slice('ng'.length), // drops the 'ng' portion.
+                deleteLeft: 0
+              }, p: entry.p
+            }
+          }),
+        ]
+      ));
     });
 
     it("handles messy mid-transform splits correctly - non-BMP text", () => {
@@ -486,7 +497,7 @@ describe('ContextToken', function() {
       };
 
       assert.equal(tokenToSplit.exampleInput, toMathematicalSMP('largelongtransforms'));
-      tokenToSplit.searchModule.hasInputs(keystrokeDistributions);
+      assert.isTrue(quotientPathHasInputs(tokenToSplit.searchModule, keystrokeDistributions));
 
       // And now for the "fun" part.
       const resultsOfSplit = tokenToSplit.split({
@@ -516,49 +527,55 @@ describe('ContextToken', function() {
         { trueTransform: keystrokeDistributions[2][0].sample, inputStartIndex: 'ng'.length, bestProbFromSet: 1 }
       ]);
 
-      assert.isTrue(resultsOfSplit[0].searchModule.hasInputs([
-        keystrokeDistributions[0],
-        keystrokeDistributions[1].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: KMWString.substring(entry.sample.insert, 0, 4) // gets the 'arge' portion & the deleteLefts.
-            }, p: entry.p
-          }
-        }),
-      ]));
+      assert.isTrue(quotientPathHasInputs(
+        resultsOfSplit[0].searchModule, [
+          keystrokeDistributions[0],
+          keystrokeDistributions[1].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: KMWString.substring(entry.sample.insert, 0, 4) // gets the 'arge' portion & the deleteLefts.
+              }, p: entry.p
+            }
+          })
+        ]
+      ));
 
-      assert.isTrue(resultsOfSplit[1].searchModule.hasInputs([
-        keystrokeDistributions[1].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: KMWString.substring(entry.sample.insert, 'arge'.length),
-              deleteLeft: 0
-            }, p: entry.p
-          }
-        }),
-        keystrokeDistributions[2].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: KMWString.substring(entry.sample.insert, 0, 'ng'.length), // gets the 'ng' portion.
-            }, p: entry.p
-          }
-        }),
-      ]));
+      assert.isTrue(quotientPathHasInputs(
+        resultsOfSplit[1].searchModule, [
+          keystrokeDistributions[1].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: KMWString.substring(entry.sample.insert, 'arge'.length),
+                deleteLeft: 0
+              }, p: entry.p
+            }
+          }),
+          keystrokeDistributions[2].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: KMWString.substring(entry.sample.insert, 0, 'ng'.length), // gets the 'ng' portion.
+              }, p: entry.p
+            }
+          })
+        ]
+      ));
 
-      assert.isTrue(resultsOfSplit[2].searchModule.hasInputs([
-        keystrokeDistributions[2].map((entry) => {
-          return {
-            sample: {
-              ...entry.sample,
-              insert: KMWString.substring(entry.sample.insert, 'ng'.length), // drops the 'ng' portion.
-              deleteLeft: 0
-            }, p: entry.p
-          }
-        }),
-      ]));
+      assert.isTrue(quotientPathHasInputs(
+        resultsOfSplit[2].searchModule, [
+          keystrokeDistributions[2].map((entry) => {
+            return {
+              sample: {
+                ...entry.sample,
+                insert: KMWString.substring(entry.sample.insert, 'ng'.length), // drops the 'ng' portion.
+                deleteLeft: 0
+              }, p: entry.p
+            }
+          })
+        ]
+      ));
     });
   });
 });

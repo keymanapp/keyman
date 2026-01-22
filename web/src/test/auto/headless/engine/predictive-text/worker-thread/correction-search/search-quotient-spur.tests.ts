@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, LegacyQuotientRoot } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientSpur, models, LegacyQuotientRoot, quotientPathHasInputs } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
@@ -193,48 +193,7 @@ describe('SearchQuotientSpur', () => {
         (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
         {text: '', p: 1})
       );
-      assert.isTrue(pathToSplit.hasInputs(distributions));
-    });
-  });
-
-  describe('hasInputs()', () => {
-    it('matches an empty array on root SearchPaths', () => {
-      assert.isTrue(new LegacyQuotientRoot(testModel).hasInputs([]));
-    });
-
-    it('matches all path inputs when provided in proper order', () => {
-      const { paths, distributions } = buildSimplePathSplitFixture();
-      assert.isTrue(paths[4].hasInputs(distributions));
-    });
-
-    it('does not match when any path input component is missing', () => {
-      const { paths, distributions } = buildSimplePathSplitFixture();
-      assert.isFalse(paths[4].hasInputs(distributions.slice(1)));
-      assert.isFalse(paths[4].hasInputs(distributions.slice(2)));
-      assert.isFalse(paths[4].hasInputs(distributions.slice(3)));
-      assert.isFalse(paths[4].hasInputs(distributions.slice(0, 3)));
-      assert.isFalse(paths[4].hasInputs(distributions.slice(0, 1).concat(distributions.slice(2))));
-    });
-
-    it('does not match when path inputs are not in proper order', () => {
-      const { paths, distributions } = buildSimplePathSplitFixture();
-      assert.isFalse(paths[4].hasInputs(distributions.slice().reverse()));
-
-      // Random shuffle.
-      let shuffled: typeof distributions;
-      let isShuffled: boolean;
-      do {
-        shuffled = distributions.slice().sort(() => Math.random() * 2 - 1);
-        // Validate that we actually shuffled - that we didn't land on the original order!
-        isShuffled = false;
-        for(let i = 0; i < distributions.length; i++) {
-          if(distributions[i] != shuffled[i]) {
-            isShuffled = true;
-            break;
-          }
-        }
-      } while(!isShuffled);
-      assert.isFalse(paths[4].hasInputs(shuffled));
+      assert.isTrue(quotientPathHasInputs(pathToSplit, distributions));
     });
   });
 });
