@@ -657,12 +657,14 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
   do {
     const entry: SearchResult = timer.time(() => {
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) < spaceQueue.peek().currentCost) {
-        return priorResultsQueue.dequeue();
+        const result = priorResultsQueue.dequeue();
+        currentReturns[result.node.resultKey] = result.node;
+        return result;
       }
 
-      let bestQueue = spaceQueue.dequeue();
-      let newResult: PathResult = bestQueue.handleNextNode();
-      spaceQueue.enqueue(bestQueue);
+      let lowestCostSource = spaceQueue.dequeue();
+      let newResult: PathResult = lowestCostSource.handleNextNode();
+      spaceQueue.enqueue(lowestCostSource);
 
       if(newResult.type == 'none') {
         return null;
