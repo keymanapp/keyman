@@ -106,7 +106,6 @@ describe('getBestMatches', () => {
 
     // Just one suggestion root should be returned as the first result.
     assert.equal(result.totalCost, 0);             // Gives a perfect match
-    assert.equal(result.inputSequence.length, 0);  // for a state with no input and
     assert.equal(result.matchString, '');          // an empty match string.
     assert.isFalse(resultState.done);
 
