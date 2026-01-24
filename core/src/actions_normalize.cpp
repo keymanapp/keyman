@@ -133,6 +133,7 @@ bool km::core::actions_normalize(
     To adjust, we remove one codepoint at a time from the app_context until
     its normalized form matches the cached_context normalized form.
   */
+  std::u32string context_final = U"";
 
   while(!app_context_string.empty()) {
     auto app_context_nfd = app_context_string;
@@ -141,7 +142,8 @@ bool km::core::actions_normalize(
       return false;
     }
 
-    if(app_context_nfd == cached_context_string) {
+    if(app_context_nfd == cached_context_string.substr(0, app_context_nfd.length())) {
+      context_final = cached_context_string.substr(app_context_nfd.length());
       break;
     }
 
@@ -155,7 +157,7 @@ bool km::core::actions_normalize(
     Normalize our output string
   */
 
-  auto output_nfc = output;
+  auto output_nfc = context_final + output;
   if(!km::core::util::normalize_nfc(output_nfc)) {
     DebugLog("nfc->normalize failed");
     return false;
