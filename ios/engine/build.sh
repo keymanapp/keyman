@@ -28,6 +28,7 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
+  configure     /ios/Carthage/Build     \
   build         /ios/build/Build/Products/Release/KeymanEngine.xcframework
 
 # Base definitions (must be before do_clean call)
@@ -57,6 +58,29 @@ fi
 function do_clean () {
   # Possible TODO:  can we clean the engine target without also cleaning the app target?
   rm -rf "$BUILD_PATH"
+  rm -rf Carthage
+}
+
+function carthage_die() {
+  local msg="$1"
+
+  # Don't leave a trace of the failed folder; we'd have to rebuild stuff anyway.
+  # This way, a later re-run doesn't think `configure` succeeded when it did not.
+  rm -rf Carthage
+  builder_die "$1"
+}
+
+function do_carthage() {
+  # Carthage setup must be handled from the directory with the Cartfile / Cartfile.resolved, it seems.
+  pushd .. > /dev/null
+
+  carthage checkout || carthage_die "Carthage dependency checkout failed"
+
+  # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
+  # which affects the sentry-cocoa dependency.
+  carthage build --use-xcframeworks --no-use-binaries --platform iOS || carthage_die "Carthage dependency loading failed"
+
+  popd > /dev/null
 }
 
 function do_packages() {
@@ -68,6 +92,7 @@ function do_packages() {
 
 function do_configure ( ) {
   do_packages
+  do_carthage
 }
 
 # Manages KeymanEngine.bundle, which is included inside the :engine target.
