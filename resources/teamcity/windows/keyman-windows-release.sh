@@ -101,6 +101,7 @@ function windows_publish_action() {
   export RSYNC_USER
   export RSYNC_HOST
   export RSYNC_ROOT
+  export KEYMAN_SYMSTOREPATH="$LOCAL_SYMBOLS_PATH"
 
   builder_launch /windows/build.sh publish
   windows_upload_symbols_to_sentry
