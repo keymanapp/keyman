@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 
 import { Codes, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { NodeKeyboardLoader } from 'keyman/test/resources';
 
 // Compare and contrast the unit tests here with those for app/browser key-event unit testing
 // in the hardware-event-processing set; the output objects there should have the same format

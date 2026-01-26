@@ -5,7 +5,7 @@ const require = createRequire(import.meta.url);
 
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { KeyboardHarness, MinimalKeymanGlobal, JSKeyboard } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { NodeKeyboardLoader } from 'keyman/test/resources';
 
 
 describe('Keyboard tests', function () {

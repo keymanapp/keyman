@@ -81,6 +81,10 @@
     "./tools/testing/test-utils": {
       "types": "./build/tools/testing/test-utils/obj/index.d.ts",
       "import": "./build/tools/testing/test-utils/obj/index.js"
+    },
+    "./test/resources": {
+      "types": "./src/test/auto/resources/build/index.d.ts",
+      "import": "./src/test/auto/resources/build/index.js"
     }
   },
   "imports": {

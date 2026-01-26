@@ -13,7 +13,11 @@ import path from 'path';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 import { env } from 'node:process';
-const KEYMAN_ROOT = env.KEYMAN_ROOT;
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const KEYMAN_ROOT = env.KEYMAN_ROOT ?? (__dirname + '/../../../../../../../../');
 
 // Required initialization setup.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.

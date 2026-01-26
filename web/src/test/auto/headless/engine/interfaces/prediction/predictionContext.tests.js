@@ -3,8 +3,8 @@ import sinon from 'sinon';
 
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
-import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { DeviceSpec, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { NodeWorker } from "@keymanapp/lexical-model-layer/node";
+import { SyntheticTextStore } from 'keyman/engine/keyboard';
 
 function compileDummyModel(suggestionSets) {
   return `
@@ -66,7 +66,7 @@ describe("PredictionContext", () => {
   let langProcessor;
 
   beforeEach(function() {
-    langProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
+    langProcessor = new LanguageProcessor(NodeWorker, new TranscriptionCache());
   });
 
   afterEach(function() {
@@ -83,7 +83,7 @@ describe("PredictionContext", () => {
 
     let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
     const initialTextStore = SyntheticTextStore.from(textStore);
-    const promise = predictiveContext.setCurrentTarget(textStore);
+    const promise = predictiveContext.setCurrentTextStore(textStore);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
     assert.equal(updateFake.callCount, 1);
@@ -122,7 +122,7 @@ describe("PredictionContext", () => {
 
     let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
     const initialTextStore = SyntheticTextStore.from(textStore);
-    const promise = predictiveContext.setCurrentTarget(textStore);
+    const promise = predictiveContext.setCurrentTextStore(textStore);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
     assert.equal(updateFake.callCount, 1);
@@ -181,7 +181,7 @@ describe("PredictionContext", () => {
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
     let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
-    const initialSuggestions = await predictiveContext.setCurrentTarget(textStore);
+    const initialSuggestions = await predictiveContext.setCurrentTextStore(textStore);
 
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
@@ -206,7 +206,7 @@ describe("PredictionContext", () => {
 
     let textState = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
 
-    await predictiveContext.setCurrentTarget(textState);
+    await predictiveContext.setCurrentTextStore(textState);
 
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
@@ -274,7 +274,7 @@ describe("PredictionContext", () => {
 
     // Test setup - return to the state at the end of the prior-defined unit test ('suggestion application...')
 
-    await predictiveContext.setCurrentTarget(textState);
+    await predictiveContext.setCurrentTextStore(textState);
 
     // This is the point in time that a reversion operation will rewind the context to.
     const revertBaseTextState = SyntheticTextStore.from(textState);
