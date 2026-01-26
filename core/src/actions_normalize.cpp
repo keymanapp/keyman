@@ -142,6 +142,14 @@ bool km::core::actions_normalize(
       return false;
     }
 
+    /*
+      We are working in NFD as we backtrack in the context, but input variable
+      app_context_string is NFC. The last character of the context may be part
+      of a composed character, so we need to track decomposition. For example,
+      'tä' + BKSP should result in 'ta', but delete back 1 in app_context_string
+      will give us 't', so we need to remember 'a', and add it back afterwards
+      (see output_nfc variable).
+    */
     if(app_context_nfd == cached_context_string.substr(0, app_context_nfd.length())) {
       context_final = cached_context_string.substr(app_context_nfd.length());
       break;
@@ -198,6 +206,8 @@ bool km::core::actions_normalize(
   delete [] actions.output;
   actions.output = new_output;
   actions.code_points_to_delete = nfu_to_delete;
+
+  // Outcome will be: <app_context><context_final><output>|
 
   return true;
 }
