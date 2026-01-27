@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.194 alpha 2026-01-27
+
+* fix(windows): export sym store path so symbols are published (#15493)
+
 ## 19.0.193 alpha 2026-01-26
 
 * fix(resources): block unsupported platforms from running certain scripts (#15480)
