@@ -63,6 +63,7 @@ type
     FShowConfigurationOnLoad: Boolean;
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser(var Message: TMessage); message WM_USER;
+    procedure ShowConfiguration;
   protected
     procedure FireCommand(const command: WideString; params: TStringList);
       override;
@@ -112,6 +113,17 @@ begin
   end;
 end;
 
+procedure TfrmSplash.ShowConfiguration;
+var
+  configFrmResult: Integer;
+begin
+  configFrmResult := Main(Self);
+  if configFrmResult = mrAbort then
+    Command_Exit
+  else
+    Do_Content_Render;
+end;
+
 procedure TfrmSplash.TntFormActivate(Sender: TObject);
 begin
   inherited;
@@ -139,8 +151,6 @@ begin
 end;
 
 procedure TfrmSplash.WMUser_FormShown(var Message: TMessage);
-var
-  configFrmResult: Integer;
 begin
   if (GetForegroundWindow <> Handle) and
     (GetWindowThreadProcessId(GetForegroundWindow) <> GetCurrentThreadId) then   // I3730
@@ -154,26 +164,16 @@ begin
 
   if FShowConfigurationOnLoad then
   begin
-    configFrmResult := Main(Self);
-    if configFrmResult = mrAbort then
-      Command_Exit
-    else
-      Do_Content_Render;
+    ShowConfiguration;
   end;
 end;
 
 procedure TfrmSplash.FireCommand(const command: WideString; params: TStringList);
-var
-  configFrmResult: Integer;
 begin
   if command = 'start' then Command_Start
   else if command = 'config' then
   begin
-    configFrmResult := Main(Self);
-    if configFrmResult = mrAbort then
-      Command_Exit
-    else
-      Do_Content_Render;
+    ShowConfiguration;
   end   // I4393   // I4396
   else if command = 'hidesplash' then FShouldDisplay := False
   else if command = 'showsplash' then FShouldDisplay := True

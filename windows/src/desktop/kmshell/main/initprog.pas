@@ -168,6 +168,7 @@ function Main(Owner: TComponent = nil): TModalResult;
 var
   frmMain: TfrmMain;
 begin
+  Result := mrNone;
   if not Assigned(Owner) then
   begin
     UfrmWebContainer.CreateForm(TfrmMain, frmMain);
