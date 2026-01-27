@@ -118,6 +118,7 @@ function publish_action() {
   export RSYNC_USER
   export RSYNC_HOST
   export RSYNC_ROOT
+  export KEYMAN_SYMSTOREPATH="$LOCAL_SYMBOLS_PATH"
 
   _publish_sentry
   ba_win_download_symbol_server_index
