@@ -35,4 +35,15 @@ describe('JSKeyboard tests', function () {
     assert.isFalse(desktopLayout.hasFlicks);
     assert.isFalse(desktopLayout.hasMultitaps);
   });
+
+  it('supports RTL layouts', async () => {
+    const rtlPath = require.resolve('../../../../../../common/test/keyboards/baseline/k_0108___rtl.js');
+    // -- START: Standard Recorder-based unit test loading boilerplate --
+    const harness = new KeyboardHarness({}, MinimalKeymanGlobal);
+    const keyboardLoader = new NodeKeyboardLoader(harness);
+    const keyboard = await keyboardLoader.loadKeyboardFromPath(rtlPath);
+    // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+    assert.isTrue(keyboard.isRTL);
+  });
 });
