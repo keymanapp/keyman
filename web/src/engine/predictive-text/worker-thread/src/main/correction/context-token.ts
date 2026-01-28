@@ -185,21 +185,6 @@ export class ContextToken {
   }
 
   /**
-   * Gets a simple, compact string-based representation of `inputRange`.
-   *
-   * This should only ever be used for debugging purposes.
-   */
-  get sourceText(): string {
-    const composite = this._inputRange.reduce((accum, current) => {
-      const alteredTransform = {...current.trueTransform};
-      alteredTransform.insert = alteredTransform.insert.slice(current.inputStartIndex);
-      return buildMergedTransform(accum, current.trueTransform)
-    }, { insert: '', deleteLeft: 0 });
-    const prefix = '\u{2421}'.repeat(composite.deleteLeft);
-    return prefix + composite.insert;
-  }
-
-  /**
    * Generates text corresponding to the net effects of the most likely inputs
    * received that can correspond to the current instance.
    */
