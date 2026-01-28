@@ -11,6 +11,7 @@ import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchNode, SearchResult } from "./distance-modeler.js";
 import { SearchQuotientSpur } from "./search-quotient-spur.js";
+import { SearchQuotientRoot } from "./search-quotient-root.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -195,14 +196,6 @@ export interface SearchQuotientNode {
    * maps compatible token source ranges to each other.
    */
   get sourceRangeKey(): string;
-
-  /**
-   * Enumerates the different potential SearchQuotientSpur sequences that lead
-   * to the current SearchQuotientNode.
-   *
-   * Intended only for use during unit testing.  Does not include the root node.
-   */
-  readonly constituentPaths: SearchQuotientSpur[][];
 }
 
 /**
@@ -272,5 +265,29 @@ export function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistrib
     }
 
     return parentHasInput();
+  }
+}
+
+/**
+ * Enumerates the different potential SearchQuotientSpur sequences that lead
+ * to a SearchQuotientNode.
+ *
+ * Intended only for use during unit testing.  Does not include the root node.
+ */
+export function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[][] {
+  if(node instanceof SearchQuotientRoot) {
+    return [];
+  } else if(node instanceof SearchQuotientSpur) {
+    const parentPaths = constituentPaths(node.parents[0]);
+    if(parentPaths.length > 0) {
+      return parentPaths.map(p => {
+        p.push(node);
+        return p;
+      });
+    } else {
+      return [[node]];
+    }
+  } else {
+    throw new Error("constituentPaths is unable to handle a new, unexpected SearchQuotientNode type");
   }
 }

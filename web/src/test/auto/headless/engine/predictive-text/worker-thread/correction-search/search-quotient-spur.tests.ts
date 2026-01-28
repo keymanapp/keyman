@@ -10,7 +10,7 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, LegacyQuotientRoot, quotientPathHasInputs } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientSpur, models, LegacyQuotientRoot, quotientPathHasInputs, constituentPaths } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
@@ -270,18 +270,18 @@ describe('SearchQuotientSpur', () => {
         {text: '', p: 1})
       );
       assert.isTrue(quotientPathHasInputs(pathToSplit, distributions));
-      assert.equal(pathToSplit.constituentPaths.length, 1);
+      assert.equal(constituentPaths(pathToSplit).length, 1);
     });
   });
 
   describe('constituentPaths', () => {
-    it('includes a single entry array when all parents are SearchPaths', () => {
+    it('includes a single entry array when all parents are SearchQuotientSpurs', () => {
       const { paths } = buildSimplePathSplitFixture();
       const finalPath = paths[4];
 
-      assert.equal(finalPath.constituentPaths.length, 1);
+      assert.equal(constituentPaths(finalPath).length, 1);
 
-      const pathSequence = finalPath.constituentPaths[0];
+      const pathSequence = constituentPaths(finalPath)[0];
       assert.equal(pathSequence.length, 4); // 4 inputs; does not include root node
 
       assert.sameOrderedMembers(pathSequence, paths.slice(1));

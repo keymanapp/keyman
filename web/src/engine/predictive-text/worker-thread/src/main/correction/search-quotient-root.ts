@@ -3,7 +3,6 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
-import { SearchQuotientSpur } from './search-quotient-spur.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 
@@ -98,9 +97,5 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
   get sourceRangeKey(): string {
     return '';
-  }
-
-  get constituentPaths(): SearchQuotientSpur[][] {
-    return [];
   }
 }
