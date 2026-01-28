@@ -146,9 +146,9 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new LegacyQuotientSpur(searchPath, synthInput1, 1);
-    const searchPath2 = new LegacyQuotientSpur(searchPath1, synthInput2, .75);
-    const searchPath3 = new LegacyQuotientSpur(searchPath2, synthInput3, .75);
+    const searchPath1 = new LegacyQuotientSpur(searchPath, synthInput1, synthInput1[0]);
+    const searchPath2 = new LegacyQuotientSpur(searchPath1, synthInput2, synthInput2[0]);
+    const searchPath3 = new LegacyQuotientSpur(searchPath2, synthInput3, synthInput3[0]);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);
@@ -180,9 +180,9 @@ describe('getBestMatches', () => {
       {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
     ];
 
-    const searchPath1 = new LegacyQuotientSpur(searchPath, synthInput1, 1);
-    const searchPath2 = new LegacyQuotientSpur(searchPath1, synthInput2, .75);
-    const searchPath3 = new LegacyQuotientSpur(searchPath2, synthInput3, .75);
+    const searchPath1 = new LegacyQuotientSpur(searchPath, synthInput1, synthInput1[0]);
+    const searchPath2 = new LegacyQuotientSpur(searchPath1, synthInput2, synthInput2[0]);
+    const searchPath3 = new LegacyQuotientSpur(searchPath2, synthInput3, synthInput3[0]);
 
     assert.notEqual(searchPath1.spaceId, searchPath.spaceId);
     assert.notEqual(searchPath2.spaceId, searchPath1.spaceId);

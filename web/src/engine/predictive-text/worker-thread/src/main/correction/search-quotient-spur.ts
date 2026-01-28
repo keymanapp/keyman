@@ -12,9 +12,10 @@ import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keyman
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { generateSpaceSeed, PathResult, SearchQuotientNode, TokenInputSource } from './search-quotient-node.js';
 
 import Distribution = LexicalModelTypes.Distribution;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
@@ -25,7 +26,8 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export abstract class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  readonly inputs?: Distribution<Readonly<Transform>>;
+  readonly inputs?: Distribution<Transform>;
+  readonly inputSource?: TokenInputSource;
 
   private parentNode: SearchQuotientNode;
   readonly spaceId: number;
@@ -50,13 +52,38 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    *
    * @param parentNode
    * @param inputs
-   * @param costHeuristic
+   * @param inputSource Either:
+   * 1.  Data about the actual context range represented by `inputs` and
+   * its underlying keystroke.
+   * 2.  The sample from the incoming distribution that represents data actually
+   * applied to the context.  It need not be included within the subset passed to `inputs`.
    */
-  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Transform>, costHeuristic: number) {
+  constructor(
+    parentNode: SearchQuotientNode,
+    inputs: Distribution<Readonly<Transform>>,
+    inputSource: TokenInputSource | ProbabilityMass<Transform>
+  ) {
     this.spaceId = generateSpaceSeed();
 
+    // Coerce inputSource to TokenInputSource format.
+    if(inputSource && (inputSource as TokenInputSource).trueTransform == undefined) {
+      const keystroke = inputSource as ProbabilityMass<Transform>;
+      inputSource = {
+        trueTransform: keystroke.sample,
+        bestProbFromSet: keystroke.p,
+        inputStartIndex: 0
+      }
+    };
+    const inputSrc = inputSource as TokenInputSource;
+
+    const transitionId = (inputs?.[0].sample.id);
+    if(transitionId !== undefined && inputSrc?.trueTransform.id != transitionId) {
+      throw new Error("Input distribution and input-source transition IDs must match");
+    }
+
     this.parentNode = parentNode;
-    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(costHeuristic);
+    this.inputSource = inputSrc;
+    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
   }
@@ -220,5 +247,23 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
   public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  }
+
+  public get sourceIdentifiers(): TokenInputSource[] {
+    if(!this.parentNode) {
+      return [];
+    }
+
+    const parentSources = this.parentNode.sourceIdentifiers;
+    if(this.inputSource) {
+      const inputId = this.inputSource.trueTransform.id;
+      if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+        return parentSources;
+      }
+
+      parentSources.push(this.inputSource);
+    }
+
+    return parentSources;
   }
 }

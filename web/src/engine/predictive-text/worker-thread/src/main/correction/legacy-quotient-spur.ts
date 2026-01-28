@@ -11,10 +11,11 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode } from './distance-modeler.js';
-import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { PathResult, SearchQuotientNode, TokenInputSource } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 
 import Distribution = LexicalModelTypes.Distribution;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 // The set of search spaces corresponding to the same 'context' for search.
@@ -27,8 +28,8 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
    * @param inputs
    * @param bestProbFromSet
    */
-  constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, bestProbFromSet: number) {
-    super(space, inputs, space.lowestPossibleSingleCost - Math.log(bestProbFromSet));
+  constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: TokenInputSource | ProbabilityMass<Transform>) {
+    super(space, inputs, inputSource);
     this.queueNodes(this.buildEdgesForNodes(space.previousResults.map(r => r.node)));
     return;
   }
