@@ -163,11 +163,10 @@ export class ContextToken {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.searchModule.inputSegments;
 
-    for(const source of sources) {
+    for(const source of this.inputSegments) {
       const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
+      components.push(`T${source.segment.transitionId}${i != 0 ? `@${i}` : ''}`);
     }
 
     return components.join('+');
