@@ -93,4 +93,8 @@ export class SearchQuotientRoot implements SearchQuotientNode {
   get inputSegments(): PathInputProperties[] {
     return [];
   }
+
+  get sourceRangeKey(): string {
+    return '';
+  }
 }

@@ -162,14 +162,7 @@ export class ContextToken {
    * maps compatible token source ranges to each other.
    */
   get sourceRangeKey(): string {
-    const components: string[] = [];
-
-    for(const source of this.inputSegments) {
-      const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? `@${i}` : ''}`);
-    }
-
-    return components.join('+');
+    return this.searchModule.sourceRangeKey;
   }
 
   /**
