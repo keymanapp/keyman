@@ -24,6 +24,7 @@ import {
   EditOperation,
   EditTuple,
   ExtendedEditOperation,
+  generateSubsetId,
   models,
   PendingTokenization,
   SearchQuotientSpur,
@@ -54,7 +55,8 @@ function toTransformToken(text: string, transformId?: number) {
       trueTransform: textAsTransform,
       transitionId: textAsTransform.id,
       start: 0
-    }, bestProbFromSet: 1
+    }, bestProbFromSet: 1,
+    subsetId: generateSubsetId()
   }, [ { sample: textAsTransform, p: 1 } ]);
   token.isWhitespace = isWhitespace;
   return token;
@@ -120,7 +122,8 @@ describe('ContextTokenization', function() {
           const map = new Map<number, Transform>();
           map.set(0, emptyTransform);
           return map;
-        })(), p: 1}]
+        })(), p: 1}],
+        inputSubsetId: generateSubsetId()
       };
 
       let tokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
@@ -152,7 +155,8 @@ describe('ContextTokenization', function() {
           const map = new Map<number, Transform>();
           map.set(0, emptyTransform);
           return map;
-        })(), p: 1}]
+        })(), p: 1}],
+        inputSubsetId: generateSubsetId()
       };
 
       let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
@@ -206,7 +210,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -259,7 +264,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 2
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -296,7 +302,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -342,7 +349,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -398,7 +406,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,
@@ -437,6 +446,7 @@ describe('ContextTokenization', function() {
       inputTransformMap.set( 0, { insert: 'day', deleteLeft: 6, id: 42 });
 
       const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const subsetId = generateSubsetId();
       const tokenization = baseTokenization.evaluateTransition({
         alignment: {
           merges: [],
@@ -449,7 +459,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: subsetId
       },
         plainModel,
         inputTransform,
@@ -469,7 +480,8 @@ describe('ContextTokenization', function() {
           trueTransform: inputTransform,
           transitionId: inputTransform.id,
           start: 0
-        }, bestProbFromSet: 1
+        }, bestProbFromSet: 1,
+        subsetId
       });
 
       // The new tail tokens should not include anything from the original tail;
@@ -479,7 +491,8 @@ describe('ContextTokenization', function() {
           trueTransform: inputTransform,
           transitionId: inputTransform.id,
           start: 0
-        }, bestProbFromSet: 1
+        }, bestProbFromSet: 1,
+        subsetId
       }]);
       assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputSegments, [{
         segment: {
@@ -487,7 +500,8 @@ describe('ContextTokenization', function() {
           transitionId: inputTransform.id,
           start: 1
         },
-        bestProbFromSet: 1
+        bestProbFromSet: 1,
+        subsetId
       }]);
 
       const tailIndex = tokenization.tokens.length - 1;
@@ -530,7 +544,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         { insert: ' ', deleteLeft: 0 },
@@ -593,7 +608,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         { insert: 't', deleteLeft: 0 },
@@ -659,7 +675,8 @@ describe('ContextTokenization', function() {
           },
           removedTokenCount: 0
         },
-        inputs: [{ sample: inputTransformMap, p: 1 }]
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
       },
         plainModel,
         inputTransform,

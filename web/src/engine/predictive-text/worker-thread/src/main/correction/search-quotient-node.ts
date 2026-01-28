@@ -78,6 +78,17 @@ export interface PathInputProperties {
    * input is included within the SearchSpace's correction space.
    */
   bestProbFromSet: number;
+
+  /**
+   * A unique identifier noting membership in a specific set of input possibilities with
+   * sufficiently similar properties that all correspond to the same "input segment".
+   *
+   * This tends to serve as an identifying factor for tokenized input distributions,
+   * indicating the distributions were all sourced from the same original input event.
+   *
+   * @see PendingTokenization.inputSubsetId
+   */
+  subsetId: number;
 }
 
 /**

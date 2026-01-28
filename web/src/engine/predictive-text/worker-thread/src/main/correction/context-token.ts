@@ -15,6 +15,7 @@ import { SearchQuotientNode, PathInputProperties } from "./search-quotient-node.
 import { TokenSplitMap } from "./context-tokenization.js";
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
+import { generateSubsetId } from './tokenization-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -113,7 +114,8 @@ export class ContextToken {
             start: 0,
             transitionId: undefined
           },
-          bestProbFromSet: BASE_PROBABILITY
+          bestProbFromSet: BASE_PROBABILITY,
+          subsetId: generateSubsetId()
         };
         searchModule = new LegacyQuotientSpur(searchModule, [{sample: transform, p: BASE_PROBABILITY}], inputMetadata);
       });
@@ -313,11 +315,11 @@ export class ContextToken {
         constructingToken = new ContextToken(lexicalModel);
         backupToken = new ContextToken(constructingToken);
         constructingToken.addInput({
+          ...priorSourceInput,
           segment: {
             ...priorSourceInput.segment,
             start: priorSourceInput.segment.start + extraCharsAdded
-          },
-          bestProbFromSet: priorSourceInput.bestProbFromSet
+          }
         }, tailDistribution);
 
         const lenToCommit = lenBeforeLastApply + extraCharsAdded;

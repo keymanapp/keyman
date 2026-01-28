@@ -83,7 +83,9 @@ describe('SearchQuotientSpur', () => {
             transitionId: leadEdgeDistribution[0].sample.id,
             start: 0
           },
-          bestProbFromSet: leadEdgeDistribution[0].p
+          bestProbFromSet: leadEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: extendedPath.inputSegments[0].subsetId
         }
       ]);
 
@@ -138,14 +140,18 @@ describe('SearchQuotientSpur', () => {
             transitionId: leadEdgeDistribution[0].sample.id,
             start: 0
           },
-          bestProbFromSet: leadEdgeDistribution[0].p
+          bestProbFromSet: leadEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[0].subsetId
         }, {
           segment: {
             trueTransform: tailEdgeDistribution[0].sample,
             transitionId: tailEdgeDistribution[0].sample.id,
             start: 0
           },
-          bestProbFromSet: tailEdgeDistribution[0].p
+          bestProbFromSet: tailEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[1].subsetId
         }
       ]);
 
@@ -216,14 +222,18 @@ describe('SearchQuotientSpur', () => {
             transitionId: leadEdgeDistribution[0].sample.id,
             start: 0
           },
-          bestProbFromSet: leadEdgeDistribution[0].p
+          bestProbFromSet: leadEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[0].subsetId
         }, {
           segment: {
             trueTransform: tailEdgeDistribution[0].sample,
             transitionId: tailEdgeDistribution[0].sample.id,
             start: 0
           },
-          bestProbFromSet: tailEdgeDistribution[0].p
+          bestProbFromSet: tailEdgeDistribution[0].p,
+          // Just write in the variable-value entry; the rest should match perfectly.
+          subsetId: length2Path.inputSegments[1].subsetId
         }
       ]);
 
