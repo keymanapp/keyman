@@ -12,7 +12,7 @@ import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keyman
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
-import { generateSpaceSeed, PathResult, SearchQuotientNode, TokenInputSource } from './search-quotient-node.js';
+import { generateSpaceSeed, PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
@@ -27,7 +27,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 export abstract class SearchQuotientSpur implements SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
   readonly inputs?: Distribution<Transform>;
-  readonly inputSource?: TokenInputSource;
+  readonly inputSource?: PathInputProperties;
 
   private parentNode: SearchQuotientNode;
   readonly spaceId: number;
@@ -61,23 +61,26 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   constructor(
     parentNode: SearchQuotientNode,
     inputs: Distribution<Readonly<Transform>>,
-    inputSource: TokenInputSource | ProbabilityMass<Transform>
+    inputSource: PathInputProperties | ProbabilityMass<Transform>
   ) {
     this.spaceId = generateSpaceSeed();
 
     // Coerce inputSource to TokenInputSource format.
-    if(inputSource && (inputSource as TokenInputSource).trueTransform == undefined) {
+    if(inputSource && (inputSource as ProbabilityMass<Transform>).sample != undefined) {
       const keystroke = inputSource as ProbabilityMass<Transform>;
       inputSource = {
-        trueTransform: keystroke.sample,
-        bestProbFromSet: keystroke.p,
-        inputStartIndex: 0
+        segment: {
+          trueTransform: keystroke.sample,
+          transitionId: keystroke.sample.id,
+          start: 0
+        },
+        bestProbFromSet: keystroke.p
       }
     };
-    const inputSrc = inputSource as TokenInputSource;
+    const inputSrc = inputSource as PathInputProperties;
 
     const transitionId = (inputs?.[0].sample.id);
-    if(transitionId !== undefined && inputSrc?.trueTransform.id != transitionId) {
+    if(transitionId !== undefined && inputSrc?.segment.transitionId != transitionId) {
       throw new Error("Input distribution and input-source transition IDs must match");
     }
 
@@ -249,15 +252,15 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
-  public get sourceIdentifiers(): TokenInputSource[] {
+  public get inputSegments(): PathInputProperties[] {
     if(!this.parentNode) {
       return [];
     }
 
-    const parentSources = this.parentNode.sourceIdentifiers;
+    const parentSources = this.parentNode.inputSegments;
     if(this.inputSource) {
-      const inputId = this.inputSource.trueTransform.id;
-      if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+      const inputId = this.inputSource.segment.transitionId;
+      if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
         return parentSources;
       }
 
