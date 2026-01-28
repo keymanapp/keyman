@@ -322,6 +322,67 @@ describe('SearchQuotientSpur', () => {
     });
   });
 
+  describe('.edgeKey', () => {
+    it('changes when input source subset IDs differ', () => {
+      const root = new LegacyQuotientRoot(testModel);
+
+      const {distributions} = buildSimplePathSplitFixture();
+      const inputSrc = {
+        segment: {
+          transitionId: distributions[0][0].sample.id,
+          start: 0
+        },
+        subsetId: generateSubsetId(),
+        bestProbFromSet: distributions[0][0].p
+      };
+
+      const spur1 = new LegacyQuotientSpur(root, distributions[0], {
+        ...inputSrc,
+        subsetId: generateSubsetId()
+      });
+      const spur2 = new LegacyQuotientSpur(root, distributions[0], {
+        ...inputSrc,
+        subsetId: generateSubsetId()
+      });
+
+      assert.notEqual(spur1.edgeKey, spur2.edgeKey);
+    });
+
+    it('changes when different parts of the same input source are used', () => {
+      const root = new LegacyQuotientRoot(testModel);
+
+      const {distributions} = buildSimplePathSplitFixture();
+      const inputSrc = {
+        segment: {
+          transitionId: distributions[0][0].sample.id,
+          start: 0
+        },
+        subsetId: generateSubsetId(),
+        bestProbFromSet: distributions[0][0].p
+      };
+
+      const spur1 = new LegacyQuotientSpur(root, distributions[0], inputSrc);
+      const spur2 = new LegacyQuotientSpur(root, distributions[0], {
+        ...inputSrc,
+        segment: {
+          ...inputSrc.segment,
+          end: 1
+        }
+      });
+      const spur3 = new LegacyQuotientSpur(root, distributions[0], {
+        ...inputSrc,
+        segment: {
+          ...inputSrc.segment,
+          start: inputSrc.segment.start + 1
+        }
+      });
+
+      assert.notEqual(spur1.edgeKey, spur2.edgeKey);
+      assert.notEqual(spur2.edgeKey, spur3.edgeKey);
+      assert.notEqual(spur3.edgeKey, spur1.edgeKey);
+    });
+  });
+
   describe('split()', () => {
     describe(`on token comprised of single-char transforms:  [crt][ae][nr][t]`, () => {
       const runSplit = (splitIndex: number) => {
