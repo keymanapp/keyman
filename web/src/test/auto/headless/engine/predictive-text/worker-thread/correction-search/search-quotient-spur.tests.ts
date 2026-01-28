@@ -10,9 +10,11 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, LegacyQuotientRoot, quotientPathHasInputs, constituentPaths } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientSpur, models, LegacyQuotientRoot, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
+
+const { constituentPaths, quotientPathHasInputs } = unitTestEndpoints;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 

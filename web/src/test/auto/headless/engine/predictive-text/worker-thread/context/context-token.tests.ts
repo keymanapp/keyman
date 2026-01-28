@@ -13,14 +13,16 @@ import { assert } from 'chai';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { KMWString } from '@keymanapp/web-utils';
 
-import { ContextToken, correction, generateSubsetId, getBestMatches, models, preprocessInputSources, quotientPathHasInputs, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, generateSubsetId, getBestMatches, models, preprocessInputSources, SearchQuotientSpur, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
-import { KMWString } from '@keymanapp/web-utils';
+
+const { quotientPathHasInputs } = unitTestEndpoints;
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});

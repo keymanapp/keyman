@@ -210,7 +210,7 @@ export interface SearchQuotientNode {
  * @param keystrokeDistributions
  * @internal
  */
-export function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistributions: Distribution<Transform>[]): boolean {
+function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistributions: Distribution<Transform>[]): boolean {
   if(!(node instanceof SearchQuotientSpur)) {
     for(const p of node.parents) {
       if(quotientPathHasInputs(p, keystrokeDistributions)) {
@@ -274,7 +274,7 @@ export function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistrib
  *
  * Intended only for use during unit testing.  Does not include the root node.
  */
-export function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[][] {
+function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[][] {
   if(node instanceof SearchQuotientRoot) {
     return [];
   } else if(node instanceof SearchQuotientSpur) {
@@ -290,4 +290,9 @@ export function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[]
   } else {
     throw new Error("constituentPaths is unable to handle a new, unexpected SearchQuotientNode type");
   }
+}
+
+export const unitTestEndpoints = {
+  quotientPathHasInputs,
+  constituentPaths
 }
