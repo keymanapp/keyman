@@ -105,7 +105,7 @@ bool km::core::actions_normalize(
     boundary prior to the intersection of the cached_context and the output.
   */
   if(!output.empty()) {
-    while(n > 0 && !km::core::util::has_nfd_boundary_before(output[0])) {
+    while(n > 0 && !km::core::util::has_nfc_boundary_before(output[0])) {
       // The output may interact with the context further in normalization. We
       // need to copy characters back further until we reach a normalization
       // boundary.

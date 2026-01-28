@@ -39,7 +39,7 @@ bool is_nfd(const std::u16string& str);
 bool is_nfd(const std::u32string& str);
 
 /** @return true if cp can interacts with prior chars */
-bool has_nfd_boundary_before(km_core_usv cp);
+bool has_nfc_boundary_before(km_core_usv cp);
 
 /** convenience function, caller owns storage */
 km_core_usv *string_to_usv(const std::u32string& src);
