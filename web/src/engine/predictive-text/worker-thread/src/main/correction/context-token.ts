@@ -142,7 +142,7 @@ export class ContextToken {
    * Denotes the original keystroke Transforms comprising the range corresponding
    * to this token.
    */
-  get inputRange() {
+  get inputRange(): TokenInputSource[] {
     return this.searchModule.sourceIdentifiers;
   }
 
@@ -160,9 +160,8 @@ export class ContextToken {
    */
   get sourceRangeKey(): string {
     const components: string[] = [];
-    const sources = this.searchModule.sourceIdentifiers;
 
-    for(const source of sources) {
+    for(const source of this.inputRange) {
       const i = source.inputStartIndex;
       components.push(`T${source.trueTransform.id}${i != 0 ? '@' + i : ''}`);
     }

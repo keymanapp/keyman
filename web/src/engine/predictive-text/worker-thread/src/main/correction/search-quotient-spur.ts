@@ -82,7 +82,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
 
     this.parentNode = parentNode;
-    this.inputSource = inputSource as TokenInputSource;
+    this.inputSource = inputSrc;
     this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
@@ -257,7 +257,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const parentSources = this.parentNode.sourceIdentifiers;
     if(this.inputSource) {
       const inputId = this.inputSource.trueTransform.id;
-      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
+      if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].trueTransform.id == inputId) {
         return parentSources;
       }
 
