@@ -44,6 +44,10 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     return;
   }
 
+  protected construct(parentNode: SearchQuotientNode, inputs?: Distribution<Transform>, inputSource?: PathInputProperties): this {
+    return new LegacyQuotientSpur(parentNode, inputs, inputSource) as this;
+  }
+
   protected buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>) {
     // With a newly-available input, we can extend new input-dependent paths from
     // our previously-reached 'extractedResults' nodes.

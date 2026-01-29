@@ -534,7 +534,7 @@ export class ContextTokenization {
       if(splits[0]?.input.index == i) {
         // do a split!
         const split = splits.shift();
-        const splitResults = baseTokenization[i].split(split, lexicalModel);
+        const splitResults = baseTokenization[i].split(split);
         const resultStack = splitResults.reverse();
         while(resultStack.length > 0) {
           tokenization.push(resultStack.pop());

@@ -10,6 +10,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchQuotientRoot implements SearchQuotientNode {
   readonly rootNode: SearchNode;
+  readonly model: LexicalModel;
   private readonly rootResult: SearchResult;
 
   readonly lowestPossibleSingleCost: number = 0;
@@ -28,6 +29,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
    */
   constructor(model: LexicalModel) {
     this.rootNode = new SearchNode(model.traverseFromRoot(), generateSpaceSeed(), t => model.toKey(t));
+    this.model = model;
     this.rootResult = new SearchResult(this.rootNode);
   }
 
@@ -91,11 +93,16 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     }
   }
 
+  // Return a new array each time; avoid aliasing potential!
   get inputSegments(): PathInputProperties[] {
     return [];
   }
 
   get sourceRangeKey(): string {
     return '';
+  }
+
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
+    return [this, new SearchQuotientRoot(this.model)];
   }
 }

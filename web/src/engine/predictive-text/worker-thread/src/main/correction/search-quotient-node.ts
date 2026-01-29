@@ -14,6 +14,7 @@ import { SearchQuotientSpur } from "./search-quotient-spur.js";
 import { SearchQuotientRoot } from "./search-quotient-root.js";
 
 import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
 let SPACE_ID_SEED = 0;
@@ -102,6 +103,11 @@ export interface SearchQuotientNode {
    * by correction-search results.
    */
   readonly spaceId: number;
+
+  /**
+   * The active LexicalModel for use with correction-search.
+   */
+  readonly model: LexicalModel;
 
   /**
    * Notes the SearchQuotientNode(s) whose correction-search paths are extended by this
@@ -196,6 +202,15 @@ export interface SearchQuotientNode {
    * maps compatible token source ranges to each other.
    */
   get sourceRangeKey(): string;
+
+  /**
+  /**
+   * Splits this SearchSpace into two halves at the specified codepoint index.
+   * The 'head' component will maximally re-use existing cached data, while the
+   * 'tail' must be reconstructed from scratch due to the new start position.
+   * @param charIndex
+   */
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode];
 }
 
 /**
