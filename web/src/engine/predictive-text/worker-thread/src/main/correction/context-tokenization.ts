@@ -15,7 +15,7 @@ import TransformUtils from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
-import { PendingTokenization } from './tokenization-subsets.js';
+import { TransitionEdge } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
@@ -46,7 +46,7 @@ export interface TokenSplitMap {
  * by any word-boundary shifts in existing content that occur due incoming
  * Transform side-effects.
  */
-export interface TokenizationEdgeAlignment {
+export interface TransitionEdgeAlignment {
   /**
    * Denotes any token merge edits needed after applying the Transform.
    */
@@ -86,7 +86,7 @@ export interface TokenizationTransitionEdits {
    * implied by the Transform but not generated within new content produced by
    * its text edits.
    */
-  alignment: TokenizationEdgeAlignment;
+  alignment: TransitionEdgeAlignment;
 
   /**
    * The tokenized form of the input Transform, indexed by position relative to
@@ -108,7 +108,7 @@ export class ContextTokenization {
    * The tokenization-transition metadata relating this instance to the most likely
    * tokenization from a prior state.
    */
-  readonly transitionEdits?: PendingTokenization;
+  readonly transitionEdits?: TransitionEdge;
 
   /**
    * The portion of edits from the true input keystroke that are not part of the
@@ -125,10 +125,10 @@ export class ContextTokenization {
 
   constructor(priorToClone: ContextTokenization);
   constructor(tokens: ContextToken[]);
-  constructor(tokens: ContextToken[], alignment: PendingTokenization, taillessTrueKeystroke: Transform);
+  constructor(tokens: ContextToken[], alignment: TransitionEdge, taillessTrueKeystroke: Transform);
   constructor(
     param1: ContextToken[] | ContextTokenization,
-    alignment?: PendingTokenization,
+    alignment?: TransitionEdge,
     taillessTrueKeystroke?: Transform
   ) {
     if(!(param1 instanceof ContextTokenization)) {
@@ -490,7 +490,7 @@ export class ContextTokenization {
    * Given results from `precomputeTokenizationAfterInput`, this method will
    * evaluate the pending transition in tokenization for all associated inputs
    * while reusing as many correction-search intermediate results as possible.
-   * @param pendingTokenization Batched results from one or more
+   * @param transitionEdge Batched results from one or more
    * `precomputeTokenizationAfterInput` calls on this instance, all with the
    * same alignment values.
    * @param lexicalModel The active lexical model
@@ -499,16 +499,16 @@ export class ContextTokenization {
    * @param bestProbFromSet The probability of the single most likely input
    * transform in the overall transformDistribution associated with the
    * keystroke triggering the transition.  It need not be represented by the
-   * pendingTokenization to be built.
+   * TransitionEdge to be built.
    * @returns
    */
   evaluateTransition(
-    pendingTokenization: PendingTokenization,
+    transitionEdge: TransitionEdge,
     lexicalModel: LexicalModel,
     sourceInput: Transform,
     bestProbFromSet: number
   ): ContextTokenization {
-    const { alignment: alignment, inputs } = pendingTokenization;
+    const { alignment: alignment, inputs } = transitionEdge;
     const sliceIndex = alignment.edgeWindow.sliceIndex;
     const baseTokenization = this.tokens.slice(sliceIndex);
     let affectedToken: ContextToken;
@@ -592,7 +592,7 @@ export class ContextTokenization {
           start: appliedLength
         },
         bestProbFromSet: bestProbFromSet,
-        subsetId: pendingTokenization.inputSubsetId
+        subsetId: transitionEdge.inputSubsetId
       }, distribution);
       appliedLength += KMWString.length(distribution[0].sample.insert);
 
@@ -605,7 +605,7 @@ export class ContextTokenization {
     return new ContextTokenization(
       this.tokens.slice(0, sliceIndex).concat(tokenization),
       null /* tokenMapping */,
-      determineTaillessTrueKeystroke(pendingTokenization)
+      determineTaillessTrueKeystroke(transitionEdge)
     );
   }
 }
@@ -1122,7 +1122,7 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
  * @param tokenizationAnalysis
  * @returns
  */
-export function determineTaillessTrueKeystroke(tokenizationAnalysis: PendingTokenization) {
+export function determineTaillessTrueKeystroke(tokenizationAnalysis: TransitionEdge) {
   // undefined by default; we haven't yet determined if we're still affecting
   // the same token that was the tail in the previous tokenization state.
   let taillessTrueKeystroke: Transform;

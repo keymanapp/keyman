@@ -26,7 +26,7 @@ import {
   ExtendedEditOperation,
   generateSubsetId,
   models,
-  PendingTokenization,
+  TransitionEdge,
   SearchQuotientSpur,
   traceInsertEdits
 } from '@keymanapp/lm-worker/test-index';
@@ -110,7 +110,7 @@ describe('ContextTokenization', function() {
 
       // We _could_ flesh this out a bit more... but it's not really needed for this test.
       const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: PendingTokenization = {
+      let transitionEdits: TransitionEdge = {
         alignment: {
           merges: [],
           splits: [],
@@ -143,7 +143,7 @@ describe('ContextTokenization', function() {
 
       // We _could_ flesh this out a bit more... but it's not really needed for this test.
       const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: PendingTokenization = {
+      let transitionEdits: TransitionEdge = {
         alignment: {
           merges: [],
           splits: [],
