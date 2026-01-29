@@ -39,8 +39,8 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
   readonly inputCount: number;
   private _codepointLength: number;
-  protected abstract readonly insertLength: number;
-  protected abstract readonly leftDeleteLength: number
+  public abstract readonly insertLength: number;
+  public abstract readonly leftDeleteLength: number
 
   /**
    * Marks all results that have already been returned from this instance of SearchPath.
@@ -515,5 +515,15 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     // Finally, we recursively verify that the parent matches.
     return this.parentNode.isSameNode(space.parentNode);
+  }
+
+  // Used to identify cluster-compatible components of SearchPaths during SearchCluster split operations.
+  get splitClusteringKey(): string {
+    const pathSrc = this.inputSource;
+    if(!pathSrc) {
+      return '';
+    }
+
+    return `${pathSrc.segment.start}${pathSrc.segment.end == undefined ? '' : `-${pathSrc.segment.end}`}`;
   }
 }
