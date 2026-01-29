@@ -12,6 +12,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { SearchQuotientSpur } from './search-quotient-spur.js';
 
 const PATH_QUEUE_COMPARATOR: Comparator<SearchQuotientNode> = (a, b) => {
   return a.currentCost - b.currentCost;
@@ -20,9 +21,10 @@ const PATH_QUEUE_COMPARATOR: Comparator<SearchQuotientNode> = (a, b) => {
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchQuotientCluster implements SearchQuotientNode {
-  // While most functions can be done directly from SearchSpace, merging and splitting will need access
-  // to SearchPath-specific members.  It's also cleaner to not allow nested SearchClusters while we
-  // haven't worked out support for such a scenario.
+  // While most functions can be done directly from SearchSpace, merging and
+  // splitting will need access to SearchQuotientSpur-specific members.  It's
+  // also cleaner to not allow nested SearchQuotientClusters while we haven't
+  // worked out support for such a scenario.
   private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
   readonly spaceId: number;
 
@@ -61,7 +63,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    */
   constructor(inboundPaths: SearchQuotientNode[]) {
     if(inboundPaths.length == 0) {
-      throw new Error("SearchCluster requires an array with at least one SearchPath");
+      throw new Error("SearchQuotientCluster requires an array with at least one SearchQuotientNode");
     }
 
     let lowestPossibleSingleCost = Number.POSITIVE_INFINITY;
@@ -72,12 +74,12 @@ export class SearchQuotientCluster implements SearchQuotientNode {
 
     for(let path of inboundPaths) {
       if(path.inputCount != inputCount || path.codepointLength != codepointLength) {
-        throw new Error(`SearchPath does not share same properties as others in the cluster:  inputCount ${path.inputCount} vs ${inputCount}, codepointLength ${path.codepointLength} vs ${codepointLength}`);
+        throw new Error(`SearchQuotientNode does not share same properties as others in the cluster:  inputCount ${path.inputCount} vs ${inputCount}, codepointLength ${path.codepointLength} vs ${codepointLength}`);
       }
 
       // If there's a source-range key mismatch - via mismatch in count or in actual ID, we have an error.
       if(path.sourceRangeKey != sourceRangeKey) {
-        throw new Error(`SearchPath does not share the same source identifiers as others in the cluster`);
+        throw new Error(`SearchQuotientNode does not share the same source identifiers as others in the cluster`);
       }
 
       lowestPossibleSingleCost = Math.min(lowestPossibleSingleCost, path.lowestPossibleSingleCost);
@@ -176,7 +178,52 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   }
 
   merge(space: SearchQuotientNode): SearchQuotientNode {
-    throw new Error('Method not implemented.');
+    // If we're at a root (which is without inputs), bypass it.
+    if(space.parents.length == 0) {
+      return this;
+    }
+
+    // What if we're trying to merge something previously split?
+    // That can only happen at the head of the incoming space, so we check for it early here.
+    if(space.inputCount == 1 && space instanceof SearchQuotientSpur) {
+      // In such a case... the 'leading edge' of the incoming space needs to be checked
+      // against the trailing edge of `this` instance's entries.
+      const thisTailInputSource = this.inputSegments[this.inputSegments.length - 1];
+      const thisTailSpaceIds = this.parents.map((path) => (path as SearchQuotientSpur).inputSource.subsetId);
+      const spaceHeadInputSource = space.inputSegments[0];
+
+      const isOnSplitInput =
+        thisTailSpaceIds.find((entry) => entry == space.inputSource.subsetId)
+        && thisTailInputSource.end == spaceHeadInputSource.start;
+
+      // In this case, we only rebuild the single path; an outer stack frame will reconstitute
+      // the split cluster from the individual paths built here.
+      if(isOnSplitInput) {
+        const firstHalf = this.parents.find((tailPath) => (tailPath as SearchQuotientSpur).inputSource?.subsetId == space.inputSource?.subsetId);
+        return firstHalf.merge(space);
+      }
+    }
+
+    // Simple, straightforward.  SearchQuotientSpurs can easily built with a
+    // SearchQuotientCluster as parent. In this case, there's also no chance of
+    // a prior split; if we'd split, it'd be a SearchQuotientCluster on both
+    // ends.
+    if(space instanceof SearchQuotientSpur) {
+      const parentMerge = this.merge(space.parents[0]) as SearchQuotientSpur;
+      return space.construct(parentMerge, space.inputs, space.inputSource);
+    }
+
+    // If we're here, we have a SearchQuotientCluster being merged in... and to
+    // something that's already a SearchQuotientCluster.
+    //
+    // Merge the parent components first as a baseline.  This specific state's
+    // aspects have to come after their affects are merged in, anyway.
+    // (Note:  is the main point of recursion.)
+    const parents = (space as SearchQuotientCluster).parents; // the constituent paths
+
+    // Assumes either none of the space's heads were split or that ALL were.
+    const parentMerges = parents.map((p) => this.merge(p)); // we get paths out
+    return new SearchQuotientCluster(parentMerges);
   }
 
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
