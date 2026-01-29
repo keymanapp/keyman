@@ -389,7 +389,9 @@ describe('SearchQuotientSpur', () => {
         const { paths, distributions } = buildSimplePathSplitFixture();
         const pathToSplit = paths[4];
 
-        const [head, tail] = pathToSplit.split(splitIndex);
+        const splitResults = pathToSplit.split(splitIndex);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         assert.equal(head.inputCount, splitIndex);
         assert.equal(tail.inputCount, pathToSplit.inputCount - splitIndex);
@@ -419,7 +421,7 @@ describe('SearchQuotientSpur', () => {
 
         const { paths, distributions } = buildSimplePathSplitFixture();
         const pathToSplit = paths[4];
-        const [head, tail] = pathToSplit.split(0);
+        const [head, tail] = pathToSplit.split(0)[0];
 
         // The split operation will still reconstruct the token; the head
         // is always built from the same root path, while the tail is not.
@@ -436,7 +438,7 @@ describe('SearchQuotientSpur', () => {
 
         const { paths } = buildSimplePathSplitFixture();
         const pathToSplit = paths[4];
-        const [head] = pathToSplit.split(1);
+        const [head] = pathToSplit.split(1)[0];
 
         assert.equal(head, pathToSplit.parents[0].parents[0].parents[0]);
       });
@@ -446,7 +448,7 @@ describe('SearchQuotientSpur', () => {
 
         const { paths } = buildSimplePathSplitFixture();
         const pathToSplit = paths[4];
-        const [head] = pathToSplit.split(2);
+        const [head] = pathToSplit.split(2)[0];
 
         assert.equal(head, pathToSplit.parents[0].parents[0]);
       });
@@ -456,7 +458,7 @@ describe('SearchQuotientSpur', () => {
 
         const { paths } = buildSimplePathSplitFixture();
         const pathToSplit = paths[4];
-        const [head] = pathToSplit.split(3);
+        const [head] = pathToSplit.split(3)[0];
 
         assert.equal(head, pathToSplit.parents[0]);
       });
@@ -466,7 +468,7 @@ describe('SearchQuotientSpur', () => {
 
         const { paths } = buildSimplePathSplitFixture();
         const pathToSplit = paths[4];
-        const [head] = pathToSplit.split(4);
+        const [head] = pathToSplit.split(4)[0];
 
         assert.equal(head, pathToSplit);
       });
@@ -510,7 +512,9 @@ describe('SearchQuotientSpur', () => {
       const runSplit = (splitIndex: number) => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(splitIndex);
+        const splitResults = pathToSplit.split(splitIndex);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         assert.equal(head.inputCount, Math.ceil(splitIndex/2));
         assert.equal(tail.inputCount, Math.ceil(pathToSplit.inputCount - splitIndex/2));
@@ -573,7 +577,7 @@ describe('SearchQuotientSpur', () => {
         runSplit(0);
 
         const { path: pathToSplit, distributions } = buildPath();
-        const [head, tail] = pathToSplit.split(0);
+        const [head, tail] = pathToSplit.split(0)[0];
 
         // The split operation will still reconstruct the token; the head
         // is always built from the same root path, while the tail is not.
@@ -617,7 +621,7 @@ describe('SearchQuotientSpur', () => {
         runSplit(8);
 
         const { path: pathToSplit } = buildPath();
-        const [head, tail] = pathToSplit.split(8);
+        const [head, tail] = pathToSplit.split(8)[0];
 
         assert.equal(head, pathToSplit.parents[0]);
         assert.equal((tail as SearchQuotientSpur).inputSource, (pathToSplit as SearchQuotientSpur).inputSource);
@@ -627,7 +631,7 @@ describe('SearchQuotientSpur', () => {
         runSplit(9);
 
         const { path: pathToSplit } = buildPath();
-        const [head, tail] = pathToSplit.split(9);
+        const [head, tail] = pathToSplit.split(9)[0];
 
         // Same parent, but not the same final step - it _was_ split, after
         // all.
@@ -647,7 +651,7 @@ describe('SearchQuotientSpur', () => {
         runSplit(10);
 
         const { path: pathToSplit } = buildPath();
-        const [head, tail] = pathToSplit.split(10);
+        const [head, tail] = pathToSplit.split(10)[0];
 
         assert.equal(head, pathToSplit);
         assert.isTrue(tail instanceof SearchQuotientRoot);
@@ -713,7 +717,9 @@ describe('SearchQuotientSpur', () => {
         const splitIndex = 0;
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(splitIndex);
+        const splitResults = pathToSplit.split(splitIndex);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         assert.equal(head.inputCount, 0);
         assert.equal(tail.inputCount, 4);
@@ -753,7 +759,9 @@ describe('SearchQuotientSpur', () => {
         const splitIndex = 1;
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(splitIndex);
+        const splitResults = pathToSplit.split(splitIndex);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // c in the first input, though the 'a' part is deleted later.
         assert.equal(head.inputCount, 1);
@@ -796,7 +804,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 2', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(2);
+        const splitResults = pathToSplit.split(2);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // ce in the second input, though the n is deleted later.
         assert.equal(head.inputCount, 2);
@@ -839,7 +849,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 3', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(3);
+        const splitResults = pathToSplit.split(3);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // cen => cel in the third input, and there's no adjacent deleteLeft.
         assert.equal(head.inputCount, 3);
@@ -887,7 +899,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 4', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(4);
+        const splitResults = pathToSplit.split(4);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // cellar in the third input, though the -ar is deleted later.
         assert.equal(head.inputCount, 3);
@@ -963,7 +977,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly after \'big\'', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(3);
+        const splitResults = pathToSplit.split(3);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         assert.equal(head.inputCount, 1);
         assert.equal(tail.inputCount, 1);
@@ -1004,7 +1020,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly after \'biglarge\'', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(8);
+        const splitResults = pathToSplit.split(8);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         assert.equal(head.inputCount, 1);
         assert.equal(tail.inputCount, 1);
@@ -1107,7 +1125,9 @@ describe('SearchQuotientSpur', () => {
         const splitIndex = 0;
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(splitIndex);
+        const splitResults = pathToSplit.split(splitIndex);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         assert.equal(head.inputCount, 0);
         assert.equal(tail.inputCount, 4);
@@ -1147,7 +1167,9 @@ describe('SearchQuotientSpur', () => {
         const splitIndex = 1;
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(splitIndex);
+        const splitResults = pathToSplit.split(splitIndex);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // c in the first input, though the 'a' part is deleted later.
         assert.equal(head.inputCount, 1);
@@ -1190,7 +1212,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 2', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(2);
+        const splitResults = pathToSplit.split(2);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // ce in the second input, though the n is deleted later.
         assert.equal(head.inputCount, 2);
@@ -1233,7 +1257,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 3', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(3);
+        const splitResults = pathToSplit.split(3);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // cen => cel in the third input, and there's no adjacent deleteLeft.
         assert.equal(head.inputCount, 3);
@@ -1282,7 +1308,9 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 4', () => {
         const { path: pathToSplit, distributions } = buildPath();
 
-        const [head, tail] = pathToSplit.split(4);
+        const splitResults = pathToSplit.split(4);
+        assert.equal(splitResults.length, 1);
+        const [head, tail] = splitResults[0];
 
         // cellar in the third input, though the -ar is deleted later.
         assert.equal(head.inputCount, 3);
@@ -1380,7 +1408,9 @@ describe('SearchQuotientSpur', () => {
         }
       );
 
-      const [head, tail] = pathToSplit.split(2);
+      const splitResults = pathToSplit.split(2);
+      assert.equal(splitResults.length, 1);
+      const [head, tail] = splitResults[0];
 
       assert.deepEqual(head.bestExample, headTarget.bestExample);
       assert.deepEqual(tail.bestExample, tailTarget.bestExample);

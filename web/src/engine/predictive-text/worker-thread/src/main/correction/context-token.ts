@@ -212,7 +212,12 @@ export class ContextToken {
       if(splitSpecs.length == 0 && spec.textOffset == 0) {
         searchSplits.push(searchSpace);
       } else {
-        const splitSpaces = searchSpace.split(spec.textOffset);
+        // Note:  it is conceivable for a token to split into multiple potential
+        // tokens due to variations in how the text's construction proceeded up
+        // to the point of the split.
+        //
+        // For now, as a stopgap, we simply take the first such split and roll with that.
+        const splitSpaces = searchSpace.split(spec.textOffset)[0];
         searchSplits.push(splitSpaces[1]);
         searchSpace = splitSpaces[0];
       }
