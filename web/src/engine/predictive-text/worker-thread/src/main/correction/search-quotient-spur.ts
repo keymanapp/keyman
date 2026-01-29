@@ -91,9 +91,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     this.parentNode = parentNode;
     this.inputSource = inputSource as PathInputProperties;
-    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSrc?.bestProbFromSet ?? 1);
+    this.lowestPossibleSingleCost = parentNode.lowestPossibleSingleCost - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
-    this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
+    this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
   }
 
   /**
@@ -120,11 +120,11 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get bestExample(): {text: string, p: number} {
-    const bestPrefix = this.parentNode?.bestExample ?? { text: '', p: 1 };
+    const bestPrefix = this.parentNode.bestExample ?? { text: '', p: 1 };
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
-      text: KMWString.substring(bestPrefix.text, 0, (this.parentNode?.codepointLength ?? 0) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      text: KMWString.substring(bestPrefix.text, 0, this.parentNode.codepointLength - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
   }
