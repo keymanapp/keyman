@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 
+import path from 'path';
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { SyntheticTextStore } from 'keyman/engine/keyboard';
@@ -9,15 +10,10 @@ import { SyntheticTextStore } from 'keyman/engine/keyboard';
  */
 
 import { LexicalModelCompiler } from '@keymanapp/kmc-model';
-import path from 'path';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { getKeymanRoot } from 'keyman/test/resources';
 
-import { env } from 'node:process';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const KEYMAN_ROOT = env.KEYMAN_ROOT ?? (__dirname + '/../../../../../../../../');
+const KEYMAN_ROOT = getKeymanRoot();
 
 // Required initialization setup.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.

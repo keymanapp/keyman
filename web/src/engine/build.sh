@@ -69,26 +69,21 @@ do_build () {
 }
 
 run_tests() {
-  local OUTPUT_FILE FAILURE_COUNT
-  # Remove stale coverage data
-  rm -rf "${KEYMAN_ROOT}/web/build/coverage/raw/engine"
-
-  # Unfortunately we get an error from the coverage report generation:
+  # Run javascript tests
+  #
+  # Trying to run languageProcessor.tests.js with c8 coverage fails with:
   # "TypeError [ERR_INVALID_URL_SCHEME]: The URL must be of scheme file"
-  # The following lines ignore the exit code and instead check the number
-  # of failed tests from the output.
-  set +e
-  OUTPUT_FILE=$(mktemp)
-  test-headless engine "" 2>&1 | tee "${OUTPUT_FILE}"
-  set -e
+  # when c8 tries to create a report from the raw coverage data. The reason
+  # is a URL starting with `data:text/javascript` coming from
+  # `web/src/engine/predictive-text/worker-main/src/node/mappedWorker.ts`.
+  #
+  # So we first run all javascript tests except languageProcessor.tests.js
+  # with coverage, and then in a second step run languageProcessor.tests.js
+  # without coverage.
+  test-headless engine "" "--exclude" "**/languageProcessor.tests.js"
+  SKIP_C8=1 test-headless engine/main/headless/languageProcessor.tests.js
 
-  FAILURE_COUNT=$(grep ' failing' "${OUTPUT_FILE}" | xargs | cut -f 1 -d' ')
-  rm "${OUTPUT_FILE}"
-  builder_echo "(The 'TypeError [ERR_INVALID_URL_SCHEME]: The URL must be of scheme file' is expected)"
-  if ((FAILURE_COUNT > 0)); then
-    builder_die "Headless engine tests failed (.js tests)"
-  fi
-
+  # Run typescript tests
   test-headless-typescript engine
 }
 

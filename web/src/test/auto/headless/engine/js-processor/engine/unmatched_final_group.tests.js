@@ -6,15 +6,11 @@ const require = createRequire(import.meta.url);
 
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/test/resources';
+import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
-import { env } from 'node:process';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const KEYMAN_ROOT = env.KEYMAN_ROOT ?? (__dirname + '/../../../../../../../../');
+const KEYMAN_ROOT = getKeymanRoot();
 
 describe('Engine - Unmatched Final Groups', function() {
   let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/ghp_enter.json'));

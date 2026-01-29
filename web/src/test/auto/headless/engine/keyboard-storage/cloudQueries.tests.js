@@ -4,13 +4,7 @@ import sinon from 'sinon';
 import { ManagedPromise } from 'keyman/common/web-utils';
 import { CloudQueryEngine, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
-import { NodeCloudRequester } from 'keyman/test/resources';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { NodeCloudRequester, getWebTestResourcesPath } from 'keyman/test/resources';
 
 const pathConfig = new PathConfiguration({
   root: '',
@@ -159,7 +153,7 @@ describe("Cloud-query interface", () => {
 
   describe('Stub fetching', () => {
     it('sil_euro_latin@no,sv', async () => {
-      const querier = mockQuery(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+      const querier = mockQuery(`${getWebTestResourcesPath()}/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
       const promise = querier.fetchCloudStubs(['sil_euro_latin@no', 'sil_euro_latin@sv']);
 
       const stubs = await promise;
@@ -176,7 +170,7 @@ describe("Cloud-query interface", () => {
     });
 
     it('sil_cameroon_azerty', async () => {
-      const querier = mockQuery(`${__dirname}/../../../resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
+      const querier = mockQuery(`${getWebTestResourcesPath()}/query-mock-results/sil_cameroon_azerty.js.fixture`);
       const promise = querier.fetchCloudStubs(['sil_cameroon_azerty']);
 
       const stubs = await promise;
@@ -192,7 +186,7 @@ describe("Cloud-query interface", () => {
     });
 
     it('@dz', async () => {
-      const querier = mockQuery(`${__dirname}/../../../resources/query-mock-results/@dz.js.fixture`);
+      const querier = mockQuery(`${getWebTestResourcesPath()}/query-mock-results/@dz.js.fixture`);
       const promise = querier.fetchCloudStubs(['@dz']);
 
       const stubs = await promise;
@@ -209,7 +203,7 @@ describe("Cloud-query interface", () => {
   });
 
   it('language list fetching', async () => {
-    const querier = mockQuery(`${__dirname}/../../../resources/query-mock-results/languages.js.fixture`);
+    const querier = mockQuery(`${getWebTestResourcesPath()}/query-mock-results/languages.js.fixture`);
     const promise = querier.languageListPromise;
 
     const langList = await promise;

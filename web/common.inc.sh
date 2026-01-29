@@ -88,17 +88,19 @@ function prepare() {
 #   test-headless engine/osk
 # ```
 function test-headless() {
-  TEST_FOLDER=$1
-  TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
-  TEST_EXTENSIONS=${2:-}
-  if [[ ! -z "${2:-}" ]]; then
+  local TEST_FOLDER=$1
+  local TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
+  local TEST_EXTENSIONS=${2:-}
+  shift $(( $# < 2 ? $# : 2 ))
+
+  if [[ ! -z "${TEST_EXTENSIONS}" ]]; then
     TEST_BASE="${KEYMAN_ROOT}/web/build/test/headless/"
 
     # Ensure the compiled tests are available.
     tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
   fi
 
-  TEST_OPTS=()
+  local TEST_OPTS=()
   if builder_is_running_on_teamcity; then
     TEST_OPTS+=(--reporter "${KEYMAN_ROOT}/common/test/resources/mocha-teamcity-reporter/teamcity.cjs" --reporter-options parentFlowId="unit_tests")
     echo "##teamcity[flowStarted flowId='unit_tests']"
@@ -108,10 +110,14 @@ function test-headless() {
     TEST_OPTS+=(--extension "${TEST_EXTENSIONS}")
   fi
 
-  builder_echo '> ' mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
-  if [[ -e .c8rc.json ]]; then
+  # Add any remaining arguments directly to Mocha.
+  TEST_OPTS+=("$@")
+
+  if [[ -e .c8rc.json && -z "${SKIP_C8:-}" ]]; then
+    builder_echo '> ' c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
     c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   else
+    builder_echo '> ' mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
     mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   fi
 

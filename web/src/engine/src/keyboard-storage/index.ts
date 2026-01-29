@@ -13,10 +13,3 @@ export { CloudRequesterInterface } from './cloud/requesterInterface.js';
 export { KeyboardRequisitioner } from './keyboardRequisitioner.js';
 export { ModelCache } from './modelCache.js';
 export { DOMCloudRequester } from './domCloudRequester.js';
-
-import { CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './cloud/cloudQueryEngine.js';
-
-export const unitTestEndpoints = {
-  CLOUD_TIMEOUT_ERR,
-  CLOUD_STUB_REGISTRATION_ERR
-};

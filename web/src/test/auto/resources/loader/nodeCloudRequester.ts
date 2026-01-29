@@ -2,8 +2,7 @@ import { ManagedPromise } from 'keyman/common/web-utils';
 import {
   CloudRequesterInterface,
   CloudQueryResult,
-  CloudQueryEngine,
-  unitTestEndpoints
+  CloudQueryEngine
 } from 'keyman/engine/keyboard-storage';
 
 import fs from 'node:fs';
@@ -33,7 +32,7 @@ export class NodeCloudRequester implements CloudRequesterInterface {
 
     // Set callback timer
     const timeoutObj = setTimeout(() => {
-      promise.reject(new Error(unitTestEndpoints.CLOUD_TIMEOUT_ERR));
+      promise.reject(new Error('The Cloud API request timed out.'));
     }, 10000);
 
     const queryId = NodeCloudRequester.QUERY_SEED++;
@@ -55,7 +54,7 @@ export class NodeCloudRequester implements CloudRequesterInterface {
       });
 
       if(!promise.isResolved) {
-        promise.reject(new Error(unitTestEndpoints.CLOUD_STUB_REGISTRATION_ERR));
+        promise.reject(new Error('The Cloud API failed to find an appropriate keyboard.'));
       }
     }
 

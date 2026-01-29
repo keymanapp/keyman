@@ -1,13 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { NodeCloudRequester } from 'keyman/test/resources';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { NodeCloudRequester, getWebTestResourcesPath } from 'keyman/test/resources';
 
 describe("Mocked cloud query results in headless mode ('canary' testing)", () => {
   function performMockedRequest(mockedResultsFile) {
@@ -38,7 +32,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   }
 
   it('sil_euro_latin@no,sv', async () => {
-    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+    const query = performMockedRequest(`${getWebTestResourcesPath()}/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -58,7 +52,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   });
 
   it('sil_cameroon_azerty', async () => {
-    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
+    const query = performMockedRequest(`${getWebTestResourcesPath()}/query-mock-results/sil_cameroon_azerty.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -75,7 +69,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   });
 
   it('@dz', async () => {
-    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/@dz.js.fixture`);
+    const query = performMockedRequest(`${getWebTestResourcesPath()}/query-mock-results/@dz.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
