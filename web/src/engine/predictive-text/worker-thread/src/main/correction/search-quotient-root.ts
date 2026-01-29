@@ -117,8 +117,8 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return true;
   }
 
-  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
-    return [this, new SearchQuotientRoot(this.model)];
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
+    return [[this, new SearchQuotientRoot(this.model)]];
   }
 
   merge(space: SearchQuotientNode): SearchQuotientNode {
