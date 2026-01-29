@@ -10,10 +10,11 @@
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchNode, SearchResult } from "./distance-modeler.js";
+import { SearchQuotientSpur } from "./search-quotient-spur.js";
+import { SearchQuotientRoot } from "./search-quotient-root.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
-import { SearchQuotientSpur } from "./search-quotient-spur.js";
 
 let SPACE_ID_SEED = 0;
 
@@ -62,20 +63,20 @@ export interface InputSegment {
 }
 
 /**
- * Models the properties and portion of an input event applied by a SearchSpace for
- * correction-search purposes.
+ * Models the properties and portion of an input event applied by a
+ * SearchQuotientNode for correction-search purposes.
  */
 export interface PathInputProperties {
   /**
    * Denotes the portion of the ongoing input stream represented by the corresponding
-   * input distribution(s) of a SearchSpace.
+   * input distribution(s) of a SearchQuotientNode.
    */
   segment: InputSegment;
 
   /**
    * Notes the highest probability found in the input event's transform
    * distribution, regardless of whether or not that specific corresponding
-   * input is included within the SearchSpace's correction space.
+   * input is included within the SearchQuotientNode's correction space.
    */
   bestProbFromSet: number;
 
@@ -103,8 +104,8 @@ export interface SearchQuotientNode {
   readonly spaceId: number;
 
   /**
-   * Notes the SearchQuotientNode(s) whose correction-search paths are extended
-   * by this SearchQuotientNode.
+   * Notes the SearchQuotientNode(s) whose correction-search paths are extended by this
+   * SearchQuotientNode.
    */
   readonly parents: SearchQuotientNode[];
 
@@ -163,7 +164,9 @@ export interface SearchQuotientNode {
   /**
    * Retrieves the sequence of inputs that led to this SearchSpace.
    *
-   * THIS WILL BE REMOVED SHORTLY.  (Once SearchQuotientNode takes on merging &
+   * THIS WILL BE REMOVED SHORTLY in favor of `constituentPaths` below, which
+   * provides an improved view into the data and models multiple paths to the
+   * space when they exist.  (Once SearchQuotientNode takes on merging &
    * splitting)
    */
   readonly inputSequence: Distribution<Transform>[];
@@ -207,7 +210,7 @@ export interface SearchQuotientNode {
  * @param keystrokeDistributions
  * @internal
  */
-export function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistributions: Distribution<Transform>[]): boolean {
+function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistributions: Distribution<Transform>[]): boolean {
   if(!(node instanceof SearchQuotientSpur)) {
     for(const p of node.parents) {
       if(quotientPathHasInputs(p, keystrokeDistributions)) {
@@ -263,4 +266,33 @@ export function quotientPathHasInputs(node: SearchQuotientNode, keystrokeDistrib
 
     return parentHasInput();
   }
+}
+
+/**
+ * Enumerates the different potential SearchQuotientSpur sequences that lead
+ * to a SearchQuotientNode.
+ *
+ * Intended only for use during unit testing.  Does not include the root node.
+ */
+function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[][] {
+  if(node instanceof SearchQuotientRoot) {
+    return [];
+  } else if(node instanceof SearchQuotientSpur) {
+    const parentPaths = constituentPaths(node.parents[0]);
+    if(parentPaths.length > 0) {
+      return parentPaths.map(p => {
+        p.push(node);
+        return p;
+      });
+    } else {
+      return [[node]];
+    }
+  } else {
+    throw new Error("constituentPaths is unable to handle a new, unexpected SearchQuotientNode type");
+  }
+}
+
+export const unitTestEndpoints = {
+  quotientPathHasInputs,
+  constituentPaths
 }

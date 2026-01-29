@@ -10,9 +10,11 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, LegacyQuotientRoot, quotientPathHasInputs } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientSpur, models, LegacyQuotientRoot, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
+
+const { constituentPaths, quotientPathHasInputs } = unitTestEndpoints;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
@@ -44,7 +46,7 @@ export function buildSimplePathSplitFixture() {
   const path4 = new LegacyQuotientSpur(path3, distrib4, distrib4[0]);
 
   return {
-    paths: [rootPath, path1, path2, path3, path4],
+    paths: [null, path1, path2, path3, path4],
     distributions: [distrib1, distrib2, distrib3, distrib4]
   };
 }
@@ -270,6 +272,23 @@ describe('SearchQuotientSpur', () => {
         {text: '', p: 1})
       );
       assert.isTrue(quotientPathHasInputs(pathToSplit, distributions));
+      assert.equal(constituentPaths(pathToSplit).length, 1);
     });
+  });
+
+  describe('constituentPaths', () => {
+    it('includes a single entry array when all parents are SearchQuotientSpurs', () => {
+      const { paths } = buildSimplePathSplitFixture();
+      const finalPath = paths[4];
+
+      assert.equal(constituentPaths(finalPath).length, 1);
+
+      const pathSequence = constituentPaths(finalPath)[0];
+      assert.equal(pathSequence.length, 4); // 4 inputs; does not include root node
+
+      assert.sameOrderedMembers(pathSequence, paths.slice(1));
+    });
+
+    // TODO:  add a test for mixed SearchPath / SearchCluster cases.
   });
 });
