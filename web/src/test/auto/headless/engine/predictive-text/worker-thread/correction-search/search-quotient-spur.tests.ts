@@ -116,14 +116,8 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(extendedPath.inputs, leadEdgeDistribution);
       assert.deepEqual(extendedPath.inputSegments, [
         {
-          segment: {
-            trueTransform: leadEdgeDistribution[0].sample,
-            transitionId: leadEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: leadEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: extendedPath.inputSegments[0].subsetId
+          transitionId: leadEdgeDistribution[0].sample.id,
+          start: 0
         }
       ]);
 
@@ -174,23 +168,11 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
       assert.deepEqual(length2Path.inputSegments, [
         {
-          segment: {
-            trueTransform: leadEdgeDistribution[0].sample,
-            transitionId: leadEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: leadEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[0].subsetId
+          transitionId: leadEdgeDistribution[0].sample.id,
+          start: 0
         }, {
-          segment: {
-            trueTransform: tailEdgeDistribution[0].sample,
-            transitionId: tailEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: tailEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[1].subsetId
+          transitionId: tailEdgeDistribution[0].sample.id,
+          start: 0
         }
       ]);
 
@@ -258,23 +240,11 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
       assert.deepEqual(length2Path.inputSegments, [
         {
-          segment: {
-            trueTransform: leadEdgeDistribution[0].sample,
-            transitionId: leadEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: leadEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[0].subsetId
+          transitionId: leadEdgeDistribution[0].sample.id,
+          start: 0
         }, {
-          segment: {
-            trueTransform: tailEdgeDistribution[0].sample,
-            transitionId: tailEdgeDistribution[0].sample.id,
-            start: 0
-          },
-          bestProbFromSet: tailEdgeDistribution[0].p,
-          // Just write in the variable-value entry; the rest should match perfectly.
-          subsetId: length2Path.inputSegments[1].subsetId
+          transitionId: tailEdgeDistribution[0].sample.id,
+          start: 0
         }
       ]);
 
@@ -1285,7 +1255,6 @@ describe('SearchQuotientSpur', () => {
       const headTarget = new LegacyQuotientSpur(
         path, headDistributionSplit, {
           segment: {
-            trueTransform: inputDistribution[0].sample,
             start: 0,
             end: 2,
             transitionId: inputDistribution[0].sample.id
@@ -1305,7 +1274,6 @@ describe('SearchQuotientSpur', () => {
       const tailTarget = new LegacyQuotientSpur(
         new LegacyQuotientRoot(testModel), tailDistributionSplit, {
           segment: {
-            trueTransform: inputDistribution[0].sample,
             start: 2,
             transitionId: inputDistribution[0].sample.id
           },
@@ -1372,7 +1340,6 @@ describe('SearchQuotientSpur', () => {
 
         const originalInputBase: PathInputProperties = {
           segment: {
-            trueTransform: {insert: 'biglargetransform', deleteLeft: 0, id: 11},
             start: 0,
             transitionId: 11
           },
@@ -1863,7 +1830,6 @@ describe('SearchQuotientSpur', () => {
         path, headDistributionSplit, {
           segment: {
             start: 0,
-            trueTransform: inputDistribution[0].sample,
             transitionId: inputDistribution[0].sample.id
           },
           bestProbFromSet: inputDistribution[0].p,
@@ -1882,7 +1848,6 @@ describe('SearchQuotientSpur', () => {
         new LegacyQuotientRoot(testModel), tailDistributionSplit, {
           segment: {
             start: 2,
-            trueTransform: inputDistribution[0].sample,
             transitionId: inputDistribution[0].sample.id
           },
           bestProbFromSet: inputDistribution[0].p,

@@ -43,14 +43,6 @@ export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 export interface InputSegment {
   /**
-   * The Transform corresponding to the keystroke applied to the true context
-   * for this input event.
-   *
-   * @deprecated Slated for removal within epic/autocorrect.
-   */
-  trueTransform: Transform;
-
-  /**
    * The transform / transition ID of the corresponding input event.
    */
   transitionId: number | undefined,
@@ -191,12 +183,11 @@ export interface SearchQuotientNode {
   readonly bestExample: { text: string, p: number };
 
   /**
-   * Gets components useful for building a string-based representation of the
-   * keystroke range corrected by this search space.
-   *
-   * TODO: will return only the `inputSegment` part of each entry in the future.
+   * Gets components representing the keystroke range corrected by this search
+   * space.   If only part of any keystroke's effects are used, this will also
+   * be noted.
    */
-  readonly inputSegments: PathInputProperties[];
+  readonly inputSegments: InputSegment[];
 
   /**
    * Gets a compact string-based representation of `inputRange` that
