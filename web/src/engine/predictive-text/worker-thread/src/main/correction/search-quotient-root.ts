@@ -15,6 +15,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
   readonly lowestPossibleSingleCost: number = 0;
 
   readonly inputCount: number = 0;
+  readonly codepointLength: number = 0;
   readonly correctionsEnabled: boolean = false;
 
   private hasBeenProcessed: boolean = false;

@@ -169,6 +169,12 @@ export interface SearchQuotientNode {
   readonly inputSequence: Distribution<Transform>[];
 
   /**
+   * Reports the length in codepoints of corrected text represented by completed
+   * paths from this instance.
+   */
+  readonly codepointLength: number;
+
+  /**
    * Determines the best example text representable by this batcher's portion of
    * the correction-search graph and its paths.
    */
