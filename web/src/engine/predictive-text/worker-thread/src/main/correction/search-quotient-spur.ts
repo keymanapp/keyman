@@ -350,15 +350,16 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       const inputId = this.inputSource.segment.transitionId;
       if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
         // Fuse the input sources!
-        const tailSrc = parentSources[parentSources.length - 1];
-        tailSrc.segment.end = this.inputSource.segment.end;
-        if(tailSrc.segment.end) {
-          delete tailSrc.segment.end;
+        const tailSrc = parentSources.pop();
+        // Deep-copy the object!
+        const extendedTailSrc = {...tailSrc, segment: {...tailSrc.segment, end: this.inputSource.segment.end}};
+        if(extendedTailSrc.segment.end) {
+          delete extendedTailSrc.segment.end;
         }
-        return parentSources;
+        parentSources.push(extendedTailSrc);
+      } else {
+        parentSources.push(this.inputSource);
       }
-
-      parentSources.push(this.inputSource);
     }
 
     return parentSources;
