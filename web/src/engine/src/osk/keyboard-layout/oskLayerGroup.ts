@@ -1,4 +1,4 @@
-import { JSKeyboard, ActiveLayout, ButtonClasses } from 'keyman/engine/keyboard';
+import { Keyboard, ActiveLayout, ButtonClasses } from 'keyman/engine/keyboard';
 import { type DeviceSpec } from 'keyman/common/web-utils';
 
 import { InputSample } from 'keyman/engine/gesture-processor';
@@ -25,7 +25,7 @@ export class OSKLayerGroup {
   private _activeLayerId: string = 'default';
   private _heightPadding: number;
 
-  public constructor(vkbd: VisualKeyboard, keyboard: JSKeyboard, formFactor: DeviceSpec.FormFactor) {
+  public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
     const layout = keyboard.layout(formFactor);
     this.spec = layout;
     this.vkbd = vkbd;

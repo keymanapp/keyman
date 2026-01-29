@@ -3,7 +3,7 @@ import {
   KM_Core, km_core_keyboard, KM_CORE_KMX_ENV,
   KM_CORE_OPTION_SCOPE, km_core_state, KM_CORE_STATUS
 } from 'keyman/engine/core-adapter';
-import { ActiveKey, ActiveSubKey } from './activeLayout.js';
+import { ActiveKey, ActiveLayout, ActiveSubKey } from './activeLayout.js';
 import { StateKeyMap } from './stateKeyMap.js';
 import { KeyEvent } from '../keyEvent.js';
 import { TextStore } from '../textStore.js';
@@ -112,5 +112,53 @@ export class KMXKeyboard {
   public notify(eventCode: NotifyEventCode, textStore: TextStore, data: number): void {
     // TODO: implement for IMX (cf #2239 and #7928)
   }
+
+  /**
+   * Indicates whether the keyboard layout is designed for right-to-left scripts.
+   * This can be used by consumers to adjust UI layout and text direction for RTL keyboards.
+   *
+   * @returns {boolean}  True if the keyboard is right-to-left, otherwise false.
+   */
+  public get isRTL(): boolean {
+    // TODO-embed-osk-in-kmx: Hook up with Core API (#15482)
+    return false;
+  }
+
+  /**
+   * Returns an ActiveLayout object representing the keyboard's layout for this
+   * form factor.  May return null if a custom desktop "help" OSK is defined,
+   * as with sil_euro_latin.
+   *
+   * In such cases, please use either `helpText` or `insertHelpHTML` instead.
+   * @param formFactor {string} The desired form factor for the layout.
+   */
+  public layout(formFactor: DeviceSpec.FormFactor): ActiveLayout {
+    // TODO-embed-osk-in-kmx: Implement this method (#15290)
+    return null;
+  }
+
+  /**
+   * Indicates whether the keyboard's desktop layout should be used for the
+   * specified device.
+   *
+   * @param device {DeviceSpec} The device specification to check
+   * @returns {boolean} True if the desktop layout should be used for
+   * this device, otherwise false.
+   */
+  public usesDesktopLayoutOnDevice(device: DeviceSpec): boolean {
+    // TODO-embed-osk-in-kmx: Implement this method (#15290)
+    return true;
+  }
+
+  /**
+   * CSS styling for the on-screen keyboard.
+   *
+   * @returns {string} CSS style string for the OSK
+   */
+  public get oskStyling(): string {
+    // TODO-embed-osk-in-kmx: Implement this method (#15290)
+    return '';
+  }
+
 
 }

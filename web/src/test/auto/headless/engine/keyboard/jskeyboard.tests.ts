@@ -8,7 +8,7 @@ import { KeyboardHarness, MinimalKeymanGlobal, JSKeyboard } from 'keyman/engine/
 import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 
 
-describe('Keyboard tests', function () {
+describe('JSKeyboard tests', function () {
   const khmerPath = require.resolve('@keymanapp/common-test-resources/keyboards/khmer_angkor.js');
 
   it('accurately determines layout properties', async () => {
@@ -16,21 +16,34 @@ describe('Keyboard tests', function () {
     const harness = new KeyboardHarness({}, MinimalKeymanGlobal);
     const keyboardLoader = new NodeKeyboardLoader(harness);
     const keyboard = await keyboardLoader.loadKeyboardFromPath(khmerPath);
-    const km_keyboard = keyboard as JSKeyboard;
+    const jsKeyboard = keyboard as JSKeyboard;
     // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+    assert.isFalse(jsKeyboard.isRTL);
 
     // `khmer_angkor` - supports longpresses, but not flicks or multitaps.
 
     // Phone supports longpress if the keyboard supports it.
-    const mobileLayout = km_keyboard.layout(DeviceSpec.FormFactor.Phone);
+    const mobileLayout = jsKeyboard.layout(DeviceSpec.FormFactor.Phone);
     assert.isTrue(mobileLayout.hasLongpresses);
     assert.isFalse(mobileLayout.hasFlicks);
     assert.isFalse(mobileLayout.hasMultitaps);
 
     // Desktop doesn't support longpress even if the keyboard supports it.
-    const desktopLayout = km_keyboard.layout(DeviceSpec.FormFactor.Desktop);
+    const desktopLayout = jsKeyboard.layout(DeviceSpec.FormFactor.Desktop);
     assert.isFalse(desktopLayout.hasLongpresses);
     assert.isFalse(desktopLayout.hasFlicks);
     assert.isFalse(desktopLayout.hasMultitaps);
+  });
+
+  it('supports RTL layouts', async () => {
+    const rtlPath = require.resolve('@keymanapp/common-test-resources/keyboards/test_rtl.js');
+    // -- START: Standard Recorder-based unit test loading boilerplate --
+    const harness = new KeyboardHarness({}, MinimalKeymanGlobal);
+    const keyboardLoader = new NodeKeyboardLoader(harness);
+    const keyboard = await keyboardLoader.loadKeyboardFromPath(rtlPath);
+    // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+    assert.isTrue(keyboard.isRTL);
   });
 });
