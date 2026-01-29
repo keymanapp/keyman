@@ -11,7 +11,7 @@ import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader
 describe('KMXKeyboard tests', function () {
   // TODO-embed-osk-in-kmx: Enable when hooking up with RTL Core API (#15482)
   it.skip('supports RTL layouts', async () => {
-    const rtlPath = require.resolve('../../../../../../common/test/keyboards/baseline/k_0108___rtl.kmx');
+    const rtlPath = require.resolve('@keymanapp/common-test-resources/keyboards/test_rtl.kmx');
     // -- START: Standard Recorder-based unit test loading boilerplate --
     const harness = new KeyboardHarness({}, MinimalKeymanGlobal);
     const keyboardLoader = new NodeKeyboardLoader(harness);
