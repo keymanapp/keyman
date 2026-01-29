@@ -90,10 +90,10 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
 
     this.parentNode = parentNode;
-    this.inputSource = inputSource as PathInputProperties;
-    this.lowestPossibleSingleCost = (parentNode?.lowestPossibleSingleCost ?? 0) - Math.log(inputSrc?.bestProbFromSet ?? 1);
+    this.inputSource = inputSrc;
+    this.lowestPossibleSingleCost = parentNode.lowestPossibleSingleCost - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
-    this.inputCount = (parentNode?.inputCount ?? 0) + (this.inputs ? 1 : 0);
+    this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
   }
 
   /**
@@ -120,11 +120,13 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get bestExample(): {text: string, p: number} {
-    const bestPrefix = this.parentNode?.bestExample ?? { text: '', p: 1 };
+    const bestPrefix = this.parentNode.bestExample ?? { text: '', p: 1 };
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
-      text: KMWString.substring(bestPrefix.text, 0, (this.parentNode?.codepointLength ?? 0) - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      // Take the parent node's result, apply delete-lefts, then apply our most
+      // likely local insert.
+      text: KMWString.substring(bestPrefix.text, 0, this.parentNode.codepointLength - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
   }
@@ -273,7 +275,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const parentSources = this.parentNode.inputSegments;
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
-      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
+      if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
         return parentSources;
       }
 
@@ -293,7 +295,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     for(const source of sources) {
       const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
+      components.push(`T${source.segment.transitionId}${i != 0 ? `@${i}` : ''}`);
     }
 
     return components.join('+');

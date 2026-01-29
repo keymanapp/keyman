@@ -52,7 +52,7 @@ export interface InputSegment {
   /**
    * The transform / transition ID of the corresponding input event.
    */
-  transitionId: number,
+  transitionId: number | undefined,
 
   /**
    * Marks the initial index (inclusive) within the insert strings for the

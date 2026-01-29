@@ -115,8 +115,6 @@ export class ContextTransition {
    * by a keystroke.
    * @param state  The context state to record as the result of the transition
    * @param inputDistribution Fat-finger data corresponding to the triggering keystroke
-   * @param preservationTransform Portions of the most likely input that do not contribute to the final token
-   * in the final context's tokenization.
    */
   finalize(state: ContextState, inputDistribution: Distribution<Transform>) {
     this._final = state;

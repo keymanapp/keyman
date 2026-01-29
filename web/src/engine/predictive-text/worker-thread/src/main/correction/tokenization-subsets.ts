@@ -30,7 +30,7 @@ export interface TransitionEdge {
   /**
    * A set of incoming keystrokes with compatible effects when applied.
    *
-   * If passed to the`subsetByInterval`, the transforms should result in a single subset.
+   * If passed to the `subsetByInterval`, the transforms should result in a single subset.
    */
   inputs: Distribution<Map<number, Transform>>
 
