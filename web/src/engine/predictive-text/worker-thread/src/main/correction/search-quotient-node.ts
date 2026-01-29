@@ -215,6 +215,14 @@ export interface SearchQuotientNode {
   get sourceRangeKey(): string;
 
   /**
+   * Appends this SearchSpace with the provided SearchSpace's search properties,
+   * extending the represented search range accordingly.  If this operation
+   * represents merging the result of a previous .split() call, the two halves
+   * of any split input components will be fully re-merged.
+   * @param space
+   */
+  merge(space: SearchQuotientNode): SearchQuotientNode;
+
   /**
    * Splits this SearchSpace into two halves at the specified codepoint index.
    * The 'head' component will maximally re-use existing cached data, while the

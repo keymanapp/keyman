@@ -107,7 +107,7 @@ describe('ContextToken', function() {
       const token2 = new ContextToken(plainModel, "'");
       const token3 = new ContextToken(plainModel, "t");
 
-      const merged = ContextToken.merge([token1, token2, token3], plainModel);
+      const merged = ContextToken.merge([token1, token2, token3]);
       assert.equal(merged.exampleInput, "can't");
       token1.inputSegments.forEach((entry) => assert.isTrue(merged.inputSegments.indexOf(entry) > -1));
       token2.inputSegments.forEach((entry) => assert.isTrue(merged.inputSegments.indexOf(entry) > -1));
@@ -161,7 +161,7 @@ describe('ContextToken', function() {
         subsetId: srcSubsetId
       }, [{sample: {insert: 't', deleteLeft: 0, deleteRight: 0, id: 1}, p: 1}]);
 
-      const merged = ContextToken.merge([token1, token2, token3], plainModel);
+      const merged = ContextToken.merge([token1, token2, token3]);
       assert.equal(merged.exampleInput, "can't");
       assert.deepEqual(merged.inputSegments, [ {
         segment: {
@@ -259,7 +259,7 @@ describe('ContextToken', function() {
         subsetId: srcSubsetIds[3]
       }, [{sample: srcTransforms[3], p: 1}]);
 
-      const merged = ContextToken.merge(tokensToMerge, plainModel);
+      const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, "applesandsourgrapes");
         assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
         segment: {
@@ -359,7 +359,7 @@ describe('ContextToken', function() {
         subsetId: srcSubsetIds[3]
       }, [{sample: srcTransforms[3], p: 1}]);
 
-      const merged = ContextToken.merge(tokensToMerge, plainModel);
+      const merged = ContextToken.merge(tokensToMerge);
       assert.equal(merged.exampleInput, toMathematicalSMP("applesandsourgrapes"));
       assert.deepEqual(merged.inputSegments, srcTransforms.map((t, i) => ({
         segment: {

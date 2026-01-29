@@ -3,6 +3,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { SearchQuotientSpur } from './search-quotient-spur.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 
@@ -104,5 +105,32 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
     return [this, new SearchQuotientRoot(this.model)];
+  }
+
+  merge(space: SearchQuotientNode): SearchQuotientNode {
+    // Head node for the incoming path is empty, so skip it.
+    if(space.parents.length == 0 || space instanceof SearchQuotientRoot) {
+      return this;
+    }
+
+    // Merge any parents first as a baseline.  We have to come after their
+    // affects are merged in, anyway.
+    const parentMerges = space.parents?.length > 0 ? space.parents.map((p) => this.merge(p)) : [this];
+
+    // if parentMerges.length > 0, is a SearchCluster.
+    // const parentMerge = parentMerges.length > 0 ? new SearchCluster(parentMerges) : parentMerges[0];
+    const parentMerge = parentMerges[0];
+
+    // Special case:  if we've reached the head of the space to be merged, check
+    // for a split transform.
+    //  - we return `this` from the root, so if that's what we received, we're
+    //    on the first descendant - the first path component.
+    if(space instanceof SearchQuotientSpur) {
+      // Needs to construct a NEW version of whatever the same type is, on this root.
+      return space.construct(parentMerge, space.inputs, space.inputSource);
+    } else {
+      // If the parent was a cluster, the cluster itself is the merge.
+      return parentMerge;
+    }
   }
 }
