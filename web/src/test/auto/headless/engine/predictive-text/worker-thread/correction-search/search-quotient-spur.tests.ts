@@ -1284,6 +1284,7 @@ describe('SearchQuotientSpur', () => {
           segment: {
             trueTransform: inputDistribution[0].sample,
             start: 0,
+            end: 2,
             transitionId: inputDistribution[0].sample.id
           },
           bestProbFromSet: inputDistribution[0].p,
