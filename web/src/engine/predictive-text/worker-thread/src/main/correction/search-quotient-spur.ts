@@ -90,7 +90,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
 
     this.parentNode = parentNode;
-    this.inputSource = inputSource as PathInputProperties;
+    this.inputSource = inputSrc;
     this.lowestPossibleSingleCost = parentNode.lowestPossibleSingleCost - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
@@ -275,7 +275,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const parentSources = this.parentNode.inputSegments;
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
-      if(inputId && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
+      if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
         return parentSources;
       }
 
@@ -295,7 +295,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     for(const source of sources) {
       const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? '@' + i : ''}`);
+      components.push(`T${source.segment.transitionId}${i != 0 ? `@${i}` : ''}`);
     }
 
     return components.join('+');
