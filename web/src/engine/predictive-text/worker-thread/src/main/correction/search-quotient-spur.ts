@@ -124,6 +124,8 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
     return {
+      // Take the parent node's result, apply delete-lefts, then apply our most
+      // likely local insert.
       text: KMWString.substring(bestPrefix.text, 0, this.parentNode.codepointLength - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
