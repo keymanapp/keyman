@@ -33,7 +33,7 @@ builder_describe \
   "--help.keyman.com=HELP_KEYMAN_COM          path to help.keyman.com repository" \
   "--symbols-local-path=LOCAL_SYMBOLS_PATH    local path to symbols directory" \
   "--symbols-remote-path=REMOTE_SYMBOLS_PATH  remote path to symbols directory" \
-  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols"
+  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols [unused; TODO: remove in v20]"
 
 builder_parse "$@"
 
@@ -101,7 +101,6 @@ function windows_publish_action() {
   export RSYNC_USER
   export RSYNC_HOST
   export RSYNC_ROOT
-  export KEYMAN_SYMSTOREPATH="$LOCAL_SYMBOLS_PATH"
 
   builder_launch /windows/build.sh publish
   windows_upload_symbols_to_sentry
@@ -111,6 +110,8 @@ function windows_publish_action() {
   tc_upload_help "Keyman for Windows" windows
   builder_echo end "publish windows" success "Finished publishing Keyman for Windows"
 }
+
+export KEYMAN_SYMSTOREPATH="$LOCAL_SYMBOLS_PATH"
 
 if builder_has_action all; then
   windows_build_action

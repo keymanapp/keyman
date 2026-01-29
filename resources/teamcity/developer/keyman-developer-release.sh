@@ -31,7 +31,7 @@ builder_describe \
   "--help.keyman.com=HELP_KEYMAN_COM          path to help.keyman.com repository" \
   "--symbols-local-path=LOCAL_SYMBOLS_PATH    local path to symbols directory" \
   "--symbols-remote-path=REMOTE_SYMBOLS_PATH  remote path to symbols directory" \
-  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols"
+  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols [unused; TODO: remove in v20]"
 
 builder_parse "$@"
 
@@ -118,7 +118,6 @@ function publish_action() {
   export RSYNC_USER
   export RSYNC_HOST
   export RSYNC_ROOT
-  export KEYMAN_SYMSTOREPATH="$LOCAL_SYMBOLS_PATH"
 
   _publish_sentry
   ba_win_download_symbol_server_index
@@ -126,6 +125,8 @@ function publish_action() {
   _publish_to_downloads_keyman_com
   tc_upload_help "api documentation" developer
 }
+
+export KEYMAN_SYMSTOREPATH="$LOCAL_SYMBOLS_PATH"
 
 if builder_has_action all; then
   build_developer_action
