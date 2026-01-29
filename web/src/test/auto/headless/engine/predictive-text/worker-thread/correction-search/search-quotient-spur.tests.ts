@@ -14,6 +14,8 @@ import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { generateSubsetId, LegacyQuotientSpur, models, LegacyQuotientRoot, SearchQuotientNode, PathInputProperties, SearchQuotientSpur, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
 
+import { buildAlphabeticClusterFixtures } from './search-quotient-cluster.tests.js';
+
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
@@ -293,7 +295,22 @@ describe('SearchQuotientSpur', () => {
       assert.sameOrderedMembers(pathSequence, paths.slice(1));
     });
 
-    // TODO:  add a test for mixed SearchQuotientSpur / SearchCluster cases.
+    it('properly enumerates child paths when encountering SearchCluster ancestors', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const finalPath = fixture.paths[4].path_k4c6;
+
+      // The longest SearchPath at the end of that fixture's set is based on a
+      // lead-in cluster; all variants of that should be included.
+      assert.equal(constituentPaths(finalPath).length, constituentPaths(fixture.clusters.cluster_k3c4).length);
+
+      // That cluster holds the different potential penultimate paths;
+      // finalPath's inputs are added directly after any variation that may be
+      // output from the cluster.
+      assert.sameDeepMembers(constituentPaths(finalPath), constituentPaths(fixture.clusters.cluster_k3c4).map((p) => {
+        p.push(finalPath);
+        return p;
+      }));
+    });
   });
 
   describe('split()', () => {
@@ -1598,27 +1615,27 @@ describe('SearchQuotientSpur', () => {
         }
       });
 
-      it('splits properly at index 0', () => {
+      it('merges tokens previously split at index 0', () => {
         runCommonAssertions(0);
       });
 
-      it('splits properly at index 1', () => {
+      it('merges tokens previously split at index 1', () => {
         runCommonAssertions(1);
       });
 
-      it('splits properly at index 2', () => {
+      it('merges tokens previously split at index 2', () => {
         runCommonAssertions(2);
       });
 
-      it('splits properly at index 3', () => {
+      it('merges tokens previously split at index 3', () => {
         runCommonAssertions(3);
       });
 
-      it('splits properly at index 4', () => {
+      it('merges tokens previously split at index 4', () => {
         runCommonAssertions(4);
       });
 
-      it('splits properly at index 5', () => {
+      it('merges tokens previously split at index 5', () => {
         runCommonAssertions(5);
       });
     });
@@ -1775,27 +1792,27 @@ describe('SearchQuotientSpur', () => {
         }
       });
 
-      it('splits properly at index 0', () => {
+      it('merges tokens previously split at index 0', () => {
         runCommonAssertions(0);
       });
 
-      it('splits properly at index 1', () => {
+      it('merges tokens previously split at index 1', () => {
         runCommonAssertions(1);
       });
 
-      it('splits properly at index 2', () => {
+      it('merges tokens previously split at index 2', () => {
         runCommonAssertions(2);
       });
 
-      it('splits properly at index 3', () => {
+      it('merges tokens previously split at index 3', () => {
         runCommonAssertions(3);
       });
 
-      it('splits properly at index 4', () => {
+      it('merges tokens previously split at index 4', () => {
         runCommonAssertions(4);
       });
 
-      it('splits properly at index 5', () => {
+      it('merges tokens previously split at index 5', () => {
         runCommonAssertions(5);
       });
     });

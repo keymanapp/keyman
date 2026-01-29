@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { SearchQuotientNode } from './search-quotient-node.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 import TransformUtils from '../transformUtils.js';
 
@@ -573,9 +573,12 @@ export class SearchNode {
 
 export class SearchResult {
   readonly node: SearchNode;
+  // Supports SearchPath -> SearchSpace remapping.
+  readonly spaceId: number;
 
-  constructor(node: SearchNode) {
+  constructor(node: SearchNode, spaceId?: number) {
     this.node = node;
+    this.spaceId = spaceId ?? node.spaceId;
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
@@ -622,10 +625,6 @@ export class SearchResult {
   get finalTraversal(): LexiconTraversal {
     return this.node.currentTraversal;
   }
-
-  get spaceId(): number {
-    return this.node.spaceId;
-  }
 }
 
 /**
@@ -655,15 +654,15 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
 
   // Stage 2:  the fun part; actually searching!
   do {
-    const entry: SearchResult = timer.time(() => {
-      if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) < spaceQueue.peek().currentCost) {
+    const entry = timer.time(() => {
+      if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
         currentReturns[result.node.resultKey] = result.node;
         return result;
       }
 
       let lowestCostSource = spaceQueue.dequeue();
-      let newResult: PathResult = lowestCostSource.handleNextNode();
+      const newResult = lowestCostSource.handleNextNode();
       spaceQueue.enqueue(lowestCostSource);
 
       if(newResult.type == 'none') {
@@ -688,7 +687,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
           currentReturns[node.resultKey] = node;
           // Do not track yielded time.
-          return new SearchResult(node);
+          return new SearchResult(node, newResult.spaceId);
         }
       }
 
