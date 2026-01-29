@@ -30,7 +30,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
-  readonly bestProbInEdge: number;
   private parentNode: SearchQuotientNode;
   readonly spaceId: number;
 
