@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.195 alpha 2026-01-29
+
+* fix(windows): adjust symbol paths for publishing to symbol server (#15509)
+
 ## 19.0.194 alpha 2026-01-27
 
 * fix(windows): export sym store path so symbols are published (#15493)
