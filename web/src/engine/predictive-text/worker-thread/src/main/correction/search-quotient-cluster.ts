@@ -21,19 +21,13 @@ const PATH_QUEUE_COMPARATOR: Comparator<SearchQuotientNode> = (a, b) => {
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientCluster implements SearchQuotientNode {
+export class SearchQuotientCluster extends SearchQuotientNode {
   // While most functions can be done directly from SearchSpace, merging and
   // splitting will need access to SearchQuotientSpur-specific members.  It's
   // also cleaner to not allow nested SearchQuotientClusters while we haven't
   // worked out support for such a scenario.
   private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
   readonly spaceId: number;
-
-  /**
-   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
-   * this SearchCluster but not yet by child SearchSpaces.
-   */
-  private childBuffers: SearchNode[][] = [];
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single
   // point in time is cheaper than iteratively building a priority queue.
@@ -70,6 +64,8 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * @param model
    */
   constructor(inboundPaths: SearchQuotientNode[]) {
+    super();
+
     if(inboundPaths.length == 0) {
       throw new Error("SearchQuotientCluster requires an array with at least one SearchQuotientNode");
     }
@@ -155,7 +151,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.selectionQueue = new PriorityQueue(PATH_QUEUE_COMPARATOR, this.selectionQueue.toArray());
 
     if(currentResult.type == 'complete') {
-      this.bufferNode(currentResult.finalNode);
+      this.saveResult(currentResult.finalNode);
       this.completedPaths?.push(currentResult.finalNode);
       currentResult.spaceId = this.spaceId;
     }
@@ -165,14 +161,6 @@ export class SearchQuotientCluster implements SearchQuotientNode {
 
   public get previousResults(): SearchResult[] {
     return this.completedPaths?.map((n => new SearchResult(n, this.spaceId))) ?? [];
-  }
-
-  public addResultBuffer(nodeBuffer: SearchNode[]): void {
-    this.childBuffers.push(nodeBuffer);
-  }
-
-  private bufferNode(node: SearchNode) {
-    this.childBuffers.forEach((buf) => buf.push(node));
   }
 
   get model(): LexicalModelTypes.LexicalModel {

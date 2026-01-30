@@ -23,7 +23,7 @@ export { default as LMLayerWorker } from './index.js'
 export * from './transform-subsets.js';
 
 // unitTestEndpoints
-import { unitTestEndpoints as SearchQuotientNodeEndpoints } from './correction/search-quotient-node.js';
+import { unitTestEndpoints as SearchQuotientNodeEndpoints } from './correction/search-quotient-utils.js';
 export const unitTestEndpoints: typeof SearchQuotientNodeEndpoints = {
   ...SearchQuotientNodeEndpoints
 }

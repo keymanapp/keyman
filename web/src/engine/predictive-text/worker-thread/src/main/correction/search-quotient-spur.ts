@@ -29,7 +29,7 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export abstract class SearchQuotientSpur implements SearchQuotientNode {
+export abstract class SearchQuotientSpur extends SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
 
   /**
@@ -37,12 +37,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    * extended with this `SearchSpace`'s input.
    */
   private incomingNodes: SearchNode[] = [];
-
-  /**
-   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
-   * this SearchPath but not yet by child SearchSpaces.
-   */
-  private childBuffers: SearchNode[][] = [];
 
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
@@ -84,6 +78,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     inputs: Distribution<Readonly<Transform>>,
     inputSource: PathInputProperties | ProbabilityMass<Transform>
   ) {
+    super();
     this.spaceId = generateSpaceSeed();
 
     // Coerce inputSource to TokenInputSource format.
@@ -112,7 +107,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
 
     this.queueNodes(this.buildEdgesForNodes(parentNode.previousResults.map(r => r.node)));
-    parentNode.addResultBuffer(this.incomingNodes);
+    this.linkAndQueueFromParent(parentNode, this.incomingNodes);
   }
 
   public get model(): LexicalModel {
@@ -443,7 +438,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
         }
       }
 
-      this.bufferNode(currentNode);
+      this.saveResult(currentNode);
       return {
         type: 'complete',
         cost: currentNode.currentCost,
@@ -458,14 +453,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
   public get previousResults(): SearchResult[] {
     return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
-  }
-
-  public addResultBuffer(nodeBuffer: SearchNode[]): void {
-    this.childBuffers.push(nodeBuffer);
-  }
-
-  private bufferNode(node: SearchNode) {
-    this.childBuffers.forEach((buf) => buf.push(node));
   }
 
   public get inputSegments(): InputSegment[] {
