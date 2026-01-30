@@ -9,7 +9,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientRoot implements SearchQuotientNode {
+export class SearchQuotientRoot extends SearchQuotientNode {
   readonly rootNode: SearchNode;
   readonly model: LexicalModel;
   private readonly rootResult: SearchResult;
@@ -23,18 +23,13 @@ export class SearchQuotientRoot implements SearchQuotientNode {
   private hasBeenProcessed: boolean = false;
 
   /**
-   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
-   * this SearchPath but not yet by child SearchSpaces.
-   */
-  private childBuffers: SearchNode[][] = [];
-
-  /**
    * Constructs a fresh SearchSpace instance for used in predictive-text correction
    * and suggestion searches.
    * @param baseSpaceId
    * @param model
    */
   constructor(model: LexicalModel) {
+    super();
     if(!model.traverseFromRoot) {
       throw new Error("The active lexical model does not support traversal-based searching.");
     }
@@ -79,7 +74,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
     this.hasBeenProcessed = true;
 
-    this.bufferNode(this.rootNode);
+    this.saveResult(this.rootNode);
     return {
       type: 'complete',
       cost: 0,
@@ -161,13 +156,5 @@ export class SearchQuotientRoot implements SearchQuotientNode {
       // If the parent was a cluster, the cluster itself is the merge.
       return parentMerge;
     }
-  }
-
-  addResultBuffer(nodeBuffer: SearchNode[]): void {
-    this.childBuffers.push(nodeBuffer);
-  }
-
-  protected bufferNode(node: SearchNode) {
-    this.childBuffers.forEach((buf) => buf.push(node));
   }
 }
