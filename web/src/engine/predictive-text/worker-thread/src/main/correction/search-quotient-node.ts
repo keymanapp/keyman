@@ -104,6 +104,51 @@ export abstract class SearchQuotientNode {
   private childQueues: SearchNode[][] = [];
 
   /**
+   * Marks all results that have already been returned from this instance of SearchPath.
+   * Should be deleted and cleared if any paths consider this one as a parent.
+   */
+  private returnedValues?: {[resultKey: string]: SearchNode} = {};
+
+
+  // The TS type system prevents this method from being rooted on the instance provided in
+  // the first parameter, sadly.
+  /**
+   * Links the provided queueing buffer to the provided parent node.  When the
+   * parent produces new intermediate results, those results will be made
+   * available for use in construction of extended paths.
+   * @param parentNode
+   * @param childQueue
+   */
+  protected linkAndQueueFromParent(parentNode: SearchQuotientNode, childQueue: SearchNode[]): void {
+    parentNode.childQueues.push(childQueue);
+  }
+
+  /**
+   * Log the results of a processed node and queue it within all subscribed
+   * processor nodes for construction of deeper search paths.
+   * @param node
+   */
+  protected saveResult(node: SearchNode): boolean {
+    const priorMatch = this.returnedValues[node.resultKey];
+    if(priorMatch !== undefined && priorMatch.currentCost < node.currentCost) {
+      return false;
+    }
+
+    this.returnedValues[node.resultKey] = node;
+    this.childQueues.forEach((buf) => buf.push(node));
+    return true;
+  }
+
+  /**
+   * Returns the set of existing, completed search-results with this node's domain.
+   */
+  public get previousResults(): SearchResult[] {
+    return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  }
+
+  // -- Everything after this is abstract and implemented by derived child classes.
+
+  /**
    * Returns an identifier uniquely identifying this search-batching structure
    * by correction-search results.
    */
@@ -150,11 +195,6 @@ export abstract class SearchQuotientNode {
    * includes the cost from the lowest possible parent nodes visited.
    */
   abstract readonly lowestPossibleSingleCost: number;
-
-  /**
-   * Returns the set of previously-processed results under this batcher's domain.
-   */
-  abstract readonly previousResults: SearchResult[];
 
   /**
    * When true, this indicates that the currently-represented portion of context
@@ -226,26 +266,4 @@ export abstract class SearchQuotientNode {
    * @param node
    */
   abstract isSameNode(node: SearchQuotientNode): boolean;
-
-  // The TS type system prevents this method from being rooted on the instance provided in
-  // the first parameter, sadly.
-  /**
-   * Links the provided queueing buffer to the provided parent node.  When the
-   * parent produces new intermediate results, those results will be made
-   * available for use in construction of extended paths.
-   * @param parentNode
-   * @param childQueue
-   */
-  protected linkAndQueueFromParent(parentNode: SearchQuotientNode, childQueue: SearchNode[]): void {
-    parentNode.childQueues.push(childQueue);
-  }
-
-  /**
-   * Log the results of a processed node and queue it within all subscribed
-   * processor nodes for construction of deeper search paths.
-   * @param node
-   */
-  protected saveResult(node: SearchNode) {
-    this.childQueues.forEach((buf) => buf.push(node));
-  }
 }

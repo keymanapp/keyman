@@ -12,7 +12,7 @@ import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keyman
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
-import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { EDIT_DISTANCE_COST_SCALE, SearchNode } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
@@ -48,12 +48,6 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
   readonly codepointLength: number;
   public abstract readonly insertLength: number;
   public abstract readonly leftDeleteLength: number
-
-  /**
-   * Marks all results that have already been returned from this instance of SearchPath.
-   * Should be deleted and cleared if any paths consider this one as a parent.
-   */
-  private returnedValues?: {[resultKey: string]: SearchNode} = {};
 
   /**
    * Provides a heuristic for the base cost at this path's depth if the best
@@ -428,16 +422,12 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     }
 
     if(currentNode.spaceId == this.spaceId) {
-      if(this.returnedValues) {
-        if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
-          this.returnedValues[currentNode.resultKey] = currentNode;
-        } else {
-          // Not a better cost, so reject it and move on to the next potential result.
-          return this.handleNextNode();
-        }
+      const isUnhandled = this.saveResult(currentNode);
+      if(!isUnhandled) {
+        // Not a better cost, so reject it and move on to the next potential result.
+        return this.handleNextNode();
       }
 
-      this.saveResult(currentNode);
       return {
         type: 'complete',
         cost: currentNode.currentCost,
@@ -448,10 +438,6 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
 
     // If we've somehow fully exhausted all search options, indicate that none remain.
     return unmatchedResult as PathResult;
-  }
-
-  public get previousResults(): SearchResult[] {
-    return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
   public get inputSegments(): InputSegment[] {
