@@ -131,7 +131,6 @@ public class KeymanSettingsInstallActivity extends BaseActivity {
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
         String languageTag = prefs.getString(DisplayLanguages.displayLanguageKey, "");
         // Install from keyman.com
         if (itemTitle.equals(getString(R.string.install_from_keyman_dot_com))) {

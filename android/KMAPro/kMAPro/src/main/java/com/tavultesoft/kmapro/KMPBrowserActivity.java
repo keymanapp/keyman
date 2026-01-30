@@ -40,8 +40,8 @@ public class KMPBrowserActivity extends BaseActivity {
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
   private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s%s";
-  private static final String KMP_SEARCH_KEYBOARDS_DISPLAY_LANGUAGE_FORMATSTR = "?lang=%s";
   private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
+  private static final String KMP_SEARCH_KEYBOARDS_DISPLAY_LANGUAGE_FORMATSTR = "?lang=%s";
 
   // Patterns for determining if a link should be opened in external browser
   // 1. Host isn't keyman.com (production/staging)
@@ -168,19 +168,19 @@ public class KMPBrowserActivity extends BaseActivity {
     // Tier determines the keyboard search host
     String host = KMPLink.getHost();
 
+    // If display language is provided, include it in the keyboard search. Otherwise fallback to default locale
+    String fallbackLang = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ?
+      LocaleList.getDefault().get(0).toLanguageTag() : "en";
+    Bundle bundle = getIntent().getExtras();
+    String displayLang = (bundle != null) && bundle.containsKey("lang") ? bundle.getString("lang") : fallbackLang;
+    String displayLangStr = KMString.format(KMP_SEARCH_KEYBOARDS_DISPLAY_LANGUAGE_FORMATSTR, displayLang);
+
     // If language ID is provided for keyboard search, include it in the keyboard search
     String languageID = getIntent().getStringExtra("languageCode");
     String languageStr = (languageID != null) ? KMString.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
 
-    // If display language is provided, include it in the keyboard search. Otherwise fallback to default locale
-    String fallbackLang = (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) ?
-      LocaleList.getDefault().get(0).toLanguageTag() : "en";
-    Bundle bundle = getIntent().getExtras();
-    String displayLang = (bundle != null) ? bundle.getString("lang") : fallbackLang;
-    String displayLangStr = KMString.format(KMP_SEARCH_KEYBOARDS_DISPLAY_LANGUAGE_FORMATSTR, displayLang);
-
     String appMajorVersion = KMManager.getMajorVersion();
-    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, displayLangStr, languageStr);
+    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr, displayLangStr);
     webView.loadUrl(kmpSearchUrl);
   }
 
