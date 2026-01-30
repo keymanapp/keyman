@@ -11,7 +11,7 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "eventemitter3": "^5.0.0",
-    "fast-xml-parser": "^5.2.2",
+    "fast-xml-parser": "^5.3.4",
     "path-browserify": "^1.0.1",
     "restructure": "^3.0.1",
     "sax": ">=0.6.0",
