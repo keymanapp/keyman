@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.196 alpha 2026-01-30
+
+* chore(common): Update Crowdin strings for `de` (#15511)
+
 ## 19.0.195 alpha 2026-01-29
 
 * fix(windows): adjust symbol paths for publishing to symbol server (#15509)
