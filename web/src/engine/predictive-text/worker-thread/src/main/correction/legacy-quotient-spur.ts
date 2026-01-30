@@ -34,7 +34,6 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
    */
   constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: PathInputProperties | ProbabilityMass<Transform>) {
     super(space, inputs, inputSource);
-    this.queueNodes(this.buildEdgesForNodes(space.previousResults.map(r => r.node)));
 
     // Compute this SearchPath's codepoint length & edge length.
     const insert = this.inputs?.[0].sample.insert ?? '';
