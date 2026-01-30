@@ -11,7 +11,7 @@
 import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchNode } from './distance-modeler.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
@@ -153,10 +153,6 @@ export class SearchQuotientCluster extends SearchQuotientNode {
     }
 
     return currentResult;
-  }
-
-  public get previousResults(): SearchResult[] {
-    return this.completedPaths?.map((n => new SearchResult(n, this.spaceId))) ?? [];
   }
 
   get model(): LexicalModelTypes.LexicalModel {
