@@ -96,23 +96,29 @@ export interface PathInputProperties {
  * Represents all or a portion of the dynamically-generated graph used to search
  * for predictive-text corrections.
  */
-export interface SearchQuotientNode {
+export abstract class SearchQuotientNode {
+  /**
+   * Holds all `incomingNode` child buffers - buffers to hold nodes processed by
+   * this SearchCluster but not yet by child SearchSpaces.
+   */
+  private childQueues: SearchNode[][] = [];
+
   /**
    * Returns an identifier uniquely identifying this search-batching structure
    * by correction-search results.
    */
-  readonly spaceId: number;
+  abstract get spaceId(): number;
 
   /**
    * The active LexicalModel for use with correction-search.
    */
-  readonly model: LexicalModel;
+  abstract get model(): LexicalModel;
 
   /**
    * Notes the SearchQuotientNode(s) whose correction-search paths are extended by this
    * SearchQuotientNode.
    */
-  readonly parents: SearchQuotientNode[];
+  abstract get parents(): SearchQuotientNode[];
 
   /**
    * Retrieves the lowest-cost / lowest-distance edge from the batcher's search
@@ -120,20 +126,20 @@ export interface SearchQuotientNode {
    * what sort of result the edge's destination node represents.
    * @returns
    */
-  handleNextNode(): PathResult;
+  abstract handleNextNode(): PathResult;
 
   /**
    * Increases the editing range that will be considered for determining
    * correction distances.
    */
-  increaseMaxEditDistance(): void;
+  abstract increaseMaxEditDistance(): void;
 
   /**
    * Reports the cost of the lowest-cost / lowest-distance edge held within the
    * batcher's search area.
    * @returns
    */
-  readonly currentCost: number;
+  abstract get currentCost(): number;
 
   /**
    * Provides a heuristic for the base cost at this path's depth if the best
@@ -143,19 +149,19 @@ export interface SearchQuotientNode {
    * This cost is based on the negative log-likelihood of the probability and
    * includes the cost from the lowest possible parent nodes visited.
    */
-  readonly lowestPossibleSingleCost: number;
+  abstract readonly lowestPossibleSingleCost: number;
 
   /**
    * Returns the set of previously-processed results under this batcher's domain.
    */
-  readonly previousResults: SearchResult[];
+  abstract readonly previousResults: SearchResult[];
 
   /**
    * When true, this indicates that the currently-represented portion of context
    * has fat-finger data available, which itself indicates that the user has
    * corrections enabled.
    */
-  readonly correctionsEnabled: boolean;
+  abstract readonly correctionsEnabled: boolean;
 
   /**
    * Reports the total number of input keystrokes represented by this
@@ -164,32 +170,32 @@ export interface SearchQuotientNode {
    * (Their fat-finger alternates, when provided, do not influence this count -
    * they're associated with the original keystroke that affected the context.)
    */
-  readonly inputCount: number;
+  abstract readonly inputCount: number;
 
   /**
    * Reports the length in codepoints of corrected text represented by completed
    * paths from this instance.
    */
-  readonly codepointLength: number;
+  abstract readonly codepointLength: number;
 
   /**
    * Determines the best example text representable by this SearchQuotientNode's
    * portion of the correction-search graph and its paths.
    */
-  readonly bestExample: { text: string, p: number };
+  abstract readonly bestExample: { text: string, p: number };
 
   /**
    * Gets components representing the keystroke range corrected by this
    * search-space quotient node.   If only part of any keystroke's effects are
    * used, this will also be noted.
    */
-  readonly inputSegments: InputSegment[];
+  abstract readonly inputSegments: InputSegment[];
 
   /**
    * Gets a compact string-based representation of `inputRange` that
    * maps compatible token source ranges to each other.
    */
-  get sourceRangeKey(): string;
+  abstract get sourceRangeKey(): string;
 
   /**
    * Appends this SearchQuotientNode with the provided SearchQuotientNode's search properties,
@@ -198,7 +204,7 @@ export interface SearchQuotientNode {
    * of any split input components will be fully re-merged.
    * @param space
    */
-  merge(space: SearchQuotientNode): SearchQuotientNode;
+  abstract merge(space: SearchQuotientNode): SearchQuotientNode;
 
   /**
    * Splits this SearchQuotientNode into two halves at the specified codepoint index.
@@ -211,7 +217,7 @@ export interface SearchQuotientNode {
    * SearchSpace instance.
    * @param charIndex
    */
-  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][];
+  abstract split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][];
 
   /**
    * Determines if the SearchQuotientNode is a duplicate of another instance.
@@ -219,13 +225,27 @@ export interface SearchQuotientNode {
    * path(s) taken to reach each must be 100% identical.
    * @param node
    */
-  isSameNode(node: SearchQuotientNode): boolean;
+  abstract isSameNode(node: SearchQuotientNode): boolean;
+
+  // The TS type system prevents this method from being rooted on the instance provided in
+  // the first parameter, sadly.
+  /**
+   * Links the provided queueing buffer to the provided parent node.  When the
+   * parent produces new intermediate results, those results will be made
+   * available for use in construction of extended paths.
+   * @param parentNode
+   * @param childQueue
+   */
+  protected linkAndQueueFromParent(parentNode: SearchQuotientNode, childQueue: SearchNode[]): void {
+    parentNode.childQueues.push(childQueue);
+  }
 
   /**
-   * This is used among SearchSpaces to ensure that nodes processed by earlier portions
-   * of the correction-search dynamic graph are provided to all child SearchSpaces for
-   * construction of new portions of the graph corresponding to their modeled inputs.
-   * @param nodeBuffer
+   * Log the results of a processed node and queue it within all subscribed
+   * processor nodes for construction of deeper search paths.
+   * @param node
    */
-  addResultBuffer(nodeBuffer: SearchNode[]): void;
+  protected saveResult(node: SearchNode) {
+    this.childQueues.forEach((buf) => buf.push(node));
+  }
 }
