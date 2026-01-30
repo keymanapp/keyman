@@ -343,6 +343,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   // setup normalization status
   const bool normalization_disabled = !test_kb->supports_normalization();
   test_source.set_normalization_disabled(normalization_disabled);
+  std::cout << "- normalization enabled = " << !normalization_disabled << std::endl;
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
@@ -377,7 +378,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       break;
     case km::tests::LDML_ACTION_KEY_EVENT: {
       auto &p = action.k;
-      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey(p.vk) << "/modifier "
+      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey_Always(p.vk) << "/modifier "
                 << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state << std::dec << std::endl;
       // Because a normal system tracks caps lock state itself,
       // we mimic that in the tests. We assume caps lock state is
