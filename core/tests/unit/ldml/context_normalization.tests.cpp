@@ -42,7 +42,7 @@ void teardown() {
 void setup(const char *keyboard) {
   teardown();
 
-  km::core::path path = km::core::path::join(arg_path, "keyboards", keyboard);
+  km::core::path path = km::core::path::join(arg_path, "keyboards", "17.0", keyboard);
   auto blob = km::tests::load_kmx_file(path.native().c_str());
   try_status(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
