@@ -2375,6 +2375,11 @@ builder_describe_platform() {
       fi
     done
   done
+
+  if [[ ${#_builder_targets[@]} == 0 ]]; then
+    builder_die "This script cannot be run on $builder_platform; supported platforms are: ${_builder_targets_excluded_by_platform[@]}"
+  fi
+
 }
 
 # Returns 0 if the specified target is excluded by platform requirements
