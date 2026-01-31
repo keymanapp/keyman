@@ -28,7 +28,7 @@
 
 
 int
-write_nfd_table() {
+write_nfc_table() {
 #ifndef __EMSCRIPTEN__
   std::cerr << "Note: This is unusual - this generator is usually only run under emscripten!" << std::endl;
 #endif
@@ -102,6 +102,6 @@ write_nfd_table() {
 
 int
 main(int /*argc*/, const char * /*argv*/[]) {
-  write_nfd_table();
+  write_nfc_table();
   return 0;
 }
