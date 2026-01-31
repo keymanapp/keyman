@@ -2,10 +2,9 @@
   "extends": "../../tsconfig.dom.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../build/test",
     "tsBuildInfoFile": "../../../build/test/tsconfig.tsbuildinfo",
-    "rootDir": "."
+    "rootDir": ".",
   },
 
   "include": [
@@ -13,6 +12,10 @@
     "headless/**/*.ts",
     "integrated/**/*.ts",
     "resources/**/*.ts",
-    "predictive-text/**/*.ts"
+    "predictive-text/**/*.ts",
+  ],
+
+  "references": [
+    { "path": "../../engine" },
   ]
 }

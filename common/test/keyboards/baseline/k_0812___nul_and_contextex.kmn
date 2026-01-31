@@ -1,0 +1,15 @@
+store(&NAME) '0812 - nul_and_contextex'
+c Description: Tests that context in context part of rule has the right offset when used with nul
+c keys: [K_T][K_T][K_B]
+c expected: 2tt3
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+store(cons) 'mnpqrstv'
+
+group(Main) using keys
+
+nul any(cons) context(2) + 'b' > '2' context(2) context(3) '3'

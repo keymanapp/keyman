@@ -29,8 +29,9 @@ src/test/auto              A Node-driven test suite for automated testing of Key
 
 ## Usage
 
-Open **index.html** or **samples/index.html** in your browser. Be sure to
-compile Keyman Engine for Web before viewing the pages.
+Start the test server by running `./build.sh start`, then open
+your browser to http://localhost:3000. Be sure to compile Keyman Engine
+for Web before viewing the pages.
 
 Refer to the samples for usage details.
 
@@ -84,7 +85,7 @@ graph TD;
     KeyboardSpec["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
     OSK-->KeyboardSpec;
-    WebUtils["@keymanapp/web-utils<br>(/web/src/engine/common/web-utils)"];
+    WebUtils["/web/src/common/web-utils"];
     KeyboardSpec---->WebUtils;
     Wordbreakers["@keymanapp/models-wordbreakers<br>(/web/src/engine/predictive-text/wordbreakers)"];
     Models["@keymanapp/models-templates<br>(/web/src/engine/predictive-text/templates/)"];
@@ -94,7 +95,7 @@ graph TD;
     LMWorker-->Wordbreakers;
     LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
     LMLayer-->LMWorker;
-    Gestures["@keymanapp/gesture-recognizer<br>(/web/src/engine/osk/gesture-recognizer)"];
+    Gestures["/web/src/engine/gesture-processor"];
     Gestures-->WebUtils;
 
     subgraph PredText["PredText: WebWorker + its interface"]
@@ -116,7 +117,7 @@ graph TD;
 
     subgraph ClassicWeb["`**ClassicWeb**
     Intermediate-level engine modules`"]
-        Elements["/web/src/engine/element-wrappers"];
+        Elements["/web/src/engine/element-text-stores"];
         Elements-->JSProc;
         KeyboardStorage["/web/src/engine/keyboard-storage"];
         KeyboardStorage-->Interfaces;

@@ -13,7 +13,7 @@ export class FocusStateAPIObject {
   activated: boolean;
 
   /**
-   * Indicates that KMW is actively maintaining focus on the currently active OutputTarget control
+   * Indicates that KMW is actively maintaining focus on the currently active TextStore control
    * while some UI element (the OSK, a keyboard-change UI) is the current focus of user-interaction.
    */
   activationPending: boolean;
@@ -35,7 +35,7 @@ interface EventMap {
 // Formerly handled under "UIManager".
 /**
  * This class provides fields and methods useful for assisting context management.  Control focus (and
- * thus, activation of the corresponding OutputTarget) should not be lost to non-context components of
+ * thus, activation of the corresponding TextStore) should not be lost to non-context components of
  * KMW, such as the OSK or a keyboard selector.
  */
 export class FocusAssistant extends EventEmitter<EventMap> {
@@ -57,19 +57,19 @@ export class FocusAssistant extends EventEmitter<EventMap> {
    * Long-term idea here: about all of the relevant OSK events that would interact with this have "enter" and
    * "leave" variants - we could take a stack of `Promise`s.  On a `Promise` fulfillment, remove it from the
    * stack.  When the last one is removed, the focus-maintenance state would end, allowing further events
-   * to deactivate the active OutputTarget.
+   * to deactivate the active TextStore.
    */
 
   /**
-   * Indicates that KMW is actively maintaining focus on the currently active OutputTarget control, rather
+   * Indicates that KMW is actively maintaining focus on the currently active TextStore control, rather
    * than losing focus while some UI element (the OSK, a keyboard-change UI) is the most direct recipient
    * of browser focus due to user-interaction - generally, with non-context engine components.
    *
-   * While the flag is active, the context-management system should not deactivate an OutputTarget upon
-   * its element's loss of focus within the page unless setting a different OutputTarget as active.
+   * While the flag is active, the context-management system should not deactivate an TextStore upon
+   * its element's loss of focus within the page unless setting a different TextStore as active.
    *
    * TODO: (potential) Future enhancement - this should not be possible to set if there is no currently-active
-   * context target to maintain.
+   * textStore to maintain.
    */
   // Formerly `isActivating`.
   public get maintainingFocus(): boolean {
@@ -80,7 +80,7 @@ export class FocusAssistant extends EventEmitter<EventMap> {
     const priorValue = this._maintainingFocus;
     this._maintainingFocus = value;
 
-    // Needed to properly update .activeTarget upon loss of maintaining-focus state.
+    // Needed to properly update .activeTextStore upon loss of maintaining-focus state.
     if(priorValue && !value) {
       this.emit('maintainingfocusend');
     }

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import PromiseStore from '#./promise-store.js';
+import { PromiseStore } from '#./promise-store.js';
 import { randomToken } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 describe('PromiseStore', function () {

@@ -14,8 +14,8 @@ SUBPROJECT_NAME=app/ui
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's desktop form-factor keyboard selection modules." \
-  "@/web/src/app/browser build" \
-  "@/web/src/tools/building/sourcemap-root" \
+  "@/web/src/app/browser                    build" \
+  "@/web/src/tools/building/sourcemap-root  build" \
   "clean" \
   "configure" \
   "build" \
@@ -48,14 +48,14 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/ui"
 
   types=(button float toggle toolbar)
-  for type in ${types[@]}
+  for type in "${types[@]}"
   do
     filename="kmwui${type}"
-    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+    node_es_bundle "${BUILD_ROOT}/obj/$filename.js" \
       --out        "${BUILD_ROOT}/debug/$filename.js" \
       --sourceRoot "@keymanapp/keyman/web/build/app/ui/debug"
 
-    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+    node_es_bundle "${BUILD_ROOT}/obj/$filename.js" \
       --out        "${BUILD_ROOT}/release/$filename.js" \
       --sourceRoot "@keymanapp/keyman/web/build/app/ui/release" \
       --minify
@@ -63,6 +63,10 @@ compile_and_copy() {
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/ui"
   cp -R "$KEYMAN_ROOT/web/src/resources/ui/." "$KEYMAN_ROOT/web/build/app/resources/ui/"
+
+  # Copy Keyman Core build artifacts for local reference
+  cp "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/ui/debug/"
+  cp "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/ui/release/"
 
   # Update the build/publish copy of our build artifacts
   prepare
