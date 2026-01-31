@@ -433,6 +433,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
+  g_beep_found = false;
+
   std::vector<km_core_context_item> test_context;
 
   km_core_context_item *citems = nullptr;
@@ -743,7 +745,6 @@ int main(int argc, char *argv[]) {
   if (rc != EXIT_SUCCESS) {
     std::wcerr << console_color::fg(console_color::BRIGHT_RED) << "FAILED" << console_color::reset() << std::endl;
     return EXIT_FAILURE;
-    return rc;
   }
 
   std::cout << std::endl << "2. Running tests in fully normalized mode" << std::endl;
