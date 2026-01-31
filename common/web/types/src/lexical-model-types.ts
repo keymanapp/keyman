@@ -303,10 +303,17 @@ export interface Suggestion {
   id?: number;
 
   /**
-   * The suggested update to the buffer. Note that this transform should
-   * be applied AFTER the instigating transform, if any.
+   * Specifies the edits needed to correct and extend the currently-edited word
+   * (within the text buffer) to match the suggested word from the lexicon.
+   * Note that this transform should be applied BEFORE the instigating transform, if any.
    */
   readonly transform: Transform;
+
+  /**
+   * Applies extra language-appropriate whitespace and/or punctuation after the main
+   * Suggestion body as specified by the source LexicalModel.
+   */
+  appendedTransform?: Transform;
 
   /**
    * A string to display the suggestion to the typist.
@@ -524,14 +531,28 @@ export interface Configuration {
   rightContextCodeUnits?: number,
 
   /**
-   * Whether or not the model appends characters to Suggestions for
-   * wordbreaking purposes.  (These characters need not be whitespace
-   * or actual wordbreak characters.)
+   * Specifies behaviors related to transforms that the active model appends
+   * to Suggestions for wordbreaking purposes.  (The Transforms need not apply
+   * whitespace or actual wordbreak characters.)
    *
    * If not specified, this will be auto-detected based on the model's
-   * punctuation properties (if they exist).
+   * punctuation properties (if they exist).  If left null/undefined, the model
+   * does not append wordbreaking transforms to Suggestions.
    */
-  wordbreaksAfterSuggestions?: boolean
+  appendsWordbreaks?: {
+    /**
+     * Specifies strings that, when input, always act as word-boundaries on the
+     * input - both when typed after a manually-applied suggestion (replacing
+     * appended whitespace) and when typed with an auto-selected suggestion
+     * available (thus accepting it directly, as with whitespace).
+     *
+     * This is designed to allow language-appropriate punctuation marks to
+     * automatically remove whitespace (or other wordbreak characters) as
+     * appropriate, and to auto-accept for inputs that clearly signal intent
+     * to end the current word, both in order to improve user UX with autocorrect.
+     */
+    breakingMarks?: string[];
+  }
 }
 
 

@@ -41,14 +41,16 @@ describe('ModelCompositor', function() {
         assert.isEmpty(suggestions1.filter((entry) => entry.tag != 'keep'));
         assert.isOk(suggestions1.find((entry) => entry.tag == 'keep'));
 
+        const context2 = {
+          left: "the apl", startOfBuffer: true, endOfBuffer: true
+        };
+        compositor.resetContext(context2, 2);
+        // Context + insert needs to match a word in the model; there is no matching word here.
+        // Invalid due to the existing context root.
         const suggestions2 = await compositor.predict({
           insert: "l",
           deleteLeft: 0
-        }, {
-          // Context + insert needs to match a word in the model; there is no matching word here.
-          // Invalid due to the existing context root.
-          left: "the apl", startOfBuffer: true, endOfBuffer: true
-        });
+        }, context2);
 
         assert.isEmpty(suggestions2.filter((entry) => entry.tag != 'keep'));
         assert.isOk(suggestions2.find((entry) => entry.tag == 'keep'));
@@ -69,6 +71,41 @@ describe('ModelCompositor', function() {
         assert.isNotEmpty(suggestions.filter((entry) => entry.tag != 'keep'));
         assert.isOk(suggestions.find((entry) => entry.tag == 'keep'));
         assert.isOk(suggestions.find((entry) => entry.displayAs == 'applied'));
+      });
+
+      it('generates suggestions from an empty context', async function() {
+        let compositor = new ModelCompositor(plainModel, true);
+        let context = {
+          left: '', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: '',
+          deleteLeft: 0
+        };
+
+        let suggestions = await compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // Suggstions are built based on the context state BEFORE the triggering
+          // input, replacing the prediction's root with the complete word.
+          //
+          // This is necessary, in part, for proper display-string construction.
+          assert.equal(suggestion.transform.deleteLeft, 0);
+        });
+
+        let keep = suggestions.find(function(suggestion) {
+          return suggestion.tag == 'keep';
+        });
+
+        assert.isUndefined(keep);
+
+        // Expect an appended space.
+        let expectedEntries = ['the', 'and', 'of', 'it'];
+        expectedEntries.forEach(function(entry) {
+          assert.isDefined(suggestions.find(function(suggestion) {
+            return suggestion.transform.insert == entry && suggestion.appendedTransform?.insert == ' ';
+          }));
+        });
       });
 
       it('generates suggestions with expected properties', async function() {
@@ -96,13 +133,14 @@ describe('ModelCompositor', function() {
         });
 
         assert.isDefined(keep);
-        assert.equal(keep.transform.insert, 'the ');
+        assert.equal(keep.transform.insert, 'the');
+        assert.isDefined(keep.appendedTransform?.insert, ' ');
 
         // Expect an appended space.
-        let expectedEntries = ['they ', 'there ', 'their ', 'these ', 'themselves '];
+        let expectedEntries = ['they', 'there', 'their', 'these', 'themselves'];
         expectedEntries.forEach(function(entry) {
           assert.isDefined(suggestions.find(function(suggestion) {
-            return suggestion.transform.insert == entry;
+            return suggestion.transform.insert == entry && suggestion.appendedTransform?.insert == ' ';
           }));
         });
       });
@@ -112,15 +150,15 @@ describe('ModelCompositor', function() {
         let context = {
           left: '', startOfBuffer: true, endOfBuffer: true,
         };
+        compositor.initContextTracker(context, 0); // Initialize context tracking first!
 
         // The 'weights' involved imply that we have an edge-case fat finger on the bottom of
         // the 'q' key, slightly in its favor.
         let inputDistribution = [
-          {sample: {insert: 'q', deleteLeft: 0}, p: 0.5},  // 'quite' (679) and 'question' (644) are included!
-          {sample: {insert: 'a', deleteLeft: 0}, p: 0.4}   // but at lower weight than 'and' (998).
+          {sample: {insert: 'q', deleteLeft: 0, id: 1}, p: 0.5},  // 'quite' (679) and 'question' (644) are included!
+          {sample: {insert: 'a', deleteLeft: 0, id: 1}, p: 0.4}   // but at lower weight than 'and' (998).
         ];
 
-        await compositor.predict({insert: '', deleteLeft: 0}, context); // Initialize context tracking first!
         let suggestions = await compositor.predict(inputDistribution, context);
 
         // remove the keep suggestion; we're not testing that here.
@@ -158,6 +196,40 @@ describe('ModelCompositor', function() {
         };
 
         let suggestions = await compositor.predict(inputTransform, context);
+        // Lots of suggestions are rooted on 'the'.  We should have more than
+        // just a single 'keep' suggestion.
+        assert.isAbove(suggestions.length, 1);
+
+        // Verify the deleteLeft length - gotta make sure we get that right.
+        suggestions.forEach(function(suggestion) {
+          // Suggestions always delete the full root of the suggestion.
+          //
+          // After a backspace, that means the text 'the' - 3 chars.
+          // Char 4 is for the original backspace, as suggestions are built
+          // based on the context state BEFORE the triggering input -
+          // here, a backspace.
+          assert.equal(suggestion.transform.deleteLeft, 4);
+        });
+      });
+
+      it('properly handles complex transforms that change the root token', async function() {
+        let compositor = new ModelCompositor(plainModel, true);
+        let context = {
+          left: 'the ', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: 'r',
+          deleteLeft: 1
+        };
+
+        let suggestions = await compositor.predict(inputTransform, context);
+        // Lots of suggestions are rooted on 'the'.  We should have more than
+        // just a single 'keep' suggestion.
+        assert.isAbove(suggestions.length, 1);
+        assert.isOk(suggestions.find((s => s.displayAs.startsWith("ther"))));
+
+        // Verify the deleteLeft length - gotta make sure we get that right.
         suggestions.forEach(function(suggestion) {
           // Suggestions always delete the full root of the suggestion.
           //
@@ -628,7 +700,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
@@ -671,7 +743,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello world ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
@@ -707,7 +779,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello world ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
@@ -750,7 +822,8 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let revertedContext = models.applyTransform(reversion.transform, appliedContext);
+      let revertedContext = models.applyTransform(reversion.transform, baseContext);
+      assert.equal(revertedContext.left, "hi");
       assert.deepEqual(revertedContext, unappliedContext);
 
       // Check #2:  Are the correct display strings built, depending on the active model's punctuation?
@@ -806,17 +879,21 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let suggestions = await compositor.applyReversion(reversion, appliedContext);
+      let suggestions = await compositor.applyReversion(reversion, models.applyTransform(postTransform, baseContext));
 
       // As this test is a bit... 'hard-wired', we only get the 'keep' suggestion.
       // It should still be accurate, though.
       assert.equal(suggestions.length, 1);
 
       let expectedTransform = {
-        insert: 'hi ',  // Keeps current context the same, though it adds a wordbreak.
+        insert: 'hi',  // Keeps current context the same, though it adds a wordbreak.
         deleteLeft: 2
       }
       assert.deepEqual(suggestions[0].transform, expectedTransform);
+      assert.deepEqual(suggestions[0].appendedTransform, {
+        insert: ' ',
+        deleteLeft: 0
+      });
     });
 
     it('model with traversals: returns appropriate suggestions upon reversion', async function() {
@@ -844,6 +921,7 @@ describe('ModelCompositor', function() {
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
       let baseSuggestion = initialSuggestions[1];
+      baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
@@ -873,37 +951,42 @@ describe('ModelCompositor', function() {
 
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
+      compositor.initContextTracker(baseContext, 0);
 
       let initialSuggestions = await compositor.predict(postTransform, baseContext);
-      const suggestionContextState = compositor.contextTracker.newest;
+      const suggestionContextState = compositor.contextTracker.latest;
 
       let keepSuggestion = initialSuggestions[0];
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
-      // One for base state, before the transform...
-      // one for after, since it makes an edit.
-      assert.equal(compositor.contextTracker.count, 2);
+      // We haven't actually recorded any suggestions, so there's no need to cache a rewind state just yet.
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 0);
 
       let baseSuggestion = initialSuggestions[1];
+      baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
+      // Two rewind states:  one for the suggestion's base word text, one for
+      // appended post-suggestion whitespace.
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
+      let contextIds = compositor.contextTracker.unitTestEndPoints.cache().keys();
+
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
-      // Accepting the suggestion adds an extra context state.
-      assert.equal(compositor.contextTracker.count, 3);
+      const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().get(15);
 
-      // The replacement should be marked on the context-tracking token.
-      assert.isOk(suggestionContextState.tail.replacement);
+      // Accepting the suggestion rewrites the latest context transition.
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
+      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [...contextIds]);
+
+      // The replacement should be marked on the context-tracking token for the applied version of the results.
+      assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);
+      assert.isAtLeast(appliedContextState.final.appliedSuggestionId, 0);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
-      compositor.applyReversion(reversion, appliedContext);
-
-      // Reverting the suggestion should remove that extra state.
-      assert.equal(compositor.contextTracker.count, 2);
-      assert.equal(compositor.contextTracker.item(1), suggestionContextState);
-
-      // The replacement should no longer be marked for the context-tracking token.
-      assert.isNotOk(suggestionContextState.tail.replacement);
+      await compositor.applyReversion(reversion, appliedContext);
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 1);
+      assert.isUndefined(compositor.contextTracker.unitTestEndPoints.cache().get(13).final.appliedSuggestionId);
     });
   });
 });
