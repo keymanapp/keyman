@@ -79,6 +79,7 @@ the `KMX_Version` enum:
 | `0x00000F00` | `VERSION_150` | Keyman 15.0                                                      |
 | `0x00001000` | `VERSION_160` | Keyman 16.0                                                      |
 | `0x00001100` | `VERSION_170` | Keyman 17.0                                                      |
+| `0x00001300` | `VERSION_190` | Keyman 19.0                                                      |
 
 ### `StartGroup`
 
@@ -100,6 +101,7 @@ The following flags are defined for .kmx keyboards:
 | `0x00000008` | `KF_LOGICALLAYOUT`    | Unused, should never be set                                                                 |
 | `0x00000010` | `KF_AUTOMATICVERSION` | The compiler determined the minimum version of Keyman automatically (see [`&Version`])      |
 | `0x00000020` | `KF_KMXPLUS`          | 16.0+: A `COMP_KEYBOARD_KMXPLUSINFO` structure is present immediately after `COMP_KEYBOARD` |
+| `0x00000040` | `KF_KMXPLUSOSK`       | 19.0+: The `COMP_KEYBOARD_KMXPLUSINFO` structure contains only OSK, and not a LDML keyboard |
 
 ### `dwHotKey`: keyboard hotkeys
 

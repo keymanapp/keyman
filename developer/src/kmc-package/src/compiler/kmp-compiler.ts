@@ -609,6 +609,12 @@ export class KmpCompiler implements KeymanCompiler {
     }
   }
 
+  // TODO-EMBED-OSK-IN-KMX: rewrite .kmx+ font data in the same way:
+  // meta: we need to rewrite the .KMX:
+  // 1. load the kmx and kmx+ headers, verify the file has KMX+ data and is v19+, otherwise skip
+  // 2. seek to the sect section, verify it is v19+, otherwise skip
+  // 3. seek to strs section, iterate over all strings, looking for magic token "*OSK-FONT-MAGIC-TOKEN-OSK-FONT*" (32 chars)
+  // 4. if found, rewrite the string to the font facename, and update the string length header; zero out remaining bytes
   private setKvkFontData(kpsFilename: string, data: KmpJsonFile.KmpJsonFile, filename: string, kvk: Uint8Array) {
     // find the appropriate font to set
     const kvkId = this.callbacks.path.basename(filename.toLowerCase(), '.kvk');
