@@ -4,7 +4,7 @@ import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import { KeyEvent } from "../keyEvent.js";
 import { type TextStore } from "../textStore.js";
 import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
-import { VariableStoreDictionary } from "../variableStore.js";
+import { VariableStore } from "../variableStore.js";
 
 import ComplexKeyboardStore = KeymanWebKeyboard.ComplexKeyboardStore;
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
@@ -120,9 +120,9 @@ export class JSKeyboard {
    *
    * @returns an object with each property referencing a variable store
    */
-  get variableStores(): VariableStoreDictionary {
+  get variableStores(): VariableStore {
     const storeNames = this.scriptObject['KVS'];
-    let values: VariableStoreDictionary = {};
+    let values: VariableStore = {};
     if(Array.isArray(storeNames)) {
       for(let store of storeNames) {
         values[store] = this.scriptObject[store];
@@ -139,7 +139,7 @@ export class JSKeyboard {
    *
    * @param values  name-value pairs for each store value
    */
-  set variableStores(values: VariableStoreDictionary) {
+  set variableStores(values: VariableStore) {
     const storeNames = this.scriptObject['KVS'];
     if(Array.isArray(storeNames)) {
       for(let store of storeNames) {
