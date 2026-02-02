@@ -39,7 +39,7 @@ public class KMPBrowserActivity extends BaseActivity {
   private static final String TAG = "KMPBrowserActivity";
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
-  private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s%s";
+  private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s?lang=%s";
   private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
   private static final String KMP_SEARCH_KEYBOARDS_DISPLAY_LANGUAGE_FORMATSTR = "?lang=%s";
 
@@ -180,7 +180,7 @@ public class KMPBrowserActivity extends BaseActivity {
     String languageStr = (languageID != null) ? KMString.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
 
     String appMajorVersion = KMManager.getMajorVersion();
-    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr, displayLangStr);
+    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr, displayLang);
     webView.loadUrl(kmpSearchUrl);
   }
 
