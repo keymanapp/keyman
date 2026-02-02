@@ -29,24 +29,24 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
     }
 
     //  U+  followed by 1.-6. hex digits will be used for conversion
-    let m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(inputString);
+    const  m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(inputString);
     // matches also invalid U+ ( U+ followed by anything) will be refused for conversion
-    let m_uni_inv = /^(U\+)+(.?)+$/i.exec(inputString);
+    const m_uni_inv = /^(U\+)+(.?)+$/i.exec(inputString);
 
     // &#x followed by 1.-6. hex digits will be used for conversion
-    let m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
+    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
     // &#  followed by 1.-6. decimal digits will be used for conversion
-    let m_dec = /^&#([0-9]{1,7});$/.exec(inputString);
+    const m_dec = /^&#([0-9]{1,7});$/.exec(inputString);
     // &  followed by gt, lt, quot, amp, apos will be used for conversion
-    let m_nam = /^&(gt|lt|quot|amp|apos);$/i.exec(inputString);
+    const m_nam = /^&(gt|lt|quot|amp|apos);$/i.exec(inputString);
     // matches also invalid & ( & followed by anything) will be will be refused for conversion for conversion
-    let m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
+    const m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
 
     // one or more characters except starting with U+ or & will be used for conversion
-    let m_chr = /^(?!U\+|&).+$/i.exec(inputString);
+    const m_chr = /^(?!U\+|&).+$/i.exec(inputString);
 
     // '&', '&#','&#x', or 'U+' with or without ; will be refused for conversion
-    let m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+|(U\+)+;?)$|^$/i.exec(inputString);
+    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+|(U\+)+;?)$|^$/i.exec(inputString);
 
     // if valid 'U+xxxx'
     if (m_uni) {
