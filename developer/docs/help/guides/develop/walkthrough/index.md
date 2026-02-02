@@ -10,7 +10,8 @@ Some tutorials seek to give the reader detailed step-by-step instructions to pro
 
 Other tutorials seek to present a series of topics and then invite readers to consider how these apply to their own data.
 
-This walkthrough attempts to provide both tutorial approaches. For each topic in the Table of Contents, the first section of that topic will provide a step-by-step guide to producing a keyboard for the Dagbani language. Subsequent sections under that topic will give other examples and discuss alternative approaches that readers can consider for their own data.
+This walkthrough attempts to provide both tutorial approaches. For each topic in the [Table of Contents](#toc-table-of-contents), the first section of that topic will provide a step-by-step guide to producing a keyboard for the Dagbani language. Subsequent sections under that topic will give other examples and discuss alternative approaches that readers can consider for their own data.
+
 
 To begin the "Step-by-Step" tutorial, start with the [Introduction](00-introduction).
 
