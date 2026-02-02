@@ -41,7 +41,7 @@ cd "${KEYMAN_ROOT}/developer/src"
 function _build_developer() {
   builder_echo start "build developer" "Building Keyman Developer"
 
-  ./build.sh configure build test api publish --npm-publish
+  builder_launch /developer/src/build.sh configure build test api publish
 
   builder_echo end "build developer" success "Finished building Keyman Developer"
 }
@@ -49,7 +49,7 @@ function _build_developer() {
 function _build_testkeyboards() {
   builder_echo start "build testkeyboards" "Building test keyboards"
 
-  "${KEYMAN_ROOT}/common/test/keyboards/build.sh"
+  builder_launch /common/test/keyboards/build.sh
 
   builder_echo end "build testkeyboards" success "Finished building test keyboards"
 }
@@ -57,7 +57,7 @@ function _build_testkeyboards() {
 function _publish_sentry() {
   builder_echo start "publish sentry" "Publishing debug information files to Sentry"
 
-  "${KEYMAN_ROOT}/developer/src/tools/sentry-upload-difs.sh"
+  builder_launch /developer/src/tools/sentry-upload-difs.sh
 
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }

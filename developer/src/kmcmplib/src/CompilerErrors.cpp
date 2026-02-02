@@ -21,11 +21,19 @@ void ReportCompilerMessage(KMX_DWORD msg, const std::vector<std::string>& parame
 
   KMCMP_COMPILER_RESULT_MESSAGE message;
   message.errorCode = msg;
-  message.lineNumber = kmcmp::currentLine + 1;
+  message.lineNumber = kmcmp::currentLine;
   message.columnNumber = kmcmp::ErrChr;
   message.parameters = parameters;
   message.filename = kmcmp::messageFilename;
   (*kmcmp::msgproc)(message, kmcmp::msgprocContext);
 
   kmcmp::ErrChr = 0;
+}
+
+void DefaultCompilerMessage::report(enum KmnCompilerMessages::KmnCompilerMessages msg, const std::vector<std::string>& parameters) {
+  ::ReportCompilerMessage(msg, parameters);
+}
+
+void DefaultCompilerMessage::report(enum KmnCompilerMessages::KmnCompilerMessages msg) {
+  ::ReportCompilerMessage(msg);
 }

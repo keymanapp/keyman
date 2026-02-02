@@ -27,43 +27,63 @@
             //   check/web/file-size
             //
 
+            function addLog(message) {
+              console.log(message);
+              return message + String.fromCharCode(10);
+            }
+
+            function addStatus(o, type, context, state) {
+              if(!o[context]) {
+                o[context] = {type, state};
+                return addLog(`Found ${context}: ${state}`);
+              } else {
+                return addLog(`Skipping repeated ${context}: ${state}`);
+              }
+            }
+
             function reduceStatuses(statuses) {
+              let summary = '';
               const filtered_statuses = statuses.reduce((o, status) => {
                 if(status.creator?.login == 'keyman-server' && status.context.startsWith('Test')) {
-                  if(!o[status.context]) o[status.context] = {type: 'build', state: status.state};
+                  summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.creator?.login == 'keymanapp-test-bot[bot]' && status.context == 'user_testing') {
-                  if(!o[status.context]) o[status.context] = {type: 'user-test', state: status.state};;
+                  summary += addStatus(o, 'user-test', status.context, status.state);
                 } else if(status.context == 'API Verification') {
-                  if(!o[status.context]) o[status.context] = {type: 'check', state: status.state};
+                  summary += addStatus(o, 'check', status.context, status.state);
                 } else if(status.context == 'Ubuntu Packaging') {
-                  if(!o[status.context]) o[status.context] = {type: 'build', state: status.state};
+                  summary += addStatus(o, 'build', status.context, status.state);
+                } else if(status.context == 'npm pack/publish') {
+                  summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.context == 'check/web/file-size') {
                   // Ignore check/web/file-size -- we won't block automerge for this at this point
+                  summary += addLog(`Skipping ${status.context}`);
                 } else {
                   // We fail with an 'unknown status' response if we get a new status check
                   // so we can be sure we are not skipping known status checks
+                  summary += addLog(`Found unknown ${status.context}: ${status.state}`);
                   o[status.context] = {type: 'unknown', state: status.state};
                 }
                 return o;
 
               }, {});
-              return filtered_statuses;
+              return { filtered_statuses, summary };
             }
 
             //
             // Given the collection of status checks we care about, return
-            // an aggregate status -- error, failed, pending, or success,
+            // an aggregate status -- error, failure, pending, or success,
             // and a summary description
             //
-            function calculateFinalStatus(filtered_statuses) {
+            function calculateFinalStatus(filtered_statuses, summary) {
               const counts = {};
               let hasBuilds = false;
               for(const context of Object.keys(filtered_statuses)) {
                 const { state, type } = filtered_statuses[context];
                 if(type == 'unknown') {
                   // We special-case for unknown status checks, and never permit them
+                  console.error(`An unknown context ${context} was found, cannot calculate build status.`);
                   return [
-                    'error', `An unknown context ${context} was found, cannot calculate build status.`
+                    'error', `An unknown context ${context} was found, cannot calculate build status.`, summary
                   ];
                 }
                 if(type == 'build') {
@@ -74,12 +94,13 @@
 
               // If we do not have any statuses yet, we wait
               if(Object.keys(filtered_statuses).length == 0 || !hasBuilds) {
-                return ['pending', 'Builds have not yet been triggered ⌛'];
+                console.log(`Builds not yet triggered`);
+                return ['pending', 'Builds have not yet been triggered ⌛', summary];
               }
 
               const state =
                 counts.error ? 'error' :
-                counts.failed ? 'failed' :
+                counts.failure ? 'failure' :
                 counts.pending ? 'pending' :
                 'success';
 
@@ -90,14 +111,16 @@
                 description += `${count} check${count == 1 ? '' : 's'} ${state}`;
               }
               appendDescription(counts.error, 'in an error state ❌');
-              appendDescription(counts.failed, 'failed ❌');
+              appendDescription(counts.failure, 'failed ❌');
               appendDescription(counts.pending, 'pending ⌛');
               appendDescription(counts.success, 'completed successfully ✅');
 
-              return [ state, description ];
+              console.log(`Finished filtering and reviewing status checks: ${state}: ${description}`);
+              return [ state, description, summary ];
             }
 
             async function getCommitStatuses(github, owner, repo, sha) {
+              console.log(`Getting commit statuses for ${sha}`);
               const statuses = await github.paginate('GET /repos/{owner}/{repo}/commits/{sha}/statuses', {
                 owner,
                 repo,
@@ -110,6 +133,7 @@
             }
 
             async function getCommitCheckRuns(github, owner, repo, sha) {
+              console.log(`Getting commit check runs for ${sha}`);
               const statuses = await github.paginate('GET /repos/{owner}/{repo}/commits/{sha}/check-runs', {
                 owner,
                 repo,
@@ -123,13 +147,11 @@
 
             function calculateCheckResult(statuses) {
               if(!Array.isArray(statuses)) {
-                return ['error', 'Failed to retrieve status checks from GitHub ❌'];
+                return ['error', 'Failed to retrieve status checks from GitHub ❌', 'statuses is not an array'];
               }
 
-              const filtered_statuses = reduceStatuses(statuses);
-
-              const result = calculateFinalStatus(filtered_statuses);
-              return result;
+              const { filtered_statuses, summary } = reduceStatuses(statuses);
+              return calculateFinalStatus(filtered_statuses, summary);
             }
 
             async function test(github, owner, repo, sha) {
@@ -149,7 +171,7 @@
               return check.data.id;
             }
 
-            async function updateCheck(github, owner, repo, checkRunId, status, description) {
+            async function updateCheck(github, owner, repo, checkRunId, status, description, summary) {
               const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
               const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
 
@@ -161,7 +183,7 @@
                 conclusion,
                 output: {
                   title: description,
-                  summary: ''
+                  summary
                 }
               });
             }
@@ -179,7 +201,7 @@
 
             // const checkRunId = await createCheck(github, owner, repo, sha);
             // const res = await test(github, owner, repo, sha);
-            // await updateCheck(github, owner, repo, checkRunId, res[0], res[1]);
+            // await updateCheck(github, owner, repo, checkRunId, res[0], res[1], res[2]);
 
 // CLONE-COMMENTED:END
 

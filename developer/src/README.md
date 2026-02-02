@@ -84,7 +84,7 @@ in Keyman for Windows.
 
 ## kmc
 
-node-based next generation compiler, hosts kmc, (and legacy kmlmc, kmlmp)
+node-based next generation compiler, hosts kmc
 
 ### kmc-analyze - Analysis tools
 

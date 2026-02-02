@@ -88,14 +88,19 @@ type
     procedure HandleFirstRun;
     function CurrentStateName: string;
     (**
-     * Checks if Keyman is the WaitingRestartState and that
-     * Keyman has not run in this Windows session.
-     * The sole purpose is for the calling code then produce
-     * a UI to confirm the user wants to continue install.
+     * Checks if Keyman is the WaitingRestartState, the cache is valid
+     * and that Keyman has not run in this Windows session. It also confirms
+     * that automatic updates are still enabled #14295.
+     * The purpose is for the calling code can choose to produce
+     * a UI to confirm the user wants to install an update,
+     * if everything is ready to start a update.
+     *
+     * NOTE: If it finds the cache is invalid it will abort causing
+     * the State Machine to change state, returning to idle.
      *
      * @returns True  if the Keyman is ready to install.
      *)
-    function ReadyToInstall: Boolean;
+    function ValidateReadyToInstall: Boolean;
     function IsInstallingState: Boolean;
 
     function GetAutomaticUpdates: Boolean;
@@ -558,14 +563,27 @@ begin
   Result := CurrentState.ClassName;
 end;
 
-function TUpdateStateMachine.ReadyToInstall: Boolean;
+function TUpdateStateMachine.ValidateReadyToInstall: Boolean;
 begin
   if not IsCurrentStateAssigned then
     Exit(False);
-  if (CurrentState is WaitingRestartState) and not HasKeymanRun then
-    Result := True
-  else
-    Result := False;
+
+  if not (CurrentState is WaitingRestartState) then
+    Exit(False);
+
+  // Verify conditions since entering WaitingRestartState:
+  // If the cache is not valid or automatic updates have
+  // been disabled clear the cache and return to the idle state.
+  if not TUpdateCheckStorage.CheckMetaDataForUpdate or not Self.GetAutomaticUpdates then
+  begin
+    HandleAbort;
+    Exit(False);
+  end;
+
+  if not HasKeymanRun then
+    Exit(True);
+
+  Result := False;
 end;
 
 function TUpdateStateMachine.IsInstallingState: Boolean;
@@ -630,6 +648,8 @@ var
   CheckForUpdates: TRemoteUpdateCheck;
   UpdateCheckResult: TRemoteUpdateCheckResult;
 begin
+  // ensure the cache is empty
+  bucStateContext.RemoveCachedFiles;
   // Remote manages the last check time therefore
   // we will allow it to return early if it hasn't reached
   // the configured time between checks.
@@ -955,7 +975,7 @@ begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
       bucStateContext.CurrentState.HandleCheck;
-      Result := kmShellExit;
+      Result := kmShellContinue;
     end
     else
     begin

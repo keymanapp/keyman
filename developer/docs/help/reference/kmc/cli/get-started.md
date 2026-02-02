@@ -149,13 +149,16 @@ referenced folder, e.g. `kmc build .`.
 [KMConvert](../../../context/kmconvert) generates keyboards and models from templates,
 and converts keyboard layouts between different formats.
 
+[kmc generate][kmc] replicates most of the functionality in KMConvert, except for
+importing Windows keyboards.
+
 The [New Project dialog](../../../context/new-project) in Keyman Developer provides a
 graphical version of the most common functionality in KMConvert.
 
 * [KMConvert reference](../../../context/kmconvert)
 
-**Note:** KMConvert is currently a Windows executable, and will be integrated
-into kmc in an upcoming version of Keyman.
+**Note:** KMConvert is currently a Windows executable, and the remaining
+functionality will be integrated into kmc in an upcoming version of Keyman.
 
 [kmc]: ./reference
 [file-layout]: ../../file-layout

@@ -31,19 +31,19 @@ package. Enter a description for the shortcut, and select the program or
 file to start from the Program list. Four predefined program entries
 (Start Product), (Product Configuration), (Product Help) and (About
 Product) will be translated into the appropriate shortcuts to start
-Keyman Desktop tasks as described.
+Keyman for Windows tasks as described.
 
 > ### Note
 In Keyman 6 and earlier, the predefined targets $KEYMAN\keyman.exe and
 $KEYMAN\kmshell.exe were available. These are translated to (Start
-Product) and (Product Configuration), respectively, in Keyman Desktop
+Product) and (Product Configuration), respectively, in Keyman
 7.0 and later versions.
 
 <!-- a seperator -->
 
 > ### Tip
 Packages are not listed in the Control Panel Add/Remove Programs applet
-with Keyman Desktop 7.0 and later versions. Packages can be uninstalled
-through the Start Menu shortcut or from Keyman Desktop Configuration.
+with Keyman 7.0 and later versions. Packages can be uninstalled
+through the Start Menu shortcut or from Keyman Configuration.
 
 [Step 6: Compiling, testing and distributing a Package](step-6)

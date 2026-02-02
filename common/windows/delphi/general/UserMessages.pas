@@ -1,18 +1,18 @@
 (*
   Name:             UserMessages
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      5 Jul 2012
 
   Modified Date:    6 Nov 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          05 Jul 2012 - mcdurdin - I3390 - Font helper can crash when WM_FONTCHANGE received [CrashID:keyman.exe_8.0.350.0_2C53A3AE_EAccessViolation]
                     04 Nov 2012 - mcdurdin - I3519 - V9.0 - Merge of I3390 - Font helper can crash when WM_FONTCHANGE received
                     28 May 2014 - mcdurdin - I4242 - Crash when OSK closed/reopened without dismissing hint window [CrashID:keyman.exe_9.0.449.0_2C405C5D_EInvalidPointer]
@@ -57,8 +57,13 @@ const
   WM_USER_SYNTAXCOLOURCHANGE = WM_USER + 130;
 
 const
-  // UfrmOSKOnScreenKeyboard
+  // UfrmPrintOSK
   WM_USER_PrintKeyboard = WM_USER + 140;
+
+const
+  // UfrmOSKOnScreenKeyboard
+  // Receive notification of modifier key changes from keyman32.dll
+  WM_KEYMAN_OSK_MODIFIER_EVENT = WM_USER + 141;
 
 const
   // UfrmOSKFontHelper

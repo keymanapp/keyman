@@ -1,5 +1,381 @@
 # Keyman Version History
 
+## 19.0.170 alpha 2025-12-03
+
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.1.1 in /resources/build/pr-build-status (#15173)
+* chore(deps-dev): bump glob from 10.4.5 to 10.5.0 in /resources/build/pr-build-status (#15184)
+* chore(deps): bump js-yaml and @microsoft/api-documenter (#15185)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#15186)
+* docs(developer): add/update API docs (#15275)
+
+## 19.0.169 alpha 2025-12-02
+
+* maint(core): verify that keyman_core_ldml.h is in sync (#15256)
+* chore(common): Update FirstVoices keyboard versions in keyboards.csv (#15261)
+
+## 19.0.168 alpha 2025-12-01
+
+* chore(android): add intent to broadcast font name (#15193)
+* docs(android): Document Keyman API for keyboard font change (#15247)
+* docs(ios): Use /cdn/dev assets for Engine guides (#15253)
+* fix(developer): handle errors in .keyman-touch-layout file when loading (#15243)
+* fix(android): address keyboard height vs touch height race after keyboard height preference change (also min max heights + docs) (#13663)
+
+## 19.0.167 alpha 2025-11-28
+
+* change(windows): add unit testing to keyman32 build (#15244)
+* refactor(windows): merge syskbdnt.cpp and syskbdnt64.cpp into RightAltEmulationCheck.cpp (#15245)
+* chore(windows): add wow64kbd support app for researching WOW64 reqs (#15246)
+
+## 19.0.166 alpha 2025-11-26
+
+* chore(android): Clarify PR title for #15136 (#15224)
+* fix(windows): escape backslashes in path in debugging message (#15236)
+
+## 19.0.165 alpha 2025-11-21
+
+* chore(mac): add keyTrace log (#14972)
+* fix(developer): avoid race in page.onload vs kmw.init in Server (#15087)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15179)
+
+## 19.0.164 alpha 2025-11-20
+
+* feat(windows): update wix to 3.14.1 (#15194)
+
+## 19.0.163 alpha 2025-11-17
+
+* chore(linux): Update debian changelog (#15133)
+* fix(windows): handle exceptions when walking stack in exception handler (#15150)
+* fix(windows): disable OutputDebugString from DllMain (#15151)
+* change(windows): include map2pdb generation for relevant Delphi projects (#14799)
+* change(windows): use circular buffer for logging (#15163)
+* fix(windows): handle forward slash for KEYMAN_ROOT env var (#15156)
+* maint(mac): handle hdiutil detach failure correctly in make-km-dmg.sh (#15176)
+
+## 19.0.162 alpha 2025-11-14
+
+* chore(linux): use `devel` for next Ubuntu release (#15157)
+* maint(resources): add build timing report to builder (#15114)
+* maint(resources): add `builder_launch` function (#15129)
+* fix(web): improve determination of default path (#15159)
+* maint(linux): free disk space before running autopkgtests (#15172)
+
+## 19.0.161 alpha 2025-11-13
+
+* docs(android): Add documentation explaining Android keyboard safety warning dialog (#15136)
+
+## 19.0.160 alpha 2025-11-12
+
+* fix(android): Change Alert Dialog instead of Toast if package missing keyboard and lexical-model files (#15098)
+* chore(linux): add support for Ubuntu 26.04 LTS Resolute (#15137)
+
+## 19.0.159 alpha 2025-11-11
+
+* maint(core): fix option defaults for Meson >= 1.1 (#15131)
+
+## 19.0.158 alpha 2025-11-10
+
+* fix(web): add unit tests for DeadkeyTracker and fix a few bugs (#15113)
+
+## 19.0.157 alpha 2025-11-06
+
+* chore(common): Consolidate platformtest.js keyboard to `/common/test/keyboards/` (#15034)
+* chore(common): Consolidate test9469.js keyboard to `/common/test/keyboards/` (#15053)
+
+## 19.0.156 alpha 2025-11-05
+
+* chore(linux): Update debian changelog (#14965)
+* maint(resources): Docker container changes permissions to match the file owner uid and gid (#14900)
+* fix(developer): remove package version if FollowKeyboardVersion is set in Package Editor (#15088)
+* maint(windows): new timestamp server for test signing (#15091)
+
+## 19.0.155 alpha 2025-11-03
+
+* maint(resources): auto merge on branch name rather than label (#15084)
+* change(developer): remove kmlmc and kmlmp (#15083)
+
+## 19.0.154 alpha 2025-10-31
+
+* chore(developer): further debugging for assertion failure (#15056)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15058)
+* fix(developer): handle exceptions loading .keyman-touch-layout files (#15060)
+* chore(developer): fix always-false nullish coalescing (#15061)
+* chore(windows): upgrade VC++ projects to v143 (VS2022) (#15062)
+
+## 19.0.153 alpha 2025-10-30
+
+* test(developer): add kmc-analyze tests for AnalyzeOskCharacterUse output formats (#15030)
+
+## 19.0.152 alpha 2025-10-30
+
+* maint(resources): include sourcemaps in npm publish (#15051)
+
+## 19.0.151 alpha 2025-10-29
+
+* maint(resources): add repository record for all published packages (#15049)
+
+## 19.0.150 alpha 2025-10-29
+
+* maint(resources): set build flags for npm-publish (#15047)
+
+## 19.0.149 alpha 2025-10-29
+
+* maint(resources): don't report status check on release builds for npm-publish (#15045)
+
+## 19.0.148 alpha 2025-10-29
+
+* chore(web,android): Consolidate chirality.js test keyboard to `/common/test/resources/keyboards/` (#14989)
+* maint(resources): npm publish - build all packages first (#15042)
+
+## 19.0.147 alpha 2025-10-28
+
+* maint(resources): move npm package publishing to GitHub Actions (#15029)
+* maint(resources): use actions/setup-node to upgrade npm (#15035)
+* maint(resources): use a string for version, rather than number (#15036)
+* maint(resources): set env variables in npm publish GHA (#15037)
+* maint(mac): minor tweaks to mac setup, using build.sh (#15028)
+* maint(resources): add build and test for npm packaging and add status check results (#15038)
+* maint(resources): add write permission for statuses for npm-publish (#15039)
+* maint(resources): skip nvm in npm-publish script (#15041)
+
+## 19.0.146 alpha 2025-10-27
+
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15008)
+* fix(developer): prevent ANSI keyboards crashing debugger (#15022)
+* test(developer): add coverage tests for warning messages in kmc-analyze/AnalyzeOskCharacterUse (#15021)
+
+## 19.0.145 alpha 2025-10-24
+
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15001)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15002)
+* test(developer): add test to kmc-analyze for Warn_PreviousMapFileCouldNotBeLoaded (#14038)
+
+## 19.0.144 alpha 2025-10-23
+
+* chore(deps-dev): bump playwright from 1.46.1 to 1.56.1 (#14984)
+* chore(web): revert "chore(deps-dev): bump playwright from 1.46.1 to 1.56.1" (#15000)
+
+## 19.0.143 alpha 2025-10-20
+
+* fix(android): Set the main app background white (#14935)
+
+## 19.0.142 alpha 2025-10-17
+
+* chore(common): add .model_info schema (#14967)
+* chore(web): update helpURL documentation and float ui link (#14960)
+* fix(linux): use `ibus` command to restart ibus (#14971)
+* chore(linux): replace deprecated `parse_version` (#14973)
+
+## 19.0.141 alpha 2025-10-16
+
+* refactor(linux): extract functions (#14937)
+* refactor(linux): remove no-longer-needed Python 3.7 code (#14956)
+* chore(linux): don't report errors to Sentry when running autopkgtests (#14938)
+* fix(linux): fix installing keyboard in shared area (#14953)
+* fix(linux): install schema during `keyman-config/build.sh install` (#14962)
+* test(linux): add regression tests for cli tools to autopkgtests (#14950)
+
+## 19.0.140 alpha 2025-10-15
+
+* fix(mac): add Microsoft Word to non-compliant app list (#14940)
+
+## 19.0.139 alpha 2025-10-13
+
+* fix(windows): osk: handle simulated left Control event when AltGr pressed (#14909)
+
+## 19.0.138 alpha 2025-10-11
+
+* fix(android): Update Sample1 text field to resize (#14922)
+
+## 19.0.137 alpha 2025-10-10
+
+* chore(common): Update crowdin strings for Vietnamese (#14915)
+* maint(resources): fix watch bug for common files, and add more logging for triggering builds (#14893)
+* docs(developer): Update keyboard-editor.md to clarify when entire row will be deleted (#14919)
+
+## 19.0.136 alpha 2025-10-09
+
+* fix(android): Refactor bottom inset calculations for in-app and system keyboard (#14873)
+* fix(linux): replace `dbus-x11` dependency (#14895)
+* chore(ios): renew certificate (#14914)
+
+## 19.0.135 alpha 2025-10-08
+
+* fix(android): Convert longpress delay menu to ConstraintLayout (#14897)
+
+## 19.0.134 alpha 2025-10-07
+
+* maint(resources): nest unit tests under parent block (#14871)
+
+## 19.0.133 alpha 2025-10-06
+
+* chore(linux): Update debian changelog (#14856)
+* maint(linux): fix integration tests in Docker (#14817)
+
+## 19.0.132 alpha 2025-10-03
+
+* fix(windows): remove cached files in idle state (#14683)
+
+## 19.0.131 alpha 2025-10-02
+
+* refactor(web): cleanup in test scripts (#14870)
+
+## 19.0.130 alpha 2025-09-30
+
+* maint(linux): allow to remote debug integration tests in Docker (#14818)
+* maint(resources): running the container for core in privileged mode (#14867)
+
+## 19.0.129 alpha 2025-09-29
+
+* chore(linux): remove no longer needed lintian overrides (#14810)
+
+## 19.0.128 alpha 2025-09-26
+
+* fix(windows): sort setup UI language selector according to language names (#13573)
+* feat(windows): improve startup time by caching locale names (#14795)
+
+## 19.0.127 alpha 2025-09-25
+
+* fix(common): registry clean-up enabled, no terminal in github action (#14824)
+* maint(windows): check code signatures only in CI builds (#14815)
+* chore(deps-dev): bump tar-fs from 3.0.9 to 3.1.1 (#14827)
+* fix(windows): disable MSI shortcut advertisement (#14814)
+* maint(resources): lookup 7z on path on Windows if SEVENZ_HOME is not set (#14816)
+* fix(android): Apply bottom insets to system keyboard (#14808)
+* fix(android): Fix bottom insets for Sample and FirstVoices apps (#14828)
+* docs(android): Document getNavigationBarHeight API (#14830)
+
+## 19.0.126 alpha 2025-09-24
+
+* maint(linux): remove several shellcheck directives (#14819)
+
+## 19.0.125 alpha 2025-09-23
+
+* fix(common): some more tests running successfully in a container (#14784)
+
+## 19.0.124 alpha 2025-09-22
+
+* maint(linux): improve `upload-to-debian` script (#14798)
+* refactor(linux): remove a meson deprecation warning (#14801)
+* refactor(linux): remove shellcheck warnings (#14802)
+* refactor(resources): use array for Docker arguments (#14803)
+
+## 19.0.123 alpha 2025-09-19
+
+* chore(linux): Update debian changelog (#14783)
+
+## 19.0.122 alpha 2025-09-18
+
+* fix(android): Refresh the banner theme when system keyboard is changed (#14768)
+* maint(common): update HISTORY.md for 18.0.241 (#14780)
+
+## 19.0.121 alpha 2025-09-17
+
+* docs(developer): document `fileVersion` (#14766)
+* maint(linux): allow to force package build on non-Keyman repo (#14749)
+* feat(linux): add breadcrumbs and system information to Sentry error reports (#14765)
+* maint(resources): fix broken test build trigger for `master` branch (#14770)
+* chore(linux): remove automatic installation of `onboard-keyman` (#14772)
+
+## 19.0.120 alpha 2025-09-16
+
+* refactor(linux): remove warning (#14761)
+* fix(linux): don't crash on invalid languages in keyboard (#14760)
+
+## 19.0.119 alpha 2025-09-15
+
+* fix(developer): transform slashes to backslashes in paths in Package Editor (#14721)
+* fix(developer): restrict invalid characters in identifiers in kmcmplib (#14746)
+* fix(common): add name for cleanup ghcr (#14755)
+
+## 19.0.118 alpha 2025-09-12
+
+* chore(common): Update to Unicode 17.0 (#14728)
+* fix(resources): match cr to lf change in pr-build-status.mjs (#14734)
+* fix(common): merging build and publish step for docker (#14747)
+* chore(developer): use icons.res to verify that configure is done (#14733)
+
+## 19.0.117 alpha 2025-09-11
+
+* fix(resources): ignore KEYMAN_VERSION_FOR_FILENAME in test (#14730)
+* fix(resources): pr build status - find 'failure' state in status checks and log (#14732)
+
+## 19.0.116 alpha 2025-09-10
+
+* fix(windows): kmshell continues when sm is in waitingrestart  and returns to idle (#14644)
+* maint(linux): allow to skip API check (#14699)
+* maint(resources): adding GitHub actions workflow for Docker builds (#14674)
+* maint(developer): use versioned filenames for PR artifacts (#14701)
+* maint(windows): use versioned filenames for PR artifacts (#14702)
+* maint(android): use versioned filenames for PR artifacts (#14703)
+* maint(ios): use versioned filenames for PR artifacts (#14704)
+* maint(mac): use versioned filenames for PR artifacts (#14705)
+* maint(resources): rename KEYMAN_VERSION_FOR_PR_FILENAME (#14720)
+
+## 19.0.115 alpha 2025-09-09
+
+* fix(linux): don't crash if `kmp.json` is missing `keyboards` section (#14708)
+
+## 19.0.114 alpha 2025-09-08
+
+* docs(web): Improve empty What's New page for Web (#14660)
+* maint(linux): remove obsolete Makefile (#14694)
+* maint(resources): honor configure comment character in commit message (#14695)
+* fix(web): fix error trying to calculate style scaling effects (#14684)
+* refactor(resources): remove shellcheck warnings (#14698)
+
+## 19.0.113 alpha 2025-09-04
+
+* fix(android): Update KMSample1 layout when changing orientation (#14678)
+
+## 19.0.112 alpha 2025-09-03
+
+* fix(developer): add clear messages about validation failures to New LM Project Parameters form (#14659)
+* docs(developer): tweak get-started for kmc and add entry to HISTORY.md (#14667)
+* fix(android): Cleanup list layout in Engine and FirstVoices for edge to edge (#14655)
+* docs(common): update license date and owner (#14668)
+* maint(linux): skip tarball creation for `Build-bot: build` buildLevel (#14671)
+* docs(common): update docs Keyman Desktop → Keyman for Windows (#14669)
+* feat(web): adds transform cataloging methods to predictive-text worker (#14581)
+* feat(web): batch correction-search paths by related subsets (#14592)
+* refactor(web): simplify edit-distance calculation-object inputs (#14618)
+
+## 19.0.111 alpha 2025-09-02
+
+* change(developer): update SIL logo (#14656)
+* fix(developer): remove incorrect offset for compiler error line (#14651)
+* fix(developer): add clear messages about validation failures to New Project Parameters form (#14657)
+* fix(developer): add clear messages about validation failures to New LDML Project Parameters form (#14658)
+* maint: add registry usage for Docker images (#14648)
+
+## 19.0.110 alpha 2025-09-01
+
+* maint(windows): for `build` buildlevel, do not publish artifacts (#14654)
+* maint(linux): generate tar-ignore in `dist.sh` (#14639)
+* fix: fixing some issues for bulding and testing with Docker containers (#14645)
+* maint(linux): create temporary worktree for packaging (#14598)
+
+## 19.0.109 alpha 2025-08-31
+
+* fix(developer): handle missing model id in package with compiler error (#14649)
+* fix(developer): handle failure to create destination path when generating new project (#14650)
+
+## 19.0.108 alpha 2025-08-29
+
+* fix(android): Fix insets for in-app vs system keyboard (#14619)
+* maint(resources): ensure REPO_ROOT is fully resolved (#14643)
+
+## 19.0.107 alpha 2025-08-28
+
+* maint(resources): fix parse bug in build-bot and add extra logging (#14611)
+* fix(android): Update Gradle files to remove flatDir warnings (#14583)
+* maint(resources): move build trigger scripts into resources/teamcity (#14607)
+* chore(linux): Update debian changelog (#14590)
+* docs: update package-editor page section details tab (#14585)
+* fix(android): polyfill globalThis for API 28 devices (#14541)
+* feat: support pagination in build bot PR commit reading (#14638)
+* refactor(linux): remove shellcheck warnings and reformat (#14572)
+
 ## 19.0.106 alpha 2025-08-27
 
 * fix(windows): check if automatic updates off before prompt (#14295)
@@ -663,6 +1039,64 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.245 stable 2025-12-03
+
+* chore(windows): VS2022 patch for stable-18.0 (#15081)
+* maint(resources): use VERSION_ENVIRONMENT var for v18 (#15068)
+* chore(linux): Update debian changelog (#14964)
+* fix(windows): add check a fix for registry datatypes (#15175)
+* chore(linux): Update debian changelog (#15132)
+* feat(windows): update wix to 3.14.1 (#15195)
+* fix(windows): reinstall low level keyboard hook if it gets removed (#15219)
+
+## 18.0.244 stable 2025-10-31
+
+* fix(linux): use `ibus` command to restart ibus (#14975)
+* fix(android): Set the main app background white (#14982)
+* fix(developer): do not treat backslash as a string escape in syntax highlighting (#15005)
+* fix(developer): handle missing `begin Unicode` in KMW compiler (#15006)
+* fix(mac): ignore non-Unicode key caps when preparing OSK (#15009)
+* maint(resources): move NPM package publishing to GitHub Actions (#15054)
+* chore(developer): add breadcrumbs to trace sporadic crashes on exit (#15059)
+* chore(developer): further debugging for assertion failure (#15057)
+
+## 18.0.243 stable 2025-10-15
+
+* chore(linux): Update debian changelog (#14855)
+* fix(android): Convert longpress delay menu to ConstraintLayout (#14906)
+* fix(linux): replace `dbus-x11` dependency (#14898)
+* chore(ios): renew certificate (#14917)
+* fix(android): Refactor bottom inset calculations for inapp and system keyboard (#14913)
+* fix(mac): add Microsoft Word to non-compliant app list (#14951)
+
+## 18.0.242 stable 2025-09-29
+
+* maint(linux): remove Oracular, add Questing (#14781)
+* maint(resources): use VERSION variable in increment-version.sh (#14779)
+* chore(linux): Update debian changelog (#14782)
+* fix(developer): remove incorrect offset for compiler error line (#14792)
+* maint(linux): improve getting PR# in `upload-to-debian.sh` (#14785)
+* chore(linux): remove no longer needed lintian overrides (#14811)
+* fix(android): Apply bottom insets to system keyboard for Keyman, KMSample2, and FirstVoices (#14833)
+* fix(windows): disable .msi shortcut advertisement (#14829)
+* feat(windows): improve startup time by caching locale names (#14832)
+
+## 18.0.241 stable 2025-09-18
+
+* maint(resources): use correct version for PR title for history cherry-pick (#14614)
+* chore(linux): Update debian changelog (#14589)
+* fix(android): Update: Android Target API to 35, Java to 21, and Gradle dependencies (#14584)
+* fix(android): Convert Keyman app layouts for edge to edge (#14597)
+* fix(android): Fix insets for in-app vs system keyboard (#14642)
+* maint(linux): create temporary worktree for packaging (#14599)
+* fix(android): Cleanup layouts for Engine, Sample apps, and FirstVoices apps for edge to edge (#14663)
+* fix(web): fix error trying to calculate style scaling effects (#14696)
+* fix(linux): don't crash if `kmp.json` is missing `keyboards` section (#14714)
+* fix(developer): transform slashes to backslashes in paths in Package Editor (#14722)
+* chore(linux): remove automatic installation of `onboard-keyman` (#14773)
+* docs(linux): update release notes for stable release (#14774)
+* fix(linux): don't crash on invalid languages in keyboard (#14771)
+
 ## 18.0.240 stable 2025-08-27
 
 * maint(resources): automatically cherry-pick history updates to master (#14596)
@@ -674,6 +1108,7 @@
 * docs(linux): clarify requirement of patched ibus for Keyman < 18 (#14113)
 * chore(linux): Update debian changelog (#14118)
 * fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult enum (#14208)
+* fix(windows): fix download failing when cache.json missing (#14207)
 * fix(web): deploy `web/build/publish` folder (#14238)
 * fix(ios): restore keyboard scale map for iPad Air 2 (#14306)
 * chore(developer): upgrade multer to 2.0.2 (#14417)

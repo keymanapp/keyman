@@ -19,7 +19,7 @@ source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/tike.exe"
 
 builder_describe_outputs \
-  configure:project    /developer/src/tike/xml/layoutbuilder/keymanweb-osk.ttf \
+  configure:project    /developer/src/tike/icons.res \
   build:project        /developer/src/tike/$WIN32_TARGET
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -72,8 +72,6 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  cp kmlmc.cmd "$DEVELOPER_PROGRAM"
-  cp kmlmp.cmd "$DEVELOPER_PROGRAM"
   cp kmc.cmd "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$DEVELOPER_PROGRAM"
   builder_if_release_build_level cp "$WIN32_TARGET_PATH/tike.dbg" "$DEVELOPER_DEBUGPATH"

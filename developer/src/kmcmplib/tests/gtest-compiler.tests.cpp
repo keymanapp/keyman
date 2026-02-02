@@ -175,7 +175,7 @@ TEST_F(CompilerTest, ReportCompilerMessage_test) {
     ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile, params);
     EXPECT_EQ(1, kmcmp::nErrors);
     EXPECT_EQ(KmnCompilerMessages::FATAL_CannotCreateTempfile, msgproc_errors[0].errorCode);
-    EXPECT_EQ(kmcmp::currentLine+1, msgproc_errors[0].lineNumber);
+    EXPECT_EQ(kmcmp::currentLine, msgproc_errors[0].lineNumber);
     EXPECT_EQ(kmcmp::ErrChr, msgproc_errors[0].columnNumber);
     EXPECT_TRUE(msgproc_errors[0].filename == kmcmp::messageFilename);
     EXPECT_TRUE(msgproc_errors[0].parameters == params);
@@ -752,8 +752,16 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     EXPECT_EQ(0, u16cmp(tstr_deadkey_valid, tstr));
     fileKeyboard.cxDeadKeyArray = 0;
 
+    // deadkey, valid
+    u16cpy(str, u"deadkey(%)");
+    EXPECT_EQ(0, (int)fileKeyboard.cxDeadKeyArray);
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_deadkey_valid_pct[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 }; // setup deadkeys
+    EXPECT_EQ(0, u16cmp(tstr_deadkey_valid_pct, tstr));
+    fileKeyboard.cxDeadKeyArray = 0;
+
     // dk, KmnCompilerMessages::ERROR_InvalidDeadkey, bad character
-    u16cpy(str, u"dk(%)");
+    u16cpy(str, u"dk(,)");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidDeadkey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // dk, KmnCompilerMessages::ERROR_InvalidDeadkey, no delimiters => NULL
