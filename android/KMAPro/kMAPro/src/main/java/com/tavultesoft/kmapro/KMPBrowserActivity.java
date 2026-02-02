@@ -241,7 +241,6 @@ public class KMPBrowserActivity extends BaseActivity {
 
     String appMajorVersion = KMManager.getMajorVersion();
     String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr, displayLang);
-    Log.d(TAG, "Search: " + kmpSearchUrl);
     return kmpSearchUrl;
   }
 
