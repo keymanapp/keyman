@@ -11,7 +11,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks } from './helpers/index.js';
 
-import { convertUtil } from '@keymanapp/common-types'
+import { convertUtil } from '@keymanapp/common-types';
 //import { convertUtil } from '@keymanapp/developer-utils';
 
 describe('convert-utils2', function () {
@@ -40,7 +40,9 @@ describe('convert-utils2', function () {
       ['X;', 'X;'],
       ['123;', '123;'],
       [';', ';'],
-      [' ;', ' ;']
+     // ['&#1234;56', 'yyyy'],
+      ['&#1234;', 'U+1234'],
+     // ['&&', 'xxx'],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
         const result = convertUtil.convertToUnicodeCodePoint(values[0] as string);
@@ -51,28 +53,61 @@ describe('convert-utils2', function () {
 
   describe('convertToUnicodeCharacter from convert-utils2', function () {
     [
-      ["&#1000000;", undefined],
       ["a", 'a'],
       ["ሴ", 'ሴ'],
       ['😎', '😎'],
       ["ẘ", "ẘ"],
-      ["U+1E98", "ẘ"],
-      ["", ''],
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
       ["&#x1F60E;", '😎'],
-      ["&#x1000000;", undefined],
+      ["&#x1E98;", "ẘ"],
       ["&#97;", 'a'],
       ["&#4660;", 'ሴ'],
       ["&#128518;", '😆'],
+      ["&#7832;", "ẘ"],
       ["U+0061", 'a'],
       ["U+1234", 'ሴ'],
       ["U+1F60E", '😎'],
-      ["U+1000000;", undefined],
+      ["U+1E98", "ẘ"],
+      ["U+", undefined],
+      ['U+', undefined],
+      ['U+U+', undefined],
+      ['U+D799', '힙'],
+      ['U+D800', undefined],
+      ['U+D83D', undefined],
+      ['U+DFFF', undefined],
+      ['U+10FFFF', '􏿿'],
+      ['U+E000', ''],
+      ['U+1000000', undefined],
+      ["&gt;", '>'],
       ["&commat;", undefined],
-      ["ab", undefined],
+      ["&commat", undefined],
+      ["ab", "ab"],
+      ["abcde", "abcde"],
+      ["ሴሴ", 'ሴሴ'],
+      ['😎😆', '😎😆'],
+      ["ẘẘ", "ẘẘ"],
+      ["", ''],
+      ['&', '&'],
+      ['&;', '&;'],
+      ['&&', '&&'],
+      ['&&;', '&&;'],
+      ["&#&#", undefined],
+      ["&#x&#x", undefined],
+      ["&#", undefined],
+      ["&#;", undefined],
+      ["&#x", undefined],
+      ["&#x;", undefined],
+      ['&##', undefined],
+      ['&##;', undefined],
+      ["&#x10FFFF;", "􏿿"],
+      ["&#1114111;", "􏿿"],
+      ["&#x110000;", undefined],
+      ["&#x1000000;", undefined],
+      ['&#1234;56', undefined],
       [undefined, undefined],
-      [null, undefined]
+      [null, undefined],
+
     ].forEach(function (values) {
       it(('from writer should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
         const result = convertUtil.convertToUnicodeCharacter(values[0] as string);
