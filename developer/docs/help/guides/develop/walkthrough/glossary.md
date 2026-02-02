@@ -6,11 +6,11 @@ title: Glossary of Key Terms
 
 ### Keyman Developer
 
-Keyman Developer is a powerful tool you can use to create custom keyboards optimized to type in any language you choose. Keyboards created with Keyman Developer can be used on Windows, Mac, Linux, iOS, Android, and the web. The Keyman Developer IDE (integrated development environment) is currently Windows-only, however the command line tools it uses can run on other platforms (such as Linux and macOS).
+Keyman Developer is a powerful tool you can use to create custom keyboards optimized to type in any language you choose. Keyboards created with Keyman Developer can be used on Windows, macOS, Linux, iOS, Android, and the web. The Keyman Developer IDE (integrated development environment) is currently Windows-only, however the command line tools it uses can run on other platforms (such as Linux and macOS).
 
 ### Keyman
 
-The application that allows users to actually use keyboards created with Keyman Developer. Available on Windows, MacOS, Linux, iOS, Android, and the web. Distinguished from Keyman Developer by its regular (not faded) app icon.
+The application that allows users to actually use keyboards created with Keyman Developer. Available on Windows, macOS, Linux, iOS, Android, and the web. Distinguished from Keyman Developer by its regular (not faded) app icon.
 
 ### Keyboard Editor
 
@@ -40,7 +40,7 @@ A subset of the keys in a keyboard layout. This subset is accessed by a modifier
 
 ### Desktop Layout
 
-A keyboard layout designed for use on desktop/laptop computers with physical keyboards (Windows, Mac, Linux). It is also used when a physical keyboard is attached to a touch device. Stored in .kmn files.
+A keyboard layout designed for use on desktop/laptop computers with physical keyboards (Windows, macOS, Linux). It is also used when a physical keyboard is attached to a touch device. Stored in .kmn files.
 
 ### Visual Keyboard / On Screen Keyboard
 
