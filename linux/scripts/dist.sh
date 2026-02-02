@@ -39,38 +39,97 @@ dch keyman --newversion "${KEYMAN_VERSION}" --force-bad-version --nomultimaint
 
 # Create the tarball
 
-# files and folders to include in the tarball
-# shellcheck disable=2034  # to_exclude appears to be unused
-to_include=(
-  common/build.sh \
-  common/cpp \
-  common/include \
-  common/linux \
-  common/test/keyboards/baseline \
-  core \
-  linux \
-  resources/build/*.sh \
-  resources/build/meson \
-  resources/standards-data \
-  resources/*.sh \
-  ./*.md \
-  ./build.sh \
-  ./*.json \
-)
+if [[ ! -z "${create_origdist+x}" ]]; then
+  # Limited tarball - only the files needed to create Ubuntu package
 
-# files and subfolders to exclude from paths included in 'to_include',
-# i.e. the exceptions to 'to_include'.
-# shellcheck disable=2034  # to_exclude appears to be unused
-to_exclude=(
-  common/test/keyboards/baseline/kmcomp-*.zip \
-  core/build \
-  linux/build \
-  linux/builddebs \
-  linux/docs/help \
-  linux/keyman-config/keyman_config/version.py \
-  linux/keyman-config/buildtools/build-langtags.py \
-  linux/keyman-system-service/build
-)
+  # files and folders to include in the tarball
+  # shellcheck disable=2034  # to_include appears to be unused
+  to_include=(
+    common/build.sh \
+    common/cpp \
+    common/include \
+    common/linux \
+    common/test/keyboards/baseline \
+    core \
+    linux \
+    resources/build/*.sh \
+    resources/build/meson \
+    resources/standards-data \
+    resources/*.sh \
+    ./*.md \
+    ./build.sh \
+    ./*.json \
+  )
+
+  # files and subfolders to exclude from paths included in 'to_include',
+  # i.e. the exceptions to 'to_include'.
+  # shellcheck disable=2034  # to_exclude appears to be unused
+  to_exclude=(
+    build \
+    common/test/keyboards/baseline/kmcomp-*.zip \
+    linux/builddebs \
+    linux/docs/help \
+    linux/keyman-config/keyman_config/version.py \
+    linux/keyman-config/buildtools/build-langtags.py \
+  )
+else
+  # Full tarball - all files needed to run `${KEYMAN_ROOT}/build.sh` on Linux
+  # files and folders to include in the tarball
+  # shellcheck disable=2034  # to_include appears to be unused
+  to_include=(
+    common/build.sh \
+    common/cpp \
+    common/include \
+    common/linux \
+    common/test/keyboards/baseline \
+    common/tools/hextobin \
+    common/web/keyman-version \
+    common/web/langtags \
+    common/web/types \
+    common/windows/cpp \
+    core \
+    developer/src/common/include \
+    developer/src/common/web \
+    developer/src/ext/json \
+    developer/src/kmc \
+    developer/src/kmc-analyze \
+    developer/src/kmc-copy \
+    developer/src/kmc-generate \
+    developer/src/kmc-keyboard-info \
+    developer/src/kmc-kmn \
+    developer/src/kmc-ldml \
+    developer/src/kmc-model \
+    developer/src/kmc-model-info \
+    developer/src/kmc-package \
+    developer/src/kmcmplib \
+    docs/minimum-versions.md.in
+    linux \
+    resources/build \
+    resources/standards-data \
+    resources/*.sh \
+    ./*.md \
+    ./build.sh \
+    ./*.json \
+  )
+
+  # files and subfolders to exclude from paths included in 'to_include',
+  # i.e. the exceptions to 'to_include'.
+  # shellcheck disable=2034  # to_exclude appears to be unused
+  to_exclude=(
+    build \
+    *.exe \
+    common/test/keyboards/baseline/kmcomp-*.zip \
+    linux/builddebs \
+    linux/docs/help \
+    linux/keyman-config/keyman_config/version.py \
+    linux/keyman-config/buildtools/build-langtags.py \
+    resources/build/history \
+    resources/build/l10n \
+    resources/build/mac \
+    resources/build/win \
+    resources/build/*.lua \
+  )
+fi
 
 # array to store list of --tar-ignore parameters generated from to_include and to_exclude.
 ignored_files=()
@@ -109,7 +168,7 @@ cd "${BASEDIR}"
 
 # create orig.tar.gz
 if [[ ! -z "${create_origdist+x}" ]]; then
-    cd dist
+    cd "${KEYMAN_ROOT}/linux/dist"
     pkgvers="keyman-${KEYMAN_VERSION}"
     tar xfz keyman-"${KEYMAN_VERSION}".tar.gz
     mv -v keyman "${pkgvers}" 2>/dev/null || mv -v "$(find . -mindepth 1 -maxdepth 1 -type d)" "${pkgvers}"
