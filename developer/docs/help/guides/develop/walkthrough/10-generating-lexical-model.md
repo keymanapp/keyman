@@ -4,9 +4,9 @@ title: Generating a Lexical Model
 
 Part 10 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package)
+[< Back: Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package)
 
-[Next: Part 11 - Installing a Keyman Lexical Model →](11-installing-lexical-model)
+[Next: Part 11 - Installing a Keyman Lexical Model >](11-installing-lexical-model)
 
 ## Step-by-Step
 
@@ -368,6 +368,6 @@ Note: The text provided for this tutorial is already in a `.txt` file format. Fo
 
 ![](images/windows-save-txt.png)
 
-[← Back: Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package)
+[< Back: Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package)
 
-[Next: Part 11 - Installing a Keyman Lexical Model →](11-installing-lexical-model)
+[Next: Part 11 - Installing a Keyman Lexical Model >](11-installing-lexical-model)

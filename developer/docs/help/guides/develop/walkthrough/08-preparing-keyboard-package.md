@@ -4,9 +4,9 @@ title: Preparing a Keyboard Package
 
 Part 8 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 7 - Writing Keyboard Documentation](07-writing-keyboard-documentation)
+[< Back: Part 7 - Writing Keyboard Documentation](07-writing-keyboard-documentation)
 
-[Next: Part 9 - Distributing a Keyboard Package →](09-distributing-keyboard-package)
+[Next: Part 9 - Distributing a Keyboard Package >](09-distributing-keyboard-package)
 
 ## Step-by-Step
 
@@ -58,6 +58,6 @@ Here is where you can enter information for:
 - Image file: If you supply a 140 pixel wide x 250 pixel high image in JPEG or PNG format, then your custom image will be shown during installation (in place of the default Keyman image). Your image file must be added to the Files list before it will be available to be selected here.
 - Related packages: If your keyboard is part of a group of keyboards, you can specify which other keyboards are part of the group. (For example, you might have three keyboards for the same language, one based on the QWERTY layout, one AZERTY, one QWERTZ, and you could use this field to note the relationship between them.) You can also use this feature to deprecate another keyboard that your keyboard supersedes.
 
-[← Back: Part 7 - Writing Keyboard Documentation](07-writing-keyboard-documentation)
+[< Back: Part 7 - Writing Keyboard Documentation](07-writing-keyboard-documentation)
 
-[Next: Part 9 - Distributing a Keyboard Package →](09-distributing-keyboard-package)
+[Next: Part 9 - Distributing a Keyboard Package >](09-distributing-keyboard-package)

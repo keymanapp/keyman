@@ -4,9 +4,9 @@ title: Creating a Desktop Layout
 
 Part 3 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 2 - Designing a Desktop Layout](02-designing-desktop-layout)
+[< Back: Part 2 - Designing a Desktop Layout](02-designing-desktop-layout)
 
-[Next: Part 4 - Using the Debugger →](04-using-debugger)
+[Next: Part 4 - Using the Debugger >](04-using-debugger)
 
 ## Step-by-Step
 
@@ -322,6 +322,6 @@ Then complete the information needed:
 - Select `Save`
 - In the `Output Bitmap Parameters` dialog, select `One file per shift state`, `Output Unicode keyboards`, and adjust the width of the image as needed, then select `OK`. Keyman Developer will create one or more files using the base filename plus letters to indicate the shift state plus `.png`. You can reference these files in your welcome.htm file.
 
-[← Back: Part 2 - Designing a Desktop Layout](02-designing-desktop-layout)
+[< Back: Part 2 - Designing a Desktop Layout](02-designing-desktop-layout)
 
-[Next: Part 4 - Using the Debugger →](04-using-debugger)
+[Next: Part 4 - Using the Debugger >](04-using-debugger)

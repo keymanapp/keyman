@@ -2,7 +2,7 @@
 title: Introduction
 ---
 
-[Next: Part 1 - Creating a Keyboard Project →](01-creating-keyboard-project)
+[Next: Part 1 - Creating a Keyboard Project >](01-creating-keyboard-project)
 
 ## Step-by-Step
 
@@ -14,7 +14,7 @@ If you encounter unfamiliar terms, please consult the [glossary](glossary).
 
 Keyman Developer is a powerful tool you can use to create custom keyboards optimized to type in any language you choose. Keyboard authors can distribute their work for desktop, web, tablet and phone, enabling global communities to quickly benefit from keyboards made for their own language.
 
-Keyboards created with Keyman Developer can be used on Windows, Mac, Linux, iOS, Android, and the web.
+Keyboards created with Keyman Developer can be used on Windows, macOS, Linux, iOS, Android, and the web.
 
 This tutorial focuses on the Keyman Developer IDE (integrated development environment).
 Currently this software is Windows-only, although the command line tools it uses can run on other platforms (such as Linux and macOS).
@@ -29,7 +29,7 @@ After installing Keyman Developer, you should be able to run it on your computer
 
 Note that Keyman Developer is a separate app from Keyman, which is the app that lets you use any keyboard created with Keyman Developer.
 In order to use the keyboard you create with Keyman Developer, you'll need to have the Keyman app installed on your computer or device.
-Keyman is available on the following platforms: Windows, MacOS, Linux, iOS, Android, and the web.
+Keyman is available on the following platforms: Windows, macOS, Linux, iOS, Android, and the web.
 
 The icons for Keyman Developer ![Keyman Developer icon](images/keyman-developer-icon.png) and Keyman ![Keyman icon](images/keyman-icon.png) are similar but slightly different.
 
@@ -71,5 +71,5 @@ There is also a mechanism for reporting problems. [Keyman Bug Reports](https://g
 
 Report Keyman software bugs and issues here. NOTE: NOT for help and support questions. The Keyman community forum is the best place to ask for help with development. Think you’ve found a Keyman bug or a problem with a specific keyboard? Describe what you’ve found on the Keyman community forum and ask whether to report a bug.
 
-[Next: Part 1 - Creating a Keyboard Project →](01-creating-keyboard-project)
+[Next: Part 1 - Creating a Keyboard Project >](01-creating-keyboard-project)
 

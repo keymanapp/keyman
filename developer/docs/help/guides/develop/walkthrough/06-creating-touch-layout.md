@@ -4,9 +4,9 @@ title: Creating a Touch Layout
 
 Part 6 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 5 - Designing a Touch Keyboard](05-designing-touch-layout)
+[< Back: Part 5 - Designing a Touch Keyboard](05-designing-touch-layout)
 
-[Next: Part 7 - Writing Keyboard Documentation Files →](07-writing-keyboard-documentation)
+[Next: Part 7 - Writing Keyboard Documentation Files >](07-writing-keyboard-documentation)
 
 ## Step-by-Step
 
@@ -146,6 +146,6 @@ See [https://help.keyman.com/developer/current-version/context/keyboard-editor#t
 
 See the end of the Step-by-Step section above for a description of how to use Keyman Developer to test your touch layout in a browser window. It’s also possible to transfer the .kmp file to a touch device and install the keyboard there for testing.
 
-[← Back: Part 5 - Designing a Touch Keyboard](05-designing-touch-layout)
+[< Back: Part 5 - Designing a Touch Keyboard](05-designing-touch-layout)
 
-[Next: Part 7 - Writing Keyboard Documentation Files →](07-writing-keyboard-documentation)
+[Next: Part 7 - Writing Keyboard Documentation Files >](07-writing-keyboard-documentation)

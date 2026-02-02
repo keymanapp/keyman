@@ -4,9 +4,9 @@ title: Distributing a Keyboard Package
 
 Part 9 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 8 - Preparing a Keyboard Package](08-preparing-keyboard-package)
+[< Back: Part 8 - Preparing a Keyboard Package](08-preparing-keyboard-package)
 
-[Next: Part 10 - Generating a Lexical Model →](10-generating-lexical-model)
+[Next: Part 10 - Generating a Lexical Model >](10-generating-lexical-model)
 
 ## Step-by-Step
 
@@ -30,6 +30,6 @@ With Keyman Developer running, it’s possible to select `Packaging`, and the `.
 
 The Keyboard App Builder (KAB) lets you put a Keyman keyboard (and optionally a lexical model) into an app for iOS or Android, which can be distributed. More details can be found on the [Keyboard App Builder](https://software.sil.org/keyboardappbuilder/) page.
 
-[← Back: Part 8 - Preparing a Keyboard Package](08-preparing-keyboard-package)
+[< Back: Part 8 - Preparing a Keyboard Package](08-preparing-keyboard-package)
 
-[Next: Part 10 - Generating a Lexical Model →](10-generating-lexical-model)
+[Next: Part 10 - Generating a Lexical Model >](10-generating-lexical-model)

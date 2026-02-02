@@ -4,9 +4,9 @@ title: Designing a Desktop Layout
 
 Part 2 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 1 - Creating a Keyboard Project](01-creating-keyboard-project)
+[< Back: Part 1 - Creating a Keyboard Project](01-creating-keyboard-project)
 
-[Next: Part 3 - Creating a Desktop Layout →](03-creating-desktop-layout)
+[Next: Part 3 - Creating a Desktop Layout >](03-creating-desktop-layout)
 
 ## Step-by-Step
 
@@ -140,6 +140,6 @@ That could be done with the `Design` mode using the visual layout tools, or by a
 We would then want to add rules to allow the user to type the characters that were on the ten keys that we repurposed to type the additional characters, for example type the `;` key then the `[` key to get an actual `[` character.
 
 
-[← Back: Part 1 - Creating a Keyboard Project](01-creating-keyboard-project)
+[< Back: Part 1 - Creating a Keyboard Project](01-creating-keyboard-project)
 
-[Next: Part 3 - Creating a Desktop Layout →](03-creating-desktop-layout)
+[Next: Part 3 - Creating a Desktop Layout >](03-creating-desktop-layout)

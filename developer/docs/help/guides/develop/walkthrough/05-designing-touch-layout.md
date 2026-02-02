@@ -4,9 +4,9 @@ title: Designing a Touch Layout
 
 Part 5 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 4 - Using the Debugger](04-using-debugger)
+[< Back: Part 4 - Using the Debugger](04-using-debugger)
 
-[Next: Part 6 - Creating a Touch Layout →](06-creating-touch-layout)
+[Next: Part 6 - Creating a Touch Layout >](06-creating-touch-layout)
 
 ## Step-by-Step
 
@@ -53,6 +53,6 @@ To switch to a “phone” layout, select the basic template, which rearranges t
 (For more details, see the next topic.)
 The result will need to be reviewed and tested, but using this approach may save you some time.
 
-[← Back: Part 4 - Using the Debugger](04-using-debugger)
+[< Back: Part 4 - Using the Debugger](04-using-debugger)
 
-[Next: Part 6 - Creating a Touch Layout →](06-creating-touch-layout)
+[Next: Part 6 - Creating a Touch Layout >](06-creating-touch-layout)

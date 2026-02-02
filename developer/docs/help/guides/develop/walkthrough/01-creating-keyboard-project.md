@@ -4,9 +4,9 @@ title: Creating a Keyboard Project
 
 Part 1 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Introduction](00-introduction)
+[< Back: Introduction](00-introduction)
 
-[Next: Part 2 - Designing a Desktop Layout →](02-designing-desktop-layout)
+[Next: Part 2 - Designing a Desktop Layout >](02-designing-desktop-layout)
 
 ## Step-by-Step
 
@@ -148,7 +148,7 @@ If you select `any`, you do not need to (and should not) choose any other option
 
 It is best practice to support as many devices as possible when creating your keyboard, because it is hard to predict who will use your keyboard in the future. By making your keyboard as accessible as possible, you can help even more people.
 
-If you decide not to include a touch layout, untick the `any` option and select `desktop` and `web` which will allow the keyboard to be used on a web page as well as on Linux, Mac and Windows (the three `desktop` platforms). If you later add a touch layout, you can reverse this process and go back to selecting just `any`.
+If you decide not to include a touch layout, untick the `any` option and select `desktop` and `web` which will allow the keyboard to be used on a web page as well as on Linux, macOS and Windows (the three `desktop` platforms). If you later add a touch layout, you can reverse this process and go back to selecting just `any`.
 
 ### Path
 
@@ -184,6 +184,6 @@ When ready, select `OK` to download the files, adjust the filenames and open the
 
 Now that you have your project set up, continue to the next section of the tutorial to start developing your first keyboard layout.
 
-[← Back: Introduction](00-introduction)
+[< Back: Introduction](00-introduction)
 
-[Next: Part 2 - Designing a Desktop Layout →](02-designing-desktop-layout)
+[Next: Part 2 - Designing a Desktop Layout >](02-designing-desktop-layout)

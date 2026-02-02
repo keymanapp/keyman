@@ -4,7 +4,7 @@ title: Installing a Keyman Lexical Model
 
 Part 11 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[← Back: Part 10 - Generating a Lexical Model](10-generating-lexical-model)
+[< Back: Part 10 - Generating a Lexical Model](10-generating-lexical-model)
 
 ## Step-by-Step
 
@@ -29,4 +29,4 @@ If an Android or iOS device has access to the Keyman package file (.kmp) that co
 As mentioned earlier, the Keyboard App Builder (KAB) lets you put a Keyman keyboard along with a lexical model into an app for iOS or Android, which can be distributed.
 More details can be found on the [Keyboard App Builder](https://software.sil.org/keyboardappbuilder/) page.
 
-[← Back: Part 10 - Generating a Lexical Model](10-generating-lexical-model)
+[< Back: Part 10 - Generating a Lexical Model](10-generating-lexical-model)
