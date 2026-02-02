@@ -165,22 +165,7 @@ public class KMPBrowserActivity extends BaseActivity {
       }
     });
 
-    // Tier determines the keyboard search host
-    String host = KMPLink.getHost();
-
-    // If display language is provided, include it in the keyboard search. Otherwise fallback to default locale
-    String fallbackLang = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ?
-      LocaleList.getDefault().get(0).toLanguageTag() : "en";
-    Bundle bundle = getIntent().getExtras();
-    String displayLang = (bundle != null) && bundle.containsKey("lang") ? bundle.getString("lang") : fallbackLang;
-    String displayLangStr = KMString.format(KMP_SEARCH_KEYBOARDS_DISPLAY_LANGUAGE_FORMATSTR, displayLang);
-
-    // If language ID is provided for keyboard search, include it in the keyboard search
-    String languageID = getIntent().getStringExtra("languageCode");
-    String languageStr = (languageID != null) ? KMString.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
-
-    String appMajorVersion = KMManager.getMajorVersion();
-    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr, displayLang);
+    String kmpSearchUrl = determineSearchUrl();
     webView.loadUrl(kmpSearchUrl);
   }
 
@@ -189,7 +174,8 @@ public class KMPBrowserActivity extends BaseActivity {
     super.onResume();
 
     if (webView != null) {
-      webView.reload();
+      String kmpSearchUrl = determineSearchUrl();
+      webView.loadUrl(kmpSearchUrl);
     }
   }
 
@@ -230,6 +216,33 @@ public class KMPBrowserActivity extends BaseActivity {
       super.onBackPressed();
       finish();
     }
+  }
+
+  /**
+   * Parse the keyman.com keyboard search URL while accounting for:
+   * host (production or staging)
+   * languageID - language ID to search for
+   * display language - request search results to be displayed in this language
+   * @return String
+   */
+  private String determineSearchUrl() {
+    // Tier determines the keyboard search host
+    String host = KMPLink.getHost();
+
+    // If display language is provided, include it in the keyboard search. Otherwise fallback to default locale
+    String fallbackLang = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ?
+      LocaleList.getDefault().get(0).toLanguageTag() : "en";
+    Bundle bundle = getIntent().getExtras();
+    String displayLang = (bundle != null) && bundle.containsKey("lang") ? bundle.getString("lang") : fallbackLang;
+
+    // If language ID is provided for keyboard search, include it in the keyboard search
+    String languageID = getIntent().getStringExtra("languageCode");
+    String languageStr = (languageID != null) ? KMString.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
+
+    String appMajorVersion = KMManager.getMajorVersion();
+    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr, displayLang);
+    Log.d(TAG, "Search: " + kmpSearchUrl);
+    return kmpSearchUrl;
   }
 
   /**
