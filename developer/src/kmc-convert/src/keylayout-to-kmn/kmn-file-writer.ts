@@ -161,7 +161,7 @@ export class KmnFileWriter {
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let version_output_character;
         const warn_text = this.reviewRules(unique_data_Rules, k);
-console.log('TODO:  if convertToUnicodeCharacter returns undefined here, we should handle that case');
+//console.log('TODO:  if convertToUnicodeCharacter returns undefined here, we should handle that case');
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = convertUtil.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = convertUtil.convertToUnicodeCodePoint(output_character);

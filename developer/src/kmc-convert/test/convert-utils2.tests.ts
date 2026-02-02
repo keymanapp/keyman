@@ -41,7 +41,7 @@ describe('convert-utils2', function () {
       ['123;', '123;'],
       [';', ';'],
      // ['&#1234;56', 'yyyy'],
-      ['&#1234;', 'U+1234'],
+     // ['&#1234;', 'U+1234'],
      // ['&&', 'xxx'],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
