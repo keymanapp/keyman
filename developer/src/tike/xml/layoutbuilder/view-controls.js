@@ -12,6 +12,11 @@ $(function() {
     builder.prepareKey();
   });
 
+  $('#viewOptionsForm').on('submit', function() {
+    $('#viewOptionsDialog').dialog('close');
+    return false;
+  });
+
   $('#viewOptionsDialog').dialog({
     autoOpen: false,
     height: 300,

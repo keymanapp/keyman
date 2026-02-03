@@ -161,8 +161,10 @@ def add_standard_arguments(parser):
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
-
-gettext.bindtextdomain('keyman-config', '/usr/share/locale')
+if os.environ.get('TEXTDOMAINDIR'):
+    gettext.bindtextdomain('keyman-config', os.environ['TEXTDOMAINDIR'])
+else:
+    gettext.bindtextdomain('keyman-config', '/usr/share/locale')
 gettext.textdomain('keyman-config')
 
 
