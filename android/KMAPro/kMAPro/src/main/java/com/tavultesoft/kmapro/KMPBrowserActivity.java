@@ -41,7 +41,6 @@ public class KMPBrowserActivity extends BaseActivity {
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
   private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s?lang=%s";
   private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
-  private static final String KMP_SEARCH_KEYBOARDS_DISPLAY_LANGUAGE_FORMATSTR = "?lang=%s";
 
   // Patterns for determining if a link should be opened in external browser
   // 1. Host isn't keyman.com (production/staging)
