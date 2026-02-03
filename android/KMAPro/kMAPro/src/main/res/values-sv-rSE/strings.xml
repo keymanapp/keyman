@@ -115,9 +115,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Alla språk är redan installerade</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Dra tangentbordet för att ändra storlek på höjden</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Rotera enheten för att justera stående och liggande</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Dra tangentbordet för att ändra storlek på höjden. Rotera enheten för att justera stående och liggande.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Återställ till standard</string>
   <!-- Context: Keyman Web Browser -->

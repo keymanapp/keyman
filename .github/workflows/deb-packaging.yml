@@ -136,7 +136,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [jammy, noble, plucky, questing]
+        dist: [jammy, noble, questing]
 
     steps:
     - name: Checkout
