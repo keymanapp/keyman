@@ -697,13 +697,17 @@ static void
 process_persist_action(IBusEngine *engine, km_core_option_item *persist_options) {
   g_assert(persist_options != NULL);
 
+  g_debug("%s: processing persist options", __FUNCTION__);
+
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   for (km_core_option_item *option = persist_options; !is_core_options_end(option); option++) {
     // Put the keyboard option into DConf
     g_assert(option->key != NULL && option->value != NULL);
-    g_message("%s: Saving keyboard option to DConf", __FUNCTION__);
+    g_autofree gchar* key   = g_utf16_to_utf8((gunichar2*)option->key, -1, NULL, NULL, NULL);
+    g_autofree gchar* value = g_utf16_to_utf8((gunichar2*)option->value, -1, NULL, NULL, NULL);
+    g_debug("%s: Saving keyboard option to DConf: %s/%s, %s=%s", __FUNCTION__, keyman->kb_name, keyman->kb_name, key, value);
     // Load the current keyboard options from DConf
-    keyman_put_keyboard_options_todconf(keyman->kb_name, keyman->kb_name, (gchar *)option->key, (gchar *)option->value);
+    keyman_put_keyboard_options_todconf(keyman->kb_name, keyman->kb_name, key, value);
   }
 }
 
