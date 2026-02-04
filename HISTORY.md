@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.198 alpha 2026-02-04
+
+* fix(core): handle backspace decomposition (#15488)
+* fix(core): normalization segment should end on NFC boundary, not NFD (#15506)
+
 ## 19.0.197 alpha 2026-02-02
 
 * chore(deps): bump tar from 7.5.6 to 7.5.7 in /developer/src/server/src/win32/trayicon/addon-src (#15514)
