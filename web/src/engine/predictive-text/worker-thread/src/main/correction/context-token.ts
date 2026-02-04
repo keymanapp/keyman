@@ -201,7 +201,7 @@ export class ContextToken {
    * @param lexicalModel
    * @returns
    */
-  split(split: TokenSplitMap) {
+  split(split: TokenSplitMap): ContextToken[] {
     // Split from tail to head - leave as much 'head' intact as possible at each
     // step, rather than needing to reconstruct the tail multiple times.
     const splitSpecs = split.matches.slice();
