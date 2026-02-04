@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.246 stable 2026-02-04
+
+* cherrypick(common):  Update FirstVoices versions in keyboards.csv (#15273)
+* docs(ios): Use /cdn/dev assets for Engine guides (#15274)
+* chore(linux): Update debian changelog (#15281)
+* maint(linux): remove EOL Ubuntu 25.04 Plucky (#15424)
+* docs(developer): update primerprep link (#15468)
+* chore(ios): Add fv_tlingityooxatangi to FirstVoices for iOS app (#15496)
+* fix(core): handle backspace decomposition (#15494)
+* fix(core): normalization segment should end on NFC boundary, not NFD (#15551)
+
 ## 18.0.245 stable 2025-12-03
 
 * chore(windows): VS2022 patch for stable-18.0 (#15081)
