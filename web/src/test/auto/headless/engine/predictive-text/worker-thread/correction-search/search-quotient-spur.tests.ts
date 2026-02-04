@@ -37,7 +37,6 @@ import { constituentPaths, quotientPathHasInputs } from '#test-resources/searchQ
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
-
 // https://www.compart.com/en/unicode/block/U+1D400
 const mathBoldUpperA = 0x1D400; // Mathematical Bold Capital A
 const mathBoldLowerA = 0x1D41A; //                   Small   A
@@ -65,6 +64,20 @@ function toMathematicalSMP(text: string) {
   });
 
   return asSMP.join('');
+}
+
+export function toSpurTypeSequence(spurs: SearchQuotientNode[]): string[] {
+  return spurs.map(s => {
+    if(s instanceof InsertionQuotientSpur) {
+      return 'insert';
+    } else if(s instanceof DeletionQuotientSpur) {
+      return 'delete';
+    } else if(s instanceof SubstitutionQuotientSpur) {
+      return 'substitute';
+    } else {
+      return 'legacy';
+    }
+  })
 }
 
 export function buildSimplePathSplitFixture() {
@@ -1750,6 +1763,131 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual((tail as LegacyQuotientSpur).inputs, tailTarget.inputs);
       assert.deepEqual((head as LegacyQuotientSpur).inputSource, headTarget.inputSource);
       assert.deepEqual((tail as LegacyQuotientSpur).inputSource, tailTarget.inputSource);
+    });
+
+    describe('correctly handles the quotient-path doc example', () => {
+      it('splits properly at index 0', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(0);
+        assert.equal(splits.length, 1);
+        assert.equal(splits[0][0], nodes.searchRoot);
+        assert.isTrue(splits[0][1].isSameNode(k2c3));
+      });
+
+      it('splits properly at index 1', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(1);
+        /*
+         * Unironically, actually 5.
+         *
+         * 3 are "clean", with 2 "dirty" - the "dirty" two both split in the
+         * middle of input for the first keystroke.
+         */
+        assert.equal(splits.length, 5);
+        assert.sameDeepMembers(splits.map(s => s.map(n => n.inputCount)), [
+          // clean
+          [0, 2], // 1 inserted char, then both inputs
+          [1, 1], // 1 std keystroke, then the other input
+          [2, 0], // BOTH keystrokes processed (with one deleted), then insertions afterward
+          // dirty
+          [1, 2], // 1/2 keystroke inserted, other 1/2 is in tail
+          [2, 1]  // first keystroke deleted, second keystroke 1/2 inserted with remainder in tail
+        ]);
+
+        splits.forEach(s => {
+          assert.equal(s[0].codepointLength, 1);
+          assert.equal(s[1].codepointLength, 2);
+        });
+
+        const cleanSplit0KeyHead = splits.find(s => s[0].inputCount == 0 && s[1].inputCount == 2);
+        const cleanSplit1KeyHead = splits.find(s => s[0].inputCount == 1 && s[1].inputCount == 1);
+        const cleanSplit2KeyHead = splits.find(s => s[0].inputCount == 2 && s[1].inputCount == 0);
+
+        assert.equal(constituentPaths(cleanSplit0KeyHead[0]).length, 1);
+        assert.sameDeepMembers(constituentPaths(cleanSplit0KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert']
+        ]);
+        assert.equal(constituentPaths(cleanSplit1KeyHead[0]).length, 2);
+        assert.sameDeepMembers(constituentPaths(cleanSplit1KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'delete'],
+          ['substitute']
+        ]);
+        assert.equal(constituentPaths(cleanSplit2KeyHead[0]).length, 3);
+        assert.sameDeepMembers(constituentPaths(cleanSplit2KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'delete', 'delete'],
+          ['substitute', 'delete'],
+          ['delete', 'substitute']
+        ]);
+      });
+
+      it('splits properly at index 2', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(2);
+        /*
+         * Unironically, actually 5.
+         *
+         * 3 are "clean", with 2 "dirty" - the "dirty" two both split in the
+         * middle of input for the first keystroke.
+         */
+        assert.equal(splits.length, 5);
+        assert.sameDeepMembers(splits.map(s => s.map(n => n.inputCount)), [
+          // clean
+          [0, 2], // 1 inserted char, then both inputs
+          [1, 1], // 1 std keystroke, then the other input
+          [2, 0], // BOTH keystrokes processed (with one deleted), then insertions afterward
+          // dirty
+          [1, 2], //insert, then 1/2 keystroke inserted, other 1/2 is in tail
+          [2, 1]  // first keystroke deleted or short, second keystroke 1/2 inserted with remainder in tail
+        ]);
+
+        splits.forEach(s => {
+          assert.equal(s[0].codepointLength, 2);
+          assert.equal(s[1].codepointLength, 1);
+        });
+
+        const cleanSplit0KeyHead = splits.find(s => s[0].inputCount == 0 && s[1].inputCount == 2);
+        const cleanSplit1KeyHead = splits.find(s => s[0].inputCount == 1 && s[1].inputCount == 1);
+        const cleanSplit2KeyHead = splits.find(s => s[0].inputCount == 2 && s[1].inputCount == 0);
+
+        assert.equal(constituentPaths(cleanSplit0KeyHead[0]).length, 1);
+        assert.sameDeepMembers(constituentPaths(cleanSplit0KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'insert']
+        ]);
+        assert.equal(constituentPaths(cleanSplit1KeyHead[0]).length, 4);
+        assert.sameDeepMembers(constituentPaths(cleanSplit1KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'insert', 'delete'],  // is too high an edit-cost, though...
+          ['substitute', 'insert'],
+          ['insert', 'substitute'],
+          ['substitute']
+        ]);
+        assert.equal(constituentPaths(cleanSplit2KeyHead[0]).length, 8);
+        assert.sameDeepMembers(constituentPaths(cleanSplit2KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'insert', 'delete', 'delete'], // is too high an edit-cost, though...
+          ['substitute', 'substitute'],
+          ['substitute', 'delete'],
+          ['delete', 'substitute'],
+          ['insert', 'substitute', 'delete'],
+          ['substitute', 'insert', 'delete'],
+          ['insert', 'delete', 'substitute'],
+          ['delete', 'substitute', 'insert']
+        ]);
+      });
+
+      it('splits properly at index 3', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(3);
+        assert.equal(splits.length, 1);
+        assert.equal(splits[0][0], k2c3);
+        assert.isTrue(splits[0][1].isSameNode(nodes.searchRoot));
+      });
     });
   });
 
