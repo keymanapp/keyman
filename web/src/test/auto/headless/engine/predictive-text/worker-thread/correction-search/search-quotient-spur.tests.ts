@@ -579,7 +579,8 @@ describe('SearchQuotientSpur', () => {
         assert.equal(headSrc.segment.transitionId, tailSrc.segment.transitionId);
         assert.equal(headSrc.segment.start, 0);
         assert.equal(tailSrc.segment.start, 1);
-        // TODO:  enhance as relevant new props, methods are added.
+        assert.equal(headSrc.segment.end, tailSrc.segment.start);
+        assert.isUndefined(tailSrc.segment.end);
       });
 
       it('splits properly at index 10', () => {
