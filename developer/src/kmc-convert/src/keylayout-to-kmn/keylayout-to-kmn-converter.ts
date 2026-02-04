@@ -471,11 +471,10 @@ export class KeylayoutToKmnConverter {
               }
             }
           } else {
-            this.callbacks.reportMessage(ConverterMessages.Info_UnsupportedCharactersDetected({
+            this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
               inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
               keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
-              key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
               KeyName: this.map_UkeleleKC_To_VK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
             }));
           }
