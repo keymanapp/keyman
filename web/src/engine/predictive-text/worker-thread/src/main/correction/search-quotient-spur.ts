@@ -353,7 +353,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
         const tailSrc = parentSources.pop();
         // Deep-copy the object and replace the segment end value.
         const extendedTailSrc = {...tailSrc, segment: {...tailSrc.segment, end: this.inputSource.segment.end}};
-        if(extendedTailSrc.segment.end) {
+        if(extendedTailSrc.segment.end === undefined) {
           delete extendedTailSrc.segment.end;
         }
         parentSources.push(extendedTailSrc);
@@ -383,7 +383,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       // left-deletions are applied without applying any of its insert string.
       const midInputStart = i != 0 || parentSegs[parentSegs.length - 1]?.segment.end !== undefined;
 
-      // If there's an entry for end, always include the start position
+      // If there's an entry for end, always include the start position.  Also
+      // include the start position if the range for the source starts after
+      // index 0.
       if(j !== undefined) {
         component = `${component}@${i}-${j}`;
       } else if(midInputStart) {
