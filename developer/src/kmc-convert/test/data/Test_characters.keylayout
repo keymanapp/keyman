@@ -42,7 +42,8 @@
             <key code="43" output="&lt;"/>
             <key code="37" output="&gt;"/>
             <key code="39" output="&apos;"/>
-            <key code="19" output="&quot;"/>        </keyMap>
+            <key code="19" output="&quot;"/>        
+        </keyMap>
     </keyMapSet>
     <actions>
         <action id="A_0">

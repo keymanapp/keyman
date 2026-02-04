@@ -43,30 +43,7 @@ export class KmnFileWriter {
       return null;
     }
   }
-  /**
-     * @brief  member function to write data from object to a kmn file
-     * @param  data_ukelele the array holding all keyboard data
-     * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
-     * @return true if data has been written; false if not
-     */
-  public writeToFile(data_ukelele: ProcesData): boolean {
-
-    let data: string = "\n";
-
-    // add top part of kmn file: STORES
-    data += this.write_KmnFileHeader(data_ukelele);
-
-    // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
-
-    try {
-      this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
-      return true;
-    } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: data_ukelele.kmn_filename }));
-      return false;
-    }
-  }
+  
   /**
    * @brief  member function to create data for the header (stores) that will be printed to the resulting kmn file
    * @param  data_ukelele an object containing all data read from a .keylayout file
@@ -337,7 +314,6 @@ export class KmnFileWriter {
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = convertUtil.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = convertUtil.convertToUnicodeCodePoint(output_character);
-
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
           if (Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
