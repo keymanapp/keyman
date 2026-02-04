@@ -40,6 +40,8 @@
 
 namespace {
 
+void print_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context);
+
 bool g_beep_found = false;
 
 km_core_option_item test_env_opts[] =
@@ -82,13 +84,15 @@ apply_action(
     std::vector<km_core_context_item> &context,
     km::tests::LdmlTestSource &test_source,
     std::vector<km_core_context_item> &test_context) {
+
+  // print_context(text_store, test_state, test_context);
   switch (act.type) {
   case KM_CORE_IT_END:
     test_assert(false);
     break;
   case KM_CORE_IT_ALERT:
     g_beep_found = true;
-    // std::cout << "beep" << std::endl;
+    std::cout << "  + beep" << std::endl;
     break;
   case KM_CORE_IT_CHAR:
     context.push_back(km_core_context_item{
@@ -104,10 +108,10 @@ apply_action(
         text_store.push_back(buf.ch[i]);
       }
     }
-    // std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
+    std::cout << "  + char(" << act.character << ")" << std::endl;
     break;
   case KM_CORE_IT_MARKER:
-    // std::cout << "deadkey(" << act.marker << ")" << std::endl;
+    std::cout << "  + deadkey(" << act.marker << ")" << std::endl;
     context.push_back(km_core_context_item{
         KM_CORE_CT_MARKER,
         {
@@ -117,6 +121,8 @@ apply_action(
     break;
   case KM_CORE_IT_BACK:
   {
+    std::cout << "  + back(" << act.backspace.expected_type << ")" << std::endl;
+
     // single char removed in context
     km_core_usv ch = 0;
     bool matched_text = false;
@@ -167,10 +173,11 @@ apply_action(
     }
     break;
   case KM_CORE_IT_PERSIST_OPT:
+    std::cout << "  + TODO-LDML: persist_opt()" << std::endl;
     break;
   case KM_CORE_IT_INVALIDATE_CONTEXT:
     {
-      std::cout << "action: context invalidated (markers cleared)" << std::endl;
+      std::cout << "  + context invalidated (markers cleared)" << std::endl;
       // TODO-LDML: We need the context for tests. So we will simulate recreating
       // the context from the context string.
       km_core_context_item* new_context_items = nullptr;
@@ -186,11 +193,11 @@ apply_action(
     }
     break;
   case KM_CORE_IT_EMIT_KEYSTROKE:
-    std::cout << "action: emit keystroke" << std::endl;
+    std::cout << "  + emit keystroke" << std::endl;
     // TODO-LDML: For now, this is a no-op. We could handle enter, etc.
     break;
   case KM_CORE_IT_CAPSLOCK:
-    std::cout << "action: capsLock " << act.capsLock << std::endl;
+    std::cout << "  + capsLock " << act.capsLock << std::endl;
     test_source.set_caps_lock_on(act.capsLock);
     break;
   default:
@@ -199,11 +206,46 @@ apply_action(
   }
 }
 
-/**
- * verify the current context
- */
+
 void
-verify_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context) {
+apply_actions(
+  km_core_state *test_state,
+  km_core_actions const *actions,
+  std::u16string &text_store,
+  std::vector<km_core_context_item> &context,
+  km::tests::LdmlTestSource &test_source,
+  std::vector<km_core_context_item> &test_context
+) {
+
+  if(actions->do_alert) {
+    apply_action(test_state, {KM_CORE_IT_ALERT}, text_store, context, test_source, test_context);
+  }
+
+  if(actions->code_points_to_delete) {
+    for(unsigned int i = 0; i < actions->code_points_to_delete; i++) {
+      km_core_action_item act = {KM_CORE_IT_BACK};
+      act.backspace = {KM_CORE_BT_CHAR, 0};
+      apply_action(test_state, act, text_store, context, test_source, test_context);
+    }
+  }
+
+  if(actions->output) {
+    for(auto ch = actions->output; *ch; ch++) {
+      km_core_action_item act = {KM_CORE_IT_CHAR};
+      act.character = *ch;
+      apply_action(test_state, act, text_store, context, test_source, test_context);
+    }
+  }
+
+  if(actions->emit_keystroke) {
+      apply_action(test_state, {KM_CORE_IT_EMIT_KEYSTROKE}, text_store, context, test_source, test_context);
+  }
+
+  // TODO-LDML: other action types - persist, caps lock
+}
+
+void
+print_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context) {
   // Compare context and text store at each step - should be identical
   size_t n                     = 0;
   km_core_context_item *citems = nullptr;
@@ -225,8 +267,18 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
     }
   }
   std::cout << std::endl;
-  std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
-  std::cout << "testcontext ";
+  std::cout << "context      : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+
+  delete[] buf;
+
+  km_core_context_item *citems_app = nullptr;
+  try_status(km_core_context_get(km_core_state_app_context(test_state), &citems_app));
+  try_status(context_items_to_utf16(citems_app, nullptr, &n));
+  buf = new km_core_cu[n];
+  try_status(context_items_to_utf16(citems_app, buf, &n));
+  std::cout << "app context  : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+
+  std::cout << "test_context : ";
   std::cout.fill('0');
   for (auto i = test_context.begin(); i < test_context.end(); i++) {
     switch (i->type) {
@@ -241,29 +293,60 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
     }
   }
   std::cout << std::endl;
+  km_core_context_items_dispose(citems);
+  km_core_context_items_dispose(citems_app);
+  delete[] buf;
+}
 
-  // Verify that both our local test_context and the core's test_state.context have
-  // not diverged
-  auto ci = citems;
-  for (auto test_ci = test_context.begin();; ci++, test_ci++) {
-    // skip over markers, they won't be in test_context
-    while (ci->type == KM_CORE_CT_MARKER) {
-      ci++;
+/**
+ * verify the current context
+ */
+void
+verify_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context, bool fully_normalized_mode, bool normalization_enabled) {
+  // Compare context and text store at each step - should be identical
+  print_context(text_store, test_state, test_context);
+
+  size_t n                     = 0;
+  km_core_context_item *citems = nullptr;
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
+  try_status(context_items_to_utf16(citems, nullptr, &n));
+  km_core_cu *buf = new km_core_cu[n];
+  try_status(context_items_to_utf16(citems, buf, &n));
+  std::u16string buf_final(buf);
+
+  if(fully_normalized_mode) {
+    if(normalization_enabled) {
+      test_assert(km::core::util::normalize_nfc(buf_final));
     }
-    // exit if BOTH are at end.
-    if (ci->type == KM_CORE_CT_END && test_ci == test_context.end()) {
-      break;  // success
+    // note: we don't compare test_context with citems because they have different
+    // normalization forms in fully_normalized_mode
+  } else {
+    // Verify that both our local test_context and the core's test_state.context have
+    // not diverged
+    auto ci = citems;
+    for (auto test_ci = test_context.begin();; ci++, test_ci++) {
+      // skip over markers, they won't be in test_context
+      while (ci->type == KM_CORE_CT_MARKER) {
+        ci++;
+      }
+      // exit if BOTH are at end.
+      if (ci->type == KM_CORE_CT_END && test_ci == test_context.end()) {
+        break;  // success
+      }
+      // fail if only ONE is at end
+      test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
+      // fail if type and marker don't match.
+      test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
-    // fail if only ONE is at end
-    test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
-    // fail if type and marker don't match.
-    test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
   km_core_context_items_dispose(citems);
-  if (text_store != buf) {
+
+  if (text_store != buf_final) {
     std::cerr << "text store has diverged from buf" << std::endl;
     std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+    std::cerr << "buf_final : " << string_to_hex(buf_final) << " [" << buf << "]" << std::endl;
+    std::cerr << "buf       : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
     test_assert(false);
   }
   delete[] buf;
@@ -327,7 +410,7 @@ verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &e
 }
 
 int
-run_test(const km::core::path &source, const km::core::path &compiled, km::tests::LdmlTestSource& test_source) {
+run_test(const km::core::path &source, const km::core::path &compiled, km::tests::LdmlTestSource& test_source, bool fully_normalized_mode) {
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
 
@@ -341,19 +424,28 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   }
 
   // setup normalization status
-  const bool normalization_disabled = !test_kb->supports_normalization();
-  test_source.set_normalization_disabled(normalization_disabled);
-  std::cout << "- normalization enabled = " << !normalization_disabled << std::endl;
+  const bool normalization_enabled = test_kb->supports_normalization();
+  test_source.set_normalization_disabled(!normalization_enabled);
+  std::wcout
+    << console_color::fg(console_color::BLUE) << "* normalization enabled = " << normalization_enabled
+    << console_color::reset() << std::endl << std::endl;
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
+
+  g_beep_found = false;
 
   std::vector<km_core_context_item> test_context;
 
   km_core_context_item *citems = nullptr;
   // setup test_context
   try_status(context_items_from_utf16(test_source.get_context().c_str(), &citems));
-  try_status(km_core_context_set(km_core_state_context(test_state), citems));
+
+  if(fully_normalized_mode) {
+    km_core_state_context_set_if_needed(test_state, test_source.get_context().c_str());
+  } else {
+    try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  }
 
   // Make a copy of the setup context for the test
   copy_context_items_to_vector(citems, test_context);
@@ -365,7 +457,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   km::tests::ldml_action action;
 
   // verify at beginning
-  verify_context(text_store, test_state, test_context);
+  verify_context(text_store, test_state, test_context, fully_normalized_mode, normalization_enabled);
 
   int errorLine = 0; // nonzero if err.
 
@@ -378,8 +470,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       break;
     case km::tests::LDML_ACTION_KEY_EVENT: {
       auto &p = action.k;
-      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey_Always(p.vk) << "/modifier "
-                << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state << std::dec << std::endl;
+      std::cout << std::endl << "- key action: " << km::core::kmx::Debug_VirtualKey_Always(p.vk) << " modifier: ["
+                << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state << std::dec << "]" << std::endl;
       // Because a normal system tracks caps lock state itself,
       // we mimic that in the tests. We assume caps lock state is
       // updated on key_down before the processor receives the
@@ -389,6 +481,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       }
 
       for (auto key_down = 1; key_down >= 0; key_down--) {
+        std::cout << "  - key_down = " << key_down << std::endl;
         // expected error only applies to key down
         try_status(km_core_process_event(
             test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
@@ -399,11 +492,17 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
           test_context.clear();
           text_store.clear();
         }
-        for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
-          apply_action(test_state, *act, text_store, test_context, test_source, test_context);
+
+        if(fully_normalized_mode) {
+          auto actions = km_core_state_get_actions(test_state);
+          apply_actions(test_state, actions, text_store, test_context, test_source, test_context);
+        } else {
+          for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
+            apply_action(test_state, *act, text_store, test_context, test_source, test_context);
+          }
         }
+        verify_context(text_store, test_state, test_context, fully_normalized_mode, normalization_enabled);
       }
-      verify_context(text_store, test_state, test_context);
     } break;
     case km::tests::LDML_ACTION_EMIT_STRING: {
       std::cout << "- string emit action: " << action.string << std::endl;
@@ -419,13 +518,17 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       }
       km_core_context_items_dispose(nitems);
 
-      verify_context(text_store, test_state, test_context);
+      verify_context(text_store, test_state, test_context, fully_normalized_mode, normalization_enabled);
     } break;
     case km::tests::LDML_ACTION_CHECK_EXPECTED: {
-      if (!normalization_disabled) {
-        test_assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+      if (normalization_enabled) {
+        if (!fully_normalized_mode) {
+          test_assert(km::core::util::normalize_nfd(action.string));
+        } else {
+          test_assert(km::core::util::normalize_nfc(action.string));
+        }
       }
-      std::cout << "- check expected" << std::endl;
+      std::cout << std::endl << "# check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
       // Compare internal context with expected result
@@ -434,7 +537,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       }
     } break;
     case km::tests::LDML_ACTION_CHECK_KEYLIST: {
-      std::cout << "- checking keylist" << std::endl;
+      std::cout << std::endl << "# checking keylist" << std::endl;
       // get keylist from kbd
       const km_core_keyboard_key* actual_list = test_kb->get_key_list();
       if (!verify_key_list(actual_list, action.string, test_source)) {
@@ -463,7 +566,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
   if (errorLine != 0) {
     // re-verify at end (if there wasn't already a failure)
-    verify_context(text_store, test_state, test_context);
+    verify_context(text_store, test_state, test_context, fully_normalized_mode, normalization_enabled);
   }
 
   // cleanup
@@ -477,15 +580,19 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     return __LINE__;
   }
 
+  if(errorLine != 0) {
+    std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - error on line " << errorLine << console_color::reset() << std::endl;
+  }
+
   return errorLine;
 }
 
 /**
  * Run all tests for this keyboard
  */
-int run_all_tests(const km::core::path &source, const km::core::path &compiled, const std::string &filter) {
-  std::wcout << console_color::fg(console_color::BLUE) << "source file   = " << source << std::endl
-            << "compiled file = " << compiled << console_color::reset() << std::endl;
+int run_all_tests(const km::core::path &source, const km::core::path &compiled, const std::string &filter, bool fully_normalized_mode) {
+  std::wcout << console_color::fg(console_color::BLUE) << "* source file   = " << source << std::endl
+            << "* compiled file = " << compiled << console_color::reset() << std::endl;
   if(!filter.empty()) {
     std::wcout << "Running only tests matching (substring search): " << filter.c_str() << std::endl;
   }
@@ -498,14 +605,14 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
 
   if (!filter.empty()) {
     // Always skip the embedded test if there's a filter.
-    std::wcout << console_color::fg(console_color::YELLOW) << "SKIP: " << source.name() << " (embedded)" << console_color::reset()
+    std::wcout << console_color::fg(console_color::YELLOW) << "* SKIP: " << source.name() << " (embedded)" << console_color::reset()
                << std::endl;
     embedded_result = 0;  // no error
   } else if (embedded_result == 0) {
     // embedded loaded OK, try it
-    std::wcout << console_color::fg(console_color::BLUE) << console_color::bold() << "TEST: " << source.name() << " (embedded)"
+    std::wcout << console_color::fg(console_color::BLUE) << console_color::bold() << "* TEST: " << source.name() << " (embedded)"
                << console_color::reset() << std::endl;
-    embedded_result = run_test(source, compiled, embedded_test_source);
+    embedded_result = run_test(source, compiled, embedded_test_source, fully_normalized_mode);
     if (embedded_result != 0) {
         failures.push_back("in-XML (@@ comment) embedded test failed");
     }
@@ -534,7 +641,7 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
         continue;
       }
       std::wcout << console_color::fg(console_color::BLUE) << "TEST: " << json_path.stem().c_str() << "/" << console_color::bold() << n.first.c_str() << console_color::reset() << std::endl;
-      int sub_test = run_test(source, compiled, *n.second);
+      int sub_test = run_test(source, compiled, *n.second, fully_normalized_mode);
       if (sub_test != 0) {
         std::wcout << console_color::fg(console_color::BRIGHT_RED) << "FAIL: " << json_path.stem() << "/" << console_color::bold() << n.first.c_str()
                    << console_color::reset() << std::endl;
@@ -633,7 +740,15 @@ int main(int argc, char *argv[]) {
     filter = argv[first_arg++];
   }
 
-  int rc = run_all_tests(ldml_file, kmx_file, filter);
+  std::cout << "1. Running tests in NFD mode" << std::endl;
+  int rc = run_all_tests(ldml_file, kmx_file, filter, false);
+  if (rc != EXIT_SUCCESS) {
+    std::wcerr << console_color::fg(console_color::BRIGHT_RED) << "FAILED" << console_color::reset() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  std::cout << std::endl << "2. Running tests in fully normalized mode" << std::endl;
+  rc = run_all_tests(ldml_file, kmx_file, filter, true);
   if (rc != EXIT_SUCCESS) {
     std::wcerr << console_color::fg(console_color::BRIGHT_RED) << "FAILED" << console_color::reset() << std::endl;
     rc = EXIT_FAILURE;
