@@ -3,7 +3,7 @@
  *
  * Created by jahorton on 2025-10-09
  *
- * This file defines the predictive-text engine's SearchSpace class, which is used to
+ * This file defines the predictive-text engine's SearchQuotientNode class, which is used to
  * manage the search-space(s) for text corrections within the engine.
  */
 
@@ -205,7 +205,7 @@ export interface SearchQuotientNode {
   get sourceRangeKey(): string;
 
   /**
-   * Appends this SearchSpace with the provided SearchSpace's search properties,
+   * Appends this SearchQuotientNode with the provided SearchQuotientNode's search properties,
    * extending the represented search range accordingly.  If this operation
    * represents merging the result of a previous .split() call, the two halves
    * of any split input components will be fully re-merged.
@@ -214,7 +214,7 @@ export interface SearchQuotientNode {
   merge(space: SearchQuotientNode): SearchQuotientNode;
 
   /**
-   * Splits this SearchSpace into two halves at the specified codepoint index.
+   * Splits this SearchQuotientNode into two halves at the specified codepoint index.
    * The 'head' component will maximally re-use existing cached data, while the
    * 'tail' must be reconstructed from scratch due to the new start position.
    * @param charIndex
