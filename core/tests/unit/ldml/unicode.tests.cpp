@@ -198,20 +198,20 @@ void test_has_boundary_before() {
   assert_basic_equal(icu4c_unicode, header_unicode);
   assert_basic_equal(icu4c_icu, header_icu);
 
-  std::cout << std::endl << "Now, let's make sure has_nfd_boundary_before() matches ICU." << std::endl;
+  std::cout << std::endl << "Now, let's make sure has_nfc_boundary_before() matches ICU." << std::endl;
 
   UErrorCode status           = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
+  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
   UASSERT_SUCCESS(status);
 
   // now, test that hasBoundaryBefore is the same
   for (km_core_usv cp = 0; cp < km::core::kmx::Uni_MAX_CODEPOINT; cp++) {
-    auto km_hbb = km::core::util::has_nfd_boundary_before(cp);
-    auto icu_hbb = nfd->hasBoundaryBefore(cp);
+    auto km_hbb = km::core::util::has_nfc_boundary_before(cp);
+    auto icu_hbb = nfc->hasBoundaryBefore(cp);
 
     if (km_hbb != icu_hbb) {
       std::cerr << "Error: util_normalize_table.h said " << boolstr(km_hbb) << " but ICU said " << boolstr(icu_hbb) << " for "
-                << "has_nfd_boundary_before(0x" << std::hex << cp << std::dec << ")" << std::endl;
+                << "has_nfc_boundary_before(0x" << std::hex << cp << std::dec << ")" << std::endl;
     }
     test_assert(km_hbb == icu_hbb);
   }
