@@ -29,7 +29,12 @@ export class KmnFileWriter {
     data += this.write_KmnFileHeader(data_ukelele);
 
     // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
+    const data_rules = this.writeData_Rules(data_ukelele);
+    if (data_rules)
+      data += data_rules;
+    else {
+      return null;
+    }
 
     try {
       return new TextEncoder().encode(data);
@@ -38,12 +43,12 @@ export class KmnFileWriter {
       return null;
     }
   }
-/**
-   * @brief  member function to write data from object to a kmn file
-   * @param  data_ukelele the array holding all keyboard data
-   * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
-   * @return true if data has been written; false if not
-   */
+  /**
+     * @brief  member function to write data from object to a kmn file
+     * @param  data_ukelele the array holding all keyboard data
+     * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
+     * @return true if data has been written; false if not
+     */
   public writeToFile(data_ukelele: ProcesData): boolean {
 
     let data: string = "\n";
@@ -58,7 +63,7 @@ export class KmnFileWriter {
       this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
       return true;
     } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: data_ukelele.kmn_filename }));
       return false;
     }
   }
@@ -161,7 +166,6 @@ export class KmnFileWriter {
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let version_output_character;
         const warn_text = this.reviewRules(unique_data_Rules, k);
-//console.log('TODO:  if convertToUnicodeCharacter returns undefined here, we should handle that case');
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = convertUtil.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = convertUtil.convertToUnicodeCodePoint(output_character);
@@ -184,6 +188,15 @@ export class KmnFileWriter {
           } else {
             version_output_character = output_Unicode_Character;
           }
+        }
+        if ((output_Unicode_Character === undefined) || (output_Unicode_CodePoint === undefined)) {
+          this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+            inputFilename: data_ukelele.keylayout_filename,
+            output: new TextDecoder().decode(unique_data_Rules[k].output),
+            keymap_index: data_ukelele.arrayOf_Rules[k].modifier_key,
+            KeyName: unique_data_Rules[k].key
+          }));
+          return null;
         }
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -247,7 +260,15 @@ export class KmnFileWriter {
             version_output_character = output_Unicode_Character;
           }
         }
-
+        if ((output_Unicode_Character === undefined) || (output_Unicode_CodePoint === undefined)) {
+          this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+            inputFilename: data_ukelele.keylayout_filename,
+            output: new TextDecoder().decode(unique_data_Rules[k].output),
+            keymap_index: unique_data_Rules[k].modifier_key,
+            KeyName: unique_data_Rules[k].key
+          }));
+          return null;
+        }
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
@@ -334,6 +355,15 @@ export class KmnFileWriter {
           } else {
             version_output_character = output_Unicode_Character;
           }
+        }
+        if ((output_Unicode_Character === undefined) || (output_Unicode_CodePoint === undefined)) {
+          this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+            inputFilename: data_ukelele.keylayout_filename,
+            output: new TextDecoder().decode(unique_data_Rules[k].output),
+            keymap_index: unique_data_Rules[k].modifier_key,
+            KeyName: unique_data_Rules[k].key
+          }));
+          return null;
         }
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule

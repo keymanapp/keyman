@@ -129,7 +129,8 @@ export class KeylayoutToKmnConverter {
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
     //writetoFile
-    if (!kmnFileWriter.writeToFile(outArray)) console.log("Error writing to file");
+    if (!kmnFileWriter.writeToFile(outArray))
+      console.log("Error writing to file");
 
     // write to object/ConverterToKmnResult
     const out_Uint8: Uint8Array = kmnFileWriter.write(outArray);
@@ -474,11 +475,10 @@ export class KeylayoutToKmnConverter {
               }
             }
           } else {
-            this.callbacks.reportMessage(ConverterMessages.Info_UnsupportedCharactersDetected({
+            this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
               inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
               keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
-              key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
               KeyName: this.map_UkeleleKC_To_VK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
             }));
           }

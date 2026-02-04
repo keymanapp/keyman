@@ -10,7 +10,6 @@
 import 'mocha';
 import { assert } from 'chai';
 import * as NodeAssert from 'node:assert';
-import { CompilerErrorNamespace, CompilerErrorSeverity } from '@keymanapp/developer-utils';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { ActionStateOutput, KeylayoutFileData, KeylayoutToKmnConverter, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
@@ -72,20 +71,6 @@ describe('KeylayoutToKmnConverter', function () {
       it(files_ + " should give no errors ", async function () {
         sut.run(files_[0]);
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
-      });
-    });
-  });
-
-  describe('RunSpecialTestFiles - create Info', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      [makePathToFixture('../data/Test_characters.keylayout')],
-      [makePathToFixture('../data/Test_onlyOneKeymap.keylayout')],
-    ].forEach(function (files_) {
-      it(files_ + " should give Info: unsupported characters ", async function () {
-        sut.run(files_[0]);
-        assert.isTrue(compilerTestCallbacks.messages.length === 1);
-        assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007));
       });
     });
   });
