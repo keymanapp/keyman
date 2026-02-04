@@ -11,7 +11,7 @@ import { assert } from 'chai';
 
 import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientSpur, models, LegacyQuotientRoot, unitTestEndpoints, SearchQuotientNode } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientSpur, models, LegacyQuotientRoot, unitTestEndpoints, SearchQuotientNode, SearchQuotientSpur, SearchQuotientRoot } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
@@ -557,29 +557,39 @@ describe('SearchQuotientSpur', () => {
         runSplit(8);
 
         const { path: pathToSplit } = buildPath();
-        const [head] = pathToSplit.split(8);
+        const [head, tail] = pathToSplit.split(8);
 
         assert.equal(head, pathToSplit.parents[0]);
+        assert.equal((tail as SearchQuotientSpur).inputSource, (pathToSplit as SearchQuotientSpur).inputSource);
       });
 
       it('splits properly at index 9', () => {
         runSplit(9);
 
         const { path: pathToSplit } = buildPath();
-        const [head] = pathToSplit.split(9);
+        const [head, tail] = pathToSplit.split(9);
 
         // Same parent, but not the same final step - it _was_ split, after
         // all.
         assert.equal(head.parents[0], pathToSplit.parents[0]);
+
+        const headSrc = (head as SearchQuotientSpur).inputSource;
+        const tailSrc = (tail as SearchQuotientSpur).inputSource;
+        assert.equal(headSrc.subsetId, tailSrc.subsetId);
+        assert.equal(headSrc.segment.transitionId, tailSrc.segment.transitionId);
+        assert.equal(headSrc.segment.start, 0);
+        assert.equal(tailSrc.segment.start, 1);
+        // TODO:  enhance as relevant new props, methods are added.
       });
 
       it('splits properly at index 10', () => {
         runSplit(10);
 
         const { path: pathToSplit } = buildPath();
-        const [head] = pathToSplit.split(10);
+        const [head, tail] = pathToSplit.split(10);
 
         assert.equal(head, pathToSplit);
+        assert.isTrue(tail instanceof SearchQuotientRoot);
       });
     });
 
