@@ -66,4 +66,5 @@ export class ConverterMessages {
     this.ERROR_InvalidFile,
     `The source file has an invalid structure: ${def(o.errorText)}`
   );
+  
 }
