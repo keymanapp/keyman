@@ -104,15 +104,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return this.parentNode.model;
   }
 
-  /**
-   * Retrieves the sequences of inputs that led to this SearchPath.
-   */
-  public get inputSequence(): Distribution<Transform>[] {
-    const parentInputs = this.parentNode?.inputSequence.slice() ?? [];
-    const localInputs = this.inputs ? [this.inputs.slice()] : [];
-    return parentInputs.concat(localInputs);
-  }
-
   get codepointLength(): number {
     if(this._codepointLength === undefined) {
       this._codepointLength = this.parentNode.codepointLength + this.insertLength - this.leftDeleteLength;
