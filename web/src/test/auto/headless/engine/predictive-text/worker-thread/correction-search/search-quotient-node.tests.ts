@@ -8,6 +8,7 @@ import { buildSimplePathSplitFixture } from './search-quotient-spur.tests.js';
 import { quotientPathHasInputs } from '#test-resources/searchQuotientUtils.js';
 
 import TrieModel = models.TrieModel;
+import { buildAlphabeticClusterFixtures } from './search-quotient-cluster.tests.js';
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
@@ -49,6 +50,39 @@ describe('quotientNodeHasParents()', () => {
       }
     } while(!isShuffled);
     assert.isFalse(quotientPathHasInputs(paths[4], shuffled));
+  });
+
+  it('is able to match inputs against SearchQuotientCluster constituent input paths', () => {
+    const { distributions, clusters } = buildAlphabeticClusterFixtures();
+
+    const fourCharCluster = clusters.cluster_k4c4;
+    const fiveCharCluster = clusters.cluster_k4c5;
+
+    assert.isTrue(quotientPathHasInputs(fourCharCluster, [
+      distributions[1].distrib_c1_i1d0,
+      distributions[2].distrib_v1_i1d0,
+      distributions[3].distrib_v2_i1d0,
+      distributions[4].distrib_c2_i1d0
+    ]));
+    assert.isFalse(quotientPathHasInputs(fiveCharCluster,[
+      distributions[1].distrib_c1_i1d0,
+      distributions[2].distrib_v1_i1d0,
+      distributions[3].distrib_v2_i1d0,
+      distributions[4].distrib_c2_i1d0
+    ]));
+
+    assert.isFalse(quotientPathHasInputs(fourCharCluster, [
+      distributions[1].distrib_c1_i1d0,
+      distributions[2].distrib_v1_i1d0,
+      distributions[3].distrib_v2_i1d0,
+      distributions[4].distrib_c2_i2d0
+    ]));
+    assert.isTrue(quotientPathHasInputs(fiveCharCluster, [
+      distributions[1].distrib_c1_i1d0,
+      distributions[2].distrib_v1_i1d0,
+      distributions[3].distrib_v2_i1d0,
+      distributions[4].distrib_c2_i2d0
+    ]));
   });
 });
 
