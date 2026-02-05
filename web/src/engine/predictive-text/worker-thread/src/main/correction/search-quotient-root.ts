@@ -1,7 +1,7 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchNode } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 
@@ -9,10 +9,9 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientRoot implements SearchQuotientNode {
+export class SearchQuotientRoot extends SearchQuotientNode {
   readonly rootNode: SearchNode;
   readonly model: LexicalModel;
-  private readonly rootResult: SearchResult;
 
   readonly lowestPossibleSingleCost: number = 0;
 
@@ -23,15 +22,15 @@ export class SearchQuotientRoot implements SearchQuotientNode {
   private hasBeenProcessed: boolean = false;
 
   /**
-   * Constructs a fresh SearchQuotientRoot instance to be used as the root of
-   * the predictive-text correction / suggestion search process.
+   * Constructs a fresh SearchSpace instance for used in predictive-text correction
+   * and suggestion searches.
    * @param baseSpaceId
    * @param model
    */
   constructor(model: LexicalModel) {
+    super();
     this.rootNode = new SearchNode(model.traverseFromRoot(), generateSpaceSeed(), t => model.toKey(t));
     this.model = model;
-    this.rootResult = new SearchResult(this.rootNode);
   }
 
   get spaceId(): number {
@@ -69,6 +68,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
     this.hasBeenProcessed = true;
 
+    this.saveResult(this.rootNode);
     return {
       type: 'complete',
       cost: 0,
@@ -79,14 +79,6 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
   public get currentCost(): number {
     return this.hasBeenProcessed ? Number.POSITIVE_INFINITY : 0;
-  }
-
-  get previousResults(): SearchResult[] {
-    if(!this.hasBeenProcessed) {
-      return [];
-    } else {
-      return [this.rootResult];
-    }
   }
 
   // Return a new array each time; avoid aliasing potential!

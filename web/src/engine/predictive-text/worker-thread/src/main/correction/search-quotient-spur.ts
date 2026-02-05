@@ -12,7 +12,7 @@ import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keyman
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
-import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { EDIT_DISTANCE_COST_SCALE, SearchNode } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
@@ -29,8 +29,15 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export abstract class SearchQuotientSpur implements SearchQuotientNode {
+export abstract class SearchQuotientSpur extends SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
+
+  /**
+   * Holds all incoming Nodes generated from a parent `SearchSpace` that have not yet been
+   * extended with this `SearchSpace`'s input.
+   */
+  private incomingNodes: SearchNode[] = [];
+
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
@@ -41,12 +48,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   readonly codepointLength: number;
   public abstract readonly insertLength: number;
   public abstract readonly leftDeleteLength: number
-
-  /**
-   * Marks all results that have already been returned from this instance of SearchPath.
-   * Should be deleted and cleared if any paths consider this one as a parent.
-   */
-  private returnedValues?: {[resultKey: string]: SearchNode} = {};
 
   /**
    * Provides a heuristic for the base cost at this path's depth if the best
@@ -72,6 +73,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     inputSource: PathInputProperties | ProbabilityMass<Transform>,
     codepointLength: number
   ) {
+    super();
     this.spaceId = generateSpaceSeed();
 
     // Coerce inputSource to TokenInputSource format.
@@ -99,6 +101,9 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
     this.codepointLength = codepointLength;
+
+    this.queueNodes(this.buildEdgesForNodes(parentNode.previousResults.map(r => r.node)));
+    this.linkAndQueueFromParent(parentNode, this.incomingNodes);
   }
 
   public get model(): LexicalModel {
@@ -309,6 +314,14 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get currentCost(): number {
+    if(this.incomingNodes.length > 0) {
+      this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
+    }
+
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -328,10 +341,18 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    * @returns
    */
   public handleNextNode(): PathResult {
+    if(this.incomingNodes.length > 0) {
+      this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
+    }
+
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
-    if(parentCost <= localCost) {
+    if(parentCost < localCost) {
       if(parentCost == Number.POSITIVE_INFINITY) {
         return {
           type: 'none'
@@ -339,6 +360,12 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       }
 
       const result = this.parentNode.handleNextNode();
+      // The parent will insert the node into our queue.  We don't need it, though
+      // any siblings certainly will.
+
+      // Preserve the array instance, but trash all entries.
+      // The array is registered with the parent; do not replace!
+      this.incomingNodes.splice(0, this.incomingNodes.length);
 
       if(result.type == 'complete') {
         this.queueNodes(this.buildEdgesForNodes([result.finalNode]));
@@ -395,13 +422,10 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
 
     if(currentNode.spaceId == this.spaceId) {
-      if(this.returnedValues) {
-        if((this.returnedValues[currentNode.resultKey]?.currentCost ?? Number.POSITIVE_INFINITY) > currentNode.currentCost) {
-          this.returnedValues[currentNode.resultKey] = currentNode;
-        } else {
-          // Not a better cost, so reject it and move on to the next potential result.
-          return this.handleNextNode();
-        }
+      const isUnhandled = this.saveResult(currentNode);
+      if(!isUnhandled) {
+        // Not a better cost, so reject it and move on to the next potential result.
+        return this.handleNextNode();
       }
 
       return {
@@ -414,10 +438,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     // If we've somehow fully exhausted all search options, indicate that none remain.
     return unmatchedResult as PathResult;
-  }
-
-  public get previousResults(): SearchResult[] {
-    return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
   }
 
   public get inputSegments(): InputSegment[] {
