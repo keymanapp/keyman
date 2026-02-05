@@ -7,8 +7,8 @@ import { assertingPromiseStatus as promiseStatus } from '../../../../../resource
 
 import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../../../resources/simulateMultiSourceInput.js";
 
-import { timedPromise } from '@keymanapp/web-utils';
-import { gestures } from '@keymanapp/gesture-recognizer';
+import { timedPromise } from 'keyman/common/web-utils';
+import { gestures } from 'keyman/engine/gesture-processor';
 
 import { TouchpathTurtle } from '#gesture-tools';
 

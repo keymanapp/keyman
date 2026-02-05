@@ -1,0 +1,13 @@
+{
+  "extends": "../../../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [ "node" ],
+    "outDir": "../../../../../../build/engine/keyboard/obj/keyboards/loaders/",
+    "tsBuildInfoFile": "../../../../../../build/engine/keyboard/obj/keyboards/loaders/tsconfig.node.tsbuildinfo",
+    "rootDir": "."
+  },
+  "references": [
+    { "path": "../../../tsconfig.json" }
+  ],
+  "include": ["node-keyboard-loader.ts", "nodeKeyboardLoader.ts"],
+}

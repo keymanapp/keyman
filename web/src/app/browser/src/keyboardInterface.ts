@@ -1,11 +1,11 @@
-import { type OutputTarget } from 'keyman/engine/element-wrappers';
+import { type AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 import { FloatingOSKView } from 'keyman/engine/osk';
-import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/main';
+import { KeyboardInterfaceBase } from 'keyman/engine/main';
 
-import ContextManager from './contextManager.js';
+import { ContextManager }  from './contextManager.js';
 import { KeymanEngine } from './keymanEngine.js';
 
-export default class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
+export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
   constructor(
     _jsGlobal: any,
     engine: KeymanEngine,
@@ -29,12 +29,12 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
   /**
    * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
    */
-  getLastActiveElement(): OutputTarget<any> {
-    return this.engine.contextManager.lastActiveTarget;
+  getLastActiveElement(): AbstractElementTextStore<any> {
+    return this.engine.contextManager.lastActiveTextStore;
   }
 
   focusLastActiveElement(): void {
-    this.engine.contextManager.restoreLastActiveTarget();
+    this.engine.contextManager.restoreLastActiveTextStore();
   }
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
