@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { KMWString } from '@keymanapp/web-utils';
-import { generateSubsetId, LegacyQuotientRoot, LegacyQuotientSpur, models, SearchQuotientCluster, SearchQuotientNode } from '@keymanapp/lm-worker/test-index';
+import { generateSubsetId, LegacyQuotientRoot, LegacyQuotientSpur, models, SearchQuotientCluster, SearchQuotientNode, SearchQuotientRoot, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -216,6 +216,69 @@ const splitDistribution = (dist: Distribution<Transform>, index: number) => {
 
   return { head: splitEntries.map(t => t[0]), tail: splitEntries.map(t => t[1])};
 }
+
+const determineTargetSplitSequences = (constituentPaths: SearchQuotientSpur[][], splitLocation: number) => {
+  const cleanPathSequences: [SearchQuotientSpur[], SearchQuotientSpur[]][] = [];
+  const dirtyPathSequences: [SearchQuotientSpur[], SearchQuotientSpur[]][] = [];
+  constituentPaths.forEach(seq => {
+    let splitIndex = seq.length - 1;
+    for(; splitIndex >= 0; splitIndex--) {
+      const spur = seq[splitIndex];
+      const codeLen = spur.codepointLength;
+
+      if(codeLen == splitLocation) {
+        cleanPathSequences.push([seq.slice(0, splitIndex+1),seq.slice(splitIndex+1)]);
+        break;
+      }
+
+      const spurStartIndex = spur.codepointLength - spur.insertLength + spur.leftDeleteLength;
+
+      if(spurStartIndex > splitLocation) {
+        continue;
+      } else if(spurStartIndex == splitLocation && spur.leftDeleteLength == 0) {
+        continue;
+      }
+
+      /* else split occurs within currently-examined entry */
+      const cleanHead = seq.slice(0, splitIndex);
+      const cleanTail = seq.slice(splitIndex+1);
+
+      const splitSegment = seq[splitIndex];
+      const segmentSplitIndex = splitSegment.codepointLength - splitLocation;
+      const splitDistrib = splitDistribution(splitSegment.inputs, segmentSplitIndex);
+      const dirtyStart = new LegacyQuotientSpur(
+        seq[splitIndex-1] ?? new LegacyQuotientRoot(splitSegment.model),
+        splitDistrib.head, {
+          ...splitSegment.inputSource,
+          segment: {
+            ...splitSegment.inputSource.segment,
+            end: segmentSplitIndex
+          }
+        }
+      );
+      const dirtyTail: SearchQuotientSpur = new LegacyQuotientSpur(
+        dirtyStart,
+        splitDistrib.tail, {
+          ...splitSegment.inputSource,
+          segment: {
+            ...splitSegment.inputSource.segment,
+            start: segmentSplitIndex
+          }
+        }
+      );
+
+      dirtyPathSequences.push([cleanHead.concat([dirtyStart]), [dirtyTail].concat(cleanTail)]);
+
+      break;
+    }
+
+    if(splitIndex == -1) {
+      cleanPathSequences.push([[], seq]);
+    }
+  });
+
+  return { cleanPathSequences, dirtyPathSequences };
+};
 
 describe('SearchQuotientCluster', () => {
   describe('constructor()', () => {
@@ -480,6 +543,436 @@ describe('SearchQuotientCluster', () => {
     });
   });
 
+  // Self-note:  reuse the 'alphabetic' fixture and split that.
+  describe('split()', () => {
+    // We'll use the 'five-char cluster' for these.
+    it('properly splits the cluster at index 0', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const fiveCharCluster = fixture.clusters.cluster_k4c5;
+
+      const splitResults = fiveCharCluster.split(0);
+      assert.equal(splitResults.length, 1);
+      const splitResult = splitResults[0];
+
+      assert.equal(splitResult[0].inputCount, 0);
+      assert.equal(splitResult[1].inputCount, fiveCharCluster.inputCount);
+
+      assert.isTrue(splitResult[0] instanceof SearchQuotientRoot);
+      assert.deepEqual(constituentPaths(splitResult[0]), []);
+
+      // Also add assertions for the right-hand side.
+      assert.isTrue(splitResult[1] instanceof SearchQuotientCluster);
+      // Note that the path structures themselves, however, will be rebuilt - and with new spaceIDs.
+      const pathSequenceToInputs = (sequence: SearchQuotientSpur[]) => sequence.map(p => p.inputs);
+      assert.deepEqual(constituentPaths(splitResult[1]).length, constituentPaths(fiveCharCluster).length);
+      // The input distributions should re-appear in the constituent paths, in full.
+      assert.sameDeepMembers(
+        constituentPaths(splitResult[1]).map(pathSequenceToInputs),
+        constituentPaths(fiveCharCluster).map(pathSequenceToInputs)
+      );
+
+      assert.equal(constituentPaths(splitResult[1]).length, constituentPaths(fiveCharCluster).length);
+    });
+
+    it('properly splits the cluster at index 1', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const fiveCharCluster = fixture.clusters.cluster_k4c5;
+
+      const splitPoint = 1;
+      const splitResults = fiveCharCluster.split(splitPoint);
+
+      const { cleanPathSequences, dirtyPathSequences } = determineTargetSplitSequences(constituentPaths(fiveCharCluster), splitPoint);
+
+      // One split array is "clean", while the other splits a keystroke in half.
+      assert.equal(splitResults.length, 2);
+      assert.sameMembers(splitResults.map((r) => r[0].inputCount + r[1].inputCount), [4, 5]);
+
+      const cleanSplit = splitResults.find((r) => r[0].inputCount + r[1].inputCount == 4);
+
+      assert.equal(cleanSplit[0].inputCount, 1);
+      assert.equal(cleanSplit[1].inputCount, fiveCharCluster.inputCount - 1);
+
+      assert.equal(cleanSplit[0], fixture.paths[1].path_k1c1_i1d0);
+
+      // There is only one valid path with the clean split.  There is a cluster
+      // in its history, but it reconverges before the end.
+      assert.isTrue(cleanSplit[1] instanceof SearchQuotientSpur);
+      // Note that the path structures themselves, however, will be rebuilt -
+      // and with new spaceIDs.ß
+      const pathSequenceToInputs = (sequence: SearchQuotientSpur[]) => sequence.map(p => p.inputs);
+      // One of the paths leading into cluster_k3c3 passes through the
+      // split-point.
+      assert.deepEqual(constituentPaths(cleanSplit[1]).length, constituentPaths(fixture.clusters.cluster_k3c3).length - 1);
+      // The input distributions should re-appear in the constituent paths, in
+      // full.
+      assert.includeDeepMembers( // not deepEqual.
+        // superset
+        constituentPaths(fiveCharCluster).map((sequence) => {
+          return sequence.slice(1);
+        }).map(pathSequenceToInputs),
+        // subset
+        constituentPaths(cleanSplit[1]).map(pathSequenceToInputs)
+      );
+
+      assert.includeDeepMembers(
+        cleanPathSequences.map(t => t[0]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(cleanSplit[0]).map(s => s.map(n => n.edgeKey))
+      );
+      assert.includeDeepMembers(
+        cleanPathSequences.map(t => t[1]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(cleanSplit[1]).map(s => s.map(n => n.edgeKey))
+      );
+
+      const dirtySplit = splitResults.find((r) => r[0].inputCount + r[1].inputCount == 5);
+
+      assert.equal(dirtySplit[0].inputCount, 1);
+      assert.equal(dirtySplit[1].inputCount, fiveCharCluster.inputCount /* +1 - 1 */);
+
+      assert.isTrue(dirtySplit[0] instanceof SearchQuotientSpur);
+      assert.deepEqual(dirtySplit[0].inputSegments[0], {
+        ... fixture.paths[1].path_k1c2_i2d0.inputSource.segment,
+        start: 0,
+        end: 1
+      });
+
+      assert.isTrue(dirtySplit[1] instanceof SearchQuotientCluster);
+      assert.equal(constituentPaths(dirtySplit[1]).length, constituentPaths(fixture.paths[4].path_k4c5_i1).length + 1)
+      assert.deepEqual(dirtySplit[1].inputSegments[0], {
+        ... fixture.paths[1].path_k1c2_i2d0.inputSource.segment,
+        start: 1,
+      });
+
+      // The unsplit input distributions should re-appear in the constituent
+      // paths, in full.
+      assert.includeDeepMembers( // not deepEqual.
+        // superset
+        constituentPaths(fiveCharCluster).map((sequence) => {
+          return sequence.slice(1);
+        }).map(pathSequenceToInputs),
+        // subset
+        constituentPaths(cleanSplit[1]).slice(1).map(pathSequenceToInputs)
+      );
+
+      assert.includeDeepMembers(
+        dirtyPathSequences.map(t => t[0]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(dirtySplit[0]).map(s => s.map(n => n.edgeKey))
+      );
+      assert.includeDeepMembers(
+        dirtyPathSequences.map(t => t[1]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(dirtySplit[1]).map(s => s.map(n => n.edgeKey))
+      );
+    });
+
+    it('properly splits the cluster at index 2', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const fiveCharCluster = fixture.clusters.cluster_k4c5;
+
+      const splitPoint = 2;
+      const splitResults = fiveCharCluster.split(splitPoint);
+      // Two split arrays are "clean" (but differ by contributing keystroke
+      // count), while the other splits a keystroke in half.
+      assert.equal(splitResults.length, 3);
+
+      const { cleanPathSequences, dirtyPathSequences } = determineTargetSplitSequences(constituentPaths(fiveCharCluster), splitPoint);
+
+      const cleanPath1Sequences = cleanPathSequences.filter(seqTuple => seqTuple[0].length == 1);
+      const cleanPath2Sequences = cleanPathSequences.filter(seqTuple => seqTuple[0].length == 2);
+
+      assert.sameMembers(splitResults.map((r) => r[0].inputCount + r[1].inputCount), [4, 4, 5]);
+
+      // Splits cleanly after 1 keystroke.
+      const cleanSplit1 = splitResults.find((r) => r[0].inputCount == 1 && + r[1].inputCount == 3);
+      assert.isTrue(cleanSplit1[0] instanceof SearchQuotientSpur);
+
+      assert.equal(cleanSplit1[0].inputCount, 1);
+      assert.equal(cleanSplit1[1].inputCount, fiveCharCluster.inputCount - 1);
+
+      assert.equal(cleanSplit1[0], fixture.paths[1].path_k1c2_i2d0);
+
+      assert.isTrue(cleanSplit1[1] instanceof SearchQuotientCluster); // passes through both final paths
+
+      // Note that the path structures themselves, however, will be rebuilt - and with new spaceIDs.
+      const pathSequenceToInputs = (sequence: SearchQuotientSpur[]) => sequence.map(p => p.inputs);
+      // One of the paths leading into cluster_k3c3 passes through the split-point.
+      assert.deepEqual(constituentPaths(cleanSplit1[1]).length, 3);
+
+      assert.includeDeepMembers(
+        cleanPath1Sequences.map(t => t[0]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(cleanSplit1[0]).map(s => s.map(n => n.edgeKey))
+      );
+      assert.includeDeepMembers(
+        cleanPath1Sequences.map(t => t[1]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(cleanSplit1[1]).map(s => s.map(n => n.edgeKey))
+      );
+
+      // The input distributions should re-appear in the constituent paths, in full.
+      assert.includeDeepMembers( // not deepEqual.
+        // superset
+        constituentPaths(fiveCharCluster).map((sequence) => {
+          return sequence.slice(1);
+        }).map(pathSequenceToInputs),
+        // subset
+        constituentPaths(cleanSplit1[1]).map(pathSequenceToInputs)
+      );
+
+      // Splits cleanly after 2 keystrokes.
+      const cleanSplit2 = splitResults.find((r) => r[0].inputCount == 2 && + r[1].inputCount == 2);
+      assert.isTrue(cleanSplit2[0] instanceof SearchQuotientSpur);
+
+      assert.equal(cleanSplit2[0].inputCount, 2);
+      assert.equal(cleanSplit2[1].inputCount, fiveCharCluster.inputCount - 2);
+
+      assert.equal(cleanSplit2[0], fixture.paths[2].path_k2c2_i2d0);
+      assert.isTrue(cleanSplit2[1] instanceof SearchQuotientSpur);
+
+      assert.deepEqual(cleanSplit2[1].inputSegments, [
+        fixture.paths[3].path_k3c3_i3d0.inputSource.segment, fixture.paths[4].path_k4c5_i2.inputSource.segment
+      ]);
+
+        assert.includeDeepMembers(
+        cleanPath2Sequences.map(t => t[0]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(cleanSplit2[0]).map(s => s.map(n => n.edgeKey))
+      );
+      assert.includeDeepMembers(
+        cleanPath2Sequences.map(t => t[1]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(cleanSplit2[1]).map(s => s.map(n => n.edgeKey))
+      );
+
+      // splits on the double-accented version (that also does a deleteLeft)
+      //
+      // Splits after THREE keystrokes - first keystroke emitted one char, then
+      // the third = the one that deletes left 1, then emits an accented vowel
+      // pair.
+      const dirtySplit = splitResults.find((r) => r[0].inputCount + r[1].inputCount == 5);
+      assert.isTrue(dirtySplit[0] instanceof SearchQuotientSpur);
+
+      assert.equal(dirtySplit[0].inputCount, 3);
+      assert.equal(dirtySplit[1].inputCount, fiveCharCluster.inputCount - 2);
+
+      assert.deepEqual(dirtySplit[0].inputSegments[2], {
+        ... fixture.paths[3].path_k3c3_i4d1a.inputSource.segment,
+        start: 0,
+        end: 1
+      });
+
+      assert.isTrue(dirtySplit[1] instanceof SearchQuotientSpur);
+      assert.deepEqual(dirtySplit[1].inputSegments[0], {
+        ... fixture.paths[3].path_k3c3_i4d1a.inputSource.segment,
+        start: 1
+      });
+      assert.deepEqual(dirtySplit[1].inputSegments[1], fixture.paths[4].path_k4c5_i2.inputSource.segment);
+
+      assert.includeDeepMembers(
+        dirtyPathSequences.map(t => t[0]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(dirtySplit[0]).map(s => s.map(n => n.edgeKey))
+      );
+      assert.includeDeepMembers(
+        dirtyPathSequences.map(t => t[1]).map(s => s.map(n => n.edgeKey)),
+        constituentPaths(dirtySplit[1]).map(s => s.map(n => n.edgeKey))
+      );
+    });
+
+    //
+    it('properly splits the cluster at index 3 - 4 char cluster', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const fourCharCluster = fixture.clusters.cluster_k4c4;
+
+      assert.equal(constituentPaths(fourCharCluster).length, 4);
+
+      const splitResults = fourCharCluster.split(3);
+
+      // Two split arrays are "clean" (but differ by contributing keystroke
+      // count), while the other splits a keystroke in half.
+      assert.equal(splitResults.length, 2);
+      assert.sameMembers(splitResults.map((r) => r[0].inputCount + r[1].inputCount), [4, 5]);
+
+      // Splits cleanly after 2 keystrokes.
+      const cleanSplit = splitResults.find((r) => r[0].inputCount == 3 && + r[1].inputCount == 1);
+      assert.isTrue(cleanSplit[0] instanceof SearchQuotientCluster);
+
+      assert.equal(cleanSplit[0].inputCount, 3);
+      assert.equal(cleanSplit[1].inputCount, fourCharCluster.inputCount - 3);
+
+      assert.equal(cleanSplit[0], fixture.clusters.cluster_k3c3);
+      assert.isTrue(cleanSplit[1] instanceof SearchQuotientSpur); // passes through both final paths
+
+      assert.equal(constituentPaths(cleanSplit[0]).length, 3);
+      assert.equal(constituentPaths(cleanSplit[1]).length, 1);
+
+      const dirtySplit = splitResults.find((r) => r[0].inputCount + r[1].inputCount == 5);
+      assert.isTrue(dirtySplit[0] instanceof SearchQuotientSpur);
+
+      assert.equal(dirtySplit[0].inputCount, 4);
+      assert.equal(dirtySplit[1].inputCount, fourCharCluster.inputCount - 4 + 1);
+
+      assert.deepEqual(dirtySplit[0].inputSegments[3], {
+        ... fixture.paths[4].path_k4c4_i2.inputSource.segment,
+        start: 0,
+        end: 1
+      });
+
+      assert.isTrue(dirtySplit[1] instanceof SearchQuotientSpur);
+      assert.deepEqual(dirtySplit[1].inputSegments[0], {
+        ... fixture.paths[4].path_k4c4_i2.inputSource.segment,
+        start: 1
+      });
+      assert.notOk(dirtySplit[1].inputSegments[1]);
+
+      assert.equal(constituentPaths(dirtySplit[0]).length, 1);
+      assert.equal(constituentPaths(dirtySplit[1]).length, 1);
+    });
+
+    //
+    it('properly splits the cluster at index 3 - 5 char cluster', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const fiveCharCluster = fixture.clusters.cluster_k4c5;
+
+      assert.equal(constituentPaths(fiveCharCluster).length, 5);
+
+      const splitResults = fiveCharCluster.split(3);
+      // Two split arrays are "clean" (but differ by contributing keystroke
+      // count), while the other splits a keystroke in half.
+      assert.equal(splitResults.length, 3);
+      assert.sameMembers(splitResults.map((r) => r[0].inputCount + r[1].inputCount), [4, 4, 5]);
+
+      // Splits cleanly after 2 keystrokes.
+      const cleanSplit1 = splitResults.find((r) => r[0].inputCount == 2 && + r[1].inputCount == 2);
+      assert.isTrue(cleanSplit1[0] instanceof SearchQuotientSpur);
+
+      assert.equal(cleanSplit1[0].inputCount, 2);
+      assert.equal(cleanSplit1[1].inputCount, fiveCharCluster.inputCount - 2);
+
+      assert.equal(cleanSplit1[0], fixture.paths[2].path_k2c3_i3d0);
+      assert.isTrue(cleanSplit1[1] instanceof SearchQuotientSpur); // passes through both final paths
+
+      // Note that the path structures themselves, however, will be rebuilt - and with new spaceIDs.
+      const pathSequenceToInputs = (sequence: SearchQuotientSpur[]) => sequence.map(p => p.inputs);
+      // One of the paths leading into cluster_k3c3 passes through the split-point.
+      assert.equal(constituentPaths(cleanSplit1[0]).length, 1);
+      assert.equal(constituentPaths(cleanSplit1[1]).length, 1);
+
+      // The input distributions should re-appear in the constituent paths, in full.
+      assert.includeDeepMembers( // not deepEqual.
+        // superset
+        constituentPaths(fiveCharCluster).map((sequence) => {
+          return sequence.slice(2);
+        }).map(pathSequenceToInputs),
+        // subset
+        constituentPaths(cleanSplit1[1]).map(pathSequenceToInputs)
+      );
+
+      // Splits cleanly after 3 keystrokes.
+      const cleanSplit2 = splitResults.find((r) => r[0].inputCount == 3 && + r[1].inputCount == 1);
+      assert.isTrue(cleanSplit2[0] instanceof SearchQuotientCluster);
+
+      assert.equal(cleanSplit2[0].inputCount, 3);
+      assert.equal(cleanSplit2[1].inputCount, fiveCharCluster.inputCount - 3);
+
+      assert.equal(cleanSplit2[0], fixture.clusters.cluster_k3c3);
+
+      assert.isTrue(cleanSplit2[1] instanceof SearchQuotientSpur);
+
+      assert.deepEqual(cleanSplit2[1].inputSegments, [
+        fixture.paths[4].path_k4c5_i2.inputSource.segment
+      ]);
+
+      assert.equal(constituentPaths(cleanSplit2[0]).length, 3);
+      assert.equal(constituentPaths(cleanSplit2[1]).length, 1);
+
+      // splits on the double-accented version (that also does a deleteLeft)
+      //
+      // Splits after THREE keystrokes - lead keystroke had two chars, emitted
+      // one, then emitted the one that deletes left 1, then emits an accented
+      // vowel pair.
+      const dirtySplit = splitResults.find((r) => r[0].inputCount + r[1].inputCount == 5);
+      assert.isTrue(dirtySplit[0] instanceof SearchQuotientSpur);
+
+      assert.equal(dirtySplit[0].inputCount, 3);
+      assert.equal(dirtySplit[1].inputCount, fiveCharCluster.inputCount - 2);
+
+      assert.deepEqual(dirtySplit[0].inputSegments[2], {
+        ... fixture.paths[3].path_k3c4_i5d1.inputSource.segment,
+        start: 0,
+        end: 1
+      });
+
+      assert.isTrue(dirtySplit[1] instanceof SearchQuotientSpur);
+      assert.deepEqual(dirtySplit[1].inputSegments[0], {
+        ... fixture.paths[3].path_k3c4_i5d1.inputSource.segment,
+        start: 1
+      });
+      assert.deepEqual(dirtySplit[1].inputSegments[1], fixture.paths[4].path_k4c5_i1.inputSource.segment);
+
+      assert.equal(constituentPaths(dirtySplit[0]).length, 1);
+      assert.equal(constituentPaths(dirtySplit[1]).length, 1);
+    });
+
+    it('properly splits the cluster at index 4', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const fiveCharCluster = fixture.clusters.cluster_k4c5;
+
+      const splitResults = fiveCharCluster.split(4);
+      // Two split arrays are "clean" (but differ by contributing keystroke
+      // count), while the other splits a keystroke in half.
+      assert.equal(splitResults.length, 2);
+      assert.sameMembers(splitResults.map((r) => r[0].inputCount + r[1].inputCount), [4, 5]);
+
+      // Splits cleanly after 3 keystrokes.
+      const cleanSplit = splitResults.find((r) => r[0].inputCount == 3 && + r[1].inputCount == 1);
+      assert.equal(cleanSplit[0], fixture.clusters.cluster_k3c4);
+
+      assert.equal(cleanSplit[1].inputCount, fiveCharCluster.inputCount - 3);
+      assert.isTrue(cleanSplit[1] instanceof SearchQuotientSpur);
+
+      const pathSequenceToInputs = (sequence: SearchQuotientSpur[]) => sequence.map(p => p.inputs);
+      assert.deepEqual(constituentPaths(cleanSplit[1]).length, 1);
+
+      // The input distributions should re-appear in the constituent paths, in full.
+      assert.includeDeepMembers( // not deepEqual.
+        // superset
+        constituentPaths(fiveCharCluster).map((sequence) => {
+          return sequence.slice(3);
+        }).map(pathSequenceToInputs),
+        // subset
+        constituentPaths(cleanSplit[1]).map(pathSequenceToInputs)
+      );
+
+      // splits on the fourth keystroke variant that outputs two chars.
+      const dirtySplit = splitResults.find((r) => r[0].inputCount + r[1].inputCount == 5);
+      assert.isTrue(dirtySplit[0] instanceof SearchQuotientSpur);
+
+      assert.equal(dirtySplit[0].inputCount, 4);
+      assert.equal(dirtySplit[1].inputCount, 1);
+
+      assert.deepEqual(dirtySplit[0].inputSegments[3], {
+        ... fixture.paths[4].path_k4c5_i2.inputSource.segment,
+        start: 0,
+        end: 1
+      });
+
+      assert.isTrue(dirtySplit[1] instanceof SearchQuotientSpur);
+      assert.deepEqual(dirtySplit[1].inputSegments[0], {
+        ... fixture.paths[4].path_k4c5_i2.inputSource.segment,
+        start: 1
+      });
+    });
+
+    it('properly splits the cluster at index 5', () => {
+      const fixture = buildAlphabeticClusterFixtures();
+      const fiveCharCluster = fixture.clusters.cluster_k4c5;
+
+      const splitResults = fiveCharCluster.split(5);
+      // Two split arrays are "clean" (but differ by contributing keystroke
+      // count), while the other splits a keystroke in half.
+      assert.equal(splitResults.length, 1);
+
+      assert.equal(splitResults[0][0], fiveCharCluster);
+      assert.equal(splitResults[0][1].inputCount, 0);
+    });
+  });
+
+  // Self-note:  reuse the 'alphabetic' fixture and manually make mocked paths
+  // that match split results; then do merges to match 'alphabetic' results.
   describe('merge()', () => {
     it('merges in a simple SearchPath with a single, unsplit input', () => {
       const fixture = buildAlphabeticClusterFixtures();

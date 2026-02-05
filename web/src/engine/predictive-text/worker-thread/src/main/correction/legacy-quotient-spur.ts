@@ -22,8 +22,8 @@ import Transform = LexicalModelTypes.Transform;
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class LegacyQuotientSpur extends SearchQuotientSpur {
-  protected readonly insertLength: number;
-  protected readonly leftDeleteLength: number;
+  public readonly insertLength: number;
+  public readonly leftDeleteLength: number;
 
   /**
    * Constructs a fresh SearchQuotientNode instance for use in predictive-text
