@@ -204,9 +204,14 @@ export interface SearchQuotientNode {
    * Splits this SearchQuotientNode into two halves at the specified codepoint index.
    * The 'head' component will maximally re-use existing cached data, while the
    * 'tail' must be reconstructed from scratch due to the new start position.
+   *
+   * It is possible that there are multiple distinct ways to split the
+   * SearchSpace into halves if the split is not consistently clean (between
+   * input boundaries) for all possible path-sequences modeled by the original
+   * SearchSpace instance.
    * @param charIndex
    */
-  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode];
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][];
 
   /**
    * Determines if the SearchQuotientNode is a duplicate of another instance.

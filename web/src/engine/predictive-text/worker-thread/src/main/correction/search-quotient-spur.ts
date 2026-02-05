@@ -242,19 +242,19 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     }
   }
 
-  public split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
+  public split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
     const internalSplitIndex = charIndex - (this.codepointLength - this.insertLength);
 
     if(internalSplitIndex <= 0 && this.parents[0]) {
       const parentResults = this.parents[0].split(charIndex);
-      return [parentResults[0], this.construct(parentResults[1], this.inputs, this.inputSource)];
+      return parentResults.map((result) => [result[0], this.construct(result[1], this.inputs, this.inputSource)]);
     } else if(charIndex >= this.codepointLength) {
       // this instance = 'first set'
       // second instance:  empty transforms.
       //
       // stopgap:  maybe go ahead and check each input for any that are longer?
       // won't matter shortly, though.
-      return [this, new LegacyQuotientRoot(this.model)];
+      return [[this, new LegacyQuotientRoot(this.model)]];
     } else {
       const firstSet: Distribution<Transform> = this.inputs.map((input) => ({
         // keep insert head
@@ -289,7 +289,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
         })
         : this.parentNode;
       // construct two SearchPath instances based on the two sets!
-      return [
+      return [[
         parent,
         this.construct(new LegacyQuotientRoot(this.model), secondSet, {
           ...this.inputSource,
@@ -298,7 +298,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
             start: this.inputSource.segment.start + internalSplitIndex
           }
         })
-      ];
+      ]];
     }
   }
 
