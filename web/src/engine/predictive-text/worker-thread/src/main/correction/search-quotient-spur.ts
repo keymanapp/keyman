@@ -38,7 +38,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   readonly spaceId: number;
 
   readonly inputCount: number;
-  private _codepointLength: number;
+  readonly codepointLength: number;
   protected abstract readonly insertLength: number;
   protected abstract readonly leftDeleteLength: number
 
@@ -69,7 +69,8 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   constructor(
     parentNode: SearchQuotientNode,
     inputs: Distribution<Readonly<Transform>>,
-    inputSource: PathInputProperties | ProbabilityMass<Transform>
+    inputSource: PathInputProperties | ProbabilityMass<Transform>,
+    codepointLength: number
   ) {
     this.spaceId = generateSpaceSeed();
 
@@ -97,18 +98,11 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     this.lowestPossibleSingleCost = parentNode.lowestPossibleSingleCost - Math.log(inputSrc?.bestProbFromSet ?? 1);
     this.inputs = inputs?.length > 0 ? inputs : null;
     this.inputCount = parentNode.inputCount + (this.inputs ? 1 : 0);
+    this.codepointLength = codepointLength;
   }
 
   public get model(): LexicalModel {
     return this.parentNode.model;
-  }
-
-  get codepointLength(): number {
-    if(this._codepointLength === undefined) {
-      this._codepointLength = this.parentNode.codepointLength + this.insertLength - this.leftDeleteLength;
-    }
-
-    return this._codepointLength;
   }
 
   public get lastInput(): Distribution<Readonly<Transform>> {
@@ -121,10 +115,15 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const bestPrefix = this.parentNode.bestExample ?? { text: '', p: 1 };
     const bestLocalInput = this.inputs?.reduce((max, curr) => max.p < curr.p ? curr : max) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1};
 
+    // Remove any characters from our parent node's "best example" per
+    // left-deletes specified by _this_ quotient-node's modeled inputs.
+    const parentPrefixAfterDeletes = KMWString.substring(bestPrefix.text, 0, this.parentNode.codepointLength - bestLocalInput.sample.deleteLeft)
+
+    // Then, apply our most likely local insert and determine the net
+    // probability of reaching this result (from the search root through to this
+    // specific result).
     return {
-      // Take the parent node's result, apply delete-lefts, then apply our most
-      // likely local insert.
-      text: KMWString.substring(bestPrefix.text, 0, this.parentNode.codepointLength - bestLocalInput.sample.deleteLeft) + bestLocalInput.sample.insert,
+      text: parentPrefixAfterDeletes + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
     }
   }
