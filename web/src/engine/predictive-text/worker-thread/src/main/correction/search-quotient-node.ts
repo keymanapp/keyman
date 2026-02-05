@@ -177,15 +177,15 @@ export interface SearchQuotientNode {
   readonly codepointLength: number;
 
   /**
-   * Determines the best example text representable by this batcher's portion of
-   * the correction-search graph and its paths.
+   * Determines the best example text representable by this SearchQuotientNode's
+   * portion of the correction-search graph and its paths.
    */
   readonly bestExample: { text: string, p: number };
 
   /**
-   * Gets components representing the keystroke range corrected by this search
-   * space.   If only part of any keystroke's effects are used, this will also
-   * be noted.
+   * Gets components representing the keystroke range corrected by this
+   * search-space quotient node.   If only part of any keystroke's effects are
+   * used, this will also be noted.
    */
   readonly inputSegments: InputSegment[];
 
