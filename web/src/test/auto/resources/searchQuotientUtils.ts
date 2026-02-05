@@ -6,7 +6,8 @@ import {
   SearchQuotientCluster,
   SearchQuotientNode,
   SearchQuotientRoot,
-  SearchQuotientSpur
+  SearchQuotientSpur,
+  SubstitutionQuotientSpur
 } from "@keymanapp/lm-worker/test-index";
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -129,4 +130,18 @@ export function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[]
   } else {
     throw new Error("constituentPaths is unable to handle a new, unexpected SearchQuotientNode type");
   }
+}
+
+export function toSpurTypeSequence(spurs: SearchQuotientNode[]): string[] {
+  return spurs.map(s => {
+    if(s instanceof InsertionQuotientSpur) {
+      return 'insert';
+    } else if(s instanceof DeletionQuotientSpur) {
+      return 'delete';
+    } else if(s instanceof SubstitutionQuotientSpur) {
+      return 'substitute';
+    } else {
+      return 'legacy';
+    }
+  })
 }

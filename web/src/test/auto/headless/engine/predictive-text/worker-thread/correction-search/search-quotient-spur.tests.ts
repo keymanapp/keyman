@@ -33,7 +33,7 @@ import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-import { constituentPaths, quotientPathHasInputs } from '#test-resources/searchQuotientUtils.js';
+import { constituentPaths, quotientPathHasInputs, toSpurTypeSequence } from '#test-resources/searchQuotientUtils.js';
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
@@ -64,20 +64,6 @@ function toMathematicalSMP(text: string) {
   });
 
   return asSMP.join('');
-}
-
-export function toSpurTypeSequence(spurs: SearchQuotientNode[]): string[] {
-  return spurs.map(s => {
-    if(s instanceof InsertionQuotientSpur) {
-      return 'insert';
-    } else if(s instanceof DeletionQuotientSpur) {
-      return 'delete';
-    } else if(s instanceof SubstitutionQuotientSpur) {
-      return 'substitute';
-    } else {
-      return 'legacy';
-    }
-  })
 }
 
 export function buildSimplePathSplitFixture() {
