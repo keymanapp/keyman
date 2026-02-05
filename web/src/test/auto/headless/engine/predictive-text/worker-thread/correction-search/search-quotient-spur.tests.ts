@@ -1850,6 +1850,7 @@ describe('SearchQuotientSpur', () => {
         assert.equal(remergedPath.codepointLength, mergeTarget.codepointLength);
         assert.sameDeepOrderedMembers(remergedPath.inputSegments, mergeTarget.inputSegments);
         assert.isTrue(quotientPathHasInputs(remergedPath, trueDistributions));
+        assert.isTrue(remergedPath.isSameNode(mergeTarget));
       }
 
       it('setup: constructs path properly', () => {
@@ -1960,6 +1961,7 @@ describe('SearchQuotientSpur', () => {
       assert.isTrue(remerged instanceof SearchQuotientSpur);
       assert.deepEqual((remerged as SearchQuotientSpur).inputs, inputDistribution);
       assert.isTrue(quotientPathHasInputs(remerged, [[startSample], inputDistribution]));
+      assert.isTrue(remerged.isSameNode(mergeTarget));
     });
   });
 });

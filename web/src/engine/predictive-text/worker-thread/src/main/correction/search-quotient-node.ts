@@ -207,4 +207,12 @@ export interface SearchQuotientNode {
    * @param charIndex
    */
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode];
+
+  /**
+   * Determines if the SearchQuotientNode is a duplicate of another instance.
+   * For such cases, the total search space covered by the quotient-graph
+   * path(s) taken to reach each must be 100% identical.
+   * @param node
+   */
+  isSameNode(node: SearchQuotientNode): boolean;
 }
