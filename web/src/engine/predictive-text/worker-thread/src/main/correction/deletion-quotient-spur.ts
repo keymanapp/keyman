@@ -1,3 +1,12 @@
+/**
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-02-03
+ *
+ * This file adds a SearchQuotientSpur variant modeling deletion of the corresponding
+ * keystroke.
+ */
+
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchNode } from "./distance-modeler.js";

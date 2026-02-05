@@ -1,3 +1,13 @@
+/**
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-02-03
+ *
+ * This file adds a SearchQuotientSpur variant modeling insertion of
+ * lexical-entry prefix characters - an operation with no corresponding
+ * keystroke.
+ */
+
 import { SearchNode } from "./distance-modeler.js";
 import { SearchQuotientNode } from "./search-quotient-node.js";
 import { SearchQuotientSpur } from "./search-quotient-spur.js";
