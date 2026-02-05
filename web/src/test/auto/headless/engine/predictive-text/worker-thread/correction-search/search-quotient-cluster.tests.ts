@@ -11,13 +11,13 @@ import { assert } from 'chai';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientRoot, LegacyQuotientSpur, models, SearchQuotientCluster, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientRoot, LegacyQuotientSpur, models, SearchQuotientCluster } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-const constituentPaths = unitTestEndpoints.constituentPaths;
+import { constituentPaths } from '#test-resources/searchQuotientUtils.js';
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
