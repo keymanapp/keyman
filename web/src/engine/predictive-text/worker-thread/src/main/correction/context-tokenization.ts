@@ -105,11 +105,15 @@ export class ContextTokenization {
    * The sequence of tokens in the context represented by this instance.
    */
   readonly tokens: ContextToken[];
+
   /**
-   * The tokenization-transition metadata relating this instance to the most likely
-   * tokenization from a prior state.
+   * Denotes whether or not the transition to this tokenization added or deleted
+   * any tokens.
    */
-  readonly transitionEdits?: TransitionEdge;
+  readonly transitionEdits?: {
+    addedNewTokens: boolean,
+    removedOldTokens: boolean
+  };
 
   /**
    * The portion of edits from the true input keystroke that are not part of the
@@ -129,13 +133,18 @@ export class ContextTokenization {
   constructor(tokens: ContextToken[], alignment: TransitionEdge, taillessTrueKeystroke: Transform);
   constructor(
     param1: ContextToken[] | ContextTokenization,
-    alignment?: TransitionEdge,
+    tokenizationPath?: TransitionEdge,
     taillessTrueKeystroke?: Transform
   ) {
     if(!(param1 instanceof ContextTokenization)) {
       const tokens = param1;
       this.tokens = [].concat(tokens);
-      this.transitionEdits = alignment;
+      if(tokenizationPath) {
+        this.transitionEdits = {
+          addedNewTokens: tokenizationPath?.inputs[0].sample.has(1) ?? false,
+          removedOldTokens: (tokenizationPath?.alignment.removedTokenCount ?? 0) > 0
+        }
+      }
       this.taillessTrueKeystroke = taillessTrueKeystroke;
     } else {
       const priorToClone = param1;
@@ -489,30 +498,16 @@ export class ContextTokenization {
 
   /**
    * Given results from `precomputeTokenizationAfterInput`, this method will
-   * evaluate the pending transition in tokenization for all associated inputs
+   * realign this tokenization's range to match the incoming keystroke's context window
    * while reusing as many correction-search intermediate results as possible.
-   * @param transitionEdge Batched results from one or more
+   * @param alignment Batched results from one or more
    * `precomputeTokenizationAfterInput` calls on this instance, all with the
    * same alignment values.
-   * @param lexicalModel The active lexical model
-   * @param sourceInput The Transform associated with the keystroke triggering
-   * the transition.
-   * @param bestProbFromSet The probability of the single most likely input
-   * transform in the overall transformDistribution associated with the
-   * keystroke triggering the transition.  It need not be represented by the
-   * TransitionEdge to be built.
    * @returns
    */
-  evaluateTransition(
-    transitionEdge: TransitionEdge,
-    lexicalModel: LexicalModel,
-    sourceInput: Transform,
-    bestProbFromSet: number
-  ): ContextTokenization {
-    const { alignment: alignment, inputs } = transitionEdge;
+  realign(alignment: TransitionEdgeAlignment): ContextTokenization {
     const sliceIndex = alignment.edgeWindow.sliceIndex;
     const baseTokenization = this.tokens.slice(sliceIndex);
-    let affectedToken: ContextToken;
 
     const tokenization: ContextToken[] = [];
 
@@ -553,33 +548,71 @@ export class ContextTokenization {
       tokenization.push(token);
     }
 
+    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tokenization), null, this.taillessTrueKeystroke);
+  }
+
+  /**
+   * Given results from `precomputeTokenizationAfterInput`, this method will
+   * evaluate the pending transition in tokenization for all associated inputs
+   * while reusing as many correction-search intermediate results as possible.
+   * @param transitionEdge Batched results from one or more
+   * `precomputeTokenizationAfterInput` calls on this instance, all with the
+   * same alignment values.
+   * @param transitionId The id of the Transform associated with the keystroke
+   * triggering the transition.
+   * @param bestProbFromSet The probability of the single most likely input
+   * transform in the overall transformDistribution associated with the
+   * keystroke triggering theh transition.  It need not be represented by the
+   * tokenizationPath to be built.
+   * @param appliedSuggestionId
+   * @returns
+   */
+  evaluateTransition(
+    transitionEdge: TransitionEdge,
+    transitionId: number,
+    bestProbFromSet: number,
+    appliedSuggestionId?: number
+  ): ContextTokenization {
+    const { alignment, inputs } = transitionEdge;
+    const sliceIndex = alignment.edgeWindow.sliceIndex;
+    const lexicalModel = this.tail.searchModule.model;
+
+    let affectedToken: ContextToken;
+
+    const tailTokenization = this.tokens.slice(sliceIndex);
+
     // Assumption:  inputs.length > 0.  (There is at least one input transform.)
     const inputTransformKeys = [...inputs[0].sample.keys()];
+    const baseTailIndex = (tailTokenization.length - 1);
     let removedTokenCount = alignment.removedTokenCount;
     while(removedTokenCount-- > 0) {
       inputTransformKeys.pop();
-      tokenization.pop();
+      tailTokenization.pop();
     }
 
     let appliedLength = 0;
     for(let i = 0; i < inputTransformKeys.length; i++) {
       const tailRelativeIndex = inputTransformKeys[i];
       let distribution = inputs.map((i) => ({sample: i.sample.get(tailRelativeIndex), p: i.p}));
-      const tokenIndex = (tokenization.length - 1) + tailRelativeIndex;
+      const tokenIndex = baseTailIndex + tailRelativeIndex;
 
-      affectedToken = tokenization[tokenIndex];
+      affectedToken = tailTokenization[tokenIndex];
       if(!affectedToken) {
         affectedToken = new ContextToken(lexicalModel);
-        tokenization.push(affectedToken);
+        tailTokenization.push(affectedToken);
       } else if(KMWString.length(affectedToken.exampleInput) == distribution[0].sample.deleteLeft) {
         // If the entire token will be replaced, throw out the old one and start anew.
         affectedToken = new ContextToken(lexicalModel);
         // Replace the token at the affected index with a brand-new token.
-        tokenization.splice(tokenIndex, 1, affectedToken);
+        tailTokenization.splice(tokenIndex, 1, affectedToken);
       }
 
       affectedToken.isPartial = true;
-      delete affectedToken.appliedTransitionId;
+      if(appliedSuggestionId !== undefined) {
+        affectedToken.appliedTransitionId = appliedSuggestionId;
+      } else {
+        delete affectedToken.appliedTransitionId;
+      }
 
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
@@ -590,7 +623,7 @@ export class ContextTokenization {
 
       const inputSource: PathInputProperties = {
         segment: {
-          transitionId: sourceInput.id,
+          transitionId,
           start: appliedLength
         },
         bestProbFromSet: bestProbFromSet,
@@ -601,17 +634,21 @@ export class ContextTokenization {
         inputSource.segment.end = appliedLength;
       }
 
+      affectedToken = new ContextToken(affectedToken);
       affectedToken.addInput(inputSource, distribution);
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
+      // Do not re-use the previous token; the mutation may have unexpected
+      // results (say, in unit-testing)
+      tailTokenization[tokenIndex] = affectedToken;
 
       affectedToken = null;
     }
 
     return new ContextTokenization(
-      this.tokens.slice(0, sliceIndex).concat(tokenization),
-      null /* tokenMapping */,
+      this.tokens.slice(0, sliceIndex).concat(tailTokenization),
+      transitionEdge,
       determineTaillessTrueKeystroke(transitionEdge)
     );
   }
