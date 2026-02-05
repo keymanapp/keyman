@@ -35,11 +35,9 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
   constructor(space: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: PathInputProperties | ProbabilityMass<Transform>) {
     // Compute this SearchPath's codepoint length & edge length.
     const inputSample = inputs?.[0].sample ?? { insert: '', deleteLeft: 0 };
-    const insert = inputSample.insert;
-    const insertLength = KMWString.length(insert);
-    const leftDeleteLength = inputSample.deleteLeft;
+    const insertLength = KMWString.length(inputSample.insert);
 
-    const codepointLength = space.codepointLength + insertLength - leftDeleteLength;
+    const codepointLength = space.codepointLength + insertLength - inputSample.deleteLeft;
 
     super(space, inputs, inputSource, codepointLength);
     this.queueNodes(this.buildEdgesForNodes(space.previousResults.map(r => r.node)));

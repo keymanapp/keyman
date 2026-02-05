@@ -117,7 +117,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     // Remove any characters from our parent node's "best example" per
     // left-deletes specified by _this_ quotient-node's modeled inputs.
-    const parentPrefixAfterDeletes = KMWString.substring(bestPrefix.text, 0, this.parentNode.codepointLength - bestLocalInput.sample.deleteLeft)
+    const parentPrefixAfterDeletes = KMWString.substring(bestPrefix.text, 0, this.parentNode.codepointLength - bestLocalInput.sample.deleteLeft);
 
     // Then, apply our most likely local insert and determine the net
     // probability of reaching this result (from the search root through to this
@@ -125,7 +125,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return {
       text: parentPrefixAfterDeletes + bestLocalInput.sample.insert,
       p: bestPrefix.p * bestLocalInput.p
-    }
+    };
   }
 
   get parents() {
