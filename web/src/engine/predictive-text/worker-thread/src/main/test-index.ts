@@ -21,9 +21,3 @@ export * from './predict-helpers.js';
 export { default as TransformUtils } from './transformUtils.js'
 export { default as LMLayerWorker } from './index.js'
 export * from './transform-subsets.js';
-
-// unitTestEndpoints
-import { unitTestEndpoints as SearchQuotientNodeEndpoints } from './correction/search-quotient-node.js';
-export const unitTestEndpoints: typeof SearchQuotientNodeEndpoints = {
-  ...SearchQuotientNodeEndpoints
-}

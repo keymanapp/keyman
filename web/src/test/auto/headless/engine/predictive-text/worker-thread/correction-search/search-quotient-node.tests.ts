@@ -1,11 +1,11 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientRoot, models, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
+import { LegacyQuotientRoot, models } from '@keymanapp/lm-worker/test-index';
 
 import { buildSimplePathSplitFixture } from './search-quotient-spur.tests.js';
 
-const { quotientPathHasInputs } = unitTestEndpoints;
+import { quotientPathHasInputs } from '#test-resources/searchQuotientUtils.js';
 
 import TrieModel = models.TrieModel;
 

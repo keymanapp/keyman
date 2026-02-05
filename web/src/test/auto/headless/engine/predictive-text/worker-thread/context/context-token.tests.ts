@@ -15,14 +15,14 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { ContextToken, correction, generateSubsetId, getBestMatches, InputSegment, models, SearchQuotientSpur, unitTestEndpoints } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, generateSubsetId, getBestMatches, InputSegment, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+
+import { quotientPathHasInputs } from "#test-resources/searchQuotientUtils.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
-
-const { quotientPathHasInputs } = unitTestEndpoints;
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
