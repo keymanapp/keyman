@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.199 alpha 2026-02-05
+
+* chore(deps): bump @isaacs/brace-expansion from 5.0.0 to 5.0.1 in /developer/src/server/src/win32/trayicon/addon-src (#15552)
+* fix(windows): unresponsive splash screen (#15269)
+* maint(common): Update langtags.json to 2026-02-03 release (v1.4) (#15459)
+* feat(android): Use current display language for keyboard search (#15510)
+* chore(linux): Update debian changelog (#15557)
+* chore(linux): update copyright year and standards version (#15559)
+
 ## 19.0.198 alpha 2026-02-04
 
 * fix(core): handle backspace decomposition (#15488)
