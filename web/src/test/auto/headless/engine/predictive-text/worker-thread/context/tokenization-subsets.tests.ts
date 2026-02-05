@@ -183,11 +183,7 @@ describe('precomputationSubsetKeyer', function() {
             // source text:  'date'
             token.addInput({
               segment: {
-                trueTransform: {
-                  insert: 'te',
-                  deleteLeft: 0,
-                  id: 13
-                }, transitionId: 13,
+                transitionId: 13,
                 start: 0
               }, bestProbFromSet: 1,
               subsetId: generateSubsetId()
@@ -219,11 +215,7 @@ describe('precomputationSubsetKeyer', function() {
             // source text:  'date'
             token.addInput({
               segment: {
-                trueTransform: {
-                  insert: 'te',
-                  deleteLeft: 0,
-                  id: 13
-                }, transitionId: 13,
+                transitionId: 13,
                 start: 0
               }, bestProbFromSet: 1,
               subsetId: generateSubsetId()
@@ -269,11 +261,7 @@ describe('precomputationSubsetKeyer', function() {
               // source text:  'dat'
               token.addInput({
                 segment: {
-                  trueTransform: {
-                    insert: 't',
-                    deleteLeft: 0,
-                    id: 13
-                  }, transitionId: 13,
+                  transitionId: 13,
                   start: 0
                 }, bestProbFromSet: 1,
                 subsetId: generateSubsetId()
@@ -305,11 +293,7 @@ describe('precomputationSubsetKeyer', function() {
           // source text:  'dat'
           token.addInput({
             segment: {
-              trueTransform: {
-                insert: 't',
-                deleteLeft: 0,
-                id: 13
-              }, transitionId: 13,
+              transitionId: 13,
               start: 0
             }, bestProbFromSet: 1,
             subsetId: generateSubsetId()
@@ -766,11 +750,7 @@ describe('TokenizationSubsetBuilder', function() {
     const fourCharTailToken = new ContextToken(baseTokenization.tail);
     fourCharTailToken.addInput({
       segment: {
-        trueTransform: {
-          insert: 'é',
-          deleteLeft: 1,
-          id: 13
-        }, transitionId: 13,
+        transitionId: 13,
         start: 0
       }, bestProbFromSet: 1,
       subsetId: generateSubsetId()
@@ -781,11 +761,7 @@ describe('TokenizationSubsetBuilder', function() {
     const fiveCharTailToken = new ContextToken(baseTokenization.tail);
     fiveCharTailToken.addInput({
       segment: {
-        trueTransform: {
-          insert: 'é',
-          deleteLeft: 1,
-          id: 13
-        }, transitionId: 13,
+        transitionId: 13,
         start: 0
       }, bestProbFromSet: 1,
       subsetId: generateSubsetId()
@@ -823,11 +799,7 @@ describe('TokenizationSubsetBuilder', function() {
     const twoCharTailToken = new ContextToken(baseTokenization.tail);
     twoCharTailToken.addInput({
       segment: {
-        trueTransform: {
-          insert: 'é',
-          deleteLeft: 1,
-          id: 13
-        }, transitionId: 13,
+        transitionId: 13,
         start: 0
       }, bestProbFromSet: .6,
       subsetId: generateSubsetId()
@@ -838,10 +810,7 @@ describe('TokenizationSubsetBuilder', function() {
     const threeCharTailToken = new ContextToken(baseTokenization.tail);
     threeCharTailToken.addInput({
       segment: {
-        trueTransform: {
-          insert: 'é',
-          deleteLeft: 1
-        }, transitionId: 13,
+        transitionId: 13,
         start: 0
       }, bestProbFromSet: .6,
       subsetId: generateSubsetId()

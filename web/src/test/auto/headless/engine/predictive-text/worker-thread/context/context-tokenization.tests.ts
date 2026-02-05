@@ -52,7 +52,6 @@ function toTransformToken(text: string, transformId?: number) {
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
   token.addInput({
     segment: {
-      trueTransform: textAsTransform,
       transitionId: textAsTransform.id,
       start: 0
     }, bestProbFromSet: 1,
@@ -476,34 +475,21 @@ describe('ContextTokenization', function() {
       const boundaryToken = tokenization.tokens[tokenization.tokens.length-3];
       const boundaryTailInput = boundaryToken.inputSegments[boundaryToken.inputSegments.length - 1];
       assert.deepEqual(boundaryTailInput, {
-        segment: {
-          trueTransform: inputTransform,
-          transitionId: inputTransform.id,
-          start: 0,
-          end: 0
-        }, bestProbFromSet: 1,
-        subsetId
+        transitionId: inputTransform.id,
+        start: 0,
+        end: 0
       });
 
       // The new tail tokens should not include anything from the original tail;
       // the token should be replaced.
       assert.deepEqual(tokenization.tokens[tokenization.tokens.length-2].inputSegments, [{
-        segment: {
-          trueTransform: inputTransform,
-          transitionId: inputTransform.id,
-          start: 0,
-          end: 1 // captured the leading whitespace insert
-        }, bestProbFromSet: 1,
-        subsetId
+        transitionId: inputTransform.id,
+        start: 0,
+        end: 1 // captured the leading whitespace insert
       }]);
       assert.deepEqual(tokenization.tokens[tokenization.tokens.length-1].inputSegments, [{
-        segment: {
-          trueTransform: inputTransform,
-          transitionId: inputTransform.id,
-          start: 1
-        },
-        bestProbFromSet: 1,
-        subsetId
+        transitionId: inputTransform.id,
+        start: 1
       }]);
 
       const tailIndex = tokenization.tokens.length - 1;
