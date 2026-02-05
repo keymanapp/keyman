@@ -13,14 +13,18 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
+  DeletionQuotientSpur,
   generateSubsetId,
+  InsertionQuotientSpur,
   LegacyQuotientRoot,
   LegacyQuotientSpur,
   models,
   PathInputProperties,
+  SearchQuotientCluster,
   SearchQuotientNode,
   SearchQuotientRoot,
-  SearchQuotientSpur
+  SearchQuotientSpur,
+  SubstitutionQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
 import { buildAlphabeticClusterFixtures } from './search-quotient-cluster.tests.js';
@@ -29,10 +33,9 @@ import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-import { constituentPaths, quotientPathHasInputs } from '#test-resources/searchQuotientUtils.js';
+import { constituentPaths, quotientPathHasInputs, toSpurTypeSequence } from '#test-resources/searchQuotientUtils.js';
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
-
 
 // https://www.compart.com/en/unicode/block/U+1D400
 const mathBoldUpperA = 0x1D400; // Mathematical Bold Capital A
@@ -96,10 +99,232 @@ export function buildSimplePathSplitFixture() {
   };
 }
 
+/**
+ * Builds a text fixture matching the [final quotient-graph example](
+ * ../../../../../../../engine/predictive-text/worker-thread/docs/correction-search-graph.md)
+ * documenting the internal SearchQuotientNode design.
+ * @returns
+ */
+export function buildQuotientDocFixture() {
+  const searchRoot = new SearchQuotientRoot(testModel);
+  let idSeed = 0;
+
+  const key1Id = idSeed++;
+  const abDistrib: Distribution<Transform> = [
+    { sample: { insert: 'a', deleteLeft: 0, id: key1Id }, p: .45 },
+    { sample: { insert: 'b', deleteLeft: 0, id: key1Id }, p: .35 }
+  ];
+
+  const cdDistrib: Distribution<Transform> = [
+    { sample: { insert: 'cd', deleteLeft: 0, id: key1Id }, p: .2 }
+  ];
+
+  const sc1 = new InsertionQuotientSpur(searchRoot);
+  const sc2 = new InsertionQuotientSpur(sc1);
+
+  // K1C0
+  const k1c0 = new DeletionQuotientSpur(searchRoot, abDistrib.concat(cdDistrib), {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+
+  // K1C1
+  const k1c1_del = new DeletionQuotientSpur(sc1, abDistrib.concat(cdDistrib), {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c1_ab = new SubstitutionQuotientSpur(searchRoot, abDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c1_ins = new InsertionQuotientSpur(k1c0);
+  const k1c1 = new SearchQuotientCluster([k1c1_del, k1c1_ab, k1c1_ins]);
+
+  const k1c2_del = new DeletionQuotientSpur(sc2, abDistrib.concat(cdDistrib), {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c2_ab = new SubstitutionQuotientSpur(sc1, abDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c2_cd = new SubstitutionQuotientSpur(searchRoot, cdDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c2_ins = new InsertionQuotientSpur(k1c1);
+  const k1c2 = new SearchQuotientCluster([k1c2_del, k1c2_ab, k1c2_cd, k1c2_ins]);
+
+  const k1c3_ab = new SubstitutionQuotientSpur(sc2, abDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c3_cd = new SubstitutionQuotientSpur(sc1, cdDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c3_ins = new InsertionQuotientSpur(k1c2);
+  const k1c3 = new SearchQuotientCluster([k1c3_ab, k1c3_cd, k1c3_ins]);
+
+  // Onto keystroke 2.
+
+  const key2Id = idSeed++;
+  const efDistrib: Distribution<Transform> = [
+    { sample: { insert: 'e', deleteLeft: 0, id: key2Id }, p: .4 },
+    { sample: { insert: 'f', deleteLeft: 0, id: key2Id }, p: .3 }
+  ];
+
+  const ghDistrib: Distribution<Transform> = [
+    { sample: { insert: 'gh', deleteLeft: 0, id: key2Id }, p: .3 }
+  ];
+
+  const k2c0 = new DeletionQuotientSpur(k1c0, efDistrib.concat(ghDistrib), {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+
+  const k2c1_del = new DeletionQuotientSpur(k1c1, efDistrib.concat(ghDistrib), {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c1_ef = new SubstitutionQuotientSpur(k1c0, efDistrib, {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c1_ins = new InsertionQuotientSpur(k2c0);
+  const k2c1 = new SearchQuotientCluster([k2c1_del, k2c1_ef, k2c1_ins]);
+
+  const k2c2_del = new DeletionQuotientSpur(k1c2, efDistrib.concat(ghDistrib), {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c2_ef = new SubstitutionQuotientSpur(k1c1, efDistrib, {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c2_gh = new SubstitutionQuotientSpur(k1c0, ghDistrib, {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c2_ins = new InsertionQuotientSpur(k2c1);
+  const k2c2 = new SearchQuotientCluster([k2c2_del, k2c2_ef, k2c2_gh, k2c2_ins]);
+
+  const k2c3_del = new DeletionQuotientSpur(k1c3, efDistrib.concat(ghDistrib), {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c3_ef = new SubstitutionQuotientSpur(k1c2, efDistrib, {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c3_gh = new SubstitutionQuotientSpur(k1c1, ghDistrib, {
+    segment: {
+      transitionId: key2Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: efDistrib[0].p
+  });
+  const k2c3_ins = new InsertionQuotientSpur(k2c2);
+  const k2c3 = new SearchQuotientCluster([k2c3_del, k2c3_ef, k2c3_gh, k2c3_ins]);
+
+  return {searchRoot, sc1, sc2, k1c0, k1c1, k1c2, k1c3, k2c0, k2c1, k2c2, k2c3};
+}
+
 describe('SearchQuotientSpur', () => {
   describe('constructor', () => {
-    it('initializes from a lexical model', () => {
+    it('initializes from a lexical model (legacy)', () => {
       const path = new LegacyQuotientRoot(testModel);
+      assert.equal(path.inputCount, 0);
+      assert.equal(path.codepointLength, 0);
+      assert.isNumber(path.spaceId);
+      assert.deepEqual(path.bestExample, {text: '', p: 1});
+      assert.deepEqual(path.parents, []);
+    });
+
+    it('initializes from a lexical model', () => {
+      const path = new SearchQuotientRoot(testModel);
       assert.equal(path.inputCount, 0);
       assert.equal(path.codepointLength, 0);
       assert.isNumber(path.spaceId);
@@ -289,36 +514,83 @@ describe('SearchQuotientSpur', () => {
       assert.isTrue(quotientPathHasInputs(pathToSplit, distributions));
       assert.equal(constituentPaths(pathToSplit).length, 1);
     });
+
+    it('setup: buildQuotientDocFixture() constructs nodes properly', () => {
+      const nodes = buildQuotientDocFixture();
+
+      [nodes.searchRoot, nodes.sc1, nodes.sc2].forEach((n) => {
+        assert.equal(n.inputCount, 0);
+      });
+      [nodes.k1c0, nodes.k1c1, nodes.k1c2, nodes.k1c3].forEach((n) => {
+        assert.equal(n.inputCount, 1);
+      });
+      [nodes.k2c0, nodes.k2c1, nodes.k2c2, nodes.k2c3].forEach((n) => {
+        assert.equal(n.inputCount, 2);
+      });
+
+      [nodes.searchRoot, nodes.k1c0, nodes.k2c0].forEach((n) => {
+        assert.equal(n.codepointLength, 0);
+      });
+      [nodes.sc1, nodes.k1c1, nodes.k2c1].forEach((n) => {
+        assert.equal(n.codepointLength, 1);
+      });
+      [nodes.sc2, nodes.k1c2, nodes.k2c2].forEach((n) => {
+        assert.equal(n.codepointLength, 2);
+      });
+      [nodes.k1c3, nodes.k2c3].forEach((n) => {
+        assert.equal(n.codepointLength, 3);
+      });
+    });
   });
 
   describe('constituentPaths', () => {
-    it('includes a single entry array when all parents are SearchQuotientSpurs', () => {
-      const { paths } = buildSimplePathSplitFixture();
-      const finalPath = paths[4];
+    describe('on the simple-path split fixture', () => {
+      it('includes a single entry array when all parents are SearchQuotientSpurs', () => {
+        const { paths } = buildSimplePathSplitFixture();
+        const finalPath = paths[4];
 
-      assert.equal(constituentPaths(finalPath).length, 1);
+        assert.equal(constituentPaths(finalPath).length, 1);
 
-      const pathSequence = constituentPaths(finalPath)[0];
-      assert.equal(pathSequence.length, 4); // 4 inputs; does not include root node
+        const pathSequence = constituentPaths(finalPath)[0];
+        assert.equal(pathSequence.length, 4); // 4 inputs; does not include root node
 
-      assert.sameOrderedMembers(pathSequence, paths.slice(1));
+        assert.sameOrderedMembers(pathSequence, paths.slice(1));
+      });
+
+      it('properly enumerates child paths when encountering SearchCluster ancestors', () => {
+        const fixture = buildAlphabeticClusterFixtures();
+        const finalPath = fixture.paths[4].path_k4c6;
+
+        // The longest SearchPath at the end of that fixture's set is based on a
+        // lead-in cluster; all variants of that should be included.
+        assert.equal(constituentPaths(finalPath).length, constituentPaths(fixture.clusters.cluster_k3c4).length);
+
+        // That cluster holds the different potential penultimate paths;
+        // finalPath's inputs are added directly after any variation that may be
+        // output from the cluster.
+        assert.sameDeepMembers(constituentPaths(finalPath), constituentPaths(fixture.clusters.cluster_k3c4).map((p) => {
+          p.push(finalPath);
+          return p;
+        }));
+      });
     });
 
-    it('properly enumerates child paths when encountering SearchCluster ancestors', () => {
-      const fixture = buildAlphabeticClusterFixtures();
-      const finalPath = fixture.paths[4].path_k4c6;
+    describe('for the final quotient-graph doc example', () => {
+      it('handles insertion-only quotient-graph paths', () => {
+        const {sc2} = buildQuotientDocFixture();
 
-      // The longest SearchPath at the end of that fixture's set is based on a
-      // lead-in cluster; all variants of that should be included.
-      assert.equal(constituentPaths(finalPath).length, constituentPaths(fixture.clusters.cluster_k3c4).length);
+        const sc2Constituents = constituentPaths(sc2);
+        assert.equal(sc2Constituents.length, 1);
+        sc2Constituents.forEach(s => s.forEach(p => assert.isTrue(p instanceof InsertionQuotientSpur)));
+      });
 
-      // That cluster holds the different potential penultimate paths;
-      // finalPath's inputs are added directly after any variation that may be
-      // output from the cluster.
-      assert.sameDeepMembers(constituentPaths(finalPath), constituentPaths(fixture.clusters.cluster_k3c4).map((p) => {
-        p.push(finalPath);
-        return p;
-      }));
+      it('handles deletion-only quotient-graph paths', () => {
+        const { k2c0 } = buildQuotientDocFixture();
+
+        const k2c0Constituents = constituentPaths(k2c0);
+        assert.equal(k2c0Constituents.length, 1);
+        k2c0Constituents.forEach(s => s.forEach(p => assert.isTrue(p instanceof DeletionQuotientSpur)));
+      });
     });
   });
 
@@ -380,6 +652,61 @@ describe('SearchQuotientSpur', () => {
       assert.notEqual(spur1.edgeKey, spur2.edgeKey);
       assert.notEqual(spur2.edgeKey, spur3.edgeKey);
       assert.notEqual(spur3.edgeKey, spur1.edgeKey);
+    });
+
+    it('is different for different insert locations', () => {
+      const {sc2} = buildQuotientDocFixture();
+
+      const sc2ConstituentPath = constituentPaths(sc2)[0];
+      assert.notEqual(sc2ConstituentPath[0].edgeKey, sc2ConstituentPath[1].edgeKey);
+    });
+
+    it('is different for different delete locations', () => {
+      const {k2c0} = buildQuotientDocFixture();
+
+      const k2c0ConstituentPath = constituentPaths(k2c0)[0];
+      assert.notEqual(k2c0ConstituentPath[0].edgeKey, k2c0ConstituentPath[1].edgeKey);
+    });
+
+    it('is different for delete spurs and substitution spurs for the same inputs', () => {
+      const root = new SearchQuotientRoot(testModel);
+      const dist: Distribution<Transform> = [
+        { sample: { insert: 'a', deleteLeft: 0, id: 13 }, p: .6 },
+        { sample: { insert: 'b', deleteLeft: 0, id: 13 }, p: .4 }
+      ];
+      const inputSrc: PathInputProperties = {
+        segment: {
+          transitionId: 13,
+          start: 0
+        },
+        subsetId: generateSubsetId(),
+        bestProbFromSet: dist[0].p
+      }
+
+      const deletionSpur = new DeletionQuotientSpur(root, dist, inputSrc);
+      const substitutionSpur = new SubstitutionQuotientSpur(root, dist, inputSrc);
+
+      assert.notEqual(deletionSpur.edgeKey, substitutionSpur.edgeKey);
+    });
+
+    it('is different for delete spurs and substitutions of empty inputs', () => {
+      const root = new SearchQuotientRoot(testModel);
+      const dist: Distribution<Transform> = [
+        { sample: { insert: '', deleteLeft: 0, id: 13 }, p: 1 }
+      ];
+      const inputSrc: PathInputProperties = {
+        segment: {
+          transitionId: 13,
+          start: 0
+        },
+        subsetId: generateSubsetId(),
+        bestProbFromSet: dist[0].p
+      }
+
+      const deletionSpur = new DeletionQuotientSpur(root, dist, inputSrc);
+      const substitutionSpur = new SubstitutionQuotientSpur(root, dist, inputSrc);
+
+      assert.notEqual(deletionSpur.edgeKey, substitutionSpur.edgeKey);
     });
   });
 
@@ -1422,6 +1749,131 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual((tail as LegacyQuotientSpur).inputs, tailTarget.inputs);
       assert.deepEqual((head as LegacyQuotientSpur).inputSource, headTarget.inputSource);
       assert.deepEqual((tail as LegacyQuotientSpur).inputSource, tailTarget.inputSource);
+    });
+
+    describe('correctly handles the quotient-path doc example', () => {
+      it('splits properly at index 0', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(0);
+        assert.equal(splits.length, 1);
+        assert.equal(splits[0][0], nodes.searchRoot);
+        assert.isTrue(splits[0][1].isSameNode(k2c3));
+      });
+
+      it('splits properly at index 1', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(1);
+        /*
+         * Unironically, actually 5.
+         *
+         * 3 are "clean", with 2 "dirty" - the "dirty" two both split in the
+         * middle of input for the first keystroke.
+         */
+        assert.equal(splits.length, 5);
+        assert.sameDeepMembers(splits.map(s => s.map(n => n.inputCount)), [
+          // clean
+          [0, 2], // 1 inserted char, then both inputs
+          [1, 1], // 1 std keystroke, then the other input
+          [2, 0], // BOTH keystrokes processed (with one deleted), then insertions afterward
+          // dirty
+          [1, 2], // 1/2 keystroke inserted, other 1/2 is in tail
+          [2, 1]  // first keystroke deleted, second keystroke 1/2 inserted with remainder in tail
+        ]);
+
+        splits.forEach(s => {
+          assert.equal(s[0].codepointLength, 1);
+          assert.equal(s[1].codepointLength, 2);
+        });
+
+        const cleanSplit0KeyHead = splits.find(s => s[0].inputCount == 0 && s[1].inputCount == 2);
+        const cleanSplit1KeyHead = splits.find(s => s[0].inputCount == 1 && s[1].inputCount == 1);
+        const cleanSplit2KeyHead = splits.find(s => s[0].inputCount == 2 && s[1].inputCount == 0);
+
+        assert.equal(constituentPaths(cleanSplit0KeyHead[0]).length, 1);
+        assert.sameDeepMembers(constituentPaths(cleanSplit0KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert']
+        ]);
+        assert.equal(constituentPaths(cleanSplit1KeyHead[0]).length, 2);
+        assert.sameDeepMembers(constituentPaths(cleanSplit1KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'delete'],
+          ['substitute']
+        ]);
+        assert.equal(constituentPaths(cleanSplit2KeyHead[0]).length, 3);
+        assert.sameDeepMembers(constituentPaths(cleanSplit2KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'delete', 'delete'],
+          ['substitute', 'delete'],
+          ['delete', 'substitute']
+        ]);
+      });
+
+      it('splits properly at index 2', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(2);
+        /*
+         * Unironically, actually 5.
+         *
+         * 3 are "clean", with 2 "dirty" - the "dirty" two both split in the
+         * middle of input for the first keystroke.
+         */
+        assert.equal(splits.length, 5);
+        assert.sameDeepMembers(splits.map(s => s.map(n => n.inputCount)), [
+          // clean
+          [0, 2], // 1 inserted char, then both inputs
+          [1, 1], // 1 std keystroke, then the other input
+          [2, 0], // BOTH keystrokes processed (with one deleted), then insertions afterward
+          // dirty
+          [1, 2], //insert, then 1/2 keystroke inserted, other 1/2 is in tail
+          [2, 1]  // first keystroke deleted or short, second keystroke 1/2 inserted with remainder in tail
+        ]);
+
+        splits.forEach(s => {
+          assert.equal(s[0].codepointLength, 2);
+          assert.equal(s[1].codepointLength, 1);
+        });
+
+        const cleanSplit0KeyHead = splits.find(s => s[0].inputCount == 0 && s[1].inputCount == 2);
+        const cleanSplit1KeyHead = splits.find(s => s[0].inputCount == 1 && s[1].inputCount == 1);
+        const cleanSplit2KeyHead = splits.find(s => s[0].inputCount == 2 && s[1].inputCount == 0);
+
+        assert.equal(constituentPaths(cleanSplit0KeyHead[0]).length, 1);
+        assert.sameDeepMembers(constituentPaths(cleanSplit0KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'insert']
+        ]);
+        assert.equal(constituentPaths(cleanSplit1KeyHead[0]).length, 4);
+        assert.sameDeepMembers(constituentPaths(cleanSplit1KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'insert', 'delete'],  // is too high an edit-cost, though...
+          ['substitute', 'insert'],
+          ['insert', 'substitute'],
+          ['substitute']
+        ]);
+        assert.equal(constituentPaths(cleanSplit2KeyHead[0]).length, 8);
+        assert.sameDeepMembers(constituentPaths(cleanSplit2KeyHead[0]).map(toSpurTypeSequence), [
+          ['insert', 'insert', 'delete', 'delete'], // is too high an edit-cost, though...
+          ['substitute', 'substitute'],
+          ['substitute', 'delete'],
+          ['delete', 'substitute'],
+          ['insert', 'substitute', 'delete'],
+          ['substitute', 'insert', 'delete'],
+          ['insert', 'delete', 'substitute'],
+          ['delete', 'substitute', 'insert']
+        ]);
+      });
+
+      it('splits properly at index 3', () => {
+        const nodes = buildQuotientDocFixture();
+        const k2c3 = nodes.k2c3;
+
+        const splits = k2c3.split(3);
+        assert.equal(splits.length, 1);
+        assert.equal(splits[0][0], k2c3);
+        assert.isTrue(splits[0][1].isSameNode(nodes.searchRoot));
+      });
     });
   });
 
