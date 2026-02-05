@@ -61,6 +61,17 @@ export interface InputSegment {
    * tokenized correction-search input.
    */
   start: number
+
+  /**
+   * Marks the final index (exclusive) within the insert strings for the
+   * corresponding transitions' Transforms that are applied by the corresponding
+   * tokenized correction-search input.
+   *
+   * If undefined, there is no portion of the input-source transform split from
+   * the right-hand side.  Otherwise, this value should match the `start` value of
+   * the _next_ split-off component of the input-source.
+   */
+  end?: number;
 }
 
 /**

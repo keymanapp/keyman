@@ -479,7 +479,8 @@ describe('ContextTokenization', function() {
         segment: {
           trueTransform: inputTransform,
           transitionId: inputTransform.id,
-          start: 0
+          start: 0,
+          end: 0
         }, bestProbFromSet: 1,
         subsetId
       });
@@ -490,7 +491,8 @@ describe('ContextTokenization', function() {
         segment: {
           trueTransform: inputTransform,
           transitionId: inputTransform.id,
-          start: 0
+          start: 0,
+          end: 1 // captured the leading whitespace insert
         }, bestProbFromSet: 1,
         subsetId
       }]);

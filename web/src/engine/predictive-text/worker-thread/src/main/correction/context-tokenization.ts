@@ -15,6 +15,7 @@ import TransformUtils from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
+import { PathInputProperties } from './search-quotient-node.js';
 import { TransitionEdge } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -561,7 +562,8 @@ export class ContextTokenization {
     }
 
     let appliedLength = 0;
-    for(let tailRelativeIndex of inputTransformKeys) {
+    for(let i = 0; i < inputTransformKeys.length; i++) {
+      const tailRelativeIndex = inputTransformKeys[i];
       let distribution = inputs.map((i) => ({sample: i.sample.get(tailRelativeIndex), p: i.p}));
       const tokenIndex = (tokenization.length - 1) + tailRelativeIndex;
 
@@ -585,7 +587,8 @@ export class ContextTokenization {
       if(affectedToken.inputCount == 0 && distribution[0].sample.deleteLeft != 0) {
         distribution = distribution.map((mass) => ({sample: { ...mass.sample, deleteLeft: 0 }, p: mass.p }));
       }
-      affectedToken.addInput({
+
+      const inputSource: PathInputProperties = {
         segment: {
           trueTransform: sourceInput,
           transitionId: sourceInput.id,
@@ -593,8 +596,13 @@ export class ContextTokenization {
         },
         bestProbFromSet: bestProbFromSet,
         subsetId: transitionEdge.inputSubsetId
-      }, distribution);
+      };
       appliedLength += KMWString.length(distribution[0].sample.insert);
+      if(i + 1 < inputTransformKeys.length) {
+        inputSource.segment.end = appliedLength;
+      }
+
+      affectedToken.addInput(inputSource, distribution);
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;

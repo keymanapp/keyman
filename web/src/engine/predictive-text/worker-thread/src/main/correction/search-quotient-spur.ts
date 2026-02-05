@@ -200,7 +200,13 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       // don't append any part of it to the parent; it's actually clean.
       const hasActualSplit = internalSplitIndex > 0 || this.inputs?.[0].sample.deleteLeft > 0;
       const parent = hasActualSplit
-        ? this.construct(this.parentNode, firstSet, this.inputSource)
+        ? this.construct(this.parentNode, firstSet, {
+          ...this.inputSource,
+          segment: {
+            ...this.inputSource.segment,
+            end: this.inputSource.segment.start + internalSplitIndex
+          }
+        })
         : this.parentNode;
       // construct two SearchPath instances based on the two sets!
       return [
@@ -343,10 +349,17 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     if(this.inputSource) {
       const inputId = this.inputSource.segment.transitionId;
       if(inputId !== undefined && parentSources.length > 0 && parentSources[parentSources.length - 1].segment.transitionId == inputId) {
-        return parentSources;
+        // Fuse the input sources!
+        const tailSrc = parentSources.pop();
+        // Deep-copy the object and replace the segment end value.
+        const extendedTailSrc = {...tailSrc, segment: {...tailSrc.segment, end: this.inputSource.segment.end}};
+        if(extendedTailSrc.segment.end === undefined) {
+          delete extendedTailSrc.segment.end;
+        }
+        parentSources.push(extendedTailSrc);
+      } else {
+        parentSources.push(this.inputSource);
       }
-
-      parentSources.push(this.inputSource);
     }
 
     return parentSources;
@@ -362,7 +375,23 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     for(const source of sources) {
       const i = source.segment.start;
-      components.push(`T${source.segment.transitionId}${i != 0 ? `@${i}` : ''}`);
+      const j = source.segment.end;
+      let component = (`T${source.segment.transitionId}`);
+
+      const parentSegs = this.parentNode.inputSegments;
+      // It is possible for an .end to be 0 after a split - if an input's
+      // left-deletions are applied without applying any of its insert string.
+      const midInputStart = i != 0 || parentSegs[parentSegs.length - 1]?.segment.end !== undefined;
+
+      // If there's an entry for end, always include the start position.  Also
+      // include the start position if the range for the source starts after
+      // index 0.
+      if(j !== undefined) {
+        component = `${component}@${i}-${j}`;
+      } else if(midInputStart) {
+        component = `${component}@${i}`;
+      }
+      components.push(component);
     }
 
     return components.join('+');
