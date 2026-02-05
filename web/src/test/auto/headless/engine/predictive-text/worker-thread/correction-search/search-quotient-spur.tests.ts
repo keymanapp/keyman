@@ -20,15 +20,14 @@ import {
   PathInputProperties,
   SearchQuotientNode,
   SearchQuotientRoot,
-  SearchQuotientSpur,
-  unitTestEndpoints
+  SearchQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-const { constituentPaths, quotientPathHasInputs } = unitTestEndpoints;
+import { constituentPaths, quotientPathHasInputs } from '#test-resources/searchQuotientUtils.js';
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
