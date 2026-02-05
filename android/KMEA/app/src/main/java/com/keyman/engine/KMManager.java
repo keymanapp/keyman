@@ -2792,6 +2792,7 @@ public final class KMManager {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       return InAppKeyboard.updateText(text);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      Log.d(TAG, "NOTE: updateText: " + text);
       return SystemKeyboard.updateText(text);
     }
 
@@ -2847,6 +2848,7 @@ public final class KMManager {
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && SystemKeyboard != null) {
+        Log.d(TAG, "NOTE: system resetContext()");
         SystemKeyboard.loadJavascript("resetContext()");
       }
     }
