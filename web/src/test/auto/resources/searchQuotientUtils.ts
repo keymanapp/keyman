@@ -1,3 +1,12 @@
+/**
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-02-05
+ *
+ * This file adds helper functions useful for developing test assertions against
+ * different types of SearchQuotientNodes and their properties.
+ */
+
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
 import { SearchQuotientNode, SearchQuotientRoot, SearchQuotientSpur } from "@keymanapp/lm-worker/test-index";
