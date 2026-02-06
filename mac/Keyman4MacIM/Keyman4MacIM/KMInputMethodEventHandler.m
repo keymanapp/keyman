@@ -8,6 +8,7 @@
 #import "KMInputMethodEventHandler.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
+#import <CoreFoundation/CoreFoundation.h>
 #import "KeySender.h"
 #import "TextApiCompliance.h"
 #import "KMSettingsRepository.h"
@@ -370,7 +371,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
           contextString = attributedString.string;
           
           //only uncomment for testing as we do not want to write context in logs
-          //os_log_debug([KMLogs testLog], " length: %lu result: %{public}@", contextString.length, contextString);
+          //os_log_debug([KMLogs keyTraceLog], " length: %lu result: %{public}@", contextString.length, contextString);
         }
       }
     }
@@ -405,18 +406,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
-    if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
-      // let the delete pass through in the original event rather than sending a new delete
-      NSString *message = @"applyOutputToTextInputClient, delete only scenario with passthrough";
-      os_log_debug([KMLogs keyTraceLog], "%@", message);
-      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
-      handledEvent = NO;
-    } else {
-      NSString *message = @"applyOutputToTextInputClient, delete only scenario";
-      os_log_debug([KMLogs keyTraceLog], "%@", message);
-      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
-      [self sendEvents:event forOutput:output];
-    }
+    handledEvent = [self handleDeleteOnlyScenario:output keyDownEvent:event client:client];
   } else if (output.isDeleteAndInsertScenario) {
     // TODO: fix issue #10246
     /*
@@ -509,6 +499,86 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   if ((self.apiCompliance.isComplianceUncertain) && (text != nil)) {
     [self.apiCompliance checkComplianceAfterInsert:text deleted:textToDelete];
   }
+}
+
+/**
+ * Handles deleting without an associated insert in one of three methods:
+ * 1. delete via replace: do the delete by replacing two (or more) characters with one.
+ * 2. backspace passthrough : if the original keydown event was a backspace, pass it through unhandled
+ * 3. generate event: generate keydown backspace events as necessary
+ */
+-(BOOL)handleDeleteOnlyScenario:(CoreKeyOutput*)output keyDownEvent:(nonnull NSEvent *)event client:(id) client {
+  
+  // attempt to delete by replacing -- for compliant apps only
+  if ([self handleDeleteWithReplacement:output keyDownEvent:event client:client]) {
+    return YES;
+  }
+  
+  // pass through if this was a backspace keydown event
+  if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
+    // let the delete pass through in the original event rather than sending a new delete
+    NSString *message = @"handleDeleteOnlyForOutput, delete only scenario with passthrough";
+    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+    
+    // instruct system to handle the event
+    return NO;
+  }
+    // otherwise generate a backspace
+  else {
+    NSString *message = @"handleDeleteOnlyForOutput, send backspace event";
+    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+    [self sendEvents:event forOutput:output];
+    
+    return YES;
+  }
+}
+
+/**
+ * For compliant apps only.
+ * This an attempt to do a more precise delete. When generating a backspace event or allowing a backspace
+ * to pass through, it may delete a combining diacritic and the preceding codepoint that it combines with.
+ * Instead, we can delete the combining diacritic alone by using the insertText API to replace two code points with one.
+ * This method only works for compliant apps because non-compliant apps do not support the insertText API.
+ */
+-(BOOL)handleDeleteWithReplacement:(CoreKeyOutput*)output keyDownEvent:(nonnull NSEvent *)event client:(id) client {
+  BOOL handledEvent = NO;
+  NSString *context = [self readContext:event forClient:client];
+  int codePointsToDelete = (int) output.codePointsToDeleteBeforeInsert;
+  
+  if ((self.apiCompliance.canReplaceText) && ([context length] > codePointsToDelete)) {
+    int codePointsToReplace = codePointsToDelete + 1;
+    NSRange replacementStringRange = NSMakeRange([context length] - codePointsToReplace, 1);
+    NSString *replacementString = [context substringWithRange:replacementStringRange];
+    
+    // replace only works for non-control characters
+    // if replacementString contains control characters, then return without handling event
+    NSString *message = nil;
+    if ([self containsControlCharacter:replacementString]) {
+      message = @"handleDeleteByReplace, replacementString contains control characters, cannot delete with replace";
+      os_log_debug([KMLogs keyTraceLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+      return NO;
+    } else {
+      message = @"handleDeleteByReplace, canReplaceText == true";
+      os_log_debug([KMLogs keyTraceLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+      handledEvent = YES;
+    }
+    
+    NSRange replacementRange = NSMakeRange(replacementStringRange.location, codePointsToReplace);
+    [client insertText:replacementString replacementRange:replacementRange];
+  }
+  
+  return handledEvent;
+}
+
+-(BOOL) containsControlCharacter:(NSString*)text {
+  NSCharacterSet *controlSet = [NSCharacterSet controlCharacterSet];
+  NSRange range = [text rangeOfCharacterFromSet:controlSet];
+  
+  return (range.location != NSNotFound);
 }
 
 /**
