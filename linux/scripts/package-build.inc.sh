@@ -42,8 +42,8 @@ function downloadSource() {
   uscan || (echo "ERROR: No new version available for ${proj}" >&2 && exit 1)
   cd ..
   mv "${proj}-${version}" "${BASEDIR}/${packageDir}"
-  mv "${proj}_${version}.orig.tar.gz" "${BASEDIR}/${packageDir}"
-  mv "${proj}-${version}.tar.gz" "${BASEDIR}/${packageDir}"
+  mv "${proj}_${version}.orig.tar.xz" "${BASEDIR}/${packageDir}"
+  mv "${proj}-${version}.tar.xz" "${BASEDIR}/${packageDir}"
   mv "${proj}"*.asc "${BASEDIR}/${packageDir}"
   rm "${proj}"*.debian.tar.xz
   cd "${BASEDIR}/${packageDir}" || exit
