@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.200 alpha 2026-02-06
+
+* change(web): define, utilize cleaner Web test-resource import paths (#15564)
+* maint(mac): upgrade to Xcode 26.2 (#15484)
+
 ## 19.0.199 alpha 2026-02-05
 
 * chore(deps): bump @isaacs/brace-expansion from 5.0.0 to 5.0.1 in /developer/src/server/src/win32/trayicon/addon-src (#15552)
