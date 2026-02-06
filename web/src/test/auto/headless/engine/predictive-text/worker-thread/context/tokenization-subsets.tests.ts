@@ -20,7 +20,7 @@ import {
   buildEdgeWindow,
   ContextToken,
   ContextTokenization,
-  generateSubsetId,
+  LegacyQuotientSpur,
   models,
   precomputationSubsetKeyer,
   TokenizationTransitionEdits,
@@ -181,16 +181,11 @@ describe('precomputationSubsetKeyer', function() {
             [...tokenization.tokens, (() => {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
-            token.addInput({
-              segment: {
-                transitionId: 13,
-                start: 0
-              }, bestProbFromSet: 1,
-              subsetId: generateSubsetId()
-            }, [
+            const dist = [
               {sample: {insert: 'te', deleteLeft: 0, id: 13}, p: 1}
-            ]);
-            return token;
+            ];
+            const space = new LegacyQuotientSpur(token.searchModule, dist, dist[0]);
+            return new ContextToken(space);
           })()],
             { insert: 's', deleteLeft: 0, deleteRight: 0 },
             false
@@ -213,16 +208,11 @@ describe('precomputationSubsetKeyer', function() {
           [...tokenization.tokens, (() => {
             const token = new ContextToken(plainModel, 'da');
             // source text:  'date'
-            token.addInput({
-              segment: {
-                transitionId: 13,
-                start: 0
-              }, bestProbFromSet: 1,
-              subsetId: generateSubsetId()
-            }, [
-              {sample: {insert: 't', deleteLeft: 0}, p: 1}
-            ]);
-            return token;
+            const dist = [
+              {sample: {insert: 't', deleteLeft: 0, id: 13}, p: 1}
+            ];
+            const space = new LegacyQuotientSpur(token.searchModule, dist, dist[0]);
+            return new ContextToken(space);
           })()],
         { insert: 'es', deleteLeft: 0, deleteRight: 0, id: 14 },
         false
@@ -257,17 +247,15 @@ describe('precomputationSubsetKeyer', function() {
           ...buildEdgeWindow(
             [...tokenization.tokens, (() => {
               const token = new ContextToken(plainModel, 'da');
-              token.isPartial = true;
               // source text:  'dat'
-              token.addInput({
-                segment: {
-                  transitionId: 13,
-                  start: 0
-                }, bestProbFromSet: 1,
-                subsetId: generateSubsetId()
-              }, [{sample: {insert: 'ts', deleteLeft: 0, id: 13}, p: 1}
-              ]);
-              return token;
+              const dist = [
+                {sample: {insert: 'ts', deleteLeft: 0, id: 13}, p: 1}
+              ];
+              const space = new LegacyQuotientSpur(token.searchModule, dist, dist[0]);
+              let token2 =  new ContextToken(space);
+              token2.isPartial = true;
+
+              return token2;
             })()],
             { insert: 'e', deleteLeft: 1, deleteRight: 0, id: 14 },
             false
@@ -289,18 +277,15 @@ describe('precomputationSubsetKeyer', function() {
       ...buildEdgeWindow(
         [...tokenization.tokens, (() => {
           const token = new ContextToken(plainModel, 'da');
-          token.isPartial = true;
           // source text:  'dat'
-          token.addInput({
-            segment: {
-              transitionId: 13,
-              start: 0
-            }, bestProbFromSet: 1,
-            subsetId: generateSubsetId()
-          }, [
+          const dist = [
             {sample: {insert: 't', deleteLeft: 0, id: 13}, p: 1}
-          ]);
-          return token;
+          ];
+          const space = new LegacyQuotientSpur(token.searchModule, dist, dist[0]);
+          let token2 =  new ContextToken(space);
+          token2.isPartial = true;
+
+          return token2;
         })()],
         { insert: 'e', deleteLeft: 0, deleteRight: 0, id: 14 },
         false
@@ -747,27 +732,25 @@ describe('TokenizationSubsetBuilder', function() {
 
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1, id: 13 };
 
-    const fourCharTailToken = new ContextToken(baseTokenization.tail);
-    fourCharTailToken.addInput({
-      segment: {
-        transitionId: 13,
-        start: 0
-      }, bestProbFromSet: 1,
-      subsetId: generateSubsetId()
-    }, [
-      { sample: trueSourceTransform, p: .6 }
-    ]);
+    let fourCharTailToken = new ContextToken(baseTokenization.tail);
+    let fourCharTailDist = [{sample: trueSourceTransform, p: .6}];
+    let fourCharTailSpace = new LegacyQuotientSpur(
+      fourCharTailToken.searchModule,
+      fourCharTailDist,
+      fourCharTailDist[0]
+    );
+    fourCharTailToken = new ContextToken(fourCharTailSpace);
 
-    const fiveCharTailToken = new ContextToken(baseTokenization.tail);
-    fiveCharTailToken.addInput({
-      segment: {
-        transitionId: 13,
-        start: 0
-      }, bestProbFromSet: 1,
-      subsetId: generateSubsetId()
-    }, [
+    let fiveCharTailToken = new ContextToken(baseTokenization.tail);
+    let fiveCharTailDist = [
       { sample: { insert: 's', deleteLeft: 0, id: 13 }, p: .4 }
-    ]);
+    ];
+    let fiveCharTailSpace = new LegacyQuotientSpur(
+      fiveCharTailToken.searchModule,
+      fiveCharTailDist,
+      fiveCharTailDist[0]
+    );
+    fiveCharTailToken = new ContextToken(fiveCharTailSpace);
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const fourCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), fourCharTailToken]);
@@ -796,27 +779,25 @@ describe('TokenizationSubsetBuilder', function() {
 
     const trueSourceTransform: Transform = { insert: 'é', deleteLeft: 1, id: 13 };
 
-    const twoCharTailToken = new ContextToken(baseTokenization.tail);
-    twoCharTailToken.addInput({
-      segment: {
-        transitionId: 13,
-        start: 0
-      }, bestProbFromSet: .6,
-      subsetId: generateSubsetId()
-    }, [
-      { sample: trueSourceTransform, p: .6 }
-    ]);
+    let twoCharTailToken = new ContextToken(baseTokenization.tail);
+    let twoCharTailDist = [{sample: trueSourceTransform, p: .6}];
+    let twoCharTailSpace = new LegacyQuotientSpur(
+      twoCharTailToken.searchModule,
+      twoCharTailDist,
+      twoCharTailDist[0]
+    );
+    twoCharTailToken = new ContextToken(twoCharTailSpace);
 
-    const threeCharTailToken = new ContextToken(baseTokenization.tail);
-    threeCharTailToken.addInput({
-      segment: {
-        transitionId: 13,
-        start: 0
-      }, bestProbFromSet: .6,
-      subsetId: generateSubsetId()
-    }, [
-      { sample: { insert: 'a', deleteLeft: 0, id: 13}, p: .4 }
-    ]);
+    let threeCharTailToken = new ContextToken(baseTokenization.tail);
+    let threeCharTailDist = [
+      { sample: { insert: 'a', deleteLeft: 0, id: 13 }, p: .4 }
+    ];
+    let threeCharTailSpace = new LegacyQuotientSpur(
+      threeCharTailToken.searchModule,
+      threeCharTailDist,
+      threeCharTailDist[0]
+    );
+    threeCharTailToken = new ContextToken(threeCharTailSpace);
 
     const subsetBuilder = new TokenizationSubsetBuilder();
     const twoCharTokenization = new ContextTokenization([...baseTokenization.tokens.slice(0, -1), twoCharTailToken]);

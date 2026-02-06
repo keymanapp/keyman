@@ -9,7 +9,7 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchQuotientNode, PathInputProperties } from "./search-quotient-node.js";
+import { SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
@@ -70,7 +70,7 @@ export class ContextToken {
    * Constructs a new, empty instance for use with the specified LexicalModel.
    * @param model
    */
-  constructor(model: LexicalModel);
+  constructor(model: SearchQuotientNode | LexicalModel);
   /**
    * Constructs a new instance with pre-existing text for use with the specified LexicalModel.
    * @param model
@@ -82,7 +82,7 @@ export class ContextToken {
    * @param baseToken
    */
   constructor(baseToken: ContextToken);
-  constructor(param: ContextToken | LexicalModel, rawText?: string, isPartial?: boolean) {
+  constructor(param: ContextToken | SearchQuotientNode | LexicalModel, rawText?: string, isPartial?: boolean) {
     if(param instanceof ContextToken) {
       const priorToken = param;
       Object.assign(this, priorToken);
@@ -93,7 +93,8 @@ export class ContextToken {
       // we need to ensure that only fully-utilized keystrokes are considered.
       this._searchModule = priorToken.searchModule;
     } else {
-      const model = param;
+      const baseSpace = param instanceof SearchQuotientNode ? param : new LegacyQuotientRoot(param as LexicalModel);
+      const BASE_PROBABILITY = 1;
 
       // May be altered outside of the constructor.
       this.isWhitespace = false;
@@ -102,31 +103,25 @@ export class ContextToken {
       rawText ||= '';
 
       // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
-      // Build a token that represents the current text with no ambiguity - probability at max (1.0)
-      let searchModule: SearchQuotientNode = new LegacyQuotientRoot(model);
-      const BASE_PROBABILITY = 1;
-      textToCharTransforms(rawText).forEach((transform) => {
-        let inputMetadata: PathInputProperties = {
+      const rawTransformDistributions: Distribution<Transform>[] = textToCharTransforms(rawText).map(function(transform) {
+        return [{sample: transform, p: BASE_PROBABILITY}];
+      });
+
+      let searchModule = baseSpace;
+
+      rawTransformDistributions.forEach((entry) => {
+        searchModule = new LegacyQuotientSpur(searchModule, entry, {
           segment: {
             start: 0,
             transitionId: undefined
           },
           bestProbFromSet: BASE_PROBABILITY,
           subsetId: generateSubsetId()
-        };
-        searchModule = new LegacyQuotientSpur(searchModule, [{sample: transform, p: BASE_PROBABILITY}], inputMetadata);
+        });
       });
 
       this._searchModule = searchModule;
     }
-  }
-
-  /**
-   * Call this to record the original keystroke Transforms for the context range
-   * corresponding to this token.
-   */
-  addInput(inputSource: PathInputProperties, distribution: Distribution<Transform>) {
-    this._searchModule = new LegacyQuotientSpur(this._searchModule, distribution, inputSource);
   }
 
   get inputCount() {

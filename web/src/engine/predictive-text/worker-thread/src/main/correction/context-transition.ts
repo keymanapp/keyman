@@ -137,6 +137,12 @@ export class ContextTransition {
       transform: Transform,
       appliedTransitionId: number
     ) => {
+      // TODO:  add NEW tokenization based on base tokenization + suggestion.
+      // Ensure it's the "most likely" in some sense.
+      //
+      // Issue:  suggestions do not currently track their base spaceId - their source.
+      // Cannot reference-equality check due to inter-thread communication.
+      // How can we best remember the suggestion's original source tokenization?
       const state = baseState.analyzeTransition(
         baseState.context,
         [{sample: transform, p: 1}],
