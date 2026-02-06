@@ -39,55 +39,50 @@ dch keyman --newversion "${KEYMAN_VERSION}" --force-bad-version --nomultimaint
 
 # Create the tarball
 
-if [[ ! -z "${create_origdist+x}" ]]; then
-  # Limited tarball - only the files needed to create Ubuntu package
+# We always include these files which are the minimum files and
+# folder required for Ubuntu/Debian packaging
+# shellcheck disable=2034  # to_include appears to be unused
+to_include=(
+  common/build.sh \
+  common/cpp \
+  common/include \
+  common/linux \
+  common/test/keyboards/baseline \
+  core \
+  linux \
+  resources/build/*.sh \
+  resources/build/meson \
+  resources/standards-data \
+  resources/*.sh \
+  ./*.md \
+  ./build.sh \
+  ./*.json \
+)
 
-  # files and folders to include in the tarball
-  # shellcheck disable=2034  # to_include appears to be unused
-  to_include=(
-    common/build.sh \
-    common/cpp \
-    common/include \
-    common/linux \
-    common/test/keyboards/baseline \
-    core \
-    linux \
-    resources/build/*.sh \
-    resources/build/meson \
-    resources/standards-data \
-    resources/*.sh \
-    ./*.md \
-    ./build.sh \
-    ./*.json \
-  )
+# files and subfolders to exclude from paths included in 'to_include',
+# i.e. the exceptions to 'to_include'.
 
-  # files and subfolders to exclude from paths included in 'to_include',
-  # i.e. the exceptions to 'to_include'.
-  # shellcheck disable=2034  # to_exclude appears to be unused
-  to_exclude=(
-    build \
-    common/test/keyboards/baseline/kmcomp-*.zip \
-    linux/builddebs \
-    linux/docs/help \
-    linux/keyman-config/keyman_config/version.py \
-    linux/keyman-config/buildtools/build-langtags.py \
-  )
-else
-  # Full tarball - all files needed to run `${KEYMAN_ROOT}/build.sh` on Linux
-  # files and folders to include in the tarball
+# shellcheck disable=2034  # to_exclude appears to be unused
+to_exclude=(
+  build \
+  common/test/keyboards/baseline/kmcomp-*.zip \
+  linux/builddebs \
+  linux/docs/help \
+  linux/keyman-config/keyman_config/version.py \
+  linux/keyman-config/buildtools/build-langtags.py \
+)
+
+if [[ -z "${create_origdist+x}" ]]; then
+  # If we build a full source tarball we include additional files
+  # so that it's possible to run `${KEYMAN_ROOT}/build.sh` on Linux
+
   # shellcheck disable=2034  # to_include appears to be unused
-  to_include=(
-    common/build.sh \
-    common/cpp \
-    common/include \
-    common/linux \
-    common/test/keyboards/baseline \
+  to_include+=(
     common/tools/hextobin \
     common/web/keyman-version \
     common/web/langtags \
     common/web/types \
     common/windows/cpp \
-    core \
     developer/src/common/include \
     developer/src/common/web \
     developer/src/ext/json \
@@ -103,26 +98,15 @@ else
     developer/src/kmc-package \
     developer/src/kmcmplib \
     docs/minimum-versions.md.in
-    linux \
     resources/build \
     resources/standards-data \
-    resources/*.sh \
-    ./*.md \
-    ./build.sh \
-    ./*.json \
   )
 
-  # files and subfolders to exclude from paths included in 'to_include',
+  # additional files and subfolders to exclude from paths included in 'to_include',
   # i.e. the exceptions to 'to_include'.
   # shellcheck disable=2034  # to_exclude appears to be unused
-  to_exclude=(
-    build \
+  to_exclude+=(
     *.exe \
-    common/test/keyboards/baseline/kmcomp-*.zip \
-    linux/builddebs \
-    linux/docs/help \
-    linux/keyman-config/keyman_config/version.py \
-    linux/keyman-config/buildtools/build-langtags.py \
     resources/build/history \
     resources/build/l10n \
     resources/build/mac \

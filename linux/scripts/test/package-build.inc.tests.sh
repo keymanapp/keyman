@@ -378,5 +378,265 @@ function test__generate_tar_ignore_list__can_include_toplevel_files() {
   assert-equal "${ignored_files[*]}" "${expected[*]}"
 }
 
+# Tests for _starts_with function
+function test__starts_with__match_parent() {
+  # Setup
+  includes=(subdir1/path1 subdir3)
+
+  # Verify
+  assert-true _starts_with includes ./subdir1
+}
+
+function test__starts_with__exact_match() {
+  # Setup
+  includes=(subdir1/path1 subdir3)
+
+  # Verify
+  assert-true _starts_with includes ./subdir1/path1
+}
+
+function test__starts_with__exact_match_localdir() {
+  # Setup
+  includes=(./subdir1/path1 ./subdir3)
+
+  # Verify
+  assert-true _starts_with includes ./subdir1/path1
+}
+
+function test__starts_with__no_match() {
+  # Setup
+  includes=(subdir1/path1 subdir3)
+
+  # Verify
+  assert-false _starts_with includes ./subdir2
+}
+
+function test__starts_with__normalized_paths() {
+  # Setup
+  includes=(path1 path2)
+
+  # Verify
+  assert-true _starts_with includes ./path1
+}
+
+function test__starts_with__subdir() {
+  # Setup
+  includes=(path1 path2)
+
+  # Verify
+  assert-false _starts_with includes ./path1/subdir
+}
+
+function test__starts_with__no_match_different_name() {
+  # Setup
+  includes=(path1 path2)
+
+  # Verify
+  assert-false _starts_with includes ./path3
+}
+
+# Tests for _ends_with function
+function test__ends_with__exact_filename_first() {
+  # Setup
+  local array=(README.md test.txt)
+
+  # Verify
+  assert-true _ends_with array ./subdir/README.md
+}
+
+function test__ends_with__exact_filename_second() {
+  # Setup
+  local array=(README.md test.txt)
+
+  # Verify
+  assert-true _ends_with array ./path/to/test.txt
+}
+
+function test__ends_with__not_matching_similar_extension() {
+  # Setup
+  local array=(README.md test.txt)
+
+  # Verify
+  assert-false _ends_with array ./README.md.bak
+}
+
+function test__ends_with__no_match_other_filename() {
+  # Setup
+  local array=(README.md test.txt)
+
+  # Verify
+  assert-false _ends_with array ./other.txt
+}
+
+# Tests for _is_exact_match function
+function test__is_exact_match__full_path_first() {
+  # Setup
+  includes=(./subdir1/path1 subdir3)
+
+  # Verify
+  assert-true _is_exact_match includes ./subdir1/path1
+}
+
+function test__is_exact_match__full_path_second() {
+  # Setup
+  includes=(./subdir1/path1 subdir3)
+
+  # Verify
+  assert-true _is_exact_match includes ./subdir3
+}
+
+function test__is_exact_match__partial_path_no_match() {
+  # Setup
+  includes=(./subdir1/path1 subdir3)
+
+  # Verify
+  assert-false _is_exact_match includes ./subdir1
+}
+
+function test__is_exact_match__sibling_path_no_match() {
+  # Setup
+  includes=(./subdir1/path1 subdir3)
+
+  # Verify
+  assert-false _is_exact_match includes ./subdir1/path2
+}
+
+function test__is_exact_match__normalized_paths_first() {
+  # Setup
+  includes=(subdir1 subdir2)
+
+  # Verify
+  assert-true _is_exact_match includes ./subdir1
+}
+
+function test__is_exact_match__normalized_paths_second() {
+  # Setup
+  includes=(subdir1 subdir2)
+
+  # Verify
+  assert-true _is_exact_match includes ./subdir2
+}
+
+function test__is_exact_match__empty_array() {
+  # Setup
+  includes=()
+
+  # Verify
+  assert-false _is_exact_match includes ./anything
+}
+
+# Tests for _is_wildcard_match function
+function test__is_wildcard_match__file() {
+  # Setup
+  local array=(sh)
+
+  # Verify
+  assert-true _is_wildcard_match array ./config/sh
+}
+
+function test__is_wildcard_match__dot_file() {
+  # Setup
+  local array=(sh)
+
+  # Verify
+  assert-false _is_wildcard_match array ./config/.sh
+}
+
+function test__is_wildcard_match__dot_files_nested() {
+  # Setup
+  local array=(.sh)
+
+  # Verify
+  assert-true _is_wildcard_match array ./deeply/nested/build/.sh
+}
+
+function test__is_wildcard_match__no_dot_prefix() {
+  # Setup
+  local array=(sh)
+
+  # Verify
+  assert-false _is_wildcard_match array ./build.sh
+}
+
+function test__is_wildcard_match__toplevel_file() {
+  # Setup
+  local array=(sh)
+
+  # Verify
+  assert-true _is_wildcard_match array ./sh
+}
+
+function test__is_wildcard_match__multiple_extensions_first() {
+  # Setup
+  local array=(tmp log)
+
+  # Verify
+  assert-true _is_wildcard_match array ./path/tmp
+}
+
+function test__is_wildcard_match__multiple_extensions_second() {
+  # Setup
+  local array=(tmp log)
+
+  # Verify
+  assert-true _is_wildcard_match array ./path/log
+}
+
+function test__is_wildcard_match__dot_in_wildcard_first() {
+  # Setup
+  local array=(.tmp .log)
+
+  # Verify
+  assert-true _is_wildcard_match array ./path/.tmp
+}
+
+function test__is_wildcard_match__dot_in_wildcard_second() {
+  # Setup
+  local array=(.tmp .log)
+
+  # Verify
+  assert-true _is_wildcard_match array ./path/.log
+}
+
+function test__is_wildcard_match__dot_in_wildcard_no_dotfile() {
+  # Setup
+  local array=(.tmp .log)
+
+  # Verify
+  assert-false _is_wildcard_match array ./path/xtmp
+}
+
+function test__is_wildcard_match__wildcard_match_dotfile() {
+  # Setup
+  local array=(\*.sh)
+
+  # Verify
+  assert-true _is_wildcard_match array ./path/.sh
+}
+
+function test__is_wildcard_match__wildcard_match_file() {
+  # Setup
+  local array=(\*.sh)
+
+  # Verify
+  assert-true _is_wildcard_match array ./path/subdir/build.sh
+}
+
+function test__is_wildcard_match__wildcard_no_matches_file() {
+  # Setup
+  local array=(\*.sh)
+
+  # Verify
+  assert-false _is_wildcard_match array ./path/old
+}
+
+function test__is_wildcard_match__wildcard_no_matches_path() {
+  # Setup
+  local array=(\*.sh)
+
+  # Verify
+  assert-false _is_wildcard_match array ./path/build.sh/foo
+}
+
 # shellcheck disable=2119
 run_tests

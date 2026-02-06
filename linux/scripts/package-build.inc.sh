@@ -153,56 +153,66 @@ function _add_to_list() {
   ignore_list+=("${prefix}/${item#./}")
 }
 
+# Returns true if one of the values in the $1 array equals ${file} ($2)
+# Example: will return true for array=(path1/path2) file=./path1/path2
 function _is_exact_match() {
-  local var="$1"
-  local needle="$2"
-  local array="${var}[@]"
-  local haystack=("${!array}")
+  local array_var="$1"
+  local file="$2"
+  local array_name="${array_var}[@]"
+  local haystack=("${!array_name}")
   local item
   for item in "${haystack[@]}"; do
-    if [[ "./${item#./}" == "${needle}" ]]; then
+    if [[ "./${item#./}" == "${file}" ]]; then
       return 0
     fi
   done
   return 1
 }
 
+# Returns true if one of the values in the $1 array starts with ${file} ($2)
+# Example: will return true for array=(path1/path2) file=./path1
 function _starts_with() {
-  local var="$1"
-  local start="$2"
-  local array="${var}[@]"
-  local values=("${!array}")
-  local item
-  for item in "${values[@]}"; do
-    if [[ "./${item#./}" == ${start}* ]]; then
+  local array_var="$1"
+  local file="$2"
+  local array_name="${array_var}[@]"
+  local array_values=("${!array_name}")
+  local array_item
+  for array_item in "${array_values[@]}"; do
+    if [[ "./${array_item#./}" == ${file}* ]]; then
       return 0
     fi
   done
   return 1
 }
 
+# Returns true if ${file} ($2) ends with one of the values in the $1 array
+# Example: will return true for array=(path2) file=./path1/path2
 function _ends_with() {
   local array_var="$1"
   local file="$2"
-  local array="${array_var}[@]"
-  local values=("${!array}")
-  local item
-  for item in "${values[@]}"; do
-    if [[ "${file}" == */${item#./} ]]; then
+  local array_name="${array_var}[@]"
+  local array_values=("${!array_name}")
+  local array_item
+  for array_item in "${array_values[@]}"; do
+    if [[ "${file}" == */${array_item#./} ]]; then
       return 0
     fi
   done
   return 1
 }
 
+# Returns true if ${file} ($2) matches one of the values of the $1 array.
+# These values may contain wildcards.
+# Example: will return true for array=(*.sh) file=./path1/build.sh
 function _is_wildcard_match() {
   local array_var="$1"
   local file="$2"
-  local array="${array_var}[@]"
-  local values=("${!array}")
-  local item
-  for item in "${values[@]}"; do
-    if [[ "${file}" =~ /\.${item}$ ]]; then
+  local array_name="${array_var}[@]"
+  local array_values=("${!array_name}")
+  local array_item
+  for array_item in "${array_values[@]}"; do
+    array_item=${array_item/./\\.}
+    if [[ "${file}" =~ /${array_item/\*/.\*}$ ]]; then
       return 0
     fi
   done
