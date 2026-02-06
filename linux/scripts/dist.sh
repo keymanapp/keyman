@@ -83,6 +83,7 @@ if [[ -z "${create_origdist+x}" ]]; then
     common/web/langtags \
     common/web/types \
     common/windows/cpp \
+    common/windows/include \
     developer/src/common/include \
     developer/src/common/web \
     developer/src/ext/json \
