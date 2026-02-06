@@ -108,6 +108,8 @@ export function editKeyer(precomputation: TokenizationTransitionEdits): string[]
   return components;
 }
 
+// editKeyer may be removed when this is, and this may be removed when the
+// LegacyQuotient* classes are removed.
 export function legacySubsetKeyer(tokenizationEdits: TokenizationTransitionEdits): string {
   const { alignment, tokenizedTransform } = tokenizationEdits;
   const { edgeWindow, merges, splits } = alignment;
@@ -214,6 +216,10 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
     }
   }
 
+  // Edit-keying is no longer needed here - we instantly realign if a merge or split is needed,
+  // before we add the (realigned) base tokenization to the subset builder.
+  //
+  // See ContextState.analyzeTransition.
   return components /*.concat(editKeyer(tokenizationEdits))*/ .join(SENTINEL_CODE_UNIT);
 }
 
