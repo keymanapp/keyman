@@ -39,8 +39,9 @@ dch keyman --newversion "${KEYMAN_VERSION}" --force-bad-version --nomultimaint
 
 # Create the tarball
 
-# files and folders to include in the tarball
-# shellcheck disable=2034  # to_exclude appears to be unused
+# We always include these files which are the minimum files and
+# folder required for Ubuntu/Debian packaging
+# shellcheck disable=2034  # to_include appears to be unused
 to_include=(
   common/build.sh \
   common/cpp \
@@ -60,17 +61,60 @@ to_include=(
 
 # files and subfolders to exclude from paths included in 'to_include',
 # i.e. the exceptions to 'to_include'.
+
 # shellcheck disable=2034  # to_exclude appears to be unused
 to_exclude=(
+  build \
   common/test/keyboards/baseline/kmcomp-*.zip \
-  core/build \
-  linux/build \
   linux/builddebs \
   linux/docs/help \
   linux/keyman-config/keyman_config/version.py \
   linux/keyman-config/buildtools/build-langtags.py \
-  linux/keyman-system-service/build
 )
+
+if [[ -z "${create_origdist+x}" ]]; then
+  # If we build a full source tarball we include additional files
+  # so that it's possible to run `${KEYMAN_ROOT}/build.sh` on Linux
+
+  # shellcheck disable=2034  # to_include appears to be unused
+  to_include+=(
+    common/tools/hextobin \
+    common/web/keyman-version \
+    common/web/langtags \
+    common/web/types \
+    common/windows/cpp \
+    common/windows/include \
+    developer/src/common/include \
+    developer/src/common/web \
+    developer/src/ext/json \
+    developer/src/kmc \
+    developer/src/kmc-analyze \
+    developer/src/kmc-copy \
+    developer/src/kmc-generate \
+    developer/src/kmc-keyboard-info \
+    developer/src/kmc-kmn \
+    developer/src/kmc-ldml \
+    developer/src/kmc-model \
+    developer/src/kmc-model-info \
+    developer/src/kmc-package \
+    developer/src/kmcmplib \
+    docs/minimum-versions.md.in
+    resources/build \
+    resources/standards-data \
+  )
+
+  # additional files and subfolders to exclude from paths included in 'to_include',
+  # i.e. the exceptions to 'to_include'.
+  # shellcheck disable=2034  # to_exclude appears to be unused
+  to_exclude+=(
+    *.exe \
+    resources/build/history \
+    resources/build/l10n \
+    resources/build/mac \
+    resources/build/win \
+    resources/build/*.lua \
+  )
+fi
 
 # array to store list of --tar-ignore parameters generated from to_include and to_exclude.
 ignored_files=()
@@ -109,7 +153,7 @@ cd "${BASEDIR}"
 
 # create orig.tar.gz
 if [[ ! -z "${create_origdist+x}" ]]; then
-    cd dist
+    cd "${KEYMAN_ROOT}/linux/dist"
     pkgvers="keyman-${KEYMAN_VERSION}"
     tar xfz keyman-"${KEYMAN_VERSION}".tar.gz
     mv -v keyman "${pkgvers}" 2>/dev/null || mv -v "$(find . -mindepth 1 -maxdepth 1 -type d)" "${pkgvers}"
