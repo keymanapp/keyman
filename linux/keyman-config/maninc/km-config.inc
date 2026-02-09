@@ -1,5 +1,5 @@
 [<DESCRIPTION]
-Keyman makes it possible for you to type in over 1,000 languages on Windows, Linux,
+Keyman makes it possible for you to type in over 2,500 languages on Windows, Linux,
 macOS, iPhone, iPad, Android tablets and phones, and even instantly in your web browser.
 
 With the world's most powerful keyboarding engine, intuitive and rapid text input is now
