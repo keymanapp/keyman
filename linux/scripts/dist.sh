@@ -4,7 +4,7 @@
 # and put them in dist/
 
 # parameters: ./dist.sh [origdist] [proj]
-# origdist = create Debian orig.tar.gz
+# origdist = create Debian orig.tar.xz
 # proj = only make tarball for this project
 
 set -e
@@ -145,19 +145,19 @@ dpkg-source \
   \
   "${ignored_files[@]}" \
   \
-  -Zgzip -b .
+  -Zxz -b .
 
-mv ../keyman_"${KEYMAN_VERSION}".tar.gz linux/dist/keyman-"${KEYMAN_VERSION}".tar.gz
+mv ../keyman_"${KEYMAN_VERSION}".tar.xz linux/dist/keyman-"${KEYMAN_VERSION}".tar.xz
 echo "3.0 (quilt)" > debian/source/format
 cd "${BASEDIR}"
 
-# create orig.tar.gz
+# create orig.tar.xz
 if [[ ! -z "${create_origdist+x}" ]]; then
     cd "${KEYMAN_ROOT}/linux/dist"
     pkgvers="keyman-${KEYMAN_VERSION}"
-    tar xfz keyman-"${KEYMAN_VERSION}".tar.gz
+    tar xfJ keyman-"${KEYMAN_VERSION}".tar.xz
     mv -v keyman "${pkgvers}" 2>/dev/null || mv -v "$(find . -mindepth 1 -maxdepth 1 -type d)" "${pkgvers}"
-    tar cfz "keyman_${KEYMAN_VERSION}.orig.tar.gz" "${pkgvers}"
-    rm "keyman-${KEYMAN_VERSION}.tar.gz"
+    tar cfJ "keyman_${KEYMAN_VERSION}.orig.tar.xz" "${pkgvers}"
+    rm "keyman-${KEYMAN_VERSION}.tar.xz"
     rm -rf "${pkgvers}"
 fi
