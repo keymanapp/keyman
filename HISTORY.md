@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.201 alpha 2026-02-09
+
+* fix(linux): include missing artifacts in source tarball (#15566)
+* chore(linux): use xz compression for source tarballs (#15568)
+
 ## 19.0.200 alpha 2026-02-06
 
 * change(web): define, utilize cleaner Web test-resource import paths (#15564)
