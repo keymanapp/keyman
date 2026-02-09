@@ -143,7 +143,7 @@ def verify_ibus_daemon(start):
     return retval
 
 
-def _get_ibus_version():
+def get_ibus_version():
     ibus_version = subprocess.run(('ibus', 'version'), check=False,
                                   stdout=subprocess.PIPE).stdout
     match = re.search(r'^IBus (.*)\n$', ibus_version.decode('utf-8'))
@@ -156,7 +156,7 @@ def _get_ibus_version():
 
 def _start_ibus_daemon(realuser):
     try:
-        if version.parse(_get_ibus_version()) >= version.parse('1.5.28'):
+        if version.parse(get_ibus_version()) >= version.parse('1.5.28'):
             # IBus ~1.5.28 added the `start` command, so we use that if possible
             # and let IBus deal with the necessary parameters
             args = ['ibus', 'start', '-d']
