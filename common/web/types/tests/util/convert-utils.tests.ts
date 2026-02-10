@@ -76,7 +76,7 @@ describe('convert-utils', function () {
 
   describe('convertToUnicodeCharacter from convert-utils', function () {
     [
-      ["a", undefined],
+      ["a", 'a'],
       ["ሴ", 'ሴ'],
       ['😎', '😎'],
       ["ẘ", "ẘ"],
