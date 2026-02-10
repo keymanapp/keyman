@@ -20,8 +20,24 @@ describe('convert-utils2', function () {
     compilerTestCallbacks.clear();
   });
 
-  describe('convertToUnicodeCodePoint from convert-utils2', function () {
+  describe('convertControlCharacterToUnicodeCodePoint from convert-utils2', function () {
     [
+      ["U+0061", 'U+0061'],
+      ["U+1234", 'U+1234'],
+      ["U+1F60E", 'U+1F60E'],
+      ["U+1E98", "U+1E98"],
+      ["U+", undefined],
+      ['U+', undefined],
+      ['U+U+', undefined],
+      ['U+D799', 'U+D799'],
+      ['U+D800', undefined],
+      ['U+D83D',undefined],
+      ['U+DFFF', undefined],
+      ['U+10FFFF', 'U+10FFFF'],
+      ['U+110000;',undefined],
+      ['U+E000', 'U+E000'],
+      ['U+1000000', undefined],
+
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
       ["&#x9;", 'U+0009'],
@@ -29,6 +45,16 @@ describe('convert-utils2', function () {
       ["&#x999;", 'U+0999'],
       ["&#x9999;", 'U+9999'],
       ["&#x99999;", 'U+99999'],
+      ["&#x0017;", 'U+0017'],
+      ["&#x007;", 'U+0007'],
+      ['&#xD799;', 'U+D799'],
+      ['&#xD800;', undefined],
+      ['&#xD83D;', undefined],
+      ['&#xDFFF;',undefined],
+      ['&#x110000;',undefined],
+      ["&#x", undefined],
+      ["&#x;", undefined],
+
       ["&#1111553;", 'U+10F601'],
       ["&#128513;", 'U+1F601'],
       ["&#9;", 'U+0009'],
@@ -36,16 +62,29 @@ describe('convert-utils2', function () {
       ["&#999;", 'U+03E7'],
       ["&#9999;", 'U+270F'],
       ["&#99999;", 'U+1869F'],
+      ["&#100000000;", undefined],
+      ["&#", undefined],
+      ["&#;", undefined],
+      ["&#1234;56", undefined],
+      ["&#007;", 'U+0007'],
+      ["&#0018;", 'U+0012'],
+      ["&#100000000;", undefined],
+      ["&#100000000;", undefined],
+      ["&#128513;", 'U+1F601'],
+      ["&#128513;", 'U+1F601'],
+
       ['0000;', '0000;'],
       ['X;', 'X;'],
       ['123;', '123;'],
       [';', ';'],
-     // ['&#1234;56', 'yyyy'],
-     // ['&#1234;', 'U+1234'],
-     // ['&&', 'xxx'],
+      ["&", "&"],
+      ["a", "a"],
+      ["ሴ", "ሴ"],
+      ['😎', '😎'],
+      ["ẘ", "ẘ"],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = convertUtil.convertToUnicodeCodePoint(values[0] as string);
+        const result = convertUtil.convertControlCharacterToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
