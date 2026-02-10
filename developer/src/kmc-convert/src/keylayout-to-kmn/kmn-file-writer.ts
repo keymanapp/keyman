@@ -145,7 +145,7 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = convertUtil.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = convertUtil.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_CodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(output_character);
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
 
@@ -219,7 +219,7 @@ export class KmnFileWriter {
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = convertUtil.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = convertUtil.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_CodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(output_character);
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
@@ -313,7 +313,7 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = convertUtil.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = convertUtil.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_CodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(output_character);
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
           if (Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {

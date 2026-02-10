@@ -476,7 +476,8 @@ export class KeylayoutToKmnConverter {
               keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
               KeyName: this.map_UkeleleKC_To_VK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
-            }));
+            }))
+            return null
           }
         }
       }
