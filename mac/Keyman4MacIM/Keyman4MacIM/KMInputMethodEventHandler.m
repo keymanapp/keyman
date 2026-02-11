@@ -515,7 +515,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   }
   
   // pass through if this was a backspace keydown event
-  if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
+  if (event.keyCode == kVK_Delete && output.codePointsToDeleteBeforeInsert == 1) {
     // let the delete pass through in the original event rather than sending a new delete
     NSString *message = @"handleDeleteOnlyForOutput, delete only scenario with passthrough";
     os_log_debug([KMLogs keyTraceLog], "%@", message);
@@ -524,8 +524,8 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     // instruct system to handle the event
     return NO;
   }
-    // otherwise generate a backspace
   else {
+    // otherwise generate a backspace
     NSString *message = @"handleDeleteOnlyForOutput, send backspace event";
     os_log_debug([KMLogs keyTraceLog], "%@", message);
     [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
