@@ -537,10 +537,33 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 
 /**
  * For compliant apps only.
- * This an attempt to do a more precise delete. When generating a backspace event or allowing a backspace
- * to pass through, it may delete a combining diacritic and the preceding codepoint that it combines with.
- * Instead, we can delete the combining diacritic alone by using the insertText API to replace two code points with one.
- * This method only works for compliant apps because non-compliant apps do not support the insertText API.
+ * 
+ * This an attempt to make sure that deletion removes only the expected codepoints.
+ * When handling a transform which only deletes a character, or when allowing a
+ * backspace to pass through, the OS or application may not use the same rules
+ * around deletion as Keyman -- especially when deleting clusters such as letter +
+ * combining diacritic (e.g. `U+0062 U+0301`), where some applications may delete
+ * both together as they represent a single 'grapheme cluster'. 
+ * 
+ * (Note, the question of whether it is appropriate for backspace to delete a
+ * cluster rather than a codepoint from an end-user perspective is not relevant
+ * here, because what is important is that we match the rules that the keyboard has
+ * provided, which means we need a method of deleting a precise number of
+ * codepoints. The keyboard author can and should include rules for cluster
+ * deletion that meet end-user expectations.)
+ * 
+ * The `insertText` API takes two parameters: a string to insert, and a range to
+ * replace with that string. However, we cannot simply pass through a zero-length
+ * insertion string along with the range to delete, because the `insertText` API
+ * treats this as an invalid call and ignores it.
+ * 
+ * Instead, we can delete the desired number of codepoints only by using the
+ * `insertText` API to replace e.g. two codepoints with one.
+ * 
+ * This method only works for compliant apps because non-compliant apps do not
+ * support the `insertText` API.
+ * 
+ * Ref: https://developer.apple.com/documentation/appkit/nstextinputclient/inserttext(_:replacementrange:)
  */
 -(BOOL)handleDeleteWithReplacement:(CoreKeyOutput*)output keyDownEvent:(nonnull NSEvent *)event client:(id) client {
   BOOL handledEvent = NO;
