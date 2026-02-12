@@ -193,7 +193,18 @@ This will create `.mo` files, e.g. `locale/de/LC_MESSAGES/keyman-config.mo`.
 ### Testing localization
 
 ```bash
-LANGUAGE=de ./km-config
+TEXTDOMAINDIR=./locale LANGUAGE=de ./km-config
+```
+
+## Testing that all strings are localizable
+
+To test that all strings can be translated, you can run the following
+command. This will create and compile a TEST.po file
+which shows all localizable strings in uppercase, and then run
+km-config with the TEST.po file.
+
+```bash
+make test-po
 ```
 
 ## Debugging unit tests

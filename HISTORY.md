@@ -1,5 +1,136 @@
 # Keyman Version History
 
+## 19.0.196 alpha 2026-01-30
+
+* chore(common): Update Crowdin strings for `de` (#15511)
+
+## 19.0.195 alpha 2026-01-29
+
+* fix(windows): adjust symbol paths for publishing to symbol server (#15509)
+
+## 19.0.194 alpha 2026-01-27
+
+* fix(windows): export sym store path so symbols are published (#15493)
+
+## 19.0.193 alpha 2026-01-26
+
+* fix(resources): block unsupported platforms from running certain scripts (#15480)
+* chore(deps): bump tar and node-gyp in /developer/src/server/src/win32/trayicon/addon-src (#15469)
+* chore(deps-dev): bump lodash from 4.17.21 to 4.17.23 (#15479)
+* chore(deps): bump tar from 7.5.3 to 7.5.6 in /developer/src/server/src/win32/trayicon/addon-src (#15495)
+
+## 19.0.192 alpha 2026-01-15
+
+* fix(linux): issues when running ./build.sh test:linux (#15434)
+
+## 19.0.191 alpha 2026-01-14
+
+* maint(linux): remove EOL Ubuntu 25.04 Plucky (#15423)
+* maint(common): fix build when using different default node version (#15422)
+
+## 19.0.190 alpha 2026-01-14
+
+* Update link to PrimerPrep in step-3.md (#15426)
+* chore(common): Update Crowdin strings for Italian (#15418)
+* maint(common): Handle custom languages in Crowdin CLI v4 (#15420)
+
+## 19.0.189 alpha 2026-01-12
+
+* maint(common): Update `crowdin.yml` to work with Crowdin CLI 4.0+ (#15407)
+
+## 19.0.188 alpha 2026-01-09
+
+* fix(mac): correct memory width mismatch in keyCodeForChar (#15393)
+* docs(common): document `api-verification` GHA (#15410)
+
+## 19.0.187 alpha 2026-01-08
+
+* maint(resources): add new ARM64 test status check to PR build status check (#15409)
+* docs(windows): update OS support to include Arm64 Win11 (#15396)
+* chore(windows,android): Update Crowdin strings for Portuguese (#15406)
+
+## 19.0.186 alpha 2026-01-07
+
+* maint: add script to report on recent changes to stable release (#15389)
+
+## 19.0.185 alpha 2026-01-06
+
+* chore(web): escape some additional values in TC service messages (#15384)
+
+## 19.0.184 alpha 2025-12-23
+
+* maint(resources): set shell for steps in core-arm64-windows-test.yml (#15387)
+* feat(developer): write UTF-8 .kmn file in kmdecomp (#15390)
+
+## 19.0.183 alpha 2025-12-22
+
+* maint(core): remove leading slash on gh api call parameter (#15381)
+* maint(core): fix test runner runs-on (#15382)
+
+## 19.0.182 alpha 2025-12-22
+
+* maint(common): Fix crowdin sync version to v2.7.0 (#15373)
+* chore(linux): Update keyman-config.pot strings (#15366)
+* chore(windows): show architecture in support texteditor (#15378)
+
+## 19.0.181 alpha 2025-12-20
+
+* fix(developer): clear message when selecting custom layer name in touch layout editor (#15371)
+* fix(developer): prevent duplicate layer name in Layer Properties dialog (#15372)
+
+## 19.0.180 alpha 2025-12-19
+
+* fix(mac): ensure retry for mac disk detach actually repeats (#15330)
+* fix(developer): handle Enter key in dialogs in Touch Layout Editor (#15338)
+* chore(windows): fix typo in error message (#15362)
+* chore(common): Update crowdin strings for PT (#15368)
+
+## 19.0.179 alpha 2025-12-18
+
+* fix(linux): fix persisting options (#15364)
+
+## 19.0.178 alpha 2025-12-17
+
+* chore(windows): correct kbda1 to kbdth0 in comment in unit test (#15351)
+
+## 19.0.177 alpha 2025-12-16
+
+* feat(windows): report a sentry event when low level hook is reinstalled (#15335)
+* chore(linux): add manual test for localization (#15356)
+* feat(developer): show keyboard version in web debugger (#15339)
+
+## 19.0.176 alpha 2025-12-13
+
+* chore(windows): remove unused variable (#15334)
+
+## 19.0.175 alpha 2025-12-12
+
+* fix(windows): use Thai Kedmanee instead of Arabic 101 in RightAltEmulationCheck.tests.cpp (#15346)
+
+## 19.0.174 alpha 2025-12-10
+
+* chore(windows): simple bisect utility for checking setup-redist.exe file size (#15322)
+
+## 19.0.173 alpha 2025-12-09
+
+* docs(developer): Clarify keystrokes in Step-1 of tutorial (#15326)
+* feat(android): Add Grabbable Bar and settings status for keyboard resizing (#15267)
+* chore(linux): Update debian changelog (#15282)
+* docs(web): fix typo in osk documentation (#15313)
+
+## 19.0.172 alpha 2025-12-08
+
+* docs(web): add links to next/previous page to web guide (#15311)
+* fix(developer): verify project file loaded successfully in analyze (#15318)
+
+## 19.0.171 alpha 2025-12-08
+
+* maint(resources): verify order of builder_describe_internal_dependency (#15257)
+* maint(common): use `builder_launch` for child builds (#15258)
+* change(windows): Revert "change(windows): include map2pdb generation for relevant Delphi projects" (#15276)
+* change(windows): add shortcuts to 'Update Available' dialog (#15280)
+* maint(resources): roll back builder_launch for trigger-release-builds.sh (#15316)
+
 ## 19.0.170 alpha 2025-12-03
 
 * chore(deps-dev): bump js-yaml from 4.1.0 to 4.1.1 in /resources/build/pr-build-status (#15173)

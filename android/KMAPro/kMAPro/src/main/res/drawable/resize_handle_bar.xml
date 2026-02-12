@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resize handle bar with grip lines and touch feedback -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Pressed state - solid darker background -->
+    <item android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#0E5196" />
+                    <corners
+                        android:topLeftRadius="8dp"
+                        android:topRightRadius="8dp" />
+                </shape>
+            </item>
+            <item
+                android:width="40dp"
+                android:height="4dp"
+                android:gravity="center">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/ms_white" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- Default state - gradient background with grip lines -->
+    <item android:drawable="@drawable/resize_handle_background" />
+</selector>
