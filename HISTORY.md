@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.202 alpha 2026-02-12
+
+* fix(linux): check for existing file before trying to install (#15573)
+
 ## 19.0.201 alpha 2026-02-09
 
 * fix(linux): include missing artifacts in source tarball (#15566)
