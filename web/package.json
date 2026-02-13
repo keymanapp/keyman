@@ -85,7 +85,8 @@
   },
   "imports": {
     "#gesture-tools": "./src/engine/osk/gesture-processor/build/tools/obj/index.js",
-    "#recorder": "./build/tools/testing/recorder/obj/index.js"
+    "#recorder": "./build/tools/testing/recorder/obj/index.js",
+    "#test-resources/*.js": "./build/test/resources/*.js"
   },
   "repository": {
     "type": "git",
