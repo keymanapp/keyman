@@ -126,7 +126,7 @@ The bulk of DOM key events trigger keystroke processing on key-down, though modi
 
 The `app/webview` version of the engine, which is designed to be used while embedded in a platform-specific host app, does not have direct access to standard hardware keystroke events, as those are handled by the host app's OS and by native code handlers run outside the host app's WebView containing the app/webview Web engine. It is the responsibility of the host app to handle hardware keystroke events and preprocess them on behalf of the Web engine, then forward them to the Web engine via JS call into the WebView.  The `PassthroughKeyboard` class within `app/webview` space provides the method `raiseKeyEvent` as an internal API for this purpose, which converts the mobile-app format for hardware keystroke into the internal `KeyEvent` format.  `raiseKeyEvent` also handles mnemonic keystroke processing and remapping.
 
-Also note that this variant does not model the user's text context with Web elements - it is entirely managed through the `Mock` type.
+Also note that this variant does not model the user's text context with Web elements - it is entirely managed through the `SyntheticTextStore` type.
 
 ### On-screen keyboard
 
@@ -212,13 +212,13 @@ host cleanly, as it may have special implications for the site or host app.
 
 With that out of the way, the JS keyboard's main group is then provided with the
 `KeyEvent` object in order to evaluate the keyboard's rules against the
-keystroke.  This involves constructing a `RuleBehavior` object to track any and
+keystroke.  This involves constructing a `ProcessorAction` object to track any and
 all needed side-effects for the keystroke.  Such changes are generally not
 applied to the engine at large at this time in order to prevent unwanted side
 effects that may arise to and from predictive text operations that follow
 shortly afterward.
 
-The `KeyboardInterface` class defines the internal API used by keyboards for
+The `JSKeyboardInterface` class defines the internal API used by keyboards for
 their evaluation of keyboard rules.
 
 Once the keyboard's script returns control to the main engine, the engine then
@@ -233,7 +233,7 @@ keyboard rules that is applied.  (A keyboard's source must _explicitly_ specify
 to not emit anything for such keys if such an outcome is desired.)  This occurs
 regardless of the keystroke's source, as such effects are necessary to
 incorporate for predictive-text operations.  If no such rule exists, the
-processor will add a note to the `RuleBehavior` object that default processing
+processor will add a note to the `ProcessorAction` object that default processing
 could not be provided and is thus needed from the engine's host.
 
 ### KMX keyboards & KMX+ (LDML) keyboards
@@ -263,12 +263,12 @@ detected.
 ### Keystroke post-processing
 
 At this stage, the side-effects desired for the original keystroke, as saved to
-its `RuleBehavior`, are then applied.  Note that this includes changes to the
+its `ProcessorAction`, are then applied.  Note that this includes changes to the
 `&layer` store - this update will also trigger an event that updates the state
 of the OSK to match the desired layer.
 
 Once that is done, the engine will then save data relevant to the original
-context state, the `KeyEvent`, and the `RuleBehavior` to the "context cache"
+context state, the `KeyEvent`, and the `ProcessorAction` to the "context cache"
 supporting multitap context reversion.  These effects include layer-change
 effects that result from JS keyboard rules, which modify the KMN-style keyboard
 stores `&oldlayer` and `&newlayer` in preparation for `begin PostKeystroke`

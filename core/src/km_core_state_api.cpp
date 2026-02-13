@@ -28,7 +28,7 @@ using namespace km::core;
 // Forward declarations
 class context;
 
-km_core_status km_core_state_create(km_core_keyboard * keyboard,
+km_core_status km_core_state_create(km_core_keyboard const *keyboard,
                                   km_core_option_item const *env,
                                   km_core_state ** out)
 {
@@ -38,7 +38,7 @@ km_core_status km_core_state_create(km_core_keyboard * keyboard,
 
   try
   {
-    *out = new km_core_state(static_cast<abstract_processor&>(*keyboard), env);
+    *out = new km_core_state(static_cast<abstract_processor&>(*const_cast<km_core_keyboard*>(keyboard)), env);
   }
   catch (std::bad_alloc &)
   {
@@ -60,7 +60,7 @@ km_core_status km_core_state_clone(km_core_state const *state,
 }
 
 
-void km_core_state_dispose(km_core_state *state)
+void km_core_state_dispose(km_core_state const *state)
 {
   delete state;
 }
@@ -301,10 +301,11 @@ km_core_cu * _new_error_string(std::u16string const str) {
 }
 
 km_core_cu * km_core_state_context_debug(
-  km_core_state *state,
+  const km_core_state *state_,
   km_core_debug_context_type context_type
 ) {
   km_core_context_item * context_items = nullptr;
+  km_core_state* state = const_cast<km_core_state*>(state_);
 
   if(context_type == KM_CORE_DEBUG_CONTEXT_INTERMEDIATE) {
     if(km_core_state_get_intermediate_context(state, &context_items) != KM_CORE_STATUS_OK) {

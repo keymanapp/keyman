@@ -1,0 +1,10 @@
+{
+  "extends": "../../../tsconfig.dom.json",
+  "compilerOptions": {
+    "outDir": "../../../../build/tools/testing/test-utils/obj/",
+    "rootDir": ".",
+    "tsBuildInfoFile": "../../../../build/tools/testing/test-utils/obj/tsconfig.tsbuildinfo"
+  },
+
+  "include": [ "*.ts" ],
+}

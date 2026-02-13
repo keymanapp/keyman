@@ -4,6 +4,7 @@
 
     { "path": "./common/tools/hextobin/" },
 
+    { "path": "./common/web/sentry-manager" },
     { "path": "./common/web/keyman-version" },
     { "path": "./common/web/langtags" },
     { "path": "./common/web/types" },
@@ -37,18 +38,5 @@
     { "path": "./resources/build/version/" },
 
     { "path": "./web/src/tsconfig.all.json" },
-    { "path": "./web/src/engine/common/web-utils" },
-    { "path": "./web/src/engine/predictive-text/types/" },
-    { "path": "./web/src/engine/predictive-text/templates" },
-    { "path": "./web/src/engine/predictive-text/wordbreakers" },
-    { "path": "./web/src/engine/predictive-text/worker-main/tsconfig.all.json" },
-    { "path": "./web/src/engine/predictive-text/worker-thread" },
-    { "path": "./web/src/engine/osk/gesture-processor/tsconfig.json" },
-    { "path": "./web/src/engine/osk/gesture-processor/src/tools/unit-test-resources/tsconfig.json" },
-    { "path": "./web/src/engine/sentry-manager/src" },
-
-    { "path": "./web/src/tools/testing/recorder" },
-    // { "path": "./web/tools/recorder/tsconfig.json" },
-    // { "path": "./web/tools/sourcemap-root/tsconfig.json" },
   ]
 }

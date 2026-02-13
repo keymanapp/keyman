@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
  *
  * @param phrase
  */
-export default function ascii(phrase: string): LexicalModelTypes.Span[] {
+export function ascii(phrase: string): LexicalModelTypes.Span[] {
   let matchWord = /[A-Za-z0-9']+/g;
   let words: LexicalModelTypes.Span[] = [];
   let match: RegExpExecArray | null;

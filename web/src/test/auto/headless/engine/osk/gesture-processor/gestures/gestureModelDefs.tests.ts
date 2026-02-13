@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { GestureModelDefs, gestures } from '@keymanapp/gesture-recognizer';
+import { GestureModelDefs, gestures } from 'keyman/engine/gesture-processor';
 
 const getGestureModel    = gestures.specs.getGestureModel;
 const getGestureModelSet = gestures.specs.getGestureModelSet;

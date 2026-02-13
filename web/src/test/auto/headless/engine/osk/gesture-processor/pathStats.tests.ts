@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { CumulativePathStats, InputSample } from '@keymanapp/gesture-recognizer';
+import { CumulativePathStats, InputSample } from 'keyman/engine/gesture-processor';
 
 describe("CumulativePathStats", function() {
   it("Sample count = 0", function() {

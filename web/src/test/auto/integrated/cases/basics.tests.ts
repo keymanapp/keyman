@@ -20,7 +20,7 @@ describe('Basic KeymanWeb', function() {
     assert.isFalse(DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
   })
 
-  beforeEach(function() {
+  beforeEach(async function(): Promise<any> {
     this.timeout(baseTimeout);
 
     const singleton = document.createElement('input');
@@ -55,7 +55,7 @@ if(!device.touchable) {
   describe('Basic Toggle UI', function() {
     this.timeout(baseTimeout);
 
-    beforeEach(async function() {
+    beforeEach(async function(): Promise<any> {
       this.timeout(baseTimeout);
 
       const singleton = document.createElement('input');
@@ -77,7 +77,7 @@ if(!device.touchable) {
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;
 
-      assert(ui.initialized, 'Initialization flag is set to false!');
+      assert.isTrue(ui.initialized, 'Initialization flag is set to false!');
       assert.isNotNull(ui.controller, 'Failed to create the controller element!');
 
       var divs = document.getElementsByTagName("div");
@@ -95,7 +95,7 @@ if(!device.touchable) {
 
   describe('Basic Button UI', function() {
 
-    beforeEach(async function() {
+    beforeEach(async function(): Promise<any> {
       this.timeout(baseTimeout);
 
       const singleton = document.createElement('input');
@@ -123,7 +123,7 @@ if(!device.touchable) {
 
   describe('Basic Float UI', function() {
 
-    beforeEach(async function() {
+    beforeEach(async function(): Promise<any> {
       this.timeout(baseTimeout);
 
       const singleton = document.createElement('input');
@@ -164,7 +164,7 @@ if(!device.touchable) {
 
   describe('Basic Toolbar UI', function() {
 
-    beforeEach(async function() {
+    beforeEach(async function(): Promise<any> {
       this.timeout(baseTimeout);
 
       const singleton = document.createElement('input');
