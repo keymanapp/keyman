@@ -1,12 +1,11 @@
 import { assert } from 'chai'
 import sinon from 'sinon';
-
 import * as PromiseStatusModule from 'promise-status-async';
-const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
-import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
 import { InputSample, GestureSource, gestures, CumulativePathStats } from 'keyman/engine/gesture-processor';
 import { timedPromise } from 'keyman/common/web-utils';
+
+import { assertingPromiseStatus as promiseStatus } from '#test-resources/assertingPromiseStatus.js';
 
 import {
   InstantRejectionModel,
@@ -21,6 +20,8 @@ import {
   FlickEndContactModel,
   FlickEndThreshold
 } from './isolatedPathSpecs.js';
+
+const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 async function simulateSequence(
   samples: InputSample<string>[],
