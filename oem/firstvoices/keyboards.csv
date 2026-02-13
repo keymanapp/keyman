@@ -60,7 +60,7 @@ fv,fv_ojibwa_rdot,ᐁᓂᔑᓇᐯᒧᐏᓐ (a-finals right w-dot),Eastern Subarc
 fv,fv_ojibwa_ifinal,ᐊᓂᔑᓇᐯᒧᐎᣙ (i-finals),Eastern Subarctic,fv_ojibwa_ifinal_kmw-9.0.js,1.0.3,oj,Ojibwa
 fv,fv_ojibwa_ifinal_rdot,ᐊᓂᔑᓇᐯᒧᐏᣙ (i-finals right w-dot),Eastern Subarctic,fv_ojibwa_ifinal_rdot_kmw-9.0.js,1.0.3,oj,Ojibwa
 fv,fv_naskapi,ᓇᔅᑲᐱ (Naskapi),Eastern Subarctic,fv_naskapi_kmw-9.0.js,9.3.1,nsk-Cans,Naskapi (Unified Canadian Aboriginal Syllabics)
-sil,sil_euro_latin,English,European,european2-1.6.js,3.0.3,en,English
+sil,sil_euro_latin,English,European,european2-1.6.js,3.0.4,en,English
 basic,basic_kbdcan,Français,European,canadian_french-1.0.js,1.1.1,fr-CA,French (Canada)
 fv,fv_anishinaabemowin,Anishinaabemowin,Great Lakes - St. Lawrence,fv_anishinaabemowin_kmw-9.0.js,10.2,oj,Ojibwa
 fv,fv_bodewadminwen,Bodéwadminwen-Nishnabémwen,Great Lakes - St. Lawrence,fv_bodewadminwen_kmw-9.0.js,9.1.1,pot-Latn,Potawatomi (Latin)
@@ -102,5 +102,6 @@ fv,fv_shihgotine_yati,Shıhgot'ı̨nę́ Yatı̨́,Western Subarctic,fv_shihgot
 fv,fv_southern_tutchone,Southern Tutchone,Western Subarctic,fv_southern_tutchone_kmw-9.0.js,9.3,tce-Latn,Southern Tutchone (Latin)
 fv,fv_tagizi_dene,Tāgizi Dene,Western Subarctic,fv_tagizi_dene_kmw-9.0.js,9.4,tgx-Latn,Tagish (Latin)
 fv,fv_tlicho_yatii,Tłı̨chǫ Yatıı̀,Western Subarctic,fv_tlicho_yatii_kmw-9.0.js,9.1.1,dgr-Latn,Dogrib (Latin)
+fv,fv_tlingityooxatangi,T’aku Tlingit Yóo X’átangí,Western Subarctic,fv_tlingityooxatangi-9.0.js,1.0,tli,T’aku Tlingit Yóo X’átangí
 fv,fv_dene_mb,ᑌᓀ ᔭᕠᐁ (Dene MB),Western Subarctic,fv_dene_mb_kmw-9.0.js,9.2.1,chp-Cans,Chipewyan (Unified Canadian Aboriginal Syllabics)
 fv,fv_dene_nt,ᑌᓀ ᔭᕱᐁ (Dene NT),Western Subarctic,fv_dene_nt_kmw-9.0.js,9.2.1,chp-Cans,Chipewyan (Unified Canadian Aboriginal Syllabics)
