@@ -77,6 +77,31 @@ assert-succeeded() {
   fi
 }
 
+_callfunc() {
+  local command="$1"
+  shift
+
+  "${command}" "$@"
+}
+
+assert-true() {
+  # shellcheck disable=SC2310
+  if ! _callfunc "$@"; then
+    messages+=("- Expected test to return true but it returned false
+                          ")
+    ((test_failures++))
+  fi
+}
+
+assert-false() {
+  # shellcheck disable=SC2310
+  if _callfunc "$@"; then
+    messages+=("- Expected test to return false but it returned true
+                          ")
+    ((test_failures++))
+  fi
+}
+
 # setup() will run before each test
 # can be overriden in test script
 setup() {

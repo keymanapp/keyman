@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 19.0.202 alpha 2026-02-12
+
+* fix(linux): check for existing file before trying to install (#15573)
+
+## 19.0.201 alpha 2026-02-09
+
+* fix(linux): include missing artifacts in source tarball (#15566)
+* chore(linux): use xz compression for source tarballs (#15568)
+
+## 19.0.200 alpha 2026-02-06
+
+* change(web): define, utilize cleaner Web test-resource import paths (#15564)
+* maint(mac): upgrade to Xcode 26.2 (#15484)
+
+## 19.0.199 alpha 2026-02-05
+
+* chore(deps): bump @isaacs/brace-expansion from 5.0.0 to 5.0.1 in /developer/src/server/src/win32/trayicon/addon-src (#15552)
+* fix(windows): unresponsive splash screen (#15269)
+* maint(common): Update langtags.json to 2026-02-03 release (v1.4) (#15459)
+* feat(android): Use current display language for keyboard search (#15510)
+* chore(linux): Update debian changelog (#15557)
+* chore(linux): update copyright year and standards version (#15559)
+
+## 19.0.198 alpha 2026-02-04
+
+* fix(core): handle backspace decomposition (#15488)
+* fix(core): normalization segment should end on NFC boundary, not NFD (#15506)
+
+## 19.0.197 alpha 2026-02-02
+
+* chore(deps): bump tar from 7.5.6 to 7.5.7 in /developer/src/server/src/win32/trayicon/addon-src (#15514)
+* chore(deps): bump fast-xml-parser from 5.2.2 to 5.3.4 (#15526)
+* fix(windows): handle symstore correctly from bash script (#15524)
+* chore(ios): Add fv_tlingityooxatangi to FirstVoices for iOS app (#15485)
+
 ## 19.0.196 alpha 2026-01-30
 
 * chore(common): Update Crowdin strings for `de` (#15511)
@@ -1169,6 +1204,17 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.246 stable 2026-02-04
+
+* cherrypick(common):  Update FirstVoices versions in keyboards.csv (#15273)
+* docs(ios): Use /cdn/dev assets for Engine guides (#15274)
+* chore(linux): Update debian changelog (#15281)
+* maint(linux): remove EOL Ubuntu 25.04 Plucky (#15424)
+* docs(developer): update primerprep link (#15468)
+* chore(ios): Add fv_tlingityooxatangi to FirstVoices for iOS app (#15496)
+* fix(core): handle backspace decomposition (#15494)
+* fix(core): normalization segment should end on NFC boundary, not NFD (#15551)
 
 ## 18.0.245 stable 2025-12-03
 
