@@ -7,7 +7,16 @@ export enum TRequiredKey {
 export const
   CRequiredKeys: TRequiredKey[] = [TRequiredKey.K_LOPT, TRequiredKey.K_BKSP, TRequiredKey.K_ENTER]; // I4447
 
-// See also builder.js: specialCharacters; web/source/osk/oskKey.ts: specialCharacters
+// Defines the various 'special' modifier/control/non-printing keys on keyboards.
+//
+// `CSpecialText*` must be kept in sync with:
+// * /web/src/engine/osk/src/specialCharacters.ts
+// * /developer/src/tike/xml/layoutBuilder/constants.js
+// * /core/include/ldml/keyman_core_ldml.ts
+//
+// More information, and unit test, in /developer/src/kmc-kmn/tests/kmw/constants.tests.ts
+//
+// Note that this mapping here is version-mapped for verification purposes.
 export const
   CSpecialText10: string = '*Shift*\0*Enter*\0*Tab*\0*BkSp*\0*Menu*\0*Hide*\0*Alt*\0*Ctrl*\0*Caps*\0' +
     '*ABC*\0*abc*\0*123*\0*Symbol*\0*Currency*\0*Shifted*\0*AltGr*\0*TabLeft*\0',

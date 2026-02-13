@@ -22,6 +22,7 @@ EXTERN bool kmcmp_CompileKeyboard(
   AWarnDeprecatedCode_GLOBAL_LIB = options.warnDeprecatedCode;
   kmcmp::FShouldAddCompilerVersion = options.shouldAddCompilerVersion;
   kmcmp::CompileTarget = options.target;
+  kmcmp::TargetVersion = options.targetVersion;
 
   if (!messageProc || !loadFileProc || !pszInfile) {
     ReportCompilerMessage(KmnCompilerMessages::FATAL_BadCallParams);

@@ -61,6 +61,17 @@ function do_build() {
 
 function do_test() {
   copy_deps
+
+  # We want to compare the key cap values from both KMW and Developer and ensure
+  # that all three are in sync. We'll copy the relevant source files and patch
+  # them in directly. The touch layout builder's constants.js is not an ES6
+  # module, so we hackily patch that here.
+  echo 'export const builder = {specialCharacters:{}}' > ./test/kmw/_imported_layoutbuilder_constants.js
+  # shellcheck disable=SC2016
+  echo 'function $(v) {v()}' >> ./test/kmw/_imported_layoutbuilder_constants.js
+  cat "${KEYMAN_ROOT}/developer/src/tike/xml/layoutbuilder/constants.js" >> ./test/kmw/_imported_layoutbuilder_constants.js
+  cp "${KEYMAN_ROOT}/web/src/engine/osk/src/specialCharacters.ts" ./test/kmw/_imported_web_osk_specialCharacters.ts
+
   typescript_run_eslint_mocha_tests 80
 }
 

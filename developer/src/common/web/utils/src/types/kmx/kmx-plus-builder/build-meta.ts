@@ -25,8 +25,10 @@ export interface BUILDER_META extends BUILDER_SECTION {
 
 export function build_meta(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILDER_META {
   return {
-    ident: constants.hex_section_id(constants.section.meta),
-    size: constants.length_meta,
+    header: {
+      ident: constants.hex_section_id(constants.section.meta),
+      size: constants.length_meta,
+    },
     _offset: 0,
     author: build_strs_index(sect_strs, kmxplus.meta.author),
     conform: build_strs_index(sect_strs, kmxplus.meta.conform),
