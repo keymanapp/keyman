@@ -79,4 +79,10 @@ export class DeveloperUtilsMessages {
     this.ERROR_ProjectFileCouldNotBeRead,
     `Project file could not be read`
   );
+
+  static ERROR_UnsupportedPackageFileVersion = SevError | 0x000D;
+  static Error_UnsupportedPackageFileVersion = (o:{version:string}) => m(
+    this.ERROR_UnsupportedPackageFileVersion,
+    `Package source file is an unsupported version '${def(o.version)}'`,
+  );
 };
