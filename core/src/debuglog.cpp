@@ -395,13 +395,18 @@ const char *Debug_ModifierName(KMX_UINT modifiers) {
 }
 
 const char *Debug_VirtualKey(KMX_WORD vk) {
+  if (!ShouldDebug()) {
+    return "";
+  }
+
+  return Debug_VirtualKey_Always(vk);
+}
+
+const char *Debug_VirtualKey_Always(KMX_WORD vk) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif
   static char buf[256];
-  if (!ShouldDebug()) {
-    return "";
-  }
 
   if (vk < 256) {
     snprintf(buf, 256, "['%s' 0x%x]", s_key_names[vk], vk);
@@ -411,7 +416,6 @@ const char *Debug_VirtualKey(KMX_WORD vk) {
   }
   return buf;
 }
-
 const char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
   if (!ShouldDebug()) {
     return "";

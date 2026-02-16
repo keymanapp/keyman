@@ -208,7 +208,7 @@ bool is_nfd(const std::u32string& str) {
 #endif
 }
 
-bool has_nfd_boundary_before(km_core_usv cp) {
+bool has_nfc_boundary_before(km_core_usv cp) {
 #ifdef __EMSCRIPTEN__
 // it's a negative table. entries in the table mean returning false. non-entries return true.
   for (auto i=0;i<(km_noBoundaryBefore_entries*2);i+=2) {
@@ -221,9 +221,9 @@ bool has_nfd_boundary_before(km_core_usv cp) {
   return true; // fallthrough
 #else
   UErrorCode status = U_ZERO_ERROR;
-  auto nfd = getNFD(status);
-  if (nfd == nullptr) return false;
-  return nfd->hasBoundaryBefore(cp);
+  auto nfc = getNFC(status);
+  if (nfc == nullptr) return false;
+  return nfc->hasBoundaryBefore(cp);
 #endif
 }
 
