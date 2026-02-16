@@ -13,6 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { SearchQuotientSpur } from './search-quotient-spur.js';
 
 const PATH_QUEUE_COMPARATOR: QueueComparator<SearchQuotientNode> = (a, b) => {
   return a.currentCost - b.currentCost;
@@ -173,7 +174,52 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   }
 
   merge(space: SearchQuotientNode): SearchQuotientNode {
-    throw new Error('Method not implemented.');
+    // If we're at a root (which is without inputs), bypass it.
+    if(space.parents.length == 0) {
+      return this;
+    }
+
+    // What if we're trying to merge something previously split?
+    // That can only happen at the head of the incoming space, so we check for it early here.
+    if(space.inputCount == 1 && space instanceof SearchQuotientSpur) {
+      // In such a case... the 'leading edge' of the incoming space needs to be checked
+      // against the trailing edge of `this` instance's entries.
+      const thisTailInputSource = this.inputSegments[this.inputSegments.length - 1];
+      const thisTailSpaceIds = this.parents.map((path) => (path as SearchQuotientSpur).inputSource.subsetId);
+      const spaceHeadInputSource = space.inputSegments[0];
+
+      const isOnSplitInput =
+        thisTailSpaceIds.some((entry) => entry == space.inputSource.subsetId)
+        && thisTailInputSource.end == spaceHeadInputSource.start;
+
+      // In this case, we only rebuild the single path; an outer stack frame will reconstitute
+      // the split cluster from the individual paths built here.
+      if(isOnSplitInput) {
+        const firstHalf = this.parents.find((tailPath) => (tailPath as SearchQuotientSpur).inputSource?.subsetId == space.inputSource?.subsetId);
+        return firstHalf.merge(space);
+      }
+    }
+
+    // Simple, straightforward.  SearchQuotientSpurs can easily built with a
+    // SearchQuotientCluster as parent. In this case, there's also no chance of
+    // a prior split; if we'd split, it'd be a SearchQuotientCluster on both
+    // ends.
+    if(space instanceof SearchQuotientSpur) {
+      const parentMerge = this.merge(space.parents[0]);
+      return space.construct(parentMerge, space.inputs, space.inputSource);
+    }
+
+    // If we're here, we have a SearchQuotientCluster being merged in... and to
+    // something that's already a SearchQuotientCluster.
+    //
+    // Merge the parent components first as a baseline.  This specific state's
+    // aspects have to come after their affects are merged in, anyway.
+    // (Note:  is the main point of recursion.)
+    const parents = (space as SearchQuotientCluster).parents; // the constituent paths
+
+    // Assumes either none of the space's heads were split or that ALL were.
+    const parentMerges = parents.map((p) => this.merge(p)); // we get paths out
+    return new SearchQuotientCluster(parentMerges);
   }
 
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
