@@ -409,7 +409,7 @@ describe('ContextState', () => {
       assert.equal(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchModule.inputCount, 1);
     });
 
-    it.skip('handles case where tail token is split into three rather than two', function() {
+    it('handles case where tail token is split into three rather than two', function() {
       let baseContext = models.tokenize(defaultBreaker, {
         left: "text'", startOfBuffer: true, endOfBuffer: true
       });
