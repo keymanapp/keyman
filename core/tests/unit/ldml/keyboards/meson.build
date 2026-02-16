@@ -30,6 +30,7 @@ tests_without_testdata = [
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',
+  'k_213_backspace_decomposition',
 ]
 
 # These tests have a *-test.xml file as well.

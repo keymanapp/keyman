@@ -48,6 +48,6 @@ KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER=noble # Ubuntu 24.04 Noble
 # Data versions -- see resources/standards-data/readme.md
 KEYMAN_VERSION_CLDR=46                              # LDML Keyboards version
 KEYMAN_VERSION_ISO639_3=2024-05-22                  # Date of last import
-KEYMAN_VERSION_LANGTAGS=2025-02-18                  # _version value
+KEYMAN_VERSION_LANGTAGS=2026-02-03                  # _version value
 KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY=2025-03-10  # Date from first line of language-subtag-registry
 KEYMAN_VERSION_UNICODE=17.0.0                       # UCD + related data

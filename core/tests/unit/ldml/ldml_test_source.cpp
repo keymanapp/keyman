@@ -423,7 +423,7 @@ LdmlTestSource::get_modifier(std::string const &m) {
 
 std::string key_event::dump() const {
   std::stringstream f;
-  f  << "Key: {" << km::core::kmx::Debug_VirtualKey(vk) << ", " << km::core::kmx::Debug_ModifierName(modifier_state) << "}";
+  f  << "Key: {" << km::core::kmx::Debug_VirtualKey_Always(vk) << ", " << km::core::kmx::Debug_ModifierName(modifier_state) << "}";
   return f.str();
 }
 
