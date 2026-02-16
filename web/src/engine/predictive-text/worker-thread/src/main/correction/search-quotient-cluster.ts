@@ -52,7 +52,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   readonly lowestPossibleSingleCost: number;
 
   /**
-   * Constructs a fresh SearchQuotientCluster instance for used in
+   * Constructs a fresh SearchQuotientCluster instance for use in
    * predictive-text correction and suggestion searches.
    * @param inboundPaths
    */
