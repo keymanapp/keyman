@@ -3,7 +3,7 @@
  *
  * Created by jahorton on 2025-10-29
  *
- * This file defines tests for the SearchSpace class of the
+ * This file defines tests for the SearchQuotientCluster class of the
  * predictive-text correction-search engine.
  */
 

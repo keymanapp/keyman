@@ -8,7 +8,7 @@
  * engine.
  */
 
-import { QueueComparator as Comparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
+import { QueueComparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
@@ -23,7 +23,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
-export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
+export const QUEUE_NODE_COMPARATOR: QueueComparator<SearchNode> = function(arg1, arg2) {
   return arg1.currentCost - arg2.currentCost;
 }
 
