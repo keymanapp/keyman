@@ -24,7 +24,6 @@ export class KeylayoutFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-
   public validate(source: KeylayoutXMLSourceFile): boolean {
     if (!SchemaValidators.default.keylayout(source)) {
        for (const err of (<any>SchemaValidators.default.keylayout).errors) {
