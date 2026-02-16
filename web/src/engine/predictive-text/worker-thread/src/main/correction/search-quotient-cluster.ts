@@ -222,7 +222,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     return new SearchQuotientCluster(parentMerges);
   }
 
-  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
     throw new Error('Method not implemented.');
   }
 

@@ -59,7 +59,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     return this.processed.slice();
   }
 
-  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode] {
-    return [this, new LegacyQuotientRoot(this.model)];
+  split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
+    return [[this, new LegacyQuotientRoot(this.model)]];
   }
 }
