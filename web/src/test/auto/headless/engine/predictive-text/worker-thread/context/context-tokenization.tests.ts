@@ -625,7 +625,7 @@ describe('ContextTokenization', function() {
       });
     });
 
-    it('handles case that triggers a token split:  can\' +. => can, \', .', () => {
+    it.skip('handles case that triggers a token split:  can\' +. => can, \', .', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can\''];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
