@@ -561,7 +561,7 @@ describe('ContextTokenization', function() {
       }
     });
 
-    it.skip('handles case that triggers a token merge:  can+\'+t', () => {
+    it('handles case that triggers a token merge:  can+\'+t', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can', '\''];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
 
