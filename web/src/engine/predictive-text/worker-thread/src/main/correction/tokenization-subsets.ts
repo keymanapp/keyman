@@ -199,6 +199,8 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
       boundaryTextLen = 0;
     }
 
+    // Note:  if any sort of transform tokenization occurs, it's implicitly a split transform.
+    // Extra inserts after the boundary-insert component are parts split off from the head.
     if(boundaryTextLen) {
       // transform.deleteLeft was already handled during boundary computation -
       // do not include it here!

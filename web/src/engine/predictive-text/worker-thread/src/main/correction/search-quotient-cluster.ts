@@ -12,6 +12,7 @@ import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
+import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 
@@ -223,7 +224,63 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   }
 
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
-    throw new Error('Method not implemented.');
+    // Don't rebuild if this is already a perfect split point!
+    if(this.codepointLength <= charIndex) {
+      return [[this, new LegacyQuotientRoot(this.model)]];
+    }
+
+    const results = this.parents.flatMap((p) => p.split(charIndex));
+
+    // Path-deduplication:  it is possible for paths to diverge after a point
+    // and then reconverge at later points.  If the split happens before such
+    // a divergence-reconvergence sequence, it is possible for left-hand side
+    // entries to be duplicated.
+    //
+    // Deduplicate clusters based solely on spaceId, though; an intact cluster
+    // should match on this basis alone.
+    const headClusterResultMap: Map<number, {
+      head: SearchQuotientCluster,
+      tails: SearchQuotientNode[]
+    }> = new Map();
+
+    const headPathResultMap = new Map<string, {
+      heads: SearchQuotientNode[],
+      tails: SearchQuotientNode[]
+    }>();
+
+    results.forEach((result) => {
+      const [head, tail] = result;
+
+      if(head instanceof SearchQuotientCluster) {
+        const bucket = headClusterResultMap.get(head.spaceId) ?? { head, tails: [] };
+        bucket.tails.push(tail);
+        headClusterResultMap.set(head.spaceId, bucket);
+        return;
+      }
+
+      let key = head.inputCount + '+' + (!(head instanceof SearchQuotientSpur) ? '' : head.splitClusteringKey);
+      const outerEntry = headPathResultMap.get(key) ?? { heads: [], tails: [] };
+
+      if(!outerEntry.heads.find(p => head.isSameNode(p))) {
+        outerEntry.heads.push(head as SearchQuotientSpur);
+      }
+
+      outerEntry.tails.push(tail);
+      headPathResultMap.set(key, outerEntry);
+    });
+
+    const resultsFromClusterHeadPaths = [...headClusterResultMap.values()].map((entry) => {
+      const tailSpace = entry.tails.length > 1 ? new SearchQuotientCluster(entry.tails) : entry.tails[0];
+      return [entry.head, tailSpace] as [SearchQuotientNode, SearchQuotientNode];
+    });
+
+    const resultsFromHeadPaths = [...headPathResultMap.values()].map((entry) => {
+      const headSpace = entry.heads.length > 1 ? new SearchQuotientCluster(entry.heads) : entry.heads[0];
+      const tailSpace = entry.tails.length > 1 ? new SearchQuotientCluster(entry.tails) : entry.tails[0];
+      return [headSpace, tailSpace] as [SearchQuotientNode, SearchQuotientNode];
+    });
+
+    return resultsFromClusterHeadPaths.concat(resultsFromHeadPaths);
   }
 
   isSameNode(space: SearchQuotientNode): boolean {
