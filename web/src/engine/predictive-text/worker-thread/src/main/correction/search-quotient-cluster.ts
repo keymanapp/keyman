@@ -193,7 +193,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
       const spaceHeadInputSource = space.inputSegments[0];
 
       const isOnSplitInput =
-        thisTailSpaceIds.find((entry) => entry == space.inputSource.subsetId)
+        thisTailSpaceIds.some((entry) => entry == space.inputSource.subsetId)
         && thisTailInputSource.end == spaceHeadInputSource.start;
 
       // In this case, we only rebuild the single path; an outer stack frame will reconstitute
@@ -209,7 +209,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     // a prior split; if we'd split, it'd be a SearchQuotientCluster on both
     // ends.
     if(space instanceof SearchQuotientSpur) {
-      const parentMerge = this.merge(space.parents[0]) as SearchQuotientSpur;
+      const parentMerge = this.merge(space.parents[0]);
       return space.construct(parentMerge, space.inputs, space.inputSource);
     }
 
