@@ -195,9 +195,15 @@ export class SearchQuotientCluster implements SearchQuotientNode {
       return false;
     }
 
-    // We need to check if the parents match.  Done naively in the manner below, this is O(N^2).
-    // Granted, we shouldn't have _that_ many incoming paths.
-    if(this.parents.find((path) => !space.parents.find((path2) => path.isSameNode(path2)))) {
+    // We need to check if the parents match.
+    // First, is the parent count the same?
+    if(this.parents.length != space.parents.length) {
+      return false;
+    } else if (this.parents.find((path) => !space.parents.find((path2) => path.isSameNode(path2)))) {
+      // Done naively in the manner above, checking each pair of nodes, to
+      // ensure a match is found for each, is O(N^2).
+      //
+      // Granted, we shouldn't have _that_ many incoming paths.
       return false;
     }
 

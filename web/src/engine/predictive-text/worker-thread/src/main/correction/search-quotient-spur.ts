@@ -497,7 +497,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   isSameNode(space: SearchQuotientNode): boolean {
-    // Easiest cases:  when the instances or their ' `spaceId` matches, we have
+    // Easiest cases:  when the instances or their `spaceId` matches, we have
     // a perfect match.
     if(this == space || this.spaceId == space.spaceId) {
       return true;
