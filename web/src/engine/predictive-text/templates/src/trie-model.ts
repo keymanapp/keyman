@@ -25,7 +25,7 @@
 // Worth noting:  we're starting to get quite a 'library' of common model/LMLayer functionality.
 // Should probably make a 'lm-utils' submodule.
 
-import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
+import { KMWString, PriorityQueue } from "keyman/common/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
@@ -269,7 +269,7 @@ export class Traversal implements LexiconTraversal {
  * prefix searches within words, however they are not very good
  * at predicting the next word.
  */
-export default class TrieModel implements LexicalModel {
+export class TrieModel implements LexicalModel {
   configuration?: Configuration;
   private _trie: Trie;
   readonly breakWords: WordBreakingFunction;

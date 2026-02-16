@@ -1,14 +1,14 @@
 import { assert } from 'chai';
-import fs from 'fs';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KMWString } from '@keymanapp/web-utils';
-import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, KeyboardProcessor, Mock } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { KMWString } from 'keyman/common/web-utils';
+import { Codes, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
 
 
 const TEST_DEVICE = {
@@ -81,7 +81,7 @@ describe('Engine - specialized backspace handling', function() {
 
   before(async () => {
     // -- START: Standard keyboard unit test loading boilerplate --
-    let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+    let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
     let keyboardLoader = new NodeKeyboardLoader(harness);
     let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
     // --  END:  Standard keyboard unit test loading boilerplate --
@@ -95,7 +95,7 @@ describe('Engine - specialized backspace handling', function() {
     // --------------
 
     // -- START: Standard keyboard unit test loading boilerplate --
-    harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+    harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
     keyboardLoader = new NodeKeyboardLoader(harness);
     keyboard = await keyboardLoader.loadKeyboardFromPath(angkorPath);
     // --  END:  Standard keyboard unit test loading boilerplate --
@@ -108,7 +108,7 @@ describe('Engine - specialized backspace handling', function() {
 
     // --------------
 
-    harness = new KeyboardInterface(globalThis, MinimalKeymanGlobal);
+    harness = new JSKeyboardInterface(globalThis, MinimalKeymanGlobal);
     harness.install();
     // Sets the keyboard as the harness's "loaded" keyboard, but not "active".
     harness.KR(new DUMMIED_KEYS_KEYBOARD_SCRIPT());
@@ -118,7 +118,7 @@ describe('Engine - specialized backspace handling', function() {
 
     // --------------
 
-    harness = new KeyboardInterface(globalThis, MinimalKeymanGlobal);
+    harness = new JSKeyboardInterface(globalThis, MinimalKeymanGlobal);
     harness.install();
     // Sets the keyboard as the harness's "loaded" keyboard, but not "active".
     harness.KR(new DOUBLED_BKSP_KEYBOARD_SCRIPT());
@@ -128,7 +128,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty context, positional keyboard', () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -139,9 +139,9 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
-    });
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isTrue(result.triggerKeyDefault);
@@ -156,7 +156,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it("empty context, positional keyboard, outputless-key that's not BKSP", () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_A,
       Lmodifiers: 0,
@@ -170,9 +170,9 @@ describe('Engine - specialized backspace handling', function() {
     // A specialized test keyboard that handles keys without emitting any content.
     // We want to ensure error cases without output, on null context, don't act
     // like backspaces.
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: dummiedWithHarness
-    });
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     // Did match a keyboard rule.
@@ -189,7 +189,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty context, positional keyboard, but text is selected', () => {
-    let contextSource = new Mock('selected text', 0);
+    let contextSource = new SyntheticTextStore('selected text', 0);
     contextSource.setSelection(0, KMWString.length(contextSource.getText()));
 
     let event = new KeyEvent({
@@ -202,9 +202,9 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
-    });
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isFalse(result.triggerKeyDefault);
@@ -226,7 +226,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty left-context, positional keyboard', () => {
-    let contextSource = new Mock('post-caret text', 0);
+    let contextSource = new SyntheticTextStore('post-caret text', 0);
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -237,9 +237,9 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
-    });
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isTrue(result.triggerKeyDefault);
@@ -254,7 +254,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('empty context, mnemonic keyboard', () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -265,9 +265,9 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: ipaWithHarness
-    });
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isTrue(result.triggerKeyDefault);
@@ -282,7 +282,7 @@ describe('Engine - specialized backspace handling', function() {
   });
 
   it('final empty context, positional keyboard, rule-handled BKSP', () => {
-    let contextSource = new Mock('abc', 2);
+    let contextSource = new SyntheticTextStore('abc', 2);
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -296,9 +296,9 @@ describe('Engine - specialized backspace handling', function() {
     // A specialized test keyboard that duplicates backspaces when sufficient
     // context exists.
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: bksp2xWithHarness
-    });
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     // Did match a keyboard rule.
@@ -317,7 +317,7 @@ describe('Engine - specialized backspace handling', function() {
 
   // Special case:  BKSP rule-matches with empty left-context.
   it("empty context, positional keyboard, outputless BKSP rule", () => {
-    let contextSource = new Mock('');
+    let contextSource = new SyntheticTextStore('');
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
@@ -331,9 +331,9 @@ describe('Engine - specialized backspace handling', function() {
     // A specialized test keyboard that handles keys without emitting any content.
     // We want to ensure error cases without output, on null context, don't act
     // like backspaces.
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: dummiedWithHarness
-    });
+    }, DEFAULT_PROCESSOR_INIT_OPTIONS);
     const result = processor.processKeystroke(event, contextSource);
 
     assert.isFalse(result.triggerKeyDefault);

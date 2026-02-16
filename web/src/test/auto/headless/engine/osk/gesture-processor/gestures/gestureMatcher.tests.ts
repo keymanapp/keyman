@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import sinon from 'sinon';
 import * as PromiseStatusModule from 'promise-status-async';
 
-import { InputSample, gestures, GestureDebugPath } from '@keymanapp/gesture-recognizer';
+import { InputSample, gestures, GestureDebugPath } from 'keyman/engine/gesture-processor';
 
 import { assertingPromiseStatus as promiseStatus } from '#test-resources/assertingPromiseStatus.js';
 import { TouchpathTurtle } from '#gesture-tools';
