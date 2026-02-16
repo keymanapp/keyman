@@ -244,7 +244,7 @@ const determineTargetSplitSequences = (constituentPaths: SearchQuotientSpur[][],
       const cleanTail = seq.slice(splitIndex+1);
 
       const splitSegment = seq[splitIndex];
-      const segmentSplitIndex = splitSegment.codepointLength - splitLocation;
+      const segmentSplitIndex = splitLocation - (splitSegment.codepointLength - splitSegment.insertLength);
       const splitDistrib = splitDistribution(splitSegment.inputs, segmentSplitIndex);
       const dirtyStart = new LegacyQuotientSpur(
         seq[splitIndex-1] ?? new LegacyQuotientRoot(splitSegment.model),
@@ -598,7 +598,7 @@ describe('SearchQuotientCluster', () => {
       // in its history, but it reconverges before the end.
       assert.isTrue(cleanSplit[1] instanceof SearchQuotientSpur);
       // Note that the path structures themselves, however, will be rebuilt -
-      // and with new spaceIDs.ß
+      // and with new spaceIDs.
       const pathSequenceToInputs = (sequence: SearchQuotientSpur[]) => sequence.map(p => p.inputs);
       // One of the paths leading into cluster_k3c3 passes through the
       // split-point.
