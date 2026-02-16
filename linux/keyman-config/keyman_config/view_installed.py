@@ -74,14 +74,18 @@ class ViewInstalledWindowBase(Gtk.Window):
         filter_text.set_name(_("KMP files"))
         filter_text.add_pattern("*.kmp")
         dlg.add_filter(filter_text)
-        response = dlg.run()
-        if response != Gtk.ResponseType.OK:
-            dlg.destroy()
-            return
+        while True:
+            response = dlg.run()
+            if response != Gtk.ResponseType.OK:
+                dlg.destroy()
+                return
 
-        file = dlg.get_filename()
-        dlg.destroy()
-        self.restart(self.install_file(file))
+            file = dlg.get_filename()
+            if file and os.path.isfile(file) and os.path.splitext(file)[1] == '.kmp':
+                dlg.destroy()
+                self.restart(self.install_file(file))
+                return
+            # Loop until we have a valid file or the user cancels the dialog
 
     def install_file(self, kmpfile, language=None):
         installDlg = InstallKmpWindow(kmpfile, viewkmp=self, language=language)
