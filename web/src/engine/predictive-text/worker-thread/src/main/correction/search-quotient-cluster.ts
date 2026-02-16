@@ -3,11 +3,12 @@
  *
  * Created by jahorton on 2025-10-20
  *
- * This file defines the predictive-text engine's SearchSpace class, which is used to
- * manage the search-space(s) for text corrections within the engine.
+ * This file defines the predictive-text engine's SearchQuotientCluster class,
+ * which is used to manage the search-space(s) for text corrections within the
+ * engine.
  */
 
-import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
+import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
@@ -15,17 +16,13 @@ import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 
-const PATH_QUEUE_COMPARATOR: Comparator<SearchQuotientNode> = (a, b) => {
+const PATH_QUEUE_COMPARATOR: QueueComparator<SearchQuotientNode> = (a, b) => {
   return a.currentCost - b.currentCost;
 }
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchQuotientCluster implements SearchQuotientNode {
-  // While most functions can be done directly from SearchSpace, merging and
-  // splitting will need access to SearchQuotientSpur-specific members.  It's
-  // also cleaner to not allow nested SearchQuotientClusters while we haven't
-  // worked out support for such a scenario.
   private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
   readonly spaceId: number;
 
@@ -51,16 +48,15 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   private _processedEdgeSet?: {[pathKey: string]: boolean} = {};
 
   /**
-   * Provides a heuristic for the base cost at each depth if the best
-   * individual input were taken at that level.
+   * Provides a heuristic for the base cost at each depth if the best individual
+   * input were taken at that level.
    */
   readonly lowestPossibleSingleCost: number;
 
   /**
-   * Constructs a fresh SearchSpace instance for used in predictive-text correction
-   * and suggestion searches.
-   * @param baseSpaceId
-   * @param model
+   * Constructs a fresh SearchQuotientCluster instance for use in
+   * predictive-text correction and suggestion searches.
+   * @param inboundPaths
    */
   constructor(inboundPaths: SearchQuotientNode[]) {
     if(inboundPaths.length == 0) {
@@ -124,7 +120,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * has fat-finger data available, which itself indicates that the user has
    * corrections enabled.
    */
-    get correctionsEnabled(): boolean {
+  get correctionsEnabled(): boolean {
     const paths = this.selectionQueue.toArray();
     // When corrections are disabled, the Web engine will only provide individual Transforms
     // for an input, not a distribution.  No distributions means we shouldn't do corrections.
@@ -194,7 +190,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
       const spaceHeadInputSource = space.inputSegments[0];
 
       const isOnSplitInput =
-        thisTailSpaceIds.find((entry) => entry == space.inputSource.subsetId)
+        thisTailSpaceIds.some((entry) => entry == space.inputSource.subsetId)
         && thisTailInputSource.end == spaceHeadInputSource.start;
 
       // In this case, we only rebuild the single path; an outer stack frame will reconstitute
@@ -210,7 +206,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     // a prior split; if we'd split, it'd be a SearchQuotientCluster on both
     // ends.
     if(space instanceof SearchQuotientSpur) {
-      const parentMerge = this.merge(space.parents[0]) as SearchQuotientSpur;
+      const parentMerge = this.merge(space.parents[0]);
       return space.construct(parentMerge, space.inputs, space.inputSource);
     }
 
@@ -299,9 +295,15 @@ export class SearchQuotientCluster implements SearchQuotientNode {
       return false;
     }
 
-    // We need to check if the parents match.  Done naively in the manner below, this is O(N^2).
-    // Granted, we shouldn't have _that_ many incoming paths.
-    if(this.parents.find((path) => !space.parents.find((path2) => path.isSameNode(path2)))) {
+    // We need to check if the parents match.
+    // First, is the parent count the same?
+    if(this.parents.length != space.parents.length) {
+      return false;
+    } else if (this.parents.find((path) => !space.parents.find((path2) => path.isSameNode(path2)))) {
+      // Done naively in the manner above, checking each pair of nodes, to
+      // ensure a match is found for each, is O(N^2).
+      //
+      // Granted, we shouldn't have _that_ many incoming paths.
       return false;
     }
 
