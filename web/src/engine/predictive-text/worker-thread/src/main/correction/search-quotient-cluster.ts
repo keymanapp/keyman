@@ -3,26 +3,24 @@
  *
  * Created by jahorton on 2025-10-20
  *
- * This file defines the predictive-text engine's SearchSpace class, which is used to
- * manage the search-space(s) for text corrections within the engine.
+ * This file defines the predictive-text engine's SearchQuotientCluster class,
+ * which is used to manage the search-space(s) for text corrections within the
+ * engine.
  */
 
-import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
+import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, SearchResult } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 
-const PATH_QUEUE_COMPARATOR: Comparator<SearchQuotientNode> = (a, b) => {
+const PATH_QUEUE_COMPARATOR: QueueComparator<SearchQuotientNode> = (a, b) => {
   return a.currentCost - b.currentCost;
 }
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchQuotientCluster implements SearchQuotientNode {
-  // While most functions can be done directly from SearchSpace, merging and splitting will need access
-  // to SearchPath-specific members.  It's also cleaner to not allow nested SearchClusters while we
-  // haven't worked out support for such a scenario.
   private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
   readonly spaceId: number;
 
@@ -48,20 +46,19 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   private _processedEdgeSet?: {[pathKey: string]: boolean} = {};
 
   /**
-   * Provides a heuristic for the base cost at each depth if the best
-   * individual input were taken at that level.
+   * Provides a heuristic for the base cost at each depth if the best individual
+   * input were taken at that level.
    */
   readonly lowestPossibleSingleCost: number;
 
   /**
-   * Constructs a fresh SearchSpace instance for used in predictive-text correction
-   * and suggestion searches.
-   * @param baseSpaceId
-   * @param model
+   * Constructs a fresh SearchQuotientCluster instance for use in
+   * predictive-text correction and suggestion searches.
+   * @param inboundPaths
    */
   constructor(inboundPaths: SearchQuotientNode[]) {
     if(inboundPaths.length == 0) {
-      throw new Error("SearchCluster requires an array with at least one SearchPath");
+      throw new Error("SearchQuotientCluster requires an array with at least one SearchQuotientNode");
     }
 
     let lowestPossibleSingleCost = Number.POSITIVE_INFINITY;
@@ -72,12 +69,12 @@ export class SearchQuotientCluster implements SearchQuotientNode {
 
     for(let path of inboundPaths) {
       if(path.inputCount != inputCount || path.codepointLength != codepointLength) {
-        throw new Error(`SearchPath does not share same properties as others in the cluster:  inputCount ${path.inputCount} vs ${inputCount}, codepointLength ${path.codepointLength} vs ${codepointLength}`);
+        throw new Error(`SearchQuotientNode does not share same properties as others in the cluster:  inputCount ${path.inputCount} vs ${inputCount}, codepointLength ${path.codepointLength} vs ${codepointLength}`);
       }
 
       // If there's a source-range key mismatch - via mismatch in count or in actual ID, we have an error.
       if(path.sourceRangeKey != sourceRangeKey) {
-        throw new Error(`SearchPath does not share the same source identifiers as others in the cluster`);
+        throw new Error(`SearchQuotientNode does not share the same source identifiers as others in the cluster`);
       }
 
       lowestPossibleSingleCost = Math.min(lowestPossibleSingleCost, path.lowestPossibleSingleCost);
@@ -121,7 +118,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * has fat-finger data available, which itself indicates that the user has
    * corrections enabled.
    */
-    get correctionsEnabled(): boolean {
+  get correctionsEnabled(): boolean {
     const paths = this.selectionQueue.toArray();
     // When corrections are disabled, the Web engine will only provide individual Transforms
     // for an input, not a distribution.  No distributions means we shouldn't do corrections.
