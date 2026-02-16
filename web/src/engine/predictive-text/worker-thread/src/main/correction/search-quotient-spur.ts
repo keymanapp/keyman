@@ -476,4 +476,23 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     return components.join('+');
   }
+
+  /**
+   * Provides a unique hash-style string corresponding to the edge represented
+   * by this graph spur.
+   *
+   * This is designed for use in two cases:
+   * 1. At runtime - plays a role in simplification of results for .split
+   *    operations with SearchQuotientCluster ancestry, which may cause
+   *    quotient-paths that diverge and reconverge during recursion
+   *    - Specifically, this property assists detection of duplicate instances
+   *      during 'diverged' states, allowing reconvergence to be handled.
+   * 2. In unit tests - validating that splits with SearchQuotientCluster
+   *    ancestry properly handle quotient-path variance in unit tests.
+   */
+  get edgeKey(): string {
+    const inputSrc = this.inputSource;
+    const segment = inputSrc.segment;
+    return `E${inputSrc.subsetId}:${segment.start}${segment.end !== undefined ? `-${segment.end}` : ''}`;
+  }
 }
