@@ -9,9 +9,8 @@ export { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE };
  * @param x Name of element to box
  */
 export function boxXmlArray(o: any, x: string): void {
-
-  if (typeof o == 'object' && !Array.isArray(o[x])) {
-    if (o[x] === null || o[x] === undefined) {
+  if(typeof o == 'object' && !Array.isArray(o[x])) {
+    if(o[x] === null || o[x] === undefined) {
       o[x] = [];
     }
     else {
@@ -65,7 +64,7 @@ export function unescapeQuadString(s: string): string {
  * @returns
  */
 export function unescapeString(s: string): string {
-  if (!s) {
+  if(!s) {
     return s;
   }
   try {
@@ -75,13 +74,13 @@ export function unescapeString(s: string): string {
      * @param matched the entire match such as '0127' or '22 22'
      * @returns the unescaped match
      */
-    function processMatch(str: string, matched: string): string {
+    function processMatch(str: string, matched: string) : string {
       const codepoints = matched.split(' ');
       const unescaped = codepoints.map(unescapeOne);
       return unescaped.join('');
     }
     s = s.replaceAll(MATCH_HEX_ESCAPE, processMatch);
-  } catch (e) {
+  } catch(e) {
     if (e instanceof RangeError) {
       throw new UnescapeError(`Out of range while unescaping '${s}': ${e.message}`, { cause: e });
       /* c8 ignore next 3 */
@@ -143,7 +142,7 @@ function regexOne(hex: string): string {
 /**
  * Escape a string (\uxxxx form) if there are any problematic codepoints
  */
-export function escapeStringForRegex(s: string): string {
+export function escapeStringForRegex(s: string) : string {
   return s.split('').map(ch => escapeRegexCharIfSyntax(ch)).join('');
 }
 
@@ -153,7 +152,7 @@ export function escapeStringForRegex(s: string): string {
  * @returns
  */
 export function unescapeStringToRegex(s: string): string {
-  if (!s) {
+  if(!s) {
     return s;
   }
   try {
@@ -163,13 +162,13 @@ export function unescapeStringToRegex(s: string): string {
      * @param matched the entire match such as '0127' or '22 22'
      * @returns the unescaped match
      */
-    function processMatch(str: string, matched: string): string {
+    function processMatch(str: string, matched: string) : string {
       const codepoints = matched.split(' ');
       const unescaped = codepoints.map(regexOne);
       return unescaped.join('');
     }
     s = s.replaceAll(MATCH_HEX_ESCAPE, processMatch);
-  } catch (e) {
+  } catch(e) {
     if (e instanceof RangeError) {
       throw new UnescapeError(`Out of range while unescaping '${s}': ${e.message}`, { cause: e });
       /* c8 ignore next 3 */
@@ -182,19 +181,19 @@ export function unescapeStringToRegex(s: string): string {
 
 /** True if this string *could* be a UTF-32 single char */
 export function
-  isOneChar(value: string): boolean {
+isOneChar(value: string) : boolean {
   return [...value].length === 1;
 }
 
 export function
-  toOneChar(value: string): number {
+toOneChar(value: string) : number {
   if (!isOneChar(value)) {
     throw Error(`Not a single char: ${value}`);
   }
   return value.codePointAt(0);
 }
 
-export function describeCodepoint(ch: number): string {
+export function describeCodepoint(ch : number) : string {
   let s;
   const p = BadStringAnalyzer.getProblem(ch);
   if (p != null) {
@@ -206,6 +205,7 @@ export function describeCodepoint(ch: number): string {
   }
   return `${s} (U+${Number(ch).toString(16).toUpperCase()})`;
 }
+
 
 export enum BadStringType {
   pua = 'PUA',
@@ -228,26 +228,26 @@ const Uni_FFFE_NONCHARACTER = 0xFFFE;
 const Uni_PLANE_MASK = 0x1F0000;
 const Uni_MAX_CODEPOINT = 0x10FFFF;
 // plane 0, 15, and 16 PUA
-const Uni_PUA_00_START = 0xE000;
-const Uni_PUA_00_END = 0xF8FF;
+const Uni_PUA_00_START =   0xE000;
+const Uni_PUA_00_END   =   0xF8FF;
 const Uni_PUA_15_START = 0x0F0000;
-const Uni_PUA_15_END = 0x0FFFFD;
+const Uni_PUA_15_END   = 0x0FFFFD;
 const Uni_PUA_16_START = 0x100000;
-const Uni_PUA_16_END = 0x10FFFD;
+const Uni_PUA_16_END   = 0x10FFFD;
 
 
 /**
  * @brief True if a lead surrogate
  * \def Uni_IsSurrogate1
  */
-export function Uni_IsSurrogate1(ch: number) {
+export function Uni_IsSurrogate1(ch : number) {
   return ((ch) >= Uni_LEAD_SURROGATE_START && (ch) <= Uni_LEAD_SURROGATE_END);
 }
 /**
  * @brief True if a trail surrogate
  * \def Uni_IsSurrogate2
  */
-export function Uni_IsSurrogate2(ch: number) {
+export function Uni_IsSurrogate2(ch : number) {
   return ((ch) >= Uni_TRAIL_SURROGATE_START && (ch) <= Uni_TRAIL_SURROGATE_END);
 }
 
@@ -255,19 +255,19 @@ export function Uni_IsSurrogate2(ch: number) {
  * @brief True if any surrogate
  * \def UniIsSurrogate
 */
-export function Uni_IsSurrogate(ch: number) {
+export function Uni_IsSurrogate(ch : number) {
   return (Uni_IsSurrogate1(ch) || Uni_IsSurrogate2(ch));
 }
 
-function Uni_IsEndOfPlaneNonCharacter(ch: number) {
+function Uni_IsEndOfPlaneNonCharacter(ch : number) {
   return (((ch) & Uni_FFFE_NONCHARACTER) == Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
 }
 
-function Uni_IsNoncharacter(ch: number) {
+function Uni_IsNoncharacter(ch : number) {
   return (((ch) >= Uni_FD_NONCHARACTER_START && (ch) <= Uni_FD_NONCHARACTER_END) || Uni_IsEndOfPlaneNonCharacter(ch));
 }
 
-function Uni_InCodespace(ch: number) {
+function Uni_InCodespace(ch : number) {
   return (ch >= 0 && ch <= Uni_MAX_CODEPOINT);
 };
 
@@ -306,8 +306,8 @@ export function isPUA(ch: number) {
 }
 
 /** @returns false if s is NEITHER NFC nor NFD. (Returns true for falsy) */
-export function isNormalized(s: string): boolean {
-  if (!s) return true; // empty or null
+export function isNormalized(s: string) : boolean {
+  if(!s) return true; // empty or null
   const nfc = s.normalize("NFC");
   const nfd = s.normalize("NFD");
   if (s !== nfc && s !== nfd) return false;
@@ -315,7 +315,7 @@ export function isNormalized(s: string): boolean {
 }
 
 class BadStringMap extends Map<BadStringType, Set<number>> {
-  public toString(): string {
+  public toString() : string {
     if (!this.size) {
       return "{}";
     }
@@ -326,7 +326,7 @@ class BadStringMap extends Map<BadStringType, Set<number>> {
 /** abstract class for analyzing and categorizing strings */
 export abstract class StringAnalyzer {
   /** add a string for analysis */
-  public add(s: string) {
+  public add(s : string) {
     for (const c of [...s]) {
       const ch = c.codePointAt(0);
       const problem = this.analyzeCodePoint(c, ch);
@@ -341,10 +341,10 @@ export abstract class StringAnalyzer {
    * @param c single codepoint to analyze (string)
    * @param ch single codepoint to analyze (scalar)
    */
-  protected abstract analyzeCodePoint(c: string, ch: number): BadStringType;
+  protected abstract analyzeCodePoint(c: string, ch: number) : BadStringType;
 
   /** internal interface for the result of an analysis */
-  protected addProblem(ch: number, type: BadStringType) {
+  protected addProblem(ch : number, type : BadStringType) {
     if (!this.m.has(type)) {
       this.m.set(type, new Set<number>());
     }
@@ -352,7 +352,7 @@ export abstract class StringAnalyzer {
   }
 
   /** get the results of the analysis */
-  public analyze(): BadStringMap {
+  public analyze() : BadStringMap {
     if (this.m.size == 0) {
       return null;
     } else {
@@ -374,7 +374,7 @@ export class BadStringAnalyzer extends StringAnalyzer {
   public static getProblem(ch: number) {
     if (!isValidUnicode(ch)) {
       return BadStringType.illegal;
-    } else if (isPUA(ch)) {
+    } else if(isPUA(ch)) {
       return BadStringType.pua;
     } else { // TODO-LDML: unassigned
       return null;

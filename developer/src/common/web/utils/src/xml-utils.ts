@@ -333,7 +333,6 @@ export class KeymanXMLReader {
   }
 
   public parse(data: string): any {
-    console.log(" PARSER_OPTIONS[this.type].attributeNamePrefix",PARSER_OPTIONS[this.type].attributeNamePrefix);
 
     const parser = this.parser();
     let result = parser.parse(data, true);

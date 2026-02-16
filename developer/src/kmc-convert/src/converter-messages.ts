@@ -32,31 +32,31 @@ export class ConverterMessages {
   static Error_FileNotFound =
     (o: { inputFilename: string; }) => m(
       this.ERROR_FileNotFound,
-      `Input filename '${def(o.inputFilename)} ' does not exist or could not be loaded.`
+      `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`
     );
 
   static ERROR_UnableToRead = SevError | 0x0004;
   static Error_UnableToRead = (o: { inputFilename: string; }) => m(
     this.ERROR_UnableToRead,
-    `Input file '${def(o.inputFilename)} ' could not be read.`
+    `Input file '${def(o.inputFilename)}' could not be read.`
   );
 
   static ERROR_UnableToConvert = SevError | 0x0005;
   static Error_UnableToConvert = (o: { inputFilename: string; }) => m(
     this.ERROR_UnableToConvert,
-    `Input file '${def(o.inputFilename)} ' could not be converted.`
+    `Input file '${def(o.inputFilename)}' could not be converted.`
   );
 
   static ERROR_UnableToWrite = SevError | 0x0006;
   static Error_UnableToWrite = (o: { outputFilename: string; }) => m(
     this.ERROR_UnableToWrite,
-    `Output file for '${def(o.outputFilename)} ' could not be written.`
+    `Output file for '${def(o.outputFilename)}' could not be written.`
   );
 
   static INFO_UnsupportedCharactersDetected = SevInfo | 0x0007;
   static Info_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string, key: string, KeyName: string, output: string; }) => m(
     this.INFO_UnsupportedCharactersDetected,
-    `INFO: Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)} ' at keyMap index ${def(o.keymap_index)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
+    `INFO: Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymap_index)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
   );
 
   static ERROR_InvalidFile = SevError | 0x0008;

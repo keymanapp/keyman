@@ -31,6 +31,7 @@ export interface KL_keyboard {
 export interface KL_Layouts {
   layouts?: KL_Layout;
 };
+
 export interface KL_Layout {
   first?: string;
   last?: string;
@@ -38,44 +39,47 @@ export interface KL_Layout {
   modifiers?: string;
 };
 
-
 export interface KL_modifierMap {
   id?: string;
   defaultIndex?: string;
 
   keyMapSelect?: KL_keyMapSelect[];
 };
+
 export interface KL_keyMapSelect {
   mapIndex?: string;
   modifier?: KL_modifier[];
 };
+
 export interface KL_modifier {
   keys?: string;
 };
-
 
 export interface KL_keyMapSet {
   id?: string;
   keyMap?: KL_keyMap[];
 };
+
 export interface KL_keyMap {
   index?: string;
   key?: KL_key[];
 };
+
 export interface KL_key {
   code?: string;
   action?: string;
   output?: string;
 };
 
-
 export interface KL_actions {
   action?: KL_action[];
 };
+
 export interface KL_action {
   id?: string;
   when?: KL_when[];
 };
+
 export interface KL_when {
   state?: string;
   output?: string;
@@ -85,5 +89,4 @@ export interface KL_when {
 export interface KL_terminators {
   when?: KL_when[];
 };
-
 
