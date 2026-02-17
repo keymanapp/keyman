@@ -7,7 +7,7 @@ import { translateLayerAttrToModifier, validModifier } from '../util/util.js';
 
 import DependencySections = KMXPlus.DependencySections;
 import Layr = KMXPlus.Layr;
-import LayrList = KMXPlus.LayrList;
+import LayrForm = KMXPlus.LayrForm;
 import LayrRow = KMXPlus.LayrRow;
 
 export class LayrCompiler extends SectionCompiler {
@@ -68,7 +68,7 @@ export class LayrCompiler extends SectionCompiler {
   public compile(sections: DependencySections): Layr {
     const sect = new Layr();
 
-    sect.lists = this.keyboard3.layers.map((layers) => {
+    sect.forms = this.keyboard3.layers.map((layers) => {
       const hardware = sections.strs.allocString(layers.formId, {compileContext: layers});
       // Already validated in validate
       const layerEntries = [];
@@ -90,12 +90,16 @@ export class LayrCompiler extends SectionCompiler {
           });
         }
       }
-      const list: LayrList = {
+      const form: LayrForm = {
         hardware,
         minDeviceWidth: layers.minDeviceWidth || 0,
         layers: layerEntries,
+        baseLayout: sections.strs.allocString('', {compileContext: sect}), // TODO-EMBED-OSK-IN-KMX
+        fontFaceName: sections.strs.allocString('', {compileContext: sect}),  // TODO-EMBED-OSK-IN-KMX
+        fontSizePct: 100,  // TODO-EMBED-OSK-IN-KMX
+        flags: 0,  // TODO-EMBED-OSK-IN-KMX
       };
-      return list;
+      return form;
     });
     return sect;
   }

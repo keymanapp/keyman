@@ -147,8 +147,14 @@ test('unicode_tests', test_unicode, suite: 'ldml',
 
 foreach kbd : tests
   kbd_src = test_path / kbd + '.xml'
-  kbd_obj = test_path / kbd + '.kmx'
-  test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-keyboards')
+  kbd_obj = test_path / '17.0' / kbd + '.kmx'
+  test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-keyboards-17')
+endforeach
+
+foreach kbd : tests
+  kbd_src = test_path / kbd + '.xml'
+  kbd_obj = test_path / '19.0' / kbd + '.kmx'
+  test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-keyboards-19')
 endforeach
 
 # Run tests on all invalid keyboards (`invalid_tests` defined in invalid-keyboards/meson.build)
