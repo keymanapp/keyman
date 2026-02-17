@@ -2,11 +2,12 @@
 title: Generating a Lexical Model
 ---
 
-Part 10 of the [Keyman Developer Walkthrough](../walkthrough).
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
+Part 10 of the [Keyman Developer Walkthrough](.).
 
-[< Back: Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package)
-
-[Next: Part 11 - Installing a Keyman Lexical Model >](11-installing-lexical-model)
+[← Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package) &nbsp; [Part 11 - Installing a Keyman Lexical Model →](11-installing-lexical-model)
+</div>
 
 ## Step-by-Step
 
@@ -39,7 +40,7 @@ In addition, the list of words should be reviewed.
 - In this tutorial, we're going to open a file, copy its contents, then paste those lines into the `wordlist.tsv` file to replace the default content. Depending on how your browser is configured, when you open the file, it may open in a new tab or it may open in the same tab as this set of instructions. In the first case you can close the tab to return here, but in the second case you'll need to use the Back feature of your browser. (You may want to read ahead to make sure you understand the next few steps since the instructions might be hidden temporarily.)
 - Click on the **dag-short-wl.txt** filename just below this paragraph to open the file (or right-click and select Open in a new tab).
 
-[dag-short-wl.txt](./dag-short-wl.txt)
+  * [dag-short-wl.txt](./dag-short-wl.txt)
 
 - Use <kbd>Ctrl</kbd>+<kbd>A</kbd> to select the entire contents and <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy the selected text.
 - Return to these instructions, either with the browser's Back feature, or by closing the newly opened tab, as appropriate.
@@ -79,7 +80,9 @@ In addition, the list of words should be reviewed.
 - Select the `Build` tab on the left. Then select the `Compile Package` button. Verify that you get the **sil.dag.wl.model.kps built successfully** message.
 - Congratulations! You have successfully built and packaged a lexical model for the Dagbani language.
 
+<div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 11 - Installing a Keyman Lexical Model](11-installing-lexical-model)
+</div>
 
 ## Introduction
 
@@ -149,13 +152,13 @@ Keyman will place you in your `.kpj` file immediately, as with a keyboard projec
 
 Currently `Wordlist (trie-1.0)` is the only choice for the `Format` field.
 
-You’ll normally want to keep the `default` choice for the `Word breaker` field and the `(Space U+0020)` option for the `Insert after word` field, unless you are dealing with an orthography that doesn’t use space to separate words. For scripts such as Khmer, Thai, and Lao, which have special ways to delimit words, see the Keyman documentation on [coding a custom word breaker](https://help.keyman.com/developer/current-version/guides/lexical-models/advanced/word-breaker).
+You’ll normally want to keep the `default` choice for the `Word breaker` field and the `(Space U+0020)` option for the `Insert after word` field, unless you are dealing with an orthography that doesn’t use space to separate words. For scripts such as Khmer, Thai, and Lao, which have special ways to delimit words, see the Keyman documentation on [coding a custom word breaker](../../../guides/lexical-models/advanced/word-breaker).
 
 You can specify the opening and closing quotation marks, and whether the language is using a right-to-left script (such as Arabic, Hebrew, Syriac, etc.)
 
 If your language uses a script with uppercase and lowercase (such as Latin, Cyrillic, Greek, etc.) you probably will want to enable the `Language uses casing` checkbox, so that Keyman will take casing into account when matching and suggesting words. For example, if you start typing `Rab`, Keyman will propose `Rabbit` rather than `rabbit`.
 
-The Keyman site has more details on [advanced topics](https://help.keyman.com/developer/17.0/guides/lexical-models/advanced/word-breaker).
+The Keyman site has more details on [advanced topics](../../../guides/lexical-models/advanced/word-breaker).
 
 ## Editing Wordlists
 
@@ -166,7 +169,7 @@ Keyman provides a default `wordlist.tsv` file for you as an example. You can rep
 For a newly created project, the only wordlist present is `wordlist.tsv`.
 If you open that file, you'll see some sample data included as an illustration.
 
-For advanced information on Keyman wordlist file formats and exporting your own wordlist files, read the [TSV file documentation](https://help.keyman.com/developer/17.0/reference/file-types/tsv).
+For advanced information on Keyman wordlist file formats and exporting your own wordlist files, read the [TSV file documentation](../../../reference/file-types/tsv).
 
 ### Ignored lines
 
@@ -368,6 +371,6 @@ Note: The text provided for this tutorial is already in a `.txt` file format. Fo
 
 ![](images/windows-save-txt.png)
 
-[< Back: Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package)
-
-[Next: Part 11 - Installing a Keyman Lexical Model >](11-installing-lexical-model)
+<div class="walkthrough-navigation" markdown="1">
+[← Part 9 - Distributing a Keyboard Package](09-distributing-keyboard-package) &nbsp; [Part 11 - Installing a Keyman Lexical Model →](11-installing-lexical-model)
+</div>

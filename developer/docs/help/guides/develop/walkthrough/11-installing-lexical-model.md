@@ -2,9 +2,12 @@
 title: Installing a Keyman Lexical Model
 ---
 
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
 Part 11 of the [Keyman Developer Walkthrough](../walkthrough).
 
-[< Back: Part 10 - Generating a Lexical Model](10-generating-lexical-model)
+[← Part 10 - Generating a Lexical Model](10-generating-lexical-model)
+</div>
 
 ## Step-by-Step
 
@@ -18,7 +21,7 @@ This concludes the walkthrough. Hopefully it has given you an overview of the en
 
 ## Submitting a lexical model to the Keyman Lexical Models Repository
 
-Follow the instructions at [https://help.keyman.com/developer/lexical-models/](https://help.keyman.com/developer/lexical-models/) to submit your lexical model to the Keyman lexical models repository. This will enable anyone with Internet access to download and use the lexical model. (Please do not submit the Dagbani lexical model used in the Step-by-Step tutorial. It’s really not suitable for submission to the repository.)
+Follow the instructions at [Working with the Keyman Cloud Lexical Models Repository](https://help.keyman.com/developer/lexical-models/) to submit your lexical model to the Keyman lexical models repository. This will enable anyone with Internet access to download and use the lexical model. (Please do not submit the Dagbani lexical model used in the Step-by-Step tutorial. It’s really not suitable for submission to the repository.)
 
 Once the lexical model has been published, any Android or iOS device with Keyman installed and access to the Internet should be able to access and load the lexical model for use with a keyboard with the same language tag (BCP 47 code) as the lexical model.
 
@@ -29,4 +32,6 @@ If an Android or iOS device has access to the Keyman package file (.kmp) that co
 As mentioned earlier, the Keyboard App Builder (KAB) lets you put a Keyman keyboard along with a lexical model into an app for iOS or Android, which can be distributed.
 More details can be found on the [Keyboard App Builder](https://software.sil.org/keyboardappbuilder/) page.
 
-[< Back: Part 10 - Generating a Lexical Model](10-generating-lexical-model)
+<div class="walkthrough-navigation" markdown="1">
+[← Part 10 - Generating a Lexical Model](10-generating-lexical-model)
+</div>

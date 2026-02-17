@@ -2,11 +2,12 @@
 title: Writing Keyboard Documentation
 ---
 
-Part 7 of the [Keyman Developer Walkthrough](../walkthrough).
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
+Part 7 of the [Keyman Developer Walkthrough](.).
 
-[< Back: Part 6 - Creating a Touch Layout](06-creating-touch-layout)
-
-[Next: Part 8 - Preparing a Keyboard Package >](08-preparing-keyboard-package)
+[← Part 6 - Creating a Touch Layout](06-creating-touch-layout) &nbsp; [Part 8 - Preparing a Keyboard Package →](08-preparing-keyboard-package)
+</div>
 
 ## Step-by-Step
 
@@ -39,7 +40,9 @@ Part 7 of the [Keyman Developer Walkthrough](../walkthrough).
 
 - Close the welcome.htm file. Click “Yes” to save the changes.
 
+<div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 8 - Preparing a Keyboard Package](08-preparing-keyboard-package)
+</div>
 
 ## Editing the README.md file
 
@@ -105,6 +108,6 @@ The Keyman keyboards repository requires that this PHP file have the name of the
 
 The PHP help file often contains the same information as is in the welcome.htm file. See [Keyman Keyboard help document (PHP help file)](https://help.keyman.com/developer/keyboards/phphelpfile) for more details.
 
-[< Back: Part 6 - Creating a Touch Layout](06-creating-touch-layout)
-
-[Next: Part 8 - Preparing a Keyboard Package >](08-preparing-keyboard-package)
+<div class="walkthrough-navigation" markdown="1">
+[← Part 6 - Creating a Touch Layout](06-creating-touch-layout) &nbsp; [Part 8 - Preparing a Keyboard Package →](08-preparing-keyboard-package)
+</div>
