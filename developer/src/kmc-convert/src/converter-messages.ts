@@ -54,9 +54,9 @@ export class ConverterMessages {
   );
 
   static INFO_UnsupportedCharactersDetected = SevInfo | 0x0007;
-  static Info_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string, key: string, KeyName: string, output: string; }) => m(
+  static Info_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string, key: string, KeyName: string, output: string; }) => m(
     this.INFO_UnsupportedCharactersDetected,
-    `INFO: Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymap_index)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
+    `INFO: Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
   );
 
   static ERROR_InvalidFile = SevError | 0x0008;

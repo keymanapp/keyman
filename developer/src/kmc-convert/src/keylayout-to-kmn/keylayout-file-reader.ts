@@ -41,7 +41,7 @@ export class KeylayoutFileReader {
    * @param o Object with possible property #text containing whitespaces
    * @return objects that do not contain property #text
    */
-  public remove_whitespace(o: any): void {
+  public removeWhitespace(o: any): void {
     if (o['#text']) {
       delete o['#text'];
     }
@@ -53,9 +53,9 @@ export class KeylayoutFileReader {
    * @param x Name of element to box
    * @return objects that contain only boxed arrays
    */
-  public removeWhitespace_boxArray(o: any, x: string): void {
+  public removeWhitespaceBoxArray(o: any, x: string): void {
 
-    this.remove_whitespace(o);
+    this.removeWhitespace(o);
     boxXmlArray(o, x);
   }
 
@@ -66,34 +66,34 @@ export class KeylayoutFileReader {
    */
   public boxArray(source: any) {
 
-    this.remove_whitespace(source);
+    this.removeWhitespace(source);
 
-    this.removeWhitespace_boxArray(source, 'keyMapSet');
+    this.removeWhitespaceBoxArray(source, 'keyMapSet');
 
-    this.removeWhitespace_boxArray(source.layouts, 'layout');
-    this.removeWhitespace_boxArray(source?.modifierMap, 'keyMapSelect');
+    this.removeWhitespaceBoxArray(source.layouts, 'layout');
+    this.removeWhitespaceBoxArray(source?.modifierMap, 'keyMapSelect');
 
     for (const keyMapSelect of source?.modifierMap?.keyMapSelect) {
-      this.removeWhitespace_boxArray(keyMapSelect, 'modifier');
+      this.removeWhitespaceBoxArray(keyMapSelect, 'modifier');
     }
 
-    this.removeWhitespace_boxArray(source.keyMapSet[0], 'keyMap');
+    this.removeWhitespaceBoxArray(source.keyMapSet[0], 'keyMap');
 
     for (const keyMapSet of source?.keyMapSet) {
       for (const keyMap of keyMapSet.keyMap) {
-        this.removeWhitespace_boxArray(keyMap, 'key');
+        this.removeWhitespaceBoxArray(keyMap, 'key');
       }
-      this.removeWhitespace_boxArray(keyMapSet, 'keyMap');
+      this.removeWhitespaceBoxArray(keyMapSet, 'keyMap');
     }
 
-    this.removeWhitespace_boxArray(source?.actions, 'action');
+    this.removeWhitespaceBoxArray(source?.actions, 'action');
     for (const action of source?.actions?.action) {
-      this.removeWhitespace_boxArray(action, 'when');
+      this.removeWhitespaceBoxArray(action, 'when');
     }
 
-    this.removeWhitespace_boxArray(source.terminators, 'when');
+    this.removeWhitespaceBoxArray(source.terminators, 'when');
     for (const action of source?.actions?.action) {
-      this.removeWhitespace_boxArray(action, 'when');
+      this.removeWhitespaceBoxArray(action, 'when');
     }
 
     return source;
