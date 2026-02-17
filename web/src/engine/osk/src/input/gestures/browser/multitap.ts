@@ -148,7 +148,7 @@ export default class Multitap implements GestureHandler {
       keyEvent.kNextLayer ||= this.originalLayer;
 
       keyEvent.inputBreadcrumb = this.sequence.trace();
-      vkbd.raiseKeyEvent(keyEvent, null);
+      vkbd.raiseKeyEvent(keyEvent, selection, null);
 
       // Now that the key has been processed, with a layer possibly changed as a result...
       if(tap.matchedId == 'modipress-multitap-start') {
