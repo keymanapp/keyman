@@ -1,10 +1,14 @@
 import { assert } from 'chai'
 import sinon from 'sinon';
-
 import * as PromiseStatusModule from 'promise-status-async';
-import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
 import { GestureModelDefs, buildGestureMatchInspector, gestures } from '@keymanapp/gesture-recognizer';
+import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+
+import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
+import { assertingPromiseStatus as promiseStatus } from '#test-resources/assertingPromiseStatus.js';
+import { assertGestureSequence, SequenceAssertion } from "#test-resources/sequenceAssertions.js";
+
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?
@@ -16,10 +20,7 @@ type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
 const getGestureModelSet = gestures.specs.getGestureModelSet;
 const modelSetForAction = gestures.matchers.modelSetForAction;
 
-import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
-import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 
-import { assertGestureSequence, SequenceAssertion } from "../../../../../resources/sequenceAssertions.js";
 
 import {
   LongpressModel,
