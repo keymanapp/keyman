@@ -7,13 +7,10 @@
  *
  */
 
-import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { XMLParser } from 'fast-xml-parser';
-import { util } from '@keymanapp/common-types';
+import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout } from "@keymanapp/developer-utils";
+import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
-import { SchemaValidators } from '@keymanapp/common-types';
-import { DeveloperUtilsMessages } from '@keymanapp/developer-utils';
-import { KeylayoutXMLSourceFile } from "@keymanapp/developer-utils";
 
 import boxXmlArray = util.boxXmlArray;
 
@@ -24,7 +21,7 @@ export class KeylayoutFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: KeylayoutXMLSourceFile): boolean {
+  public validate(source: Keylayout.KeylayoutXMLSourceFile): boolean {
     if (!SchemaValidators.default.keylayout(source)) {
        for (const err of (<any>SchemaValidators.default.keylayout).errors) {
         this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({
@@ -105,13 +102,13 @@ export class KeylayoutFileReader {
    * @param  inputFilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(inputFilename: string): KeylayoutXMLSourceFile {
+  public read(inputFilename: string): Keylayout.KeylayoutXMLSourceFile {
 
     const options = {
       ignoreAttributes: [''],       // we do not process an output character of ""
       trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (space)
       parseTagValue: false,
-      attributeNamePrefix: '@_',    // to access the attribute
+      attributeNamePrefix: '@__',    // to access the attribute
       ignoreDeclaration: true
     };
 
