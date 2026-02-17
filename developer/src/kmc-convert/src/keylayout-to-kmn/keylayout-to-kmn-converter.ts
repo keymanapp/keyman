@@ -60,15 +60,14 @@ export interface ActionStateOutput {
  * @brief  member function to find the number of keys defined in a .keykayout file.
  *         We process 'MAX_KEY_COUNT' keys at maximum. In case a keylayout has fewer keys defined, we use that smaller number of keys (USE_KEY_COUNT)
  * @param  data data read from keylayout file 
- * @param  pos the nth keyMap to be examined
  * @return usedKeyCount holding the number of keys of a certain keyMap used in a .keykayout file.
  */
-export function findUsedKeysCount(data: any, pos: number): number {
+export function findUsedKeysCount(data: any): number {
 
   let usedKeyCount = KeylayoutToKmnConverter.MAX_KEY_COUNT;
-  if (data.keyboard.keyMapSet[0].keyMap[pos].key.length < usedKeyCount) {
+  if (data.keyboard.keyMapSet[0].keyMap[0].key.length < usedKeyCount) {
     // set max to n-1 (keys are zero indexed )
-    usedKeyCount = data.keyboard.keyMapSet[0].keyMap[pos].key.length - 1;
+    usedKeyCount = data.keyboard.keyMapSet[0].keyMap[0].key.length - 1;
   }
   return usedKeyCount;
 }
@@ -127,8 +126,6 @@ export class KeylayoutToKmnConverter {
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
-    const wrFile = kmnFileWriter.writeToFile(outArray);
-    console.log(wrFile);
     // write to object/ConverterToKmnResult
     const outUint8: Uint8Array = kmnFileWriter.write(outArray);
     const result: ConverterToKmnResult = {
@@ -169,9 +166,8 @@ export class KeylayoutToKmnConverter {
         }
         modifierBehavior.push(singleModifierSet);
       }
-      const behav = 0;
       // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
-      KeylayoutToKmnConverter.USE_KEY_COUNT = findUsedKeysCount(jsonObj, behav);
+      KeylayoutToKmnConverter.USE_KEY_COUNT = findUsedKeysCount(jsonObj);
 
       // fill rules into arrayOfRules of dataObject
       return this.createRuleData(dataObject, jsonObj);
