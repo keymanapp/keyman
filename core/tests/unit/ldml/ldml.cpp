@@ -157,21 +157,20 @@ apply_action(
       matched_text = true; // no text to match as context is empty.
     }
     // now, we need to simulate what ldml_processor::emit_backspace() is going to do.
-      auto end = context.rbegin();
-      while (end != context.rend()) {
-        if (end->type == KM_CORE_CT_CHAR) {
-          test_assert(!matched_text);
-          test_assert_equal(end->character, ch); // expect popped char to be same as what's in context
-          matched_text = true;
-          context.pop_back();
-          break;  // exit on first real char
-        }
-        test_assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+    while (!context.empty()) {
+      if (context.back().type == KM_CORE_CT_CHAR) {
+        test_assert(!matched_text);
+        test_assert_equal(context.back().character, ch); // expect popped char to be same as what's in context
+        matched_text = true;
         context.pop_back();
+        break;  // exit on first real char
       }
-      test_assert(matched_text);
+      test_assert(context.back().type != KM_CORE_CT_END);  // inappropriate here.
+      context.pop_back();
     }
+    test_assert(matched_text);
     break;
+  }
   case KM_CORE_IT_PERSIST_OPT:
     std::cout << "  + TODO-LDML: persist_opt()" << std::endl;
     break;
