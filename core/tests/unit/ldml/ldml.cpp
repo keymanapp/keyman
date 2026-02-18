@@ -40,7 +40,7 @@
 
 namespace {
 
-void print_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context);
+void print_context(std::u16string &text_store, km_core_state *&test_state, std::list<km_core_context_item> &test_context);
 
 bool g_beep_found = false;
 
@@ -68,10 +68,10 @@ string_to_hex(const std::u16string &input) {
 
 
 void
-copy_context_items_to_vector(km_core_context_item *citems, std::vector<km_core_context_item> &vector) {
-  vector.clear();
+copy_context_items_to_list(km_core_context_item *citems, std::list<km_core_context_item> &list) {
+  list.clear();
   for(km_core_context_item *ci = citems; ci->type != KM_CORE_CT_END; ci++) {
-    vector.emplace_back(*ci);
+    list.emplace_back(*ci);
   }
 }
 
@@ -81,9 +81,9 @@ apply_action(
     km_core_state *test_state,
     km_core_action_item const &act,
     std::u16string &text_store,
-    std::vector<km_core_context_item> &context,
+    std::list<km_core_context_item> &context,
     km::tests::LdmlTestSource &test_source,
-    std::vector<km_core_context_item> &test_context) {
+    std::list<km_core_context_item> &test_context) {
 
   // print_context(text_store, test_state, test_context);
   switch (act.type) {
@@ -183,9 +183,9 @@ apply_action(
       // We replace the cached context with the current application context
       km_core_status status = context_items_from_utf16(text_store.c_str(), &new_context_items);
       test_assert(status == KM_CORE_STATUS_OK);
-      copy_context_items_to_vector(new_context_items, context);
+      copy_context_items_to_list(new_context_items, context);
       // also update the test context
-      copy_context_items_to_vector(new_context_items, test_context);
+      copy_context_items_to_list(new_context_items, test_context);
       // TODO-LDML: now we need to SET the core context!
       status = km_core_context_set(km_core_state_context(test_state), new_context_items);
       km_core_context_items_dispose(new_context_items);
@@ -211,9 +211,9 @@ apply_actions(
   km_core_state *test_state,
   km_core_actions const *actions,
   std::u16string &text_store,
-  std::vector<km_core_context_item> &context,
+  std::list<km_core_context_item> &context,
   km::tests::LdmlTestSource &test_source,
-  std::vector<km_core_context_item> &test_context
+  std::list<km_core_context_item> &test_context
 ) {
 
   if(actions->do_alert) {
@@ -244,7 +244,7 @@ apply_actions(
 }
 
 void
-print_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context) {
+print_context(std::u16string &text_store, km_core_state *&test_state, std::list<km_core_context_item> &test_context) {
   // Compare context and text store at each step - should be identical
   size_t n                     = 0;
   km_core_context_item *citems = nullptr;
@@ -279,7 +279,7 @@ print_context(std::u16string &text_store, km_core_state *&test_state, std::vecto
 
   std::cout << "test_context : ";
   std::cout.fill('0');
-  for (auto i = test_context.begin(); i < test_context.end(); i++) {
+  for (auto i = test_context.begin(); i != test_context.end(); i++) {
     switch (i->type) {
     case KM_CORE_CT_CHAR:
       std::cout << "U+" << std::setw(4) << std::hex << i->character << std::dec << " ";
@@ -301,7 +301,7 @@ print_context(std::u16string &text_store, km_core_state *&test_state, std::vecto
  * verify the current context
  */
 void
-verify_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context, bool fully_normalized_mode, bool normalization_enabled) {
+verify_context(std::u16string &text_store, km_core_state *&test_state, std::list<km_core_context_item> &test_context, bool fully_normalized_mode, bool normalization_enabled) {
   // Compare context and text store at each step - should be identical
   print_context(text_store, test_state, test_context);
 
@@ -434,7 +434,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
   g_beep_found = false;
 
-  std::vector<km_core_context_item> test_context;
+  std::list<km_core_context_item> test_context;
 
   km_core_context_item *citems = nullptr;
   // setup test_context
@@ -447,7 +447,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   }
 
   // Make a copy of the setup context for the test
-  copy_context_items_to_vector(citems, test_context);
+  copy_context_items_to_list(citems, test_context);
   km_core_context_items_dispose(citems);
 
   // Setup baseline text store
