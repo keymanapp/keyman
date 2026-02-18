@@ -415,26 +415,25 @@ void
 ldml_event_state::remove_text(std::u32string &str, size_t length) {
   // str is the string to remove, so it should be at least as long as length
   assert(length <= str.length());
-  /** track how many context items have been removed, via push_backspace() */
-  size_t contextRemoved = 0;
-  for (auto c = state->context().rbegin(); length > 0 && c != state->context().rend(); c++, contextRemoved++) {
+  while (length > 0 && !state->context().empty()) {
 #ifndef NDEBUG
     /** last char of context */
     km_core_usv lastCtx = str.back();
 #endif
-    uint8_t type        = c->type;
+    auto lastStateCtx = state->context().back();
+    uint8_t type = lastStateCtx.type;
     assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
     if (type == KM_CORE_BT_CHAR) {
       // single char, drop it
       length--;
-      assert(c->character == lastCtx);
+      assert(lastStateCtx.character == lastCtx);
       str.pop_back();
       // Cause prior char to be removed
       actions.code_points_to_delete++;
     } else if (type == KM_CORE_BT_MARKER) {
       assert(length >= 3);
       // #3 - the marker.
-      assert(lastCtx == c->marker);
+      assert(lastCtx == lastStateCtx.marker);
       str.pop_back();
       length--;
       // #2 - the code
@@ -447,13 +446,9 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
       // Nothing in actions
       length--;
     }
-  }
-  assert(length == 0);
-  // now, pop the context items
-  for (size_t i = 0; i < contextRemoved; i++) {
-    // we don't pop during the above loop because the iterator gets confused
     state->context().pop_back();
   }
+  assert(length == 0);
 }
 
 void
