@@ -103,11 +103,6 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    if (outputFilename === null) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
-      return null;
-    }
-
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
     const jsonO: Keylayout.KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
 
@@ -120,9 +115,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
-
-    const outArray: ProcessedData = await this.convert(jsonO, outputFilename);
+    const outArray: ProcessedData = await this.convert(jsonO, inputFilename);
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
@@ -130,7 +123,7 @@ export class KeylayoutToKmnConverter {
     const outUint8: Uint8Array = kmnFileWriter.write(outArray);
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outUint8, filename: outputFilename }
+        kmn: { data: outUint8, filename: outArray.kmnFilename }
       }
     };
     return result;
@@ -141,10 +134,14 @@ export class KeylayoutToKmnConverter {
    * @param  jsonObj containing filename, behaviour and rules of a json object
    * @return an ProcessedData containing all data ready to print out
    */
-  private convert(jsonObj: any, outputfilename: string): ProcessedData {
-    const modifierBehavior: string[][] = [];           // modifier for each behaviour
-    const rules: Rule[] = [];                          // an array of data for a kmn rule
+  private convert(jsonObj: any, inputfilename: string): ProcessedData {
+    // modifiers for each behaviour
+    const modifierBehavior: string[][] = [];
 
+    // an array of data for a kmn rule
+    const rules: Rule[] = [];
+
+    // dataObject for all relevant data
     const dataObject: ProcessedData = {
       keylayoutFilename: "",
       kmnFilename: "",
@@ -152,11 +149,10 @@ export class KeylayoutToKmnConverter {
       arrayOfRules: []
     };
 
-    if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
-      dataObject.keylayoutFilename = outputfilename.replace(/\.kmn$/, '.keylayout');
-      dataObject.kmnFilename = outputfilename;
-      dataObject.arrayOfModifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
-      dataObject.arrayOfRules = rules;
+    if ((jsonObj === null) || (!jsonObj.hasOwnProperty("keyboard"))) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename: inputfilename }));
+      return dataObject;
+    } else {
 
       // create an array of modifier combinations and store in dataObject
       for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
@@ -166,16 +162,18 @@ export class KeylayoutToKmnConverter {
         }
         modifierBehavior.push(singleModifierSet);
       }
+
+      // fill dataObject with filenames, behaviours and (initialized) rules
+      dataObject.keylayoutFilename = inputfilename;
+      dataObject.kmnFilename = inputfilename.replace(/\.kkeylayoutn$/, '.kmn');;
+      dataObject.arrayOfModifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
+      dataObject.arrayOfRules = rules;
+
       // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
       KeylayoutToKmnConverter.USE_KEY_COUNT = findUsedKeysCount(jsonObj);
 
       // fill rules into arrayOfRules of dataObject
       return this.createRuleData(dataObject, jsonObj);
-    }
-    else {
-      const inputFilename = dataObject.keylayoutFilename;
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
-      return dataObject;
     }
   }
 

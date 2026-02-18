@@ -107,7 +107,6 @@ describe('KeylayoutToKmnConverter', function () {
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
     });
 
-
     it('run() should throw on null input file name and unknown output file name', async function () {
       const result = sut.run(null, 'X');
       assert.isNotNull(result);
@@ -119,38 +118,43 @@ describe('KeylayoutToKmnConverter', function () {
       const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_OutputFilenameIsRequired());
+      assert.equal(compilerTestCallbacks.messages.length, 2);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead({ inputFilename }));
+      assert.equal(compilerTestCallbacks.messages[1].code, 5246984);
     });
 
-    it('run() should throw on and null output file name', async function () {
+    it('run() should return on available input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_OutputFilenameIsRequired());
+      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, null));
+      assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() should return on correct input file name and empty output file name ', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, ''));
+      assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() should return on correct input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, null));
+      assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() should return on correct input file name and given output file name ', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const outputFilename = makePathToFixture('../data/OutputName.kmn');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
+      assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() return on correct input file extention and unsupperted output file extention', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const outputFilename = makePathToFixture('../data/OutputXName.B');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
+      assert.equal(compilerTestCallbacks.messages.length, 0);
     });
   });
 
@@ -206,14 +210,14 @@ describe('KeylayoutToKmnConverter', function () {
         arrayOfModifiers: [],
         arrayOfRules: [['C0', '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', 'A']]
       }, '');
-      assert.isTrue((convertedRule .keylayoutFilename === ''
-        && convertedRule .arrayOfModifiers.length === 0
-        && convertedRule .arrayOfRules.length === 0));
+      assert.isTrue((convertedRule.keylayoutFilename === ''
+        && convertedRule.arrayOfModifiers.length === 0
+        && convertedRule.arrayOfRules.length === 0));
     });
 
     it('should return empty array of rules on null input', async function () {
       const convertedRule = sut.convertBound.convert(null, 'ABC.kmn');
-      assert.isTrue(convertedRule .arrayOfRules.length === 0);
+      assert.isTrue(convertedRule.arrayOfRules.length === 0);
     });
   });
 
