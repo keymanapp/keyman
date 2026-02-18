@@ -2,11 +2,12 @@
 title: Creating a Keyboard Project
 ---
 
-Part 1 of the [Keyman Developer Walkthrough](../walkthrough).
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
+  Part 1 of the [Keyman Developer Walkthrough](.).
 
-[< Back: Introduction](00-introduction)
-
-[Next: Part 2 - Designing a Desktop Layout >](02-designing-desktop-layout)
+  [← Introduction](00-introduction) &nbsp; [Part 2 - Designing a Desktop Layout →](02-designing-desktop-layout)
+</div>
 
 ## Step-by-Step
 
@@ -31,8 +32,9 @@ For the Dagbani keyboard, the keyboard planning has been done for you. Follow th
 - Select `OK` to close the `Select BCP 47 tag` dialog.
 - Select `OK` to close the `New Basic Keyboard Project` dialog.
 
+<div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 2 - Designing a Desktop Layout](02-designing-desktop-layout)
-
+</div>
 ---
 
 ## Planning a Keyboard
@@ -41,7 +43,7 @@ The first step is identifying the language or languages your keyboard will cover
 
 - it is difficult to optimize a keyboard for multiple languages since a rarely used character for one language may be a common character for another.
 - it is harder for users to find the keyboard since the name of the keyboard may not relate to the particular language they are researching.
-- a separate lexical model (for predictive text) is needed for each language, so having a keyboard that handles multiple languages may make installation of a lexical model harder.
+- it is more difficult for users to select the correct language for during installation, particularly if a keyboard handles many languages. This is particularly important for lexical models for predictive text, as a separate model is needed for each language.
 
 Furthermore, having a keyboard specifically designed for a single language may help with community acceptance.
 
@@ -87,19 +89,22 @@ Note that the `Keyboard ID` (near the bottom of the dialog) fills in automatical
 You can modify the value in this field, though you are limited to the characters a-z, the numbers 0-9 and underscore.
 This value will be used as the base filename of many of your Keyman files.
 
-If you decide to change the keyboard ID, you’ll need to change most of the files in the project.
-This is best done using Keyman Developer’s `Clone local project` feature.
-
-- From the `Project` menu, select `New Project` then `Clone local project`.
-- Use the `Browse` button to navigate to the `.kpj` file of your existing project.
-- Specify a new `project ID` (and adjust `Destination path` if desired), then select `OK`.
+> [!NOTE]
+> If you decide to change the keyboard ID, you’ll need to change most of the files in the project. This is best done using Keyman Developer’s `Clone local project` feature.
+> • From the `Project` menu, select `New Project` then `Clone local project`.
+> • Use the `Browse` button to navigate to the `.kpj` file of your existing project.
+> • Specify a new `project ID` (and adjust `Destination path` if desired), then select `OK`.
 
 ### Description
 
 This brief description of your keyboard is included in all of your information files.
-Try to keep this short but informative, as this is what people will see when searching for your keyboard.
+Try to keep this short but informative, as this is what people will see when searching for your keyboard on the keyman.com website.
 It may be useful to include alternate language names, the script (Latin, Devanagari, etc)
 if the language is written in more than one script, the region where it is used, or other details about the keyboard.
+
+The description field can use [Markdown](https://www.markdownguide.org/cheat-sheet/) for basic formatting and links.
+
+The description is added to `README.md` and the package `.kps` file.
 
 ### Author, Copyright, and Full Copyright
 
@@ -111,19 +116,24 @@ The Full Copyright field has the date as well as the copyright holder.
 The name used in the Copyright fields must be the real name of an individual or of an organization.
 Copyright cannot be assigned to a pseudonym.
 
+The short copyright message is added to `README.md`, `welcome.htm`, `readme.htm`, package `.kps` details, and the [`&copyright` keyboard system store](https://help.keyman.com/developer/language/reference/copyright) in the `.kmn` file.
+The full copyright message is added to `LICENSE.md`.
+
 ### Languages
 
-This table displays the [BCP 47](https://help.keyman.com/developer/current-version/reference/bcp-47) tag (or tags) associated with your keyboard.
+This table displays the [BCP 47](../../../reference/bcp-47) tag (or tags) associated with your keyboard.
 A BCP 47 tag identifies a language and will help users find your keyboard when they search for their language.
 If you don’t know what your language’s tag is, you can search for its name and find the corresponding tag in the [IANA Language Subtag Registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry), which contains all existing BCP 47 tags, the [Glottolog](https://glottolog.org/glottolog/language) (under the ISO-639-3 column), or the [SIL Ethnologue](https://www.ethnologue.com/).
 
 The SIL Ethnologue is the most user-friendly option of the three, if you are unfamiliar with language tags.
 
 In addition to your basic BCP 47 tag, you can add
-[Script](https://help.keyman.com/developer/current-version/reference/bcp-47#toc-the-script-subtag) and
-[Region](https://help.keyman.com/developer/current-version/reference/bcp-47#toc-the-region-subtag) subtags.
+[Script](../../../reference/bcp-47#toc-the-script-subtag) and
+[Region](../../../reference/bcp-47#toc-the-region-subtag) subtags.
 However, you should always use the simplest possible BCP 47 tag to identify your language.
 Only add Script and Region tags if your keyboard is for a script or region that differs from the most commonly used form of the language.
+
+Language information is added to `README.md` and in the package `.kps` file, in the Keyboards section.
 
 ### Version
 
@@ -133,10 +143,11 @@ The version number consists of two or three integer numbers separated by periods
 
 New keyboards usually start with version `1.0` (which is equivalent to `1.0.0`).
 Generally the first number is incremented for major changes to the keyboard,
-the second for minor changes, and the third for corrections or bug fixes.
-But the most important point is that the new version number be greater than the existing one (as noted above).
+the second for minor changes, and the third for corrections or bug fixes (this is known as [semantic versioning](https://semver.org); note that Keyman keyboard versions do not allow additional labels).
 
-The version number appears in the `HISTORY.md` file and the `.kmn` file.
+The most important point is that the new version number be greater than the existing one (as noted above).
+
+The version number appears in the `HISTORY.md` file and the `.kmn` file in the [`&keyboardversion` keyboard system store](https://help.keyman.com/developer/language/reference/keyboardversion).
 It should be updated in both places whenever you distribute a new version of the keyboard.
 
 ### Targets
@@ -148,7 +159,7 @@ If you select `any`, you do not need to (and should not) choose any other option
 
 It is best practice to support as many devices as possible when creating your keyboard, because it is hard to predict who will use your keyboard in the future. By making your keyboard as accessible as possible, you can help even more people.
 
-If you decide not to include a touch layout, untick the `any` option and select `desktop` and `web` which will allow the keyboard to be used on a web page as well as on Linux, macOS and Windows (the three `desktop` platforms). If you later add a touch layout, you can reverse this process and go back to selecting just `any`.
+If you decide not to include a touch layout, untick the `any` option and select `desktop` and `web` which will allow the keyboard to be used on a web page as well as on Linux, macOS and Windows (the three `desktop` platforms). If you later add a touch layout, you can reverse this process and go back to selecting just `any` in the [`&targets` keyboard system store](https://help.keyman.com/developer/language/reference/targets).
 
 ### Path
 
@@ -160,7 +171,7 @@ It’s a good idea to let Keyman handle naming your files, since it uses good na
 
 Once you have filled out all of the fields,
 Keyman Developer will create your project and open it in a new window with your project’s `.kpj` (Keyman project) file displayed.
-You can read more about the `.kpj` file type in the [official Keyman documentation](https://help.keyman.com/developer/current-version/reference/file-types/kpj).
+You can read more about the `.kpj` file type in the [official Keyman documentation](../../../reference/file-types/kpj).
 
 ## Basing a new Keyboard Project on an existing one
 
@@ -184,6 +195,6 @@ When ready, select `OK` to download the files, adjust the filenames and open the
 
 Now that you have your project set up, continue to the next section of the tutorial to start developing your first keyboard layout.
 
-[< Back: Introduction](00-introduction)
-
-[Next: Part 2 - Designing a Desktop Layout >](02-designing-desktop-layout)
+<div class="walkthrough-navigation" markdown="1">
+  [← Introduction](00-introduction) &nbsp; [Part 2 - Designing a Desktop Layout →](02-designing-desktop-layout)
+</div>

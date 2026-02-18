@@ -2,11 +2,12 @@
 title: Designing a Touch Layout
 ---
 
-Part 5 of the [Keyman Developer Walkthrough](../walkthrough).
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
+Part 5 of the [Keyman Developer Walkthrough](.).
 
-[< Back: Part 4 - Using the Debugger](04-using-debugger)
-
-[Next: Part 6 - Creating a Touch Layout >](06-creating-touch-layout)
+[← Part 4 - Using the Debugger](04-using-debugger) &nbsp; [Next: Part 6 - Creating a Touch Layout →](06-creating-touch-layout)
+</div>
 
 ## Step-by-Step
 
@@ -14,7 +15,9 @@ In the Dagbani keyboard, `;e` was selected as the way to generate the character 
 
 For the Step-by-Step tutorial, the design decisions have been made for you. We will be adding ten longpress keys to the default touch layout.
 
+<div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 6 - Creating a Touch Layout](06-creating-touch-layout)
+</div>
 
 ---
 
@@ -44,7 +47,8 @@ If you use Keyman Developer’s New Project feature, a touch layout is added aut
 There are advantages to basing the touch layout on the desktop layout.
 Users who switch between the two may benefit from the similarity.
 In addition, your touch layout may be able to take advantage of the logic in the desktop layout code you’ve already created.
-Specifically, if the `ID` field for a key in the touch layout begins with `K_` then the Keyman processes the keystroke information (as modified by the active layer of the touch layout) according to what is in the .kmn file.
+Specifically, if the `ID` field for a key in the touch layout begins with `K_` then Keyman treats the key as the same as the corresponding desktop key (as modified by the active layer of the touch layout)
+according to the rules that are in the .kmn file.
 
 If you establish the desktop keyboard layout and create the On-Screen Keyboard,
 you can switch to the Touch Editor and import from the OSK.
@@ -53,6 +57,6 @@ To switch to a “phone” layout, select the basic template, which rearranges t
 (For more details, see the next topic.)
 The result will need to be reviewed and tested, but using this approach may save you some time.
 
-[< Back: Part 4 - Using the Debugger](04-using-debugger)
-
-[Next: Part 6 - Creating a Touch Layout >](06-creating-touch-layout)
+<div class="walkthrough-navigation" markdown="1">
+[← Part 4 - Using the Debugger](04-using-debugger) &nbsp; [Part 6 - Creating a Touch Layout →](06-creating-touch-layout)
+</div>

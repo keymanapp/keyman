@@ -1,0 +1,16 @@
+.walkthrough-navigation {
+  display: block;
+  clear: both;
+  background: #eeeeee;
+  border-radius: 8px;
+}
+
+.walkthrough-navigation::before {
+  content: "Keyman Developer Walkthrough";
+  display: block;
+  background: #cccccc;
+  border-radius: 8px 8px 0 0;
+  padding: 6px 10px 6px;
+  font-size: 10pt;
+  margin-bottom: 8px;
+}
