@@ -35,13 +35,11 @@ function do_build() {
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
   tsc --emitDeclarationOnly --outFile "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.d.ts"
-  echo 'a'
   # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
   # So, to make sure it's easily-accessible for the DOM-based tests...
   node "${LIB_BUNDLER}"  "${KEYMAN_ROOT}/${BUILD_DIR}/obj/index.js" \
     --out                "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.mjs" \
     --format esm
-  echo 'b'
 }
 
 function do_test() {
