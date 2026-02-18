@@ -23,7 +23,7 @@ To continue the Step-by-Step tutorial move to the next page: [Part 10 - Generati
 
 Follow the instructions at [Working with the Keyman Cloud Keyboard Repository](https://help.keyman.com/developer/keyboards/) to submit your keyboard to the Keyman keyboards repository. This will enable anyone with Internet access to download and use the keyboard. (Please do not submit the Dagbani keyboard used in the Step-by-Step tutorial. There is already a Dagbani keyboard in the repository.)
 
-One requirement for keyboards that are submitted to the Keyman keyboards repository is the addition of a PHP help file that provides the online help available on the keyman.com site. See the **Editing the PHP help file** section of the [Writing Keyboard Documentation](07-writing-keyboard-documentation) page for more details.
+One requirement for keyboards that are submitted to the Keyman keyboards repository is the addition of a PHP help file that provides the online help available on the keyman.com site. See the **Editing the PHP help file** section of the [Writing Keyboard Documentation](07-writing-keyboard-documentation#toc-editing-the-php-help-file) page for more details.
 
 ## Other Distribution Methods
 

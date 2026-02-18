@@ -1,4 +1,6 @@
-# Using the Debugger
+---
+title: Using the Debugger
+---
 
 <link href='walkthrough.css' rel='stylesheet'>
 <div class="walkthrough-navigation" markdown="1">

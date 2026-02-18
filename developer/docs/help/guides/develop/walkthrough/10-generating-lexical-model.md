@@ -265,7 +265,7 @@ For the purposes of this tutorial, we’ve provided a sample text that you can d
 
 The sample text is a collection of folktales for the Fulfulde language. Right-click on the **Anduna_anndaaka.txt** link below and select `Save link as` and navigate to a folder where you can save the file and work on it. After you have deleted some unneeded words from the file you'll use PrimerPrep to create a wordlist file that you will then include in the `source` folder of your lexical model project.
 
-[Aduna_anndaaka.txt](./Aduna_anndaaka.txt)
+* [Aduna_anndaaka.txt](./Aduna_anndaaka.txt)
 
 ### File Preparation
 
