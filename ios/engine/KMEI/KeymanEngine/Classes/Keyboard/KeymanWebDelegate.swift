@@ -9,7 +9,7 @@
 import WebKit
 
 /// Delegate receiving events from Keyman Web.
-protocol KeymanWebDelegate: class {
+protocol KeymanWebDelegate: AnyObject {
   /// Keyman Web has loaded (or reloaded).
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController)
 

@@ -195,8 +195,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       tabView.translatesAutoresizingMaskIntoConstraints = false
       self.view.addSubview(tabVC.view)
 
-      tabView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-      tabView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+      tabView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+      tabView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
       tabView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
       tabView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
 
