@@ -389,7 +389,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 
   func showActivityView() {
     view.isUserInteractionEnabled = false
-    let indicatorView = UIActivityIndicatorView(style: .whiteLarge)
+    let indicatorView = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
     let activityView = UIView(frame: indicatorView.bounds.insetBy(dx: -10.0, dy: -10.0))
     activityView.backgroundColor = Colors.spinnerBackground
     activityView.layer.cornerRadius = 6.0

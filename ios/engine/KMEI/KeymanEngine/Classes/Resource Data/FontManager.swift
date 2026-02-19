@@ -65,7 +65,7 @@ public class FontManager {
     //
     // Calls to `cachedFont` after the `.filter` below may be assumed to have
     // non-nil return values.
-    var fontSet = initialFontSet.filter { !(cachedFont(at: $0)?.isRegistered ?? true) }
+    let fontSet = initialFontSet.filter { !(cachedFont(at: $0)?.isRegistered ?? true) }
     
     // The prior line filters out any entries where cachedFont(at: $0) would be nil.
     // Batch-lookups all fonts lacking cache-confirmation of prior registration.
