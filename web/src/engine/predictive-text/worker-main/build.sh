@@ -13,8 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
-
-BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 ################################ Main script ################################
 
@@ -47,8 +46,8 @@ function do_build() {
   tsc -b ./tsconfig.all.json
 
   # esbuild-bundled products at this level are not intended to be used for anything but testing.
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/obj/web/index.js" \
-    --out        "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
+  node "$LIB_BUNDLER"    "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/obj/web/index.js" \
+    --out                "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
     --format esm
 }
 
