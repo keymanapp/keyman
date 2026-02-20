@@ -130,6 +130,7 @@ protected:
     core::debug_items          _debug_items;
     km_core_keyboard_imx_platform _imx_callback;
     void *_imx_object;
+    bool _backspace_handled_internally;
 
 public:
     state(core::abstract_processor & kb, km_core_option_item const *env);
@@ -174,6 +175,12 @@ public:
       km_core_actions const &actions
     );
     void apply_actions_and_merge_app_context();
+
+    // This is used to track whether the backspace key was handled internally
+    // during the keydown event. This is needed so that we can return the same
+    // value from the keyup event. Only used when processing KM_CORE_VKEY_BKSP.
+    void set_backspace_handled_internally(bool handled) { _backspace_handled_internally = handled; }
+    bool backspace_handled_internally() const { return _backspace_handled_internally; }
   };
 } // namespace core
 } // namespace km

@@ -48,6 +48,18 @@ kmcorekeyboardapitests = executable('km_core_keyboard_api.tests',
 
 test('km-core-keyboard-api-tests', kmcorekeyboardapitests)
 
+# tests for km_core_process_even
+km_core_process_event_tests_exe = executable(
+  'km_core_process_event_tests',
+  ['km_core_process_event.tests.cpp', common_test_files],
+  include_directories: [inc, libsrc],
+  cpp_args: defns + warns,
+  link_args: [ links, extra_link_args ],
+  dependencies: [icu_uc, icu_i18n, gtest_dep, gmock_dep],
+  objects: lib.extract_all_objects(recursive: false),
+)
+test('km_core_process_event', km_core_process_event_tests_exe)
+
 subdir('json')
 subdir('utftest')
 subdir('kmnkbd')
