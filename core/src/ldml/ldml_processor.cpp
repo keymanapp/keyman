@@ -179,21 +179,20 @@ ldml_processor::process_event(
   ldml_state.clear();
 
   try {
-    if (!is_key_down) {
-      process_key_up(ldml_state);
-    } else {
-      switch (vk) {
-      // Currently, only one VK gets spoecial treatment.
-      // Special handling for backspace VK
-      case KM_CORE_VKEY_BKSP:
-        process_backspace(ldml_state);
-        break;
-      default:
-        // all other VKs
+    switch (vk) {
+    // Currently, only one VK gets special treatment.
+    // Special handling for backspace VK
+    case KM_CORE_VKEY_BKSP:
+      process_backspace(ldml_state);
+      break;
+    default:
+      // all other VKs
+      if (is_key_down) {
         process_key_down(ldml_state);
-      } // end of switch
-    } // end of normal processing
-
+      } else {
+        process_key_up(ldml_state);
+      }
+    }  // end of switch
     // all key-up and key-down events end up here.
     // commit the ldml state into the core state
     ldml_state.commit();
@@ -210,11 +209,31 @@ void
 ldml_processor::process_key_up(ldml_event_state &ldml_state)
     const {
   // TODO-LDML: Implement caps lock handling
-  ldml_state.clear();
+
+  // Look up the key
+  bool found = false;
+  const std::u16string key_str = keys.lookup(ldml_state.get_vk(), ldml_state.get_modifier_state(), found);
+
+  if (!found) {
+    ldml_state.emit_passthrough_keystroke();
+  }
 }
 
 void
 ldml_processor::process_backspace(ldml_event_state &ldml_state) const {
+  if (ldml_state.get_modifier_state() & K_MODIFIERFLAG) {
+    // we never process modifier+bksp
+    ldml_state.emit_passthrough_keystroke();
+    return;
+  }
+
+  if (!ldml_state.is_key_down()) {
+    if (!ldml_state.get_state()->backspace_handled_internally()) {
+      ldml_state.emit_passthrough_keystroke();
+    }
+    return;
+  }
+
   if (!!bksp_transforms) {
     // process with an empty string via the bksp transforms
     auto matchedContext = process_output(ldml_state, std::u32string(), bksp_transforms.get());
@@ -243,7 +262,7 @@ void ldml_event_state::emit_backspace() {
     // else loop again
     assert(end.type != KM_CORE_CT_END);  // inappropriate here.
     state->context().pop_back();
- }
+  }
   /*
     We couldn't find a character at end of context (context is empty),
     so we'll pass the backspace keystroke on to the app to process; the
@@ -532,10 +551,10 @@ ldml_event_state::ldml_event_state(
     uint8_t i,
     uint16_t e) {
   this->state          = s;
-  this->vk             = v;
-  this->modifier_state = m;
-  this->is_key_down    = i;
-  this->event_flags    = e;
+  this->_vk             = v;
+  this->_modifier_state = m;
+  this->_is_key_down    = i;
+  this->_event_flags    = e;
 
   actions.persist_options = new km_core_option_item[1];
   actions.persist_options[0] = NULL_OPTIONS[0];
