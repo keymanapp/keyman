@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.204 alpha 2026-02-20
+
+* maint(web): ensure Web build scripts handle paths with spaces properly (#15598)
+
 ## 19.0.203 alpha 2026-02-16
 
 * docs: Add status.keyman.com info to website readme (#15591)
