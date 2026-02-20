@@ -243,7 +243,7 @@ void ldml_event_state::emit_backspace() {
     // else loop again
     assert(end.type != KM_CORE_CT_END);  // inappropriate here.
     state->context().pop_back();
- }
+  }
   /*
     We couldn't find a character at end of context (context is empty),
     so we'll pass the backspace keystroke on to the app to process; the
