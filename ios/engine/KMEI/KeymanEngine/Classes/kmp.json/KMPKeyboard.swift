@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class KMPKeyboard: Codable, KMPResource {
+class KMPKeyboard: Codable, KMPResource {
   public var name: String
   public var keyboardId: String
   public var packageId: String?

@@ -118,13 +118,10 @@ class KeymanWebViewController: UIViewController {
   override func loadView() {
     let config = WKWebViewConfiguration()
     let prefs = WKPreferences()
+    prefs.javaScriptEnabled = true
     config.preferences = prefs
     config.suppressesIncrementalRendering = false
     config.userContentController = self.userContentController
-
-    let webPagePrefs = WKWebpagePreferences.init()
-    webPagePrefs.allowsContentJavaScript = true
-    config.defaultWebpagePreferences = webPagePrefs
 
     webView = KeymanWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
     webView!.isOpaque = false
@@ -256,7 +253,7 @@ extension KeymanWebViewController {
 
       self.currentText = String(jsonText)
 
-      let finalRange = range ?? self.currentCursorRange ?? nil
+      var finalRange = range ?? self.currentCursorRange ?? nil
       self.currentCursorRange = finalRange
 
       //

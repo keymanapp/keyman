@@ -17,10 +17,10 @@ public enum APIKeyboardFetchError: Error { }
 public class APIKeyboardRepository { }
 
 @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "APIKeyboardRepository and associated types have been obsoleted in favor of keyboard search and package-oriented queries.")
-public protocol KeyboardRepository: AnyObject { }
+public protocol KeyboardRepository: class { }
 
 @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "APIKeyboardRepository and associated types have been obsoleted in favor of keyboard search and package-oriented queries.")
-public protocol KeyboardRepositoryDelegate: AnyObject { }
+public protocol KeyboardRepositoryDelegate: class { }
 
 @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "APILexicalModelRepository and associated types have been obsoleted by `Queries.LexicalModel` and its `fetch` variants.")
 public protocol LexicalModelRepository { }
@@ -32,7 +32,7 @@ public enum APILexicalModelFetchError: Error { }
 public class APILexicalModelRepository { }
 
 @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "APILexicalModelRepository and associated types have been obsoleted by `Queries.LexicalModel` and its `fetch` variants.")
-public protocol LexicalModelRepositoryDelegate: AnyObject { }
+public protocol LexicalModelRepositoryDelegate: class { }
 
 @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "This type is no longer utilized by KeymanEngine, as the related API methods have all been obsoleted.")
 public struct Options: Codable { }

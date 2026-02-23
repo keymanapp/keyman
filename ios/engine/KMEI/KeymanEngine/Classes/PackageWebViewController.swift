@@ -40,18 +40,17 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
 
   override func loadView() {
     let config = WKWebViewConfiguration()
-    let webkitPrefs = WKPreferences()
+    let prefs = WKPreferences()
+    prefs.javaScriptEnabled = true
 
     /**
       In iPadOS 16 and above WKWebView defaults to lying about its user-agent,
       telling the web server that it is a mac. We can avoid this with .mobile:
       */
-    let webPagePrefs = WKWebpagePreferences.init()
-    webPagePrefs.preferredContentMode = .mobile
-    webPagePrefs.allowsContentJavaScript = true
-    config.defaultWebpagePreferences = webPagePrefs
+    let pref = WKWebpagePreferences.init()
+    pref.preferredContentMode = .mobile
+    config.defaultWebpagePreferences = pref
 
-    
     // Inject a meta viewport tag into the head of the file if it doesn't exist
     let metaViewportInjection = """
       if(!document.querySelectorAll('meta[name=viewport]').length) {
@@ -65,7 +64,7 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
     let injection = WKUserScript(source: metaViewportInjection, injectionTime: .atDocumentStart, forMainFrameOnly: true)
     let controller = WKUserContentController()
     controller.addUserScript(injection)
-    config.preferences = webkitPrefs
+    config.preferences = prefs
     config.userContentController = controller
 
     webView = WKWebView(frame: CGRect.zero, configuration: config)

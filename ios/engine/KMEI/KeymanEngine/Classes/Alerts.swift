@@ -16,7 +16,7 @@ open class Alerts {
 
   public static func constructActivitySpinner() -> UIActivityIndicatorView {
     let activitySpinner: UIActivityIndicatorView
-    activitySpinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
+    activitySpinner = UIActivityIndicatorView(style: .whiteLarge)
     activitySpinner.hidesWhenStopped = true
     activitySpinner.translatesAutoresizingMaskIntoConstraints = false
     activitySpinner.backgroundColor = Colors.spinnerBackground

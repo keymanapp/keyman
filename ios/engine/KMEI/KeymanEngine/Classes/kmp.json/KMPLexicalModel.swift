@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class KMPLexicalModel: Codable, KMPResource {
+class KMPLexicalModel: Codable, KMPResource {
   public var name: String
   public var lexicalModelId: String
   public var packageId: String?

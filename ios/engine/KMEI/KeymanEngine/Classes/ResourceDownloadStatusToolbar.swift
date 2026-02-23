@@ -72,7 +72,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
    * Creates the classic spinning-wheel 'activity in progress' indicator.
    */
   private func setupActivityIndicator() -> UIActivityIndicatorView {
-    let indicatorView = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
+    let indicatorView = UIActivityIndicatorView(style: .gray)
     indicatorView.center = CGPoint(x: frame.width - indicatorView.frame.width,
                                    y: frame.height * 0.5)
     indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]

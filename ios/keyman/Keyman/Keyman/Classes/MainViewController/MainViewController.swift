@@ -781,7 +781,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     dismissGetStartedView(nil)
     overlayWindow.isHidden = false
-    let activityView = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
+    let activityView = UIActivityIndicatorView(style: .whiteLarge)
     let containerView = UIView(frame: activityView.bounds.insetBy(dx: -10.0, dy: -10.0))
     containerView.backgroundColor = Colors.spinnerBackground
     containerView.layer.cornerRadius = 6.0
