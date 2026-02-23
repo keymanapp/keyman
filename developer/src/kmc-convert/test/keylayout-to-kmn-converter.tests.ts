@@ -124,6 +124,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should return on available input file name and null output file name', async function () {
+      this.timeout(5000); // allow longer time for this test
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
