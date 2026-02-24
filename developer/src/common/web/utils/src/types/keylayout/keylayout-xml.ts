@@ -1,5 +1,5 @@
 /*
- * Keyman is 2025 copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Created by S. Schmitt on 2025-06-12
  *
@@ -14,6 +14,7 @@ export interface KeylayoutXMLSourceFile {
    */
   keyboard: KL_keyboard;
 };
+
 export interface KL_keyboard {
   group?: string;
   id?: string;

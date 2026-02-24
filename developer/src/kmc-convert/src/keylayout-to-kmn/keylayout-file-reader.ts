@@ -108,7 +108,7 @@ export class KeylayoutFileReader {
       ignoreAttributes: [''],       // we do not process an output character of ""
       trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (space)
       parseTagValue: false,
-      attributeNamePrefix: '@__',    // to access the attribute
+      attributeNamePrefix: '@__',   // to access the attribute
       ignoreDeclaration: true
     };
 

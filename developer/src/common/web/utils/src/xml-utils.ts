@@ -66,9 +66,9 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     preserveOrder: true,     // Gives us a 'special' format
   },
   'keylayout': {
-    attributeNamePrefix: '@__', // avoid @_
+    attributeNamePrefix: '@__',
     htmlEntities: true,
-    ignoreAttributes: false, // We'd like attributes, please
+    ignoreAttributes: false, // use attributes
     tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
       return tagValue?.trim();
