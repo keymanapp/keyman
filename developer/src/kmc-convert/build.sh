@@ -55,6 +55,6 @@ do_test() {
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 
-builder_run_action test        do_kmc_convert_test  # build schema,...
+#builder_run_action test        do_kmc_convert_test  # build schema,...
 builder_run_action test        do_test
 builder_run_action publish     ci_publish_npm

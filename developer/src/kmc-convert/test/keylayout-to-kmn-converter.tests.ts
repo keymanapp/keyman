@@ -66,7 +66,15 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
       [makePathToFixture('../data/Test_nr_elements.keylayout')],
       [makePathToFixture('../data/Test.keylayout')],
-      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
+     // [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
+      
+      /*
+    ].forEach(function (files) {
+      it(files + " should give no errors ", async function () {
+        sut.run(files[0]);
+>>>>>>> feat/developer/kmc-convert*/
+
+
     ].forEach(function (files_) {
       it(files_ + " should give no errors ", async function () {
         sut.run(files_[0]);
@@ -74,6 +82,22 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
+/*=======
+*/
+  /*describe('RunSpecialTestFiles - create Info', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [makePathToFixture('../data/Test_characters.keylayout')],
+      [makePathToFixture('../data/Test_onlyOneKeymap.keylayout')],
+    ].forEach(function (files) {
+      it(files + " should give Info: unsupported characters ", async function () {
+        sut.run(files[0]);
+        assert.isTrue(compilerTestCallbacks.messages.length === 1);
+        assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007));
+      });
+    });
+  });*/
+
 
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);

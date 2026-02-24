@@ -315,6 +315,22 @@ export class KmnFileWriter {
         const output_Unicode_Character = convertUtil.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(output_character);
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
+
+
+        /*const warnText = this.reviewRules(uniqueDataRules, k);
+        const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
+        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
+        //const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
+        //const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
+        const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
+        const outputUnicodeCodePoint = this.convertToUnicodeCodePoint(outputCharacter);
+
+        if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {*/
+
+
+
+
+
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
           if (Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
 
