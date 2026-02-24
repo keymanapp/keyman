@@ -315,7 +315,7 @@ describe('KmpCompiler', function () {
     assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJson));
   });
 
-  it(`should reject an package that contains itself`, function () {
+  it(`should reject a package that contains itself`, function () {
     const inputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kps');
     const outputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kmp');
     const kmpJson = kmpCompiler.transformKpsToKmpObject(inputFilename);
