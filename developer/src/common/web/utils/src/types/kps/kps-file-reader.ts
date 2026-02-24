@@ -38,16 +38,21 @@ export class KpsFileReader {
       return null;
     }
 
+    if(!kpsPackage.Package) {
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_NotAPackageFile());
+      return null;
+    }
+
     return this.boxArrays(kpsPackage);
   }
 
   private boxArrays(data: KpsPackage): KpsPackage {
-    boxXmlArray(data.Package?.Files, 'File');
-    boxXmlArray(data.Package?.Keyboards, 'Keyboard');
-    boxXmlArray(data.Package?.LexicalModels, 'LexicalModel');
-    boxXmlArray(data.Package?.RelatedPackages, 'RelatedPackage');
+    boxXmlArray(data.Package.Files, 'File');
+    boxXmlArray(data.Package.Keyboards, 'Keyboard');
+    boxXmlArray(data.Package.LexicalModels, 'LexicalModel');
+    boxXmlArray(data.Package.RelatedPackages, 'RelatedPackage');
 
-    if(data.Package?.Keyboards?.Keyboard) {
+    if(data.Package.Keyboards?.Keyboard) {
       for(const k of data.Package.Keyboards.Keyboard) {
         boxXmlArray(k.Examples, 'Example');
         boxXmlArray(k.Languages, 'Language');
@@ -56,17 +61,17 @@ export class KpsFileReader {
       }
     }
 
-    if(data.Package?.LexicalModels?.LexicalModel) {
+    if(data.Package.LexicalModels?.LexicalModel) {
       for(const lm of data.Package.LexicalModels.LexicalModel) {
         boxXmlArray(lm.Languages, 'Language');
       }
     }
 
-    boxXmlArray(data.Package?.RelatedPackages, 'RelatedPackage');
-    boxXmlArray(data.Package?.StartMenu?.Items, 'Item');
-    boxXmlArray(data.Package?.Strings, 'String');
+    boxXmlArray(data.Package.RelatedPackages, 'RelatedPackage');
+    boxXmlArray(data.Package.StartMenu?.Items, 'Item');
+    boxXmlArray(data.Package.Strings, 'String');
 
-    if(data.Package?.Info) {
+    if(data.Package.Info) {
       // If no properties are defined on an <Info> subitem, then it will be a
       // string, and needs to be boxed into a KpsInfoItem object
       const info: any = data.Package.Info;

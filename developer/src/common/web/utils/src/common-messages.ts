@@ -58,4 +58,28 @@ export class CommonTypesMessages {
     this.ERROR_InvalidPackageFile,
     `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`
   );
+
+  static ERROR_InvalidProjectFile = SevError | 0x000A;
+  static Error_InvalidProjectFile = (o:{message:string}) => m(
+    this.ERROR_InvalidProjectFile,
+    `Project file is not valid: ${def(o.message)}`,
+  );
+
+  static ERROR_UnsupportedProjectVersion = SevError | 0x000B;
+  static Error_UnsupportedProjectVersion = (o:{version:string}) => m(
+    this.ERROR_UnsupportedProjectVersion,
+    `Project version ${def(o.version)} is not supported by this version of Keyman Developer.`,
+  );
+
+  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x000C;
+  static Error_ProjectFileCouldNotBeRead = () => m(
+    this.ERROR_ProjectFileCouldNotBeRead,
+    `Project file could not be read`
+  );
+
+  static ERROR_NotAPackageFile = SevError | 0x000D;
+  static Error_NotAPackageFile = () => m(
+    this.ERROR_NotAPackageFile,
+    `Package source file is not a valid .kps file because it is missing the <Package> root element.`,
+  );
 };
