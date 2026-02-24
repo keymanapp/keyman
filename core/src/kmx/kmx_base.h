@@ -1,6 +1,7 @@
 #pragma once
 
 #include "keyman_core.h"
+#include "../../../common/include/keyman_vkey.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf

@@ -8,6 +8,7 @@
 
 using namespace km::core;
 using namespace kmx;
+using namespace km_vk;
 
 /* Globals */
 

@@ -15,6 +15,8 @@
 #include <vector>
 #include "km_u16.h"
 #include <cassert>
+#include "../../../common/include/keyman_vkey.h"
+
 
 enum ShiftState {
   Base         = 0,                   // 0
@@ -29,7 +31,7 @@ enum ShiftState {
   ShftXxxx     = Shft | Xxxx,         // 9
 };
 
-#define VK_SPACE    0x20
+/*#define VK_SPACE    0x20
 #define VK_COLON	  0xBA
 #define VK_EQUAL	  0xBB
 #define VK_COMMA	  0xBC
@@ -45,7 +47,7 @@ enum ShiftState {
 #define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
 #define VK_DIVIDE   0x6F
-#define VK_CANCEL   3
+#define VK_CANCEL   0x03
 #define VK_DECIMAL  0x2E
 
 #define VK_OEM_CLEAR      0xFE
@@ -60,7 +62,7 @@ enum ShiftState {
 #define VK_CONTROL        0x11
 #define VK_MENU           0x12
 #define VK_PAUSE          0x13
-#define VK_CAPITAL        0x14
+#define VK_CAPITAL        0x14*/
 
 typedef std::vector<std::string> vec_string_1D;
 typedef std::vector<KMX_DWORD> vec_dword_1D;
