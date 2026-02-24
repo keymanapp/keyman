@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.205 alpha 2026-02-24
+
+* fix(core): fix iterator in backspace handling (#15596)
+* refactor(core): simplify loop for removing text (#15600)
+* test(core): add LDML baseline test with minimal keyboard (#15608)
+
 ## 19.0.204 alpha 2026-02-20
 
 * maint(web): ensure Web build scripts handle paths with spaces properly (#15598)
