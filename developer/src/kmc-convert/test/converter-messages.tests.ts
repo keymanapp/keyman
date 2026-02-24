@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 import 'mocha';
 import { ConverterMessages } from '../src/converter-messages.js';

@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Infrastructure for keyboard source file conversion tools
  */

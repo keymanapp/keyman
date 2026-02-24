@@ -29,8 +29,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/developer-utils": "*",
-    "ajv": "^8.17.1"
+    "@keymanapp/developer-utils": "*"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
@@ -38,6 +37,9 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "@types/semver": "^7.3.12",
+    "ajv": "^8.12.0",
+    "ajv-cli": "^5.0.0",
+    "ajv-formats": "^2.1.1",
     "c8": "^7.12.0",
     "chalk": "^2.4.2",
     "typescript": "^5.4.5"

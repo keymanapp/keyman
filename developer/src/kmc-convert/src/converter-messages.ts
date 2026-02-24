@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Converter messages
  */
@@ -29,11 +29,10 @@ export class ConverterMessages {
   );
 
   static ERROR_FileNotFound = SevError | 0x0003;
-  static Error_FileNotFound =
-    (o: { inputFilename: string; }) => m(
-      this.ERROR_FileNotFound,
-      `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`
-    );
+  static Error_FileNotFound = (o: { inputFilename: string; }) => m(
+    this.ERROR_FileNotFound,
+    `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`
+  );
 
   static ERROR_UnableToRead = SevError | 0x0004;
   static Error_UnableToRead = (o: { inputFilename: string; }) => m(

@@ -5,16 +5,16 @@
     "keyboard": {
       "additionalProperties": false,
       "properties": {
-        "@_group": {
+        "@__group": {
           "type": "string"
         },
-        "@_id": {
+        "@__id": {
           "type": "string"
         },
-        "@_maxout": {
+        "@__maxout": {
           "type": "string"
         },
-        "@_name": {
+        "@__name": {
           "type": "string"
         },
         "actions": {
@@ -24,20 +24,20 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@_id": {
+                  "@__id": {
                     "type": "string"
                   },
                   "when": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "@_next": {
+                        "@__next": {
                           "type": "string"
                         },
-                        "@_output": {
+                        "@__output": {
                           "type": "string"
                         },
-                        "@_state": {
+                        "@__state": {
                           "type": "string"
                         }
                       },
@@ -65,33 +65,33 @@
           "items": {
             "additionalProperties": false,
             "properties": {
-              "@_id": {
+              "@__id": {
                 "type": "string"
               },
               "keyMap": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "@_baseIndex": {
+                    "@__baseIndex": {
                       "type": "string"
                     },
-                    "@_baseMapSet": {
+                    "@__baseMapSet": {
                       "type": "string"
                     },
-                    "@_index": {
+                    "@__index": {
                       "type": "string"
                     },
                     "key": {
                       "items": {
                         "additionalProperties": false,
                         "properties": {
-                          "@_action": {
+                          "@__action": {
                             "type": "string"
                           },
-                          "@_code": {
+                          "@__code": {
                             "type": "string"
                           },
-                          "@_output": {
+                          "@__output": {
                             "type": "string"
                           }
                         },
@@ -125,16 +125,16 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@_first": {
+                  "@__first": {
                     "type": "string"
                   },
-                  "@_last": {
+                  "@__last": {
                     "type": "string"
                   },
-                  "@_mapSet": {
+                  "@__mapSet": {
                     "type": "string"
                   },
-                  "@_modifiers": {
+                  "@__modifiers": {
                     "type": "string"
                   }
                 },
@@ -152,24 +152,24 @@
         "modifierMap": {
           "additionalProperties": false,
           "properties": {
-            "@_defaultIndex": {
+            "@__defaultIndex": {
               "type": "string"
             },
-            "@_id": {
+            "@__id": {
               "type": "string"
             },
             "keyMapSelect": {
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@_mapIndex": {
+                  "@__mapIndex": {
                     "type": "string"
                   },
                   "modifier": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "@_keys": {
+                        "@__keys": {
                           "type": "string"
                         }
                       },
@@ -200,10 +200,10 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@_output": {
+                  "@__output": {
                     "type": "string"
                   },
-                  "@_state": {
+                  "@__state": {
                     "type": "string"
                   }
                 },

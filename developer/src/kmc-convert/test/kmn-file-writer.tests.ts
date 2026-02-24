@@ -11,7 +11,7 @@ import 'mocha';
 import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { KeylayoutToKmnConverter, ProcesData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
 import { ConverterMessages } from '../src/converter-messages.js';
@@ -25,10 +25,10 @@ describe('KmnFileWriter', function () {
   describe("write() ", function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const read = sut_r.read(inputFilename);
-    const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const read = sutR.read(inputFilename);
+    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     // empty ProcesData from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
@@ -46,56 +46,56 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe("writeData_Rules() ", function () {
+  describe("writeDataRules() ", function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const read = sut_r.read(inputFilename);
-    const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const read = sutR.read(inputFilename);
+    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // empty ProcesData from unavailable file name
-    const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
-    const read_unavailable = sut_r.read(inputFilename_unavailable);
-    const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
+    // empty ProcessedData from unavailable file name
+    const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
+    const readUnavailable = sutR.read(inputFilenameUnavailable);
+    const convertedUnavailable = sut.convertBound.convert(readUnavailable, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
 
-    it('writeData_Rules() should return true (no error) if written', async function () {
-      const result = sut_w.writeData_Rules(converted);
+    it('writeDataRules() should return true (no error) if written', async function () {
+      const result = sutW.writeDataRules(converted);
       assert.isTrue(result.length > 0);
     });
 
-    it('writeData_Rules() should return false if no inputfile', async function () {
-      const result = sut_w.writeData_Rules(converted_unavailable);
+    it('writeDataRules() should return false if no inputfile', async function () {
+      const result = sutW.writeDataRules(convertedUnavailable);
       assert.isFalse(result.length > 0);
     });
 
   });
 
-  describe("write_KmnFileHeader() ", function () {
+  describe("writeKmnFileHeader() ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
-    const read = sut_r.read(inputFilename);
-    const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const read = sutR.read(inputFilename);
+    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // empty ProcesData from unavailable file name
-    const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
-    const read_unavailable = sut_r.read(inputFilename_unavailable);
-    const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
+    // empty ProcessedData from unavailable file name
+    const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
+    const readUnavailable = sutR.read(inputFilenameUnavailable);
+    const convertedUnavailable = sut.convertBound.convert(readUnavailable, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
 
-    // empty ProcesData from empty filename
-    const inputFilename_empty = makePathToFixture('');
-    const read_empty = sut_r.read(inputFilename_empty);
-    const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty);
+    // empty ProcessedData from empty filename
+    const inputFilenameEmpty = makePathToFixture('');
+    const readEmpty = sutR.read(inputFilenameEmpty);
+    const convertedEmpty = sut.convertBound.convert(readEmpty, inputFilenameEmpty);
 
-    const out_expected_first: string =
+    const outExpectedFirst: string =
       "c ..................................................................................................................\n"
       + "c ..................................................................................................................\n"
       + "c Keyman keyboard generated by kmn-convert version: " + KEYMAN_VERSION.VERSION + "\n"
       + "c from Ukelele file: ";
 
-    const out_expected_last: string =
+    const outExpectedLast: string =
       "\n"
       + "c ..................................................................................................................\n"
       + "c ..................................................................................................................\n"
@@ -106,24 +106,24 @@ describe('KmnFileWriter', function () {
       + "group(main) using keys\n\n"
       + "\n";
 
-    it(('write_KmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
-      const written_correctName = sut_w.write_KmnFileHeader(converted);
-      assert.equal(written_correctName, (out_expected_first + converted.keylayout_filename + out_expected_last));
+    it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
+      const writtenCorrectName = sutW.writeKmnFileHeader(converted);
+      assert.equal(writtenCorrectName, (outExpectedFirst + converted.keylayoutFilename + outExpectedLast));
     });
 
-    it(('write_KmnFileHeader should return store text without filename ').padEnd(62, " ") + 'on empty input', async function () {
-      const written_emptyName = sut_w.write_KmnFileHeader(converted_empty);
-      assert.equal(written_emptyName, (out_expected_first + out_expected_last));
+    it(('writeKmnFileHeader should return store text without filename ').padEnd(62, " ") + 'on empty input', async function () {
+      const writtenEmptyName = sutW.writeKmnFileHeader(convertedEmpty);
+      assert.equal(writtenEmptyName, (outExpectedFirst + outExpectedLast));
     });
 
-    it(('write_KmnFileHeader should return store text without filename ').padEnd(62, " ") + 'on only filename as input', async function () {
-      const written_onlyName = sut_w.write_KmnFileHeader(converted_unavailable);
-      assert.equal(written_onlyName, (out_expected_first + converted_unavailable.keylayout_filename + out_expected_last));
+    it(('writeKmnFileHeader should return store text without filename ').padEnd(62, " ") + 'on only filename as input', async function () {
+      const writtenOnlyName = sutW.writeKmnFileHeader(convertedUnavailable);
+      assert.equal(writtenOnlyName, (outExpectedFirst + convertedUnavailable.keylayoutFilename + outExpectedLast));
     });
   });
 
   describe('reviewRules messages', function () {
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
 
     [
       [[new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'UNAVAILABLE', 'K_A', new TextEncoder().encode('A'))],
@@ -167,8 +167,8 @@ describe('KmnFileWriter', function () {
       ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) : here: ']],
 
     ].forEach(function (values: any, index: number) {
-      it(('rule " ' + values[0][0].rule_type + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sut_w.reviewRules(values[0], 0);
+      it(('rule " ' + values[0][0].ruleType + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.reviewRules(values[0], 0);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -178,7 +178,7 @@ describe('KmnFileWriter', function () {
 
   describe('reviewRules messages duplicate and ambiguous', function () {
 
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       //all
       [[
@@ -333,8 +333,8 @@ describe('KmnFileWriter', function () {
       ["c WARNING: duplicate rule: earlier: [CAPS K_C]  >  'X' here: "]],
 
     ].forEach(function (values: any, index: number) {
-      it('rule ' + values[0][0].rule_type + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sut_w.reviewRules(values[0], 1);
+      it('rule ' + values[0][0].ruleType + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.reviewRules(values[0], 1);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -343,7 +343,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe('reviewRules messages duplicate and ambiguous with Extra warning', function () {
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [[[
       new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'RALT', 'K_B', new TextEncoder().encode('X')),
       new Rule("C2", '', '', 0, 0, 'RALT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('Y')),
@@ -353,8 +353,8 @@ describe('KmnFileWriter', function () {
     [''],
     ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' here: PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
     ].forEach(function (values: any, index: number) {
-      it(('rule ' + values[0][0].rule_type + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sut_w.reviewRules(values[0], 2);
+      it(('rule ' + values[0][0].ruleType + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.reviewRules(values[0], 2);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -363,7 +363,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe('write from intermediate data array', function () {
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       [
         [ /* see ../data/Test_C0.keylayout */
@@ -453,13 +453,13 @@ describe('KmnFileWriter', function () {
       ],
     ].forEach(function (values: any) {
       it(('an array of Rules should create a set of kmn rules '), async function () {
-        const data: ProcesData = {
-          keylayout_filename: "",
-          kmn_filename: "",
-          arrayOf_Modifiers: [[]],
-          arrayOf_Rules: values[0]
+        const data: ProcessedData = {
+          keylayoutFilename: "",
+          kmnFilename: "",
+          arrayOfModifiers: [[]],
+          arrayOfRules: values[0]
         };
-        const result1 = sut_w.writeData_Rules(data);
+        const result1 = sutW.writeDataRules(data);
         assert.isTrue(result1 === values[1][0]);
       });
     });

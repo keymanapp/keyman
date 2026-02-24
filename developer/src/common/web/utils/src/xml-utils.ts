@@ -66,9 +66,9 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     preserveOrder: true,     // Gives us a 'special' format
   },
   'keylayout': {
-    attributeNamePrefix: '@_', // avoid @_
+    attributeNamePrefix: '@__',
     htmlEntities: true,
-    ignoreAttributes: false, // We'd like attributes, please
+    ignoreAttributes: false, // use attributes
     tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
       return tagValue?.trim();
@@ -236,43 +236,6 @@ export class KeymanXMLReader {
     }
   }
 
-
-  /**
-   * Requires attribute prefix @_ (double underscore)
-   * For attributes, just remove @_ and continue.
-   * For objects, replace any empty string "" with an empty object {} */
-  private static fixupEmptyStringToEmptyObject_keylayout(data: any) : any {
-
-    if (typeof data === 'object') {
-      // For arrays of objects, we map "" to {}
-      // "" means an empty object
-      if (Array.isArray(data)) {
-        return data.map(v => {
-          if (v === '') {
-            return {};
-          } else {
-            return KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v);
-          }
-        });
-      }
-      // otherwise: remove @_ for attributes, remap objects
-      const e: any = [];
-      Object.entries(data).forEach(([k, v]) => {
-        if (k.startsWith('@_')) {
-          e.push([k.substring(3), KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v)]);
-        } else {
-          if (v === '') {
-            e.push([k, {}]);
-          } else {
-            e.push([k, KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v)]);
-          }
-        }
-     });
-      return Object.fromEntries(e);
-    } else {
-      return data;
-    }
-  }
   /**
    * Replace:
    * ```json
@@ -338,8 +301,6 @@ export class KeymanXMLReader {
     let result = parser.parse(data, true);
     if (PARSER_OPTIONS[this.type].attributeNamePrefix === '$') {
       result = KeymanXMLReader.fixupDollarAttributes(result);
-    } else if (PARSER_OPTIONS[this.type].attributeNamePrefix === '@_') {
-      result = KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(result);
     } else if (PARSER_OPTIONS[this.type].attributeNamePrefix === '@__') {
       result = KeymanXMLReader.fixupEmptyStringToEmptyObject(result);
     } else if (PARSER_OPTIONS[this.type].preserveOrder) {
