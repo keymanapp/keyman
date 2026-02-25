@@ -3,7 +3,7 @@ title: Options - Keyman Core API
 ---
 
 A state’s default options are set from the keyboard at creation time and the
-environment. The Platform layer is then is expected to apply any persisted
+environment. The Platform layer is then expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
 simple C arrays of [km_core_option_item] terminated with a `KM_CORE_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
