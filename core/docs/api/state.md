@@ -15,7 +15,8 @@ owned by the state object.
 
 ## Description
 
-Describes the
+Describes a change to the hardware caps lock indicator state requested by
+Keyman Core to the Platform layer.
 
 ## Specification
 ```c
@@ -50,6 +51,7 @@ This API replaces the Action items APIs, which are now deprecated and will be
 removed in the future.
 
 ## Specification
+
 ```c
 typedef struct {
   unsigned int code_points_to_delete;
@@ -60,8 +62,8 @@ typedef struct {
   km_core_caps_state new_caps_lock_state;
   const km_core_usv* deleted_context;
 } km_core_actions;
-
 ```
+
 ## Members
 
 `code_points_to_delete`
@@ -78,15 +80,17 @@ typedef struct {
 
 `emit_keystroke`
 : Emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes.
+  On most platforms this signals whether the processor handled the event
+  (0) or not (1). See also [key handling](keyhandling).
 
 `new_caps_lock_state`
 : -1=unchanged, 0=off, 1=on
 
 `deleted_context`
 : Reference copy of actual UTF32 codepoints deleted from end of context
-  (closest to caret) exactly code_points_to_delete in length (plus null
+  (closest to caret) exactly `code_points_to_delete` in length (plus null
   terminator). Used to determine encoding conversion differences when
-  deleting; only set when using [km_core_state_get_actions], otherwise nullptr.
+  deleting; only set when using [km_core_state_get_actions], otherwise `nullptr`.
 
 -------------------------------------------------------------------------------
 

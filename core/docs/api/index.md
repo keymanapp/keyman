@@ -19,6 +19,7 @@ This is an internal API intended for use only within Keyman Engine.
 * [Options](options)
 * [Processor](processor)
 * [State and Actions](state)
+* [Key Handling](keyhandling)
 * [JSON introspection Schema](json-schema)
 * [Building Keyman Core](building)
 

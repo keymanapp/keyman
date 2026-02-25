@@ -4,10 +4,10 @@ title: JSON Introspection Schema
 
 The [`km_core_state_to_json()`](state#km_core_state_to_json) call
 generates a JSON document describing the internal state of the keyboard
-processor, this is the schema describing that document.
+processor. This is the schema describing that document.
 
 **WARNING**: The structure and format of the JSON document is independently
-versioned is not considered part of C API. It is intended solely for use in
+versioned and is not considered part of the C API. It is intended solely for use in
 diagnostics or by development and debugging tools which may need to be aware of
 keyboard processor engine implementation details.
 
