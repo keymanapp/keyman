@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.206 alpha 2026-02-25
+
+* maint(ios): upgrade to Xcode 26.2 (#15498)
+
 ## 19.0.205 alpha 2026-02-24
 
 * fix(core): fix iterator in backspace handling (#15596)
