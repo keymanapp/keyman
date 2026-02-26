@@ -1,6 +1,10 @@
 #!/usr/bin/python3
+'''
+Keyman is copyright (C) SIL Global. MIT License.
+'''
 
 import gi
+from datetime import datetime
 
 gi.require_version('Gtk', '3.0')
 
@@ -23,9 +27,14 @@ class SupportWidget(Gtk.Box):
         self.pack_start(label, False, False, 10)
 
         # Description
-        desc_label = Gtk.Label(
+        desc_label = Gtk.Label()
+        desc_label.set_markup(
             _("Generate a diagnostic report to help troubleshoot issues with Keyman. "
-              "You can copy this report and include it when reporting issues."))
+              "You can copy this report and include it when reporting issues.\n\n"
+              "This report does not contain personally identifiable information, "
+              "but it will include system information and Keyman configuration details. "
+              "See the <a href='https://software.sil.org/privacy-policy/'>privacy policy</a>."))
+        desc_label.set_use_markup(True)
         desc_label.set_line_wrap(True)
         desc_label.set_halign(Gtk.Align.START)
         desc_label.set_padding(5, 5)
@@ -119,7 +128,8 @@ class SupportWidget(Gtk.Box):
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
             Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
         dialog.set_do_overwrite_confirmation(True)
-        dialog.set_current_name("keyman-diagnostic-report.txt")
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        dialog.set_current_name(f"keyman-diagnostic-report_{date_str}.txt")
 
         filter_text = Gtk.FileFilter()
         filter_text.set_name(_("Text files"))

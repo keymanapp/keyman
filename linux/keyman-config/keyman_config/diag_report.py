@@ -4,6 +4,7 @@ Keyman is copyright (C) SIL Global. MIT License.
 
 Collects diagnostic information about the system for troubleshooting.
 '''
+from datetime import datetime
 import logging
 import os
 import platform
@@ -11,7 +12,7 @@ import shutil
 import subprocess
 
 from keyman_config.get_kmp import InstallLocation
-from keyman_config.ibus_util import get_ibus_version
+from keyman_config.ibus_util import get_ibus_version, verify_ibus_daemon, IbusDaemon
 from keyman_config.list_installed_kmp import get_installed_kmp
 from keyman_config.version import (
     __version__,
@@ -389,12 +390,28 @@ class DiagReport:
                 )
         return lines or None
 
+    def _get_ibus_state(self):
+        ibus_state = verify_ibus_daemon(False)
+        match ibus_state:
+            case IbusDaemon.RUNNING:
+                return "Running"
+            case IbusDaemon.NOT_RUNNING:
+                return "Not running"
+            case IbusDaemon.MORE_THAN_ONE:
+                return "More than one instance running"
+            case IbusDaemon.ERROR_USER:
+                return "invalid/unknown user"
+            case IbusDaemon.ERROR:
+                return "got exception finding ibus-daemon"
+            case _:
+                return f"Unknown state: {ibus_state}"
+
     def _create_report(self): # sourcery skip: low-code-quality
         """Generate a complete diagnostic report as a formatted string."""
         keyman_info = self._get_keyman_version()
         lines = [
             "=" * 60,
-            "Keyman Diagnostic Report",
+            f"Keyman for Linux Diagnostic Report ({datetime.now().strftime('%Y-%m-%d')})",
             "=" * 60,
             "",
             "--- Keyman Version ---",
@@ -411,7 +428,7 @@ class DiagReport:
         # IBus Version
         ibus_version = get_ibus_version()
         if ibus_version is not None:
-            lines.extend(("", "--- IBus ---", f"  IBus version: {ibus_version or 'unknown'}"))
+            lines.extend(("", "--- IBus ---", f"  IBus version: {ibus_version or 'unknown'} ({self._get_ibus_state()})"))
             if engines := self._get_ibus_engines():
                 lines.append(f"  Preload engines: {', '.join(engines)}")
 

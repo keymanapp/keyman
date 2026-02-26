@@ -187,7 +187,7 @@ class DiagReportTests(unittest.TestCase):
 
         # Verify
         self.assertIsInstance(result, str)
-        self.assertIn('Keyman Diagnostic Report', result)
+        self.assertIn('Keyman for Linux Diagnostic Report', result)
         self.assertIn('Keyman Version', result)
         self.assertIn('IBus', result)
         self.assertIn('Operating System', result)
@@ -205,7 +205,7 @@ class DiagReportTests(unittest.TestCase):
 
         # Verify
         self.assertIsInstance(result, str)
-        self.assertIn('Keyman Diagnostic Report', result)
+        self.assertIn('Keyman for Linux Diagnostic Report', result)
 
     @patch.object(DiagReport, '_parse_desktop_file')
     @patch('subprocess.run')
