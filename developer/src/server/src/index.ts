@@ -1,5 +1,4 @@
 import * as fs from 'node:fs';
-import * as os from 'node:os';
 import * as path from 'node:path';
 import chalk from 'chalk';
 import express from 'express';
@@ -76,7 +75,7 @@ export async function run() {
 
   setupRoutes(app, upload, wsServer, environment);
 
-  /* Start the server */
+  /* Start the web server */
 
   let server = null;
   try {
@@ -85,6 +84,8 @@ export async function run() {
     console.error(err);
     // TODO handle and cleanup EADDRINUSE, throw anything else
   }
+
+  /* Attach the web socket server */
 
   server.on('upgrade', (request, socket, head) => {
     wsServer.handleUpgrade(request, socket, head, socket => {
@@ -95,45 +96,60 @@ export async function run() {
   /* Launch ngrok if enabled */
 
   configuration.ngrokEndpoint = '';
+  if(configuration.useNgrok) {
+    await startNGrok();
+  }
 
-  if(configuration.useNgrok
-    && os.platform() == 'win32'
-    && fs.existsSync(path.join(configuration.ngrokBinPath, 'ngrok.exe'))
-  ) {
-    const ngrok: any = await import('ngrok');
-    (async function() {
-      configuration.ngrokEndpoint = await ngrok.connect({
-        proto: 'http',
-        addr: configuration.port,
-        authtoken: configuration.ngrokToken,
-        binPath: () => configuration.ngrokBinPath,
-        onLogEvent: (msg: string) => {
-          if(options.ngrokLog) {
-            console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
-          }
-        },
-        onStatusChange: (state: string) => {
-          if(state == 'connected') {
-            setTimeout(async () => {
-              const api = ngrok.getApi();
-              const tunnels = await api.listTunnels();
-              configuration.ngrokEndpoint = tunnels.tunnels[0]?.public_url ?? '';
-              console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
-            }, 1000);
-          } else if(state == 'closed') {
-            configuration.ngrokEndpoint = '';
-            console.log(chalk.blueBright('ngrok tunnel closed'));
-          }
-        }
-      });
-      console.log(chalk.blueBright('ngrok tunnel initially established at %s'), configuration.ngrokEndpoint);
-      tray.start(configuration.port, configuration.ngrokEndpoint);
-    })();
+  /* Load the tray icon */
+
+  tray.start(configuration.port, configuration.ngrokEndpoint);
+}
+
+async function loadNGrok() {
+  try {
+    return await import('@ngrok/ngrok');
+  } catch(e) {
+    // ngrok can fail import if it cannot load its dependent binary library,
+    // either because it is missing or because it has missing dependencies
+    // itself. But we don't want to crash the server if that happens
+    console.error(e);
+    return null;
   }
-  else {
-    /* Load the tray icon */
-    tray.start(configuration.port, configuration.ngrokEndpoint);
+}
+
+async function startNGrok() {
+  console.log('Attempting to start ngrok');
+  const ngrok = await loadNGrok();
+  if(!ngrok) {
+    return false;
   }
+
+  let started = false;
+  const listener = await ngrok.forward({
+    proto: 'http',
+    addr: configuration.port,
+    authtoken: configuration.ngrokToken,
+    onLogEvent: (msg: string) => {
+      if(options.ngrokLog) {
+        console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
+      }
+    },
+    onStatusChange: (state: string) => {
+      if(state == 'connected' && started) {
+        // We only announce reconnection after initial start
+        configuration.ngrokEndpoint = listener.url();
+        console.log(chalk.blueBright('ngrok tunnel reconnected at %s'), configuration.ngrokEndpoint);
+      } else if(state == 'closed') {
+        configuration.ngrokEndpoint = '';
+        console.log(chalk.blueBright('ngrok tunnel closed'));
+      }
+    }
+  });
+  started = true;
+  configuration.ngrokEndpoint = listener.url();
+  console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
+
+  return true;
 }
 
 function getRunningInstancePid(pidFilename: string) {
