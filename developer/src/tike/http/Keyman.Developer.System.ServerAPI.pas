@@ -25,6 +25,8 @@ type
     class procedure StartServer; static;
     class procedure StopServer; static;
     class procedure GetServerURLs(v: TStrings); static;
+    class function ServerBinPath: string; static;
+    class procedure CleanupOldNgrok; static;
 
     // API endpoints
     class function IsKeyboardRegistered(const Filename: string): Boolean; static;
@@ -65,6 +67,7 @@ uses
   Keyman.Developer.System.KeymanDeveloperPaths,
   Keyman.System.KeyboardUtils,
   Keyman.System.LexicalModelUtils,
+  RegistryKeys,
   utilexecute,
   utilsystem,
   Winapi.ShlObj,
@@ -83,6 +86,12 @@ begin
     then sw := SW_SHOWNORMAL
     else sw := SW_HIDE;
 
+  // We have an explicit NODE_PATH env var so that Node can
+  // find our downloaded version of ngrok in %AppData%\Server\bin\@ngrok
+  // without us risking messing up the user's own node environment (if
+  // they have one!)
+  SetEnvironmentVariable('NODE_PATH', PChar(ServerBinPath));
+
   if not TUtilExecute.Execute(Format('"%s" .', [TKeymanDeveloperPaths.NodePath]),
     TKeymanDeveloperPaths.ServerPath, sw) then
   begin
@@ -90,6 +99,12 @@ begin
   end;
 
   LastGetStatusTime := 0;
+end;
+
+class function TServerDebugAPI.ServerBinPath: string;
+begin
+  Result := TKeymanDeveloperPaths.ServerDataPath + 'bin';
+  ForceDirectories(Result);
 end;
 
 function QueryFullProcessImageName(
@@ -187,6 +202,17 @@ begin
   end;
 
   Result := True;
+end;
+
+class procedure TServerDebugAPI.CleanupOldNgrok;
+begin
+  // #15625: In February 2026, we moved from npm ngrok module to @ngrok/ngrok.
+  // This npm module uses a different binary version of ngrok, so we should
+  // cleanup the old ngrok.exe if we find it.
+  if FileExists(TServerDebugAPI.ServerBinPath + '\ngrok.exe') then
+  begin
+    System.SysUtils.DeleteFile(TServerDebugAPI.ServerBinPath + '\ngrok.exe');
+  end;
 end;
 
 class procedure TServerDebugAPI.GetServerURLs(v: TStrings);
