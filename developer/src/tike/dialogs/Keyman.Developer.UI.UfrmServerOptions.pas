@@ -4,8 +4,10 @@ interface
 
 uses
   System.Classes,
+  System.Net.HttpClient,
   System.SysUtils,
   System.Variants,
+  System.Win.Registry,
   Vcl.Controls,
   Vcl.Dialogs,
   Vcl.Forms,
@@ -28,35 +30,40 @@ type
     gbAdvanced: TGroupBox;
     chkServerShowConsoleWindow: TCheckBox;
     cmdCreateAccount: TButton;
-    lblVersion: TLabel;
+    lblNgrokInstallState: TLabel;
     Label1: TLabel;
     lblGetToken: TLabel;
     lblDefaultPort: TLabel;
     editDefaultPort: TEdit;
     chkUseNgrok: TCheckBox;
     chkLeaveServerRunning: TCheckBox;
+    cmdInstallVCRedist: TButton;
+    lblVCRedistInstallState: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDownloadClick(Sender: TObject);
     procedure cmdCreateAccountClick(Sender: TObject);
     procedure lblGetTokenClick(Sender: TObject);
+    procedure cmdInstallVCRedistClick(Sender: TObject);
   private
+    FInstallStateChanged: Boolean;
     FDownloadProgress: TfrmDownloadProgress;
+    FDownloadObject: string;
     procedure UpdateVersionLabel;
     function NgrokPath: string;
     procedure DownloadNgrok(AOwner: TfrmDownloadProgress; var Result: Boolean);
     procedure HttpReceiveData(const Sender: TObject; AContentLength,
       AReadCount: Int64; var Abort: Boolean);
-    { Private declarations }
+    procedure DownloadVCRedist(AOwner: TfrmDownloadProgress;
+      var Result: Boolean);
+    function DoDownload(AOwner: TfrmDownloadProgress; const objectName, url: string): IHTTPResponse;
+    function RedistInstallerPath: string;
   public
-    { Public declarations }
   end;
 
 implementation
 
 uses
-  System.Net.HttpClient,
-  System.Zip,
   Winapi.ShlObj,
 
   KeymanDeveloperOptions,
@@ -73,8 +80,18 @@ const
   // to be stable, as they are used in other apps also.
   SUrlNgrokAuthToken = 'https://dashboard.ngrok.com/get-started/your-authtoken';
   SUrlNgrokSignup = 'https://dashboard.ngrok.com/signup';
-  SUrlNgrokDownload = 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-386.zip';
-  SNGrokExe = 'ngrok.exe';
+
+  // Note, we manually update the version of ngrok as required in subsequent
+  // releases, rather than trying to handle a potentially moving target
+  SNgrokVersion = 'v1.7.0';
+  SUrlNgrokDownload = 'https://github.com/ngrok/ngrok-javascript/releases/download/'+SNgrokVersion+'/ngrok.win32-ia32-msvc.node';
+  SNgrokNodeModuleFilename = 'ngrok-win32-ia32-msvc.node';
+
+  // VC++ Redistributable - presence, filename, and permanent URL
+  SUrlVCRedistDownload = 'https://aka.ms/vc14/vc_redist.x86.exe';
+  SVCRedistExeFilename = 'VC_redist.x86.exe';
+  SRegKey_VCRedist = 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86';
+  SRegValue_VCRedist_Version = 'Version';
 
 procedure TfrmServerOptions.cmdCreateAccountClick(Sender: TObject);
 begin
@@ -86,104 +103,153 @@ begin
   Abort := False;
   if Assigned(FDownloadProgress) then
   begin
-    FDownloadProgress.HTTPStatus(nil, 'Downloading ngrok', AReadCount, AContentLength);
+    FDownloadProgress.HTTPStatus(nil, 'Downloading '+FDownloadObject, AReadCount, AContentLength);
     FDownloadProgress.HTTPCheckCancel(nil, Abort);
   end;
 end;
 
-procedure TfrmServerOptions.DownloadNgrok(AOwner: TfrmDownloadProgress; var Result: Boolean);
+function TfrmServerOptions.DoDownload(AOwner: TfrmDownloadProgress; const objectName, url: string): IHTTPResponse;
 var
   http: THttpClient;
   res: IHTTPResponse;
-  fs: TFileStream;
-  zip: TZipFile;
-  ms: TStream;
-  zh: TZipHeader;
 begin
-  Result := False;
+  Result := nil;
 
+  FDownloadObject := objectName;
   FDownloadProgress := AOwner;
   http := THttpClient.Create;
   try
     http.OnReceiveData := HttpReceiveData;
 
     try
-      res := http.Get(SUrlNgrokDownload);
+      res := http.Get(url);
     except
       on E:ENetHTTPClientException do
       begin
-        ShowMessage(Format('Unable to download %s: %s', [SNGrokExe, E.Message]));
+        ShowMessage(Format('Unable to download %s from %s: %s', [objectName, url, E.Message]));
         Exit;
       end;
     end;
 
     if res.StatusCode <> 200 then
     begin
-      ShowMessage(Format('Unable to download %s: %d %s',
-        [SNGrokExe, res.StatusCode, res.StatusText]));
+      ShowMessage(Format('Unable to download %s from %s: %d %s',
+        [objectName, url, res.StatusCode, res.StatusText]));
       Exit;
     end;
 
-    // Download is a zip file with a single executable, so let's extract it
-    ms := nil;
-    try
-      zip := TZipFile.Create;
-      try
-        try
-          zip.Open(res.ContentStream, zmRead);
-          zip.Read(SNGrokExe, ms, zh);
-          ms.Position := 0;
-        finally
-          zip.Free;
-        end;
-      except
-        on E:Exception do
-        begin
-          ShowMessage(Format('Unable to extract %s from downloaded archive: %s',
-            [SNGrokExe, E.Message]));
-          Exit;
-        end;
-      end;
-      try
-        fs := TFileStream.Create(NgrokPath, fmCreate);
-      except
-        on E:Exception do
-        begin
-          ShowMessage(Format('Unable to save %s: %s', [SNGrokExe, E.Message]));
-          Exit;
-        end;
-      end;
-      try
-        fs.CopyFrom(ms, 0);
-      finally
-        fs.Free;
-      end;
-    finally
-      ms.Free;
-    end;
+    Result := res;
   finally
     http.Free;
     FDownloadProgress := nil;
+    FDownloadObject := '';
   end;
+end;
+
+procedure TfrmServerOptions.DownloadVCRedist(AOwner: TfrmDownloadProgress; var Result: Boolean);
+var
+  res: IHTTPResponse;
+  fs: TFileStream;
+begin
+  Result := False;
+
+  res := DoDownload(AOwner, 'Microsoft Visual C++ Redistributable', SUrlVCRedistDownload);
+  if not Assigned(res) then
+    Exit;
+
+  // Save the redistributable installer
+
+  try
+    fs := TFileStream.Create(RedistInstallerPath, fmCreate);
+    try
+      fs.CopyFrom(res.ContentStream, 0);
+    finally
+      fs.Free;
+    end;
+  except
+    on E:Exception do
+    begin
+      ShowMessage(Format('Unable to save %s: %s', [RedistInstallerPath, E.Message]));
+      Exit;
+    end;
+  end;
+
+  // Execute the installer - user will need to follow prompts to complete installation
+
+  Result := TUtilExecute.WaitForProcess('"'+RedistInstallerPath+'"', ExtractFileDir(RedistInstallerPath), SW_SHOWNORMAL);
+  FInstallStateChanged := True;
+end;
+
+procedure TfrmServerOptions.DownloadNgrok(AOwner: TfrmDownloadProgress; var Result: Boolean);
+var
+  res: IHTTPResponse;
+  fs: TFileStream;
+begin
+  Result := False;
+
+  res := DoDownload(AOwner, 'ngrok', SUrlNgrokDownload);
+  if not Assigned(res) then
+    Exit;
+
+  // Download is a single file, needs to be saved to AppData\Keyman\Keyman Developer\Server\bin\@ngrok\filename
+
+  try
+    fs := TFileStream.Create(NgrokPath, fmCreate);
+  except
+    on E:Exception do
+    begin
+      ShowMessage(Format('Unable to save %s: %s', [SNgrokNodeModuleFilename, E.Message]));
+      Exit;
+    end;
+  end;
+  try
+    fs.CopyFrom(res.ContentStream, 0);
+  finally
+    fs.Free;
+  end;
+
+  Result := True;
+  FInstallStateChanged := True;
 end;
 
 procedure TfrmServerOptions.cmdDownloadClick(Sender: TObject);
 var
   DownloadProgress: TfrmDownloadProgress;
 begin
-  TServerDebugAPI.StopServer;
+  if FKeymanDeveloperOptions.ServerUseNgrok then
+  begin
+    // We need to stop the server if NGrok has been enabled because the module
+    // may be locked and in use
+    TServerDebugAPI.StopServer;
+  end;
 
+  DownloadProgress := TfrmDownloadProgress.Create(Self);
   try
-    DownloadProgress := TfrmDownloadProgress.Create(Self);
-    try
-      DownloadProgress.Callback := DownloadNgrok;
-      DownloadProgress.ShowModal;
-    finally
-      DownloadProgress.Free;
-    end;
+    DownloadProgress.Callback := DownloadNgrok;
+    DownloadProgress.ShowModal;
   finally
+    DownloadProgress.Free;
     UpdateVersionLabel;
-    TServerDebugAPI.StartServer;
+    if FKeymanDeveloperOptions.ServerUseNgrok then
+    begin
+      // Restart the server after ngrok module is installed (although ngrok may
+      // not run if the dependency is not also installed)
+      TServerDebugAPI.StartServer;
+    end;
+  end;
+end;
+
+procedure TfrmServerOptions.cmdInstallVCRedistClick(Sender: TObject);
+var
+  DownloadProgress: TfrmDownloadProgress;
+begin
+  DownloadProgress := TfrmDownloadProgress.Create(Self);
+  try
+    DownloadProgress.Callback := DownloadVCRedist;
+    DownloadProgress.ShowModal;
+  finally
+    DownloadProgress.Free;
+    UpdateVersionLabel;
   end;
 end;
 
@@ -205,7 +271,8 @@ begin
     (FKeymanDeveloperOptions.ServerKeepAlive <> KeepAlive) or
     (FKeymanDeveloperOptions.ServerUseNgrok <> UseNgrok) or
     (FKeymanDeveloperOptions.ServerNgrokToken <> ngrokToken) or
-    (FKeymanDeveloperOptions.ServerServerShowConsoleWindow <> ngrokKeepVisible);
+    (FKeymanDeveloperOptions.ServerServerShowConsoleWindow <> ngrokKeepVisible) or
+    FInstallStateChanged;
 
   if Changed then
   begin
@@ -226,7 +293,8 @@ begin
   chkUseNgrok.Checked := FKeymanDeveloperOptions.ServerUseNgrok;
   chkLeaveServerRunning.Checked := FKeymanDeveloperOptions.ServerKeepAlive;
 
-  lblVersion.Caption := '';
+  lblNgrokInstallState.Caption := '';
+  lblVCRedistInstallState.Caption := '';
   editAuthToken.Text := FKeymanDeveloperOptions.ServerNgrokToken;
 
   chkServerShowConsoleWindow.Checked := FKeymanDeveloperOptions.ServerServerShowConsoleWindow;
@@ -239,29 +307,36 @@ begin
   TUtilExecute.URL(SUrlNgrokAuthToken);
 end;
 
+
 function TfrmServerOptions.NgrokPath: string;
 begin
-  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Server\bin\';
+  Result := TServerDebugAPI.ServerBinPath + '\@ngrok';
   ForceDirectories(Result);
-  Result := Result + SNgrokExe;
+  Result := Result + '\' + SNgrokNodeModuleFilename;
+end;
+
+function TfrmServerOptions.RedistInstallerPath: string;
+begin
+  Result := TServerDebugAPI.ServerBinPath + SVCRedistExeFilename;
 end;
 
 procedure TfrmServerOptions.UpdateVersionLabel;
 var
-  logtext: string;
-  ec: Integer;
+  reg: TRegistry;
 begin
-  if not FileExists(NgrokPath) then
-    lblVersion.Caption := 'Ngrok not installed'
-  else if TUtilExecute.Console(Format('"%s" --version', [NgrokPath]), ExtractFilePath(ParamStr(0)),
-    logtext, ec) then
-  begin
-    if ec = 0
-      then lblVersion.Caption := logtext.Trim
-      else lblVersion.Caption := Format('Error %d running ngrok: %s', [ec, logtext.Trim])
-  end
-  else
-    lblVersion.Caption := Format('Unable to run ngrok: %s', [SysErrorMessage(GetLastError)]);
+  if FileExists(NgrokPath)
+    then lblNgrokInstallState.Caption := 'Installed'
+    else lblNgrokInstallState.Caption := 'Not installed';
+
+  lblVCRedistInstallState.Caption := 'Not installed';
+  reg := TRegistry.Create;
+  try
+    reg.RootKey := HKEY_LOCAL_MACHINE;
+    if reg.OpenKeyReadOnly(SRegKey_VCRedist) and reg.ValueExists(SRegValue_VCRedist_Version) then
+      lblVCRedistInstallState.Caption := reg.ReadString(SRegValue_VCRedist_Version);
+  finally
+    reg.Free;
+  end;
 end;
 
 end.
