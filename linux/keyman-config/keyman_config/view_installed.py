@@ -30,6 +30,7 @@ from keyman_config.keyboard_layouts_widget import KeyboardLayoutsWidget
 from keyman_config.list_installed_kmp import get_installed_kmp
 from keyman_config.options_widget import OptionsWidget
 from keyman_config.sentry_handling import SentryErrorHandling
+from keyman_config.support_widget import SupportWidget
 
 
 class ViewInstalledWindowBase(Gtk.Window):
@@ -154,6 +155,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         self.refresh_installed_kmp()
         stack.add_titled(KeyboardLayoutsWidget(self, self.store, self.restart), "KeyboardLayouts", _("Keyboard Layouts"))
         stack.add_titled(OptionsWidget(self.sentry), "Options", _("Options"))
+        stack.add_titled(SupportWidget(), "Support", _("Support"))
         return outerHbox
 
     def _add_app_buttons(self):
