@@ -2,6 +2,8 @@
 title: Developing Keyboards
 ---
 
+[Keyman Developer Walkthrough](walkthrough)
+
 [Keyman keyboard tutorial](tutorial)
 
 [An advanced keyboard development example](advanced-keyboard-development-example)
