@@ -83,10 +83,10 @@ struct _IBusKeymanEngine {
   gboolean         rctrl_pressed;
   gboolean         lalt_pressed;
   gboolean         ralt_pressed;
-  IBusLookupTable *table;
   IBusProperty    *status_prop;
   IBusPropList    *prop_list;
   void            *settings;
+  gboolean         is_dirty;
 
   commit_queue_item commit_queue[MAX_QUEUE_SIZE];
   commit_queue_item *commit_item;
@@ -467,6 +467,7 @@ ibus_keyman_engine_constructor(
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
     keyman->rctrl_pressed = FALSE;
+    keyman->is_dirty = FALSE;
     initialize_queue_items(keyman, 0, MAX_QUEUE_SIZE);
     keyman->commit_item    = &keyman->commit_queue[0];
     gchar **split_name     = g_strsplit(engine_name, ":", 2);
@@ -635,10 +636,25 @@ static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
     IBusText *text;
     g_autofree gchar *debug = NULL;
     g_message("DAR: %s - %s", __FUNCTION__, debug = debug_utf8_with_codepoints(string));
-    text = ibus_text_new_from_static_string (string);
+    text = ibus_text_new_from_string(string);
     g_object_ref_sink(text);
     ibus_engine_commit_text ((IBusEngine *)keyman, text);
     g_object_unref (text);
+    keyman->is_dirty = FALSE;
+}
+
+// Wayland uses double-buffering for surrounding text and some other
+// functionality, so we have to commit to apply the changes.
+// See https://wayland.app/protocols/input-method-unstable-v2
+static void
+apply_changes(IBusKeymanEngine* keyman) {
+  IBusText* text;
+  g_message("%s - committing", __FUNCTION__);
+  text = ibus_text_new_from_static_string("");
+  g_object_ref_sink(text);
+  ibus_engine_commit_text((IBusEngine*)keyman, text);
+  g_object_unref(text);
+  keyman->is_dirty = FALSE;
 }
 
 //
@@ -649,7 +665,7 @@ is_core_options_end(km_core_option_item *option) {
 }
 
 static void
-process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
+process_output_action(IBusEngine* engine, const km_core_usv* output_utf32) {
   if (output_utf32 == NULL || output_utf32[0] == '\0') {
     return;
   }
@@ -689,12 +705,13 @@ process_backspace_action(IBusEngine *engine, unsigned int code_points_to_delete)
     return;
   }
 
+  IBusKeymanEngine* keyman = (IBusKeymanEngine*)engine;
   if (client_supports_surrounding_text(engine)) {
     g_message("%s: compliant app: deleting surrounding text %d codepoints", __FUNCTION__, code_points_to_delete);
     ibus_engine_delete_surrounding_text(engine, -code_points_to_delete, code_points_to_delete);
+    keyman->is_dirty = TRUE;
   } else {
     g_message("%s: non-compliant app: queueing %d backspaces", __FUNCTION__, code_points_to_delete);
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
     keyman->commit_item->code_points_to_delete = code_points_to_delete;
   }
 }
@@ -767,6 +784,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
       ibus_engine_forward_key_event(engine, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, 0);
       current_item->code_points_to_delete--;
     }
+    keyman->is_dirty = TRUE;
     // don't remove the item from the queue yet - we need to process it
     // again for the output and keystrokes. Instead emit the sentinel key
     // again.
@@ -786,6 +804,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
     g_message("%s: Forwarding key from commit queue: keyval=0x%02x, keycode=0x%02x, state=0x%02x",
       __FUNCTION__, current_item->keyval, current_item->keycode, current_item->state);
     ibus_engine_forward_key_event(engine, current_item->keyval, current_item->keycode, current_item->state);
+    keyman->is_dirty = TRUE;
   }
   keyman->commit_item--;
   memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * MAX_QUEUE_SIZE - 1);
@@ -796,6 +815,10 @@ static void
 finish_process_actions(IBusEngine *engine) {
   g_assert(engine != NULL);
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  if (keyman->is_dirty) {
+    apply_changes(keyman);
+  }
+
   if (client_supports_surrounding_text(engine)) {
     // compliant app
     return;
@@ -846,6 +869,8 @@ process_actions(
   IBusEngine *engine,
   km_core_actions const *actions
 ) {
+  IBusKeymanEngine* keyman = (IBusKeymanEngine*)engine;
+  keyman->is_dirty = FALSE;
   process_backspace_action(engine, actions->code_points_to_delete);
   process_output_action(engine, actions->output);
   process_persist_action(engine, actions->persist_options);
