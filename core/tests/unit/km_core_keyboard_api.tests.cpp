@@ -18,7 +18,7 @@ protected:
       km_core_keyboard_dispose(this->keyboard);
       this->keyboard = nullptr;
     }
-    }
+  }
 };
 
 TEST_F(KmCoreKeyboardApiTests, LoadFromBlob) {
