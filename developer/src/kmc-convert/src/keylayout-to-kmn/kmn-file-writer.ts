@@ -906,5 +906,4 @@ export class KmnFileWriter {
     }
     return warningTextArray;
   }
-
 }
