@@ -1,7 +1,7 @@
 import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution, KeyEvent } from 'keyman/engine/keyboard';
+import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from 'keyman/engine/keyboard';
 import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, GestureSourceSubview, InputSample, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '../../../corrections.js';
@@ -197,20 +197,21 @@ export default class Flick implements GestureHandler {
   }
 
   private emitKey(vkbd: VisualKeyboard, selection: ActiveKeyBase, pathStats: CumulativePathStats<any>) {
-    let keyEvent: KeyEvent;
+    let finalSelection: ActiveKeyBase;
     const projectedDistance = calcLockedDistance(pathStats, this.lockedDir);
     if(projectedDistance > this.gestureParams.flick.triggerDist) {
-      keyEvent = vkbd.keyEventFromSpec(selection);
+      finalSelection = selection;
     } else {
       // Even if mid-way between base key and actual key.
-      keyEvent = vkbd.keyEventFromSpec(this.baseSpec);
+      finalSelection = this.baseSpec;
     }
 
+    const keyEvent = vkbd.keyEventFromSpec(finalSelection);
     keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);
     keyEvent.inputBreadcrumb = this.sequence.trace();
 
     // emit the keystroke
-    vkbd.raiseKeyEvent(keyEvent, null);
+    vkbd.raiseKeyEvent(keyEvent, finalSelection, null);
   }
 
   private buildPopupRecognitionConfig(vkbd: VisualKeyboard): GestureRecognizerConfiguration<KeyElement, string> {

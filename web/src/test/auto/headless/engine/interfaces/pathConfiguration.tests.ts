@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import sinon from 'sinon';
 
 import { PathOptionDefaults, PathConfiguration } from 'keyman/engine/interfaces';
 

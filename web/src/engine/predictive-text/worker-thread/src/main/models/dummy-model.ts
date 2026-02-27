@@ -100,7 +100,16 @@ export class DummyModel implements LexicalModel {
       let distribution: Distribution<Suggestion> = [];
 
       for(let s of suggestions) {
-        distribution.push({sample: s, p: s.p !== undefined ? s.p : 1});  // For a dummy model, this is sufficient.  The uniformness is all that matters.
+        const transitionId = transform.id;
+        if(transitionId !== undefined) {
+          // Set the transform ID to match the incoming transform ID if one exists.
+          s.transformId = transitionId;
+          if(s.transform) {
+            s.transform.id = transitionId;
+          }
+        }
+        // For a dummy model, this is sufficient.  The uniformness is all that matters.
+        distribution.push({sample: s, p: s.p !== undefined ? s.p : 1});
       }
 
       return distribution;
