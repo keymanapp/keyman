@@ -53,11 +53,11 @@ export class ConverterMessages {
   );
 
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
-  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string,  KeyName: string, output: string; }) => m(
+  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string,  KeyName: string, output: string; }) => m(
     this.ERROR_UnsupportedCharactersDetected,
     `Input file ${def(o.inputFilename)}
     contains unsupported character '${def(o.output)}'
-    at ${def(o.keymap_index)} ${def(o.KeyName)} .`
+    at ${def(o.keymapIndex)} ${def(o.KeyName)} .`
   );
 
   static ERROR_InvalidFile = SevError | 0x0008;

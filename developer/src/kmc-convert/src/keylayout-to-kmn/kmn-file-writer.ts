@@ -29,9 +29,9 @@ export class KmnFileWriter {
     data += this.writeKmnFileHeader(dataUkelele);
 
     // add bottom part of kmn file: RULES
-    const data_rules = this.writeData_Rules(data_ukelele);
-    if (data_rules)
-      data += data_rules;
+    const dataRules = this.writeDataRules(dataUkelele);
+    if (dataRules)
+      data += dataRules;
     else {
       return null;
     }
@@ -143,13 +143,9 @@ export class KmnFileWriter {
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
-
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-        const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = this.convertToUnicodeCodePoint(outputCharacter);
+        const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
+        const outputUnicodeCodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(outputCharacter);
 
         if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
 
@@ -170,12 +166,12 @@ export class KmnFileWriter {
             versionOutputCharacter = outputUnicodeCharacter;
           }
         }
-        if ((output_Unicode_Character === undefined) || (output_Unicode_CodePoint === undefined)) {
+        if ((outputUnicodeCharacter === undefined) || (outputUnicodeCodePoint === undefined)) {
           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
-            inputFilename: data_ukelele.keylayout_filename,
-            output: new TextDecoder().decode(unique_data_Rules[k].output),
-            keymap_index: data_ukelele.arrayOf_Rules[k].modifier_key,
-            KeyName: unique_data_Rules[k].key
+            inputFilename: dataUkelele.keylayoutFilename,
+            output: new TextDecoder().decode(uniqueDataRules[k].output),
+            keymapIndex: dataUkelele.arrayOfRules[k].modifierKey,
+            KeyName: uniqueDataRules[k].key
           }));
           return null;
         }
@@ -222,11 +218,8 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-        const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = this.convertToUnicodeCodePoint(outputCharacter);
+        const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
+        const outputUnicodeCodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(outputCharacter);
 
         if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
@@ -244,12 +237,12 @@ export class KmnFileWriter {
             versionOutputCharacter = outputUnicodeCharacter;
           }
         }
-        if ((output_Unicode_Character === undefined) || (output_Unicode_CodePoint === undefined)) {
+        if ((outputUnicodeCharacter === undefined) || (outputUnicodeCodePoint === undefined)) {
           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
-            inputFilename: data_ukelele.keylayout_filename,
-            output: new TextDecoder().decode(unique_data_Rules[k].output),
-            keymap_index: unique_data_Rules[k].modifier_key,
-            KeyName: unique_data_Rules[k].key
+            inputFilename: dataUkelele.keylayoutFilename,
+            output: new TextDecoder().decode(uniqueDataRules[k].output),
+            keymapIndex: uniqueDataRules[k].modifierKey,
+            KeyName: uniqueDataRules[k].key
           }));
           return null;
         }
@@ -319,12 +312,8 @@ export class KmnFileWriter {
 
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
-        //const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        //const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-        const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = this.convertToUnicodeCodePoint(outputCharacter);
-
+        const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
+        const outputUnicodeCodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(outputCharacter);
         if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
           if (Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
@@ -343,12 +332,12 @@ export class KmnFileWriter {
             versionOutputCharacter = outputUnicodeCharacter;
           }
         }
-        if ((output_Unicode_Character === undefined) || (output_Unicode_CodePoint === undefined)) {
+        if ((outputUnicodeCharacter === undefined) || (outputUnicodeCodePoint === undefined)) {
           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
-            inputFilename: data_ukelele.keylayout_filename,
-            output: new TextDecoder().decode(unique_data_Rules[k].output),
-            keymap_index: unique_data_Rules[k].modifier_key,
-            KeyName: unique_data_Rules[k].key
+            inputFilename: dataUkelele.keylayoutFilename,
+            output: new TextDecoder().decode(uniqueDataRules[k].output),
+            keymapIndex: uniqueDataRules[k].modifierKey,
+            KeyName: uniqueDataRules[k].key
           }));
           return null;
         }

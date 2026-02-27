@@ -31,17 +31,17 @@ describe('KmnFileWriter', function () {
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     // empty ProcesData from unavailable file name
-    const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
-    const read_unavailable = sut_r.read(inputFilename_unavailable);
-    const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
+    const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
+    const readUnavailable = sutR.read(inputFilenameUnavailable);
+    const convertedUnavailable = sut.convertBound.convert(readUnavailable, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
 
     it('write() should return null in case of missing inputfile', async function () {
-      const result = sut_w.write(converted_unavailable);
+      const result = sutW.write(convertedUnavailable);
       assert.isNull(result);
     });
 
     it('write() should return result for input file ' + inputFilename, async function () {
-      const result = sut_w.write(converted);
+      const result = sutW.write(converted);
       assert.isNotNull(result);
     });
   });
@@ -467,8 +467,8 @@ describe('KmnFileWriter', function () {
 
   describe("write() should throw for invalid output characters ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
 
     [
       ['../data/Test_invalidInput_C0.keylayout', "U+-456", "CAPS", "K_S"],
@@ -476,20 +476,20 @@ describe('KmnFileWriter', function () {
       ['../data/Test_invalidInput_C2.keylayout', "U+-123", "CAPS", "K_D"],
       ['../data/Test_invalidInput_C3.keylayout', "U+-123", "CAPS", "K_D"],
     ].forEach(function (values) {
-      it(("run() should throw on invalid input output character: " + values[0] + ")") +
+      it(("write() from describe: should throw on invalid input output character: " + values[0] + ")") +
         ' contains unsupported character \'' + values[1] +
         "\' at " + values[2] + " " + values[3] + ".", async function () {
           const inputName = makePathToFixture(values[0]);
-          const read = sut_r.read(inputName);
-          const converted = sut.convert_bound.convert(read, inputName.replace(/\.keylayout$/, '.kmn'));
-          const result = sut_w.writeData_Rules(converted);
+          const read = sutR.read(inputName);
+          const converted = sut.convertBound.convert(read, inputName);
+          const result = sutW.writeDataRules(converted);
 
           assert.isNull(result);
           assert.equal(compilerTestCallbacks.messages.length, 1);
           assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnsupportedCharactersDetected({
             inputFilename: inputName,
             output: values[1],
-            keymap_index: values[2],
+            keymapIndex: values[2],
             KeyName: values[3]
           }));
         });

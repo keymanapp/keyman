@@ -164,7 +164,7 @@ export class KeylayoutToKmnConverter {
 
       // fill dataObject with filenames, behaviours and (initialized) rules
       dataObject.keylayoutFilename = inputfilename;
-      dataObject.kmnFilename = inputfilename.replace(/\.kkeylayoutn$/, '.kmn');;
+      dataObject.kmnFilename = inputfilename.replace(/\.keylayout$/, '.kmn');;
       dataObject.arrayOfModifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       dataObject.arrayOfRules = rules;
 
@@ -466,9 +466,9 @@ export class KeylayoutToKmnConverter {
           } else {
             this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
               inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
-              keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
-              KeyName: this.map_UkeleleKC_To_VK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+              KeyName: this.mapUkeleleKeycodeToVK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
             }))
             return null
           }
