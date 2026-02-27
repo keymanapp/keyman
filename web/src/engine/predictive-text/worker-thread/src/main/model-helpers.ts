@@ -6,7 +6,7 @@ import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import * as models from '@keymanapp/models-templates';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 /**
  * The default punctuation and spacing produced by the model.

@@ -12,3 +12,7 @@ source/environment.inc.ts
 **/.idea/**/*.xml
 **/*.iml
 **/*.kpj.user
+
+# Playwright
+playwright-report/
+test-results/

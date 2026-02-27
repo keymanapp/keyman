@@ -1,0 +1,1162 @@
+/***
+   KeymanWeb 11.0
+   Copyright 2019 SIL International
+***/
+
+//#region Imports
+
+import { type DeviceSpec, KMWString } from "keyman/common/web-utils";
+import { ModifierKeyConstants } from '@keymanapp/common-types';
+import {
+  Codes,
+  JSKeyboard,
+  KeyboardHarness,
+  KeyboardKeymanGlobal,
+  KeyMapping,
+  SyntheticTextStore,
+  MutableSystemStore,
+  ProcessorAction,
+  SystemStore,
+  SystemStoreIDs,
+  type Deadkey,
+  type KeyEvent,
+  type TextStore,
+  VariableStore,
+  VariableStoreDictionary,
+  VariableStoreSerializer,
+} from "keyman/engine/keyboard";
+import { PlatformSystemStore } from './platformSystemStore.js';
+import { ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement } from "./stores.js";
+
+//#endregion
+
+//#region Helper type definitions
+
+export class KeyInformation {
+  vk: boolean;
+  code: number;
+  modifiers: number;
+}
+
+type RuleChar = string;
+
+class RuleDeadkey {
+  /** Discriminant field - 'd' for Deadkey.
+   */
+  t: 'd';
+
+  /**
+   * Value:  the deadkey's ID.
+   */
+  d: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
+}
+
+class ContextAny {
+  /** Discriminant field - 'a' for `any()`.
+   */
+  ['t']: 'a';
+
+  /**
+   * Value:  the store to search.
+   */
+  ['a']: KeyboardStore; // For 'a'ny statement.
+
+  /**
+   * If set to true, negates the 'any'.
+   */
+  ['n']: boolean | 0 | 1;
+}
+
+class RuleIndex {
+  /** Discriminant field - 'i' for `index()`.
+   */
+  ['t']: 'i';
+
+  /**
+   * Value: the Store from which to output
+   */
+  ['i']: KeyboardStore;
+
+  /**
+   * Offset: the offset in context for the corresponding `any()`.
+   */
+  ['o']: number;
+}
+
+class ContextEx {
+  /** Discriminant field - 'c' for `context()`.
+   */
+  ['t']: 'c';
+
+  /**
+   * Value:  The offset into the current rule's context to be matched.
+   */
+  ['c']: number; // For 'c'ontext statement.
+}
+
+class ContextNul {
+  /** Discriminant field - 'n' for `nul`
+   */
+  ['t']: 'n';
+}
+
+class StoreBeep {
+  /** Discriminant field - 'b' for `beep`
+   */
+  ['t']: 'b';
+}
+
+type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul;
+type ContextEntry = RuleChar | ContextNonCharEntry;
+
+export type StoreNonCharEntry = RuleDeadkey | StoreBeep;
+
+/**
+ * Cache of context storing and retrieving return values from KC
+ * Must be reset prior to each keystroke and after any text changes
+ * MCD 3/1/14
+ **/
+class CachedContext {
+  _cache: string[][];
+
+  reset(): void {
+    this._cache = [];
+  }
+
+  get(n: number, ln: number): string {
+    // return null; // uncomment this line to disable context caching
+    if(typeof this._cache[n] == 'undefined') {
+      return null;
+    } else if(typeof this._cache[n][ln] == 'undefined') {
+      return null;
+    }
+    return this._cache[n][ln];
+  }
+
+  set(n: number, ln: number, val: string): void {
+    if(typeof this._cache[n] == 'undefined') {
+      this._cache[n] = [];
+    }
+    this._cache[n][ln] = val;
+  }
+};
+
+type CachedExEntry = {valContext: (string|number)[], deadContext: Deadkey[]};
+/**
+ * An extended version of cached context storing designed to work with
+ * `fullContextMatch` and its helper functions.
+ */
+class CachedContextEx {
+  _cache: CachedExEntry[][];
+
+  reset(): void {
+    this._cache = [];
+  }
+
+  get(n: number, ln: number): CachedExEntry {
+    // return null; // uncomment this line to disable context caching
+    if(typeof this._cache[n] == 'undefined') {
+      return null;
+    } else if(typeof this._cache[n][ln] == 'undefined') {
+      return null;
+    }
+    return this._cache[n][ln];
+  }
+
+  set(n: number, ln: number, val: CachedExEntry): void {
+    if(typeof this._cache[n] == 'undefined') {
+      this._cache[n] = [];
+    }
+    this._cache[n][ln] = val;
+  }
+
+  clone(): CachedContextEx {
+    const r = new CachedContextEx();
+    r._cache = this._cache;
+    return r;
+  }
+};
+
+//#endregion
+
+export class JSKeyboardInterface extends KeyboardHarness {
+  static readonly GLOBAL_NAME = 'KeymanWeb';
+
+  cachedContext: CachedContext = new CachedContext();
+  cachedContextEx: CachedContextEx = new CachedContextEx();
+  ruleContextEx: CachedContextEx;
+
+  activeTextStore: TextStore;
+  ruleBehavior: ProcessorAction;
+
+  systemStores: {[storeID: number]: SystemStore};
+
+  _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
+
+  // Must be accessible to some of the keyboard API methods.
+  activeKeyboard: JSKeyboard;
+  activeDevice: DeviceSpec;
+
+  variableStoreSerializer: VariableStoreSerializer;
+
+  // A 'reference point' that debug keyboards may use to access KMW's code constants.
+  public get Codes(): typeof Codes {
+    return Codes;
+  }
+
+  constructor(_jsGlobal: any, keymanGlobal: KeyboardKeymanGlobal, variableStoreSerializer: VariableStoreSerializer = null) {
+    super(_jsGlobal, keymanGlobal);
+
+    this.systemStores = {};
+
+    this.systemStores[SystemStoreIDs.TSS_PLATFORM] = new PlatformSystemStore(this);
+    this.systemStores[SystemStoreIDs.TSS_LAYER] = new MutableSystemStore(SystemStoreIDs.TSS_LAYER, 'default');
+    this.systemStores[SystemStoreIDs.TSS_NEWLAYER] = new MutableSystemStore(SystemStoreIDs.TSS_NEWLAYER, '');
+    this.systemStores[SystemStoreIDs.TSS_OLDLAYER] = new MutableSystemStore(SystemStoreIDs.TSS_OLDLAYER, '');
+
+    this.variableStoreSerializer = variableStoreSerializer;
+  }
+
+  /**
+   * Function     KSF
+   * Scope        Public
+   *
+   * Saves the document's current focus settings on behalf of the keyboard.  Often paired with insertText.
+   */
+  saveFocus(): void { }
+
+  /**
+   * A text-insertion method used by custom OSKs for helpHTML interaction, like with sil_euro_latin.
+   *
+   * This function currently bypasses web-core's standard text handling control path and all predictive text processing.
+   * It also has DOM-dependencies that help ensure KMW's active TextStore retains focus during use.
+   */
+  insertText?: (Ptext: string, PdeadKey: number) => void;
+
+  /**
+   * Function     registerKeyboard  KR
+   * Scope        Public
+   * @param       {Object}      Pk      JSKeyboard  object
+   * Description  Registers a keyboard with KeymanWeb once its script has fully loaded.
+   *
+   *              In web-core, this also activates the keyboard; in other modules, this method
+   *              may be replaced with other implementations.
+   */
+  registerKeyboard(Pk: any): void {
+    // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
+    //        by DOM-aware code.
+    const keyboard = new JSKeyboard(Pk);
+    this.loadedKeyboard = keyboard;
+  }
+
+  /**
+   * Get *cached or uncached* keyboard context for a specified range, relative to caret
+   *
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {number}      ln            Number of characters to return
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
+   * @return      {string}                    Context string
+   *
+   * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
+   *             KC(2,1,Pelem) == "e"
+   *             KC(3,3,Pelem) == "def"
+   *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
+   */
+
+  context(n: number, ln: number, textStore: TextStore): string {
+    const v = this.cachedContext.get(n, ln);
+    if(v !== null) {
+      return v;
+    }
+
+    const r = this.KC_(n, ln, textStore);
+    this.cachedContext.set(n, ln, r);
+    return r;
+  }
+
+  /**
+   * Get (uncached) keyboard context for a specified range, relative to caret
+   *
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {number}      ln            Number of characters to return
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
+   * @return      {string}                    Context string
+   *
+   * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
+   *             KC(2,1,Pelem) == "e"
+   *             KC(3,3,Pelem) == "def"
+   *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
+   */
+  private KC_(n: number, ln: number, textStore: TextStore): string {
+    let tempContext = '';
+
+    // If we have a selection, we have an empty context
+    tempContext = textStore.isSelectionEmpty() ? textStore.getTextBeforeCaret() : "";
+
+    if(KMWString.length(tempContext) < n) {
+      tempContext = Array(n-KMWString.length(tempContext)+1).join("\uFFFE") + tempContext;
+    }
+
+    return KMWString.substr(KMWString.substr(tempContext, -n), 0, ln);
+  }
+
+  /**
+   * Function     nul           KN
+   * Scope        Public
+   * @param       {number}      n             Length of context to check
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
+   * @return      {boolean}                   True if length of context is less than or equal to n
+   * Description  Test length of context, return true if the length of the context is less than or equal to n
+   *
+   * Example     [abc|def] as INPUT, with the caret position marked by |:
+   *             KN(3,Pelem) == TRUE
+   *             KN(2,Pelem) == FALSE
+   *             KN(4,Pelem) == TRUE
+   */
+  nul(n: number, textStore: TextStore): boolean {
+    const cx=this.context(n+1, 1, textStore);
+
+    // With #31, the result will be a replacement character if context is empty.
+    return cx === "\uFFFE";
+  }
+
+  /**
+   * Function     contextMatch  KCM
+   * Scope        Public
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {Object}      textStore  Focused element
+   * @param       {string}      val           String to match
+   * @param       {number}      ln            Number of characters to return
+   * @return      {boolean}                   True if selected context matches val
+   * Description  Test keyboard context for match
+   */
+  contextMatch(n: number, textStore: TextStore, val: string, ln: number): boolean {
+    const cx=this.context(n, ln, textStore);
+    if(cx === val) {
+      return true; // I3318
+    }
+    textStore.deadkeys().resetMatched(); // I3318
+    return false;
+  }
+
+  /**
+   * Builds the *cached or uncached* keyboard context for a specified range, relative to caret
+   *
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {number}      ln            Number of characters to return
+   * @param       {Object}      textStore  Element to work with (must be currently focused element)
+   * @return      {Array}                     Context array (of strings and numbers)
+   */
+  private _BuildExtendedContext(n: number, ln: number, textStore: TextStore): CachedExEntry {
+    let cache: CachedExEntry = this.cachedContextEx.get(n, ln);
+    if(cache !== null) {
+      return cache;
+    } else {
+      // By far the easiest way to correctly build what we want is to start from the right and work to what we need.
+      // We may have done it for a similar cursor position before.
+      cache = this.cachedContextEx.get(n, n);
+      if(cache === null) {
+        // First, let's make sure we have a cloned, sorted copy of the deadkey array.
+        const unmatchedDeadkeys = textStore.deadkeys().toSortedArray(); // Is reverse-order sorted for us already.
+
+        // Time to build from scratch!
+        let index = 0;
+        cache = { valContext: [], deadContext: []};
+        while(cache.valContext.length < n) {
+          // As adapted from `deadkeyMatch`.
+          const sp = textStore.getCaret();
+          const deadPos = sp - index;
+          if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p > deadPos) {
+            // We have deadkeys at the right-hand side of the caret!  They don't belong in the context, so pop 'em off.
+            unmatchedDeadkeys.splice(0, 1);
+            continue;
+          } else if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p == deadPos) {
+            // Take the deadkey.
+            cache.deadContext[n-cache.valContext.length-1] = unmatchedDeadkeys[0];
+            cache.valContext = ([unmatchedDeadkeys[0].d] as (string|number)[]).concat(cache.valContext);
+            unmatchedDeadkeys.splice(0, 1);
+          } else {
+            // Take the character.  We get "\ufffe" if it doesn't exist.
+            const kc = this.context(++index, 1, textStore);
+            cache.valContext = ([kc] as (string|number)[]).concat(cache.valContext);
+          }
+        }
+        this.cachedContextEx.set(n, n, cache);
+      }
+
+      // Now that we have the cache...
+      const subCache = cache;
+      subCache.valContext = subCache.valContext.slice(0, ln);
+      this.cachedContextEx.set(n, ln, subCache);
+
+      return subCache;
+    }
+  }
+
+  /**
+   * Function       fullContextMatch    KFCM
+   * Scope          Private
+   * @param         {number}    n             Number of characters to move back from caret
+   * @param         {Object}    textStore  Focused element
+   * @param         {Array}     rule          An array of ContextEntries to match.
+   * @return        {boolean}                 True if the fully-specified rule context matches the current KMW state.
+   *
+   * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
+   * near-directly modeling (externally) the compiled form of Desktop rules' context section.
+   */
+  fullContextMatch(n: number, textStore: TextStore, rule: ContextEntry[]): boolean {
+    // Stage one:  build the context index map.
+    const fullContext = this._BuildExtendedContext(n, rule.length, textStore);
+    this.ruleContextEx = this.cachedContextEx.clone();
+    const context = fullContext.valContext;
+    const deadContext = fullContext.deadContext;
+
+    let mismatch = false;
+
+    // This symbol internally indicates lack of context in a position.  (See KC_)
+    const NUL_CONTEXT = "\uFFFE";
+
+    const assertNever = function(x: never): never {
+      // Could be accessed by improperly handwritten calls to `fullContextMatch`.
+      throw new Error("Unexpected object in fullContextMatch specification: " + x);
+    }
+
+    // Stage two:  time to match against the rule specified.
+    for(let i=0; i < rule.length; i++) {
+      if(typeof rule[i] == 'string') {
+        const str = rule[i] as string;
+        if(str !== context[i]) {
+          mismatch = true;
+          break;
+        }
+      } else {
+        // TypeScript needs a cast to this intermediate type to do its discriminated union magic.
+        const r = rule[i] as ContextNonCharEntry;
+        switch(r.t) {
+          case 'd':
+            // We still need to set a flag here;
+            if(r['d'] !== context[i]) {
+              mismatch = true;
+            } else {
+              deadContext[i].set();
+            }
+            break;
+          case 'a':
+            let lookup: KeyboardStoreElement;
+
+            if(typeof context[i] == 'string') {
+              lookup = context[i] as string;
+            } else {
+              lookup = {'t': 'd', 'd': context[i] as number};
+            }
+
+            const result = this.any(i, lookup, r.a);
+
+            if(!r.n) { // If it's a standard 'any'...
+              if(!result) {
+                mismatch = true;
+              } else if(deadContext[i] !== undefined) {
+                // It's a deadkey match, so indicate that.
+                deadContext[i].set();
+              }
+              // 'n' for 'notany'.
+              // - if `result === true`, `any` would match:  this should thus fail.
+              // - if `context[i] === NUL_CONTEXT`, `notany` should not match.
+            } else if(r.n && (result || context[i] === NUL_CONTEXT)) {
+              mismatch = true;
+            }
+            break;
+          case 'i':
+            // The context will never hold a 'beep.'
+            const ch = this._Index(r.i, r.o) as string | RuleDeadkey;
+
+            if(ch !== undefined && (typeof(ch) == 'string' ? ch : ch.d) !== context[i]) {
+              mismatch = true;
+            } else if(deadContext[i] !== undefined) {
+              deadContext[i].set();
+            }
+            break;
+          case 'c':
+            if(context[r.c - 1] !== context[i]) {
+              mismatch = true;
+            } else if(deadContext[i] !== undefined) {
+              deadContext[i].set();
+            }
+            break;
+          case 'n':
+            // \uFFFE is the internal 'no context here sentinel'.
+            if(context[i] != NUL_CONTEXT) {
+              mismatch = true;
+            }
+            break;
+          default:
+            assertNever(r);
+        }
+      }
+    }
+
+    if(mismatch) {
+      // Reset the matched 'any' indices, if any.
+      textStore.deadkeys().resetMatched();
+      this._AnyIndices = [];
+    }
+
+    return !mismatch;
+  }
+
+  /**
+   * Function     KIK
+   * Scope        Public
+   * @param       {Object}  e   keystroke event
+   * @return      {boolean}     true if keypress event
+   * Description  Test if event as a keypress event
+   */
+  isKeypress(e: KeyEvent): boolean {
+    if(this.activeKeyboard.isMnemonic) {   // I1380 - support KIK for positional layouts
+      return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
+    } else {
+      return KeyMapping._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
+    }
+  }
+
+  /**
+   * Maps a KeyEvent's modifiers to their appropriate value for key-rule evaluation
+   * based on the rule's specified target modifier set.
+   *
+   * Mostly used to correct chiral OSK-keys targeting non-chiral rules.
+   * @param e The source KeyEvent
+   * @returns
+   */
+  private static matchModifiersToRuleChirality(eventModifiers: number, targetModifierMask: number): number {
+    const CHIRAL_ALT  = ModifierKeyConstants.LALTFLAG  | ModifierKeyConstants.RALTFLAG;
+    const CHIRAL_CTRL = ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG;
+
+    let modifiers = eventModifiers;
+
+    // If the target rule does not use chiral alt...
+    if(!(targetModifierMask & CHIRAL_ALT)) {
+      const altIntersection  = modifiers & CHIRAL_ALT;
+
+      if(altIntersection) {
+        // Undo the chiral part         and replace with non-chiral.
+        modifiers ^= altIntersection  | ModifierKeyConstants.K_ALTFLAG;
+      }
+    }
+
+    // If the target rule does not use chiral ctrl...
+    if(!(targetModifierMask & CHIRAL_CTRL)) {
+      const ctrlIntersection = modifiers & CHIRAL_CTRL;
+
+      if(ctrlIntersection) {
+        // Undo the chiral part         and replace with non-chiral.
+        modifiers ^= ctrlIntersection | ModifierKeyConstants.K_CTRLFLAG;
+      }
+    }
+
+    return modifiers;
+  }
+
+  /**
+   * Function     keyMatch      KKM
+   * Scope        Public
+   * @param       {Object}      e           keystroke event
+   * @param       {number}      Lruleshift
+   * @param       {number}      Lrulekey
+   * @return      {boolean}                 True if key matches rule
+   * Description  Test keystroke with modifiers against rule
+   */
+  keyMatch(e: KeyEvent, Lruleshift:number, Lrulekey:number): boolean {
+    let retVal = false; // I3318
+    let keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
+
+    const bitmask = this.activeKeyboard.modifierBitmask;
+    const modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
+    const stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
+
+    const eventModifiers = JSKeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
+
+    if(e.vkCode > 255) {
+      keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
+    }
+
+    if(e.LisVirtualKey || keyCode > 255) {
+      if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255)) { // added keyCode test to support extended keys
+        retVal = ((Lrulekey == keyCode) && ((Lruleshift & modifierBitmask) == eventModifiers)); //I3318, I3555
+        retVal = retVal && this.stateMatch(e, Lruleshift & stateBitmask);
+      }
+    } else if((Lruleshift & 0x4000) == 0) {
+      retVal = (keyCode == Lrulekey); // I3318, I3555
+    }
+    if(!retVal) {
+      this.activeTextStore.deadkeys().resetMatched();  // I3318
+    }
+    return retVal; // I3318
+  };
+
+  /**
+   * Function     stateMatch    KSM
+   * Scope        Public
+   * @param       {Object}      e       keystroke event
+   * @param       {number}      Lstate
+   * Description  Test keystroke against state key rules
+   */
+  stateMatch(e: KeyEvent, Lstate: number) {
+    return ((Lstate & e.Lstates) == Lstate);
+  }
+
+  /**
+   * Function     keyInformation  KKI
+   * Scope        Public
+   * @param       {Object}      e
+   * @return      {Object}              Object with event's virtual key flag, key code, and modifiers
+   * Description  Get object with extended key event information
+   */
+  keyInformation(e: KeyEvent): KeyInformation {
+    const ei = new KeyInformation();
+    ei['vk'] = e.LisVirtualKey;
+    ei['code'] = e.Lcode;
+    ei['modifiers'] = e.Lmodifiers;
+    return ei;
+  };
+
+  /**
+   * Function     deadkeyMatch  KDM
+   * Scope        Public
+   * @param       {number}      n             offset from current cursor position
+   * @param       {Object}      textStore     TextStore
+   * @param       {number}      d             deadkey
+   * @return      {boolean}                   True if deadkey found selected context matches val
+   * Description  Match deadkey at current cursor position
+   *
+   * Deprecated:  use `fullContextMatch` instead.
+   */
+  deadkeyMatch(n: number, textStore: TextStore, d: number): boolean {
+    return textStore.hasDeadkeyMatch(n, d);
+  }
+
+  /**
+   * Function     beep          KB
+   * Scope        Public
+   * @param       {Object}      textStore  element to flash
+   * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
+   */
+  beep(textStore: TextStore): void {
+    this.resetContextCache();
+
+    // Denote as part of the matched rule's behavior.
+    this.ruleBehavior.beep = true;
+  }
+
+  _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
+    if(typeof(store) == 'string') {
+      const cachedStores = this.activeKeyboard.explodedStores;
+
+      // Is the result cached?
+      if(cachedStores[store]) {
+        return cachedStores[store];
+      }
+
+      // Nope, so let's build its cache.
+      const result: ComplexKeyboardStore = [];
+      for(let i=0; i < KMWString.length(store); i++) {
+        result.push(KMWString.charAt(store, i));
+      }
+
+      // Cache the result for later!
+      cachedStores[store] = result;
+      return result;
+    } else {
+      return store;
+    }
+  }
+
+  /**
+   * Function     any           KA
+   * Scope        Public
+   * @param       {number}      n     character position (index)
+   * @param       {string}      ch    character to find in string
+   * @param       {string}      s     'any' string
+   * @return      {boolean}           True if character found in 'any' string, sets index accordingly
+   * Description  Test for character matching
+   */
+  any(n: number, ch: KeyboardStoreElement, s: KeyboardStore): boolean {
+    if(ch == '') {
+      return false;
+    }
+
+    s = this._ExplodeStore(s);
+    let Lix = -1;
+    for(let i=0; i < s.length; i++) {
+      const entry = s[i];
+      if(typeof(entry) == 'string') {
+        if(s[i] == ch) {
+          Lix = i;
+          break;
+        }
+        // @ts-ignore // Needs to test against .t for automatic inference, but it's not actually there.
+      } else if(entry.d === (ch as RuleDeadkey).d) {
+        Lix = i;
+        break;
+      }
+    }
+    this._AnyIndices[n] = Lix;
+    return Lix >= 0;
+  }
+
+  /**
+   * Function     _Index
+   * Scope        Public
+   * @param       {string}      Ps      string
+   * @param       {number}      Pn      index
+   * Description  Returns the character from a store string according to the offset in the index array
+   */
+  _Index(Ps: KeyboardStore, Pn: number): KeyboardStoreElement {
+    Ps = this._ExplodeStore(Ps);
+
+    if(this._AnyIndices[Pn-1] < Ps.length) {   //I3319
+      return Ps[this._AnyIndices[Pn-1]];
+    } else {
+      /* Should not be possible for a compiled keyboard, but may arise
+      * during the development of handwritten keyboards.
+      */
+      console.warn("Unmatched contextual index() statement detected in rule with index " + Pn + "!");
+      return "";
+    }
+  }
+
+  /**
+   * Function     indexOutput   KIO
+   * Scope        Public
+   * @param       {number}      Pdn           no of character to overwrite (delete)
+   * @param       {string}      Ps            string
+   * @param       {number}      Pn            index
+   * @param       {Object}      textStore  element to output to
+   * Description  Output a character selected from the string according to the offset in the index array
+   */
+  indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, textStore: TextStore): void {
+    this.resetContextCache();
+
+    const assertNever = function(x: never): never {
+      // Could be accessed by improperly handwritten calls to `fullContextMatch`.
+      throw new Error("Unexpected object in fullContextMatch specification: " + x);
+    }
+
+    const indexChar = this._Index(Ps, Pn);
+    if(indexChar !== "") {
+      if(typeof indexChar == 'string' ) {
+        this.output(Pdn, textStore, indexChar);  //I3319
+      } else if(indexChar.t) {
+        switch(indexChar.t) {
+          case 'b': // Beep commands may appear within stores.
+            this.beep(textStore);
+            break;
+          case 'd':
+            this.deadkeyOutput(Pdn, textStore, indexChar.d);
+            break;
+          default:
+            assertNever(indexChar);
+        }
+      } else { // For keyboards developed during 10.0's alpha phase - t:'d' was assumed.
+        this.deadkeyOutput(Pdn, textStore, (indexChar as any).d);
+      }
+    }
+  }
+
+
+  /**
+   * Function     deleteContext KDC
+   * Scope        Public
+   * @param       {number}      dn            number of context entries to overwrite
+   * @param       {Object}      textStore  element to output to
+   * Description  Keyboard output
+   */
+  deleteContext(dn: number, textStore: TextStore): void {
+    let context: CachedExEntry;
+
+    // We want to control exactly which deadkeys get removed.
+    if(dn > 0) {
+      context = this._BuildExtendedContext(dn, dn, textStore);
+      let nulCount = 0;
+
+      for(let i=0; i < context.valContext.length; i++) {
+        const dk = context.deadContext[i];
+
+        if(dk) {
+          // Remove deadkey in context.
+          textStore.deadkeys().remove(dk);
+
+          // Reduce our reported context size.
+          dn--;
+        } else if(context.valContext[i] == "\uFFFE") {
+          // Count any `nul` sentinels that would contribute to our deletion count.
+          nulCount++;
+        }
+      }
+
+      // Prevent attempts to delete nul sentinels, as they don't exist in the actual context.
+      // (Addresses regression from KMW v 12.0 paired with Developer bug through same version)
+      const contextLength = context.valContext.length - nulCount;
+      if(dn > contextLength) {
+        dn = contextLength;
+      }
+    }
+
+    // If a matched deadkey hasn't been deleted, we don't WANT to delete it.
+    textStore.deadkeys().resetMatched();
+
+    // Why reinvent the wheel?  Delete the remaining characters by 'inserting a blank string'.
+    this.output(dn, textStore, '');
+  }
+
+  /**
+   * Function     output        KO
+   * Scope        Public
+   * @param       {number}      dn            number of characters to overwrite
+   * @param       {Object}      textStore     element to output to
+   * @param       {string}      s             string to output
+   * Description  Keyboard output
+   *
+   * Note: it might seem more logical for this function to be part of TextStore
+   * or context manager, but it is here because it implements the JS-keyboard API function KO,
+   * used for the "output" portion of JS keyboard rule implementations for Keyman keyboards.
+   */
+  output(dn: number, textStore: TextStore, s: string): void {
+    this.resetContextCache();
+
+    textStore.saveProperties();
+    textStore.clearSelection();
+    textStore.deadkeys().deleteMatched(); // I3318
+    if(dn >= 0) {
+      // Automatically manages affected deadkey positions.  Does not delete deadkeys b/c legacy behavior support.
+      textStore.deleteCharsBeforeCaret(dn);
+    }
+    // Automatically manages affected deadkey positions.
+    textStore.insertTextBeforeCaret(s);
+    textStore.restoreProperties();
+  }
+
+  /**
+   * `contextExOutput` function emits the character or object at `contextOffset` from the
+   * current matched rule's context. Introduced in Keyman 14.0, in order to resolve a
+   * gap between desktop and web core functionality for context(n) matching on notany().
+   * See #917 for additional detail.
+   * @alias       KCXO
+   * @public
+   * @param       {number}        Pdn            number of characters to delete left of cursor
+   * @param       {TextStore}     textStore      textStore to output to
+   * @param       {number}        contextLength  length of current rule context to retrieve
+   * @param       {number}        contextOffset  offset from start of current rule context, 1-based
+   */
+  contextExOutput(Pdn: number, textStore: TextStore, contextLength: number, contextOffset: number): void {
+    this.resetContextCache();
+
+    if(Pdn >= 0) {
+      this.output(Pdn, textStore, "");
+    }
+
+    const context = this.ruleContextEx.get(contextLength, contextLength);
+    const dk = context.deadContext[contextOffset-1], vc = context.valContext[contextOffset-1];
+    if(dk) {
+      textStore.insertDeadkeyBeforeCaret(dk.d);
+    } else if(typeof vc == 'string') {
+      this.output(-1, textStore, vc);
+    } else {
+      throw new Error("contextExOutput: should never be a numeric valContext with no corresponding deadContext");
+    }
+  }
+
+  /**
+   * Function     deadkeyOutput KDO
+   * Scope        Public
+   * @param       {number}      Pdn           no of character to overwrite (delete)
+   * @param       {TextStore}      textStore  element to output to
+   * @param       {number}      Pd            deadkey id
+   * Description  Record a deadkey at current cursor position, deleting Pdn characters first
+   */
+  deadkeyOutput(Pdn: number, textStore: TextStore, Pd: number): void {
+    this.resetContextCache();
+
+    if(Pdn >= 0) {
+      this.output(Pdn, textStore,"");  //I3318 corrected to >=
+    }
+
+    textStore.insertDeadkeyBeforeCaret(Pd);
+    //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
+  }
+
+  /**
+   * KIFS compares the content of a system store with a string value
+   *
+   * @param       {number}      systemId      ID of the system store to test (only TSS_LAYER currently supported)
+   * @param       {string}      strValue      String value to compare to
+   * @param       {TextStore}      textStore  Currently active element (may be needed by future tests)
+   * @return      {boolean}                   True if the test succeeds
+   */
+  ifStore(systemId: number, strValue: string, textStore: TextStore): boolean {
+    let result=true;
+    const store = this.systemStores[systemId];
+    if(store) {
+      result = store.matches(strValue);
+    }
+    return result; //Moved from previous line, now supports layer selection, Build 350
+  }
+
+  /**
+   * KSETS sets the value of a system store to a string
+   *
+   * @param       {number}      systemId      ID of the system store to set (only TSS_LAYER currently supported)
+   * @param       {string}      strValue      String to set as the system store content
+   * @param       {TextStore}      textStore  Currently active element (may be needed in future tests)
+   * @return      {boolean}                   True if command succeeds
+   *                                          (i.e. for TSS_LAYER, if the layer is successfully selected)
+   *
+   * Note that option/variable stores are instead set within keyboard script code, as they only
+   * affect keyboard behavior.
+   */
+  setStore(systemId: number, strValue: string, textStore: TextStore): boolean {
+    this.resetContextCache();
+    // Unique case:  we only allow set(&layer) ops from keyboard rules triggered by touch OSKs.
+    if(systemId == SystemStoreIDs.TSS_LAYER && this.activeDevice.touchable) {
+      // Denote the changed store as part of the matched rule's behavior.
+      this.ruleBehavior.setStore[systemId] = strValue;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Load an option store value from a cookie or default value
+   *
+   * @param       {string}      kbdName     keyboard internal name
+   * @param       {string}      storeName   store (option) name, embedded in cookie name
+   * @param       {string}      dfltValue   default value
+   * @return      {string}                  current or default option value
+   *
+   * This will only ever be called when the keyboard is loaded, as it is used by keyboards
+   * to initialize a store value on the keyboard's script object.
+   */
+  loadStore(kbdName: string, storeName:string, dfltValue:string): string {
+    this.resetContextCache();
+    if(this.variableStoreSerializer) {
+      const cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
+      return cValue[storeName] || dfltValue;
+    } else {
+      return dfltValue;
+    }
+  }
+
+  /**
+   * Save an option store value to a cookie
+   *
+   * @param       {string}      storeName   store (option) name, embedded in cookie name
+   * @param       {string}      optValue    option value to save
+   * @return      {boolean}                 true if save successful
+   *
+   * Note that a keyboard will freely manipulate the value of its variable stores on the
+   * script object within its own code.  This function's use is merely to _persist_ that
+   * value across sessions, providing a custom user default for later uses of the keyboard.
+   */
+  saveStore(storeName:string, optValue:string): boolean {
+    this.resetContextCache();
+    const kbd=this.activeKeyboard;
+    if(!kbd || typeof kbd.id == 'undefined' || kbd.id == '') {
+      return false;
+    }
+
+    // And the lookup under that entry looks for the value under the store name, again.
+    const valueObj: VariableStore = {};
+    valueObj[storeName] = optValue;
+
+    // Null-check in case of invocation during unit-test
+    if(this.ruleBehavior) {
+      this.ruleBehavior.saveStore[storeName] = valueObj;
+    } else {
+      // We're in a unit-test environment, directly invoking this method from outside of a keyboard.
+      // In this case, we should immediately commit the change.
+      this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, valueObj);
+    }
+    return true;
+  }
+
+  resetContextCache(): void {
+    this.cachedContext.reset();
+    this.cachedContextEx.reset();
+  }
+
+  defaultBackspace(textStore: TextStore) {
+    if(textStore.isSelectionEmpty()) {
+      // Delete the character left of the caret
+      this.output(1, textStore, "");
+    } else {
+      // Delete just the selection
+      this.output(0, textStore, "");
+    }
+  }
+
+  /**
+   * Function     processNewContextEvent
+   * Scope        Private
+   * @param       {TextStore}       textStore   The textStore receiving input
+   * @param       {KeyEvent}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
+   * Description  Calls the keyboard's `begin newContext` group
+   * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin NewContext`
+   */
+  processNewContextEvent(textStore: TextStore, keystroke: KeyEvent): ProcessorAction {
+    if(!this.activeKeyboard) {
+      throw "No active keyboard for keystroke processing!";
+    }
+    return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), textStore, keystroke, true);
+  }
+
+  /**
+   * Function     processPostKeystroke
+   * Scope        Private
+   * @param       {TextStore}       textStore   The textStore receiving input
+   * @param       {KeyEvent}        keystroke   The input keystroke with relevant properties to be mapped by the keyboard.
+   * Description  Calls the keyboard's `begin postKeystroke` group
+   * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin PostKeystroke`
+   */
+  processPostKeystroke(textStore: TextStore, keystroke: KeyEvent): ProcessorAction {
+    if(!this.activeKeyboard) {
+      throw "No active keyboard for keystroke processing!";
+    }
+    return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), textStore, keystroke, true);
+  }
+
+  /**
+   * Function     processKeystroke
+   * Scope        Private
+   * @param       {TextStore}       textStore   The textStore receiving input
+   * @param       {KeyEvent}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
+   * Description  Encapsulates calls to keyboard input processing.
+   * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin Unicode`
+   */
+  processKeystroke(textStore: TextStore, keystroke: KeyEvent): ProcessorAction {
+    if(!this.activeKeyboard) {
+      throw "No active keyboard for keystroke processing!";
+    }
+    return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), textStore, keystroke, false);
+  }
+
+  private process(callee: (textStore: TextStore, keystroke: KeyEvent) => boolean, textStore: TextStore, keystroke: KeyEvent, readonly: boolean): ProcessorAction {
+    // Clear internal state tracking data from prior keystrokes.
+    if(!textStore) {
+      throw "No textStore specified for keyboard output!";
+    } else if(!this.activeKeyboard) {
+      throw "No active keyboard for keystroke processing!";
+    } else if(!callee) {
+      throw "No callee for keystroke processing!";
+    }
+
+    textStore.invalidateSelection();
+
+    textStore.deadkeys().resetMatched();       // I3318
+    this.resetContextCache();
+
+    // Capture the initial state of the TextStore before any rules are matched.
+    const preInput = SyntheticTextStore.from(textStore, true);
+
+    // Capture the initial state of any variable stores
+    const cachedVariableStores = this.activeKeyboard.variableStores;
+
+    // Establishes the results object, allowing corresponding commands to set values here as appropriate.
+    this.ruleBehavior = new ProcessorAction();
+
+    // Ensure the settings are in place so that KIFS/ifState activates and deactivates
+    // the appropriate rule(s) for the modeled device.
+    this.activeDevice = keystroke.device;
+
+    // Calls the start-group of the active keyboard.
+    this.activeTextStore = textStore;
+    const matched = callee(textStore, keystroke);
+    this.activeTextStore = null;
+
+    // Finalize the rule's results.
+    this.ruleBehavior.transcription = textStore.buildTranscriptionFrom(preInput, keystroke, readonly);
+
+    // We always backup the changes to variable stores to the ProcessorAction, to
+    // be applied during finalization, then restore them to the cached initial
+    // values to avoid side-effects with predictive text mocks.
+    this.ruleBehavior.variableStores = this.activeKeyboard.variableStores;
+    this.activeKeyboard.variableStores = cachedVariableStores;
+
+    // `matched` refers to whether or not the FINAL rule (from any group) matched, rather than
+    // whether or not ANY rule matched.  If the final rule doesn't match, we trigger the key's
+    // default behavior (if appropriate).
+    //
+    // See https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852
+    this.ruleBehavior.triggerKeyDefault = !matched;
+
+    // Clear our result-tracking variable to prevent any possible pollution for future processing.
+    const behavior = this.ruleBehavior;
+    this.ruleBehavior = null;
+
+    return behavior;
+  }
+
+  /**
+   * Applies the dictionary of variable store values to the active keyboard
+   *
+   * Has no effect on keyboards compiled with 14.0 or earlier; system store
+   * names are not exposed unless compiled with Developer 15.0 or later.
+   *
+   * @param stores A dictionary of stores which should be found in the
+   *               keyboard
+   */
+  applyVariableStores(stores: VariableStoreDictionary): void {
+    this.activeKeyboard.variableStores = stores;
+  }
+
+  /**
+   * Publishes the JSKeyboardInterface's shorthand API names.  As this assigns the current functions
+   * held by the longform versions, note that this should be called after replacing any of them via
+   * JS method extension.
+   *
+   * DOM-aware KeymanWeb should call this after its domKbdInterface.ts code is loaded, as it replaces
+   * a few.  (This is currently done within its kmwapi.ts.)
+   */
+  static __publishShorthandAPI() {
+    // Keyboard callbacks
+    const prototype = this.prototype;
+
+    const exportKBCallback = function(miniName: string, longName: keyof JSKeyboardInterface) {
+      if(prototype[longName]) {
+        // @ts-ignore
+        prototype[miniName] = prototype[longName];
+      }
+    }
+
+    exportKBCallback('KSF', 'saveFocus');
+    // @ts-ignore // is defined at a higher level
+    exportKBCallback('KBR', 'beepReset');
+    exportKBCallback('KT', 'insertText');
+    exportKBCallback('KR', 'registerKeyboard');
+    // @ts-ignore // is defined at a higher level
+    exportKBCallback('KRS', 'registerStub');
+    exportKBCallback('KC', 'context');
+    exportKBCallback('KN', 'nul');
+    exportKBCallback('KCM', 'contextMatch');
+    exportKBCallback('KFCM', 'fullContextMatch');
+    exportKBCallback('KIK', 'isKeypress');
+    exportKBCallback('KKM', 'keyMatch');
+    exportKBCallback('KSM', 'stateMatch');
+    exportKBCallback('KKI', 'keyInformation');
+    exportKBCallback('KDM', 'deadkeyMatch');
+    exportKBCallback('KB', 'beep');
+    exportKBCallback('KA', 'any');
+    exportKBCallback('KDC', 'deleteContext');
+    exportKBCallback('KO', 'output');
+    exportKBCallback('KDO', 'deadkeyOutput');
+    exportKBCallback('KCXO', 'contextExOutput');
+    exportKBCallback('KIO', 'indexOutput');
+    exportKBCallback('KIFS', 'ifStore');
+    exportKBCallback('KSETS', 'setStore');
+    exportKBCallback('KLOAD', 'loadStore');
+    exportKBCallback('KSAVE', 'saveStore');
+  }
+}
+
+(function() {
+  // This will be the only call within the keyboard module.
+  JSKeyboardInterface.__publishShorthandAPI();
+}());

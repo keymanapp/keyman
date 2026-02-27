@@ -33,7 +33,7 @@
     #undef _kmn_export_flag
     #undef _kmn_import_flag
     #undef _kmn_static_flag
-  #else  // How MSVC sepcifies function level attributes adn deprecation
+  #else  // How MSVC sepcifies function level attributes and deprecation
     #define _kmn_and
     #define _kmn_tag_fn(a)     __declspec(a)
     #define _kmn_deprecated_flag deprecated

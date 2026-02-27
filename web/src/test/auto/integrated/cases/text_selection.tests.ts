@@ -7,7 +7,7 @@ import {
   teardownKMW
 } from "../test_utils.js";
 import * as KMWRecorder from '#recorder';
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 import { type KeymanEngine } from 'keyman/app/browser';
 
 type WindowKey = keyof typeof window;

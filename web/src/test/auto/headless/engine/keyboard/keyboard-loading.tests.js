@@ -3,9 +3,9 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { KeyboardHarness, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
 
 describe('Headless keyboard loading', function() {
   const laoPath = require.resolve('@keymanapp/common-test-resources/keyboards/lao_2008_basic.js');
@@ -58,10 +58,10 @@ describe('Headless keyboard loading', function() {
 
       // Runs a blank KeyEvent through the keyboard's rule processing...
       // but via separate harness configured with a different captured global.
-      let ruleHarness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       ruleHarness.activeKeyboard = keyboard;
       try {
-        ruleHarness.processKeystroke(new Mock(), keyboard.constructNullKeyEvent(device));
+        ruleHarness.processKeystroke(new SyntheticTextStore(), keyboard.constructNullKeyEvent(device));
         assert.fail();
       } catch (err) {
         // Drives home an important detail: the 'global' object is effectively
