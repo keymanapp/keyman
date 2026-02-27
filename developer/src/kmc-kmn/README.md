@@ -7,3 +7,7 @@ used from the command line with
 Note: this package requires WASM support.
 
 * [API Reference](https://help.keyman.com/developer/current-version/reference/api/kmc-kmn)
+
+# Next Generation Compiler
+
+src/ng-compiler holds the fully typescript-based rewrite of the Kmn compiler currently in development.
