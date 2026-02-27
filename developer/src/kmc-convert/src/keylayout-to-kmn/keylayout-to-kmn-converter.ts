@@ -133,7 +133,7 @@ export class KeylayoutToKmnConverter {
    * @param  jsonObj containing filename, behaviour and rules of a json object
    * @return an ProcessedData containing all data ready to print out
    */
-  private convert(jsonObj: any, inputfilename: string): ProcessedData {
+  private convert(jsonObj: any, inputFilename: string): ProcessedData {
     // modifiers for each behaviour
     const modifierBehavior: string[][] = [];
 
@@ -149,31 +149,30 @@ export class KeylayoutToKmnConverter {
     };
 
     if ((jsonObj === null) || (!jsonObj.hasOwnProperty("keyboard"))) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename: inputfilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename: inputFilename }));
       return dataObject;
-    } else {
-
-      // create an array of modifier combinations and store in dataObject
-      for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
-        const singleModifierSet: string[] = [];
-        for (let k = 0; k < jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier.length; k++) {
-          singleModifierSet.push(jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier[k]['@__keys']);
-        }
-        modifierBehavior.push(singleModifierSet);
-      }
-
-      // fill dataObject with filenames, behaviours and (initialized) rules
-      dataObject.keylayoutFilename = inputfilename;
-      dataObject.kmnFilename = inputfilename.replace(/\.keylayout$/, '.kmn');;
-      dataObject.arrayOfModifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
-      dataObject.arrayOfRules = rules;
-
-      // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
-      KeylayoutToKmnConverter.USE_KEY_COUNT = findUsedKeysCount(jsonObj);
-
-      // fill rules into arrayOfRules of dataObject
-      return this.createRuleData(dataObject, jsonObj);
     }
+
+    // create an array of modifier combinations and store in dataObject
+    for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
+      const singleModifierSet: string[] = [];
+      for (let k = 0; k < jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier.length; k++) {
+        singleModifierSet.push(jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier[k]['@__keys']);
+      }
+      modifierBehavior.push(singleModifierSet);
+    }
+
+    // fill dataObject with filenames, behaviours and (initialized) rules
+    dataObject.keylayoutFilename = inputFilename;
+    dataObject.kmnFilename = inputFilename.replace(/\.keylayout$/, '.kmn');;
+    dataObject.arrayOfModifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
+    dataObject.arrayOfRules = rules;
+
+    // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
+    KeylayoutToKmnConverter.USE_KEY_COUNT = findUsedKeysCount(jsonObj);
+
+    // fill rules into arrayOfRules of dataObject
+    return this.createRuleData(dataObject, jsonObj);
   }
 
   /**
@@ -469,8 +468,8 @@ export class KeylayoutToKmnConverter {
               keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
               KeyName: this.mapUkeleleKeycodeToVK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
-            }))
-            return null
+            }));
+            return null;
           }
         }
       }
