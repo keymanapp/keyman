@@ -34,6 +34,7 @@ namespace kmcmp {
     extern std::string messageFilename;
     extern int BeginLine[4];
     extern int CompileTarget;
+    extern int TargetVersion;
     extern KMX_BOOL FMnemonicLayout;
 }
 
@@ -57,6 +58,7 @@ class CompilerTest : public testing::Test {
             kmcmp::nErrors = 0;
             kmcmp::currentLine = 0;
             kmcmp::ErrChr = 0;
+            kmcmp::TargetVersion = 0;
             kmcmp::messageFilename = "";
             kmcmp::BeginLine[BEGIN_ANSI] = -1;
             kmcmp::BeginLine[BEGIN_UNICODE] = -1;

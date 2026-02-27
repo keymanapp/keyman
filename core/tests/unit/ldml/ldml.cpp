@@ -623,7 +623,7 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
   km::tests::LdmlJsonTestSourceFactory json_factory;
   // adjust path
 
-  const auto json_path = km::tests::LdmlJsonTestSourceFactory::kmx_to_test_json(compiled);
+  const auto json_path = km::tests::LdmlJsonTestSourceFactory::source_to_test_json(source);
   int json_result = json_factory.load(compiled, json_path);
   if (json_result != -1) {
     const km::tests::JsonTestMap& json_tests = json_factory.get_tests();
