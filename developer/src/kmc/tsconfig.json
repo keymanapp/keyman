@@ -14,6 +14,7 @@
     { "path": "../../../common/web/types" },
     { "path": "../kmc-analyze" },
     { "path": "../kmc-copy" },
+    { "path": "../kmc-convert" },
     { "path": "../kmc-generate" },
     { "path": "../kmc-keyboard-info" },
     { "path": "../kmc-kmn" },
