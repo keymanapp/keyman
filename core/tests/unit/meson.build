@@ -48,7 +48,7 @@ kmcorekeyboardapitests = executable('km_core_keyboard_api.tests',
 
 test('km-core-keyboard-api-tests', kmcorekeyboardapitests)
 
-# tests for km_core_process_even
+# tests for km_core_process_event
 km_core_process_event_tests_exe = executable(
   'km_core_process_event_tests',
   ['km_core_process_event.tests.cpp', common_test_files],
