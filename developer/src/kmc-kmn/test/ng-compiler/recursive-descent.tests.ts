@@ -8,14 +8,14 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRule, SingleChildRuleWithASTStrategy } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, SingleChildRule, SingleChildRuleWithASTRebuild } from '../../src/ng-compiler/recursive-descent.js';
 import { Rule, SequenceRule, parameterSequence, AlternateTokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
-import { NewNode } from '../../src/ng-compiler/ast-strategy.js';
+import { NewNode } from '../../src/ng-compiler/ast-rebuild.js';
 
 const LIST_OF_ONE: Token[] = [
   new Token(TokenType.STRING, ''),
@@ -35,7 +35,7 @@ class TrueRule extends Rule {
     if (tokenBuffer.currentToken().isTokenType(TokenType.EOF))
       return false;
     tokenBuffer.popToken();
-    node.addChild(new ASTNode(NodeType.TMP));
+    node.addChild(new ASTNode());
     return true;
   }
 }
@@ -60,7 +60,7 @@ let parameters: Token[]      = null;
 describe("Recursive Descent Tests", () => {
   beforeEach(() => {
     tokenBuffer = new TokenBuffer(LIST_OF_ONE);
-    root        = new ASTNode(NodeType.TMP);
+    root        = new ASTNode();
     trueRule    = new TrueRule();
     falseRule   = new FalseRule();
     parameters  = [];
@@ -80,21 +80,21 @@ describe("Recursive Descent Tests", () => {
       assert.isTrue(validRule.parse(tokenBuffer, root));
     });
   });
-  describe("SingleChildRuleWithASTStrategy Tests", () => {
-    class ConcreteSingleChildRuleWithASTStrategy extends SingleChildRuleWithASTStrategy {}
+  describe("SingleChildRuleWithASTRebuild Tests", () => {
+    class ConcreteSingleChildRuleWithASTRebuild extends SingleChildRuleWithASTRebuild {}
     it("can apply a strategy (NewNode)", () => {
-      const newNodeRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING), trueRule);
+      const newNodeRule: Rule = new ConcreteSingleChildRuleWithASTRebuild(new NewNode(NodeType.STRING), trueRule);
       assert.isTrue(newNodeRule.parse(tokenBuffer, root));
       const parent = root.getSoleChildOfType(NodeType.STRING); // from NewNode strategy
       assert.isNotNull(parent);
       assert.isNotNull(parent.getSoleChildOfType(NodeType.TMP)); // from trueRule
     });
     it("returns false without a rule to parse (no rule)", () => {
-      const noRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING));
+      const noRule: Rule = new ConcreteSingleChildRuleWithASTRebuild(new NewNode(NodeType.STRING));
       assert.isFalse(noRule.parse(tokenBuffer, root));
     });
     it("returns false without a rule to parse (null)", () => {
-      const noRule: Rule = new ConcreteSingleChildRuleWithASTStrategy(new NewNode(NodeType.STRING), null);
+      const noRule: Rule = new ConcreteSingleChildRuleWithASTRebuild(new NewNode(NodeType.STRING), null);
       assert.isFalse(noRule.parse(tokenBuffer, root));
     });
   });

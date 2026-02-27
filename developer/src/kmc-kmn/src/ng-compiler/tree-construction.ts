@@ -20,13 +20,10 @@ export class ASTNode {
 
   /**
    * Construct an ASTNode
-   *
-   * @param nodeType the node type
-   * @param token a token from the input (or null)
    */
   public constructor(
-    /** the node type */
-    public readonly nodeType: NodeType,
+    /** the node type (default TMP) */
+    public readonly nodeType: NodeType=NodeType.TMP,
     /** a token (if appropriate) from the input */
     public readonly token: Token=null
   ) {
@@ -137,6 +134,15 @@ export class ASTNode {
   }
 
   /**
+   * Check if this node has one and only one child.
+   *
+   * @returns true if there is one and only one child
+   */
+  public hasSoleChild(): boolean  {
+    return this.getChildren().length == 1;
+  }
+
+  /**
    * Check if this node has one and only one child of a given type.
    *
    * @param requiredType the required type
@@ -223,6 +229,15 @@ export class ASTNode {
    */
   public removeFirstChild(): ASTNode {
     return this.hasChildren() ? this.children.shift() : null;
+  }
+
+  /**
+   * Remove the sole child node, if there is one and only one.
+   *
+   * @returns the sole child node or null
+   */
+  public removeSoleChild(): ASTNode {
+    return this.hasSoleChild() ? this.removeChildren()[0] : null;
   }
 
   /**
