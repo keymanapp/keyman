@@ -15,8 +15,9 @@ const XML_META_DATA_SYMBOL = XMLParser.getMetaDataSymbol();
 export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
 
 export type KeymanXMLType =
-  'keyboard3'           // LDML <keyboard3>
+  'keyboard3'             // LDML <keyboard3>
   | 'keyboardTest3'       // LDML <keyboardTest3>
+  | 'keylayout'           // keylayout
   | 'kps'                 // <Package>
   | 'kvks'                // <visualkeyboard>
   | 'kpj'                 // <KeymanDeveloperProject>
@@ -63,6 +64,16 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     ignoreAttributes: false, // We'd like attributes, please
     ignorePiTags: true,
     preserveOrder: true,     // Gives us a 'special' format
+  },
+  'keylayout': {
+    attributeNamePrefix: '@__',
+    htmlEntities: true,
+    ignoreAttributes: false, // use attributes
+    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+      // since trimValues: false, we need to zap any element values that would be trimmed.
+      return tagValue?.trim();
+    },
+    trimValues: false, // preserve spaces, but see tagValueProcessor
   },
   'kps': {
     ...PARSER_COMMON_OPTIONS,
@@ -285,6 +296,7 @@ export class KeymanXMLReader {
   }
 
   public parse(data: string): any {
+
     const parser = this.parser();
     let result = parser.parse(data, true);
     if (PARSER_OPTIONS[this.type].attributeNamePrefix === '$') {

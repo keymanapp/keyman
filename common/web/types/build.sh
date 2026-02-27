@@ -28,6 +28,7 @@ builder_parse "$@"
 function compile_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
   local schemas=(
+    "$KEYMAN_ROOT/resources/standards-data/keylayout/keylayout.schema.json"
     "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboard3.schema.json"
     "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboardtest3.schema.json"
     "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"

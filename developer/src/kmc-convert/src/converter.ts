@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Infrastructure for keyboard source file conversion tools
  */
@@ -28,6 +28,7 @@ export interface ConverterResult extends KeymanCompilerResult {
  * compiler does not read or write from filesystem or network directly, but
  * relies on callbacks for all external IO.
  */
+
 export class Converter implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: CompilerOptions;
@@ -57,33 +58,32 @@ export class Converter implements KeymanCompiler {
    * @returns         Source artifacts on success, null on failure.
    */
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult> {
-
     const converterOptions: CompilerOptions = {
       ...defaultCompilerOptions,
       ...this.options,
     };
 
-    if(!outputFilename) {
+    if (!outputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
       return null;
     }
 
     const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename);
-    if(!ConverterClass) {
-      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({inputFilename, outputFilename}));
+    if (!ConverterClass) {
+      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename }));
       return null;
     }
 
     const binaryData = this.callbacks.loadFile(inputFilename);
-    if(!binaryData) {
-      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({inputFilename}));
+    if (!binaryData) {
+      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
     }
 
     const converter = new ConverterClass(this.callbacks, converterOptions);
-    const artifacts = await converter.run(inputFilename, outputFilename, binaryData);
+    const result = await converter.run(inputFilename, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
-    return artifacts ? { artifacts } : null;
+    return result ?  result : null;
   }
 
   /**
@@ -99,8 +99,8 @@ export class Converter implements KeymanCompiler {
    * @returns true on success
    */
   async write(artifacts: ConverterArtifacts): Promise<boolean> {
-    for(const key of Object.keys(artifacts)) {
-      if(artifacts[key]) {
+    for (const key of Object.keys(artifacts)) {
+      if (artifacts[key]) {
         this.callbacks.fs.writeFileSync(artifacts[key].filename, artifacts[key].data);
       }
     }
