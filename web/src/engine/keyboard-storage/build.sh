@@ -34,16 +34,16 @@ builder_parse "$@"
 do_build () {
   compile $SUBPROJECT_NAME
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/index.mjs" \
+  node "${LIB_BUNDLER}"    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/index.js" \
+    --out                  "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/index.mjs" \
     --format esm
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/domCloudRequester.js" \
-    --out        "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/dom-cloud-requester.mjs" \
+  node "${LIB_BUNDLER}"    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/domCloudRequester.js" \
+    --out                  "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/dom-cloud-requester.mjs" \
     --format esm
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/nodeCloudRequester.js" \
-    --out        "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/node-cloud-requester.mjs" \
+  node "${LIB_BUNDLER}"    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/nodeCloudRequester.js" \
+    --out                  "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/node-cloud-requester.mjs" \
     --format   esm \
     --platform node
 }
