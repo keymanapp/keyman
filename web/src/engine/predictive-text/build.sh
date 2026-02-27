@@ -40,8 +40,6 @@ builder_describe_outputs \
   build:worker-main             "/web/src/engine/worker-main/build/obj/lmlayer.js" \
   build:worker-thread           "/web/src/engine/worker-thread/build/obj/worker-main.wrapped.js"
 
-BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 #### Build action definitions ####
 
 # We can run all clean & configure actions at once without much issue.
