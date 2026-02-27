@@ -1,22 +1,25 @@
-//
-// .keyman-touch-layout JSON format
-//
-// Follows /common/schemas/keyman-touch-layout/keyman-touch-layout.spec.json for
-// reading and
-// /common/schemas/keyman-touch-layout/keyman-touch-layout.clean.spec.json for
-// writing
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * .keyman-touch-layout JSON format definitions
+ *
+ * Follows scheams in /common/schemas/keyman-touch-layout/, using
+ * keyman-touch-layout.spec.json for reading and
+ * keyman-touch-layout.clean.spec.json for writing
+ */
 
 /**
  * On screen keyboard description consisting of specific layouts for tablet, phone,
  * and desktop. Despite its name, this format is used for both touch layouts and
  * hardware-style layouts.
  */
-export interface TouchLayoutFile {
+export type TouchLayoutFile = {
   tablet?: TouchLayoutPlatform;
   phone?: TouchLayoutPlatform;
   desktop?: TouchLayoutPlatform;
 };
+
+export type TouchLayoutPlatformName = keyof TouchLayoutFile;
 
 export type TouchLayoutFont = string;
 export type TouchLayoutFontSize = string;

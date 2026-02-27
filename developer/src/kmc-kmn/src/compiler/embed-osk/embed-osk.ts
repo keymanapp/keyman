@@ -12,8 +12,7 @@ import { KMXPlusVersion } from "@keymanapp/ldml-keyboard-constants";
 import { KmnCompilerOptions } from "../compiler.js";
 import { PuaMap, loadKvkFile } from "../osk.js";
 import { EmbedOskKvkInKmx } from "./embed-osk-kvk.js";
-
-// import { EmbedOskTouchLayoutInKmx } from "./embed-osk-touch-layout.js";
+import { EmbedOskTouchLayoutInKmx } from "./embed-osk-touch-layout.js";
 
 export class EmbedOskInKmx {
   constructor(
@@ -31,7 +30,7 @@ export class EmbedOskInKmx {
     kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus);
     kmx.kmxplus.disp = new KMXPlus.Disp();
     kmx.kmxplus.keys = new KMXPlus.Keys(strs);
-    // list?
+    kmx.kmxplus.list = new KMXPlus.List(strs);
     kmx.kmxplus.loca = new KMXPlus.Loca();
     kmx.kmxplus.meta = new KMXPlus.Meta();
     kmx.kmxplus.meta.author = strs.allocString();
@@ -68,6 +67,15 @@ export class EmbedOskInKmx {
       embedKvk.transformVisualKeyboardToKmxPlus(kmxPlus, vk);
     }
 
+    if(touchLayoutFilename) {
+      const embedTouchLayout = new EmbedOskTouchLayoutInKmx(this.callbacks);
+      const tl = embedTouchLayout.loadTouchLayoutFile(touchLayoutFilename);
+      if(!tl) {
+        // error will have been reported by loadTouchLayoutFile
+        return null;
+      }
+      embedTouchLayout.transformTouchLayoutToKmxPlus(kmxPlus, tl);
+    }
 
     // TODO-EMBED-OSK-IN-KMX: touch layout to ldml
     // TODO-EMBED-OSK-IN-KMX: display map remapping
