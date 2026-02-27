@@ -40,7 +40,8 @@ builder_describe \
   ":setup                       Keyman Developer setup bootstrap" \
   ":test=test/auto              Various older tests (others in each module)" \
   ":tike                        Keyman Developer IDE" \
-  ":inst                        Bundled installers"
+  ":inst                        Bundled installers" \
+  ":vscode-plugin               Keyman Developer for VSCode"
 
 builder_describe_platform \
   :ext       win,delphi \
