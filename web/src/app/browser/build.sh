@@ -49,25 +49,25 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/browser"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/browser/src"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
-    --out        "${BUILD_ROOT}/debug/keymanweb.js" \
-    --charset    "utf8" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/browser/debug" \
-    --target     "es6"
+  node "${LIB_BUNDLER}"    "${SRC_ROOT}/debug-main.js" \
+    --out                  "${BUILD_ROOT}/debug/keymanweb.js" \
+    --charset              "utf8" \
+    --sourceRoot           "@keymanapp/keyman/web/build/app/browser/debug" \
+    --target               "es6"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
-    --out        "${BUILD_ROOT}/release/keymanweb.js" \
-    --charset    "utf8" \
-    --profile    "${BUILD_ROOT}/filesize-profile.log" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/browser/release" \
-    --minify \
-    --target     "es6"
+  node "${LIB_BUNDLER}"    "${SRC_ROOT}/release-main.js" \
+    --out                  "${BUILD_ROOT}/release/keymanweb.js" \
+    --charset              "utf8" \
+    --profile              "${BUILD_ROOT}/filesize-profile.log" \
+    --sourceRoot           "@keymanapp/keyman/web/build/app/browser/release" \
+    --minify               \
+    --target               "es6"
 
-  $BUNDLE_CMD    "${BUILD_ROOT}/obj/test-index.js" \
-    --out        "${BUILD_ROOT}/lib/index.mjs" \
-    --charset    "utf8" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/browser/lib" \
-    --format esm
+  node "${LIB_BUNDLER}"    "${BUILD_ROOT}/obj/test-index.js" \
+    --out                  "${BUILD_ROOT}/lib/index.mjs" \
+    --charset              "utf8" \
+    --sourceRoot           "@keymanapp/keyman/web/build/app/browser/lib" \
+    --format               esm
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
