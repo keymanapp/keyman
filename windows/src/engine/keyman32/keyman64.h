@@ -75,7 +75,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>
-#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
+#include "../../../../common/include/kmx_file.h"
 #include "../../../../common/windows/cpp/include/registry.h"
 #include "../../../../common/windows/cpp/include/unicode.h"
 #include "../../../../common/windows/cpp/include/xstring.h"
@@ -125,6 +125,12 @@
 #define SCAN_FLAG_KEYMAN_KEY_EVENT          0xFF
 
 #define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000
+
+// Reserved for hotkey remapping, aligns with HK_ defined in kmx_file.h
+#define HK_RALT_INVALID     0x00100000
+#define HK_RCTRL_INVALID    0x00200000
+#define HK_RSHIFT_INVALID   0x00400000
+
 
 /***************************************************************************/
 // wm_keyman

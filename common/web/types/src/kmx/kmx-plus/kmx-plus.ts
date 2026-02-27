@@ -1,9 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * KMX+ file format structures and helper functions
+ */
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from '../../ldml-keyboard/string-list.js';
 import * as util from '../../util/util.js';
-import * as KMX from '../kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '../../ldml-keyboard/unicodeset-parser-api.js';
 import { VariableParser } from '../../ldml-keyboard/pattern-parser.js';
 import { MarkerParser } from '../../ldml-keyboard/pattern-parser.js';
@@ -12,7 +15,7 @@ import isOneChar = util.isOneChar;
 import toOneChar = util.toOneChar;
 import unescapeString = util.unescapeString;
 import escapeStringForRegex = util.escapeStringForRegex;
-import KMXFile = KMX.KMXFile;
+import { KMXPlusFileFormat } from './kmx-plus-file.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts
@@ -480,11 +483,93 @@ export class Bksp extends Tran {
   }
 };
 
+export enum DispItemFlags {
+  isId = constants.disp_item_flags_is_id,
+  isSvg = constants.disp_item_flags_is_svg,
+
+  maskHint = constants.disp_item_flags_mask_hint,
+
+  hintPrimary = constants.disp_item_hint_primary << constants.disp_item_flags_shift_hint,
+  hintNW = constants.disp_item_hint_nw << constants.disp_item_flags_shift_hint,
+  hintN = constants.disp_item_hint_n << constants.disp_item_flags_shift_hint,
+  hintNE = constants.disp_item_hint_ne << constants.disp_item_flags_shift_hint,
+  hintW = constants.disp_item_hint_w << constants.disp_item_flags_shift_hint,
+  hintE = constants.disp_item_hint_e << constants.disp_item_flags_shift_hint,
+  hintSW = constants.disp_item_hint_sw << constants.disp_item_flags_shift_hint,
+  hintS = constants.disp_item_hint_s << constants.disp_item_flags_shift_hint,
+  hintSE = constants.disp_item_hint_se << constants.disp_item_flags_shift_hint,
+
+  maskKeyCapType = constants.disp_item_flags_mask_key_cap_type,
+
+  keyCapShift = constants.disp_key_cap_shift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEnter = constants.disp_key_cap_enter << constants.disp_item_flags_shift_key_cap_type,
+  keyCapTab = constants.disp_key_cap_tab << constants.disp_item_flags_shift_key_cap_type,
+  keyCapBksp = constants.disp_key_cap_bksp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapMenu = constants.disp_key_cap_menu << constants.disp_item_flags_shift_key_cap_type,
+  keyCapHide = constants.disp_key_cap_hide << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAlt = constants.disp_key_cap_alt << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCtrl = constants.disp_key_cap_ctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCaps = constants.disp_key_cap_caps << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAbc_Upper = constants.disp_key_cap_abc_upper << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAbc_Lower = constants.disp_key_cap_abc_lower << constants.disp_item_flags_shift_key_cap_type,
+  keyCap123 = constants.disp_key_cap_123 << constants.disp_item_flags_shift_key_cap_type,
+  keyCapSymbol = constants.disp_key_cap_symbol << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCurrency = constants.disp_key_cap_currency << constants.disp_item_flags_shift_key_cap_type,
+  keyCapShifted = constants.disp_key_cap_shifted << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAltgr = constants.disp_key_cap_altgr << constants.disp_item_flags_shift_key_cap_type,
+  keyCapTableft = constants.disp_key_cap_tableft << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLalt = constants.disp_key_cap_lalt << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRalt = constants.disp_key_cap_ralt << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLctrl = constants.disp_key_cap_lctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRctrl = constants.disp_key_cap_rctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLaltctrl = constants.disp_key_cap_laltctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRaltctrl = constants.disp_key_cap_raltctrl << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLaltctrlshift = constants.disp_key_cap_laltctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRaltctrlshift = constants.disp_key_cap_raltctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAltshift = constants.disp_key_cap_altshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCtrlshift = constants.disp_key_cap_ctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapAltctrlshift = constants.disp_key_cap_altctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLaltshift = constants.disp_key_cap_laltshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRaltshift = constants.disp_key_cap_raltshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLctrlshift = constants.disp_key_cap_lctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRctrlshift = constants.disp_key_cap_rctrlshift << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLtrenter = constants.disp_key_cap_ltrenter << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLtrbksp = constants.disp_key_cap_ltrbksp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRtlenter = constants.disp_key_cap_rtlenter << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRtlbksp = constants.disp_key_cap_rtlbksp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapShiftlock = constants.disp_key_cap_shiftlock << constants.disp_item_flags_shift_key_cap_type,
+  keyCapShiftedlock = constants.disp_key_cap_shiftedlock << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnj = constants.disp_key_cap_zwnj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnjios = constants.disp_key_cap_zwnjios << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnjandroid = constants.disp_key_cap_zwnjandroid << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwnjgeneric = constants.disp_key_cap_zwnjgeneric << constants.disp_item_flags_shift_key_cap_type,
+  keyCapSp = constants.disp_key_cap_sp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapNbsp = constants.disp_key_cap_nbsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapNarnbsp = constants.disp_key_cap_narnbsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEnq = constants.disp_key_cap_enq << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEmq = constants.disp_key_cap_emq << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEnsp = constants.disp_key_cap_ensp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapEmsp = constants.disp_key_cap_emsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapPunctsp = constants.disp_key_cap_punctsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapThsp = constants.disp_key_cap_thsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapHsp = constants.disp_key_cap_hsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwsp = constants.disp_key_cap_zwsp << constants.disp_item_flags_shift_key_cap_type,
+  keyCapZwj = constants.disp_key_cap_zwj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapWj = constants.disp_key_cap_wj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapCgj = constants.disp_key_cap_cgj << constants.disp_item_flags_shift_key_cap_type,
+  keyCapLtrm = constants.disp_key_cap_ltrm << constants.disp_item_flags_shift_key_cap_type,
+  keyCapRtlm = constants.disp_key_cap_rtlm << constants.disp_item_flags_shift_key_cap_type,
+  keyCapSh = constants.disp_key_cap_sh << constants.disp_item_flags_shift_key_cap_type,
+  keyCapHtab = constants.disp_key_cap_htab << constants.disp_item_flags_shift_key_cap_type,
+}
+
 // 'disp'
-export class DispItem {
-  to: StrsItem;
-  id: StrsItem;
+export interface DispItem {
+  to: StrsItem;   // not used in v19
+  id: StrsItem;   // not used in v19
   display: StrsItem;
+  toId: StrsItem; // v19
+  flags: DispItemFlags; // v19
 };
 
 export class Disp extends Section {
@@ -494,13 +579,31 @@ export class Disp extends Section {
 
 // 'layr'
 
+export enum LayrFormFlags {
+   showBaseLayout = constants.layr_form_flags_show_base_layout,
+   chiralSeparate = constants.layr_form_flags_chiral_separate,
+};
+
+export enum LayrFormHardware {
+  touch = 'touch', // layr_form_hardware_touch
+  abnt2 = 'abnt2', // layr_form_hardware_abnt2
+  iso = 'iso',     // layr_form_hardware_iso
+  jis = 'jis',     // layr_form_hardware_jis
+  ks = 'ks',       // layr_form_hardware_ks
+  us = 'us',       // layr_form_hardware_us
+};
+
 /**
  * In-memory `<layers>`
  */
-export class LayrList {
+export class LayrForm {
   hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
+  baseLayout: StrsItem;   // v19
+  fontFaceName: StrsItem; // v19
+  fontSizePct: number;    // v19 (integer percentage)
+  flags: LayrFormFlags;   // v19
 };
 
 /**
@@ -520,11 +623,23 @@ export class LayrList {
 };
 
 export class Layr extends Section {
-  lists: LayrList[] = [];
+  forms: LayrForm[] = [];
+};
+
+export enum KeysKeysFlags {
+  /**
+   * 0 if to is a char, 1 if it is a string
+   */
+  extend = constants.keys_key_flags_extend,
+
+  /**
+   * 1 if the key is a gap
+   */
+  gap = constants.keys_key_flags_gap,
 };
 
 export class KeysKeys {
-  flags: number;
+  flags: KeysKeysFlags;
   flicks: string; // for in-memory only
   id: StrsItem;
   longPress: ListItem;
@@ -613,8 +728,12 @@ export class List extends Section {
 
 export { ListItem as ListItem };
 
+/**
+ * In-memory representation of KMX+ data. See also `KMXPlusFileFormat` and
+ * `KMXPlusFile`.
+ */
 export interface KMXPlusData {
-    sect?: Strs; // sect is ignored in-memory
+    sect?: Sect; // sect is ignored in-memory
     bksp?: Bksp;
     disp?: Disp;
     elem?: Elem; // elem is ignored in-memory
@@ -629,356 +748,7 @@ export interface KMXPlusData {
     vars?: Vars;
 };
 
-export class KMXPlusFile extends KMXFile {
-
-  /* KMXPlus file structures */
-
-  public readonly COMP_PLUS_SECT_ITEM: any;
-  public readonly COMP_PLUS_SECT: any;
-
-  // COMP_PLUS_BKSP == COMP_PLUS_TRAN
-  public readonly COMP_PLUS_BKSP_ITEM: any;
-  public readonly COMP_PLUS_BKSP: any;
-
-  public readonly COMP_PLUS_DISP_ITEM: any;
-  public readonly COMP_PLUS_DISP: any;
-
-  public readonly COMP_PLUS_ELEM_ELEMENT: any;
-  public readonly COMP_PLUS_ELEM_STRING: any;
-  public readonly COMP_PLUS_ELEM: any;
-
-  // COMP_PLUS_KEYS is now COMP_PLUS_KEYS_KMAP
-
-  public readonly COMP_PLUS_LAYR_ENTRY: any;
-  public readonly COMP_PLUS_LAYR_KEY: any;
-  public readonly COMP_PLUS_LAYR_LIST: any;
-  public readonly COMP_PLUS_LAYR_ROW: any;
-  public readonly COMP_PLUS_LAYR: any;
-
-  public readonly COMP_PLUS_KEYS_FLICK: any;
-  public readonly COMP_PLUS_KEYS_FLICKS: any;
-  public readonly COMP_PLUS_KEYS_KEY: any;
-  public readonly COMP_PLUS_KEYS_KMAP: any;
-  public readonly COMP_PLUS_KEYS: any;
-
-  public readonly COMP_PLUS_LIST_LIST: any;
-  public readonly COMP_PLUS_LIST_INDEX: any;
-  public readonly COMP_PLUS_LIST: any;
-
-  public readonly COMP_PLUS_LOCA_ITEM: any;
-  public readonly COMP_PLUS_LOCA: any;
-
-  public readonly COMP_PLUS_META: any;
-
-  public readonly COMP_PLUS_STRS_ITEM: any;
-  public readonly COMP_PLUS_STRS: any;
-
-  public readonly COMP_PLUS_TRAN_GROUP: any;
-  public readonly COMP_PLUS_TRAN_TRANSFORM: any;
-  public readonly COMP_PLUS_TRAN_REORDER: any;
-  public readonly COMP_PLUS_TRAN: any;
-
-  public readonly COMP_PLUS_USET_USET: any;
-  public readonly COMP_PLUS_USET_RANGE: any;
-  public readonly COMP_PLUS_USET: any;
-
-  public readonly COMP_PLUS_VKEY_ITEM: any;
-  public readonly COMP_PLUS_VKEY: any;
-
-  public readonly COMP_PLUS_VARS: any;
-  public readonly COMP_PLUS_VARS_ITEM: any;
-
+export class KMXPlusFile extends KMXPlusFileFormat {
   /* File in-memory data */
-
   public kmxplus: KMXPlusData = { };
-
-  constructor() {
-    super();
-    // Binary-correct structures matching kmx_plus.h
-
-    // helpers
-    const STR_REF       = r.uint32le;
-    const ELEM_REF      = r.uint32le;
-    const LIST_REF      = r.uint32le;
-    const STR_OR_CHAR32 = r.uint32le;
-    const CHAR32        = r.uint32le;
-    const STR_OR_CHAR32_OR_USET = r.uint32le;
-    const IDENT         = r.uint32le;
-    // 'sect'
-
-    this.COMP_PLUS_SECT_ITEM = new r.Struct({
-      sect: r.uint32le,
-      offset: r.uint32le //? new r.VoidPointer(r.uint32le, {type: 'global'})
-    });
-
-    this.COMP_PLUS_SECT = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      total: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_SECT_ITEM, 'count')
-    });
-
-    // 'bksp' - see 'tran'
-
-    // 'disp'
-    this.COMP_PLUS_DISP_ITEM = new r.Struct({
-      to: STR_REF,
-      id: STR_REF,
-      display: STR_REF,
-    });
-
-    this.COMP_PLUS_DISP = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      count: r.uint32le,
-      baseCharacter: CHAR32,
-      items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
-    });
-
-    // 'elem'
-
-    this.COMP_PLUS_ELEM_ELEMENT = new r.Struct({
-      element: STR_OR_CHAR32_OR_USET,
-      flags: r.uint32le
-    });
-
-    this.COMP_PLUS_ELEM_STRING = new r.Struct({
-      offset: r.uint32le,
-      length: r.uint32le
-    });
-
-    this.COMP_PLUS_ELEM = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      count: r.uint32le,
-      strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
-      // + variable subtable: Element data (see KMXPlusBuilder.emitElements())
-    });
-
-    // 'finl' - see 'tran'
-
-    // 'keys' - see 'keys.kmap'
-
-    // 'layr'
-
-    this.COMP_PLUS_LAYR_ENTRY = new r.Struct({
-      id: r.uint32le, // str
-      mod: r.uint32le, // bitfield
-      row: r.uint32le, // index into rows
-      count: r.uint32le,
-    });
-
-    this.COMP_PLUS_LAYR_KEY = new r.Struct({
-      key: r.uint32le, // str: key id
-    });
-
-    this.COMP_PLUS_LAYR_LIST = new r.Struct({
-      hardware: STR_REF, // str: hardware name
-      layer: r.uint32le, // index into layers
-      count: r.uint32le,
-      minDeviceWidth: r.uint32le, // integer: millimeters
-    });
-
-    this.COMP_PLUS_LAYR_ROW = new r.Struct({
-      key: r.uint32le,
-      count: r.uint32le,
-    });
-
-    this.COMP_PLUS_LAYR = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      listCount: r.uint32le,
-      layerCount: r.uint32le,
-      rowCount: r.uint32le,
-      keyCount: r.uint32le,
-      lists: new r.Array(this.COMP_PLUS_LAYR_LIST, 'listCount'),
-      layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
-      rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
-      keys: new r.Array(this.COMP_PLUS_LAYR_KEY, 'keyCount'),
-    });
-
-    this.COMP_PLUS_KEYS_FLICK = new r.Struct({
-      directions: LIST_REF, // list
-      to: STR_OR_CHAR32, // str | codepoint
-    });
-
-    this.COMP_PLUS_KEYS_FLICKS = new r.Struct({
-      count: r.uint32le,
-      flick: r.uint32le,
-      id: STR_REF, // str
-    });
-
-    this.COMP_PLUS_KEYS_KEY = new r.Struct({
-      to: STR_OR_CHAR32, // str | codepoint
-      flags: r.uint32le,
-      id: STR_REF, // str
-      switch: STR_REF, // str
-      width: r.uint32le, // width*10  ( 1 = 0.1 keys)
-      longPress: LIST_REF, // list index
-      longPressDefault: STR_REF, // str
-      multiTap: LIST_REF, // list index
-      flicks: r.uint32le, // index into flicks table
-    });
-
-    this.COMP_PLUS_KEYS_KMAP = new r.Struct({
-      vkey: r.uint32le,
-      mod: r.uint32le,
-      key: r.uint32le, // index into 'keys' subtable
-    });
-
-    this.COMP_PLUS_KEYS = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      keyCount: r.uint32le,
-      flicksCount: r.uint32le,
-      flickCount: r.uint32le,
-      kmapCount: r.uint32le,
-      keys: new r.Array(this.COMP_PLUS_KEYS_KEY, 'keyCount'),
-      flicks: new r.Array(this.COMP_PLUS_KEYS_FLICKS, 'flicksCount'),
-      flick: new r.Array(this.COMP_PLUS_KEYS_FLICK, 'flickCount'),
-      kmap: new r.Array(this.COMP_PLUS_KEYS_KMAP, 'kmapCount'),
-    });
-
-    // 'list'
-
-    this.COMP_PLUS_LIST_LIST = new r.Struct({
-      index: r.uint32le,
-      count: r.uint32le,
-    });
-
-    this.COMP_PLUS_LIST_INDEX = new r.Struct({
-      str: STR_REF, // str
-    });
-
-    this.COMP_PLUS_LIST = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      listCount: r.uint32le,
-      indexCount: r.uint32le,
-      lists: new r.Array(this.COMP_PLUS_LIST_LIST, 'listCount'),
-      indices: new r.Array(this.COMP_PLUS_LIST_INDEX, 'indexCount'),
-    });
-
-    // 'loca'
-
-    this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
-
-    this.COMP_PLUS_LOCA = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
-    });
-
-    // 'meta'
-
-    this.COMP_PLUS_META = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      author: STR_REF, //str
-      conform: STR_REF, //str
-      layout: STR_REF, //str
-      name: STR_REF, //str
-      indicator: STR_REF, //str
-      version: STR_REF, //str
-      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['normalizationDisabled'])
-    });
-
-    // 'name' is gone
-
-    // 'ordr' now part of 'tran'
-
-    // 'strs'
-
-    this.COMP_PLUS_STRS_ITEM = new r.Struct({
-      // While we use length which is number of utf-16 code units excluding null terminator,
-      // we always write a null terminator, so we can get restructure to do that for us here
-      offset: r.uint32le, //? new r.Pointer(r.uint32le, new r.String(null, 'utf16le')),
-      length: r.uint32le
-    });
-
-    this.COMP_PLUS_STRS = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
-      // + variable subtable: String data (see KMXPlusBuilder.emitStrings())
-    });
-
-    // 'tran'
-
-    this.COMP_PLUS_TRAN_GROUP = new r.Struct({
-      type: r.uint32le, //type of group
-      count: r.uint32le, //number of items
-      index: r.uint32le, //index into subtable
-    });
-
-    this.COMP_PLUS_TRAN_TRANSFORM = new r.Struct({
-      from: STR_REF, //str
-      to: STR_REF, //str
-      mapFrom: ELEM_REF, //elem
-      mapTo: ELEM_REF //elem
-    });
-
-    this.COMP_PLUS_TRAN_REORDER = new r.Struct({
-      elements: ELEM_REF, //elem
-      before: ELEM_REF, //elem
-    });
-
-    this.COMP_PLUS_TRAN = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      groupCount: r.uint32le,
-      transformCount: r.uint32le,
-      reorderCount: r.uint32le,
-      groups: new r.Array(this.COMP_PLUS_TRAN_GROUP, 'groupCount'),
-      transforms: new r.Array(this.COMP_PLUS_TRAN_TRANSFORM, 'transformCount'),
-      reorders: new r.Array(this.COMP_PLUS_TRAN_REORDER, 'reorderCount'),
-    });
-
-    // 'uset'
-    this.COMP_PLUS_USET_USET = new r.Struct({
-      range: r.uint32le,
-      count: r.uint32le,
-      pattern: STR_REF, // str
-    });
-
-    this.COMP_PLUS_USET_RANGE = new r.Struct({
-      start: CHAR32,
-      end: CHAR32,
-    });
-
-    this.COMP_PLUS_USET = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      usetCount: r.uint32le,
-      rangeCount: r.uint32le,
-      usets: new r.Array(this.COMP_PLUS_USET_USET, 'usetCount'),
-      ranges: new r.Array(this.COMP_PLUS_USET_RANGE, 'rangeCount'),
-    });
-
-    // 'vars'
-
-    this.COMP_PLUS_VARS_ITEM = new r.Struct({
-      type: r.uint32le,
-      id: STR_REF, // str
-      value: STR_REF, // str
-      elem: ELEM_REF,
-    });
-
-    this.COMP_PLUS_VARS = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      markers: LIST_REF,
-      varCount: r.uint32le,
-      varEntries: new r.Array(this.COMP_PLUS_VARS_ITEM, 'varCount'),
-    });
-
-    // 'vkey' is removed
-
-    // Aliases
-
-    this.COMP_PLUS_BKSP = this.COMP_PLUS_TRAN;
-  }
-}
+};

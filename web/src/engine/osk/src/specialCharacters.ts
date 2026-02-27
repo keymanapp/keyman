@@ -1,5 +1,12 @@
 // Defines the PUA code mapping for the various 'special' modifier/control/non-printing keys on keyboards.
-// `specialCharacters` must be kept in sync with the same variable in constants.js. See also CompileKeymanWeb.pas: CSpecialText10
+//
+// `specialCharacters` must be kept in sync with the same values in:
+// * /developer/src/tike/xml/layoutBuilder/constants.js
+// * /developer/src/kmc-kmn/src/kmw-compiler/constants.ts
+// * /core/include/ldml/keyman_core_ldml.ts
+//
+// More information, and unit test, in /developer/src/kmc-kmn/tests/kmw/constants.tests.ts
+
 const specialCharacters = {
   '*Shift*':    8,
   '*Enter*':    5,

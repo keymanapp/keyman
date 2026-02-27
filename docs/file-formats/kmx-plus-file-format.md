@@ -9,7 +9,7 @@
 This document discusses the binary format for KMXPlus, which contains keyboards
 converted from source LDML data.
 
-Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
+Specification: <https://unicode.org/reports/tr35/tr35-keyboards.html>
 
 ## C7043.1 Principles
 
@@ -120,7 +120,7 @@ Each element string is made up of elements with the following item structure:
 
 ### C7043.2.5 Removed: old-format `keys`
 
-_this section has been merged into the new `keys.kmap`_
+_this section has been merged into the new `key2.kmap`_
 
 ### C7043.2.6 `loca`—Locales
 
@@ -150,7 +150,7 @@ locale IDs (starting at offset 16) are in sorted binary order.
 | 8 |  32  | author        | str: Keyboard author                |
 |12 |  32  | conform       | str: CLDR 'conformsTo' version      |
 |16 |  32  | layout        | str: layout type                    |
-|20 |  32  | name          | str: keyboard nme                   |
+|20 |  32  | name          | str: keyboard name                  |
 |24 |  32  | indicator     | str: indicator                      |
 |28 |  32  | version       | str: keyboard version               |
 |32 |  32  | settings      | int: keyboard settings              |
@@ -294,32 +294,35 @@ Represents layers on the keyboard.
 |---|------|------------|------------------------------------------|
 | 0 |  32  | ident      | `layr`                                   |
 | 4 |  32  | size       | int: Length of section                   |
-| 8 |  32  | listCount  | int: Number of layer lists               |
+| 8 |  32  | formCount  | int: Number of layer forms               |
 |12 |  32  | layerCount | int: number of layer entries             |
 |16 |  32  | rowCount   | int: number of row entries               |
 |20 |  32  | keyCount   | int: number of key entries               |
-|24 | var  | lists      | layer list sub-table                     |
+|24 | var  | forms      | layer form sub-table                     |
 | - | var  | layers     | layers sub-table                         |
 | - | var  | rows       | rows sub-table                           |
 | - | var  | keys       | keys sub-table                           |
 
-### `layr.lists` subtable
+### `layr.forms` subtable
 
-Each layer list corresponds to one `<layers>` element.
-There are `listCount` total lists.
+Each layer form corresponds to one `<layers>` element.
+There are `formCount` total forms.
+
+Note: renamed from `lists` to `forms` in Keyman 19, to increase clarity
+and differentiate from other uses of `list`.
 
 | ∆ | Bits | Name             | Description                                |
 |---|------|------------------|--------------------------------------------|
 | 0+|  32  | hardware         | str: name of hardware layout.              |
 | 4+|  32  | layer            | int: index to first layer element          |
-| 8+|  32  | count            | int: number of layer elements in this list |
+| 8+|  32  | count            | int: number of layer elements in this form |
 |12+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
-- `hardware` is the name of a form, or the string `touch`
+- `hardware` is the name of a form, or the string `"touch"`.
 
 See UTS #35 section 7 for details about these values.
 
-Layer lists are sorted by `hardware` string, then minDeviceWidth ascending.
+Layer forms are sorted by `hardware` string, then minDeviceWidth ascending.
 
 ### `layr.layers` subtable
 
@@ -336,7 +339,7 @@ both with `id="abc"`, but one with key flags of 0x0000 and one with keyflags of 
 | 8+|  32  | row        | int: index into rows area (next section)       |
 |12+|  32  | count      | int: number of `rows` elements for this layer  |
 
-- for `mod` see `keys.key.mod`
+- for `mod` see `key2.kmap.mod`
 
 ### `layr.rows` subtable
 
@@ -400,17 +403,17 @@ on the `id` field.
 
 For each key:
 
-| ∆ | Bits | Name             | Description                                              |
-|---|------|----------------  |----------------------------------------------------------|
-| 0+|  32  | to               | str: output string OR UTF-32LE codepoint                 |
-| 4+|  32  | flags            | int: per-key flags                                       |
-| 8+|  32  | id               | str: key id                                              |
-|12+|  32  | switch           | str: layer id to switch to                               |
-|16+|  32  | width            | int: key width*10 (supports 0.1 as min width)            |
+| ∆ | Bits | Name             | Description                                                     |
+|---|------|----------------  |-----------------------------------------------------------------|
+| 0+|  32  | to               | str: output string OR UTF-32LE codepoint                        |
+| 4+|  32  | flags            | int: per-key flags                                              |
+| 8+|  32  | id               | str: key id                                                     |
+|12+|  32  | switch           | str: layer id to switch to                                      |
+|16+|  32  | width            | int: key width*10 (supports 0.1 as min width)                   |
 |20+|  32  | longPress        | list: index into `list` section with longPress key id list or 0 |
-|24+|  32  | longPressDefault | str: default longpress key id or 0                           |
+|24+|  32  | longPressDefault | str: default longpress key id or 0                              |
 |28+|  32  | multiTap         | list: index into `list` section with multiTap key id list or 0  |
-|32+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
+|32+|  32  | flicks           | int: index into `key2.flicks` subtable                          |
 
 - `id`: The original string id from XML. This may be 0 to save space (i.e.
   omit the string id).
@@ -491,7 +494,7 @@ For each key:
 |  0x0020  | `ctrl`    | `K_CTRLFLAG`       | Either Control                                |
 |  0x0040  | `alt`     | `K_ALTFLAG`        | Either Alt                                    |
 |  0x0100  | `caps`    | `CAPITALFLAG`      | Caps lock                                     |
-|  0x10000 | `other` | n/a                  | Other (not used in conjunction with others)   |
+| 0x10000  | `other`   | n/a                | Other (not used in conjunction with others)   |
 
 TODO-LDML: Note that conforming to other keyman values, left versus right shift
 cannot be distinguished.
