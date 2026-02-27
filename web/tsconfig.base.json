@@ -16,5 +16,14 @@
     "importHelpers": true,
     "inlineSources": true,
     "sourceMap": true,
+
+    "baseUrl": "./",
+
+    "paths": {
+      // Note: this overrides paths in ../tsconfig.base.json
+      "keyman/common/web-utils": ["./src/common/web-utils/src/index.js"],
+      "keyman/engine/*": ["./src/engine/src/*/index.js"],
+    },
+
   }
 }

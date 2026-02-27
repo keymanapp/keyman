@@ -34,9 +34,9 @@
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { KMWString } from "@keymanapp/web-utils";
+import { KMWString } from "keyman/common/web-utils";
 
-import ModelCompositor from './model-compositor.js';
+import { ModelCompositor } from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Capabilities = LexicalModelTypes.Capabilities;
@@ -66,7 +66,7 @@ import { OutgoingMessageKind } from '@keymanapp/lm-message-types';
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
  */
-export default class LMLayerWorker {
+export class LMLayerWorker {
   /**
    * State pattern. This object handles onMessage().
    * handleMessage() can transition to a different state, if

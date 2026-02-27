@@ -3,9 +3,10 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, KeyboardProcessor, Mock } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
+import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
 
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 
@@ -16,7 +17,7 @@ const NUL = '\uFFFE';
  * ---------------------
  *
  * This suite contains two types of tests, both designed to test all possible variations
- * of behaviors that `KeyboardInterface.fullContextMatch` may be expected to handle.
+ * of behaviors that `JSKeyboardInterface.fullContextMatch` may be expected to handle.
  *
  * Type 1:  White-box tests for validity of the generated context-cache
  * - uses only the `baseSequence` of each test spec definition; does not
@@ -60,14 +61,14 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       var ruleSeq = new RecordedKeystrokeSequence(matchTest.sequence);
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
-      // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new Mock();
-      ruleSeq.test(proctor, target);
+      // We want to specify the TextStore for this test; our actual concern is the resulting context.
+      var textStore = new SyntheticTextStore();
+      ruleSeq.test(proctor, textStore);
 
       // Now for the real test!
-      let processor = new KeyboardProcessor(device);
+      let processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
       processor.keyboardInterface = keyboardWithHarness;
-      var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, target, ruleDef.rule);
+      var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, textStore, ruleDef.rule);
 
       var msg = matchTest.msg;
       if(!msg) {
@@ -882,7 +883,7 @@ var NUL_TEST_2 = {
 /* Keyman language equivalent:
  *
  * nul nul any(abc) context(3) > 'success'
- * 
+ *
  * This one may... "stretch" what's actually allowed by Keyman language rules,
  * but we wish to ensure that the actual context management is capable of
  * handling this.
@@ -925,7 +926,7 @@ var NUL_TEST_3 = {
 /* Keyman language equivalent:
  *
  * nul nul dk(1) any(abc) > 'success'
- * 
+ *
  * This may also "stretch" what's actually allowed by Keyman language rules,
  * but we wish to ensure that the actual context management is capable of
  * handling this.
@@ -1101,7 +1102,7 @@ var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1, NOTANY_NUL_TEST_2, NOTANY_NUL_TES
 
 describe('Engine - Context Matching', function() {
   before(async function() {
-    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
     const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js'));
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;
@@ -1111,20 +1112,19 @@ describe('Engine - Context Matching', function() {
   it('properly generates extended context data needed by context-matching checks below', function() {
     let matchDefs = FULL_RULE_SET;
 
-    for(var j = 0; j < matchDefs.length; j++) {
+    for(const ruleDef of matchDefs) {
       // Prepare the context!
-      var ruleDef = matchDefs[j];
-      var ruleSeq = new RecordedKeystrokeSequence(ruleDef.baseSequence);
+      const ruleSeq = new RecordedKeystrokeSequence(ruleDef.baseSequence);
       let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
 
-      // We want to specify the OutputTarget for this test; our actual concern is the resulting context.
-      var target = new Mock();
-      ruleSeq.test(proctor, target);
+      // We want to specify the TextStore for this test; our actual concern is the resulting context.
+      const textStore = new SyntheticTextStore();
+      ruleSeq.test(proctor, textStore);
 
       // Now for the real test!
-      let processor = new KeyboardProcessor(device);
+      const processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
       processor.keyboardInterface = keyboardWithHarness;
-      var res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, target);
+      const res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, textStore);
 
       assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);
     }

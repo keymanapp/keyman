@@ -1,0 +1,13 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) '0202 - alt'
+c Description: Tests Alt processing with non-US kbds.
+c keys: [K_A][K_B][K_C][RALT K_A][K_A][K_B][K_C][K_A]
+c expected: abcdabca
+
+store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+'c' + [Alt K_A] > "cd"
