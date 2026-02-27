@@ -55,6 +55,7 @@ export class KeymanEngineBase<
 
   private keyEventListener: KeyEventFullHandler = (event, callback) => {
     const outputTarget = this.contextManager.activeTarget;
+    const predictionContext = this.contextManager.predictionContext;
 
     if(!this.contextManager.activeKeyboard || !outputTarget) {
       if(callback) {
@@ -88,7 +89,7 @@ export class KeymanEngineBase<
         this.core.keyboardProcessor.layerId = oskLayer;
       }
     }
-    const result = this.core.processKeyEvent(event, outputTarget);
+    const result = this.core.processKeyEvent(event, outputTarget, predictionContext);
 
     if(result && result.transcription?.transform) {
       this.config.onRuleFinalization(result, this.contextManager.activeTarget);
@@ -249,6 +250,7 @@ export class KeymanEngineBase<
 
     const keyboardProcessor = this.core.keyboardProcessor;
     const predictionContext = new PredictionContext(this.core.languageProcessor, () => keyboardProcessor.layerId);
+    // Set the prediction context within languageProcessor (or InputProcessor / this.core)
     this.contextManager.configure({
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.

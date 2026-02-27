@@ -15,6 +15,7 @@ export { default as DeviceSpec, physicalKeyDeviceAlias } from "./deviceSpec.js";
 export { default as Version } from "./version.js";
 
 export { default as globalObject } from "./globalObject.js";
+export { RewindableCache } from "./rewindable-cache.js";
 
 export * as KMWString from './kmwstring.js';
 
