@@ -3,7 +3,7 @@
  */
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { Transcription } from './transcription.js';
-import { VariableStore, VariableStoreDictionary } from '../variableStore.js';
+import { VariableStore } from '../variableStore.js';
 import { SystemStoreDictionary } from '../systemStore.js';
 
 /**
@@ -34,7 +34,7 @@ export class ProcessorAction {
   /**
    * A set of variable stores with possible changes to be applied during finalization.
    */
-  variableStores: VariableStoreDictionary = {};
+  variableStores: VariableStore = {};
 
   /**
    * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.
