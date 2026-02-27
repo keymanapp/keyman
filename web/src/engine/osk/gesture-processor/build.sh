@@ -12,8 +12,6 @@ SUBPROJECT_NAME=engine/osk/gesture-processor
 . "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 BUILD_DIR="/web/src/engine/osk/gesture-processor/build"
 
 ################################ Main script ################################
@@ -46,8 +44,8 @@ function do_build_module() {
   # Build
   tsc --build $builder_verbose
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/${BUILD_DIR}/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.mjs" \
+  node "$LIB_BUNDLER"   "${KEYMAN_ROOT}/${BUILD_DIR}/obj/index.js" \
+    --out               "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.mjs" \
     --format esm
 }
 
