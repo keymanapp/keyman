@@ -60,14 +60,19 @@ The link file also appears locally.
 ##### Port lookup table
 After this, you can access the website at the following ports:
 
-| Website        |          URL          |  with website-local-proxy running | Docker Container Name  |
-|----------------|-----------------------|-----------------------------------|------------------------|
-| keyman.com     | http://localhost:8053 | http://keyman.com.localhost       | keyman-website         |
-| s.keyman.com   | http://localhost:8054 | http://s.keyman.com.localhost     | s-keyman-website       |
-| help.keyman    | http://localhost:8055 | http://help.keyman.com.localhost  | help-keyman-website    |
-| keymanweb.com  | http://localhost:8057 | http://keymanweb.com.localhost    | web-keyman-website     |
-|                |                       | http://web.keyman.com.localhost   |                        |
-| api.keyman.com | http://localhost:8058 | http://api.keyman.com.localhost   | api-keyman-com-website |
+| Website            |          URL          |  with website-local-proxy running          | Docker Container Name  |
+|--------------------|-----------------------|--------------------------------------------|------------------------|
+| keyman.com         | http://localhost:8053 | http://keyman.com.localhost                | keyman-website         |
+| s.keyman.com       | http://localhost:8054 | http://s.keyman.com.localhost              | s-keyman-website       |
+| help.keyman        | http://localhost:8055 | http://help.keyman.com.localhost           | help-keyman-website    |
+| keymanweb.com      | http://localhost:8057 | http://keymanweb.com.localhost             | web-keyman-website     |
+|                    |                       | http://web.keyman.com.localhost            |                        |
+| api.keyman.com     | http://localhost:8058 | http://api.keyman.com.localhost            | api-keyman-com-website |
+| status.keyman.com* | http://localhost:8060 | http://status-backend.keyman.com.localhost | status-keyman-website  |
+|                    | http://localhost:8061 | http://status.keyman.com.localhost         | status-keyman-public   |
+
+\* Note that status.keyman.com runs in two containers in development to allow for live reload and separation of logs for backend and frontend. 
+In production, only port 8060 is used.
 
 #### Remove the Docker container and image
 1. Run `./build.sh clean`.
@@ -96,15 +101,15 @@ Refer to **Port lookup table** above for Docker container names
 
 The table below shows server-side dependencies for each website
 
-|Website               | Depends On           |
-|----------------------|-------------         |
-| s.keyman.com         | <br><br>             |
-| downloads.keyman.com | <br><br>             |
-| api.keyman.com       | downloads.keyman.com<br>s.keyman.com |
-| keymanweb.com        | api.keyman.com       |
+| Website              | Depends On                             |
+|----------------------|----------------------------------------|
+| s.keyman.com         | <br><br>                               |
+| downloads.keyman.com | <br><br>                               |
+| api.keyman.com       | downloads.keyman.com<br>s.keyman.com   |
+| keymanweb.com        | api.keyman.com                         |
 | keyman.com           | api.keyman.com<br>downloads.keyman.com |
 | help.keyman.com      | api.keyman.com<br>downloads.keyman.com |
-
+| status.keyman.com    | api.keyman.com<br>downloads.keyman.com |
 
 ---------
 
