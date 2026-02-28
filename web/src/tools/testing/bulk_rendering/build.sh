@@ -31,9 +31,9 @@ builder_parse "$@"
 function do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/renderer_core.js" \
-    --out        "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/bulk_render.js" \
-    --sourceRoot "@keymanapp/keyman/web/build/$SUBPROJECT_NAME/lib/"
+  node "${LIB_BUNDLER}"    "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/renderer_core.js" \
+    --out                  "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/bulk_render.js" \
+    --sourceRoot           "@keymanapp/keyman/web/build/$SUBPROJECT_NAME/lib/"
 
   # To ensure it's available to the testing pages when served via localhost or build agent.
   cp "${KEYMAN_ROOT}/node_modules/@zip.js/zip.js/dist/zip.min.js" \

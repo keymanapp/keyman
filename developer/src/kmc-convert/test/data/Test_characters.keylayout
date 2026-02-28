@@ -27,7 +27,7 @@
             <!-- empty output will not be written into kmn-->
             <key code="1" output=""/>
             <key code="2" output="ä"/>
-            <key code="3" output="@"/>
+            <key code="3" output="W̊"/>
             <key code="4" output="ሴ"/>
             <key code="5" output="😎"/>
         </keyMap>
@@ -38,6 +38,11 @@
             <key code="3" output="U+1F600"/>
             <key code="4" output="U+0002"/>
             <key code="5" output="&#x0004;"/>
+            <key code="6" output="&amp;"/>
+            <key code="43" output="&lt;"/>
+            <key code="37" output="&gt;"/>
+            <key code="39" output="&apos;"/>
+            <key code="19" output="&quot;"/>        
         </keyMap>
     </keyMapSet>
     <actions>
