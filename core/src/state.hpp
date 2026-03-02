@@ -179,7 +179,15 @@ public:
     /**
      * This is used to track whether the backspace key was handled internally
      * during the keydown event. This is needed so that we can return the same
-     * value from the keyup event. Only used when processing KM_CORE_VKEY_BKSP.
+     * value from the keyup event as we did for the keydown event.
+     *
+     * Backspace is the only key that we sometimes handle internally (if we
+     * have enough context) and sometimes not. By the time we get the keyup
+     * event the context already got updated and so we have no way of knowing
+     * whether or not the keydown handled it internally. Therefore this
+     * flag exists.
+     *
+     *  Only used when processing KM_CORE_VKEY_BKSP.
      */
     void set_backspace_handled_internally(bool handled) { _backspace_handled_internally = handled; }
     bool backspace_handled_internally() const { return _backspace_handled_internally; }
