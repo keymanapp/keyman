@@ -82,7 +82,8 @@ const
   SUrlNgrokSignup = 'https://dashboard.ngrok.com/signup';
 
   // Note, we manually update the version of ngrok as required in subsequent
-  // releases, rather than trying to handle a potentially moving target
+  // releases, rather than trying to handle a potentially moving target. This
+  // should match developer/src/server/package.json version for ngrok.
   SNgrokVersion = 'v1.7.0';
   SUrlNgrokDownload = 'https://github.com/ngrok/ngrok-javascript/releases/download/'+SNgrokVersion+'/ngrok.win32-ia32-msvc.node';
   SNgrokNodeModuleFilename = 'ngrok-win32-ia32-msvc.node';
@@ -317,7 +318,7 @@ end;
 
 function TfrmServerOptions.RedistInstallerPath: string;
 begin
-  Result := TServerDebugAPI.ServerBinPath + SVCRedistExeFilename;
+  Result := TServerDebugAPI.ServerBinPath + '\' + SVCRedistExeFilename;
 end;
 
 procedure TfrmServerOptions.UpdateVersionLabel;
