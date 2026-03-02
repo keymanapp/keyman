@@ -70,7 +70,7 @@ export class PackageValidation {
   }
 
   private checkForModelsAndKeyboardsInSamePackage(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
-    if(kmpJson.lexicalModels?.length > 0 && kmpJson.keyboards?.length > 0) {
+    if((kmpJson.lexicalModels?.length ?? 0) > 0 && (kmpJson.keyboards?.length ?? 0) > 0) {
       this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageCannotContainBothModelsAndKeyboards());
       return false;
     }
@@ -119,8 +119,8 @@ export class PackageValidation {
       this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageNameDoesNotFollowKeyboardConventions({filename}));
     }
 
-    for(let keyboard of kmpJson.keyboards) {
-      if(!this.checkForDuplicatedOrNonMinimalLanguages('keyboard', keyboard.id, keyboard.languages)) {
+    for(const keyboard of kmpJson.keyboards) {
+      if(!this.checkForDuplicatedOrNonMinimalLanguages('keyboard', keyboard.id, keyboard.languages ?? [])) {
         return false;
       }
       // Note: package-version-validation verifies that there is a corresponding
@@ -131,7 +131,7 @@ export class PackageValidation {
   }
 
   private checkContentFiles(kmpJson: KmpJsonFile.KmpJsonFile, outputFilename: string): boolean {
-    for(let file of kmpJson.files) {
+    for(const file of kmpJson.files ?? []) {
       if(!this.checkContentFile(file, outputFilename)) {
         return false;
       }
@@ -202,7 +202,7 @@ export class PackageValidation {
     return true;
   }
 
-  private checkPackageInfo(file: KmpJsonFile.KmpJsonFile) {
+  private checkPackageInfo(file: KmpJsonFile.KmpJsonFile): boolean {
     if(!file.info || !file.info.name || !file.info.name.description.trim()) {
       this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageNameCannotBeBlank());
       return false;
@@ -214,11 +214,11 @@ export class PackageValidation {
       /* c8 ignore next 3 */
       if (match === null) {
         this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidAuthorEmail({email:file.info.author.url}));
-        return null;
+        return false;
       }
       if(!isValidEmail(match[2])) {
         this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidAuthorEmail({email:file.info.author.url}));
-        return null;
+        return false;
       }
 
     }
