@@ -532,10 +532,10 @@ ldml_event_state::ldml_event_state(
     uint8_t i,
     uint16_t e) {
   this->state          = s;
-  this->vk             = v;
-  this->modifier_state = m;
-  this->is_key_down    = i;
-  this->event_flags    = e;
+  this->_vk             = v;
+  this->_modifier_state = m;
+  this->_is_key_down    = i;
+  this->_event_flags    = e;
 
   actions.persist_options = new km_core_option_item[1];
   actions.persist_options[0] = NULL_OPTIONS[0];
