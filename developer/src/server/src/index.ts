@@ -124,30 +124,36 @@ async function startNGrok() {
     return false;
   }
 
-  let started = false;
-  const listener = await ngrok.forward({
-    proto: 'http',
-    addr: configuration.port,
-    authtoken: configuration.ngrokToken,
-    onLogEvent: (msg: string) => {
-      if(options.ngrokLog) {
-        console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
+  try {
+    let started = false;
+    const listener = await ngrok.forward({
+      proto: 'http',
+      addr: configuration.port,
+      authtoken: configuration.ngrokToken,
+      onLogEvent: (msg: string) => {
+        if(options.ngrokLog) {
+          console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
+        }
+      },
+      onStatusChange: (state: string) => {
+        if(state == 'connected' && started) {
+          // We only announce reconnection after initial start
+          configuration.ngrokEndpoint = listener.url() ?? '';
+          console.log(chalk.blueBright('ngrok tunnel reconnected at %s'), configuration.ngrokEndpoint);
+        } else if(state == 'closed') {
+          configuration.ngrokEndpoint = '';
+          console.log(chalk.blueBright('ngrok tunnel closed'));
+        }
       }
-    },
-    onStatusChange: (state: string) => {
-      if(state == 'connected' && started) {
-        // We only announce reconnection after initial start
-        configuration.ngrokEndpoint = listener.url();
-        console.log(chalk.blueBright('ngrok tunnel reconnected at %s'), configuration.ngrokEndpoint);
-      } else if(state == 'closed') {
-        configuration.ngrokEndpoint = '';
-        console.log(chalk.blueBright('ngrok tunnel closed'));
-      }
-    }
-  });
-  started = true;
-  configuration.ngrokEndpoint = listener.url();
-  console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
+    });
+    started = true;
+    configuration.ngrokEndpoint = listener.url();
+    console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
+  } catch(e) {
+    configuration.ngrokEndpoint = '';
+    console.error(chalk.red('ngrok tunnel failed to connect with an error: %s'), e);
+    return false;
+  }
 
   return true;
 }
