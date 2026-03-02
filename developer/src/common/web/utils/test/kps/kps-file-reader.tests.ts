@@ -16,9 +16,21 @@ import { KpsFileReader } from "../../src/types/kps/kps-file-reader.js";
 import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
 import { CommonTypesMessages } from '../../src/common-messages.js';
 
-const callbacks = new TestCompilerCallbacks();
 
 describe('kps-file-reader', function () {
+
+  const callbacks = new TestCompilerCallbacks();
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  });
+
   it('kps-file-reader should read a valid file', function() {
     const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
     const reader = new KpsFileReader(callbacks);
@@ -89,7 +101,7 @@ describe('kps-file-reader', function () {
     const kps = reader.read(input);
 
     assert.isNull(kps);
-    assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_NotAPackageFile));
+    assert.isTrue(callbacks.hasMessage(CommonTypesMessages.ERROR_NotAPackageFile));
   });
 
 });
