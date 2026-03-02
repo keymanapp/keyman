@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.207 alpha 2026-03-02
+
+* chore(ios): Cleanup `RELEASE_OEM_FIRSTVOICES` var in build.sh scripts (#15605)
+* fix(developer): package compiler handle missing `info` section in .kps file (#15620)
+* fix(developer): handle window already destroyed when closing editor (#15618)
+
 ## 19.0.206 alpha 2026-02-25
 
 * maint(ios): upgrade to Xcode 26.2 (#15498)
