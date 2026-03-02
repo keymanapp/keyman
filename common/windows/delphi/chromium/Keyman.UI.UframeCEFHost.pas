@@ -373,7 +373,7 @@ end;
 procedure TframeCEFHost.SetFocus;
 begin
   AssertVclThread;
-  if not FIsClosing and cefwp.CanFocus and Assigned(cef) then
+  if not FIsClosing and Assigned(cefwp) and Assigned(cef) and cefwp.CanFocus then
   begin
     GetParentForm(Self).ActiveControl := Self;
     cef.SetFocus(True);
