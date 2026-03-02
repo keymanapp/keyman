@@ -17,9 +17,21 @@ import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
 import { SymbolUtils } from '../../src/symbol-utils.js';
 import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 
-const callbacks = new TestCompilerCallbacks();
 
 describe('kps-file-reader', function () {
+
+  const callbacks = new TestCompilerCallbacks();
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  });
+
   it('kps-file-reader should read a valid file', function() {
     const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
     const reader = new KpsFileReader(callbacks);

@@ -22,23 +22,16 @@ export class KpsFileReader {
   public read(file: Uint8Array): KpsPackage {
     const data = new TextDecoder().decode(file);
 
-    const kpsPackage = (() => {
-        let a: KpsPackage;
-
-        try {
-          a = new KeymanXMLReader('kps')
-            .parse(data) as KpsPackage;
-        } catch(e) {
-          this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidPackageFile({e}));
-        }
-        return a;
-    })();
-
-    if(!kpsPackage) {
+    let kpsPackage: KpsPackage = null;
+    try {
+      kpsPackage = new KeymanXMLReader('kps')
+        .parse(data) as KpsPackage;
+    } catch(e) {
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidPackageFile({e}));
       return null;
     }
 
-    if(!kpsPackage.Package) {
+    if(!kpsPackage?.Package) {
       this.callbacks.reportMessage(DeveloperUtilsMessages.Error_NotAPackageFile());
       return null;
     }
