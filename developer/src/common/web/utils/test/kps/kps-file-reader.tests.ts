@@ -17,9 +17,21 @@ import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
 import { SymbolUtils } from '../../src/symbol-utils.js';
 import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 
-const callbacks = new TestCompilerCallbacks();
 
 describe('kps-file-reader', function () {
+
+  const callbacks = new TestCompilerCallbacks();
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  });
+
   it('kps-file-reader should read a valid file', function() {
     const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
     const reader = new KpsFileReader(callbacks);
@@ -83,4 +95,16 @@ describe('kps-file-reader', function () {
     assert.lengthOf(callbacks.messages, 1);
     assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_InvalidPackageFile));
   });
+
+  // ERROR_NotAPackageFile
+
+  it(`should generate ERROR_NotAPackageFile when the package source file is valid XML but does not have a <Package> root element`, function () {
+    const input = fs.readFileSync(makePathToFixture('kps', 'error_not_a_package_file.kps'));
+    const reader = new KpsFileReader(callbacks);
+    const kps = reader.read(input);
+
+    assert.isNull(kps);
+    assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_NotAPackageFile));
+  });
+
 });
