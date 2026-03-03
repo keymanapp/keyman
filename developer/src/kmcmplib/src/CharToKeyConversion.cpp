@@ -1,10 +1,11 @@
 
 #include "pch.h"
 #include "CharToKeyConversion.h"
+#include "../../../../common/include/keyman_vkey.h"
 
 /* Following VKeys come from Windows */
 
-#define VK_COLON	0xBA
+/*#define VK_COLON	0xBA
 #define VK_EQUAL	0xBB
 #define VK_COMMA	0xBC
 #define VK_HYPHEN	0xBD
@@ -19,7 +20,7 @@
 
 #define VK_NUMPAD0  0x60
 #define VK_NUMPAD9  0x69
-#define VK_SPACE    0x20
+#define VK_SPACE    0x20*/
 
 
 /* Following code lifted from syskbd.cpp and tweaked for compiler use. Todo: consolidate */
