@@ -6,14 +6,16 @@
 //
 
 import SwiftUI
+import KeymanSettings
 
 @main
 struct ConfigApp: App {
-  @StateObject var configuration = Configuration()
+//  @StateObject var configuration = Configuration()
+  @StateObject var settings = KeymanSettings()
   var body: some Scene {
     WindowGroup {
       ConfigView()
-        .environmentObject(configuration)
+        .environmentObject(settings)
    }
   }
 }

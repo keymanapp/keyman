@@ -3,24 +3,23 @@
  *
  * Created by Shawn Schantz on 2026-02-24
  *
- * Owns the data that owns all the Keyman configuration data
- * which it loads form the repository and communicates with
- * the Keyman input method when the configuration is changed
+ * Owns all the Keyman configuration data loaded from the repository
+ * Communicates with the Keyman input method when the configuration is changed
  *
  */
 import SwiftUI
 import Combine
-import KeymanData
+import KeymanSettings
 
 public class Configuration : ObservableObject {
   //@Published public var keyboardPackages: [KeymanPackage]
-  @Published public var keymanData: KeymanData
+  @Published public var settings: KeymanSettings
 
   fileprivate let notificationCenter:DistributedNotificationCenter
   //fileprivate let dataRepo: DataRepository
   
   public init() {
-    self.keymanData = KeymanData()
+    self.settings = KeymanSettings()
     
     //self.dataRepo = DataRepository()
     

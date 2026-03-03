@@ -7,17 +7,18 @@
  */
 
 import SwiftUI
-import KeymanData
+import KeymanSettings
 
 struct ConfigView: View {
-  @EnvironmentObject var configuration: Configuration
+  @EnvironmentObject var settings: KeymanSettings
   
   var body: some View {
     VStack {
       Image(systemName: "keyboard")
         .imageScale(.large)
         .foregroundColor(.secondary)
-      Text(configuration.keymanData.value)
+      Text(settings.settingName)
+      Button("update settings") {settings.settingName = "Settings changed!"}
     }
     .padding()
   }
