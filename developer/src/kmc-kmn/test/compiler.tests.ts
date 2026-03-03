@@ -11,6 +11,8 @@ const keyboardsDir = __dirname + '/../../../../../common/test/keyboards/';
 const baselineDir = keyboardsDir + 'baseline/';
 
 describe('Compiler class', function() {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('should throw on failure', async function() {
     const compiler = new KmnCompiler();
     const callbacks : any = null; // ERROR
@@ -25,14 +27,12 @@ describe('Compiler class', function() {
 
   it('should start', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic keyboard', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
@@ -60,7 +60,6 @@ describe('Compiler class', function() {
   it('should build all baseline fixtures', async function() {
     this.timeout(10000); // there are quite a few fixtures, sometimes CI agents are slow
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
@@ -90,7 +89,6 @@ describe('Compiler class', function() {
 
   it('should compile a keyboard with visual keyboard', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert.isTrue(await compiler.init(callbacks, {
       saveDebug: true,
       shouldAddCompilerVersion: false,

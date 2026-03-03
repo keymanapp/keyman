@@ -21,20 +21,12 @@ describe('KmpCompiler', function () {
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
   let kmpCompiler: KmpCompiler = null;
 
   this.beforeAll(async function() {
-    callbacks.clear();
     kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-    callbacks.clear();
   });
 
   for (const modelID of MODELS) {
