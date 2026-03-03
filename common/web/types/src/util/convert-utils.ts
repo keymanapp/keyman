@@ -121,7 +121,7 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
  *                 the input character if a Unicode Codepoint or valid input character is provided (e.g. 'c' -> 'c', '😎' -> '😎')
  *                 undefined if inputString is not valid, null or undefined, or a surrogate codepoint
  */
-export function convertControlCharacterToUnicodeCodePoint(inputString: string): string | undefined {
+export function convertCharacterToUnicodeCodePoint(inputString: string): string | undefined {
     if ((inputString === null) || (inputString === undefined)) {
         return undefined;
     }

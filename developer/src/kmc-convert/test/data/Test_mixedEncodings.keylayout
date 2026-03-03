@@ -14,7 +14,7 @@
     </layouts>
     <modifierMap id="30" defaultIndex="0">
         <keyMapSelect mapIndex="0">
-            <modifier keys="shift"/>
+            <modifier keys=""/>
         </keyMapSelect>
         <keyMapSelect mapIndex="1">
             <modifier keys="caps"/>
@@ -23,16 +23,16 @@
     <keyMapSet id="ANSI">
         <keyMap index="0">
             <key code="0" output="A"/>
-            <key code="1" output="&#x41;"/>
+            <key code="1" output="&#x42;"/>
             <key code="2" output="&#67;"/>
             <key code="3" output="U+0044"/>
         </keyMap>
         <keyMap index="1">
-            <key code="0" output="😎"/>
-            <key code="1" output="&#x1F600;"/>
+            <key code="0" output="&#x1F600;"/>
+            <key code="1" output="😎"/>
             <key code="2" output="&#128514;"/>
             <key code="3" output="&gt;"/>
-            <key code="4" output=">"/>
+            <key code="4" output="<"/>
         </keyMap>
     </keyMapSet>
     <actions>

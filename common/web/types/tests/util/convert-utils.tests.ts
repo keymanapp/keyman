@@ -4,7 +4,7 @@ import { convertUtil } from '@keymanapp/common-types';
 
 describe('convert-utils', function () {
 
-  describe('convertControlCharacterToUnicodeCodePoint from convert-utils', function () {
+  describe('convertCharacterToUnicodeCodePoint from convert-utils', function () {
     [
       ["U+0061", 'U+0061'],
       ["U+1234", 'U+1234'],
@@ -68,7 +68,7 @@ describe('convert-utils', function () {
       ["ẘ", "ẘ"],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = convertUtil.convertControlCharacterToUnicodeCodePoint(values[0] as string);
+        const result = convertUtil.convertCharacterToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
@@ -84,14 +84,17 @@ describe('convert-utils', function () {
       ["&#x1234;", 'ሴ'],
       ["&#x1F60E;", '😎'],
       ["&#x1E98;", "ẘ"],
+
       ["&#97;", 'a'],
       ["&#4660;", 'ሴ'],
       ["&#128518;", '😆'],
       ["&#7832;", "ẘ"],
+
       ["U+0061", 'a'],
       ["U+1234", 'ሴ'],
       ["U+1F60E", '😎'],
       ["U+1E98", "ẘ"],
+
       ["U+", undefined],
       ['U+', undefined],
       ['U+U+', undefined],
@@ -99,8 +102,8 @@ describe('convert-utils', function () {
       ['U+D800', undefined],
       ['U+D83D', undefined],
       ['U+DFFF', undefined],
-      ['U+10FFFF', '􏿿'],
-      ['U+E000', ''],
+  ['U+10FFFF', '􏿿'],
+  ['U+E000', ''],
       ['U+1000000', undefined],
       ["&gt;", '>'],
       ["&commat;", undefined],
@@ -110,10 +113,11 @@ describe('convert-utils', function () {
       ["ሴሴ", 'ሴሴ'],
       ['😎😆', '😎😆'],
       ["ẘẘ", "ẘẘ"],
-      ["", ''],
+    ["", ''],
       ['&', '&'],
       ['&;', '&;'],
       ['&&', '&&'],
+      
       ['&&;', '&&;'],
       ["&#&#", undefined],
       ["&#x&#x", undefined],

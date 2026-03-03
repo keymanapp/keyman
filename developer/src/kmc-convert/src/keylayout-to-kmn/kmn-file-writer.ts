@@ -17,6 +17,28 @@ export class KmnFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
 
+  // TODO remove
+  public writeToFile(dataUkelele: ProcessedData): boolean {
+
+    let data: string = "\n";
+
+    // add top part of kmn file: STORES
+    data += this.writeKmnFileHeader(dataUkelele);
+
+    // add bottom part of kmn file: RULES
+    data += this.writeDataRules(dataUkelele);
+
+    try {
+      this.callbacks.fs.writeFileSync(dataUkelele.kmnFilename, new TextEncoder().encode(data));
+      return true;
+    } catch (err) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename }));
+      return false;
+    }
+  }
+
+
+
   /**
    * @brief  member function to write data from object to a Uint8Array
    * @param  dataUkelele the array holding all keyboard data
@@ -43,7 +65,7 @@ export class KmnFileWriter {
       return null;
     }
   }
-  
+
   /**
    * @brief  member function to create data for the header (stores) that will be printed to the resulting kmn file
    * @param  dataUkelele an object containing all data read from a .keylayout file
@@ -145,16 +167,33 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(outputCharacter);
 
-        if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
+        // const outputUnicodeCodePoint = convertUtil.convertCharacterToUnicodeCodePoint(outputCharacter);
+        // here exchange const outputUnicodeCodePoint = hu() 
+        let inpt;
+        // if starts with &#x
+        if (outputCharacter.startsWith("&#x")) {
+          inpt = parseInt(outputCharacter.slice(3, -1), 16);
+        }
+        else if (outputCharacter.startsWith("&#")) {
+          inpt = parseInt(outputCharacter.slice(2, -1), 10);
+        }
+        else if (outputCharacter.startsWith("U+")) {
+          inpt = parseInt(outputCharacter.slice(2), 16);
+        }
+
+
+        if ((outputUnicodeCharacter !== undefined)) {
 
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-          if ((Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          // if ((Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          // try 
+          if (inpt < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
 
-            versionOutputCharacter = outputUnicodeCodePoint;
+            versionOutputCharacter = "U+" + inpt.toString(16).toUpperCase().padStart(4, "0");
 
-            if (outputUnicodeCodePoint.length > 1) {
+            //if (outputUnicodeCodePoint.length > 1) {
+            if (2 > 1) {
               if (warnText[2] == "") {
                 warnText[2] = warnText[2] + "c WARNING: use of a control character " /*+ outputUnicodeCodePoint*/;
               }
@@ -166,7 +205,15 @@ export class KmnFileWriter {
             versionOutputCharacter = outputUnicodeCharacter;
           }
         }
-        if ((outputUnicodeCharacter === undefined) || (outputUnicodeCodePoint === undefined)) {
+
+
+        /* console.log("-------------------------------------------------- ",);
+ 
+         console.log("     outputCharacter ", outputCharacter);
+         console.log("     outputUnicodeCharacter ", outputUnicodeCharacter);*/
+
+
+        if ((outputUnicodeCharacter === undefined)) {
           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
             inputFilename: dataUkelele.keylayoutFilename,
             output: new TextDecoder().decode(uniqueDataRules[k].output),
@@ -219,13 +266,32 @@ export class KmnFileWriter {
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(outputCharacter);
 
-        if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
+
+
+        // const outputUnicodeCodePoint = convertUtil.convertCharacterToUnicodeCodePoint(outputCharacter);
+        // here exchange const outputUnicodeCodePoint = hu() 
+        let inpt;
+        // if starts with &#x
+        if (outputCharacter.startsWith("&#x")) {
+          inpt = parseInt(outputCharacter.slice(3, -1), 16);
+        }
+        else if (outputCharacter.startsWith("&#")) {
+          inpt = parseInt(outputCharacter.slice(2, -1), 10);
+        }
+        else if (outputCharacter.startsWith("U+")) {
+          inpt = parseInt(outputCharacter.slice(2), 16);
+        }
+
+        //const outputUnicodeCodePoint = convertUtil.convertCharacterToUnicodeCodePoint(outputCharacter);
+
+        if (outputUnicodeCharacter !== undefined) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-          if (Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-            versionOutputCharacter = outputUnicodeCodePoint;
-            if (outputUnicodeCodePoint.length > 1) {
+          if (inpt < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+            versionOutputCharacter = "U+" + inpt.toString(16).toUpperCase().padStart(4, "0");
+
+            // if (outputUnicodeCodePoint.length > 1) {
+            if (2 > 1) {
               if (warnText[2] == "") {
                 warnText[2] = warnText[2] + "c WARNING: use of a control character ";
               }
@@ -237,7 +303,7 @@ export class KmnFileWriter {
             versionOutputCharacter = outputUnicodeCharacter;
           }
         }
-        if ((outputUnicodeCharacter === undefined) || (outputUnicodeCodePoint === undefined)) {
+        if (outputUnicodeCharacter === undefined) {
           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
             inputFilename: dataUkelele.keylayoutFilename,
             output: new TextDecoder().decode(uniqueDataRules[k].output),
@@ -313,14 +379,40 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = convertUtil.convertControlCharacterToUnicodeCodePoint(outputCharacter);
-        if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
+
+        let inpt;
+        // if starts with &#x
+        if (outputCharacter.startsWith("&#x")) {
+          inpt = parseInt(outputCharacter.slice(3, -1), 16);
+        }
+        else if (outputCharacter.startsWith("&#")) {
+          inpt = parseInt(outputCharacter.slice(2, -1), 10);
+        }
+        else if (outputCharacter.startsWith("U+")) {
+          inpt = parseInt(outputCharacter.slice(2), 16);
+        }
+
+
+
+
+
+
+
+
+
+
+        //const outputUnicodeCodePoint = convertUtil.convertCharacterToUnicodeCodePoint(outputCharacter);
+        if (outputUnicodeCharacter !== undefined) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-          if (Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+          //if (Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+          if (inpt < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
 
-            versionOutputCharacter = outputUnicodeCodePoint;
+            versionOutputCharacter = "U+" + inpt.toString(16).toUpperCase().padStart(4, "0");
 
-            if (outputUnicodeCodePoint.length > 1) {
+            //versionOutputCharacter = outputUnicodeCodePoint;
+
+            //if (outputUnicodeCodePoint.length > 1) {
+              if (2 > 1) {
               if (warnText[2] == "") {
                 warnText[2] = warnText[2] + "c WARNING: use of a control character ";
               }
@@ -332,7 +424,7 @@ export class KmnFileWriter {
             versionOutputCharacter = outputUnicodeCharacter;
           }
         }
-        if ((outputUnicodeCharacter === undefined) || (outputUnicodeCodePoint === undefined)) {
+        if (outputUnicodeCharacter === undefined)  {
           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
             inputFilename: dataUkelele.keylayoutFilename,
             output: new TextDecoder().decode(uniqueDataRules[k].output),
