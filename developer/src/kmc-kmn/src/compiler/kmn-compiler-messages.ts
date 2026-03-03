@@ -68,9 +68,10 @@ type KmcmpLibMessageParameters = {p:string[]};
  * ```
  */
 export class KmnCompilerMessages {
-  // TODO: v18.0 we should consider moving error message generation in kmcmplib to
-  // kmc-kmn, which would avoid a number of legacy issues. Questions about
-  // parameterisation.
+
+  //------------------------------------------------------------------------------|
+  // max length of detail message lines (checked by verifyCompilerMessagesObject) |
+  //------------------------------------------------------------------------------|
 
   static FATAL_UnexpectedException = SevFatal | 0x900;
   static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(
@@ -197,10 +198,32 @@ export class KmnCompilerMessages {
   static ERROR_FileNotFound = SevError | 0x90C;
   static Error_FileNotFound = (o:{filename: string}) => m(
     this.ERROR_FileNotFound,
-    `File ${def(o.filename)} was not found`,
-    `The file was not found on the disk. Verify that you have the correct path
-    to the file.`
-  );
+    `File ${def(o.filename)} was not found`, `
+    The file was not found on the disk. Verify that you have the correct path
+    to the file.
+  `);
+
+  static WARN_EmbeddedOskDoesNotSupportBitmaps               = SevWarn | 0x90D;
+  static Warn_EmbeddedOskDoesNotSupportBitmaps               = (o:{keyId: string}) => m(
+    this.WARN_EmbeddedOskDoesNotSupportBitmaps,
+    `The On-Screen Keyboard key '${def(o.keyId)}' uses a bitmap, which is not supported in v19+ embedded On-Screen Keyboards`, `
+    The v19+ On-Screen Keyboard is embedded into the .kmx file. However, bitmap
+    images are not supported for key caps. To support arbitrary images, use a
+    custom font for the On-Screen Keyboard.
+  `);
+
+  static HINT_EmbeddedOskDoesNotSupportNonUnicode               = SevHint | 0x90E;
+  static Hint_EmbeddedOskDoesNotSupportNonUnicode               = (o:{keyId: string}) => m(
+    this.HINT_EmbeddedOskDoesNotSupportNonUnicode,
+    `The On-Screen Keyboard key '${def(o.keyId)}' is not Unicode, and will be ignored`, `
+    The v19+ On-Screen Keyboard is embedded into the .kmx file. However,
+    non-Unicode key caps are not supported in the .kmx embedded On-Screen
+    Keyboard. Only the first non-Unicode key cap found will be reported.
+  `);
+
+  //------------------------------------------------------------------------------|
+  // Messages below this point come from kmcmplib                                 |
+  //------------------------------------------------------------------------------|
 
   // static STATUS_None                                            = 0x000;   // This is not a real error
   // static STATUS_EndOfFile                                       = 0x001;   // This is not a real error

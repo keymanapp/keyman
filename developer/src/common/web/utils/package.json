@@ -10,6 +10,7 @@
   ],
   "dependencies": {
     "@keymanapp/common-types": "*",
+    "@keymanapp/ldml-keyboard-constants": "*",
     "eventemitter3": "^5.0.0",
     "fast-xml-parser": "^5.3.4",
     "path-browserify": "^1.0.1",
