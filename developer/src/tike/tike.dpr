@@ -303,7 +303,8 @@ uses
   Keyman.Developer.UI.RichEdit41 in '..\common\delphi\components\Keyman.Developer.UI.RichEdit41.pas',
   Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},
   Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters.pas' {frmCloneLocalProjectParameters},
-  Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters.pas' {frmCloneKeymanCloudProjectParameters};
+  Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters.pas' {frmCloneKeymanCloudProjectParameters},
+  tom_TLB in '..\common\delphi\components\tom_TLB.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
