@@ -29,6 +29,10 @@ export class SearchQuotientRoot implements SearchQuotientNode {
    * @param model
    */
   constructor(model: LexicalModel) {
+    if(!model.traverseFromRoot) {
+      throw new Error("The active lexical model does not support traversal-based searching.");
+    }
+
     this.rootNode = new SearchNode(model.traverseFromRoot(), generateSpaceSeed(), t => model.toKey(t));
     this.model = model;
     this.rootResult = new SearchResult(this.rootNode);
@@ -122,6 +126,10 @@ export class SearchQuotientRoot implements SearchQuotientNode {
   }
 
   merge(space: SearchQuotientNode): SearchQuotientNode {
+    if(this.model != space.model) {
+      throw new Error("Cannot merge search graphs based on different LexicalModels");
+    }
+
     // Head node for the incoming path is empty, so skip it.
     if(space.parents.length == 0 || space instanceof SearchQuotientRoot) {
       return this;
