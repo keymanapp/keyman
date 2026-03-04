@@ -43,7 +43,6 @@ import io.sentry.Sentry;
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
   private static View inputView = null;
-  private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
   private int inputType = InputType.TYPE_NULL;
   private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
@@ -206,8 +205,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (icText != null && icText.text != null) {
         boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
         boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
-        if (!didUpdateText || !didUpdateSelection)
-          exText = icText;
       }
     }
 
@@ -278,10 +275,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (exText != null)
-        exText = null;
-    }
+    // Do nothing
   }
 
   @Override
