@@ -239,7 +239,8 @@ export class ContextState {
    */
   analyzeTransition(
     context: Context,
-    transformDistribution: Distribution<Transform>
+    transformDistribution: Distribution<Transform>,
+    mayCorrect: boolean
   ): ContextTransition {
     const lexicalModel = this.model;
     const trueInput = transformDistribution[0].sample;
@@ -258,6 +259,8 @@ export class ContextState {
     this.tokenizations.forEach(t => {
       const slidTokenization = t.applyContextSlide(lexicalModel, slideUpdateTransform);
       slidTokenizations.set(t.clusteringKey, slidTokenization);
+
+      // This is the base-state displayTokenization identifier needed for `transitionTokenizations` below.
       if(t == this._displayTokenization) {
         slidDisplayKey = slidTokenization.clusteringKey;
       }
@@ -277,7 +280,7 @@ export class ContextState {
       return transition;
     }
 
-    const {subsets, keyMatchingUserContext} = precomputeTransitions([...slidTokenizations.values()], transformDistribution, slidDisplayKey);
+    const {subsets, keyMatchingUserContext} = precomputeTransitions([...slidTokenizations.values()], transformDistribution, slidDisplayKey, mayCorrect);
     const finalTokenizations = transitionTokenizations(subsets, transformDistribution);
 
     // ------------
@@ -300,6 +303,7 @@ export class ContextState {
     transition.finalize(state, transformDistribution);
 
     // Maybe sort the tokenizations in some manner, first?
+    // Also, avoid retaining a transition ID invalidly...
     transition.revertableTransitionId = state.tokenizations.map((tokenization) => {
       const tokens = tokenization.tokens;
       const lastIndex = tokens.length - 1;

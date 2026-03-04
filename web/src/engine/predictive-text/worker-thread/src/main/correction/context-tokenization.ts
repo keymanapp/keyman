@@ -14,12 +14,13 @@ import { KMWString } from 'keyman/common/web-utils';
 import { ContextToken, ContextTokenLike } from './context-token.js';
 import { TransformUtils } from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
-import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { PathInputProperties } from './search-quotient-node.js';
 import { TransitionEdge } from './tokenization-subsets.js';
+import { SubstitutionQuotientSpur } from './substitution-quotient-spur.js';
+import { SearchQuotientRoot } from './search-quotient-root.js';
+import { DeletionQuotientSpur } from './deletion-quotient-spur.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
@@ -95,6 +96,10 @@ export interface TokenizationTransitionEdits {
   /**
    * The tokenized form of the input Transform, indexed by position relative to
    * the end of the original context's tail token.
+   *
+   * When set to `null`, indicates that the transition matches a `delete` edit
+   * paradigm - the actual input is ignored but the keystroke is considered
+   * processed.
    */
   tokenizedTransform: Map<number, Transform>;
 }
@@ -111,7 +116,6 @@ export class ContextTokenization {
 
   constructor(priorToClone: ContextTokenization);
   constructor(tokens: ContextToken[]);
-  constructor(tokens: ContextToken[], alignment: TransitionEdge);
   constructor(
     param1: ContextToken[] | ContextTokenization
   ) {
@@ -371,7 +375,7 @@ export class ContextTokenization {
       }
 
       const token = new ContextToken(baseTokenization[i]);
-      token.isPartial = false;
+      token.isPartial = baseTokenization[i].isPartial;
       tokenization.push(token);
     }
 
@@ -400,6 +404,7 @@ export class ContextTokenization {
     bestProbFromSet: number
   ): ContextTokenization {
     const { alignment, inputs } = transitionEdge;
+    const viaDeletion = (inputs.length == 0);
     const sliceIndex = alignment.edgeWindow.sliceIndex;
     const lexicalModel = this.tail.searchModule.model;
 
@@ -408,9 +413,13 @@ export class ContextTokenization {
     const tailTokenization = this.tokens.slice(sliceIndex);
 
     // Assumption:  inputs.length > 0.  (There is at least one input transform.)
-    const inputTransformKeys = [...inputs[0].sample.keys()];
+    const inputTransformKeys = [...inputs[0]?.sample.keys() ?? [0]];
     const baseTailIndex = (tailTokenization.length - 1);
     let removedTokenCount = alignment.removedTokenCount;
+    if(alignment.removedTokenCount && viaDeletion) {
+      throw new Error("Deletion edits should not alter the token count!");
+    }
+
     while(removedTokenCount-- > 0) {
       inputTransformKeys.pop();
       tailTokenization.pop();
@@ -420,15 +429,22 @@ export class ContextTokenization {
     for(let i = 0; i < inputTransformKeys.length; i++) {
       const tailRelativeIndex = inputTransformKeys[i];
       let distribution = inputs.map((i) => ({sample: i.sample.get(tailRelativeIndex), p: i.p}));
+      // For deletions, accumulate all values into a single deletion transform
+      // representing deletion of anything in the original distribution.
+      if(viaDeletion) {
+        distribution = [{sample: { insert: '', deleteLeft: 0 }, p: distribution.reduce((accum, curr) => accum + curr.p, 0)}]
+      }
+
+      const exemplarTransform = distribution[0].sample;
       const tokenIndex = baseTailIndex + tailRelativeIndex;
 
       affectedToken = tailTokenization[tokenIndex];
       if(!affectedToken) {
-        affectedToken = new ContextToken(new LegacyQuotientRoot(lexicalModel));
+        affectedToken = new ContextToken(new SearchQuotientRoot(lexicalModel));
         tailTokenization.push(affectedToken);
-      } else if(KMWString.length(affectedToken.exampleInput) == distribution[0].sample.deleteLeft) {
+      } else if(!viaDeletion && KMWString.length(affectedToken.exampleInput) == exemplarTransform.deleteLeft) {
         // If the entire token will be replaced, throw out the old one and start anew.
-        affectedToken = new ContextToken(new LegacyQuotientRoot(lexicalModel));
+        affectedToken = new ContextToken(new SearchQuotientRoot(lexicalModel));
         // Replace the token at the affected index with a brand-new token.
         tailTokenization.splice(tokenIndex, 1, affectedToken);
       }
@@ -439,7 +455,7 @@ export class ContextTokenization {
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
       // We start at index 0 in the insert string for the "new" token.
-      if(affectedToken.inputCount == 0 && distribution[0].sample.deleteLeft != 0) {
+      if(affectedToken.inputCount == 0 && exemplarTransform.deleteLeft != 0) {
         distribution = distribution.map((mass) => ({sample: { ...mass.sample, deleteLeft: 0 }, p: mass.p }));
       }
 
@@ -451,13 +467,15 @@ export class ContextTokenization {
         bestProbFromSet: bestProbFromSet,
         subsetId: transitionEdge.inputSubsetId
       };
-      appliedLength += KMWString.length(distribution[0].sample.insert);
+      appliedLength += KMWString.length(exemplarTransform.insert);
       if(i + 1 < inputTransformKeys.length) {
         inputSource.segment.end = appliedLength;
       }
 
-      const searchPath = new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
-      affectedToken = new ContextToken(searchPath, affectedToken.isPartial);
+      const searchPath = viaDeletion
+        ? new DeletionQuotientSpur(affectedToken.searchModule, distribution, inputSource)
+        : new SubstitutionQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
+      affectedToken = new ContextToken(searchPath, i == inputTransformKeys.length - 1);
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
@@ -469,7 +487,7 @@ export class ContextTokenization {
       affectedToken = null;
     }
 
-    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tailTokenization));
+    return new ContextTokenization(this.tokens.slice(0, sliceIndex). /*map((t) => new ContextToken(t.searchModule, false)).*/ concat(tailTokenization));
   }
 
   get clusteringKey(): string {
@@ -632,6 +650,10 @@ export function mapWhitespacedTokenization(
 
   const tokenize = determineModelTokenizer(lexicalModel);
   const postTokenization = tokenize({left: retokenizationText + transform.insert, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
+  // TODO:  hmm, how to tokenize with Insert spur placeholders...
+  // especially if some are at a word's RHS and some at the next word's LHS.
+  // \uffe is wordbroken as its own char!  Yikes!
+  // ... could do "deadkey-like' marking if needed?
   if(postTokenization.length == 0) {
     postTokenization.push('');
   }
@@ -639,6 +661,7 @@ export function mapWhitespacedTokenization(
 
   // What does the edge's retokenization look like when we remove the inserted portions?
   const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
+  // TODO:  Make sure we preserve a '' boundary token if it existed!
   const insertBoundaryToken = postTokenization[firstInsertPostIndex];
 
   // Note:  requires that helpers have not mutated `stackedInserts`.
@@ -696,6 +719,15 @@ export function mapWhitespacedTokenization(
   if(stackedDeletes[stackedDeletes.length - 1] == 0) {
     // the boundary indices found by both methods above differ
     if(lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset) {
+      // Uncommenting the following block actually breaks three tests at
+      // present without fixing the ones I'd hoped would be fixed.
+      //
+      // // Need to resolve this handling more precisely; it may only work in
+      // // select cases.  We probably do need something like it, though:
+      // // addition to whitespace vs start of new token.
+      // retokenizedEdge.push('');
+      // editBoundary.tokenIndex++;
+      // editBoundary.text = '';
       shiftDeletes = true;
     }
 

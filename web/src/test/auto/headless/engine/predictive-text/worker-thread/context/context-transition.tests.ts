@@ -90,7 +90,7 @@ describe('ContextTransition', () => {
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseState.context, [
         { sample: { insert: '!', deleteLeft: 0 }, p: 1 }
-      ]);
+      ], true);
 
       const cloned = new ContextTransition(transition);
       assert.notEqual(cloned, transition);
@@ -110,7 +110,7 @@ describe('ContextTransition', () => {
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
         { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+      ], true);
       assert.isOk(transition);
 
       let suggestions = transition.final.suggestions = [{
@@ -196,7 +196,7 @@ describe('ContextTransition', () => {
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
         { sample: { insert: ' ', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+      ], true);
       assert.isOk(transition);
 
       let suggestions = transition.final.suggestions = [{
@@ -283,8 +283,9 @@ describe('ContextTransition', () => {
 
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
-        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: .99 },
+        { sample: { insert: 'l', deleteLeft: 0, id: 2 }, p: .01 }
+      ], true);
 
       let suggestions = transition.final.suggestions = [{
         transform: {
@@ -333,8 +334,9 @@ describe('ContextTransition', () => {
 
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
-        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: .99 },
+        { sample: { insert: 'l', deleteLeft: 0, id: 2 }, p: .01 }
+      ], true);
 
       let suggestions = transition.final.suggestions = [{
         transform: {

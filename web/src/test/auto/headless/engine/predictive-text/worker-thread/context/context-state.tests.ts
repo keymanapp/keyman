@@ -13,7 +13,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextState, determineContextSlideTransform, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { ContextState, DeletionQuotientSpur, determineContextSlideTransform, InsertionQuotientSpur, models, SearchQuotientSpur, SubstitutionQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import Context = LexicalModelTypes.Context;
 import Transform = LexicalModelTypes.Transform;
@@ -99,7 +99,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -126,7 +126,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -153,7 +153,7 @@ describe('ContextState', () => {
       let rawTokens = [" ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -178,7 +178,7 @@ describe('ContextState', () => {
       let rawTokens = [" ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -203,7 +203,7 @@ describe('ContextState', () => {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -225,7 +225,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -248,7 +248,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -273,7 +273,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", "  ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -299,7 +299,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform), true);
       assert.isOk(newContextMatch?.final);
       assert.deepEqual(newContextMatch?.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
@@ -315,10 +315,23 @@ describe('ContextState', () => {
       let rawTokens = ["'", "a"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
-      assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.equal(newContextMatch.final.tokenizations.length, 6);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        4
+      );
+      const displayTokenization = newContextMatch.final.displayTokenization;
+      assert.deepEqual(displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
@@ -341,10 +354,23 @@ describe('ContextState', () => {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform), true);
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
-      assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.equal(newContextMatch.final.tokenizations.length, 6);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        4
+      );
+      const displayTokenization = newContextMatch.final.displayTokenization;
+      assert.deepEqual(displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
@@ -365,10 +391,23 @@ describe('ContextState', () => {
       let rawTokens = ["and", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}]);
+      let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}], true);
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
-      assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.equal(newContextMatch.final.tokenizations.length, 6);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        4
+      );
+      const displayTokenization = newContextMatch.final.displayTokenization;
+      assert.deepEqual(displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
       // The 'wordbreak' transform
       let state = newContextMatch.final;
@@ -389,9 +428,21 @@ describe('ContextState', () => {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}]);
+      let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}], true);
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
+      assert.equal(newContextMatch.final.tokenizations.length, 6);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        4
+      );
       const displayTokenization = newContextMatch.final.displayTokenization;
       assert.deepEqual(displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -420,7 +471,7 @@ describe('ContextState', () => {
         insert: '\"',
         deleteLeft: 0
       }
-      let problemContextMatch = baseState.analyzeTransition({left: "text'", startOfBuffer: true, endOfBuffer: true}, [{sample: transform, p: 1}]);
+      let problemContextMatch = baseState.analyzeTransition({left: "text'", startOfBuffer: true, endOfBuffer: true}, [{sample: transform, p: 1}], true);
       assert.isNotNull(problemContextMatch);
 
       assert.deepEqual(problemContextMatch.final.displayTokenization.exampleInput, ['text', '\'', '"']);

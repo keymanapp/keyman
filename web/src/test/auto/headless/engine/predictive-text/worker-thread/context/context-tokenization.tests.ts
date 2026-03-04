@@ -955,6 +955,8 @@ describe('ContextTokenization', function() {
           sliceIndex: 2
         });
       });
+
+      // with insertion spurs (and their SENTINEL padding)
     });
   });
 
