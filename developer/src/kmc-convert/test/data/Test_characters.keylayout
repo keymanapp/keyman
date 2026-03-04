@@ -24,7 +24,7 @@
     <keyMapSet id="ANSI">
         <keyMap index="0">
             <key code="0" output="a"/>
-            <!-- empty output will not be written into kmn-->
+            <!-- empty output will not be written into kmn -->
             <key code="1" output=""/>
             <key code="2" output="ä"/>
             <key code="3" output="W̊"/>

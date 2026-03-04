@@ -117,11 +117,7 @@ export class KeylayoutToKmnConverter {
     const outArray: ProcessedData = await this.convert(jsonO, inputFilename);
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
-    // TODO remove
-    const out_text_ok: boolean = kmnFileWriter.writeToFile(outArray); if (!out_text_ok) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
-      return null;
-    }
+
     // write to object/ConverterToKmnResult
     const outUint8: Uint8Array = kmnFileWriter.write(outArray);
     const result: ConverterToKmnResult = {
@@ -479,8 +475,6 @@ export class KeylayoutToKmnConverter {
       }
     }
     dataUkelele.arrayOfRules = objectArray;
-    const xxx=this.reviewRuleInputData(dataUkelele);
-    if (xxx === null) { console.log("Error in reviewRuleInputData NULLLLLLL"); return null; }
     return this.reviewRuleInputData(dataUkelele);
   }
 

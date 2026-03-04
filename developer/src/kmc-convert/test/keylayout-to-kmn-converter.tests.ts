@@ -21,42 +21,6 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-
-  describe('RunONE', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
-    ].forEach(function (files) {
-      it(files + " should give no errors ", async function () {
-        sut.run(files[0]);
-        assert.isTrue(compilerTestCallbacks.messages.length === 0);
-      });
-    });
-  });
-
-  /*describe('RunFILES', function () {
-    this.timeout(10000); // allow longer time for these tests
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      [makePathToFixture('../data/Polish.keylayout')],
-      [makePathToFixture('../data/Spanish.keylayout')],
-      [makePathToFixture('../data/French.keylayout')],
-      [makePathToFixture('../data/German_complete_reduced.keylayout')],
-      //  [makePathToFixture('../data/German_complete.keylayout')],
-      //  [makePathToFixture('../data/German_standard.keylayout')],
-      [makePathToFixture('../data/Italian_command.keylayout')],
-      [makePathToFixture('../data/Italian.keylayout')],
-      [makePathToFixture('../data/Latin_American.keylayout')],
-      [makePathToFixture('../data/Swiss_French.keylayout')],
-      [makePathToFixture('../data/Swiss_German.keylayout')],
-    ].forEach(function (files) {
-      it(files + " should give no errors ", async function () {
-        sut.run(files[0]);
-        assert.isTrue(compilerTestCallbacks.messages.length === 0);
-      });
-    });
-  });*/
-
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -79,7 +43,6 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe('RunSpecialTestFiles', function () {
-    this.timeout(10000); // allow longer time for these tests
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
       [makePathToFixture('../data/Test_C0.keylayout')],
@@ -103,6 +66,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
       [makePathToFixture('../data/Test_nr_elements.keylayout')],
       [makePathToFixture('../data/Test.keylayout')],
+      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
       [makePathToFixture('../data/Test_Character_Codepoint_C0.keylayout')],
       [makePathToFixture('../data/Test_Character_Codepoint_C2.keylayout')],
       [makePathToFixture('../data/Test_Character_Codepoint_C3.keylayout')],
