@@ -43,7 +43,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
-  private parentNode: SearchQuotientNode;
+  protected readonly parentNode: SearchQuotientNode;
   readonly spaceId: number;
 
   readonly inputCount: number;
