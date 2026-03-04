@@ -14,7 +14,6 @@ import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { ContextToken } from './context-token.js';
 import TransformUtils from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
-import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 import { PathInputProperties } from './search-quotient-node.js';
@@ -22,6 +21,7 @@ import { TransitionEdge } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
+import { SubstitutionQuotientSpur } from './substitution-quotient-spur.js';
 
 // May be able to "get away" with 2 & 5 or so, but having extra will likely help
 // with edit path stability.
@@ -94,6 +94,10 @@ export interface TokenizationTransitionEdits {
   /**
    * The tokenized form of the input Transform, indexed by position relative to
    * the end of the original context's tail token.
+   *
+   * When set to `null`, indicates that the transition matches a `delete` edit
+   * paradigm - the actual input is ignored but the keystroke is considered
+   * processed.
    */
   tokenizedTransform: Map<number, Transform>;
 }
@@ -371,6 +375,10 @@ export class ContextTokenization {
 
     const tokenize = determineModelTokenizer(lexicalModel);
     const postTokenization = tokenize({left: retokenizationText + transform.insert, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
+    // TODO:  hmm, how to tokenize with Insert spur placeholders...
+    // especially if some are at a word's RHS and some at the next word's LHS.
+    // \uffe is wordbroken as its own char!  Yikes!
+    // ... could do "deadkey-like' marking if needed?
     if(postTokenization.length == 0) {
       postTokenization.push('');
     }
@@ -378,6 +386,7 @@ export class ContextTokenization {
 
     // What does the edge's retokenization look like when we remove the inserted portions?
     const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
+    // TODO:  Make sure we preserve a '' boundary token if it existed!
     const insertBoundaryToken = postTokenization[firstInsertPostIndex];
 
     // Note:  requires that helpers have not mutated `stackedInserts`.
@@ -436,6 +445,15 @@ export class ContextTokenization {
       // the boundary indices found by both methods above differ
       if(lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset) {
         shiftDeletes = true;
+        // Uncommenting the following block actually breaks three tests at
+        // present without fixing the ones I'd hoped would be fixed.
+        //
+        // // Need to resolve this handling more precisely; it may only work in
+        // // select cases.  We probably do need something like it, though:
+        // // addition to whitespace vs start of new token.
+        // retokenizedEdge.push('');
+        // editBoundary.tokenIndex++;
+        // editBoundary.text = '';
       }
 
       // there are no inserts, so we don't affect the boundary token we landed on.
@@ -631,7 +649,7 @@ export class ContextTokenization {
         inputSource.segment.end = appliedLength;
       }
 
-      const searchPath = new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
+      const searchPath = new SubstitutionQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
       affectedToken = new ContextToken(searchPath);
 
       if(appliedSuggestionId !== undefined) {

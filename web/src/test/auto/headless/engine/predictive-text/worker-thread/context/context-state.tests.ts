@@ -13,7 +13,7 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextState, determineContextSlideTransform, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { ContextState, DeletionQuotientSpur, determineContextSlideTransform, InsertionQuotientSpur, models, SearchQuotientSpur, SubstitutionQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import Context = LexicalModelTypes.Context;
 import Transform = LexicalModelTypes.Transform;
@@ -322,7 +322,19 @@ describe('ContextState', () => {
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
+      assert.equal(newContextMatch.final.tokenizations.length, 4);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        2
+      );
       const finalTokenization = newContextMatch.final.tokenizations[0];
       assert.deepEqual(finalTokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.deepEqual(finalTokenization.taillessTrueKeystroke, { insert: '', deleteLeft: 0 });
@@ -349,7 +361,19 @@ describe('ContextState', () => {
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
+      assert.equal(newContextMatch.final.tokenizations.length, 4);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        2
+      );
       const finalTokenization = newContextMatch.final.tokenizations[0];
       assert.deepEqual(finalTokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
@@ -375,7 +399,19 @@ describe('ContextState', () => {
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}]);
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
+      assert.equal(newContextMatch.final.tokenizations.length, 4);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        2
+      );
       const finalTokenization = newContextMatch.final.tokenizations[0];
       assert.deepEqual(finalTokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
@@ -401,7 +437,19 @@ describe('ContextState', () => {
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}]);
       assert.isNotNull(newContextMatch?.final);
-      assert.equal(newContextMatch.final.tokenizations.length, 1);
+      assert.equal(newContextMatch.final.tokenizations.length, 4);
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(newContextMatch.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        2
+      );
       const finalTokenization = newContextMatch.final.tokenizations[0];
       assert.deepEqual(finalTokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.

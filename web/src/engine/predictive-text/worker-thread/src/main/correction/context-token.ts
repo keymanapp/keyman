@@ -11,6 +11,8 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
+import { SearchQuotientCluster } from './search-quotient-cluster.js';
+import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 import { generateSubsetId } from './tokenization-subsets.js';
@@ -93,6 +95,9 @@ export class ContextToken {
       // we need to ensure that only fully-utilized keystrokes are considered.
       this._searchModule = priorToken.searchModule;
     } else {
+      // TODO:  Should also build a couple of following insert spurs... & their
+      // related tokenizations.  But that's on an external level and can't really
+      // be done here.
       const baseSpace = param instanceof SearchQuotientNode ? param : new LegacyQuotientRoot(param as LexicalModel);
       const BASE_PROBABILITY = 1;
 
@@ -109,6 +114,9 @@ export class ContextToken {
 
       let searchModule = baseSpace;
 
+      // TODO: Will need alternative, specialized construction outside a
+      // constructor, I believe.  Use of context-transition methods on
+      // ContextState will help build the insert and delete spurs needed.
       rawTransformDistributions.forEach((entry) => {
         searchModule = new LegacyQuotientSpur(searchModule, entry, {
           segment: {
@@ -121,6 +129,14 @@ export class ContextToken {
       });
 
       this._searchModule = searchModule;
+    }
+  }
+
+  addInboundSpur(spur: SearchQuotientSpur) {
+    if(this.searchModule instanceof SearchQuotientCluster) {
+      this._searchModule = new SearchQuotientCluster([...this._searchModule.parents, spur])
+    } else {
+      this._searchModule = new SearchQuotientCluster([this._searchModule, spur]);
     }
   }
 

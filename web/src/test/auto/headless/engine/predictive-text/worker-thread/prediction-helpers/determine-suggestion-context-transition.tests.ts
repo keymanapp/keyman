@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { ContextTracker, determineContextTransition, ModelCompositor, models } from "@keymanapp/lm-worker/test-index";
+import { ContextTracker, DeletionQuotientSpur, determineContextTransition, InsertionQuotientSpur, ModelCompositor, models, SubstitutionQuotientSpur } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -103,7 +103,19 @@ describe('determineContextTransition', () => {
       assert.isOk(transition);
       assert.equal(transition, tracker.latest);
       assert.isFalse(warningEmitterSpy.called);
-      assert.equal(transition.final.tokenizations.length, 1);
+      assert.equal(transition.final.tokenizations.length, 4);
+      assert.equal(transition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(transition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(transition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        2
+      );
       assert.sameOrderedMembers(transition.final.tokenizations[0].exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
       assert.isOk(transition.final.tokenizations[0].transitionEdits);
       assert.equal(transition.final.context.left, targetContext.left);
@@ -226,7 +238,19 @@ describe('determineContextTransition', () => {
       assert.notEqual(extendingTransition, baseTransition);
 
       // These values support delayed reversions.
-      assert.equal(extendingTransition.final.tokenizations.length, 1);
+      assert.equal(extendingTransition.final.tokenizations.length, 4);
+      assert.equal(extendingTransition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.equal(extendingTransition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof DeletionQuotientSpur).length,
+        1
+      );
+      assert.equal(extendingTransition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof InsertionQuotientSpur).length,
+        2
+      );
       assert.equal(extendingTransition.final.tokenizations[0].tokens[6].appliedTransitionId, pred_testing.transformId);
       assert.equal(extendingTransition.final.tokenizations[0].tokens[7].appliedTransitionId, pred_testing.transformId);
 
