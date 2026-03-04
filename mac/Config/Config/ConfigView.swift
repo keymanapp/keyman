@@ -18,7 +18,9 @@ struct ConfigView: View {
         .imageScale(.large)
         .foregroundColor(.secondary)
       Text(settings.settingName)
-      Button("update settings") {settings.settingName = "Settings changed!"}
+      Text("keyboard count = \(settings.keyboardPackages.count)")
+      Button("Update settings") {settings.settingName = "Settings changed!"}
+      Button("Remove last keyboard") {settings.keyboardPackages.removeLast()}
     }
     .padding()
   }

@@ -22,4 +22,7 @@
    <FileRef
       location = "group:Keyman4Mac/Keyman4Mac.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:KeymanSettings/Tests/KeymanSettingsTests/KeymanSettingsTests.xctestplan">
+   </FileRef>
 </Workspace>
