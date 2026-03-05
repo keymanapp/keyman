@@ -2,11 +2,12 @@
 title: Designing a Desktop Layout
 ---
 
-Part 2 of the [Keyman Developer Walkthrough](../walkthrough).
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
+Part 2 of the [Keyman Developer Walkthrough](.).
 
-[< Back: Part 1 - Creating a Keyboard Project](01-creating-keyboard-project)
-
-[Next: Part 3 - Creating a Desktop Layout >](03-creating-desktop-layout)
+[← Part 1 - Creating a Keyboard Project](01-creating-keyboard-project) &nbsp; [Part 3 - Creating a Desktop Layout →](03-creating-desktop-layout)
+</div>
 
 ## Step-by-Step
 
@@ -18,7 +19,9 @@ We’ll start with the default QWERTY layout and add rules so that typing <kbd>;
 
 This Step-by-Step tutorial won’t be using the visual layout features of Keyman Developer for creating the desktop keyboard.
 
+<div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 3 - Creating a Desktop Layout](03-creating-desktop-layout)
+</div>
 
 ---
 
@@ -60,7 +63,7 @@ For visual mapping, this can be done with tools as rudimentary as a pen and pape
 
 Navigate to your `.kpj` file, go to the `Keyboards` tab, and open your `.kmn` file. This is where your keyboard’s information lies, as well as the code that makes it work.
 
-You can read more about the `.kmn` file type in the [official Keyman documentation](https://help.keyman.com/developer/current-version/reference/file-types/kmn).
+You can read more about the `.kmn` file type in the [official Keyman documentation](../../../reference/file-types/kmn).
 
 Inside your `.kmn` file, select the `Layout` tab on the left.
 For a new project, the `Design` tab (at the bottom) should already be selected.
@@ -112,7 +115,9 @@ Here’s an example of how to list your keystrokes. (This can also be reused whe
 Once you have planned the visual layout of your keyboard and determined how to assign the rest of the keys on the keyboard, it’s time to begin coding.
 If your layout is simple enough that you do not need to program additional keys, you do not need to worry as much about the next section.
 In some cases, using Keyman’s visual editor is enough for a desktop keyboard.
-Note that once you begin adding rules, the keyboard becomes too complex to modify with the visual layout tools, so it is best to do any visual layout work first using the `Design` tab, then add the additional rules using the `Code` tab.
+
+> [!NOTE]
+> Once you begin adding multi-part rules, the keyboard becomes too complex to modify with the visual layout tools, so it is best to do any visual layout work first using the `Design` tab, then add the additional rules using the `Code` tab.
 
 ### Deadkeys
 
@@ -139,7 +144,6 @@ We could choose to design the keyboard so that typing `[ { ] } - _ = + \ |` will
 That could be done with the `Design` mode using the visual layout tools, or by adding rules.
 We would then want to add rules to allow the user to type the characters that were on the ten keys that we repurposed to type the additional characters, for example type the `;` key then the `[` key to get an actual `[` character.
 
-
-[< Back: Part 1 - Creating a Keyboard Project](01-creating-keyboard-project)
-
-[Next: Part 3 - Creating a Desktop Layout >](03-creating-desktop-layout)
+<div class="walkthrough-navigation" markdown="1">
+[← Part 1 - Creating a Keyboard Project](01-creating-keyboard-project) &nbsp; [Part 3 - Creating a Desktop Layout →](03-creating-desktop-layout)
+</div>

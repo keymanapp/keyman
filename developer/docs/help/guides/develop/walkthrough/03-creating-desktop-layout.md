@@ -2,11 +2,12 @@
 title: Creating a Desktop Layout
 ---
 
-Part 3 of the [Keyman Developer Walkthrough](../walkthrough).
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
+Part 3 of the [Keyman Developer Walkthrough](.).
 
-[< Back: Part 2 - Designing a Desktop Layout](02-designing-desktop-layout)
-
-[Next: Part 4 - Using the Debugger >](04-using-debugger)
+[← Part 2 - Designing a Desktop Layout](02-designing-desktop-layout) &nbsp; [Part 4 - Using the Debugger →](04-using-debugger)
+</div>
 
 ## Step-by-Step
 
@@ -71,7 +72,9 @@ store(output_char) "ɛɔŋɣʒƐƆŊƔƷ"
 - Select the `Build` tab on the left, then the `Compile Keyboard` button. (Alternatively you can use the `Keyboard` menu, `Compile Keyboard` menu item to compile the keyboard. Or you can use the <kbd>F7</kbd> function key as a shortcut.)
 - You should see messages at the bottom indicating `dagbani.kmn built successfully`. If this is not the case, you’ll need to examine the error messages to see what the error is and correct it.
 
+<div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 4 - Using the Debugger](04-using-debugger)
+</div>
 
 ---
 
@@ -95,14 +98,17 @@ If you click on that key, you’ll see it change color and the information about
 
 ![](images/unicode-character-value.png)
 
-This shows:
+On the key cap, this shows:
 
 - `[` the default value from the QWERTY layout
-- `ɛ` the value displayed on this key for the On-screen Keyboard (OSK)
-- `U+025B` the Unicode value that the key will produce
-- `ɛ` the character that the key will produce (the equivalent of the Unicode value)
+- `ɛ` the character that the key will produce
 
-The last two of these values are linked. If you change one, the other will change. Most of the time the second and fourth items will be the same, but sometimes it might be helpful to display something different than what is actually produced. If, for example, the character being produced is not visible, such as a no-break space or a right-to-left mark, it might be helpful to display `NBSP` or `RTL` or some symbol to remind the user what the key produces.
+Below the key cap, there are two edit fields which allow you to change the character that the key will product:
+
+- `U+025B` the Unicode value(s) that the key will produce
+- `ɛ` the character(s) that the key will produce (the equivalent of the Unicode value)
+
+These two edit fields are linked. If you change one, the other will change.
 
 Clicking on the `Code` tab at the bottom of the window displays the code equivalent of the work in the visual editor:
 
@@ -118,7 +124,7 @@ If you were to continue this example, you would drag the `ɔ` character to the `
 
 ## Understanding Keyman Code
 
-Keyman’s Visual Editor (the `Design` tab) is helpful in assigning characters to keys in a consistent manner. For a simple keyboard, it may be all that you need. It’s likely, however, that you’ll need to use the `Code` tab to provide the logic needed for your keyboard.
+Keyman’s Visual Editor (the `Design` mode of the `Layout` tab) is helpful in assigning characters to keys in a consistent manner. For a simple keyboard, it may be all that you need. It’s likely, however, that you’ll need to use the `Code` tab to provide the logic needed for your keyboard.
 
 When you begin an new project (using the “Project” menu, “New Project” menu item), Keyman Developer initializes your `.kmn` file.
 With the `Layout` tab on the left selected, you will see two small tabs at the bottom of the window: the `Design` tab and the `Code` tab.
@@ -142,7 +148,7 @@ group(main) using keys
 The `store()` statements at the top are called the “header” of your file.
 This is where the important information about your keyboard is stored.
 
-A summary of the elements of the Keyman header can be found in part of [another tutorial](https://help.keyman.com/developer/18.0/guides/develop/tutorial/step-3) and detailed information is in the official Keyman documentation:
+A summary of the elements of the Keyman header can be found in the [language guide](https://help.keyman.com/developer/language/guide/headers) and detailed information is in the official Keyman documentation:
 
 - [&version](https://help.keyman.com/developer/language/reference/version)
 - [&name](https://help.keyman.com/developer/language/reference/name)
@@ -182,7 +188,7 @@ There are a few key terms that you must know when writing rules:
 **Context**
 
 The context specifies the conditions that will trigger a rule.
-If the character(s) to the left of the cursor match the context of a rule, the rule will be processed by Keyman.
+If the character(s) prior to the cursor match the context of a rule, the rule will be processed by Keyman.
 
 **Key**
 
@@ -193,9 +199,9 @@ For more information on keys and keystrokes, read the [official Keyman documenta
 
 The output determines which characters are produced by a rule. When a rule is processed, Keyman will replace the context with the output.
 
-The Context (which may be empty) is separated from the Key by “+”.
+The Context (which may be empty) is separated from the Key by `+`.
 
-The Key is separated from the Output by “>”.
+The Key is separated from the Output by `>`.
 
 You can include comments in your Keyman code by typing a plain `c` followed by a space then any text you like afterwards. (If you want the letter “c”, you must surround in in quotes like `"c"`.) This is a good way to document your code and make things easier to read later, both for yourself and others. Comments can be made at the end of a line (with a space before the `c` as well as after) or be on their own line. Any text that follows the `c` through the end of the line will be ignored when the keyboard is compiled.
 
@@ -204,7 +210,7 @@ Writing rules in Keyman is very straightforward for simple key substitutions. Su
 `"^" + "a" > "â"`
 
 In this example, the **context** is `^`, the **key** is `a`, and the **output** is `â`.
-Whenever Keyman finds the context (`^`) to the left of the cursor and the current keystroke is `a`, it will replace the context (and the typed character) with `â`.
+Whenever Keyman finds the context (`^`) prior to the cursor and the current keystroke is `a`, it will replace the context (and the typed character) with `â`.
 
 Characters written into Keyman code should always be surrounded by single quotes (`' '`) or double quotes (`" "`).
 Either pair will work (as long as they match).
@@ -275,7 +281,7 @@ You can read more about the `store`, `index` and `any` keywords in the [Keyman l
 
 ### Deadkeys
 
-At the end of the previous topic, an example was given of using the “;” key as a “deadkey”. Typing the deadkey produces no output, but it potentially changes the output of the following key. Changing the first two rules from the Step-by-Step example to treat the “;” as a deadkey, would result in:
+At the end of the previous topic, an example was given of using the <kbd>;</kbd> key as a “deadkey”. Typing the deadkey produces no output, but it potentially changes the output of the following key. Changing the first two rules from the Step-by-Step example to treat the <kbd>;</kbd> as a deadkey, would result in:
 
 ```keyman
 + ";" > dk(1)      c Define ";" as a deadkey
@@ -308,6 +314,8 @@ It is also possible to create an on-screen layout automatically based on what yo
 - Select the `Fill from layout` button above the keyboard image
 - Check the results.
 
+The On-Screen Keyboard editor looks very similar to the `Design` mode of the `Layout` tab. Most of the time, the key caps will be the same as in the `Design` mode of the `Layout` tab, but sometimes it might be helpful to display something different than what is actually produced. If, for example, the character being produced is not visible, such as a no-break space or a right-to-left mark, it might be helpful to display `NBSP` or `RTL` or some symbol to remind the user what the key produces.
+
 ## Exporting an On-Screen Keyboard Layout
 
 One way to document a keyboard layout is to use images of the keyboard showing the different layers: default layer, Shift layer, Right-Alt layer, etc.
@@ -322,6 +330,6 @@ Then complete the information needed:
 - Select `Save`
 - In the `Output Bitmap Parameters` dialog, select `One file per shift state`, `Output Unicode keyboards`, and adjust the width of the image as needed, then select `OK`. Keyman Developer will create one or more files using the base filename plus letters to indicate the shift state plus `.png`. You can reference these files in your welcome.htm file.
 
-[< Back: Part 2 - Designing a Desktop Layout](02-designing-desktop-layout)
-
-[Next: Part 4 - Using the Debugger >](04-using-debugger)
+<div class="walkthrough-navigation" markdown="1">
+[← Part 2 - Designing a Desktop Layout](02-designing-desktop-layout) &nbsp; [Part 4 - Using the Debugger →](04-using-debugger)
+</div>

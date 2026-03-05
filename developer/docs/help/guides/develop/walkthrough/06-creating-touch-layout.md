@@ -2,11 +2,12 @@
 title: Creating a Touch Layout
 ---
 
-Part 6 of the [Keyman Developer Walkthrough](../walkthrough).
+<link href='walkthrough.css' rel='stylesheet'>
+<div class="walkthrough-navigation" markdown="1">
+Part 6 of the [Keyman Developer Walkthrough](.).
 
-[< Back: Part 5 - Designing a Touch Keyboard](05-designing-touch-layout)
-
-[Next: Part 7 - Writing Keyboard Documentation Files >](07-writing-keyboard-documentation)
+[← Part 5 - Designing a Touch Keyboard](05-designing-touch-layout) &nbsp; [Part 7 - Writing Keyboard Documentation Files →](07-writing-keyboard-documentation)
+</div>
 
 ## Step-by-Step
 
@@ -73,7 +74,9 @@ Keyman Developer provides a way to test your keyboard in a web browser.
 - If you click on the `Shift` key, the display changes to the `shift` layer and you can enter characters from that layer.
 - When you are finished testing, you can close the browser tab.
 
+<div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 7 - Writing Keyboard Documentation Files](07-writing-keyboard-documentation)
+</div>
 
 ---
 
@@ -140,12 +143,12 @@ Use care when combining different kinds of gestures as some of them may conflict
 
 ## Reference
 
-See [https://help.keyman.com/developer/current-version/context/keyboard-editor#toc-touch-layout-tab](https://help.keyman.com/developer/current-version/context/keyboard-editor#toc-touch-layout-tab) for more details.
+See [Touch layout editor documentation](../../../context/keyboard-editor#toc-touch-layout-tab) for more details.
 
 ## Testing Touch Keyboards
 
 See the end of the Step-by-Step section above for a description of how to use Keyman Developer to test your touch layout in a browser window. It’s also possible to transfer the .kmp file to a touch device and install the keyboard there for testing.
 
-[< Back: Part 5 - Designing a Touch Keyboard](05-designing-touch-layout)
-
-[Next: Part 7 - Writing Keyboard Documentation Files >](07-writing-keyboard-documentation)
+<div class="walkthrough-navigation" markdown="1">
+[← Part 5 - Designing a Touch Keyboard](05-designing-touch-layout) &nbsp; [Part 7 - Writing Keyboard Documentation Files →](07-writing-keyboard-documentation)
+</div>
