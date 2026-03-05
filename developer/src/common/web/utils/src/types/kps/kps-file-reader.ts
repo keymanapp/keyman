@@ -22,19 +22,17 @@ export class KpsFileReader {
   public read(file: Uint8Array): KpsPackage {
     const data = new TextDecoder().decode(file);
 
-    const kpsPackage = (() => {
-        let a: KpsPackage;
+    let kpsPackage: KpsPackage = null;
+    try {
+      kpsPackage = new KeymanXMLReader('kps')
+        .parse(data) as KpsPackage;
+    } catch(e) {
+      this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidPackageFile({e}));
+      return null;
+    }
 
-        try {
-          a = new KeymanXMLReader('kps')
-            .parse(data) as KpsPackage;
-        } catch(e) {
-          this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidPackageFile({e}));
-        }
-        return a;
-    })();
-
-    if(!kpsPackage) {
+    if(!kpsPackage?.Package) {
+      this.callbacks.reportMessage(CommonTypesMessages.Error_NotAPackageFile());
       return null;
     }
 
@@ -42,12 +40,12 @@ export class KpsFileReader {
   }
 
   private boxArrays(data: KpsPackage): KpsPackage {
-    boxXmlArray(data.Package?.Files, 'File');
-    boxXmlArray(data.Package?.Keyboards, 'Keyboard');
-    boxXmlArray(data.Package?.LexicalModels, 'LexicalModel');
-    boxXmlArray(data.Package?.RelatedPackages, 'RelatedPackage');
+    boxXmlArray(data.Package.Files, 'File');
+    boxXmlArray(data.Package.Keyboards, 'Keyboard');
+    boxXmlArray(data.Package.LexicalModels, 'LexicalModel');
+    boxXmlArray(data.Package.RelatedPackages, 'RelatedPackage');
 
-    if(data.Package?.Keyboards?.Keyboard) {
+    if(data.Package.Keyboards?.Keyboard) {
       for(const k of data.Package.Keyboards.Keyboard) {
         boxXmlArray(k.Examples, 'Example');
         boxXmlArray(k.Languages, 'Language');
@@ -56,17 +54,17 @@ export class KpsFileReader {
       }
     }
 
-    if(data.Package?.LexicalModels?.LexicalModel) {
+    if(data.Package.LexicalModels?.LexicalModel) {
       for(const lm of data.Package.LexicalModels.LexicalModel) {
         boxXmlArray(lm.Languages, 'Language');
       }
     }
 
-    boxXmlArray(data.Package?.RelatedPackages, 'RelatedPackage');
-    boxXmlArray(data.Package?.StartMenu?.Items, 'Item');
-    boxXmlArray(data.Package?.Strings, 'String');
+    boxXmlArray(data.Package.RelatedPackages, 'RelatedPackage');
+    boxXmlArray(data.Package.StartMenu?.Items, 'Item');
+    boxXmlArray(data.Package.Strings, 'String');
 
-    if(data.Package?.Info) {
+    if(data.Package.Info) {
       // If no properties are defined on an <Info> subitem, then it will be a
       // string, and needs to be boxed into a KpsInfoItem object
       const info: any = data.Package.Info;
