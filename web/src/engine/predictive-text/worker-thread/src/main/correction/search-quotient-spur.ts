@@ -331,13 +331,14 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
-    if(parentCost <= localCost) {
-      if(parentCost == Number.POSITIVE_INFINITY) {
-        return {
-          type: 'none'
-        };
-      }
+    if(localCost == Number.POSITIVE_INFINITY && parentCost == Number.POSITIVE_INFINITY) {
+      // Only occurs when there's nothing more to search.
+      return {
+        type: 'none'
+      };
+    }
 
+    if(parentCost <= localCost) {
       const result = this.parentNode.handleNextNode();
 
       if(result.type == 'complete') {
