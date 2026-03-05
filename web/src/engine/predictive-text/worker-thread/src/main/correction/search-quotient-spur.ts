@@ -313,7 +313,14 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     return this.parentNode?.correctionsEnabled || this.inputs?.length > 1;
   }
 
-  public get currentCost(): number {
+  // Exposed for use with mock-implementations used in unit-testing; is also
+  // used by this class internally at run-time.
+  /**
+   * This method builds search results from edges represented by this
+   * quotient-spur and its inputs that extend from any search results newly
+   * processed by this spur's parent.
+   */
+  protected processPendingRoots() {
     if(this.incomingNodes.length > 0) {
       this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
 
@@ -321,6 +328,10 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
       // The array is registered with the parent; do not replace!
       this.incomingNodes.splice(0, this.incomingNodes.length);
     }
+  }
+
+  public get currentCost(): number {
+    this.processPendingRoots();
 
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
@@ -341,13 +352,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
    * @returns
    */
   public handleNextNode(): PathResult {
-    if(this.incomingNodes.length > 0) {
-      this.queueNodes(this.buildEdgesForNodes(this.incomingNodes));
-
-      // Preserve the array instance, but trash all entries.
-      // The array is registered with the parent; do not replace!
-      this.incomingNodes.splice(0, this.incomingNodes.length);
-    }
+    this.processPendingRoots();
 
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
