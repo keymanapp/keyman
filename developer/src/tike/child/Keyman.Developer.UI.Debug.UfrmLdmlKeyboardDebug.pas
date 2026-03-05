@@ -391,7 +391,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
     dk: TDeadKeyInfo;
   begin
     Result.Selection := memo.Selection;
-    Result.Length := Length(memo.Text);
+    Result.Length := Length(memo.GetTextCR);
     for dk in FDeadkeys do
     begin
       if dk.Position >= Result.Selection.Start
@@ -406,7 +406,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
     L: Integer;
     s: string;
   begin
-    s := memo.Text;
+    s := memo.GetTextCR;
     L := Length(s);
     for dk in FDeadkeys do
       if dk.SavedPosition < 0 then
@@ -430,10 +430,6 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
 
     if GetKeyState(VK_CONTROL) >= 0 then
     begin
-      if (vk = VK_RETURN) and (GetKeyState(VK_MENU) >= 0) then
-      begin
-        memo.SelText := #13#10;
-      end;
       Exit;
     end;
 
@@ -591,13 +587,13 @@ begin
           RealignMemoSelectionState(state);
           selection := memo.Selection;
         end;
-        lhs := Copy(memo.Text, 1, selection.Start);
+        lhs := Copy(memo.GetTextCR, 1, selection.Start);
       end
       else
         lhs := '';
 
-      context := Copy(memo.Text, lhs.Length + 1, selection.Start - lhs.Length);
-      rhs := Copy(memo.Text, lhs.Length + context.Length + 1, MaxInt);
+      context := Copy(memo.GetTextCR, lhs.Length + 1, selection.Start - lhs.Length);
+      rhs := Copy(memo.GetTextCR, lhs.Length + context.Length + 1, MaxInt);
 
       // Reinsert the context
 
@@ -844,19 +840,21 @@ end;
 procedure TfrmLdmlKeyboardDebug.UpdateCharacterGrid;   // I4808
 var
   start, len: Integer;
+  text: string;
 begin
   if csDestroying in ComponentState then
     Exit;
 
   start := memo.SelStart;
   len := memo.SelLength;
-  if start + len > Length(memo.Text) then
+  text := memo.GetTextCR;
+  if start + len > text.Length then
   begin
     // RichEdit has a virtual final character, which is selected when
     // pressing Ctrl+A, etc.
-    len := Length(memo.Text) - start;
+    len := text.Length - start;
   end;
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len,
+  TCharacterGridRenderer.Fill(sgChars, text, FDeadkeys, start, len,
     memo.Selection.Anchor, True);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
