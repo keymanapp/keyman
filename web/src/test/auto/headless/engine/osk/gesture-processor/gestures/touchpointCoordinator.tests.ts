@@ -3,9 +3,8 @@ import sinon from 'sinon';
 import * as PromiseStatusModule from 'promise-status-async';
 import { PROMISE_PENDING } from 'promise-status-async';
 
-import { GestureModelDefs, GestureSource, gestures, TouchpointCoordinator } from '@keymanapp/gesture-recognizer';
-import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
-
+import { GestureModelDefs, GestureSource, gestures, TouchpointCoordinator } from 'keyman/engine/gesture-processor';
+import { ManagedPromise, timedPromise } from 'keyman/common/web-utils';
 import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
 import { assertingPromiseStatus as promiseStatus } from '#test-resources/assertingPromiseStatus.js';
 import { assertGestureSequence, SequenceAssertion } from "#test-resources/sequenceAssertions.js";
