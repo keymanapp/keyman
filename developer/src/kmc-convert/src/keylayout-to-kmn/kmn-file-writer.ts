@@ -153,8 +153,7 @@ export class KmnFileWriter {
                 // 38 35 ... (ሴ) 
                 // 38 35 ... (ऩ) 
                 // 85 43 ... (😀) 
-                // 85 43 ... (--) 
-
+                // 85 43 ... (--)
         
                 // outputCharacter 
                 // a (a) 
