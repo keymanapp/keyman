@@ -21,7 +21,7 @@ public class PackageRepository {
   /**
    * Creates the directory tree where keyboards are stored under the standard 'Group Containers' directory
    */
-  func createKeyman19DataDirectories() {
+  func createKeyman19SharedDataDirectories() {
     if let keyboardDirectory = pathUtil.keyman19KeyboardsDirectory {
       
       do {
@@ -63,7 +63,10 @@ public class PackageRepository {
     }
   }
  
-  public func keyman19DataDirectoryExists() -> Bool {
+  /**
+   * Check to see whether the shared Keyman data directory exists under 'Library/Group Containers/'
+   */
+  public func keyman19SharedDataDirectoryExists() -> Bool {
     guard let keyboardsUrl = self.pathUtil.keyman19KeyboardsDirectory else {
       return false
     }
