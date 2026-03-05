@@ -29,7 +29,7 @@ function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 procedure FreeGlobalProjectUI;
 function IsGlobalProjectUIReady: Boolean;
 function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
-function VerifyNewProjectPathWithUser(const BasePath, KeyboardID: string): Boolean;
+function VerifyNewProjectPathWithUser(const BasePath, ProjectID: string): Boolean;
 
 implementation
 
@@ -157,7 +157,7 @@ begin
   hLockFile := INVALID_HANDLE_VALUE;
 end;
 
-function VerifyNewProjectPathWithUser(const BasePath, KeyboardID: string): Boolean;
+function VerifyNewProjectPathWithUser(const BasePath, ProjectID: string): Boolean;
 var
   ProjectFolder: string;
 begin
@@ -167,7 +167,7 @@ begin
       Exit(False);
   end;
 
-  ProjectFolder := IncludeTrailingPathDelimiter(BasePath) + KeyboardID;
+  ProjectFolder := IncludeTrailingPathDelimiter(BasePath) + ProjectID;
   if DirectoryExists(ProjectFolder) then
   begin
     MessageDlg('The project folder '+ProjectFolder+' already exists. Please choose a different folder or delete it in File Explorer.', mtError, [mbOk], 0);
