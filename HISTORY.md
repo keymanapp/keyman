@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.210 alpha 2026-03-05
+
+* fix(developer): apply keyboard description in Windows keyboard import (#15667)
+* fix(developer): improve UI feedback on upgrade (#15670)
+
 ## 19.0.209 alpha 2026-03-04
 
 * maint(ios): update fv Cartfile for Xcode 26 (#15655)
