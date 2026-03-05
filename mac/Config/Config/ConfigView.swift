@@ -20,7 +20,9 @@ struct ConfigView: View {
       Text(settings.settingName)
       Text("keyboard count = \(settings.keyboardPackages.count)")
       Button("Update settings") {settings.settingName = "Settings changed!"}
-      Button("Remove last keyboard") {settings.keyboardPackages.removeLast()}
+      Button("Remove last keyboard") {if !settings.keyboardPackages.isEmpty {
+        settings.keyboardPackages.removeLast()}
+      }
     }
     .padding()
   }

@@ -21,8 +21,8 @@ public class PackageRepository {
   /**
    * Creates the directory tree where keyboards are stored under the standard 'Group Containers' directory
    */
-  func createDataDirectories(pathUtil: KeymanPaths) {
-    if let keyboardDirectory = pathUtil.keyman18KeyboardsDirectory {
+  func createKeyman19DataDirectories() {
+    if let keyboardDirectory = pathUtil.keyman19KeyboardsDirectory {
       
       do {
         // create the directory if it doesn't already exist
@@ -62,32 +62,61 @@ public class PackageRepository {
       print("App Group container URL not found. Check your entitlements and provisioning profiles.")
     }
   }
+ 
+  public func keyman19DataDirectoryExists() -> Bool {
+    guard let keyboardsUrl = self.pathUtil.keyman19KeyboardsDirectory else {
+      return false
+    }
+    
+    return self.directoryExistsAtPath(directoryUrl: keyboardsUrl)
+  }
   
-  public func readKeyboardPackageSource() -> [PackageSource] {
+  func directoryExistsAtPath(directoryUrl: URL) -> Bool {
+      var isDirectory: ObjCBool = false
+    let exists = FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: &isDirectory)
+      return exists && isDirectory.boolValue
+  }
+
+  public func readKeymanPackagesForKeyman19() -> [PackageSource] {
+    guard let keyboardsUrl = self.pathUtil.keyman19KeyboardsDirectory else {
+      return []
+    }
+ 
+//    print("App Group container URL not found. Check your entitlements and provisioning profiles.")
+
+    return readKeyboardPackageSource(keyboardDirectoryUrl: keyboardsUrl)
+  }
+
+  public func readKeymanPackagesForKeyman18() -> [PackageSource] {
+    guard let keyboardsUrl = self.pathUtil.keyman18KeyboardsDirectory else {
+      return []
+    }
+    
+    return readKeyboardPackageSource(keyboardDirectoryUrl: keyboardsUrl)
+  }
+
+  public func readKeyboardPackageSource(keyboardDirectoryUrl: URL) -> [PackageSource] {
     var packages: [PackageSource] = []
     
-    if let keyboardDirectory = self.pathUtil.keyman18KeyboardsDirectory {
-      do {
-        // Get the URLs for all items in the directory that are not hidden
-        let directoryContents = try FileManager.default.contentsOfDirectory(
-          at: keyboardDirectory,
-          includingPropertiesForKeys: nil,
-          options: [.skipsHiddenFiles]
-        )
-        
-        for itemUrl in directoryContents {
-          // if the item is a directory, then attempt to read it as a keyboard
-          if (itemUrl.hasDirectoryPath) {
-            if let packageSource =  readKeyboardPackageFromDirectory(keyboardDirectoryUrl: itemUrl) {
-              packages.append(packageSource)
-            }
+    do {
+      // Get the URLs for all items in the directory that are not hidden
+      let directoryContents = try FileManager.default.contentsOfDirectory(
+        at: keyboardDirectoryUrl,
+        includingPropertiesForKeys: nil,
+        options: [.skipsHiddenFiles]
+      )
+      
+      for itemUrl in directoryContents {
+        // if the item is a directory, then attempt to read it as a keyboard
+        if (itemUrl.hasDirectoryPath) {
+          if let packageSource =  readKeyboardPackageFromDirectory(keyboardDirectoryUrl: itemUrl) {
+            packages.append(packageSource)
           }
         }
-      } catch {
-        print("Failed to read directory: \(error.localizedDescription)")
-      }    } else {
-        print("App Group container URL not found. Check your entitlements and provisioning profiles.")
       }
+    } catch {
+      print("Failed to read directory: \(error.localizedDescription)")
+    }
     
     print("\(packages.count) packages read")
     return packages

@@ -23,12 +23,16 @@ public class KeymanSettings : ObservableObject {
     //    }
     
     // load keyboards from disk
-    let packageSourceArray = self.dataRepository.readKeyboardPackageSource()
-    
-    // create a KeymanPackage object for each PackageSource and insert it in the array
-    for source in packageSourceArray {
-      let package = KeymanPackage(packageSource: source)
-      self.keyboardPackages.append(package)
+    if (self.dataRepository.keyman19DataDirectoryExists()) {
+      let packageSourceArray = self.dataRepository.readKeymanPackagesForKeyman19()
+      
+      // create a KeymanPackage object for each PackageSource object and insert it in the array
+      for source in packageSourceArray {
+        let package = KeymanPackage(packageSource: source)
+        self.keyboardPackages.append(package)
+      }
+    } else {
+      self.dataRepository.createKeyman19DataDirectories()
     }
   }
 }
