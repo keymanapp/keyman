@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{82E04599-9378-4816-B0AB-8AB58BD307B3}</ProjectGuid>
         <MainSource>tike.dpr</MainSource>
@@ -597,6 +597,7 @@
             <Form>frmCloneKeymanCloudProjectParameters</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\common\delphi\components\tom_TLB.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
