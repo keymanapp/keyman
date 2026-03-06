@@ -26,7 +26,7 @@
     "sinon": "^17.0.1",
     "source-map-support": "^0.5.21",
     "tslib": "^2.5.2",
-    "typescript": "^5.4.5"
+    "typescript": "~5.4.5"
   },
   "scripts": {},
   "workspaces": [
