@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		290FB4632AFB358F00249D58 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */; };
 		290FB4642AFB358F00249D58 /* ZIPFoundation.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		290FB4652AFB359A00249D58 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */; };
 		294D40E9279FE62600DB37F6 /* KeyboardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294D40E8279FE62600DB37F6 /* KeyboardRepository.swift */; };
 		294D40EC27A110BC00DB37F6 /* KeyboardSettingsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294D40EB27A110BC00DB37F6 /* KeyboardSettingsRepository.swift */; };
 		29694DC227A27EC300EA6C18 /* LexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29694DC127A27EC300EA6C18 /* LexicalModelRepository.swift */; };
@@ -59,9 +58,6 @@
 		CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
 		CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
-		CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
-		CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
-		CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -161,10 +157,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */,
-				290FB4652AFB359A00249D58 /* ZIPFoundation.xcframework in Frameworks */,
-				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
-				CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */,
 				CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
