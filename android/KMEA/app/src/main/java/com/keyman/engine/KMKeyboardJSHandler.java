@@ -216,7 +216,10 @@ public class KMKeyboardJSHandler {
             k.setShouldIgnoreTextChange(true);
             k.setShouldIgnoreSelectionChange(true);
           }
-          performLeftDeletions(ic, deleteLeft);
+          while (deleteLeft-- > 0)  {
+            // Just delete one at a time
+            performLeftDeletions(ic, 1);
+          }
         }
 
         // Perform right-deletions
