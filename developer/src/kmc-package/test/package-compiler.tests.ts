@@ -136,8 +136,6 @@ describe('KmpCompiler', function () {
    */
 
   it(`should transform a .kps file for a keyboard package to a correct kmp.json`, function () {
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('kmp.json', 'ahom_star.kps');
     const kmpJsonRefPath = makePathToFixture('kmp.json', 'kmp.json');
 
@@ -163,12 +161,8 @@ describe('KmpCompiler', function () {
   });
 
   it(`should support .kps 17.0 metadata correctly`, function () {
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('kmp_2.0', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('kmp_2.0', 'kmp.json');
-
-    debugger;
 
     const kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJsonActual == null) {
@@ -197,8 +191,6 @@ describe('KmpCompiler', function () {
   it('should warn on absolute paths', async function() {
     this.timeout(10000); // building a zip file can sometimes be slow
 
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
@@ -224,8 +216,6 @@ describe('KmpCompiler', function () {
 
   it('should normalize DOS pathnames from \\ to /', async function() {
     // this.timeout(10000); // building a zip file can sometimes be slow
-
-    callbacks.clear();
 
     const kpsPath = makePathToFixture('normalize_paths', 'source', 'khmer_angkor.kps');
     const kmpCompiler = new KmpCompiler();
