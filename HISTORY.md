@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 19.0.211 alpha 2026-03-06
+
+* chore(deps-dev): bump basic-ftp from 5.0.5 to 5.2.0 (#15631)
+* chore(deps-dev): bump rollup from 4.22.4 to 4.59.0 (#15632)
+* chore(deps): bump minimatch and @microsoft/api-extractor (#15647)
+* chore(deps): bump minimatch from 10.1.1 to 10.2.4 in /developer/src/server/src/win32/trayicon/addon-src (#15648)
+* chore(deps): bump tar from 7.5.7 to 7.5.10 in /developer/src/server/src/win32/trayicon/addon-src (#15682)
+* chore(deps): bump multer from 2.0.2 to 2.1.1 (#15681)
+* chore(web): remove implicit any type when setting processingConfig.itemIdentifier (#15689)
+* maint(common): rollback from Typescript 5.8.2 to 5.4.x (#15690)
+* docs: tweak build bot docs and update imsample gitignore (#15691)
+* maint(developer): make `TestCompilerCallbacks` usage more consistent and simplify (#15665)
+* maint(developer): cleanup additional TestCompilerCallbacks references (#15684)
+* fix(developer): prevent new projects from overwriting existing projects (#15669)
+* fix(developer): retrieve debug memo anchor without side effects (#15672)
+* fix(developer): ngrok upgrade (#15626)
+* chore(deps-dev): bump minimatch from 9.0.5 to 9.0.9 in /resources/build/pr-build-status (#15650)
+
 ## 19.0.210 alpha 2026-03-05
 
 * fix(developer): apply keyboard description in Windows keyboard import (#15667)
