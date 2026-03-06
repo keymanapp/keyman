@@ -1,5 +1,39 @@
 # Keyman Version History
 
+## 19.0.210 alpha 2026-03-05
+
+* fix(developer): apply keyboard description in Windows keyboard import (#15667)
+* fix(developer): improve UI feedback on upgrade (#15670)
+
+## 19.0.209 alpha 2026-03-04
+
+* maint(ios): update fv Cartfile for Xcode 26 (#15655)
+* feat(linux): implement diagnostic report (#15576)
+* refactor(core): cleanup (#15656)
+
+## 19.0.208 alpha 2026-03-03
+
+* docs(core): add keyhandling doc (#15629)
+* fix(developer): handle CRLF as CR internally in LDML debugger (#15616)
+* fix(developer): handle .kps file that has no `<Package>` element (#15622)
+* fix(developer): use correct return values and nullish checks in package-validation (#15653)
+
+## 19.0.207 alpha 2026-03-02
+
+* chore(ios): Cleanup `RELEASE_OEM_FIRSTVOICES` var in build.sh scripts (#15605)
+* fix(developer): package compiler handle missing `info` section in .kps file (#15620)
+* fix(developer): handle window already destroyed when closing editor (#15618)
+
+## 19.0.206 alpha 2026-02-25
+
+* maint(ios): upgrade to Xcode 26.2 (#15498)
+
+## 19.0.205 alpha 2026-02-24
+
+* fix(core): fix iterator in backspace handling (#15596)
+* refactor(core): simplify loop for removing text (#15600)
+* test(core): add LDML baseline test with minimal keyboard (#15608)
+
 ## 19.0.204 alpha 2026-02-20
 
 * maint(web): ensure Web build scripts handle paths with spaces properly (#15598)

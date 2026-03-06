@@ -17,8 +17,7 @@ tests_from_cldr = [
 
 # these have 'embedded' (@@) testdata instead of a separate file
 tests_without_testdata = [
-# disabling 000 until we have updates to core or to the keyboard so that it passes
-#  'k_000_null_keyboard',
+  'k_000_minimal_keyboard',
   'k_002_tinyu32',
   'k_003_transform',
   'k_004_tinyshift',
