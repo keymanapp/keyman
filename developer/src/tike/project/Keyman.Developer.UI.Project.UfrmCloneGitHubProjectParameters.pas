@@ -97,6 +97,7 @@ uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectUI,
   Keyman.System.KeyboardUtils,
   Keyman.System.LexicalModelUtils,
   UfrmMain;
@@ -331,29 +332,12 @@ begin
 end;
 
 function TfrmCloneGitHubProjectParameters.Validate: Boolean;
-var
-  ProjectFolder: string;
 begin
   if IsSourceProjectALexicalModelProject
     then Result := TLexicalModelUtils.IsValidLexicalModelID(Trim(editProjectID.Text), True)
     else Result := TKeyboardUtils.IsValidKeyboardID(Trim(editProjectID.Text), True);
 
-  if Result then
-  begin
-    if not DirectoryExists(editPath.Text) then
-    begin
-      if MessageDlg('The target folder '+editPath.Text+' does not exist. Create it now?', mtConfirmation, mbOkCancel, 0) = mrCancel then
-        Exit(False);
-    end;
-
-    ProjectFolder := IncludeTrailingPathDelimiter(editPath.Text) + editProjectID.Text;
-    if DirectoryExists(ProjectFolder) then
-    begin
-      if MessageDlg('The project folder '+ProjectFolder+' already exists. Are you sure you want to overwrite it?', mtWarning,
-          mbOkCancel, 0) = mrCancel then
-        Exit(False);
-    end;
-  end;
+  Result := Result and VerifyNewProjectPathWithUser(editPath.Text, editProjectID.Text);
 end;
 
 procedure TfrmCloneGitHubProjectParameters.UpdateProjectFilename;
