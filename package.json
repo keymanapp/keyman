@@ -5,6 +5,7 @@
     "@microsoft/api-documenter": "^7.28.0",
     "@microsoft/api-extractor": "^7.57.6",
     "@types/chai": "^4.3.14",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^20.4.1",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@web/dev-server-esbuild": "^1.0.2",
