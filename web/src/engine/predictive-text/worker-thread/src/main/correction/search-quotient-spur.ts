@@ -362,11 +362,8 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     // Forbid a raw edit-distance of greater than 2.
     // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
-    let substitutionsOnly = false;
     if(currentNode.editCount > 2) {
       return unmatchedResult as PathResult;
-    } else if(currentNode.editCount == 2) {
-      substitutionsOnly = true;
     }
 
     // Thresholds _any_ path, partially based on currently-traversed distance.
@@ -387,12 +384,6 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
 
     // OK, we fully crossed a graph edge and have landed on a transition point;
     // time to build more edges / edge batches.
-
-    // Always possible, as this does not require any new input.
-    if(!substitutionsOnly) {
-      let insertionEdges = currentNode.buildInsertionEdges();
-      this.selectionQueue.enqueueAll(insertionEdges);
-    }
 
     if(currentNode.spaceId == this.spaceId) {
       if(this.returnedValues) {
