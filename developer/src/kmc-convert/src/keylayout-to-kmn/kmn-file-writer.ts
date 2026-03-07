@@ -144,42 +144,10 @@ export class KmnFileWriter {
         // and add a warning about the use of control characters
         let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
-        /* TODO remove
-                // uniqueDataRules[k].output 
-                // 97 (a) 
-                // 32 ( ) 
-                // 87 204 138 (W̊) 
-                // 225 136 180 (ሴ) 
-                // 38 35 ... (ሴ) 
-                // 38 35 ... (ऩ) 
-                // 85 43 ... (😀) 
-                // 85 43 ... (--)
-        
-                // outputCharacter 
-                // a (a) 
-                //   ( ) 
-                // W̊ (W̊) 
-                // ሴ (ሴ) 
-                // '&#x1234;' (ሴ) 
-                // &#2345; ('ऩ') 
-                // 'U+1F600' (😀) 
-                // U+0002 (---) 
-        */
+
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        /*
-                // outputUnicodeCharacter
-                //  a (a) 
-                //    ( ) 
-                //  W̊ (W̊) 
-                //  ሴ (ሴ) 
-                //  ሴ (ሴ) 
-                //  ሴ ('ऩ') 
-                //  😀 (😀) 
-                //  --- (---) txt added ctr char
-        */
         const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
 
-        // get value of the character ( less 32 will produce msg)
         let charValue = KeylayoutToKmnConverter.MAX_CTRL_CHARACTER;
 
         // if starts with &#x
@@ -257,7 +225,6 @@ export class KmnFileWriter {
     for (let k = 0; k < uniqueDataRules.length; k++) {
 
       if (uniqueDataRules[k].ruleType === "C2") {
-
         // use of Unicode Character vs Unicode Codepoint;
         // we always print out the Unicode Character  (A, W̊, 😎, ... ).
         // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
@@ -267,9 +234,6 @@ export class KmnFileWriter {
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
-
-        // const outputUnicodeCodePoint = convertUtil.convertCharacterToUnicodeCodePoint(outputCharacter);
-        // here exchange const outputUnicodeCodePoint = hu() 
 
         let charValue = KeylayoutToKmnConverter.MAX_CTRL_CHARACTER;
 
@@ -371,7 +335,6 @@ export class KmnFileWriter {
 
     for (let k = 0; k < uniqueDataRules.length; k++) {
       if (uniqueDataRules[k].ruleType === "C3") {
-
         // use of Unicode Character vs Unicode Codepoint;
         // we always print out the Unicode Character  (A, W̊, 😎, ... ).
         // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)

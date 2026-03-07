@@ -63,7 +63,7 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
     }
 
     // invalid 'U+xxxx'
-   else if (m_uni_inv) {
+    else if (m_uni_inv) {
         return undefined;
     }
 

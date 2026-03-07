@@ -23,7 +23,7 @@ export class KeylayoutFileReader {
    */
   public validate(source: Keylayout.KeylayoutXMLSourceFile): boolean {
     if (!SchemaValidators.default.keylayout(source)) {
-       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
+      for (const err of (<any>SchemaValidators.default.keylayout).errors) {
         this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({
           e: err.instancePath
         }));
