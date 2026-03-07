@@ -18,7 +18,7 @@ verify_on_mac
 builder_describe "Defines actions for use in CI-related iOS builds." \
   "build" \
   "prep-release"
-  # For consideration:  clean               ("Cleanup Carthage Mess", "Clean XCode DerivedData Mess")
+  # For consideration:  clean               ("Clean XCode DerivedData Mess")
   # For consideration:  publish:testflight  ("Upload to TestFlight (PR area)")
   # For consideration:  publish:app-store   ("Push * to the App Store for Deployment")
   # For consideration:  publish:fastlane    (for matching release-build steps)

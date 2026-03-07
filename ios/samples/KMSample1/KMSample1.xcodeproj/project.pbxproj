@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		290FB45B2AFB234900249D58 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB45A2AFB234800249D58 /* ZIPFoundation.xcframework */; };
-		290FB45C2AFB234900249D58 /* ZIPFoundation.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB45A2AFB234800249D58 /* ZIPFoundation.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEA1AD39165005534F0 /* Main.storyboard */; };
 		98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCED1AD39165005534F0 /* Images.xcassets */; };
 		98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEF1AD39165005534F0 /* LaunchScreen.xib */; };
@@ -16,12 +14,6 @@
 		C0324B841F87172900AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B831F87172900AF3785 /* ViewController.swift */; };
 		CEBD337D26549EC100EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */; };
 		CEBD337E26549EC100EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD33C62654CB0E00EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */; };
-		CEBD33C72654CB0F00EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD33CA2654CB1300EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */; };
-		CEBD33CB2654CB1300EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD33CC2654CB1400EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */; };
-		CEBD33CD2654CB1500EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CED2AC85260AFADC00A408D2 /* ekwtamil99uni.kmp in Resources */ = {isa = PBXBuildFile; fileRef = CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */; };
 /* End PBXBuildFile section */
 
@@ -32,10 +24,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				CEBD33CB2654CB1300EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
-				290FB45C2AFB234900249D58 /* ZIPFoundation.xcframework in Embed Frameworks */,
-				CEBD33C72654CB0F00EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
-				CEBD33CD2654CB1500EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
 				CEBD337E26549EC100EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -44,7 +32,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		290FB45A2AFB234800249D58 /* ZIPFoundation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ZIPFoundation.xcframework; path = ../../Carthage/Build/ZIPFoundation.xcframework; sourceTree = "<group>"; };
 		98ABFCDD1AD39165005534F0 /* KMSample1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMSample1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98ABFCE11AD39165005534F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98ABFCEB1AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -53,9 +40,6 @@
 		C0324B7F1F87170600AF3785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C0324B831F87172900AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = KeymanEngine.xcframework; sourceTree = "<group>"; };
-		CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
-		CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 		CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */ = {isa = PBXFileReference; lastKnownFileType = file; path = ekwtamil99uni.kmp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -64,10 +48,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEBD33CA2654CB1300EB2EA8 /* Reachability.xcframework in Frameworks */,
-				290FB45B2AFB234900249D58 /* ZIPFoundation.xcframework in Frameworks */,
-				CEBD33CC2654CB1400EB2EA8 /* Sentry.xcframework in Frameworks */,
-				CEBD33C62654CB0E00EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD337D26549EC100EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -117,10 +97,6 @@
 		98ABFD171AD391B0005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				290FB45A2AFB234800249D58 /* ZIPFoundation.xcframework */,
-				CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */,
-				CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */,
-				CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */,
 				CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */,
 			);
 			name = Frameworks;
@@ -359,11 +335,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -384,11 +356,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
