@@ -146,7 +146,7 @@ which brew || (
 
 BREW_ALL="bash jq python3 meson ninja coreutils pyenv"
 BREW_WEB="node emscripten"
-BREW_IOS="swiftlint carthage"
+BREW_IOS="swiftlint"
 BREW_MACOS="carthage cocoapods"
 BREW_ANDROID="openjdk@8 android-sdk android-studio ant gradle maven"
 
