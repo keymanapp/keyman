@@ -4,9 +4,5 @@
 <dict>
 	<key>com.apple.security.app-sandbox</key>
 	<false/>
-	<key>com.apple.security.application-groups</key>
-	<array>
-		<string>3YE4W86L3G.com.keyman</string>
-	</array>
 </dict>
 </plist>
