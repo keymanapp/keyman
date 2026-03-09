@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.212 alpha 2026-03-09
+
+* chore(android): Cleanup unused Extracted Text (#15671)
+* chore(deps): bump fast-xml-parser from 5.3.4 to 5.3.8 (#15649)
+* fix(developer): resolve input project path for `kmc copy` (#15700)
+* fix(developer): await copier result before reporting success or failure (#15701)
+* fix(developer): correct INVALID_HANDLE_VALUE check in UnlockProject (#15704)
+* fix(developer): use trimmed version of paths when verifying in New Project (#15705)
+
 ## 19.0.211 alpha 2026-03-06
 
 * chore(deps-dev): bump basic-ftp from 5.0.5 to 5.2.0 (#15631)
