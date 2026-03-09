@@ -185,7 +185,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    */
   private getLocalFolderProject(source: string): string {
     source = this.normalizePath(source);
-    const projectSource = this.normalizePath(this.callbacks.path.join(source, this.callbacks.path.basename(source) + KeymanFileTypes.Source.Project));
+    const projectSource = this.normalizePath(this.callbacks.path.resolve(this.callbacks.path.join(source, this.callbacks.path.basename(source) + KeymanFileTypes.Source.Project)));
     if(!this.callbacks.fs.existsSync(projectSource)) {
       this.callbacks.reportMessage(CopierMessages.Error_CannotFindInputProject({project: source}));
       return null;
@@ -200,7 +200,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * @returns
    */
   private getLocalFileProject(source: string): string {
-    return this.normalizePath(source);
+    return this.normalizePath(this.callbacks.path.resolve(source));
   }
 
   /**
