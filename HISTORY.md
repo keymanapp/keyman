@@ -1265,6 +1265,26 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.247 stable 2026-03-09
+
+* chore(linux): Update debian changelog (#15556)
+* chore(linux): update copyright year and standards version (#15558)
+* fix(mac): retry for mac disk detach (#15577)
+* maint(mac): upgrade to Xcode 26.2 (#15575)
+* maint(ios): upgrade to Xcode 26.2 (#15614)
+* fix(developer): handle CRLF as CR internally in LDML debugger (#15660)
+* fix(developer): handle .kps file that has no `<Package>` element (#15661)
+* fix(developer): use correct return values and nullish checks in package-validation (#15662)
+* fix(developer): handle window already destroyed when closing editor (#15663)
+* fix(developer): package compiler handle missing `info` section in .kps file (#15664)
+* fix(developer): apply keyboard description in Windows keyboard import (#15668)
+* fix(developer): improve UI feedback on upgrade (#15686)
+* fix(developer): prevent new projects from overwriting existing projects (#15694)
+* fix(developer): retrieve debug memo anchor without side effects (#15695)
+* fix(developer): ngrok upgrade (#15633)
+* fix(developer): await copier result before reporting success or failure (#15702)
+* fix(developer): resolve input project path for `kmc copy` (#15703)
+
 ## 18.0.246 stable 2026-02-04
 
 * cherrypick(common):  Update FirstVoices versions in keyboards.csv (#15273)
