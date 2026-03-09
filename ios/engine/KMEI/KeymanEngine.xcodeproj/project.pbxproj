@@ -38,7 +38,6 @@
 		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
 		9A079DCA222E050E00581263 /* LexicalModelKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */; };
 		9A079DD4223194B100581263 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
-		9A079DE62231A69D00581263 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A079DE52231A69D00581263 /* Foundation.framework */; };
 		9A079E372238680700581263 /* KMPLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E362238680700581263 /* KMPLexicalModel.swift */; };
 		9A079E3A223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */; };
 		9A079E3D223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */; };
@@ -359,7 +358,6 @@
 		9A079DCF223194B100581263 /* KeymanEngineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanEngineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A079DD1223194B100581263 /* FileManagementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementTests.swift; sourceTree = "<group>"; };
 		9A079DD3223194B100581263 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9A079DE52231A69D00581263 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9A079E362238680700581263 /* KMPLexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPLexicalModel.swift; sourceTree = "<group>"; };
 		9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardKeymanPackage.swift; sourceTree = "<group>"; };
 		9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallableLexicalModel.swift; sourceTree = "<group>"; };
@@ -557,7 +555,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A079DE62231A69D00581263 /* Foundation.framework in Frameworks */,
 				9A079DD4223194B100581263 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -953,7 +950,6 @@
 		F243888114BBD43000A3E055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9A079DE52231A69D00581263 /* Foundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
