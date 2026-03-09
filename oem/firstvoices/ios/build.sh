@@ -32,7 +32,6 @@ DERIVED_DATA="$THIS_SCRIPT_PATH/build"
 
 do_clean ( ) {
   rm -rf "$DERIVED_DATA"
-  rm -rf Carthage
 }
 
 ### START OF THE BUILD ###
@@ -47,15 +46,6 @@ KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 # First things first - update our dependencies.
 
-function carthage_die() {
-  local msg="$1"
-
-  # Don't leave a trace of the failed folder; we'd have to rebuild stuff anyway.
-  # This way, a later re-run doesn't think `configure` succeeded when it did not.
-  rm -rf Carthage
-  builder_die "$1"
-}
-
 function do_configure() {
   KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
   KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards/keyboards.csv"
@@ -66,15 +56,6 @@ function do_configure() {
   mkdir -p "$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards"
   cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
   downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
-
-  echo
-  echo "Load dependencies with Carthage"
-
-  carthage checkout || carthage_die "Carthage dependency checkout failed"
-
-  # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
-  # which affects the sentry-cocoa dependency.
-  carthage build --use-xcframeworks --no-use-binaries --platform iOS || carthage_die "Carthage dependency loading failed"
 }
 
 #

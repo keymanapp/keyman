@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		290FB4632AFB358F00249D58 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */; };
-		290FB4642AFB358F00249D58 /* ZIPFoundation.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		290FB4652AFB359A00249D58 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */; };
 		294D40E9279FE62600DB37F6 /* KeyboardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294D40E8279FE62600DB37F6 /* KeyboardRepository.swift */; };
 		294D40EC27A110BC00DB37F6 /* KeyboardSettingsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294D40EB27A110BC00DB37F6 /* KeyboardSettingsRepository.swift */; };
 		29694DC227A27EC300EA6C18 /* LexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29694DC127A27EC300EA6C18 /* LexicalModelRepository.swift */; };
@@ -52,16 +49,15 @@
 		98C9A8F21BFBF6C1009E9A4F /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */; };
 		CEBD34022654D41200EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
 		CEBD34032654D41200EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD341A2654D76600EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
-		CEBD341B2654D76600EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD341F2654D76900EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
-		CEBD34202654D76900EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
-		CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
-		CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
-		CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
-		CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
+		D87BA10A2F5B5F9900EBD286 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA1092F5B5F9900EBD286 /* Reachability */; };
+		D87BA10D2F5B608900EBD286 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA10C2F5B608900EBD286 /* DeviceKit */; };
+		D87BA1102F5B643300EBD286 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA10F2F5B643300EBD286 /* Sentry */; };
+		D87BA1132F5B649E00EBD286 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA1122F5B649E00EBD286 /* ZIPFoundation */; };
+		D87BA1152F5B64B700EBD286 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA1142F5B64B700EBD286 /* Reachability */; };
+		D87BA1172F5B64B700EBD286 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA1162F5B64B700EBD286 /* DeviceKit */; };
+		D87BA1192F5B64B700EBD286 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA1182F5B64B700EBD286 /* Sentry */; };
+		D87BA11B2F5B64B700EBD286 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = D87BA11A2F5B64B700EBD286 /* ZIPFoundation */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -71,10 +67,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				CEBD34202654D76900EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
-				290FB4642AFB358F00249D58 /* ZIPFoundation.xcframework in Embed Frameworks */,
-				CEBD341B2654D76600EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
-				CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
 				CEBD34032654D41200EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -94,7 +86,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ZIPFoundation.xcframework; path = Carthage/Build/ZIPFoundation.xcframework; sourceTree = "<group>"; };
 		294D40E8279FE62600DB37F6 /* KeyboardRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardRepository.swift; sourceTree = "<group>"; };
 		294D40EB27A110BC00DB37F6 /* KeyboardSettingsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSettingsRepository.swift; sourceTree = "<group>"; };
 		29694DC127A27EC300EA6C18 /* LexicalModelRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelRepository.swift; sourceTree = "<group>"; };
@@ -139,9 +130,6 @@
 		98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = FirstVoices.entitlements; sourceTree = "<group>"; };
 		98C9A9FA1BFC1111009E9A4F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
 		CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = KeymanEngine.xcframework; sourceTree = "<group>"; };
-		CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
-		CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,11 +137,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEBD341F2654D76900EB2EA8 /* Reachability.xcframework in Frameworks */,
-				290FB4632AFB358F00249D58 /* ZIPFoundation.xcframework in Frameworks */,
-				CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */,
-				CEBD341A2654D76600EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD34022654D41200EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
+				D87BA10A2F5B5F9900EBD286 /* Reachability in Frameworks */,
+				D87BA10D2F5B608900EBD286 /* DeviceKit in Frameworks */,
+				D87BA1102F5B643300EBD286 /* Sentry in Frameworks */,
+				D87BA1132F5B649E00EBD286 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,11 +149,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */,
-				290FB4652AFB359A00249D58 /* ZIPFoundation.xcframework in Frameworks */,
-				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
-				CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */,
 				CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
+				D87BA1152F5B64B700EBD286 /* Reachability in Frameworks */,
+				D87BA1172F5B64B700EBD286 /* DeviceKit in Frameworks */,
+				D87BA1192F5B64B700EBD286 /* Sentry in Frameworks */,
+				D87BA11B2F5B64B700EBD286 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,10 +269,6 @@
 		98C9A9FB1BFC19ED009E9A4F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */,
-				CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */,
-				CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */,
-				CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */,
 				CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */,
 			);
 			name = Frameworks;
@@ -308,6 +292,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AEDAB2F5F441D00928595 /* PBXTargetDependency */,
+				D88AEDAD2F5F441D00928595 /* PBXTargetDependency */,
+				D88AEDAF2F5F441D00928595 /* PBXTargetDependency */,
+				D88AEDB12F5F441D00928595 /* PBXTargetDependency */,
 			);
 			name = FirstVoices;
 			productName = FirstVoices;
@@ -326,6 +314,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AEDB32F5F442800928595 /* PBXTargetDependency */,
+				D88AEDB52F5F442800928595 /* PBXTargetDependency */,
+				D88AEDB72F5F442800928595 /* PBXTargetDependency */,
+				D88AEDB92F5F442800928595 /* PBXTargetDependency */,
 			);
 			name = SWKeyboard;
 			productName = SWKeyboard;
@@ -374,6 +366,12 @@
 				Base,
 			);
 			mainGroup = 9889E8AD1BFA9CEC00019560;
+			packageReferences = (
+				D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */,
+				D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			productRefGroup = 9889E8B71BFA9CEC00019560 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -510,6 +508,41 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D88AEDAB2F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDAA2F5F441D00928595 /* Reachability */;
+		};
+		D88AEDAD2F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDAC2F5F441D00928595 /* DeviceKit */;
+		};
+		D88AEDAF2F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDAE2F5F441D00928595 /* Sentry */;
+		};
+		D88AEDB12F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB02F5F441D00928595 /* ZIPFoundation */;
+		};
+		D88AEDB32F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB22F5F442800928595 /* Reachability */;
+		};
+		D88AEDB52F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB42F5F442800928595 /* DeviceKit */;
+		};
+		D88AEDB72F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB62F5F442800928595 /* Sentry */;
+		};
+		D88AEDB92F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB82F5F442800928595 /* ZIPFoundation */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		9889E8C21BFA9CEC00019560 /* Main.storyboard */ = {
@@ -667,7 +700,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices Keyboards Development";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5;
 			};
 			name = Debug;
 		};
@@ -694,7 +727,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 6;
 			};
 			name = Release;
 		};
@@ -790,6 +823,124 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.4;
+			};
+		};
+		D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.0;
+			};
+		};
+		D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.6.0;
+			};
+		};
+		D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.20;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D87BA1092F5B5F9900EBD286 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D87BA10C2F5B608900EBD286 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D87BA10F2F5B643300EBD286 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D87BA1122F5B649E00EBD286 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D87BA1142F5B64B700EBD286 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D87BA1162F5B64B700EBD286 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D87BA1182F5B64B700EBD286 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D87BA11A2F5B64B700EBD286 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D88AEDAA2F5F441D00928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AEDAC2F5F441D00928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AEDAE2F5F441D00928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AEDB02F5F441D00928595 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D88AEDB22F5F442800928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AEDB42F5F442800928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AEDB62F5F442800928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AEDB82F5F442800928595 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9889E8AE1BFA9CEC00019560 /* Project object */;
 }

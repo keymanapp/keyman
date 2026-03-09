@@ -26,7 +26,6 @@
 		1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
 		29084CAB2CD48B5D004070E7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 29084CAA2CD48B5D004070E7 /* Images.xcassets */; };
-		296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */; };
 		29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */; };
 		29E202BD2CCB7541008B4740 /* KeyboardHeightViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E202BC2CCB7541008B4740 /* KeyboardHeightViewController.swift */; };
 		377D10DE26846B8900467431 /* SpacebarTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D10DD26846B8900467431 /* SpacebarTextViewController.swift */; };
@@ -39,7 +38,6 @@
 		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
 		9A079DCA222E050E00581263 /* LexicalModelKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */; };
 		9A079DD4223194B100581263 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
-		9A079DE62231A69D00581263 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A079DE52231A69D00581263 /* Foundation.framework */; };
 		9A079E372238680700581263 /* KMPLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E362238680700581263 /* KMPLexicalModel.swift */; };
 		9A079E3A223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */; };
 		9A079E3D223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */; };
@@ -121,9 +119,6 @@
 		CE46D65D247B93C9005FD506 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */; };
 		CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */; };
-		CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC226522EAA001733AC /* Sentry.xcframework */; };
-		CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC326522EAA001733AC /* Reachability.xcframework */; };
-		CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */; };
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
 		CE71705823A9C14D00A924A1 /* ResourceFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */; };
 		CE71705F23A9C97F00A924A1 /* PackageInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */; };
@@ -190,6 +185,14 @@
 		CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */; };
 		CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */; };
 		CEF9367824D3B0B20031C70D /* PackageInstallView_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */; };
+		D8AF2E802F5B6878001EA6F4 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2E7F2F5B6878001EA6F4 /* Reachability */; };
+		D8AF2E832F5B688F001EA6F4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2E822F5B688F001EA6F4 /* DeviceKit */; };
+		D8AF2E862F5B68AD001EA6F4 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2E852F5B68AD001EA6F4 /* Sentry */; };
+		D8AF2E892F5B68D1001EA6F4 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2E882F5B68D1001EA6F4 /* ZIPFoundation */; };
+		D8AF2E9F2F5B6E07001EA6F4 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2E9E2F5B6E07001EA6F4 /* Reachability */; };
+		D8AF2EA12F5B6E07001EA6F4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2EA02F5B6E07001EA6F4 /* DeviceKit */; };
+		D8AF2EA32F5B6E07001EA6F4 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2EA22F5B6E07001EA6F4 /* Sentry */; };
+		D8AF2EA52F5B6E07001EA6F4 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = D8AF2EA42F5B6E07001EA6F4 /* ZIPFoundation */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -307,7 +310,6 @@
 		2949146F2738DA6700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/ResourceInfoView.strings"; sourceTree = "<group>"; };
 		294914702738DD7400400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		294914712738DD9700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "ff-NG"; path = "ff-NG.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
-		296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ZIPFoundation.xcframework; path = ../../Carthage/Build/ZIPFoundation.xcframework; sourceTree = "<group>"; };
 		297810FE297FAEDF007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		297810FF297FAEF8007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29781100297FAF06007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = kn; path = kn.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -356,7 +358,6 @@
 		9A079DCF223194B100581263 /* KeymanEngineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanEngineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A079DD1223194B100581263 /* FileManagementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementTests.swift; sourceTree = "<group>"; };
 		9A079DD3223194B100581263 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9A079DE52231A69D00581263 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9A079E362238680700581263 /* KMPLexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPLexicalModel.swift; sourceTree = "<group>"; };
 		9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardKeymanPackage.swift; sourceTree = "<group>"; };
 		9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallableLexicalModel.swift; sourceTree = "<group>"; };
@@ -433,9 +434,6 @@
 		CE4459D323FBBB34003151FD /* KeymanEngineTestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineTestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Queries+LexicalModel.swift"; sourceTree = "<group>"; };
 		CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryModelTests.swift; sourceTree = "<group>"; };
-		CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CE5EDDC226522EAA001733AC /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
-		CE5EDDC326522EAA001733AC /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
 		CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstallViewController.swift; sourceTree = "<group>"; };
@@ -546,6 +544,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D375A1F82075A00F61AE0 /* KeymanEngine.framework in Frameworks */,
+				D8AF2E9F2F5B6E07001EA6F4 /* Reachability in Frameworks */,
+				D8AF2EA12F5B6E07001EA6F4 /* DeviceKit in Frameworks */,
+				D8AF2EA32F5B6E07001EA6F4 /* Sentry in Frameworks */,
+				D8AF2EA52F5B6E07001EA6F4 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,7 +555,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A079DE62231A69D00581263 /* Foundation.framework in Frameworks */,
 				9A079DD4223194B100581263 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -562,10 +563,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */,
-				CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */,
-				CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */,
-				CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */,
+				D8AF2E802F5B6878001EA6F4 /* Reachability in Frameworks */,
+				D8AF2E832F5B688F001EA6F4 /* DeviceKit in Frameworks */,
+				D8AF2E862F5B68AD001EA6F4 /* Sentry in Frameworks */,
+				D8AF2E892F5B68D1001EA6F4 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -949,11 +950,6 @@
 		F243888114BBD43000A3E055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */,
-				CE5EDDC326522EAA001733AC /* Reachability.xcframework */,
-				CE5EDDC226522EAA001733AC /* Sentry.xcframework */,
-				CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */,
-				9A079DE52231A69D00581263 /* Foundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1092,6 +1088,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AEDA32F5F43F000928595 /* PBXTargetDependency */,
+				D88AEDA52F5F43F000928595 /* PBXTargetDependency */,
+				D88AEDA72F5F43F000928595 /* PBXTargetDependency */,
+				D88AEDA92F5F43F000928595 /* PBXTargetDependency */,
 			);
 			name = KeymanEngine;
 			productName = KeymanEngine;
@@ -1221,6 +1221,12 @@
 				vi,
 			);
 			mainGroup = F243887314BBD43000A3E055;
+			packageReferences = (
+				D8AF2E7E2F5B6878001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */,
+				D8AF2E812F5B688F001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				D8AF2E842F5B68AD001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				D8AF2E872F5B68D1001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1590,6 +1596,22 @@
 			isa = PBXTargetDependency;
 			target = CE4459D223FBBB34003151FD /* KeymanEngineTestHost */;
 			targetProxy = CE4459F823FBBCB3003151FD /* PBXContainerItemProxy */;
+		};
+		D88AEDA32F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA22F5F43F000928595 /* Reachability */;
+		};
+		D88AEDA52F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA42F5F43F000928595 /* DeviceKit */;
+		};
+		D88AEDA72F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA62F5F43F000928595 /* Sentry */;
+		};
+		D88AEDA92F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA82F5F43F000928595 /* ZIPFoundation */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2108,7 +2130,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2383,7 +2405,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2426,7 +2448,7 @@
 				DEFINES_MODULE = YES;
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2581,6 +2603,104 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D8AF2E7E2F5B6878001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.4;
+			};
+		};
+		D8AF2E812F5B688F001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.0;
+			};
+		};
+		D8AF2E842F5B68AD001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.6.0;
+			};
+		};
+		D8AF2E872F5B68D1001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.20;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D88AEDA22F5F43F000928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E7E2F5B6878001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AEDA42F5F43F000928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E812F5B688F001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AEDA62F5F43F000928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E842F5B68AD001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AEDA82F5F43F000928595 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E872F5B68D1001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D8AF2E7F2F5B6878001EA6F4 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E7E2F5B6878001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D8AF2E822F5B688F001EA6F4 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E812F5B688F001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D8AF2E852F5B68AD001EA6F4 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E842F5B68AD001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D8AF2E882F5B68D1001EA6F4 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E872F5B68D1001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D8AF2E9E2F5B6E07001EA6F4 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E7E2F5B6878001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D8AF2EA02F5B6E07001EA6F4 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E812F5B688F001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D8AF2EA22F5B6E07001EA6F4 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E842F5B68AD001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D8AF2EA42F5B6E07001EA6F4 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E872F5B68D1001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F243887514BBD43000A3E055 /* Project object */;
 }
