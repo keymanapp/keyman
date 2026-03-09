@@ -292,7 +292,7 @@ context as well.
 The devices listed are representative of the various types of platforms that
 Keyman supports, to allow testing on each of the available form factors.
 
-## Making your Keyman Developer Server instance globally available with ngrok
+## Making your Keyman Developer Server instance globally available with ngrok {#ngrok}
 
 One of the fiddliest parts of testing keyboards and models with mobile devices
 is transferring the files to your phone or tablet. Keyman Developer Server will
@@ -320,28 +320,30 @@ configure ngrok manually.
    click **Configure Server...**. You should be presented with a window similar
    to this:
 
-    ![](images/config.png)
+    ![](../images/ui/frmKeyman_Developer_Server_Options.png)
 
 2. Tick the box **Use ngrok to provide public url for Server**
-3. If ngrok is available, a version number will be shown to the right of the
+3. If ngrok is available, the text 'Installed' will be shown to the right of the
    **Download or update ngrok** button. Otherwise, click this button to download
    the latest version.
-4. You'll need a free ngrok account, so click the **Create free ngrok
+4. **Install required redistributable**: ngrok requires an additional Microsoft
+   VC++ redistributable component; if the text next to this button shows 'Not
+   installed', press the button and follow the prompts to install the
+   redistributable component.
+5. You'll need a free ngrok account, so click the **Create free ngrok
    account...** button to open the ngrok website, and follow the steps there
    to finish the account creation process.
-5. After creating the account, you should be presented with an authentication
+6. After creating the account, you should be presented with an authentication
    token. You can also access this by clicking the **Get token** link in the
    Keyman Developer Server Options dialog box. Paste this token into the
    **Authentication token** edit box.
-6. Select the most appropriate region for your location, to minimize the latency
-   (delay) when using the ngrok service.
 7. Click **OK** to save changes, and start the ngrok service within Keyman
    Developer Server.
 
 Once ngrok is configured, you should see an additional **Server** menu item in
 Keyman Developer's **Tools** menu, with three items:
 
-**Open `https://some-url.ngrok.io` in browser**
+**Open `https://some-url.ngrok-free.app` in browser**
 
 : Opens the public URL to your current Keyman Developer Server instance in the
   default browser on your computer.
@@ -353,15 +355,7 @@ Keyman Developer's **Tools** menu, with three items:
 
 **Configure...**
 
-: Opens the Keyman Developer Server Options dialog box.
-
-# Configuring Keyman Developer Server
-
-Keyman Developer Server has a number of configuration options. On Windows, using
-Keyman Developer is the easiest way to manage these options. Open **Tools |
-Options**, select **Server** tab, and click **Configure Server...**.
-
-![](images/config.png)
+: Opens the [Keyman Developer Server Options](options#server-tab) dialog box.
 
 ## Configuration Files
 
