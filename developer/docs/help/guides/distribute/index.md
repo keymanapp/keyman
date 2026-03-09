@@ -1,10 +1,8 @@
 ---
-title: Distributing keyboards
+title: Package Tutorial
 ---
 
--   [Package development tutorial](tutorial) (Keyman for Windows, Keyman for macOS, Keyman for mobile apps)
--   [Distribute keyboards to Keyman applications](packages)
+In version 19, the Package Tutorial has been replaced by the Keyman
+Developer Walkthrough, which covers all the topics in greater depth.
 
-## See also
-
--   [Keyman Engine](/developer/engine/)
+* [The Keyman Developer Walkthrough →](../develop/walkthrough/08-preparing-keyboard-package)
