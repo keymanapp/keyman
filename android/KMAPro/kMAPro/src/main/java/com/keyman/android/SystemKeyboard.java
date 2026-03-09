@@ -203,8 +203,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         return value, so we test for that as well (#11479)
       */
       if (icText != null && icText.text != null) {
-        boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
-        boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        // Update the text selection but ignore the returned statuses
+        KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
+        KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       }
     }
 
