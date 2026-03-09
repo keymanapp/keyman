@@ -148,7 +148,7 @@ end;
 
 procedure UnlockProject;
 begin
-  if not hLockFile = INVALID_HANDLE_VALUE then
+  if hLockFile = INVALID_HANDLE_VALUE then
   begin
     Exit;
   end;
