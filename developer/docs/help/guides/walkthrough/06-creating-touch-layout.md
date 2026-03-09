@@ -143,7 +143,7 @@ Use care when combining different kinds of gestures as some of them may conflict
 
 ## Reference
 
-See [Touch layout editor documentation](../../../context/keyboard-editor#toc-touch-layout-tab) for more details.
+See [Touch layout editor documentation](../../context/keyboard-editor#toc-touch-layout-tab) for more details.
 
 ## Testing Touch Keyboards
 
