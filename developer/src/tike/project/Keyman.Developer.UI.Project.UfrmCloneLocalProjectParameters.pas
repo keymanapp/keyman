@@ -254,7 +254,7 @@ begin
     then Result := TLexicalModelUtils.IsValidLexicalModelID(Trim(editProjectID.Text), True)
     else Result := TKeyboardUtils.IsValidKeyboardID(Trim(editProjectID.Text), True);
 
-  Result := Result and VerifyNewProjectPathWithUser(editPath.Text, editProjectID.Text);
+  Result := Result and VerifyNewProjectPathWithUser(BasePath, ProjectID);
 end;
 
 procedure TfrmCloneLocalProjectParameters.UpdateProjectFilename;
