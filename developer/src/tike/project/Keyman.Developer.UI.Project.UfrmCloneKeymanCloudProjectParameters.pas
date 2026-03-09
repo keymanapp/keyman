@@ -286,7 +286,7 @@ end;
 function TfrmCloneKeymanCloudProjectParameters.Validate: Boolean;
 begin
   Result := TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True);
-  Result := Result and VerifyNewProjectPathWithUser(editPath.Text, editKeyboardID.Text);
+  Result := Result and VerifyNewProjectPathWithUser(BasePath, KeyboardID);
 end;
 
 procedure TfrmCloneKeymanCloudProjectParameters.SetKeyboardID(const Value: string);

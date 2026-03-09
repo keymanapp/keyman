@@ -481,7 +481,7 @@ begin
   end;
 
   Result := TLexicalModelUtils.DoesProjectFilenameFollowLexicalModelConventions(editModelID.Text + Ext_LexicalModelProject);
-  Result := Result and VerifyNewProjectPathWithUser(editPath.Text, editModelID.Text);
+  Result := Result and VerifyNewProjectPathWithUser(BasePath, ModelID);
 end;
 
 { Dynamically update other fields based on filled details }
