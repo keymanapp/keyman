@@ -292,6 +292,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AEDAB2F5F441D00928595 /* PBXTargetDependency */,
+				D88AEDAD2F5F441D00928595 /* PBXTargetDependency */,
+				D88AEDAF2F5F441D00928595 /* PBXTargetDependency */,
+				D88AEDB12F5F441D00928595 /* PBXTargetDependency */,
 			);
 			name = FirstVoices;
 			productName = FirstVoices;
@@ -310,6 +314,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AEDB32F5F442800928595 /* PBXTargetDependency */,
+				D88AEDB52F5F442800928595 /* PBXTargetDependency */,
+				D88AEDB72F5F442800928595 /* PBXTargetDependency */,
+				D88AEDB92F5F442800928595 /* PBXTargetDependency */,
 			);
 			name = SWKeyboard;
 			productName = SWKeyboard;
@@ -501,6 +509,41 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		D88AEDAB2F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDAA2F5F441D00928595 /* Reachability */;
+		};
+		D88AEDAD2F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDAC2F5F441D00928595 /* DeviceKit */;
+		};
+		D88AEDAF2F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDAE2F5F441D00928595 /* Sentry */;
+		};
+		D88AEDB12F5F441D00928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB02F5F441D00928595 /* ZIPFoundation */;
+		};
+		D88AEDB32F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB22F5F442800928595 /* Reachability */;
+		};
+		D88AEDB52F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB42F5F442800928595 /* DeviceKit */;
+		};
+		D88AEDB72F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB62F5F442800928595 /* Sentry */;
+		};
+		D88AEDB92F5F442800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDB82F5F442800928595 /* ZIPFoundation */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		9889E8C21BFA9CEC00019560 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -657,7 +700,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices Keyboards Development";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5;
 			};
 			name = Debug;
 		};
@@ -684,7 +727,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 6;
 			};
 			name = Release;
 		};
@@ -853,6 +896,46 @@
 			productName = Sentry;
 		};
 		D87BA11A2F5B64B700EBD286 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D88AEDAA2F5F441D00928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AEDAC2F5F441D00928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AEDAE2F5F441D00928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AEDB02F5F441D00928595 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D88AEDB22F5F442800928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA1082F5B5F9900EBD286 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AEDB42F5F442800928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10B2F5B608900EBD286 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AEDB62F5F442800928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D87BA10E2F5B643300EBD286 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AEDB82F5F442800928595 /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D87BA1112F5B649E00EBD286 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
 			productName = ZIPFoundation;

@@ -1088,6 +1088,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AEDA32F5F43F000928595 /* PBXTargetDependency */,
+				D88AEDA52F5F43F000928595 /* PBXTargetDependency */,
+				D88AEDA72F5F43F000928595 /* PBXTargetDependency */,
+				D88AEDA92F5F43F000928595 /* PBXTargetDependency */,
 			);
 			name = KeymanEngine;
 			productName = KeymanEngine;
@@ -1592,6 +1596,22 @@
 			isa = PBXTargetDependency;
 			target = CE4459D223FBBB34003151FD /* KeymanEngineTestHost */;
 			targetProxy = CE4459F823FBBCB3003151FD /* PBXContainerItemProxy */;
+		};
+		D88AEDA32F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA22F5F43F000928595 /* Reachability */;
+		};
+		D88AEDA52F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA42F5F43F000928595 /* DeviceKit */;
+		};
+		D88AEDA72F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA62F5F43F000928595 /* Sentry */;
+		};
+		D88AEDA92F5F43F000928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA82F5F43F000928595 /* ZIPFoundation */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2620,6 +2640,26 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D88AEDA22F5F43F000928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E7E2F5B6878001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AEDA42F5F43F000928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E812F5B688F001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AEDA62F5F43F000928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E842F5B68AD001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AEDA82F5F43F000928595 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E872F5B68D1001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
 		D8AF2E7F2F5B6878001EA6F4 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D8AF2E7E2F5B6878001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */;

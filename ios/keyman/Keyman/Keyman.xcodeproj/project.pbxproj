@@ -708,6 +708,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AED9B2F5F43C500928595 /* PBXTargetDependency */,
+				D88AED9D2F5F43C500928595 /* PBXTargetDependency */,
+				D88AED9F2F5F43C500928595 /* PBXTargetDependency */,
+				D88AEDA12F5F43C500928595 /* PBXTargetDependency */,
 			);
 			name = Keyman;
 			productName = KeymanTouch;
@@ -728,6 +732,10 @@
 			buildRules = (
 			);
 			dependencies = (
+				D88AED932F5F439800928595 /* PBXTargetDependency */,
+				D88AED952F5F439800928595 /* PBXTargetDependency */,
+				D88AED972F5F439800928595 /* PBXTargetDependency */,
+				D88AED992F5F439800928595 /* PBXTargetDependency */,
 			);
 			name = SWKeyboard;
 			productName = SWKeyboard;
@@ -1067,6 +1075,41 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D88AED932F5F439800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AED922F5F439800928595 /* Reachability */;
+		};
+		D88AED952F5F439800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AED942F5F439800928595 /* DeviceKit */;
+		};
+		D88AED972F5F439800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AED962F5F439800928595 /* Sentry */;
+		};
+		D88AED992F5F439800928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AED982F5F439800928595 /* ZIPFoundation */;
+		};
+		D88AED9B2F5F43C500928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AED9A2F5F43C500928595 /* Reachability */;
+		};
+		D88AED9D2F5F43C500928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AED9C2F5F43C500928595 /* DeviceKit */;
+		};
+		D88AED9F2F5F43C500928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AED9E2F5F43C500928595 /* Sentry */;
+		};
+		D88AEDA12F5F43C500928595 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D88AEDA02F5F43C500928595 /* ZIPFoundation */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */ = {
@@ -1603,6 +1646,46 @@
 			productName = Sentry;
 		};
 		D87C2E392F5B7C0700890244 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E932F5B6951001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D88AED922F5F439800928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E8A2F5B691C001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AED942F5F439800928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E8D2F5B6930001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AED962F5F439800928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E902F5B6942001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AED982F5F439800928595 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E932F5B6951001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D88AED9A2F5F43C500928595 /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E8A2F5B691C001EA6F4 /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+		D88AED9C2F5F43C500928595 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E8D2F5B6930001EA6F4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+		D88AED9E2F5F43C500928595 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8AF2E902F5B6942001EA6F4 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		D88AEDA02F5F43C500928595 /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D8AF2E932F5B6951001EA6F4 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
 			productName = ZIPFoundation;
