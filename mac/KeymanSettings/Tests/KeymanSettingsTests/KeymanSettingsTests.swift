@@ -40,13 +40,13 @@ import Foundation
   @Test("Check Keyman 19 container data directory") func testKeyman19ContainerDataDirectory() async throws {
     #expect(true)
     let containerDirectory = try #require(KeymanPaths().keyman19ContainerDirectory)
-    #expect(containerDirectory.absoluteString.hasSuffix("Group%20Containers/3YE4W86L3G.com.keyman/"))
+    #expect(containerDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/"))
   }
   
   @Test("Check Keyman 19 keyboards directory") func testKeyman19KeyboardsDirectory() async throws {
     #expect(true)
     let keyboardsDirectory = try #require(KeymanPaths().keyman19KeyboardsDirectory)
-    #expect(keyboardsDirectory.absoluteString.hasSuffix("Group%20Containers/3YE4W86L3G.com.keyman/Library/Application%20Support/Keyman-Keyboards/"))
+    #expect(keyboardsDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Keyboards/"))
   }
 }
 

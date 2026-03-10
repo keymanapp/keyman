@@ -28,15 +28,16 @@ import Foundation
  *        keyman18KeyboardsDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
  * For Keyman version 19 (and later):
  *    containerDirectory: '~/Library/Group Containers'
- *      containerKeymanDirectory: '~/Library/Group Containers/3YE4W86L3G.com.keyman'
- *        groupKeymanSupportDirectory: '~/Library/Group Containers/3YE4W86L3G.com.keyman/Library/Application Support'
- *          keyman19KeyboardsDirectory: '~/Library/Group Containers/3YE4W86L3G.com.keyman/Library/Application Support/Keyman-Keyboards'
+ *      containerKeymanDirectory: '~/Library/Group Containers/group.com.keyman'
+ *        groupKeymanSupportDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support'
+ *          keyman19KeyboardsDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Keyboards'
 */
 
 public struct KeymanPaths {
   static let keymanBundleId = "keyman.inputmethod.Keyman"
-  static let configBundleId = "com.keyman.Config"
-  static let groupId = "3YE4W86L3G.com.keyman"
+  static let configBundleId = "com.keyman.config"
+//  static let groupId = "3YE4W86L3G.com.keyman"
+  static let groupId = "group.com.keyman"
 
   static private let keyboardsDirectoryName = "Keyman-Keyboards"
   static private let keymanSubdirectoryName = "keyman.inputmethod.Keyman"
