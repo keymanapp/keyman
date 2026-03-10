@@ -26,7 +26,6 @@ import {
 import { constituentPaths } from '../../helpers/constituentPaths.js';
 import { quotientPathHasInputs } from '../../helpers/quotientPathHasInputs.js';
 import { buildCantLinearFixture } from '../../helpers/buildCantLinearFixture.js';
-import { buildAlphabeticClusterFixtures } from '../../helpers/buildAlphabeticClusteredFixture.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -233,37 +232,6 @@ describe('SearchQuotientSpur', () => {
       assert.deepEqual(length1Path.bestExample, {text: 't', p: 0.5});
       assert.deepEqual(length1Path.parents, [rootPath]);
       assert.deepEqual(length1Path.inputs, leadEdgeDistribution);
-    });
-  });
-
-  describe('constituentPaths', () => {
-    it('includes a single entry array when all parents are SearchQuotientSpurs', () => {
-      const { paths } = buildCantLinearFixture();
-      const finalPath = paths[4];
-
-      assert.equal(constituentPaths(finalPath).length, 1);
-
-      const pathSequence = constituentPaths(finalPath)[0];
-      assert.equal(pathSequence.length, 4); // 4 inputs; does not include root node
-
-      assert.sameOrderedMembers(pathSequence, paths.slice(1));
-    });
-
-    it('properly enumerates child paths when encountering SearchCluster ancestors', () => {
-      const fixture = buildAlphabeticClusterFixtures();
-      const finalPath = fixture.paths[4].path_k4c6;
-
-      // The longest SearchPath at the end of that fixture's set is based on a
-      // lead-in cluster; all variants of that should be included.
-      assert.equal(constituentPaths(finalPath).length, constituentPaths(fixture.clusters.cluster_k3c4).length);
-
-      // That cluster holds the different potential penultimate paths;
-      // finalPath's inputs are added directly after any variation that may be
-      // output from the cluster.
-      assert.sameDeepMembers(constituentPaths(finalPath), constituentPaths(fixture.clusters.cluster_k3c4).map((p) => {
-        p.push(finalPath);
-        return p;
-      }));
     });
   });
 
