@@ -58,8 +58,6 @@ describe('SubstitutionQuotientSpur', () => {
       assert.deepEqual(rootPath.parents, []);
     });
 
-    // TODO:  for each of the possible ancestor Spur types, + the root!
-    // Properties should have proper relationship with each test's ancestor.
     it('may be built from arbitrary prior SearchQuotientSpur', () => {
       const rootPath = new SearchQuotientRoot(testModel);
 
