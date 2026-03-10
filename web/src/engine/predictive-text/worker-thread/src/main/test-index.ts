@@ -7,6 +7,7 @@ export { ContextTransition } from './correction/context-transition.js';
 export * from './correction/correction-searchable.js';
 export * from './correction/correction-result-mapping.js';
 export * from './correction/distance-modeler.js';
+export * from './correction/deletion-quotient-spur.js';
 export * from './correction/insertion-quotient-spur.js';
 export * from './correction/substitution-quotient-spur.js';
 export * from './correction/search-quotient-cluster.js';
