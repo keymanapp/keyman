@@ -1,12 +1,20 @@
+/**
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-03-10
+ *
+ * This file adds unit tests for unit-test helper functions validating
+ * the correction-search modules of the Keyman predictive-text engine.
+ */
+
 import { assert } from 'chai';
 
-import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LegacyQuotientRoot, models } from '@keymanapp/lm-worker/test-index';
+import { models, SearchQuotientRoot } from '@keymanapp/lm-worker/test-index';
 
-import { buildCantLinearFixture } from '../../helpers/buildCantLinearFixture.js';
-import { buildAlphabeticClusterFixtures } from '../../helpers/buildAlphabeticClusteredFixture.js';
-
-import { quotientPathHasInputs } from '#test-resources/searchQuotientUtils.js';
+import { quotientPathHasInputs } from "./quotientPathHasInputs.js";
+import { buildCantLinearFixture } from './buildCantLinearFixture.js';
+import { buildAlphabeticClusterFixtures } from './buildAlphabeticClusteredFixture.js';
+import { jsonFixture } from '../templates/helpers.js';
 
 import TrieModel = models.TrieModel;
 
@@ -14,7 +22,7 @@ const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
 describe('quotientNodeHasParents()', () => {
   it('matches an empty array on root SearchPaths', () => {
-    assert.isTrue(quotientPathHasInputs(new LegacyQuotientRoot(testModel), []));
+    assert.isTrue(quotientPathHasInputs(new SearchQuotientRoot(testModel), []));
   });
 
   it('matches all path inputs when provided in proper order', () => {
@@ -85,4 +93,3 @@ describe('quotientNodeHasParents()', () => {
     ]));
   });
 });
-
