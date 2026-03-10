@@ -30,14 +30,15 @@ export class InsertionQuotientSpur extends SearchQuotientSpur {
   protected buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>): SearchNode[] {
     // Note that .buildInsertionEdges will not extend any nodes reached by empty-input
     // or by deletions.
-    return baseNodes.flatMap((n) => n.buildInsertionEdges());
+    return baseNodes
+      // If there are already at least 2 edits for a node, do not add new edits.
+      // Also, do not permit insert edits to follow delete edits.
+      .filter((n) => n.lastEdgeType != 'deletion' && n.editCount < 2)
+      .flatMap((n) => n.buildInsertionEdges(this.spaceId));
   }
 
   get edgeKey(): string {
     return `SR[${this.parentNode.sourceRangeKey}]L${this.codepointLength}INS`;
-    // How will this differentiate from other cases?
-    // ... sourceRangeKey + codepointLength + insert count?
-    return '';
   }
 
   get bestExample() {

@@ -26,12 +26,12 @@ import { buildQuotientDocFixture } from '../../helpers/buildQuotientDocFixture.j
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
-function assertResultsFromQuotientNode(path: SearchQuotientNode, results: string[], shouldMatch: boolean) {
+function assertResultsFromQuotientNode(path: SearchQuotientNode, results: string[], shouldMatch: boolean, strictSpaceMatch?: boolean) {
   let matchCount = 0;
 
   let result: PathResult = path.handleNextNode();
   while(result.type != 'none') {
-    if(result.type == 'complete') {
+    if(result.type == 'complete' && (!strictSpaceMatch || result.finalNode.spaceId == path.spaceId)) {
       const resultKey = result.finalNode.resultKey;
       if(results.find((entry) => entry == resultKey)) {
         matchCount++;
@@ -78,8 +78,6 @@ describe('InsertionQuotientSpur', () => {
       assert.deepEqual(rootPath.parents, []);
     });
 
-    // TODO:  for each of the possible ancestor Spur types, + the root!
-    // Properties should have proper relationship with each test's ancestor.
     it('may be built from arbitrary prior SearchQuotientSpur', () => {
       const rootPath = new SearchQuotientRoot(testModel);
 
@@ -142,21 +140,14 @@ describe('InsertionQuotientSpur', () => {
   });
 
   describe('handleNextNode()', () => {
-    it('does not output results that directly match inputs', () => {
+    it('forwards results that match the parent node\'s conditions', () => {
       const canPath = buildCantLinearFixture().paths[3];
+      const followingInsert = new InsertionQuotientSpur(canPath);
 
       const matchTargets = [
         'can',
         'car',
         'cen',  // 'cent' and 'center' are supported in this test model.
-      ];
-      assertResultsFromQuotientNode(canPath, matchTargets, true);
-    });
-
-    it('does not output results that substitute inputs', () => {
-      const canPath = buildCantLinearFixture().paths[3];
-
-      const matchTargets = [
         // Replacement of first char
         'man',
         'far',
@@ -166,21 +157,56 @@ describe('InsertionQuotientSpur', () => {
         // Replacement of third char
         'cal',  // 'call'
       ];
-      assertResultsFromQuotientNode(canPath, matchTargets, true);
+      assertResultsFromQuotientNode(followingInsert, matchTargets, true);
+    });
+
+    it('does not \'own\' results forwarded from the parent node', () => {
+      const canPath = buildCantLinearFixture().paths[3];
+      const followingInsert = new InsertionQuotientSpur(canPath);
+
+      const matchTargets = [
+        'can',
+        'car',
+        'cen',  // 'cent' and 'center' are supported in this test model.
+        // Replacement of first char
+        'man',
+        'far',
+        // Replacement of second char
+        'con',  // 'consider' and variants thereof are also supported.
+        'cor',  // 'corner'
+        // Replacement of third char
+        'cal',  // 'call'
+      ];
+      assertResultsFromQuotientNode(followingInsert, matchTargets, false, true);
     });
 
     it('outputs results that insert characters as needed', () => {
       const canPath = buildCantLinearFixture().paths[3];
+      const followingInsert = new InsertionQuotientSpur(canPath);
 
       const matchTargets = [
-        'char',  // 'c' + (insert) 'h' + 'ar'
-        'than',  // 't' + (insert) 'h' + 'an'
+        'cann',  // 'can' + (insert) 'n' (=> 'cannot')
+        'care',  // 'car' + (insert) 'e'
+        'rang',  // 'ran' + (insert) 'g' (=> 'range')
       ];
-      assertResultsFromQuotientNode(canPath, matchTargets, false);
+      assertResultsFromQuotientNode(followingInsert, matchTargets, true);
+    });
+
+    it('outputs results extending prior inserts if insertion spur is parent', () => {
+      const canPath = buildCantLinearFixture().paths[3];
+      const firstInsert = new InsertionQuotientSpur(canPath);
+      const followingInsert = new InsertionQuotientSpur(firstInsert)
+
+      const matchTargets = [
+        'canno',  // 'can' + (insert) 'n' (=> 'cannot')
+        'range',  // 'ran' + (insert) 'g' (=> 'range')
+      ];
+      assertResultsFromQuotientNode(followingInsert, matchTargets, true);
     });
 
     it('does not output results that delete incoming keystrokes as needed', () => {
       const canPath = buildCantLinearFixture().paths[3];
+      const followingInsert = new InsertionQuotientSpur(canPath);
 
       const matchTargets = [
         // Delete only first
@@ -188,9 +214,16 @@ describe('InsertionQuotientSpur', () => {
         'en',   // (delete) 'c'/'r'/'t' + 'en', for 'end',
         // Even delete second
         'n',    // model possesses words starting with just 'n'
-        't'     // ... and 't'.
+        't',    // ... and 't'.
+        // Delete only third
+        'ca',
+        'ce'
       ];
-      assertResultsFromQuotientNode(canPath, matchTargets, false);
+      assertResultsFromQuotientNode(followingInsert, matchTargets, false);
+    });
+
+    it.skip('does not output results when immediately following a deletion spur edit', () => {
+
     });
   });
 });

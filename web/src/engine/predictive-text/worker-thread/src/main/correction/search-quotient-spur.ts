@@ -387,6 +387,16 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
 
       if(result.type == 'complete') {
         this.queueNodes(this.buildEdgesForNodes([result.finalNode]));
+
+        // We triggered the processing of this node from our parent
+        // quotient-node, so that parent cannot report this result.
+        //
+        // If `this` node models insertion spurs, then the result is
+        // valid for this node's keystroke count too - and thus should
+        // be forwarded as a potential correction-search result.
+        if(this.inputCount == this.parentNode.inputCount) {
+          return result;
+        }
       }
 
       return {
