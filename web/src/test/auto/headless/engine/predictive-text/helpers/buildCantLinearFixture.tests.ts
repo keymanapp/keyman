@@ -4,7 +4,7 @@ import { constituentPaths } from "./constituentPaths.js";
 import { quotientPathHasInputs } from "./quotientPathHasInputs.js";
 import { buildCantLinearFixture } from "./buildCantLinearFixture.js";
 
-describe('buildSimplePathSplitFixture() fixture', () => {
+describe('buildCantLinearFixture() fixture', () => {
   it('constructs paths properly', () => {
     const { paths, distributions } = buildCantLinearFixture();
     const pathToSplit = paths[4];
