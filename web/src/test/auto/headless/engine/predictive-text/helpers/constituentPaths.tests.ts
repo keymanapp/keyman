@@ -9,9 +9,13 @@
 
 import { assert } from 'chai';
 
+import { DeletionQuotientSpur, InsertionQuotientSpur } from '@keymanapp/lm-worker/test-index';
+
 import { constituentPaths } from "./constituentPaths.js";
+import { toSpurTypeSequence } from './toSpurTypeSequence.js';
 import { buildCantLinearFixture } from './buildCantLinearFixture.js';
 import { buildAlphabeticClusterFixtures } from './buildAlphabeticClusteredFixture.js';
+import { buildQuotientDocFixture } from './buildQuotientDocFixture.js';
 
 describe('constituentPaths', () => {
   it('includes a single entry array when all parents are SearchQuotientSpurs', () => {
@@ -41,5 +45,51 @@ describe('constituentPaths', () => {
       p.push(finalPath);
       return p;
     }));
+  });
+
+  describe('for the final quotient-graph doc example', () => {
+    it('handles insertion-only quotient-graph paths', () => {
+      const { sc2 } = buildQuotientDocFixture().nodes;
+
+      const sc2Constituents = constituentPaths(sc2);
+      assert.equal(sc2Constituents.length, 1);
+      sc2Constituents.forEach(s => s.forEach(p => assert.isTrue(p instanceof InsertionQuotientSpur)));
+    });
+
+    it('handles deletion-only quotient-graph paths', () => {
+      const { k2c0 } = buildQuotientDocFixture().nodes;
+
+      const k2c0Constituents = constituentPaths(k2c0);
+      assert.equal(k2c0Constituents.length, 1);
+      k2c0Constituents.forEach(s => s.forEach(p => assert.isTrue(p instanceof DeletionQuotientSpur)));
+    });
+
+    it('does not emit sequences with inserts immediately following deletes', () => {
+      const { k2c3 } = buildQuotientDocFixture().nodes;
+
+      const k2c3Constituents = constituentPaths(k2c3);
+
+      const shouldNotOccur = k2c3Constituents.find((seq) => {
+        const typeSeq = toSpurTypeSequence(seq);
+        return typeSeq.find((type, index) => {
+          return type == 'delete' && typeSeq[index+1] == 'insert';
+        });
+      });
+      assert.isNotOk(shouldNotOccur);
+    });
+
+    it('does emit sequences with deletes immediately following inserts', () => {
+      const { k2c3 } = buildQuotientDocFixture().nodes;
+
+      const k2c3Constituents = constituentPaths(k2c3);
+
+      const shouldOccur = k2c3Constituents.find((seq) => {
+        const typeSeq = toSpurTypeSequence(seq);
+        return typeSeq.find((type, index) => {
+          return type == 'insert' && typeSeq[index+1] == 'delete';
+        });
+      });
+      assert.isNotOk(shouldOccur);
+    });
   });
 });
