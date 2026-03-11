@@ -11,6 +11,7 @@ import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { convertUtil } from '@keymanapp/common-types';
 
 export class KmnFileWriter {
 
@@ -28,7 +29,12 @@ export class KmnFileWriter {
     data += this.writeKmnFileHeader(dataUkelele);
 
     // add bottom part of kmn file: RULES
-    data += this.writeDataRules(dataUkelele);
+    const dataRules = this.writeDataRules(dataUkelele);
+    if (dataRules)
+      data += dataRules;
+    else {
+      return null;
+    }
 
     try {
       return new TextEncoder().encode(data);
@@ -132,38 +138,57 @@ export class KmnFileWriter {
         if ((k > 1) && (uniqueDataRules[k - 1].key !== uniqueDataRules[k].key) && (uniqueDataRules[k - 1].ruleType === uniqueDataRules[k].ruleType)) {
           data += '\n';
         }
-
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
+        // and add a warning about the use of control characters
         let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-        const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = this.convertToUnicodeCodePoint(outputCharacter);
+        const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
 
-        if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
+        let charValue = KeylayoutToKmnConverter.MAX_CTRL_CHARACTER;
 
-          // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-          if ((Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-
-            versionOutputCharacter = outputUnicodeCodePoint;
-
-            if (outputUnicodeCodePoint.length > 1) {
-              if (warnText[2] == "") {
-                warnText[2] = warnText[2] + "c WARNING: use of a control character " /*+ outputUnicodeCodePoint*/;
-              }
-              else {
-                warnText[2] = warnText[2] + " Use of a control character "/* + outputUnicodeCodePoint*/;
-              }
-            }
-          } else {
-            versionOutputCharacter = outputUnicodeCharacter;
-          }
+        // if starts with &#x
+        if (outputCharacter.startsWith("&#x")) {
+          charValue = parseInt(outputCharacter.slice(3, -1), 16);
         }
+        else if (outputCharacter.startsWith("&#")) {
+          charValue = parseInt(outputCharacter.slice(2, -1), 10);
+        }
+        else if (outputCharacter.startsWith("U+")) {
+          charValue = parseInt(outputCharacter.slice(2), 16);
+        }
+
+        if (outputUnicodeCharacter !== undefined) {
+
+          if (charValue >= KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+
+            // print character (A, W̊, 😎, ... )
+            versionOutputCharacter = outputUnicodeCharacter;
+          } else {
+
+            // print codepoint if it is a control character (U+0007, ...)
+            versionOutputCharacter = "U+" + charValue.toString(16).toUpperCase().padStart(4, "0");
+
+            if (warnText[2] == "") {
+              warnText[2] = warnText[2] + "c WARNING: use of a control character ";
+            }
+            else {
+              warnText[2] = warnText[2] + "; Use of a control character ";
+            }
+          }
+        } else {
+          this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+            inputFilename: dataUkelele.keylayoutFilename,
+            output: new TextDecoder().decode(uniqueDataRules[k].output),
+            keymapIndex: uniqueDataRules[k].modifierKey,
+            KeyName: uniqueDataRules[k].key
+          }));
+          return null;
+        }
+
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
@@ -200,34 +225,55 @@ export class KmnFileWriter {
     for (let k = 0; k < uniqueDataRules.length; k++) {
 
       if (uniqueDataRules[k].ruleType === "C2") {
-
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
+        // and add a warning about the use of control characters
         let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-        const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = this.convertToUnicodeCodePoint(outputCharacter);
+        const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
 
-        if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
-          // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-          if (Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-            versionOutputCharacter = outputUnicodeCodePoint;
-            if (outputUnicodeCodePoint.length > 1) {
-              if (warnText[2] == "") {
-                warnText[2] = warnText[2] + "c WARNING: use of a control character ";
-              }
-              else {
-                warnText[2] = warnText[2] + "; Use of a control character ";
-              }
-            }
-          } else {
+        let charValue = KeylayoutToKmnConverter.MAX_CTRL_CHARACTER;
+
+        // if starts with &#x
+        if (outputCharacter.startsWith("&#x")) {
+          charValue = parseInt(outputCharacter.slice(3, -1), 16);
+        }
+        else if (outputCharacter.startsWith("&#")) {
+          charValue = parseInt(outputCharacter.slice(2, -1), 10);
+        }
+        else if (outputCharacter.startsWith("U+")) {
+          charValue = parseInt(outputCharacter.slice(2), 16);
+        }
+
+        if (outputUnicodeCharacter !== undefined) {
+
+          if (charValue >= KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+
+            // print character (A, W̊, 😎, ... )
             versionOutputCharacter = outputUnicodeCharacter;
+          } else {
+
+            // print codepoint if it is a control character (U+0007, ...)
+            versionOutputCharacter = "U+" + charValue.toString(16).toUpperCase().padStart(4, "0");
+
+            if (warnText[2] == "") {
+              warnText[2] = warnText[2] + "c WARNING: use of a control character ";
+            }
+            else {
+              warnText[2] = warnText[2] + "; Use of a control character ";
+            }
           }
+        } else {
+          this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+            inputFilename: dataUkelele.keylayoutFilename,
+            output: new TextDecoder().decode(uniqueDataRules[k].output),
+            keymapIndex: uniqueDataRules[k].modifierKey,
+            KeyName: uniqueDataRules[k].key
+          }));
+          return null;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -289,37 +335,57 @@ export class KmnFileWriter {
 
     for (let k = 0; k < uniqueDataRules.length; k++) {
       if (uniqueDataRules[k].ruleType === "C3") {
-
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
+        // and add a warning about the use of control characters
         let versionOutputCharacter;
-
         const warnText = this.reviewRules(uniqueDataRules, k);
+
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
-        //const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        //const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-        const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
-        const outputUnicodeCodePoint = this.convertToUnicodeCodePoint(outputCharacter);
+        const outputUnicodeCharacter = convertUtil.convertToUnicodeCharacter(outputCharacter);
 
-        if ((outputUnicodeCharacter !== undefined) && (outputUnicodeCodePoint !== undefined)) {
-          // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-          if (Number("0x" + outputUnicodeCodePoint.substring(2, outputUnicodeCodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+        let charValue = KeylayoutToKmnConverter.MAX_CTRL_CHARACTER;
 
-            versionOutputCharacter = outputUnicodeCodePoint;
-
-            if (outputUnicodeCodePoint.length > 1) {
-              if (warnText[2] == "") {
-                warnText[2] = warnText[2] + "c WARNING: use of a control character ";
-              }
-              else {
-                warnText[2] = warnText[2] + "; Use of a control character ";
-              }
-            }
-          } else {
-            versionOutputCharacter = outputUnicodeCharacter;
-          }
+        // if starts with &#x
+        if (outputCharacter.startsWith("&#x")) {
+          charValue = parseInt(outputCharacter.slice(3, -1), 16);
         }
+        else if (outputCharacter.startsWith("&#")) {
+          charValue = parseInt(outputCharacter.slice(2, -1), 10);
+        }
+        else if (outputCharacter.startsWith("U+")) {
+          charValue = parseInt(outputCharacter.slice(2), 16);
+        }
+
+        if (outputUnicodeCharacter !== undefined) {
+
+          if (charValue >= KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+
+            // print character (A, W̊, 😎, ... )
+            versionOutputCharacter = outputUnicodeCharacter;
+          } else {
+
+            // print codepoint if it is a control character (U+0007, ...)
+            versionOutputCharacter = "U+" + charValue.toString(16).toUpperCase().padStart(4, "0");
+
+            if (warnText[2] == "") {
+              warnText[2] = warnText[2] + "c WARNING: use of a control character ";
+            }
+            else {
+              warnText[2] = warnText[2] + "; Use of a control character ";
+            }
+          }
+        } else {
+          this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+            inputFilename: dataUkelele.keylayoutFilename,
+            output: new TextDecoder().decode(uniqueDataRules[k].output),
+            keymapIndex: uniqueDataRules[k].modifierKey,
+            KeyName: uniqueDataRules[k].key
+          }));
+          return null;
+        }
+
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
@@ -885,83 +951,4 @@ export class KmnFileWriter {
     }
     return warningTextArray;
   }
-
-  // TODO: move to util
-  /**
-   * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
-   * @param  inputString the value that will converted
-   * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
-   */
-  public convertToUnicodeCharacter(inputString: string): string {
-
-    if ((inputString === null) || (inputString === undefined)) {
-      return undefined;
-    }
-
-    // e.g. U+0061 U+1234 U+1F60E
-    else if (inputString.match(/^U\+([0-9a-f]{2,6})$/i)) {
-      return String.fromCodePoint(parseInt((inputString.match(/^U\+([0-9a-f]{2,6})$/i))[1], 16));
-    }
-
-    // e.g. &#x61;  &#x1234; &#x1F60E;
-    else if (inputString.match(/^&#x([0-9a-f]{2,6});$/i)) {
-      return String.fromCodePoint(parseInt((inputString.match(/^&#x([0-9a-f]{2,6});$/i))[1], 16));
-    }
-
-    // e.g. &#97; &#4660; &#128518;
-    else if (inputString.match(/^&#([0-9a-f]{2,6});$/i)) {
-      return String.fromCodePoint(parseInt((inputString.match(/^&#([0-9a-f]{2,6});$/i))[1], 10));
-    }
-
-    // e.g. &gt; &quot;
-    else if (inputString.match(/^&([a-z]{1,4});$/i)) {
-      if (inputString === '&gt;') { return '>'; }
-      else if (inputString === '&lt;') { return '<'; }
-      else if (inputString === '&amp;') { return '&'; }
-      else if (inputString === '&apos;') { return "'"; }
-      else if (inputString === '&quot;') { return '"'; }
-      else return undefined;
-    }
-
-    // 'A'  or  "B" have length=1 and segment-length=1 and will be used. 
-    // "ẘ"  or  "😎" have length=2 but segment-length=1 and will be used. 
-    // "ab" has length=2 and segment-length=2 and will not be used. 
-    else if ([...new Intl.Segmenter().segment(inputString)].length <= 1) {
-      return inputString;
-    }
-    else {
-      return undefined;
-    }
-  }
-  // TODO: move to util
-  /**
-   * @brief  function to convert a numeric character reference to a unicode Code Point e.g. &#4660 -> U+1234;  &#x10F601 -> U+1F60E
-   * @param  instr the value that will converted
-   * @return returns a unicode Code Point like U+0063, U+1234, U+1F60E; returns the input character if a non-numeric reference is used or returns 'undefined' if instr is not recognized
-   */
-  public convertToUnicodeCodePoint(instr: string): string {
-
-    if ((instr === null) || (instr === undefined)) {
-      return undefined;
-    }
-
-    if (instr.substring(0, 3) === "&#x") {
-      const numLength = instr.length - instr.indexOf("x") - 1;
-      const numStr = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
-      return ("U+" + numStr.slice(-numLength).padStart(4, "0"));
-    }
-
-    // if not hex: convert to hex
-    if ((instr.substring(0, 2) === "&#")) {
-      const numLength = instr.length - instr.indexOf("#") - 1;
-      const numStr = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
-      return "U+" + Number(numStr.slice(-numLength)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
-    }
-    else
-      return instr;
-  }
-
-
-
-
 }
