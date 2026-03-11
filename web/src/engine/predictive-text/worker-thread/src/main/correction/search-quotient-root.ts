@@ -68,7 +68,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
    */
   public handleNextNode(): PathResult {
     if(this.hasBeenProcessed) {
-      return null;
+      return { type: 'none' };
     }
 
     this.hasBeenProcessed = true;
