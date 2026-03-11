@@ -14,44 +14,15 @@ import {
   generateSubsetId,
   LegacyQuotientRoot,
   LegacyQuotientSpur,
-  models,
-  PathResult,
-  SearchQuotientNode,
+  models
 } from '@keymanapp/lm-worker/test-index';
 
 import { buildCantLinearFixture } from '../../helpers/buildCantLinearFixture.js';
+import { analyzeQuotientNodeResults } from '../../helpers/analyzeQuotientNodeResults.js';
 
 import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
-
-function assertResultsFromQuotientNode(path: SearchQuotientNode, results: string[], shouldMatch: boolean) {
-  let matchCount = 0;
-
-  let result: PathResult = path.handleNextNode();
-  while(result.type != 'none') {
-    if(result.type == 'complete') {
-      const resultKey = result.finalNode.resultKey;
-      if(results.find((entry) => entry == resultKey)) {
-        matchCount++;
-      }
-    }
-
-    if(matchCount == results.length) {
-      break;
-    }
-
-    result = path.handleNextNode();
-  }
-
-  if(shouldMatch) {
-    assert.notEqual(result.type, 'none');
-    assert.equal(matchCount, results.length);
-  } else {
-    assert.equal(result.type, 'none');
-    assert.equal(matchCount, 0);
-  }
-}
 
 describe('LegacyQuotientSpur', () => {
   describe('constructor', () => {
@@ -296,7 +267,10 @@ describe('LegacyQuotientSpur', () => {
         'car',
         'cen',  // 'cent' and 'center' are supported in this test model.
       ];
-      assertResultsFromQuotientNode(canPath, matchTargets, true);
+      const analysis = analyzeQuotientNodeResults(canPath, matchTargets);
+
+      assert.sameMembers(analysis.found, matchTargets);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it('outputs results that substitute inputs', () => {
@@ -312,7 +286,10 @@ describe('LegacyQuotientSpur', () => {
         // Replacement of third char
         'cal',  // 'call'
       ];
-      assertResultsFromQuotientNode(canPath, matchTargets, true);
+      const analysis = analyzeQuotientNodeResults(canPath, matchTargets);
+
+      assert.sameMembers(analysis.found, matchTargets);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it('outputs results that insert characters as needed', () => {
@@ -322,7 +299,10 @@ describe('LegacyQuotientSpur', () => {
         'char',  // 'c' + (insert) 'h' + 'ar'
         'than',  // 't' + (insert) 'h' + 'an'
       ];
-      assertResultsFromQuotientNode(canPath, matchTargets, true);
+      const analysis = analyzeQuotientNodeResults(canPath, matchTargets);
+
+      assert.sameMembers(analysis.found, matchTargets);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it('outputs results that delete incoming keystrokes as needed', () => {
@@ -336,7 +316,10 @@ describe('LegacyQuotientSpur', () => {
         'n',    // model possesses words starting with just 'n'
         't'     // ... and 't'.
       ];
-      assertResultsFromQuotientNode(canPath, matchTargets, true);
+      const analysis = analyzeQuotientNodeResults(canPath, matchTargets);
+
+      assert.sameMembers(analysis.found, matchTargets);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
   });
 });
