@@ -19,8 +19,8 @@ import Transform = LexicalModelTypes.Transform;
 // Mark affected tokens with the applied-suggestion transition ID
 // for easy future reference.
 const tagTokens = (state: ContextState, suggestion: Suggestion) => {
-  const inputs = state.tokenization.transitionEdits.inputs;
-  const appliedTokenCount = inputs[0].sample.size;
+  const edits = state.tokenization.transitionEdits;
+  const appliedTokenCount = edits.editedTokenCount;
   const tokens = state.tokenization.tokens;
   for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
     tokens[i].appliedTransitionId = suggestion.transformId;
