@@ -13,8 +13,6 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import {
   InsertionQuotientSpur,
   models,
-  PathResult,
-  SearchQuotientNode,
   SearchQuotientRoot,
   SubstitutionQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
@@ -24,35 +22,9 @@ import TrieModel = models.TrieModel;
 import { buildCantLinearFixture } from '../../helpers/buildCantLinearFixture.js';
 import { buildQuotientDocFixture } from '../../helpers/buildQuotientDocFixture.js';
 
+import { analyzeQuotientNodeResults } from '../../helpers/analyzeQuotientNodeResults.js';
+
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
-
-function assertResultsFromQuotientNode(path: SearchQuotientNode, results: string[], shouldMatch: boolean, strictSpaceMatch?: boolean) {
-  let matchCount = 0;
-
-  let result: PathResult = path.handleNextNode();
-  while(result.type != 'none') {
-    if(result.type == 'complete' && (!strictSpaceMatch || result.finalNode.spaceId == path.spaceId)) {
-      const resultKey = result.finalNode.resultKey;
-      if(results.find((entry) => entry == resultKey)) {
-        matchCount++;
-      }
-    }
-
-    if(matchCount == results.length) {
-      break;
-    }
-
-    result = path.handleNextNode();
-  }
-
-  if(shouldMatch) {
-    assert.notEqual(result.type, 'none');
-    assert.equal(matchCount, results.length);
-  } else {
-    assert.equal(result.type, 'none');
-    assert.equal(matchCount, 0);
-  }
-}
 
 describe('InsertionQuotientSpur', () => {
   describe('constructor', () => {
@@ -157,7 +129,10 @@ describe('InsertionQuotientSpur', () => {
         // Replacement of third char
         'cal',  // 'call'
       ];
-      assertResultsFromQuotientNode(followingInsert, matchTargets, true);
+      const analysis = analyzeQuotientNodeResults(followingInsert, matchTargets);
+
+      assert.sameMembers(analysis.found, matchTargets);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it('does not \'own\' results forwarded from the parent node', () => {
@@ -177,7 +152,11 @@ describe('InsertionQuotientSpur', () => {
         // Replacement of third char
         'cal',  // 'call'
       ];
-      assertResultsFromQuotientNode(followingInsert, matchTargets, false, true);
+      const analysis = analyzeQuotientNodeResults(followingInsert, matchTargets, {ignoreParents: true});
+
+      assert.sameMembers(analysis.found, []);
+      assert.sameMembers(analysis.missing, matchTargets);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it('outputs results that insert characters as needed', () => {
@@ -189,7 +168,11 @@ describe('InsertionQuotientSpur', () => {
         'care',  // 'car' + (insert) 'e'
         'rang',  // 'ran' + (insert) 'g' (=> 'range')
       ];
-      assertResultsFromQuotientNode(followingInsert, matchTargets, true);
+      const analysis = analyzeQuotientNodeResults(followingInsert, matchTargets, {ignoreParents: true});
+
+      assert.sameMembers(analysis.found, matchTargets);
+      assert.sameMembers(analysis.missing, []);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it('outputs results extending prior inserts if insertion spur is parent', () => {
@@ -201,7 +184,11 @@ describe('InsertionQuotientSpur', () => {
         'canno',  // 'can' + (insert) 'n' (=> 'cannot')
         'range',  // 'ran' + (insert) 'g' (=> 'range')
       ];
-      assertResultsFromQuotientNode(followingInsert, matchTargets, true);
+      const analysis = analyzeQuotientNodeResults(followingInsert, matchTargets, {ignoreParents: true});
+
+      assert.sameMembers(analysis.found, matchTargets);
+      assert.sameMembers(analysis.missing, []);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it('does not output results that delete incoming keystrokes as needed', () => {
@@ -217,9 +204,13 @@ describe('InsertionQuotientSpur', () => {
         't',    // ... and 't'.
         // Delete only third
         'ca',
-        'ce'
+        'ce',
       ];
-      assertResultsFromQuotientNode(followingInsert, matchTargets, false);
+      const analysis = analyzeQuotientNodeResults(followingInsert, matchTargets);
+
+      assert.sameMembers(analysis.found, []);
+      assert.sameMembers(analysis.missing, matchTargets);
+      assert.isEmpty(analysis.foundWithDuplicates);
     });
 
     it.skip('does not output results when immediately following a deletion spur edit', () => {
