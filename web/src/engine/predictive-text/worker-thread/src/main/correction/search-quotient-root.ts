@@ -67,7 +67,7 @@ export class SearchQuotientRoot extends SearchQuotientNode {
    */
   public handleNextNode(): PathResult {
     if(this.hasBeenProcessed) {
-      return null;
+      return { type: 'none' };
     }
 
     this.hasBeenProcessed = true;

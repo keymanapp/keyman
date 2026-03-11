@@ -23,7 +23,7 @@ import TrieModel = models.TrieModel;
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 const altModel = new TrieModel(jsonFixture('models/tries/accented'));
 
-describe('SearchQuotientSpur', () => {
+describe('SearchQuotientRoot', () => {
   describe('constructor', () => {
     it('initializes from a lexical model', () => {
       const path = new SearchQuotientRoot(testModel);
@@ -44,7 +44,7 @@ describe('SearchQuotientSpur', () => {
     assert.deepEqual(constituentPaths(path), []);
   });
 
-  describe('.isSameNode returns true for separate instance on same model', () => {
+  it('.isSameNode returns true for separate instance on same model', () => {
     const root1 = new SearchQuotientRoot(testModel);
     const root2 = new SearchQuotientRoot(testModel);
 

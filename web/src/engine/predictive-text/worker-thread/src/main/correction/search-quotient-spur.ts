@@ -176,6 +176,10 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
   // spaces are in sequence here.
   // `this` = head 'space'.
   public merge(space: SearchQuotientNode): SearchQuotientNode {
+    if(this.model != space.model) {
+      throw new Error("Cannot merge search graphs based on different LexicalModels");
+    }
+
     // Head node for the incoming path is empty, so skip it.
     if(space.parents.length == 0 || space instanceof SearchQuotientRoot) {
       return this;
