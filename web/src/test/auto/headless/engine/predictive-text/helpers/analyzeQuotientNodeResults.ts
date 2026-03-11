@@ -67,7 +67,7 @@ export function analyzeQuotientNodeResults(
   };
 
   for(let key of expectedResults) {
-    const matchCount = matchMap.get(key);
+    const matchCount = matchMap.get(key) ?? 0;
 
     if(matchCount == 0) {
       analysis.missing.push(key);
