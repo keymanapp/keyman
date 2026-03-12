@@ -10,11 +10,11 @@
 import { assert } from 'chai';
 
 import { models, SearchQuotientRoot } from '@keymanapp/lm-worker/test-index';
+import { jsonFixture } from "@keymanapp/common-test-resources/model-helpers.mjs";
 
 import { quotientPathHasInputs } from "./quotientPathHasInputs.js";
 import { buildCantLinearFixture } from './buildCantLinearFixture.js';
 import { buildAlphabeticClusterFixtures } from './buildAlphabeticClusteredFixture.js';
-import { jsonFixture } from '../templates/helpers.js';
 
 import TrieModel = models.TrieModel;
 

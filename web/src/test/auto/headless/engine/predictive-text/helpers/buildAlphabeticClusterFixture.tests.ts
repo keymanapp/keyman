@@ -1,3 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-03-09
+ *
+ * This file tests the construction of the helper test-fixture function in
+ * buildAlphabeticClusteredFixture.ts.
+ */
+
 import { assert } from "chai";
 
 import { SearchQuotientNode } from "@keymanapp/lm-worker/test-index";
@@ -15,7 +24,7 @@ describe('buildAlphabeticClusteredFixture() fixture', () => {
     const allDists = Object.values(distributions).map(set => Object.values(set)).flat();
     const finalClusterPaths = constituentPaths(clusters.cluster_k5c6) as SearchQuotientNode[][];
 
-    allPaths.forEach((spur) => assert.isTrue(finalClusterPaths.find(seq => seq.indexOf(spur) > -1)));
-    allDists.forEach((dist) => allPaths.find(path => quotientPathHasInputs(path, [dist])));
+    allPaths.forEach((spur) => assert.isOk(finalClusterPaths.find(seq => seq.indexOf(spur) > -1)));
+    allDists.forEach((dist) => assert.isOk(allPaths.find(path => quotientPathHasInputs(path, [dist]))));
   });
 });

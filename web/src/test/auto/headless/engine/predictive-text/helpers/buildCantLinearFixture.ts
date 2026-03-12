@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-03-09
+ *
+ * This file defines a unit-text fixture for testing behaviors related to a
+ * simple linear sequence of SearchQuotientSpurs, with no convergence or
+ * divergence occurring within the fixture.
+ */
+
 import { LegacyQuotientRoot, LegacyQuotientSpur, models } from "@keymanapp/lm-worker/test-index";
 import { jsonFixture } from "@keymanapp/common-test-resources/model-helpers.mjs";
 
