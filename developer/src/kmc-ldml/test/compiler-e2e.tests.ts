@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import 'mocha';
 import {assert} from 'chai';
-import hextobin from '@keymanapp/hextobin';
+import { hextobinFromFile } from '@keymanapp/hextobin';
 import {compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture, scrubContextFromMessages} from './helpers/index.js';
 import { compareXml } from './helpers/compareXml.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
@@ -41,7 +41,7 @@ describe('compiler-tests', function() {
       const binaryFilename = makePathToFixture(`basic-${vernum}.txt`);
 
       // Compare output
-      const expected = await hextobin(binaryFilename, undefined, {silent:true});
+      const expected = hextobinFromFile(binaryFilename, undefined, {silent:true});
 
       // now compare it to use with run()
       // Let's build basic.xml
