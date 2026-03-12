@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-03-11
+ *
+ * This file defines a unit-text helper designed to test what search-graph
+ * results for corrections may result from paths traversing through a given
+ * SearchQuotientNode.
+ */
+
 import { PathResult, SearchQuotientNode } from "@keymanapp/lm-worker/test-index";
 
 /**
@@ -42,8 +52,6 @@ export function analyzeQuotientNodeResults(
   node: SearchQuotientNode,
   expectedResults: string[]
 ) {
-  let matchCount = 0;
-
   const matchMap: Map<string, number> = new Map();
 
   let result: PathResult = node.handleNextNode();
@@ -51,9 +59,7 @@ export function analyzeQuotientNodeResults(
     if(result.type == 'complete') {
       const resultKey = result.finalNode.resultKey;
       if(expectedResults.find((entry) => entry == resultKey)) {
-        matchCount++;
-
-        matchMap.set(resultKey, matchMap.get(resultKey) ?? 0 + 1);
+        matchMap.set(resultKey, (matchMap.get(resultKey) ?? 0) + 1);
       }
     }
 
