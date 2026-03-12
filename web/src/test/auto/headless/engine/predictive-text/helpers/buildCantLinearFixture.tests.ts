@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-03-09
+ *
+ * This file defines unit tests for validating a unit-text fixture for behaviors
+ * related to a simple linear sequence of SearchQuotientSpurs, with no
+ * convergence or divergence occurring within the fixture.
+ */
+
 import { assert } from "chai";
 
 import { constituentPaths } from "./constituentPaths.js";
