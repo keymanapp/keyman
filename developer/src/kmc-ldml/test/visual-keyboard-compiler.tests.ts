@@ -7,7 +7,7 @@ import {assert} from 'chai';
 import { stripIndent } from 'common-tags';
 
 import { KMX, KvkFileWriter, VisualKeyboard } from '@keymanapp/common-types';
-import hextobin from '@keymanapp/hextobin';
+import { hextobinFromFile } from '@keymanapp/hextobin';
 
 import { checkMessages, compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 
@@ -57,7 +57,7 @@ describe('visual-keyboard-compiler', function() {
     assert.isNotNull(code);
 
     // Compare output
-    const expected = await hextobin(binaryFilename, undefined, {silent:true});
+    const expected = hextobinFromFile(binaryFilename, undefined, {silent:true});
 
     assert.deepEqual<Uint8Array>(code, expected);
   });
