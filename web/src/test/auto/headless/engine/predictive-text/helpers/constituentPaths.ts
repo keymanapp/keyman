@@ -8,6 +8,8 @@
  */
 
 import {
+  DeletionQuotientSpur,
+  InsertionQuotientSpur,
   SearchQuotientCluster,
   SearchQuotientNode,
   SearchQuotientRoot,
@@ -26,8 +28,29 @@ export function constituentPaths(node: SearchQuotientNode): SearchQuotientSpur[]
   } else if(node instanceof SearchQuotientCluster) {
     return node.parents.flatMap((p) => constituentPaths(p));
   } else if(node instanceof SearchQuotientSpur) {
-    const parentPaths = constituentPaths(node.parents[0]);
-    let pathsToExtend = parentPaths;
+    const parentPaths = constituentPaths(node.parents[0]);    let pathsToExtend = parentPaths;
+
+    if(node instanceof InsertionQuotientSpur) {
+      pathsToExtend = pathsToExtend.filter(s => {
+        const tail = s[s.length - 1];
+
+        // Deletion nodes and modules should always be ordered after those for
+        // insertion in order to avoid duplicating search paths.  (Insertions may
+        // stick to the right of a root, while deletions always process inputs; they
+        // may thus precede deletions.)
+        //
+        // Also, internally, insertion edges are not built after deletion (or empty) edges.
+        if(tail instanceof DeletionQuotientSpur) {
+          return false;
+        } else if(tail.insertLength == 0 && tail.leftDeleteLength == 0) {
+          // Insertions should also not appear after empty nodes; there's no net
+          // difference between inserting before and inserting after.
+          return false;
+        }
+
+        return true;
+      });
+    }
 
     if(parentPaths.length > 0) {
       return pathsToExtend.map(p => {
