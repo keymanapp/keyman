@@ -14,10 +14,14 @@ import { applyTransform } from '@keymanapp/models-templates';
 import { KMWString } from '@keymanapp/web-utils';
 
 import { ContextToken } from './context-token.js';
-import { ContextTokenization } from './context-tokenization.js';
+import { ContextTokenization, determineTaillessTrueKeystroke } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
 import { determineModelTokenizer } from '../model-helpers.js';
-import { legacySubsetKeyer, TokenizationSubsetBuilder } from './tokenization-subsets.js';
+import { InsertionQuotientSpur } from './insertion-quotient-spur.js';
+import { DeletionQuotientSpur } from './deletion-quotient-spur.js';
+import { SearchQuotientCluster } from './search-quotient-cluster.js';
+import { SearchQuotientNode } from './search-quotient-node.js';
+import { generateSubsetId, precomputationSubsetKeyer, TokenizationSubsetBuilder } from './tokenization-subsets.js';
 import TransformUtils from '../transformUtils.js';
 
 import Context = LexicalModelTypes.Context;
@@ -45,7 +49,7 @@ export class ContextState {
   /**
    * Denotes the most likely tokenization for the represented Context.
    */
-  tokenization: ContextTokenization;
+  tokenizations: ContextTokenization[];
 
   /**
    * Denotes the keystroke-sourced Transform that was last applied to a
@@ -118,13 +122,13 @@ export class ContextState {
    * @param tokenization Precomputed tokenization for the context, leveraging previous
    * correction-search progress and results
    */
-  constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization);
-  constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization) {
+  constructor(context: Context, model: LexicalModel, tokenizations?: ContextTokenization[]);
+  constructor(param1: Context | ContextState, model?: LexicalModel, tokenizations?: ContextTokenization[]) {
     if(!(param1 instanceof ContextState)) {
       this.context = param1;
       this.model = model;
-      if(tokenization) {
-        this.tokenization = tokenization;
+      if(tokenizations) {
+        this.tokenizations = tokenizations;
       } else {
         this.initFromReset();
       }
@@ -133,7 +137,7 @@ export class ContextState {
 
       Object.assign(this, stateToClone);
       this.inputTransforms = new Map(stateToClone.inputTransforms);
-      this.tokenization = new ContextTokenization(stateToClone.tokenization);
+      this.tokenizations = stateToClone.tokenizations.map(t => new ContextTokenization(t));
 
       // A shallow copy of the array is fine, but we'd be best off
       // not aliasing the array itself.
@@ -164,7 +168,7 @@ export class ContextState {
     if(baseTokens.length == 0) {
       baseTokens.push(new ContextToken(this.model));
     }
-    this.tokenization = new ContextTokenization(baseTokens);
+    this.tokenizations = [new ContextTokenization(baseTokens)];
     this.inputTransforms = new Map();
   }
 
@@ -198,19 +202,22 @@ export class ContextState {
     appliedSuggestionId?: number
   ): ContextTransition {
     const lexicalModel = this.model;
-
     const trueInput = transformDistribution[0].sample;
+
     const transition = new ContextTransition(this, this.appliedInput?.id);
 
     // From here on, we work toward the common-case - re-using old info when
     // context (and its tokenization) is changed by an input Transform.
-
-    let trueInputSubsetKey: string;
     const slideUpdateTransform = determineContextSlideTransform(this.context, context);
 
     // Goal:  allow multiple base tokenizations.
-    const startTokenizations = [this.tokenization];
-    const startTokenizationsAfterSlide = startTokenizations.map(t => t.applyContextSlide(lexicalModel, slideUpdateTransform));
+    const startTokenizations: Set<ContextTokenization> = new Set();
+    const keyedTokenizations: Map<string, ContextTokenization> = new Map();
+    this.tokenizations.forEach(t => {
+      const slidTokenization = t.applyContextSlide(lexicalModel, slideUpdateTransform);
+      startTokenizations.add(slidTokenization);
+      keyedTokenizations.set(t.clusteringKey, slidTokenization)
+    });
 
     // Easy case - no net change to the tokenizations whatsoever; the actual request
     // aims to save-state the most recent results.
@@ -220,38 +227,12 @@ export class ContextState {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
       const state = new ContextState(this);
-      state.tokenization = startTokenizationsAfterSlide[0];
+      state.tokenizations = [...startTokenizations.values()];
       transition.finalize(state, transformDistribution);
       return transition;
     }
 
-    const subsetBuilder = new TokenizationSubsetBuilder(legacySubsetKeyer);
-    for(let baseTokenization of startTokenizationsAfterSlide) {
-
-      for(let mass of transformDistribution) {
-        const tokenizationAnalysis = baseTokenization.mapWhitespacedTokenization(lexicalModel, mass.sample);
-        subsetBuilder.addPrecomputation(baseTokenization, tokenizationAnalysis, mass.p);
-
-        if(mass.sample == trueInput) {
-          trueInputSubsetKey = subsetBuilder.keyer(tokenizationAnalysis);
-        }
-      }
-    }
-
-    // And now to (partly) detransform from a multiple-tokenization paradigm.
-    const trueInputSubset = subsetBuilder.subsets.get(trueInputSubsetKey);
-    // Right now, we only have one base tokenization, so we just fetch it.
-    const baseTokenization = startTokenizationsAfterSlide[0];
-    // For multiple tokenizations, we'd retrieve each, use the "most likely" one as base,
-    // and then fold all resulting search spaces (on the final token) into one.
-    const tokenizationAnalysis = trueInputSubset.transitionEdges.get(baseTokenization);
-
-    // Determine the best probability from among ALL available inputs, before they're split
-    // into subsets.
-    const bestProb = transformDistribution.reduce((best, curr) => Math.max(best, curr.p), 0);
-    // Should gain one per subsetBuilder.subsets entry.
-    const realignedTokenization = baseTokenization.realign(tokenizationAnalysis.alignment);
-    const resultTokenization = realignedTokenization.evaluateTransition(tokenizationAnalysis, trueInput.id, bestProb, appliedSuggestionId);
+    const finalTokenizations = this.transitionTokenizations(startTokenizations, transformDistribution, appliedSuggestionId);
 
     // ------------
 
@@ -261,18 +242,251 @@ export class ContextState {
     // epic/dict-breaker:  if ANY decently-likely tokenization satisfies this, we still
     // have a reasonable candidate for display of a delayed reversion.  (Not 'all' -
     // 'any'.)
-    const tokens = resultTokenization.tokens;
-    const lastIndex = tokens.length - 1;
-    // Ignore a context-final empty '' token; the interesting one is what comes before.
-    const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
-    const appliedSuggestionTransitionId = nonEmptyTail?.appliedTransitionId;
 
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
-    state.tokenization =  new ContextTokenization(resultTokenization.tokens, tokenizationAnalysis, resultTokenization.taillessTrueKeystroke);
+    // Set tokenizations from above.
+    // TODO:
+    // - sort by most .tail.searchSpace.bestExample.p?
+    // - threshold to the N most likely tokenizations?
+    state.tokenizations = finalTokenizations;
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution);
-    transition.revertableTransitionId = appliedSuggestionTransitionId;
+
+    // Maybe sort the tokenizations in some manner, first?
+    // Also, avoid retaining a transition ID invalidly...
+    transition.revertableTransitionId = state.tokenizations.map((tokenization) => {
+      const tokens = tokenization.tokens;
+      const lastIndex = tokens.length - 1;
+      // Ignore a context-final empty '' token; the interesting one is what comes before.
+      const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
+      return nonEmptyTail?.appliedTransitionId;
+    }).find((transitionId) => {
+      return transitionId !== undefined;
+    });
     return transition;
+  }
+
+  private buildTransitionTargetSets(
+    startTokenizations: Set<ContextTokenization>,
+    transformDistribution: Distribution<Transform>
+  ) {
+    // Deletions:
+    // - handle the incoming key, but do not extend the token.
+    // - is nearly the same as an empty '', deleteLeft: 0 input
+    // - technically could use a `null` Transform to indicate "deletion" transition?
+    // - would need to overwrite the entry in `tokenizationAnalysis.tokenizedTransform` to facilitate this
+
+    // Insertions:
+    // - just... auto-add as appropriate on top of deletions
+    // - problem:  how to 'bin' them?  To match the insertion to any pre-existing bucket?
+
+    const subsetBuilder = new TokenizationSubsetBuilder(precomputationSubsetKeyer);
+    for(let baseTokenization of startTokenizations.values()) {
+      for(let mass of transformDistribution) {
+        // Handle the splits and merges early, here.
+        const tokenizationAnalysis = baseTokenization.mapWhitespacedTokenization(this.model, mass.sample);
+        const alignment = tokenizationAnalysis.alignment;
+
+        // Pre-process any splits and merges; the result of these operations may
+        // have the same properties as other base tokenizations within the
+        // subset if compatible.
+        const needsRealignment = (alignment.merges.length > 0 || alignment.splits.length > 0 || alignment.unmappedEdits.length > 0);
+        const sourceTokenization = needsRealignment ? baseTokenization.realign(alignment) : baseTokenization;
+
+        subsetBuilder.addPrecomputation(sourceTokenization, tokenizationAnalysis, mass.p);
+      }
+
+      // Also prep for a 'delete' transition:  no change to text, but handles the key anyway.
+      const tokenizationAnalysis = baseTokenization.mapWhitespacedTokenization(this.model, {insert: '', deleteLeft: 0});
+      // The `null` case indicates the 'delete' transition.
+      tokenizationAnalysis.tokenizedTransform = null;
+      // TODO:  Though... what if we did it a different way and supported
+      // metadata for BOTH `delete` AND `insert`?  We could pre-bin even
+      // `insert` cases here, maybe.
+      //
+      // A tweak to precomputationSubsetKeyer (allowing +1 or +2 inserts) could
+      // allow computing the offset key.  This may be doable within
+      // `.preComputation`?  How would the markers for that look, though...?
+      subsetBuilder.addPrecomputation(baseTokenization, tokenizationAnalysis, 0);
+    }
+
+    return subsetBuilder.subsets;
+  }
+
+  private transitionTokenizations(
+    startTokenizations: Set<ContextTokenization>,
+    transformDistribution: Distribution<Transform>,
+    // overrides checks for token substitution that can fail for large applied suggestions.
+    appliedSuggestionId?: number
+  ) {
+    const subsets = this.buildTransitionTargetSets(startTokenizations, transformDistribution);
+
+    const trueInput = transformDistribution[0].sample;
+    // Determine the best probability from among ALL available inputs, before they're split
+    // into subsets.
+    const bestProb = transformDistribution.reduce((best, cur) => best < cur.p ? cur.p : best, 0);
+
+    // For all target tokenizations - each transition subset...
+    const finalTokenizations: Map<string, ContextTokenization> = new Map();
+
+    [...subsets.entries()].forEach(([key, subset]) => {
+      // Iterate over all _source_ tokenizations and the changes used to transition them
+      // to that target tokenization.
+      const transitionSets = [...subset.transitionEdges.entries()];
+      const isolatedSubsetResults = transitionSets.flatMap((precomp) => {
+        const rootTokenization = precomp[0];
+
+        // Handle deletions here?  Could always .flatMap above .map call + return an array - one with insertion, one with deletion.
+        // Probably:  define new transition method for tokenization:  keeps the same, tags the new input (as deletion only)
+
+        if(precomp[1].viaDeletion) {
+          if(appliedSuggestionId !== undefined) {
+            return [] as ContextTokenization[];
+          }
+          const baseTokenization = precomp[0];
+          const deletionSpur = new DeletionQuotientSpur(
+            baseTokenization.tail.searchModule,
+            transformDistribution, {
+              segment: {
+                transitionId: transformDistribution[0].sample.id,
+                start: 0
+              },
+              subsetId: generateSubsetId(),
+              bestProbFromSet: bestProb
+            }
+          );
+
+          const tokens = baseTokenization.tokens;
+          const newTail = new ContextToken(deletionSpur);
+          tokens[tokens.length - 1] = newTail;
+          return new ContextTokenization(
+            tokens,
+            null,
+            {insert: '', deleteLeft: 0}
+          );
+        } else {
+          // Following call:  is actually designed to build SubstitutionQuotientSpurs.
+          return rootTokenization.evaluateTransition(precomp[1], trueInput.id, bestProb, appliedSuggestionId);
+        }
+      });
+
+      // Super-easy case:  there's only the one tokenization anyway.
+      if(isolatedSubsetResults.length == 1) {
+        finalTokenizations.set(key, isolatedSubsetResults[0])
+        return;
+      }
+
+      // A delete-only transition during suggestion application,
+      // which should not permit delete edge construction.
+      if(isolatedSubsetResults.length == 0) {
+        return;
+      }
+
+      // Assumption:  all produced "isolatedSubsetResults" should essentially be
+      // the same tokenization. That said, tail entries will likely not be
+      // perfect matches; we need to splice them together, without duplicates.
+      // We also cannot rely on tokens before the standard tail index having
+      // been unmodified; merges and splits may have been applied earlier in the
+      // sequence.
+
+      const tokenCount = isolatedSubsetResults[0].tokens.length;
+      if(isolatedSubsetResults.find(sr => sr.tokens.length != tokenCount)) {
+        throw new Error("Assumption invalidated:  incoming tokenization paths do not converge");
+      }
+
+      const sourceRangeKey = isolatedSubsetResults[0].tail.sourceRangeKey;
+      if(isolatedSubsetResults.find(sr => sr.tail.sourceRangeKey != sourceRangeKey)) {
+        throw new Error("Assumption invalidated:  incoming tokenizations do not cover same input range")
+      }
+
+      const finalizedTokenization: ContextToken[] = [];
+      for(let i = 0; i < tokenCount; i++) {
+        const spaceSet: Set<SearchQuotientNode> = new Set();
+        let isWhitespace = true;
+        let isPartial = false;
+
+        isolatedSubsetResults.map((sr) => sr.tokens[i]).forEach((token) => {
+          const searchSpace = token.searchModule;
+          isWhitespace &&= token.isWhitespace;
+          isPartial ||= token.isPartial;
+
+          if(searchSpace instanceof SearchQuotientCluster) {
+            searchSpace.parents.forEach(p => spaceSet.add(p));
+            // TODO:  detach the cluster's queue, etc for memory reclamation?
+            // (The part that receives newly processed nodes from parents.)
+            //
+            // Then again, that only gets attached in Spurs, right?
+          } else {
+            spaceSet.add(searchSpace);
+          }
+        });
+
+        const setVals = [...spaceSet.values()]
+        const finalizedSpace = setVals.length > 1 ? new SearchQuotientCluster(setVals) : setVals[0];
+
+        const token = new ContextToken(finalizedSpace);
+        token.isWhitespace = isWhitespace;
+        token.isPartial = isPartial;
+
+        finalizedTokenization.push(token)
+      }
+
+      // TODO:  process 'insert' edits too.  (Based on number of legal remaining
+      // edits?) ALSO NOTE:  root node constructions need initial 'insert'
+      // edit-spur constructions + tokenizations, too. ... what if we allow
+      // adding new (insert) spurs to the clusters after initial construction?
+      // - so, rather than reconstruct from an incomplete cluster, just... add
+      //   onto it?
+      // - is "less elegant" in terms of how clusters should operate, BUT avoids
+      //   nasty cluster-creation ordering logic.
+
+      // Handle insert spurs here & add them to clusters.  Double-check that we
+      // aren't pushing too far with 'em.
+
+      finalTokenizations.set(key, new ContextTokenization(
+        finalizedTokenization,
+        transitionSets[0][1],
+        determineTaillessTrueKeystroke(transitionSets[0][1])
+      ));
+    });
+
+    if(appliedSuggestionId === undefined) {
+      // Construct insert edit spurs based on the prior results + link them as needed.
+      [...subsets.entries()].forEach(([key, subset]) => {
+        for(let i=0; i < subset.insertEdgeKeys.length; i++) {
+          const baseTokenization = finalTokenizations.get(i == 0 ? key : subset.insertEdgeKeys[i-1]);
+          const tailModule = baseTokenization.tail.searchModule;
+
+          if(tailModule instanceof DeletionQuotientSpur) {
+            // No new insertions are allowed immediately after a deletion edge.
+            // We also can't extend the disallowed insertion with another;
+            // simply break the loop.
+            break;
+          }
+
+          const insertionSpur = new InsertionQuotientSpur(tailModule);
+
+          let matchedTokenization = finalTokenizations.get(subset.insertEdgeKeys[i]);
+          if(matchedTokenization) {
+            matchedTokenization.tail.addInboundSpur(insertionSpur);
+          } else {
+            const tokens = baseTokenization.tokens.slice();
+            tokens.pop();
+            tokens.push(new ContextToken(insertionSpur));
+            matchedTokenization = new ContextTokenization(
+              tokens,
+              null,
+              {insert: '', deleteLeft: 0}
+            );
+            finalTokenizations.set(subset.insertEdgeKeys[i], matchedTokenization);
+          }
+        }
+      });
+    }
+
+    // TODO:  also consider an inserted whitespace (at some sort of low prob)
+
+    return [...finalTokenizations.values()];
   }
 }
 
