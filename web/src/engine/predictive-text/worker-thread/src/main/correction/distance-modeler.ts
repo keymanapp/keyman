@@ -157,7 +157,7 @@ export class SearchNode {
    * Notes the edit operation used for the most recent edge in the node's
    * represented search path.
    */
-  private readonly lastEdgeType: PathEdge;
+  readonly lastEdgeType: PathEdge;
 
   constructor(rootTraversal: LexiconTraversal, spaceId: number, toKey?: (arg0: string) => string);
   constructor(node: SearchNode, spaceId?: number, edgeType?: PathEdge);
@@ -271,14 +271,21 @@ export class SearchNode {
    * character not seen in the input, as if the user accidentally skipped typing
    * it.  No new input will be expected, but the search will continue one
    * character deeper in the backing lexicon.
+   * @param spaceId A unique identifier associated with the SearchQuotientNode
+   * that calls this method and processes the resulting SearchNodes.
+   *
+   * If left empty, the nodes will be associated with the same SearchQuotientNode
+   * as this instance.
    * @returns An array of SearchNodes corresponding to lexical entries that are
    * prefixed with the lexicon entry represented by the current Node's
    * matchSequence text.
    */
-  buildInsertionEdges(): SearchNode[] {
+  buildInsertionEdges(spaceId?: number): SearchNode[] {
     if(this.hasPartialInput) {
       throw new Error("Invalid state:  will not take new input while still processing Transform subset");
     }
+
+    spaceId ??= this.spaceId;
 
     // Do not create insertion nodes after an empty transform; only before.
     // "Before" and "after" are identical for empty transforms - why duplicate?
@@ -304,7 +311,7 @@ export class SearchNode {
     for(let lexicalChild of this.currentTraversal.children()) {
       let childCalc = this.calculation.addMatchChar(lexicalChild.char);
 
-      let searchChild = new SearchNode(this, this.spaceId, PathEdge.INSERTION);
+      let searchChild = new SearchNode(this, spaceId, PathEdge.INSERTION);
       searchChild.calculation = childCalc;
       searchChild.priorInput = this.priorInput;
       searchChild.matchedTraversals.push(lexicalChild.traversal());

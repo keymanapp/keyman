@@ -46,17 +46,27 @@ export interface SearchResultAnalysis {
  * @param node The SearchQuotientNode to utilize for the search.
  * @param expectedResults A set of strings used for the test scenario.  Strings
  * not found here will be ignored.
+ * @param options
  * @returns
  */
 export function analyzeQuotientNodeResults(
   node: SearchQuotientNode,
-  expectedResults: string[]
+  expectedResults: string[],
+  options?: {
+    /**
+     * When set to true, this method will ignore any parent results forwarded
+     * through this node but not resulting directly from it.
+     */
+    ignoreParents?: boolean
+  }
 ) {
+  const ignoreParents = options?.ignoreParents ?? false;
+
   const matchMap: Map<string, number> = new Map();
 
   let result: PathResult = node.handleNextNode();
   while(result.type != 'none') {
-    if(result.type == 'complete') {
+    if(result.type == 'complete' && (!ignoreParents || result.spaceId == node.spaceId)) {
       const resultKey = result.finalNode.resultKey;
       if(expectedResults.find((entry) => entry == resultKey)) {
         matchMap.set(resultKey, (matchMap.get(resultKey) ?? 0) + 1);
