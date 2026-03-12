@@ -79,16 +79,27 @@ processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboa
 
 static void processCapsLock(const km_core_caps_state caps_lock_state, BOOL isUp, BOOL Updateable, BOOL externalEvent) {
 
+  /// For Debuging
+  // TODO: 15594 - remove this debug message and associated code after testing
+  SendDebugMessageFormat("ACTION CAPS STATE:%d FIsUp=%d Updateable=%d ExternalEvent=%d CapsState=%d",
+    caps_lock_state, isUp, Updateable, externalEvent, IsCapsLockOn());
+
+  ///
   // We only want to process the Caps Lock key event once --
-  // in the first pass (!Updateable).
-  if (Updateable){
+  // it has to be updateble as TSF does not have updateable=0 events.
+  if (!Updateable){
     return;
   }
 
   if (caps_lock_state == KM_CORE_CAPS_ON) {
     // This case would occur for the keyboard system store setting `store(&CapsOnOnly) '1'`
+    if (!isUp && !IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
+      SendDebugMessageFormat("TURN CAPS ON key down: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+    }
     if (isUp && !IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
-      SendDebugMessageFormat("TURN CAPS ON: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      SendDebugMessageFormat("TURN CAPS ON key up: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
@@ -96,16 +107,21 @@ static void processCapsLock(const km_core_caps_state caps_lock_state, BOOL isUp,
     // This case would occur for the keyboard system store setting `store(&CapsAlwaysOff) '1'`
     // A trick is being played here of synthesising a release the CAPSLOCK key event
     // then a depress CAPSLOCK key event
-    else if (!isUp && IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
-      SendDebugMessageFormat("TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
-      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
-      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
-    }
+    //else if (!isUp && IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
+    //  SendDebugMessageFormat("TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+    //  keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+    //  keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+    //}
   } else if (caps_lock_state == KM_CORE_CAPS_OFF) {
     // This case would occur for the keyboard system store setting `store(&ShiftFreesCaps) '1'`
     // OR selecting a keyboard with CAPs always off rule
     if ((!isUp && IsCapsLockOn()) || (externalEvent && IsCapsLockOn())) {
-      SendDebugMessageFormat("TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      SendDebugMessageFormat("TURN CAPS OFF key down: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+    }
+    if ((isUp && IsCapsLockOn()) || (externalEvent && IsCapsLockOn())) {
+      SendDebugMessageFormat("TURN CAPS OFF key up: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
@@ -151,7 +167,7 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeystroke) {
 
   km_core_actions const* core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
 
-  processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
+
   if (core_actions->emit_keystroke) {
     *emitKeystroke = TRUE;
     SendDebugMessageFormat("EMIT_KEYSTROKE");
