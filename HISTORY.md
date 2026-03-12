@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.248 stable 2026-03-12
+
+* fix(ios): Revert Sentry to 8.38.0 to fix FirstVoices crash on startup with 18.0.247 (#15726)
+
 ## 18.0.247 stable 2026-03-09
 
 * chore(linux): Update debian changelog (#15556)
