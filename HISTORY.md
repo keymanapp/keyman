@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.214 alpha 2026-03-12
+
+* chore(linux): Update debian changelog (#15718)
+* maint(resources): use x86_64 emscripten on arm/windows builds (#15715)
+
 ## 19.0.213 alpha 2026-03-10
 
 * maint(linux): set git credential for linux help on the correct repo (#15707)
