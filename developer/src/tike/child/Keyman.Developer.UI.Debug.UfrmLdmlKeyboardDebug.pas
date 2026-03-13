@@ -74,6 +74,7 @@ type
     procedure memoClick(Sender: TObject);   // I4808
     procedure memoKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
+    procedure memoDblClick(Sender: TObject);
   private
     FFileName: string;
     debugkeyboard: TDebugKeyboard;
@@ -108,6 +109,7 @@ type
     function SetKeyEventContext: Boolean;
     function HandleMemoKeydown(var Message: TMessage): Boolean;
     procedure Run(vkey: Word);
+    procedure UpdateMemoSelection;
 
   protected
     function GetHelpTopic: string; override;
@@ -206,13 +208,13 @@ end;
 
 procedure TfrmLdmlKeyboardDebug.memoGotFocus(Sender: TObject);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 procedure TfrmLdmlKeyboardDebug.memoKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 function TfrmLdmlKeyboardDebug.HandleMemoKeydown(var Message: TMessage): Boolean;
@@ -391,7 +393,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
     dk: TDeadKeyInfo;
   begin
     Result.Selection := memo.Selection;
-    Result.Length := Length(memo.Text);
+    Result.Length := Length(memo.GetTextCR);
     for dk in FDeadkeys do
     begin
       if dk.Position >= Result.Selection.Start
@@ -406,7 +408,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
     L: Integer;
     s: string;
   begin
-    s := memo.Text;
+    s := memo.GetTextCR;
     L := Length(s);
     for dk in FDeadkeys do
       if dk.SavedPosition < 0 then
@@ -430,10 +432,6 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
 
     if GetKeyState(VK_CONTROL) >= 0 then
     begin
-      if (vk = VK_RETURN) and (GetKeyState(VK_MENU) >= 0) then
-      begin
-        memo.SelText := #13#10;
-      end;
       Exit;
     end;
 
@@ -591,13 +589,13 @@ begin
           RealignMemoSelectionState(state);
           selection := memo.Selection;
         end;
-        lhs := Copy(memo.Text, 1, selection.Start);
+        lhs := Copy(memo.GetTextCR, 1, selection.Start);
       end
       else
         lhs := '';
 
-      context := Copy(memo.Text, lhs.Length + 1, selection.Start - lhs.Length);
-      rhs := Copy(memo.Text, lhs.Length + context.Length + 1, MaxInt);
+      context := Copy(memo.GetTextCR, lhs.Length + 1, selection.Start - lhs.Length);
+      rhs := Copy(memo.GetTextCR, lhs.Length + context.Length + 1, MaxInt);
 
       // Reinsert the context
 
@@ -635,7 +633,7 @@ begin
         SendMessage(memo.Handle, (WM_USER + 97) {EM_SETTEXTEX}, NativeUint(@ste), NativeUInt(PChar(str)));
         selection.Start := lhs.Length + output.Length;
         selection.Finish := selection.Start;
-        selection.Anchor := selection.Start;
+        selection.Caret := selection.Start;
         memo.Selection := selection;
       finally
         memo.Lines.EndUpdate;
@@ -820,22 +818,32 @@ end;
 procedure TfrmLdmlKeyboardDebug.memoChange(Sender: TObject);
 begin
   UpdateDeadkeys;
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 procedure TfrmLdmlKeyboardDebug.memoClick(Sender: TObject);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
+end;
+
+procedure TfrmLdmlKeyboardDebug.memoDblClick(Sender: TObject);
+begin
+  UpdateMemoSelection;
 end;
 
 procedure TfrmLdmlKeyboardDebug.memoSelMove(Sender: TObject);
+begin
+  UpdateMemoSelection;
+end;
+
+procedure TfrmLdmlKeyboardDebug.UpdateMemoSelection;
 begin
   if memo.Focused then
   begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
   end;
 
-  if not memo.ReadOnly and not memo.SelectionChanging then
+  if not memo.ReadOnly then
   begin
     UpdateCharacterGrid;   // I4808
   end;
@@ -844,20 +852,22 @@ end;
 procedure TfrmLdmlKeyboardDebug.UpdateCharacterGrid;   // I4808
 var
   start, len: Integer;
+  text: string;
 begin
   if csDestroying in ComponentState then
     Exit;
 
   start := memo.SelStart;
   len := memo.SelLength;
-  if start + len > Length(memo.Text) then
+  text := memo.GetTextCR;
+  if start + len > text.Length then
   begin
     // RichEdit has a virtual final character, which is selected when
     // pressing Ctrl+A, etc.
-    len := Length(memo.Text) - start;
+    len := text.Length - start;
   end;
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len,
-    memo.Selection.Anchor, True);
+  TCharacterGridRenderer.Fill(sgChars, text, FDeadkeys, start, len,
+    memo.Selection.Caret, True);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 
