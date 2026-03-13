@@ -533,8 +533,8 @@ describe('KmnFileWriter', function () {
         const data: ProcessedData = {
           keylayoutFilename: "",
           kmnFilename: "",
-          arrayOfModifiers: [[]],
-          arrayOfRules: values[0]
+          modifiers: [[]],
+          rules: values[0]
         };
         const result1 = sutW.writeDataRules(data);
         assert.isTrue(result1 === values[1][0]);

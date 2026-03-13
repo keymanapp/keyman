@@ -31,25 +31,25 @@ export interface ConverterToKmnResult extends ConverterResult {
 };
 
 export interface ProcessedData {
-  keylayoutFilename: string,
-  kmnFilename: string,
-  arrayOfModifiers: string[][],
-  arrayOfRules: Rule[],
+  keylayoutFilename: string;
+  kmnFilename: string;
+  modifiers: string[][];
+  rules: Rule[];
 };
 
 export interface KeylayoutFileData {
-  actionId?: string,
-  keyCode?: string,
-  key?: string,
-  behaviour?: string,
-  modifier?: string,
+  actionId?: string;
+  keyCode?: string;
+  key?: string;
+  behavior ?: string;
+  modifier?: string;
   outchar?: string;
 };
 
 export interface ActionStateOutput {
-  id: string,
-  state: string,
-  output: string,
+  id: string;
+  state: string;
+  output: string;
 };
 
 /**
@@ -135,27 +135,27 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    const outArray: ProcessedData = await this.convert(jsonO, inputFilename);
+    const processedData: ProcessedData = await this.convert(jsonO, inputFilename);
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
     // write to object/ConverterToKmnResult
-    const outUint8: Uint8Array = kmnFileWriter.write(outArray);
+    const outputKmn = kmnFileWriter.write(processedData);
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outUint8, filename: outArray.kmnFilename }
+        kmn: { data: outputKmn, filename: processedData.kmnFilename }
       }
     };
     return result;
   }
 
   /**
-   * @brief  member function to read filename and behaviour of a json object into a ProcessedData
-   * @param  jsonObj containing filename, behaviour and rules of a json object
+   * @brief  member function to read filename and behaviorof a json object into a ProcessedData
+   * @param  jsonObj containing filename, behaviorand rules of a json object
    * @return an ProcessedData containing all data ready to print out
    */
   private convert(jsonObj: any, inputfilename: string): ProcessedData {
-    // modifiers for each behaviour
+    // modifiers for each behavior
     const modifierBehavior: string[][] = [];
 
     // an array of data for a kmn rule
@@ -165,8 +165,8 @@ export class KeylayoutToKmnConverter {
     const dataObject: ProcessedData = {
       keylayoutFilename: "",
       kmnFilename: "",
-      arrayOfModifiers: [],
-      arrayOfRules: []
+      modifiers: [],
+      rules: []
     };
 
     if ((jsonObj === null) || (!jsonObj.hasOwnProperty("keyboard"))) {
@@ -183,35 +183,35 @@ export class KeylayoutToKmnConverter {
         modifierBehavior.push(singleModifierSet);
       }
 
-      // fill dataObject with filenames, behaviours and (initialized) rules
+      // fill dataObject with filenames, behaviors and (initialized) rules
       dataObject.keylayoutFilename = inputfilename;
       dataObject.kmnFilename = inputfilename.replace(/\.keylayoutn$/, '.kmn');
-      dataObject.arrayOfModifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
-      dataObject.arrayOfRules = rules;
+      dataObject.modifiers = modifierBehavior;  // ukelele uses behaviors e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
+      dataObject.rules = rules;
 
       // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
       KeylayoutToKmnConverter.USE_KEY_COUNT = findUsedKeysCount(jsonObj);
 
-      // fill rules into arrayOfRules of dataObject
+      // fill rules into 'rules' of dataObject
       return this.createRuleData(dataObject, jsonObj);
     }
   }
 
   /**
     * @brief  member function to read the rules contained in a json object and add array of Rules[] to an ProcessedData
-    * @param  dataUkelele: an object containing the name of the in/output file, an array of behaviours and an (empty) array of Rules
+    * @param  dataUkelele: an object containing the name of the in/output file, an array of behaviors and an (empty) array of Rules
     * @param  jsonObj: json Object containing all data read from a keylayout file
-    * @return an object containing the name of the input file, an array of behaviours and a populated array of Rules[]
+    * @return an object containing the name of the input file, an array of behaviors and a populated array of Rules[]
     */
   public createRuleData(dataUkelele: ProcessedData, jsonObj: any): ProcessedData {
 
-    const objectArray: Rule[] = [];
+    const rules: Rule[] = [];
     let dkCounterC3: number = 0;
     let dkCounterC2: number = 0;
     let actionId: string;
 
     // check if we use CAPS in a modifier throughout the .keylayout file. In this case we need to add NCAPS
-    const isCapsused: boolean = this.checkIfCapsIsUsed(dataUkelele.arrayOfModifiers);
+    const isCapsused: boolean = this.checkIfCapsIsUsed(dataUkelele.modifiers);
 
     // if there are different amounts of keyMapSelect vs keyMap
     if (jsonObj.keyboard.modifierMap?.keyMapSelect.length !== jsonObj.keyboard.keyMapSet[0].keyMap.length) {
@@ -224,7 +224,7 @@ export class KeylayoutToKmnConverter {
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
 
-        // if index of keys and behaviours exist
+        // if index of keys and behaviors exist
         const isItAvailable = ((j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length) && (i < jsonObj.keyboard.keyMapSet[0].keyMap.length));
         if (!isItAvailable) {
           continue;
@@ -244,7 +244,7 @@ export class KeylayoutToKmnConverter {
             && (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__output'] !== "")) {
 
             // loop modifiers
-            for (let l = 0; l < dataUkelele.arrayOfModifiers[i].length; l++) {
+            for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
 
               if (this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code']))) {
 
@@ -261,11 +261,11 @@ export class KeylayoutToKmnConverter {
                   /*   dk for C2*/                0,
                   /*   unique B */                0,
 
-                  /*   modifierKey*/             this.createKmnModifier(dataUkelele.arrayOfModifiers[i][l], isCapsused),
+                  /*   modifierKey*/             this.createKmnModifier(dataUkelele.modifiers[i][l], isCapsused),
                   /*   key */                     this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'])),
                   /*   output */                  new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__output']),
                 );
-                objectArray.push(ruleObj);
+                rules.push(ruleObj);
               }
             }
             // }
@@ -282,7 +282,7 @@ export class KeylayoutToKmnConverter {
             // ...............e. g. <when state="none" output="a" ............................................................................
             // ...............................................................................................................................
 
-            for (let l = 0; l < dataUkelele.arrayOfModifiers[i].length; l++) {
+            for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
 
               if ((this.getOutputFromActionIdNone(jsonObj, actionId) !== undefined)
                 && (this.getOutputFromActionIdNone(jsonObj, actionId) !== "")) {
@@ -290,7 +290,7 @@ export class KeylayoutToKmnConverter {
                 const outputchar: string = this.getOutputFromActionIdNone(jsonObj, actionId);
 
                 const b1ModifierKeyObj: KeylayoutFileData[] =
-                  this.getActionOutputBehaviourKeyModiFromActionIDStateOutput(jsonObj, dataUkelele.arrayOfModifiers, actionId, outputchar, isCapsused);
+                  this.getActionOutputBehaviorKeyModiFromActionIDStateOutput(jsonObj, dataUkelele.modifiers, actionId, outputchar, isCapsused);
 
                 for (let m = 0; m < b1ModifierKeyObj.length; m++) {
                   ruleObj = new Rule(
@@ -311,7 +311,7 @@ export class KeylayoutToKmnConverter {
                     /*   output */                  new TextEncoder().encode(outputchar)
                   );
                   if ((outputchar !== undefined) && (outputchar !== "undefined") && (outputchar !== "")) {
-                    objectArray.push(ruleObj);
+                    rules.push(ruleObj);
                   }
                 }
               }
@@ -340,10 +340,10 @@ export class KeylayoutToKmnConverter {
 
 
               // Data of Block Nr 4 .....................................................................................................................................................................
-              // with present actionId (a18) find all keycode-behaviour-pairs that use this action (a18) => (keymapIndex 0/keycode 24 and keymapIndex 3/keycode 24) ....................................
+              // with present actionId (a18) find all keycode-behavior-pairs that use this action (a18) => (keymapIndex 0/keycode 24 and keymapIndex 3/keycode 24) ....................................
               // from these create an array of modifier combinations  e.g. [['','caps?'], ['Caps']] .....................................................................................................
               /* eg: [['24', 0], ['24', 3]] */        const b4DeadkeyObj: KeylayoutFileData[] = this.getKeyModifierArrayFromActionID(jsonObj, actionId);
-              /* e.g. [['','caps?'], ['Caps']]*/      const b4DeadkeyModifierObj: string[] = this.getModifierArrayFromKeyModifierArray(dataUkelele.arrayOfModifiers, b4DeadkeyObj);
+              /* e.g. [['','caps?'], ['Caps']]*/      const b4DeadkeyModifierObj: string[] = this.getModifierArrayFromKeyModifierArray(dataUkelele.modifiers, b4DeadkeyObj);
               // ........................................................................................................................................................................................
 
 
@@ -354,9 +354,9 @@ export class KeylayoutToKmnConverter {
 
 
               // Data of Block Nr 1  ....................................................................................................................................................................
-              // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behaviour,modifier,output] ......................................................................
+              // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behavior,modifier,output] ......................................................................
               /*  eg: ['0','K_A','a9','0','â'] */    const b1KeycodeObj: KeylayoutFileData[] = this.getKeyActionOutputArrayFromActionStateOutputArray(jsonObj, b6ActionIdObj);
-              /*  eg: ['K_A','a9','0','NCAPS','â']*/  const b1ModifierKeyObj: KeylayoutFileData[] = this.getKeyBehaviourModOutputArrayFromKeyActionBehaviourOutputArray(jsonObj, b1KeycodeObj, isCapsused);
+              /*  eg: ['K_A','a9','0','NCAPS','â']*/  const b1ModifierKeyObj: KeylayoutFileData[] = this.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(jsonObj, b1KeycodeObj, isCapsused);
                   // .......................................................................................................................................................................................
 
                   for (let n1 = 0; n1 < b4DeadkeyModifierObj.length; n1++) {
@@ -384,7 +384,7 @@ export class KeylayoutToKmnConverter {
                           if ((b1ModifierKeyObj[n4].outchar !== undefined)
                             && (b1ModifierKeyObj[n4].outchar !== "undefined")
                             && (b1ModifierKeyObj[n4].outchar !== "")) {
-                            objectArray.push(ruleObj);
+                            rules.push(ruleObj);
                           }
                         }
                       }
@@ -417,10 +417,10 @@ export class KeylayoutToKmnConverter {
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 4 ........................................................................................................................................................................
-              // with present actionId (a16) find all keycode-behaviour-pairs that use this action (a16) => (keymapIndex 3/keycode 32) ....................................................................
+              // with present actionId (a16) find all keycode-behavior-pairs that use this action (a16) => (keymapIndex 3/keycode 32) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
               /* e.g. [['32', 3]] */                      const b4DeadkeyObj: KeylayoutFileData[] = this.getKeyModifierArrayFromActionID(jsonObj, actionId);
-              /* e.g. [ [ 'anyOption', 'Caps' ] ]*/       const b4DeadkeyModifierObj: string[] = this.getModifierArrayFromKeyModifierArray(dataUkelele.arrayOfModifiers, b4DeadkeyObj);
+              /* e.g. [ [ 'anyOption', 'Caps' ] ]*/       const b4DeadkeyModifierObj: string[] = this.getModifierArrayFromKeyModifierArray(dataUkelele.modifiers, b4DeadkeyObj);
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 3 ........................................................................................................................................................................
@@ -429,10 +429,10 @@ export class KeylayoutToKmnConverter {
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 2  .......................................................................................................................................................................
-              // with present actionId (a17) find all key names and behaviours that use this action (a17) => (keymapIndex 3/keycode 28) ....................................................................
+              // with present actionId (a17) find all key names and behaviors that use this action (a17) => (keymapIndex 3/keycode 28) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
               /* eg: index=3 */                           const b2PrevDeadkeyObj: KeylayoutFileData[] = this.getKeyModifierArrayFromActionID(jsonObj, b3ActionId);
-              /* e.g. [ [ 'anyOption', 'Caps' ] ] */      const b2PrevDeadkeyModifierObj: string[] = this.getModifierArrayFromKeyModifierArray(dataUkelele.arrayOfModifiers, b2PrevDeadkeyObj);
+              /* e.g. [ [ 'anyOption', 'Caps' ] ] */      const b2PrevDeadkeyModifierObj: string[] = this.getModifierArrayFromKeyModifierArray(dataUkelele.modifiers, b2PrevDeadkeyObj);
               // ...........................................................................................................................................................................................
               // Data of Block Nr 6 ........................................................................................................................................................................
               // create an array[action id,state,output] from all state-output-pairs that use state = b5ValueNext (e.g. use 1 in  <when state="1" output="â"/> ) .........................................
@@ -440,9 +440,9 @@ export class KeylayoutToKmnConverter {
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 1  .......................................................................................................................................................................
-              // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behaviour,modifier,output] .........................................................................
+              // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behavior,modifier,output] .........................................................................
               /*  eg: ['49','K_SPACE','a0','0','Â'] */    const b1KeycodeObj: KeylayoutFileData[] = this.getKeyActionOutputArrayFromActionStateOutputArray(jsonObj, b6ActionIdObj);
-              /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ const b1ModifierKeyObj: KeylayoutFileData[] = this.getKeyBehaviourModOutputArrayFromKeyActionBehaviourOutputArray(jsonObj, b1KeycodeObj, isCapsused);
+              /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ const b1ModifierKeyObj: KeylayoutFileData[] = this.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(jsonObj, b1KeycodeObj, isCapsused);
                   // ...........................................................................................................................................................................................
 
                   for (let n1 = 0; n1 < b2PrevDeadkeyModifierObj.length; n1++) {
@@ -472,7 +472,7 @@ export class KeylayoutToKmnConverter {
                                 if ((b1ModifierKeyObj[n7].outchar !== undefined)
                                   && (b1ModifierKeyObj[n7].outchar !== "undefined")
                                   && (b1ModifierKeyObj[n7].outchar !== "")) {
-                                  objectArray.push(ruleObj);
+                                  rules.push(ruleObj);
                                 }
                               }
                             }
@@ -496,53 +496,53 @@ export class KeylayoutToKmnConverter {
         }
       }
     }
-    dataUkelele.arrayOfRules = objectArray;
+    dataUkelele.rules = rules;
     return this.reviewRuleInputData(dataUkelele);
   }
 
   /**
-    * @brief  member function to review data in array of Rules[] of dataUkelele: remove duplicate rules and mark first occurance of a rule in objectArray
-    * @param  dataUkelele: an object containing the name of the in/output file, an array of behaviours and an array of Rules
-    * @return an object containing the name of the input file, an array of behaviours and the revised array of Rules[]
+    * @brief  member function to review data in array of rules of dataUkelele: remove duplicate rules and mark first occurance of a rule in rules
+    * @param  dataUkelele: an object containing the name of the in/output file, an array of behaviors and an array of Rules
+    * @return an object containing the name of the input file, an array of behaviors and the revised array of Rule[]
     */
   public reviewRuleInputData(dataUkelele: ProcessedData): ProcessedData {
 
-    // check for duplicate C2 and C3 rules in objectArray (e.g. [NCAPS RALT K_8]  >  dk(C12) ): create a separate array of unique rules,
-    // then compare to objectArray and mark first occurrence  of a rule in objectArray
+    // check for duplicate C2 and C3 rules in rules (e.g. [NCAPS RALT K_8]  >  dk(C12) ): create a separate array of unique rules,
+    // then compare to rules and mark first occurrence  of a rule in rules
 
     let uniqueCountDkB = 0;
-    const listOfUniqueText2Rules: string[][] = [];
+    const uniqueTextRules: string[][] = [];
 
-    const objectArray: Rule[] = dataUkelele.arrayOfRules;
+    const rules: Rule[] = dataUkelele.rules;
 
     //------------------------------------ C2: dk ----------------------------------
     // first rule is always unique
-    objectArray[0].uniqueDeadkey = uniqueCountDkB;
-    objectArray[0].idDeadkey = uniqueCountDkB;
+    rules[0].uniqueDeadkey = uniqueCountDkB;
+    rules[0].idDeadkey = uniqueCountDkB;
     uniqueCountDkB++;
 
-    for (let i = 0; i < objectArray.length; i++) {
+    for (let i = 0; i < rules.length; i++) {
 
 
       if (
-        ((objectArray[i].modifierDeadkey !== undefined) && (objectArray[i].modifierDeadkey !== "")) &&
-        ((objectArray[i].deadkey !== undefined) && (objectArray[i].deadkey !== ""))
+        ((rules[i].modifierDeadkey !== undefined) && (rules[i].modifierDeadkey !== "")) &&
+        ((rules[i].deadkey !== undefined) && (rules[i].deadkey !== ""))
       ) {
         let IsFirstUsedHereDk: boolean = true;
 
         // check if not used before
         for (let j = 0; j < i; j++) {
-          if ((objectArray[i].modifierDeadkey === objectArray[j].modifierDeadkey)
-            && (objectArray[i].deadkey === objectArray[j].deadkey)) {
+          if ((rules[i].modifierDeadkey === rules[j].modifierDeadkey)
+            && (rules[i].deadkey === rules[j].deadkey)) {
             IsFirstUsedHereDk = IsFirstUsedHereDk && false;
           }
         }
 
         if (IsFirstUsedHereDk) {
-          objectArray[i].uniqueDeadkey = uniqueCountDkB;
-          listOfUniqueText2Rules.push([
-            objectArray[i].modifierDeadkey,
-            objectArray[i].deadkey,
+          rules[i].uniqueDeadkey = uniqueCountDkB;
+          uniqueTextRules.push([
+            rules[i].modifierDeadkey,
+            rules[i].deadkey,
             String(uniqueCountDkB)]);
           uniqueCountDkB++;
         }
@@ -553,37 +553,37 @@ export class KeylayoutToKmnConverter {
     let uniqueCountDkA = 0;
 
     // first rule is always unique
-    objectArray[0].uniquPrevDeadkey = uniqueCountDkA;
+    rules[0].uniquPrevDeadkey = uniqueCountDkA;
     uniqueCountDkA++;
 
-    for (let i = 0; i < objectArray.length; i++) {
-      if ((objectArray[i].modifierPrevDeadkey !== "") && (objectArray[i].prevDeadkey !== "")) {
+    for (let i = 0; i < rules.length; i++) {
+      if ((rules[i].modifierPrevDeadkey !== "") && (rules[i].prevDeadkey !== "")) {
         let isFirstUsedHerePrevDk: boolean = true;
 
         // check if not used before
         for (let j = 0; j < i; j++) {
-          if ((objectArray[i].modifierPrevDeadkey === objectArray[j].modifierPrevDeadkey)
-            && (objectArray[i].prevDeadkey === objectArray[j].prevDeadkey)) {
+          if ((rules[i].modifierPrevDeadkey === rules[j].modifierPrevDeadkey)
+            && (rules[i].prevDeadkey === rules[j].prevDeadkey)) {
             isFirstUsedHerePrevDk = isFirstUsedHerePrevDk && false;
           }
         }
 
         // check if first part of C3 rule contains a rule that is already defined in C2
         if (isFirstUsedHerePrevDk) {
-          objectArray[i].uniquPrevDeadkey = uniqueCountDkA;
+          rules[i].uniquPrevDeadkey = uniqueCountDkA;
           uniqueCountDkA++;
-          for (let k = 0; k < listOfUniqueText2Rules.length; k++) {
-            if ((listOfUniqueText2Rules[k][0] === objectArray[i].modifierDeadkey) && ((listOfUniqueText2Rules[k][1] === objectArray[i].deadkey))) {
-              objectArray[i].uniqueDeadkey = Number(listOfUniqueText2Rules[k][2]);
+          for (let k = 0; k < uniqueTextRules.length; k++) {
+            if ((uniqueTextRules[k][0] === rules[i].modifierDeadkey) && ((uniqueTextRules[k][1] === rules[i].deadkey))) {
+              rules[i].uniqueDeadkey = Number(uniqueTextRules[k][2]);
             }
           }
         }
 
         if (isFirstUsedHerePrevDk) {
-          objectArray[i].uniqueDeadkey = uniqueCountDkB;
-          listOfUniqueText2Rules.push([
-            objectArray[i].modifierPrevDeadkey,
-            objectArray[i].prevDeadkey,
+          rules[i].uniqueDeadkey = uniqueCountDkB;
+          uniqueTextRules.push([
+            rules[i].modifierPrevDeadkey,
+            rules[i].prevDeadkey,
             String(uniqueCountDkB)
           ]);
           uniqueCountDkB++;
@@ -591,18 +591,18 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-    // loop through objectArray and mark first occurence each rule of listOfUniqueText2Rules
-    for (let i = 0; i < objectArray.length; i++) {
-      for (let j = 0; j < listOfUniqueText2Rules.length; j++) {
-        if ((objectArray[i].modifierPrevDeadkey === listOfUniqueText2Rules[j][0]) && (objectArray[i].prevDeadkey === listOfUniqueText2Rules[j][1])) {
-          objectArray[i].idPrevDeadkey = Number(listOfUniqueText2Rules[j][2]);
+    // loop through rules and mark first occurence each rule of uniqueTextRules
+    for (let i = 0; i < rules.length; i++) {
+      for (let j = 0; j < uniqueTextRules.length; j++) {
+        if ((rules[i].modifierPrevDeadkey === uniqueTextRules[j][0]) && (rules[i].prevDeadkey === uniqueTextRules[j][1])) {
+          rules[i].idPrevDeadkey = Number(uniqueTextRules[j][2]);
         }
-        if ((objectArray[i].modifierDeadkey === listOfUniqueText2Rules[j][0]) && (objectArray[i].deadkey === listOfUniqueText2Rules[j][1])) {
-          objectArray[i].idDeadkey = Number(listOfUniqueText2Rules[j][2]);
+        if ((rules[i].modifierDeadkey === uniqueTextRules[j][0]) && (rules[i].deadkey === uniqueTextRules[j][1])) {
+          rules[i].idDeadkey = Number(uniqueTextRules[j][2]);
         }
       }
     }
-    dataUkelele.arrayOfRules = objectArray;
+    dataUkelele.rules = rules;
     return dataUkelele;
   }
 
@@ -687,9 +687,9 @@ export class KeylayoutToKmnConverter {
       kmnModifier += kmnNcaps + addModifier;
     }
     // remove duplicate and empty entries and make sure NCAPS is at the beginning
-    const duplicateModifierArray: string[] = kmnModifier.split(" ").filter(item => item);
+    const duplicateModifier: string[] = kmnModifier.split(" ").filter(item => item);
 
-    const uniqueModifier: string[] = duplicateModifierArray.filter(function (item, pos, self) {
+    const uniqueModifier: string[] = duplicateModifier.filter(function (item, pos, self) {
       return self.indexOf(item) === pos;
     });
 
@@ -823,7 +823,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  member function to create an array of (modifier) behaviours for a given keycode in [{keycode,modifier}]
+   * @brief  member function to create an array of (modifier) behaviors for a given keycode in [{keycode,modifier}]
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  search  : KeylayoutFileData[] - an array[{keycode,modifier}]  to be found
    * @return a string[] containing modifiers
@@ -831,7 +831,7 @@ export class KeylayoutToKmnConverter {
   public getModifierArrayFromKeyModifierArray(data: any, search: KeylayoutFileData[]): string[] {
     const returnString1D: string[] = [];
     for (let i = 0; i < search.length; i++) {
-      returnString1D.push(data[search[i].behaviour]);
+      returnString1D.push(data[search[i].behavior ]);
     }
     return returnString1D;
   }
@@ -870,26 +870,26 @@ export class KeylayoutToKmnConverter {
     if ((search === undefined) || (search === null))
       return [];
 
-    const returnObjarray1D = [];
+    const keyActionOutput = [];
 
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'] === search[k].id &&
             data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'] <= KeylayoutToKmnConverter.MAX_KEY_COUNT) {
-            const returnObject = {
+            const singleDataSet = {
               keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'],
               key: this.mapUkeleleKeycodeToVK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'])),
               actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'],
-              behaviour: data.keyboard.keyMapSet[0].keyMap[i]['@__index'],
+              behavior : data.keyboard.keyMapSet[0].keyMap[i]['@__index'],
               outchar: search[k].output
             };
-            returnObjarray1D.push(returnObject);
+            keyActionOutput.push(singleDataSet);
           }
         }
       }
     }
-    return returnObjarray1D;
+    return keyActionOutput;
   }
 
   /**
@@ -899,56 +899,56 @@ export class KeylayoutToKmnConverter {
    * @return an array: idStateOutputObject[] containing all [{actionId, state, output}] for a certain state
    */
   public getActionStateOutputArrayFromActionState(data: any, search: string): ActionStateOutput[] {
-    const returnObjarray1D: ActionStateOutput[] = [];
+    const actionStateOutput: ActionStateOutput[] = [];
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
         if ((data.keyboard.actions.action[i].when[j]['@__state'] === search)) {
           if (data.keyboard.actions.action[i].when[j]['@__output'] !== undefined) {
-           const returnObject  = {
+           const singleDataSet  = {
               id: data.keyboard.actions.action[i]['@__id'],
               state: data.keyboard.actions.action[i].when[j]['@__state'],
               output: data.keyboard.actions.action[i].when[j]['@__output']
             };
-            returnObjarray1D.push(returnObject);
+            actionStateOutput.push(singleDataSet);
           }
         }
       }
     }
-    return returnObjarray1D;
+    return actionStateOutput;
   }
 
   /**
-   * @brief  member function to create an 2D array of [KeyName,actionId,behaviour,modifier,output]
+   * @brief  member function to create an 2D array of [KeyName,actionId,behavior,modifier,output]
    * @param  data    : any an object containing all data read from a .keylayout file
-   * @param  search  : array of [{keycode,keyname,actionId,behaviour,output}] to be found
+   * @param  search  : array of [{keycode,keyname,actionId,behavior,output}] to be found
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
-   * @return an array: KeylayoutFileData[] containing [{KeyName,actionId,behaviour,modifier,output}]
+   * @return an array: KeylayoutFileData[] containing [{KeyName,actionId,behavior,modifier,output}]
    */
-  public getKeyBehaviourModOutputArrayFromKeyActionBehaviourOutputArray(data: any, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
-    const returnObjarray1D = [];
+  public getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(data: any, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
+    const keyBehaviorModOutput = [];
 
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
-        const behaviourIdx: number = Number(search[i].behaviour);
-        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviourIdx].modifier.length; j++) {
-          const returnObject = {
+        const behaviorIdx: number = Number(search[i].behavior );
+        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviorIdx].modifier.length; j++) {
+          const singleDataSet = {
             actionId: search[i].actionId,
             key: search[i].key,
-            behaviour: search[i].behaviour,
-            modifier: this.createKmnModifier(data.keyboard.modifierMap.keyMapSelect[behaviourIdx].modifier[j]['@__keys'], isCAPSused),
+            behavior: search[i].behavior ,
+            modifier: this.createKmnModifier(data.keyboard.modifierMap.keyMapSelect[behaviorIdx].modifier[j]['@__keys'], isCAPSused),
             outchar: search[i].outchar,
           };
-          returnObjarray1D.push(returnObject);
+          keyBehaviorModOutput.push(singleDataSet);
         }
       }
     }
     // remove duplicates
-    const uniqueObjarray = returnObjarray1D.reduce((unique, o) => {
+    const uniquekeyBehaviorModOutput = keyBehaviorModOutput.reduce((unique, o) => {
       if (!unique.some(obj =>
         obj.actionId === o.actionId &&
         obj.key === o.key &&
-        obj.behaviour === o.behaviour &&
+        obj.behavior === o.behavior &&
         obj.modifier === o.modifier &&
         obj.outchar === o.outchar
       )) {
@@ -956,20 +956,20 @@ export class KeylayoutToKmnConverter {
       }
       return unique;
     }, []);
-    return uniqueObjarray;
+    return uniquekeyBehaviorModOutput;
   }
 
   /**
-   * @brief  member function to create an array of [actionID, output, behaviour,keyname,modifier] for a given actionId
+   * @brief  member function to create an array of [actionID, output, behavior,keyname,modifier] for a given actionId
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  modi    : any - an array of modifiers
    * @param  search  : string - an actionId to be found
    * @param  outchar  : string - the output character
    * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
-   * @return an array: KeylayoutFileData[] containing [{actionID,output, behaviour,keyname,modifier}]
+   * @return an array: KeylayoutFileData[] containing [{actionID,output, behavior,keyname,modifier}]
    */
-  public getActionOutputBehaviourKeyModiFromActionIDStateOutput(data: any, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
-    const returnObjarray1D = [];
+  public getActionOutputBehaviorKeyModiFromActionIDStateOutput(data: any, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
+    const actionOutputBehaviorKeyModi = [];
 
     if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
       return [];
@@ -979,15 +979,15 @@ export class KeylayoutToKmnConverter {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@__index']].length; k++) {
-            const behaviourIdx: number = data.keyboard.keyMapSet[0].keyMap[i]['@__index'];
-            const returnObject = {
+            const behaviorIdx: number = data.keyboard.keyMapSet[0].keyMap[i]['@__index'];
+            const singleDataSet = {
               outchar: outchar,
               actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'],
-              behaviour: data.keyboard.keyMapSet[0].keyMap[i]['@__index'],
+              behavior: data.keyboard.keyMapSet[0].keyMap[i]['@__index'],
               key: this.mapUkeleleKeycodeToVK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'])),
-              modifier: this.createKmnModifier(modi[behaviourIdx][k], isCapsused),
+              modifier: this.createKmnModifier(modi[behaviorIdx][k], isCapsused),
             };
-            returnObjarray1D.push(returnObject);
+            actionOutputBehaviorKeyModi.push(singleDataSet);
           }
         }
       }
@@ -996,11 +996,11 @@ export class KeylayoutToKmnConverter {
     //.............................................................................
 
     // remove duplicates
-    const uniqueObjarray = returnObjarray1D.reduce((unique, o) => {
+    const uniqueactionOutputBehaviorKey = actionOutputBehaviorKeyModi.reduce((unique, o) => {
       if (!unique.some(obj =>
         obj.outchar === o.outchar &&
         obj.actionId === o.actionId &&
-        obj.behaviour === o.behaviour &&
+        obj.behavior === o.behavior &&
         obj.key === o.key &&
         obj.modifier === o.modifier
       )) {
@@ -1009,25 +1009,25 @@ export class KeylayoutToKmnConverter {
       return unique;
     }, []);
 
-    return uniqueObjarray;
+    return uniqueactionOutputBehaviorKey;
   }
 
   /**
-   * @brief  member function to create an array of [{keycode,behaviour}] for a given actionId
+   * @brief  member function to create an array of [{keycode,behavior}] for a given actionId
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  search  : string - an actionId to be found
-   * @return an array: KeylayoutFileData[] containing [{keycode,behaviour}]
+   * @return an array: KeylayoutFileData[] containing [{keycode,behavior}]
    */
   public getKeyModifierArrayFromActionID(data: any, search: string): KeylayoutFileData[] {
     const mapIndexObject1D: KeylayoutFileData[] = [];
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'] === search) {
-          const returnObject = {
+          const singleDataSet = {
             key: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'],
-            behaviour: String(i),
+            behavior: String(i),
           };
-          mapIndexObject1D.push(returnObject);
+          mapIndexObject1D.push(singleDataSet);
         }
       }
     }
