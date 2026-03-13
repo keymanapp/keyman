@@ -49,20 +49,20 @@ function do_build() {
 
   # Base product - the main keyboard processor
   builder_echo "Bundle base product - the main keyboard processor"
-  ${BUNDLE_CMD}  "${BUILD_DIR}/obj/index.js" \
-    --out        "${BUILD_DIR}/lib/index.mjs" \
+  node "${LIB_BUNDLER}"  "${BUILD_DIR}/obj/index.js" \
+    --out                "${BUILD_DIR}/lib/index.mjs" \
     --format esm
 
   # The DOM-oriented keyboard loader
   builder_echo "Bundle the DOM-oriented keyboard loader"
-  ${BUNDLE_CMD}  "${BUILD_DIR}/obj/keyboards/loaders/dom-keyboard-loader.js" \
-    --out        "${BUILD_DIR}/lib/dom-keyboard-loader.mjs" \
+  node "${LIB_BUNDLER}"  "${BUILD_DIR}/obj/keyboards/loaders/dom-keyboard-loader.js" \
+    --out                "${BUILD_DIR}/lib/dom-keyboard-loader.mjs" \
     --format esm
 
   # The Node-oriented keyboard loader
   builder_echo "Bundle the Node-oriented keyboard loader"
-  ${BUNDLE_CMD}  "${BUILD_DIR}/obj/keyboards/loaders/node-keyboard-loader.js" \
-    --out        "${BUILD_DIR}/lib/node-keyboard-loader.mjs" \
+  node "${LIB_BUNDLER}"  "${BUILD_DIR}/obj/keyboards/loaders/node-keyboard-loader.js" \
+    --out                "${BUILD_DIR}/lib/node-keyboard-loader.mjs" \
     --format   esm \
     --platform node
 
