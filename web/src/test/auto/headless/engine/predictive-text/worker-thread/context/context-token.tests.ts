@@ -17,7 +17,7 @@ import { KMWString } from '@keymanapp/web-utils';
 
 import { ContextToken, correction, generateSubsetId, getBestMatches, InputSegment, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
-import { quotientPathHasInputs } from "#test-resources/searchQuotientUtils.js";
+import { quotientPathHasInputs } from "../../helpers/quotientPathHasInputs.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import ExecutionTimer = correction.ExecutionTimer;
