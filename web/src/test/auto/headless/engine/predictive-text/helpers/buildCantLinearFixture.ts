@@ -15,8 +15,9 @@ import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
-// Needs legacy vs 'new' style implementation!
-
+/**
+ * Build a linear fixture that models the word 'cant' and words close to that.
+ */
 export function buildCantLinearFixture() {
   const rootPath = new LegacyQuotientRoot(testModel);
 
