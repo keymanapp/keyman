@@ -6,13 +6,15 @@ import { KPJFileReader } from "../../src/types/kpj/kpj-file-reader.js";
 import { KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from '../../src/types/kpj/keyman-developer-project.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
-const callbacks = new TestCompilerCallbacks();
 
 describe('kpj-file-reader', function () {
+
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('kpj-file-reader should read a valid file', async function() {
     const kpjPath = 'khmer_angkor.kpj';
     const path = makePathToFixture('kpj', kpjPath);
-    const input = fs.readFileSync(path);
+    const input = fs.readFileSync(path) as Uint8Array;
     const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
     reader.validate(kpj);
@@ -124,7 +126,7 @@ describe('kpj-file-reader', function () {
 
   it('should load a v1.0 keyboard project with missing <File>', async function() {
     const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_file.kpj');
-    const input = fs.readFileSync(path);
+    const input = fs.readFileSync(path) as Uint8Array;
     const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
     reader.validate(kpj);
@@ -140,7 +142,7 @@ describe('kpj-file-reader', function () {
 
   it('should load a v1.0 keyboard project with missing <Files>', async function() {
     const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_files.kpj');
-    const input = fs.readFileSync(path);
+    const input = fs.readFileSync(path) as Uint8Array;
     const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
     reader.validate(kpj);

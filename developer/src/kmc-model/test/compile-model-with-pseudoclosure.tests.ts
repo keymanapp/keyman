@@ -7,7 +7,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   const MODEL_ID = 'example.qaa.trivial';
   const PATH = makePathToFixture(MODEL_ID);
