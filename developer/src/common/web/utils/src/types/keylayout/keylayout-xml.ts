@@ -33,6 +33,7 @@ export interface KL_Keyboard {
    * <layouts>, <modifierMap>, <keyMapSet>, <actions>, <terminators>
    * the 5 main elements.
    */
+  //layoutsMM: KL_Layouts[];
   layouts?: KL_Layouts[];
   modifierMap?: KL_ModifierMap[];
   keyMapSet?: KL_KeyMapSet[];
@@ -165,4 +166,3 @@ export interface KL_Terminators {
    */
   when?: KL_When[];
 };
-
