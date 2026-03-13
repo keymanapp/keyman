@@ -30,9 +30,6 @@ export interface ConverterToKmnResult extends ConverterResult {
   artifacts: ConverterToKmnArtifacts;
 };
 
-
-
-
 export interface ProcessedData {
   keylayoutFilename: string,
   kmnFilename: string,
@@ -54,6 +51,30 @@ export interface ActionStateOutput {
   state: string,
   output: string,
 };
+
+/**
+ * @brief  class for all storing a rule containing data for key, deadkey, previous deadkey, output)
+ */
+export class Rule {
+  constructor(
+    public ruleType: string,             /* C0, C1, C2, C3, or C4 */
+
+    public modifierPrevDeadkey: string, /* first key used by C3 rules*/
+    public prevDeadkey: string,
+    public idPrevDeadkey: number,
+    public uniquPrevDeadkey: number,
+
+    public modifierDeadkey: string,      /* second key used by C2,C3 rules*/
+    public deadkey: string,
+    public idDeadkey: number,
+    public uniqueDeadkey: number,
+
+    public modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
+    public key: string,
+    public output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
+  ) { }
+
+}
 
 /**
  * @brief  member function to find the number of keys defined in a .keykayout file.
@@ -164,7 +185,7 @@ export class KeylayoutToKmnConverter {
 
       // fill dataObject with filenames, behaviours and (initialized) rules
       dataObject.keylayoutFilename = inputfilename;
-      dataObject.kmnFilename = inputfilename.replace(/\.kkeylayoutn$/, '.kmn');;
+      dataObject.kmnFilename = inputfilename.replace(/\.keylayoutn$/, '.kmn');
       dataObject.arrayOfModifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       dataObject.arrayOfRules = rules;
 
@@ -692,29 +713,13 @@ export class KeylayoutToKmnConverter {
   public isAcceptableKeymanModifier(keylayoutModifier: string): boolean {
     if (keylayoutModifier === null)
       return false;
-
-    let iskKeymanModifier: boolean = true;
-    const modifierSingle: string[] = keylayoutModifier.split(" ");
-
-    for (let i = 0; i < modifierSingle.length; i++) {
-      if (
-        (modifierSingle[i].toUpperCase() === "NCAPS")
-        || (modifierSingle[i].toUpperCase() === "CAPS")
-        || (modifierSingle[i].toUpperCase() === "SHIFT")
-        || (modifierSingle[i].toUpperCase() === "ALT")
-        || (modifierSingle[i].toUpperCase() === "RALT")
-        || (modifierSingle[i].toUpperCase() === "LALT")
-        || (modifierSingle[i].toUpperCase() === "CTRL")
-        || (modifierSingle[i].toUpperCase() === "LCTRL")
-        || (modifierSingle[i].toUpperCase() === "RCTRL")
-        || (modifierSingle[i].toUpperCase() === "")
-      ) {
-        iskKeymanModifier &&= true;
-      } else {
-        iskKeymanModifier &&= false;
+    const modifierSingle = keylayoutModifier.toUpperCase().split(" ");
+    for (const mod of modifierSingle) {
+      if (!mod.match(/^(NCAPS|CAPS|SHIFT|ALT|RALT|LALT|CTRL|LCTRL|RCTRL|)$/)) {
+        return false;
       }
     }
-    return iskKeymanModifier;
+    return true;
   }
 
   /**
@@ -866,14 +871,13 @@ export class KeylayoutToKmnConverter {
       return [];
 
     const returnObjarray1D = [];
-    let returnObject: KeylayoutFileData;
 
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'] === search[k].id &&
             data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'] <= KeylayoutToKmnConverter.MAX_KEY_COUNT) {
-            returnObject = {
+            const returnObject = {
               keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'],
               key: this.mapUkeleleKeycodeToVK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'])),
               actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'],
@@ -896,13 +900,12 @@ export class KeylayoutToKmnConverter {
    */
   public getActionStateOutputArrayFromActionState(data: any, search: string): ActionStateOutput[] {
     const returnObjarray1D: ActionStateOutput[] = [];
-    let returnObject: ActionStateOutput;
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
         if ((data.keyboard.actions.action[i].when[j]['@__state'] === search)) {
           if (data.keyboard.actions.action[i].when[j]['@__output'] !== undefined) {
-            returnObject = {
+           const returnObject  = {
               id: data.keyboard.actions.action[i]['@__id'],
               state: data.keyboard.actions.action[i].when[j]['@__state'],
               output: data.keyboard.actions.action[i].when[j]['@__output']
@@ -924,14 +927,12 @@ export class KeylayoutToKmnConverter {
    */
   public getKeyBehaviourModOutputArrayFromKeyActionBehaviourOutputArray(data: any, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
     const returnObjarray1D = [];
-    let returnObject: KeylayoutFileData;
 
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
         const behaviourIdx: number = Number(search[i].behaviour);
         for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviourIdx].modifier.length; j++) {
-
-          returnObject = {
+          const returnObject = {
             actionId: search[i].actionId,
             key: search[i].key,
             behaviour: search[i].behaviour,
@@ -969,7 +970,6 @@ export class KeylayoutToKmnConverter {
    */
   public getActionOutputBehaviourKeyModiFromActionIDStateOutput(data: any, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
     const returnObjarray1D = [];
-    let returnObject: KeylayoutFileData;
 
     if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
       return [];
@@ -980,7 +980,7 @@ export class KeylayoutToKmnConverter {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@__index']].length; k++) {
             const behaviourIdx: number = data.keyboard.keyMapSet[0].keyMap[i]['@__index'];
-            returnObject = {
+            const returnObject = {
               outchar: outchar,
               actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'],
               behaviour: data.keyboard.keyMapSet[0].keyMap[i]['@__index'],
@@ -1019,12 +1019,11 @@ export class KeylayoutToKmnConverter {
    * @return an array: KeylayoutFileData[] containing [{keycode,behaviour}]
    */
   public getKeyModifierArrayFromActionID(data: any, search: string): KeylayoutFileData[] {
-    let returnObject: KeylayoutFileData;
     const mapIndexObject1D: KeylayoutFileData[] = [];
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'] === search) {
-          returnObject = {
+          const returnObject = {
             key: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'],
             behaviour: String(i),
           };
@@ -1041,27 +1040,3 @@ export class KeylayoutToKmnConverter {
   };
 }
 
-/**
- * @brief  class for all storing a rule containing data for key, deadkey, previous deadkey, output)
- */
-export class Rule {
-  constructor(
-    public ruleType: string,             /* C0, C1, C2, C3, or C4 */
-
-    public modifierPrevDeadkey: string, /* first key used by C3 rules*/
-    public prevDeadkey: string,
-    public idPrevDeadkey: number,
-    public uniquPrevDeadkey: number,
-
-    public modifierDeadkey: string,      /* second key used by C2,C3 rules*/
-    public deadkey: string,
-    public idDeadkey: number,
-    public uniqueDeadkey: number,
-
-    public modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
-    public key: string,
-    public output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
-
-  ) { }
-
-}

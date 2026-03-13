@@ -3,7 +3,7 @@
  *
  * Created by S. Schmitt on 2025-05-12
  *
- * Write Keyman .kmn files
+ * Write Keyman .kmn files from an in-memory representation generated
  *
  */
 
@@ -139,7 +139,7 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
         const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
@@ -207,7 +207,7 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
         const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
@@ -296,7 +296,7 @@ export class KmnFileWriter {
 
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
         //const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         //const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
         const outputUnicodeCharacter = this.convertToUnicodeCharacter(outputCharacter);
