@@ -25,7 +25,7 @@ const generateTestFilenames = (id: string) => ({
 });
 
 describe('KeymanWeb Compiler', function() {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
   const kmnCompiler: KmnCompiler = new KmnCompiler();
 
   this.beforeAll(async function() {
@@ -33,13 +33,6 @@ describe('KeymanWeb Compiler', function() {
       shouldAddCompilerVersion: false,
       saveDebug: true,
     }));
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed() || debug) {
-      callbacks.printMessages();
-    }
-    callbacks.clear();
   });
 
   it('should compile a complex keyboard', async function() {
