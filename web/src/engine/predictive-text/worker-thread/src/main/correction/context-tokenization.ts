@@ -566,7 +566,7 @@ export class ContextTokenization {
    * triggering the transition.
    * @param bestProbFromSet The probability of the single most likely input
    * transform in the overall transformDistribution associated with the
-   * keystroke triggering theh transition.  It need not be represented by the
+   * keystroke triggering the transition.  It need not be represented by the
    * tokenizationPath to be built.
    * @param appliedSuggestionId
    * @returns
