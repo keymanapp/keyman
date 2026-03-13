@@ -72,6 +72,10 @@ store(output_char) "ɛɔŋɣʒƐƆŊƔƷ"
 - Select the `Build` tab on the left, then the `Compile Keyboard` button. (Alternatively you can use the `Keyboard` menu, `Compile Keyboard` menu item to compile the keyboard. Or you can use the <kbd>F7</kbd> function key as a shortcut.)
 - You should see messages at the bottom indicating `dagbani.kmn built successfully`. If this is not the case, you’ll need to examine the error messages to see what the error is and correct it.
 
+## Interpreting Errors
+
+When compiling your Keyman code, Keyman Developer will report any errors, warnings and hints in the box at the bottom of the window. The message will give a short description of what the compiler found was wrong along with the line number of where the problem was detected. The error, warning or hint has an identifier (“KM02033” for example). This identifier is a link to a more detailed description.
+
 <div class="walkthrough-navigation" markdown="1">
 To continue the Step-by-Step tutorial move to the next page: [Part 4 - Using the Debugger](04-using-debugger)
 </div>
@@ -247,7 +251,7 @@ Some Keyman rules have no context, that is, a context that is empty. The followi
 is an example of the most basic rule possible. You may have noticed lines like these in your code after using the `Design` tab to edit your keyboard.
 
 Note that rules created when using the `Design` tab use [virtual key codes](/developer/language/guide/virtual-keys#common-virtual-key-codes) rather than the corresponding characters.
-This does not matter unless you are writing a [mnemonic layout](https://help.keyman.com/developer/language/reference/mnemoniclayout) keyboard. Keyman keyboards are positional by default, so unless you specify a mnemonic layout in your header, the following two lines of code will produce the same output:
+This does not matter unless you are writing a [mnemonic layout](https://help.keyman.com/developer/language/reference/mnemoniclayout) keyboard. Keyman keyboards are positional -- the opposite of mnemonic -- by default, so unless you specify a mnemonic layout in your header, the following two lines of code will produce the same output:
 
 ```keyman
 + "e"   > U+025B
