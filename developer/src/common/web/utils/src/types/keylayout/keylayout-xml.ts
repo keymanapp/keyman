@@ -12,10 +12,10 @@ export interface KeylayoutXMLSourceFile {
   /**
    * <keyboard> -- the root element.
    */
-  keyboard: KL_keyboard;
+  keyboard: KL_Keyboard;
 };
 
-export interface KL_keyboard {
+export interface KL_Keyboard {
   group?: string;
   id?: string;
   name?: string;
@@ -23,10 +23,10 @@ export interface KL_keyboard {
 
   layoutsMM: KL_Layouts[];
   layouts?: KL_Layouts[];
-  modifierMap?: KL_modifierMap[];
-  keyMapSet?: KL_keyMapSet[];
-  actions?: KL_actions[];
-  terminators?: KL_terminators[];
+  modifierMap?: KL_ModifierMap[];
+  keyMapSet?: KL_KeyMapSet[];
+  actions?: KL_Actions[];
+  terminators?: KL_Terminators[];
 };
 
 export interface KL_Layouts {
@@ -40,54 +40,54 @@ export interface KL_Layout {
   modifiers?: string;
 };
 
-export interface KL_modifierMap {
+export interface KL_ModifierMap {
   id?: string;
   defaultIndex?: string;
 
-  keyMapSelect?: KL_keyMapSelect[];
+  keyMapSelect?: KL_KeyMapSelect[];
 };
 
-export interface KL_keyMapSelect {
+export interface KL_KeyMapSelect {
   mapIndex?: string;
-  modifier?: KL_modifier[];
+  modifier?: KL_Modifier[];
 };
 
-export interface KL_modifier {
+export interface KL_Modifier {
   keys?: string;
 };
 
-export interface KL_keyMapSet {
+export interface KL_KeyMapSet {
   id?: string;
-  keyMap?: KL_keyMap[];
+  keyMap?: KL_KeyMap[];
 };
 
-export interface KL_keyMap {
+export interface KL_KeyMap {
   index?: string;
-  key?: KL_key[];
+  key?: KL_Key[];
 };
 
-export interface KL_key {
+export interface KL_Key {
   code?: string;
   action?: string;
   output?: string;
 };
 
-export interface KL_actions {
-  action?: KL_action[];
+export interface KL_Actions {
+  action?: KL_Action[];
 };
 
-export interface KL_action {
+export interface KL_Action {
   id?: string;
-  when?: KL_when[];
+  when?: KL_When[];
 };
 
-export interface KL_when {
+export interface KL_When {
   state?: string;
   output?: string;
   next?: string;
 };
 
-export interface KL_terminators {
-  when?: KL_when[];
+export interface KL_Terminators {
+  when?: KL_When[];
 };
 

@@ -249,7 +249,6 @@ export class KeymanXMLReader {
    * @param data input data
    */
   private static fixupPreserveOrder(data: any): any {
-
     // we need to extract the root name specially
     if (!Array.isArray(data)) {
       throw Error(`Internal Error: XML parser preserveOrder did not yield an array.`);
@@ -296,7 +295,6 @@ export class KeymanXMLReader {
   }
 
   public parse(data: string): any {
-
     const parser = this.parser();
     let result = parser.parse(data, true);
     if (PARSER_OPTIONS[this.type].attributeNamePrefix === '$') {
@@ -327,7 +325,6 @@ const PROLOGUE = { '?xml': { '$version': '1.0', '$encoding': 'utf-8' } };
 
 /** wrapper for XML generation support */
 export class KeymanXMLWriter {
-
   private static fixDataForWrite(data: any) : any {
     if(typeof data === 'object') {
       if (Array.isArray(data)) {
