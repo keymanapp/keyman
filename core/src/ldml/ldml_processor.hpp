@@ -178,10 +178,10 @@ public:
    size_t context_to_string(std::u32string &str, bool include_markers = true);
 
  private:
-   km_core_virtual_key vk;
-   uint16_t modifier_state;
-   uint8_t is_key_down;
-   uint16_t event_flags;
+   km_core_virtual_key _vk;
+   uint16_t _modifier_state;
+   uint8_t _is_key_down;
+   uint16_t _event_flags;
    km_core_state *state;
 
    // our in-flight action struct.
@@ -194,12 +194,12 @@ public:
 // implementation
 km_core_virtual_key
 ldml_event_state::get_vk() const {
-  return vk;
+  return _vk;
 }
 
 uint16_t
 ldml_event_state::get_modifier_state() const {
-  return modifier_state;
+  return _modifier_state;
 }
 
 } // namespace core
