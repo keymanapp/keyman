@@ -27,8 +27,8 @@ help into a simple, single file that is easy for an end-user to install.
 A lexical model package file contains a single lexical model, optionally also
 fonts and/or documentation.
 
-Internally, as well as your own files, the package file will contain metadata
-file "kmp.json", which lists the details Keyman needs to install the package.
+In addition to your own files, the package will contain a metadata file named
+"kmp.json", which lists the details Keyman requires for installation.
 The package file is a ZIP compatible archive.
 
 > [!Tip] You can distribute keyboards and lexical models in package files, but
@@ -50,15 +50,15 @@ for uninstallation.
 On Windows, the context menu for a package file has one additional entry:
 "Install".
 
-#### Keyman for mac
+#### Keyman for macOS
 
-Keyman for mac can install package files with fonts and keyboards, and shortcuts
-in the package will be available through the keyboard's entry in Keyman
-Configuration.
+Keyman for macOS can install package files with fonts and keyboards, and
+shortcuts in the package will be available through the keyboard's entry in
+Keyman Configuration.
 
 #### Keyman for Linux
 
-Keyman for mac can install package files with fonts and keyboards.
+Keyman for Linux can install package files with fonts and keyboards.
 
 #### Keyman for Android and Keyman for iPhone and iPad
 
@@ -83,7 +83,7 @@ following files and file types are recognized by the package installer:
 \*.js (mobile only)
 :   Touch layout Keyboard files. When Keyman mobile applications install
     a keyboard package, all included keyboards will be installed as a
-    group. With Keyman Developer 10, the keyboard version information is
+    group. With Keyman Developer 10+, the keyboard version information is
     in kmp.json, and no longer within the JS file names.
 
 welcome.htm
@@ -97,16 +97,15 @@ readme.htm
     metadata about the package, to allow the user to determine if they
     wish to continue installation of the package.
 
-kmp.inf (Legacy versions of Keyman)
+kmp.inf (required by Keyman 9 and earlier versions)
 :   A Windows .ini format file that lists each of the files in the
     package, together with metadata.
 
 kmp.json
-:   A JSON format file contains metadata for the keyboard package such
-    as package version, keyboard versions, and lists each of the files
+:   A JSON format file containing metadata for the keyboard package such
+    as package version, keyboard versions, and listing each of the files
     in the package. For more explanation of the structure of the JSON
-    file, please read the
-    [metadata](metadata) documentation.
+    file, please read the [metadata](metadata) documentation.
 
 \*.ttf, \*.otf, \*.ttc
 :   Truetype font files that will be installed with the package, and
@@ -119,7 +118,9 @@ kmp.json
 > [!TIP]
 > Read [File Layout](../file-layout) to know which files to include or exclude in the project folder.
 
-The best way to distribute packages is to distribute it through Keyman Cloud:
+The best way to distribute a package is to distribute it through Keyman Cloud,
+which makes it available on keyman.com and in the Keyboard Download interface
+inside the Keyman apps:
 
 * [Share a keyboard package](/developer/keyboards)
 * [Share a lexical model package](/developer/lexical-models)

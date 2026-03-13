@@ -2,4 +2,4 @@
 redirect: ..
 ---
 
-(Removed in v19)
+(Replaced by new walkthrough in v19)
