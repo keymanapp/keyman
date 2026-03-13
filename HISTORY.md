@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.215 alpha 2026-03-13
+
+* chore(linux): fix dependency of Debian test suite (#15735)
+* chore(linux): Update debian changelog (#15732)
+
 ## 19.0.214 alpha 2026-03-12
 
 * chore(linux): Update debian changelog (#15718)
