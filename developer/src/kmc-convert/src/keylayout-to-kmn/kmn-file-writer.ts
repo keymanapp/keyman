@@ -683,7 +683,7 @@ export class KmnFileWriter {
         && curr.modifierPrevDeadkey === rule[index].modifierPrevDeadkey
         && curr.idPrevDeadkey !== rule[index].idPrevDeadkey
         && curr.prevDeadkey === rule[index].prevDeadkey
-        && rule[index].uniquPrevDeadkey !== 0
+        && rule[index].uniquePrevDeadkey !== 0
         && idx < index
       );
 
@@ -704,7 +704,7 @@ export class KmnFileWriter {
         && curr.deadkey === rule[index].deadkey
         && curr.idDeadkey === rule[index].idDeadkey)
         && idx < index
-        && (rule[index].uniqueDeadkey !== 0 || rule[index].uniquPrevDeadkey !== 0)
+        && (rule[index].uniqueDeadkey !== 0 || rule[index].uniquePrevDeadkey !== 0)
       );
 
       // 5-5 dk(C1) + [SHIFT CAPS K_A]  >   dk(C2)  <-> dk(C1) + [SHIFT CAPS K_A]  >  dk(C2)

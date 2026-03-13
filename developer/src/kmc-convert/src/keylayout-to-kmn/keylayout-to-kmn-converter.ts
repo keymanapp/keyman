@@ -57,21 +57,21 @@ export interface ActionStateOutput {
  */
 export class Rule {
   constructor(
-    public ruleType: string,             /* C0, C1, C2, C3, or C4 */
+    public readonly ruleType: string,             /* C0, C1, C2, C3, or C4 */
 
-    public modifierPrevDeadkey: string, /* first key used by C3 rules*/
-    public prevDeadkey: string,
-    public idPrevDeadkey: number,
-    public uniquPrevDeadkey: number,
+    public readonly modifierPrevDeadkey: string, /* first key used by C3 rules*/
+    public readonly prevDeadkey: string,
+    public  idPrevDeadkey: number,
+    public  uniquePrevDeadkey: number,
 
-    public modifierDeadkey: string,      /* second key used by C2,C3 rules*/
-    public deadkey: string,
-    public idDeadkey: number,
-    public uniqueDeadkey: number,
+    public readonly modifierDeadkey: string,      /* second key used by C2,C3 rules*/
+    public readonly deadkey: string,
+    public  idDeadkey: number,
+    public  uniqueDeadkey: number,
 
-    public modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
-    public key: string,
-    public output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
+    public readonly modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
+    public readonly key: string,
+    public readonly output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
   ) { }
 
 }
@@ -135,7 +135,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    const processedData: ProcessedData = await this.convert(jsonO, inputFilename);
+    const processedData = await this.convert(jsonO, inputFilename);
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
@@ -553,7 +553,7 @@ export class KeylayoutToKmnConverter {
     let uniqueCountDkA = 0;
 
     // first rule is always unique
-    rules[0].uniquPrevDeadkey = uniqueCountDkA;
+    rules[0].uniquePrevDeadkey = uniqueCountDkA;
     uniqueCountDkA++;
 
     for (let i = 0; i < rules.length; i++) {
@@ -570,7 +570,7 @@ export class KeylayoutToKmnConverter {
 
         // check if first part of C3 rule contains a rule that is already defined in C2
         if (isFirstUsedHerePrevDk) {
-          rules[i].uniquPrevDeadkey = uniqueCountDkA;
+          rules[i].uniquePrevDeadkey = uniqueCountDkA;
           uniqueCountDkA++;
           for (let k = 0; k < uniqueTextRules.length; k++) {
             if ((uniqueTextRules[k][0] === rules[i].modifierDeadkey) && ((uniqueTextRules[k][1] === rules[i].deadkey))) {
@@ -680,7 +680,7 @@ export class KeylayoutToKmnConverter {
       else if ((modifierState[i].toUpperCase() === 'ANYOPTION') || (modifierState[i].toUpperCase() === 'OPTION')) {
         addModifier = "RALT ";
       }
-
+      // to enable the use of other modifiers e.g. 'command' of Italian.keylayout
       else {
         addModifier = modifierState[i] + " ";
       }
