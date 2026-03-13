@@ -31,6 +31,10 @@ export interface ConverterToKmnResult extends ConverterResult {
 };
 
 export interface ProcessedData {
+   /**
+   * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
+   * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
+   */
   keylayoutFilename: string;
   kmnFilename: string;
   modifiers: string[][];
@@ -38,6 +42,10 @@ export interface ProcessedData {
 };
 
 export interface KeylayoutFileData {
+  /**
+   * Interface for storing data read from a .keylayout file and used for processing rules.
+   * These are used for obtaining one entity form the other (e.g. from action id to output, from keycode to modifier, etc.)
+   */
   actionId?: string;
   keyCode?: string;
   key?: string;
@@ -47,6 +55,11 @@ export interface KeylayoutFileData {
 };
 
 export interface ActionStateOutput {
+   /**
+   * Interface for storing data read from a .keylayout file and used for processing rules.
+   * These are used for obtaining the triplet [action id, state, output]
+   * e.g. ['a9','1','â'] from <when state="1" output="â"/> for action id a9
+   */
   id: string;
   state: string;
   output: string;
