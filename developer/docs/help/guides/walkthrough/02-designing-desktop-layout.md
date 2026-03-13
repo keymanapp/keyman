@@ -63,7 +63,7 @@ For visual mapping, this can be done with tools as rudimentary as a pen and pape
 
 Navigate to your `.kpj` file, go to the `Keyboards` tab, and open your `.kmn` file. This is where your keyboard’s information lies, as well as the code that makes it work.
 
-You can read more about the `.kmn` file type in the [official Keyman documentation](../../../reference/file-types/kmn).
+You can read more about the `.kmn` file type in the [official Keyman documentation](../../reference/file-types/kmn).
 
 Inside your `.kmn` file, select the `Layout` tab on the left.
 For a new project, the `Design` tab (at the bottom) should already be selected.

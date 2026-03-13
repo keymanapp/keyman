@@ -29,7 +29,7 @@ To continue the Step-by-Step tutorial move to the next page: [Part 9 - Distribut
 
 ## Package Files
 
-See the [Keyman Package Editor documentation](../../../context/package-editor) if you need more details on the following items.
+See the [Keyman Package Editor documentation](../../context/package-editor) if you need more details on the following items.
 
 ### Files
 

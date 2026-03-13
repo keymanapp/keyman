@@ -28,7 +28,7 @@ To continue the Step-by-Step tutorial move to the next page: [Part 5 - Designing
 
 ## Running the Debugger
 
-See the [debugger documentation](../../../context/debug) for more information on running the debugger.
+See the [debugger documentation](../../context/debug) for more information on running the debugger.
 
 ## Interpreting Errors
 

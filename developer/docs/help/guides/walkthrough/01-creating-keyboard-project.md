@@ -121,15 +121,15 @@ The full copyright message is added to `LICENSE.md`.
 
 ### Languages
 
-This table displays the [BCP 47](../../../reference/bcp-47) tag (or tags) associated with your keyboard.
+This table displays the [BCP 47](../../reference/bcp-47) tag (or tags) associated with your keyboard.
 A BCP 47 tag identifies a language and will help users find your keyboard when they search for their language.
 If you don’t know what your language’s tag is, you can search for its name and find the corresponding tag in the [IANA Language Subtag Registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry), which contains all existing BCP 47 tags, the [Glottolog](https://glottolog.org/glottolog/language) (under the ISO-639-3 column), or the [SIL Ethnologue](https://www.ethnologue.com/).
 
 The SIL Ethnologue is the most user-friendly option of the three, if you are unfamiliar with language tags.
 
 In addition to your basic BCP 47 tag, you can add
-[Script](../../../reference/bcp-47#toc-the-script-subtag) and
-[Region](../../../reference/bcp-47#toc-the-region-subtag) subtags.
+[Script](../../reference/bcp-47#toc-the-script-subtag) and
+[Region](../../reference/bcp-47#toc-the-region-subtag) subtags.
 However, you should always use the simplest possible BCP 47 tag to identify your language.
 Only add Script and Region tags if your keyboard is for a script or region that differs from the most commonly used form of the language.
 
@@ -171,7 +171,7 @@ It’s a good idea to let Keyman handle naming your files, since it uses good na
 
 Once you have filled out all of the fields,
 Keyman Developer will create your project and open it in a new window with your project’s `.kpj` (Keyman project) file displayed.
-You can read more about the `.kpj` file type in the [official Keyman documentation](../../../reference/file-types/kpj).
+You can read more about the `.kpj` file type in the [official Keyman documentation](../../reference/file-types/kpj).
 
 ## Basing a new Keyboard Project on an existing one
 

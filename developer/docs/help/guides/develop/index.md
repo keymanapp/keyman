@@ -6,7 +6,7 @@ In version 19, the main keyboard tutorials have been replaced by the Keyman
 Developer Walkthrough, which covers all the topics found in the main tutorials
 in greater depth.
 
-* [The Keyman Developer Walkthrough →](walkthrough/)
+* [The Keyman Developer Walkthrough →](../walkthrough/)
 
 Other tutorials:
 

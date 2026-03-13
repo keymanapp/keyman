@@ -152,13 +152,13 @@ Keyman will place you in your `.kpj` file immediately, as with a keyboard projec
 
 Currently `Wordlist (trie-1.0)` is the only choice for the `Format` field.
 
-You’ll normally want to keep the `default` choice for the `Word breaker` field and the `(Space U+0020)` option for the `Insert after word` field, unless you are dealing with an orthography that doesn’t use space to separate words. For scripts such as Khmer, Thai, and Lao, which have special ways to delimit words, see the Keyman documentation on [coding a custom word breaker](../../../guides/lexical-models/advanced/word-breaker).
+You’ll normally want to keep the `default` choice for the `Word breaker` field and the `(Space U+0020)` option for the `Insert after word` field, unless you are dealing with an orthography that doesn’t use space to separate words. For scripts such as Khmer, Thai, and Lao, which have special ways to delimit words, see the Keyman documentation on [coding a custom word breaker](../../guides/lexical-models/advanced/word-breaker).
 
 You can specify the opening and closing quotation marks, and whether the language is using a right-to-left script (such as Arabic, Hebrew, Syriac, etc.)
 
 If your language uses a script with uppercase and lowercase (such as Latin, Cyrillic, Greek, etc.) you probably will want to enable the `Language uses casing` checkbox, so that Keyman will take casing into account when matching and suggesting words. For example, if you start typing `Rab`, Keyman will propose `Rabbit` rather than `rabbit`.
 
-The Keyman site has more details on [advanced topics](../../../guides/lexical-models/advanced/word-breaker).
+The Keyman site has more details on [advanced topics](../../guides/lexical-models/advanced/word-breaker).
 
 ## Editing Wordlists
 
@@ -169,7 +169,7 @@ Keyman provides a default `wordlist.tsv` file for you as an example. You can rep
 For a newly created project, the only wordlist present is `wordlist.tsv`.
 If you open that file, you'll see some sample data included as an illustration.
 
-For advanced information on Keyman wordlist file formats and exporting your own wordlist files, read the [TSV file documentation](../../../reference/file-types/tsv).
+For advanced information on Keyman wordlist file formats and exporting your own wordlist files, read the [TSV file documentation](../../reference/file-types/tsv).
 
 ### Ignored lines
 
@@ -242,7 +242,7 @@ You can submit your lexical model to the Keyman lexical models repository in a m
 This makes the lexical model available to anyone with Internet access.
 See [Guide for Lexical Model Submissions](/developer/lexical-models/submission/).
 
-The [Distribute lexical modes to Keyman Applications](../../lexical-models/distribute/packages) page details other distribution possibilities.
+The [Distribute lexical modes to Keyman Applications](../lexical-models/distribute/packages) page details other distribution possibilities.
 
 In addition, it is possible to use [Keyboard App Builder](https://software.sil.org/keyboardappbuilder/), which will allow you to build an app that includes Keyman, a specific keyboard and a specific lexical model.
 You can then distribute this app to users directly or through the platform's source of apps.

@@ -4,7 +4,7 @@ title: Installing a Keyman Lexical Model
 
 <link href='walkthrough.css' rel='stylesheet'>
 <div class="walkthrough-navigation" markdown="1">
-Part 11 of the [Keyman Developer Walkthrough](../walkthrough).
+Part 11 of the [Keyman Developer Walkthrough](.).
 
 [← Part 10 - Generating a Lexical Model](10-generating-lexical-model)
 </div>
