@@ -24,6 +24,12 @@ import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
+/**
+ * Builds a fixture for use in unit-testing against diverging and re-converging
+ * routes through the modeled correction-search graph and its SearchQuotientNode
+ * representation.
+ * @returns
+ */
 export const buildAlphabeticClusterFixtures = () => {
   const rootPath = new LegacyQuotientRoot(testModel);
 
