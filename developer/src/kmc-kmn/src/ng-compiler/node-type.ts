@@ -97,6 +97,7 @@ export enum NodeType {
   RESET                 = "RESET",               // https://help.keyman.com/developer/language/reference/reset
   RETURN                = "RETURN",              // https://help.keyman.com/developer/language/reference/return
   RHS                   = "RHS",                 // https://help.keyman.com/developer/language/guide/rules
+  ROOT                  = "ROOT",
   SAVE                  = "SAVE",                // https://help.keyman.com/developer/language/reference/save
   SET                   = "SET",                 // https://help.keyman.com/developer/language/reference/set
   SHIFT                 = "SHIFT",               // https://help.keyman.com/developer/language/reference/_keywordsbytype
