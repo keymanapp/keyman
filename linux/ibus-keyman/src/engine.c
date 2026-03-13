@@ -246,6 +246,12 @@ debug_utf8_with_codepoints(const gchar *utf8) {
 
 static gboolean
 client_supports_surrounding_text(IBusEngine *engine) {
+  // This is not always reliable: IBus detects whether the client supports
+  // surrounding text by emitting the retrieve-surrounding signal. As part
+  // of that signal handler, the client is expected to call
+  // gtk_im_context_set_surrounding_with_selection which ends calling
+  // set_context_if_needed at a time when IBus is still in the middle of
+  // determining whether the client supports surrounding text.
   g_assert(engine != NULL);
   return (engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0;
 }
