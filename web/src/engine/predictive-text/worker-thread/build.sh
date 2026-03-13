@@ -19,9 +19,7 @@ WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
 INTERMEDIATE=./build/intermediate
 LIB=./build/lib
 
-bundle_cmd="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
-
-SRCMAP_CLEANER="node $KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js"
+SRCMAP_CLEANER="${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js"
 
 ################################ Main script ################################
 
@@ -62,26 +60,26 @@ function do_build() {
 
 
   # The ES6 target needs no polyfills - we go straight to the wrapped version.
-  $bundle_cmd src/main/worker-main.ts \
-    --out $INTERMEDIATE/worker-main.js \
+  node "$LIB_BUNDLER"    src/main/worker-main.ts \
+    --out                $INTERMEDIATE/worker-main.js \
     --charset "utf8" \
     --target "es6" \
     --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
-  $SRCMAP_CLEANER \
+  node "$SRCMAP_CLEANER" \
     $INTERMEDIATE/worker-main.js.map \
     $INTERMEDIATE/worker-main.js.map \
     --clean
 
-  $bundle_cmd src/main/worker-main.ts \
-    --out $INTERMEDIATE/worker-main.min.js \
+  node "$LIB_BUNDLER"     src/main/worker-main.ts \
+    --out                 $INTERMEDIATE/worker-main.min.js \
     --minify \
     --charset "utf8" \
     --profile build/filesize-profile.log \
     --target "es6" \
     --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
-  $SRCMAP_CLEANER \
+  node "$SRCMAP_CLEANER" \
     $INTERMEDIATE/worker-main.min.js.map \
     $INTERMEDIATE/worker-main.min.js.map \
     --clean

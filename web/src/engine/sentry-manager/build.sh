@@ -39,9 +39,9 @@ fi
 if builder_start_action build; then
   tsc --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/index.js" \
-    --sourceRoot "@keymanapp/keyman/web/src/engine/sentry-manager/build/lib/"
+  node "${LIB_BUNDLER}"    "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/obj/index.js" \
+    --out                  "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/index.js" \
+    --sourceRoot           "@keymanapp/keyman/web/src/engine/sentry-manager/build/lib/"
 
   builder_finish_action success build
 fi
