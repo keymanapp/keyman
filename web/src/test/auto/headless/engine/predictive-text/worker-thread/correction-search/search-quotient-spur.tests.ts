@@ -18,6 +18,7 @@ import {
   LegacyQuotientSpur,
   models,
   PathInputProperties,
+  SearchNode,
   SearchQuotientNode,
   SearchQuotientRoot,
   SearchQuotientSpur
@@ -62,7 +63,45 @@ function toMathematicalSMP(text: string) {
   return asSMP.join('');
 }
 
+class MockQuotientSpur extends SearchQuotientSpur {
+  insertLength: number;
+  leftDeleteLength: number;
+
+  readonly _receivedNodes: SearchNode[] = [];
+
+  public get receivedNodes(): SearchNode[] {
+    // This triggers .buildEdgesForNodes() for any new results from the parent.
+    //
+    // .handleNextNode() and .currentCost also trigger this, but this mock
+    // implementation bypasses both.
+    this.processPendingRoots();
+    return this._receivedNodes;
+  }
+
+  constructor(parentNode: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: PathInputProperties) {
+    super(parentNode, inputs, inputSource, 0);
+  }
+
+  construct(parentNode: SearchQuotientNode, inputs: Distribution<Transform>, inputSource: PathInputProperties): this {
+    return new MockQuotientSpur(parentNode, inputs, inputSource) as this;
+  }
+
+  protected buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>): SearchNode[] {
+    baseNodes.forEach((n) => this._receivedNodes.push(n));
+    return [];
+  }
+}
+
 describe('SearchQuotientSpur', () => {
+  it('constructor links to parent node and receives queued results from it', () => {
+    const baseNode = new SearchQuotientRoot(testModel);
+    const descendantSpur = new MockQuotientSpur(baseNode, /* ? */ null, /* ? */ null);
+
+    assert.isEmpty(descendantSpur.receivedNodes);
+    baseNode.handleNextNode();
+    assert.isNotEmpty(descendantSpur.receivedNodes);
+  });
+
   describe('split()', () => {
     describe(`on token comprised of single-char transforms:  [crt][ae][nr][t]`, () => {
       const runSplit = (splitIndex: number) => {

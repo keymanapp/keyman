@@ -11,7 +11,7 @@
 import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchNode } from './distance-modeler.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
@@ -22,18 +22,19 @@ const PATH_QUEUE_COMPARATOR: QueueComparator<SearchQuotientNode> = (a, b) => {
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
-export class SearchQuotientCluster implements SearchQuotientNode {
+export class SearchQuotientCluster extends SearchQuotientNode {
   private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
   readonly spaceId: number;
 
-  // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
-  // is cheaper than iteratively building a priority queue.
+  // We use an array and not a PriorityQueue b/c batch-heapifying at a single
+  // point in time is cheaper than iteratively building a priority queue.
   /**
-   * This tracks all paths that have reached the end of a viable input-matching path - even
-   * those of lower cost that produce the same correction as other paths.
+   * This tracks all paths that have reached the end of a viable input-matching
+   * path - even those of lower cost that produce the same correction as other
+   * paths.
    *
-   * When new input is received, its entries are then used to append edges to the path in order
-   * to find potential paths to reach a new viable end.
+   * When new input is received, its entries are then used to append edges to
+   * the path in order to find potential paths to reach a new viable end.
    */
   private completedPaths?: SearchNode[] = [];
 
@@ -59,6 +60,8 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * @param inboundPaths
    */
   constructor(inboundPaths: SearchQuotientNode[]) {
+    super();
+
     if(inboundPaths.length == 0) {
       throw new Error("SearchQuotientCluster requires an array with at least one SearchQuotientNode");
     }
@@ -141,17 +144,15 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     const bestPath = this.selectionQueue.dequeue();
     const currentResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
+    this.selectionQueue = new PriorityQueue(PATH_QUEUE_COMPARATOR, this.selectionQueue.toArray());
 
     if(currentResult.type == 'complete') {
+      this.saveResult(currentResult.finalNode);
       this.completedPaths?.push(currentResult.finalNode);
       currentResult.spaceId = this.spaceId;
     }
 
     return currentResult;
-  }
-
-  public get previousResults(): SearchResult[] {
-    return this.completedPaths?.map((n => new SearchResult(n, this.spaceId))) ?? [];
   }
 
   get model(): LexicalModelTypes.LexicalModel {
