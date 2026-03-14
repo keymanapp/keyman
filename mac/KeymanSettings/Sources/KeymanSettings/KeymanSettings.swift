@@ -24,6 +24,9 @@ public class KeymanSettings : ObservableObject {
     
     // load keyboards from disk
     if (self.dataRepository.keyman19SharedDataDirectoryExists()) {
+      // TODO: remove test code
+      self.dataRepository.writeSomethingToContainer()
+
       let packageSourceArray = self.dataRepository.readKeymanPackagesForKeyman19()
       
       // create a KeymanPackage object for each PackageSource object and insert it in the array

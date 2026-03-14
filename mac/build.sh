@@ -181,18 +181,68 @@ do_build_app ( ) {
 
   builder_heading "Building Keyman.app"
 
-  execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+# no provisioning with codesigning suppressed
+#execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+# without codesigning suppression, provisioning profile is included but no application ID??
+execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+
+check_code_sign_status
 }
 
 do_update_app_metadata ( ) {
   updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
+
+  # re-sign the app after updating the plist file
+  alternate_sign_app
+}
+
+check_code_sign_status() {
+  KEYMAN_APP_PATH="$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
+
+  echo "Listing entitlements for $KEYMAN_APP_PATH using codesign:"
+  codesign -d --entitlements - --xml "$KEYMAN_APP_PATH" | plutil -convert xml1 -o - -
+
+  #codesign -dvvv --entitlements - --xml "$KEYMAN_APP_PATH"
+
+  # Check the exit status of the command
+  if [ $? -eq 0 ]; then
+      echo "codesign command executed successfully."
+  else
+      echo "codesign command failed."
+  fi
+}
+
+# preserve the metadata included in the Keyman.app bundle, but use the runtime option to ensure hardened runtime is enabled for notarization
+alternate_sign_app () {
+  builder_echo "alternate signing method..."
+  if builder_is_debug_build; then
+    ENTITLEMENTS_FILE=Keyman.Debug.entitlements
+  else
+    ENTITLEMENTS_FILE=Keyman.entitlements
+
+    # re-sign the app after updating the plist file
+    builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
+
+    builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
+
+    builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --options runtime \
+      --preserve-metadata=identifier,entitlements \
+      --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
+      "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
+
+  check_code_sign_status
+  fi
+}
+
+sign_app () {
+  builder_echo info "original signing method..."
 
   if builder_is_debug_build; then
     ENTITLEMENTS_FILE=Keyman.Debug.entitlements
   else
     ENTITLEMENTS_FILE=Keyman.entitlements
 
-    # We need to re-sign the app after updating the plist file
+    # re-sign the app after updating the plist file
     builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
 
     builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
@@ -233,11 +283,18 @@ do_notarize() {
 
     # Note: get-task-allow entitlement must be *off* in our release build (to do this, don't include base entitlements in project build settings)
 
+    #builder_echo info "checking Keyman code sign status in notarize prior to re-signing $TARGET_APP_PATH..."
+    #check_code_sign_status
+
+    # commenting out this re-signing step for now, as it is stripping entitlements
     # We may need to re-run the code signing if a custom certificate has been passed in
-    if [ ! -z "${CERTIFICATE_ID+x}" ]; then
-      builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
-      builder_if_release_build_level mac_codesign direct --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
-    fi
+    #if [ ! -z "${CERTIFICATE_ID+x}" ]; then
+    #  builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
+    #  builder_if_release_build_level mac_codesign direct --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
+    #fi
+
+    #builder_echo info "checking Keyman code sign status in notarize after re-signing $TARGET_APP_PATH..."
+    #check_code_sign_status
 
     builder_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"
 

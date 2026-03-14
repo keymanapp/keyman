@@ -45,7 +45,7 @@ public class PackageRepository {
   }
   
   public func writeSomethingToContainer() {
-    if let keyboardDirectory = self.pathUtil.keyman18KeyboardsDirectory {
+    if let keyboardDirectory = self.pathUtil.keyman19KeyboardsDirectory {
       print("About to write to: \(keyboardDirectory.path)")
       
       do {

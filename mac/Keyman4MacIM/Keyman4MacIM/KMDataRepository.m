@@ -117,8 +117,10 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
   if (_keyman19ContainerDirectory == nil) {
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
+    os_log_info([KMLogs dataLog], "about to fetch containerUrl");
     NSURL *containerUrl = [fileManager containerURLForSecurityApplicationGroupIdentifier: kKeymanGroupId];
-    
+    os_log_info([KMLogs dataLog], "containerUrl: '%{public}@'", containerUrl.path);
+
     _keyman19ContainerDirectory = containerUrl;
   }
   return _keyman19ContainerDirectory;
@@ -143,7 +145,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
   if (!exists) {
     NSError *createError = nil;
     os_log_info([KMLogs dataLog], "createKeyman19SharedDirectoriesIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keyman19KeyboardsDirectory.path);
-    [fileManager createDirectoryAtPath:self.keyman19KeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
+    [fileManager createDirectoryAtPath:self.keyman19KeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
     if (createError) {
       os_log_error([KMLogs dataLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
     } else {
@@ -151,6 +153,14 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
     }
   } else {
     os_log_info([KMLogs dataLog], "Keyman data directory already exists: '%{public}@'", self.keyman19KeyboardsDirectory.path);
+    NSString *contentString = @"Not a .kmp file";
+    NSString *filePath = [self.keyman19KeyboardsDirectory.path stringByAppendingPathComponent:@"readable.txt"];
+    NSData *data = [contentString dataUsingEncoding:NSUTF8StringEncoding];
+    if ([fileManager createFileAtPath: filePath contents:data attributes:nil]) {
+      os_log_info([KMLogs dataLog], "created file at: %{public}@", filePath);
+    } else {
+      os_log_info([KMLogs dataLog], "failed to create file at: %{public}@", filePath);
+    }
   }
 }
 
@@ -165,7 +175,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
   if (!exists) {
     NSError *createError = nil;
     os_log_info([KMLogs dataLog], "createDataDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanDataDirectory.path);
-    [fileManager createDirectoryAtPath:self.keymanDataDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
+    [fileManager createDirectoryAtPath:self.keymanDataDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
     if (createError) {
       os_log_error([KMLogs dataLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
     } else {
@@ -188,7 +198,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
   if (!exists) {
     NSError *createError = nil;
     os_log_info([KMLogs dataLog], "createKeyboardsDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanKeyboardsDirectory.path);
-    [fileManager createDirectoryAtPath:self.keymanKeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
+    [fileManager createDirectoryAtPath:self.keymanKeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
     if (createError) {
       os_log_error([KMLogs dataLog], "error creating Keyman-Keyboards directory: '%{public}@'", createError.localizedDescription);
     } else {
