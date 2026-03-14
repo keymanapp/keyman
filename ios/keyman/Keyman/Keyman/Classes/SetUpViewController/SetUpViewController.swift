@@ -49,7 +49,7 @@ class SetUpViewController: UIViewController, WKNavigationDelegate {
   func reloadKeymanHelp() {
     if let networkStatus = networkReachable?.connection {
       switch networkStatus {
-      case Reachability.Connection.none, Reachability.Connection.unavailable:
+      case Reachability.Connection.unavailable:
         loadFromLocal()
       default:
         loadFromServer()
