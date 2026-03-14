@@ -19,13 +19,15 @@
 
 @implementation KMDataRepository
 /**
- * Two directory trees are represented by the following properties, one in active use
- * and one that is obsolete.
- * The actively used directories, begin with the parent
+ * Three directory trees are represented by the following properties, one in active use
+ * and two that are obsolete.
+ * The actively used directories, introduced in Keyman 19, are shared via the app group `group.com.keyman`:
+ *  'Group Containers/group.com.keyman/Library/Application Support/Keyman-Keyboards/
+ * The obsolete directories from Keyman 18 are:
  *    applicationSupportSubDirectory: '~/Library/Application Support'
  *      keymanDataDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'
  *        keymanKeyboardsDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
- * The obsolete directories, begin with the parent
+ * The obsolete directories from Keyman 17 and earlier are:
  *    documentsSubDirectory: '~/Documents'
  *      obsoleteKeymanKeyboardsDirectory: '~/Documents/Keyman-Keyboards'
  */
@@ -35,6 +37,9 @@
 @synthesize documentsSubDirectory = _documentsSubDirectory;
 @synthesize obsoleteKeymanKeyboardsDirectory = _obsoleteKeymanKeyboardsDirectory;
 
+@synthesize keyman19ContainerDirectory = _keyman19ContainerDirectory;
+@synthesize keyman19KeyboardsDirectory = _keyman19KeyboardsDirectory;
+
 NSString *const kKeyboardsDirectoryName = @"Keyman-Keyboards";
 /**
  * The name of the subdirectory within '~/Library/Application Support'.
@@ -43,6 +48,11 @@ NSString *const kKeyboardsDirectoryName = @"Keyman-Keyboards";
  * createDirectoryAtPath sees the .app extension and creates an application file.)
  */
 NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
+
+//NSString *const kKeymanGroupId = @"3YE4W86L3G.com.keyman";
+NSString *const kKeymanGroupId = @"group.com.keyman";
+
+NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/Keyman-Keyboards";
 
 + (KMDataRepository *)shared {
   static KMDataRepository *shared = nil;
@@ -103,8 +113,59 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   return _keymanKeyboardsDirectory;
 }
 
+- (NSURL *)keyman19ContainerDirectory {
+  if (_keyman19ContainerDirectory == nil) {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    os_log_info([KMLogs dataLog], "about to fetch containerUrl");
+    NSURL *containerUrl = [fileManager containerURLForSecurityApplicationGroupIdentifier: kKeymanGroupId];
+    os_log_info([KMLogs dataLog], "containerUrl: '%{public}@'", containerUrl.path);
+
+    _keyman19ContainerDirectory = containerUrl;
+  }
+  return _keyman19ContainerDirectory;
+}
+
+- (NSURL *)keyman19KeyboardsDirectory {
+  if (_keymanKeyboardsDirectory == nil) {
+    NSURL *keyboardsUrl = [self.keyman19ContainerDirectory URLByAppendingPathComponent:kContainerKeyboardsPartialPath  isDirectory: TRUE];
+    _keyman19KeyboardsDirectory = keyboardsUrl;
+  }
+  return _keyman19KeyboardsDirectory;
+}
+
 /**
- * Creates Keyman data directory if it do not exist yet. This is the main data subdirectory: keyman.inputmethod.Keyman
+ * Creates Keyman 19 data directory if it does not exist yet. This is under 'Group Containers'.
+ */
+- (void)createKeyman19SharedDirectoriesIfNecessary {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  BOOL isDir;
+  BOOL exists = [fileManager fileExistsAtPath:self.keyman19KeyboardsDirectory.path isDirectory:&isDir];
+
+  if (!exists) {
+    NSError *createError = nil;
+    os_log_info([KMLogs dataLog], "createKeyman19SharedDirectoriesIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keyman19KeyboardsDirectory.path);
+    [fileManager createDirectoryAtPath:self.keyman19KeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
+    if (createError) {
+      os_log_error([KMLogs dataLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
+    } else {
+      os_log_info([KMLogs dataLog], "created Keyman data directory: '%{public}@'", self.keyman19KeyboardsDirectory.path);
+    }
+  } else {
+    os_log_info([KMLogs dataLog], "Keyman data directory already exists: '%{public}@'", self.keyman19KeyboardsDirectory.path);
+    NSString *contentString = @"Not a .kmp file";
+    NSString *filePath = [self.keyman19KeyboardsDirectory.path stringByAppendingPathComponent:@"readable.txt"];
+    NSData *data = [contentString dataUsingEncoding:NSUTF8StringEncoding];
+    if ([fileManager createFileAtPath: filePath contents:data attributes:nil]) {
+      os_log_info([KMLogs dataLog], "created file at: %{public}@", filePath);
+    } else {
+      os_log_info([KMLogs dataLog], "failed to create file at: %{public}@", filePath);
+    }
+  }
+}
+
+/**
+ * Creates Keyman data directory if it does not exist yet. This is the main data subdirectory: keyman.inputmethod.Keyman
  */
 - (void)createDataDirectoryIfNecessary {
   NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -114,7 +175,7 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   if (!exists) {
     NSError *createError = nil;
     os_log_info([KMLogs dataLog], "createDataDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanDataDirectory.path);
-    [fileManager createDirectoryAtPath:self.keymanDataDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
+    [fileManager createDirectoryAtPath:self.keymanDataDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
     if (createError) {
       os_log_error([KMLogs dataLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
     } else {
@@ -137,7 +198,7 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   if (!exists) {
     NSError *createError = nil;
     os_log_info([KMLogs dataLog], "createKeyboardsDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanKeyboardsDirectory.path);
-    [fileManager createDirectoryAtPath:self.keymanKeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
+    [fileManager createDirectoryAtPath:self.keymanKeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
     if (createError) {
       os_log_error([KMLogs dataLog], "error creating Keyman-Keyboards directory: '%{public}@'", createError.localizedDescription);
     } else {

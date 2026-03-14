@@ -754,7 +754,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * namely, the keyboard data on disk and the settings in UserDefaults
  */
 - (void)prepareStorage {
-  [KMDataRepository.shared createDataDirectoryIfNecessary];
+  os_log_debug([KMLogs dataLog], "*** prepareStorage ***");
+
+  [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
+// [KMDataRepository.shared createDataDirectoryIfNecessary];
+
+  // TODO: MAC_CONFIG expand data migration for Keyman 19
   
   if ([KMSettingsRepository.shared dataMigrationNeeded]) {
     [KMDataRepository.shared migrateData];

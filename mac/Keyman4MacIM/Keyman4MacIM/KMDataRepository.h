@@ -16,9 +16,13 @@ NS_ASSUME_NONNULL_BEGIN
 // keymanKeyboardsDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
 @property (readonly) NSURL *keymanKeyboardsDirectory;
 
+@property (readonly) NSURL *keyman19ContainerDirectory;
+@property (readonly) NSURL *keyman19KeyboardsDirectory;
+
 + (KMDataRepository *)shared;
 - (void)createDataDirectoryIfNecessary;
 - (void)createKeyboardsDirectoryIfNecessary;
+- (void)createKeyman19SharedDirectoriesIfNecessary;
 - (BOOL)migrateData;
 - (NSString*)buildFullPath:(NSString *)fromPartialPath;
 - (NSString*)trimToPartialPath:(NSString *)fromFullPath;
