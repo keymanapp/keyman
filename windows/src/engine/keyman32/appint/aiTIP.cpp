@@ -138,7 +138,12 @@ BOOL TIPProcessKeyInternal(
     SendDebugMessageFormat("Scan code was zero so using cached scan code %x", scan);
   }
 
-  if(scan == SCAN_FLAG_KEYMAN_KEY_EVENT) {   // I4370
+
+  // We need to check the last key is the wparam or VK_PROCESSKEY (as that is what keyup comes for synthesised keys on the KeyUP).
+  // Just the lastscan code is not sufficent becasue we have the case where Shift press appears
+  // here before the low level keyboard hook.
+  if (((_td->LastKey == wParam || _td->LastKey == VK_PROCESSKEY) && _td->LastScanCode == SCAN_FLAG_KEYMAN_KEY_EVENT)
+    || scan == SCAN_FLAG_KEYMAN_KEY_EVENT) {
     if (wParam == VK_CAPITAL && !isUp) {
       // Must also record toggle state change when Keyman has generated
       // a Caps Lock event
