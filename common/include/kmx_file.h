@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <km_types.h>
+#include "km_types.h"
 
 #ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
@@ -52,8 +52,10 @@ namespace kmx {
 #define VERSION_160 0x00001000
 #define VERSION_170 0x00001100
 
+#define VERSION_190 0x00001300
+
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_170
+#define VERSION_MAX VERSION_190
 
 //
 // Backspace types
@@ -61,6 +63,9 @@ namespace kmx {
 
 #define BK_DEFAULT    0
 #define BK_DEADKEY    1
+
+// Next character to delete is a Unicode surrogate pair
+#define BK_SURROGATE  4
 
 // Different begin types
 #define BEGIN_ANSI    0
@@ -267,14 +272,24 @@ namespace kmx {
 #define C_CODE_IFSYSTEMSTORE(store, val1, val2) U_UC_SENTINEL U_CODE_IFSYSTEMSTORE store val1 val2
 #define C_CODE_SETSYSTEMSTORE(store, val) U_UC_SENTINEL U_CODE_SETSYSTEMSTORE store val
 
+//
+// COMP_KEYBOARD.dwFlags bitfield
+//
+
 #define KF_SHIFTFREESCAPS 0x0001
 #define KF_CAPSONONLY   0x0002
 #define KF_CAPSALWAYSOFF  0x0004
 #define KF_LOGICALLAYOUT  0x0008
 #define KF_AUTOMATICVERSION 0x0010
 
-// 16.0: Support for LDML Keyboards in KMXPlus file format
-#define KF_KMXPLUS  0x0020
+/** 16.0+: A `COMP_KEYBOARD_KMXPLUSINFO` structure is present immediately after `COMP_KEYBOARD` */
+#define KF_KMXPLUS          0x0020
+
+/**
+ * 19.0+: The `COMP_KEYBOARD_KMXPLUSINFO` structure contains a v19 embedded OSK;
+ * may be used with or without KF_KMXPLUS.
+ */
+#define KF_KMXPLUSOSK       0x0040
 
 #define HK_ALT      0x00010000
 #define HK_CTRL     0x00020000
@@ -362,17 +377,17 @@ struct COMP_KEYBOARD_KMXPLUSINFO {
 };
 
 /**
- * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
+ * Only valid if comp_keyboard.dwFlags&(KF_KMXPLUS|KF_KMXPLUSOSK)
  */
 struct COMP_KEYBOARD_EX {
-  COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
-  COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
+  struct COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
+  struct COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
 };
 
-typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
-typedef COMP_STORE *PCOMP_STORE;
-typedef COMP_KEY *PCOMP_KEY;
-typedef COMP_GROUP *PCOMP_GROUP;
+typedef struct COMP_KEYBOARD *PCOMP_KEYBOARD;
+typedef struct COMP_STORE *PCOMP_STORE;
+typedef struct COMP_KEY *PCOMP_KEY;
+typedef struct COMP_GROUP *PCOMP_GROUP;
 
 extern const int CODE__SIZE[];
 #define CODE__SIZE_MAX 5
@@ -382,10 +397,10 @@ extern const int CODE__SIZE[];
 #define KEYBOARDFILEGROUP_SIZE  24
 #define KEYBOARDFILEKEY_SIZE    20
 
-static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
-static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
-static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
-static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
+static_assert(sizeof(struct COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
+static_assert(sizeof(struct COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
+static_assert(sizeof(struct COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
+static_assert(sizeof(struct COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
 #ifdef KM_CORE_LIBRARY
 } // namespace kmx
