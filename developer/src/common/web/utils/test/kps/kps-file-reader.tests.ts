@@ -4,7 +4,7 @@
  * Created by mcdurdin on 2024-10-16
  */
 
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import 'mocha';
 import {assert} from 'chai';
 
@@ -17,23 +17,13 @@ import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
 import { SymbolUtils } from '../../src/symbol-utils.js';
 import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 
-const callbacks = new TestCompilerCallbacks();
 
 describe('kps-file-reader', function () {
 
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
-
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('kps-file-reader should read a valid file', function() {
-    const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
+    const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps')) as Uint8Array;
     const reader = new KpsFileReader(callbacks);
     const kps = reader.read(input);
 
@@ -70,7 +60,7 @@ describe('kps-file-reader', function () {
   });
 
   it('kps-file-reader should round-trip with kps-file-writer', function() {
-    const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
+    const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps')) as Uint8Array;
     const reader = new KpsFileReader(callbacks);
     // Remove XML metadata symbols to reduce clutter for testing purposes
     const kps = SymbolUtils.removeSymbols(reader.read(input));
@@ -87,13 +77,24 @@ describe('kps-file-reader', function () {
   // ERROR_InvalidPackageFile
 
   it('should generate ERROR_InvalidPackageFile if package source file contains invalid XML', async function() {
-    const input = fs.readFileSync(makePathToFixture('kps', 'error_invalid_package_file.kps'));
+    const input = fs.readFileSync(makePathToFixture('kps', 'error_invalid_package_file.kps')) as Uint8Array;
     const reader = new KpsFileReader(callbacks);
     const kps = reader.read(input);
 
     assert.isNull(kps);
     assert.lengthOf(callbacks.messages, 1);
     assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_InvalidPackageFile));
+  });
+
+  // ERROR_NotAPackageFile
+
+  it(`should generate ERROR_NotAPackageFile when the package source file is valid XML but does not have a <Package> root element`, function () {
+    const input = fs.readFileSync(makePathToFixture('kps', 'error_not_a_package_file.kps')) as Uint8Array;
+    const reader = new KpsFileReader(callbacks);
+    const kps = reader.read(input);
+
+    assert.isNull(kps);
+    assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_NotAPackageFile));
   });
 
   // ERROR_UnsupportedPackageFileVersion

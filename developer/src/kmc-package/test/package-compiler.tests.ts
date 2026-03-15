@@ -23,22 +23,12 @@ describe('KmpCompiler', function () {
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
-  const callbacks = new TestCompilerCallbacks(makePathToFixture('online'));
+  const callbacks = new TestCompilerCallbacks(this, makePathToFixture('online'));
   let kmpCompiler: KmpCompiler = null;
 
   this.beforeAll(async function() {
     kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
-  });
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
   });
 
   for (const modelID of MODELS) {
@@ -292,7 +282,7 @@ describe('KmpCompiler', function () {
     assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJsonData));
   });
 
-  it(`should reject an package that contains itself`, async function () {
+  it(`should reject a package that contains itself`, async function () {
     const inputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kps');
     const outputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kmp');
     const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);

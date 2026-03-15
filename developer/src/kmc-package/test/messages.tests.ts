@@ -10,15 +10,9 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/developer-utils';
 
-const callbacks = new TestCompilerCallbacks(makePathToFixture('online'));
-
 describe('PackageCompilerMessages', function () {
 
-  this.afterEach(function() {
-    if(this.currentTest.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
+  const callbacks = new TestCompilerCallbacks(this, makePathToFixture('online'));
 
   it('should have a valid PackageCompilerMessages object', function() {
     return verifyCompilerMessagesObject(PackageCompilerMessages, CompilerErrorNamespace.PackageCompiler);

@@ -10,6 +10,7 @@ import { makePathToFixture } from './helpers/index.js';
 // test results documented below.
 
 describe('package versioning', function () {
+  const callbacks = new TestCompilerCallbacks(this);
 
   const cases: [string,string][] = [
     ['test-single-version-1-package', 'test1.kps'],
@@ -32,7 +33,6 @@ describe('package versioning', function () {
 
   for(const [ caseTitle, filename ] of cases) {
     it(caseTitle, async function () {
-      const callbacks = new TestCompilerCallbacks();
       const kmpCompiler = new KmpCompiler();
       assert.isTrue(await kmpCompiler.init(callbacks, null));
 

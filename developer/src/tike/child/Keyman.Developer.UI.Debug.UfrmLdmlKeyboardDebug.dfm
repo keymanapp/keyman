@@ -37,8 +37,10 @@ inherited frmLdmlKeyboardDebug: TfrmLdmlKeyboardDebug
     TabOrder = 0
     OnChange = memoChange
     OnClick = memoClick
+    OnDblClick = memoDblClick
     OnEnter = memoGotFocus
     OnKeyUp = memoKeyUp
+    OnSelectionChange = memoSelMove
     OnMessage = memoMessage
     IsDebugging = False
   end

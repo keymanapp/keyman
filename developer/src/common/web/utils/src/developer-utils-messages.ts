@@ -80,7 +80,13 @@ export class DeveloperUtilsMessages {
     `Project file could not be read`
   );
 
-  static ERROR_UnsupportedPackageFileVersion = SevError | 0x000D;
+  static ERROR_NotAPackageFile = SevError | 0x000D;
+  static Error_NotAPackageFile = () => m(
+    this.ERROR_NotAPackageFile,
+    `Package source file is not a valid .kps file because it is missing the <Package> root element.`,
+  );
+
+  static ERROR_UnsupportedPackageFileVersion = SevError | 0x000E;
   static Error_UnsupportedPackageFileVersion = (o:{version:string}) => m(
     this.ERROR_UnsupportedPackageFileVersion,
     `Package source file is an unsupported version '${def(o.version)}'`,
