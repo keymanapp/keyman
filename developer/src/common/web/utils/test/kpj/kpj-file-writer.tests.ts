@@ -1,4 +1,7 @@
-import * as fs from 'fs';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import * as fs from 'node:fs';
 import 'mocha';
 import {assert} from 'chai';
 import { makePathToFixture } from '../helpers/index.js';
@@ -8,13 +11,13 @@ import { KPJFileWriter } from '../../src/types/kpj/kpj-file-writer.js';
 import { KeymanDeveloperProjectOptions } from '../../src/types/kpj/keyman-developer-project.js';
 import { SymbolUtils } from '../../src/symbol-utils.js';
 
-const callbacks = new TestCompilerCallbacks();
-
 describe('kpj-file-writer', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('kpj-file-writer should write a valid v1.0 file', async function() {
     const kpjPath = 'khmer_angkor.kpj';
     const path = makePathToFixture('kpj', kpjPath);
-    const input = fs.readFileSync(path);
+    const input = fs.readFileSync(path) as Uint8Array;
     const reader = new KPJFileReader(callbacks);
     const inputKpj = reader.read(input);
     reader.validate(inputKpj);
@@ -53,7 +56,7 @@ describe('kpj-file-writer', function () {
   it('kpj-file-writer should write a valid v2.0 file', async function() {
     const kpjPath = 'khmer_angkor.kpj';
     const path = makePathToFixture('kpj', kpjPath);
-    const input = fs.readFileSync(path);
+    const input = fs.readFileSync(path) as Uint8Array;
     const reader = new KPJFileReader(callbacks);
     const inputKpj = reader.read(input);
     reader.validate(inputKpj);
