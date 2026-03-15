@@ -27,11 +27,10 @@ global.keyman = MinimalKeymanGlobal;
 // Test the KeyboardProcessor interface.
 describe('LanguageProcessor', function() {
   let languageProcessor: LanguageProcessor;
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   beforeEach(function() {
     languageProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
-    callbacks.clear();
   });
 
   afterEach(function() {

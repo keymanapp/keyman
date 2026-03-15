@@ -9,6 +9,8 @@ import { makePathToFixture } from './helpers/index.js';
 import { WindowsPackageInstallerCompiler, WindowsPackageInstallerSources } from '../src/compiler/windows-package-installer-compiler.js';
 
 describe('WindowsPackageInstallerCompiler', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it(`should build an SFX archive`, async function () {
     this.timeout(10000); // this test can take a little while to run
 
@@ -22,7 +24,6 @@ describe('WindowsPackageInstallerCompiler', function () {
       appName: 'Testing',
     };
 
-    const callbacks = new TestCompilerCallbacks();
     const compiler = new WindowsPackageInstallerCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
 
@@ -44,7 +45,7 @@ describe('WindowsPackageInstallerCompiler', function () {
     const zipBuffer = sfxBuffer.slice(setupExeSize);
 
     // Verify setup.exe sfx loader
-    const setupExeFixture = fs.readFileSync(sources.setupExeFilename);
+    const setupExeFixture = fs.readFileSync(sources.setupExeFilename) as Uint8Array;
     assert.deepEqual(setupExe, setupExeFixture);
 
     // Load the zip from the buffer
@@ -68,7 +69,7 @@ khmer_angkor.kmp
     assert.equal(setupInf.trim(), setupInfFixture.trim());
 
     const verifyFile = async (filename: string) => {
-      const fixture = fs.readFileSync(filename);
+      const fixture = fs.readFileSync(filename) as Uint8Array;
       const file = await zipFile.file(path.basename(filename)).async('uint8array');
       assert.deepEqual(file, fixture, `File in zip '${filename}' did not match fixture`);
     };

@@ -7,7 +7,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KeymanFileTypes } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler', function () {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   this.timeout(5000);
 
