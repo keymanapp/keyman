@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.216 alpha 2026-03-16
+
+* docs: tweak walkthrough content (#15712)
+* chore(deps): bump tar from 7.5.10 to 7.5.11 in /developer/src/server/src/win32/trayicon/addon-src (#15723)
+* docs(linux): add documentation how input methods work in GTK (#15749)
+* docs(core): improve keyhandling doc (#15736)
+* maint(resources): try meson 1.10.1 (#15754)
+* maint(ios): clean carthage before builds (#15757)
+
 ## 19.0.215 alpha 2026-03-13
 
 * chore(linux): fix dependency of Debian test suite (#15735)
