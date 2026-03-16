@@ -78,8 +78,8 @@ processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboa
 }
 
 static void processCapsLock(const km_core_caps_state caps_state_change, BOOL isUp, BOOL Updateable, BOOL externalEvent) {
-  // Turn three state value into a boolean for whether caps lock should be on or off, we only want to process the key event if the
-  // state is changing
+  // Turn three state value into a boolean for whether caps lock should be on or off,
+  // we only want to process the key event if the state is changing.
   BOOL required_caps_state = (caps_state_change == KM_CORE_CAPS_ON);
   BOOL isCapsOn            = IsCapsLockOn();
   /// For Debuging
@@ -87,12 +87,13 @@ static void processCapsLock(const km_core_caps_state caps_state_change, BOOL isU
   SendDebugMessageFormat("ACTION CAPS STATE:%d FIsUp=%d Updateable=%d ExternalEvent=%d CapsState=%d", caps_state_change, isUp, Updateable,
       externalEvent, isCapsOn);
 
-  // We only want to process the Caps Lock key event once --
-  // it has to be updateble as TSF does not have updateable=0 events.
+  // We only want to process the Caps Lock key event once;
+  // it has to be when updateble=1 as TSF does not consistently
+  // have updateable=0 events.
   if (!Updateable){
     return;
   }
-  
+
   if (isCapsOn != required_caps_state) {
     SendDebugMessageFormat(
       "Simulate CAPS %s: FIsUp=%d CurrentCapsState=%d ExternalEvent=%d",
@@ -157,6 +158,6 @@ ProcessActionsExternalEvent() {
     return FALSE;
   }
   km_core_actions const* core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
-  processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, FALSE, TRUE);
+  processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, TRUE, TRUE);
   return TRUE;
 }

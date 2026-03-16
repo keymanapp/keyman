@@ -139,9 +139,10 @@ BOOL TIPProcessKeyInternal(
   }
 
 
-  // We need to check the last key is the wparam or VK_PROCESSKEY (as that is what keyup comes for synthesised keys on the KeyUP).
-  // Just the lastscan code is not sufficent becasue we have the case where Shift press appears
-  // here before the low level keyboard hook.
+  // We need to check if the last key is the same as `wparam` or `VK_PROCESSKEY`
+  // (VK_PROCESSKEY is what synthesised keys on the KeyUP have).
+  // Just the lastscan code is not sufficient because we have the case where
+  // Shift press is processed here before the low level keyboard hook.
   if (((_td->LastKey == wParam || _td->LastKey == VK_PROCESSKEY) && _td->LastScanCode == SCAN_FLAG_KEYMAN_KEY_EVENT)
     || scan == SCAN_FLAG_KEYMAN_KEY_EVENT) {
     if (wParam == VK_CAPITAL && !isUp) {
