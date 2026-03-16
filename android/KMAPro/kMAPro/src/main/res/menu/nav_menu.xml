@@ -8,7 +8,7 @@
 <!--            android:title="Home" />-->
 <!--    </group>-->
 
-    <item android:title="Installation"
+    <item android:title="Setup"
         >
         <menu>
             <item
@@ -34,7 +34,7 @@
     </item>
 
     <item
-        android:title="Customization">
+        android:title="Preferences">
         <menu>
 
             <item
