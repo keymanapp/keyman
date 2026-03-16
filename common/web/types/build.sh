@@ -82,4 +82,4 @@ function do_configure() {
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/schemas/ ./node_modules/ ./obj/
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
-builder_run_action test       typescript_run_eslint_mocha_tests 60
+builder_run_action test       typescript_run_eslint_mocha_tests

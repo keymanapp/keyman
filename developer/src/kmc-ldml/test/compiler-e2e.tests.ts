@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import 'mocha';
 import {assert} from 'chai';
 import { hextobinFromFile } from '@keymanapp/hextobin';
-import {compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture, scrubContextFromMessages} from './helpers/index.js';
+import {compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToCommonFixture, makePathToFixture, scrubContextFromMessages} from './helpers/index.js';
 import { compareXml } from './helpers/compareXml.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import { kmxToXml } from '../src/util/serialize.js';
@@ -37,8 +37,8 @@ describe('compiler-tests', function() {
       // Let's build basic.xml
       // It should match basic.kmx (built from basic.txt)
 
-      const inputFilename = makePathToFixture('basic.xml');
-      const binaryFilename = makePathToFixture(`basic-${vernum}.txt`);
+      const inputFilename = makePathToCommonFixture('keyboards', 'kmx-plus', 'basic.xml');
+      const binaryFilename = makePathToCommonFixture('keyboards', 'kmx-plus', `basic-${vernum}.txt`);
 
       // Compare output
       const expected = hextobinFromFile(binaryFilename, undefined, {silent:true});
@@ -55,8 +55,8 @@ describe('compiler-tests', function() {
       assert.isNotNull(kmx);
       assert.isNotNull(kmx.data);
       if(debug) {
-        fs.writeFileSync(makePathToFixture(`basic-${vernum}-actual.kmx`), kmx.data);
-        fs.writeFileSync(makePathToFixture(`basic-${vernum}-expected.kmx`), expected);
+        fs.writeFileSync(makePathToCommonFixture(`basic-${vernum}-actual.kmx`), kmx.data);
+        fs.writeFileSync(makePathToCommonFixture(`basic-${vernum}-expected.kmx`), expected);
       }
       assert.deepEqual<Uint8Array>(kmx.data, expected);
 
@@ -66,7 +66,7 @@ describe('compiler-tests', function() {
   });
 
   it('should not build a v19 file with incorrect section versions for sect, disp, and layr', async function() {
-      const inputFilename = makePathToFixture('basic.xml');
+      const inputFilename = makePathToCommonFixture('keyboards', 'kmx-plus', 'basic.xml');
       const kmxPlusBuilder = await runKmxPlusCompiler(inputFilename, KMX.KMX_Version.VERSION_190);
 
       assert.equal(kmxPlusBuilder.sect.sect?.header.ident, constants.sectionid_sec2);
@@ -87,7 +87,7 @@ describe('compiler-tests', function() {
   });
 
   it('should not build a v17 file with incorrect section versions', async function() {
-      const inputFilename = makePathToFixture('basic.xml');
+      const inputFilename = makePathToCommonFixture('keyboards', 'kmx-plus', 'basic.xml');
       const kmxPlusBuilder = await runKmxPlusCompiler(inputFilename, KMX.KMX_Version.VERSION_170);
 
       assert.equal(kmxPlusBuilder.sect.sect?.header.ident, constants.hex_section_id(constants.section.sect));
@@ -146,7 +146,7 @@ describe('compiler-tests', function() {
     this.timeout(4000);
     // Let's build basic.xml
     // It should match basic.kmx (built from basic.txt)
-    const inputFilename = makePathToFixture('basic.xml');
+    const inputFilename = makePathToCommonFixture('keyboards', 'kmx-plus', 'basic.xml');
 
     // Compile the keyboard
     const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});

@@ -10,6 +10,318 @@ import * as r from 'restructure';
 import KMXFile = KMX.KMXFile;
 import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
+/* interfaces that match the COMP_PLUS_* structs -- for type safety */
+
+export type IIDENT = number;
+export type ISTR_REF = number;
+export type ISTR_OR_CHAR32_OR_USET = number;
+
+export interface ICOMP_PLUS_SectionHeader {
+  ident: IIDENT;
+  size: number;
+  version?: number;
+};
+
+// 'sect'
+
+export interface ICOMP_PLUS_SECT_ITEM {
+  sect: number;
+  offset: number;
+};
+
+export interface ICOMP_PLUS_SECT {
+  header: ICOMP_PLUS_SectionHeader;
+  total: number;
+  count: number;
+  items: ICOMP_PLUS_SECT_ITEM[];
+};
+
+// 'bksp' - see 'tran'
+
+// 'disp'
+
+export interface ICOMP_PLUS_DISP_ITEM_v17 {
+  to: ISTR_REF;
+  id: ISTR_REF;
+  display: ISTR_REF;
+};
+
+export interface ICOMP_PLUS_DISP_v17 {
+  header: ICOMP_PLUS_SectionHeader;
+  count: number;
+  baseCharacter: ISTR_REF;
+  items: ICOMP_PLUS_DISP_ITEM_v17[];
+};
+
+export interface ICOMP_PLUS_DISP_ITEM_v19 {
+  toId: ISTR_REF;
+  display: ISTR_REF;
+  flags: number;
+};
+
+export interface ICOMP_PLUS_DISP_v19 {
+  header: ICOMP_PLUS_SectionHeader;
+  count: number;
+  baseCharacter: ISTR_REF;
+  items: ICOMP_PLUS_DISP_ITEM_v19[];
+};
+
+// 'elem'
+
+export interface ICOMP_PLUS_ELEM_ELEMENT {
+  element: ISTR_OR_CHAR32_OR_USET;
+  flags: number;
+};
+
+export interface ICOMP_PLUS_ELEM_STRING {
+  offset: number;
+  length: number;
+};
+
+export interface ICOMP_PLUS_ELEM {
+  header: ICOMP_PLUS_SectionHeader;
+  count: number;
+  strings: ICOMP_PLUS_ELEM_STRING[];
+  // + variable subtable: Element data (see KMXPlusBuilder.emitElements())
+};
+
+// 'keys'
+
+export type ISTR_OR_CHAR32 = number;
+export type ILIST_REF = number;
+
+export interface ICOMP_PLUS_KEYS_FLICK {
+  directions: ILIST_REF; // list
+  to: ISTR_OR_CHAR32; // str | codepoint
+};
+
+export interface ICOMP_PLUS_KEYS_FLICKS {
+  count: number;
+  flick: number;
+  id: ISTR_REF; // str
+};
+
+export interface ICOMP_PLUS_KEYS_KEY {
+  to: ISTR_OR_CHAR32; // str | codepoint
+  flags: number;
+  id: ISTR_REF; // str
+  switch: ISTR_REF; // str
+  width: number; // width*10  ( 1 = 0.1 keys)
+  longPress: ILIST_REF; // list index
+  longPressDefault: ISTR_REF; // str
+  multiTap: ILIST_REF; // list index
+  flicks: number; // index into flicks table
+};
+
+export interface ICOMP_PLUS_KEYS_KMAP {
+  vkey: number;
+  mod: number;
+  key: number; // index into 'keys' subtable
+};
+
+export interface ICOMP_PLUS_KEYS {
+  header: ICOMP_PLUS_SectionHeader;
+  keyCount: number;
+  flicksCount: number;
+  flickCount: number;
+  kmapCount: number;
+  keys: ICOMP_PLUS_KEYS_KEY[];
+  flicks: ICOMP_PLUS_KEYS_FLICKS[];
+  flick: ICOMP_PLUS_KEYS_FLICK[];
+  kmap: ICOMP_PLUS_KEYS_KMAP[];
+};
+
+export interface ICOMP_PLUS_LAYR_ENTRY {
+  id: ISTR_REF; // str
+  mod: number; // bitfield
+  row: number; // index into rows
+  count: number;
+};
+
+export interface ICOMP_PLUS_LAYR_KEY {
+  key: ISTR_REF; // str: key id
+};
+
+export interface ICOMP_PLUS_LAYR_FORM_v17 {
+  hardware: ISTR_REF; // str: hardware name
+  layer: number; // index into layers
+  count: number;
+  minDeviceWidth: number; // integer: millimeters
+};
+
+export interface ICOMP_PLUS_LAYR_FORM_v19 {
+  hardware: ISTR_REF;          // str: hardware name
+  layer: number;          // index into layers
+  count: number;
+  minDeviceWidth: number; // integer: millimeters
+  baseLayout: ISTR_REF;        // v19: str: identifier for base layout (reserved)
+  fontFaceName: ISTR_REF;      // v19: str: font face name
+  fontSizePct: number;    // v19: font size in % of default size
+  flags: number;          // v19: flags
+};
+
+export interface ICOMP_PLUS_LAYR_ROW {
+  key: number;
+  count: number;
+};
+
+export interface ICOMP_PLUS_LAYR_v17 {
+  header: ICOMP_PLUS_SectionHeader;
+  formCount: number;
+  layerCount: number;
+  rowCount: number;
+  keyCount: number;
+  forms: ICOMP_PLUS_LAYR_FORM_v17[];
+  layers: ICOMP_PLUS_LAYR_ENTRY[];
+  rows: ICOMP_PLUS_LAYR_ROW[];
+  keys: ICOMP_PLUS_LAYR_KEY[];
+};
+
+export interface ICOMP_PLUS_LAYR_v19 {
+  header: ICOMP_PLUS_SectionHeader;
+  formCount: number;
+  layerCount: number;
+  rowCount: number;
+  keyCount: number;
+  forms: ICOMP_PLUS_LAYR_FORM_v19[];
+  layers: ICOMP_PLUS_LAYR_ENTRY[];
+  rows: ICOMP_PLUS_LAYR_ROW[];
+  keys: ICOMP_PLUS_LAYR_KEY[];
+};
+
+// 'list'
+
+export interface ICOMP_PLUS_LIST_LIST {
+  index: number;
+  count: number;
+};
+
+export interface ICOMP_PLUS_LIST_INDEX {
+  str: ISTR_REF; // str
+};
+
+export interface ICOMP_PLUS_LIST {
+  header: ICOMP_PLUS_SectionHeader;
+  listCount: number;
+  indexCount: number;
+  lists: ICOMP_PLUS_LIST_LIST[];
+  indices: ICOMP_PLUS_LIST_INDEX[];
+};
+
+// 'loca'
+
+export type ICOMP_PLUS_LOCA_ITEM = ISTR_REF; //str
+
+export interface ICOMP_PLUS_LOCA {
+  header: ICOMP_PLUS_SectionHeader;
+  count: number;
+  items: ICOMP_PLUS_LOCA_ITEM[];
+};
+
+// 'meta'
+
+export interface ICOMP_PLUS_META {
+  header: ICOMP_PLUS_SectionHeader;
+  author: ISTR_REF; //str
+  conform: ISTR_REF; //str
+  layout: ISTR_REF; //str
+  name: ISTR_REF; //str
+  indicator: ISTR_REF; //str
+  version: ISTR_REF; //str
+  settings: number; //new r.Bitfield(number, ['normalizationDisabled'])
+};
+
+// 'strs'
+
+export interface ICOMP_PLUS_STRS_ITEM {
+  // While we use length which is number of utf-16 code units excluding null terminator,
+  // we always write a null terminator, so we can get restructure to do that for us here
+  offset: number; //? new r.Pointer(number, new r.String(null, 'utf16le')),
+  length: number;
+};
+
+export interface ICOMP_PLUS_STRS {
+  header: ICOMP_PLUS_SectionHeader;
+  count: number;
+  items: ICOMP_PLUS_STRS_ITEM[];
+  // + variable subtable: String data (see KMXPlusBuilder.emitStrings())
+};
+
+// 'tran'
+
+export interface ICOMP_PLUS_TRAN_GROUP {
+  type: number; //type of group
+  count: number; //number of items
+  index: number; //index into subtable
+};
+
+export type IELEM_REF = number;
+
+export interface ICOMP_PLUS_TRAN_TRANSFORM {
+  from: ISTR_REF; //str
+  to: ISTR_REF; //str
+  mapFrom: IELEM_REF; //elem
+  mapTo: IELEM_REF; //elem
+};
+
+export interface ICOMP_PLUS_TRAN_REORDER {
+  elements: IELEM_REF; //elem
+  before: IELEM_REF; //elem
+};
+
+export interface ICOMP_PLUS_TRAN {
+  header: ICOMP_PLUS_SectionHeader;
+  groupCount: number;
+  transformCount: number;
+  reorderCount: number;
+  groups: ICOMP_PLUS_TRAN_GROUP[];
+  transforms: ICOMP_PLUS_TRAN_TRANSFORM[];
+  reorders: ICOMP_PLUS_TRAN_REORDER[];
+};
+
+// 'uset'
+
+export interface ICOMP_PLUS_USET_USET {
+  range: number;
+  count: number;
+  pattern: ISTR_REF; // str
+};
+
+export type ICHAR32 = number;
+
+export interface ICOMP_PLUS_USET_RANGE {
+  start: ICHAR32;
+  end: ICHAR32;
+};
+
+export interface ICOMP_PLUS_USET {
+  header: ICOMP_PLUS_SectionHeader;
+  usetCount: number;
+  rangeCount: number;
+  usets: ICOMP_PLUS_USET_USET[];
+  ranges: ICOMP_PLUS_USET_RANGE[];
+};
+
+// 'vars'
+
+export interface ICOMP_PLUS_VARS_ITEM {
+  type: number;
+  id: ISTR_REF; // str
+  value: ISTR_REF; // str
+  elem: IELEM_REF;
+};
+
+export interface ICOMP_PLUS_VARS {
+  header: ICOMP_PLUS_SectionHeader;
+  markers: ILIST_REF;
+  varCount: number;
+  varEntries: ICOMP_PLUS_VARS_ITEM[];
+};
+
+// Aliases
+
+export type ICOMP_PLUS_BKSP = ICOMP_PLUS_TRAN;
+
 /**
  * Binary representation of KMX+ data, using Restructure. These structures
  * should be directly used only by KMX+ file readers and writers; in general,
@@ -78,7 +390,7 @@ export class KMXPlusFileFormat extends KMXFile {
   public readonly COMP_PLUS_VARS: any;
   public readonly COMP_PLUS_VARS_ITEM: any;
 
-  private readonly COMP_PLUS_SectionHeader: any;
+  public readonly COMP_PLUS_SectionHeader: any;
 
   constructor(public readonly version: KMXPlusVersion) {
     super();
@@ -138,7 +450,7 @@ export class KMXPlusFileFormat extends KMXFile {
     this.COMP_PLUS_DISP_v17 = new r.Struct({
       header: this.COMP_PLUS_SectionHeader,
       count: r.uint32le,
-      baseCharacter: CHAR32,
+      baseCharacter: STR_REF,
       items: new r.Array(this.COMP_PLUS_DISP_ITEM_v17, 'count'),
     });
 
@@ -151,7 +463,7 @@ export class KMXPlusFileFormat extends KMXFile {
     this.COMP_PLUS_DISP_v19 = new r.Struct({
       header: this.COMP_PLUS_SectionHeader,
       count: r.uint32le,
-      baseCharacter: CHAR32,
+      baseCharacter: STR_REF,
       items: new r.Array(this.COMP_PLUS_DISP_ITEM_v19, 'count'),
     });
 
@@ -181,14 +493,14 @@ export class KMXPlusFileFormat extends KMXFile {
     // 'layr'
 
     this.COMP_PLUS_LAYR_ENTRY = new r.Struct({
-      id: r.uint32le, // str
+      id: STR_REF, // str
       mod: r.uint32le, // bitfield
       row: r.uint32le, // index into rows
       count: r.uint32le,
     });
 
     this.COMP_PLUS_LAYR_KEY = new r.Struct({
-      key: r.uint32le, // str: key id
+      key: STR_REF, // str: key id
     });
 
     this.COMP_PLUS_LAYR_FORM_v17 = new r.Struct({
