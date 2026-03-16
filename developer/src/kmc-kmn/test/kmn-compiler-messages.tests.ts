@@ -7,7 +7,7 @@ import { KmnCompilerMessageRanges, KmnCompilerMessages } from '../src/compiler/k
 import { makePathToFixture } from './helpers/index.js';
 
 describe('KmnCompilerMessages', function () {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid KmnCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KmnCompilerMessages, CompilerErrorNamespace.KmnCompiler);
