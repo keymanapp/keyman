@@ -69,6 +69,10 @@ _node_select_version_with_nvm() {
   else
     # launch nvm in a sub process, see _builder_nvm.sh for details
     "${KEYMAN_ROOT}/resources/build/_builder_nvm.sh" "${REQUIRED_NODE_VERSION}"
+
+    if ! echo "${PATH}" | grep -qF "${HOME}/.keyman/node"; then
+      export PATH="${HOME}/.keyman/node:${PATH}"
+    fi
   fi
 
   # Now, check that the node version is correct, on all systems

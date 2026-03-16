@@ -3,11 +3,8 @@
 default:
 	echo "Use ./build.sh command instead of make!"
 
-version_reconf:
-	cd .. && ./scripts/reconf.sh
-
-version: version_reconf
-	$(eval KEYMAN_VERSION := $(shell ./build.sh build && python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
+version:
+	$(eval KEYMAN_VERSION := $(shell ./build.sh build > /dev/null && python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
 
 # i18n
 
@@ -31,3 +28,15 @@ $(MOFILES): %/LC_MESSAGES/keyman-config.mo: %.po
 	msgfmt -v --check --output-file=$@ $^
 
 compile-po: $(MOFILES)
+
+create-test-po:
+	cd locale && \
+		msginit --locale=TEST --width=98 --no-translator --input keyman-config.pot --output-file=TEST.po && \
+		mv TEST.po TEST1.po && \
+		../../scripts/create-test-po.py TEST1.po TEST.po && \
+		rm TEST1.po
+
+test-po: create-test-po
+	mkdir -p locale/TEST/LC_MESSAGES
+	msgfmt -v --check --output-file=locale/TEST/LC_MESSAGES/keyman-config.mo locale/TEST.po
+	TEXTDOMAINDIR=./locale LANGUAGE=TEST ./km-config

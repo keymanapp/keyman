@@ -133,18 +133,14 @@ PKEYMAN64THREADDATA Globals_InitThread()
 
 void Globals_UninitThread()
 {
-  OutputThreadDebugString("Globals_UninitThread");
+  // OutputThreadDebugString("Globals_UninitThread");
   if (!Globals_ProcessInitialised()) {
-    OutputThreadDebugString("Globals_UninitThread aborted without cleanup");
+    // OutputThreadDebugString("Globals_UninitThread aborted without cleanup");
     return;
   }
 
   ISerialKeyEventClient::Shutdown();
 
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if (_td) {
-    delete _td->pSerialKeyEventClient;
-  }
   CloseThreadSharedBufferManager();
 
   EnterCriticalSection(&csGlobals);

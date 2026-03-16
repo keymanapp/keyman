@@ -19,8 +19,9 @@
   <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Updates installieren</string>
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">Version: %1$s</string>
-  <!-- Context: Text label when old Chrome version installed -->
+  <!-- Context: Text label when old Chrome version installed. Label replaced in Keyman 19.0 -->
   <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    Keyman benötigt Chrome Version 57 oder neuer.</string>
+  <string name="text_require_chrome_version" comment="Banner text when old version of Chrome is installed">    Keyman benötigt Chrome-Version %1$s oder neuer.</string>
   <!-- Context: Button label -->
   <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">Chrome aktualisieren</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
@@ -68,6 +69,8 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Tastaturhöhe anpassen</string>
   <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Langes Drücken anpassen</string>
+  <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Leertasten-Beschriftung</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
   <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Tastatur</string>
@@ -85,13 +88,17 @@
   <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Zeige Sprache und Tastaturnamen auf Leertaste</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Beschriftung auf Leertaste nicht anzeigen</string>
+  <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard -->
+  <string name="show_osk" comment="show OSK when physical keyboard is connected">Bildschirmtastatur anzeigen</string>
+  <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard hint -->
+  <string name="show_osk_hint" comment="When physical keyboard is connected">Wenn die physische Tastatur verbunden ist</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Beim Tippen vibrieren</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">Banner immer anzeigen</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">Nicht implementiert</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">Wenn ausgeschaltet, wird nur angezeigt, wenn vorhersagender Text aktiviert ist</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Erlaube das Senden von Fehlerberichten</string>
@@ -118,11 +125,19 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Alle Sprachen bereits installiert</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Ziehen Sie die Tastatur, um die Höhe zu ändern</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Drehen Sie das Gerät um Hoch- und Querformat anzupassen</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Ziehen Sie die Tastatur, um die Höhe zu verändern. Drehen Sie das Gerät, um Hoch- oder Querformat anzupassen.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Einstellungen auf Standard zurücksetzen</string>
+  <!-- Context: Keyboard height display format. %1$d = portrait percentage, %2$d = landscape percentage -->
+  <string name="keyboard_height_format" comment="Format for displaying keyboard height percentages">%1$d%% Hochformat | %2$d%% Querformat</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Verzögerung: %1$.1f Sekunden</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Verzögerung verlängern</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Verzögerung verkürzen</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Regler für Verzögerung beim langen Drücken</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Suchen oder URL eingeben</string>
   <!-- Context: Keyman Web Browser -->

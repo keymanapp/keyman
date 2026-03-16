@@ -116,9 +116,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Wszystkie języki są już zainstalowane</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Przeciągnij klawiaturę, aby zmienić wysokość</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Obróć urządzenie, aby dostosować pionowo i poziomo</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Przeciągnij klawiaturę, aby zmienić wysokość. Obróć urządzenie, aby dostosować pionowo i poziomo.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Przywróć domyślne</string>
   <!-- Context: Keyman Web Browser -->

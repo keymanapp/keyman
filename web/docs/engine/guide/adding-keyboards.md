@@ -56,3 +56,5 @@ keyman.addKeyboards('french','sil_euro_latin@sv','sil_euro_latin@no')
 ```
 
 This will install three keyboards - one for French (named, quite simply, "French") and two copies of the EuroLatin keyboard - one for Swedish and one for Norwegian.
+
+[Previous: What is a Keyboard?](what-is-a-keyboard) | [Next: Additional Examples](examples/)

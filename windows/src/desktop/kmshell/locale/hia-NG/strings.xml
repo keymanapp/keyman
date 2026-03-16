@@ -864,7 +864,7 @@ keyboard unda da mogka thlina nda Windows.  Keyman keyboards na da spat sosaya t
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman t klunt tina kol ɗughwana habara da fata an log file  lo hogal %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). Da thlavataka t Keyman kajuwa tikanta k masat tana file na.\n\n\WARNING: Nana file nana da guluk kada kudeɗ kudeɗa.  Da klunt tina kol ɗughwana kaɗa da mogan hankalɗe t kompitagha nda kawai da mog thlina vita kwara kwara la sinanta mog thlina technical support.\n\nPRIVACY WARNING: Gamsa asinana klunt tina kol ɗughwana an logfile da fat sma keystrokes unda vindataka.  Kawai da gunataka t debug log anga sarta klun tina kol ɗughwana ko sarta naghata.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman t klunt tina kol ɗughwana habara da fata an log file  lo hogal %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (where # is a number). Da thlavataka t Keyman kajuwa tikanta k masat tana file na.\n\n\WARNING: Nana file nana da guluk kada kudeɗ kudeɗa.  Da klunt tina kol ɗughwana kaɗa da mogan hankalɗe t kompitagha nda kawai da mog thlina vita kwara kwara la sinanta mog thlina technical support.\n\nPRIVACY WARNING: Gamsa asinana klunt tina kol ɗughwana an logfile da fat sma keystrokes unda vindataka.  Kawai da gunataka t debug log anga sarta klun tina kol ɗughwana ko sarta naghata.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

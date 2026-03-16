@@ -461,7 +461,7 @@ type
     procedure FeatureModified(Sender: TObject);
     function SaveFeature(ID: TKeyboardParser_FeatureID): Boolean;
     procedure SelectTouchLayoutTemplate(APromptChange: Boolean);
-    function LoadTouchLayout: Boolean;   // I4034
+    procedure LoadTouchLayout;   // I4034
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
 
@@ -1659,8 +1659,7 @@ begin
       end;
     kfTouchLayout:
       begin
-        if not LoadTouchLayout then
-          Exit(False);
+        LoadTouchLayout;
       end;
     else
     begin
@@ -3202,17 +3201,15 @@ begin
   FFeature[kfTouchLayout].Modified := True;
 end;
 
-function TfrmKeymanWizard.LoadTouchLayout: Boolean;   // I4034
+procedure TfrmKeymanWizard.LoadTouchLayout;   // I4034
 begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutDesign then
   begin
-    Result := frameTouchLayout.Load(FFeature[kfTouchLayout].Filename, False, False);
-  end
-  else
-  begin
-    frameTouchLayoutSource.LoadFromFile(FFeature[kfTouchLayout].Filename, tffUTF8);
-    Result := True;
+    if frameTouchLayout.Load(FFeature[kfTouchLayout].Filename, False, False) then
+      Exit;
+    pagesTouchLayout.ActivePage := pageTouchLayoutCode;
   end;
+  frameTouchLayoutSource.LoadFromFile(FFeature[kfTouchLayout].Filename, tffUTF8);
 end;
 
 procedure TfrmKeymanWizard.SaveTouchLayout;   // I3885

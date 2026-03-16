@@ -864,7 +864,7 @@ keyboard na ká ga slera anikwa na am Windows.  Keyman keyboards anuga maga sler
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug labare ŋanna anuga a de puwa am log file a ɗavan %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). Ká nuga shigashe am Keyman kabu ká gwada gagga file.\n\n\WARNING: File ŋanna anuga nye ba ƴaike a ba at watsire.  Magave debugging anaba gulla maga slera system antara sawari a sawa aza nda technical support.\n\nPRIVACY WARNING: Tazlaŋa diyasdiya gé kini debug logfile a maga rakodini baɗumma keystrokes ŋanna ká vinda ká.  Ká kunna debug log gé naza lokte debugging mtu diagnostic session.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug labare ŋanna anuga a de puwa am log file a ɗavan %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (where # is a number). Ká nuga shigashe am Keyman kabu ká gwada gagga file.\n\n\WARNING: File ŋanna anuga nye ba ƴaike a ba at watsire.  Magave debugging anaba gulla maga slera system antara sawari a sawa aza nda technical support.\n\nPRIVACY WARNING: Tazlaŋa diyasdiya gé kini debug logfile a maga rakodini baɗumma keystrokes ŋanna ká vinda ká.  Ká kunna debug log gé naza lokte debugging mtu diagnostic session.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

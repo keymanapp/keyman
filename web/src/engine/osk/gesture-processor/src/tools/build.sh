@@ -9,8 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 BASE_DIR="/web/src/engine/osk/gesture-processor"
 BUILD_DIR="${BASE_DIR}/build"
 
@@ -71,8 +69,8 @@ function do_build_fixture() {
 function do_build_testmodule() {
   compile "" "${THIS_SCRIPT_PATH}/unit-test-resources" "${KEYMAN_ROOT}/${BUILD_DIR}/tools"
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/${BUILD_DIR}/tools/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/${BUILD_DIR}/tools/lib/index.mjs" \
+  node "$LIB_BUNDLER"   "${KEYMAN_ROOT}/${BUILD_DIR}/tools/obj/index.js" \
+    --out               "${KEYMAN_ROOT}/${BUILD_DIR}/tools/lib/index.mjs" \
     --format "esm"
 }
 

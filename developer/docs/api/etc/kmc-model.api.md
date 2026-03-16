@@ -4,16 +4,16 @@
 
 ```ts
 
-/// <reference types="@keymanapp/common-types" />
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerOptions } from '@keymanapp/developer-utils';
+import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifact } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
+import { KeymanCompilerResult } from '@keymanapp/developer-utils';
 
-import { CompilerCallbacks } from '@keymanapp/common-types';
-import { CompilerEvent } from '@keymanapp/common-types';
-import { CompilerOptions } from '@keymanapp/common-types';
-import { KeymanCompiler } from '@keymanapp/common-types';
-import { KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
-import { KeymanCompilerResult } from '@keymanapp/common-types';
-
+// Warning: (ae-forgotten-export) The symbol "CasingFunction" needs to be exported by the entry point main.d.ts
+//
 // @public
 export type CasedWordformToKeySpec = (term: string, applyCasing?: CasingFunction) => string;
 
@@ -46,6 +46,7 @@ export interface LexicalModelCompilerResult extends KeymanCompilerResult {
 export interface LexicalModelSource extends LexicalModelDeclaration {
     readonly applyCasing?: CasingFunction;
     readonly languageUsesCasing?: boolean;
+    // Warning: (ae-forgotten-export) The symbol "LexicalModelPunctuation" needs to be exported by the entry point main.d.ts
     readonly punctuation?: LexicalModelPunctuation;
     readonly rootClass?: string;
     readonly searchTermToKey?: WordformToKeySpec;
@@ -58,6 +59,12 @@ export interface LexicalModelSource extends LexicalModelDeclaration {
 //
 // @internal (undocumented)
 export class ModelCompilerMessages {
+    // (undocumented)
+    static ERROR_ModelFileNotFound: number;
+    // (undocumented)
+    static Error_ModelFileNotFound: (o: {
+        filename: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_NoDefaultExport: number;
     // (undocumented)
@@ -95,6 +102,12 @@ export class ModelCompilerMessages {
     // (undocumented)
     static Error_UTF16BEUnsupported: () => CompilerEvent;
     // (undocumented)
+    static ERROR_WordlistFileNotFound: number;
+    // (undocumented)
+    static Error_WordlistFileNotFound: (o: {
+        filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static FATAL_UnexpectedException: number;
     // (undocumented)
     static Fatal_UnexpectedException: (o: {
@@ -114,6 +127,8 @@ export class ModelCompilerMessages {
     }) => CompilerEvent;
 }
 
+// Warning: (ae-forgotten-export) The symbol "WordBreakingFunction" needs to be exported by the entry point main.d.ts
+//
 // @public
 export type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
 

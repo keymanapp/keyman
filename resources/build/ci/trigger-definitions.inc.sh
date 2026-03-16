@@ -19,7 +19,7 @@ readonly build_level_release=release
 readonly valid_build_levels="$build_level_skip|$build_level_build|$build_level_release"
 
 #
-# Target platforms
+# Target platforms (note: 'common' matches all common* platforms in build bot commands)
 #
 
 available_platforms=(android common_web common_windows common_mac common_linux ios linux mac web windows developer)
@@ -87,7 +87,7 @@ bc_test_android=(KeymanAndroid_TestPullRequests KeymanAndroid_TestSamplesAndTest
 bc_test_ios=(Keyman_iOS_TestPullRequests Keyman_iOS_TestSamplesAndTestProjects)
 bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Linux_Test_Integration Keyman_Common_KPAPI_TestPullRequests_Linux deb-pr-packaging_GitHub)
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
-bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
+bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows core-arm64-windows-test_GitHub)
 bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
 bc_test_developer=(Keyman_Developer_Test Keyman_Test_Developer_Mac Keyman_Test_Developer_Linux npm-publish_GitHub)
 

@@ -23,7 +23,7 @@ KMManager.applyKeyboardHeight(Context context, int height, int orientation)
 : The context
 
 `height`
-: The height of the keyboard frame in *density-independent pixels (dp)*. Pass `KMManager.KeyboardHeight_Reset` to reset the keyboard height (for current orientation) to device-specific defaults.
+: The height of the keyboard frame in *density-independent pixels (dp)*. Pass `KMManager.KeyboardHeight_Reset` to reset the keyboard height (for the current orientation) to device-specific defaults.
 
 `orientation` _(Optional)_
 : Accepts a [screen orientation](https://developer.android.com/training/multiscreen/screensizes#TaskUseOriQuali) value. This is most useful if you want to change the size of the keyboard in the other (non-current) orientation. If `orientation` is not defined, keyboard height is set for the current device orientation.
@@ -78,3 +78,5 @@ The following script illustrates the use of `applyKeyboardHeight()` to reset key
 
 ## See also
 * [getKeyboardHeight()](getKeyboardHeight)
+* [getKeyboardHeightMax()](getKeyboardHeightMax)
+* [getKeyboardHeightMin()](getKeyboardHeightMin)

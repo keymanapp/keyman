@@ -44,7 +44,7 @@ cd "${KEYMAN_ROOT}/android"
 function _create_zip_archive() {
   builder_echo start "archive" "Copying release artifacts to upload/ and creating zip"
 
-  "${KEYMAN_ROOT}/android/build.sh" archive
+  builder_launch /android/build.sh archive
 
   builder_echo end "archive" success "Finished copying release artifacts to upload/ and creating zip"
 }
@@ -66,7 +66,7 @@ function _publish_to_playstore() {
   local PUBTARGETS="$1"
   builder_echo start "publish to Google Play Store" "Publishing release to Google Play Store"
 
-  "${KEYMAN_ROOT}/android/build.sh" "publish-play-store:${PUBTARGETS}"
+  builder_launch /android/build.sh "publish-play-store:${PUBTARGETS}"
 
   builder_echo end "publish to Google Play Store" success "Finished publishing release to Google Play Store"
 }
@@ -107,10 +107,10 @@ fi
 
 if builder_has_action all; then
   android_clean_action
-  android_build_action "${TARGETS}" --release
+  android_build_action "${TARGETS}"
   do_publish
 else
   builder_run_action  clean    android_clean_action
-  builder_run_action  build    android_build_action "${TARGETS}" --release
+  builder_run_action  build    android_build_action "${TARGETS}"
   builder_run_action  publish  do_publish
 fi

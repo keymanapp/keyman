@@ -141,6 +141,8 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   SendDebugEntry();
 
+  LowLevelHookWatchDog::HookIsAlive();
+
   PKBDLLHOOKSTRUCT hs = (PKBDLLHOOKSTRUCT) lParam;
 
   BOOL extended = hs->flags & LLKHF_EXTENDED ? TRUE : FALSE;

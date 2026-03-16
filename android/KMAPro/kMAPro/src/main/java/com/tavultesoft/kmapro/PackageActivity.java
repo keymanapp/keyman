@@ -85,7 +85,8 @@ public class PackageActivity extends BaseActivity implements
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
       } else if (!pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
-        showErrorToast(getString(R.string.no_targets_to_install));
+        // Not using showErrorToast to avoid cluttering Sentry with noise
+        showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
         return;
       }
       tempPackagePath = kmpProcessor.unzipKMP(kmpFile);

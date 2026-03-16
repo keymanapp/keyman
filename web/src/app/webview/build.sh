@@ -43,19 +43,19 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/webview"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/webview/src"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
-    --out        "${BUILD_ROOT}/debug/keymanweb-webview.js" \
-    --charset    "utf8" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug" \
-    --target     "es6"
+  node "${LIB_BUNDLER}"    "${SRC_ROOT}/debug-main.js" \
+    --out                  "${BUILD_ROOT}/debug/keymanweb-webview.js" \
+    --charset              "utf8" \
+    --sourceRoot           "@keymanapp/keyman/web/build/app/webview/debug" \
+    --target               "es6"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
-    --out        "${BUILD_ROOT}/release/keymanweb-webview.js" \
-    --charset    "utf8" \
-    --profile    "${BUILD_ROOT}/filesize-profile.log" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/webview/release" \
-    --minify \
-    --target     "es6"
+  node "${LIB_BUNDLER}"    "${SRC_ROOT}/release-main.js" \
+    --out                  "${BUILD_ROOT}/release/keymanweb-webview.js" \
+    --charset              "utf8" \
+    --profile              "${BUILD_ROOT}/filesize-profile.log" \
+    --sourceRoot           "@keymanapp/keyman/web/build/app/webview/release" \
+    --minify               \
+    --target               "es6"
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
@@ -78,7 +78,7 @@ compile_and_copy() {
   node map-polyfill-bundler.js
 
   # For dependent test pages.
-  "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
+  builder_launch /web/src/test/manual/embed/android-harness/build.sh configure,build
 }
 
 builder_run_action configure node_select_version_and_npm_ci

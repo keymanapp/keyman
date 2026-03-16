@@ -863,7 +863,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Labar nur Keyman debug mji ara ɗuwana nda akwa log file %LOCALAPPDATA%\Keyman\Diag\system#.etl (iviku # aga lamba). kuga ngeri Keyman kabi kukulna file.\n\n\WARNING: File ku acitu hu ŋga kakaɗu. Ngeri debugging acitu fia kwahir nasara ginyi kija na saɗu baɗa tsu kuga iu thlir duri ma ga thlia sawari ara technical support.\n\nPRIVACY WARNING: Manki kuga sini debug logfile naja vur iu records nur  ca keystrokes dugu a ruɓutsini. Kuga pahu debug log anu odikura latu nur debugging akiya mai nur diagnostic.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Labar nur Keyman debug mji ara ɗuwana nda akwa log file %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (iviku # aga lamba). kuga ngeri Keyman kabi kukulna file.\n\n\WARNING: File ku acitu hu ŋga kakaɗu. Ngeri debugging acitu fia kwahir nasara ginyi kija na saɗu baɗa tsu kuga iu thlir duri ma ga thlia sawari ara technical support.\n\nPRIVACY WARNING: Manki kuga sini debug logfile naja vur iu records nur  ca keystrokes dugu a ruɓutsini. Kuga pahu debug log anu odikura latu nur debugging akiya mai nur diagnostic.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

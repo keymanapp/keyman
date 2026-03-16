@@ -328,7 +328,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Modified: 18.0.96.0 -->
-  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Verificar automaticamente por atualizações e download</string>
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Verificar automaticamente por atualizações e descarregar</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
@@ -458,6 +458,30 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">Diagnóstico...</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_No_Updates_Available" comment="Update tab - no updates are available">Sem atualizações disponíveis</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">Atualizações estão disponíveis que serão aplicadas quando o Windows for reiniciado:</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_Current_Version" comment="Update tab Currently Installed Version">Versão instalada atualmente</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_New_Version" comment="Update tab New Version">Nova versão</string>
+  <!-- Context: Configuration Dialog - Update tab pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Instalar a atualização agora exigirá uma reinicialização do seu computador antes de poder usar o Keyman novamente. Atualizar mesmo assim?</string>
+  <!-- Context: Configuration Dialog - Update on boot pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Uma atualização para o Keyman foi descarregada e está pronta para ser instalada.</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -518,7 +542,7 @@
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico
+  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico 
   que utiliza no Windows. O teclado Keyman irá se adaptar automaticamente ao seu layout preferido.</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
@@ -552,6 +576,10 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.230.0 -->
   <string name="S_Update" comment="Update tab name">Atualizar</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update_Now" comment="Update now button">Atualizar agora</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -623,10 +651,18 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
+  <!-- Context: Install Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Later" comment="Apply Update Later">Mais Tarde</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
   <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Aplicar atualização agora</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Button_Update_InstallNow" comment="Install update now button - update dialog">Instalar atualização agora</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
@@ -913,7 +949,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">As informações de depuração do keyman serão armazenadas em um ficheiro de log chamado %LOCALAPPDATA%\Keyman\Diag\system#.etl (onde # é um número). Deverá sair do Keyman antes de tentar excluir este ficheiro.\n\n\AVISO: Este ficheiro pode crescer grande rapidamente. Permitir a depuração pode tornar o sistema mais lento e só deve ser feito se recomendado pelo suporte técnico.\n\nATENÇÃO: Por favor, note que o ficheiro de log de depuração registra todos os traços de tecla que digita. Só deve ativar o log de depuração durante uma sessão de diagnóstico ou depuração.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">As informações de depuração do keyman serão armazenadas em um ficheiro de log chamado %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (onde # é um número). Deverá sair do Keyman antes de tentar excluir este ficheiro.\n\n\AVISO: Este ficheiro pode crescer grande rapidamente. Permitir a depuração pode tornar o sistema mais lento e só deve ser feito se recomendado pelo suporte técnico.\n\nATENÇÃO: Por favor, note que o ficheiro de log de depuração registra todos os traços de tecla que digita. Só deve ativar o log de depuração durante uma sessão de diagnóstico ou depuração.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

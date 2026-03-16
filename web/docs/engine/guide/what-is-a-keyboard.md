@@ -11,3 +11,5 @@ The keyboards available for use with KeymanWeb have been developed by a wide ran
 KeymanWeb supports a very wide range of languages, and many keyboards available for use with KeymanWeb include features specific to particular languages. Because of this, each keyboard has its own documentation, which is included with the On-Screen Keyboard. Although the level of detail in this documentation does vary somewhat, depending on the designer and the requirements of each keyboard, this is the first place to look for information on using a particular language with KeymanWeb.
 
 [Index of help for KeymanWeb keyboard layouts](/keyboard)
+
+[Previous: User Interface Design](user-interface-design) | [Next: Installing Keyboards](adding-keyboards)

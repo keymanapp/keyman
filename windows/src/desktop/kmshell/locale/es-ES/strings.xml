@@ -948,7 +948,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">La información de depuración de Keyman se almacenará en un archivo de registro llamado %LOCALAPPDATA%\Keyman\Diag\system#.etl (donde # es un número). Debe salir de Keyman antes de intentar borrar este archivo.\n\n ADVERTENCIA: Este archivo puede crecer muy rápidamente.  La activación de la depuración puede ralentizar el sistema y sólo debe hacerse si así lo aconseja el servicio de asistencia técnica.\n\nADVERTENCIA DE PRIVACIDAD: Tenga en cuenta que el archivo de registro de depuración registra todas las pulsaciones de teclas que se realizan.  Sólo debe activar el registro de depuración durante una sesión de depuración o diagnóstico.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">La información de depuración de Keyman se almacenará en un archivo de registro llamado %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (donde # es un número). Debe salir de Keyman antes de intentar borrar este archivo.\n\n ADVERTENCIA: Este archivo puede crecer muy rápidamente.  La activación de la depuración puede ralentizar el sistema y sólo debe hacerse si así lo aconseja el servicio de asistencia técnica.\n\nADVERTENCIA DE PRIVACIDAD: Tenga en cuenta que el archivo de registro de depuración registra todas las pulsaciones de teclas que se realizan.  Sólo debe activar el registro de depuración durante una sesión de depuración o diagnóstico.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

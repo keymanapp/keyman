@@ -559,7 +559,7 @@ builder_describe_internal_dependency \
 ```
 
 **Note:** actions and targets must be fully specified, and this _must_ be called
-before either [`builder_describe_outputs`] or [`builder_parse`] in order for
+before both of [`builder_describe_outputs`] and [`builder_parse`] in order for
 dependencies to be resolved.
 
 --------------------------------------------------------------------------------
@@ -1034,6 +1034,28 @@ request test, or as a mainline branch test.
 if builder_is_ci_test_build; then
   ...
 fi
+```
+
+--------------------------------------------------------------------------------
+
+## `builder_launch` function
+
+Starts a child script build, passing current build dependency, inheritable
+options, and timing status through as parameters. This should be used rather
+than calling the build script directly, to avoid multiple builds of
+dependencies.
+
+Do not use builder standard options such as `--deps` or `--debug`.
+
+### Parameters
+
+* 1: `script`      path to script, relative to root of repo, with leading slash
+* 2+: `parameters` action(s), target(s), parameters for the child script to run
+
+### Example
+
+```bash
+  builder_launch /core/build.sh configure,build:wasm --no-tests
 ```
 
 --------------------------------------------------------------------------------

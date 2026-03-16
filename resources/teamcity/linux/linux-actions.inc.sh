@@ -38,7 +38,7 @@ linux_additional_test_dependencies_action() {
 linux_build_action() {
   INSTALLDIR="$(mktemp -d)"
   # shellcheck disable=SC2068
-  DESTDIR="${INSTALLDIR}" "${KEYMAN_ROOT}/linux/build.sh" clean configure build install $@
+  DESTDIR="${INSTALLDIR}" builder_launch /linux/build.sh clean configure build install $@
 }
 
 # Run unit tests for Keyman for Linux.
@@ -52,6 +52,6 @@ linux_unit_tests_action() {
 
   export NO_AT_BRIDGE=1
   # shellcheck disable=SC2068
-  "${KEYMAN_ROOT}/linux/build.sh" test $@
+  builder_launch /linux/build.sh test $@
   builder_echo endTest unit_tests success "Finished running unit tests"
 }

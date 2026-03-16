@@ -80,7 +80,7 @@ build_action() {
       version.py.in > version.py
   popd
   pushd buildtools
-  if [ -f build-langtags.py ]; then
+  if [[ -f build-langtags.py ]]; then
     builder_echo "Create lang_tags_map.py"
     python3 ./build-langtags.py
   else

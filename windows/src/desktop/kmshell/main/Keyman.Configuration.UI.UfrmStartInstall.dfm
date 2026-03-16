@@ -151,7 +151,7 @@ object frmStartInstall: TfrmStartInstall
     Top = 200
     Width = 75
     Height = 25
-    Caption = 'Update now'
+    Caption = '&Update now'
     ModalResult = 1
     TabOrder = 0
   end
@@ -160,7 +160,7 @@ object frmStartInstall: TfrmStartInstall
     Top = 200
     Width = 75
     Height = 25
-    Caption = 'Later'
+    Caption = '&Later'
     ModalResult = 8
     TabOrder = 1
   end

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Product UpgradeCode="f212edf7-0bef-43bb-8fc2-2625ae7bbfca" Manufacturer="SIL International"
            Id="*" Name="$(var.PRODUCTNAME) $(var.RELEASE)" Version="$(var.KEYMAN_VERSION)" Language="1033">
     <Package Keywords="Keyman,$(var.PRODUCTNAME),Keyboard,Engine"
@@ -36,6 +36,11 @@
     </Property>
 
     <Property Id='OnlineProductID' Value='30' />
+
+
+    <!-- CE38CB16_4448_4432_851B_B3FCE3AF464F is the GUID for the keyman engine merge
+         module package; this makes the WIX_NATIVE_MACHINE property available to it -->
+    <SetProperty Id="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE]" Before="LaunchConditions"/>
 
     <Directory Id="TARGETDIR" Name="SourceDir" DiskId="1">
 
@@ -179,6 +184,7 @@
     <Property Id="ALLUSERS">1</Property>
 
     <UIRef Id="WixUI_FeatureTree"/>
+    <PropertyRef Id="WIX_NATIVE_MACHINE" />
 
     <Icon Id="appicon.ico" SourceFile="..\branding\appicon.ico" />
     <Icon Id="KMSHELL.ico" SourceFile="..\branding\cfgicon.ico" />

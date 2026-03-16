@@ -49,3 +49,5 @@ EXPORTS
 			Keyman_UnregisterControllerThread
 
       SetCustomPostKeyCallback
+
+			Keyman_WatchDogKeyEvent

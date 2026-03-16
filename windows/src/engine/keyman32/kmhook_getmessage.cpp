@@ -146,6 +146,15 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
   }
 
   if ((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP)) {   // I4642
+
+    // To help our low level keyboard hook recover if system load causes it to
+    // be uninstalled, we tell the controller process that we should have seen a
+    // keystroke event in the low level keyboard hook; this gets passed into the
+    // LowLevelHookWatchDog via keyman.exe
+    if(mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN) {
+      Globals::PostMasterController(wm_keyman_control, KMC_WATCHDOG_KEYEVENT, 0);
+    }
+
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
     CheckScheduledRefresh();
     _td->LastScanCode = scan;

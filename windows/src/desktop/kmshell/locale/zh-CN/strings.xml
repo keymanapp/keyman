@@ -884,7 +884,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman 调试信息将存储在一个名为 %LOCALAPPDATA%\Keyman\Diag\system#.etl 的日志文件(其中# 是一个数字)。 您应该在尝试删除此文件之前退出Keyman。\n\n\警告: 此文件可以快速扩展。 启用调试可能会减慢您的系统，并且只有在得到技术支持的情况下才能完成。\n\nPRIVACY 警告：请注意，调试日志文件会记录所有您键入的按键。 您只应该在调试或诊断会话期间打开调试日志。</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman 调试信息将存储在一个名为 %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl 的日志文件(其中# 是一个数字)。 您应该在尝试删除此文件之前退出Keyman。\n\n\警告: 此文件可以快速扩展。 启用调试可能会减慢您的系统，并且只有在得到技术支持的情况下才能完成。\n\nPRIVACY 警告：请注意，调试日志文件会记录所有您键入的按键。 您只应该在调试或诊断会话期间打开调试日志。</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

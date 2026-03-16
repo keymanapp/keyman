@@ -1,18 +1,18 @@
 (*
   Name:             KeymanControlRestart
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jun 2007
 
   Modified Date:    19 Jun 2007
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jun 2007 - mcdurdin - Initial version
 *)
 unit KeymanEngineControl;
@@ -43,6 +43,10 @@ type
     procedure UnregisterMasterController(Value: LongWord); safecall;
     procedure RegisterControllerThread(Value: LongWord); safecall;
     procedure UnregisterControllerThread(Value: LongWord); safecall;
+
+    // New in 19.0
+
+    procedure WatchDogKeyEvent; safecall;    // 32 bit only
   end;
 
 implementation

@@ -31,6 +31,9 @@
 /* Message displayed in Configuration window when keyboard metadata cannot be loaded */
 "message-error-unknown-metadata" = "sconosciuto";
 
+/* Configuration window section heading when keyboard has no package name */
+"unknown-package-name" = "Pacchetto tastiera senza nome";
+
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "OK";
 

@@ -5,6 +5,11 @@ import { isProject, loadProject } from './projectLoader.js';
 async function runProject(callbacks: CompilerCallbacks, filename: string, callback: (filename:string)=>Promise<boolean>): Promise<boolean> {
   const project = await loadProject(filename, callbacks);
 
+  if(!project) {
+    // errors reported by loadProject
+    return false;
+  }
+
   for(const file of project.files) {
     if(KeymanFileTypes.filenameIs(file.filename, KeymanFileTypes.Source.Project)) {
       // Don't accidentally recurse into projects

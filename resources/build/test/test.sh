@@ -2,6 +2,9 @@
 
 set -eu
 
+# Avoid timing reports in unit tests
+export _builder_timings=false
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -243,7 +246,7 @@ if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]]; then
   expected="$(builder_echo grey "Local build environment detected:  setting --debug")"$'\n'"$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test --debug>")"
 fi
 if [[ "${parse_output[*]}" != "${expected}" ]]; then
-  builder_die "FAIL: Wrong output for '--feature xyzzy --bar abc --baz def test':\n  Actual  : ${parse_output[*]}\n  Expected: ${expected}"
+  builder_die "FAIL: Wrong output for '--feature xyzzy --bar abc --baz def test':\n  Actual  : '${parse_output[*]}'\n  Expected: '${expected}'"
 fi
 
 #----------------------------------------------------------------------
@@ -300,12 +303,12 @@ function builder_echo_start_end_tests() {
   TEAMCITY_GIT_PATH=""
   _builder_debug_internal=false
   _builder_is_child=0
-  expected=""
+  expected="$(builder_echo heading "description")"
   result=$(builder_echo start "foo" "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo start foo description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
-  expected=""
+  expected="$(builder_echo success "description")"
   result=$(builder_echo end "foo" success "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
@@ -436,7 +439,7 @@ echo
   # Finally, run with --help so we can see what it looks like; note:
   # builder_parse calls `exit 0` on a --help run, so running in a subshell
   echo -e "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
-  builder_parse --no-color --help
+  builder_parse --no-color --help --no-timings
 ) || builder_die "FAIL: builder-parse unexpectedly returned failure code $?"
 
 echo -e "${COLOR_GREEN}======================================================${COLOR_RESET}"

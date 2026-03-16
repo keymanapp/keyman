@@ -42,3 +42,4 @@ watch
 .pc/
 # Debian patch files will be re-generated
 debian/patches/
+TEST.po

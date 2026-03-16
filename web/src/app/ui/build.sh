@@ -51,13 +51,13 @@ compile_and_copy() {
   for type in ${types[@]}
   do
     filename="kmwui${type}"
-    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
-      --out        "${BUILD_ROOT}/debug/$filename.js" \
-      --sourceRoot "@keymanapp/keyman/web/build/app/ui/debug"
+    node "${LIB_BUNDLER}"    "${BUILD_ROOT}/obj/$filename.js" \
+      --out                  "${BUILD_ROOT}/debug/$filename.js" \
+      --sourceRoot           "@keymanapp/keyman/web/build/app/ui/debug"
 
-    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
-      --out        "${BUILD_ROOT}/release/$filename.js" \
-      --sourceRoot "@keymanapp/keyman/web/build/app/ui/release" \
+    node "${LIB_BUNDLER}"    "${BUILD_ROOT}/obj/$filename.js" \
+      --out                  "${BUILD_ROOT}/release/$filename.js" \
+      --sourceRoot           "@keymanapp/keyman/web/build/app/ui/release" \
       --minify
   done
 

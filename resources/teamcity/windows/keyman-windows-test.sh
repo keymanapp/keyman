@@ -37,7 +37,7 @@ fi
 
 function windows_publish_action() {
   builder_echo start "publish windows" "Publishing Keyman for Windows"
-  "${KEYMAN_ROOT}/windows/build.sh" publish
+  builder_launch /windows/build.sh publish
   windows_upload_symbols_to_sentry
   builder_echo end "publish windows" success "Finished publishing Keyman for Windows"
 }

@@ -151,13 +151,16 @@ static void test_source(IBusKeymanTestsFixture* fixture, gconstpointer user_data
   km::tests::KmxTestSource test_source;
   std::string keys        = "";
   std::u16string expected = u"", expected_context = u"", context = u"";
-  km::tests::kmx_options options;
+  km::tests::kmx_options options_from_test;
   bool expected_beep = false;
   // NOTE: we don't verify expected beeps since engine.c directly calls a gdk method so we
   // don't know when it gets called.
-  g_assert_cmpint(test_source.load_source(sourcefile.c_str(), keys, expected, expected_context, context, options, expected_beep), ==, 0);
+  g_assert_cmpint(
+      test_source.load_source(sourcefile.c_str(), keys, expected, expected_context,
+        context, options_from_test, expected_beep),
+      ==, 0);
 
-  for (auto & option : options) {
+  for (auto& option : options_from_test) {
     if (option.type == km::tests::KOT_INPUT) {
       auto key = g_utf16_to_utf8((gunichar2 *)option.key.c_str(), option.key.length(), NULL, NULL, NULL);
       auto value = g_utf16_to_utf8((gunichar2 *)option.value.c_str(), option.value.length(), NULL, NULL, NULL);
@@ -182,11 +185,31 @@ static void test_source(IBusKeymanTestsFixture* fixture, gconstpointer user_data
     press_key(fixture, p);
   }
 
+  // Verify the expected output
   if (expected.length() == 0) {
     g_assert_null(ibus_im_test_get_text(fixture->ibuscontext));
   } else {
     auto expectedText = g_utf16_to_utf8((gunichar2*)expected.c_str(), expected.length(), NULL, NULL, NULL);
     g_assert_cmpstr(ibus_im_test_get_text(fixture->ibuscontext), ==, expectedText);
+  }
+
+  // Verify the expected persisted options
+  g_settings_sync();
+  g_auto(GStrv) options = keyman_get_keyboard_options_fromdconf(data->test_name, data->test_name);
+  for (auto& option : options_from_test) {
+    // No need to verify KOT_OUTPUT because that's a temporary variable in the keyboard
+    if (option.type == km::tests::KOT_SAVED) {
+      g_autofree gchar* expectedKey   = g_utf16_to_utf8((gunichar2*)option.key.c_str(), option.key.length(), NULL, NULL, NULL);
+      g_autofree gchar* expectedValue =
+          g_utf16_to_utf8((gunichar2*)option.value.c_str(), option.value.length(), NULL, NULL, NULL);
+      g_autofree gchar* expected = g_strdup_printf("%s=%s", expectedKey, expectedValue);
+      for (int i = 0; options[i] != NULL; i++) {
+        if (g_strrstr(options[i], expectedKey) != NULL) {
+          g_assert_cmpstr(options[i], ==, expected);
+          break;
+        }
+      }
+    }
   }
 
   // Cleanup

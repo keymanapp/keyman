@@ -82,6 +82,14 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Erro fatal de teclado com %1$s:%2$s para %3$s idioma. Carregando o teclado padrão.</string>
     <!-- Context: Fatal keyboard error.  -->
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Erro no teclado %1$s:%2$s para %3$s idioma.</string>
+    <!-- Context: Alert Dialog body: System WebView not installed -->
+    <string name="body_install_webview" comment="Notification when WebView not installed">        Keyman requer que o WebView seja instalado.\"</string>
+    <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">        Keyman requer que o WebView seja ativado.\"</string>
+    <!-- Context Button label: Install WebView -->
+    <string name="label_install_webview" comment="Button label to install webview">Instalar WebView</string>
+    <!-- Context Button label: Enable WebView -->
+    <string name="label_enable_webview" comment="Button label to enable webview">Ativar WebView</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Verificando o download do dicionário associado</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">A ligação ao servidor do Keyman para verificar dicionários para descarregar falhou</string>
@@ -115,6 +123,8 @@
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Falha ao recuperar o arquivo baixado</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Falha ao acessar o servidor!</string>
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">Gerenciador de Downloads desativado - não é possível verificar atualizações</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"Todos os recursos estão atualizados!"</string>
     <!-- Context: General Updates -->
@@ -138,10 +148,10 @@
     <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Habilitar previsões</string>
     <!-- Context: Language Settings menu strings - radio buttons -->
-    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Disable suggestions</string>
-    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Predictions only</string>
-    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Predictions with corrections</string>
-    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Predictions with auto-corrections</string>
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Desativar sugestões</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Apenas previsões</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Previsões com correções</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Previsões com correções automáticas</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dicionário</string>
     <plurals name="model_count">

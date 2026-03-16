@@ -118,9 +118,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">ಎಲ್ಲಾ ಭಾಷೆಗಳನ್ನು ಈಗಾಗಲೇ ಸ್ಥಾಪಿಸಲಾಗಿದೆ</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">ಎತ್ತರವನ್ನು ಬದಲಾಯಿಸಲು ಕೀಲಿಮಣೆಯನ್ನು ಎಳೆಯಿರಿ</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">ಪೋರ್ಟ್ರೇಟ್ ಮತ್ತು ಲ್ಯಾಂಡ್ಸ್ಕೇಪ್ ಹೊಂದಿಸಲು ಸಾಧನವನ್ನು ತಿರುಗಿಸಿ</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">ಎತ್ತರವನ್ನು ಬದಲಾಯಿಸಲು ಕೀಲಿಮಣೆಯನ್ನು ಎಳೆಯಿರಿ. ಪೋರ್ಟ್ರೇಟ್ ಮತ್ತು ಲ್ಯಾಂಡ್ಸ್ಕೇಪ್ ಹೊಂದಿಸಲು ಸಾಧನವನ್ನು ತಿರುಗಿಸಿ.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">ಡೀಫಾಲ್ಟ್ ಮರುಹೊಂದಿಸಿ</string>
   <!-- Context: Keyman Web Browser -->
