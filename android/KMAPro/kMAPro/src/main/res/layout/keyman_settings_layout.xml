@@ -13,6 +13,7 @@
     android:background="@color/keyman_blue"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent" />
+<!--    android:background="@color/keyman_blue"-->
 
   <fragment
     android:layout_marginTop="?attr/actionBarSize"

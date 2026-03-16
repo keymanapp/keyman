@@ -14,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.keyman.engine.data.CloudRepository;
 import com.keyman.engine.data.Dataset;
 import com.keyman.engine.data.Keyboard;
-import com.keyman.engine.data.LexicalModel;
 import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.DownloadFileUtils;
 import com.keyman.android.DownloadIntentService;
@@ -47,24 +45,20 @@ import com.keyman.engine.util.WebViewUtils;
 import com.keyman.engine.util.WebViewUtils.EngineWebViewVersionStatus;
 import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
+
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
-import android.os.Parcelable;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -73,11 +67,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ResolveInfo;
+
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
+
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -86,10 +80,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+import androidx.drawerlayout.widget.DrawerLayout;
+=======
+import androidx.core.content.ContextCompat;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
-import android.provider.Settings;
-import android.text.Html;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -176,9 +175,21 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
+<<<<<<< Updated upstream
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setLogo(R.drawable.keyman_logo);
+=======
+<<<<<<< Updated upstream
+    getSupportActionBar().setDisplayUseLogoEnabled(false);
+    getSupportActionBar().setDisplayShowHomeEnabled(false);
+=======
+    getSupportActionBar().setDisplayUseLogoEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setLogo(R.drawable.keyman_logo_mode);
+//    getSupportActionBar().setLogo(R.drawable.keyman_logo);
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
@@ -672,7 +683,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
     final View textSizeController = inflater.inflate(R.layout.text_size_controller, null);
     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-    dialogBuilder.setIcon(R.drawable.ic_light_action_textsize);
+    dialogBuilder.setIcon(R.drawable.ic_action_textsize_mode);
     dialogBuilder.setTitle(getTextSizeString());
     dialogBuilder.setView(textSizeController);
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
@@ -684,6 +695,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     final AlertDialog dialog = dialogBuilder.create();
     dialog.show();
+    dialog.getWindow().setBackgroundDrawableResource(R.color.dialogBackground);
 
     final SeekBar seekBar = (SeekBar) dialog.findViewById(R.id.seekBar);
     seekBar.setProgress(textSize - minTextSize);
@@ -741,7 +753,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void showClearTextDialog() {
     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-    dialogBuilder.setIcon(R.drawable.ic_light_action_trash);
+    dialogBuilder.setIcon(R.drawable.ic_action_trash_mode);
     dialogBuilder.setTitle(getString(R.string.action_clear_text));
     dialogBuilder.setMessage(getString(R.string.all_text_will_be_cleared));
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
@@ -758,7 +770,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       }
     });
 
-    dialogBuilder.show();
+    //dialogBuilder.show(); no dialog
+    final AlertDialog dialog = dialogBuilder.create();
+    dialog.show();
+    dialog.getWindow().setBackgroundDrawableResource(R.color.dialogBackground);
   }
 
   private void checkGetStarted() {
@@ -999,7 +1014,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     Paint p = new Paint();
     p.setStyle(Paint.Style.FILL);
-    p.setColor(Color.WHITE);
+    //p.setColor(Color.BLACK);
+    p.setColor(ContextCompat.getColor(context,R.color.toolbarColor));
     canvas.drawRect(new Rect(0, 0, width, actionBarHeight), p);
 
     p.setColor(context.getResources().getColor(R.color.keyman_orange));

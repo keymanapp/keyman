@@ -16,7 +16,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.InputMethodInfo;
+
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -24,7 +24,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -174,7 +174,8 @@ public class GetStartedActivity extends BaseActivity {
       String one = String.valueOf(R.drawable.ic_looks_one);
       String two = String.valueOf(R.drawable.ic_looks_two);
       String three = String.valueOf(R.drawable.ic_looks_three);
-      String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
+      String checkbox_on = String.valueOf(R.drawable.ic_checkbox);
+//      String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
       String info = String.valueOf(R.drawable.ic_info_outline);
 
       List<Keyboard> kbList = KMManager.getKeyboardsList(this);

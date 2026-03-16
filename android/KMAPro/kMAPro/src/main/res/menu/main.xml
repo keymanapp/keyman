@@ -7,7 +7,8 @@
     <item android:id="@+id/action_share"
         app:showAsAction="always"
         android:title="@string/action_share"
-        android:icon="@drawable/ic_light_action_share" />
+        android:icon="@drawable/ic_action_share_mode"
+        />
 
     <!-- Disable Web Browser to investigate Google sign-in -->
     <!--item
@@ -21,45 +22,58 @@
         android:id="@+id/action_overflow"
         app:showAsAction="ifRoom"
         android:title="@string/action_overflow"
-        android:icon="@drawable/ic_light_action_overflow" >
+        android:icon="@drawable/ic_action_overflow_mode"
+        >
 
+<<<<<<< Updated upstream
         <menu>
+<<<<<<< Updated upstream
+=======
+                <item android:id="@+id/action_share"
+                    app:showAsAction="always"
+                    android:title="@string/action_share"
+                    android:icon="@drawable/ic_light_action_share" />
+=======
+        <menu
+            >
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
             <item
                 android:id="@+id/action_text_size"
                 android:title="@string/action_text_size"
                 app:showAsAction="always"
-                android:icon="@drawable/ic_light_action_textsize" />
+                android:icon="@drawable/ic_action_textsize_mode" />
 
             <item
                 android:id="@+id/action_clear_text"
                 android:title="@string/action_clear_text"
                 app:showAsAction="always"
-                android:icon="@drawable/ic_light_action_trash" />
+                android:icon="@drawable/ic_action_trash_mode" />
 
             <item
                 android:id="@+id/action_info"
                 android:title="@string/action_info"
                 app:showAsAction="always"
-                android:icon="@drawable/ic_light_action_info" />
+                android:icon="@drawable/ic_action_info_mode" />
 
             <item
                 android:id="@+id/action_get_started"
                 android:title="@string/get_started"
                 app:showAsAction="always"
-                android:icon="@drawable/ic_action_get_started" />
+                android:icon="@drawable/ic_action_get_started_mode" />
 
             <item
                 android:id="@+id/action_settings"
                 android:title="@string/action_settings"
                 app:showAsAction="always"
-                android:icon="@drawable/ic_settings" />
+                android:icon="@drawable/ic_settings_mode" />
 
             <item
                 android:id="@+id/action_update_keyboards"
                 android:title="@string/action_install_updates"
                 app:showAsAction="always"
-                android:icon="@drawable/ic_cloud_download"
+                android:icon="@drawable/ic_cloud_download_mode"
                 app:actionLayout="@layout/update_count_view"/>
 
         </menu>

@@ -241,7 +241,8 @@
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"
       android:launchMode="singleTask"
-      android:theme="@style/AppTheme.Light.Dialog"/>
+      android:theme="@style/AppTheme.Dialog"/>
+<!--      android:theme="@style/AppTheme.Light.Dialog-->
     <activity
       android:name=".KeymanSettingsActivity"
       android:label="@string/keyman_settings"
@@ -275,7 +276,8 @@
       android:name=".KeyboardSettingsActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"
-      android:theme="@style/AppTheme.Light.Dialog" />
+      android:theme="@style/AppTheme.Dialog" />
+<!--      android:theme="@style/AppTheme.Light.Dialog-->
     <activity
       android:name=".SelectPackageActivity"
       android:label="@string/app_name"

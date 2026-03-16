@@ -7,7 +7,8 @@
 
     <!-- product logos -->
     <item
-        android:bottom="@dimen/product_logo_bottom">
+        android:bottom="@dimen/product_logo_bottom"
+        >
         <bitmap
             android:src="@drawable/keyman_logo_splash"
             android:gravity="center"/>

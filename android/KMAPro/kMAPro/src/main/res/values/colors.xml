@@ -13,17 +13,27 @@
     <color name="complementary_4">#00735E</color>
     <color name="complementary_5">#0AB8A0</color>
     <color name="complementary_6">#79C3DA</color>
-    <color name="neutral_1">#000000</color>
+    <color name="neutral_1">#FFFFFF</color>
     <color name="neutral_2">#6D6C6F</color>
     <color name="neutral_3">#929396</color>
     <color name="neutral_4">#C9CACA</color>
     <color name="neutral_5">#DADDDC</color>
 
+
     <color name="keyman_orange">@color/analagous_5</color>
     <color name="keyman_red">@color/analagous_6</color>
     <color name="keyman_blue">@color/complementary_6</color>
 
+    <color name="iconColor">#000</color>
+    <color name="toolbarColor">@color/neutral_1</color>
+    <color name="menuBgColor">@color/neutral_1</color>
+    <color name="checkboxTick">@color/neutral_2</color>
     <color name="yellow_background">#FFFFFFCF</color>
+<!--    <color name="yellow_background">#E6E6E6</color>-->
+    <color name="branded_logo_bg">@color/neutral_1</color>
     <color name="activated_bg">@color/complementary_1</color>
+
+    <color name="dialogBackground">#FFFFFF</color>
+    <color name="toolbar">@color/keyman_blue</color>
 
 </resources>
