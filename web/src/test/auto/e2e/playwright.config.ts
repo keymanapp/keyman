@@ -76,7 +76,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: `${KEYMAN_ROOT}/web/build.sh start`,
+    command: `"${KEYMAN_ROOT}/node_modules/.bin/gosh" "${KEYMAN_ROOT}/web/build.sh start"`,
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.KEYMAN_IS_CI_BUILD,
   },
