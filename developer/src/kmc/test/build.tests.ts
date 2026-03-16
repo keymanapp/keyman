@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -19,12 +22,11 @@ interface CompilerWarningsAsErrorsTruthTable {
   result: boolean;
 };
 
-describe('build', function() {
-  const callbacks: TestCompilerCallbacks = new TestCompilerCallbacks();
+describe('compilerWarningsAsErrors', function () {
+  const callbacks = new TestCompilerCallbacks(this);
   let outPath: string = null;
 
   this.beforeEach(function() {
-    callbacks.clear();
     clearOptions();
     outPath = fs.mkdtempSync(path.join(os.tmpdir(), 'kmc-'));
   });

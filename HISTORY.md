@@ -1,5 +1,65 @@
 # Keyman Version History
 
+## 19.0.214 alpha 2026-03-12
+
+* chore(linux): Update debian changelog (#15718)
+* maint(resources): use x86_64 emscripten on arm/windows builds (#15715)
+
+## 19.0.213 alpha 2026-03-10
+
+* maint(linux): set git credential for linux help on the correct repo (#15707)
+
+## 19.0.212 alpha 2026-03-09
+
+* chore(android): Cleanup unused Extracted Text (#15671)
+* chore(deps): bump fast-xml-parser from 5.3.4 to 5.3.8 (#15649)
+* fix(developer): resolve input project path for `kmc copy` (#15700)
+* fix(developer): await copier result before reporting success or failure (#15701)
+* fix(developer): correct INVALID_HANDLE_VALUE check in UnlockProject (#15704)
+* fix(developer): use trimmed version of paths when verifying in New Project (#15705)
+
+## 19.0.211 alpha 2026-03-06
+
+* chore(deps-dev): bump basic-ftp from 5.0.5 to 5.2.0 (#15631)
+* chore(deps-dev): bump rollup from 4.22.4 to 4.59.0 (#15632)
+* chore(deps): bump minimatch and @microsoft/api-extractor (#15647)
+* chore(deps): bump minimatch from 10.1.1 to 10.2.4 in /developer/src/server/src/win32/trayicon/addon-src (#15648)
+* chore(deps): bump tar from 7.5.7 to 7.5.10 in /developer/src/server/src/win32/trayicon/addon-src (#15682)
+* chore(deps): bump multer from 2.0.2 to 2.1.1 (#15681)
+* chore(web): remove implicit any type when setting processingConfig.itemIdentifier (#15689)
+* maint(common): rollback from Typescript 5.8.2 to 5.4.x (#15690)
+* docs: tweak build bot docs and update imsample gitignore (#15691)
+* maint(developer): make `TestCompilerCallbacks` usage more consistent and simplify (#15665)
+* maint(developer): cleanup additional TestCompilerCallbacks references (#15684)
+* fix(developer): prevent new projects from overwriting existing projects (#15669)
+* fix(developer): retrieve debug memo anchor without side effects (#15672)
+* fix(developer): ngrok upgrade (#15626)
+* chore(deps-dev): bump minimatch from 9.0.5 to 9.0.9 in /resources/build/pr-build-status (#15650)
+
+## 19.0.210 alpha 2026-03-05
+
+* fix(developer): apply keyboard description in Windows keyboard import (#15667)
+* fix(developer): improve UI feedback on upgrade (#15670)
+
+## 19.0.209 alpha 2026-03-04
+
+* maint(ios): update fv Cartfile for Xcode 26 (#15655)
+* feat(linux): implement diagnostic report (#15576)
+* refactor(core): cleanup (#15656)
+
+## 19.0.208 alpha 2026-03-03
+
+* docs(core): add keyhandling doc (#15629)
+* fix(developer): handle CRLF as CR internally in LDML debugger (#15616)
+* fix(developer): handle .kps file that has no `<Package>` element (#15622)
+* fix(developer): use correct return values and nullish checks in package-validation (#15653)
+
+## 19.0.207 alpha 2026-03-02
+
+* chore(ios): Cleanup `RELEASE_OEM_FIRSTVOICES` var in build.sh scripts (#15605)
+* fix(developer): package compiler handle missing `info` section in .kps file (#15620)
+* fix(developer): handle window already destroyed when closing editor (#15618)
+
 ## 19.0.206 alpha 2026-02-25
 
 * maint(ios): upgrade to Xcode 26.2 (#15498)
@@ -1222,6 +1282,30 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.248 stable 2026-03-12
+
+* fix(ios): Revert Sentry to 8.38.0 to fix FirstVoices crash on startup with 18.0.247 (#15726)
+
+## 18.0.247 stable 2026-03-09
+
+* chore(linux): Update debian changelog (#15556)
+* chore(linux): update copyright year and standards version (#15558)
+* fix(mac): retry for mac disk detach (#15577)
+* maint(mac): upgrade to Xcode 26.2 (#15575)
+* maint(ios): upgrade to Xcode 26.2 (#15614)
+* fix(developer): handle CRLF as CR internally in LDML debugger (#15660)
+* fix(developer): handle .kps file that has no `<Package>` element (#15661)
+* fix(developer): use correct return values and nullish checks in package-validation (#15662)
+* fix(developer): handle window already destroyed when closing editor (#15663)
+* fix(developer): package compiler handle missing `info` section in .kps file (#15664)
+* fix(developer): apply keyboard description in Windows keyboard import (#15668)
+* fix(developer): improve UI feedback on upgrade (#15686)
+* fix(developer): prevent new projects from overwriting existing projects (#15694)
+* fix(developer): retrieve debug memo anchor without side effects (#15695)
+* fix(developer): ngrok upgrade (#15633)
+* fix(developer): await copier result before reporting success or failure (#15702)
+* fix(developer): resolve input project path for `kmc copy` (#15703)
 
 ## 18.0.246 stable 2026-02-04
 

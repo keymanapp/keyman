@@ -206,7 +206,8 @@ export class KmpCompiler implements KeymanCompiler {
         fileVersion: null,
         keymanDeveloperVersion: KEYMAN_VERSION.VERSION
       },
-      options: {}
+      options: {},
+      info: {},
     };
 
     //

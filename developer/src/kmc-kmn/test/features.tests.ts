@@ -7,24 +7,7 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
 
 describe('Keyboard compiler features', function() {
-  let callbacks: TestCompilerCallbacks = null;
-
-  this.beforeAll(async function() {
-    callbacks = new TestCompilerCallbacks();
-  });
-
-  this.beforeEach(function() {
-    callbacks.clear();
-
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
-
-
+  const callbacks = new TestCompilerCallbacks(this);
 
   // Test each Keyman file version target
 
