@@ -224,9 +224,14 @@ describe('KeylayoutToKmnConverter', function () {
 
   describe('createKmnModifier ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-
     [
       ['NCAPS', true, 'NCAPS'],
+      ['NCAPS', false, 'NCAPS'],
+      ['CAPS', true, 'CAPS'],
+      ['CAPS?', true, 'NCAPS'],
+      ['CAPS? NCAPS', true, 'NCAPS'],
+      ['CAPS NCAPS', true, 'CAPS NCAPS'],
+      ['caps ncaps', true, 'CAPS NCAPS'],
       ['NCAPS shift', true, 'NCAPS SHIFT'],
       ['shift', true, 'NCAPS SHIFT'],
       ['leftshift', true, 'NCAPS SHIFT'],

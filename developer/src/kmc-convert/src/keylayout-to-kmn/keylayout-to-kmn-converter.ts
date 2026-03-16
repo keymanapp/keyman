@@ -31,10 +31,10 @@ export interface ConverterToKmnResult extends ConverterResult {
 };
 
 export interface ProcessedData {
-   /**
-   * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
-   * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
-   */
+  /**
+  * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
+  * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
+  */
   keylayoutFilename: string;
   kmnFilename: string;
   modifiers: string[][];
@@ -49,17 +49,17 @@ export interface KeylayoutFileData {
   actionId?: string;
   keyCode?: string;
   key?: string;
-  behavior ?: string;
+  behavior?: string;
   modifier?: string;
   outchar?: string;
 };
 
 export interface ActionStateOutput {
-   /**
-   * Interface for storing data read from a .keylayout file and used for processing rules.
-   * These are used for obtaining the triplet [action id, state, output]
-   * e.g. ['a9','1','â'] from <when state="1" output="â"/> for action id a9
-   */
+  /**
+  * Interface for storing data read from a .keylayout file and used for processing rules.
+  * These are used for obtaining the triplet [action id, state, output]
+  * e.g. ['a9','1','â'] from <when state="1" output="â"/> for action id a9
+  */
   id: string;
   state: string;
   output: string;
@@ -74,13 +74,13 @@ export class Rule {
 
     public readonly modifierPrevDeadkey: string, /* first key used by C3 rules*/
     public readonly prevDeadkey: string,
-    public  idPrevDeadkey: number,
-    public  uniquePrevDeadkey: number,
+    public idPrevDeadkey: number,
+    public uniquePrevDeadkey: number,
 
     public readonly modifierDeadkey: string,      /* second key used by C2,C3 rules*/
     public readonly deadkey: string,
-    public  idDeadkey: number,
-    public  uniqueDeadkey: number,
+    public idDeadkey: number,
+    public uniqueDeadkey: number,
 
     public readonly modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
     public readonly key: string,
@@ -198,7 +198,7 @@ export class KeylayoutToKmnConverter {
 
       // fill dataObject with filenames, behaviors and (initialized) rules
       dataObject.keylayoutFilename = inputfilename;
-      dataObject.kmnFilename = inputfilename.replace(/\.keylayoutn$/, '.kmn');
+      dataObject.kmnFilename = inputfilename.replace(/\.keylayout$/, '.kmn');
       dataObject.modifiers = modifierBehavior;  // ukelele uses behaviors e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       dataObject.rules = rules;
 
@@ -631,9 +631,11 @@ export class KeylayoutToKmnConverter {
     let kmnModifier: string = "";
     let kmnNcaps: string = "";
 
-    const modifierState: string[] = keylayoutModifier.split(" ");
+    const modifierState = keylayoutModifier.split(" ");
 
-    for (let i = 0; i < modifierState.length; i++) {
+    for (const modifier of modifierState) {
+
+      const modifierUppercase = modifier.toUpperCase();
 
       if (isCAPSused && (keylayoutModifier).toUpperCase().indexOf("CAPS?") > 0) {
         kmnNcaps = " NCAPS ";
@@ -643,62 +645,64 @@ export class KeylayoutToKmnConverter {
         kmnNcaps = " NCAPS ";
       }
 
-      // if we find a modifier containing a '?' e.g. SHIFT? => SHIFT occurs 0 or 1 times so it is not necessary.
+      // if we find a modifier containing a '?' e.g. SHIFT? it means the modifier is not necessary.
       // If it is not necessary we don't write this modifier
-      if (modifierState[i].toUpperCase().includes('?') && (!modifierState[i].toUpperCase().includes('CAPS?'))) {
+      if (modifierUppercase.includes('?') && modifierUppercase !== 'CAPS?') {
         addModifier = "";
       }
 
       // if we find caps? => caps is not necessary.
       // If caps is not necessary and isCAPSused we need to write out NCAPS.
-      else if (isCAPSused && (modifierState[i].toUpperCase().includes('CAPS?'))) {
+      else if (isCAPSused && modifierUppercase === 'CAPS?') {
         addModifier = "NCAPS ";
       }
-      else if (!isCAPSused && (modifierState[i].toUpperCase().includes('CAPS?'))) {
+      else if (!isCAPSused && modifierUppercase === 'CAPS?') {
         addModifier = "";
       }
-      else if ((modifierState[i].toUpperCase().includes('CAPS') && (!(modifierState[i].toUpperCase().includes('NCAPS'))))) {
+      else if (modifierUppercase === 'CAPS' || modifierUppercase === 'CAPS?') {
         addModifier = "CAPS ";
       }
-      else if (isCAPSused && (modifierState[i].toUpperCase().includes('NCAPS'))) {
+      else if (isCAPSused && (modifierUppercase === 'NCAPS')) {
         addModifier = "NCAPS ";
       }
 
-      else if ((modifierState[i].toUpperCase() === 'ANYSHIFT') || (modifierState[i].toUpperCase() === 'SHIFT')) {
+      else if (modifierUppercase === 'ANYSHIFT' || modifierUppercase === 'SHIFT') {
         addModifier = "SHIFT ";
       }
-      else if ((modifierState[i].toUpperCase() === "LEFTSHIFT") || (modifierState[i].toUpperCase() === "LSHIFT")) {
+      else if (modifierUppercase === "LEFTSHIFT" || modifierUppercase === "LSHIFT") {
         addModifier = "SHIFT ";
       }
-      else if ((modifierState[i].toUpperCase() === "RIGHTSHIFT") || (modifierState[i].toUpperCase() === "RSHIFT")) {
+      else if (modifierUppercase === "RIGHTSHIFT" || modifierUppercase === "RSHIFT") {
         addModifier = "SHIFT ";
       }
 
-      else if ((modifierState[i].toUpperCase() === 'ANYCONTROL') || (modifierState[i].toUpperCase() === 'CONTROL')) {
+      else if (modifierUppercase === 'ANYCONTROL' || modifierUppercase === 'CONTROL') {
         addModifier = "CTRL ";
       }
-      else if ((modifierState[i].toUpperCase() === "LEFTCONTROL") || (modifierState[i].toUpperCase() === "LCONTROL")) {
+      else if (modifierUppercase === "LEFTCONTROL" || modifierUppercase === "LCONTROL") {
         addModifier = "LCTRL ";
       }
-      else if ((modifierState[i].toUpperCase() === "RIGHTCONTROL") || (modifierState[i].toUpperCase() === "RCONTROL")) {
+      else if (modifierUppercase === "RIGHTCONTROL" || modifierUppercase === "RCONTROL") {
         addModifier = "RCTRL ";
       }
 
-      else if ((modifierState[i].toUpperCase() === "LEFTOPTION") || (modifierState[i].toUpperCase() === "LOPTION")) {
+      else if (modifierUppercase === "LEFTOPTION" || modifierUppercase === "LOPTION") {
         addModifier = "LALT ";
       }
-      else if ((modifierState[i].toUpperCase() === "RIGHTOPTION") || (modifierState[i].toUpperCase() === "ROPTION")) {
+      else if (modifierUppercase === "RIGHTOPTION" || modifierUppercase === "ROPTION") {
         addModifier = "RALT ";
       }
-      else if ((modifierState[i].toUpperCase() === 'ANYOPTION') || (modifierState[i].toUpperCase() === 'OPTION')) {
+      else if (modifierUppercase === 'ANYOPTION' || modifierUppercase === 'OPTION') {
         addModifier = "RALT ";
       }
-      // to enable the use of other modifiers e.g. 'command' of Italian.keylayout
+      // to enable the use of other modifiers (leave upper/lowecase as in .keylayout)
+      // e.g. 'shift command' -> 'NCAPS SHIFT command'; 'wrongModifierName' -> 'wrongModifierName'
       else {
-        addModifier = modifierState[i] + " ";
+        addModifier = modifier + " ";
       }
       kmnModifier += kmnNcaps + addModifier;
     }
+
     // remove duplicate and empty entries and make sure NCAPS is at the beginning
     const duplicateModifier: string[] = kmnModifier.split(" ").filter(item => item);
 
@@ -844,7 +848,7 @@ export class KeylayoutToKmnConverter {
   public getModifierArrayFromKeyModifierArray(data: any, search: KeylayoutFileData[]): string[] {
     const returnString1D: string[] = [];
     for (let i = 0; i < search.length; i++) {
-      returnString1D.push(data[search[i].behavior ]);
+      returnString1D.push(data[search[i].behavior]);
     }
     return returnString1D;
   }
@@ -894,7 +898,7 @@ export class KeylayoutToKmnConverter {
               keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'],
               key: this.mapUkeleleKeycodeToVK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'])),
               actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@__action'],
-              behavior : data.keyboard.keyMapSet[0].keyMap[i]['@__index'],
+              behavior: data.keyboard.keyMapSet[0].keyMap[i]['@__index'],
               outchar: search[k].output
             };
             keyActionOutput.push(singleDataSet);
@@ -918,7 +922,7 @@ export class KeylayoutToKmnConverter {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
         if ((data.keyboard.actions.action[i].when[j]['@__state'] === search)) {
           if (data.keyboard.actions.action[i].when[j]['@__output'] !== undefined) {
-           const singleDataSet  = {
+            const singleDataSet = {
               id: data.keyboard.actions.action[i]['@__id'],
               state: data.keyboard.actions.action[i].when[j]['@__state'],
               output: data.keyboard.actions.action[i].when[j]['@__output']
@@ -943,12 +947,12 @@ export class KeylayoutToKmnConverter {
 
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
-        const behaviorIdx: number = Number(search[i].behavior );
+        const behaviorIdx: number = Number(search[i].behavior);
         for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviorIdx].modifier.length; j++) {
           const singleDataSet = {
             actionId: search[i].actionId,
             key: search[i].key,
-            behavior: search[i].behavior ,
+            behavior: search[i].behavior,
             modifier: this.createKmnModifier(data.keyboard.modifierMap.keyMapSelect[behaviorIdx].modifier[j]['@__keys'], isCAPSused),
             outchar: search[i].outchar,
           };
