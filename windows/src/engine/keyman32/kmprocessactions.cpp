@@ -78,21 +78,21 @@ processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboa
 }
 
 static void processCapsLock(const km_core_caps_state caps_state_change, BOOL isUp, BOOL Updateable, BOOL externalEvent) {
-  // Turn three state value into a boolean for whether caps lock should be on or off,
-  // we only want to process the key event if the state is changing.
-  BOOL required_caps_state = (caps_state_change == KM_CORE_CAPS_ON);
   BOOL isCapsOn            = IsCapsLockOn();
   /// For Debuging
   // TODO: 15594 - remove this debug message and associated code after testing
   SendDebugMessageFormat("ACTION CAPS STATE:%d FIsUp=%d Updateable=%d ExternalEvent=%d CapsState=%d", caps_state_change, isUp, Updateable,
       externalEvent, isCapsOn);
-
   // We only want to process the Caps Lock key event once;
   // it has to be when updateble=1 as TSF does not consistently
   // have updateable=0 events.
-  if (!Updateable){
+  if (!Updateable || caps_state_change == KM_CORE_CAPS_UNCHANGED)
+  {
     return;
   }
+  // Turn three state value into a boolean for whether caps lock should be on or off,
+  // we only want to process the key event if the state is changing.
+  BOOL required_caps_state = (caps_state_change == KM_CORE_CAPS_ON);
 
   if (isCapsOn != required_caps_state) {
     SendDebugMessageFormat(
