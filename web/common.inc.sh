@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #
 
-LIB_BUNDLER="${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 # Compiles all build products corresponding to the specified target.
 # This should be called from the working directory of a child project's
 # build script.
@@ -93,7 +91,7 @@ function test-headless() {
   TEST_FOLDER=$1
   TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
   TEST_EXTENSIONS=${2:-}
-  if [ ! -z "${2:-}" ]; then
+  if [[ ! -z "${2:-}" ]]; then
     TEST_BASE="${KEYMAN_ROOT}/web/build/test/headless/"
 
     # Ensure the compiled tests are available.
@@ -106,9 +104,11 @@ function test-headless() {
     echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
   if [[ -n "${TEST_EXTENSIONS}" ]]; then
+    # file extension of test files
     TEST_OPTS+=(--extension "${TEST_EXTENSIONS}")
   fi
 
+  builder_echo '> ' mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   if [[ -e .c8rc.json ]]; then
     c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   else

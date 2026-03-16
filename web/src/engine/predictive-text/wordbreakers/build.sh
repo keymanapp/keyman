@@ -19,6 +19,7 @@ SUBPROJECT_NAME=engine/predictive-text/wordbreakers
 # Note:  the raw text files used for data.inc.ts are found within
 # /resources/standards-data/unicode-character-database.
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
+  "@/common/web/types  build" \
   "clean" \
   "configure" \
   "build" \
@@ -63,7 +64,7 @@ function do_test() {
   fi
 }
 
-builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
+builder_run_action configure  do_configure
 builder_run_action build      do_build
 builder_run_action test       test-headless-typescript $SUBPROJECT_NAME

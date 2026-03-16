@@ -2,8 +2,8 @@ import { assert } from 'chai'
 import sinon from 'sinon';
 import * as PromiseStatusModule from 'promise-status-async';
 
-import { InputSample, GestureSource, gestures, CumulativePathStats } from '@keymanapp/gesture-recognizer';
-import { timedPromise } from '@keymanapp/web-utils';
+import { InputSample, GestureSource, gestures, CumulativePathStats } from 'keyman/engine/gesture-processor';
+import { timedPromise } from 'keyman/common/web-utils';
 
 import { assertingPromiseStatus as promiseStatus } from '#test-resources/assertingPromiseStatus.js';
 
