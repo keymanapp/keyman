@@ -21,6 +21,13 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
+let SUGGESTION_ID_SEED = 0;
+export function generateSuggestionId() {
+  const id = SUGGESTION_ID_SEED;
+  SUGGESTION_ID_SEED++;
+  return id;
+}
+
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
   private _contextTracker?: correction.ContextTracker;
@@ -61,8 +68,6 @@ export class ModelCompositor {
    *     behavior changes might feel arbitrary to users if we used a hard threshold instead.
    */
   static readonly SINGLE_CHAR_KEY_PROB_EXPONENT = 16;
-
-  private SUGGESTION_ID_SEED = 0;
 
   private testMode: boolean = false;
   private verbose: boolean = true;
@@ -193,11 +198,6 @@ export class ModelCompositor {
       this.verbose
     );
 
-    suggestions.forEach((suggestion) => {
-      suggestion.id = this.SUGGESTION_ID_SEED;
-      this.SUGGESTION_ID_SEED++;
-    });
-
     if(revertableTransitionId) {
       const reversion = this.contextTracker.peek(revertableTransitionId)?.reversion;
       if(reversion) {
@@ -264,8 +264,7 @@ export class ModelCompositor {
       // verification later.
       reversion.id = -suggestion.id;
     } else {
-      reversion.id = -this.SUGGESTION_ID_SEED;
-      this.SUGGESTION_ID_SEED++;
+      reversion.id = -generateSuggestionId();
     }
 
     // Step 3:  if we track Contexts, update the tracking data as appropriate.

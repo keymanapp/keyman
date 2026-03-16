@@ -10,7 +10,7 @@ import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
-import ModelCompositor from './model-compositor.js';
+import ModelCompositor, { generateSuggestionId } from './model-compositor.js';
 import { getBestMatches } from './correction/distance-modeler.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
@@ -1023,15 +1023,19 @@ export function finalizeSuggestions(
       mutableSuggestion.transform = mergedTransform;
     }
 
+    const suggestionId = generateSuggestionId();
+
     if(!verbose) {
       return {
         ...prediction.sample,
-        p: tuple.totalProb
+        p: tuple.totalProb,
+        id: suggestionId
       };
     } else {
       const sample: Outcome<Suggestion | Keep> = {
         ...prediction.sample,
         p: tuple.totalProb,
+        id: suggestionId,
         "lexical-p": prediction.p,
         "correction-p": tuple.correction.p
       }

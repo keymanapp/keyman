@@ -171,6 +171,10 @@ describe('finalizeSuggestions', () => {
         insert: testModelWithSpacing.punctuation.insertAfterWord,
         deleteLeft: 0
       });
+
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
@@ -191,6 +195,10 @@ describe('finalizeSuggestions', () => {
 
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
+
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
 
       // We do not add a whitespace despite not splitting a token if there's a
       // matching whitespace immediately to the caret's right.
@@ -223,6 +231,10 @@ describe('finalizeSuggestions', () => {
         insert: testModelWithSpacing.punctuation.insertAfterWord,
         deleteLeft: 0
       });
+
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
@@ -251,6 +263,10 @@ describe('finalizeSuggestions', () => {
         insert: testModelWithSpacing.punctuation.insertAfterWord,
         deleteLeft: 0
       });
+
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });
@@ -274,6 +290,9 @@ describe('finalizeSuggestions', () => {
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithoutSpacing, unfinalized, context, transform, false);
 
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
@@ -297,6 +316,10 @@ describe('finalizeSuggestions', () => {
 
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithoutSpacing, unfinalized, context, transform, false);
+
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
 
       // We do not add a whitespace despite not splitting a token if there's a
       // matching whitespace immediately to the caret's right.
@@ -325,6 +348,9 @@ describe('finalizeSuggestions', () => {
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithoutSpacing, unfinalized, context, transform, false);
 
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });
@@ -353,6 +379,10 @@ describe('finalizeSuggestions', () => {
         insert: testModelWithSpacing.punctuation.insertAfterWord,
         deleteLeft: 0
       });
+
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
@@ -371,7 +401,6 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
@@ -379,6 +408,10 @@ describe('finalizeSuggestions', () => {
         insert: testModelWithSpacing.punctuation.insertAfterWord,
         deleteLeft: 0
       });
+
+      // For full deep equality, we can't (or at least, shouldn't) test against
+      // specific suggestion ID values,
+      finalized.forEach((entry) => delete entry.id);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });
