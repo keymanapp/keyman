@@ -14,17 +14,7 @@ import { KeymanProjectCopier } from '../src/KeymanProjectCopier.js';
 import { makePathToFixture } from './helpers/index.js';
 
 describe('CopierMessages', function () {
-  const callbacks = new TestCompilerCallbacks(makePathToFixture('online'));
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
+  const callbacks = new TestCompilerCallbacks(this, makePathToFixture('online'));
 
   it('should have a valid CopierMessages object', function() {
     return verifyCompilerMessagesObject(CopierMessages, CompilerErrorNamespace.Copier);

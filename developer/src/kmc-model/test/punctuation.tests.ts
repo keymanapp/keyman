@@ -6,12 +6,13 @@ import { makePathToFixture, compileModelSourceCode } from './helpers/index.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('LexicalModelCompiler', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   describe('specifying punctuation', function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = makePathToFixture(MODEL_ID);
 
     it('should compile punctuation into the generated code', async function () {
-      const callbacks = new TestCompilerCallbacks();
 
       const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));

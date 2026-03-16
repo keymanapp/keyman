@@ -143,20 +143,38 @@ def verify_ibus_daemon(start):
     return retval
 
 
-def _get_ibus_version():
-    ibus_version = subprocess.run(('ibus', 'version'), check=False,
-                                  stdout=subprocess.PIPE).stdout
-    match = re.search(r'^IBus (.*)\n$', ibus_version.decode('utf-8'))
-    if match:
-        logging.info('Running IBus version %s', match.group(1))
-        return match.group(1)
-    logging.warning('Unable to determine IBus version')
-    return ''
+def get_ibus_version():
+    """
+    Get the installed IBus version string if available. This checks the `ibus` command
+    output and parses the reported version.
+
+    Returns the version as a string on success, an empty string if the version
+    cannot be determined, or None if the `ibus` command is not available.
+
+    Returns:
+        str | None: The detected IBus version string, an empty string if
+                    parsing fails, or None if the `ibus` command is not found.
+    """
+    try:
+        ibus_version = subprocess.run(('ibus', 'version'), check=False,
+                                      stdout=subprocess.PIPE).stdout
+        if match := re.search(r'^IBus (.*)\n$', ibus_version.decode('utf-8')):
+            logging.info('Running IBus version %s', match[1])
+            return match[1]
+        logging.warning('Unable to determine IBus version')
+        return ''
+    except FileNotFoundError:
+        logging.warning('ibus command not found')
+        return None
 
 
 def _start_ibus_daemon(realuser):
     try:
-        if version.parse(_get_ibus_version()) >= version.parse('1.5.28'):
+        ibus_ver = get_ibus_version()
+        if not ibus_ver:
+            return
+
+        if version.parse(ibus_ver) >= version.parse('1.5.28'):
             # IBus ~1.5.28 added the `start` command, so we use that if possible
             # and let IBus deal with the necessary parameters
             args = ['ibus', 'start', '-d']
