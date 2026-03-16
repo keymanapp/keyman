@@ -4,17 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <item android:id="@+id/action_share"
-        app:showAsAction="always"
-        android:title="@string/action_share"
-        android:icon="@drawable/ic_light_action_share" />
+<!--    <item android:id="@+id/action_share"-->
+<!--        app:showAsAction="always"-->
+<!--        android:title="@string/action_share"-->
+<!--        android:icon="@drawable/ic_light_action_share" />-->
 
     <!-- Disable Web Browser to investigate Google sign-in -->
-    <!--item
+    <!--<item
         android:id="@+id/action_web"
         app:showAsAction="always"
         android:title="@string/action_web"
         android:icon="@drawable/ic_light_action_web" /> -->
+
+<!--    <item android:id="@+id/action_share"-->
+<!--        app:showAsAction="always"-->
+<!--        android:title="@string/action_share"-->
+<!--        android:icon="@drawable/ic_light_action_share" />-->
 
     <!-- Set showAsAction="never" for overflow -->
     <item
@@ -24,6 +29,10 @@
         android:icon="@drawable/ic_light_action_overflow" >
 
         <menu>
+                <item android:id="@+id/action_share"
+                    app:showAsAction="always"
+                    android:title="@string/action_share"
+                    android:icon="@drawable/ic_light_action_share" />
 
             <item
                 android:id="@+id/action_text_size"

@@ -6,6 +6,9 @@
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Share</string>
 
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
   <!-- Context: Menu Action -->
   <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
 
