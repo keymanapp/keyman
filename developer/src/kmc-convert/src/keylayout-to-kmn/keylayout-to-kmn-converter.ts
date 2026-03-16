@@ -224,7 +224,7 @@ export class KeylayoutToKmnConverter {
     let actionId: string;
 
     // check if we use CAPS in a modifier throughout the .keylayout file. In this case we need to add NCAPS
-    const isCapsused: boolean = this.checkIfCapsIsUsed(dataUkelele.modifiers);
+    const isCapsused = (this.checkIfCapsIsUsed(dataUkelele.modifiers) !== undefined);
 
     // if there are different amounts of keyMapSelect vs keyMap
     if (jsonObj.keyboard.modifierMap?.keyMapSelect.length !== jsonObj.keyboard.keyMapSet[0].keyMap.length) {
@@ -619,7 +619,6 @@ export class KeylayoutToKmnConverter {
     return dataUkelele;
   }
 
-
   /**
    * @brief  member function to create a kmn modifier from a keylayout modifier
    * @param  keylayoutModifier :string - modifier used in a .keylayout file
@@ -627,87 +626,77 @@ export class KeylayoutToKmnConverter {
    * @return string - a modifier value suitable for use in a .kmn-file
    */
   public createKmnModifier(keylayoutModifier: string, isCAPSused: boolean): string {
-    let addModifier: string = "";
-    let kmnModifier: string = "";
-    let kmnNcaps: string = "";
 
+    const kmnModifier: string[] = [];
     const modifierState = keylayoutModifier.split(" ");
 
     for (const modifier of modifierState) {
-
       const modifierUppercase = modifier.toUpperCase();
 
       if (isCAPSused && (keylayoutModifier).toUpperCase().indexOf("CAPS?") > 0) {
-        kmnNcaps = " NCAPS ";
+        kmnModifier.push("NCAPS");
       }
-
       if (isCAPSused && (keylayoutModifier).toUpperCase().indexOf("CAPS") === -1) {
-        kmnNcaps = " NCAPS ";
+        kmnModifier.push("NCAPS");
       }
 
       // if we find a modifier containing a '?' e.g. SHIFT? it means the modifier is not necessary.
       // If it is not necessary we don't write this modifier
       if (modifierUppercase.includes('?') && modifierUppercase !== 'CAPS?') {
-        addModifier = "";
+        kmnModifier.push("");
       }
-
-      // if we find caps? => caps is not necessary.
+      // if we find 'caps?' => caps is not necessary.
       // If caps is not necessary and isCAPSused we need to write out NCAPS.
       else if (isCAPSused && modifierUppercase === 'CAPS?') {
-        addModifier = "NCAPS ";
+        kmnModifier.push("NCAPS");
       }
       else if (!isCAPSused && modifierUppercase === 'CAPS?') {
-        addModifier = "";
+        kmnModifier.push("");
       }
       else if (modifierUppercase === 'CAPS' || modifierUppercase === 'CAPS?') {
-        addModifier = "CAPS ";
+        kmnModifier.push("CAPS");
       }
       else if (isCAPSused && (modifierUppercase === 'NCAPS')) {
-        addModifier = "NCAPS ";
+        kmnModifier.push("NCAPS");
       }
-
       else if (modifierUppercase === 'ANYSHIFT' || modifierUppercase === 'SHIFT') {
-        addModifier = "SHIFT ";
+        kmnModifier.push("SHIFT");
       }
       else if (modifierUppercase === "LEFTSHIFT" || modifierUppercase === "LSHIFT") {
-        addModifier = "SHIFT ";
+        kmnModifier.push("SHIFT");
       }
       else if (modifierUppercase === "RIGHTSHIFT" || modifierUppercase === "RSHIFT") {
-        addModifier = "SHIFT ";
+        kmnModifier.push("SHIFT");
       }
-
       else if (modifierUppercase === 'ANYCONTROL' || modifierUppercase === 'CONTROL') {
-        addModifier = "CTRL ";
+        kmnModifier.push("CTRL");
       }
       else if (modifierUppercase === "LEFTCONTROL" || modifierUppercase === "LCONTROL") {
-        addModifier = "LCTRL ";
+        kmnModifier.push("LCTRL");
       }
       else if (modifierUppercase === "RIGHTCONTROL" || modifierUppercase === "RCONTROL") {
-        addModifier = "RCTRL ";
+        kmnModifier.push("RCTRL");
       }
-
       else if (modifierUppercase === "LEFTOPTION" || modifierUppercase === "LOPTION") {
-        addModifier = "LALT ";
+        kmnModifier.push("LALT");
       }
       else if (modifierUppercase === "RIGHTOPTION" || modifierUppercase === "ROPTION") {
-        addModifier = "RALT ";
+        kmnModifier.push("RALT");
       }
       else if (modifierUppercase === 'ANYOPTION' || modifierUppercase === 'OPTION') {
-        addModifier = "RALT ";
+        kmnModifier.push("RALT");
       }
       // to enable the use of other modifiers (leave upper/lowecase as in .keylayout)
       // e.g. 'shift command' -> 'NCAPS SHIFT command'; 'wrongModifierName' -> 'wrongModifierName'
       else {
-        addModifier = modifier + " ";
+        if (!this.isAcceptableKeymanModifier(modifier))
+          kmnModifier.push(modifier);
       }
-      kmnModifier += kmnNcaps + addModifier;
     }
 
     // remove duplicate and empty entries and make sure NCAPS is at the beginning
-    const duplicateModifier: string[] = kmnModifier.split(" ").filter(item => item);
-
-    const uniqueModifier: string[] = duplicateModifier.filter(function (item, pos, self) {
-      return self.indexOf(item) === pos;
+    const uniqueModifier: string[] = kmnModifier.filter(function (item, pos, self) {
+      return ((self.indexOf(item) === pos) && (item !== ""));
     });
 
     return uniqueModifier.flat().toString().replace(/,/g, " ");
@@ -716,10 +705,12 @@ export class KeylayoutToKmnConverter {
   /**
    * @brief  member function to check if CAPS is used throughout a keylayout file or not
    * @param  keylayoutModifier the modifier string used in the .keylayout-file
-   * @return kmnModifier: the modifier string used in the .kmn-file
+   * @return "caps" or undefined if "caps" is not found
    */
-  public checkIfCapsIsUsed(keylayoutModifier: string[][]): boolean {
-    return JSON.stringify(keylayoutModifier).toUpperCase().includes("CAPS");
+  public checkIfCapsIsUsed(keylayoutModifier: string[][]): string {
+    if (!keylayoutModifier)
+      return undefined;
+    return keylayoutModifier.flat().find(e => e.toUpperCase() === 'CAPS');
   }
 
   /**

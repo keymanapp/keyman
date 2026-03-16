@@ -7,11 +7,12 @@
  * structures produced by xml2js when passed keylayout .xml file.
  * The prefix KL is stands for 'Keylayout'
  *
- * A keylayout file is a configuration file used macOS to define custom keyboard mappings,
- * mapping physical key presses to specific characters or Unicode symbols. These XML-based files,
- * created with Ukelele, allow users to create custom layouts for different languages or special characters,
- * such as mapping Option + Key combinations.
- * With kmc-convert we can convert these keylayout files to .kmn files which can be used in Keyman keyboards.
+ * A keylayout file is a configuration file used macOS to define custom
+ * keyboard mappings, mapping physical key presses to specific characters
+ * or Unicode symbols. These XML-based files, created with Ukelele, allow
+ * users to create custom layouts for different languages or special characters,
+ * such as mapping Option + Key combinations.  With kmc-convert we can convert
+ * these keylayout files to .kmn files which can be used in Keyman keyboards.
  */
 
 export interface KeylayoutXMLSourceFile {

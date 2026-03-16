@@ -1,7 +1,10 @@
 
 # Keylayout
 
-This is to get a **keylayout.schema.json** for validating keylayout files
+A keylayout file is a configuration file used macOS to define custom keyboard mappings, mapping physical key presses to specific characters or Unicode symbols. These XML-based files, created with Ukelele, allow users to create custom layouts for different languages or special haracters, such as mapping Option + Key combinations. With kmc-convert we can convert these keylayout files to .kmn files which can be used in Keyman keyboards. 
+For validating a .keylayout file a keylayout.schema.json is needed.
+
+This is to get a **keylayout.schema.json**:
 
 
 - We first need to have a `.XSD file` created from a `.keylayout file` (which is an xml-file type )
