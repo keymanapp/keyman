@@ -15,7 +15,7 @@ import { ElemElement, ElementString } from './element-string.js';
 import { KMXFile } from '../kmx.js';
 
 export class KMXPlusFileReaderError extends KeymanTypesError {
-  constructor(message?: string, options?: ErrorOptions) {
+  constructor(message?: string, options?: any /* ErrorOptions type not yet broadly available */) {
     super(message, options);
     this.name = this.constructor.name;
   }
