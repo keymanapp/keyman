@@ -23,16 +23,15 @@ import {
   SearchQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
-import { buildAlphabeticClusterFixtures } from './search-quotient-cluster.tests.js';
+import { constituentPaths } from '../../helpers/constituentPaths.js';
+import { quotientPathHasInputs } from '../../helpers/quotientPathHasInputs.js';
+import { buildCantLinearFixture } from '../../helpers/buildCantLinearFixture.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-import { constituentPaths, quotientPathHasInputs } from '#test-resources/searchQuotientUtils.js';
-
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
-
 
 // https://www.compart.com/en/unicode/block/U+1D400
 const mathBoldUpperA = 0x1D400; // Mathematical Bold Capital A
@@ -61,39 +60,6 @@ function toMathematicalSMP(text: string) {
   });
 
   return asSMP.join('');
-}
-
-export function buildSimplePathSplitFixture() {
-  const rootPath = new LegacyQuotientRoot(testModel);
-
-  const distrib1 = [
-    { sample: {insert: 'c', deleteLeft: 0, id: 11}, p: 0.5 },
-    { sample: {insert: 'r', deleteLeft: 0, id: 11}, p: 0.4 },
-    { sample: {insert: 't', deleteLeft: 0, id: 11}, p: 0.1 }
-  ];
-  const path1 = new LegacyQuotientSpur(rootPath, distrib1, distrib1[0]);
-
-  const distrib2 = [
-    { sample: {insert: 'a', deleteLeft: 0, id: 12}, p: 0.7 },
-    { sample: {insert: 'e', deleteLeft: 0, id: 12}, p: 0.3 }
-  ];
-  const path2 = new LegacyQuotientSpur(path1, distrib2, distrib2[0]);
-
-  const distrib3 = [
-    { sample: {insert: 'n', deleteLeft: 0, id: 13}, p: 0.8 },
-    { sample: {insert: 'r', deleteLeft: 0, id: 13}, p: 0.2 }
-  ];
-  const path3 = new LegacyQuotientSpur(path2, distrib3, distrib3[0]);
-
-  const distrib4 = [
-    { sample: {insert: 't', deleteLeft: 0, id: 14}, p: 1 }
-  ];
-  const path4 = new LegacyQuotientSpur(path3, distrib4, distrib4[0]);
-
-  return {
-    paths: [null, path1, path2, path3, path4],
-    distributions: [distrib1, distrib2, distrib3, distrib4]
-  };
 }
 
 describe('SearchQuotientSpur', () => {
@@ -269,64 +235,11 @@ describe('SearchQuotientSpur', () => {
     });
   });
 
-  describe('fixture construction', () => {
-    it('setup: buildSimplePathSplitFixture() constructs paths properly', () => {
-      const { paths, distributions } = buildSimplePathSplitFixture();
-      const pathToSplit = paths[4];
-
-      assert.equal(pathToSplit.inputCount, 4);
-      assert.equal(distributions.length, pathToSplit.inputCount);
-      assert.equal(pathToSplit.codepointLength, 4); // one char per input, no deletions anywhere
-      // Per assertions documented in the setup above.
-      assert.deepEqual(pathToSplit.bestExample, distributions.reduce(
-        (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
-        {text: '', p: 1})
-      );
-      assert.deepEqual(pathToSplit.parents[0].bestExample, distributions.slice(0, pathToSplit.inputCount-1).reduce(
-        (constructing, current) => ({text: constructing.text + current[0].sample.insert, p: constructing.p * current[0].p}),
-        {text: '', p: 1})
-      );
-      assert.isTrue(quotientPathHasInputs(pathToSplit, distributions));
-      assert.equal(constituentPaths(pathToSplit).length, 1);
-    });
-  });
-
-  describe('constituentPaths', () => {
-    it('includes a single entry array when all parents are SearchQuotientSpurs', () => {
-      const { paths } = buildSimplePathSplitFixture();
-      const finalPath = paths[4];
-
-      assert.equal(constituentPaths(finalPath).length, 1);
-
-      const pathSequence = constituentPaths(finalPath)[0];
-      assert.equal(pathSequence.length, 4); // 4 inputs; does not include root node
-
-      assert.sameOrderedMembers(pathSequence, paths.slice(1));
-    });
-
-    it('properly enumerates child paths when encountering SearchCluster ancestors', () => {
-      const fixture = buildAlphabeticClusterFixtures();
-      const finalPath = fixture.paths[4].path_k4c6;
-
-      // The longest SearchPath at the end of that fixture's set is based on a
-      // lead-in cluster; all variants of that should be included.
-      assert.equal(constituentPaths(finalPath).length, constituentPaths(fixture.clusters.cluster_k3c4).length);
-
-      // That cluster holds the different potential penultimate paths;
-      // finalPath's inputs are added directly after any variation that may be
-      // output from the cluster.
-      assert.sameDeepMembers(constituentPaths(finalPath), constituentPaths(fixture.clusters.cluster_k3c4).map((p) => {
-        p.push(finalPath);
-        return p;
-      }));
-    });
-  });
-
   describe('.edgeKey', () => {
     it('changes when input source subset IDs differ', () => {
       const root = new LegacyQuotientRoot(testModel);
 
-      const {distributions} = buildSimplePathSplitFixture();
+      const {distributions} = buildCantLinearFixture();
       const inputSrc = {
         segment: {
           transitionId: distributions[0][0].sample.id,
@@ -351,7 +264,7 @@ describe('SearchQuotientSpur', () => {
     it('changes when different parts of the same input source are used', () => {
       const root = new LegacyQuotientRoot(testModel);
 
-      const {distributions} = buildSimplePathSplitFixture();
+      const {distributions} = buildCantLinearFixture();
       const inputSrc = {
         segment: {
           transitionId: distributions[0][0].sample.id,
@@ -386,7 +299,7 @@ describe('SearchQuotientSpur', () => {
   describe('split()', () => {
     describe(`on token comprised of single-char transforms:  [crt][ae][nr][t]`, () => {
       const runSplit = (splitIndex: number) => {
-        const { paths, distributions } = buildSimplePathSplitFixture();
+        const { paths, distributions } = buildCantLinearFixture();
         const pathToSplit = paths[4];
 
         const splitResults = pathToSplit.split(splitIndex);
@@ -419,7 +332,7 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 0', () => {
         runSplit(0);
 
-        const { paths, distributions } = buildSimplePathSplitFixture();
+        const { paths, distributions } = buildCantLinearFixture();
         const pathToSplit = paths[4];
         const [head, tail] = pathToSplit.split(0)[0];
 
@@ -436,7 +349,7 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 1', () => {
         runSplit(1);
 
-        const { paths } = buildSimplePathSplitFixture();
+        const { paths } = buildCantLinearFixture();
         const pathToSplit = paths[4];
         const [head] = pathToSplit.split(1)[0];
 
@@ -446,7 +359,7 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 2', () => {
         runSplit(2);
 
-        const { paths } = buildSimplePathSplitFixture();
+        const { paths } = buildCantLinearFixture();
         const pathToSplit = paths[4];
         const [head] = pathToSplit.split(2)[0];
 
@@ -456,7 +369,7 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 3', () => {
         runSplit(3);
 
-        const { paths } = buildSimplePathSplitFixture();
+        const { paths } = buildCantLinearFixture();
         const pathToSplit = paths[4];
         const [head] = pathToSplit.split(3)[0];
 
@@ -466,7 +379,7 @@ describe('SearchQuotientSpur', () => {
       it('splits properly at index 4', () => {
         runSplit(4);
 
-        const { paths } = buildSimplePathSplitFixture();
+        const { paths } = buildCantLinearFixture();
         const pathToSplit = paths[4];
         const [head] = pathToSplit.split(4)[0];
 
