@@ -190,6 +190,12 @@ check_code_sign_status
 }
 
 do_update_app_metadata ( ) {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+      echo "do_update_app_metadata, release_build_level = true."
+  else
+      echo "do_update_app_metadata, release_build_level = false."
+  fi
+    
   updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
 
   # re-sign the app after updating the plist file
@@ -199,17 +205,22 @@ do_update_app_metadata ( ) {
 check_code_sign_status() {
   KEYMAN_APP_PATH="$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
 
-  echo "Listing entitlements for $KEYMAN_APP_PATH using codesign:"
-  codesign -d --entitlements - --xml "$KEYMAN_APP_PATH" | plutil -convert xml1 -o - -
+  if [ -e "$KEYMAN_APP_PATH" ]; then
+    echo "check_code_sign_status, $KEYMAN_APP_PATH exists, listing entitlements using codesign:"
+    codesign -d --entitlements - --xml "$KEYMAN_APP_PATH" | plutil -convert xml1 -o - -
 
-  #codesign -dvvv --entitlements - --xml "$KEYMAN_APP_PATH"
+    #codesign -dvvv --entitlements - --xml "$KEYMAN_APP_PATH"
 
-  # Check the exit status of the command
-  if [ $? -eq 0 ]; then
-      echo "codesign command executed successfully."
-  else
-      echo "codesign command failed."
+    # Check the exit status of the command
+    if [ $? -eq 0 ]; then
+        echo "codesign command executed successfully."
+    else
+        echo "codesign command failed."
+    fi
+ else
+      echo "check_code_sign_status, $KEYMAN_APP_PATH does not exist."
   fi
+
 }
 
 # preserve the metadata included in the Keyman.app bundle, but use the runtime option to ensure hardened runtime is enabled for notarization
@@ -324,7 +335,10 @@ do_sentry() {
 do_install() {
   if builder_is_ci_build; then
     builder_die "build.sh install should not be run on CI"
-  elif ! builder_has_option --quick; then
+  elif ! builder_has_option --quick && ! builder_is_debug_build; then
+    # do not notarize if quick option is specified or not a relase build
+    # notarization fails unless signed with Developer ID certificate
+    # which is not used in debug builds
     do_notarize
   else
     if [ "$(spctl --status)" == "assessments enabled" ]; then
@@ -342,7 +356,7 @@ do_install() {
 }
 
 do_publish() {
-  builder_if_release_build_level do_notarize
+  is_release do_notarize
 
   builder_heading "Preparing files for release deployment..."
   ./setup/build.sh
