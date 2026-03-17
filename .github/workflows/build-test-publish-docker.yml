@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: Checkout repository
         id: checkout
-        uses: actions/checkout@v5.0.1
+        uses: actions/checkout@v6.0.2
       - name: Build Docker images
         id: build
         run: |
@@ -67,7 +67,7 @@ jobs:
     steps:
       - name: Checkout repository
         id: checkout
-        uses: actions/checkout@v5.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Test Docker images
         id: test
