@@ -76,6 +76,8 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
 /**
  * Collates information related to suggestions during the suggestion generation
  * process.
+ *
+ * This type is leveraged for all model types, even those without Traversals.
  */
 export type CorrectionPredictionTuple = {
   /**
@@ -86,6 +88,12 @@ export type CorrectionPredictionTuple = {
    * The correction upon which the Suggestion (or Keep) is based
    */
   correction: ProbabilityMass<string>,
+  /**
+   * The ContextTokenization of the correction-search result used to produce this tuple.
+   *
+   * May be null if the model doesn't leverage the Traversal pattern.
+   */
+  baseTokenization?: ContextTokenization;
   /**
    * The likelihood of the prediction - its lexical-model likelihood multiplied
    * by the keystroke-sequence + correction likelihood.
@@ -568,7 +576,10 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], predictionContext);
-    predictions.forEach((entry) => entry.preservationTransform = tokenization.taillessTrueKeystroke);
+    predictions.forEach((entry) => {
+      entry.preservationTransform = tokenization.taillessTrueKeystroke;
+      entry.baseTokenization = tokenization;
+    });
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
@@ -1019,12 +1030,15 @@ export function finalizeSuggestions(
   context: Context,
   inputTransform: Transform,
   verbose?: boolean
-): Outcome<Suggestion | Keep>[] {
+): { suggestions: Outcome<Suggestion | Keep>[], suggestionTokenizationMap: Map<number, ContextTokenization>} {
   const punctuation = determinePunctuationFromModel(lexicalModel);
   const tokenize = determineModelTokenizer(lexicalModel);
 
+  const tokenizationMap = new Map<number, ContextTokenization>();
+
   const suggestions = deduplicatedSuggestionTuples.map((tuple) => {
     const prediction = tuple.prediction;
+    tokenizationMap.set(tuple.prediction.sample.id, tuple.baseTokenization);
 
     // If this is a suggestion after any form of wordbreak input, make sure we preserve any components
     // from prior tokens!
@@ -1106,7 +1120,7 @@ export function finalizeSuggestions(
     });
   };
 
-  return suggestions;
+  return {suggestions, suggestionTokenizationMap: tokenizationMap};
 }
 
 export function toAnnotatedSuggestion(

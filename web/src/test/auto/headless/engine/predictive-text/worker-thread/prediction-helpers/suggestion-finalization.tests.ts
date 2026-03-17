@@ -174,8 +174,8 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
-      assert.sameDeepOrderedMembers(finalized, expected);
+      finalized.suggestions.forEach((entry) => delete entry.id);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
 
     it('does not add whitespace when caret is followed by whitespace', () => {
@@ -198,11 +198,11 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
+      finalized.suggestions.forEach((entry) => delete entry.id);
 
       // We do not add a whitespace despite not splitting a token if there's a
       // matching whitespace immediately to the caret's right.
-      assert.sameDeepOrderedMembers(finalized, expected);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
 
     // Not saying this is ideal... just that this is what it's currently set to do.
@@ -234,8 +234,8 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
-      assert.sameDeepOrderedMembers(finalized, expected);
+      finalized.suggestions.forEach((entry) => delete entry.id);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
 
     it('adds whitespace when caret is mid-token', () => {
@@ -266,8 +266,8 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
-      assert.sameDeepOrderedMembers(finalized, expected);
+      finalized.suggestions.forEach((entry) => delete entry.id);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
   });
 
@@ -292,8 +292,8 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
-      assert.sameDeepOrderedMembers(finalized, expected);
+      finalized.suggestions.forEach((entry) => delete entry.id);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
 
     it('does not add whitespace when caret is followed by whitespace', () => {
@@ -319,11 +319,11 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
+      finalized.suggestions.forEach((entry) => delete entry.id);
 
       // We do not add a whitespace despite not splitting a token if there's a
       // matching whitespace immediately to the caret's right.
-      assert.sameDeepOrderedMembers(finalized, expected);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
 
     it('does not add whitespace when caret is mid-token', () => {
@@ -350,8 +350,8 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
-      assert.sameDeepOrderedMembers(finalized, expected);
+      finalized.suggestions.forEach((entry) => delete entry.id);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
   });
 
@@ -382,8 +382,8 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
-      assert.sameDeepOrderedMembers(finalized, expected);
+      finalized.suggestions.forEach((entry) => delete entry.id);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
 
     it('does not add extra data to suggestions when not "verbose"', () => {
@@ -411,8 +411,8 @@ describe('finalizeSuggestions', () => {
 
       // For full deep equality, we can't (or at least, shouldn't) test against
       // specific suggestion ID values,
-      finalized.forEach((entry) => delete entry.id);
-      assert.sameDeepOrderedMembers(finalized, expected);
+      finalized.suggestions.forEach((entry) => delete entry.id);
+      assert.sameDeepOrderedMembers(finalized.suggestions, expected);
     });
   });
 });

@@ -154,6 +154,7 @@ export class ModelCompositor {
     const SEARCH_TIMEOUT = DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
     const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
 
+    // postContextState will be null if this.contextTracker is null.
     const { postContextState, rawPredictions, revertableTransitionId } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
 
     if(this.activeTimer == timer) {
@@ -184,9 +185,15 @@ export class ModelCompositor {
     if(!hasExistingKeep) {
       const baseTuple = createDefaultKeep(this.lexicalModel, context, transformDistribution[0]);
 
+      // When using a Traversal-backed model, denote the ContextTokenization
+      // matching what the user currently sees; the keep should apply to it.
+      if(postContextState?.displayTokenization) {
+        baseTuple.baseTokenization = postContextState.displayTokenization;
+      }
+
       // Will be re-sorted shortly after this; just use the simple O(1) method here
       // and let sorting put it in place.
-      deduplicatedSuggestionTuples.push(baseTuple);
+      deduplicatedSuggestionTuples.unshift(baseTuple);
     }
 
     // Section 3:  Sort the suggestions in display priority order to determine
@@ -198,7 +205,7 @@ export class ModelCompositor {
     // then cache and return the set of suggestions
 
     // Now that we've marked the suggestion to auto-select, we can finalize the suggestions.
-    const suggestions = finalizeSuggestions(
+    const { suggestions, suggestionTokenizationMap } = finalizeSuggestions(
       this.lexicalModel,
       deduplicatedSuggestionTuples.splice(0, ModelCompositor.MAX_SUGGESTIONS),
       context,
@@ -223,6 +230,7 @@ export class ModelCompositor {
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(postContextState) {
       postContextState.suggestions = suggestions;
+      postContextState.suggestionTokenizationMap = suggestionTokenizationMap;
     }
 
     return suggestions;

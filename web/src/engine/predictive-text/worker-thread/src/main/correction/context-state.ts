@@ -43,7 +43,7 @@ export class ContextState {
   readonly model: LexicalModel;
 
   /**
-   * Denotes the most likely tokenization for the represented Context.
+   * Denotes the possible tokenization(s) for the represented Context.
    */
   tokenization: ContextTokenization;
 
@@ -72,6 +72,11 @@ export class ContextState {
   suggestions?: Suggestion[];
 
   /**
+   * Maps each suggestion to the tokenization it is rooted upon.
+   */
+  suggestionTokenizationMap?: Map<number, ContextTokenization>;
+
+  /**
    * If set, denotes the suggestion ID for the suggestion (from .suggestions) that
    * was applied for the final transition to this context state.
    */
@@ -89,6 +94,14 @@ export class ContextState {
     }
 
     return this.suggestions.find(s => s.id == this.appliedSuggestionId)?.transformId;
+  }
+
+  /**
+   * Returns the ContextTokenization matching the current version of context, as
+   * is visible to the user.
+   */
+  get displayTokenization(): ContextTokenization {
+    return this.tokenization;
   }
 
   /**
