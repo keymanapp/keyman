@@ -3,7 +3,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import * as correction from './correction/index.js'
 import TransformUtils from './transformUtils.js';
-import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
+import { applySuggestionCasing, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
@@ -179,7 +179,15 @@ export class ModelCompositor {
     //
     // Will also add a 'keep' suggestion (with `.matchesModel = false`) matching
     // the current state of context if there is no such matching prediction.
-    processSimilarity(this.lexicalModel, deduplicatedSuggestionTuples, context, transformDistribution[0]);
+    const hasExistingKeep = processSimilarity(this.lexicalModel, deduplicatedSuggestionTuples, context, transformDistribution[0]);
+
+    if(!hasExistingKeep) {
+      const baseTuple = createDefaultKeep(this.lexicalModel, context, transformDistribution[0]);
+
+      // Will be re-sorted shortly after this; just use the simple O(1) method here
+      // and let sorting put it in place.
+      deduplicatedSuggestionTuples.push(baseTuple);
+    }
 
     // Section 3:  Sort the suggestions in display priority order to determine
     // which are most optimal, then auto-select based on the results.
