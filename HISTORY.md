@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.217 alpha 2026-03-17
+
+* maint(mac): search for brew-installed rsync (#15765)
+
 ## 19.0.216 alpha 2026-03-16
 
 * docs: tweak walkthrough content (#15712)
