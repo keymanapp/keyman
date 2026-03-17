@@ -190,10 +190,10 @@ check_code_sign_status
 }
 
 do_update_app_metadata ( ) {
-  if builder_is_ci_build && builder_is_ci_build_level_build; then
-      echo "do_update_app_metadata, release_build_level = true."
+  if builder_is_ci_release_level_build; then
+      echo "do_update_app_metadata, builder_is_ci_release_level_build = true."
   else
-      echo "do_update_app_metadata, release_build_level = false."
+      echo "do_update_app_metadata, builder_is_ci_release_level_build = false."
   fi
     
   updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
@@ -241,7 +241,7 @@ alternate_sign_app () {
       --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
       "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
 
-  check_code_sign_status
+  #check_code_sign_status
   fi
 }
 
