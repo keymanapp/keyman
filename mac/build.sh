@@ -356,7 +356,7 @@ do_install() {
 }
 
 do_publish() {
-  is_release do_notarize
+  builder_if_release_build_level do_notarize
 
   builder_heading "Preparing files for release deployment..."
   ./setup/build.sh
