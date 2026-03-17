@@ -183,15 +183,11 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('should return empty on empty input', async function () {
-      assert.isTrue((convertedEmpty.keylayoutFilename === ''
-        && convertedEmpty.modifiers.length === 0
-        && convertedEmpty.rules.length === 0));
+        assert.isNull(convertedEmpty)
     });
 
-    it('should return empty on only name as input', async function () {
-      assert.isTrue((convertedUnavailable.keylayoutFilename === ''
-        && convertedUnavailable.modifiers.length === 0
-        && convertedUnavailable.rules.length === 0));
+    it('should return empty on empty name as input', async function () {
+        assert.isNull(convertedUnavailable)
     });
 
     it('should return empty on only modifiers as input', async function () {
@@ -200,9 +196,7 @@ describe('KeylayoutToKmnConverter', function () {
         modifiers: [['caps'], ['Shift'], ['command']],
         rules: []
       }, '');
-      assert.isTrue((convertedMod.keylayoutFilename === ''
-        && convertedMod.modifiers.length === 0
-        && convertedMod.rules.length === 0));
+        assert.isNull(convertedMod)
     });
 
     it('should return empty on only rules as input', async function () {
@@ -211,14 +205,13 @@ describe('KeylayoutToKmnConverter', function () {
         modifiers: [],
         rules: [['C0', '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', 'A']]
       }, '');
-      assert.isTrue((convertedRule.keylayoutFilename === ''
-        && convertedRule.modifiers.length === 0
-        && convertedRule.rules.length === 0));
+        assert.isNull(convertedRule)
     });
 
     it('should return empty array of rules on null input', async function () {
       const convertedRule = sut.convertBound.convert(null, 'ABC.kmn');
-      assert.isTrue(convertedRule.rules.length === 0);
+        assert.isNull(convertedRule)
+
     });
   });
 
@@ -320,20 +313,20 @@ describe('KeylayoutToKmnConverter', function () {
   describe('checkIfCapsIsUsed ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [[['caps', 'xxx'], ['yyy']], 'caps'],
-      [[['Caps', 'xxx'], ['yyy']], 'Caps'],
-      [[['CaPs', 'xxx'], ['yyy']], 'CaPs'],
-      [[['Caps?', 'xxx'], ['yyy']], undefined],
-      [[['caps?', 'xxx'], ['yyy']], undefined],
-      [[['zzz', 'xxx'], ['yyy']], undefined],
-      [[['shift', 'xxx'], ['caps']], 'caps'],
-      [[['shift', 'caps'], ['yyy']], 'caps'],
-      [[['caps', 'xxx'], ['caps']], 'caps'],
-      [[['', 'someWordWithCaps'], ['']], undefined],
-      [null, undefined],
-      [[], undefined],
-      [[['', ''], ['']], undefined],
-      [[[' ', ' '], [' ']], undefined],
+      [[['caps', 'xxx'], ['yyy']], true],
+      [[['Caps', 'xxx'], ['yyy']], true],
+      [[['CaPs', 'xxx'], ['yyy']], true],
+      [[['Caps?', 'xxx'], ['yyy']], false],
+      [[['caps?', 'xxx'], ['yyy']], false],
+      [[['zzz', 'xxx'], ['yyy']], false],
+      [[['shift', 'xxx'], ['caps']], true],
+      [[['shift', 'caps'], ['yyy']], true],
+      [[['caps', 'xxx'], ['caps']], true],
+      [[['', 'someWordWithCaps'], ['']], false],
+      [null, false],
+      [[], false],
+      [[['', ''], ['']], false],
+      [[[' ', ' '], [' ']], false],
     ].forEach(function (values) {
       it(("checkIfCapsIsUsed(" + values[0] + ")").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         const result = sut.checkIfCapsIsUsed(values[0] as string[][]);
