@@ -11,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Build Keyman common file types module" \
   "@/core/include/ldml" \
+  "@/common/tools/hextobin" \
   "@/common/web/keyman-version" \
   "configure" \
   "build" \
