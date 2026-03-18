@@ -170,7 +170,7 @@ export class KmnFileWriter {
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warnText[2].indexOf("duplicate") < 0)) {
+        if (warnText[2].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
@@ -236,7 +236,7 @@ export class KmnFileWriter {
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warnText[1].indexOf("duplicate") < 0)) {
+        if (warnText[1].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
@@ -326,7 +326,7 @@ export class KmnFileWriter {
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warnText[0].indexOf("duplicate") < 0)) {
+        if (warnText[0].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
 
@@ -344,7 +344,7 @@ export class KmnFileWriter {
           }
         }
 
-        if ((warnText[1].indexOf("duplicate") < 0)) {
+        if (warnText[1].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
@@ -363,7 +363,7 @@ export class KmnFileWriter {
           }
         }
 
-        if ((warnText[2].indexOf("duplicate") < 0)) {
+        if (warnText[2].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
@@ -903,17 +903,17 @@ export class KmnFileWriter {
 
     // e.g. U+0061 U+1234 U+1F60E
     else if (inputString.match(/^U\+([0-9a-f]{2,6})$/i)) {
-      return String.fromCodePoint(parseInt((inputString.match(/^U\+([0-9a-f]{2,6})$/i))[1], 16));
+      return String.fromCodePoint(parseInt(inputString.match(/^U\+([0-9a-f]{2,6})$/i)[1], 16));
     }
 
     // e.g. &#x61;  &#x1234; &#x1F60E;
     else if (inputString.match(/^&#x([0-9a-f]{2,6});$/i)) {
-      return String.fromCodePoint(parseInt((inputString.match(/^&#x([0-9a-f]{2,6});$/i))[1], 16));
+      return String.fromCodePoint(parseInt(inputString.match(/^&#x([0-9a-f]{2,6});$/i)[1], 16));
     }
 
     // e.g. &#97; &#4660; &#128518;
     else if (inputString.match(/^&#([0-9a-f]{2,6});$/i)) {
-      return String.fromCodePoint(parseInt((inputString.match(/^&#([0-9a-f]{2,6});$/i))[1], 10));
+      return String.fromCodePoint(parseInt(inputString.match(/^&#([0-9a-f]{2,6});$/i)[1], 10));
     }
 
     // e.g. &gt; &quot;

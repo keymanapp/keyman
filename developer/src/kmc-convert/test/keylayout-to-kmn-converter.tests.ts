@@ -75,16 +75,17 @@ describe('KeylayoutToKmnConverter', function () {
     });
   });
 
-  describe('RunSpecialTestFiles - create Info', function () {
+  describe('RunSpecialTestFiles - create Error: unsupported characters', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
       [makePathToFixture('../data/Test_characters.keylayout')],
       [makePathToFixture('../data/Test_onlyOneKeymap.keylayout')],
+      [makePathToFixture('../data/Test_unsupportedCharacters.keylayout')],
     ].forEach(function (files) {
-      it(files + " should give Info: unsupported characters ", async function () {
+      it(files + " should give Error: unsupported characters ", async function () {
         sut.run(files[0]);
         assert.isTrue(compilerTestCallbacks.messages.length === 1);
-        assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007));
+        assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Error | CompilerErrorNamespace.Converter | 0x0007));
       });
     });
   });

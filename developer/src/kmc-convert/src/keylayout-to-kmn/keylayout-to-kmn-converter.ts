@@ -228,6 +228,7 @@ export class KeylayoutToKmnConverter {
     if (jsonObj.keyboard.modifierMap?.keyMapSelect.length !== jsonObj.keyboard.keyMapSet[0].keyMap.length) {
       const errorText = dataUkelele.keylayoutFilename;
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText }));
+      return null;
     }
 
     for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_COUNT; j++) {
@@ -243,7 +244,7 @@ export class KeylayoutToKmnConverter {
 
         let ruleObj: Rule;
 
-        if ((j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length)) {
+        if (j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length) {
           // ...............................................................................................................................
           // case C0: output ...............................................................................................................
           // C0 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
@@ -505,13 +506,14 @@ export class KeylayoutToKmnConverter {
               }
             }
           } else {
-            this.callbacks.reportMessage(ConverterMessages.Info_UnsupportedCharactersDetected({
+            this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
               inputFilename: jsonObj.keyboard['@__name'] + ".keylayout",
               keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@__index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__output'],
               key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'],
               KeyName: this.mapUkeleleKeycodeToVK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'])
             }));
+            return null;
           }
         }
       }
@@ -544,10 +546,8 @@ export class KeylayoutToKmnConverter {
     for (let i = 0; i < rules.length; i++) {
 
 
-      if (
-        ((rules[i].modifierDeadkey !== undefined) && (rules[i].modifierDeadkey !== "")) &&
-        ((rules[i].deadkey !== undefined) && (rules[i].deadkey !== ""))
-      ) {
+      if (((rules[i].modifierDeadkey !== undefined) && (rules[i].modifierDeadkey !== ""))
+        && ((rules[i].deadkey !== undefined) && (rules[i].deadkey !== ""))) {
         let IsFirstUsedHereDk: boolean = true;
 
         // check if not used before
@@ -593,7 +593,7 @@ export class KeylayoutToKmnConverter {
           rules[i].uniquePrevDeadkey = uniqueCountDkA;
           uniqueCountDkA++;
           for (let k = 0; k < uniqueTextRules.length; k++) {
-            if ((uniqueTextRules[k][0] === rules[i].modifierDeadkey) && ((uniqueTextRules[k][1] === rules[i].deadkey))) {
+            if ((uniqueTextRules[k][0] === rules[i].modifierDeadkey) && (uniqueTextRules[k][1] === rules[i].deadkey)) {
               rules[i].uniqueDeadkey = Number(uniqueTextRules[k][2]);
             }
           }
@@ -919,7 +919,7 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
-        if ((data.keyboard.actions.action[i].when[j]['@__state'] === search)) {
+        if (data.keyboard.actions.action[i].when[j]['@__state'] === search) {
           if (data.keyboard.actions.action[i].when[j]['@__output'] !== undefined) {
             const singleDataSet = {
               id: data.keyboard.actions.action[i]['@__id'],
