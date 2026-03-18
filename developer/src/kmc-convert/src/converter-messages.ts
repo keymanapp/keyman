@@ -47,9 +47,9 @@ export class ConverterMessages {
   );
 
   static ERROR_UnableToWrite = SevError | 0x0006;
-  static Error_UnableToWrite = (o: { outputFilename: string; }) => m(
+  static Error_UnableToWrite = (o: { outputFilename: string, errorText: string; }) => m(
     this.ERROR_UnableToWrite,
-    `Output file for '${def(o.outputFilename)}' could not be written.`
+    `Output file for '${def(o.outputFilename)}' could not be written. ${def(o.errorText)}`
   );
 
   static INFO_UnsupportedCharactersDetected = SevInfo | 0x0007;

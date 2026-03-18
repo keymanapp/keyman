@@ -24,16 +24,19 @@ export class KmnFileWriter {
   public write(dataUkelele: ProcessedData): Uint8Array {
     let data: string = "\n";
 
-    // add top part of kmn file: STORES
-    data += this.writeKmnFileHeader(dataUkelele);
+    // top part of kmn file: STORES
+    const dataStores = this.writeKmnFileHeader(dataUkelele);
 
-    // add bottom part of kmn file: RULES
-    data += this.writeDataRules(dataUkelele);
+    // bottom part of kmn file: RULES
+    const dataRules = this.writeDataRules(dataUkelele);
+
+    if (dataRules)
+      data += dataStores + dataRules;
 
     try {
       return new TextEncoder().encode(data);
     } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename, errorText: err }));
       return null;
     }
   }
