@@ -58,6 +58,12 @@ export class ConverterMessages {
     `INFO: Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
   );
 
+  static ERROR_UndefinedActionDetected = SevError | 0x0009;
+  static Error_UndefinedActionDetected = (o: { inputFilename: string, action: string, KeyName: string, keymapIndex: string; }) => m(
+    this.ERROR_UndefinedActionDetected,
+    `${def(o.inputFilename)}: Action id ${def(o.action)} of key ${def(o.KeyName)} in keymapIndex ${def(o.keymapIndex)} is not defined`
+  );
+
   static ERROR_InvalidFile = SevError | 0x0008;
   static Error_InvalidFile = (o: { errorText: string; }) => m(
     this.ERROR_InvalidFile,

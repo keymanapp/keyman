@@ -89,6 +89,19 @@ describe('KeylayoutToKmnConverter', function () {
     });
   });
 
+  describe('RunSpecialTestFiles - undefined action', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [makePathToFixture('../data/Test_undefinedAction.keylayout')],
+    ].forEach(function (files) {
+      it(files + " should give Error: undefined action detected", async function () {
+        sut.run(files[0]);
+        assert.isTrue(compilerTestCallbacks.messages.length === 1);
+        assert.equal(compilerTestCallbacks.messages[0].code, 5292041);
+      });
+    });
+  });
+
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
@@ -183,11 +196,11 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('should return empty on empty input', async function () {
-        assert.isNull(convertedEmpty)
+      assert.isNull(convertedEmpty);
     });
 
     it('should return empty on empty name as input', async function () {
-        assert.isNull(convertedUnavailable)
+      assert.isNull(convertedUnavailable);
     });
 
     it('should return empty on only modifiers as input', async function () {
@@ -196,7 +209,7 @@ describe('KeylayoutToKmnConverter', function () {
         modifiers: [['caps'], ['Shift'], ['command']],
         rules: []
       }, '');
-        assert.isNull(convertedMod)
+      assert.isNull(convertedMod);
     });
 
     it('should return empty on only rules as input', async function () {
@@ -205,12 +218,12 @@ describe('KeylayoutToKmnConverter', function () {
         modifiers: [],
         rules: [['C0', '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', 'A']]
       }, '');
-        assert.isNull(convertedRule)
+      assert.isNull(convertedRule);
     });
 
     it('should return empty array of rules on null input', async function () {
       const convertedRule = sut.convertBound.convert(null, 'ABC.kmn');
-        assert.isNull(convertedRule)
+      assert.isNull(convertedRule);
 
     });
   });
@@ -419,16 +432,16 @@ describe('KeylayoutToKmnConverter', function () {
     const read = sutR.read(inputFilename);
 
     [
-      ['none', 0],
+      ['none', -1],
       ['A_16', 8],
       ['A_18', 10],
       ['A_19', 11],
-      ['0', 0],
-      ['', 0],
-      [' ', 0],
-      [null, 0],
-      [undefined, 0],
-      ['unknown', 0],
+      ['0', -1],
+      ['', -1],
+      [' ', -1],
+      [null, -1],
+      [undefined, -1],
+      ['unknown', -1],
     ].forEach(function (values) {
       it(("getActionIndexFromActionId('" + values[0] + "')").padEnd(50, " ") + ' should return ' + values[1], async function () {
         const result = sut.getActionIndexFromActionId(read, String(values[0]));

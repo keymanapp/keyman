@@ -337,6 +337,15 @@ export class KeylayoutToKmnConverter {
               // ...............................................................................................................................
 
               const b1ActionIndex: number = this.getActionIndexFromActionId(jsonObj, actionId);
+              if (b1ActionIndex < 0) {
+                this.callbacks.reportMessage(ConverterMessages.Error_UndefinedActionDetected({
+                  inputFilename: jsonObj.keyboard['@__name'] + ".keylayout",
+                  action: actionId,
+                  KeyName: this.mapUkeleleKeycodeToVK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code']),
+                  keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@__index']
+                }));
+                return null;
+              }
 
               // with actionId from above loop all 'action' and search for a state(none)-next-pair ............................................................................................................
               // e.g. in Block 5: find <when state="none" next="1"/> for action id a18 ......................................................................................................................
@@ -807,7 +816,7 @@ export class KeylayoutToKmnConverter {
         return i;
       }
     }
-    return 0;
+    return -1;
   }
 
   /**
