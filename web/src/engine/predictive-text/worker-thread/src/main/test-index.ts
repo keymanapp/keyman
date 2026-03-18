@@ -13,6 +13,7 @@ export * from './correction/legacy-quotient-spur.js';
 export * from './correction/search-quotient-root.js';
 export { ExtendedEditOperation, SegmentableDistanceCalculation } from './correction/segmentable-calculation.js';
 export * from './correction/tokenization-subsets.js';
+export * from './correction/transition-helpers.js';
 export * as correction from './correction/index.js';
 export * from './model-helpers.js';
 export * as models from './models/index.js';
