@@ -174,8 +174,11 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (mp->wParam != VK_BACK) {
       if(scan == SCAN_FLAG_KEYMAN_KEY_EVENT) {
         mp->lParam = (mp->lParam & 0xFF00FFFFL) | (MapVirtualKey((UINT)mp->wParam, 0) << 16);
-        SendDebugMessageFormat("wm_keyman clear `SCAN_FLAG_KEYMAN_KEY_EVENT` new_wParam=%x new_lParam=%x LastKey=%x LastScanCode=%x",
-          mp->wParam, mp->lParam, _td->LastKey, _td->LastScanCode);
+        if (mp->wParam == VK_CAPITAL) {
+          ProcessToggleChange(VK_CAPITAL);
+        }
+        SendDebugMessageFormat("WMKEY=%x clear `SCAN_FLAG_KEYMAN_KEY_EVENT` new_wParam=%x new_lParam=%x LastKey=%x LastScanCode=%x",
+          mp->message, mp->wParam, mp->lParam, _td->LastKey, _td->LastScanCode);
       }
     }
   }

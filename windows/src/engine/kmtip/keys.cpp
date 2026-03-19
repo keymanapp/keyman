@@ -178,17 +178,10 @@ STDAPI CKMTipTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPA
 {
   SendDebugEntry();
   LogKey(0, wParam, lParam);
-  // If the keystroke is a Keyman-generated key, ignore it
-  // But we need to pass Caps Lock through, even if we generated it, so we can track Caps Lock state.
-  // TODO: Fix magic constants
-  if ((lParam & 0x00FF0000L) == 0xFF0000L &&
-    wParam != VK_CAPITAL) {
-    *pfEaten = FALSE;
-  }
-  else {
-    *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
-//  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
-  }
+  *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
+
+  SendDebugMessageFormat(L"pfEaten=%s, wParam=%x, lParam=%x", *pfEaten ? L"TRUE" : L"FALSE", wParam, lParam);
+  //  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
   SendDebugExit();
   return S_OK;
 }
@@ -205,8 +198,9 @@ STDAPI CKMTipTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM 
 {
   SendDebugEntry();
   LogKey(1, wParam, lParam);
-  fEatenBuf[wParam] = *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, TRUE, FALSE);   // I3588
-//  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
+  fEatenBuf[wParam] = *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, TRUE, FALSE);  // I3588
+  SendDebugMessageFormat(L"pfEaten=%s wParam=%x lParam=%x", *pfEaten ? L"TRUE" : L"FALSE", wParam, lParam);
+  //  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
   SendDebugExit();
 	return S_OK;
 }
@@ -222,17 +216,11 @@ STDAPI CKMTipTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARA
 {
   SendDebugEntry();
   LogKey(2, wParam, lParam);
-  // If the keystroke is a Keyman-generated key, ignore it
-  // But we need to pass Caps Lock through, even if we generated it, so we can track Caps Lock state.
-  if ((lParam & 0x00FF0000L) == 0xFF0000L &&
-    wParam != VK_CAPITAL) {  // I3566
-    *pfEaten = FALSE;
-  }
-  else {
-    _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
-    *pfEaten = fEatenBuf[wParam];
-  }
-//  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
+  _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
+  *pfEaten = fEatenBuf[wParam];
+
+  //  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
+  SendDebugMessageFormat(L"pfEaten=%s wParam=%x lParam=%x", *pfEaten ? L"TRUE" : L"FALSE", wParam, lParam);
   SendDebugExit();
   return S_OK;
 }
@@ -251,16 +239,11 @@ STDAPI CKMTipTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lP
   LogKey(3, wParam, lParam);
   // If the keystroke is a Keyman-generated key, ignore it
   // But we need to pass Caps Lock through, even if we generated it, so we can track Caps Lock state.
-  if ((lParam & 0x00FF0000L) == 0xFF0000L &&
-    wParam != VK_CAPITAL) {   // I3566   // I3605
-    *pfEaten = FALSE;
-  }
-  else
-  {
-  	_KeymanProcessKeystroke(pContext, wParam, lParam, TRUE, FALSE);   // I3588   // I3605
-    *pfEaten = fEatenBuf[wParam];
-  }
-//  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
+
+  _KeymanProcessKeystroke(pContext, wParam, lParam, TRUE, FALSE);   // I3588   // I3605
+  *pfEaten = fEatenBuf[wParam];
+
+  SendDebugMessageFormat(L"pfEaten=%s wParam=%x lParam=%x", *pfEaten ? L"TRUE" : L"FALSE", wParam, lParam);
   SendDebugExit();
   return S_OK;
 }
