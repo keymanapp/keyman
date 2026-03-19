@@ -1,6 +1,6 @@
 import Combine
 
-public class KeymanSettings : ObservableObject {
+public class SettingsContainer : ObservableObject {
 
   @Published public var settingName: String
   @Published public var keyboardPackages: [KeymanPackage]

@@ -8,9 +8,6 @@
       location = "group:Config/Config.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:KeymanData">
-   </FileRef>
-   <FileRef
       location = "group:Keyman4MacIM/Pods/Pods.xcodeproj">
    </FileRef>
    <FileRef

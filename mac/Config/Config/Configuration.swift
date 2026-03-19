@@ -13,13 +13,13 @@ import KeymanSettings
 
 public class Configuration : ObservableObject {
   //@Published public var keyboardPackages: [KeymanPackage]
-  @Published public var settings: KeymanSettings
+  @Published public var settings: SettingsContainer
 
   fileprivate let notificationCenter:DistributedNotificationCenter
   //fileprivate let dataRepo: DataRepository
   
   public init() {
-    self.settings = KeymanSettings()
+    self.settings = SettingsContainer()
     
     //self.dataRepo = DataRepository()
     

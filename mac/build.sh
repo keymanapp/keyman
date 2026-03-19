@@ -20,6 +20,7 @@ builder_describe "Builds Keyman for macOS." \
   "install     Installs result of Keyman4MacIM locally." \
   ":engine     KeymanEngine4Mac" \
   ":app        Keyman4MacIM" \
+  ":configapp  Keyman Configuration app" \
   ":help       Online documentation" \
   ":mcompile   mnemonic layout recompiler- mac" \
   ":testapp    Keyman4Mac (test harness)" \
@@ -43,6 +44,7 @@ fi
 ENGINE_NAME="KeymanEngine4Mac"
 TESTAPP_NAME="Keyman4Mac"
 IM_NAME="Keyman4MacIM"
+CONFIGAPP_NAME="Config"
 XCODE_PROJ_EXT=".xcodeproj"
 PRODUCT_NAME="Keyman"
 
@@ -51,10 +53,12 @@ KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 KME4M_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$ENGINE_NAME"
 KMTESTAPP_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$TESTAPP_NAME"
 KM4MIM_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$IM_NAME"
+CONFIGAPP_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$CONFIGAPP_NAME"
 
 KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
 KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
+CONFIGAPP_PROJ_PATH="$CONFIGAPP_BASE_PATH/$CONFIGAPP_NAME$XCODE_PROJ_EXT"
 
 PODS_FOLDER="/mac/Keyman4MacIM/Pods/Target Support Files/Pods-Keyman"
 
@@ -62,6 +66,7 @@ builder_describe_outputs \
   configure     "$PODS_FOLDER/$CONFIG_TARGET" \
   build:engine  "/mac/$ENGINE_NAME/build/$CONFIG" \
   build:app     "/mac/$IM_NAME/build/$CONFIG" \
+  build:configapp     "/mac/$CONFIGAPP_NAME/build/$CONFIG" \
   build:testapp "/mac/$TESTAPP_NAME/build/$CONFIG"
 
 ### DEFINE HELPER FUNCTIONS ###
@@ -175,7 +180,7 @@ do_update_engine_metadata ( ) {
 }
 
 do_build_app ( ) {
-  ### Build Keyman.app (Input Method and Configuration app) ###
+  ### Build Keyman.app (Input Method) ###
   builder_heading "Building help"
   build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
 
@@ -187,6 +192,23 @@ do_build_app ( ) {
 execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 
 check_code_sign_status
+}
+
+do_build_settings_package ( ) {
+  ### Build Keyman Settings Package ###
+  builder_heading "Building Keyman Settings Package"
+  execBuildCommand "Keyman Settings Package" xcodebuild $BUILD_OPTIONS $BUILD_ACTIONS -scheme KeymanSettings \
+    -destination 'platform=macOS' -derivedDataPath ./build \
+    BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+}
+
+do_build_config_app ( ) {
+  ### Build Keyman Configuration.app (Configuration app) ###
+  builder_heading "Building Keyman Configuration.app"
+  
+  xcodebuild -resolvePackageDependencies -project $CONFIGAPP_PROJ_PATH -scheme Config
+  execBuildCommand "Keyman Configuration" "xcodebuild -project $CONFIGAPP_PROJ_PATH \
+   -derivedDataPath ./build $BUILD_OPTIONS $BUILD_ACTIONS -scheme Config
 }
 
 do_update_app_metadata ( ) {
@@ -388,6 +410,9 @@ builder_run_action build:app      do_build_app
 builder_run_action test:app       execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 builder_run_action test:help      check-markdown  "$KEYMAN_ROOT/mac/docs/help"
 builder_run_action build:app      do_update_app_metadata
+
+#builder_run_action build:configapp      do_build_settings_package
+#builder_run_action build:configapp      do_build_config_app
 
 builder_run_action build:testapp  do_build_testapp
 

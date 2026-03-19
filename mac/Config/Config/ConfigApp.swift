@@ -11,7 +11,7 @@ import KeymanSettings
 @main
 struct ConfigApp: App {
 //  @StateObject var configuration = Configuration()
-  @StateObject var settings = KeymanSettings()
+  @StateObject var settings = SettingsContainer()
   var body: some Scene {
     WindowGroup {
       ConfigView()

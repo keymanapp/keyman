@@ -10,7 +10,7 @@ import SwiftUI
 import KeymanSettings
 
 struct ConfigView: View {
-  @EnvironmentObject var settings: KeymanSettings
+  @EnvironmentObject var settings: SettingsContainer
   
   var body: some View {
     VStack {
