@@ -13,7 +13,6 @@ import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
-
 export interface ConverterResult extends KeymanCompilerResult {
   /**
    * Internal in-memory build artifacts from a successful compilation. Caller
@@ -129,15 +128,41 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
+  async run(inputFilename: string, binaryData?: Uint8Array, outputFilename?: string): Promise<ConverterToKmnResult> {
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
     }
+    //...................................................................................................
+    /* OLD good VERSION -     old read() with fast-xml-parser (string-> XMLSourceFile)
+   
+    if (outputFilename === null) {
+       this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+       return null;
+     }
+ 
+     const KeylayoutReader = new KeylayoutFileReader(this.callbacks//, this.options//);
+     const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
+ 
+     try {
+       if (!KeylayoutReader.validate(jsonO)) {
+         return null;
+       }
+     } catch (e) {
+       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
+       return null;
+     }*/
 
-    const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
-    const jsonO: Keylayout.KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
+    //...................................................................................................
+    //NEW READER 1st easier version - new read() with keyman xml parser  (Uint8Array-> XMLSourceFile)
+
+    let jsonO: Keylayout.KeylayoutXMLSourceFile;
+    const KeylayoutReader = new KeylayoutFileReader(this.callbacks,/* this.options*/);
+    if (!binaryData) {
+      jsonO = KeylayoutReader.read_Uint8Array(this.callbacks.loadFile(inputFilename));
+    }
+    else jsonO = KeylayoutReader.read_Uint8Array(binaryData);
 
     try {
       if (!KeylayoutReader.validate(jsonO)) {
@@ -147,6 +172,27 @@ export class KeylayoutToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
       return null;
     }
+    //...................................................................................................
+    //VERY NEW READER next  version - very new read() with KeymanXMLReader (Uint8Array-> XMLSourceFile)
+    /*
+    // TODO
+      let jsonO: Keylayout.KeylayoutXMLSourceFile;
+      const KeylayoutReader = new KeylayoutFileReader(this.callbacks,// this.options//);
+      if (!binaryData) {
+        jsonO = KeylayoutReader.read_Uint8Array_UseKeymanXMLReader(this.callbacks.loadFile(inputFilename));
+      }
+      else jsonO = KeylayoutReader.read_Uint8Array_UseKeymanXMLReader(binaryData);
+
+      try {
+        if (!KeylayoutReader.validate(jsonO)) {
+          return null;
+        }
+      } catch (e) {
+        this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
+        return null;
+      }
+    */
+    //...................................................................................................
 
     const processedData = await this.convert(jsonO, inputFilename);
 
@@ -793,7 +839,7 @@ export class KeylayoutToKmnConverter {
       "K_N"          /* N */,
       "K_M"          /* M */,
       "K_PERIOD"     /* . */,
-      "K_?C1"        /* \ */,   // 48 for ANSI  correct??
+      "K_oE2"        /* \ */,   // 48 for ANSI  correct??
       "K_SPACE"      /* \ */
     ];
 

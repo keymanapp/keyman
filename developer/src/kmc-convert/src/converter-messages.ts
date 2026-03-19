@@ -34,10 +34,16 @@ export class ConverterMessages {
     `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`
   );
 
-  static ERROR_UnableToRead = SevError | 0x0004;
-  static Error_UnableToRead = (o: { inputFilename: string; }) => m(
-    this.ERROR_UnableToRead,
+  static ERROR_UnableToReadFile = SevError | 0x0004;
+  static Error_UnableToReadFile = (o: { inputFilename: string; }) => m(
+    this.ERROR_UnableToReadFile,
     `Input file '${def(o.inputFilename)}' could not be read.`
+  );
+
+  static ERROR_UnableToRead = SevError | 0x000A;
+  static Error_UnableToRead = () => m(
+    this.ERROR_UnableToRead,
+    `Input file could not be read.`
   );
 
   static ERROR_UnableToConvert = SevError | 0x0005;

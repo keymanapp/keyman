@@ -9,7 +9,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { Keylayout } from "@keymanapp/developer-utils"
+import { Keylayout } from "@keymanapp/developer-utils";
 import { compilerTestCallbacks, makePathToFixture } from './helpers/index.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
 
@@ -22,7 +22,7 @@ describe('KeylayoutFileReader', function () {
   describe("validate() ", function () {
 
     it('validate() should return true on correct inputfile', async function () {
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(inputFilename);
       const validated = sutR.validate(result);
@@ -30,7 +30,7 @@ describe('KeylayoutFileReader', function () {
     });
 
     it('validate() should return false on inputfile with unknown tags', async function () {
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_unknownTags.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(inputFilename);
       const validated = sutR.validate(result);
@@ -38,21 +38,21 @@ describe('KeylayoutFileReader', function () {
     });
 
     it('validate() should return false on inputfile with additional tags', async function () {
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_additionalTags.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(inputFilename);
       const validated = sutR.validate(result);
       assert.isFalse(validated);
     });
     it('validate() should return false on inputfile with missing tags', async function () {
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_missingTags.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(inputFilename);
       const validated = sutR.validate(result);
       assert.isFalse(validated);
     });
     it('validate() should return false on no entries in action-when', async function () {
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(inputFilename);
       const validated = sutR.validate(result);

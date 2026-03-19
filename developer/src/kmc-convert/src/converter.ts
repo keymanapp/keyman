@@ -81,9 +81,9 @@ export class Converter implements KeymanCompiler {
     }
 
     const converter = new ConverterClass(this.callbacks, converterOptions);
-    const result = await converter.run(inputFilename, outputFilename);
+    const result = await converter.run(inputFilename, binaryData, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
-    return result ?  result : null;
+    return result ? result : null;
   }
 
   /**

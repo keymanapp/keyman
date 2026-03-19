@@ -21,7 +21,6 @@ describe('KmnFileWriter', function () {
     compilerTestCallbacks.clear();
   });
 
-
   describe("write() ", function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);

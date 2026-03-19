@@ -9,9 +9,9 @@
 
 import { XMLParser } from 'fast-xml-parser';
 import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout } from "@keymanapp/developer-utils";
+//import { KeymanXMLReader } from "@keymanapp/developer-utils";
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
-
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
@@ -23,7 +23,7 @@ export class KeylayoutFileReader {
    */
   public validate(source: Keylayout.KeylayoutXMLSourceFile): boolean {
     if (!SchemaValidators.default.keylayout(source)) {
-       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
+      for (const err of (<any>SchemaValidators.default.keylayout).errors) {
         this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({
           e: err.instancePath
         }));
@@ -102,6 +102,8 @@ export class KeylayoutFileReader {
    * @param  inputFilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
+  //.................................................................................................
+  // old read() with fast-xml-parser (string-> XMLSourceFile)
   public read(inputFilename: string): Keylayout.KeylayoutXMLSourceFile {
 
     const options = {
@@ -120,8 +122,53 @@ export class KeylayoutFileReader {
       return jsonObj;
     }
     catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename }));
       return null;
     }
   }
+  //.................................................................................................
+  // new read() with keyman xml parser  (Uint8Array-> XMLSourceFile)
+  public read_Uint8Array(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
+
+    const options = {
+      ignoreAttributes: [''],       // we do not process an output character of ""
+      trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (space)
+      parseTagValue: false,
+      attributeNamePrefix: '@__',   // to access the attribute
+      ignoreDeclaration: true
+    };
+
+    try {
+      const xmlFile = source;
+      const parser = new XMLParser(options);
+      const jsonObj = parser.parse(xmlFile);      // get plain Object
+      this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
+      return jsonObj;
+    }
+    catch (err) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+      return null;
+    }
+  }
+  //.................................................................................................
+  /*// very new read() with KeymanXMLReader (Uint8Array-> XMLSourceFile)
+  public read_Uint8Array_UseKeymanXMLReader(file: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
+
+    let result: Keylayout.KeylayoutXMLSourceFile;
+    const data = new TextDecoder().decode(file);
+
+    try {
+      result = new KeymanXMLReader('keylayout').parse(data) as Keylayout.KeylayoutXMLSourceFile;
+      this.boxArray(result.keyboard);
+    } catch (e) {
+      console.log("TODO here error");
+      //this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ e }));
+    }
+    if (!result) {
+      return null;
+    }
+    this.boxArray(result.keyboard);   // result now contains arrays; no single fields
+    return result;
+  }*/
+  //.................................................................................................
 }
