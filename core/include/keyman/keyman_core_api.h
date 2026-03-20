@@ -580,15 +580,17 @@ typedef struct {
 
 `emit_keystroke`
 : Emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes.
+  On most platforms this signals whether the processor handled the event
+  (0) or not (1). See also [key handling](keyhandling).
 
 `new_caps_lock_state`
 : -1=unchanged, 0=off, 1=on
 
 `deleted_context`
 : Reference copy of actual UTF32 codepoints deleted from end of context
-  (closest to caret) exactly code_points_to_delete in length (plus null
+  (closest to caret) exactly `code_points_to_delete` in length (plus null
   terminator). Used to determine encoding conversion differences when
-  deleting; only set when using [km_core_state_get_actions], otherwise nullptr.
+  deleting; only set when using [km_core_state_get_actions], otherwise `nullptr`.
 
 -------------------------------------------------------------------------------
 
@@ -748,7 +750,7 @@ title: Options - Keyman Core API
 ---
 
 A state’s default options are set from the keyboard at creation time and the
-environment. The Platform layer is then is expected to apply any persisted
+environment. The Platform layer is then expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
 simple C arrays of [km_core_option_item] terminated with a `KM_CORE_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
@@ -1011,11 +1013,6 @@ Provides read-only information about a keyboard.
 typedef struct {
   km_core_cu const * version_string;
   km_core_cu const * id;
-
-  // TODO-web-core: Deprecate this field (#12497)
-  // KMN_DEPRECATED
-  km_core_path_name  folder_path;
-
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
 
@@ -1028,9 +1025,6 @@ typedef struct {
 
 `id`
 : Keyman keyboard ID string.
-
-`folder_path`
-: Path to the unpacked folder containing the keyboard and associated resources (deprecated).
 
 `default_options`
 : Set of default values for any options included in the keyboard.

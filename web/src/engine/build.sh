@@ -14,9 +14,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # ################################ Main script ################################
 
+# dependency on kmc required for tests
 builder_describe "Builds Keyman Engine for Web (KMW)" \
   "@/core:wasm                 build" \
   "@/common/tools/es-bundling  build" \
+  "@/developer/src/kmc         build" \
   "@/web/src/common/web-utils  build" \
   "clean" \
   "configure" \

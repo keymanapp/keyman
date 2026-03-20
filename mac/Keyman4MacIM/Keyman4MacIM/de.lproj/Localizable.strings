@@ -31,6 +31,9 @@
 /* Message displayed in Configuration window when keyboard metadata cannot be loaded */
 "message-error-unknown-metadata" = "unbekannt";
 
+/* Configuration window section heading when keyboard has no package name */
+"unknown-package-name" = "Unbenanntes Tastaturpaket";
+
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "OK";
 
@@ -67,8 +70,11 @@
 /* copyright label in the Package Information window */
 "copyright-label" = "Copyright:";
 
-/* message displayed to alert user to need grant accessibility permission */
+/* message displayed to alert user to grant accessibility permission in Preferences, pre-Ventura */
 "privacy-alert-text" = "Um richtig zu funktionieren, benötigt Keyman Funktionen zur Barrierefreiheit:\n\nDazu in den Systemeinstellungen, Sicherheit & Privatsphäre den Zugriff gewähren.\nStarten Sie anschließend Ihr System neu.";
+
+/* message displayed to alert user to grant accessibility permission in Settings, for macOS Ventura and later */
+"privacy-alert-text-ventura" = "Um richtig zu funktionieren, benötigt Keyman Funktionen zur Barrierefreiheit:\n\nDazu in den Systemeinstellungen, Sicherheit & Privatsphäre den Zugriff gewähren.\nStarten Sie anschließend Ihr System neu.";
 
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
 "no-keyboard-configured-menu-placeholder" = "(Keine Tastatur konfiguriert)";

@@ -164,6 +164,74 @@ EOF
   assert-contains "${test_output_contents}" "PASS: test_succeeding1"
 }
 
+# Helper functions for testing assert-true and assert-false
+function returns_true() {
+  return 0
+}
+
+function returns_false() {
+  return 1
+}
+
+## Tests for assert-true function
+
+function test__assert_true__with_function_that_returns_true() {
+  # Execute and Verify - should pass
+  assert-true returns_true
+}
+
+function test__assert_true__with_builtin_true() {
+  # Execute and Verify - should pass
+  assert-true true
+}
+
+function test__assert_true__with_function_with_args_success() {
+  # Execute and Verify - file exists
+  assert-true test -f /etc/hostname
+}
+
+function test__assert_true__increments_failure_on_false() {
+  # Setup
+  test_failures=0
+  messages=()
+
+  # Execute function that returns false
+  returns_false
+  local result=$?
+
+  # Verify it failed
+  assert-equal "${result}" "1"
+}
+
+## Tests for assert-false function
+
+function test__assert_false__with_function_that_returns_false() {
+  # Execute and Verify - should pass
+  assert-false returns_false
+}
+
+function test__assert_false__with_builtin_false() {
+  # Execute and Verify - should pass
+  assert-false false
+}
+
+function test__assert_false__with_function_with_args_success() {
+  # Execute and Verify - file does not exist
+  assert-false test -f /nonexistent/file/that/does/not/exist
+}
+
+function test__assert_false__increments_failure_on_true() {
+  # Setup
+  test_failures=0
+  messages=()
+
+  # Execute function that returns true
+  returns_true
+  local result=$?
+
+  # Verify it succeeded
+  assert-equal "${result}" "0"
+}
 
 # shellcheck disable=SC2031
 if [[ "${1:-}" != "--recursive" ]]; then

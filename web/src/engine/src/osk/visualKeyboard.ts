@@ -6,6 +6,7 @@ import {
   ActiveLayout,
   ActiveSubKey,
   JSKeyboard,
+  Keyboard,
   KeyboardProperties,
   KeyDistribution,
   KeyEvent,
@@ -86,7 +87,7 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
    * The Keyman keyboard on which to base the on-screen keyboard being represented.
    */
-  keyboard: JSKeyboard,
+  keyboard: Keyboard,
 
   /**
    * Metadata about the keyboard, such as relevant fonts, display name, and language code.
@@ -241,7 +242,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
   public deferLayout: boolean;
 
   // The keyboard object corresponding to this VisualKeyboard.
-  public readonly layoutKeyboard: JSKeyboard;
+  public readonly layoutKeyboard: Keyboard;
   public readonly layoutKeyboardProperties: KeyboardProperties;
 
   get layerId(): string {
@@ -336,7 +337,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
     }
 
     // Override font if specified by keyboard
-    if ('font' in layout) {
+    if (layout && 'font' in layout) {
       this.fontFamily = layout['font'];
     } else {
       this.fontFamily = '';

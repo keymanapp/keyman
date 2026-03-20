@@ -1,8 +1,6 @@
 import { assert } from 'chai'
 import sinon from 'sinon';
-
 import * as PromiseStatusModule from 'promise-status-async';
-const PromiseStatuses = PromiseStatusModule.PromiseStatuses;
 
 import { InputSample, gestures, GestureDebugPath } from 'keyman/engine/gesture-processor';
 
@@ -25,6 +23,8 @@ import {
   LongpressDistanceThreshold,
   MainLongpressSourceModel
 } from './isolatedPathSpecs.js';
+
+const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 type PathInheritanceType = gestures.specs.ContactModel<string>['pathInheritance'];
 function dummyInheritanceMatcher(inheritanceType: PathInheritanceType): gestures.specs.GestureModel<string> {

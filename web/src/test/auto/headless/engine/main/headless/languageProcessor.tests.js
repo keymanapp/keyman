@@ -22,11 +22,10 @@ global.keyman = {}; // So that keyboard-based checks against the global `keyman`
 // Test the JSKeyboardProcessor interface.
 describe('LanguageProcessor', function() {
   let languageProcessor;
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   beforeEach(function() {
     languageProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
-    callbacks.clear();
   });
 
   afterEach(function() {

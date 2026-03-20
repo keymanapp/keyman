@@ -121,7 +121,7 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
   // yet to be modularized at this time, though.)
   private _hostTextStore: HostTextStore;
 
-  private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
+  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
 
   constructor(engineConfig: WebviewConfiguration) {
     super(engineConfig);
@@ -141,7 +141,7 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTextStore(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, textStore: TextStore) {
+  activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: TextStore) {
     // `textStore` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.

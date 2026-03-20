@@ -105,7 +105,7 @@ cd "$WORK_DIR"
 # FirstVoices app
 #
 
-if [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
+if [[ "${RELEASE_OEM_FIRSTVOICES-false}" = true ]]; then
   FIRSTVOICESAPP_IPA="../oem/firstvoices/ios/build/Build/Products/Release-iphoneos/FirstVoices.ipa"
   FIRSTVOICESAPP_IPA_DST="firstvoices-ios-${KEYMAN_VERSION_FOR_FILENAME}.ipa"
 
@@ -129,6 +129,6 @@ fi
 write_download_info "${UPLOAD_DIR}" "${KMEI_DST_NAME}" "Keyman Engine for iOS" zip ios
 write_download_info "${UPLOAD_DIR}" "${KEYMANAPP_IPA_DST}" "Keyman for iPhone and iPad" ipa ios
 
-if [[ ${RELEASE_OEM_FIRSTVOICES} = true ]]; then
+if [[ ${RELEASE_OEM_FIRSTVOICES-false} = true ]]; then
   write_download_info "${UPLOAD_DIR}" "${FIRSTVOICESAPP_IPA_DST}" "FirstVoices Keyboards" ipa ios
 fi

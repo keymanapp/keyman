@@ -3,8 +3,9 @@
   "private": true,
   "devDependencies": {
     "@microsoft/api-documenter": "^7.28.0",
-    "@microsoft/api-extractor": "^7.47.3",
+    "@microsoft/api-extractor": "^7.57.6",
     "@types/chai": "^4.3.14",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^20.4.1",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@web/dev-server-esbuild": "^1.0.2",
@@ -22,11 +23,11 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^11.2.2",
-    "playwright": "^1.46.1",
+    "playwright": "1.46.1",
     "sinon": "^17.0.1",
     "source-map-support": "^0.5.21",
     "tslib": "^2.5.2",
-    "typescript": "^5.4.5"
+    "typescript": "~5.4.5"
   },
   "scripts": {},
   "workspaces": [

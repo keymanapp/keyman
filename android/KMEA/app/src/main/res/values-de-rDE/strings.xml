@@ -82,6 +82,14 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Fataler Tastaturfehler mit %1$s:%2$s für %3$s Sprache. Standard-Tastatur wird geladen.</string>
     <!-- Context: Fatal keyboard error.  -->
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Fehler in Tastatur %1$s:%2$s für %3$s Sprache.</string>
+    <!-- Context: Alert Dialog body: System WebView not installed -->
+    <string name="body_install_webview" comment="Notification when WebView not installed">        Keyman benötigt die Installation von WebView.\"</string>
+    <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">        WebView muss eingeschaltet sein für Keyman.\"</string>
+    <!-- Context Button label: Install WebView -->
+    <string name="label_install_webview" comment="Button label to install webview">WebView installieren</string>
+    <!-- Context Button label: Enable WebView -->
+    <string name="label_enable_webview" comment="Button label to enable webview">WebView einschalten</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Suche nach zugehörigem Wörterbuch zum Herunterladen</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Kann keine Verbindung zum Keyman Server herstellen, um nach dem zugehörigen Wörterbuch zu suchen</string>
@@ -115,6 +123,8 @@
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Laden der heruntergeladenen Datei fehlgeschlagen</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Fehler beim Zugriff auf den Server!</string>
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">DownloadManager ist deaktiviert - kann nicht nach Updates suchen</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"Alle Ressourcen sind auf dem neuesten Stand!"</string>
     <!-- Context: General Updates -->
@@ -133,10 +143,15 @@
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s -Tastatur installiert</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Tastatur gelöscht</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Korrekturen aktivieren</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Vorhersagen aktivieren</string>
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Vorschläge deaktivieren</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Nur Vorhersagen</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Vorhersagen mit Korrekturen</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Vorhersagen mit Auto-Korrekturen</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Wörterbuch</string>
     <plurals name="model_count">

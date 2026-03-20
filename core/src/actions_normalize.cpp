@@ -105,7 +105,7 @@ bool km::core::actions_normalize(
     boundary prior to the intersection of the cached_context and the output.
   */
   if(!output.empty()) {
-    while(n > 0 && !km::core::util::has_nfd_boundary_before(output[0])) {
+    while(n > 0 && !km::core::util::has_nfc_boundary_before(output[0])) {
       // The output may interact with the context further in normalization. We
       // need to copy characters back further until we reach a normalization
       // boundary.
@@ -133,6 +133,7 @@ bool km::core::actions_normalize(
     To adjust, we remove one codepoint at a time from the app_context until
     its normalized form matches the cached_context normalized form.
   */
+  std::u32string context_final = U"";
 
   while(!app_context_string.empty()) {
     auto app_context_nfd = app_context_string;
@@ -141,7 +142,16 @@ bool km::core::actions_normalize(
       return false;
     }
 
-    if(app_context_nfd == cached_context_string) {
+    /*
+      We are working in NFD as we backtrack in the context, but input variable
+      app_context_string is NFC. The last character of the context may be part
+      of a composed character, so we need to track decomposition. For example,
+      'tä' + BKSP should result in 'ta', but delete back 1 in app_context_string
+      will give us 't', so we need to remember 'a', and add it back afterwards
+      (see output_nfc variable).
+    */
+    if(app_context_nfd == cached_context_string.substr(0, app_context_nfd.length())) {
+      context_final = cached_context_string.substr(app_context_nfd.length());
       break;
     }
 
@@ -155,7 +165,7 @@ bool km::core::actions_normalize(
     Normalize our output string
   */
 
-  auto output_nfc = output;
+  auto output_nfc = context_final + output;
   if(!km::core::util::normalize_nfc(output_nfc)) {
     DebugLog("nfc->normalize failed");
     return false;
@@ -196,6 +206,8 @@ bool km::core::actions_normalize(
   delete [] actions.output;
   actions.output = new_output;
   actions.code_points_to_delete = nfu_to_delete;
+
+  // Outcome will be: <app_context><context_final><output>|
 
   return true;
 }

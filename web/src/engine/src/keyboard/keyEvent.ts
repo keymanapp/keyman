@@ -6,12 +6,12 @@
 // a key event.  The most straightforward way to integrate Web OSK events on other platforms is to have
 // other platforms recognize and utilize this type.
 
-import { type JSKeyboard } from "./keyboards/jsKeyboard.js";
 import { type DeviceSpec } from "keyman/common/web-utils";
 
 import { Codes } from './codes.js';
 import { DefaultOutputRules } from "./defaultOutputRules.js";
 import { ActiveKeyBase } from './keyboards/activeLayout.js';
+import { type Keyboard } from "./keyboards/keyboardLoaderBase.js";
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.
@@ -44,7 +44,7 @@ export interface KeyEventSpec {
    * guarantee that the keyboard instance known to the handler has not changed during JS execution
    * since the user's interaction that raised the event.
    */
-  srcKeyboard?: JSKeyboard;
+  srcKeyboard?: Keyboard;
 
   // Holds a generated fat-finger distribution (when appropriate)
   keyDistribution?: KeyDistribution;
@@ -85,7 +85,7 @@ export class KeyEvent implements KeyEventSpec {
    * guarantee that the keyboard instance known to the handler has not changed during JS execution
    * since the user's interaction that raised the event.
    */
-  srcKeyboard?: JSKeyboard;
+  srcKeyboard?: Keyboard;
 
   // Holds relevant event properties leading to construction of this KeyEvent.
   source?: any; // Technically, KeyEvent|MouseEvent|Touch - but those are DOM types that must be kept out of headless mode.
