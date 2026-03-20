@@ -9,7 +9,7 @@
 
 import { XMLParser } from 'fast-xml-parser';
 import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout } from "@keymanapp/developer-utils";
-//import { KeymanXMLReader } from "@keymanapp/developer-utils";
+import { KeymanXMLReader } from "@keymanapp/developer-utils";
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
@@ -39,8 +39,10 @@ export class KeylayoutFileReader {
    * @return objects that do not contain property #text
    */
   public removeWhitespace(o: any): void {
-    if (o['#text']) {
-      delete o['#text'];
+    if (o !== undefined) {
+      if (o['#text']) {
+        delete o['#text'];
+      }
     }
   }
 
@@ -127,7 +129,7 @@ export class KeylayoutFileReader {
     }
   }
   //.................................................................................................
-  // new read() with keyman xml parser  (Uint8Array-> XMLSourceFile)
+  // new read() with fast xml parser  (Uint8Array-> XMLSourceFile)
   public read_Uint8Array(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
 
     const options = {
@@ -139,9 +141,9 @@ export class KeylayoutFileReader {
     };
 
     try {
-      const xmlFile = source;
+      //const xmlFile = source;
       const parser = new XMLParser(options);
-      const jsonObj = parser.parse(xmlFile);      // get plain Object
+      const jsonObj = parser.parse(source);      // get plain Object
       this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
       return jsonObj;
     }
@@ -151,24 +153,35 @@ export class KeylayoutFileReader {
     }
   }
   //.................................................................................................
-  /*// very new read() with KeymanXMLReader (Uint8Array-> XMLSourceFile)
+  // very new read() with KeymanXMLReader (Uint8Array-> XMLSourceFile)
   public read_Uint8Array_UseKeymanXMLReader(file: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
+     // public read_Uint8Array(file: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
 
-    let result: Keylayout.KeylayoutXMLSourceFile;
+    /* // first idea use regex -> no
+     const data_with = new TextDecoder().decode(file);
+     let source: Keylayout.KeylayoutXMLSourceFile;
+     const data = data_with.replace(/(>[\\r\\n\s]+)/g, ">");
+ */
+
+    // second use options
     const data = new TextDecoder().decode(file);
-
+    let source: Keylayout.KeylayoutXMLSourceFile;
     try {
-      result = new KeymanXMLReader('keylayout').parse(data) as Keylayout.KeylayoutXMLSourceFile;
-      this.boxArray(result.keyboard);
-    } catch (e) {
+      source = new KeymanXMLReader('keylayout').
+        parse(data) as Keylayout.KeylayoutXMLSourceFile;
+      console.log("source");
+    }
+    catch (e) {
       console.log("TODO here error");
       //this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ e }));
-    }
-    if (!result) {
       return null;
     }
-    this.boxArray(result.keyboard);   // result now contains arrays; no single fields
-    return result;
-  }*/
+
+    if (this.boxArray(source)) {
+      return source;
+    }
+    // boxArrays ... resolveImports has already logged a message
+    return null;
+  }
   //.................................................................................................
 }

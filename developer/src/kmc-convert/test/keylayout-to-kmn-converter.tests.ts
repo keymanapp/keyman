@@ -27,14 +27,15 @@ describe('KeylayoutToKmnConverter', function () {
     const infile = makePathToFixture('../data/test.keylayout');
     const outfile = makePathToFixture('../data/test.kmn');
     const binaryData = compilerTestCallbacks.loadFile(infile);
+    const base= await converter.run(infile, binaryData, outfile)
 
-    assert.deepEqual(await converter.run(infile, binaryData, outfile), await converter.run(infile));
-    assert.deepEqual(await converter.run(infile, binaryData, outfile), await converter.run(infile, null));
-    assert.deepEqual(await converter.run(infile, binaryData, outfile), await converter.run(infile, null, null));
-    assert.deepEqual(await converter.run(infile, binaryData, outfile), await converter.run(infile, null, outfile));
-    assert.deepEqual(await converter.run(infile, binaryData, outfile), await converter.run(infile, binaryData));
-    assert.deepEqual(await converter.run(infile, binaryData, outfile), await converter.run(infile, binaryData, null));
-    assert.deepEqual(await converter.run(infile, binaryData, outfile), await converter.run(infile, binaryData, outfile));
+    assert.deepEqual(base, await converter.run(infile));
+    assert.deepEqual(base, await converter.run(infile, null));
+    assert.deepEqual(base, await converter.run(infile, null, null));
+    assert.deepEqual(base, await converter.run(infile, null, outfile));
+    assert.deepEqual(base, await converter.run(infile, binaryData));
+    assert.deepEqual(base, await converter.run(infile, binaryData, null));
+    assert.deepEqual(base, await converter.run(infile, binaryData, outfile));
   });
 
   describe('RunTestFiles resulting in errors ', function () {
