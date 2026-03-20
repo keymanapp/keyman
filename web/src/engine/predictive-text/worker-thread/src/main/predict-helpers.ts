@@ -1036,7 +1036,6 @@ export function finalizeSuggestions(
       if(presDL > 0) {
         mergedTransform.deleteLeft -= presDL;
       }
-      mergedTransform.id = prediction.sample.transformId;
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
       // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
@@ -1044,6 +1043,11 @@ export function finalizeSuggestions(
 
       // Assignment via by-reference behavior, as suggestion is an object
       mutableSuggestion.transform = mergedTransform;
+    }
+
+    // Is sometimes not set during unit tests.
+    if(prediction.sample.transformId) {
+      prediction.sample.transform.id = prediction.sample.transformId;
     }
 
     if(!verbose) {

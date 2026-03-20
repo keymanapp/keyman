@@ -9,6 +9,7 @@ import { ContextTracker, matchBaseContextState, models } from "@keymanapp/lm-wor
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
+import Suggestion = LexicalModelTypes.Suggestion;
 import TrieModel = models.TrieModel;
 
 const plainApplyCasing: CasingFunction = function(caseToApply, text) {
@@ -124,7 +125,7 @@ describe('matchBaseContextState', () => {
     assert.equal(matchedState, transition.base);
   });
 
-  it('handles sliding context with large jump from applying a suggestion', () => {
+  it('handles sliding context with large jump from applying a large insertion', () => {
     const context: Context = {
       left: 'ot of test here might cause the sliding context window to shift ', // 64 chars
       startOfBuffer: false,
@@ -137,7 +138,8 @@ describe('matchBaseContextState', () => {
       left: 'ot of test here might cause the sliding context window to shift ',
       startOfBuffer: false, // We're sliding now.
       endOfBuffer: true
-    }, [{sample: { insert: 'dramatically', deleteLeft: 0 }, p: 1}], true);
+    }, [{sample: { insert: 'dramatically', deleteLeft: 0 }, p: 1}]);
+
     contextTracker.latest = transition;
 
     const warningSpy = sinon.spy(console, 'warn');
@@ -155,7 +157,42 @@ describe('matchBaseContextState', () => {
     }
   });
 
-it('handles backward-sliding context after big delete', () => {
+  it('handles sliding context with large jump from applying a suggestion', () => {
+    const context: Context = {
+      left: 'ot of test here might cause the sliding context window to shift ', // 64 chars
+      startOfBuffer: false,
+      endOfBuffer: true
+    };
+    const contextTracker = new ContextTracker(plainCasedModel, context, 1, plainCasedModel.configuration);
+
+    const suggestion: Suggestion= {
+      transform: { insert: 'dramatically', deleteLeft: 0, id: 3 },
+      displayAs: 'dramatically',
+      transformId: 3,
+      id: 5
+    }
+
+    const latest = contextTracker.latest;
+    latest.final.suggestions = [suggestion];
+    const transition = latest.applySuggestion(suggestion).base;
+    contextTracker.latest = transition;
+
+    const warningSpy = sinon.spy(console, 'warn');
+    try {
+      const matchedState = matchBaseContextState(contextTracker, {
+        left: 'ere might cause the sliding context window to shift dramatically',
+        startOfBuffer: false,
+        endOfBuffer: true
+      }, 1);
+
+      assert.isFalse(warningSpy.called);
+      assert.equal(matchedState, transition.final);
+    } finally {
+      warningSpy.restore();
+    }
+  });
+
+  it('handles backward-sliding context after big deletion via input', () => {
     const context: Context = {
       left: 'ere might cause the sliding context window to shift dramatically', // 64 chars
       startOfBuffer: false,
@@ -168,7 +205,42 @@ it('handles backward-sliding context after big delete', () => {
       left: 'ere might cause the sliding context window to shift dramatically',
       startOfBuffer: false, // We're sliding now.
       endOfBuffer: true
-    }, [{sample: { insert: '', deleteLeft: 'dramatically'.length }, p: 1}], true);
+    }, [{sample: { insert: '', deleteLeft: 'dramatically'.length }, p: 1}]);
+    contextTracker.latest = transition;
+
+    const warningSpy = sinon.spy(console, 'warn');
+    try {
+      const matchedState = matchBaseContextState(contextTracker, {
+        left: 'ot of test here might cause the sliding context window to shift ',
+        startOfBuffer: false,
+        endOfBuffer: true
+      }, 1);
+
+      assert.isFalse(warningSpy.called);
+      assert.equal(matchedState, transition.final);
+    } finally {
+      warningSpy.restore();
+    }
+  });
+
+  it('handles backward-sliding context after big deletion from suggestion', () => {
+    const context: Context = {
+      left: 'ere might cause the sliding context window to shift dramatically', // 64 chars
+      startOfBuffer: false,
+      endOfBuffer: true
+    };
+    const contextTracker = new ContextTracker(plainCasedModel, context, 1, plainCasedModel.configuration);
+
+    const suggestion: Suggestion= {
+      transform: { insert: '', deleteLeft: 'dramatically'.length, id: 3 },
+      displayAs: '""',
+      transformId: 3,
+      id: 5
+    }
+
+    const latest = contextTracker.latest;
+    latest.final.suggestions = [suggestion];
+    const transition = latest.applySuggestion(suggestion).base;
     contextTracker.latest = transition;
 
     const warningSpy = sinon.spy(console, 'warn');

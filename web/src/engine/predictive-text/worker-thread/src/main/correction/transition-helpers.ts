@@ -40,7 +40,7 @@ export function precomputeTransitions(
    * in context (and the tokenizations that model each) that will result from
    * the currently-considered context variations and input.
    */
-  subsets: ReadonlyMap<string, TokenizationSubset>,
+  subsets: Map<string, TokenizationSubset>,
   /**
    * The key matching the resulting context variation that will match the actual
    * context edited by the user.
@@ -74,7 +74,7 @@ export function precomputeTransitions(
   }
 
   return {
-    subsets: subsetBuilder.subsets,
+    subsets: new Map(subsetBuilder.subsets),
     keyMatchingUserContext
   };
 }
