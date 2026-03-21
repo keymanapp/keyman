@@ -397,6 +397,24 @@ do_publish() {
   fi
 }
 
+do_create_installer() {
+  builder_heading "Creating installer package..."
+
+  ./installer/build-installer.sh
+}
+
+do_publish_installer() {
+  builder_heading "Publishing installer package..."
+
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    builder_echo info "writing download info for Keyman installer..."
+    local UPLOAD_PATH="${KEYMAN_MAC_BASE_PATH}/output/${KEYMAN_VERSION}"
+    write_download_info "${UPLOAD_PATH}" "Keyman-${KEYMAN_VERSION_FOR_FILENAME}.pkg" "Keyman Installer Package" pkg mac
+  else
+    builder_echo info "not writing download info because we are not on a CI build..."
+  fi
+}
+
 ### PROCESS COMMAND-LINE ARGUMENTS ###
 
 builder_run_action clean          do_clean
@@ -423,4 +441,6 @@ builder_run_action build:testapp  do_build_testapp
 
 builder_run_action install do_install
 
-builder_run_action publish do_publish
+#builder_run_action publish do_publish
+builder_run_action publish do_create_installer
+builder_run_action publish do_publish_installer
