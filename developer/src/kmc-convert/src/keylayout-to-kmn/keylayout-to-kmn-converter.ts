@@ -160,9 +160,9 @@ export class KeylayoutToKmnConverter {
     let jsonO: Keylayout.KeylayoutXMLSourceFile;
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks,/* this.options*/);
     if (!binaryData) {
-      jsonO = KeylayoutReader.read_Uint8Array(this.callbacks.loadFile(inputFilename));
+      jsonO = KeylayoutReader.read(this.callbacks.loadFile(inputFilename));
     }
-    else jsonO = KeylayoutReader.read_Uint8Array(binaryData);
+    else jsonO = KeylayoutReader.read(binaryData);
 
     try {
       if (!KeylayoutReader.validate(jsonO)) {
@@ -194,7 +194,7 @@ export class KeylayoutToKmnConverter {
     */
     //...................................................................................................
 
-    const processedData = await this.convert(jsonO, inputFilename);
+    const processedData = await this.convert(jsonO, inputFilename, outputFilename);
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
@@ -213,7 +213,7 @@ export class KeylayoutToKmnConverter {
    * @param  jsonObj containing filename, behaviorand rules of a json object
    * @return an ProcessedData containing all data ready to print out
    */
-  private convert(jsonObj: any, inputfilename: string): ProcessedData {
+  private convert(jsonObj: any, inputfilename: string, outputFilename?: string): ProcessedData {
     // modifiers for each behavior
     const modifierBehavior: string[][] = [];
 
@@ -242,7 +242,10 @@ export class KeylayoutToKmnConverter {
 
     // fill dataObject with filenames, behaviors and (initialized) rules
     dataObject.keylayoutFilename = inputfilename;
-    dataObject.kmnFilename = inputfilename.replace(/\.keylayout$/, '.kmn');
+    if (!outputFilename)
+      dataObject.kmnFilename = inputfilename.replace(/\.keylayout$/, '.kmn');
+    else
+      dataObject.kmnFilename = outputFilename;
     dataObject.modifiers = modifierBehavior;  // ukelele uses behaviors e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
     dataObject.rules = rules;
 

@@ -25,8 +25,8 @@ describe('KmnFileWriter', function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const read = sutR.read(inputFilename);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);    
+    const read= sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     it('write() should return result', async function () {
@@ -39,8 +39,8 @@ describe('KmnFileWriter', function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const read = sutR.read(inputFilename);
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions); 
+    const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     it('writeDataRules() should return true (no error) if written', async function () {
@@ -54,8 +54,8 @@ describe('KmnFileWriter', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
-    const read = sutR.read(inputFilename);
+    const inputFilename = makePathToFixture('../data/Test.keylayout');    
+    const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     const outExpectedFirst: string =

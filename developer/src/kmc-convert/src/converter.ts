@@ -63,8 +63,9 @@ export class Converter implements KeymanCompiler {
       ...this.options,
     };
 
-    if (!outputFilename) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+    // TODO-kmc-convert: do we allow !outputFilename?
+    if (!inputFilename) {
+      this.callbacks.reportMessage(ConverterMessages.Error_IntputFilenameIsRequired());
       return null;
     }
 

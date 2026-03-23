@@ -9,7 +9,6 @@
 
 import { XMLParser } from 'fast-xml-parser';
 import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout } from "@keymanapp/developer-utils";
-import { KeymanXMLReader } from "@keymanapp/developer-utils";
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
@@ -105,32 +104,8 @@ export class KeylayoutFileReader {
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
   //.................................................................................................
-  // old read() with fast-xml-parser (string-> XMLSourceFile)
-  public read(inputFilename: string): Keylayout.KeylayoutXMLSourceFile {
-
-    const options = {
-      ignoreAttributes: [''],       // we do not process an output character of ""
-      trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (space)
-      parseTagValue: false,
-      attributeNamePrefix: '@__',   // to access the attribute
-      ignoreDeclaration: true
-    };
-
-    try {
-      const xmlFile = this.callbacks.fs.readFileSync(inputFilename, 'utf8');
-      const parser = new XMLParser(options);
-      const jsonObj = parser.parse(xmlFile);      // get plain Object
-      this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
-      return jsonObj;
-    }
-    catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename }));
-      return null;
-    }
-  }
-  //.................................................................................................
   // new read() with fast xml parser  (Uint8Array-> XMLSourceFile)
-  public read_Uint8Array(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
+  public read(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
 
     const options = {
       ignoreAttributes: [''],       // we do not process an output character of ""
@@ -141,7 +116,6 @@ export class KeylayoutFileReader {
     };
 
     try {
-      //const xmlFile = source;
       const parser = new XMLParser(options);
       const jsonObj = parser.parse(source);      // get plain Object
       this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
@@ -151,37 +125,6 @@ export class KeylayoutFileReader {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
       return null;
     }
-  }
-  //.................................................................................................
-  // very new read() with KeymanXMLReader (Uint8Array-> XMLSourceFile)
-  public read_Uint8Array_UseKeymanXMLReader(file: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
-     // public read_Uint8Array(file: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
-
-    /* // first idea use regex -> no
-     const data_with = new TextDecoder().decode(file);
-     let source: Keylayout.KeylayoutXMLSourceFile;
-     const data = data_with.replace(/(>[\\r\\n\s]+)/g, ">");
- */
-
-    // second use options
-    const data = new TextDecoder().decode(file);
-    let source: Keylayout.KeylayoutXMLSourceFile;
-    try {
-      source = new KeymanXMLReader('keylayout').
-        parse(data) as Keylayout.KeylayoutXMLSourceFile;
-      console.log("source");
-    }
-    catch (e) {
-      console.log("TODO here error");
-      //this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ e }));
-      return null;
-    }
-
-    if (this.boxArray(source)) {
-      return source;
-    }
-    // boxArrays ... resolveImports has already logged a message
-    return null;
   }
   //.................................................................................................
 }
