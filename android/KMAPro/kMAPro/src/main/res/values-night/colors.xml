@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="yellow_background">#171717</color>
+    <color name="yellow_background">#131313</color>
 
     <color name="iconColor">#FFFFFF</color>
     <color name="toolbarColor">@color/ms_black</color>

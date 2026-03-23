@@ -80,14 +80,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
+
 import androidx.drawerlayout.widget.DrawerLayout;
-=======
+
 import androidx.core.content.ContextCompat;
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+
 
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -175,21 +172,19 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
-<<<<<<< Updated upstream
+
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setLogo(R.drawable.keyman_logo);
-=======
-<<<<<<< Updated upstream
+
     getSupportActionBar().setDisplayUseLogoEnabled(false);
     getSupportActionBar().setDisplayShowHomeEnabled(false);
-=======
+
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setLogo(R.drawable.keyman_logo_mode);
 //    getSupportActionBar().setLogo(R.drawable.keyman_logo);
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
