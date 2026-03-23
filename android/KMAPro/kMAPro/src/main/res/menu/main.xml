@@ -20,7 +20,6 @@
 <!--        app:showAsAction="always"-->
 <!--        android:title="@string/action_share"-->
 <!--        android:icon="@drawable/ic_light_action_share" />-->
-
     <!-- Set showAsAction="never" for overflow -->
     <item
         android:id="@+id/action_overflow"
@@ -29,10 +28,10 @@
         android:icon="@drawable/ic_light_action_overflow" >
 
         <menu>
-                <item android:id="@+id/action_share"
-                    app:showAsAction="always"
-                    android:title="@string/action_share"
-                    android:icon="@drawable/ic_light_action_share" />
+            <item android:id="@+id/action_share"
+                app:showAsAction="always"
+                android:title="@string/action_share"
+                android:icon="@drawable/ic_light_action_share" />
 
             <item
                 android:id="@+id/action_text_size"
@@ -73,4 +72,12 @@
 
         </menu>
     </item>
+
+    <item
+        android:id="@+id/action_sidebar"
+        android:icon="@drawable/ic_light_action_overflow"
+        android:title="Menu"
+        app:showAsAction="always" />
+
+
 </menu>

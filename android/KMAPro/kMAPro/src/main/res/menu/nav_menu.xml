@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
 
 <!--    <group android:checkableBehavior="single">-->
 <!--        <item-->
@@ -8,7 +10,10 @@
 <!--            android:title="Home" />-->
 <!--    </group>-->
 
-    <item android:title="Setup"
+    <item
+        android:id="@+id/action_sidebar"
+        android:title="Setup"
+
         >
         <menu>
             <item
@@ -50,11 +55,16 @@
                 android:icon="@drawable/ic_action_timelapse"
                 android:title="Adjust Longpress Delay" />
 
+            <item
+                android:id="@+id/nav_spacebar_caption"
+                android:icon="@drawable/spacebar_key_bg"
+                android:title="Spacebar caption" />
+
 
             <item
                 android:id="@+id/nav_toggle_show_osk"
                 android:icon="@drawable/ic_keyboard"
-                android:title="Show OSK"
+                android:title="Show On Screen Keyboard"
                 app:actionLayout="@layout/nav_switch_item" />
             <item
                 android:id="@+id/nav_toggle_haptic_feedback"

@@ -249,6 +249,44 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         } else if (id == R.id.nav_longpress_delay) {
           drawerLayout.closeDrawers();
           startActivity(new Intent(context, AdjustLongpressDelayActivity.class));
+        } else if (id == R.id.nav_spacebar_caption) {
+          drawerLayout.closeDrawers();
+
+          // Same entries as in KeymanSettingsFragment
+          CharSequence[] entries = {
+            getString(R.string.spacebar_caption_language),
+            getString(R.string.spacebar_caption_keyboard),
+            getString(R.string.spacebar_caption_language_keyboard),
+            getString(R.string.spacebar_caption_blank)
+          };
+
+          KMManager.SpacebarText[] values = {
+            KMManager.SpacebarText.LANGUAGE,
+            KMManager.SpacebarText.KEYBOARD,
+            KMManager.SpacebarText.LANGUAGE_KEYBOARD,
+            KMManager.SpacebarText.BLANK
+          };
+
+          // Find the currently selected index
+          KMManager.SpacebarText current = KMManager.getSpacebarText();
+          int currentIndex = Arrays.asList(values).indexOf(current);
+
+          new AlertDialog.Builder(context)
+            .setTitle(getString(R.string.spacebar_caption))
+            .setSingleChoiceItems(entries, currentIndex, (dialog, which) -> {
+              KMManager.setSpacebarText(values[which]);
+
+              // Persist the selection just like KeymanSettingsFragment does
+              SharedPreferences prefs = getSharedPreferences(
+                getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+              prefs.edit()
+                .putString(KeymanSettingsActivity.spacebarTextKey, values[which].toString())
+                .apply();
+
+              dialog.dismiss();
+            })
+            .setNegativeButton(getString(R.string.label_cancel), null)
+            .show();
         } else if (id == R.id.nav_settings) {
           drawerLayout.closeDrawers();
           startActivity(new Intent(context, KeymanSettingsActivity.class));
@@ -583,7 +621,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       }
 
       return true;
-    } else if (item.getItemId() == R.id.action_overflow) {
+    } else if (item.getItemId() == R.id.action_sidebar) {
       // Open the drawer from the end when the hamburger (overflow) icon is clicked
       if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
         drawerLayout.closeDrawer(GravityCompat.END);
@@ -1106,8 +1144,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     bindDrawerSwitch(navigationView, R.id.nav_toggle_haptic_feedback,
       prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false),
       new SwitchChangeHandler() {
-        @Override
-        public void onChanged(boolean isChecked) {
+        @Override        public void onChanged(boolean isChecked) {
           SharedPreferences.Editor editor = prefs.edit();
           editor.putBoolean(KeymanSettingsActivity.hapticFeedbackKey, isChecked);
           editor.apply();

@@ -8,6 +8,7 @@
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="action_sidebar">Show sidebar menu</string>
 
   <!-- Context: Menu Action -->
   <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
