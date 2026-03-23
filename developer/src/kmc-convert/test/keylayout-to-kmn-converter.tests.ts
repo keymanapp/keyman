@@ -22,6 +22,7 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe('Run kmc-convert with or without outputfile name', async function () {
+
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = '../data/test.keylayout';
     [
@@ -36,14 +37,15 @@ describe('KeylayoutToKmnConverter', function () {
     });
   });
 
-  describe('Run kmc-convert with or without  outputfile', async function () {
+  describe('Run kmc-convert with or without outputfile', async function () {
     const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = makePathToFixture('../data/test.keylayout');
     const outfile = makePathToFixture('../data/test.kmn');
+    const out_diff = makePathToFixture('../data/test_OtherOutputName.kmn');
     const base = await converter.run(infile, outfile);
     assert.deepEqual(base, await converter.run(infile));
     assert.deepEqual(base, await converter.run(infile, null));
-    assert.deepEqual(base, await converter.run(infile, outfile));
+    assert.notDeepEqual(base, await converter.run(infile, out_diff));
   });
 
   describe('RunTestFiles resulting in errors ', function () {
