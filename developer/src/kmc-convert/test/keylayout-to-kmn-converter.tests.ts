@@ -22,10 +22,8 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe('Run kmc-convert with or without outputfile name', async function () {
-
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = '../data/test.keylayout';
-    const binaryData = compilerTestCallbacks.loadFile(makePathToFixture(infile));
     [
       [makePathToFixture('../data/test.kmn')],
       [],
@@ -34,7 +32,7 @@ describe('KeylayoutToKmnConverter', function () {
       it(infile + " should run " + ((files[0]) ?
         ("with specified output filename and should create " + files[0]) :
         ("without specified output filename and should create " + makePathToFixture(infile.replace(/\.keylayout$/, '.kmn')))), async function () {
-          await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), binaryData, files[0]));
+          await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile),  files[0]));
           assert.equal(compilerTestCallbacks.messages.length, 0);
         });
     });
@@ -44,16 +42,12 @@ describe('KeylayoutToKmnConverter', function () {
     const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = makePathToFixture('../data/test.keylayout');
     const outfile = makePathToFixture('../data/test.kmn');
-    const binaryData = compilerTestCallbacks.loadFile(infile);
-    const base = await converter.run(infile, binaryData, outfile);
-
+    const base = await converter.run(infile, outfile);
     assert.deepEqual(base, await converter.run(infile));
     assert.deepEqual(base, await converter.run(infile, null));
-    assert.deepEqual(base, await converter.run(infile, null, null));
-    assert.deepEqual(base, await converter.run(infile, null, outfile));
-    assert.deepEqual(base, await converter.run(infile, binaryData));
-    assert.deepEqual(base, await converter.run(infile, binaryData, null));
-    assert.deepEqual(base, await converter.run(infile, binaryData, outfile));
+    assert.deepEqual(base, await converter.run(infile, outfile));
+    assert.deepEqual(base, await converter.run(infile, null));
+    assert.deepEqual(base, await converter.run(infile, outfile));
   });
 
   describe('RunTestFiles resulting in errors ', function () {
@@ -71,7 +65,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
-        sut.run(files[0], compilerTestCallbacks.loadFile(files[0]));
+        sut.run(files[0]);
         assert.isTrue(compilerTestCallbacks.messages.length > 0);
       });
     });
@@ -103,7 +97,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test.keylayout')],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
-        sut.run(files[0], compilerTestCallbacks.loadFile(files[0]));
+        sut.run(files[0]);
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
       });
     });
@@ -117,7 +111,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_unsupportedCharacters.keylayout')],
     ].forEach(function (files) {
       it(files + " should give Error: unsupported characters ", async function () {
-        sut.run(files[0], compilerTestCallbacks.loadFile(files[0]));
+        sut.run(files[0]);
         assert.isTrue(compilerTestCallbacks.messages.length === 1);
         assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Error | CompilerErrorNamespace.Converter | 0x0007));
       });
@@ -130,7 +124,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_undefinedAction.keylayout')],
     ].forEach(function (files) {
       it(files + " should give Error: undefined action detected", async function () {
-        sut.run(files[0], compilerTestCallbacks.loadFile(files[0]));
+        sut.run(files[0]);
         assert.isTrue(compilerTestCallbacks.messages.length === 1);
         assert.equal(compilerTestCallbacks.messages[0].code, 5292040);
       });
@@ -149,14 +143,14 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should throw on null input file name and empty output file name', async function () {
-      const result = sut.run(null, null, '');
+      const result = sut.run(null, '');
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 1);
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
     });
 
     it('run() should throw on null input file name and unknown output file name', async function () {
-      const result = sut.run(null, null, 'X');
+      const result = sut.run(null, 'X');
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 1);
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
@@ -166,15 +160,15 @@ describe('KeylayoutToKmnConverter', function () {
       const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 2);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead());
-      assert.equal(compilerTestCallbacks.messages[1].code, 5246984);
+      assert.equal(compilerTestCallbacks.messages.length, 1);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));// ok
+      assert.equal(compilerTestCallbacks.messages[1].code, 5292037);
     });
 
     it('run() should return on available input file name and null output file name', async function () {
       this.timeout(5000); // allow longer time for this test
       const inputFilename = makePathToFixture('../data/Test.keylayout');
-      const result = sut.run(inputFilename, compilerTestCallbacks.loadFile(inputFilename), null);
+      const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, null));
       assert.equal(compilerTestCallbacks.messages.length, 0);
@@ -182,27 +176,27 @@ describe('KeylayoutToKmnConverter', function () {
 
     it('run() should return on correct input file name and empty output file name ', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
-      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, compilerTestCallbacks.loadFile(inputFilename), ''));
+      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, ''));
       assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() should return on correct input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
-      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, compilerTestCallbacks.loadFile(inputFilename), null));
+      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, null));
       assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() should return on correct input file name and given output file name ', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const outputFilename = makePathToFixture('../data/OutputName.kmn');
-      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, compilerTestCallbacks.loadFile(inputFilename), outputFilename));
+      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
       assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() return on correct input file extention and unsupperted output file extention', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const outputFilename = makePathToFixture('../data/OutputXName.B');
-      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, compilerTestCallbacks.loadFile(inputFilename), outputFilename));
+      await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
       assert.equal(compilerTestCallbacks.messages.length, 0);
     });
   });

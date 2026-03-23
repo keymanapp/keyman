@@ -128,8 +128,8 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, binaryData?: Uint8Array, outputFilename?: string): Promise<ConverterToKmnResult> {
-
+  // async run(inputFilename: string,  outputFilename?: string): Promise<ConverterToKmnResult> {
+  async run(inputFilename: string,/* binaryData?: Uint8Array, */outputFilename?: string): Promise<ConverterToKmnResult> {
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
@@ -157,13 +157,15 @@ export class KeylayoutToKmnConverter {
     //...................................................................................................
     //NEW READER 1st easier version - new read() with keyman xml parser  (Uint8Array-> XMLSourceFile)
 
-    let jsonO: Keylayout.KeylayoutXMLSourceFile;
-    const KeylayoutReader = new KeylayoutFileReader(this.callbacks,/* this.options*/);
-    if (!binaryData) {
-      jsonO = KeylayoutReader.read(this.callbacks.loadFile(inputFilename));
-    }
-    else jsonO = KeylayoutReader.read(binaryData);
+    const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
 
+    const binaryData = this.callbacks.loadFile(inputFilename);
+    const jsonO: Keylayout.KeylayoutXMLSourceFile = KeylayoutReader.read(binaryData);
+
+    if (!jsonO) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename :inputFilename}));
+      return null;
+    }
     try {
       if (!KeylayoutReader.validate(jsonO)) {
         return null;
