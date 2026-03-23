@@ -3,7 +3,7 @@
  *
  * KMX+ file format structures and helper functions
  */
-import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 import { ElementString } from './element-string.js';
 import { ListItem } from '../../ldml-keyboard/string-list.js';
 import * as util from '../../util/util.js';
@@ -22,6 +22,7 @@ import { KMXPlusFileFormat } from './kmx-plus-file.js';
 // Reader in kmx-loader.ts
 
 export class Section {
+  static dependencies: SectionIdent[] = [];
 }
 
 /**
@@ -46,6 +47,8 @@ export class Elem extends Section {
     super();
     this.strings.push(ElementString.fromStrings(sections, {}, '')); // C7043: null element string
   }
+  static override dependencies: SectionIdent[] = ['strs', 'uset'];
+
   /**
    * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
    * If it is a string, will be interpreted per reorder element ruls.
@@ -68,6 +71,7 @@ export class Elem extends Section {
 
 export class Loca extends Section {
   locales: StrsItem[] = [];
+  static override dependencies: SectionIdent[] = ['strs'];
 };
 
 // 'meta'
@@ -85,6 +89,8 @@ export class Meta extends Section {
   indicator: StrsItem;
   version: StrsItem; // semver version string, defaults to "0"
   settings: KeyboardSettings;
+
+  static override dependencies: SectionIdent[] = ['strs'];
 
   /** convenience for checking settings */
   get normalizationDisabled() {
@@ -265,6 +271,8 @@ export class Vars extends Section {
   sets: SetVarItem[] = [];
   usets: UnicodeSetItem[] = [];
 
+  static override dependencies: SectionIdent[] = ['strs', 'list', 'uset', 'elem'];
+
   /**
    *
    * @returns false if any invalid variables
@@ -374,13 +382,12 @@ export class Vars extends Section {
  * Common base for variable sections
  * See Variable
  */
-export class VarsItem extends Section {
+export class VarsItem {
   id: StrsItem;
   value: StrsItem;
   compileContext?: any;
 
   constructor(id: string, value: string, sections: DependencySections, compileContext?: any) {
-    super();
     this.id = sections.strs.allocString(id);
     this.value = sections.strs.allocString(value, { unescape: true });
     this.compileContext = compileContext;
@@ -392,6 +399,7 @@ export class VarsItem extends Section {
 };
 
 export class UnicodeSetItem extends VarsItem {
+  // TODO-EMBED-OSK-IN-KMX: second usetparser ref (outside `sections`) is never used, cleanup
   constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser, compileContext?: any) {
     super(id, value, sections, compileContext);
     const needRanges = sections.usetparser.sizeUnicodeSet(value);
@@ -453,6 +461,7 @@ export class Tran extends Section {
   get id() {
     return constants.section.tran;
   }
+  static override dependencies: SectionIdent[] = ['strs', 'list', 'uset', 'elem'];
 };
 
 export class UsetItem {
@@ -465,6 +474,7 @@ export class UsetItem {
 
 export class Uset extends Section {
   usets: UsetItem[] = [];
+  static override dependencies: SectionIdent[] = ['strs'];
   allocUset(set: UnicodeSet, sections: DependencySections, compileContext?: any) : UsetItem {
     // match the same pattern
     let result = this.usets.find(s => set.pattern == s.uset.pattern);
@@ -575,6 +585,7 @@ export interface DispItem {
 export class Disp extends Section {
   baseCharacter: StrsItem;
   disps: DispItem[] = [];
+  static override dependencies: SectionIdent[] = ['strs'];
 };
 
 // 'layr'
@@ -624,6 +635,7 @@ export class LayrForm {
 
 export class Layr extends Section {
   forms: LayrForm[] = [];
+  static override dependencies: SectionIdent[] = ['strs'];
 };
 
 export enum KeysKeysFlags {
@@ -682,6 +694,7 @@ export class Keys extends Section {
     const nullFlicks = new KeysFlicks(strs.allocString(''));
     this.flicks.push(nullFlicks); // C7043: null element string
   }
+  static override dependencies: SectionIdent[] = ['strs', 'list'];
 };
 
 export class List extends Section {
@@ -723,6 +736,7 @@ export class List extends Section {
     super();
     this.lists.push(ListItem.fromStrings([], {}, { strs })); // C7043: null element string
   }
+  static override dependencies: SectionIdent[] = ['strs'];
   lists: ListItem[] = [];
 };
 
@@ -751,4 +765,27 @@ export interface KMXPlusData {
 export class KMXPlusFile extends KMXPlusFileFormat {
   /* File in-memory data */
   public kmxplus: KMXPlusData = { };
+  static createEmptyMinimalKMXPlusFile(version: KMXPlusVersion): KMXPlusFile {
+    const kmx = new KMXPlusFile(version);
+    const strs = kmx.kmxplus.strs = new Strs();
+    kmx.kmxplus.layr = new Layr();
+    kmx.kmxplus.elem = new Elem(kmx.kmxplus);
+    kmx.kmxplus.disp = new Disp();
+    kmx.kmxplus.keys = new Keys(strs);
+    kmx.kmxplus.list = new List(strs);
+    kmx.kmxplus.loca = new Loca();
+
+    kmx.kmxplus.meta = new Meta();
+    kmx.kmxplus.meta.author = strs.allocString();
+    kmx.kmxplus.meta.conform = strs.allocString();
+    kmx.kmxplus.meta.indicator = strs.allocString();
+    kmx.kmxplus.meta.layout = strs.allocString();
+    kmx.kmxplus.meta.name = strs.allocString();
+    kmx.kmxplus.meta.settings = 0;
+    kmx.kmxplus.meta.version = strs.allocString();
+
+    // Are there other sections we need?
+
+    return kmx;
+  }
 };

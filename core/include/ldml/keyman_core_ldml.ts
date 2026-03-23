@@ -17,25 +17,31 @@
 
 
 /**
+ * Names of the possible sections
+ */
+export const SECTION_IDENTS = [
+  // Keep this sorted, but with `sect` as the first entry.
+  'sect',
+  'bksp',
+  'disp',
+  'elem',
+  'keys',
+  'layr',
+  'list',
+  'loca',
+  'meta',
+  'strs',
+  'tran',
+  'uset',
+  'vars'
+] as const;
+
+/**
  * Defines the section identifiers and ensures that we include each and every
  * one of them in the `sections` block and gives us a type which we can iterate
  * through.
  */
-export type SectionIdent =
-// Keep this sorted, but with `sect` as the first entry.
-  'sect' |
-  'bksp' |
-  'disp' |
-  'elem' |
-  'keys' |
-  'layr' |
-  'list' |
-  'loca' |
-  'meta' |
-  'strs' |
-  'tran' |
-  'uset' |
-  'vars';
+export type SectionIdent = typeof SECTION_IDENTS[number];
 
 
 type SectionMap = {
@@ -339,6 +345,11 @@ class Constants {
    * `prebase = flags & elem_flags_prebase`
    */
   readonly elem_flags_prebase = 0x00000008;
+
+  /**
+   * bitwise mask for bit flags in elem[elemstr][element].flags.
+   */
+  readonly elem_flags_flags_mask = 0x0000FFFF;
 
   /**
    * bitwise mask for order in elem[elemstr][element].flags.

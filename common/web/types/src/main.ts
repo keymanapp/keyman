@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 export * as KMX from './kmx/kmx.js';
 export { KmxFileReader, KmxFileReaderError } from './kmx/kmx-file-reader.js';
 export * as KeymanTargets from './kmx/keyman-targets.js';
@@ -7,6 +11,7 @@ export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
 
+export { KMXPlusFileReader } from './kmx/kmx-plus/kmx-plus-file-reader.js';
 
 export { USVirtualKeyCodes, usVirtualKeyName } from './consts/virtual-key-constants.js';
 export * as Constants from './consts/virtual-key-constants.js';
