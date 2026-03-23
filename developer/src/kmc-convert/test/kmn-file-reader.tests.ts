@@ -19,28 +19,13 @@ describe('KeylayoutFileReader', function () {
     compilerTestCallbacks.clear();
   });
 
-/*
-compilerTestCallbacks.loadFile
-  loadFile(filename: string): Uint8Array {
-    try {
-      return fs.readFileSync(filename) as Uint8Array;
-    } catch(e) {
-      if (e.code === 'ENOENT') {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  }*/
-
-
   describe("validate() ", function () {
 
     it('validate() should return true on correct inputfile', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-           const validated = sutR.validate(result);
+      const validated = sutR.validate(result);
       assert.isTrue(validated);
     });
 

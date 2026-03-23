@@ -31,21 +31,20 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (files) {
       it(infile + " should run " + ((files[0]) ?
         ("with specified output filename and should create " + files[0]) :
-        ("without specified output filename and should create " + makePathToFixture(infile.replace(/\.keylayout$/, '.kmn')))), async function () {
-          await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile),  files[0]));
-          assert.equal(compilerTestCallbacks.messages.length, 0);
-        });
+        ("without specified output filename and should create "
+          + makePathToFixture(infile.replace(/\.keylayout$/, '.kmn')))), async function () {
+            await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
+            assert.equal(compilerTestCallbacks.messages.length, 0);
+          });
     });
   });
 
-  describe('Run kmc-convert with or without binary data or outputfile', async function () {
+  describe('Run kmc-convert with or without  outputfile', async function () {
     const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = makePathToFixture('../data/test.keylayout');
     const outfile = makePathToFixture('../data/test.kmn');
     const base = await converter.run(infile, outfile);
     assert.deepEqual(base, await converter.run(infile));
-    assert.deepEqual(base, await converter.run(infile, null));
-    assert.deepEqual(base, await converter.run(infile, outfile));
     assert.deepEqual(base, await converter.run(infile, null));
     assert.deepEqual(base, await converter.run(infile, outfile));
   });
@@ -160,8 +159,8 @@ describe('KeylayoutToKmnConverter', function () {
       const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));// ok
+      assert.equal(compilerTestCallbacks.messages.length, 2);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead());// ok
       assert.equal(compilerTestCallbacks.messages[1].code, 5292037);
     });
 
