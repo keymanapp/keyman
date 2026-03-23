@@ -26,11 +26,13 @@ export const KMXPLUS_FILE_READER_ERROR = {
   FILE_IS_TOO_SHORT: () => "file is too short",
   UNRECOGNIZED_MAGIC: () => "header magic bytes should be 'sect' or 'sec2'",
   VERSION_SHOULD_MATCH_CONSTRUCTOR: (o:{version: KMXPlusVersion, constructorVersion: KMXPlusVersion}) => `Expected version '${o.version}' to match constructor version '${o.constructorVersion}'`,
-  MISSING_SECT: () => "Missing 'sect' section",
+  MISSING_SECT: () => "Missing 'sect' or 'sec2' section",
   EXPECTED_SECT_OR_SEC2: () => "Expected 'sect' or 'sec2' section",
   UNKNOWN_ELEMENT_TYPE: (o:{type:string}) => `Internal Error: Unknown element type 0x${o.type}`,
   UNKNOWN_VAR_TYPE: (o:{type:number, id:number}) => `Unrecognized var type ${o.type} for ${o.id}`,
   UNKNOWN_GROUP_TYPE: (o:{type:number}) => `Unrecognized group type ${o.type}`,
+  NOT_A_VALID_KMX_FILE: () => `Not a .kmx file: header does not contain FILEID_COMPILED`,
+  KMX_FILE_DOES_NOT_INCLUDE_KMXPLUS_SECTION: () => `.kmx file does not include a KMX+ section`,
 };
 
 export class KMXPlusFileReader {
@@ -42,15 +44,31 @@ export class KMXPlusFileReader {
     }
   }
 
-  public readFromKmx(input: Uint8Array) {
-    // This is for a valid KMX+ files, results undefined if not a valid KMX+ file
+  /**
+   * Read KMX+ data from a whole KMX file.
+   * Throws if file is not a .kmx file or if the file does not contain a KMX+ section.
+   * Results may be undefined if file is not a completely valid KMX+ file.
+   * @param input A whole .kmx file
+   * @returns in-memory representation of the KMX+ data
+   */
+  public readFromKmx(input: Uint8Array): KMXPlus.KMXPlusData {
     const kmx = new KMXFile();
+    if(input.length < KMXFile.COMP_KEYBOARD_SIZE + KMXFile.COMP_KEYBOARD_KMXPLUSINFO_SIZE) {
+      throw new KMXPlusFileReaderError(KMXPLUS_FILE_READER_ERROR.FILE_IS_TOO_SHORT());
+    }
+    const header = kmx.COMP_KEYBOARD.fromBuffer(input);
+    if(header.dwIdentifier != KMXFile.FILEID_COMPILED) {
+      throw new KMXPlusFileReaderError(KMXPLUS_FILE_READER_ERROR.NOT_A_VALID_KMX_FILE());
+    }
+    if((header.dwFlags & (KMXFile.KF_KMXPLUS | KMXFile.KF_KMXPLUSOSK)) == 0) {
+      throw new KMXPlusFileReaderError(KMXPLUS_FILE_READER_ERROR.KMX_FILE_DOES_NOT_INCLUDE_KMXPLUS_SECTION());
+    }
     const binaryKmxPlusHeader = kmx.COMP_KEYBOARD_KMXPLUSINFO.fromBuffer(input.slice(KMXFile.COMP_KEYBOARD_SIZE));
     return this.read(input.slice(binaryKmxPlusHeader.dpKMXPlus, binaryKmxPlusHeader.dpKMXPlus + binaryKmxPlusHeader.dwKMXPlusSize));
   }
 
   /**
-   * Read the KMX+ data into memory
+   * Read the KMX+ data into memory. Results may be undefined if file is not a completely valid KMX+ data blob
    * @param source  KMX+ data blob starting at the sect/sec2 section -- does not include the KMX wrapper
    * @returns in-memory representation of the KMX+ data
    */

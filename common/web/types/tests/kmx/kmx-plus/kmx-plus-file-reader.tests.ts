@@ -22,22 +22,46 @@ function sectToSectionReader(ident: SectionIdent) {
 
 describe('KMXPlusFileReader', function() {
 
+  // read
+
   it('should throw when no data is provided', function() {
     const reader = new KMXPlusFileReader();
     assert.throws(() => reader.read(null), KMXPLUS_FILE_READER_ERROR.SOURCE_IS_REQUIRED());
   });
 
-  it('should throw when the input file is too short', function() {
+  it('should throw when the KMX+ section is too short', function() {
     const reader = new KMXPlusFileReader();
     const file = new Uint8Array([0,0,0]);
     assert.throws(() => reader.read(file), KMXPLUS_FILE_READER_ERROR.FILE_IS_TOO_SHORT());
   });
 
-  it('should throw when the input file has invalid magic', function() {
+  it('should throw when the KMX+ section has invalid magic', function() {
     const reader = new KMXPlusFileReader();
     const file = new Uint8Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     assert.throws(() => reader.read(file), KMXPLUS_FILE_READER_ERROR.UNRECOGNIZED_MAGIC());
   });
+
+  // readFromKmx
+
+  it('should throw when the .kmx file is too short', function() {
+    const reader = new KMXPlusFileReader();
+    const file = new Uint8Array([0,0,0,0,0,0,0,0]);
+    assert.throws(() => reader.readFromKmx(file), KMXPLUS_FILE_READER_ERROR.FILE_IS_TOO_SHORT());
+  });
+
+  it('should throw when the .kmx file has invalid magic', function() {
+    const reader = new KMXPlusFileReader();
+    const file = new Uint8Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    assert.throws(() => reader.readFromKmx(file), KMXPLUS_FILE_READER_ERROR.NOT_A_VALID_KMX_FILE());
+  });
+
+  it('should throw when the .kmx file does not contain a KMX+ section', function() {
+    const reader = new KMXPlusFileReader();
+    const file = new Uint8Array([0x4B, 0x58, 0x54, 0x53, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    assert.throws(() => reader.readFromKmx(file), KMXPLUS_FILE_READER_ERROR.KMX_FILE_DOES_NOT_INCLUDE_KMXPLUS_SECTION());
+  });
+
+  // deeper tests
 
   [[17, KMXPlusVersion.Version17], [19, KMXPlusVersion.Version19]].forEach( ([versionMajor, version]) => {
     function preloadSections(sections: SectionIdent[], thisSection: SectionIdent) {
