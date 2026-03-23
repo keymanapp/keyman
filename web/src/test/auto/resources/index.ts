@@ -10,7 +10,7 @@ import { dirname } from 'node:path';
 
 export function getKeymanRoot(): string {
   const __dirname = dirname(fileURLToPath(import.meta.url));
-  return process.env['KEYMAN_ROOT'] ?? (__dirname + '/../../../../../../');
+  return __dirname + '/../../../../../../';
 }
 
 export function getWebTestResourcesPath(): string {

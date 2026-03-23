@@ -7,6 +7,15 @@ import { LanguageAPIPropertySpec } from 'keyman/engine/keyboard';
 import { CloudRequesterInterface } from './requesterInterface.js';
 import { ManagedPromise, Version } from 'keyman/common/web-utils';
 
+// For when the API call straight-up times out.
+export const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";
+// Currently cannot distinguish between "no matching keyboard" and other script-load errors.
+export const CLOUD_MALFORMED_OBJECT_ERR = "Could not find a keyboard with that ID.";
+// Represents unspecified errors that occur when registering the results of a successful API call.
+export const CLOUD_STUB_REGISTRATION_ERR = "The Cloud API failed to find an appropriate keyboard.";
+// Represents custom, specified KMW errors that occur when registering the results of a successful API call.
+export const CLOUD_REGISTRATION_ERR = "Error occurred while registering keyboards: ";
+
 export const MISSING_KEYBOARD = function(kbdid: string) {
   return kbdid + ' keyboard not found.';
 }
@@ -130,7 +139,7 @@ export class CloudQueryEngine extends EventEmitter<EventMap> {
     try {
       result = this._registerCore(x);
     } catch(err) {
-      result = new Error(`Error occurred while registering keyboards: ${err}`);
+      result = new Error(CLOUD_REGISTRATION_ERR + err);
     }
 
     if(!promiseid) {
@@ -190,7 +199,7 @@ export class CloudQueryEngine extends EventEmitter<EventMap> {
 
     // Ignore callback unless the context is defined
     if(typeof(options) == 'undefined' || typeof(options['context']) == 'undefined') {
-      return new Error('Could not find a keyboard with that ID.');
+      return new Error(CLOUD_MALFORMED_OBJECT_ERR);
     }
 
     // Register each keyboard for the specified language codes

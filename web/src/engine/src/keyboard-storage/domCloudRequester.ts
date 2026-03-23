@@ -1,5 +1,6 @@
 import { ManagedPromise } from 'keyman/common/web-utils';
 import { CloudRequesterInterface } from './cloud/requesterInterface.js';
+import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './cloud/cloudQueryEngine.js';
 
 export class DOMCloudRequester implements CloudRequesterInterface {
   private readonly fileLocal: boolean;
@@ -13,7 +14,7 @@ export class DOMCloudRequester implements CloudRequesterInterface {
 
     // Set callback timer
     const timeoutID = window.setTimeout(() => {
-      promise.reject(new Error('The Cloud API request timed out.'));
+      promise.reject(new Error(CLOUD_TIMEOUT_ERR));
     }, 10000);
 
     const tFlag='&timerid='+ timeoutID;
@@ -27,7 +28,7 @@ export class DOMCloudRequester implements CloudRequesterInterface {
       // script does not ever call `register`.  Also provides default handling
       // should `register` fail to report results/failure correctly.
       if(!promise.isResolved) {
-        promise.reject(new Error('The Cloud API failed to find an appropriate keyboard.'));
+        promise.reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
       }
     };
 
@@ -41,8 +42,7 @@ export class DOMCloudRequester implements CloudRequesterInterface {
                         lineno?: number, colno?: number, error?: Error) => {
       window.clearTimeout(timeoutID);
 
-      // Currently cannot distinguish between "no matching keyboard" and other script-load errors.
-      let msg = 'Could not find a keyboard with that ID.';
+      let msg = CLOUD_MALFORMED_OBJECT_ERR;
       if(error) {
         msg = msg + ": " + error.message;
       }
