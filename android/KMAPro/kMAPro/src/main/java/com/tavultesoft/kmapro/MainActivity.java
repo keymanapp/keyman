@@ -49,6 +49,7 @@ import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Build;
@@ -94,6 +95,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.core.content.ContextCompat;
 
 
+import android.provider.Settings;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
