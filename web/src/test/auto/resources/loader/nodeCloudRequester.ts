@@ -1,13 +1,16 @@
-import { ManagedPromise } from 'keyman/common/web-utils';
-import {
-  CloudRequesterInterface,
-  CloudQueryResult,
-  CloudQueryEngine
-} from 'keyman/engine/keyboard-storage';
-
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import fs from 'node:fs';
 import https from 'node:https';
 import vm from 'node:vm';
+
+import { ManagedPromise } from 'keyman/common/web-utils';
+import {
+  CloudQueryEngine,
+  CloudQueryResult,
+  CloudRequesterInterface
+} from 'keyman/engine/keyboard-storage';
 
 export class NodeCloudRequester implements CloudRequesterInterface {
   private static QUERY_SEED = 1;

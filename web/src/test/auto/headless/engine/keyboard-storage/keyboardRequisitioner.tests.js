@@ -1,16 +1,19 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { assert } from 'chai';
+import { createRequire } from 'module';
 import sinon from 'sinon';
-import fs from 'fs';
 
 import { ManagedPromise } from 'keyman/common/web-utils';
-import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader, NodeCloudRequester, getWebTestResourcesPath } from 'keyman/test/resources';
-import { KeyboardRequisitioner, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
+import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { KeyboardRequisitioner, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
+import { NodeCloudRequester, NodeKeyboardLoader, getWebTestResourcesPath } from 'keyman/test/resources';
 
-import path from 'path';
-
-import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 let commonResourcesPackage = '@keymanapp/common-test-resources';

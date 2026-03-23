@@ -1,14 +1,17 @@
-import { assert } from 'chai';
-import fs from 'fs';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
 
+import { assert } from 'chai';
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
+const require = createRequire(import.meta.url);
 const KEYMAN_ROOT = getKeymanRoot();
 
 describe('Engine - Deadkeys', function() {

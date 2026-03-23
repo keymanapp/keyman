@@ -1,6 +1,10 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { ManagedPromise } from 'keyman/common/web-utils';
+
+import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_STUB_REGISTRATION_ERR, CLOUD_TIMEOUT_ERR } from './cloud/cloudQueryEngine.js';
 import { CloudRequesterInterface } from './cloud/requesterInterface.js';
-import { CLOUD_MALFORMED_OBJECT_ERR, CLOUD_TIMEOUT_ERR, CLOUD_STUB_REGISTRATION_ERR } from './cloud/cloudQueryEngine.js';
 
 export class DOMCloudRequester implements CloudRequesterInterface {
   private readonly fileLocal: boolean;

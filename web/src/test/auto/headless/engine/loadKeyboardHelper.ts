@@ -4,6 +4,7 @@
 
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
+
 import { getKeymanRoot } from 'keyman/test/resources';
 
 const KEYMAN_ROOT = getKeymanRoot();

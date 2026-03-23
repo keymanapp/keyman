@@ -1,15 +1,17 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
+
 import { assert } from 'chai';
-import fs from 'fs';
-
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
 
-
+const require = createRequire(import.meta.url);
 const KEYMAN_ROOT = getKeymanRoot();
 
 describe('Engine - Unmatched Final Groups', function() {

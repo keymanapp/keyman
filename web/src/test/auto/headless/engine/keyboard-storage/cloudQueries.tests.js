@@ -1,9 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { ManagedPromise } from 'keyman/common/web-utils';
-import { CloudQueryEngine, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
+import { CloudQueryEngine, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 import { NodeCloudRequester, getWebTestResourcesPath } from 'keyman/test/resources';
 
 const pathConfig = new PathConfiguration({
