@@ -30,9 +30,8 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/test_OtherOutputName.kmn')],
     ].forEach(function (files) {
       it(infile + " should run " + ((files[0]) ?
-        ("with specified output filename and should create " + files[0]) :
-        ("without specified output filename and should create "
-          + makePathToFixture(infile.replace(/\.keylayout$/, '.kmn')))), async function () {
+        ("and use specified output filename") :
+        ("create outputfile name from input filename ")), async function () {
             await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
             assert.equal(compilerTestCallbacks.messages.length, 0);
           });
