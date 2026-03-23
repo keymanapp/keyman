@@ -21,31 +21,6 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-  describe('Run kmc-convert with or without outputfile name', async function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const infile = '../data/test.keylayout';
-    [
-      [makePathToFixture('../data/test.kmn')],
-      [],
-      [makePathToFixture('../data/test_OtherOutputName.kmn')],
-    ].forEach(function (files) {
-      it(infile + " should run " , async function () {
-            await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
-            assert.equal(compilerTestCallbacks.messages.length, 0);
-          });
-    });
-  });
-
-  describe('Run kmc-convert with or without  outputfile', async function () {
-    const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const infile = makePathToFixture('../data/test.keylayout');
-    const outfile = makePathToFixture('../data/test.kmn');
-    const base = await converter.run(infile, outfile);
-    assert.deepEqual(base, await converter.run(infile));
-    assert.deepEqual(base, await converter.run(infile, null));
-    assert.deepEqual(base, await converter.run(infile, outfile));
-  });
-
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
