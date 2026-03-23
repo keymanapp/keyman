@@ -5,11 +5,10 @@
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
+import { getKeymanRoot } from 'keyman/test/resources';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const KEYMAN_ROOT = process.env['KEYMAN_ROOT'] ?? (__dirname + '/../../../../../../');
+const KEYMAN_ROOT = getKeymanRoot();
+
 export const coreurl = pathToFileURL(`${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core`).toString();
 
 export function loadKeyboardBlob(filename: string) {

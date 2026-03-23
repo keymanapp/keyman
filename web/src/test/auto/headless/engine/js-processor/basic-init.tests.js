@@ -4,8 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
-import { DEFAULT_PROCESSOR_INIT_OPTIONS } from '../../../resources/defaultProcessorInitOptions.js';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS, NodeKeyboardLoader } from 'keyman/test/resources';
 
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.

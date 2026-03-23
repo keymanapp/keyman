@@ -2,13 +2,12 @@ import { assert } from 'chai'
 import sinon from 'sinon';
 
 import * as PromiseStatusModule from 'promise-status-async';
+import { assertingPromiseStatus as promiseStatus, simulateMultiSourceMatcherInput, simulateSelectorInput } from 'keyman/test/resources';
 
 import { timedPromise } from 'keyman/common/web-utils';
 import { gestures } from 'keyman/engine/gesture-processor';
 
 import { TouchpathTurtle } from '#gesture-tools';
-import { assertingPromiseStatus as promiseStatus } from '#test-resources/assertingPromiseStatus.js';
-import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "#test-resources/simulateMultiSourceInput.js";
 
 import {
   LongpressModel,
@@ -56,7 +55,7 @@ describe("MatcherSelector", function () {
           specSet: [LongpressModel]
         }, this.fakeClock);
 
-        let completion = executor();
+        const completion = executor();
         await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 

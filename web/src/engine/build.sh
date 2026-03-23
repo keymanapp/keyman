@@ -14,9 +14,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # ################################ Main script ################################
 
+# dependency on kmc required for tests
 builder_describe "Builds Keyman Engine for Web (KMW)" \
   "@/core:wasm                 build" \
   "@/common/tools/es-bundling  build" \
+  "@/developer/src/kmc         build" \
   "@/web/src/common/web-utils  build" \
   "clean" \
   "configure" \
@@ -68,11 +70,30 @@ do_build () {
   node src/osk/validate-gesture-specs.js
 }
 
-builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/engine"
+run_tests() {
+  # Run javascript tests
+  #
+  # Trying to run languageProcessor.tests.js with c8 coverage fails with:
+  # "TypeError [ERR_INVALID_URL_SCHEME]: The URL must be of scheme file"
+  # when c8 tries to create a report from the raw coverage data. The reason
+  # is a URL starting with `data:text/javascript` coming from
+  # `web/src/engine/predictive-text/worker-main/src/node/mappedWorker.ts`.
+  #
+  # So we first run all javascript tests except languageProcessor.tests.js
+  # with coverage, and then in a second step run languageProcessor.tests.js
+  # without coverage.
+  test-headless engine "" "--exclude" "**/languageProcessor.tests.js"
+  SKIP_C8=1 test-headless engine/main/headless/languageProcessor.tests.js
+
+  # Run typescript tests
+  test-headless-typescript engine
+}
+
+builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/engine"
 builder_run_child_actions clean
 builder_run_action configure node_select_version_and_npm_ci
 builder_run_child_actions configure
 builder_run_child_actions build
 builder_run_action build do_build
-builder_run_action test test-headless-typescript engine
+builder_run_action test  run_tests
 builder_run_child_actions test

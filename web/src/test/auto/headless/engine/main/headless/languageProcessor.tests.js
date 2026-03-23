@@ -1,19 +1,20 @@
-import { assert } from 'chai';
-
-import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
-import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { SyntheticTextStore } from 'keyman/engine/keyboard';
-
 /*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
  * Unit tests for the Dummy prediction model.
  */
+import path from 'node:path';
 
-import { LexicalModelCompiler } from '@keymanapp/kmc-model';
-import path from 'path';
+import { assert } from 'chai';
+
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { LexicalModelCompiler } from '@keymanapp/kmc-model';
+import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+import { SyntheticTextStore } from 'keyman/engine/keyboard';
+import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
+import { getKeymanRoot } from 'keyman/test/resources';
 
-import { env } from 'node:process';
-const KEYMAN_ROOT = env.KEYMAN_ROOT;
+const KEYMAN_ROOT = getKeymanRoot();
 
 // Required initialization setup.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.

@@ -1,11 +1,14 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { EventEmitter } from 'eventemitter3';
 
-import { PathConfiguration } from 'keyman/engine/interfaces';
-
-import { KeyboardStub, ErrorStub, KeyboardAPISpec } from '../keyboardStub.js';
-import { LanguageAPIPropertySpec } from 'keyman/engine/keyboard';
-import { CloudRequesterInterface } from './requesterInterface.js';
 import { ManagedPromise, Version } from 'keyman/common/web-utils';
+import { PathConfiguration } from 'keyman/engine/interfaces';
+import { LanguageAPIPropertySpec } from 'keyman/engine/keyboard';
+
+import { ErrorStub, KeyboardAPISpec, KeyboardStub } from '../keyboardStub.js';
+import { CloudRequesterInterface } from './requesterInterface.js';
 
 // For when the API call straight-up times out.
 export const CLOUD_TIMEOUT_ERR = "The Cloud API request timed out.";

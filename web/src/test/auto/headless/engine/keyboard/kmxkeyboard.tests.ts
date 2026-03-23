@@ -6,7 +6,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { NodeKeyboardLoader } from 'keyman/test/resources';
 
 describe('KMXKeyboard tests', function () {
   // TODO-embed-osk-in-kmx: Enable when hooking up with RTL Core API (#15482)
