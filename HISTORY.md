@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.218 alpha 2026-03-24
+
+* fix(developer): define globalThis for compiled custom lexical models (#15777)
+
 ## 19.0.217 alpha 2026-03-17
 
 * maint(mac): search for brew-installed rsync (#15765)
