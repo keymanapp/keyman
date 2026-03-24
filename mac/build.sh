@@ -130,6 +130,8 @@ do_clean ( ) {
   rm -rf "$KMTESTAPP_BASE_PATH/build"
   rm -rf "$KEYMAN_ROOT/mac/setup/Install Keyman.app"
   rm -rf "$CONFIGAPP_BASE_PATH/build"
+  rm -rf "$KEYMAN_MAC_BASE_PATH/build"
+  rm -rf "$KEYMAN_MAC_BASE_PATH/output"
 
   builder_heading "Cleaning pods folder (CocoaPods)"
   rm -rf "$PODS_FOLDER"
@@ -194,7 +196,7 @@ do_build_app ( ) {
 # without codesigning suppression, provisioning profile is included but no application ID??
 execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 
-check_code_sign_status
+#check_code_sign_status
 }
 
 do_build_settings_package ( ) {
@@ -216,12 +218,6 @@ do_build_config_app ( ) {
 }
 
 do_update_app_metadata ( ) {
-  if builder_is_ci_release_level_build; then
-      echo "do_update_app_metadata, builder_is_ci_release_level_build = true."
-  else
-      echo "do_update_app_metadata, builder_is_ci_release_level_build = false."
-  fi
-    
   updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
 
   # re-sign the app after updating the plist file

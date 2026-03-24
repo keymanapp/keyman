@@ -27,7 +27,9 @@ if [ ! -d "$DEST_DIR" ]; then
 fi
 
 # Copy the input method to the destination directory
-cp -r "$SOURCE_FILE" "$DEST_DIR/"
+# must use cp -R to maintain symbolic links and preserve permissions
+# if we use -r, the input method's code signature will be invalid and the system will not load it
+cp -R "$SOURCE_FILE" "$DEST_DIR/"
 
 # Set the user as owner
 chown "$CONSOLE_USER":staff "$DEST_DIR/Keyman.app"

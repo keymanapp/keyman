@@ -87,16 +87,13 @@ mkdir -p "$OUTPUT_DIRECTORY_PATH"
 
 productbuild --package ./build/keyman-input-method.pkg \
     --package ./build/keyman-config.pkg \
-    --sign "Developer ID Installer: Summer Institute of Linguistics, Inc (SIL) (3YE4W86L3G)" \
+    --sign $INSTALLER_CERTIFICATE_ID \
     "$OUTPUT_PACKAGE_PATH"
 
  #   ./build/KeymanExport/$PACKAGE_NAME
 
   builder_heading "Uploading install package to Apple for notarization"
   mac_notarize "$OUTPUT_DIRECTORY_PATH" "$OUTPUT_PACKAGE_PATH"
-
-   builder_heading "Attempting to staple notarization to install package"
-   xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
 
   builder_heading "Attempting to staple notarization to install package"
   xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
