@@ -182,6 +182,7 @@ export class LexicalModelCompiler implements KeymanCompiler {
         let sources: string[] = modelSource.sources.map(function(source) {
           return new TextDecoder().decode(callbacks.loadFile(callbacks.path.join(sourcePath, source)));
         });
+        func += `globalThis.exports = globalThis.exports ?? {};\n`;
         func += this.transpileSources(sources).join('\n');
         func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
         break;
