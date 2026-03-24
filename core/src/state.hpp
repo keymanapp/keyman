@@ -187,7 +187,7 @@ public:
      * whether or not the keydown handled it internally. Therefore this
      * flag exists.
      *
-     *  Only used when processing KM_CORE_VKEY_BKSP.
+     *  Only used when processing KM_CORE_VKEY_BKSP with LDML keyboards.
      */
     void set_backspace_handled_internally(bool handled) { _backspace_handled_internally = handled; }
     bool backspace_handled_internally() const { return _backspace_handled_internally; }

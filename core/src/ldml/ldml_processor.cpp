@@ -179,20 +179,13 @@ ldml_processor::process_event(
   ldml_state.clear();
 
   try {
-    switch (vk) {
-    // Currently, only one VK gets special treatment.
-    // Special handling for backspace VK
-    case KM_CORE_VKEY_BKSP:
+    if (vk == KM_CORE_VKEY_BKSP) {
       process_backspace(ldml_state);
-      break;
-    default:
-      // all other VKs
-      if (is_key_down) {
-        process_key_down(ldml_state);
-      } else {
-        process_key_up(ldml_state);
-      }
-    }  // end of switch
+    } else if (is_key_down) {
+      process_key_down(ldml_state);
+    } else {
+      process_key_up(ldml_state);
+    }
     // all key-up and key-down events end up here.
     // commit the ldml state into the core state
     ldml_state.commit();
