@@ -87,7 +87,7 @@ mkdir -p "$OUTPUT_DIRECTORY_PATH"
 
 productbuild --package ./build/keyman-input-method.pkg \
     --package ./build/keyman-config.pkg \
-    --sign $INSTALLER_CERTIFICATE_ID \
+    --sign "$INSTALLER_CERTIFICATE_ID" \
     "$OUTPUT_PACKAGE_PATH"
 
  #   ./build/KeymanExport/$PACKAGE_NAME
