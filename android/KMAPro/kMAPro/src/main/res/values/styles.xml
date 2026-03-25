@@ -38,4 +38,10 @@
         <item name="android:textColorSecondary">@android:color/black</item>
     </style>
 
+    <style name="NavigationDrawerItemText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:singleLine">false</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
 </resources>

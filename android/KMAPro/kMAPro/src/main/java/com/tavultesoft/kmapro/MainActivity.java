@@ -93,6 +93,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.provider.Settings;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -217,6 +220,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     drawerToggle.syncState();
 
     navigationView = findViewById(R.id.nav_view);
+    navigationView.setItemMaxLines(2);
     navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
       @Override
       public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -297,6 +301,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         return true;
       }
     });
+    initializeDrawerItemSubtitles(navigationView);
     initializeDrawerToggleOptions(navigationView);
     initializeDrawerCheckboxOptions(navigationView);
     refreshDrawerSystemKeyboardCheckboxes(navigationView);
@@ -1163,6 +1168,59 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           KMManager.setMaySendCrashReport(isChecked);
         }
       });
+  }
+
+  private void initializeDrawerItemSubtitles(NavigationView navigationView) {
+//    setDrawerItemSubtitle(navigationView, R.id.nav_installed_languages,
+//      getString(R.string.drawer_subtitle_installed_languages));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_install_keyboard,
+//      getString(R.string.drawer_subtitle_install_keyboard));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_checkbox_enable_system_keyboard,
+//      getString(R.string.drawer_subtitle_enable_system_keyboard));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_checkbox_set_default_keyboard,
+//      getString(R.string.drawer_subtitle_set_default_keyboard));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_display_language,
+//      getString(R.string.drawer_subtitle_display_language));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_keyboard_height,
+//      getString(R.string.drawer_subtitle_keyboard_height));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_longpress_delay,
+//      getString(R.string.drawer_subtitle_longpress_delay));
+    setDrawerItemSubtitle(navigationView, R.id.nav_spacebar_caption,
+      getString(R.string.drawer_subtitle_spacebar_caption));
+    setDrawerItemSubtitle(navigationView, R.id.nav_toggle_show_osk,
+      getString(R.string.drawer_subtitle_show_osk));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_toggle_haptic_feedback,
+//      getString(R.string.drawer_subtitle_haptic_feedback));
+    setDrawerItemSubtitle(navigationView, R.id.nav_toggle_send_crash_report,
+      getString(R.string.drawer_subtitle_send_crash_report));
+//    setDrawerItemSubtitle(navigationView, R.id.nav_settings,
+//      getString(R.string.drawer_subtitle_more_settings));
+    setDrawerItemSubtitle(navigationView, R.id.nav_about,
+      getString(R.string.drawer_subtitle_about));
+  }
+
+  private void setDrawerItemSubtitle(NavigationView navigationView, int menuItemId, String subtitle) {
+    MenuItem menuItem = navigationView.getMenu().findItem(menuItemId);
+    if (menuItem == null || subtitle == null || subtitle.isEmpty()) {
+      return;
+    }
+
+    CharSequence currentTitle = menuItem.getTitle();
+    if (currentTitle == null || currentTitle.length() == 0) {
+      return;
+    }
+
+    String baseTitle = currentTitle.toString();
+    int newlineIndex = baseTitle.indexOf('\n');
+    if (newlineIndex >= 0) {
+      baseTitle = baseTitle.substring(0, newlineIndex);
+    }
+
+    SpannableString fullTitle = new SpannableString(baseTitle + "\n" + subtitle);
+    int subtitleStart = baseTitle.length() + 1;
+    fullTitle.setSpan(new RelativeSizeSpan(0.85f), subtitleStart, fullTitle.length(),
+      Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    menuItem.setTitle(fullTitle);
   }
 
   private void initializeDrawerCheckboxOptions(NavigationView navigationView) {

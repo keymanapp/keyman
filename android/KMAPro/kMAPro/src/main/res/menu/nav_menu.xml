@@ -28,12 +28,12 @@
             <item
                 android:id="@+id/nav_checkbox_enable_system_keyboard"
                 android:icon="@drawable/ic_keyboard"
-                android:title="Enable System Keyboard"
+                android:title="Enable Keyman as system-wide keyboard"
                 app:actionLayout="@layout/nav_checkbox_item" />
             <item
                 android:id="@+id/nav_checkbox_set_default_keyboard"
                 android:icon="@drawable/ic_settings"
-                android:title="Set Keyman As Default"
+                android:title="Set Keyman As default keyboard"
                 app:actionLayout="@layout/nav_checkbox_item" />
         </menu>
     </item>
@@ -67,9 +67,9 @@
                 android:title="Show On Screen Keyboard"
                 app:actionLayout="@layout/nav_switch_item" />
             <item
-                android:id="@+id/nav_toggle_haptic_feedback"
-                android:icon="@drawable/ic_navigation_refresh"
-                android:title="Haptic Feedback"
+                android:id="@+id/action_get_started"
+                android:icon="@drawable/ic_action_get_started"
+                android:title="Show &quot;Get Started&quot; on startup"
                 app:actionLayout="@layout/nav_switch_item" />
             <item
                 android:id="@+id/nav_toggle_send_crash_report"
