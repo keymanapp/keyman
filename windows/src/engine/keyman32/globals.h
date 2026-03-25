@@ -239,6 +239,7 @@ typedef struct tagKEYMAN64THREADDATA
 
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
+  BYTE LastTransition;
 
   /* Serialized key events */
 

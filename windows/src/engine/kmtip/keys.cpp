@@ -76,6 +76,7 @@ BOOL CKMTipTextService::_InitKeystrokeSink()
   pKeystrokeMgr->Release();
 
 	memset(fEatenBuf, 0, sizeof(fEatenBuf));
+  memset(fTestEatenBuf, 0, sizeof(fTestEatenBuf));
 
   return_SendDebugExit(_keystrokeSinkInitialized = (hr == S_OK));
 }
@@ -178,8 +179,7 @@ STDAPI CKMTipTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPA
 {
   SendDebugEntry();
   LogKey(0, wParam, lParam);
-  *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
-
+  fTestEatenBuf[wParam] = *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);  // I3588
   SendDebugMessageFormat(L"pfEaten=%s, wParam=%x, lParam=%x", *pfEaten ? L"TRUE" : L"FALSE", wParam, lParam);
   //  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
   SendDebugExit();
@@ -217,7 +217,7 @@ STDAPI CKMTipTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARA
   SendDebugEntry();
   LogKey(2, wParam, lParam);
   _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
-  *pfEaten = fEatenBuf[wParam];
+  *pfEaten = fTestEatenBuf[wParam];
 
   //  SendDebugMessageFormat("pfEaten=%s", *pfEaten ? "TRUE" : "FALSE");
   SendDebugMessageFormat(L"pfEaten=%s wParam=%x lParam=%x", *pfEaten ? L"TRUE" : L"FALSE", wParam, lParam);

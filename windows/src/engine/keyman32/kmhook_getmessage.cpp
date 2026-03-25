@@ -156,9 +156,11 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     }
 
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
+    BYTE keyTransitionEvent = KEYMSG_FLAG_TRANSITION(mp->lParam);
     CheckScheduledRefresh();
     _td->LastScanCode = scan;
     _td->LastKey = mp->wParam;
+    _td->LastTransition = keyTransitionEvent;
 
     switch (mp->wParam) {
     case VK_MENU:
@@ -177,8 +179,8 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
         if (mp->wParam == VK_CAPITAL) {
           ProcessToggleChange(VK_CAPITAL);
         }
-        SendDebugMessageFormat("WMKEY=%x clear `SCAN_FLAG_KEYMAN_KEY_EVENT` new_wParam=%x new_lParam=%x LastKey=%x LastScanCode=%x",
-          mp->message, mp->wParam, mp->lParam, _td->LastKey, _td->LastScanCode);
+        SendDebugMessageFormat("WMKEY=%x clear `SCAN_FLAG_KEYMAN_KEY_EVENT` new_wParam=%x new_lParam=%x LastKey=%x LastScanCode=%x LastTransition=%x",
+          mp->message, mp->wParam, mp->lParam, _td->LastKey, _td->LastScanCode, _td->LastTransition);
       }
     }
   }
