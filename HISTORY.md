@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.219 alpha 2026-03-25
+
+* maint(common): Update GitHub actions for Node 24 (#15762)
+* fix(core): fix keydown/up handling for LDML keyboards (#15609)
+
 ## 19.0.218 alpha 2026-03-24
 
 * fix(developer): define globalThis for compiled custom lexical models (#15777)
