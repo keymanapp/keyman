@@ -404,7 +404,7 @@ do_publish_installer() {
 
   if builder_is_ci_build && builder_is_ci_build_level_release; then
     builder_echo info "writing download info for Keyman installer..."
-    local UPLOAD_PATH="${KEYMAN_MAC_BASE_PATH}/output/${KEYMAN_VERSION}"
+    local UPLOAD_PATH="${KEYMAN_MAC_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
     write_download_info "${UPLOAD_PATH}" "Keyman-${KEYMAN_VERSION_FOR_FILENAME}.pkg" "Keyman Installer Package" pkg mac
   else
     builder_echo info "not writing download info because we are not on a CI build..."
