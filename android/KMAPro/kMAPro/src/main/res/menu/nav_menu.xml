@@ -17,6 +17,10 @@
         >
         <menu>
             <item
+                android:id="@+id/nav_about_current_keyboard"
+                android:icon="@drawable/ic_keyboard"
+                android:title="Current keyboard" />
+            <item
                 android:id="@+id/nav_installed_languages"
                 android:icon="@drawable/ic_folder_open"
                 android:title="Installed Languages" />
@@ -84,12 +88,19 @@
         </menu>
     </item>
 
-    <item android:title="About">
+<!--    <item android:title="About">-->
+<!--        <menu>-->
+
+
+<!--        </menu>-->
+<!--    </item>-->
+    <item android:title="Help">
         <menu>
             <item
-                android:id="@+id/nav_about"
+                android:id="@+id/nav_help"
                 android:icon="@drawable/ic_info_outline"
-                android:title="Keyman for Android" />
+                android:title="User guide" />
+
         </menu>
     </item>
 

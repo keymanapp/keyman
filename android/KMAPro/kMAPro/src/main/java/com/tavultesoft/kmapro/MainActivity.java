@@ -95,6 +95,7 @@ import android.provider.Settings;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.TypedValue;
@@ -118,6 +119,7 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import com.google.android.material.navigation.NavigationView;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import android.view.MenuItem;
 import androidx.appcompat.widget.AppCompatCheckBox;
@@ -148,6 +150,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private static final String userTextSizeKey = "UserTextSize";
   private Toolbar toolbar;
   private Menu menu;
+  private String lastCurrentKeyboardDrawerTitle = null;
+  private String lastKnownKeyboardId = null;
+  private static final boolean DEBUG_CURRENT_KEYBOARD_LOGS = false;
+  private static final boolean SHOW_CURRENT_KEYBOARD_ERROR_TOAST = false;
 
   private static Dataset repo;
   private boolean didExecuteParser = false;
@@ -225,7 +231,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       @Override
       public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.nav_toggle_show_osk || id == R.id.nav_toggle_haptic_feedback || id == R.id.nav_toggle_send_crash_report) {
+        if (id == R.id.nav_toggle_show_osk || id == R.id.action_get_started || id == R.id.nav_toggle_send_crash_report) {
           toggleDrawerSwitch(navigationView, id);
         } else if (id == R.id.nav_checkbox_enable_system_keyboard) {
           drawerLayout.closeDrawers();
@@ -294,13 +300,18 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         } else if (id == R.id.nav_settings) {
           drawerLayout.closeDrawers();
           startActivity(new Intent(context, KeymanSettingsActivity.class));
-        } else if (id == R.id.nav_about) {
+        } else if (id == R.id.nav_help
+        ) {
           drawerLayout.closeDrawers();
           startActivity(new Intent(context, InfoActivity.class));
+        } else if (id == R.id.nav_about_current_keyboard) {
+          drawerLayout.closeDrawers();
+          showCurrentKeyboardSettings();
         }
         return true;
       }
     });
+    updateCurrentKeyboardDrawerItemTitle(navigationView);
     initializeDrawerItemSubtitles(navigationView);
     initializeDrawerToggleOptions(navigationView);
     initializeDrawerCheckboxOptions(navigationView);
@@ -315,7 +326,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       }
       @Override
       public void onDrawerOpened(View drawerView) {
-
+        if (navigationView != null) {
+          updateCurrentKeyboardDrawerItemTitle(navigationView);
+        }
       }
 
       @Override
@@ -661,7 +674,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardChanged(String newKeyboard) {
-    textView.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
+    if (newKeyboard != null && !newKeyboard.isEmpty()) {
+      lastKnownKeyboardId = newKeyboard;
+      textView.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
+    }
   }
 
   @Override
@@ -1146,14 +1162,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         }
       });
 
-    bindDrawerSwitch(navigationView, R.id.nav_toggle_haptic_feedback,
-      prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false),
+    bindDrawerSwitch(navigationView, R.id.action_get_started,
+      prefs.getBoolean(GetStartedActivity.showGetStartedKey, true),
       new SwitchChangeHandler() {
-        @Override        public void onChanged(boolean isChecked) {
+        @Override
+        public void onChanged(boolean isChecked) {
           SharedPreferences.Editor editor = prefs.edit();
-          editor.putBoolean(KeymanSettingsActivity.hapticFeedbackKey, isChecked);
+          editor.putBoolean(GetStartedActivity.showGetStartedKey, isChecked);
           editor.apply();
-          KMManager.setHapticFeedback(isChecked);
         }
       });
 
@@ -1195,8 +1211,80 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       getString(R.string.drawer_subtitle_send_crash_report));
 //    setDrawerItemSubtitle(navigationView, R.id.nav_settings,
 //      getString(R.string.drawer_subtitle_more_settings));
-    setDrawerItemSubtitle(navigationView, R.id.nav_about,
+    setDrawerItemSubtitle(navigationView, R.id.nav_help,
       getString(R.string.drawer_subtitle_about));
+    setDrawerItemSubtitle(navigationView, R.id.nav_about_current_keyboard,
+      getString(R.string.drawer_subtitle_about_current_keyboard));
+  }
+
+  private void updateCurrentKeyboardDrawerItemTitle(NavigationView navigationView) {
+    MenuItem menuItem = navigationView.getMenu().findItem(R.id.nav_about_current_keyboard);
+    if (menuItem == null) {
+      return;
+    }
+
+    Keyboard currentKeyboard = getBestAvailableKeyboard();
+    String newTitle;
+    if (currentKeyboard != null && currentKeyboard.getKeyboardName() != null && !currentKeyboard.getKeyboardName().isEmpty()) {
+      newTitle = getString(R.string.drawer_about_current_keyboard) + ": " + currentKeyboard.getKeyboardName();
+    } else {
+      newTitle = getString(R.string.drawer_about_current_keyboard) + ": " + getString(R.string.drawer_about_no_active_keyboard);
+    }
+
+    if (!newTitle.equals(lastCurrentKeyboardDrawerTitle)) {
+      menuItem.setTitle(newTitle);
+      lastCurrentKeyboardDrawerTitle = newTitle;
+    }
+  }
+
+  private void showCurrentKeyboardSettings() {
+    Keyboard currentKeyboard = getBestAvailableKeyboard();
+    if (currentKeyboard == null) {
+      if (BuildConfig.DEBUG && DEBUG_CURRENT_KEYBOARD_LOGS) {
+        KMLog.LogInfo(TAG, "Current keyboard unavailable; not opening KeyboardSettingsActivity.");
+      }
+      if (SHOW_CURRENT_KEYBOARD_ERROR_TOAST) {
+        Toast.makeText(this, getString(R.string.drawer_about_no_active_keyboard), Toast.LENGTH_SHORT).show();
+      }
+      return;
+    }
+
+    Intent intent = new Intent(this, KeyboardSettingsActivity.class);
+    Bundle bundle = new Bundle();
+    bundle.putSerializable(KMManager.KMKey_Keyboard, currentKeyboard);
+    intent.putExtras(bundle);
+    startActivity(intent);
+  }
+
+  private Keyboard getBestAvailableKeyboard() {
+    List<Keyboard> keyboards = KMManager.getKeyboardsList(this);
+    if (keyboards == null || keyboards.isEmpty()) {
+      if (BuildConfig.DEBUG && DEBUG_CURRENT_KEYBOARD_LOGS) {
+        KMLog.LogInfo(TAG, "No installed keyboards available.");
+      }
+      return null;
+    }
+
+    if (keyboards.size() == 1) {
+      return keyboards.get(0);
+    }
+
+    if (lastKnownKeyboardId != null && !lastKnownKeyboardId.isEmpty()) {
+      for (Keyboard keyboard : keyboards) {
+        String keyboardId = keyboard.getKeyboardID();
+        if (keyboardId != null && (keyboardId.equals(lastKnownKeyboardId)
+            || lastKnownKeyboardId.contains(keyboardId)
+            || keyboardId.contains(lastKnownKeyboardId))) {
+          return keyboard;
+        }
+      }
+    }
+
+    if (BuildConfig.DEBUG && DEBUG_CURRENT_KEYBOARD_LOGS) {
+      KMLog.LogInfo(TAG, "Current keyboard id unavailable; falling back to first installed keyboard.");
+    }
+
+    return keyboards.get(0);
   }
 
   private void setDrawerItemSubtitle(NavigationView navigationView, int menuItemId, String subtitle) {
@@ -1220,6 +1308,15 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     int subtitleStart = baseTitle.length() + 1;
     fullTitle.setSpan(new RelativeSizeSpan(0.85f), subtitleStart, fullTitle.length(),
       Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+    TypedValue typedValue = new TypedValue();
+    getTheme().resolveAttribute(android.R.attr.textColorSecondary, typedValue, true);
+    int subtitleColor = typedValue.resourceId != 0
+      ? ContextCompat.getColor(this, typedValue.resourceId)
+      : typedValue.data;
+    fullTitle.setSpan(new ForegroundColorSpan(subtitleColor), subtitleStart, fullTitle.length(),
+      Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
     menuItem.setTitle(fullTitle);
   }
 
@@ -1276,9 +1373,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return;
     }
 
+    switchView.setClickable(false);
+    switchView.setFocusable(false);
+    switchView.setLongClickable(false);
+
     switchView.setChecked(defaultValue);
     switchView.setOnCheckedChangeListener((buttonView, isChecked) -> switchChangeHandler.onChanged(isChecked));
-    actionView.setOnClickListener(v -> switchView.toggle());
   }
 
   private void toggleDrawerSwitch(NavigationView navigationView, int menuItemId) {
