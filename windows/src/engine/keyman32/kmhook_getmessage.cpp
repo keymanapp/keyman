@@ -179,7 +179,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
         if (mp->wParam == VK_CAPITAL) {
           ProcessToggleChange(VK_CAPITAL);
         }
-        SendDebugMessageFormat("WMKEY=%x clear `SCAN_FLAG_KEYMAN_KEY_EVENT` new_wParam=%x new_lParam=%x LastKey=%x LastScanCode=%x LastTransition=%x",
+        SendDebugMessageFormat("WMKEY=%x Clear `SCAN_FLAG_KEYMAN_KEY_EVENT` before LastKey=%x LastScanCode=%x LastTransition=%x after wParam=%x lParam=%x",
           mp->message, mp->wParam, mp->lParam, _td->LastKey, _td->LastScanCode, _td->LastTransition);
       }
     }

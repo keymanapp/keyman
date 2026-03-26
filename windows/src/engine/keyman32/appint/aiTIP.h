@@ -80,7 +80,9 @@ public:
 
 /**
  * ProcessToggleChange
- * Toggles the state of FLAGS in the Globals::ShiftState bit mask
+ * Sets or clears the state of FLAGS in the Globals::ShiftState bit mask
+ * Using the status of the key as determined by GetKeyState,
+ * ensuring it is consistent with the actual state of the key.
  * Supports VK_CAPITAL and VK_NUMLOCK
  * It DOES NOT generate a system event change for these flags
  * @param  key

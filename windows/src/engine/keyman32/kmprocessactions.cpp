@@ -79,10 +79,11 @@ processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboa
 
 static void processCapsLock(const km_core_caps_state caps_state_change, BOOL isUp, BOOL Updateable, BOOL externalEvent) {
   BOOL isCapsOn            = IsCapsLockOn();
-  /// For Debuging
-  // TODO: 15594 - remove this debug message and associated code after testing
-  SendDebugMessageFormat("ACTION CAPS STATE:%d FIsUp=%d Updateable=%d ExternalEvent=%d CapsState=%d", caps_state_change, isUp, Updateable,
-      externalEvent, isCapsOn);
+  
+  // This debug message is useful for understanding the sequence of events around caps lock changes
+  //SendDebugMessageFormat("ACTION CAPS STATE:%d FIsUp=%d Updateable=%d ExternalEvent=%d CapsState=%d", caps_state_change, isUp, Updateable,
+  //    externalEvent, isCapsOn);
+  
   // We only want to process the Caps Lock key event once;
   // it has to be when updateble=1 as TSF does not consistently
   // have updateable=0 events.
@@ -90,13 +91,13 @@ static void processCapsLock(const km_core_caps_state caps_state_change, BOOL isU
   {
     return;
   }
-  // Turn three state value into a boolean for whether caps lock should be on or off,
+  // Turn three state value into a boolean for whether capslock should be on or off,
   // we only want to process the key event if the state is changing.
   BOOL required_caps_state = (caps_state_change == KM_CORE_CAPS_ON);
 
   if (isCapsOn != required_caps_state) {
     SendDebugMessageFormat(
-      "Simulate CAPS %s: FIsUp=%d CurrentCapsState=%d ExternalEvent=%d",
+      "Simulate CapsLock %s: FIsUp=%d CurrentCapsState=%d ExternalEvent=%d",
       required_caps_state ? "ON" : "OFF", isUp, isCapsOn, externalEvent);
     keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
     keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
@@ -141,7 +142,6 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeystroke) {
   _td->CoreProcessEventRun = TRUE;
 
   km_core_actions const* core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
-
 
   if (core_actions->emit_keystroke) {
     *emitKeystroke = TRUE;
