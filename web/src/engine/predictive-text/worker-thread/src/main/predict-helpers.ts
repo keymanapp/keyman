@@ -356,6 +356,7 @@ export function determineContextTransition(
   return transition;
 }
 
+// TODO:  Remove this and its associated unit tests!
 /**
  * Determines where the context for prediction-generation should be rooted and how
  * much of the context it should replace.
@@ -514,33 +515,37 @@ export function buildAndMapPredictions(
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
 
-  // No matter the prediction, once we know the root of the prediction, we'll
-  // always 'replace' the same amount of text.  We can handle this before the
-  // big 'prediction root' loop.
-  const { predictionContext, deleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
+  const applicationTarget = transition.base.displayTokenization;
+  const { tokensToRemove, tokensToPredict } = determineSuggestionRange(applicationTarget.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
 
-  let correction = match.matchString;
-  let rootCost = match.totalCost;
+  const deleteLeft = tokensToPredict.length > 1 ? 0 : tokensToRemove.reduce((prev, curr) => prev + curr.searchModule.codepointLength, 0);
+
+  // Exists to be extended by the 'correctionTransfrom' below.
+  const emptyContext: Context = {
+    left: '',
+    startOfBuffer: false,
+    endOfBuffer: false
+  };
 
   // Replace the existing context with the correction.
   const correctionTransform: Transform = {
-    insert: correction,  // insert correction string
-    deleteLeft: deleteLeft,
+    insert: match.matchString,  // insert correction string
+    deleteLeft: 0,
     id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
   }
 
+  const rootCost = match.totalCost;
   const predictionRoot = {
     sample: correctionTransform,
     p: Math.exp(-rootCost * costFactor)
   };
 
-  // Worth considering:  extend Traversal to allow direct prediction lookups?
-  // let traversal = match.finalTraversal; // ...
-  let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
+  let predictions = predictFromCorrections(model, [predictionRoot], emptyContext);
   predictions.forEach((entry) => {
     entry.preservationTransform = tokenization.taillessTrueKeystroke;
     // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
     // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
+    entry.prediction.sample.transform.deleteLeft = deleteLeft;
   });
 
   return predictions;
@@ -1118,13 +1123,10 @@ export function finalizeSuggestions(
     //
     // Note:  may need adjustment if/when supporting phrase-level correction.
     if(tuple.preservationTransform) {
-      const presDL = tuple.preservationTransform.deleteLeft;
-      const mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
-      // Any preserved delete-left is applied early because it directly affects the suggestion
-      // root; we need to remove that preserved delete-left here.
-      if(presDL > 0) {
-        mergedTransform.deleteLeft -= presDL;
-      }
+      const mergedTransform = {
+        ...models.buildMergedTransform(tuple.preservationTransform, {...prediction.sample.transform, deleteLeft: 0}),
+        deleteLeft: prediction.sample.transform.deleteLeft
+      };
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
       // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
