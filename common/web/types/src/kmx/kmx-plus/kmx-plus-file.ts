@@ -15,6 +15,7 @@ import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 export type IIDENT = number;
 export type ISTR_REF = number;
 export type ISTR_OR_CHAR32_OR_USET = number;
+export type ITABLE_REF = number;
 
 export interface ICOMP_PLUS_SectionHeader {
   ident: IIDENT;
@@ -25,7 +26,7 @@ export interface ICOMP_PLUS_SectionHeader {
 // 'sect'
 
 export interface ICOMP_PLUS_SECT_ITEM {
-  sect: number;
+  sect: IIDENT;
   offset: number;
 };
 
@@ -97,7 +98,7 @@ export interface ICOMP_PLUS_KEYS_FLICK {
 
 export interface ICOMP_PLUS_KEYS_FLICKS {
   count: number;
-  flick: number;
+  flick: ITABLE_REF; // keys.flick index
   id: ISTR_REF; // str
 };
 
@@ -110,7 +111,7 @@ export interface ICOMP_PLUS_KEYS_KEY {
   longPress: ILIST_REF; // list index
   longPressDefault: ISTR_REF; // str
   multiTap: ILIST_REF; // list index
-  flicks: number; // index into flicks table
+  flicks: ITABLE_REF; // keys.flicks index
 };
 
 export interface ICOMP_PLUS_KEYS_KMAP {
@@ -132,34 +133,34 @@ export interface ICOMP_PLUS_KEYS {
 };
 
 export interface ICOMP_PLUS_LAYR_ENTRY {
-  id: ISTR_REF; // str
-  mod: number; // bitfield
-  row: number; // index into rows
+  id: ISTR_REF;    // str
+  mod: number;     // bitfield
+  row: ITABLE_REF; // layr.rows index
   count: number;
 };
 
 export interface ICOMP_PLUS_LAYR_KEY {
-  key: ISTR_REF; // str: key id
+  key: ISTR_REF;   // str: key id
 };
 
 export interface ICOMP_PLUS_LAYR_FORM_v17 {
   hardware: ISTR_REF; // str: hardware name
-  layer: number; // index into layers
+  layer: ITABLE_REF;  // layr.layers index
   count: number;
   minDeviceWidth: number; // integer: millimeters
 };
 
 export interface ICOMP_PLUS_LAYR_FORM_v19 {
-  hardware: ISTR_REF;          // str: hardware name
-  layer: number;          // index into layers
+  hardware: ISTR_REF;         // str: hardware name
+  layer: ITABLE_REF;          // layr.layrs index
   count: number;
-  minDeviceWidth: number; // integer: millimeters
-  baseLayout: ISTR_REF;        // v19: str: identifier for base layout (reserved)
-  flags: number;          // v19: flags
+  minDeviceWidth: number;     // integer: millimeters
+  baseLayout: ISTR_REF;       // v19: str: identifier for base layout (reserved)
+  flags: number;              // v19: flags
 };
 
 export interface ICOMP_PLUS_LAYR_ROW {
-  key: number;
+  key: ITABLE_REF;      // layr.keys index
   count: number;
 };
 
@@ -190,7 +191,7 @@ export interface ICOMP_PLUS_LAYR_v19 {
 // 'list'
 
 export interface ICOMP_PLUS_LIST_LIST {
-  index: number;
+  index: ITABLE_REF;  // list.indices index
   count: number;
 };
 
@@ -234,7 +235,7 @@ export interface ICOMP_PLUS_META {
 export interface ICOMP_PLUS_STRS_ITEM {
   // While we use length which is number of utf-16 code units excluding null terminator,
   // we always write a null terminator, so we can get restructure to do that for us here
-  offset: number; //? new r.Pointer(number, new r.String(null, 'utf16le')),
+  offset: number; // offset to utf16le string
   length: number;
 };
 
@@ -248,9 +249,9 @@ export interface ICOMP_PLUS_STRS {
 // 'tran'
 
 export interface ICOMP_PLUS_TRAN_GROUP {
-  type: number; //type of group
-  count: number; //number of items
-  index: number; //index into subtable
+  type: number;      // type of group
+  count: number;     // number of items
+  index: ITABLE_REF; // tran.transforms or tran.reorders index (per type)
 };
 
 export type IELEM_REF = number;
@@ -280,9 +281,9 @@ export interface ICOMP_PLUS_TRAN {
 // 'uset'
 
 export interface ICOMP_PLUS_USET_USET {
-  range: number;
+  range: ITABLE_REF;  // uset.ranges
   count: number;
-  pattern: ISTR_REF; // str
+  pattern: ISTR_REF;  // str
 };
 
 export type ICHAR32 = number;
