@@ -11,7 +11,6 @@ import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '../src/main.js';
 import { EmbedOskInKmx } from '../src/compiler/embed-osk/embed-osk.js';
 import { makePathToFixture } from './helpers/index.js';
-import { oskFontMagicToken } from '@keymanapp/developer-utils';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const keyboardsDir = __dirname + '/../../../../../common/test/keyboards/';
@@ -373,8 +372,6 @@ describe('Compiler OSK Embedding', function() {
         const form = kmxplus.layr.forms[0];
         assert.equal(form.baseLayout.value, 'en-us');
         assert.equal(form.flags, KMXPlus.LayrFormFlags.chiralSeparate);
-        assert.equal(form.fontFaceName.value, oskFontMagicToken);
-        assert.equal(form.fontSizePct, 100);
         assert.equal(form.hardware.value, 'us');
         assert.equal(form.minDeviceWidth, 0);
         assert.lengthOf(form.layers, 4);
@@ -457,7 +454,7 @@ describe('Compiler OSK Embedding', function() {
         // KMX+ -- strs
 
         assert.isObject(kmxplus.strs);
-        assert.lengthOf(kmxplus.strs.strings, 476);
+        assert.lengthOf(kmxplus.strs.strings, 475);
 
         // KMX+ -- disp
 
@@ -575,8 +572,6 @@ describe('Compiler OSK Embedding', function() {
         const form = kmxplus.layr.forms[0];
         assert.equal(form.baseLayout.value, 'en-us');
         assert.equal(form.flags, 0);
-        assert.equal(form.fontFaceName.value, oskFontMagicToken);
-        assert.equal(form.fontSizePct, 100);
         assert.equal(form.hardware.value, 'touch');
         assert.equal(form.minDeviceWidth, 1); // eq. to 'phone' layout
         assert.lengthOf(form.layers, 4);
@@ -655,7 +650,7 @@ describe('Compiler OSK Embedding', function() {
         // KMX+ -- strs
 
         assert.isObject(kmxplus.strs);
-        assert.lengthOf(kmxplus.strs.strings, 664);
+        assert.lengthOf(kmxplus.strs.strings, 663);
 
         // KMX+ -- disp
 

@@ -11,8 +11,8 @@ Note that counts and headers will need to merge both .kvks and .keyman-touch-lay
 ```
 touch-layout
   tablet|phone|desktop -> determines minDeviceWidth and hardware
-    font: meta.fontFaceName
-    fontsize: meta.fontSize
+    font: use only in design, not in KMX+
+    fontsize: use only in design, not in KMX+
     displayUnderlying: lay2.forms.flags.showBaseLayout
     defaultHint: resolved at compile time to generate hints for each key
     layer[]

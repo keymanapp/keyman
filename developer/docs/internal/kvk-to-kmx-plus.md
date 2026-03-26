@@ -19,7 +19,7 @@ visualkeyboard
     layout: ignore
   encoding
     @name: only recognize 'unicode' encoding, ignore 'ansi'
-    fontname, fontsize: meta.fontFaceName, meta.fontFaceSize
+    fontname, fontsize: use only for design time, not in .kmx+
     layer
       @shift: see layr.layers discussion
       key

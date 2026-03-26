@@ -1068,8 +1068,6 @@ COMP_KMXPLUS_LAYR_Helper::set(const COMP_KMXPLUS_LAYR *newLayr) {
         localForms[i].minDeviceWidth = forms_v17[i].minDeviceWidth;
 
         localForms[i].baseLayout = 0;
-        localForms[i].fontFaceName = 0;
-        localForms[i].fontSizePct = 100;
         localForms[i].flags = 0;
       }
       forms = localForms;

@@ -5,7 +5,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KMX, KMXPlus, ModifierKeyConstant, USVirtualKeyCodes, VisualKeyboard } from '@keymanapp/common-types';
-import { KMXPlusBuilder, oskFontMagicToken } from '@keymanapp/developer-utils';
+import { KMXPlusBuilder } from '@keymanapp/developer-utils';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompilerMessages } from '../src/main.js';
 import { loadKvkFile } from '../src/compiler/osk.js';
@@ -235,8 +235,6 @@ describe('Compiler OSK Embedding', function() {
         assert.isNotNull(form);
         assert.equal(form.baseLayout.value, 'en-us'); // For v19
         assert.equal(form.flags, 0);
-        assert.equal(form.fontFaceName.value, oskFontMagicToken);
-        assert.equal(form.fontSizePct, 100);
         assert.equal(form.hardware.value, 'us');
         assert.equal(form.minDeviceWidth, 0);
 
@@ -289,8 +287,6 @@ describe('Compiler OSK Embedding', function() {
         assert.equal(kmxPlus.kmxplus.layr.forms[0].baseLayout.value, 'en-us');
         assert.equal(kmxPlus.kmxplus.layr.forms[0].flags, KMXPlus.LayrFormFlags.chiralSeparate);
         // TODO-EMBED-OSK-IN-KMX: need to test showBaseLayout at some point
-        assert.equal(kmxPlus.kmxplus.layr.forms[0].fontFaceName.value, oskFontMagicToken);
-        assert.equal(kmxPlus.kmxplus.layr.forms[0].fontSizePct, 100);
         assert.equal(kmxPlus.kmxplus.layr.forms[0].hardware.value, 'us');
         assert.equal(kmxPlus.kmxplus.layr.forms[0].minDeviceWidth, 0);
         assert.equal(kmxPlus.kmxplus.layr.forms[0].layers.length, 4);

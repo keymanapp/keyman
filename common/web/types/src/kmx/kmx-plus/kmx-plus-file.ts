@@ -155,8 +155,6 @@ export interface ICOMP_PLUS_LAYR_FORM_v19 {
   count: number;
   minDeviceWidth: number; // integer: millimeters
   baseLayout: ISTR_REF;        // v19: str: identifier for base layout (reserved)
-  fontFaceName: ISTR_REF;      // v19: str: font face name
-  fontSizePct: number;    // v19: font size in % of default size
   flags: number;          // v19: flags
 };
 
@@ -516,8 +514,6 @@ export class KMXPlusFileFormat extends KMXFile {
       count: r.uint32le,
       minDeviceWidth: r.uint32le, // integer: millimeters
       baseLayout: STR_REF,        // v19: str: identifier for base layout (reserved)
-      fontFaceName: STR_REF,      // v19: str: font face name
-      fontSizePct: r.uint32le,    // v19: font size in % of default size
       flags: r.uint32le,          // v19: flags
     });
 

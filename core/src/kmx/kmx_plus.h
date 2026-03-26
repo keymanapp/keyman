@@ -548,8 +548,6 @@ struct COMP_KMXPLUS_LAYR_FORM_V19 {
     KMX_DWORD_unaligned count;
     KMX_DWORD_unaligned minDeviceWidth;
     KMXPLUS_STR         baseLayout;        // v19: str: identifier for base layout (reserved)
-    KMXPLUS_STR         fontFaceName;      // v19: str: font face name
-    KMX_DWORD_unaligned fontSizePct;       // v19: font size in % of default size
     KMX_DWORD_unaligned flags;             // v19: flags
 };
 

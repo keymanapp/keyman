@@ -6,7 +6,6 @@ import { assert } from 'chai';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KMXPlus, LdmlKeyboardTypes, TouchLayout } from '@keymanapp/common-types';
 import { EmbedOskTouchLayoutInKmx } from '../src/compiler/embed-osk/embed-osk-touch-layout.js';
-import { oskFontMagicToken } from '@keymanapp/developer-utils';
 import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
 const Q_KEY: TouchLayout.TouchLayoutKey = {
@@ -278,17 +277,14 @@ describe('Compiler OSK Embedding', function() {
         assert.lengthOf(kmxplus.layr.forms, 1);
         assert.equal(kmxplus.layr.forms[0].baseLayout, kmxplus.strs.strings[1]);
         assert.equal(kmxplus.layr.forms[0].flags, 0);
-        assert.equal(kmxplus.layr.forms[0].fontFaceName, kmxplus.strs.strings[3]);
-        assert.equal(kmxplus.layr.forms[0].fontSizePct, 100);
         assert.equal(kmxplus.layr.forms[0].hardware, kmxplus.strs.strings[2]);
         assert.equal(kmxplus.layr.forms[0].minDeviceWidth, 200);
         assert.lengthOf(kmxplus.layr.forms[0].layers, 1);
-        assert.equal(kmxplus.layr.forms[0].layers[0].id, kmxplus.strs.strings[4]);
+        assert.equal(kmxplus.layr.forms[0].layers[0].id, kmxplus.strs.strings[3]);
         assert.equal(kmxplus.layr.forms[0].layers[0].mod, 0);
 
         assert.equal(kmxplus.strs.strings[1].value, 'en-us');
         assert.equal(kmxplus.strs.strings[2].value, 'touch');
-        assert.equal(kmxplus.strs.strings[3].value, oskFontMagicToken); // *OSK-FONT-MAGIC-TOKEN-OSK-FONT*
       });
     });
 
@@ -308,29 +304,26 @@ describe('Compiler OSK Embedding', function() {
         assert.lengthOf(callbacks.messages, 0);
         assert.lengthOf(kmxplus.layr.forms, 1);
 
-        assert.lengthOf(kmxplus.strs.strings, 13);
+        assert.lengthOf(kmxplus.strs.strings, 12);
         assert.equal(kmxplus.strs.strings[0].value, '');
         assert.equal(kmxplus.strs.strings[1].value, '\u25cc');
         assert.equal(kmxplus.strs.strings[2].value, 'en-us');
         assert.equal(kmxplus.strs.strings[3].value, 'touch');
-        assert.equal(kmxplus.strs.strings[4].value, oskFontMagicToken);
-        assert.equal(kmxplus.strs.strings[5].value, 'default');
-        assert.equal(kmxplus.strs.strings[6].value, 'default-K_Q+1');
-        assert.equal(kmxplus.strs.strings[7].value, 's');
-        assert.equal(kmxplus.strs.strings[8].value, 'default-K_1+2');
-        assert.equal(kmxplus.strs.strings[9].value, 'default-K_ENTER+3');
-        assert.equal(kmxplus.strs.strings[10].value, 'default-U_1235+4');
-        assert.equal(kmxplus.strs.strings[11].value, 'shift');
-        assert.equal(kmxplus.strs.strings[12].value, '1');
+        assert.equal(kmxplus.strs.strings[4].value, 'default');
+        assert.equal(kmxplus.strs.strings[5].value, 'default-K_Q+1');
+        assert.equal(kmxplus.strs.strings[6].value, 's');
+        assert.equal(kmxplus.strs.strings[7].value, 'default-K_1+2');
+        assert.equal(kmxplus.strs.strings[8].value, 'default-K_ENTER+3');
+        assert.equal(kmxplus.strs.strings[9].value, 'default-U_1235+4');
+        assert.equal(kmxplus.strs.strings[10].value, 'shift');
+        assert.equal(kmxplus.strs.strings[11].value, '1');
 
         assert.equal(kmxplus.layr.forms[0].baseLayout, kmxplus.strs.strings[2]);
         assert.equal(kmxplus.layr.forms[0].flags, 0);
-        assert.equal(kmxplus.layr.forms[0].fontFaceName, kmxplus.strs.strings[4]);
-        assert.equal(kmxplus.layr.forms[0].fontSizePct, 100);
         assert.equal(kmxplus.layr.forms[0].hardware, kmxplus.strs.strings[3]);
         assert.equal(kmxplus.layr.forms[0].minDeviceWidth, 1);
         assert.lengthOf(kmxplus.layr.forms[0].layers, 1);
-        assert.equal(kmxplus.layr.forms[0].layers[0].id, kmxplus.strs.strings[5]);
+        assert.equal(kmxplus.layr.forms[0].layers[0].id, kmxplus.strs.strings[4]);
         assert.equal(kmxplus.layr.forms[0].layers[0].mod, 0);
       });
     });

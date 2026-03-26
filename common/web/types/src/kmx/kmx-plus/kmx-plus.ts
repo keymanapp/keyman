@@ -612,8 +612,6 @@ export class LayrForm {
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
   baseLayout: StrsItem;   // v19
-  fontFaceName: StrsItem; // v19
-  fontSizePct: number;    // v19 (integer percentage)
   flags: LayrFormFlags;   // v19
 };
 

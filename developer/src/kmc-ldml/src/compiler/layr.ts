@@ -95,8 +95,6 @@ export class LayrCompiler extends SectionCompiler {
         minDeviceWidth: layers.minDeviceWidth || 0,
         layers: layerEntries,
         baseLayout: sections.strs.allocString('', {compileContext: sect}), // TODO-EMBED-OSK-IN-KMX
-        fontFaceName: sections.strs.allocString('', {compileContext: sect}),  // TODO-EMBED-OSK-IN-KMX
-        fontSizePct: 100,  // TODO-EMBED-OSK-IN-KMX
         flags: 0,  // TODO-EMBED-OSK-IN-KMX
       };
       return form;
