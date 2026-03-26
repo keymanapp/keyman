@@ -448,31 +448,40 @@ export function buildAndMapPredictions(
   // No matter the prediction, once we know the root of the prediction, we'll
   // always 'replace' the same amount of text.  We can handle this before the
   // big 'prediction root' loop.
-  const { predictionContext, deleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
+  //
+  // TODO:  Fix - should just zero-out the token to be predicted while
+  // preserving all prior relevant context.
+  const { deleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
 
-  let correction = match.matchString;
   let rootCost = match.totalCost;
+
+  // Exists to be extended by the 'correctionTransfrom' below.
+  const emptyContext: Context = {
+    left: '',
+    startOfBuffer: false,
+    endOfBuffer: false
+  };
 
   // Replace the existing context with the correction.
   const correctionTransform: Transform = {
-    insert: correction,  // insert correction string
-    deleteLeft: deleteLeft,
+    insert: match.matchString,  // insert correction string
+    deleteLeft: 0,
     id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
   }
 
   /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-    * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-    * there are significantly more likely words.  We only need this to allow very minor fat-finger
-    * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-    * key borders.
-    *
-    * Technically, the probabilities this produces won't be normalized as-is... but there's no
-    * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-    * to apply it could become tricky, so it's simpler to leave out.
-    *
-    * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-    * is needed in the future.
-    */
+   * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+   * there are significantly more likely words.  We only need this to allow very minor fat-finger
+   * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+   * key borders.
+   *
+   * Technically, the probabilities this produces won't be normalized as-is... but there's no
+   * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+   * to apply it could become tricky, so it's simpler to leave out.
+   *
+   * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+   * is needed in the future.
+   */
   if(searchSpace.inputCount <= 1) {
     /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
      * ambiguous case that would only arise very near the center of the boundary between two keys.
@@ -493,11 +502,12 @@ export function buildAndMapPredictions(
     p: Math.exp(-rootCost)
   };
 
-  let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
+  let predictions = predictFromCorrections(model, [predictionRoot], emptyContext);
   predictions.forEach((entry) => {
     entry.preservationTransform = tokenization.taillessTrueKeystroke;
     // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
     // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
+    entry.prediction.sample.transform.deleteLeft = deleteLeft;
   });
 
   return predictions;
