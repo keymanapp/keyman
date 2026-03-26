@@ -78,7 +78,7 @@
       <key vkey="K_A">᧬</key>
       <key vkey="K_Z">᧷</key>
       <key vkey="K_Y">᧥</key>
-      <key vkey="K_X">᧸</key>
+      <!-- <key vkey="K_X">᧸</key> removed for unit test purposes to test gap -->
       <key vkey="K_W">᧡</key>
       <key vkey="K_B">᧻</key>
       <key vkey="K_C">᧹</key>

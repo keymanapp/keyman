@@ -10,11 +10,12 @@
  * by build.sh before running the tests in order to avoid pathing issues.
  *
  * This is testing that the values in these files are equivalent:
+ *   developer/src/common/web/utils/src/types/keyman-touch-layout/special-key-caps.ts
  *   developer/src/tike/xml/layoutbuilder/constants.js
- *   web/src/engine/osk/src/specialCharacters.ts
  *   developer/src/kmc-kmn/kmw-compiler/constants.ts
- *   core/include/ldml/keyman_core_ldml.ts
  *   developer/docs/help/reference/file-types/keyman-touch-layout.md
+ *   core/include/ldml/keyman_core_ldml.ts
+ *   web/src/engine/osk/src/specialCharacters.ts
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -27,15 +28,18 @@ import keymanWebSpecialCharacters from "./_imported_web_osk_specialCharacters.js
 import { CSpecialText17, CSpecialText14, CSpecialText10, CSpecialText17ZWNJ } from "../../src/kmw-compiler/constants.js";
 import { builder } from "./_imported_layoutbuilder_constants.js";
 import { constants as coreLdmlConstants } from "@keymanapp/ldml-keyboard-constants";
+import { specialKeyCaps } from "@keymanapp/developer-utils";
 
 /** Verify key cap constants across 4 modules: KMW treated as primary */
 describe('Key cap special text values from KeymanWeb', function() {
 
-  it('should match key cap special text in Developer Touch Layout Builder', function() {
-    // The key cap special text objects in these two files should be exactly equal:
+  it('should match key cap special text in Developer Touch Layout Builder and developer-utils', function() {
+    // The key cap special text objects in these three files should be exactly equal:
     //   developer/src/tike/xml/layoutbuilder/constants.js
+    //   developer/src/common/web/utils/src/types/keyman-touch-layout/special-key-caps.ts
     //   web/src/engine/osk/src/specialCharacters.ts
     assert.deepEqual(builder.specialCharacters, keymanWebSpecialCharacters);
+    assert.deepEqual(specialKeyCaps, keymanWebSpecialCharacters);
   });
 
   it('should match key cap special text in Developer kmc-kmn KMW compiler', function() {

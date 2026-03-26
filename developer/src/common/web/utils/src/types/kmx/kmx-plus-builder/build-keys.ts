@@ -135,6 +135,12 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     if (result.flicks === -1) {
       throw new Error(`Keys: Could not find flicks id=${key.flicks} for key=${key.id.value}`);
     }
+    if(key.to.isOneChar && (key.flags & constants.keys_key_flags_extend) != 0) {
+      throw new Error(`Keys: internal inconsistency: key ${key.id.value}, has extend flag but is oneChar`);
+    }
+    else if(!key.to.isOneChar && (key.flags & constants.keys_key_flags_extend) == 0) {
+      throw new Error(`Keys: internal inconsistency: key ${key.id.value}, does not have extend flag but is not oneChar`);
+    }
     return result;
   });
   // sort the keys by id

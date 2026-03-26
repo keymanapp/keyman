@@ -43,6 +43,7 @@ export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_e
     type: constants.vars_entry_type_unicodeSet,
     id: build_strs_index(sect_strs, v.id),
     value: build_strs_index(sect_strs, v.value),
+    // TODO-LDML: why do we lose the unicode set ranges for variables when we keep them in build_uset? wouldn't this mean we don't need the uset parser at all client-side?
   });
 
   const vars: BUILDER_VARS = {

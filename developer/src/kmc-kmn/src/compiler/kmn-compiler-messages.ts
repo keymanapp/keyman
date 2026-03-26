@@ -221,6 +221,23 @@ export class KmnCompilerMessages {
     Keyboard. Only the first non-Unicode key cap found will be reported.
   `);
 
+  static WARN_InvalidUnicodeKeyId               = SevWarn | 0x90F;
+  static Warn_InvalidUnicodeKeyId               = (o:{id: string}) => m(
+    this.WARN_InvalidUnicodeKeyId,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier is not a valid Unicode sequence`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where 'aaaa'
+    and 'bbbb' and so on are valid Unicode codepoints. For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_TouchLayoutSpecialLabelNotValid               = SevWarn | 0x910;
+  static Warn_TouchLayoutSpecialLabelNotValid               = (o:{id: string, text: string}) => m(
+    this.WARN_TouchLayoutSpecialLabelNotValid,
+    `The On-Screen Keyboard key '${def(o.id)}' has an invalid "special" key cap value '${def(o.text)}'`, `
+    Key cap values of the form '*TEXT*' are reserved; for more detail, see
+    https://help.keyman.com/developer/current-version/reference/file-types/keyman-touch-layout#toc-key-text
+  `);
+
   //------------------------------------------------------------------------------|
   // Messages below this point come from kmcmplib                                 |
   //------------------------------------------------------------------------------|
@@ -484,8 +501,8 @@ export class KmnCompilerMessages {
     `Virtual keys are not valid for mnemonic layouts`, o);
 
   static ERROR_InvalidTouchLayoutFile                         = SevError | 0x059;
-  static Error_InvalidTouchLayoutFile = (o:{filename:string}) => mw(this.ERROR_InvalidTouchLayoutFile,
-    `Touch layout file ${def(o.filename)} is not valid`);
+  static Error_InvalidTouchLayoutFile = (o:{filename:string, message: string}) => mw(this.ERROR_InvalidTouchLayoutFile,
+    `Touch layout file ${def(o.filename)} is not valid: ${def(o.message)}`);
 
   static ERROR_TouchLayoutInvalidIdentifier                   = SevError | 0x05A;
   static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string, address:KeyAddress}) => mw(this.ERROR_TouchLayoutInvalidIdentifier,

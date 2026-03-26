@@ -12,6 +12,7 @@ export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
 
 export { KMXPlusFileReader } from './kmx/kmx-plus/kmx-plus-file-reader.js';
+export * as KMXPlusFileFormat from './kmx/kmx-plus/kmx-plus-file.js';
 
 export { USVirtualKeyCodes, usVirtualKeyName } from './consts/virtual-key-constants.js';
 export * as Constants from './consts/virtual-key-constants.js';

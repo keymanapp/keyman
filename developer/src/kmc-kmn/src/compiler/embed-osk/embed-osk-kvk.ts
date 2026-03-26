@@ -129,10 +129,11 @@ export class EmbedOskKvkInKmx {
         continue;
       }
 
+      const toText = strs.allocString(key.text, {singleOk: true});
       const keykey: KMXPlus.KeysKeys = {
         id: strs.allocString(keyId),
-        to: strs.allocString(key.text),
-        flags: 0, // available flags are: gap, extend; neither needed
+        to: toText,
+        flags: toText.isOneChar ? 0 : KMXPlus.KeysKeysFlags.extend, // available flags are: gap, extend; gap is not needed
         flicks: "",
         longPress: null,
         longPressDefault: strs.allocString(),

@@ -52,10 +52,10 @@ Every section has a header. The header format and size changed in version 19.
 | ∆ | Bits | Name    | Description                                |
 |---|------|---------|--------------------------------------------|
 | 0 |  32  | ident   | e.g. `sect`, `sec2`, `keys`...             |
-| 4 |  32  | size    | int: Length of section                     |
+| 4 |  32  | size    | int: Length of section, including header   |
 | 8 |  32  | version | int: Version of the section (version 19+)  |
 
-A version 17 header is thus 64 bytes, whereas a version 19+ header is 96 bytes.
+A version 17 header is thus 8 bytes, whereas a version 19+ header is 12 bytes.
 
 This header is not shown in the section descriptions below; all offsets shown
 are relative to the start of the content in the section.
