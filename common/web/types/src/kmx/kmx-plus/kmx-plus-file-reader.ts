@@ -288,8 +288,6 @@ export class KMXPlusFileReader {
         resultForm.flags = 0;
         resultForm.hardware = this.readString(form.hardware, kmx);
         resultForm.minDeviceWidth = form.minDeviceWidth;
-        resultForm.fontFaceName = this.readString(0, kmx);
-        resultForm.fontSizePct = 100;
         for(let i = 0; i < form.count; i++) {
           const layer = layr.layers[form.layer + i];
           const resultLayer = new KMXPlus.LayrEntry();
@@ -315,8 +313,6 @@ export class KMXPlusFileReader {
         resultForm.flags = form.flags;
         resultForm.hardware = this.readString(form.hardware, kmx);
         resultForm.minDeviceWidth = form.minDeviceWidth;
-        resultForm.fontFaceName = this.readString(form.fontFaceName, kmx);
-        resultForm.fontSizePct = form.fontSizePct;
         for(let i = 0; i < form.count; i++) {
           const layer = layr.layers[form.layer + i];
           const resultLayer = new KMXPlus.LayrEntry();

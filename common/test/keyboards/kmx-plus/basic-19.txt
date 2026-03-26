@@ -413,8 +413,6 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   01 00 00 00                       #   KMX_DWORD count
   7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
   00 00 00 00                       #   KMXPLUS_STR baseLayout v19
-  00 00 00 00                       #   KMXPLUS_STR fontFaceName v19
-  64 00 00 00                       #   KMX_DWORD fontSizePct v19 // 100%
   00 00 00 00                       #   KMX_DWORD flags v19
 
   # layers 0
