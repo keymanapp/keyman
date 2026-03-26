@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.220 alpha 2026-03-26
+
+* fix(mac): improved adherence to backspace rules for compliant apps (#15561)
+
 ## 19.0.219 alpha 2026-03-25
 
 * maint(common): Update GitHub actions for Node 24 (#15762)
