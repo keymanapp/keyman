@@ -617,28 +617,6 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 }
 
 /**
- * Check whether the string to be deleted is part of the same cluster as the character in the context that precedes it.
- * This function made not be needed, using `precededBySurrogatePair` instead.
- */
--(BOOL) deletionWillReplacePartOfCluster: (NSUInteger)deletionLocation precedingCharacterLocation: (NSUInteger)precedingLocation context:(NSString*) context {
-  // NSString objects hold UTF-16 characters, so a single unicode composed character
-  // or grapheme cluster may occupy a range of NSString indices instead of a single character.
-  // This includes base and combining characters potentially composed of surrogate pairs.
-  NSRange firstDeletionTargetClusterRange = [context rangeOfComposedCharacterSequenceAtIndex: deletionLocation];
-  
-  // get range of the preceding cluster in the context
-  NSRange precedingClusterRange = [context rangeOfComposedCharacterSequenceAtIndex: precedingLocation];
-  
-  NSString *firstFullCharacterToDelete = [context substringWithRange:firstDeletionTargetClusterRange];
-  NSString *precedingFullCharacter = [context substringWithRange:precedingClusterRange];
-  os_log_debug([KMLogs keyTraceLog], "firstDeletionTargetCharacterRange: %{public}@, deletionCharacter: %{public}@, precedingCharacterRange %{public}@, precedingCharacter: %{public}@", NSStringFromRange(firstDeletionTargetClusterRange), firstFullCharacterToDelete, NSStringFromRange(precedingClusterRange), precedingFullCharacter);
-
-  // true when the first character to delete and the preceding character
-  // from the context are part of the same grapheme cluster
-  return NSEqualRanges(firstDeletionTargetClusterRange, precedingClusterRange);
-}
-
-/**
  * Check whether the preceding character, which is to be used for the replacement,
  * is part of a surrogate pair that is distinct from the character being deleted.
  */
@@ -647,16 +625,15 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   unichar precedingCharacter  = [context characterAtIndex:precedingLocation];
   
   if (CFStringIsSurrogateHighCharacter(precedingCharacter)) {
-    // preceding character is high character
-    // this is not expected from Keyman Core; write to log but return false
+    // preceding character is high character -- unexpected from Keyman Core
+    // write to log and return false
     precedingCharacterIsLowSurrogate = false;
-    NSString *message = [NSString stringWithFormat:@"High surrogate found for preceding character at %ld", (long)precedingCharacter];
+    NSString *message = [NSString stringWithFormat:@"Unexpected high surrogate found for preceding character at %ld", (long)precedingCharacter];
     os_log_debug([KMLogs keyTraceLog], "%{public}@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
   } else if (CFStringIsSurrogateLowCharacter(precedingCharacter)) {
     // preceding character is low surrogate
       precedingCharacterIsLowSurrogate = true;
-    NSString *message = [NSString stringWithFormat:@"Low surrogate found for preceding character at %ld", (long)precedingCharacter];
-    os_log_debug([KMLogs keyTraceLog], "%{public}@", message);
   }
 
   return precedingCharacterIsLowSurrogate;
@@ -714,9 +691,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 
   // verify that preceding characters comprise a surrogate pair
   if ((CFStringIsSurrogateHighCharacter(highCharacter)) && (CFStringIsSurrogateLowCharacter(lowCharacter))) {
-    NSString *message = [NSString stringWithFormat:@"Replacement string containing surrogate %@", replacementString];
-    os_log_debug([KMLogs keyTraceLog], "%{public}@", message);
-    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+    // found preceding surrogate as expected
   } else {
     NSString *message = [NSString stringWithFormat:@"Preceding characters of string do not comprise a surrogate pair: 0x%02x, 0x%02x", (unsigned int)highCharacter, (unsigned int)lowCharacter];
     os_log_debug([KMLogs keyTraceLog], "%@", message);
@@ -731,37 +706,6 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   [client insertText:replacementString replacementRange:replacementRange];
 
   return YES;
-}
-
-/**
- * Replace both the text to delete and the cluster preceding it solely with the cluster that precedes it.
- * The 'cluster' may be just one character, but if contains surrogate pairs, this ensures that they stay together.
- * Returns YES if executing the replace/delete and NO otherwise.
- * This function may not be needed, using `deleteByReplacingWithPrecedingSurrogate` instead.
- */
-  -(BOOL) deleteByReplacingWithPrecedingCluster:(NSUInteger)precedingCharacterLocation deleteLength:(NSUInteger)deleteLength context:(NSString*) context client:(id) client {
-  
-    os_log_debug([KMLogs keyTraceLog], "deleteByReplacingWithPrecedingCluster, deletion target is independent of the grapheme cluster that precedes it");
-    
-    // get range of the preceding cluster and the substring from the context
-    NSRange precedingClusterRange = [context rangeOfComposedCharacterSequenceAtIndex: precedingCharacterLocation];
-    NSString *replacementString = [context substringWithRange:precedingClusterRange];
-    
-    // guard: if preceding cluster contains control characters, return NO
-    if ([self containsControlCharacter:replacementString]) {
-      NSString *message = @"replacementString contains control characters, cannot delete with replace";
-      os_log_debug([KMLogs keyTraceLog], "%@", message);
-      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
-      return NO;
-    }
-
-    // perform the replacement
-    NSUInteger replacementLength = [replacementString length] + deleteLength;
-    NSRange replacementRange = NSMakeRange([context length] - replacementLength, replacementLength);
-    os_log_debug([KMLogs keyTraceLog], "replacementRange: %{public}@", NSStringFromRange(replacementRange));
-    [client insertText:replacementString replacementRange:replacementRange];
-
-    return YES;
 }
 
 -(BOOL) containsControlCharacter:(NSString*)text {
