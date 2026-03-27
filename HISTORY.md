@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.249 stable 2026-03-27
+
+* chore(linux): Update debian changelog (#15717)
+* chore(linux): fix dependency of Debian test suite (#15734)
+* chore(linux): Update debian changelog (#15731)
+* maint(ios): Upgrade Sentry to 8.58.0 to support XCode 26 (#15755)
+* fix(developer): define globalThis for compiled custom lexical models (#15778)
+* fix(common): add missing `default` property to keyman-touch-layout.clean.spec.json (#15792)
+
 ## 18.0.248 stable 2026-03-12
 
 * fix(ios): Revert Sentry to 8.38.0 to fix FirstVoices crash on startup with 18.0.247 (#15726)
