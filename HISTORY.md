@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 19.0.220 alpha 2026-03-26
+
+* fix(mac): improved adherence to backspace rules for compliant apps (#15561)
+
+## 19.0.219 alpha 2026-03-25
+
+* maint(common): Update GitHub actions for Node 24 (#15762)
+* fix(core): fix keydown/up handling for LDML keyboards (#15609)
+
+## 19.0.218 alpha 2026-03-24
+
+* fix(developer): define globalThis for compiled custom lexical models (#15777)
+
+## 19.0.217 alpha 2026-03-17
+
+* maint(mac): search for brew-installed rsync (#15765)
+
+## 19.0.216 alpha 2026-03-16
+
+* docs: tweak walkthrough content (#15712)
+* chore(deps): bump tar from 7.5.10 to 7.5.11 in /developer/src/server/src/win32/trayicon/addon-src (#15723)
+* docs(linux): add documentation how input methods work in GTK (#15749)
+* docs(core): improve keyhandling doc (#15736)
+* maint(resources): try meson 1.10.1 (#15754)
+* maint(ios): clean carthage before builds (#15757)
+
+## 19.0.215 alpha 2026-03-13
+
+* chore(linux): fix dependency of Debian test suite (#15735)
+* chore(linux): Update debian changelog (#15732)
+
 ## 19.0.214 alpha 2026-03-12
 
 * chore(linux): Update debian changelog (#15718)
