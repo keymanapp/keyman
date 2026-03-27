@@ -5,13 +5,13 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { InputProcessor } from 'keyman/engine/main';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { DefaultOutputRules, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS, NodeKeyboardLoader } from 'keyman/test/resources';
 import { KeyboardTest } from '@keymanapp/recorder-core';
 
-import { Worker } from '@keymanapp/lexical-model-layer/node';
-import * as utils from '@keymanapp/web-utils';
+import { NodeWorker } from '@keymanapp/lexical-model-layer/node';
+import * as utils from 'keyman/common/web-utils';
 const KMWString = utils.KMWString;
 
 // Required initialization setup.
@@ -27,11 +27,11 @@ let device = {
 // Initialize supplementary plane string extensions
 KMWString.enableSupplementaryPlane(false);
 
-// Test the KeyboardProcessor interface.
+// Test the JSKeyboardProcessor interface.
 describe('InputProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let core = new InputProcessor(device);
+      let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
       assert.isNotNull(core);
     });
 
@@ -40,7 +40,11 @@ describe('InputProcessor', function() {
       try {
         // Can construct without the second parameter; if so, the final assertion - .mayPredict
         // will be invalidated.  (No worker, no ability to predict.)
-        core = new InputProcessor(device, Worker);
+        core = new InputProcessor(device, NodeWorker, {
+          baseLayout: 'us',
+          keyboardInterface: new JSKeyboardInterface({}, null, null),
+          defaultOutputRules: new DefaultOutputRules()
+        });
 
         assert.isOk(core.keyboardProcessor);
         assert.isDefined(core.keyboardProcessor.contextDevice);
@@ -51,7 +55,7 @@ describe('InputProcessor', function() {
 
         // These checks are lifted from the keyboard init checks found in
         // web/src/test/auto/headless/engine/js-processor/basic-init.js.
-        assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
+        assert.equal('us', core.keyboardProcessor.baseLayout, 'JSKeyboardProcessor has unexpected base layout')
         assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
         assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
         assert.isUndefined(core.keyboardProcessor.activeKeyboard, 'Initialized with already-active keyboard');
@@ -94,7 +98,7 @@ describe('InputProcessor', function() {
       }
 
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;
@@ -103,8 +107,8 @@ describe('InputProcessor', function() {
     describe('without fat-fingering', function() {
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device);
-        let context = new Mock("", 0);
+        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+        let context = new SyntheticTextStore("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
@@ -118,12 +122,12 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, no fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
+        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
 
-        let core = new InputProcessor(device);  // I mean, it IS long context, and time
+        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);  // I mean, it IS long context, and time
                                           // thresholding is disabled within Node.
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
@@ -140,8 +144,8 @@ describe('InputProcessor', function() {
     describe('with fat-fingering', function() {
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device);
-        let context = new Mock("", 0);
+        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+        let context = new SyntheticTextStore("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
@@ -156,7 +160,7 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, with fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
+        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -164,7 +168,7 @@ describe('InputProcessor', function() {
                                           // Keep at the same 'order of magnitude' as the
                                           // 'without fat-fingers' test.
 
-        let core = new InputProcessor(device);  // It IS long context, and time
+        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);  // It IS long context, and time
                                           // thresholding is disabled within Node.
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
@@ -184,12 +188,12 @@ describe('InputProcessor', function() {
     let keyboardWithHarness;
     let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
     // For convenience we define the key sequence in a test file although we don't use the
-    // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
+    // rest of the recorder stuff since it uses only JSKeyboardProcessor, not InputProcessor.
     let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext));
 
     before(async function () {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;
@@ -201,8 +205,8 @@ describe('InputProcessor', function() {
     for (let testSet of testDefinitions.inputTestSets[0]['testSet']) {
       it(testSet.msg ?? 'test', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device);
-        let context = new Mock("", 0);
+        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+        let context = new SyntheticTextStore("", 0);
 
         core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
