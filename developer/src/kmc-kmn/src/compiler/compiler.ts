@@ -6,16 +6,18 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { VisualKeyboard, KvkFileReader, LdmlKeyboardTypes, KeymanFileTypes, KvkFileWriter, ObjectWithCompileContext } from '@keymanapp/common-types';
+import { LdmlKeyboardTypes, KeymanFileTypes, KvkFileWriter, ObjectWithCompileContext, KMX } from '@keymanapp/common-types';
 import {
   CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanCompiler, KeymanCompilerArtifacts,
-  KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact, KvksFileReader,
+  KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact,
   CompilerError
 } from '@keymanapp/developer-utils';
 import * as Osk from './osk.js';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
+import { loadKvkFile } from './osk.js';
 import { KmnCompilerMessages } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
+import { EmbedOskInKmx } from './embed-osk/embed-osk.js';
 
 //
 // Matches kmcmplibapi.h definitions
@@ -56,9 +58,11 @@ export interface KmnCompilerResultExtra {
    */
   targets: number;
   kvksFilename?: string;
+  touchLayoutFilename?: string;
   displayMapFilename?: string;
   stores: CompilerResultExtraStore[];
   groups: CompilerResultExtraGroup[];
+  targetVersion: KMX.KMX_Version;
 };
 
 /** @internal */
@@ -224,9 +228,11 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       extra: {
         targets: wasm_result.extra.targets,
         displayMapFilename: wasm_result.extra.displayMapFilename,
+        touchLayoutFilename: wasm_result.extra.touchLayoutFilename,
         kvksFilename: wasm_result.extra.kvksFilename,
         stores: [],
         groups: [],
+        targetVersion: wasm_result.extra.targetVersion,
       },
       displayMap: null
     };
@@ -322,6 +328,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       wasm_options.compilerWarningsAsErrors = options.compilerWarningsAsErrors;
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
+      wasm_options.targetVersion = options.targetVersion ?? 0;
       wasm_options.target = 0; // CKF_KEYMAN; TODO use COMPILETARGETS_KMX
 
       wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_callbacks);
@@ -350,7 +357,14 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
         }
       }
 
+      if(result.extra.targetVersion >= KMX.KMXFile.VERSION_190) {
+        if(!this.embedOskInKmx(infile, result)) {
+          return null;
+        }
+      }
+
       if(result.extra.kvksFilename) {
+        // TODO-EMBED-OSK-IN-KMX: skip this once we support embedded OSK in all desktop targets
         result.artifacts.kvk = this.runKvkCompiler(result.extra.kvksFilename, infile, outfile, result.displayMap);
         if(!result.artifacts.kvk) {
           return null;
@@ -361,7 +375,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       // KeymanWeb compiler
       //
 
-      if(wasm_result.extra.targets & COMPILETARGETS_JS) {
+      if(result.extra.targets & COMPILETARGETS_JS) {
         wasm_options.target = 1; // CKF_KEYMANWEB TODO use COMPILETARGETS_JS
 
         // We always want debug data in the intermediate .kmx, so that error
@@ -421,45 +435,28 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
     return this.callbacks.path.basename(kmnFilename, KeymanFileTypes.Source.KeymanKeyboard);
   }
 
-  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {
-    // The compiler detected a .kvks file, which needs to be captured
-    kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
-    const data = this.callbacks.loadFile(kvksFilename);
-    if(!data) {
-      this.callbacks.reportMessage(KmnCompilerMessages.Error_FileNotFound({filename: kvksFilename}));
-      return null;
+  private embedOskInKmx(kmnFilename: string, result: KmnCompilerResult): boolean {
+    const embedder = new EmbedOskInKmx(this.callbacks, this.options);
+    const newData = embedder.embed(
+      result.artifacts.kmx.data,
+      result.extra.kvksFilename ? this.callbacks.resolveFilename(kmnFilename, result.extra.kvksFilename) : null,
+      result.extra.touchLayoutFilename ? this.callbacks.resolveFilename(kmnFilename, result.extra.touchLayoutFilename) : null,
+      result.displayMap
+    );
+    if(!newData) {
+      // messages will have been raised in .embed
+      return false;
     }
 
-    const filename = this.callbacks.path.basename(kvksFilename);
-    let basename = null;
-    let vk: VisualKeyboard.VisualKeyboard = null;
-    if(filename.endsWith('.kvk')) {
-      /* Legacy keyboards may reference a binary .kvk. That's not an error */
-      // TODO: (lowpri) add hint to convert to .kvks?
-      basename = this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Binary.VisualKeyboard);
-      const reader = new KvkFileReader();
-      try {
-        vk = reader.read(data);
-      } catch(e) {
-        this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvkFile({filename, e}));
-        return null;
-      }
-    } else {
-      basename = this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Source.VisualKeyboard);
-      const reader = new KvksFileReader();
-      let kvks = null;
-      try {
-        kvks = reader.read(data);
-        reader.validate(kvks);
-      } catch(e) {
-        this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
-        return null;
-      }
-      const invalidVkeys: string[] = [];
-      vk = reader.transform(kvks, invalidVkeys);
-      for(const invalidVkey of invalidVkeys) {
-        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
-      }
+    result.artifacts.kmx.data = newData;
+    return true;
+  }
+
+  private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {
+    // The compiler detected a .kvks file, which needs to be captured
+    const vk = loadKvkFile(this.callbacks.resolveFilename(kmnFilename, kvksFilename), this.callbacks);
+    if(!vk) {
+      return null;
     }
 
     // Make sure that we maintain the correspondence between source keyboard and
@@ -471,6 +468,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       Osk.remapVisualKeyboard(vk, displayMap);
     }
 
+    const basename = this.callbacks.path.basename(kvksFilename, this.callbacks.path.extname(kvksFilename));
     const writer = new KvkFileWriter();
     return {
       filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
