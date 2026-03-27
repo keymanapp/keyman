@@ -12,7 +12,8 @@ import boxXmlArray = util.boxXmlArray;
 import { DeveloperUtilsMessages } from "../../developer-utils-messages.js";
 import { CompilerCallbacks } from "../../compiler-callbacks.js";
 import { KeymanXMLReader } from "../../xml-utils.js";
-import { KpsPackage } from "./kps-file.js";
+import { KPS_FILE_VERSIONS, KpsPackage } from "./kps-file.js";
+
 
 export class KpsFileReader {
   constructor(private callbacks: CompilerCallbacks) {
@@ -33,6 +34,11 @@ export class KpsFileReader {
 
     if(!kpsPackage?.Package) {
       this.callbacks.reportMessage(DeveloperUtilsMessages.Error_NotAPackageFile());
+      return null;
+    }
+
+    if(!KPS_FILE_VERSIONS.includes(kpsPackage.Package?.System?.FileVersion)) {
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_UnsupportedPackageFileVersion({version: kpsPackage.Package?.System?.FileVersion}));
       return null;
     }
 
