@@ -16,7 +16,7 @@ struct ConfigView: View {
     VStack {
       Image(systemName: "keyboard")
         .imageScale(.large)
-        .foregroundColor(.secondary)
+        .foregroundColor(.accentColor)
       Text(settings.settingName)
       Text("keyboard count = \(settings.keyboardPackages.count)")
       Button("Update settings") {settings.settingName = "Settings changed!"}

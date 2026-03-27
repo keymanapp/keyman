@@ -28,7 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D88F03C62F50ED5000C02A31 /* Config.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Config.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D88F03C62F50ED5000C02A31 /* Keyman Configuration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Keyman Configuration.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D88F03D32F50ED5100C02A31 /* ConfigTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConfigTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D88F03DD2F50ED5100C02A31 /* ConfigUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConfigUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -91,7 +91,7 @@
 		D88F03C72F50ED5000C02A31 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D88F03C62F50ED5000C02A31 /* Config.app */,
+				D88F03C62F50ED5000C02A31 /* Keyman Configuration.app */,
 				D88F03D32F50ED5100C02A31 /* ConfigTests.xctest */,
 				D88F03DD2F50ED5100C02A31 /* ConfigUITests.xctest */,
 			);
@@ -128,7 +128,7 @@
 				D83272A72F57614400F71698 /* KeymanSettings */,
 			);
 			productName = Config;
-			productReference = D88F03C62F50ED5000C02A31 /* Config.app */;
+			productReference = D88F03C62F50ED5000C02A31 /* Keyman Configuration.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D88F03D22F50ED5100C02A31 /* ConfigTests */ = {
@@ -421,7 +421,6 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Keyman Configuration";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -430,7 +429,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Keyman Configuration";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Keyman Mac Config Dev";
 				REGISTER_APP_GROUPS = YES;
@@ -459,7 +458,6 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Keyman Configuration";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -468,7 +466,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Keyman Configuration";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Keyman Mac Config Dist";
 				REGISTER_APP_GROUPS = YES;

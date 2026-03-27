@@ -14,7 +14,7 @@ mac_verify_on_mac
 ### SET PATHS ###
 
 IM_NAME="Keyman4MacIM"
-CONFIG_NAME="Config"
+CONFIGAPP_NAME="Keyman Configuration"
 XCODE_PROJ_EXT=".xcodeproj"
 XCODE_WORKSPACE_EXT=".xcworkspace"
 PRODUCT_NAME="Keyman"
@@ -23,11 +23,7 @@ KEYMAN_MAC_BASE_PATH="${KEYMAN_ROOT}/mac"
 KM4MIM_BASE_PATH="${KEYMAN_MAC_BASE_PATH}/${IM_NAME}"
 
 KMIM_WORKSPACE_PATH="${KM4MIM_BASE_PATH}/${IM_NAME}${XCODE_WORKSPACE_EXT}"
-
 KEYMAN_WORKSPACE_PATH="${KEYMAN_MAC_BASE_PATH}/${PRODUCT_NAME}${XCODE_WORKSPACE_EXT}"
-#CONFIGAPP_BASE_PATH="${KEYMAN_MAC_BASE_PATH}/${CONFIGAPP_NAME}"
-#CONFIGAPP_PROJ_PATH="${CONFIGAPP_BASE_PATH}/${CONFIGAPP_NAME}${XCODE_PROJ_EXT}"
-
 
 # --- Configuration ---
 #INPUT_METHOD_NAME="Keyman.app"
@@ -75,7 +71,7 @@ pkgbuild --component ./build/KeymanExport/Keyman.app \
     --version "$KEYMAN_VERSION" \
     ./build/keyman-input-method.pkg
 
-pkgbuild --component ./build/ConfigExport/Config.app \
+pkgbuild --component "./build/ConfigExport/$CONFIGAPP_NAME.app" \
     --install-location /Applications \
     --identifier "$INSTALL_CONFIG_BUNDLE_ID" \
     --version "$KEYMAN_VERSION" \
@@ -87,6 +83,7 @@ mkdir -p "$OUTPUT_DIRECTORY_PATH"
 
 productbuild --package ./build/keyman-input-method.pkg \
     --package ./build/keyman-config.pkg \
+    --version "$KEYMAN_VERSION" \
     --sign 5FCED4988F27D172C5628A16DBA4AE6CA0015D11 \
     "$OUTPUT_PACKAGE_PATH"
 

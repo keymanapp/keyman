@@ -10,7 +10,7 @@
 
 import Foundation
 
-public class PackageRepository {
+public struct PackageRepository {
   fileprivate let packageFileName = "kmp.json"
   fileprivate let pathUtil: KeymanPaths
   

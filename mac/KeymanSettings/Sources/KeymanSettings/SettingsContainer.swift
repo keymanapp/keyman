@@ -4,12 +4,19 @@ public class SettingsContainer : ObservableObject {
 
   @Published public var settingName: String
   @Published public var keyboardPackages: [KeymanPackage]
-  
+  @Published public var activeKeyboards: Set<String>
+  @Published public var currentKeyboard: String
+
   fileprivate let dataRepository: PackageRepository
-  
+  fileprivate let settingsRepository: SettingsRepository
+
   public init() {
     settingName = "uninitialized"
     self.dataRepository = PackageRepository()
+    self.settingsRepository = SettingsRepository(suiteName: KeymanPaths.groupId)
+    
+    self.activeKeyboards = self.settingsRepository.readActiveKeyboards()
+    self.currentKeyboard = self.settingsRepository.readSelectedKeyboard()
     
     self.keyboardPackages = []
     
