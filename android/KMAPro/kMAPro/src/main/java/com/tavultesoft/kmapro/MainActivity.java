@@ -103,6 +103,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -142,6 +143,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private ConstraintLayout constraintLayout;
   private KMTextView textView;
+  private View keyboardToolbarToggleButton;
+  private View keyboardToolbarContainer;
+  private boolean isKeyboardToolbarExpanded = false;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
@@ -297,9 +301,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             })
             .setNegativeButton(getString(R.string.label_cancel), null)
             .show();
-        } else if (id == R.id.nav_settings) {
-          drawerLayout.closeDrawers();
-          startActivity(new Intent(context, KeymanSettingsActivity.class));
+//        } else if (id == R.id.nav_settings) {
+//          drawerLayout.closeDrawers();
+//          startActivity(new Intent(context, KeymanSettingsActivity.class));
         } else if (id == R.id.nav_help
         ) {
           drawerLayout.closeDrawers();
@@ -346,6 +350,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textSize = prefs.getInt(userTextSizeKey, minTextSize);
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
+
+    initializeKeyboardToolbar();
 
     // Check WebView enabled and Chrome version
     SystemWebViewStatus webViewStatus = WebViewUtils.getSystemWebViewStatus(context);
@@ -530,26 +536,26 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   @SuppressLint("RestrictedApi")
-  @Override
-  public boolean onPrepareOptionsMenu(final Menu menu) {
-    this.menu = menu;
-    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-    if (_overflowMenuItem != null) {
-      MenuItem updateKeyboards = this.menu.findItem(R.id.action_update_keyboards);
-      updateUpdateCountIndicator(updateKeyboards,
-        KMManager.getUpdateTool().getOpenUpdateCount(), true);
-    }
-    return super.onPrepareOptionsMenu(menu);
-  }
+//  @Override
+//  public boolean onPrepareOptionsMenu(final Menu menu) {
+//    this.menu = menu;
+//    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+//    if (_overflowMenuItem != null) {
+//      MenuItem updateKeyboards = this.menu.findItem(R.id.action_update_keyboards);
+//      updateUpdateCountIndicator(updateKeyboards,
+//        KMManager.getUpdateTool().getOpenUpdateCount(), true);
+//    }
+//    return super.onPrepareOptionsMenu(menu);
+//  }
 
   private void updateUpdateCountIndicator(int anUpdateCount) {
     if (menu == null) {
       return;
     }
-    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-    if (_overflowMenuItem != null) {
-      updateUpdateCountIndicator(_overflowMenuItem, anUpdateCount, false);
-    }
+//    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+//    if (_overflowMenuItem != null) {
+//      updateUpdateCountIndicator(_overflowMenuItem, anUpdateCount, false);
+//    }
 
     final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
     if (_keyboardupdate != null && anUpdateCount > 0) {
@@ -668,6 +674,34 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    if (ev.getAction() == MotionEvent.ACTION_DOWN && isKeyboardToolbarExpanded) {
+      boolean touchOnToolbar = isTouchInsideView(ev, keyboardToolbarContainer);
+      boolean touchOnToggle = isTouchInsideView(ev, keyboardToolbarToggleButton);
+      if (!touchOnToolbar && !touchOnToggle) {
+        setKeyboardToolbarExpanded(false, true);
+      }
+    }
+    return super.dispatchTouchEvent(ev);
+  }
+
+  private boolean isTouchInsideView(MotionEvent ev, View view) {
+    if (view == null || view.getVisibility() != View.VISIBLE) {
+      return false;
+    }
+
+    int[] location = new int[2];
+    view.getLocationOnScreen(location);
+    float x = ev.getRawX();
+    float y = ev.getRawY();
+
+    return x >= location[0]
+      && x <= location[0] + view.getWidth()
+      && y >= location[1]
+      && y <= location[1] + view.getHeight();
+  }
+
+  @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
     // Do nothing
   }
@@ -685,11 +719,99 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     // Refresh banner theme
     BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
     resizeTextView(true);
+    updateKeyboardToolbarPosition();
+    if (keyboardToolbarToggleButton != null) {
+      keyboardToolbarToggleButton.setVisibility(View.VISIBLE);
+    }
   }
 
   @Override
   public void onKeyboardDismissed() {
     resizeTextView(false);
+    setKeyboardToolbarExpanded(false, false);
+    if (keyboardToolbarToggleButton != null) {
+      keyboardToolbarToggleButton.setVisibility(View.GONE);
+    }
+  }
+
+  private void initializeKeyboardToolbar() {
+    keyboardToolbarToggleButton = findViewById(R.id.keyboardToolbarToggleButton);
+    keyboardToolbarContainer = findViewById(R.id.keyboardToolbarContainer);
+
+    if (keyboardToolbarToggleButton == null || keyboardToolbarContainer == null) {
+      return;
+    }
+
+    setKeyboardToolbarExpanded(false, false);
+    keyboardToolbarToggleButton.setOnClickListener(v -> setKeyboardToolbarExpanded(!isKeyboardToolbarExpanded, true));
+
+    View shareButton = findViewById(R.id.keyboardToolbarShareButton);
+    if (shareButton != null) {
+      shareButton.setOnClickListener(v -> {
+        showShareDialog();
+        setKeyboardToolbarExpanded(false, true);
+      });
+    }
+
+    View textSizeButton = findViewById(R.id.keyboardToolbarTextSizeButton);
+    if (textSizeButton != null) {
+      textSizeButton.setOnClickListener(v -> {
+        showTextSizeDialog();
+        setKeyboardToolbarExpanded(false, true);
+      });
+    }
+
+    View clearButton = findViewById(R.id.keyboardToolbarClearButton);
+    if (clearButton != null) {
+      clearButton.setOnClickListener(v -> {
+        showClearTextDialog();
+        setKeyboardToolbarExpanded(false, true);
+      });
+    }
+  }
+
+  private void setKeyboardToolbarExpanded(boolean expanded, boolean animateRotation) {
+    if (keyboardToolbarContainer == null || keyboardToolbarToggleButton == null) {
+      return;
+    }
+
+    isKeyboardToolbarExpanded = expanded;
+    keyboardToolbarContainer.setVisibility(expanded ? View.VISIBLE : View.GONE);
+
+    float targetRotation = expanded ? 180f : 0f;
+    if (animateRotation) {
+      keyboardToolbarToggleButton.animate().rotation(targetRotation).setDuration(180).start();
+    } else {
+      keyboardToolbarToggleButton.setRotation(targetRotation);
+    }
+  }
+
+  private void updateKeyboardToolbarPosition() {
+    int keyboardTopOffset = KMManager.getKeyboardHeight(this) + KMManager.getBannerHeight(this) + dpToPx(12);
+    updateBottomMargin(keyboardToolbarToggleButton, keyboardTopOffset);
+    updateBottomMargin(keyboardToolbarContainer, dpToPx(8));
+  }
+
+  private void updateBottomMargin(View view, int bottomMargin) {
+    if (view == null) {
+      return;
+    }
+
+    ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+    if (!(layoutParams instanceof ViewGroup.MarginLayoutParams)) {
+      return;
+    }
+
+    ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layoutParams;
+    if (marginLayoutParams.bottomMargin != bottomMargin) {
+      marginLayoutParams.bottomMargin = bottomMargin;
+      view.setLayoutParams(marginLayoutParams);
+    }
+  }
+
+  private int dpToPx(int dp) {
+    float density = getResources().getDisplayMetrics().density;
+    return Math.round(dp * density);
   }
 
   public void downloadKMP(String packageId, String bcp47, KmpInstallMode installMode) {

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+	android:layout_height="match_parent"
+	android:layout_gravity="center_vertical"
+	android:minHeight="48dp"
+	android:paddingStart="8dp"
+	android:paddingEnd="8dp"
+	android:clickable="false"
+	android:focusable="false">
+
+	<androidx.appcompat.widget.AppCompatImageView
+		android:id="@+id/nav_right_icon"
+		android:layout_width="20dp"
+		android:layout_height="20dp"
+		android:layout_gravity="center"
+		android:clickable="false"
+		android:focusable="false"
+		android:contentDescription="@null"
+		android:src="@drawable/ic_action_increment" />
+
+</FrameLayout>
