@@ -146,6 +146,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private View keyboardToolbarToggleButton;
   private View keyboardToolbarContainer;
   private boolean isKeyboardToolbarExpanded = false;
+  private boolean suppressOutsideCloseForCurrentTouch = false;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
@@ -675,12 +676,19 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    if (ev.getAction() == MotionEvent.ACTION_DOWN && isKeyboardToolbarExpanded) {
-      boolean touchOnToolbar = isTouchInsideView(ev, keyboardToolbarContainer);
+    int action = ev.getActionMasked();
+    if (action == MotionEvent.ACTION_DOWN && isKeyboardToolbarExpanded && !suppressOutsideCloseForCurrentTouch) {
       boolean touchOnToggle = isTouchInsideView(ev, keyboardToolbarToggleButton);
+      if (touchOnToggle) {
+        return super.dispatchTouchEvent(ev);
+      }
+
+      boolean touchOnToolbar = isTouchInsideView(ev, keyboardToolbarContainer);
       if (!touchOnToolbar && !touchOnToggle) {
         setKeyboardToolbarExpanded(false, true);
       }
+    } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+      suppressOutsideCloseForCurrentTouch = false;
     }
     return super.dispatchTouchEvent(ev);
   }
@@ -690,15 +698,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return false;
     }
 
-    int[] location = new int[2];
-    view.getLocationOnScreen(location);
-    float x = ev.getRawX();
-    float y = ev.getRawY();
-
-    return x >= location[0]
-      && x <= location[0] + view.getWidth()
-      && y >= location[1]
-      && y <= location[1] + view.getHeight();
+    Rect bounds = new Rect();
+    view.getGlobalVisibleRect(bounds);
+    return bounds.contains((int) ev.getRawX(), (int) ev.getRawY());
   }
 
   @Override
@@ -743,6 +745,15 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
 
     setKeyboardToolbarExpanded(false, false);
+    keyboardToolbarToggleButton.setOnTouchListener((v, event) -> {
+      int action = event.getActionMasked();
+      if (action == MotionEvent.ACTION_DOWN) {
+        suppressOutsideCloseForCurrentTouch = true;
+      } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+        suppressOutsideCloseForCurrentTouch = false;
+      }
+      return false;
+    });
     keyboardToolbarToggleButton.setOnClickListener(v -> setKeyboardToolbarExpanded(!isKeyboardToolbarExpanded, true));
 
     View shareButton = findViewById(R.id.keyboardToolbarShareButton);
