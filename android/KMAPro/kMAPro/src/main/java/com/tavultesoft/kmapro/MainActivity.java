@@ -6,6 +6,8 @@ package com.tavultesoft.kmapro;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
+import com.google.android.material.navigation.NavigationView;
+import android.util.DisplayMetrics;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -201,6 +203,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkHapticFeedback();
 
     setContentView(R.layout.activity_main);
+
+    NavigationView navView = findViewById(R.id.nav_view);
+    DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+    int width = (int) (displayMetrics.widthPixels * 0.80);
+    navView.getLayoutParams().width = width;
+    navView.requestLayout();
 
     constraintLayout = (ConstraintLayout)findViewById(R.id.constraintLayout);
     setupEdgeToEdge(R.id.constraintLayout);
