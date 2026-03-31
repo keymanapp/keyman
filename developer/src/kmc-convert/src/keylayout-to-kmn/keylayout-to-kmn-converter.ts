@@ -1060,4 +1060,3 @@ export class KeylayoutToKmnConverter {
     convert: this.convert.bind(this),
   };
 }
-
