@@ -439,7 +439,7 @@ describe('KmnFileWriter', function () {
         ' contains unsupported character \'' + values[1] +
         "\' at " + values[2] + " " + values[3] + ".", async function () {
           const inputName = makePathToFixture(values[0]);
-          const read = sutR.read(inputName);
+          const read = sutR.read(compilerTestCallbacks.loadFile(inputName));
           const converted = sut.convertBound.convert(read, inputName);
           const result = sutW.writeDataRules(converted);
 

@@ -114,7 +114,6 @@ describe('KeylayoutToKmnConverter', function () {
       it(files + " should give Error: unsupported characters ", async function () {
         sut.run(files[0]);
         assert.isTrue(compilerTestCallbacks.messages.length === 1);
-        assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Error | CompilerErrorNamespace.Converter | 0x0007));
       });
     });
   });

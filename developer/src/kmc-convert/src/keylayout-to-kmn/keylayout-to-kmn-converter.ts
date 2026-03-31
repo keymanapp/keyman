@@ -516,7 +516,6 @@ export class KeylayoutToKmnConverter {
               inputFilename: jsonObj.keyboard['@__name'] + ".keylayout",
               keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@__index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__output'],
-              key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'],
               KeyName: this.mapUkeleleKeycodeToVK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@__code'])
             }));
             return null;
