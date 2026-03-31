@@ -63,8 +63,8 @@ export class Converter implements KeymanCompiler {
       ...this.options,
     };
 
-    if (!outputFilename) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+    if (!inputFilename) {
+      this.callbacks.reportMessage(ConverterMessages.Error_IntputFilenameIsRequired());
       return null;
     }
 
@@ -74,16 +74,10 @@ export class Converter implements KeymanCompiler {
       return null;
     }
 
-    const binaryData = this.callbacks.loadFile(inputFilename);
-    if (!binaryData) {
-      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
-      return null;
-    }
-
     const converter = new ConverterClass(this.callbacks, converterOptions);
     const result = await converter.run(inputFilename, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
-    return result ?  result : null;
+    return result ? result : null;
   }
 
   /**

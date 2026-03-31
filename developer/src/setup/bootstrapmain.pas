@@ -1,18 +1,18 @@
 (*
   Name:             bootstrapmain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Jun 2007
 
   Modified Date:    12 Aug 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Jun 2007 - mcdurdin - Initial version
                     05 Jun 2007 - mcdurdin - I817 - Fix -x option
                     19 Jun 2007 - mcdurdin - I817 - Translate to Unicode and remove Forms dependence
@@ -123,12 +123,12 @@ begin
     DeletePath(TempPath);  // I3310
 end;
 
-procedure ProcessCommandLine(var FPromptForReboot, FSilent, FOffline, FExtractOnly, FContinueSetup: Boolean; var FExtractPath: WideString);  // I3355   // I3500
+procedure ProcessCommandLine(var FUILevel: TInstallUILevel; var FPromptForReboot, FOffline, FExtractOnly, FContinueSetup: Boolean; var FExtractPath: WideString);  // I3355   // I3500
 var
   i: Integer;
 begin
   FPromptForReboot := True;  // I3355   // I3500
-  FSilent := False;
+  FUILevel := uiFull;
   FOffline := False;
   FExtractOnly := False;
   FContinueSetup := False;
@@ -139,13 +139,13 @@ begin
       FContinueSetup := True
     else if WideSameText(ParamStr(i), '-au') then // I2849
     begin
-      FSilent := True;
+      FUILevel := uiProgressOnly;
       FOffline := True;
     end
     else if WideSameText(ParamStr(i), '-s') then
     begin
       FPromptForReboot := False;  // I3355   // I3500
-      FSilent := True;
+      FUILevel := uiSilent;
     end
     else if WideSameText(ParamStr(i), '-o') then
       FOffline := True
@@ -169,7 +169,7 @@ var
   FExtractOnly: Boolean;
   FContinueSetup: Boolean;
   FPromptForReboot: Boolean;  // I3355   // I3500
-  FSilent: Boolean;
+  FUILevel: TInstallUILevel;
   FOffline: Boolean;
   FExtractOnly_Path: WideString;
 BEGIN
@@ -193,11 +193,11 @@ BEGIN
         { Display the dialog }
         //Cancel_From_InfoWin := False;
 
-        ProcessCommandLine(FPromptForReboot, FSilent, FOffline, FExtractOnly, FContinueSetup, FExtractOnly_Path);  // I3355   // I3500
+        ProcessCommandLine(FUILevel, FPromptForReboot, FOffline, FExtractOnly, FContinueSetup, FExtractOnly_Path);  // I3355   // I3500
 
         if FExtractOnly then
         begin
-          DoExtractOnly(FSilent, FExtractOnly_Path);
+          DoExtractOnly(FUILevel = uiSilent, FExtractOnly_Path);
           Exit;
         end;
 
@@ -224,8 +224,8 @@ BEGIN
         try
           ContinueSetup := FContinueSetup;
           Offline := FOffline;
-          if FSilent
-            then DoInstall(True, FPromptForReboot)  // I3355   // I3500
+          if FUILevel <> uiFull
+            then DoInstall(FUILevel, FPromptForReboot)  // I3355   // I3500
             else ShowModal;
         finally
           Free;

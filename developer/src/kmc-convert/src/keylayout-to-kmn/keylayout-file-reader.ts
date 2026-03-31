@@ -11,7 +11,6 @@ import { XMLParser } from 'fast-xml-parser';
 import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout } from "@keymanapp/developer-utils";
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
-
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
@@ -39,8 +38,10 @@ export class KeylayoutFileReader {
    * @return objects that do not contain property #text
    */
   public removeWhitespace(o: any): void {
-    if (o['#text']) {
-      delete o['#text'];
+    if (o !== undefined) {
+      if (o['#text']) {
+        delete o['#text'];
+      }
     }
   }
 
@@ -102,7 +103,9 @@ export class KeylayoutFileReader {
    * @param  inputFilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(inputFilename: string): Keylayout.KeylayoutXMLSourceFile {
+  //.................................................................................................
+  // new read() with fast xml parser  (Uint8Array-> XMLSourceFile)
+  public read(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
 
     const options = {
       ignoreAttributes: [''],       // we do not process an output character of ""
@@ -113,15 +116,15 @@ export class KeylayoutFileReader {
     };
 
     try {
-      const xmlFile = this.callbacks.fs.readFileSync(inputFilename, 'utf8');
       const parser = new XMLParser(options);
-      const jsonObj = parser.parse(xmlFile);      // get plain Object
+      const jsonObj = parser.parse(source);      // get plain Object
       this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
       return jsonObj;
     }
     catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
       return null;
     }
   }
+  //.................................................................................................
 }

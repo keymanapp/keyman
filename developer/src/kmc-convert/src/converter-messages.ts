@@ -16,16 +16,17 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
  * @internal
  */
 export class ConverterMessages {
+
   static ERROR_OutputFilenameIsRequired = SevError | 0x0001;
   static Error_OutputFilenameIsRequired = () => m(
     this.ERROR_OutputFilenameIsRequired,
     `An output filename is required for keyboard conversion.`
   );
 
-  static ERROR_NoConverterFound = SevError | 0x0002;
-  static Error_NoConverterFound = (o: { inputFilename: string, outputFilename: string; }) => m(
-    this.ERROR_NoConverterFound,
-    `No converter is available that can convert from '${def(o.inputFilename)}' to '${def(o.outputFilename)}'.`
+  static ERROR_IntputFilenameIsRequired = SevError | 0x0002;
+  static Error_IntputFilenameIsRequired = () => m(
+    this.ERROR_IntputFilenameIsRequired,
+    `An output filename is required for keyboard conversion.`
   );
 
   static ERROR_FileNotFound = SevError | 0x0003;
@@ -34,36 +35,52 @@ export class ConverterMessages {
     `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`
   );
 
-  static ERROR_UnableToRead = SevError | 0x0004;
-  static Error_UnableToRead = (o: { inputFilename: string; }) => m(
-    this.ERROR_UnableToRead,
+  static ERROR_InvalidFile = SevError | 0x0004;
+  static Error_InvalidFile = (o: { errorText: string; }) => m(
+    this.ERROR_InvalidFile,
+    `The source file has an invalid structure: ${def(o.errorText)}`
+  );
+
+  static ERROR_UnableToReadFile = SevError | 0x0005;
+  static Error_UnableToReadFile = (o: { inputFilename: string; }) => m(
+    this.ERROR_UnableToReadFile,
     `Input file '${def(o.inputFilename)}' could not be read.`
   );
 
-  static ERROR_UnableToConvert = SevError | 0x0005;
+  static ERROR_UnableToRead = SevError | 0x0006;
+  static Error_UnableToRead = () => m(
+    this.ERROR_UnableToRead,
+    `Input file could not be read.`
+  );
+
+  static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
+  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string, key: string, KeyName: string, output: string; }) => m(
+    this.ERROR_UnsupportedCharactersDetected,
+    `Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
+  );
+
+  static ERROR_UndefinedActionDetected = SevError | 0x0008;
+  static Error_UndefinedActionDetected = (o: { inputFilename: string, action: string, KeyName: string, keymapIndex: string; }) => m(
+    this.ERROR_UndefinedActionDetected,
+    `${def(o.inputFilename)}: Action id ${def(o.action)} of key ${def(o.KeyName)} in keymapIndex ${def(o.keymapIndex)} is not defined`
+  );
+
+  static ERROR_NoConverterFound = SevError | 0x0009;
+  static Error_NoConverterFound = (o: { inputFilename: string, outputFilename: string; }) => m(
+    this.ERROR_NoConverterFound,
+    `No converter is available that can convert from '${def(o.inputFilename)}' to '${def(o.outputFilename)}'.`
+  );
+
+  static ERROR_UnableToConvert = SevError | 0x000A;
   static Error_UnableToConvert = (o: { inputFilename: string; }) => m(
     this.ERROR_UnableToConvert,
     `Input file '${def(o.inputFilename)}' could not be converted.`
   );
 
-  static ERROR_UnableToWrite = SevError | 0x0006;
-  static Error_UnableToWrite = (o: { outputFilename: string; }) => m(
+  static ERROR_UnableToWrite = SevError | 0x000B;
+  static Error_UnableToWrite = (o: { outputFilename: string, errorText: string; }) => m(
     this.ERROR_UnableToWrite,
-    `Output file for '${def(o.outputFilename)}' could not be written.`
+    `Output file for '${def(o.outputFilename)}' could not be written. ${def(o.errorText)}`
   );
 
-  static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
-  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string,  KeyName: string, output: string; }) => m(
-    this.ERROR_UnsupportedCharactersDetected,
-    `Input file ${def(o.inputFilename)}
-    contains unsupported character '${def(o.output)}'
-    at ${def(o.keymapIndex)} ${def(o.KeyName)} .`
-  );
-
-  static ERROR_InvalidFile = SevError | 0x0008;
-  static Error_InvalidFile = (o: { errorText: string; }) => m(
-    this.ERROR_InvalidFile,
-    `The source file has an invalid structure: ${def(o.errorText)}`
-  );
-  
 }
