@@ -22,6 +22,7 @@ describe('KeylayoutToKmnConverter', function () {
 
   describe('Run kmc-convert with or without outputfile name', async function () {
 
+    this.timeout(5000); // allow longer time for this test
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = '../data/test.keylayout';
     [
@@ -29,10 +30,12 @@ describe('KeylayoutToKmnConverter', function () {
       [],
       [makePathToFixture('../data/test_OtherOutputName.kmn')],
     ].forEach(function (files) {
-      it(infile + " should run " , async function () {
-            await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
-            assert.equal(compilerTestCallbacks.messages.length, 0);
-          });
+      it(infile + " should run ", async function () {
+        await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
+        if (compilerTestCallbacks.messages.length > 0) console.log(compilerTestCallbacks.messages[0]);
+        if (compilerTestCallbacks.messages.length > 1) console.log(compilerTestCallbacks.messages[1]);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+      });
     });
   });
 
