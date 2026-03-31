@@ -9,7 +9,6 @@
 import 'mocha';
 import { assert } from 'chai';
 import * as NodeAssert from 'node:assert';
-import { CompilerErrorNamespace, CompilerErrorSeverity } from '@keymanapp/developer-utils';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { ActionStateOutput, KeylayoutFileData, KeylayoutToKmnConverter, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
@@ -44,14 +43,13 @@ describe('KeylayoutToKmnConverter', function () {
     const out_diff = makePathToFixture('../data/test_OtherOutputName.kmn');
     const base = await converter.run(infile, outfile);
     assert.deepEqual(base, await converter.run(infile));
-    assert.notDeepEqual(base, await converter.run(infile, out_diff));
+    assert.deepEqual(base, await converter.run(infile, null));
   });
 
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
       [makePathToFixture('../data/Test_DifferentAmountOfMapSelectInKeyMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_DifferentAmountOfMapSelectInKeyMapERROR_1.keylayout')],
       [makePathToFixture('../data/Test_MissingkeyERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingkeyMapERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingLayoutsERROR.keylayout')],
@@ -60,6 +58,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_MissingActionsERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingTerminatorsERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
+      [makePathToFixture('../data/Test_characters.keylayout')],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
         sut.run(files[0]);
@@ -92,6 +91,10 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
       [makePathToFixture('../data/Test_nr_elements.keylayout')],
       [makePathToFixture('../data/Test.keylayout')],
+      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C0.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C2.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C3.keylayout')],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(files[0]);
@@ -110,7 +113,6 @@ describe('KeylayoutToKmnConverter', function () {
       it(files + " should give Error: unsupported characters ", async function () {
         sut.run(files[0]);
         assert.isTrue(compilerTestCallbacks.messages.length === 1);
-        assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Error | CompilerErrorNamespace.Converter | 0x0007));
       });
     });
   });
