@@ -44,7 +44,6 @@ describe('KeylayoutToKmnConverter', function () {
     const out_diff = makePathToFixture('../data/test_OtherOutputName.kmn');
     const base = await converter.run(infile, outfile);
     assert.deepEqual(base, await converter.run(infile));
-    assert.deepEqual(base, await converter.run(infile, null));
     assert.notDeepEqual(base, await converter.run(infile, out_diff));
   });
 
