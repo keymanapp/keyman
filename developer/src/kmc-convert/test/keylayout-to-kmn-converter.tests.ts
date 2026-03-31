@@ -22,24 +22,17 @@ describe('KeylayoutToKmnConverter', function () {
 
   describe('Run kmc-convert with or without outputfile name', async function () {
 
-    this.timeout(5000); // allow longer time for this test
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const infile = '../data/test.keylayout';
+    const infile = '../data/Test.keylayout';
     [
-      [makePathToFixture('../data/test.kmn')],
+      [makePathToFixture('../data/Test.kmn')],
       [],
       [makePathToFixture('../data/test_OtherOutputName.kmn')],
     ].forEach(function (files) {
-      it( "test.keylayout should run ", async function () {
-console.log('infile',infile)
-console.log('makePathToFixture(infile)',makePathToFixture(infile))
-        await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture('../data/test.keylayout'), files[0]));
-
-
-        if (compilerTestCallbacks.messages.length > 0) console.log(compilerTestCallbacks.messages[0]);
-        if (compilerTestCallbacks.messages.length > 1) console.log(compilerTestCallbacks.messages[1]);
-        assert.equal(compilerTestCallbacks.messages.length, 0);
-      });
+      it(infile + " should run " , async function () {
+            await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
+            assert.equal(compilerTestCallbacks.messages.length, 0);
+          });
     });
   });
 
@@ -88,6 +81,10 @@ console.log('makePathToFixture(infile)',makePathToFixture(infile))
       [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
       [makePathToFixture('../data/Test_nr_elements.keylayout')],
       [makePathToFixture('../data/Test.keylayout')],
+      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C0.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C2.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C3.keylayout')],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(files[0]);
