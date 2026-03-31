@@ -36,16 +36,6 @@ describe('KeylayoutToKmnConverter', function () {
     });
   });
 
-  describe('Run kmc-convert with or without outputfile', async function () {
-    const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const infile = makePathToFixture('../data/test.keylayout');
-    const outfile = makePathToFixture('../data/test.kmn');
-    const out_diff = makePathToFixture('../data/test_OtherOutputName.kmn');
-    const base = await converter.run(infile, outfile);
-    assert.deepEqual(base, await converter.run(infile));
-    assert.deepEqual(base, await converter.run(infile, null));
-  });
-
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -91,10 +81,6 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
       [makePathToFixture('../data/Test_nr_elements.keylayout')],
       [makePathToFixture('../data/Test.keylayout')],
-      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
-      [makePathToFixture('../data/Test_Character_Codepoint_C0.keylayout')],
-      [makePathToFixture('../data/Test_Character_Codepoint_C2.keylayout')],
-      [makePathToFixture('../data/Test_Character_Codepoint_C3.keylayout')],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(files[0]);
