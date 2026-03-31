@@ -36,7 +36,6 @@ console.log('makePathToFixture(infile)',makePathToFixture(infile))
         await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture('../data/test.keylayout'), files[0]));
 
 
-
         if (compilerTestCallbacks.messages.length > 0) console.log(compilerTestCallbacks.messages[0]);
         if (compilerTestCallbacks.messages.length > 1) console.log(compilerTestCallbacks.messages[1]);
         assert.equal(compilerTestCallbacks.messages.length, 0);
