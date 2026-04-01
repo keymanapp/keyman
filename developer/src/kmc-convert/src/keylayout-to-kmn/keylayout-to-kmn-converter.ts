@@ -129,6 +129,7 @@ export class KeylayoutToKmnConverter {
    * @return null on success
    */
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
+
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
