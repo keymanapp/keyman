@@ -66,6 +66,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.app.AlertDialog;
@@ -88,6 +89,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -153,11 +156,19 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   DownloadResultReceiver resultReceiver;
   private static ProgressDialog progressDialog;
+  private static final String PREFS_NAME = "settings";
+  private static final String KEY_THEME_MODE = "theme_mode";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    setTheme(R.style.AppTheme);
+    //    setTheme(R.style.AppTheme);
+
+    SharedPreferences theme_prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    int savedMode = theme_prefs.getInt(KEY_THEME_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+    AppCompatDelegate.setDefaultNightMode(savedMode);
+    getDelegate().applyDayNight();
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
     context = this;
 
     checkSendCrashReport();
@@ -245,6 +256,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           if (imManager != null) {
             imManager.showInputMethodPicker();
           }
+
         } else if (id == R.id.nav_installed_languages) {
           drawerLayout.closeDrawers();
           Intent intent = new Intent(context, LanguagesSettingsActivity.class);
@@ -268,6 +280,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         } else if (id == R.id.nav_about) {
           drawerLayout.closeDrawers();
           startActivity(new Intent(context, InfoActivity.class));
+        }else if (id == R.id.nav_palette){
+          drawerLayout.closeDrawers();
+          openThemeDialog();
         }
         return true;
       }
@@ -311,6 +326,40 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
     checkGetStarted();
+  }
+
+  private void openThemeDialog() {
+    String[] options = {"Dark Mode", "Light Mode", "System Default"};
+
+    SharedPreferences themePrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    int currentMode = themePrefs.getInt(KEY_THEME_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
+    int checkedItem;
+    if (currentMode == AppCompatDelegate.MODE_NIGHT_YES) checkedItem = 0;
+    else if (currentMode == AppCompatDelegate.MODE_NIGHT_NO) checkedItem = 1;
+    else checkedItem = 2;
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle("Choose Theme");
+
+    builder.setSingleChoiceItems(options, checkedItem, (dialog, which) -> {
+      int modeToApply;
+      switch (which) {
+        case 0: modeToApply = AppCompatDelegate.MODE_NIGHT_YES; break;
+        case 1: modeToApply = AppCompatDelegate.MODE_NIGHT_NO; break;
+        default: modeToApply = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM; break;
+      }
+      // Save the choice
+      themePrefs.edit().putInt(KEY_THEME_MODE, modeToApply).apply();
+
+      // Apply immediately
+      AppCompatDelegate.setDefaultNightMode(modeToApply);
+      getDelegate().applyDayNight(); // ensures current activity updates
+
+      dialog.dismiss();
+    });
+    builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+    builder.show();
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -560,6 +609,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     updateUpdateCountIndicator(KMManager.getUpdateTool().getOpenUpdateCount());
     return true;
   }
+
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
