@@ -117,7 +117,7 @@ export interface ICOMP_PLUS_KEYS_KEY {
 export interface ICOMP_PLUS_KEYS_KMAP {
   vkey: number;
   mod: number;
-  key: number; // index into 'keys' subtable
+  key: ITABLE_REF; // keys.keys index
 };
 
 export interface ICOMP_PLUS_KEYS {
@@ -152,7 +152,7 @@ export interface ICOMP_PLUS_LAYR_FORM_v17 {
 
 export interface ICOMP_PLUS_LAYR_FORM_v19 {
   hardware: ISTR_REF;         // str: hardware name
-  layer: ITABLE_REF;          // layr.layrs index
+  layer: ITABLE_REF;          // layr.layers index
   count: number;
   minDeviceWidth: number;     // integer: millimeters
   baseLayout: ISTR_REF;       // v19: str: identifier for base layout (reserved)
