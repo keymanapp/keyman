@@ -589,6 +589,8 @@ export async function correctAndEnumerate(
   const tokenizations = [transition.final.tokenization];
   const searchModules = tokenizations.map(t => t.tail.searchModule);
 
+  // const preppedTokenizationSearch = prepareTokenizationSearch(transition, tokenizations);
+
   // Only run the correction search when corrections are enabled.
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;

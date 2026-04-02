@@ -14,6 +14,7 @@ export * from './correction/legacy-quotient-root.js';
 export * from './correction/legacy-quotient-spur.js';
 export * from './correction/search-quotient-root.js';
 export { ExtendedEditOperation, SegmentableDistanceCalculation } from './correction/segmentable-calculation.js';
+export * from './correction/tokenization-corrector.js';
 export * from './correction/tokenization-subsets.js';
 export * from './correction/transition-helpers.js';
 export * from './correction/token-result-mapping.js';
