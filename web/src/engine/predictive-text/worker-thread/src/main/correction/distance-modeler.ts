@@ -6,7 +6,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
-import { TokenResultMapping } from './token-result-mapping.js';
+import { initTokenResultFilterer, TokenResultMapping } from './token-result-mapping.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 import TransformUtils from '../transformUtils.js';
 
@@ -573,6 +573,18 @@ export class SearchNode {
 }
 
 /**
+ * Searches for the best available token corrections from among the provided
+ * SearchSpaces, ending after the configured timer has elapsed or all available
+ * corrections have been enumerated.
+ * @param searchModules
+ * @param timer
+ * @returns
+ */
+export const getBestTokenMatches = (searchModules: SearchQuotientNode[], timer?: ExecutionTimer) => {
+  return getBestMatches(searchModules, timer, initTokenResultFilterer());
+}
+
+/**
  * Searches for the best available corrections from among the provided
  * SearchSpaces, ending after the configured timer has elapsed or all available
  * corrections have been enumerated.
@@ -580,7 +592,13 @@ export class SearchNode {
  * @param timer
  * @returns
  */
-export async function *getBestMatches(searchModules: SearchQuotientNode[], timer: ExecutionTimer): AsyncGenerator<TokenResultMapping> {
+export async function *getBestMatches(
+  searchModules: SearchQuotientNode[],
+  timer: ExecutionTimer,
+  filter?: (searchResult: TokenResultMapping) => boolean
+): AsyncGenerator<TokenResultMapping> {
+  filter ??= () => true;
+
   const spaceQueue = new PriorityQueue<SearchQuotientNode>((a, b) => a.currentCost - b.currentCost);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
@@ -595,14 +613,14 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
   spaceQueue.enqueueAll(searchModules);
 
-  let currentReturns: {[resultKey: string]: SearchNode} = {};
-
   // Stage 2:  the fun part; actually searching!
   do {
     const entry: TokenResultMapping = timer.time(() => {
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
-        currentReturns[result.node.resultKey] = result.node;
+
+        // Just pass it through the filter, even if it _was_ already filtered once before.
+        filter(result);
         return result;
       }
 
@@ -613,27 +631,8 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
       if(newResult.type == 'none') {
         return null;
       } else if(newResult.type == 'complete') {
-        const node = newResult.mapping.node;
-
-        // Is the entry a reasonable result?
-        if(node.isFullReplacement) {
-          // If the entry's 'match' fully replaces the input string, we consider it
-          // unreasonable and ignore it.  Also, if we've reached this point...
-          // we can(?) assume that everything thereafter is as well.
-          return null;
-        }
-
-        // As we can't guarantee a monotonically-increasing cost during the search -
-        // due to effects from keystrokes with deleteLeft > 0 - it's technically
-        // possible to find a lower-cost path later in such cases.
-        //
-        // If it occurs, we should re-emit it - it'll show up earlier in the
-        // suggestions that way, as it should.
-        if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
-          currentReturns[node.resultKey] = node;
-          // Do not track yielded time.
-          return newResult.mapping;
-        }
+        const mapping = newResult.mapping;
+        return filter(mapping) ? mapping : null;
       }
 
       return null;

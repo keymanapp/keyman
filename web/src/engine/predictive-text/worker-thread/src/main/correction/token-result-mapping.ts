@@ -6,6 +6,31 @@ import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
+export function initTokenResultFilterer() {
+  const priorReturns: Map<string, SearchNode> = new Map();
+
+  const closure = (searchResult: TokenResultMapping) => {
+    const node = searchResult.node;
+
+    if(node.isFullReplacement) {
+      // If the entry's 'match' fully replaces the input string, we consider it
+      // unreasonable and ignore it.  Also, if we've reached this point...
+      // we can(?) assume that everything thereafter is as well.
+      return false;
+    }
+
+    if((priorReturns.get(node.resultKey)?.currentCost ?? Number.MAX_VALUE) >= searchResult.totalCost) {
+      priorReturns.set(node.resultKey, node);
+
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  return closure;
+}
+
 export class TokenResultMapping {
   readonly node: SearchNode;
 
