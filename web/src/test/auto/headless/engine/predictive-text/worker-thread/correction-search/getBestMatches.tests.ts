@@ -10,9 +10,8 @@
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { correction, getBestMatches, LegacyQuotientSpur, models, LegacyQuotientRoot } from '@keymanapp/lm-worker/test-index';
+import { correction, getBestMatches, LegacyQuotientSpur, models, LegacyQuotientRoot, TokenResultMapping } from '@keymanapp/lm-worker/test-index';
 
-import SearchResult = correction.SearchResult;
 import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
@@ -22,11 +21,11 @@ function buildTestTimer() {
 }
 
 describe('getBestMatches', () => {
-  const checkRepeatableResults_teh = async (iter: AsyncGenerator<correction.SearchResult, any, any>) => {
+  const checkRepeatableResults_teh = async (iter: AsyncGenerator<TokenResultMapping, any, any>) => {
     const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
     assert.isFalse(firstIterResult.done);
 
-    const firstResult: correction.SearchResult = firstIterResult.value; // Retrieves <actual value>
+    const firstResult: TokenResultMapping = firstIterResult.value; // Retrieves <actual value>
     // No checks on the first set's cost.
     assert.equal(firstResult.matchString, "ten");
 
@@ -102,7 +101,7 @@ describe('getBestMatches', () => {
 
     // While there's no input, insertion operations can produce suggestions.
     const resultState = await iter.next();
-    const result: SearchResult = resultState.value;
+    const result: TokenResultMapping = resultState.value;
 
     // Just one suggestion root should be returned as the first result.
     assert.equal(result.totalCost, 0);             // Gives a perfect match
@@ -111,7 +110,7 @@ describe('getBestMatches', () => {
 
     // Should be able to reach more, though.
     const laterResultState = await iter.next();
-    const laterResult: SearchResult = laterResultState.value;
+    const laterResult: TokenResultMapping = laterResultState.value;
 
     // Edit required:  an 'insertion' edge (no input matched, but char pulled
     // from lexicon)

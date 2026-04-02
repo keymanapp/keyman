@@ -11,7 +11,8 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { getBestMatches, SearchResult } from './correction/distance-modeler.js';
+import { getBestMatches } from './correction/distance-modeler.js';
+import { TokenResultMapping } from './correction/token-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
 
@@ -392,7 +393,7 @@ export function determineSuggestionAlignment(
 export function buildAndMapPredictions(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: SearchResult
+  match: TokenResultMapping
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
   const searchSpace = tokenization.tail.searchModule;

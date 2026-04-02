@@ -1,0 +1,64 @@
+import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { SearchNode, TraversableToken } from "./distance-modeler.js";
+
+import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
+import Transform = LexicalModelTypes.Transform;
+
+export class TokenResultMapping {
+  readonly node: SearchNode;
+
+  // Supports SearchPath -> SearchSpace remapping.
+  readonly spaceId: number;
+
+  constructor(node: SearchNode, spaceId?: number) {
+    this.node = node;
+    this.spaceId = spaceId ?? node.spaceId;
+  }
+
+  get inputSequence(): ProbabilityMass<Transform>[] {
+    return this.node.priorInput;
+  }
+
+  get matchSequence(): TraversableToken<string>[] {
+    return this.node.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.node.matchedTraversals[i+1]}));
+  };
+
+  get matchString(): string {
+    return this.node.resultKey;
+  }
+
+  /**
+   * Gets the number of Damerau-Levenshtein edits needed to reach the node's
+   * matchString from the output induced by the input sequence used to reach it.
+   *
+   * (This is scaled by `SearchSpace.EDIT_DISTANCE_COST_SCALE` when included in
+   * `totalCost`.)
+   */
+  get knownCost(): number {
+    return this.node.editCount;
+  }
+
+  /**
+   * Gets the "input sampling cost" of the edge, which should be considered as the
+   * negative log-likelihood of the input path taken to reach the node.
+   */
+  get inputSamplingCost(): number {
+    return this.node.inputSamplingCost;
+  }
+
+  /**
+   * Gets the "total cost" of the edge, which should be considered as the
+   * negative log-likelihood of the input path taken to reach the node
+   * multiplied by the 'probability' induced by needed Damerau-Levenshtein edits
+   * to the resulting output.
+   */
+  get totalCost(): number {
+    return this.node.currentCost;
+  }
+
+  get finalTraversal(): LexiconTraversal {
+    return this.node.currentTraversal;
+  }
+}
