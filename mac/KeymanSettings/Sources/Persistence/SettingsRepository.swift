@@ -8,8 +8,11 @@
  *
  */
 
-
 import Foundation
+
+public enum UserDefaultsError: Error {
+    case unknownSuite
+}
 
 public struct SettingsRepository {
   fileprivate let pathUtil: KeymanPaths
@@ -19,7 +22,8 @@ public struct SettingsRepository {
   let kActiveKeyboardsKey = "KMActiveKeyboardsKey"
   let kSelectedKeyboardKey = "KMSelectedKeyboardKey"
   let kPersistedOptionsKey = "KMPersistedOptionsKey"
-  let kShowOskOnActivate = "KMShowOskOnActivate"
+  let kDataModelVersionKey = "KMDataModelVersionKey"
+  let kShowOskOnActivateKey = "KMShowOskOnActivate"
   let kForceSentryError = "KMForceSentryError"
   
   //  public init() {
@@ -27,10 +31,16 @@ public struct SettingsRepository {
   //    self.defaultsSuiteName = KeymanPaths.groupId
   //  }
   //
-  public init(suiteName: String) {
+  public init(suiteName: String) throws(Error) {
     self.pathUtil = KeymanPaths()
     self.defaultsSuiteName = suiteName
-    self.defaults = UserDefaults(suiteName: suiteName)
+    
+    let userDefaults = UserDefaults(suiteName: suiteName)
+    if userDefaults == nil {
+      throw(UserDefaultsError.unknownSuite)
+    } else {
+      self.defaults = userDefaults
+    }
   }
   
   public func readActiveKeyboards() -> Set<String> {
@@ -46,13 +56,16 @@ public struct SettingsRepository {
   }
   
   public func readSelectedKeyboard() -> String {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
+    if let sharedDefaults = self.defaults {
+      return sharedDefaults.value(forKey: kSelectedKeyboardKey) as? String ?? ""
+    } else {
       return ""
     }
- 
-    let selectedKeyboard = sharedDefaults.value(forKey: kSelectedKeyboardKey) as? String ?? ""
-
-    return selectedKeyboard
+  }
+  
+  public func writeSelectedKeyboard(keyboardName: String) {
+    if let sharedDefaults = self.defaults {
+      sharedDefaults.set(keyboardName, forKey: kSelectedKeyboardKey)
+    }
   }
 }

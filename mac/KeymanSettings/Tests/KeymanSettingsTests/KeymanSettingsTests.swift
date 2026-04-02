@@ -50,8 +50,36 @@ import Foundation
   }
 }
 
+// defaults read test.suite.name
 
-@Suite("Load KMP data") struct KeymanDataRepositoryTests {
+@Suite("Settings check") struct KeymanSettingsRepositoryTests {
+  var settingsRepo: SettingsRepository
+  
+  fileprivate init() async throws {
+    print("init Settings")
+    do {
+      try self.settingsRepo = SettingsRepository(suiteName: "test.suite.name")
+      print("Found group container")
+    } catch UserDefaultsError.unknownSuite {
+      fatalError("Group container not found.")
+    } catch {
+      fatalError("Unable to access settings in group container.")
+    }
+    
+    self.settingsRepo.writeSelectedKeyboard(keyboardName: "keyboardtest")
+  }
+  
+  @Test("Write selected keyboard") func writeSelectedKeyboard() async throws {
+    settingsRepo.writeSelectedKeyboard(keyboardName: "testing")
+    #expect(settingsRepo.readSelectedKeyboard() == "testing")
+  }
+  
+  @Test("Read selected keyboard") func readSelectedKeyboard() async throws {
+    #expect(settingsRepo.readSelectedKeyboard() == "keyboardtest")
+  }
+}
+
+@Suite("Load KMP data") struct KeymanPackageRepositoryTests {
   var testKmpUrl: URL? = nil
   
   fileprivate init() async throws {
@@ -60,11 +88,6 @@ import Foundation
   
   func getAmharicKmpUrl() -> URL? {
     return Bundle.module.url(forResource: "amharic.kmp", withExtension: "json")
-  }
-  
-  @Test("Find amharic .kmp file") func locateKmpTestData() async throws {
-    let kmpUrl = try #require(self.getAmharicKmpUrl())
-    #expect(kmpUrl.isFileURL)
   }
   
   @Test("Read package") func loadPackageSource() async throws {

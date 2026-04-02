@@ -4,7 +4,7 @@
  * Created by Shawn Schantz on 2026-02-24
  *
  * Wrapper object that represents a Keyman package as loaded from a .KMP file
- * Can be loaded but disabled
+ * Mostly immutable, but can be marked as enabled/disabled
  *
  */
 
@@ -12,7 +12,7 @@ import Foundation
 import AppKit
 
 // MARK: - Root
-public struct KeymanPackage: Identifiable, Hashable, Equatable {
+public class KeymanPackage: Identifiable, Hashable, Equatable {
   static let defaultImage: NSImage? = {
     var image: NSImage? = nil
     if let imageUrl = Bundle.main.url(forResource: "SideImage", withExtension: "bmp") {
@@ -22,11 +22,12 @@ public struct KeymanPackage: Identifiable, Hashable, Equatable {
   }()
 
   public var id = UUID()
-  public var enabled: Bool
   let source: PackageSource
-  public let keyboards: [Keyboard]
+  public var keyboards: [Keyboard]
   
+  // the URL of the directory in which the package is contained
   public let sourceDirectoryUrl: URL
+  // the URL of the kmp.json file for the package
   public let jsonFileUrl: URL
   public let readmeFileUrl: URL?
   public let graphicFileUrl: URL?
@@ -48,7 +49,6 @@ public struct KeymanPackage: Identifiable, Hashable, Equatable {
   }
 
   init(packageSource: PackageSource) {
-    self.enabled = true
     self.source = packageSource
     self.sourceDirectoryUrl = packageSource.directoryUrl!
     self.jsonFileUrl = packageSource.jsonFileUrl!
@@ -67,7 +67,7 @@ public struct KeymanPackage: Identifiable, Hashable, Equatable {
     
     if let keyboards = source.keyboards {
       for keyboardSource in keyboards {
-        let keyboard = Keyboard(keyboardSource: keyboardSource)
+        let keyboard = Keyboard(keyboardSource: keyboardSource, directoryUrl: self.sourceDirectoryUrl)
         keyboardsArray.append(keyboard)
       }
     }
@@ -75,6 +75,34 @@ public struct KeymanPackage: Identifiable, Hashable, Equatable {
     
 //    ConfigLogger.shared.testLogger.debug("package created for: \(packageSource.packageName)")
     print("package created for: \(packageSource.packageName)")
+  }
+  
+  public func isKeyboardEnabled(keyboardId: String) -> Bool {
+    var enabled = false
+    if let keyboard = self.keyboards.first(where: { $0.keyboardId == keyboardId }) {
+      enabled = keyboard.enabled
+    }
+    
+    return enabled
+  }
+
+  public func enableKeyboard(keyboardId: String, enabled: Bool) {
+    let keyboard = self.keyboards.first(where: { $0.keyboardId == keyboardId })
+    if (keyboard != nil) {
+      keyboard!.enabled = enabled
+    }
+  }
+
+  public func validate() -> Bool {
+    var validKeyboards = self.keyboards.isEmpty == false
+    
+    self.keyboards.forEach { keyboard in
+      if (validKeyboards && !keyboard.validateKmxFile()) {
+        validKeyboards = false
+      }
+    }
+    
+    return validKeyboards
   }
   
   static func buildGraphicFileUrl(source: PackageSource) -> URL? {

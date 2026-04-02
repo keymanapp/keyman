@@ -18,6 +18,23 @@ public struct PackageRepository {
     self.pathUtil = KeymanPaths()
   }
   
+  func loadPackages() -> [KeymanPackage] {
+    var installedPackages: [KeymanPackage] = []
+    let packageSourceArray = self.readKeymanPackagesForKeyman19()
+    
+    // create a KeymanPackage object for each PackageSource object and insert it in the array if it is valid
+    for source in packageSourceArray {
+      let package = KeymanPackage(packageSource: source)
+      if (package.validate()) {
+        installedPackages.append(package)
+      } else {
+        print("package '\(source.packageName)' is not valid")
+      }
+    }
+    
+    return installedPackages
+  }
+  
   /**
    * Creates the directory tree where keyboards are stored under the standard 'Group Containers' directory
    */
@@ -44,6 +61,9 @@ public struct PackageRepository {
     }
   }
   
+  /**
+   * for group container testing purposes to check directory access
+   */
   public func writeSomethingToContainer() {
     if let keyboardDirectory = self.pathUtil.keyman19KeyboardsDirectory {
       print("About to write to: \(keyboardDirectory.path)")
@@ -74,6 +94,9 @@ public struct PackageRepository {
     return self.directoryExistsAtPath(directoryUrl: keyboardsUrl)
   }
   
+  /**
+   * returns true if a directory exists at the specified URL
+   */
   func directoryExistsAtPath(directoryUrl: URL) -> Bool {
       var isDirectory: ObjCBool = false
     let exists = FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: &isDirectory)
@@ -110,7 +133,7 @@ public struct PackageRepository {
       )
       
       for itemUrl in directoryContents {
-        // if the item is a directory, then attempt to read it as a keyboard
+        // if the item is a directory, then attempt to read it as a keyboard package
         if (itemUrl.hasDirectoryPath) {
           if let packageSource =  readKeyboardPackageFromDirectory(keyboardDirectoryUrl: itemUrl) {
             packages.append(packageSource)
@@ -124,27 +147,27 @@ public struct PackageRepository {
     print("\(packages.count) packages read")
     return packages
   }
-  
+
   func readKeyboardPackageFromDirectory(keyboardDirectoryUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
-    
     let lastPathComponent = keyboardDirectoryUrl.lastPathComponent
     let kmpFileUrl = keyboardDirectoryUrl.appendingPathComponent(packageFileName)
+    
     if FileManager.default.fileExists(atPath: kmpFileUrl.path) {
       if let source = readKeyboardPackage(kmpFileUrl) {
         packageSource = source
         // save the keyboard directory and path of the kmp.json for this keyboard
         packageSource?.directoryUrl = keyboardDirectoryUrl
         packageSource?.jsonFileUrl = kmpFileUrl
-     }
+      }
     } else {
-//      ConfigLogger.shared.testLogger.debug(" ** \(lastPathComponent) DOES NOT contain the file 'kmp.json')")
+      //      ConfigLogger.shared.testLogger.debug(" ** \(lastPathComponent) DOES NOT contain the file 'kmp.json')")
       print(" ** \(lastPathComponent) DOES NOT contain the file 'kmp.json')")
     }
     
     return packageSource
   }
-  
+ 
   public func readKeyboardPackage(_ kmpFileUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
     do {
