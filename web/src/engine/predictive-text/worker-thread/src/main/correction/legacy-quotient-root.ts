@@ -11,7 +11,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 
 export class LegacyQuotientRoot extends SearchQuotientRoot {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  private processed: TokenResultMapping[] = [];
+  private processed: SearchNode[] = [];
 
   constructor(model: LexicalModel) {
     super(model);
@@ -43,11 +43,11 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
       this.selectionQueue.enqueueAll(insertionEdges);
     }
 
-    this.processed.push(new TokenResultMapping(node));
+    this.processed.push(node);
     return {
       type: 'complete',
       cost: node.currentCost,
-      finalNode: node,
+      mapping: new TokenResultMapping(node),
       spaceId: this.spaceId
     };
   }
@@ -57,7 +57,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
   }
 
   get previousResults(): TokenResultMapping[] {
-    return this.processed.slice();
+    return this.processed.map((n) => new TokenResultMapping(n));
   }
 
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {

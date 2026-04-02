@@ -613,7 +613,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
       if(newResult.type == 'none') {
         return null;
       } else if(newResult.type == 'complete') {
-        const node = newResult.finalNode;
+        const node = newResult.mapping.node;
 
         // Is the entry a reasonable result?
         if(node.isFullReplacement) {
@@ -632,7 +632,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
           currentReturns[node.resultKey] = node;
           // Do not track yielded time.
-          return new TokenResultMapping(newResult.finalNode);
+          return newResult.mapping;
         }
       }
 

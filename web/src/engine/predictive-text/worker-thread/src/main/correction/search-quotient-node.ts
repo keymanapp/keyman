@@ -9,7 +9,6 @@
 
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
-import { SearchNode } from "./distance-modeler.js";
 import { TokenResultMapping } from "./token-result-mapping.js";
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -32,7 +31,7 @@ type IntermediateSearchPath = {
 type CompleteSearchPath = {
   type: 'complete',
   cost: number,
-  finalNode: SearchNode,
+  mapping: TokenResultMapping,
   spaceId: number
 }
 
