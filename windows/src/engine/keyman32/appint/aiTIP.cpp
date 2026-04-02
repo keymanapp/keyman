@@ -152,7 +152,7 @@ BOOL TIPProcessKeyInternal(
   SendDebugMessageFormat("VirtualKey=%s lParam=%x   IsUp=%d Extended=%d Updateable=%d Preserved=%d",
     Debug_VirtualKey((WORD) wParam), lParam, isUp, extended, Updateable, Preserved);
 
-  if(_td->LastKey == wParam && scan == 0) {   // I4642
+  if (_td->LastKey == wParam && scan == 0) {  // I4642 - handle issue with Logos application. 
     scan = _td->LastScanCode;
     SendDebugMessageFormat("Scan code was zero so using cached scan code %x", scan);
   }
