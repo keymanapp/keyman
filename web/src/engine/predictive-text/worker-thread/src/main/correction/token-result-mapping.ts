@@ -1,6 +1,8 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { CorrectionResultMapping } from "./correction-result-mapping.js";
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
+import { SearchQuotientNode } from "./search-quotient-node.js";
 
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
@@ -31,15 +33,21 @@ export function initTokenResultFilterer() {
   return closure;
 }
 
-export class TokenResultMapping {
+export class TokenResultMapping implements CorrectionResultMapping<SearchNode> {
+  readonly matchingSpace: SearchQuotientNode;
   readonly node: SearchNode;
 
   // Supports SearchPath -> SearchSpace remapping.
   readonly spaceId: number;
 
-  constructor(node: SearchNode, spaceId?: number) {
+  constructor(node: SearchNode, finalQuotientNode: SearchQuotientNode, spaceId?: number) {
+    this.matchingSpace = finalQuotientNode;
     this.node = node;
     this.spaceId = spaceId ?? node.spaceId;
+  }
+
+  get matchedResult(): SearchNode {
+    return this.node;
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {

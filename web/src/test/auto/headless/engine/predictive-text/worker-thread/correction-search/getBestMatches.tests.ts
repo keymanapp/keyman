@@ -101,7 +101,7 @@ describe('getBestMatches', () => {
 
     // While there's no input, insertion operations can produce suggestions.
     const resultState = await iter.next();
-    const result: TokenResultMapping = resultState.value;
+    const result = resultState.value;
 
     // Just one suggestion root should be returned as the first result.
     assert.equal(result.totalCost, 0);             // Gives a perfect match
@@ -110,7 +110,7 @@ describe('getBestMatches', () => {
 
     // Should be able to reach more, though.
     const laterResultState = await iter.next();
-    const laterResult: TokenResultMapping = laterResultState.value;
+    const laterResult = laterResultState.value;
 
     // Edit required:  an 'insertion' edge (no input matched, but char pulled
     // from lexicon)

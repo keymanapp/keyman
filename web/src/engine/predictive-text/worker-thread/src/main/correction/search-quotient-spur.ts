@@ -12,8 +12,9 @@ import { QueueComparator, KMWString, PriorityQueue } from '@keymanapp/web-utils'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
+import { PathResult } from './correction-searchable.js';
 import { EDIT_DISTANCE_COST_SCALE, SearchNode } from './distance-modeler.js';
-import { generateSpaceSeed, InputSegment, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { generateSpaceSeed, InputSegment, PathInputProperties, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
@@ -332,7 +333,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
    * sort of result the edge's destination node represents.
    * @returns
    */
-  public handleNextNode(): PathResult {
+  public handleNextNode(): PathResult<TokenResultMapping> {
     const parentCost = this.parentNode?.currentCost ?? Number.POSITIVE_INFINITY;
     const localCost = this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
 
@@ -353,13 +354,13 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       return {
         ...result,
         type: 'intermediate'
-      } as PathResult
+      } as PathResult<TokenResultMapping>
     }
 
     // will have equal .spaceId.
     let currentNode = this.selectionQueue.dequeue();
 
-    let unmatchedResult: PathResult = {
+    let unmatchedResult: PathResult<TokenResultMapping> = {
       type: 'intermediate',
       cost: currentNode.currentCost
     }
@@ -404,7 +405,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       return {
         type: 'complete',
         cost: currentNode.currentCost,
-        mapping: new TokenResultMapping(currentNode),
+        mapping: new TokenResultMapping(currentNode, this),
         spaceId: this.spaceId
       };
     }
@@ -414,7 +415,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get previousResults(): TokenResultMapping[] {
-    return Object.values(this.returnedValues ?? {}).map(v => new TokenResultMapping(v));
+    return Object.values(this.returnedValues ?? {}).map(v => new TokenResultMapping(v, this));
   }
 
   public get inputSegments(): InputSegment[] {

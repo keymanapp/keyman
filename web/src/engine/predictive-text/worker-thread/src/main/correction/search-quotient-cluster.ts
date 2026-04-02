@@ -11,9 +11,10 @@
 import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { PathResult } from './correction-searchable.js';
 import { SearchNode } from './distance-modeler.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
-import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
@@ -138,7 +139,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * sort of result the edge's destination node represents.
    * @returns
    */
-  public handleNextNode(): PathResult {
+  public handleNextNode(): PathResult<TokenResultMapping> {
     const bestPath = this.selectionQueue.dequeue();
     const currentResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
@@ -152,7 +153,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
   }
 
   public get previousResults(): TokenResultMapping[] {
-    return this.completedPaths?.map((n => new TokenResultMapping(n, this.spaceId))) ?? [];
+    return this.completedPaths?.map((n => new TokenResultMapping(n, this))) ?? [];
   }
 
   get model(): LexicalModelTypes.LexicalModel {

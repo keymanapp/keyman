@@ -11,9 +11,11 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
+import { PathResult } from './correction-searchable.js';
 import { SearchNode } from './distance-modeler.js';
-import { PathResult, SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
+import { SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
+import { TokenResultMapping } from './token-result-mapping.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
@@ -78,7 +80,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
    * sort of result the edge's destination node represents.
    * @returns
    */
-  public handleNextNode(): PathResult {
+  public handleNextNode(): PathResult<TokenResultMapping> {
     const result = super.handleNextNode();
 
     if(result.type == 'complete') {

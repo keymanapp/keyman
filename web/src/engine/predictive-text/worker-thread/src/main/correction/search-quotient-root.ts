@@ -1,8 +1,9 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { PathResult } from './correction-searchable.js';
 import { SearchNode } from './distance-modeler.js';
-import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
@@ -36,7 +37,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
     this.rootNode = new SearchNode(model.traverseFromRoot(), generateSpaceSeed(), t => model.toKey(t));
     this.model = model;
-    this.rootResult = new TokenResultMapping(this.rootNode);
+    this.rootResult = new TokenResultMapping(this.rootNode, this);
   }
 
   get spaceId(): number {
@@ -67,7 +68,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
    * sort of result the edge's destination node represents.
    * @returns
    */
-  public handleNextNode(): PathResult {
+  public handleNextNode(): PathResult<TokenResultMapping> {
     if(this.hasBeenProcessed) {
       return { type: 'none' };
     }
@@ -77,7 +78,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return {
       type: 'complete',
       cost: 0,
-      mapping: new TokenResultMapping(this.rootNode),
+      mapping: new TokenResultMapping(this.rootNode, this),
       spaceId: this.spaceId
     };
   }

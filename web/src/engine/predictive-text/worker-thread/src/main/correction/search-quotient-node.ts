@@ -9,6 +9,8 @@
 
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
+import { CorrectionSearchable, PathResult } from "./correction-searchable.js";
+import { SearchNode } from "./distance-modeler.js";
 import { TokenResultMapping } from "./token-result-mapping.js";
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -18,24 +20,6 @@ let SPACE_ID_SEED = 0;
 export function generateSpaceSeed(): number {
   return SPACE_ID_SEED++;
 }
-
-type NullPath = {
-  type: 'none'
-}
-
-type IntermediateSearchPath = {
-  type: 'intermediate',
-  cost: number
-}
-
-type CompleteSearchPath = {
-  type: 'complete',
-  cost: number,
-  mapping: TokenResultMapping,
-  spaceId: number
-}
-
-export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;
 
 export interface InputSegment {
   /**
@@ -96,7 +80,7 @@ export interface PathInputProperties {
  * Represents all or a portion of the dynamically-generated graph used to search
  * for predictive-text corrections.
  */
-export interface SearchQuotientNode {
+export interface SearchQuotientNode extends CorrectionSearchable<SearchNode, TokenResultMapping> {
   /**
    * Returns an identifier uniquely identifying this search-batching structure
    * by correction-search results.
@@ -120,7 +104,7 @@ export interface SearchQuotientNode {
    * what sort of result the edge's destination node represents.
    * @returns
    */
-  handleNextNode(): PathResult;
+  handleNextNode(): PathResult<TokenResultMapping>;
 
   /**
    * Increases the editing range that will be considered for determining

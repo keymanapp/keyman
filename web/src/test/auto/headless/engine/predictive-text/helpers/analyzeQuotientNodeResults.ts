@@ -8,7 +8,7 @@
  * SearchQuotientNode.
  */
 
-import { PathResult, SearchQuotientNode } from "@keymanapp/lm-worker/test-index";
+import { PathResult, SearchQuotientNode, TokenResultMapping } from "@keymanapp/lm-worker/test-index";
 
 /**
  * Represents the results of a call to `analyzeQuotientNodeResults` during unit
@@ -54,7 +54,7 @@ export function analyzeQuotientNodeResults(
 ) {
   const matchMap: Map<string, number> = new Map();
 
-  let result: PathResult = node.handleNextNode();
+  let result: PathResult<TokenResultMapping> = node.handleNextNode();
   while(result.type != 'none') {
     if(result.type == 'complete') {
       const resultKey = result.mapping.node.resultKey;

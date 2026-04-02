@@ -1,13 +1,14 @@
 import { PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { PathResult } from './correction-searchable.js';
+import { SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { QUEUE_NODE_COMPARATOR } from './search-quotient-spur.js';
 import { SearchNode } from './distance-modeler.js';
-import { TokenResultMapping } from './token-result-mapping.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
+import { TokenResultMapping } from './token-result-mapping.js';
 
 export class LegacyQuotientRoot extends SearchQuotientRoot {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
@@ -28,7 +29,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
    * sort of result the edge's destination node represents.
    * @returns
    */
-  public handleNextNode(): PathResult {
+  public handleNextNode(): PathResult<TokenResultMapping> {
     const node = this.selectionQueue.dequeue();
 
     if(!node) {
@@ -47,7 +48,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     return {
       type: 'complete',
       cost: node.currentCost,
-      mapping: new TokenResultMapping(node),
+      mapping: new TokenResultMapping(node, this),
       spaceId: this.spaceId
     };
   }
@@ -57,7 +58,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
   }
 
   get previousResults(): TokenResultMapping[] {
-    return this.processed.map((n) => new TokenResultMapping(n));
+    return this.processed.map((n) => new TokenResultMapping(n, this));
   }
 
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
