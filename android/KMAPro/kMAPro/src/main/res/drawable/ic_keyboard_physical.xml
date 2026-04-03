@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Keyboard body outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.8"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M2,5 L22,5 L22,17 L2,17 Z" />
+
+    <!-- Row 1 keys: 5 small squares -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M4,7.5 L5.5,7.5 L5.5,9 L4,9 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M7,7.5 L8.5,7.5 L8.5,9 L7,9 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M10,7.5 L11.5,7.5 L11.5,9 L10,9 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M13,7.5 L14.5,7.5 L14.5,9 L13,9 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M16,7.5 L17.5,7.5 L17.5,9 L16,9 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M19,7.5 L20.5,7.5 L20.5,9 L19,9 Z" />
+
+    <!-- Row 2 keys -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M4,10.5 L5.5,10.5 L5.5,12 L4,12 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M7,10.5 L8.5,10.5 L8.5,12 L7,12 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M10,10.5 L11.5,10.5 L11.5,12 L10,12 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M13,10.5 L14.5,10.5 L14.5,12 L13,12 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M16,10.5 L17.5,10.5 L17.5,12 L16,12 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M19,10.5 L20.5,10.5 L20.5,12 L19,12 Z" />
+
+    <!-- Row 3: spacebar (wide) + 2 small keys -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M4,13.5 L5.5,13.5 L5.5,15 L4,15 Z" />
+    <!-- Spacebar -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M7,13.5 L17,13.5 L17,15 L7,15 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:pathData="M18.5,13.5 L20.5,13.5 L20.5,15 L18.5,15 Z" />
+
+    <!-- Cable coming out bottom center -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M12,17 L12,21" />
+
+    <!-- USB plug at end of cable -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.8"
+        android:strokeLineJoin="round"
+        android:pathData="M9.5,21 L14.5,21 L14.5,23 L9.5,23 Z" />
+
+</vector>

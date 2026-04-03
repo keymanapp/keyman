@@ -65,6 +65,10 @@
 
     <style name="AppTheme.PopupMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
         <item name="android:popupBackground">@color/menuBgColor</item>
+    <style name="NavigationDrawerItemText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:singleLine">false</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
 </resources>

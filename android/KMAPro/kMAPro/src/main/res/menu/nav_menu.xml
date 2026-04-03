@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
 
 <!--    <group android:checkableBehavior="single">-->
 <!--        <item-->
@@ -8,27 +10,38 @@
 <!--            android:title="Home" />-->
 <!--    </group>-->
 
-    <item android:title="Setup"
+    <item
+        android:id="@+id/action_sidebar"
+        android:title="Setup"
+
         >
         <menu>
             <item
+                android:id="@+id/nav_about_current_keyboard"
+                android:icon="@drawable/ic_keyboard"
+                android:title="Current keyboard"
+                app:actionLayout="@layout/nav_right_icon_item"
+                />
+            <item
                 android:id="@+id/nav_installed_languages"
                 android:icon="@drawable/ic_folder_open"
-                android:title="Installed Languages" />
+                android:title="Installed Languages"
+                app:actionLayout="@layout/nav_right_icon_item"/>
             <item
                 android:id="@+id/nav_install_keyboard"
                 android:icon="@drawable/ic_content_add"
-                android:title="Install Keyboard or Dictionary" />
+                android:title="Install Keyboard or Dictionary"
+                app:actionLayout="@layout/nav_right_icon_item"/>
 
             <item
                 android:id="@+id/nav_checkbox_enable_system_keyboard"
-                android:icon="@drawable/ic_keyboard"
-                android:title="Enable System Keyboard"
+                android:icon="@drawable/ic_keyboard_on_screen"
+                android:title="Enable Keyman as system-wide keyboard"
                 app:actionLayout="@layout/nav_checkbox_item" />
             <item
                 android:id="@+id/nav_checkbox_set_default_keyboard"
                 android:icon="@drawable/ic_settings"
-                android:title="Set Keyman As Default"
+                android:title="Set Keyman As default keyboard"
                 app:actionLayout="@layout/nav_checkbox_item" />
         </menu>
     </item>
@@ -40,30 +53,38 @@
             <item
                 android:id="@+id/nav_display_language"
                 android:icon="@drawable/ic_translate"
-                android:title="Display Language" />
+                android:title="Display Language"
+                app:actionLayout="@layout/nav_right_icon_item"/>
             <item
                 android:id="@+id/nav_keyboard_height"
                 android:icon="@drawable/ic_height"
-                android:title="Adjust Keyboard Height" />
+                android:title="Adjust Keyboard Height"
+                app:actionLayout="@layout/nav_right_icon_item"/>
             <item
                 android:id="@+id/nav_longpress_delay"
                 android:icon="@drawable/ic_action_timelapse"
-                android:title="Adjust Longpress Delay" />
+                android:title="Adjust Longpress Delay"
+                app:actionLayout="@layout/nav_right_icon_item"/>
+
+            <item
+                android:id="@+id/nav_spacebar_caption"
+                android:icon="@drawable/spacebar_key_bg"
+                android:title="Spacebar caption" />
 
 
             <item
                 android:id="@+id/nav_toggle_show_osk"
-                android:icon="@drawable/ic_keyboard"
-                android:title="Show OSK"
+                android:icon="@drawable/ic_keyboard_physical"
+                android:title="Show On Screen Keyboard"
                 app:actionLayout="@layout/nav_switch_item" />
             <item
-                android:id="@+id/nav_toggle_haptic_feedback"
-                android:icon="@drawable/ic_navigation_refresh"
-                android:title="Haptic Feedback"
+                android:id="@+id/action_get_started"
+                android:icon="@drawable/ic_action_get_started"
+                android:title="Show &quot;Get Started&quot; on startup"
                 app:actionLayout="@layout/nav_switch_item" />
             <item
                 android:id="@+id/nav_toggle_send_crash_report"
-                android:icon="@drawable/ic_info_outline"
+                android:icon="@drawable/ic_warning"
                 android:title="Send Crash Report"
                 app:actionLayout="@layout/nav_switch_item" />
             <item
@@ -71,19 +92,32 @@
                 android:icon="@drawable/ic_palette"
                 android:title="Appearance Mode" />
 
-            <item
-                android:id="@+id/nav_settings"
-                android:icon="@drawable/ic_settings"
-                android:title="More Settings…" />
+<!--            <item-->
+<!--                android:id="@+id/nav_settings"-->
+<!--                android:icon="@drawable/ic_settings"-->
+<!--                android:title="More Settings…" />-->
         </menu>
     </item>
 
-    <item android:title="About">
+<!--    <item android:title="About">-->
+<!--        <menu>-->
+
+
+<!--        </menu>-->
+<!--    </item>-->
+    <item android:title="Help">
         <menu>
             <item
-                android:id="@+id/nav_about"
+                android:id="@+id/nav_help"
                 android:icon="@drawable/ic_info_outline"
-                android:title="Keyman for Android" />
+                android:title="User guide"
+                app:actionLayout="@layout/nav_right_icon_item"/>
+            <item
+                android:id="@+id/action_update_keyboards"
+                android:icon="@drawable/ic_cloud_download"
+                android:title="Update Keyboards"
+                />
+
         </menu>
     </item>
 

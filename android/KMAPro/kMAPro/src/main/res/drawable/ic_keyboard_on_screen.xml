@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Phone/screen outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.8"
+        android:strokeLineJoin="round"
+        android:pathData="M5,1 L19,1 Q20,1 20,2 L20,22 Q20,23 19,23 L5,23 Q4,23 4,22 L4,2 Q4,1 5,1 Z" />
+
+    <!-- Screen area top bar (status bar hint) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:pathData="M4,4 L20,4" />
+
+    <!-- Keyboard panel background inside screen -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.4"
+        android:strokeLineJoin="round"
+        android:pathData="M5.5,13 L18.5,13 L18.5,21.5 L5.5,21.5 Z" />
+
+    <!-- Keyboard Row 1: 4 keys -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M6.5,14 L7.5,14 L7.5,15 L6.5,15 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M9,14 L10,14 L10,15 L9,15 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M11.5,14 L12.5,14 L12.5,15 L11.5,15 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M14,14 L15,14 L15,15 L14,15 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M16.5,14 L17.5,14 L17.5,15 L16.5,15 Z" />
+
+    <!-- Keyboard Row 2: 4 keys -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M6.5,16 L7.5,16 L7.5,17 L6.5,17 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M9,16 L10,16 L10,17 L9,17 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M11.5,16 L12.5,16 L12.5,17 L11.5,17 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M14,16 L15,16 L15,17 L14,17 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M16.5,16 L17.5,16 L17.5,17 L16.5,17 Z" />
+
+    <!-- Spacebar row -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M6.5,18.5 L7.5,18.5 L7.5,19.5 L6.5,19.5 Z" />
+    <!-- Spacebar -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M9,18.5 L15,18.5 L15,19.5 L9,19.5 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M16.5,18.5 L17.5,18.5 L17.5,19.5 L16.5,19.5 Z" />
+
+    <!-- Home button circle -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:pathData="M12,22 m-0.8,0 a0.8,0.8 0 1,0 1.6,0 a0.8,0.8 0 1,0 -1.6,0" />
+
+</vector>
