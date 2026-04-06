@@ -38,6 +38,5 @@
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintVertical_bias="1.0"/>
-<!--    android:background="@android:color/transparent"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

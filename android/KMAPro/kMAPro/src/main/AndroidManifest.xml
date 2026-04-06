@@ -43,19 +43,19 @@
     <meta-data
       android:name="io.sentry.auto-init" android:value="false" />
 
-<!--    <service-->
-<!--      android:name="com.keyman.android.SystemKeyboard"-->
-<!--      android:exported="true"-->
-<!--      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"-->
-<!--      android:permission="android.permission.BIND_INPUT_METHOD">-->
-<!--      <intent-filter>-->
-<!--        <action android:name="android.view.InputMethod" />-->
-<!--      </intent-filter>-->
+    <service
+      android:name="com.keyman.android.SystemKeyboard"
+      android:exported="true"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+      android:permission="android.permission.BIND_INPUT_METHOD">
+      <intent-filter>
+        <action android:name="android.view.InputMethod" />
+      </intent-filter>
 
-<!--      <meta-data-->
-<!--        android:name="android.view.im"-->
-<!--        android:resource="@xml/method" />-->
-<!--    </service>-->
+      <meta-data
+        android:name="android.view.im"
+        android:resource="@xml/method" />
+    </service>
     <service
       android:name="com.keyman.android.DownloadIntentService"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"

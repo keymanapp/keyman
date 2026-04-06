@@ -6,10 +6,12 @@ package com.tavultesoft.kmapro;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,16 +19,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
-import android.view.Window;
-import android.view.View;
-import android.view.WindowManager;
-import android.os.Build;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.WindowCompat;
-
 
 /**
  * Settings menu for adjusting the keyboard height.
@@ -49,6 +45,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
 
     setupEdgeToEdge(R.id.adjust_keyboard_layout);
 //    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       Window window = getWindow();
       window.setStatusBarColor(ContextCompat.getColor(this, R.color.keyman_blue));

@@ -117,6 +117,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -136,12 +137,6 @@ import android.view.MenuItem;
 import androidx.appcompat.widget.AppCompatCheckBox;
 
 import io.sentry.android.core.SentryAndroid;
-import android.view.Window;
-import android.view.View;
-import android.view.WindowManager;
-import android.os.Build;
-import androidx.core.content.ContextCompat;
-
 
 public class MainActivity extends BaseActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -261,6 +256,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         window.getDecorView().setSystemUiVisibility(flags);
       }
     }
+
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);

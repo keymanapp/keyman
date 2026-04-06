@@ -18,7 +18,6 @@
     <color name="neutral_3">#929396</color>
     <color name="neutral_4">#C9CACA</color>
     <color name="neutral_5">#DADDDC</color>
-    <color name="ms_black">#000000</color>
 
 
     <color name="keyman_orange">@color/analagous_5</color>
@@ -36,7 +35,6 @@
 
     <color name="dialogBackground">#FFFFFF</color>
     <color name="toolbar">@color/keyman_blue</color>
-    <color name="main_text_color">#000000</color>
-
+<!--    <color name="main_text_color">#FFFFFF</color>-->
 
 </resources>

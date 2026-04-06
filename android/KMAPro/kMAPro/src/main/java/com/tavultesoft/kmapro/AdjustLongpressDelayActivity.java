@@ -8,8 +8,10 @@ package com.tavultesoft.kmapro;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
