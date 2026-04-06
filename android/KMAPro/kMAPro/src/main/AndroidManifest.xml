@@ -224,6 +224,7 @@
 
     </activity>
 
+
     <activity
       android:name=".InfoActivity"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"

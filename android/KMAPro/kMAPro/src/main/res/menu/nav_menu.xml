@@ -66,7 +66,10 @@
                 android:icon="@drawable/ic_info_outline"
                 android:title="Send Crash Report"
                 app:actionLayout="@layout/nav_switch_item" />
-
+            <item
+                android:id="@+id/nav_palette"
+                android:icon="@drawable/ic_palette"
+                android:title="Appearance Mode" />
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_settings"

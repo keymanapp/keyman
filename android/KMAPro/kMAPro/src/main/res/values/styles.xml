@@ -50,4 +50,8 @@
         <item name="android:popupBackground">@color/menuBgColor</item>
     </style>
 
+<!--    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">-->
+<!--        <item name="android:windowBackground">@color/splashBackground</item>-->
+<!--    </style>-->
+
 </resources>

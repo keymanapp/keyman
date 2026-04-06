@@ -185,6 +185,7 @@ dependencies {
         transitive = true
     }
     implementation 'com.google.android.gms:play-services-maps3d:0.2.0'
+    //implementation 'com.google.android.gms:play-services-maps:19.0.0'
 }
 
 /*def void dumpProperties(it){

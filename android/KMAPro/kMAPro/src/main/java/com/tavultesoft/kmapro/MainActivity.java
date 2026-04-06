@@ -66,6 +66,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.app.AlertDialog;
@@ -147,17 +148,25 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private static final String userTextSizeKey = "UserTextSize";
   private Toolbar toolbar;
   private Menu menu;
-
   private static Dataset repo;
   private boolean didExecuteParser = false;
 
   DownloadResultReceiver resultReceiver;
   private static ProgressDialog progressDialog;
+  private static final String PREFS_NAME = "settings";
+  private static final String KEY_THEME_MODE = "theme_mode";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    setTheme(R.style.AppTheme);
+    // 1. Load the saved preference first
+    SharedPreferences theme_prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    int savedMode = theme_prefs.getInt(KEY_THEME_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
+    // 2. Apply it before the UI draws
+    AppCompatDelegate.setDefaultNightMode(savedMode);
+    getDelegate().applyDayNight();
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
     context = this;
 
     checkSendCrashReport();
@@ -268,6 +277,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         } else if (id == R.id.nav_about) {
           drawerLayout.closeDrawers();
           startActivity(new Intent(context, InfoActivity.class));
+        }
+        else if (id == R.id.nav_palette) {
+          drawerLayout.closeDrawers();
+          openThemeDialog();
         }
         return true;
       }
@@ -1443,5 +1456,46 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
     outStream.flush();
     outStream.close();
+  }
+  private void openThemeDialog() {
+    String[] options = {"Dark Mode", "Light Mode", "System Default"};
+
+    SharedPreferences themePrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    int currentMode = themePrefs.getInt(KEY_THEME_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
+    int checkedItem;
+    if (currentMode == AppCompatDelegate.MODE_NIGHT_YES) checkedItem = 0;
+    else if (currentMode == AppCompatDelegate.MODE_NIGHT_NO) checkedItem = 1;
+    else checkedItem = 2;
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle("Choose Theme");
+
+    builder.setSingleChoiceItems(options, checkedItem, (dialog, which) -> {
+      int modeToApply;
+      switch (which) {
+        case 0:
+          modeToApply = AppCompatDelegate.MODE_NIGHT_YES;
+          break;
+        case 1:
+          modeToApply = AppCompatDelegate.MODE_NIGHT_NO;
+          break;
+        default:
+          modeToApply = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+          break;
+      }
+
+      // Save selection
+      themePrefs.edit().putInt(KEY_THEME_MODE, modeToApply).apply();
+
+      // Apply immediately
+      AppCompatDelegate.setDefaultNightMode(modeToApply);
+      getDelegate().applyDayNight();
+
+      dialog.dismiss();
+    });
+
+    builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+    builder.show();
   }
 }
