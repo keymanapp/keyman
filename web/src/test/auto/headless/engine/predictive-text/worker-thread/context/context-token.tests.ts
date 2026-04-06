@@ -15,7 +15,7 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from '@keymanapp/web-utils';
 
-import { ContextToken, correction, generateSubsetId, getBestMatches, InputSegment, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
+import { ContextToken, correction, generateSubsetId, getBestMatches, InputSegment, LegacyQuotientRoot, models, SearchQuotientSpur } from '@keymanapp/lm-worker/test-index';
 
 import { quotientPathHasInputs } from "../../helpers/quotientPathHasInputs.js";
 
@@ -54,7 +54,7 @@ describe('ContextToken', function() {
 
   describe("<constructor>", () => {
     it("(model: LexicalModel)", async () => {
-      let token = new ContextToken(plainModel);
+      let token = new ContextToken(new LegacyQuotientRoot(plainModel));
 
       assert.equal(token.searchModule.inputCount, 0);
       assert.isEmpty(token.exampleInput);
@@ -67,7 +67,7 @@ describe('ContextToken', function() {
     });
 
     it("(model: LexicalModel, text: string)", () => {
-      let token = new ContextToken(plainModel, "and");
+      let token = ContextToken.fromRawText(plainModel, "and");
 
       assert.equal(token.searchModule.bestExample.text, 'and');
       assert.equal(token.exampleInput, 'and');
@@ -85,7 +85,7 @@ describe('ContextToken', function() {
 
     it("(token: ContextToken", () => {
       // Same as in a test above, since we verified that it works correctly.
-      let baseToken = new ContextToken(plainModel, "and");
+      let baseToken = ContextToken.fromRawText(plainModel, "and");
       let clonedToken = new ContextToken(baseToken);
 
       assert.equal(clonedToken.searchModule, baseToken.searchModule);
@@ -103,9 +103,9 @@ describe('ContextToken', function() {
 
   describe("merge()", () => {
     it("merges three tokens without previously-split transforms", () => {
-      const token1 = new ContextToken(plainModel, "can");
-      const token2 = new ContextToken(plainModel, "'");
-      const token3 = new ContextToken(plainModel, "t");
+      const token1 = ContextToken.fromRawText(plainModel, "can");
+      const token2 = ContextToken.fromRawText(plainModel, "'");
+      const token3 = ContextToken.fromRawText(plainModel, "t");
 
       const merged = ContextToken.merge([token1, token2, token3]);
       assert.equal(merged.exampleInput, "can't");
@@ -127,9 +127,9 @@ describe('ContextToken', function() {
       const srcTransform = { insert: "can't", deleteLeft: 0, deleteRight: 0, id: 1 };
       const srcSubsetId = generateSubsetId();
 
-      const token1 = new ContextToken(plainModel);
-      const token2 = new ContextToken(plainModel);
-      const token3 = new ContextToken(plainModel);
+      const token1 = new ContextToken(new LegacyQuotientRoot(plainModel));
+      const token2 = new ContextToken(new LegacyQuotientRoot(plainModel));
+      const token3 = new ContextToken(new LegacyQuotientRoot(plainModel));
 
       token1.addInput({
         segment: {
@@ -185,13 +185,13 @@ describe('ContextToken', function() {
       ];
 
       // apples
-      const token1 = new ContextToken(plainModel);
+      const token1 = new ContextToken(new LegacyQuotientRoot(plainModel));
       // and
-      const token2 = new ContextToken(plainModel);
+      const token2 = new ContextToken(new LegacyQuotientRoot(plainModel));
       // sour
-      const token3 = new ContextToken(plainModel);
+      const token3 = new ContextToken(new LegacyQuotientRoot(plainModel));
       // grapes
-      const token4 = new ContextToken(plainModel);
+      const token4 = new ContextToken(new LegacyQuotientRoot(plainModel));
       const tokensToMerge = [token1, token2, token3, token4]
 
       token1.addInput({
@@ -275,13 +275,13 @@ describe('ContextToken', function() {
       ];
 
       // apples
-      const token1 = new ContextToken(plainModel);
+      const token1 = new ContextToken(new LegacyQuotientRoot(plainModel));
       // and
-      const token2 = new ContextToken(plainModel);
+      const token2 = new ContextToken(new LegacyQuotientRoot(plainModel));
       // sour
-      const token3 = new ContextToken(plainModel);
+      const token3 = new ContextToken(new LegacyQuotientRoot(plainModel));
       // grapes
-      const token4 = new ContextToken(plainModel);
+      const token4 = new ContextToken(new LegacyQuotientRoot(plainModel));
       const tokensToMerge = [token1, token2, token3, token4]
 
       token1.addInput({
@@ -371,7 +371,7 @@ describe('ContextToken', function() {
         ]
       ]
 
-      const tokenToSplit = new ContextToken(plainModel);
+      const tokenToSplit = new ContextToken(new LegacyQuotientRoot(plainModel));
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {
@@ -414,7 +414,7 @@ describe('ContextToken', function() {
       const splitTextArray = ['big', 'large', 'transform'];
       const subsetId = generateSubsetId();
 
-      const tokenToSplit = new ContextToken(plainModel);
+      const tokenToSplit = new ContextToken(new LegacyQuotientRoot(plainModel));
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {
@@ -485,7 +485,7 @@ describe('ContextToken', function() {
         generateSubsetId()
       ];
 
-      const tokenToSplit = new ContextToken(plainModel);
+      const tokenToSplit = new ContextToken(new LegacyQuotientRoot(plainModel));
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {
@@ -612,7 +612,7 @@ describe('ContextToken', function() {
         generateSubsetId()
       ];
 
-      const tokenToSplit = new ContextToken(plainModel);
+      const tokenToSplit = new ContextToken(new LegacyQuotientRoot(plainModel));
       for(let i = 0; i < keystrokeDistributions.length; i++) {
         tokenToSplit.addInput({
           segment: {

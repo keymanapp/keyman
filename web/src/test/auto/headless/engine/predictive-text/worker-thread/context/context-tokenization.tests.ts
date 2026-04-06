@@ -39,7 +39,7 @@ var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
 
 function toToken(text: string) {
   let isWhitespace = text == ' ';
-  let token = new ContextToken(plainModel, text);
+  let token = ContextToken.fromRawText(plainModel, text);
   token.isWhitespace = isWhitespace;
   return token;
 }
@@ -48,7 +48,7 @@ let TOKEN_TRANSFORM_SEED = 0;
 function toTransformToken(text: string, transformId?: number) {
   let idSeed = transformId === undefined ? TOKEN_TRANSFORM_SEED++ : transformId;
   let isWhitespace = text == ' ';
-  let token = new ContextToken(plainModel);
+  let token = ContextToken.fromRawText(plainModel, '');
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
   token.addInput({
     segment: {

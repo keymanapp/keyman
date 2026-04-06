@@ -151,7 +151,7 @@ export class ContextState {
   private initFromReset() {
     const tokenizedContext = determineModelTokenizer(this.model)(this.context).left;
     const baseTokens = tokenizedContext.map((entry) => {
-      const token = new ContextToken(this.model, entry.text);
+      const token = ContextToken.fromRawText(this.model, entry.text);
 
       if(entry.isWhitespace) {
         token.isWhitespace = true;
@@ -162,7 +162,7 @@ export class ContextState {
 
     // And now build the final context state object, which includes whitespace 'tokens'.);
     if(baseTokens.length == 0) {
-      baseTokens.push(new ContextToken(this.model));
+      baseTokens.push(ContextToken.fromRawText(this.model, ''));
     }
     this.tokenization = new ContextTokenization(baseTokens);
     this.inputTransforms = new Map();
