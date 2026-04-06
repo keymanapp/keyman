@@ -41,7 +41,7 @@
             <item
                 android:id="@+id/nav_checkbox_set_default_keyboard"
                 android:icon="@drawable/ic_settings"
-                android:title="Set Keyman As default keyboard"
+                android:title="Set Keyman as default keyboard"
                 app:actionLayout="@layout/nav_checkbox_item" />
         </menu>
     </item>

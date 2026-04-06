@@ -14,18 +14,12 @@
   <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
 
   <!-- Context: Navigation drawer subtitles -->
-  <!-- <string name="drawer_subtitle_installed_languages" comment="Subtitle for Installed Languages drawer item">Manage your installed keyboards and dictionaries</string> -->
-  <!-- <string name="drawer_subtitle_install_keyboard" comment="Subtitle for Install Keyboard or Dictionary drawer item">Add from keyman.com, local file, or QR code</string> -->
-  <!-- <string name="drawer_subtitle_enable_system_keyboard" comment="Subtitle for Enable System Keyboard drawer item">Turn on Keyman in Android keyboard settings</string> -->
-  <!-- <string name="drawer_subtitle_set_default_keyboard" comment="Subtitle for Set Keyman As Default drawer item">Choose Keyman as your active keyboard</string> -->
-  <!-- <string name="drawer_subtitle_display_language" comment="Subtitle for Display Language drawer item">Change the app interface language</string> -->
-  <!-- <string name="drawer_subtitle_keyboard_height" comment="Subtitle for Adjust Keyboard Height drawer item">Resize keyboard for portrait and landscape</string> -->
-  <!-- <string name="drawer_subtitle_longpress_delay" comment="Subtitle for Adjust Longpress Delay drawer item">Set how long to hold for popup keys</string> -->
+
   <string name="drawer_subtitle_spacebar_caption" comment="Subtitle for Spacebar caption drawer item">Show keyboard name on spacebar</string>
   <string name="drawer_subtitle_show_osk" comment="Subtitle for Show On Screen Keyboard drawer item">When a physical keyboard is connected</string>
-  <!-- <string name="drawer_subtitle_haptic_feedback" comment="Subtitle for Haptic Feedback drawer item">Enable vibration while typing</string> -->
+
   <string name="drawer_subtitle_send_crash_report" comment="Subtitle for Send Crash Report drawer item">When on, crash reports will be sent</string>
-  <!-- <string name="drawer_subtitle_more_settings" comment="Subtitle for More Settings drawer item">Open additional settings</string> -->
+
   <string name="drawer_subtitle_about" comment="Subtitle for About drawer item">Learn how to use the keyboard</string>
   <string name="drawer_subtitle_about_current_keyboard" comment="Subtitle for current keyboard About drawer item">Help and QR code for the active keyboard</string>
   <string name="drawer_about_current_keyboard" comment="Title for current keyboard About drawer item">Current keyboard</string>
