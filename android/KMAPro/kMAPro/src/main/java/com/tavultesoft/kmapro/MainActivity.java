@@ -117,6 +117,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -227,8 +228,35 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     navView.requestLayout();
 
     constraintLayout = (ConstraintLayout)findViewById(R.id.constraintLayout);
-    setupEdgeToEdge(R.id.constraintLayout);
-    setupStatusBarColors(android.R.color.white, R.color.neutral_2);
+//    setupEdgeToEdge(R.id.constraintLayout);
+//    setupStatusBarColors(android.R.color.white, R.color.neutral_2);
+    // START OF FIXED STATUS BAR LOGIC
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      Window window = getWindow();
+      window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+      window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+      // Set the status bar color based on your dynamic color resource
+      window.setStatusBarColor(ContextCompat.getColor(this, R.color.toolbarColor));
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        int flags = window.getDecorView().getSystemUiVisibility();
+
+        // Check if the system is currently in Night Mode
+        boolean isDarkMode = (getResources().getConfiguration().uiMode &
+          Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+
+        if (!isDarkMode) {
+          // LIGHT MODE: Make icons BLACK so they show up on white
+          flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        } else {
+          // DARK MODE: Make icons WHITE (by removing the light flag)
+          flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        }
+        window.getDecorView().setSystemUiVisibility(flags);
+      }
+    }
+
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);

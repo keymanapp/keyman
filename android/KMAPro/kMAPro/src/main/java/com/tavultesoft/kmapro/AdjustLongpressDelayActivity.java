@@ -8,14 +8,17 @@ package com.tavultesoft.kmapro;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
@@ -59,7 +62,20 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     setContentView(R.layout.activity_adjust_longpress_delay);
 
     setupEdgeToEdge(R.id.adjust_longpress_layout);
-    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+//    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      Window window = getWindow();
+      window.setStatusBarColor(ContextCompat.getColor(this, R.color.keyman_blue));
+      boolean isDarkBackground = true;
+      int flags = window.getDecorView().getSystemUiVisibility();
+      if (isDarkBackground) {
+        flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      } else {
+        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      }
+      window.getDecorView().setSystemUiVisibility(flags);
+      WindowCompat.setDecorFitsSystemWindows(window, false);
+    }
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
