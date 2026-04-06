@@ -13,5 +13,6 @@
     <color name="toolbar">@color/ms_black</color>
 
     <color name="branded_logo_bg">@color/ms_black</color>
+    <color name="main_text_color">#FFFFFF</color>
 
 </resources>

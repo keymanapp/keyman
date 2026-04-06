@@ -20,6 +20,13 @@ import androidx.core.content.ContextCompat;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
+import android.view.Window;
+import android.view.View;
+import android.view.WindowManager;
+import android.os.Build;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
+
 
 /**
  * Settings menu for adjusting the keyboard height.
@@ -41,7 +48,20 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     setContentView(R.layout.activity_adjust_keyboard_height);
 
     setupEdgeToEdge(R.id.adjust_keyboard_layout);
-    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+//    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      Window window = getWindow();
+      window.setStatusBarColor(ContextCompat.getColor(this, R.color.keyman_blue));
+      boolean isDarkBackground = true;
+      int flags = window.getDecorView().getSystemUiVisibility();
+      if (isDarkBackground) {
+        flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      } else {
+        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      }
+      window.getDecorView().setSystemUiVisibility(flags);
+      WindowCompat.setDecorFitsSystemWindows(window, false);
+    }
 
     Toolbar toolbar = findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);

@@ -5,6 +5,6 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
     android:focusable="false"
-    android:clickable="true"
+    android:clickable="false"
     android:minWidth="48dp"
     android:minHeight="48dp" />

@@ -12,8 +12,6 @@
         <!-- colorPrimaryDark is used for the status bar -->
         <item name="colorPrimaryDark">@color/complementary_5</item>
 
-        <item name="android:statusBarColor">@android:color/white</item>
-
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textColorHint">@color/neutral_3</item>
         <item name="android:textColorPrimary">@android:color/black</item>
@@ -22,32 +20,59 @@
         <item name="popupMenuStyle">@style/AppTheme.PopupMenu</item>
 
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-<!--        <item name="android:windowBackground">@color/toolbarColor</item>-->
+
+        <item name="android:windowBackground">@android:color/white</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
 
+        <item name="android:statusBarColor">@color/toolbarColor</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
+
     </style>
 
     <style name="AppTheme.Dialog" parent="AppTheme.Light.Dialog" />
 
-    <style name="AppTheme.BrandedLaunch" parent="Theme.AppCompat.NoActionBar">
+<!--    <style name="AppTheme.BrandedLaunch" parent="Theme.AppCompat.NoActionBar">-->
+<!--        <item name="android:windowBackground">@drawable/branded_logo</item>-->
+<!--    </style>-->
+<!--    <style name="AppTheme.BrandedLaunch" parent="Theme.SplashScreen">-->
+<!--        <item name="android:windowBackground">@drawable/branded_logo</item>-->
+<!--    </style>-->
+    <style name="Theme.App.Starting" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.BrandedLaunchDark" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/branded_logo_dark_mode</item>
+    </style>
+
+    <style name="AppTheme.BrandedLaunchLight" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/branded_logo</item>
     </style>
 
-<!--    <style name="AppTheme.Toolbar" parent="Base.Widget.AppCompat.Toolbar">-->
-<!--        <item name="android:colorPrimary">@android:color/white</item>-->
-<!--        <item name="android:background">@android:color/white</item>-->
-<!--        <item name="android:textColorPrimary">@android:color/black</item>-->
-<!--        <item name="android:textColorSecondary">@android:color/black</item>-->
-<!--    </style>-->
+    <style name="AppTheme.Toolbar" parent="Base.Widget.AppCompat.Toolbar">
+        <item name="android:colorPrimary">@android:color/white</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="android:textColorSecondary">@android:color/black</item>
+        <item name="android:statusBarColor">@color/toolbarColor</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+    </style>
 
     <style name="AppTheme.PopupMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
-        <item name="android:popupBackground">@color/menuBgColor</item>
+        <item name="android:popupBackground">@color/menuBgColor</item></style>
+    <style name="NavigationDrawerItemText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:singleLine">false</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
 <!--    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">-->
