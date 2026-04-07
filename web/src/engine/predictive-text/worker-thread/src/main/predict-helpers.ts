@@ -752,9 +752,7 @@ export function dedupeSuggestions(
 
 /**
  * This function checks for any suggestions that directly match the actual
- * context in some manner and ranks suggestions accordingly.  Additionally, if
- * there is no such suggestion, a stand-in is generated and added to the list,
- * though marked as "not matching the model".
+ * context in some manner and ranks suggestions accordingly.
  *
  * The suggestion "ranks", from highest to lowest:
  * - the suggestion produces an exact match for the user's current text
