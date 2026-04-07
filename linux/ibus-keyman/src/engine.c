@@ -780,7 +780,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
     ibus_engine_forward_key_event(engine, current_item->keyval, current_item->keycode, current_item->state);
   }
   keyman->commit_item--;
-  memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * MAX_QUEUE_SIZE - 1);
+  memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * (MAX_QUEUE_SIZE - 1));
   initialize_queue_items(keyman, MAX_QUEUE_SIZE - 1, 1);
 }
 
