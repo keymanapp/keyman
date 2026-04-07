@@ -3,7 +3,7 @@
  *
  * Convert .keyman-touch-layout data into KMXPlus data for embedding into .kmx
  */
-import { TouchLayout, KMXPlus } from "@keymanapp/common-types";
+import { TouchLayout, KMXPlus, modifierStringToState, USVirtualKeyCodes } from "@keymanapp/common-types";
 import { CompilerCallbacks, TouchLayoutFileReader, specialKeyCaps } from "@keymanapp/developer-utils";
 import { KmnCompilerMessages } from "../kmn-compiler-messages.js";
 import { constants } from "@keymanapp/ldml-keyboard-constants";
@@ -11,6 +11,7 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 export class EmbedOskTouchLayoutInKmx {
 
   private keyIndex: number = 0;
+  private vkDictionary: string[] = [];
 
   constructor(private callbacks: CompilerCallbacks) {
   }
@@ -33,7 +34,7 @@ export class EmbedOskTouchLayoutInKmx {
     }
   }
 
-  public transformTouchLayoutToKmxPlus(kmx: KMXPlus.KMXPlusFile, touchLayout: TouchLayout.TouchLayoutFile): void {
+  public transformTouchLayoutToKmxPlus(kmx: KMXPlus.KMXPlusFile, touchLayout: TouchLayout.TouchLayoutFile, vkDictionary: string): void {
     // empty the keys into layer bags
     // build the layers
     // don't forget all the gestures
@@ -42,6 +43,7 @@ export class EmbedOskTouchLayoutInKmx {
     // transformTouchLayoutPlatform(kmx, tl, 'desktop', tl.desktop); // probably not needed
 
     this.keyIndex = 0;
+    this.vkDictionary = vkDictionary.split(/\s+/);
     kmx.kmxplus.disp.baseCharacter = kmx.kmxplus.strs.allocString('\u25cc');
     this.addPlatformFromTouchLayoutPlatform(kmx.kmxplus, 'tablet', touchLayout.tablet, 200); // anything larger than 200mm width
     this.addPlatformFromTouchLayoutPlatform(kmx.kmxplus, 'phone', touchLayout.phone, 1); // anything larger than 1mm width
@@ -71,43 +73,71 @@ export class EmbedOskTouchLayoutInKmx {
     kmxplus.layr.forms.push(newForm);
   }
 
-  private addLayerFromTouchLayoutLayer(kmxplus: KMXPlus.KMXPlusData, newForm: KMXPlus.LayrForm, platformName: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer): void {
+  private addLayerFromTouchLayoutLayer(kmxplus: KMXPlus.KMXPlusData, newForm: KMXPlus.LayrForm, platform: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer): void {
     const newEntry = new KMXPlus.LayrEntry();
     newEntry.id = kmxplus.strs.allocString(layer.id);
     newEntry.mod = 0;
     for(const row of layer.row) {
-      this.addRowFromTouchLayoutRow(kmxplus, newEntry, layer, row);
+      this.addRowFromTouchLayoutRow(kmxplus, newEntry, platform, layer, row);
     }
     newForm.layers.push(newEntry);
   }
 
-  private generateUniqueKeyId(id: string, layer: string) {
+  /**
+   * Generates a unique key identifier from the touch layout platform, layer and
+   * key id. The pattern returned is `platform~layer-id+modifier`; this pattern
+   * (without the platform~ prefix) matches the identifiers used in KeymanWeb
+   * and has been chosen for backward compatibility. These identifiers should be
+   * stable across versions of Keyman.
+   *
+   * If a key identifier is repeated, then a `~n` suffix will be appended, where
+   * `n` is an incrementing counter guaranteeing uniqueness.
+   *
+   * @param keys
+   * @param id        the KeymanWeb key id, K_, T_, or U_
+   * @param layer     the id of the layer in which the key is found
+   * @param keyModifier  an overriding modifier state (see modifierNames in
+   * developer/src/tike/xml/layoutbuilder/constants.js)
+   * @returns
+   */
+  private generateUniqueKeyId(keys: KMXPlus.Keys, platform: string, layer: string, id: string, keyModifier: string) {
+    // key id in KeymanWeb is `layer-id+override`
+    // we need to pass in this data so that rules can still be applied
+    // `+override` is the modifier for the key to be applied in the kmap -- not the layer
+    const baseId = platform + '~' + layer + '-' + id + (keyModifier !== '' ? '+'+keyModifier : '');
+
+    const key = keys.keys.find(item => item.id.value == baseId);
+    if(!key) {
+      return baseId;
+    }
+
     this.keyIndex++;
-    // TODO-EMBED-OSK-IN-KMX: report on uniqueness per form?
-    return layer + '-' + id + '+' + this.keyIndex;
+    const resolvedId = baseId + '~' + this.keyIndex;
+    this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutKeyIdUsedMoreThanOnceInALayer({id, layer, resolvedId}));
+    return resolvedId;
   }
 
-  private addRowFromTouchLayoutRow(kmxplus: KMXPlus.KMXPlusData, newEntry: KMXPlus.LayrEntry, layer: TouchLayout.TouchLayoutLayer, row: TouchLayout.TouchLayoutRow): void {
+  private addRowFromTouchLayoutRow(kmxplus: KMXPlus.KMXPlusData, newEntry: KMXPlus.LayrEntry, platform: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer, row: TouchLayout.TouchLayoutRow): void {
     const newRow = new KMXPlus.LayrRow();
 
     for(const key of row.key) {
-      this.addKeyFromTouchLayoutKey(kmxplus, newRow, layer, key);
+      this.addKeyFromTouchLayoutKey(kmxplus, newRow, platform, layer, key);
     }
 
     newEntry.rows.push(newRow);
   }
 
-  private addKeyFromTouchLayoutKey(kmxplus: KMXPlus.DependencySections, newRow: KMXPlus.LayrRow, layer: TouchLayout.TouchLayoutLayer, key: TouchLayout.TouchLayoutKey): void {
+  private addKeyFromTouchLayoutKey(kmxplus: KMXPlus.DependencySections, newRow: KMXPlus.LayrRow, platform: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer, key: TouchLayout.TouchLayoutKey): void {
     const newKey = new KMXPlus.KeysKeys();
 
-    newKey.id = kmxplus.strs.allocString(this.generateUniqueKeyId(key.id, key.layer ?? layer.id));
+    newKey.id = kmxplus.strs.allocString(this.generateUniqueKeyId(kmxplus.keys, platform, layer.id, key.id, key.layer ?? ''));
     newKey.to = this.getKeyCap(kmxplus, newKey.id.value, key.id, key.text);
     newKey.flags = newKey.to.isOneChar ? 0 : KMXPlus.KeysKeysFlags.extend;
 
     if(key.flick) {
       const newFlicks = new KMXPlus.KeysFlicks(newKey.id);
       for(const direction of Object.keys(key.flick) as (keyof TouchLayout.TouchLayoutFlick)[]) {
-        this.addFlickFromTouchLayoutFlick(kmxplus, newFlicks, direction, layer, key.flick[direction]);
+        this.addFlickFromTouchLayoutFlick(kmxplus, newFlicks, direction, platform, layer, key.flick[direction]);
       }
       kmxplus.keys.flicks.push(newFlicks);
       newKey.flicks = newFlicks.id.value;
@@ -116,7 +146,7 @@ export class EmbedOskTouchLayoutInKmx {
     }
 
     if(key.sk && key.sk.length) {
-      const { listItem, defaultId } = this.addKeysFromSubKeys(kmxplus, layer, key.sk);
+      const { listItem, defaultId } = this.addKeysFromSubKeys(kmxplus, platform, layer, key.sk);
       newKey.longPress = listItem;
       newKey.longPressDefault = defaultId;
     } else {
@@ -125,7 +155,7 @@ export class EmbedOskTouchLayoutInKmx {
     }
 
     if(key.multitap && key.multitap.length) {
-      const { listItem } = this.addKeysFromSubKeys(kmxplus, layer, key.multitap);
+      const { listItem } = this.addKeysFromSubKeys(kmxplus, platform, layer, key.multitap);
       newKey.multiTap = listItem;
     } else {
       newKey.multiTap = null;
@@ -152,13 +182,74 @@ export class EmbedOskTouchLayoutInKmx {
 
     kmxplus.keys.keys.push(newKey);
     newRow.keys.push(newKey.id);
+
+    this.addKmap(kmxplus, newKey, layer.id, key.id, key.layer, key.text);
   }
 
-  private addKeysFromSubKeys(kmxplus: KMXPlus.DependencySections, layer: TouchLayout.TouchLayoutLayer, subKeys: TouchLayout.TouchLayoutSubKey[]) {
+  private addKmap(kmxplus: KMXPlus.DependencySections, newKey: KMXPlus.KeysKeys, layerId: string, keyId: string, keyModifier: string, keyText: string) {
+    const newKmap = new KMXPlus.KeysKmap();
+    newKmap.key = newKey.id.value;
+    newKmap.mod = modifierStringToState(keyModifier ?? layerId);
+    newKmap.vkey = this.keyCodeToVkey(layerId, keyId, keyText);
+    kmxplus.keys.kmap.push(newKmap);
+  }
+
+  private keyCodeToVkey(layerId: string, id: string, text: string) {
+    id = id.toUpperCase();
+
+    // K_ --> always look up from standard map, give warning if not found, return 0
+    if(id.startsWith('K_')) {
+      const result: number = (<any>USVirtualKeyCodes)[id];
+      if(typeof result !== 'number') {
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutInvalidKeyId({layerId, id}));
+        return 0;
+      }
+      if(result > 255) {
+        // TODO-EMBED-OSK-IN-KMX: Do we need to do something with this? These are keys like K_LOPT,
+        // and also what about K_ENTER, etc?
+        return 0;
+      }
+
+      return result;
+    }
+
+    // T_ --> look up from VKDictionary, give warning if not found, return 0
+    if(id.startsWith('T_')) {
+      const index = this.vkDictionary.findIndex(key => key.toUpperCase() === id);
+      if(index < 0) {
+        if(text != '') {
+          // Only warn if the key cap isn't blank
+          this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutCustomKeyNotDefined({keyId: id, platformName: 'TODO-EMBED-OSK-IN-KMX', layerId, address: {keyIndex:0, rowIndex:0}}));
+        }
+        return 0;
+      }
+
+      return index + 256;
+    }
+
+    // U_ --> look up from VKDictionary, return 0 if not found, will map at runtime (no warning)
+    if(id.startsWith('U_')) {
+      const index = this.vkDictionary.findIndex(key => key.toUpperCase() === id);
+      if(index < 0) {
+        // will be mapped at runtime
+        return 0;
+      }
+
+      return index + 256;
+    }
+
+    // TODO-EMBED-OSK-IN-KMX: warn on blank ids, missing required keys, error on missing layers
+
+    // invalid ID, give warning, return 0
+    this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutUnidentifiedKey({layerId, address:{keyIndex:0,rowIndex:0}})); // TODO-EMBED-OSK-IN-KMX: proper address
+    return 0;
+  }
+
+  private addKeysFromSubKeys(kmxplus: KMXPlus.DependencySections, platform: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer, subKeys: TouchLayout.TouchLayoutSubKey[]) {
     let defaultId: KMXPlus.StrsItem = null;
     const ids: string[] = [];
     for(const subKey of subKeys) {
-      const newKey = this.keyFromSubKey(kmxplus, layer, subKey);
+      const newKey = this.keyFromSubKey(kmxplus, platform, layer, subKey);
       kmxplus.keys.keys.push(newKey);
       if(subKey.default) {
         defaultId = newKey.id;
@@ -174,20 +265,20 @@ export class EmbedOskTouchLayoutInKmx {
     return { listItem, defaultId };
   }
 
-  private addFlickFromTouchLayoutFlick(kmxplus: KMXPlus.DependencySections, flicks: KMXPlus.KeysFlicks, direction: string, layer: TouchLayout.TouchLayoutLayer, subKey: TouchLayout.TouchLayoutSubKey): void {
+  private addFlickFromTouchLayoutFlick(kmxplus: KMXPlus.DependencySections, flicks: KMXPlus.KeysFlicks, direction: string, platform: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer, subKey: TouchLayout.TouchLayoutSubKey): void {
     const newFlick = new KMXPlus.KeysFlick();
     newFlick.directions = kmxplus.list.allocList([direction], {}, kmxplus);
 
-    const newKey = this.keyFromSubKey(kmxplus, layer, subKey);
+    const newKey = this.keyFromSubKey(kmxplus, platform, layer, subKey);
     kmxplus.keys.keys.push(newKey);
 
     newFlick.keyId = newKey.id;
     flicks.flicks.push(newFlick);
   }
 
-  private keyFromSubKey(kmxplus: KMXPlus.DependencySections, layer: TouchLayout.TouchLayoutLayer, subKey: TouchLayout.TouchLayoutSubKey) {
+  private keyFromSubKey(kmxplus: KMXPlus.DependencySections, platform: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer, subKey: TouchLayout.TouchLayoutSubKey) {
     const newKey = new KMXPlus.KeysKeys();
-    newKey.id = kmxplus.strs.allocString(this.generateUniqueKeyId(subKey.id, subKey.layer ?? layer.id));
+    newKey.id = kmxplus.strs.allocString(this.generateUniqueKeyId(kmxplus.keys, platform, layer.id, subKey.id, subKey.layer ?? ''));
     newKey.flicks = null;
     newKey.longPress = null;
     newKey.longPressDefault = kmxplus.strs.allocString('');
@@ -196,6 +287,9 @@ export class EmbedOskTouchLayoutInKmx {
     newKey.to = this.getKeyCap(kmxplus, newKey.id.value, subKey.id, subKey.text);
     newKey.flags = newKey.to.isOneChar ? 0 : KMXPlus.KeysKeysFlags.extend;
     newKey.width = 100;
+
+    this.addKmap(kmxplus, newKey, layer.id, subKey.id, subKey.layer, subKey.text);
+
     return newKey;
   }
 

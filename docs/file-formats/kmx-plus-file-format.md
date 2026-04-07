@@ -472,8 +472,9 @@ Elements are ordered by the `flicks.keyId`, and secondarily by the directions li
 
 #### `key2.kmap` key map subtable
 
-This table (formerly the `keys` section)
-The keys are sorted in ascending order based on the `vkey`, `mod` fields.
+This table (formerly the `keys` section) The keys are sorted in ascending order
+based on the `vkey`, `mod` fields. Note that there may be multiple `keys`
+that resolve to a single `vkey`+`mod` pair.
 
 For each key:
 

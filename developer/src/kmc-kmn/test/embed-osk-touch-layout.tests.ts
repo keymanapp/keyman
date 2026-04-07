@@ -4,7 +4,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { KMXPlus, LdmlKeyboardTypes, TouchLayout } from '@keymanapp/common-types';
+import { KMXPlus, LdmlKeyboardTypes, TouchLayout, USVirtualKeyCodes } from '@keymanapp/common-types';
 import { EmbedOskTouchLayoutInKmx } from '../src/compiler/embed-osk/embed-osk-touch-layout.js';
 import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
@@ -76,7 +76,7 @@ describe('Compiler OSK Embedding', function() {
     describe('EmbedOskTouchLayoutInKmx.keyFromTouchLayoutKey', function() {
       it('should convert a touch layout key into a KMX+ key', async function() {
         const kmxRow = new KMXPlus.LayrRow();
-        embedder.unitTestEndpoints.addKeyFromTouchLayoutKey(kmxplus, kmxRow, { id: 'default', row: [] }, Q_KEY);
+        embedder.unitTestEndpoints.addKeyFromTouchLayoutKey(kmxplus, kmxRow, 'phone', { id: 'default', row: [] }, Q_KEY);
         assert.lengthOf(callbacks.messages, 0);
 
         // --- kmxplus ---
@@ -99,11 +99,11 @@ describe('Compiler OSK Embedding', function() {
 
         assert.lengthOf(kmxplus.strs.strings, 8);
         assert.equal(kmxplus.strs.strings[0].value, '');                  // null string, always defined
-        assert.equal(kmxplus.strs.strings[1].value, 'default-K_Q+1');     // id of Q key
+        assert.equal(kmxplus.strs.strings[1].value, 'phone~default-K_Q');       // id of Q key
         assert.equal(kmxplus.strs.strings[2].value, 's');                 // south-flick direction
-        assert.equal(kmxplus.strs.strings[3].value, 'default-K_1+2') ;    // flick id
-        assert.equal(kmxplus.strs.strings[4].value, 'default-K_ENTER+3'); // longpress id
-        assert.equal(kmxplus.strs.strings[5].value, 'default-U_1235+4');  // multitap id
+        assert.equal(kmxplus.strs.strings[3].value, 'phone~default-K_1') ;      // flick id
+        assert.equal(kmxplus.strs.strings[4].value, 'phone~default-K_ENTER');   // longpress id
+        assert.equal(kmxplus.strs.strings[5].value, 'phone~default-U_1235');    // multitap id
         assert.equal(kmxplus.strs.strings[6].value, 'shift');             // nextlayer on Q key
         assert.equal(kmxplus.strs.strings[7].value, '1');                 // hint on Q key
 
@@ -147,7 +147,7 @@ describe('Compiler OSK Embedding', function() {
           },
           { // K_Q
             flags: 0,
-            flicks: "default-K_Q+1",
+            flicks: "phone~default-K_Q",
             id: kmxplus.strs.strings[1],
             longPress: kmxplus.list.lists[2],
             longPressDefault: kmxplus.strs.strings[4],
@@ -168,10 +168,17 @@ describe('Compiler OSK Embedding', function() {
         assert.lengthOf(kmxplus.keys.flicks[1].flicks, 1);
         assert.equal(kmxplus.keys.flicks[1].id, kmxplus.strs.strings[1]);
         assert.equal(kmxplus.keys.flicks[1].flicks[0].directions, kmxplus.list.lists[1]);
-        assert.equal(kmxplus.keys.flicks[1].flicks[0].keyId, kmxplus.strs.strings[3]); // default-K_1+2
+        assert.equal(kmxplus.keys.flicks[1].flicks[0].keyId, kmxplus.strs.strings[3]); // default-K_1
 
+        // kmap
         assert.isArray(kmxplus.keys.kmap);
-        assert.isEmpty(kmxplus.keys.kmap);
+        assert.lengthOf(kmxplus.keys.kmap, 4);
+        assert.deepEqual(kmxplus.keys.kmap, [
+          {key: "phone~default-K_1", mod: 0, vkey: USVirtualKeyCodes.K_1 },
+          {key: "phone~default-K_ENTER", mod: 0, vkey: USVirtualKeyCodes.K_ENTER },
+          {key: "phone~default-U_1235", mod: 0, vkey: 0 },
+          {key: "phone~default-K_Q", mod: 0, vkey: USVirtualKeyCodes.K_Q },
+        ]);
 
         // --- kmxplus.disp ---
 
@@ -235,7 +242,7 @@ describe('Compiler OSK Embedding', function() {
       it('should build a row of keys', async function() {
         const entry = new KMXPlus.LayrEntry();
         const row = { id: 1, key: [ Q_KEY ] };
-        embedder.unitTestEndpoints.addRowFromTouchLayoutRow(kmxplus, entry, { id: 'default', row: [] }, row);
+        embedder.unitTestEndpoints.addRowFromTouchLayoutRow(kmxplus, entry,  'phone', { id: 'default', row: [] }, row);
 
         assert.lengthOf(callbacks.messages, 0);
         assert.lengthOf(entry.rows, 1);
@@ -300,7 +307,9 @@ describe('Compiler OSK Embedding', function() {
           }
         };
 
-        embedder.transformTouchLayoutToKmxPlus(kmxfile, touchLayout);
+        const vkDictionary = '';
+
+        embedder.transformTouchLayoutToKmxPlus(kmxfile, touchLayout, vkDictionary);
         assert.lengthOf(callbacks.messages, 0);
         assert.lengthOf(kmxplus.layr.forms, 1);
 
@@ -310,11 +319,11 @@ describe('Compiler OSK Embedding', function() {
         assert.equal(kmxplus.strs.strings[2].value, 'en-us');
         assert.equal(kmxplus.strs.strings[3].value, 'touch');
         assert.equal(kmxplus.strs.strings[4].value, 'default');
-        assert.equal(kmxplus.strs.strings[5].value, 'default-K_Q+1');
+        assert.equal(kmxplus.strs.strings[5].value, 'phone~default-K_Q');
         assert.equal(kmxplus.strs.strings[6].value, 's');
-        assert.equal(kmxplus.strs.strings[7].value, 'default-K_1+2');
-        assert.equal(kmxplus.strs.strings[8].value, 'default-K_ENTER+3');
-        assert.equal(kmxplus.strs.strings[9].value, 'default-U_1235+4');
+        assert.equal(kmxplus.strs.strings[7].value, 'phone~default-K_1');
+        assert.equal(kmxplus.strs.strings[8].value, 'phone~default-K_ENTER');
+        assert.equal(kmxplus.strs.strings[9].value, 'phone~default-U_1235');
         assert.equal(kmxplus.strs.strings[10].value, 'shift');
         assert.equal(kmxplus.strs.strings[11].value, '1');
 
