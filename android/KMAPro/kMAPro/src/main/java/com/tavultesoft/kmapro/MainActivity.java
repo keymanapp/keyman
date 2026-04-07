@@ -305,13 +305,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           drawerLayout.closeDrawers();
           startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
         } else if (id == R.id.nav_checkbox_set_default_keyboard) {
-          drawerLayout.closeDrawers();
-          InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-          if (imManager != null) {
-            imManager.showInputMethodPicker();
-          }
+          showSettingsAndOpenDefaultKeyboardPicker();
 
-        } else if (id == R.id.nav_installed_languages) {
+        }
+       else if (item.getItemId() == R.id.action_settings) {
+        showSettings();
+        return true;}
+       else if (id == R.id.nav_installed_languages) {
           drawerLayout.closeDrawers();
           Intent intent = new Intent(context, LanguagesSettingsActivity.class);
           intent.putExtra(KMManager.KMKey_DisplayKeyboardSwitcher, false);
@@ -1426,30 +1426,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void initializeDrawerItemSubtitles(NavigationView navigationView) {
-//    setDrawerItemSubtitle(navigationView, R.id.nav_installed_languages,
-//      getString(R.string.drawer_subtitle_installed_languages));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_install_keyboard,
-//      getString(R.string.drawer_subtitle_install_keyboard));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_checkbox_enable_system_keyboard,
-//      getString(R.string.drawer_subtitle_enable_system_keyboard));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_checkbox_set_default_keyboard,
-//      getString(R.string.drawer_subtitle_set_default_keyboard));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_display_language,
-//      getString(R.string.drawer_subtitle_display_language));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_keyboard_height,
-//      getString(R.string.drawer_subtitle_keyboard_height));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_longpress_delay,
-//      getString(R.string.drawer_subtitle_longpress_delay));
+
     setDrawerItemSubtitle(navigationView, R.id.nav_spacebar_caption,
       getString(R.string.drawer_subtitle_spacebar_caption));
     setDrawerItemSubtitle(navigationView, R.id.nav_toggle_show_osk,
       getString(R.string.drawer_subtitle_show_osk));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_toggle_haptic_feedback,
-//      getString(R.string.drawer_subtitle_haptic_feedback));
     setDrawerItemSubtitle(navigationView, R.id.nav_toggle_send_crash_report,
       getString(R.string.drawer_subtitle_send_crash_report));
-//    setDrawerItemSubtitle(navigationView, R.id.nav_settings,
-//      getString(R.string.drawer_subtitle_more_settings));
     setDrawerItemSubtitle(navigationView, R.id.nav_help,
       getString(R.string.drawer_subtitle_about));
     setDrawerItemSubtitle(navigationView, R.id.nav_about_current_keyboard,
@@ -1566,18 +1549,21 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         public void run() {
           startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
         }
-      });
+      }, true);
 
     bindDrawerCheckboxAction(navigationView, R.id.nav_checkbox_set_default_keyboard,
       new Runnable() {
         @Override
         public void run() {
-          InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-          if (imManager != null) {
-            imManager.showInputMethodPicker();
-          }
+          showSettingsAndOpenDefaultKeyboardPicker();
         }
-      });
+      }, true);
+  }
+
+  private void showSettingsAndOpenDefaultKeyboardPicker() {
+    Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
+    settingsIntent.putExtra(KeymanSettingsActivity.openDefaultKeyboardPickerKey, true);
+    startActivity(settingsIntent);
   }
 
   private void refreshDrawerSystemKeyboardCheckboxes(NavigationView navigationView) {
@@ -1642,7 +1628,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
   }
 
-  private void bindDrawerCheckboxAction(NavigationView navigationView, int menuItemId, final Runnable onActivate) {
+  private void bindDrawerCheckboxAction(NavigationView navigationView, int menuItemId,
+                                        final Runnable onActivate, final boolean closeDrawerAfterAction) {
     MenuItem menuItem = navigationView.getMenu().findItem(menuItemId);
     if (menuItem == null) {
       return;
@@ -1666,8 +1653,20 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return;
     }
 
-    checkBox.setOnClickListener(v -> onActivate.run());
-    actionView.setOnClickListener(v -> onActivate.run());
+    checkBox.setOnClickListener(v -> runDrawerCheckboxAction(onActivate, closeDrawerAfterAction));
+    actionView.setOnClickListener(v -> runDrawerCheckboxAction(onActivate, closeDrawerAfterAction));
+  }
+
+  private void runDrawerCheckboxAction(final Runnable onActivate, boolean closeDrawerAfterAction) {
+    if (onActivate == null) {
+      return;
+    }
+
+    onActivate.run();
+
+    if (closeDrawerAfterAction && drawerLayout != null) {
+      drawerLayout.closeDrawers();
+    }
   }
 
   private void setDrawerCheckboxState(NavigationView navigationView, int menuItemId, boolean isChecked) {

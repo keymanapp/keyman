@@ -22,6 +22,11 @@
                 android:title="Current keyboard"
                 app:actionLayout="@layout/nav_right_icon_item"
                 />
+                        <!-- <item
+                            android:id="@+id/action_settings"
+                            android:title="@string/action_settings"
+                            app:showAsAction="always"
+                            android:icon="@drawable/ic_settings" /> -->
             <item
                 android:id="@+id/nav_installed_languages"
                 android:icon="@drawable/ic_folder_open"
