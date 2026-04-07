@@ -1,7 +1,6 @@
 package com.tavultesoft.kmapro;
 
 import android.os.Bundle;
-import android.view.inputmethod.InputMethodManager;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
@@ -15,10 +14,8 @@ public class KeymanSettingsActivity extends BaseActivity {
   public static final String spacebarTextKey = "SpacebarText";
   public static final String hapticFeedbackKey = "HapticFeedback";
   public static final String oskWithPhysicalKeyboardKey = "ShowOSK";
-  public static final String openDefaultKeyboardPickerKey = "OpenDefaultKeyboardPicker";
 
   protected KeymanSettingsFragment innerFragment;
-  private boolean openDefaultKeyboardPickerPending = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +46,6 @@ public class KeymanSettingsActivity extends BaseActivity {
 
     // For Keyman sites, disable keyboard picker task flag so keyboard picker doesn't dismiss Keyman app
     KMManager.dontCloseParentAppOnShowKeyboardPicker();
-
-    openDefaultKeyboardPickerPending = getIntent().getBooleanExtra(openDefaultKeyboardPickerKey, false);
   }
 
   @Override
@@ -59,14 +54,6 @@ public class KeymanSettingsActivity extends BaseActivity {
 
     if(hasFocus) {
       innerFragment.update();
-
-      if (openDefaultKeyboardPickerPending) {
-        openDefaultKeyboardPickerPending = false;
-        InputMethodManager imManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        if (imManager != null) {
-          getWindow().getDecorView().post(imManager::showInputMethodPicker);
-        }
-      }
     }
   }
 }

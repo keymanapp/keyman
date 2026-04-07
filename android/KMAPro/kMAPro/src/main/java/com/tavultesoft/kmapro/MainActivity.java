@@ -305,7 +305,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           drawerLayout.closeDrawers();
           startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
         } else if (id == R.id.nav_checkbox_set_default_keyboard) {
-          showSettingsAndOpenDefaultKeyboardPicker();
+          showDefaultKeyboardPickerFromMainPage();
 
         }
        else if (item.getItemId() == R.id.action_settings) {
@@ -1544,26 +1544,21 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void initializeDrawerCheckboxOptions(NavigationView navigationView) {
     bindDrawerCheckboxAction(navigationView, R.id.nav_checkbox_enable_system_keyboard,
-      new Runnable() {
-        @Override
-        public void run() {
-          startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+      () -> {
+        if (drawerLayout != null) {
+          drawerLayout.closeDrawers();
         }
-      }, true);
+        startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+      });
 
     bindDrawerCheckboxAction(navigationView, R.id.nav_checkbox_set_default_keyboard,
-      new Runnable() {
-        @Override
-        public void run() {
-          showSettingsAndOpenDefaultKeyboardPicker();
-        }
-      }, true);
+      this::showDefaultKeyboardPickerFromMainPage);
   }
 
-  private void showSettingsAndOpenDefaultKeyboardPicker() {
-    Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
-    settingsIntent.putExtra(KeymanSettingsActivity.openDefaultKeyboardPickerKey, true);
-    startActivity(settingsIntent);
+  private void showDefaultKeyboardPickerFromMainPage() {
+    Intent pickerIntent = new Intent(this, GetStartedActivity.class);
+    pickerIntent.putExtra(GetStartedActivity.openDefaultKeyboardPickerOnlyKey, true);
+    startActivity(pickerIntent);
   }
 
   private void refreshDrawerSystemKeyboardCheckboxes(NavigationView navigationView) {
@@ -1629,7 +1624,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void bindDrawerCheckboxAction(NavigationView navigationView, int menuItemId,
-                                        final Runnable onActivate, final boolean closeDrawerAfterAction) {
+                                        final Runnable onActivate) {
     MenuItem menuItem = navigationView.getMenu().findItem(menuItemId);
     if (menuItem == null) {
       return;
@@ -1653,20 +1648,18 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return;
     }
 
-    checkBox.setOnClickListener(v -> runDrawerCheckboxAction(onActivate, closeDrawerAfterAction));
-    actionView.setOnClickListener(v -> runDrawerCheckboxAction(onActivate, closeDrawerAfterAction));
-  }
-
-  private void runDrawerCheckboxAction(final Runnable onActivate, boolean closeDrawerAfterAction) {
-    if (onActivate == null) {
-      return;
-    }
-
-    onActivate.run();
-
-    if (closeDrawerAfterAction && drawerLayout != null) {
-      drawerLayout.closeDrawers();
-    }
+    checkBox.setClickable(true);
+    checkBox.setFocusable(false);
+    checkBox.setOnClickListener(v -> {
+      if (onActivate != null) {
+        onActivate.run();
+      }
+    });
+    actionView.setOnClickListener(v -> {
+      if (onActivate != null) {
+        onActivate.run();
+      }
+    });
   }
 
   private void setDrawerCheckboxState(NavigationView navigationView, int menuItemId, boolean isChecked) {

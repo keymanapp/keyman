@@ -36,14 +36,25 @@ public class GetStartedActivity extends BaseActivity {
   private static ArrayList<HashMap<String, String>> list = null;
   private static KMListAdapter listAdapter = null;
   protected static final String showGetStartedKey = "ShowGetStarted";
+  public static final String openDefaultKeyboardPickerOnlyKey = "OpenDefaultKeyboardPickerOnly";
   private final String iconKey = "icon";
   private final String textKey = "text";
   private final String isEnabledKey = "isEnabled";
+  private boolean openDefaultKeyboardPickerOnly = false;
+  private boolean didAutoOpenDefaultKeyboardPicker = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+    openDefaultKeyboardPickerOnly = getIntent().getBooleanExtra(openDefaultKeyboardPickerOnlyKey, false);
+
+    if (openDefaultKeyboardPickerOnly) {
+      // Picker-only mode: intentionally skip rendering Get Started UI.
+      KMManager.dontCloseParentAppOnShowKeyboardPicker();
+      return;
+    }
+
     final Context context = this;
     setContentView(R.layout.get_started_list_layout);
 
@@ -162,14 +173,23 @@ public class GetStartedActivity extends BaseActivity {
   }
 
   @Override
-  protected void onPause() {
-    super.onPause();
-  }
-
-  @Override
   public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
+      if (openDefaultKeyboardPickerOnly) {
+        if (!didAutoOpenDefaultKeyboardPicker) {
+          didAutoOpenDefaultKeyboardPicker = true;
+          InputMethodManager imManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+          if (imManager != null) {
+            imManager.showInputMethodPicker();
+          }
+        } else {
+          // Focus returned after the picker was dismissed, so close the host activity.
+          finish();
+        }
+        return;
+      }
+
       // Enumerated steps are replaced with checkboxes when the user completes a step
       String one = String.valueOf(R.drawable.ic_looks_one);
       String two = String.valueOf(R.drawable.ic_looks_two);
@@ -207,6 +227,14 @@ public class GetStartedActivity extends BaseActivity {
       listView.setAdapter(listAdapter);
 
       uncheckGetStartedIfComplete();
+    }
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    if (openDefaultKeyboardPickerOnly && didAutoOpenDefaultKeyboardPicker) {
+      finish();
     }
   }
 }
