@@ -189,3 +189,42 @@ export function visualKeyboardShiftToLayerName(shift: VisualKeyboardShiftState):
   }
   return result.substring(0, result.length - 1);
 }
+
+/**
+ * Get modifier key state from a hyphen-separated modifier string, such as
+ * found in layer ids or key "layer" properties. Ignores unrecognized
+ * components. Order of components is not significant.
+ *
+ * @param   modifierString     a modifier string such as 'ctrl-shift'
+ * @return  Keyman modifier state bitmask
+ */
+export function modifierStringToState(modifierString: string): ModifierKeyConstant {
+  const map = new Map<string,ModifierKeyConstant>([
+    ['shift',     ModifierKeyConstant.K_SHIFTFLAG],
+    ['leftctrl',  ModifierKeyConstant.LCTRLFLAG],
+    ['rightctrl', ModifierKeyConstant.RCTRLFLAG],
+    ['ctrl',      ModifierKeyConstant.K_CTRLFLAG],
+    ['leftalt',   ModifierKeyConstant.LALTFLAG],
+    ['rightalt',  ModifierKeyConstant.RALTFLAG],
+    ['alt',       ModifierKeyConstant.K_ALTFLAG],
+    ['caps',      ModifierKeyConstant.CAPITALFLAG],
+    // legacy mappings: these were deprecated when we introduced chiral
+    // modifiers in KeymanWeb in ~v14.0; typically these would have been used
+    // without other components, but for the purposes of this function, we can
+    // treat them as components without harm
+    ['altshift',     ModifierKeyConstant.K_ALTFLAG | ModifierKeyConstant.K_SHIFTFLAG],
+    ['ctrlalt',      ModifierKeyConstant.K_CTRLFLAG | ModifierKeyConstant.K_ALTFLAG],
+    ['ctrlaltshift', ModifierKeyConstant.K_CTRLFLAG | ModifierKeyConstant.K_ALTFLAG | ModifierKeyConstant.K_SHIFTFLAG],
+    ['ctrlshift',    ModifierKeyConstant.K_CTRLFLAG | ModifierKeyConstant.K_SHIFTFLAG],
+  ]);
+
+  let modifier = 0;
+  const components = modifierString.split('-');
+  for(const component of components) {
+    if(map.has(component)) {
+      modifier |= map.get(component);
+    }
+  }
+
+  return modifier;
+}
