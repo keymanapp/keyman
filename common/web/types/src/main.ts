@@ -20,6 +20,7 @@ export {
   ModifierKeyConstant, ModifierKeyConstants, LDML_MODIFIER_TO_KVK_MODIFIER, KVK_MODIFIER_TO_LDML_MODIFIER,
   translateLdmlModifiersToVisualKeyboardShift, translateVisualKeyboardShiftToLdmlModifiers,
   visualKeyboardShiftToLayerName,
+  modifierStringToState,
 } from './consts/modifier-key-constants.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
