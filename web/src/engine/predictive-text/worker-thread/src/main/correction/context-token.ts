@@ -88,9 +88,8 @@ export class ContextToken {
       this._searchModule = priorToken.searchModule;
     } else {
       this._searchModule = param;
+      this.isPartial = !!isPartial;
     }
-
-    this.isPartial = !!isPartial;
   }
 
   /**
