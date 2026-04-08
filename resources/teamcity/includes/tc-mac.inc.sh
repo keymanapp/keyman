@@ -12,9 +12,13 @@ ba_mac_unlock_keychain() {
 }
 
 ba_mac_clean_xcode_derived_data() {
-  builder_echo start "clean" "Cleaning XCode DerivedData mess"
+  builder_echo start "clean" "Cleaning XCode DerivedData and Carthage cache mess"
   rm -rf "${HOME}/Library/Developer/Xcode/DerivedData"
-  builder_echo end "clean" success "Finished cleaning XCode DerivedData mess"
+
+  # https://stackoverflow.com/a/45504898/1836776
+  rm -rf "${HOME}/Library/Caches/org.carthage.CarthageKit"
+
+  builder_echo end "clean" success "Finished cleaning XCode DerivedData and Carthage cache mess"
 }
 
 ba_mac_unmount_volumes_keyman() {
