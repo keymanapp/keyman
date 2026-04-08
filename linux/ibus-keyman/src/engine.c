@@ -643,9 +643,13 @@ static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
     keyman->is_dirty = FALSE;
 }
 
-// Wayland uses double-buffering for surrounding text and some other
-// functionality, so we have to commit to apply the changes.
-// See https://wayland.app/protocols/input-method-unstable-v2
+/**
+ * Commit an empty string to flush the surrounding text buffer.
+ * 
+ * Wayland uses double-buffering for surrounding text and some other
+ * functionality, so we have to commit to apply the changes.
+ * See https://wayland.app/protocols/input-method-unstable-v2
+ */
 static void
 apply_changes(IBusKeymanEngine* keyman) {
   IBusText* text;
