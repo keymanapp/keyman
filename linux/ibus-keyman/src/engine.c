@@ -86,6 +86,9 @@ struct _IBusKeymanEngine {
   IBusProperty    *status_prop;
   IBusPropList    *prop_list;
   void            *settings;
+  // Flag indicating if there are pending changes (forwarded keystrokes,
+  // deleted surrounding text) that need to be applied by committing an
+  //empty text to the input engine
   gboolean         is_dirty;
 
   commit_queue_item commit_queue[MAX_QUEUE_SIZE];
@@ -645,7 +648,7 @@ static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
 
 /**
  * Commit an empty string to flush the surrounding text buffer.
- * 
+ *
  * Wayland uses double-buffering for surrounding text and some other
  * functionality, so we have to commit to apply the changes.
  * See https://wayland.app/protocols/input-method-unstable-v2
