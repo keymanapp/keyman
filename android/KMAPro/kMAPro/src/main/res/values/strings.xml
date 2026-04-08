@@ -16,7 +16,7 @@
   <!-- Context: Navigation drawer subtitles -->
 
   <string name="drawer_subtitle_spacebar_caption" comment="Subtitle for Spacebar caption drawer item">Show keyboard name on spacebar</string>
-  <string name="drawer_subtitle_show_osk" comment="Subtitle for Show On Screen Keyboard drawer item">When a physical keyboard is connected</string>
+  <string name="drawer_subtitle_show_osk" comment="Subtitle for Show On Screen Keyboard drawer item">When physical keyboard connected</string>
 
   <string name="drawer_subtitle_send_crash_report" comment="Subtitle for Send Crash Report drawer item">When on, crash reports will be sent</string>
 
