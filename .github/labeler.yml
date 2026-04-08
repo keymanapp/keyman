@@ -5,86 +5,173 @@
 # common ones. The others are commented out. There is still some variance between
 # folder names and labels; consider this documentation of that ;-)
 
-docs: docs/**
+docs:
+- changed-files:
+  - any-glob-to-any-file: 'docs/**'
 
 #
 # Add labels based on changed files using actions/labeler
 #
 
 android/:
-  - android/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/android/**
-android/app/: android/KMAPro/**
-android/engine/: android/KMEA/**
-android/samples/: android/Samples/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - android/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/android/**
+android/app/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - android/KMAPro/**
+android/engine/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - android/KMEA/**
+android/samples/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - android/Samples/**
 
 common/:
-  - common/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/common/**
-common/web/: common/web/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - common/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/common/**
+common/web/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - common/web/**
 
 core/:
-  - core/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/core/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - core/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/core/**
 
 developer/:
-  - developer/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/developer/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - developer/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/developer/**
 developer/compilers/:
-  - developer/src/kmc/**
-  - developer/src/kmcmplib/**
-  - developer/src/kmc-*/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - developer/src/kmc/**
+      - developer/src/kmcmplib/**
+      - developer/src/kmc-*/**
 developer/ide/:
-  - developer/src/server/**
-  - developer/src/tike/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - developer/src/server/**
+      - developer/src/tike/**
 
 ios/:
-  - ios/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/ios/**
-ios/app/: ios/keyman/**
-ios/engine/: ios/engine/**
-ios/samples/: ios/samples/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - ios/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/ios/**
+ios/app/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - ios/keyman/**
+ios/engine/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - ios/engine/**
+ios/samples/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - ios/samples/**
 
 linux/:
-  - linux/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/linux/**
-linux/config/: linux/keyman-config/**
-linux/engine/: linux/ibus-keyman/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - linux/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/linux/**
+linux/config/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - linux/keyman-config/**
+linux/engine/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - linux/ibus-keyman/**
 
 mac/:
-  - mac/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/mac/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - mac/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/mac/**
 # mac/config/:
 # mac/engine/: mac/**
 
-oem/: oem/**
-oem/fv/: oem/firstvoices/**
-oem/fv/android/: oem/firstvoices/android/**
-oem/fv/ios/: oem/firstvoices/ios/**
-oem/fv/windows/: oem/firstvoices/windows/**
+oem/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - oem/**
+oem/fv/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - oem/firstvoices/**
+oem/fv/android/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - oem/firstvoices/android/**
+oem/fv/ios/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - oem/firstvoices/ios/**
+oem/fv/windows/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - oem/firstvoices/windows/**
 
-resources/: resources/**
+resources/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - resources/**
 
 web/:
-  - web/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/web/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - web/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/web/**
 # web/bookmarklet/
-web/engine/: web/source/**
-web/ui/: web/source/kmwui*
-web/samples/: web/samples/**
-web/predictive-text/: web/src/engine/predictive-text/**
+web/engine/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - web/source/**
+web/ui/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - web/source/kmwui*
+web/samples/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - web/samples/**
+web/predictive-text/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - web/src/engine/predictive-text/**
 
 windows/:
-  - windows/**
-  - resources/teamcity/includes/**
-  - resources/teamcity/windows/**
-windows/config/: windows/src/desktop/**
-windows/engine/: windows/src/engine/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - windows/**
+      - resources/teamcity/includes/**
+      - resources/teamcity/windows/**
+windows/config/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - windows/src/desktop/**
+windows/engine/:
+  - changed-files:
+    - any-glob-to-any-file:
+      - windows/src/engine/**

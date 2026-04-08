@@ -52,6 +52,7 @@ state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
                      env->key,
                      env->value);
   }
+  _backspace_handled_internally = false;
   _imx_callback = nullptr;
   _imx_object = nullptr;
   memset(const_cast<km_core_actions*>(&_action_struct), 0, sizeof(km_core_actions));
