@@ -12,6 +12,11 @@ import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
+export interface messageCharacter {
+  message: string;
+  character: string;
+};
+
 export class KmnFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
@@ -129,8 +134,6 @@ export class KmnFileWriter {
           continue;
         }
 
-        //---------------------------------------------------------------------------------------------
-
         // add a line after rules of each key
         if ((k > 1) && (uniqueDataRules[k - 1].key !== uniqueDataRules[k].key) && (uniqueDataRules[k - 1].ruleType === uniqueDataRules[k].ruleType)) {
           data += '\n';
@@ -147,40 +150,11 @@ export class KmnFileWriter {
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-
-          const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(outputCharacter);
-          const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(outputCharacter);
-          const m_dec = /^&#([0-9]{1,7});$/.exec(outputCharacter);
-
-          // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
-          const c_val = ((m_uni || m_hex || m_dec) ?
-            m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
-          );
-
-          // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
-          if ((c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (outputCharacter.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-
-            // for control characters in 'U+...', '&#x...'  or '&#...' format
-            if (c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-              versionOutputCharacter = "U+" + c_val.toString(16).toUpperCase().padStart(4, '0');
-            }
-
-            // for control characters in "" format
-            if (outputCharacter.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-              versionOutputCharacter = "U+" + outputCharacter.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-            }
-
-            if (warnText[2] == "") {
-              warnText[2] = warnText[2] + "c WARNING: use of a control character ";
-            }
-            else {
-              warnText[2] = warnText[2] + " Use of a control character ";
-            }
-          }
-          else {
-            versionOutputCharacter = this.convertToUnicodeCharacter(outputCharacter);;
-          }
+          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] =  characterMessage.message;
         }
+
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
@@ -229,44 +203,10 @@ export class KmnFileWriter {
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-
-          const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(outputCharacter);
-          const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(outputCharacter);
-          const m_dec = /^&#([0-9]{1,7});$/.exec(outputCharacter);
-
-          // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
-          const c_val = ((m_uni || m_hex || m_dec) ?
-            m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
-          );
-
-          // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
-          if ((c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (outputCharacter.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-
-            // for control characters in 'U+...', '&#x...'  or '&#...' format
-            if (c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-              versionOutputCharacter = "U+" + c_val.toString(16).toUpperCase().padStart(4, '0');
-            }
-
-            // for control characters in "" format
-            if (outputCharacter.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-              versionOutputCharacter = "U+" + outputCharacter.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-            }
-
-            if (warnText[2] == "") {
-              warnText[2] = warnText[2] + "c WARNING: use of a control character ";
-            }
-            else {
-              warnText[2] = warnText[2] + "; Use of a control character ";
-            }
-          }
-          else {
-            versionOutputCharacter = this.convertToUnicodeCharacter(outputCharacter);;
-          }
+          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] =  characterMessage.message;
         }
-
-
-
-
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -337,39 +277,9 @@ export class KmnFileWriter {
         // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
 
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-
-          const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(outputCharacter);
-          const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(outputCharacter);
-          const m_dec = /^&#([0-9]{1,7});$/.exec(outputCharacter);
-
-          // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
-          const c_val = ((m_uni || m_hex || m_dec) ?
-            m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
-          );
-
-          // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
-          if ((c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (outputCharacter.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-
-            // for control characters in 'U+...', '&#x...'  or '&#...' format
-            if (c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-              versionOutputCharacter = "U+" + c_val.toString(16).toUpperCase().padStart(4, '0');
-            }
-
-            // for control characters in "" format
-            if (outputCharacter.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-              versionOutputCharacter = "U+" + outputCharacter.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-            }
-
-            if (warnText[2] == "") {
-              warnText[2] = warnText[2] + "c WARNING: use of a control character ";
-            }
-            else {
-              warnText[2] = warnText[2] + "; Use of a control character ";
-            }
-          }
-          else {
-            versionOutputCharacter = this.convertToUnicodeCharacter(outputCharacter);;
-          }
+          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] =  characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -576,7 +486,7 @@ export class KmnFileWriter {
             + " "
             + amb_1_1[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character
             + "\' ");
       }
 
@@ -587,7 +497,7 @@ export class KmnFileWriter {
             + " "
             + dup_1_1[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character
             + "\' ");
       }
     }
@@ -672,8 +582,7 @@ export class KmnFileWriter {
             + " "
             + amb_3_3[0].key
             + "]  >  \'"
-            /*+ new TextDecoder().decode(amb_3_3[0].output)*/
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character
             + "\' ");
       }
 
@@ -686,8 +595,7 @@ export class KmnFileWriter {
             + " "
             + dup_3_3[0].key
             + "]  >  \'"
-            /* + new TextDecoder().decode(dup_3_3[0].output)*/
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character
             + "\' ");
       }
 
@@ -815,7 +723,7 @@ export class KmnFileWriter {
             + " "
             + amb_6_3[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character
             + "\' ");
       }
 
@@ -828,7 +736,7 @@ export class KmnFileWriter {
             + " "
             + dup_6_3[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character
             + "\' ");
       }
 
@@ -889,7 +797,7 @@ export class KmnFileWriter {
             + " "
             + amb_6_6[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character
             + "\' ");
       }
 
@@ -902,7 +810,7 @@ export class KmnFileWriter {
             + " "
             + dup_6_6[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output))
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character
             + "\' ");
       }
     }
@@ -948,38 +856,53 @@ export class KmnFileWriter {
   *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
   *         null in case of an empty string or null or undefined input
   */
-  public writeCharacterOrUnicode(ctr: string): string | null {
+  public writeCharacterOrUnicode(ctr: string, msg: string = ""): messageCharacter {
 
     if ((ctr === null) || (ctr === undefined) || (ctr.length === 0)) {
       return null;
     }
 
     let versionOutputCharacter;
+    const out: messageCharacter = {
+      message: msg,
+      character: ctr
+    };
+
     const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(ctr);
     const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(ctr);
     const m_dec = /^&#([0-9]{1,7});$/.exec(ctr);
 
     // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
-    const c_val = ((m_uni || m_hex || m_dec) ?
+    const ctr_val = ((m_uni || m_hex || m_dec) ?
       m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
     );
 
     // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
-    if ((c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+    if ((ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
 
       // for control characters in 'U+...', '&#x...'  or '&#...' format
-      if (c_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-        versionOutputCharacter = "U+" + c_val.toString(16).toUpperCase().padStart(4, '0');
+      if (ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+        versionOutputCharacter = "U+" + ctr_val.toString(16).toUpperCase().padStart(4, '0');
       }
-
       // for control characters in "" format
       if (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
         versionOutputCharacter = "U+" + ctr.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
       }
-      return versionOutputCharacter;
+      if (versionOutputCharacter)
+        out.character = versionOutputCharacter;
+
+      // add a warning message
+      if (msg == "") {
+        out.message = "c WARNING: use of a control character ";
+      }
+      else {
+        out.message = msg + "; Use of a control character ";
+      }
     }
-    else
-      return ctr;
+    else {
+      out.character = this.convertToUnicodeCharacter(ctr);;
+    }
+    return out;
   }
 
   // TODO: move to util

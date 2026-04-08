@@ -81,6 +81,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
       [makePathToFixture('../data/Test_nr_elements.keylayout')],
       [makePathToFixture('../data/Test.keylayout')],
+      [makePathToFixture('../data/Test_differentEncodings.keylayout')],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(files[0]);
