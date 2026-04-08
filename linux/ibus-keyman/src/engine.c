@@ -814,7 +814,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
     keyman->is_dirty = TRUE;
   }
   keyman->commit_item--;
-  memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * MAX_QUEUE_SIZE - 1);
+  memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * (MAX_QUEUE_SIZE - 1));
   initialize_queue_items(keyman, MAX_QUEUE_SIZE - 1, 1);
 }
 
