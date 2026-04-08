@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.222 alpha 2026-04-08
+
+* fix(linux): fix memory problem (#15823)
+
 ## 19.0.221 alpha 2026-03-27
 
 * fix(common): add missing `default` property to keyman-touch-layout.clean.spec.json (#15787)
