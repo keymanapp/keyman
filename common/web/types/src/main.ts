@@ -21,6 +21,10 @@ export {
   translateLdmlModifiersToVisualKeyboardShift, translateVisualKeyboardShiftToLdmlModifiers,
   visualKeyboardShiftToLayerName,
 } from './consts/modifier-key-constants.js';
+export {
+  CharacterConstant,
+  CharacterConstantString,
+} from './consts/character-constants.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
 

@@ -3,7 +3,7 @@
  *
  * Convert .keyman-touch-layout data into KMXPlus data for embedding into .kmx
  */
-import { TouchLayout, KMXPlus } from "@keymanapp/common-types";
+import { TouchLayout, KMXPlus, CharacterConstantString } from "@keymanapp/common-types";
 import { CompilerCallbacks, TouchLayoutFileReader, oskFontMagicToken, specialKeyCaps } from "@keymanapp/developer-utils";
 import { KmnCompilerMessages } from "../kmn-compiler-messages.js";
 import { constants } from "@keymanapp/ldml-keyboard-constants";
@@ -42,7 +42,7 @@ export class EmbedOskTouchLayoutInKmx {
     // transformTouchLayoutPlatform(kmx, tl, 'desktop', tl.desktop); // probably not needed
 
     this.keyIndex = 0;
-    kmx.kmxplus.disp.baseCharacter = kmx.kmxplus.strs.allocString('\u25cc');
+    kmx.kmxplus.disp.baseCharacter = kmx.kmxplus.strs.allocString(CharacterConstantString.DOTTED_CIRCLE);
     this.addPlatformFromTouchLayoutPlatform(kmx.kmxplus, 'tablet', touchLayout.tablet, 200); // anything larger than 200mm width
     this.addPlatformFromTouchLayoutPlatform(kmx.kmxplus, 'phone', touchLayout.phone, 1); // anything larger than 1mm width
   }
@@ -76,7 +76,7 @@ export class EmbedOskTouchLayoutInKmx {
   private addLayerFromTouchLayoutLayer(kmxplus: KMXPlus.KMXPlusData, newForm: KMXPlus.LayrForm, platformName: TouchLayout.TouchLayoutPlatformName, layer: TouchLayout.TouchLayoutLayer): void {
     const newEntry = new KMXPlus.LayrEntry();
     newEntry.id = kmxplus.strs.allocString(layer.id);
-    newEntry.mod = 0;
+    newEntry.mod = 0; // mod is unused for touch layouts
     for(const row of layer.row) {
       this.addRowFromTouchLayoutRow(kmxplus, newEntry, layer, row);
     }
@@ -226,9 +226,6 @@ export class EmbedOskTouchLayoutInKmx {
     } else if(text.trim() === '' && sourceId.startsWith('U_')) {
       // if key cap == U_xxxx[_yyyy], then we generate key cap from that
       const keyCap = this.unicodeKeyIdToString(sourceId);
-      if(keyCap === null) {
-        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId({id: sourceId}));
-      }
       return kmxplus.strs.allocString(keyCap ?? '', {singleOk: true});
     }
 
@@ -239,25 +236,56 @@ export class EmbedOskTouchLayoutInKmx {
     // Test for fall back to U_xxxxxx key id
     // For this first test, we ignore the keyCode and use the keyName
     if(!id || id.substring(0, 2) != 'U_') {
+      this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId_NaN({id, component: id}));
       return null;
     }
 
     let result = '';
     const codePoints = id.substring(2).split('_');
     for(const codePoint of codePoints) {
-      const codePointValue = parseInt(codePoint, 16);
-      if (isNaN(codePointValue) || (0x0 <= codePointValue && codePointValue <= 0x1F) || (0x80 <= codePointValue && codePointValue <= 0x9F)) {
-        // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
-        // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-        // Also handles invalid identifiers (e.g. `U_ghij`) for which parseInt returns NaN
-
-        // We'll still attempt to add valid chars
-        continue;
-      } else {
-        result += String.fromCodePoint(codePointValue);
+      if(!/^[0-9a-f]+$/i.test(codePoint) || codePoint.length > 6 || codePoint.length < 4) {
+        // Cope with invalid identifiers (e.g. `U_ghij` or `U_24`)
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId_NaN({id, component: codePoint}));
+        return null;
       }
+
+      const codePointValue = parseInt(codePoint, 16);
+      if (isNaN(codePointValue)) {
+        // Any other out-of-range value for which parseInt returns NaN
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId_NaN({id, component: codePoint}));
+        return null;
+      }
+
+      if((0x0 <= codePointValue && codePointValue <= 0x1F) || (0x7F <= codePointValue && codePointValue <= 0x9F)) {
+        // Code points [U_0000 - U_001F] and [U_007F - U_009F] refer to Unicode C0 and C1 control codes.
+        // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId_Control({id, component: codePoint}));
+        return null;
+      }
+
+      if(0xFFFE <= (codePointValue & 0xFFFF) || (0xFDD0 <= codePointValue && codePointValue <= 0xFDDF)) {
+        // U+FFFE + U+FFFF, U+1FFFE + U+1FFFF, etc are noncharacters, as are
+        // U+FDD0-U+FDEF and should never be produced
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId_Noncharacter({id, component: codePoint}));
+        return null;
+      }
+
+      if(0xD800 <= codePointValue && codePointValue <= 0xDFFF) {
+        // surrogate pairs, use the code point instead
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId_SurrogatePair({id, component: codePoint}));
+        return null;
+      }
+
+      if(codePointValue < 0 || codePointValue > 0x10FFFF) {
+        // out of range
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidUnicodeKeyId_OutOfRange({id, component: codePoint}));
+        return null;
+      }
+
+      result += String.fromCodePoint(codePointValue);
     }
-    return result ? result : null;
+
+    return result;
   }
 
   public unitTestEndpoints = {
@@ -270,6 +298,7 @@ export class EmbedOskTouchLayoutInKmx {
     addKeysFromSubKeys: this.addKeysFromSubKeys.bind(this),
     addFlickFromTouchLayoutFlick: this.addFlickFromTouchLayoutFlick.bind(this),
     keyFromSubKey: this.keyFromSubKey.bind(this),
+    unicodeKeyIdToString: this.unicodeKeyIdToString.bind(this),
   }
 
 }

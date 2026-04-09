@@ -8,6 +8,7 @@ import { KMXPlus, LdmlKeyboardTypes, TouchLayout } from '@keymanapp/common-types
 import { EmbedOskTouchLayoutInKmx } from '../src/compiler/embed-osk/embed-osk-touch-layout.js';
 import { oskFontMagicToken } from '@keymanapp/developer-utils';
 import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
+import { KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
 
 const Q_KEY: TouchLayout.TouchLayoutKey = {
   "id": "K_Q",
@@ -332,6 +333,67 @@ describe('Compiler OSK Embedding', function() {
         assert.lengthOf(kmxplus.layr.forms[0].layers, 1);
         assert.equal(kmxplus.layr.forms[0].layers[0].id, kmxplus.strs.strings[5]);
         assert.equal(kmxplus.layr.forms[0].layers[0].mod, 0);
+      });
+    });
+  });
+
+  describe('unicodeKeyIdToString', function() {
+    it('should transform valid Unicode U_ key identifiers to a Unicode string', function() {
+      [
+        ['U_0020', '\u0020'],
+        ['U_007E', '\u007e'],
+        ['U_1234', '\u1234'],
+        ['U_0020_0021_0022', '\u0020\u0021\u0022'],
+        ['U_FD00', '\ufd00'],
+        ['U_FFFD', '\ufffd'],
+        ['U_10221', '\u{10221}'],
+        ['U_10F000', '\u{10f000}'],
+        ['U_10F000_10F002', '\u{10f000}\u{10f002}'],
+        ['U_10F000_0020', '\u{10f000}\u{0020}'],
+      ].forEach(v => {
+        const [id, expected] = v;
+        assert.equal(embedder.unitTestEndpoints.unicodeKeyIdToString(id), expected, `expected '${id}' to generate '${expected}'`);
+      });
+    });
+
+    it('should reject invalid Unicode U_ key identifiers and generate an appropriate warning', function() {
+      [
+        {id: 'U', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'T_x', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: '', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_argh', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_zzzz', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_1234_', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_1234__', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_123_!', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_123!', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_123.456', message:KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_-1', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN},
+        {id: 'U_2F', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN}, // too short; we want U_002F for consistency
+        {id: 'U_002000210022', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_NaN}, // too long, should have been U_0020_0021_0022
+
+        {id: 'U_0000', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_Control},
+        {id: 'U_001F', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_Control},
+        {id: 'U_007F', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_Control},
+        {id: 'U_0088', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_Control},
+
+        {id: 'U_FFFE', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_Noncharacter},
+        {id: 'U_FDD1', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_Noncharacter},
+        {id: 'U_10FFFF', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_Noncharacter},
+
+        {id: 'U_110000', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_OutOfRange},
+
+        {id: 'U_D800', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_SurrogatePair},
+        {id: 'U_DC00', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_SurrogatePair},
+        {id: 'U_DFFF', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_SurrogatePair},
+        {id: 'U_D830', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_SurrogatePair},
+        {id: 'U_0031_D830', message: KmnCompilerMessages.WARN_InvalidUnicodeKeyId_SurrogatePair}, // tests subsequent component
+      ].forEach(v => {
+        callbacks.clear();
+        assert.isNull(embedder.unitTestEndpoints.unicodeKeyIdToString(v.id), `expected '${v.id}' to return null`);
+        assert.lengthOf(callbacks.messages, 1, `expected '${v.id}' to generate a single warning message`);
+        assert.equal(callbacks.messages[0].code, v.message, `expected '${v.id}' to generate warning ${v.message}`);
       });
     });
   });
