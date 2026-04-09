@@ -13,8 +13,8 @@
 #include "action.hpp"
 
 #include <test_assert.h>
-#include "../emscripten_filesystem.h"
-#include "../load_kmx_file.hpp"
+#include "../helpers/emscripten_filesystem.h"
+#include "../helpers/load_kmx_file.hpp"
 
 const km_core_action_item alert_action_item();
 const km_core_action_item bksp_action_item(uint8_t type, uintptr_t value);
