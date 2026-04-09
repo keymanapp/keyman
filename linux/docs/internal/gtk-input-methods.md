@@ -18,25 +18,42 @@ support.
 
 ```mermaid
 flowchart LR
-  subgraph GTK
-    app(application)
-    im-module["im-ibus
-    (IBusIMContext)"]
-    app --- im-module
+  subgraph App["Application"]
+    style App fill:blue
+    subgraph ClientApp["Client App"]
+      N1("GTK 3/4 Application")
+    end
+    subgraph GtkIMContext["Gtk.IMContext"]
+      N2["GTK 3:<br/>in /usr/lib/x86_64-linux-gnu/<br/>gtk-3.0/3.0.0/immodules:<br>im-ibus.so<br/>im-wayland.so<br/>im-xim.so"]
+      N3["GTK 4:<br/>in /usr/lib/x86_64-linux-gnu/<br/>gtk-4.0/4.0.0/immodules:<br>libim-ibus.so<br>(wayland built-in)"]
+      subgraph S2["&nbsp;"]
+        IBusIMContext
+        N4["Source for IBus clients:<br>https://github.com/ibus/<br>ibus/tree/main/client"]
+      end
+    end
   end
 
-  subgraph ibus[ibus-daemon]
-    direction LR
-    IBusInputContext <--> IBusEngine
+  subgraph IBus["IBus Daemon"]
+    style IBus fill:purple
+    IBusInputContext["IBusInputContext"]
+    IBusEngine["IBusEngine"]
+    N5["Source for IBus Daemon in https://github.com/ibus/ibus/tree/main/src"]
   end
 
-  subgraph keyman
-    ibus-engine-keyman
-  end
+  KeymanEngine["Keyman Engine"]
 
-  GTK <--> ibus <--> keyman
+  ClientApp ~~~ GtkIMContext
+  IBusIMContext <-- IBus--> IBusInputContext
+  IBusInputContext <--> IBusEngine
+  IBusEngine <-- IBus --> KeymanEngine
 
-  style app color:#FFFFFF, stroke:#00C853, fill:#00C853
+style N1 color:#FFFFFF, stroke:#00C853, fill:#00C853
+style N2 fill:none
+style N3 fill:none
+style N4 fill:none
+style N5 fill:none
+style S1 fill:none, stroke-width:0
+style S2 fill:none, stroke-width:0
 ```
 
 The im-module implements a [GIOExtensionPoint](https://docs.gtk.org/gio/struct.IOExtensionPoint.html)
