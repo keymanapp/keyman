@@ -9,7 +9,9 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
+import { SearchQuotientCluster } from './search-quotient-cluster.js';
 import { legacySubsetKeyer, TokenizationSubset, TokenizationSubsetBuilder } from './tokenization-subsets.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -80,11 +82,9 @@ export function precomputeTransitions(
 /**
  * Given results from `precomputeTransitions`, this function generates the
  * context variations that should result from the current context variants and
- * input.  The one best matching the user's visible context will be set at index
- * 0.
+ * input.
  * @param precomputedTransitionSubsets
  * @param transformDistribution
- * @param keyMatchingUserContext
  * @returns
  */
 export function transitionTokenizations(
@@ -124,10 +124,61 @@ export function transitionTokenizations(
       return;
     }
 
-    // Of particular note - there may no longer be a specific, single set of edits
-    // for the transition; there will be different paths to reach a tokenization!
-    throw new Error("Multi-tokenization transitions not yet supported.");
+    finalTokenizations.set(key, mergeAlignedTokenizations(independentTransitionResults));
   });
 
   return finalTokenizations;
+}
+
+/**
+ * Given two or more instances of ContextTokenization, this function will
+ * attempt to merge each token's SearchQuotientNodes as necessary to result in a
+ * single instance.
+ *
+ * An error will be thrown if the instances do not sufficiently converge to the
+ * same tokenization pattern.
+ * @param tokenizations
+ * @returns
+ */
+export function mergeAlignedTokenizations(tokenizations: ContextTokenization[]): ContextTokenization {
+  const finalizedTokens: ContextToken[] = [];
+
+  // Iterate through the token indices as long as at least one tokenization
+  // remains with that index.
+  //
+  // Assumption:  all have at least one token.
+  for(
+    let i = 0;
+    tokenizations.length > 0;
+    // Two co-related iteration steps.  Could be expressed as just one with ++i in functor conditional.
+    i++, tokenizations = tokenizations.filter((tokenization) => tokenization.tokens.length > i)
+  ) {
+    const bucket: ContextToken[] = [];
+
+    tokenizations.forEach((tokenization) => {
+      // Check for matches already within the bucket.
+      const token = tokenization.tokens[i];
+
+      if(!bucket.find((t) => t.searchModule.isSameNode(token.searchModule))) {
+        bucket.push(token);
+      }
+    });
+
+    if(bucket.length == 1) {
+      finalizedTokens.push(bucket[0]);
+    } else {
+      const constituentSpurs = bucket.flatMap((token) => {
+        const quotientNode = token.searchModule;
+
+        if(quotientNode instanceof SearchQuotientCluster) {
+          return quotientNode.parents;
+        } else {
+          return quotientNode;
+        }
+      })
+      finalizedTokens.push(new ContextToken(new SearchQuotientCluster(constituentSpurs)));
+    }
+  }
+
+  return new ContextTokenization(finalizedTokens);
 }
