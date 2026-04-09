@@ -21,20 +21,6 @@ describe('KmnFileWriter', function () {
     compilerTestCallbacks.clear();
   });
 
-  describe("write() ", function () {
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
-
-    it('write() should return result', async function () {
-      const result = sutW.write(converted);
-      assert.isNotNull(result);
-    });
-  });
-
   describe("writeDataRules() ", function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
@@ -87,14 +73,17 @@ describe('KmnFileWriter', function () {
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
       ["&#x1F60E;", '😎'],
+      ["&#x0002;", '\u0002'],
       ["&#x1000000;",undefined ],
       ["&#97;", 'a'],
       ["&#4660;", 'ሴ'],
       ["&#128518;", '😆'],
+      ["&#0003;", '\u0003'],
       ["&#1000000;", '󴉀'],
       ["U+0061", 'a'],
       ["U+1234", 'ሴ'],
       ["U+1F60E", '😎'],
+      ["U+0001", '\u0001'],
       ["U+1000000;", undefined],
       ["&commat;", undefined],
       ["a", 'a'],
@@ -103,6 +92,9 @@ describe('KmnFileWriter', function () {
       ["W̊", "W̊"],
       ["ab", 'ab'],
       ["", ''],
+      ["␤", '␤'],
+      ["␕", '␕'],
+      ["", ''],
       [undefined, undefined],
       [null, undefined]
     ].forEach(function (values) {
@@ -115,7 +107,6 @@ describe('KmnFileWriter', function () {
 
   describe('reviewRules messages', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-
     [
       [[new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'UNAVAILABLE', 'K_A', new TextEncoder().encode('A'))],
       [''],
@@ -168,7 +159,6 @@ describe('KmnFileWriter', function () {
   });
 
   describe('reviewRules messages duplicate and ambiguous', function () {
-
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       //all

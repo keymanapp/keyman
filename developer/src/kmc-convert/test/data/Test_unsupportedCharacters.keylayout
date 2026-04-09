@@ -23,7 +23,7 @@
     </modifierMap>
     <keyMapSet id="ANSI">
         <keyMap index="0">
-            <key code="0" output=""/>      <!-- C0-> keyman rule part 1 -->
+            <key code="0" output=""/>       <!-- C0-> keyman rule part 1 -->
             <key code="1" action="a1"/>     <!-- C1-> keyman rule part 1 -->
             <key code="2" action="a0"/>     <!-- C2-> keyman rule part 6 -->
             <key code="32" action="a4"/>    <!-- C1-> keyman rule part 1 -->
