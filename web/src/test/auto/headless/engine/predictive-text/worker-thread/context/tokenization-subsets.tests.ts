@@ -36,7 +36,7 @@ var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
 
 function toToken(text: string) {
   let isWhitespace = text == ' ';
-  let token = new ContextToken(plainModel, text);
+  let token = ContextToken.fromRawText(plainModel, text);
   token.isWhitespace = isWhitespace;
   return token;
 }
@@ -179,7 +179,7 @@ describe('precomputationSubsetKeyer', function() {
         edgeWindow: {
           ...buildEdgeWindow(
             [...tokenization.tokens, (() => {
-            const token = new ContextToken(plainModel, 'da');
+            const token = ContextToken.fromRawText(plainModel, 'da');
             // source text:  'date'
             token.addInput({
               segment: {
@@ -211,7 +211,7 @@ describe('precomputationSubsetKeyer', function() {
     precomputation2.alignment.edgeWindow = {
       ...buildEdgeWindow(
           [...tokenization.tokens, (() => {
-            const token = new ContextToken(plainModel, 'da');
+            const token = ContextToken.fromRawText(plainModel, 'da');
             // source text:  'date'
             token.addInput({
               segment: {
@@ -256,7 +256,7 @@ describe('precomputationSubsetKeyer', function() {
         edgeWindow: {
           ...buildEdgeWindow(
             [...tokenization.tokens, (() => {
-              const token = new ContextToken(plainModel, 'da');
+              const token = ContextToken.fromRawText(plainModel, 'da');
               token.isPartial = true;
               // source text:  'dat'
               token.addInput({
@@ -288,7 +288,7 @@ describe('precomputationSubsetKeyer', function() {
     precomputation2.alignment.edgeWindow = {
       ...buildEdgeWindow(
         [...tokenization.tokens, (() => {
-          const token = new ContextToken(plainModel, 'da');
+          const token = ContextToken.fromRawText(plainModel, 'da');
           token.isPartial = true;
           // source text:  'dat'
           token.addInput({

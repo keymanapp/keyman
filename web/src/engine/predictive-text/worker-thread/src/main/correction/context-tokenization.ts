@@ -20,6 +20,7 @@ import { TransitionEdge } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
+import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 
 // May be able to "get away" with 2 & 5 or so, but having extra will likely help
 // with edit path stability.
@@ -227,7 +228,7 @@ export class ContextTokenization {
       // token for it, but don't try to preserve its fat-finger data any more.
       // (To do so may be a complex problem for little return.)
       if(editBoundary.text) {
-        preservedTokens.unshift(new ContextToken(lexicalModel, editBoundary.text, editBoundary.isPartial));
+        preservedTokens.unshift(ContextToken.fromRawText(lexicalModel, editBoundary.text, editBoundary.isPartial));
       }
 
       // And done.  Why retokenize?  We already had a proper tokenization;
@@ -314,7 +315,7 @@ export class ContextTokenization {
           // fallthrough;
         case 'insert':
         case 'substitute':
-          tokensToPrefix.push(new ContextToken(lexicalModel, slidAndRetokenized[match], i - mergeOffset == 0));
+          tokensToPrefix.push(ContextToken.fromRawText(lexicalModel, slidAndRetokenized[match], i - mergeOffset == 0));
           break;
         default:
           // do nothing.
@@ -602,11 +603,11 @@ export class ContextTokenization {
 
       affectedToken = tailTokenization[tokenIndex];
       if(!affectedToken) {
-        affectedToken = new ContextToken(lexicalModel);
+        affectedToken = new ContextToken(new LegacyQuotientRoot(lexicalModel));
         tailTokenization.push(affectedToken);
       } else if(KMWString.length(affectedToken.exampleInput) == distribution[0].sample.deleteLeft) {
         // If the entire token will be replaced, throw out the old one and start anew.
-        affectedToken = new ContextToken(lexicalModel);
+        affectedToken = new ContextToken(new LegacyQuotientRoot(lexicalModel));
         // Replace the token at the affected index with a brand-new token.
         tailTokenization.splice(tokenIndex, 1, affectedToken);
       }

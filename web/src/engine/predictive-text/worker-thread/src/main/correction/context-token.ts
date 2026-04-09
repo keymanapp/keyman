@@ -44,7 +44,7 @@ export class ContextToken {
   /**
    * Indicates whether or not the token is considered whitespace.
    */
-  isWhitespace: boolean;
+  isWhitespace: boolean = false;
 
   /**
    * Contains all relevant correction-search data for use in generating
@@ -67,22 +67,16 @@ export class ContextToken {
   appliedTransitionId?: number;
 
   /**
-   * Constructs a new, empty instance for use with the specified LexicalModel.
+   * Constructs a new instance based directly on a pre-constructed SearchQuotientNode.
    * @param model
    */
-  constructor(model: LexicalModel);
-  /**
-   * Constructs a new instance with pre-existing text for use with the specified LexicalModel.
-   * @param model
-   * @param rawText
-   */
-  constructor(model: LexicalModel, rawText: string, isPartial?: boolean);
+  constructor(quotientNode: SearchQuotientNode, isPartial?: boolean);
   /**
    * This constructor deep-copies the specified instance.
    * @param baseToken
    */
   constructor(baseToken: ContextToken);
-  constructor(param: ContextToken | LexicalModel, rawText?: string, isPartial?: boolean) {
+  constructor(param: ContextToken | SearchQuotientNode, isPartial?: boolean) {
     if(param instanceof ContextToken) {
       const priorToken = param;
       Object.assign(this, priorToken);
@@ -93,32 +87,36 @@ export class ContextToken {
       // we need to ensure that only fully-utilized keystrokes are considered.
       this._searchModule = priorToken.searchModule;
     } else {
-      const model = param;
-
-      // May be altered outside of the constructor.
-      this.isWhitespace = false;
+      this._searchModule = param;
       this.isPartial = !!isPartial;
-
-      rawText ||= '';
-
-      // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
-      // Build a token that represents the current text with no ambiguity - probability at max (1.0)
-      let searchModule: SearchQuotientNode = new LegacyQuotientRoot(model);
-      const BASE_PROBABILITY = 1;
-      textToCharTransforms(rawText).forEach((transform) => {
-        let inputMetadata: PathInputProperties = {
-          segment: {
-            start: 0,
-            transitionId: undefined
-          },
-          bestProbFromSet: BASE_PROBABILITY,
-          subsetId: generateSubsetId()
-        };
-        searchModule = new LegacyQuotientSpur(searchModule, [{sample: transform, p: BASE_PROBABILITY}], inputMetadata);
-      });
-
-      this._searchModule = searchModule;
     }
+  }
+
+  /**
+   * Constructs a new instance with pre-existing text for use with the specified LexicalModel.
+   * @param model
+   * @param rawText
+   */
+  static fromRawText(model: LexicalModel, rawText: string, isPartial?: boolean) {
+    rawText ||= '';
+
+    // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
+    // Build a token that represents the current text with no ambiguity - probability at max (1.0)
+    let searchModule: SearchQuotientNode = new LegacyQuotientRoot(model);
+    const BASE_PROBABILITY = 1;
+    textToCharTransforms(rawText).forEach((transform) => {
+      let inputMetadata: PathInputProperties = {
+        segment: {
+          start: 0,
+          transitionId: undefined
+        },
+        bestProbFromSet: BASE_PROBABILITY,
+        subsetId: generateSubsetId()
+      };
+      searchModule = new LegacyQuotientSpur(searchModule, [{sample: transform, p: BASE_PROBABILITY}], inputMetadata);
+    });
+
+    return new ContextToken(searchModule, isPartial);
   }
 
   /**
