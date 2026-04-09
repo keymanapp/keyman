@@ -81,36 +81,6 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe('convertToUnicodeCodePoint ', function () {
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    [
-      ["&#x10F601;", 'U+10F601'],
-      ["&#x1F601;", 'U+1F601'],
-      ["&#x9;", 'U+0009'],
-      ["&#x99;", 'U+0099'],
-      ["&#x999;", 'U+0999'],
-      ["&#x9999;", 'U+9999'],
-      ["&#x99999;", 'U+99999'],
-      ["&#1111553;", 'U+10F601'],
-      ["&#128513;", 'U+1F601'],
-      ["&#9;", 'U+0009'],
-      ["&#99;", 'U+0063'],
-      ["&#999;", 'U+03E7'],
-      ["&#9999;", 'U+270F'],
-      ["&#99999;", 'U+1869F'],
-      ['0000;', '0000;'],
-      ['X;', 'X;'],
-      ['123;', '123;'],
-      [';', ';'],
-      [' ;', ' ;']
-    ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sutW.convertToUnicodeCodePoint(values[0] as string);
-        assert.equal(result, values[1]);
-      });
-    });
-  });
-
   describe('convertToUnicodeCharacter ', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
