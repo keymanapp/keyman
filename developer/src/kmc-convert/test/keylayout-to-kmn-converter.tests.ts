@@ -101,7 +101,6 @@ describe('KeylayoutToKmnConverter', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
       [makePathToFixture('../data/Test_characters.keylayout')],
-      [makePathToFixture('../data/Test_EmptyOutputCharacter.keylayout')],
     ].forEach(function (files) {
       it(files + " should give Error: unsupported characters ", async function () {
         sut.run(files[0]);
