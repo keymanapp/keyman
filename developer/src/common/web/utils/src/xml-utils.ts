@@ -66,14 +66,6 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     preserveOrder: true,     // Gives us a 'special' format
   },
   'keylayout': {
-    /*
-    //my options copied from fast-xml-parser
-    ignoreAttributes: [''],       // we do not process an output character of ""
-    trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (space)
-    parseTagValue: false,
-    attributeNamePrefix: '@__',   // to access the attribute
-    ignoreDeclaration: true
-*/
     attributeNamePrefix: '@__',
     htmlEntities: true,
     ignoreAttributes: false, // use attributes

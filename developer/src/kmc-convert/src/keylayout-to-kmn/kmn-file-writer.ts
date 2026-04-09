@@ -905,7 +905,7 @@ export class KmnFileWriter {
     return out;
   }
 
-  // TODO: move to util
+  // TODO: move to util in PR 14569
   /**
    * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
    * @param  inputString the value that will converted
@@ -1003,35 +1003,4 @@ export class KmnFileWriter {
     }
     return undefined;
   }
-  // TODO: move to util
-  /**
-   * @brief  function to convert a numeric character reference to a unicode Code Point e.g. &#4660 -> U+1234;  &#x10F601 -> U+1F60E
-   * @param  instr the value that will converted
-   * @return returns a unicode Code Point like U+0063, U+1234, U+1F60E; returns the input character if a non-numeric reference is used or returns 'undefined' if instr is not recognized
-   */
-  public convertToUnicodeCodePoint(instr: string): string {
-
-    if ((instr === null) || (instr === undefined)) {
-      return undefined;
-    }
-
-    if (instr.substring(0, 3) === "&#x") {
-      const numLength = instr.length - instr.indexOf("x") - 1;
-      const numStr = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
-      return ("U+" + numStr.slice(-numLength).padStart(4, "0"));
-    }
-
-    // if not hex: convert to hex
-    if ((instr.substring(0, 2) === "&#")) {
-      const numLength = instr.length - instr.indexOf("#") - 1;
-      const numStr = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
-      return "U+" + Number(numStr.slice(-numLength)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
-    }
-    else
-      return instr;
-  }
-
-
-
-
 }
