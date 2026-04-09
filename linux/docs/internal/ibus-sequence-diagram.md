@@ -8,11 +8,11 @@ a wrong value initially.
 ```mermaid
 sequenceDiagram
     autonumber
-    box blue Application
+    box rgb(153, 153, 255) Application
     participant A as Client
     participant IMC as IBusIMContext
     end
-    box purple IBus
+    box rgb(255, 77, 255) IBus
     participant InC as IBusInputContext
     participant E as IBusEngine
     end

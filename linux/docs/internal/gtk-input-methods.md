@@ -19,7 +19,7 @@ support.
 ```mermaid
 flowchart LR
   subgraph App["Application"]
-    style App fill:blue
+    style App fill:#9999ff
     subgraph ClientApp["Client App"]
       N1("GTK 3/4 Application")
     end
@@ -34,7 +34,7 @@ flowchart LR
   end
 
   subgraph IBus["IBus Daemon"]
-    style IBus fill:purple
+    style IBus fill:#ff4dff
     IBusInputContext["IBusInputContext"]
     IBusEngine["IBusEngine"]
     N5["Source for IBus Daemon in https://github.com/ibus/ibus/tree/main/src"]
@@ -52,7 +52,6 @@ style N2 fill:none
 style N3 fill:none
 style N4 fill:none
 style N5 fill:none
-style S1 fill:none, stroke-width:0
 style S2 fill:none, stroke-width:0
 ```
 
