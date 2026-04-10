@@ -114,7 +114,7 @@ for(const line of lines) {
 
 cacheResult();
 
-console.dir(apiEndpoints);
+// console.dir(apiEndpoints);
 
 // Build heading references
 
