@@ -1,6 +1,7 @@
 import { CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/developer-utils';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
+import { KMX } from '@keymanapp/common-types';
 
 export interface ExtendedCompilerOptions extends CompilerOptions {
   /**
@@ -186,6 +187,12 @@ export function commanderOptionsToCompilerOptions(options: any, callbacks: Compi
     return null;
   }
 
+  const targetVersion = options.targetVersion ? KMX.versionStringToKmxVersion(options.targetVersion) : undefined;
+  if(targetVersion === null) {
+    callbacks.reportMessage(InfrastructureMessages.Error_InvalidTargetVersion({targetVersion: options.targetVersion}));
+    return null;
+  }
+
   // We don't want to rename command line options to match the precise
   // properties that we have in CompilerOptions, but nor do we want to rename
   // CompilerOptions properties...
@@ -196,6 +203,7 @@ export function commanderOptionsToCompilerOptions(options: any, callbacks: Compi
     saveDebug: options.debug,
     compilerWarningsAsErrors: options.compilerWarningsAsErrors,
     warnDeprecatedCode: options.warnDeprecatedCode,
+    targetVersion,
     // ExtendedOptions
     forPublishing: options.forPublishing,
     messageOverrides: overrides,
