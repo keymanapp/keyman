@@ -32,59 +32,11 @@
 
 namespace
 {
-  std::string get_json_doc(km_core_state const& state)
-  {
-    size_t sz = 0;
-    try_status(km_core_state_to_json(&state, nullptr, &sz));
-    std::string buf(sz-1, 0);
-    try_status(km_core_state_to_json(&state, &buf[0], &sz));
-
-    return buf;
-  }
-
   km_core_option_item test_env_opts[] =
   {
     {u"hello",     u"world", 0},
     KM_CORE_OPTIONS_END
   };
-
-constexpr char const *doc1_expected = u8"\
-{\n\
-    \"$schema\" : \"keyman/core/docs/introspection.schema\",\n\
-    \"keyboard\" : {\n\
-        \"id\" : \"dummy\",\n\
-        \"version\" : \"3.145\",\n\
-        \"rules\" : []\n\
-    },\n\
-    \"context\" : [\n\
-        \"H\",\n\
-        \"e\",\n\
-        \"l\",\n\
-        \"l\",\n\
-        \"o\",\n\
-        \" \",\n\
-        \"😁\",\n\
-        \"S\",\n\
-        \"I\",\n\
-        \"L\"\n\
-    ],\n\
-    \"actions\" : [\n\
-        { \"persist\" : { \"keyboard\" : { \"__test_point\" : \"F2 pressed test save.\" } } }\n\
-    ]\n\
-}\n";
-
-constexpr char const *doc2_expected = u8"\
-{\n\
-    \"$schema\" : \"keyman/core/docs/introspection.schema\",\n\
-    \"keyboard\" : {\n\
-        \"id\" : \"dummy\",\n\
-        \"version\" : \"3.145\",\n\
-        \"rules\" : []\n\
-    },\n\
-    \"context\" : [],\n\
-    \"actions\" : []\n\
-}\n";
-
 
 constexpr km_core_option_item const expected_persist_opt = {
   u"__test_point",
@@ -173,19 +125,6 @@ int main(int argc, char * argv[])
   km_core_action_item action = {KM_CORE_IT_PERSIST_OPT, {0,}, };
   action.option = &expected_persist_opt;
   test_assert(action_items(test_state, {action, {KM_CORE_IT_END}}));
-
-  // Test debug dump
-  auto doc1 = get_json_doc(*test_state),
-       doc2 = get_json_doc(*test_clone);
-
-  std::cout << doc1 << std::endl;
-  std::cout << doc2 << std::endl;
-
-  // These should not be equal.
-  if (doc1 == doc2)           return __LINE__;
-  // These should be.
-  if (doc1 != doc1_expected)  return __LINE__;
-  if (doc2 != doc2_expected)  return __LINE__;
 
   // Destroy them
   km_core_state_dispose(test_state);

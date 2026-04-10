@@ -40,7 +40,6 @@ This is an internal API intended for use only within Keyman Engine.
 * [Options](options)
 * [Processor](processor)
 * [State and Actions](state)
-* [JSON introspection Schema](json-schema)
 * [Building Keyman Core](building)
 
 ## Requirements
@@ -100,6 +99,12 @@ Caps Lock.
 filename: changes.md
 title: Changes - Keyman Core API
 ---
+
+### Changes in 19.0
+
+* The JSON introspection APIs (which were not fully implemented),
+  `km_core_state_options_to_json` and `km_core_state_to_json`, have been
+  removed.
 
 ## Changes between 16.0 and 17.0
 
@@ -936,55 +941,6 @@ km_core_state_options_update(km_core_state *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_to_json()
-
-## Description
-
-Export the contents of a [km_core_options] array to a JSON formatted document and
-place it in the supplied buffer, reporting how much space was used. If null is
-passed as the buffer the number of bytes required is returned in `space`. If
-there is insufficent space to hold the document the contents of the buffer is
-undefined. The returned buffer uses UTF-8 encoding.
-
-## Specification
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_state_options_to_json(km_core_state const *state,
-                       char *buf,
-                       size_t *space);
-
-/*
-```
-## Parameters
-
-`state`
-: An opaque pointer to a state object.
-
-`buf`
-: A pointer to the buffer to place the C string containing the JSON
-  document into, can be null.
-
-`space`
-: A pointer to a size_t variable. This variable must contain the
-  number of bytes available in the buffer pointed to by `buf`, unless `buf` is
-  null. On return it will hold how many bytes were used.
-
-## Returns
-
-`KM_CORE_STATUS_OK`
-: On success.
-
-`KM_CORE_STATUS_INVALID_ARGUMENT`
-: If non-optional parameters are null.
-
-`KM_CORE_STATUS_NO_MEM`
-: In the event an internal memory allocation fails.
-
--------------------------------------------------------------------------------
-
 ---
 filename: keyboards.md
 title: Keyboards - Keyman Core API
@@ -1575,56 +1531,6 @@ km_core_cu_dispose(km_core_cu *cp);
 
 `cp`
 : A pointer to the start of the [km_core_cu] array to be disposed of.
-
--------------------------------------------------------------------------------
-
-# km_core_state_to_json()
-
-## Description
-
-Export the internal state of a [km_core_state] object to a JSON format document
-and place it in the supplied buffer, reporting how much space was used. If null
-is passed as the buffer the number of bytes required is returned. If there is
-insufficent space to hold the document, the contents of the buffer is undefined.
-The encoding of the returned data is UTF-8.
-
-__WARNING__: The structure and format of the JSON document while independently
-versioned is not part of this API and is intended solely for use in diagnostics
-or by development and debugging tools which are aware of processor
-implementation details.
-
-## Specification
-
-```c */
-KMN_API
-km_core_status
-km_core_state_to_json(km_core_state const *state,
-                     char *buf,
-                     size_t *space);
-
-/*
-```
-## Parameters
-
-`state`
-: An pointer to an opaque state object.
-
-`buf`
-: A pointer to the buffer to place the C string containing the JSON
-  document into. May be null.
-
-`space`
-: A pointer to a size_t variable. This variable must contain the
-  number of bytes available in the buffer pointed to by `buf`, unless `buf` is
-  null. On return it will hold how many bytes were used.
-
-## Returns
-
-`KM_CORE_STATUS_OK`
-: On success.
-
-`KM_CORE_STATUS_NO_MEM`
-: In the event an internal memory allocation fails.
 
 -------------------------------------------------------------------------------
 

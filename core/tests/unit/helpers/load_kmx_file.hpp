@@ -1,6 +1,8 @@
 #ifndef __LOAD_KMX_FILE_HPP__
 #define __LOAD_KMX_FILE_HPP__
 
+#include <vector>
+
 #include "path.hpp"
 
 namespace km {

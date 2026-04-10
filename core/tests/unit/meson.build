@@ -48,7 +48,6 @@ kmcorekeyboardapitests = executable('km_core_keyboard_api.tests',
 
 test('km-core-keyboard-api-tests', kmcorekeyboardapitests)
 
-subdir('json')
 subdir('utftest')
 subdir('kmnkbd')
 subdir('kmx')

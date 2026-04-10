@@ -26,16 +26,6 @@
 km::core::path const test_kb_path = "/a/dummy/keyboard.mock";
 km::core::mock_processor mock_processor(test_kb_path);
 
-const std::string empty_json = "\
-{\n\
-    \"keyboard\" : {},\n\
-    \"environment\" : {},\n\
-    \"saved\" : {\n\
-        \"keyboard\" : {},\n\
-        \"environment\" : {}\n\
-    }\n\
-}\n";
-
 TEST(km_core_options, verify_list_size) {
   km_core_option_item const api_mock_options[] = {
     {u"hello",   u"world", KM_CORE_OPT_KEYBOARD},
@@ -62,20 +52,6 @@ TEST(km_core_options, test_empty_list) {
   km_core_state empty_state(mock_processor, empty_options_list);
   km_core_cu const *value;
   EXPECT_EQ(km_core_state_option_lookup(&empty_state, KM_CORE_OPT_ENVIRONMENT, u"isdummy", &value), KM_CORE_STATUS_KEY_ERROR);
-}
-
-TEST(km_core_options, test_json) {
-  GTEST_SKIP();
-
-
-  km_core_option_item const empty_options_list[] = {KM_CORE_OPTIONS_END};
-  km_core_state empty_state(mock_processor, empty_options_list);
-
-  size_t sz = 0;
-  ASSERT_EQ(km_core_state_options_to_json(&empty_state, nullptr, &sz), KM_CORE_STATUS_OK);
-  std::string buf(sz-1, 0);
-  ASSERT_EQ(km_core_state_options_to_json(&empty_state, &buf[0], &sz), KM_CORE_STATUS_OK);
-  EXPECT_EQ(buf, empty_json);
 }
 
 #define expect_opt_matches(state, scope, key, expected) {\
@@ -111,31 +87,4 @@ TEST(km_core_options, test_setting_state) {
     KM_CORE_OPTIONS_END
   };
   EXPECT_EQ(km_core_state_options_update(&test_state, bad_scope_opts), KM_CORE_STATUS_INVALID_ARGUMENT);
-
-  /*size_t sz = 0;
-  ASSERT_EQ(km_core_state_options_to_json(&test_state, nullptr, &sz), KM_CORE_STATUS_OK);
-  std::string buf(sz-1, 0);
-  std::cout << sz << std::endl;
-  ASSERT_EQ(km_core_state_options_to_json(&test_state, &buf[0], &sz), KM_CORE_STATUS_OK);
-
-
-  const std::string mock_json = "\
-{\n\
-    \"keyboard\" : {\n\
-        \"test_keyboard_option\" : \"default_value\"\n\
-    },\n\
-    \"environment\" : {\n\
-        \"test_env_option\" : \"yes\"\n\
-    },\n\
-    \"saved\" : {\n\
-        \"keyboard\" : {\n\
-            \"test_keyboard_option\" : \"globe\"\n\
-        },\n\
-        \"environment\" : {\n\
-            \"test_env_option\" : \"no\"\n\
-        }\n\
-    }\n\
-}\n";
-
-  EXPECT_EQ(buf, mock_json);*/
 }

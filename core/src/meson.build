@@ -89,7 +89,6 @@ kmx_files = files(
   'km_core_state_context_set_if_needed.cpp',
   'km_core_debug_api.cpp',
   'km_core_processevent_api.cpp',
-  'jsonpp.cpp',
   'util_normalize.cpp',
   'util_regex.cpp',
   'core_icu.cpp',
@@ -129,7 +128,6 @@ core_files = files(
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
-  'jsonpp.cpp',
   '../../common/cpp/utfcodec.cpp',
 )
 
