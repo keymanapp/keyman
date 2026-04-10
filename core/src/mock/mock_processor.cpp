@@ -75,11 +75,11 @@ namespace km {
     mock_processor::mock_processor(core::path const & path)
     : abstract_processor(
         keyboard_attributes(path.stem(), u"3.145", {
-          option{KM_CORE_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
+          option{KM_CORE_OPT_KEYBOARD, u"test_keyboard_option", u"default_value"},
         })),
       _options({
-          {u"\x01__test_point", u"not tiggered"},
-          {u"\x02hello", u"-"}
+          {u"\x01test_keyboard_option", u"default_value"},
+          {u"\x02test_env_option", u"-"}
       })
     {
     }
