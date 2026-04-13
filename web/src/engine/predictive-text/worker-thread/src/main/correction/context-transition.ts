@@ -146,7 +146,12 @@ export class ContextTransition {
     //   return t.applyContextSlide(lexicalModel, slideUpdateTransform);
     // });
 
-    const performTransitionStep = (baseState: ContextState, rootTokenization: ContextTokenization, transformToApply: Transform, inputDistribution: Distribution<Transform>) => {
+    const performTransitionStep = (
+      baseState: ContextState,
+      rootTokenization: ContextTokenization,
+      transformToApply: Transform,
+      inputDistribution: Distribution<Transform>
+    ) => {
       const appliedDistribution = [{sample: transformToApply, p: 1}];
       const { subsets: applicationSubsets, keyMatchingUserContext } = precomputeTransitions(
         [rootTokenization], appliedDistribution
@@ -180,9 +185,13 @@ export class ContextTransition {
       resultingState.appliedSuggestionId = suggestion.id;
       resultingState.suggestions = this.final.suggestions;
 
-      const resultingTransition = new ContextTransition(baseState, suggestion.id);
+      // Use the transform's ID for the transition.  Note that when applying the
+      // `appendedTransform` component of a suggestion, this will differ from
+      // suggestion.transformId.
+      const resultingTransition = new ContextTransition(baseState, transformToApply.id);
       resultingTransition.finalize(resultingState, inputDistribution);
       resultingTransition.revertableTransitionId = suggestion.transformId;
+      // .finalize unsets _.transitionId; re-assign it.
       resultingTransition._transitionId = transformToApply.id;
 
       return {
@@ -210,7 +219,12 @@ export class ContextTransition {
     }
 
     // Appended transforms apply to the context resulting from that.
-    const appendingTransition = performTransitionStep(results.transition.final, results.tokenization, suggestion.appendedTransform, []).transition;
+    const appendingTransition = performTransitionStep(
+      results.transition.final,
+      results.tokenization,
+      suggestion.appendedTransform,
+      []
+    ).transition;
     appendingTransition.final.appliedInput = { insert: '', deleteLeft: 0 };
 
     // Ensure the appended tokens all have the transition ID tagged to enable reversion.
