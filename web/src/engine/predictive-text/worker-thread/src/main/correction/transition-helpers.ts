@@ -52,14 +52,39 @@ export function precomputeTransitions(
   const lexicalModel = startTokenizations[0]?.tail.searchModule.model;
 
   const subsetBuilder = new TokenizationSubsetBuilder(keyer);
+
   for(let baseTokenization of startTokenizations) {
     for(let mass of transformDistribution) {
       const tokenizationAnalysis = baseTokenization.mapWhitespacedTokenization(lexicalModel, mass.sample);
       const alignment = tokenizationAnalysis.alignment;
 
-      // Pre-process any splits and merges; the result of these operations may
-      // have the same properties as other base tokenizations within the
-      // subset if compatible.
+      /* Pre-process any splits and merges; the result of these operations may
+       * have the same properties as other base tokenizations within the subset
+       * if compatible.
+       *
+       * Example case:  suppose the following two variations of context (forced
+       * as they may be):
+       * - [can, '] + t
+       * - [cans] + t
+       *
+       * Both have the same total codepoint length and incoming input, but the
+       * tokenization pattern is different.  But, if we pre-merge the first
+       * version...
+       * - [can'] + t
+       * - [cans] + t
+       *
+       * Both land with the same tokenization pattern:
+       * - [can't]
+       * - [canst]
+       *     - 5 total codepoints
+       *     - same total count of input transforms
+       *     - just one token for both cases.
+       *
+       * These two cases should converge within the same tokenization-pattern
+       * "cluster"... and the key built from 'sourceTokenization' below (during
+       * the .addPrecomputation call) is the tool used internally to recognize
+       * this.
+       */
       const needsRealignment = (alignment.merges.length > 0 || alignment.splits.length > 0 || alignment.unmappedEdits.length > 0);
       const sourceTokenization = needsRealignment ? baseTokenization.realign(alignment) : baseTokenization;
 
