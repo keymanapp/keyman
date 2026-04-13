@@ -1046,7 +1046,7 @@ export function finalizeSuggestions(
     }
 
     // Is sometimes not set during unit tests.
-    if(prediction.sample.transformId) {
+    if(prediction.sample.transformId !== undefined) {
       prediction.sample.transform.id = prediction.sample.transformId;
     }
 
