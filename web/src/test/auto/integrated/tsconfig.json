@@ -2,7 +2,6 @@
   "extends": "../../../tsconfig.dom.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../build/test",
     "rootDir": "."
   },

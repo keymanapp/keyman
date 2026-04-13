@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build/",
+    "rootDir": ".",
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
+    "skipLibCheck": true,
+    "noEmitOnError": false
+  },
+
+  "include": [ "*.ts", "loader/*.ts", "@types/*.d.ts" ],
+  "exclude": [ "node_modules" ],
+
+  "references": [
+    { "path": "../../../common/web-utils" },
+    { "path": "../../../engine" },
+  ]
+}

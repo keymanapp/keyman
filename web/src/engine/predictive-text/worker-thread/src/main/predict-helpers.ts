@@ -1,12 +1,12 @@
 import * as models from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import TransformUtils from './transformUtils.js';
+import { TransformUtils } from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
-import ModelCompositor from './model-compositor.js';
+import { ModelCompositor } from './model-compositor.js';
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
