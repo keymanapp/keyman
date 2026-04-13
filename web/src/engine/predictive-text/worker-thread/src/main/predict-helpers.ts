@@ -14,7 +14,6 @@ import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 import { getBestMatches, SearchNode } from './correction/distance-modeler.js';
 import { SearchQuotientNode } from './correction/search-quotient-node.js';
-import { TokenizationCorrector } from './correction/tokenization-corrector.js';
 import { initTokenResultFilterer, TokenResultMapping } from './correction/token-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
@@ -393,6 +392,13 @@ export function determineSuggestionAlignment(
   return { predictionContext: context, deleteLeft };
 }
 
+/**
+ * Given two ContextTokenizations related by context transition, this function
+ * determines the tail-end range of the tokenization affected by the transition.
+ * @param userContextTokenization
+ * @param variantForSuggestions
+ * @returns
+ */
 export function determineSuggestionRange(
   userContextTokenization: ContextTokenization,
   variantForSuggestions: ContextTokenization
@@ -408,8 +414,8 @@ export function determineSuggestionRange(
   const tokenSetA = userContextTokenization.tokens.slice();
   const tokenSetB = variantForSuggestions.tokens.slice();
 
-  let tokensToRemove: ContextToken[] = [];
-  let tokensToPredict: ContextToken[] = [];
+  const tokensToRemove: ContextToken[] = [];
+  const tokensToPredict: ContextToken[] = [];
 
   const tailIdFor = (tokens: ContextToken[]) => tokens[tokens.length-1]?.spaceId ?? -1;
   let tailOfA = tailIdFor(tokenSetA);
@@ -431,6 +437,8 @@ export function determineSuggestionRange(
     tokensToRemove.push(tokenSetA.pop());
     tokensToPredict.push(tokenSetB.pop());
   }
+
+  tokensToRemove.reverse();
 
   return {
     tokensToRemove,
@@ -502,46 +510,6 @@ export function buildAndMapPredictions(
   });
 
   return predictions;
-}
-
-export function prepareTokenizationSearch(
-  transition: ContextTransition,
-  tokenizations: ContextTokenization[]
-) {
-  // Goal - determine what parts of each tokenization are searchable & prep them for correcion-search.
-  const tokenizationAnalyses = tokenizations.map((tokenization) => {
-    return {
-      tokenization: tokenization,
-      analysis: determineSuggestionRange(transition.base.displayTokenization, tokenization)
-    };
-  });
-
-  const biggestCommonRemoval = tokenizationAnalyses.reduce(
-    (biggest, current) => biggest.length > current.analysis.tokensToRemove.length ? biggest : current.analysis.tokensToRemove,
-    [] as ContextToken[]
-  );
-
-  const tokenizationSetup = tokenizationAnalyses.map((tuple) => {
-    // These tokens are unaffected by the input whatsoever, though their
-    // probability may affect thresholding for the non-locked tokens.
-    const unaffectedTokenCount = biggestCommonRemoval.length - tuple.analysis.tokensToRemove.length;
-    const lockedTokens: ContextToken[] = biggestCommonRemoval.slice(0, unaffectedTokenCount);
-    let unboundToken: ContextToken;
-    const boundTokens: ContextToken[] = [];
-    tuple.analysis.tokensToPredict.forEach((token, index) => {
-      if(!correctionValidForAutoSelect(token.exampleInput)) {
-        lockedTokens.push(token);
-      } else if(index == tuple.analysis.tokensToPredict.length - 1) {
-        unboundToken = token;
-      } else {
-        boundTokens.push(token);
-      }
-    });
-
-    return new TokenizationCorrector(tuple.tokenization, tuple.analysis.tokensToPredict, lockedTokens, boundTokens, unboundToken);
-  });
-
-  return tokenizationSetup;
 }
 
 /**
@@ -618,8 +586,6 @@ export async function correctAndEnumerate(
   const tokenizations = [transition.final.tokenization];
   const searchModules = tokenizations.map(t => t.tail.searchModule);
 
-  // const preppedTokenizationSearch = prepareTokenizationSearch(transition, tokenizations);
-
   // Only run the correction search when corrections are enabled.
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
@@ -638,7 +604,7 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    if(match.matchedResult.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
+    if(match.node.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
       continue;
     }
 
