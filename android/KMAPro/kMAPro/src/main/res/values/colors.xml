@@ -35,6 +35,6 @@
 
     <color name="dialogBackground">#FFFFFF</color>
     <color name="toolbar">@color/keyman_blue</color>
-<!--    <color name="main_text_color">#FFFFFF</color>-->
+    <color name="main_text_color">#000000</color>
 
 </resources>
