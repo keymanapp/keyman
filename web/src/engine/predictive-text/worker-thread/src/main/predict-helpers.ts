@@ -392,6 +392,13 @@ export function determineSuggestionAlignment(
   return { predictionContext: context, deleteLeft };
 }
 
+/**
+ * Given two ContextTokenizations related by context transition, this function
+ * determines the tail-end range of the tokenization affected by the transition.
+ * @param userContextTokenization
+ * @param variantForSuggestions
+ * @returns
+ */
 export function determineSuggestionRange(
   userContextTokenization: ContextTokenization,
   variantForSuggestions: ContextTokenization
@@ -407,8 +414,8 @@ export function determineSuggestionRange(
   const tokenSetA = userContextTokenization.tokens.slice();
   const tokenSetB = variantForSuggestions.tokens.slice();
 
-  let tokensToRemove: ContextToken[] = [];
-  let tokensToPredict: ContextToken[] = [];
+  const tokensToRemove: ContextToken[] = [];
+  const tokensToPredict: ContextToken[] = [];
 
   const tailIdFor = (tokens: ContextToken[]) => tokens[tokens.length-1]?.spaceId ?? -1;
   let tailOfA = tailIdFor(tokenSetA);
@@ -430,6 +437,8 @@ export function determineSuggestionRange(
     tokensToRemove.push(tokenSetA.pop());
     tokensToPredict.push(tokenSetB.pop());
   }
+
+  tokensToRemove.reverse();
 
   return {
     tokensToRemove,
