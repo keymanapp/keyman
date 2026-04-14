@@ -88,7 +88,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   constructor(
     tokenization: ContextTokenization,
     tailCorrectionLength: number,
-    filterClosure: (token: ContextToken) => boolean
+    filterClosure: (token: ContextToken, index?: number) => boolean
   ) {
     this.tokenization = tokenization;
     this.tailCorrectionLength = tailCorrectionLength;

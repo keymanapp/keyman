@@ -14,6 +14,7 @@ import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 import { getBestMatches, SearchNode } from './correction/distance-modeler.js';
 import { SearchQuotientNode } from './correction/search-quotient-node.js';
+import { TokenizationCorrector } from './correction/tokenization-corrector.js';
 import { initTokenResultFilterer, TokenResultMapping } from './correction/token-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
@@ -448,6 +449,39 @@ export function buildAndMapPredictions(
   });
 
   return predictions;
+}
+
+export function prepareTokenizationSearch(
+  transition: ContextTransition,
+  tokenizations: ContextTokenization[]
+) {
+  // Goal - determine what parts of each tokenization are searchable & prep them for correcion-search.
+  const tokenizationAnalyses = tokenizations.map((tokenization) => {
+    return {
+      tokenization: tokenization,
+      analysis: determineSuggestionRange(transition.base.displayTokenization, tokenization)
+    };
+  });
+
+  const biggestCommonRemoval = tokenizationAnalyses.reduce(
+    (biggest, current) => biggest.length > current.analysis.tokensToRemove.length ? biggest : current.analysis.tokensToRemove,
+    [] as ContextToken[]
+  );
+
+  const tokenizationSetup = tokenizationAnalyses.map((tuple) => {
+    // These tokens are unaffected by the input whatsoever, though their
+    // probability may affect thresholding for the non-locked tokens.
+    const unaffectedTokenCount = biggestCommonRemoval.length - tuple.analysis.tokensToRemove.length;
+
+    const mutatedLength = tuple.analysis.tokensToPredict.length;
+    return new TokenizationCorrector(tuple.tokenization, mutatedLength, (token, index) => {
+      return index >= unaffectedTokenCount  // is a modified token
+        && index == mutatedLength - 1       // TEMP: adjacent to the caret (TO BE REMOVED)
+        && correctionValidForAutoSelect(token.exampleInput);  // and is eligible text-correction
+    });
+  });
+
+  return tokenizationSetup;
 }
 
 /**
