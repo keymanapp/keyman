@@ -604,6 +604,39 @@ export function determineTokenizedCorrectionSequence(
   };
 }
 
+export function prepareTokenizationSearch(
+  transition: ContextTransition,
+  tokenizations: ContextTokenization[]
+) {
+  // Goal - determine what parts of each tokenization are searchable & prep them for correcion-search.
+  const tokenizationAnalyses = tokenizations.map((tokenization) => {
+    return {
+      tokenization: tokenization,
+      analysis: determineSuggestionRange(transition.base.displayTokenization.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId)
+    };
+  });
+
+  const biggestCommonRemoval = tokenizationAnalyses.reduce(
+    (biggest, current) => biggest.length > current.analysis.tokensToRemove.length ? biggest : current.analysis.tokensToRemove,
+    [] as ContextTokenLike[]
+  );
+
+  const tokenizationSetup = tokenizationAnalyses.map((tuple) => {
+    // These tokens are unaffected by the input whatsoever, though their
+    // probability may affect thresholding for the non-locked tokens.
+    const unaffectedTokenCount = biggestCommonRemoval.length - tuple.analysis.tokensToRemove.length;
+
+    const mutatedLength = tuple.analysis.tokensToPredict.length;
+    return new TokenizationCorrector(tuple.tokenization, mutatedLength, (token, index) => {
+      return index >= unaffectedTokenCount  // is a modified token
+        && index == mutatedLength - 1       // TEMP: adjacent to the caret (TO BE REMOVED)
+        && correctionValidForAutoSelect(token.exampleInput);  // and is eligible text-correction
+    });
+  });
+
+  return tokenizationSetup;
+}
+
 /**
  * This method performs the correction-search and model-lookup operations for
  * prediction generation by using the user's context state and potential
