@@ -14,6 +14,7 @@ import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 import { getBestMatches, SearchNode } from './correction/distance-modeler.js';
 import { SearchQuotientNode } from './correction/search-quotient-node.js';
+import { TokenizationCorrector } from './correction/tokenization-corrector.js';
 import { initTokenResultFilterer, TokenResultMapping } from './correction/token-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
@@ -323,6 +324,7 @@ export function determineContextTransition(
   return transition;
 }
 
+// TODO:  Remove this and its associated unit tests!
 /**
  * Determines where the context for prediction-generation should be rooted and how
  * much of the context it should replace.
@@ -430,14 +432,13 @@ export function determineSuggestionRange(
     }
   }
 
-  tokensToPredict.reverse();
-
   // Can occur when backspacing to the end of a previous word.
   if(tokensToPredict.length == 0) {
     tokensToRemove.push(tokenSetA.pop());
     tokensToPredict.push(tokenSetB.pop());
   }
 
+  tokensToPredict.reverse();
   tokensToRemove.reverse();
 
   return {
@@ -454,34 +455,37 @@ export function buildAndMapPredictions(
   const model = transition.final.model;
   const searchSpace = tokenization.tail.searchModule;
 
-  // No matter the prediction, once we know the root of the prediction, we'll
-  // always 'replace' the same amount of text.  We can handle this before the
-  // big 'prediction root' loop.
-  const { predictionContext, deleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
+  const applicationTarget = transition.base.displayTokenization;
+  const { deleteLeft } = determineSuggestionRange(applicationTarget, tokenization);
 
-  let correction = match.matchString;
-  let rootCost = match.totalCost;
+  // Exists to be extended by the 'correctionTransfrom' below.
+  const emptyContext: Context = {
+    left: '',
+    startOfBuffer: false,
+    endOfBuffer: false
+  };
 
   // Replace the existing context with the correction.
   const correctionTransform: Transform = {
-    insert: correction,  // insert correction string
-    deleteLeft: deleteLeft,
+    insert: match.matchString,  // insert correction string
+    deleteLeft: 0,
     id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
   }
 
+  let rootCost = match.totalCost;
   /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-    * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-    * there are significantly more likely words.  We only need this to allow very minor fat-finger
-    * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-    * key borders.
-    *
-    * Technically, the probabilities this produces won't be normalized as-is... but there's no
-    * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-    * to apply it could become tricky, so it's simpler to leave out.
-    *
-    * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-    * is needed in the future.
-    */
+   * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+   * there are significantly more likely words.  We only need this to allow very minor fat-finger
+   * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+   * key borders.
+   *
+   * Technically, the probabilities this produces won't be normalized as-is... but there's no
+   * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+   * to apply it could become tricky, so it's simpler to leave out.
+   *
+   * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+   * is needed in the future.
+   */
   if(searchSpace.inputCount <= 1) {
     /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
      * ambiguous case that would only arise very near the center of the boundary between two keys.
@@ -502,14 +506,55 @@ export function buildAndMapPredictions(
     p: Math.exp(-rootCost)
   };
 
-  let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
+  let predictions = predictFromCorrections(model, [predictionRoot], emptyContext);
   predictions.forEach((entry) => {
     entry.preservationTransform = tokenization.taillessTrueKeystroke;
     // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
     // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
+    entry.prediction.sample.transform.deleteLeft = deleteLeft;
   });
 
   return predictions;
+}
+
+export function prepareTokenizationSearch(
+  transition: ContextTransition,
+  tokenizations: ContextTokenization[]
+) {
+  // Goal - determine what parts of each tokenization are searchable & prep them for correcion-search.
+  const tokenizationAnalyses = tokenizations.map((tokenization) => {
+    return {
+      tokenization: tokenization,
+      analysis: determineSuggestionRange(transition.base.displayTokenization, tokenization)
+    };
+  });
+
+  const biggestCommonRemoval = tokenizationAnalyses.reduce(
+    (biggest, current) => biggest.length > current.analysis.tokensToRemove.length ? biggest : current.analysis.tokensToRemove,
+    [] as ContextToken[]
+  );
+
+  const tokenizationSetup = tokenizationAnalyses.map((tuple) => {
+    // These tokens are unaffected by the input whatsoever, though their
+    // probability may affect thresholding for the non-locked tokens.
+    const unaffectedTokenCount = biggestCommonRemoval.length - tuple.analysis.tokensToRemove.length;
+    const lockedTokens: ContextToken[] = biggestCommonRemoval.slice(0, unaffectedTokenCount);
+    let unboundToken: ContextToken;
+    const boundTokens: ContextToken[] = [];
+    tuple.analysis.tokensToPredict.forEach((token, index) => {
+      if(!correctionValidForAutoSelect(token.exampleInput)) {
+        lockedTokens.push(token);
+      } else if(index == tuple.analysis.tokensToPredict.length - 1) {
+        unboundToken = token;
+      } else {
+        boundTokens.push(token);
+      }
+    });
+
+    return new TokenizationCorrector(tuple.tokenization, tuple.analysis.tokensToPredict, lockedTokens, boundTokens, unboundToken);
+  });
+
+  return tokenizationSetup;
 }
 
 /**
@@ -585,6 +630,8 @@ export async function correctAndEnumerate(
   // The 'eventual' logic will be significantly more complex, though still manageable.
   const tokenizations = [transition.final.tokenization];
   const searchModules = tokenizations.map(t => t.tail.searchModule);
+
+  // const preppedTokenizationSearch = prepareTokenizationSearch(transition, tokenizations);
 
   // Only run the correction search when corrections are enabled.
   let rawPredictions: CorrectionPredictionTuple[] = [];
