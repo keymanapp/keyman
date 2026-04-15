@@ -5,12 +5,13 @@ export class TokenizationResultMapping implements CorrectionResultMapping<Readon
   readonly matchingSpace: TokenizationCorrector;
   readonly matchedResult: ReadonlyArray<TokenResult>;
 
-  // Supports SearchPath -> SearchSpace remapping.
-  readonly spaceId: number;
-
   constructor(tokenization: TokenResult[], corrector: TokenizationCorrector) {
     this.matchingSpace = corrector;
     this.matchedResult = tokenization;
+  }
+
+  get spaceId(): number {
+    return this.matchingSpace.tokenization.spaceId;
   }
 
   // /**

@@ -28,6 +28,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   private tokenCostMap: Map<ContextToken, number>;
   private _lockedTokenResults: Map<ContextToken, TokenResult>;
   private lastTotalCost: number;
+  private handleHasBeenCalled: boolean = false;
 
   get currentCost(): number {
     const token = this.selectionQueue.peek();
@@ -140,6 +141,10 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     return this.lastTotalCost + tokenCost - (this.tokenCostMap.get(updatedToken) ?? 0);
   }
 
+  private collateResults(): TokenizationResultMapping {
+    return new TokenizationResultMapping(this.orderedTokens.map((t) => this._lockedTokenResults.get(t)), this);
+  }
+
   handleNextNode(): PathResult<TokenizationResultMapping> {
     // Notable states:
     // 1.  Unbound tokens have not yet been "locked" - no valid correction has yet been found.
@@ -153,14 +158,23 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     // 4.  Unbound token is unlocked, but all others are locked.
 
     const tokenToUpdate = this.selectionQueue.dequeue();
-    const tokenResult = tokenToUpdate.searchModule.handleNextNode();
+    const tokenResult = tokenToUpdate?.searchModule.handleNextNode();
 
-    if(tokenResult.type == 'none') {
+    if(tokenResult?.type == 'none' || (!tokenResult && this.handleHasBeenCalled)) {
       // If we reach this point, the tokenization has exhausted its search space.
       return {
         'type': 'none'
       };
+    } else if(!tokenResult) {
+      this.handleHasBeenCalled = true;
+      return {
+        'type': 'complete',
+        cost: this.lastTotalCost,
+        mapping: this.collateResults()
+      };
     }
+
+    this.handleHasBeenCalled = true;
 
     // Update the cost associated with the token.
     const cost = this.lastTotalCost = this.getUpdatedTotalCost(tokenToUpdate, tokenResult.cost);
@@ -198,13 +212,12 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       this.selectionQueue.enqueue(this._unboundToken);
     }
 
-    const tokenCorrections: TokenResult[] = this.orderedTokens.map((t) => this._lockedTokenResults.get(t));
-
-    if(tokenCorrections.findIndex((c) => c == undefined) != -1) {
+    const correctionResults = this.collateResults();
+    if(correctionResults.matchedResult.findIndex((c) => c == undefined) != -1) {
       return {
         type: 'intermediate',
         cost
-      }
+      };
     }
 
     // Determine the proper return type and construct the proper return object accordingly.
@@ -212,7 +225,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     return {
       type: 'complete',
       cost,
-      mapping: new TokenizationResultMapping(tokenCorrections, this)
+      mapping: correctionResults
     };
   }
 }
