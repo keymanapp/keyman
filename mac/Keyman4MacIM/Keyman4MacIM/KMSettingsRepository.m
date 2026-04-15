@@ -76,6 +76,16 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   return ([[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey] != nil);
 }
 
+/**
+ * Returns true for Keyman 18 and earlier when settings were stored exclusively for the input method rather than for the app group.
+ * If the selectedKeyboard has not been set, then the settings are not saved in the input method's UserDefaults.
+ */
+- (BOOL)inputMethodUserDefaultsExist
+{
+  return ([[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey] != nil);
+}
+
+
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value {
   NSDictionary *optionsMap = [self readOptionsForSelectedKeyboard];
   NSDictionary *newOptionsMap = nil;
@@ -125,12 +135,12 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
 }
 
 /**
- * Determines whether the keyboard data needs to be moved from the old location to the new location
+ * Determines whether the keyboard data needs to be moved from pre-Keyman-18 location to the Keyman 18 location
  * This is true if
  * 1) the UserDefaults exist (indicating that this is not a new installation of Keyman) and
  * 2) the value for kVersionStoreDataInLibraryDirectory is < 1,
  */
-- (BOOL)dataMigrationNeeded {
+- (BOOL)keyman18DataMigrationNeeded {
   BOOL keymanSettingsExist = [self settingsExist];
   os_log([KMLogs dataLog], "keyman settings exist: %{public}@", keymanSettingsExist ? @"YES" : @"NO" );
   
@@ -142,6 +152,24 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
 
   return migrationNeeded;
 }
+
+/**
+ * Determines whether the keyboard data needs to be moved from the Keyman 18 location to the Keyman 19 location
+ * This is true if the UserDefaults exist in the old location for the input method
+ */
+- (BOOL)keyman19SettingsMigrationNeeded {
+  BOOL keymanSettingsExistForInputMethod = [self inputMethodUserDefaultsExist];
+  os_log([KMLogs dataLog], "keyman input method settings exist (for 18 and earlier): %{public}@", keymanSettingsExistForInputMethod ? @"YES" : @"NO" );
+  
+  BOOL keyboardsStoredInLibrary = [self dataModelWithKeyboardsInLibrary];
+  os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
+  
+  BOOL migrationNeeded = keymanSettingsExistForInputMethod;
+  os_log([KMLogs dataLog], "dataMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
+
+  return migrationNeeded;
+}
+
 
 - (NSString *)readSelectedKeyboard {
   return [[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey];
@@ -226,14 +254,14 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   return [userData removeObjectForKey:kPersistedOptionsKey];
 }
 
-- (void)convertSettingsForMigration {
+- (void)migrateSettingsForKeyman18 {
   os_log_debug([KMLogs dataLog], "converting settings in UserDefaults for migration");
-  [self convertSelectedKeyboardPathForMigration];
-  [self convertActiveKeyboardArrayForMigration];
-  [self convertOptionsPathsForMigration];
+  [self convertSelectedKeyboardPathForKeyman18Migration];
+  [self convertActiveKeyboardArrayForKeyman18Migration];
+  [self convertOptionsPathsForKeyman18Migration];
 }
 
-- (void)convertSelectedKeyboardPathForMigration {
+- (void)convertSelectedKeyboardPathForKeyman18Migration {
   NSString *selectedKeyboardPath = [self readSelectedKeyboard];
   if (selectedKeyboardPath != nil) {
     NSString *newPathString = [self trimObsoleteKeyboardPath:selectedKeyboardPath];
@@ -262,7 +290,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   return newPath;
 }
 
-- (void)convertActiveKeyboardArrayForMigration {
+- (void)convertActiveKeyboardArrayForKeyman18Migration {
   NSMutableArray *keyboards = [self activeKeyboards];
   NSMutableArray *convertedActiveKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
   BOOL didConvert = NO;
@@ -286,7 +314,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   }
 }
 
-- (void)convertOptionsPathsForMigration {
+- (void)convertOptionsPathsForKeyman18Migration {
   NSDictionary * optionsMap = [self readFullOptionsMap];
   NSMutableDictionary *mutableOptionsMap = nil;
   BOOL optionsChanged = NO;

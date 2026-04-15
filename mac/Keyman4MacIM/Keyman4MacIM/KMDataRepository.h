@@ -10,20 +10,21 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface KMDataRepository : NSObject
-// keymanDataDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'
-@property (readonly) NSURL *keymanDataDirectory;
+// keyman18DataDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'
+@property (readonly) NSURL *keyman18DataDirectory;
 
-// keymanKeyboardsDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
-@property (readonly) NSURL *keymanKeyboardsDirectory;
+// keyman18KeyboardsDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
+@property (readonly) NSURL *keyman18KeyboardsDirectory;
 
 @property (readonly) NSURL *keyman19ContainerDirectory;
 @property (readonly) NSURL *keyman19KeyboardsDirectory;
 
 + (KMDataRepository *)shared;
-- (void)createDataDirectoryIfNecessary;
+- (void)createKeyman18DataDirectoryIfNecessary;
 - (void)createKeyboardsDirectoryIfNecessary;
 - (void)createKeyman19SharedDirectoriesIfNecessary;
-- (BOOL)migrateData;
+- (BOOL)migrateDataForKeyman18;
+- (BOOL)migrateDataForKeyman19;
 - (NSString*)buildFullPath:(NSString *)fromPartialPath;
 - (NSString*)trimToPartialPath:(NSString *)fromFullPath;
 - (NSString *)buildPartialPathFrom:(NSString *)keyboardSubdirectory keyboardFile:(NSString *)kmxFilename;

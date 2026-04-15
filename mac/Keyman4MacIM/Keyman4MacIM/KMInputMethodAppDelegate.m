@@ -509,7 +509,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  */
 - (NSString *)keyboardsPath {
   if (_keyboardsPath == nil) {
-    _keyboardsPath = [KMDataRepository shared].keymanKeyboardsDirectory.path;
+    _keyboardsPath = [KMDataRepository shared].keyman18KeyboardsDirectory.path;
   }
   
   return _keyboardsPath;
@@ -756,17 +756,28 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)prepareStorage {
   os_log_debug([KMLogs dataLog], "*** prepareStorage ***");
 
-  [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
-// [KMDataRepository.shared createDataDirectoryIfNecessary];
+// TODO: create directory before copy during migration?
+// [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
+// [KMDataRepository.shared createKeyman18DataDirectoryIfNecessary];
 
-  // TODO: MAC_CONFIG expand data migration for Keyman 19
+// Keyman 18 data migration: TODO: uncomment and modify for double migration
+  /*
+  if ([KMSettingsRepository.shared keyman18DataMigrationNeeded]) {
+    [KMDataRepository.shared migrateDataForKeyman18];
+    [KMSettingsRepository.shared migrateSettingsForKeyman18];
+  }
+  */
   
-  if ([KMSettingsRepository.shared dataMigrationNeeded]) {
-    [KMDataRepository.shared migrateData];
-    [KMSettingsRepository.shared convertSettingsForMigration];
+// Keyman 19 data migration
+  if ([KMSettingsRepository.shared keyman19SettingsMigrationNeeded]) {
+    [KMDataRepository.shared migrateDataForKeyman19];
+    //[KMSettingsRepository.shared migrateSettingsForKeyman18];
   }
   
-  [KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
+  [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
+
+  // TODO: delete
+  //[KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
   [KMSettingsRepository.shared setDataModelVersionIfNecessary];
 }
 
