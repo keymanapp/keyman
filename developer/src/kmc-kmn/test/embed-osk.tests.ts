@@ -53,6 +53,7 @@ describe('Compiler OSK Embedding', function() {
       const result = await compileKMNFile('test_v19_kmxplus');
       assert.isNotNull(result);
       assert.isNotNull(result.artifacts.kmx);
+      assert.lengthOf(callbacks.messages, 0);
 
       // We'll check that the stores and groups start after the KMX+ struct
 
@@ -215,6 +216,8 @@ describe('Compiler OSK Embedding', function() {
 
         const data = embedder.unitTestEndpoints.injectKmxPlusIntoKmxFile(semiValid19KmxFile, sentinelKmxPlusBlob);
         assert.isNotNull(data);
+        assert.lengthOf(callbacks.messages, 0);
+
         assert.equal(data.byteLength, semiValid19KmxFile.byteLength + sentinelKmxPlusBlob.byteLength);
 
         assert.deepEqual(
@@ -263,6 +266,7 @@ describe('Compiler OSK Embedding', function() {
 
         const data = embedder.embed(kmxArtifacts.artifacts.kmx.data, makePathToFixture('embed-osk/khmer_angkor.kvks'), '', null);
         assert.isNotNull(data);
+        assert.lengthOf(callbacks.messages, 0);
 
         const kmx = new KMX.KMXFile();
         const binaryKeyboard = kmx.COMP_KEYBOARD.fromBuffer(data);
@@ -306,8 +310,8 @@ describe('Compiler OSK Embedding', function() {
         assert.lengthOf(kmxplus.keys.flicks, 1);
         assert.equal(kmxplus.keys.flicks[0].id.value, '');
         assert.lengthOf(kmxplus.keys.flicks[0].flicks, 0);
-        assert.lengthOf(kmxplus.keys.kmap, 0);
         assert.lengthOf(kmxplus.keys.keys, 185); // number of key entries in the .kvks file (less one commented out to create a gap)
+        assert.lengthOf(kmxplus.keys.kmap, 185);
 
         // first key
 
@@ -430,6 +434,7 @@ describe('Compiler OSK Embedding', function() {
 
         const data = embedder.embed(kmxArtifacts.artifacts.kmx.data, '', makePathToFixture('embed-osk/khmer_angkor.keyman-touch-layout'), null);
         assert.isNotNull(data);
+        assert.lengthOf(callbacks.messages, 0);
 
         const kmx = new KMX.KMXFile();
         const binaryKeyboard = kmx.COMP_KEYBOARD.fromBuffer(data);
@@ -454,7 +459,7 @@ describe('Compiler OSK Embedding', function() {
         // KMX+ -- strs
 
         assert.isObject(kmxplus.strs);
-        assert.lengthOf(kmxplus.strs.strings, 475);
+        assert.lengthOf(kmxplus.strs.strings, 476);
 
         // KMX+ -- disp
 
@@ -464,15 +469,15 @@ describe('Compiler OSK Embedding', function() {
 
         // NE Hint on Q key
 
-        const qDisp = kmxplus.disp.disps.find(disp => disp.toId.value == 'default-K_Q+169');
-        assert.equal(qDisp.toId.value, 'default-K_Q+169');
+        const qDisp = kmxplus.disp.disps.find(disp => disp.toId.value == 'phone~default-K_Q');
+        assert.equal(qDisp.toId.value, 'phone~default-K_Q');
         assert.equal(qDisp.display.value, '្ឆ');
         assert.equal(qDisp.flags, KMXPlus.DispItemFlags.hintNE | KMXPlus.DispItemFlags.isId);
 
         // Enter key cap on Enter key
 
-        const enterDisp = kmxplus.disp.disps.find(disp => disp.toId.value == 'default-K_ENTER+56');
-        assert.equal(enterDisp.toId.value, 'default-K_ENTER+56');
+        const enterDisp = kmxplus.disp.disps.find(disp => disp.toId.value == 'phone~default-K_ENTER');
+        assert.equal(enterDisp.toId.value, 'phone~default-K_ENTER');
         assert.equal(enterDisp.display.value, '');
         assert.equal(enterDisp.flags, KMXPlus.DispItemFlags.keyCapEnter | KMXPlus.DispItemFlags.isId);
 
@@ -490,45 +495,44 @@ describe('Compiler OSK Embedding', function() {
         assert.equal(kmxplus.keys.flicks[0].id.value, '');
         assert.lengthOf(kmxplus.keys.flicks[0].flicks, 0);
 
-        assert.equal(kmxplus.keys.flicks[1].id.value, 'default-K_A+189');
+        assert.equal(kmxplus.keys.flicks[1].id.value, 'phone~default-K_A');
         assert.lengthOf(kmxplus.keys.flicks[1].flicks, 1);
         assert.equal(kmxplus.keys.flicks[1].flicks[0].directions[0].value.value, 's');
-        assert.equal(kmxplus.keys.flicks[1].flicks[0].keyId.value, 'shift-K_A+190');
+        assert.equal(kmxplus.keys.flicks[1].flicks[0].keyId.value, 'phone~default-K_A+shift');
 
 
-        assert.equal(kmxplus.keys.flicks[2].id.value, 'default-K_B+218');
+        assert.equal(kmxplus.keys.flicks[2].id.value, 'phone~default-K_B');
         assert.lengthOf(kmxplus.keys.flicks[2].flicks, 1);
         assert.equal(kmxplus.keys.flicks[2].flicks[0].directions[0].value.value, 's');
-        assert.equal(kmxplus.keys.flicks[2].flicks[0].keyId.value, 'default-T_17D2_1794+219');
+        assert.equal(kmxplus.keys.flicks[2].flicks[0].keyId.value, 'phone~default-U_17D2_1794');
 
-        assert.equal(kmxplus.keys.flicks[61].id.value, 'western-U_003D+387');
+        assert.equal(kmxplus.keys.flicks[61].id.value, 'phone~western-U_003D');
         assert.lengthOf(kmxplus.keys.flicks[61].flicks, 1);
         assert.equal(kmxplus.keys.flicks[61].flicks[0].directions[0].value.value, 's');
-        assert.equal(kmxplus.keys.flicks[61].flicks[0].keyId.value, 'western-U_2260+388');
+        assert.equal(kmxplus.keys.flicks[61].flicks[0].keyId.value, 'phone~western-U_2260');
 
-
-        assert.lengthOf(kmxplus.keys.kmap, 0);
+        assert.lengthOf(kmxplus.keys.kmap, 398);
         assert.lengthOf(kmxplus.keys.keys, 398);
 
         // first key
 
         assert.equal(kmxplus.keys.keys[0].flags, 0);
-        assert.equal(kmxplus.keys.keys[0].flicks, '');
-        assert.equal(kmxplus.keys.keys[0].id.value, 'default-K_0+10');
+        assert.equal(kmxplus.keys.keys[0].flicks, 'phone~default-K_A');
+        assert.equal(kmxplus.keys.keys[0].id.value, 'phone~default-K_A');
         assert.lengthOf(kmxplus.keys.keys[0].longPress, 0);
         assert.equal(kmxplus.keys.keys[0].longPressDefault.value, '');
         assert.lengthOf(kmxplus.keys.keys[0].multiTap, 0);
         assert.equal(kmxplus.keys.keys[0].switch.value, '');
-        assert.equal(kmxplus.keys.keys[0].to.value, '០');
+        assert.equal(kmxplus.keys.keys[0].to.value, 'ា');
         assert.equal(kmxplus.keys.keys[0].width, 100);
 
-        // equals key
+        // equals key (on tablet form only)
 
-        const equalsKey = kmxplus.keys.keys[29];
+        const equalsKey = kmxplus.keys.keys.find(key => key.id.value == 'tablet~default-K_EQUAL');
         assert.isDefined(equalsKey);
         assert.equal    (equalsKey.flags, 0);
         assert.equal    (equalsKey.flicks, '');
-        assert.equal    (equalsKey.id.value, 'default-K_EQUAL+12');
+        assert.equal    (equalsKey.id.value, 'tablet~default-K_EQUAL');
         assert.lengthOf (equalsKey.longPress, 0);
         assert.equal    (equalsKey.longPressDefault.value, '');
         assert.lengthOf (equalsKey.multiTap, 0);
@@ -538,11 +542,11 @@ describe('Compiler OSK Embedding', function() {
 
         // ល key
 
-        const laKey = kmxplus.keys.keys[43];
+        const laKey = kmxplus.keys.keys.find(key => key.id.value == 'phone~default-K_L');
         assert.isDefined(laKey);
         assert.equal   (laKey.flags, 0);
-        assert.equal   (laKey.flicks, '');
-        assert.equal   (laKey.id.value, 'default-K_L+36');
+        assert.equal   (laKey.flicks, 'phone~default-K_L');
+        assert.equal   (laKey.id.value, 'phone~default-K_L');
         assert.lengthOf(laKey.longPress, 0);
         assert.equal   (laKey.longPressDefault.value, '');
         assert.lengthOf(laKey.multiTap, 0);
@@ -552,29 +556,29 @@ describe('Compiler OSK Embedding', function() {
 
         // K_Q - south-flick
 
-        const qKey = kmxplus.keys.keys[64];
-        assert.equal(qKey.id.value, 'default-K_Q+169');
+        const qKey = kmxplus.keys.keys.find(key => key.id.value == 'phone~default-K_Q');
+        assert.equal(qKey.id.value, 'phone~default-K_Q');
         assert.equal(qKey.to.value, 'ឆ');
-        assert.equal(qKey.flicks, 'default-K_Q+169');
+        assert.equal(qKey.flicks, 'phone~default-K_Q');
 
-        const flicks = kmxplus.keys.flicks.find(flicks => flicks.id.value == 'default-K_Q+169');
-        assert.equal(flicks.id.value, 'default-K_Q+169');
+        const flicks = kmxplus.keys.flicks.find(flicks => flicks.id.value == 'phone~default-K_Q');
+        assert.equal(flicks.id.value, 'phone~default-K_Q');
         assert.lengthOf(flicks.flicks, 1);
         assert.equal(flicks.flicks[0].directions[0].value.value, 's');
-        assert.equal(flicks.flicks[0].keyId.value, 'default-T_17D2_1786+170');
+        assert.equal(flicks.flicks[0].keyId.value, 'phone~default-U_17D2_1786');
 
         // K_NUMLOCK - multitap
 
-        const numlockKey = kmxplus.keys.keys.find(key => key.id.value == 'default-K_NUMLOCK+226');
+        const numlockKey = kmxplus.keys.keys.find(key => key.id.value == 'phone~default-K_NUMLOCK');
         assert.lengthOf(numlockKey.multiTap, 1);
-        assert.equal(numlockKey.multiTap[0].value.value, 'default-K_NUMERALS+227');
+        assert.equal(numlockKey.multiTap[0].value.value, 'phone~default-K_NUMERALS');
 
         // K_PERIOD - multitap
 
-        const periodKey = kmxplus.keys.keys.find(key => key.id.value == 'default-K_PERIOD+231');
+        const periodKey = kmxplus.keys.keys.find(key => key.id.value == 'phone~default-K_PERIOD');
         assert.lengthOf(periodKey.longPress, 1);
-        assert.equal(periodKey.longPress[0].value.value, 'shift-K_PERIOD+232');
-        assert.equal(periodKey.longPressDefault.value, 'shift-K_PERIOD+232');
+        assert.equal(periodKey.longPress[0].value.value, 'phone~default-K_PERIOD+shift');
+        assert.equal(periodKey.longPressDefault.value, 'phone~default-K_PERIOD+shift');
         assert.equal(periodKey.width, 120); // happens to be a wider key, let's test that too
 
         // KMX+ -- layr
@@ -603,10 +607,10 @@ describe('Compiler OSK Embedding', function() {
         assert.lengthOf(layer.rows[2].keys, 10);
         assert.lengthOf(layer.rows[3].keys, 5);
 
-        assert.equal(layer.rows[0].keys[0].value, 'default-K_Q+169');
-        assert.equal(layer.rows[1].keys[0].value, 'default-K_A+189');
-        assert.equal(layer.rows[2].keys[0].value, 'default-K_SHIFT+209');
-        assert.equal(layer.rows[3].keys[0].value, 'default-K_NUMLOCK+226');
+        assert.equal(layer.rows[0].keys[0].value, 'phone~default-K_Q');
+        assert.equal(layer.rows[1].keys[0].value, 'phone~default-K_A');
+        assert.equal(layer.rows[2].keys[0].value, 'phone~default-K_SHIFT');
+        assert.equal(layer.rows[3].keys[0].value, 'phone~default-K_NUMLOCK');
 
         // KMX+ -- list
 
@@ -638,6 +642,7 @@ describe('Compiler OSK Embedding', function() {
 
         const data = embedder.embed(kmxArtifacts.artifacts.kmx.data, makePathToFixture('embed-osk/khmer_angkor.kvks'), makePathToFixture('embed-osk/khmer_angkor.keyman-touch-layout'), null);
         assert.isNotNull(data);
+        assert.lengthOf(callbacks.messages, 0);
 
         const kmx = new KMX.KMXFile();
         const binaryKeyboard = kmx.COMP_KEYBOARD.fromBuffer(data);
@@ -662,7 +667,7 @@ describe('Compiler OSK Embedding', function() {
         // KMX+ -- strs
 
         assert.isObject(kmxplus.strs);
-        assert.lengthOf(kmxplus.strs.strings, 663);
+        assert.lengthOf(kmxplus.strs.strings, 664);
 
         // KMX+ -- disp
 
@@ -681,7 +686,7 @@ describe('Compiler OSK Embedding', function() {
         assert.isObject(kmxplus.keys);
         assert.lengthOf(kmxplus.keys.flicks, 62);
 
-        assert.lengthOf(kmxplus.keys.kmap, 0);
+        assert.lengthOf(kmxplus.keys.kmap, 583);  // TODO-EMBED-OSK-IN-KMX comparison
         assert.lengthOf(kmxplus.keys.keys, 583);
 
         // first key

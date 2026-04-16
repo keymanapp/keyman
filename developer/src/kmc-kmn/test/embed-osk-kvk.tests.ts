@@ -115,7 +115,8 @@ describe('Compiler OSK Embedding', function() {
         ]);
 
         assert.isArray(keys.kmap);
-        assert.isEmpty(keys.kmap);
+        assert.lengthOf(keys.kmap, keys.keys.length);
+        // TODO-EMBED-OSK-IN-KMX: add tests for keys.kmap
 
         // bag will be a map of maps; this test has three layers with an unmodified base layer K_A, a shift+K_B, and Ctrl+Shift+C
         assert.isNotNull(bag);
