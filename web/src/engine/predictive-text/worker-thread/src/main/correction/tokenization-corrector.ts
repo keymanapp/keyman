@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-04-02
+ *
+ * This file defines the `TokenizationCorrector` class, which is used to
+ * prioritize optimal multi-token corrections (and predictions) within the
+ * predictive-text correction-search engine.
+ */
+
 import { PriorityQueue } from "@keymanapp/web-utils";
 
 import { ContextToken } from "./context-token.js";
