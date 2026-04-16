@@ -206,6 +206,7 @@ export class EmbedOskTouchLayoutInKmx {
     if(text.match(/^\*(.+)\*$/)) {
       if(typeof((<any>specialKeyCaps)[text]) != 'number') {
         this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutSpecialLabelNotValid({id: sourceId, text}));
+        // gracefully degrade, display the unrecognized `*x*` key cap
       } else {
         const keyCap = (<any>specialKeyCaps)[text];
         const newDisp: KMXPlus.DispItem = {

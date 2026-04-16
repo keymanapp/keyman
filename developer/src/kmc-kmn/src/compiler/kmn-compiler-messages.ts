@@ -261,8 +261,8 @@ export class KmnCompilerMessages {
     The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
     component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
     hexadecimal. Control codes and non-character codepoints are not permitted.
-    Use the whole Unicode codepoint rather than a surrogate pair. For more
-    detail, see
+    Use the whole Unicode codepoint rather than a surrogate pair
+    (e.g. \`U_1F600\`). For more detail, see
     https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
   `);
 

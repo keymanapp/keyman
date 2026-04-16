@@ -498,6 +498,18 @@ describe('Compiler OSK Embedding', function() {
         assert.equal(kmxplus.keys.flicks[1].flicks[0].directions[0].value.value, 's');
         assert.equal(kmxplus.keys.flicks[1].flicks[0].keyId.value, 'shift-K_A+190');
 
+
+        assert.equal(kmxplus.keys.flicks[2].id.value, 'default-K_B+218');
+        assert.lengthOf(kmxplus.keys.flicks[2].flicks, 1);
+        assert.equal(kmxplus.keys.flicks[2].flicks[0].directions[0].value.value, 's');
+        assert.equal(kmxplus.keys.flicks[2].flicks[0].keyId.value, 'default-T_17D2_1794+219');
+
+        assert.equal(kmxplus.keys.flicks[61].id.value, 'western-U_003D+387');
+        assert.lengthOf(kmxplus.keys.flicks[61].flicks, 1);
+        assert.equal(kmxplus.keys.flicks[61].flicks[0].directions[0].value.value, 's');
+        assert.equal(kmxplus.keys.flicks[61].flicks[0].keyId.value, 'western-U_2260+388');
+
+
         assert.lengthOf(kmxplus.keys.kmap, 0);
         assert.lengthOf(kmxplus.keys.keys, 398);
 
@@ -552,7 +564,7 @@ describe('Compiler OSK Embedding', function() {
         assert.equal(flicks.id.value, 'default-K_Q+169');
         assert.lengthOf(flicks.flicks, 1);
         assert.equal(flicks.flicks[0].directions[0].value.value, 's');
-        assert.equal(flicks.flicks[0].keyId.value, 'shift-K_A+190');
+        assert.equal(flicks.flicks[0].keyId.value, 'default-T_17D2_1786+170');
 
         // K_NUMLOCK - multitap
 
