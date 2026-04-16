@@ -221,6 +221,70 @@ export class KmnCompilerMessages {
     Keyboard. Only the first non-Unicode key cap found will be reported.
   `);
 
+  static WARN_InvalidUnicodeKeyId_NaN           = SevWarn | 0x90F;
+  static Warn_InvalidUnicodeKeyId_NaN           = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_NaN,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is not a valid hexadecimal value`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_Control       = SevWarn | 0x910;
+  static Warn_InvalidUnicodeKeyId_Control       = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_Control,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is a control character`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_Noncharacter  = SevWarn | 0x911;
+  static Warn_InvalidUnicodeKeyId_Noncharacter  = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_Noncharacter,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is a reserved non-character`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_SurrogatePair = SevWarn | 0x912;
+  static Warn_InvalidUnicodeKeyId_SurrogatePair = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_SurrogatePair,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is a Unicode surrogate`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    Use the whole Unicode codepoint rather than a surrogate pair
+    (e.g. \`U_1F600\`). For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_OutOfRange    = SevWarn | 0x913;
+  static Warn_InvalidUnicodeKeyId_OutOfRange    = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_OutOfRange,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is not a valid Unicode character`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    The range of characters permitted is from 0020 - 10FFFD. For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_TouchLayoutSpecialLabelNotValid               = SevWarn | 0x914;
+  static Warn_TouchLayoutSpecialLabelNotValid               = (o:{id: string, text: string}) => m(
+    this.WARN_TouchLayoutSpecialLabelNotValid,
+    `The On-Screen Keyboard key '${def(o.id)}' has an invalid "special" key cap value '${def(o.text)}'`, `
+    Key cap values of the form '*TEXT*' are reserved; for more detail, see
+    https://help.keyman.com/developer/current-version/reference/file-types/keyman-touch-layout#toc-key-text
+  `);
+
   //------------------------------------------------------------------------------|
   // Messages below this point come from kmcmplib                                 |
   //------------------------------------------------------------------------------|
@@ -484,8 +548,8 @@ export class KmnCompilerMessages {
     `Virtual keys are not valid for mnemonic layouts`, o);
 
   static ERROR_InvalidTouchLayoutFile                         = SevError | 0x059;
-  static Error_InvalidTouchLayoutFile = (o:{filename:string}) => mw(this.ERROR_InvalidTouchLayoutFile,
-    `Touch layout file ${def(o.filename)} is not valid`);
+  static Error_InvalidTouchLayoutFile = (o:{filename:string, message: string}) => mw(this.ERROR_InvalidTouchLayoutFile,
+    `Touch layout file ${def(o.filename)} is not valid: ${def(o.message)}`);
 
   static ERROR_TouchLayoutInvalidIdentifier                   = SevError | 0x05A;
   static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string, address:KeyAddress}) => mw(this.ERROR_TouchLayoutInvalidIdentifier,

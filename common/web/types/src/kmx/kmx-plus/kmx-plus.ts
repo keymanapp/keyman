@@ -771,6 +771,7 @@ export class KMXPlusFile extends KMXPlusFileFormat {
     kmx.kmxplus.layr = new Layr();
     kmx.kmxplus.elem = new Elem(kmx.kmxplus);
     kmx.kmxplus.disp = new Disp();
+    kmx.kmxplus.disp.baseCharacter = strs.allocString();
     kmx.kmxplus.keys = new Keys(strs);
     kmx.kmxplus.list = new List(strs);
     kmx.kmxplus.loca = new Loca();

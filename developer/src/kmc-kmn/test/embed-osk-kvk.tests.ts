@@ -8,9 +8,9 @@ import { KMX, KMXPlus, ModifierKeyConstant, USVirtualKeyCodes, VisualKeyboard } 
 import { KMXPlusBuilder, oskFontMagicToken } from '@keymanapp/developer-utils';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompilerMessages } from '../src/main.js';
-import { EmbedOskInKmx } from '../src/compiler/embed-osk/embed-osk.js';
 import { loadKvkFile } from '../src/compiler/osk.js';
 import { EmbedOskKvkInKmx } from '../src/compiler/embed-osk/embed-osk-kvk.js';
+import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
 // VK header is not used in all functions, e.g. buildLayerBags, so this is a
 // default header for those tests
@@ -67,14 +67,12 @@ describe('Compiler OSK Embedding', function() {
         const keys = new KMXPlus.Keys(strs);
         const bag = embedder.unitTestEndpoints.buildLayerBags(vk, strs, keys);
 
-        assert.lengthOf(strs.strings, 7);
+        assert.lengthOf(strs.strings, 5);
         assert.equal(strs.strings[0].value, '');
         assert.equal(strs.strings[1].value, 'default-K_A');
-        assert.equal(strs.strings[2].value, 'a');
-        assert.equal(strs.strings[3].value, 'shift-K_B');
-        assert.equal(strs.strings[4].value, 'B');
-        assert.equal(strs.strings[5].value, 'shift-ctrl-K_C');
-        assert.equal(strs.strings[6].value, 'Ctrl+Shift+C');
+        assert.equal(strs.strings[2].value, 'shift-K_B');
+        assert.equal(strs.strings[3].value, 'Ctrl+Shift+C');
+        assert.equal(strs.strings[4].value, 'shift-ctrl-K_C');
 
         assert.lengthOf(keys.flicks, 1);
         assert.lengthOf(keys.flicks[0].flicks, 0);
@@ -84,34 +82,34 @@ describe('Compiler OSK Embedding', function() {
           {
             flags: 0,
             flicks: "",
-            id: strs.strings[1],
+            id: strs.strings[1],  // default-K_A
             longPress: null,
             longPressDefault: strs.strings[0],
             multiTap: null,
             switch: strs.strings[0],
-            to: strs.strings[2],
+            to: new KMXPlus.CharStrsItem('a'),
             width: 100
           },
           {
             flags: 0,
             flicks: "",
-            id: strs.strings[3],
+            id: strs.strings[2], // shift-K_B
             longPress: null,
             longPressDefault: strs.strings[0],
             multiTap: null,
             switch: strs.strings[0],
-            to: strs.strings[4],
+            to: new KMXPlus.CharStrsItem('B'),
             width: 100
           },
           {
-            flags: 0,
+            flags: KMXPlus.KeysKeysFlags.extend,
             flicks: "",
-            id: strs.strings[5],
+            id: strs.strings[4], // shift-ctrl-K_C
             longPress: null,
             longPressDefault: strs.strings[0],
             multiTap: null,
             switch: strs.strings[0],
-            to: strs.strings[6],
+            to: strs.strings[3], // Ctrl+Shift+C
             width: 100
           },
         ]);
@@ -133,12 +131,12 @@ describe('Compiler OSK Embedding', function() {
         const k_a = defaultLayer.get(USVirtualKeyCodes.K_A);
         assert.equal(k_a.flags, 0);
         assert.equal(k_a.flicks, "");
-        assert.equal(k_a.id, strs.strings[1]);
+        assert.equal(k_a.id, strs.strings[1]); // default-K_A
         assert.equal(k_a.longPress, null);
         assert.equal(k_a.longPressDefault, strs.strings[0]);
         assert.equal(k_a.multiTap, null);
         assert.equal(k_a.switch, strs.strings[0]);
-        assert.equal(k_a.to, strs.strings[2]);
+        assert.deepEqual(k_a.to, new KMXPlus.CharStrsItem('a'));
         assert.equal(k_a.width, 100);
 
         const shiftLayer = bag.get(ModifierKeyConstant.K_SHIFTFLAG);
@@ -148,12 +146,12 @@ describe('Compiler OSK Embedding', function() {
         const k_b = shiftLayer.get(USVirtualKeyCodes.K_B);
         assert.equal(k_b.flags, 0);
         assert.equal(k_b.flicks, "");
-        assert.equal(k_b.id, strs.strings[3]);
+        assert.equal(k_b.id, strs.strings[2]); // shift-K_B
         assert.equal(k_b.longPress, null);
         assert.equal(k_b.longPressDefault, strs.strings[0]);
         assert.equal(k_b.multiTap, null);
         assert.equal(k_b.switch, strs.strings[0]);
-        assert.equal(k_b.to, strs.strings[4]);
+        assert.deepEqual(k_b.to, new KMXPlus.CharStrsItem('B'));
         assert.equal(k_b.width, 100);
 
         const shiftCtrlLayer = bag.get(ModifierKeyConstant.K_SHIFTFLAG | ModifierKeyConstant.K_CTRLFLAG);
@@ -161,14 +159,14 @@ describe('Compiler OSK Embedding', function() {
 
         assert.isTrue(shiftCtrlLayer.has(USVirtualKeyCodes.K_C));
         const k_c = shiftCtrlLayer.get(USVirtualKeyCodes.K_C);
-        assert.equal(k_c.flags, 0);
+        assert.equal(k_c.flags, KMXPlus.KeysKeysFlags.extend);
         assert.equal(k_c.flicks, "");
-        assert.equal(k_c.id, strs.strings[5]);
+        assert.equal(k_c.id, strs.strings[4]); // shift-ctrl-K_C
         assert.equal(k_c.longPress, null);
         assert.equal(k_c.longPressDefault, strs.strings[0]);
         assert.equal(k_c.multiTap, null);
         assert.equal(k_c.switch, strs.strings[0]);
-        assert.equal(k_c.to, strs.strings[6]);
+        assert.equal(k_c.to, strs.strings[3]); // Ctrl+Shift+C
         assert.equal(k_c.width, 100);
 
       });
@@ -266,7 +264,7 @@ describe('Compiler OSK Embedding', function() {
         const vk = loadKvkFile(makePathToFixture('embed-osk', 'khmer_angkor.kvks'), callbacks);
         assert.isNotNull(vk);
 
-        const kmxPlus = new EmbedOskInKmx(callbacks,{}).unitTestEndpoints.createEmptyKmxPlusFile();
+        const kmxPlus = KMXPlus.KMXPlusFile.createEmptyMinimalKMXPlusFile(KMXPlusVersion.Version19);
         assert.isNotNull(kmxPlus);
 
         embedder.unitTestEndpoints.transformVisualKeyboardToKmxPlus(kmxPlus, vk);
@@ -274,8 +272,8 @@ describe('Compiler OSK Embedding', function() {
         // Verify various aspects of the kmxPlus based on the source .kvks
         assert.equal(kmxPlus.kmxplus.keys.flicks.length, 1);
 
-        // number of <key>s in the .kvks = 186, vscode search
-        assert.equal(kmxPlus.kmxplus.keys.keys.length, 186);
+        // number of <key>s in the .kvks = 186, vscode search, one commented out to test gap
+        assert.equal(kmxPlus.kmxplus.keys.keys.length, 185);
 
         // first key in the file is RA K_B ឞ
         assert.equal(kmxPlus.kmxplus.keys.keys[0].id.value, 'rightalt-K_B');

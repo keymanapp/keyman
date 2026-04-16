@@ -108,6 +108,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   keys.flicks.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
   // now, allocate 'flick' entries for each 'flicks'
   keys.flicks.forEach((flicks) => {
+    flicks.flick = keys.flick.length;
     flicks._flicks.forEach((flick) => {
       keys.flick.push({
         directions: build_list_index(sect_list, flick.directions),
@@ -134,6 +135,12 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     // Make sure the flicks were found
     if (result.flicks === -1) {
       throw new Error(`Keys: Could not find flicks id=${key.flicks} for key=${key.id.value}`);
+    }
+    if(key.to.isOneChar && (key.flags & constants.keys_key_flags_extend) != 0) {
+      throw new Error(`Keys: internal inconsistency: key ${key.id.value}, has extend flag but is oneChar`);
+    }
+    else if(!key.to.isOneChar && (key.flags & constants.keys_key_flags_extend) == 0) {
+      throw new Error(`Keys: internal inconsistency: key ${key.id.value}, does not have extend flag but is not oneChar`);
     }
     return result;
   });

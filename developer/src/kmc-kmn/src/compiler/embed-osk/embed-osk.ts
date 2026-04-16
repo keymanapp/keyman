@@ -12,37 +12,14 @@ import { KMXPlusVersion } from "@keymanapp/ldml-keyboard-constants";
 import { KmnCompilerOptions } from "../compiler.js";
 import { PuaMap, loadKvkFile } from "../osk.js";
 import { EmbedOskKvkInKmx } from "./embed-osk-kvk.js";
-
-// import { EmbedOskTouchLayoutInKmx } from "./embed-osk-touch-layout.js";
+import { EmbedOskTouchLayoutInKmx } from "./embed-osk-touch-layout.js";
 
 export class EmbedOskInKmx {
   constructor(
-    public callbacks: CompilerCallbacks, //TODO-EMBED-OSK-IN-KMX: private
-    public options: KmnCompilerOptions //TODO-EMBED-OSK-IN-KMX: private
+    private readonly callbacks: CompilerCallbacks,
+    /* @ts-ignore ts(6138) `options` is not used */
+    private readonly options: KmnCompilerOptions
   ) {
-  }
-
-  private createEmptyKmxPlusFile() {
-    // TODO-EMBED-OSK-IN-KMX: merge this default construction with LDML compiler
-    // start to write the ldml format
-    const kmx = new KMXPlus.KMXPlusFile(KMXPlusVersion.Version19);
-    const strs = kmx.kmxplus.strs = new KMXPlus.Strs();
-    kmx.kmxplus.layr = new KMXPlus.Layr();
-    kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus);
-    kmx.kmxplus.disp = new KMXPlus.Disp();
-    kmx.kmxplus.keys = new KMXPlus.Keys(strs);
-    // list?
-    kmx.kmxplus.loca = new KMXPlus.Loca();
-    kmx.kmxplus.meta = new KMXPlus.Meta();
-    kmx.kmxplus.meta.author = strs.allocString();
-    kmx.kmxplus.meta.conform = strs.allocString();
-    kmx.kmxplus.meta.indicator = strs.allocString();
-    kmx.kmxplus.meta.layout = strs.allocString();
-    kmx.kmxplus.meta.name = strs.allocString();
-    kmx.kmxplus.meta.settings = 0;
-    kmx.kmxplus.meta.version = strs.allocString();
-
-    return kmx;
   }
 
   /**
@@ -56,20 +33,28 @@ export class EmbedOskInKmx {
    * @returns
    */
   public embed(kmx: Uint8Array, kvksFilename: string, touchLayoutFilename: string, displayMap: PuaMap): Uint8Array {
-    const kmxPlus = this.createEmptyKmxPlusFile();
+    const kmxPlus = KMXPlus.KMXPlusFile.createEmptyMinimalKMXPlusFile(KMXPlusVersion.Version19);
 
     if(kvksFilename) {
       const embedKvk = new EmbedOskKvkInKmx(this.callbacks);
-      const vk = loadKvkFile(kvksFilename, this.callbacks);
-      if(!vk) {
+      const visualKeyboard = loadKvkFile(kvksFilename, this.callbacks);
+      if(!visualKeyboard) {
         // error will have been reported by loadKvkFile
         return null;
       }
-      embedKvk.transformVisualKeyboardToKmxPlus(kmxPlus, vk);
+      embedKvk.transformVisualKeyboardToKmxPlus(kmxPlus, visualKeyboard);
     }
 
+    if(touchLayoutFilename) {
+      const embedTouchLayout = new EmbedOskTouchLayoutInKmx(this.callbacks);
+      const touchLayout = embedTouchLayout.loadTouchLayoutFile(touchLayoutFilename);
+      if(!touchLayout) {
+        // error will have been reported by loadTouchLayoutFile
+        return null;
+      }
+      embedTouchLayout.transformTouchLayoutToKmxPlus(kmxPlus, touchLayout);
+    }
 
-    // TODO-EMBED-OSK-IN-KMX: touch layout to ldml
     // TODO-EMBED-OSK-IN-KMX: display map remapping
 
     const builder = new KMXPlusBuilder(kmxPlus);
@@ -138,7 +123,6 @@ export class EmbedOskInKmx {
 
   public readonly unitTestEndpoints = {
     injectKmxPlusIntoKmxFile: this.injectKmxPlusIntoKmxFile.bind(this),
-    createEmptyKmxPlusFile: this.createEmptyKmxPlusFile.bind(this),
   };
 
 };

@@ -5,7 +5,7 @@
  *
  * Convert Keyman .kvks files to KMX+ format.
  */
-import { KMXPlus, VisualKeyboard, translateLdmlModifiersToVisualKeyboardShift, visualKeyboardShiftToLayerName, ModifierKeyConstant, usVirtualKeyName, translateVisualKeyboardShiftToLdmlModifiers } from "@keymanapp/common-types";
+import { KMXPlus, VisualKeyboard, translateLdmlModifiersToVisualKeyboardShift, visualKeyboardShiftToLayerName, ModifierKeyConstant, usVirtualKeyName, translateVisualKeyboardShiftToLdmlModifiers, CharacterConstantString } from "@keymanapp/common-types";
 import { CompilerCallbacks, oskFontMagicToken } from "@keymanapp/developer-utils";
 import { KmnCompilerMessages } from "../kmn-compiler-messages.js";
 import { oskLayouts } from "./osk-layout.js";
@@ -36,7 +36,7 @@ export class EmbedOskKvkInKmx {
     kmx.kmxplus.layr.forms.push(form);
 
     // For now, we only support dotted circle (U+25CC) as our base character
-    kmx.kmxplus.disp.baseCharacter = kmx.kmxplus.strs.allocString('\u25cc');
+    kmx.kmxplus.disp.baseCharacter = kmx.kmxplus.strs.allocString(CharacterConstantString.DOTTED_CIRCLE);
   }
 
   /**
@@ -129,10 +129,11 @@ export class EmbedOskKvkInKmx {
         continue;
       }
 
+      const toText = strs.allocString(key.text, {singleOk: true});
       const keykey: KMXPlus.KeysKeys = {
         id: strs.allocString(keyId),
-        to: strs.allocString(key.text),
-        flags: 0, // available flags are: gap, extend; neither needed
+        to: toText,
+        flags: toText.isOneChar ? 0 : KMXPlus.KeysKeysFlags.extend, // available flags are: gap, extend; gap is not needed
         flicks: "",
         longPress: null,
         longPressDefault: strs.allocString(),
