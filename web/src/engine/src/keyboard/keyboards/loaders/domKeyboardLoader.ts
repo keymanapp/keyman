@@ -2,7 +2,7 @@
 
 ///<reference lib="dom" />
 
-import { JSKeyboard } from '../jsKeyboard.js';
+import { Keyboard } from '../keyboard.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
@@ -54,7 +54,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     return new Uint8Array(buffer);
   }
 
-  protected async loadKeyboardFromScript(script: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<JSKeyboard> {
+  protected async loadKeyboardFromScript(script: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
     try {
       this.evalScriptInContext(script, this.harness._jsGlobal);
     } catch (e) {

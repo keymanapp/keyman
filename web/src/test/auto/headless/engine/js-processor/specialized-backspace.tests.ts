@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { DeviceSpec, KMWString } from 'keyman/common/web-utils';
-import { Codes, DefaultOutputRules, JSKeyboard, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { Codes, DefaultOutputRules, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/test/resources';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
@@ -103,7 +103,7 @@ describe('Engine - specialized backspace handling', function() {
     // This part provides extra assurance that the keyboard properly loaded.
     assert.equal(keyboard.id, "Keyboard_sil_ipa");
 
-    harness.activeKeyboard = keyboard as JSKeyboard;
+    harness.activeKeyboard = keyboard;
     ipaWithHarness = harness;
 
     // --------------
@@ -117,7 +117,7 @@ describe('Engine - specialized backspace handling', function() {
     // This part provides extra assurance that the keyboard properly loaded.
     assert.equal(keyboard.id, "Keyboard_khmer_angkor");
 
-    harness.activeKeyboard = keyboard as JSKeyboard;
+    harness.activeKeyboard = keyboard;
     angkorWithHarness = harness;
 
     // --------------

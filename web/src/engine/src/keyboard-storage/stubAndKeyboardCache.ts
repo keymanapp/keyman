@@ -1,4 +1,4 @@
-import { type Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader, KMXKeyboard } from "keyman/engine/keyboard";
+import { Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader, KMXKeyboard } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
 import { KeyboardStub } from "./keyboardStub.js";
@@ -152,7 +152,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     keyboardID = toPrefixedKeyboardId(keyboardID);
 
     const cachedEntry = this.keyboardTable[keyboardID];
-    if(cachedEntry instanceof JSKeyboard) {
+    if(cachedEntry instanceof Keyboard) {
       return Promise.resolve(cachedEntry);
     } else if(cachedEntry instanceof Promise) {
       return cachedEntry;
@@ -172,6 +172,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
 
     promise.then((kbd) => {
       // Overrides the built-in ID in case of keyboard namespacing.
+      // TODO-web-core: what do we have to do for KMX keyboards here?
       if (kbd instanceof JSKeyboard) {
         kbd.scriptObject["KI"] = keyboardID;
       }
@@ -197,12 +198,12 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   getStub(keyboardID: string, languageID: string): KeyboardStub;
-  getStub(keyboard: JSKeyboard, languageID?: string): KeyboardStub;
-  getStub(arg0: string | JSKeyboard, arg1?: string): KeyboardStub {
+  getStub(keyboard: Keyboard, languageID?: string): KeyboardStub;
+  getStub(arg0: string | Keyboard, arg1?: string): KeyboardStub {
     let keyboardID: string;
     const languageID = arg1 || '---';
 
-    if(arg0 instanceof JSKeyboard) {
+    if(arg0 instanceof Keyboard) {
       keyboardID = arg0.id;
     } else {
       keyboardID = arg0;
@@ -229,12 +230,12 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
   /**
    * Removes all metadata (stubs) associated with a specific keyboard from the cache, optionally
    * removing the cached keyboard as well.
-   * @param keyboard Either the keyboard ID or `JSKeyboard` instance
-   * @param purge If `true`, will also purge the `JSKeyboard` instance itself from the cache.
+   * @param keyboard Either the keyboard ID or `Keyboard` instance
+   * @param purge If `true`, will also purge the `Keyboard` instance itself from the cache.
    *              If `false`, only forgets the metadata (stubs).
    */
-  forgetKeyboard(keyboard: string | JSKeyboard, purge: boolean = false) {
-    const id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard);
+  forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false) {
+    const id: string = (keyboard instanceof Keyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard);
 
     if(this.stubSetTable[id]) {
       delete this.stubSetTable[id];

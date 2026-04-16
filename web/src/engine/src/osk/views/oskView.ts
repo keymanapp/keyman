@@ -14,6 +14,7 @@ import { DeviceSpec, ManagedPromise } from 'keyman/common/web-utils';
 import {
   Codes,
   JSKeyboard,
+  Keyboard,
   KeyboardProperties,
   type MinimalCodesInterface,
   type MutableSystemStore, type SystemStoreMutationHandler,
@@ -58,8 +59,8 @@ export interface LegacyOSKEventMap {
   }): void;
 }
 
-export class JSKeyboardData {
-  keyboard: JSKeyboard;
+export class KeyboardData {
+  keyboard: Keyboard;
   metadata: KeyboardProperties;
 };
 
@@ -172,7 +173,7 @@ export abstract class OSKView
   private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
   private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
-  private keyboardData: JSKeyboardData;
+  private keyboardData: KeyboardData;
 
   /**
    * Provides the current parameterization for timings and distances used by
@@ -553,11 +554,11 @@ export abstract class OSKView
     }
   }
 
-  public get activeKeyboard(): JSKeyboardData {
+  public get activeKeyboard(): KeyboardData {
     return this.keyboardData;
   }
 
-  public set activeKeyboard(keyboardData: JSKeyboardData) {
+  public set activeKeyboard(keyboardData: KeyboardData) {
     this.keyboardData = keyboardData;
     this.loadActiveKeyboard();
 
@@ -765,7 +766,7 @@ export abstract class OSKView
 
     // Create new ones for the new, incoming kbd.
     this.kbdStyleSheetManager = new StylesheetManager(this._Box, this.config.doCacheBusting || false);
-    const kbdView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard, this.keyboardData?.metadata);
+    const kbdView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard as JSKeyboard, this.keyboardData?.metadata);
 
     // Perform the replacement.
     this._Box.replaceChild(kbdView.element, oldKbd.element);

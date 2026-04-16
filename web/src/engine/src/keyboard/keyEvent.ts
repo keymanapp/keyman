@@ -11,7 +11,7 @@ import { type DeviceSpec } from "keyman/common/web-utils";
 import { Codes } from './codes.js';
 import { DefaultOutputRules } from "./defaultOutputRules.js";
 import { ActiveKeyBase } from './keyboards/activeLayout.js';
-import { type Keyboard } from "./keyboards/keyboardLoaderBase.js";
+import { type Keyboard } from "./keyboards/keyboard.js";
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.

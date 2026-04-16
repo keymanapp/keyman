@@ -1,6 +1,7 @@
 import { JSKeyboard } from "./jsKeyboard.js";
 import { Codes } from "../codes.js";
 import { DeviceSpec } from 'keyman/common/web-utils';
+import { Keyboard } from './keyboard.js';
 
 /**
  * Defines members of the top-level `keyman` global object necessary to guarantee
@@ -64,7 +65,7 @@ export class KeyboardHarness {
   /**
    * This field serves as the receptacle for a successfully-loaded Keyboard.
    */
-  public loadedKeyboard: JSKeyboard = null;
+  public loadedKeyboard: Keyboard = null;
 
   /**
    * Keyman keyboards register themselves into the Keyman Engine for Web by directly
@@ -85,6 +86,7 @@ export class KeyboardHarness {
       throw new Error("Unexpected state:  the most-recently loaded keyboard field was not properly reset.");
     }
     this.loadedKeyboard = new JSKeyboard(scriptObject);
+    // TODO-web-core: do we have to do something similar for KMX keyboards?
   }
 
   // Is evaluated on script-load for some keyboards using variable stores.

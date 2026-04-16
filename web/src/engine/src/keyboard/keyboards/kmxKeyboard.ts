@@ -8,14 +8,16 @@ import { StateKeyMap } from './stateKeyMap.js';
 import { KeyEvent } from '../keyEvent.js';
 import { TextStore } from '../textStore.js';
 import { NotifyEventCode } from './keyboardLoaderBase.js';
+import { Keyboard } from './keyboard.js';
 
 /**
  * Acts as a wrapper class for KMX(+) Keyman keyboards
  */
-export class KMXKeyboard {
-  private _state: km_core_state;
+export class KMXKeyboard extends Keyboard {
+  private _state: km_core_state | null = null;
 
-  public constructor(private _keyboard: km_core_keyboard) {
+  public constructor(private _name: string, private _keyboard: km_core_keyboard) {
+    super();
     const environment_opts =
       [
         {
@@ -77,6 +79,10 @@ export class KMXKeyboard {
     return id;
   }
 
+  public get name(): string {
+    return this._name;
+  }
+
   public get keyboard(): km_core_keyboard {
     return this._keyboard;
   }
@@ -121,6 +127,15 @@ export class KMXKeyboard {
    */
   public get isRTL(): boolean {
     // TODO-embed-osk-in-kmx: Hook up with Core API (#15482)
+    return false;
+  }
+
+  /**
+   * Returns always false because (legacy) pick lists (Chinese, Japanese, Korean, etc.)
+   * are not supported when using KMX keyboards.
+   */
+  public get isCJK(): boolean {
+    // always return false
     return false;
   }
 

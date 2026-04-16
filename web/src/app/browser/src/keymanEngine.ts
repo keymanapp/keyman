@@ -689,18 +689,14 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     argFormFactor?: DeviceSpec.FormFactor,
     argLayerId?: string
   ): HTMLElement {
-    let PKbd: Keyboard = null;
+    const PKbd = (PInternalName != null ? this.keyboardRequisitioner.cache.getKeyboard(PInternalName) : null) || this.core.activeKeyboard;
 
-    if(PInternalName != null) {
-      PKbd = this.keyboardRequisitioner.cache.getKeyboard(PInternalName);
-    }
-
-    PKbd = PKbd || this.core.activeKeyboard;
     if (PKbd instanceof KMXKeyboard) {
-      // TODO-web-core: implement for KMX keyboards (epic/embed-osk-in-kmx)
+      // TODO-embed-osk-in-kmx: implement for KMX keyboards
       return null;
     }
-    const Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
+    const jsKbd = PKbd as JSKeyboard;
+    const Pstub = this.keyboardRequisitioner.cache.getStub(jsKbd);
 
     // help.keyman.com will set this function in place to specify the desired
     // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
@@ -712,7 +708,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     const targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
 
     return VisualKeyboard.buildDocumentationKeyboard(
-      PKbd,
+      jsKbd,
       Pstub,
       this.config.paths,
       argFormFactor,
