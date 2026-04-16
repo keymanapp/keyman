@@ -65,8 +65,26 @@ _tc_rsync() {
   else
     local RSYNC=rsync
     if builder_is_macos; then
+      # We need to look for a newer version of rsync because the version bundled
+      # with macos does not work correctly; we assume that this is installed
+      # with Homebrew. On Intel, this is found in /usr/local/bin, and on M1, it
+      # is found in /opt/homebrew/bin.
+
       RSYNC=/usr/local/bin/rsync
-      [[ -f /opt/homebrew/bin/rsync ]] && RSYNC=/opt/homebrew/bin/rsync
+      [[ -x /opt/homebrew/bin/rsync ]] && RSYNC=/opt/homebrew/bin/rsync
+
+      # On build agents, we unlink rsync from homebrew, because otherwise xcode
+      # builds which use rsync internally fail, so we need to specify the full
+      # path to rsync. Generally, rsync is not needed on developer machines as
+      # this is only used for release builds from the build agents. #15764
+      if [[ ! -x "${RSYNC}" ]]; then
+        # Try and find the rsync binary with `brew list`. It should be something
+        # like `/opt/homebrew/Cellar/rsync/3.4.1/bin/rsync`
+        RSYNC="$(brew list rsync | grep /bin/rsync\$)"
+        if [[ ! -x "${RSYNC}" ]]; then
+          builder_die "Could not find Homebrew-installed rsync anywhere"
+        fi
+      fi
     fi
 
     ${RSYNC} "${rsync_args[@]}"

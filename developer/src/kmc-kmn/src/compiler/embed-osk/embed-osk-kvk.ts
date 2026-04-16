@@ -5,7 +5,7 @@
  *
  * Convert Keyman .kvks files to KMX+ format.
  */
-import { KMXPlus, VisualKeyboard, translateLdmlModifiersToVisualKeyboardShift, visualKeyboardShiftToLayerName, ModifierKeyConstant, usVirtualKeyName, translateVisualKeyboardShiftToLdmlModifiers } from "@keymanapp/common-types";
+import { KMXPlus, VisualKeyboard, translateLdmlModifiersToVisualKeyboardShift, visualKeyboardShiftToLayerName, ModifierKeyConstant, usVirtualKeyName, translateVisualKeyboardShiftToLdmlModifiers, CharacterConstantString } from "@keymanapp/common-types";
 import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { KmnCompilerMessages } from "../kmn-compiler-messages.js";
 import { oskLayouts } from "./osk-layout.js";
@@ -36,7 +36,7 @@ export class EmbedOskKvkInKmx {
     kmx.kmxplus.layr.forms.push(form);
 
     // For now, we only support dotted circle (U+25CC) as our base character
-    kmx.kmxplus.disp.baseCharacter = kmx.kmxplus.strs.allocString('\u25cc');
+    kmx.kmxplus.disp.baseCharacter = kmx.kmxplus.strs.allocString(CharacterConstantString.DOTTED_CIRCLE);
   }
 
   /**
@@ -145,12 +145,12 @@ export class EmbedOskKvkInKmx {
       layerBags.get(mod).set(key.vkey, keykey);
       keys.keys.push(keykey);
 
-      this.addKmap(keys, keykey, key.vkey, key.shift);
+      this.addKmap(keys, keykey, key.vkey, mod);
     }
     return layerBags;
   }
 
-  private addKmap(keys: KMXPlus.Keys, newKey: KMXPlus.KeysKeys, vkey: number, mod: number) {
+  private addKmap(keys: KMXPlus.Keys, newKey: KMXPlus.KeysKeys, vkey: number, mod: ModifierKeyConstant) {
     const newKmap = new KMXPlus.KeysKmap();
     newKmap.key = newKey.id.value;
     newKmap.mod = mod;

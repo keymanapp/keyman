@@ -1,5 +1,48 @@
 # Keyman Version History
 
+## 19.0.222 alpha 2026-04-08
+
+* fix(linux): fix memory problem (#15823)
+
+## 19.0.221 alpha 2026-03-27
+
+* fix(common): add missing `default` property to keyman-touch-layout.clean.spec.json (#15787)
+* chore(deps): bump picomatch from 4.0.3 to 4.0.4 in /developer/src/server/src/win32/trayicon/addon-src (#15786)
+* chore(deps): bump picomatch from 2.3.1 to 2.3.2 (#15784)
+* chore(deps-dev): bump flatted from 3.2.5 to 3.4.2 (#15773)
+* chore(deps): bump brace-expansion from 5.0.4 to 5.0.5 in /developer/src/server/src/win32/trayicon/addon-src (#15791)
+
+## 19.0.220 alpha 2026-03-26
+
+* fix(mac): improved adherence to backspace rules for compliant apps (#15561)
+
+## 19.0.219 alpha 2026-03-25
+
+* maint(common): Update GitHub actions for Node 24 (#15762)
+* fix(core): fix keydown/up handling for LDML keyboards (#15609)
+
+## 19.0.218 alpha 2026-03-24
+
+* fix(developer): define globalThis for compiled custom lexical models (#15777)
+
+## 19.0.217 alpha 2026-03-17
+
+* maint(mac): search for brew-installed rsync (#15765)
+
+## 19.0.216 alpha 2026-03-16
+
+* docs: tweak walkthrough content (#15712)
+* chore(deps): bump tar from 7.5.10 to 7.5.11 in /developer/src/server/src/win32/trayicon/addon-src (#15723)
+* docs(linux): add documentation how input methods work in GTK (#15749)
+* docs(core): improve keyhandling doc (#15736)
+* maint(resources): try meson 1.10.1 (#15754)
+* maint(ios): clean carthage before builds (#15757)
+
+## 19.0.215 alpha 2026-03-13
+
+* chore(linux): fix dependency of Debian test suite (#15735)
+* chore(linux): Update debian changelog (#15732)
+
 ## 19.0.214 alpha 2026-03-12
 
 * chore(linux): Update debian changelog (#15718)
@@ -1282,6 +1325,15 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.249 stable 2026-03-27
+
+* chore(linux): Update debian changelog (#15717)
+* chore(linux): fix dependency of Debian test suite (#15734)
+* chore(linux): Update debian changelog (#15731)
+* maint(ios): Upgrade Sentry to 8.58.0 to support XCode 26 (#15755)
+* fix(developer): define globalThis for compiled custom lexical models (#15778)
+* fix(common): add missing `default` property to keyman-touch-layout.clean.spec.json (#15792)
 
 ## 18.0.248 stable 2026-03-12
 

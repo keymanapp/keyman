@@ -10,6 +10,7 @@ import * as util from '../../util/util.js';
 import { UnicodeSetParser, UnicodeSet } from '../../ldml-keyboard/unicodeset-parser-api.js';
 import { VariableParser } from '../../ldml-keyboard/pattern-parser.js';
 import { MarkerParser } from '../../ldml-keyboard/pattern-parser.js';
+import { ModifierKeyConstant } from '../../consts/modifier-key-constants.js';
 
 import isOneChar = util.isOneChar;
 import toOneChar = util.toOneChar;
@@ -620,7 +621,7 @@ export class LayrForm {
  */
  export class LayrEntry {
   id: StrsItem;
-  mod: number;
+  mod: ModifierKeyConstant;
   rows: LayrRow[] = [];
 };
 
@@ -663,7 +664,7 @@ export class KeysKeys {
 
 export class KeysKmap {
   vkey: number;
-  mod: number;
+  mod: ModifierKeyConstant;
   key: string; // for in-memory only
 };
 
