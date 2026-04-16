@@ -100,11 +100,13 @@ export class EmbedOskTouchLayoutInKmx {
    * developer/src/tike/xml/layoutbuilder/constants.js)
    * @returns
    */
-  private generateUniqueKeyId(keys: KMXPlus.Keys, platform: string, layer: string, id: string, keyModifier: string) {
+  private generateUniqueKeyId(keys: KMXPlus.Keys, platform: string, layer: string, id: string, keyModifier: string): string {
     // key id in KeymanWeb is `layer-id+override`
     // we need to pass in this data so that rules can still be applied
     // `+override` is the modifier for the key to be applied in the kmap -- not the layer
-    const baseId = platform + '~' + layer + '-' + id + (keyModifier !== '' ? '+'+keyModifier : '');
+    const baseId = keyModifier === '' ?
+      `${platform}~${layer}-${id}` :
+      `${platform}~${layer}-${id}+${keyModifier}`;
 
     const key = keys.keys.find(item => item.id.value == baseId);
     if(!key) {
@@ -194,14 +196,14 @@ export class EmbedOskTouchLayoutInKmx {
     kmxplus.keys.kmap.push(newKmap);
   }
 
-  private keyCodeToVkey(layerId: string, id: string, text: string) {
-    id = id.toUpperCase();
+  private keyCodeToVkey(layerId: string, keyCode: string, text: string) {
+    keyCode = keyCode.toUpperCase();
 
     // K_ --> always look up from standard map, give warning if not found, return 0
-    if(id.startsWith('K_')) {
-      const result: number = (<any>USVirtualKeyCodes)[id];
+    if(keyCode.startsWith('K_')) {
+      const result: number = (<any>USVirtualKeyCodes)[keyCode];
       if(typeof result !== 'number') {
-        this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutInvalidKeyId({layerId, id}));
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutInvalidKeyId({layerId, id: keyCode}));
         return 0;
       }
       if(result > 255) {
@@ -214,12 +216,15 @@ export class EmbedOskTouchLayoutInKmx {
     }
 
     // T_ --> look up from VKDictionary, give warning if not found, return 0
-    if(id.startsWith('T_')) {
-      const index = this.vkDictionary.findIndex(key => key.toUpperCase() === id);
+    if(keyCode.startsWith('T_')) {
+      const index = this.vkDictionary.findIndex(key => key.toUpperCase() === keyCode);
       if(index < 0) {
         if(text != '') {
           // Only warn if the key cap isn't blank
-          this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutCustomKeyNotDefined({keyId: id, platformName: 'TODO-EMBED-OSK-IN-KMX', layerId, address: {keyIndex:0, rowIndex:0}}));
+          // This is a bit heuristic: a blank key is likely to be unused
+          // TODO-EMBED-OSK-IN-KMX: this needs to be cleaned up to match validate-layout-file:158
+          // "Check that each custom key code has at least *a* rule associated with it"
+          this.callbacks.reportMessage(KmnCompilerMessages.Warn_TouchLayoutCustomKeyNotDefined({keyId: keyCode, platformName: 'TODO-EMBED-OSK-IN-KMX', layerId, address: {keyIndex:0, rowIndex:0}}));
         }
         return 0;
       }
@@ -228,8 +233,8 @@ export class EmbedOskTouchLayoutInKmx {
     }
 
     // U_ --> look up from VKDictionary, return 0 if not found, will map at runtime (no warning)
-    if(id.startsWith('U_')) {
-      const index = this.vkDictionary.findIndex(key => key.toUpperCase() === id);
+    if(keyCode.startsWith('U_')) {
+      const index = this.vkDictionary.findIndex(key => key.toUpperCase() === keyCode);
       if(index < 0) {
         // will be mapped at runtime
         return 0;

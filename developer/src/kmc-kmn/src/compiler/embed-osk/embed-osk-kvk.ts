@@ -145,12 +145,12 @@ export class EmbedOskKvkInKmx {
       layerBags.get(mod).set(key.vkey, keykey);
       keys.keys.push(keykey);
 
-      this.addKmap(keys, keykey, key.vkey, key.shift);
+      this.addKmap(keys, keykey, key.vkey, mod);
     }
     return layerBags;
   }
 
-  private addKmap(keys: KMXPlus.Keys, newKey: KMXPlus.KeysKeys, vkey: number, mod: number) {
+  private addKmap(keys: KMXPlus.Keys, newKey: KMXPlus.KeysKeys, vkey: number, mod: ModifierKeyConstant) {
     const newKmap = new KMXPlus.KeysKmap();
     newKmap.key = newKey.id.value;
     newKmap.mod = mod;

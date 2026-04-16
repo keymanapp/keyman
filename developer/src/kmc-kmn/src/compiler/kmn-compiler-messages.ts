@@ -290,11 +290,14 @@ export class KmnCompilerMessages {
     this.WARN_TouchLayoutKeyIdUsedMoreThanOnceInALayer,
     `The On-Screen Keyboard key id '${def(o.id)}' is used more than once on layer '${def(o.layer)}'. The resolved id for the duplicate is '${def(o.resolvedId)}'`, `
     Key ids should not be re-used on the same layer, because each key should be
-    unique for a given layer. If you do want to use the same key rule for the same
-    layer, for example if you have a longpress and a flick with the same output,
-    you may need to add a rule to duplicate the output. The compiler will
-    de-duplicate the identifier but the unique value it generates may change, so
-    it cannot be safely used for example with CSS rules to identify the key.
+    unique for a given layer. The compiler will de-duplicate the identifier but
+    the unique value it generates may change, so it cannot be safely used for
+    example with CSS rules to identify the key.
+
+    If you do want to use the same key rule for the same layer, for example if
+    you have a longpress and a flick with the same output, it is safer to use
+    two different ids and repeat the rule, or use \`store\` and \`any\` to
+    match both key ids in the one rule.
     https://help.keyman.com/developer/current-version/reference/file-types/keyman-touch-layout#toc-key-code
   `);
 

@@ -74,6 +74,9 @@ describe('Compiler OSK Embedding', function() {
 
   describe('EmbedOskTouchLayoutInKmx', function() {
 
+    // TODO-EMBED-OSK-IN-KMX: add a test to exercise de-dedup of key ids
+    // https://github.com/keymanapp/keyman/pull/15821#discussion_r3056712353
+
     describe('EmbedOskTouchLayoutInKmx.keyFromTouchLayoutKey', function() {
       it('should convert a touch layout key into a KMX+ key', async function() {
         const kmxRow = new KMXPlus.LayrRow();
