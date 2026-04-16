@@ -81,8 +81,7 @@ describe('Key cap special text values from KeymanWeb', function() {
     assert.deepEqual(compilerSpecialCharacters, specialCharactersPatch);
   });
 
-  // TODO-EMBED-OSK-IN-KMX: enable once we have complete the Core LDML headers
-  it.skip('should match key cap special text in Core constants', function() {
+  it('should match key cap special text in Core constants', function() {
     // These two files should have the same constant values for key caps:
     //   core/include/ldml/keyman_core_ldml.ts
     //   web/src/engine/osk/src/specialCharacters.ts
@@ -98,23 +97,23 @@ describe('Key cap special text values from KeymanWeb', function() {
     specialCharactersPatch['*ABC_upper*'] = specialCharactersPatch['*ABC*'];
     delete specialCharactersPatch['*ABC*'];
 
-    // 2. Map all the "*Name*" key names to "dis2_key_cap_name"...
-    const dis2_key_cap_expected: any = {};
+    // 2. Map all the "*Name*" key names to "disp_key_cap_name"...
+    const disp_key_cap_expected: any = {};
     for(const key of Object.keys(specialCharactersPatch)) {
-      const newKey = key.replace(/^\*(.+)\*$/, 'dis2_key_cap_$1').toLowerCase();
-      dis2_key_cap_expected[newKey] = specialCharactersPatch[key];
+      const newKey = key.replace(/^\*(.+)\*$/, 'disp_key_cap_$1').toLowerCase();
+      disp_key_cap_expected[newKey] = specialCharactersPatch[key];
     }
 
-    // 3. We only want to compare the dis2_key_cap_ values from the
+    // 3. We only want to compare the disp_key_cap_ values from the
     //    coreLdmlConstants object
     const coreConstantsFiltered: any = {};
     for(const key of Object.keys(coreLdmlConstants)) {
-      if(key.match(/^dis2_key_cap_/)) {
+      if(key.match(/^disp_key_cap_/)) {
         coreConstantsFiltered[key] = (<any>coreLdmlConstants)[key];
       }
     }
 
-    assert.deepEqual(coreConstantsFiltered, dis2_key_cap_expected);
+    assert.deepEqual(coreConstantsFiltered, disp_key_cap_expected);
   });
 
   it('should be documented correctly', function() {
