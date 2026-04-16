@@ -27,6 +27,7 @@ TEST(km_core_keyboard, simple_sniff_test) {
   EXPECT_EQ(km_core_keyboard_get_key_list(test_kb,&kb_key_list), KM_CORE_STATUS_OK);
   EXPECT_EQ(km_core_keyboard_get_imx_list(test_kb,&kb_imx_list), KM_CORE_STATUS_OK);
 
+  // Note: 3.145 is a hard-coded version string in mock_processor
   EXPECT_EQ(km::core::kmx::u16cmp(kb_attrs->version_string, u"3.145"), 0);
 
   // cleanup
