@@ -14,8 +14,8 @@
 #include "context.hpp"
 
 #include <test_assert.h>
-#include "../emscripten_filesystem.h"
-#include "../load_kmx_file.hpp"
+#include "../helpers/emscripten_filesystem.h"
+#include "../helpers/load_kmx_file.hpp"
 
 void compare_context(km_core_context *app_context, const km_core_cu* expected_final_app_context);
 

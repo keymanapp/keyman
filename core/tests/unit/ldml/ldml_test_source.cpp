@@ -40,7 +40,7 @@
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
 
-#include "../load_kmx_file.hpp"
+#include "../helpers/load_kmx_file.hpp"
 
 #include <test_assert.h>
 #include <test_color.h>

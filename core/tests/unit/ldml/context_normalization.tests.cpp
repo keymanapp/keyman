@@ -12,8 +12,8 @@
 #include "action.hpp"
 
 #include <test_assert.h>
-#include "../emscripten_filesystem.h"
-#include "../load_kmx_file.hpp"
+#include "../helpers/emscripten_filesystem.h"
+#include "../helpers/load_kmx_file.hpp"
 
 //-------------------------------------------------------------------------------------
 // Context normalization tests

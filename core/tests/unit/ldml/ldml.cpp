@@ -36,7 +36,7 @@
 #include "ldml/ldml_markers.hpp"
 
 #include "processor.hpp"
-#include "../load_kmx_file.hpp"
+#include "../helpers/load_kmx_file.hpp"
 
 namespace {
 
