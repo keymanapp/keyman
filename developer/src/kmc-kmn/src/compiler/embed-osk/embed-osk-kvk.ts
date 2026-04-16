@@ -6,7 +6,7 @@
  * Convert Keyman .kvks files to KMX+ format.
  */
 import { KMXPlus, VisualKeyboard, translateLdmlModifiersToVisualKeyboardShift, visualKeyboardShiftToLayerName, ModifierKeyConstant, usVirtualKeyName, translateVisualKeyboardShiftToLdmlModifiers, CharacterConstantString } from "@keymanapp/common-types";
-import { CompilerCallbacks, oskFontMagicToken } from "@keymanapp/developer-utils";
+import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { KmnCompilerMessages } from "../kmn-compiler-messages.js";
 import { oskLayouts } from "./osk-layout.js";
 
@@ -64,12 +64,6 @@ export class EmbedOskKvkInKmx {
       form.flags |= KMXPlus.LayrFormFlags.chiralSeparate;
     }
 
-    // We will reserve space for the font facename to be rewritten, with a magic
-    // token that the package compiler will search for; see kmp-compiler.ts.
-    form.fontFaceName = strs.allocString(oskFontMagicToken);
-
-    // We only currently support 100% font size
-    form.fontSizePct = 100;
     form.hardware = strs.allocString(formName);
 
     // For hardware-style keyboards, device width is not relevant

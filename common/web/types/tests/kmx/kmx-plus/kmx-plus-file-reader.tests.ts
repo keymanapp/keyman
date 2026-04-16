@@ -282,8 +282,6 @@ describe('KMXPlusFileReader', function() {
 
       assert.equal(layr.forms[0].baseLayout.value, '');
       assert.equal(layr.forms[0].flags, 0);
-      assert.equal(layr.forms[0].fontFaceName.value, '');
-      assert.equal(layr.forms[0].fontSizePct, 100);
       assert.equal(layr.forms[0].hardware.value, 'us');
       assert.equal(layr.forms[0].minDeviceWidth, 123);
 

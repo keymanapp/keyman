@@ -523,7 +523,7 @@ class Constants {
   /**
    *  Length of each layer form in the 'layr' section variable part (v19+)
    */
-  readonly length_layr_form_v19 = 32;
+  readonly length_layr_form_v19 = 24;
 
   /**
    * for the 'hardware' field indicating a touch keyboard, non-hardware

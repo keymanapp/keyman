@@ -4,7 +4,7 @@
  * Convert .keyman-touch-layout data into KMXPlus data for embedding into .kmx
  */
 import { TouchLayout, KMXPlus, CharacterConstantString } from "@keymanapp/common-types";
-import { CompilerCallbacks, TouchLayoutFileReader, oskFontMagicToken, specialKeyCaps } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, TouchLayoutFileReader, specialKeyCaps } from "@keymanapp/developer-utils";
 import { KmnCompilerMessages } from "../kmn-compiler-messages.js";
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 
@@ -56,8 +56,6 @@ export class EmbedOskTouchLayoutInKmx {
     const newForm = new KMXPlus.LayrForm();
     newForm.baseLayout = kmxplus.strs.allocString('en-us'); // TODO-EMBED-OSK-IN-KMX: should this be null for touch?
     newForm.hardware = kmxplus.strs.allocString(KMXPlus.LayrFormHardware.touch);
-    newForm.fontFaceName = kmxplus.strs.allocString(oskFontMagicToken);
-    newForm.fontSizePct = 100;
     newForm.flags = platform.displayUnderlying ? KMXPlus.LayrFormFlags.showBaseLayout : 0;
     newForm.minDeviceWidth = deviceWidth;
     newForm.layers = [];

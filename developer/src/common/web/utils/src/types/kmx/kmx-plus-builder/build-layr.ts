@@ -23,8 +23,6 @@ interface BUILDER_LAYR_FORM {
   minDeviceWidth: number; // width in millimeters
   _layers: LayrEntry[]; // original layer entry, for in-memory only
   baseLayout: BUILDER_STR_REF;   // v19: base layout (e.g. 'us')
-  fontFaceName: BUILDER_STR_REF; // v19: face name of font for key caps
-  fontSizePct: number;           // v19: font size in % of default size for implementation, typically 100
   flags: KMXPlus.LayrFormFlags;  // v19: flags
 };
 
@@ -99,8 +97,6 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, versio
       count: form.layers.length,
       minDeviceWidth: form.minDeviceWidth,
       baseLayout: build_strs_index(sect_strs, form.baseLayout),
-      fontFaceName: build_strs_index(sect_strs, form.fontFaceName),
-      fontSizePct: form.fontSizePct,
       flags: form.flags,
     };
   });
