@@ -7,7 +7,8 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
-import { DeviceSpec, JSKeyboard, Keyboard, KMXKeyboard } from "keyman/engine/keyboard";
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { JSKeyboard, Keyboard, KMXKeyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
@@ -61,8 +62,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     super(workerFactory, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
       return {
-        // The `engine` parameter cannot be supplied with the constructing instance before calling
-        // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
+        baseLayout: 'us',
         keyboardInterface: new KeyboardInterface(window, engine as KeymanEngine),
         defaultOutputRules: new DefaultBrowserRules(engine.contextManager)
       };

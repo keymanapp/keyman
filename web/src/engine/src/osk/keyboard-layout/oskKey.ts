@@ -1,4 +1,5 @@
-import { ActiveKey, ActiveSubKey, ButtonClass, ButtonClasses, DeviceSpec } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { ActiveKey, ActiveSubKey, ButtonClass, ButtonClasses } from 'keyman/engine/keyboard';
 
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
 import { specialCharacters } from '../specialCharacters.js';

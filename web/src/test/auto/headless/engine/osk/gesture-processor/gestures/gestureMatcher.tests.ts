@@ -1,15 +1,12 @@
 import { assert } from 'chai'
 import sinon from 'sinon';
-
 import * as PromiseStatusModule from 'promise-status-async';
-const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
-import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
 import { InputSample, gestures, GestureDebugPath } from 'keyman/engine/gesture-processor';
 
 import { TouchpathTurtle } from '#gesture-tools';
 
-import { simulateMultiSourceMatcherInput } from "../../../../../resources/simulateMultiSourceInput.js";
+import { assertingPromiseStatus as promiseStatus, simulateMultiSourceMatcherInput } from 'keyman/test/resources';
 
 import {
   FlickEndModel,
@@ -26,6 +23,8 @@ import {
   LongpressDistanceThreshold,
   MainLongpressSourceModel
 } from './isolatedPathSpecs.js';
+
+const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 type PathInheritanceType = gestures.specs.ContactModel<string>['pathInheritance'];
 function dummyInheritanceMatcher(inheritanceType: PathInheritanceType): gestures.specs.GestureModel<string> {

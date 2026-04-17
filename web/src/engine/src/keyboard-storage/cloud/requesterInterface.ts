@@ -1,4 +1,4 @@
-import { ManagedPromise } from 'keyman/engine/keyboard';
+import { ManagedPromise } from 'keyman/common/web-utils';
 
 export interface CloudRequesterInterface {
   request<T>(query: string): {

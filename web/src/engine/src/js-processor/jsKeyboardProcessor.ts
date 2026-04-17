@@ -9,31 +9,22 @@
 import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
-  Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
-  DefaultRules, EmulationKeystrokes, type MutableSystemStore,
+  Codes, type JSKeyboard, KeyEvent, Layouts,
+  DefaultOutputRules, EmulationKeystrokes, type MutableSystemStore,
   TextStore, ProcessorAction, SystemStoreIDs, SyntheticTextStore,
   KeyboardProcessor,
   EventMap,
   BeepHandler,
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
-import { DeviceSpec, globalObject, KMWString } from "keyman/common/web-utils";
+import { DeviceSpec, KMWString } from "keyman/common/web-utils";
+import { ProcessorInitOptions } from './processorInitOptions.js';
 
 // #endregion
 
 export type LogMessageHandler = (str: string) => void;
 
-export interface ProcessorInitOptions {
-  baseLayout?: string;
-  keyboardInterface?: JSKeyboardInterface; // for tests, replace keyboardInterface with a mock, TODO-web-core: refactor into a unit test pattern
-  defaultOutputRules?: DefaultRules; // Takes the class def object, not an instance thereof.
-}
-
 export class JSKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
-  private static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
-    baseLayout: 'us',
-    defaultOutputRules: new DefaultRules()  // TODO-web-core: move this out of here and only in keymanEngine.ts, rename to DefaultOutputRules
-  };
 
   // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
   // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
@@ -59,25 +50,21 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
 
   public baseLayout: string;
 
-  public defaultRules: DefaultRules;
+  public defaultOutputRules: DefaultOutputRules;
 
   // Callbacks for various feedback types
   public beepHandler?: BeepHandler;
   public warningLogger?: LogMessageHandler;
   public errorLogger?: LogMessageHandler;
 
-  constructor(device: DeviceSpec, options?: ProcessorInitOptions) {
+  constructor(device: DeviceSpec, options: ProcessorInitOptions) {
     super();
-
-    if(!options) {
-      options = JSKeyboardProcessor.DEFAULT_OPTIONS;
-    }
 
     this.contextDevice = device;
 
-    this.baseLayout = options.baseLayout || JSKeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
-    this.keyboardInterface = options.keyboardInterface || new JSKeyboardInterface(globalObject(), MinimalKeymanGlobal);
-    this.defaultRules = options.defaultOutputRules || JSKeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
+    this.baseLayout = options.baseLayout;
+    this.keyboardInterface = options.keyboardInterface;
+    this.defaultOutputRules = options.defaultOutputRules;
   }
 
   public get activeKeyboard(): JSKeyboard {
@@ -133,13 +120,13 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
       matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                         // if no match occurs.
 
-      if(this.defaultRules.isCommand(Lkc)) {
+      if(this.defaultOutputRules.isCommand(Lkc)) {
         // Note this in the rule behavior, return successfully.  We'll consider applying it later.
         ruleBehavior.triggersDefaultCommand = true;
 
         // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
         // to emulate default behavior here.
-      } else if((special = this.defaultRules.forSpecialEmulation(Lkc)) != null) {
+      } else if((special = this.defaultOutputRules.forSpecialEmulation(Lkc)) != null) {
         switch(special) {
           case EmulationKeystrokes.Backspace:
             this.keyboardInterface.defaultBackspace(textStore);
@@ -163,12 +150,12 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     const isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
     if(!matched) {
-      if((char = this.defaultRules.forAny(Lkc, isMnemonic, ruleBehavior)) != null) {
-        special = this.defaultRules.forSpecialEmulation(Lkc)
+      if((char = this.defaultOutputRules.forAny(Lkc, isMnemonic, ruleBehavior)) != null) {
+        special = this.defaultOutputRules.forSpecialEmulation(Lkc)
         if(special == EmulationKeystrokes.Backspace) {
           // A browser's default backspace may fail to delete both parts of an SMP character.
           this.keyboardInterface.defaultBackspace(textStore);
-        } else if(special || this.defaultRules.isCommand(Lkc)) { // Filters out 'commands' like TAB.
+        } else if(special || this.defaultOutputRules.isCommand(Lkc)) { // Filters out 'commands' like TAB.
           // We only do the "for special emulation" cases under the condition above... aside from backspace
           // Let the browser handle those.
           return null;
@@ -638,7 +625,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
 
     if (data.triggersDefaultCommand) {
       const keyEvent = data.transcription.keystroke;
-      this.defaultRules.applyCommand(keyEvent, textStore);
+      this.defaultOutputRules.applyCommand(keyEvent, textStore);
     }
 
     if (this.warningLogger && data.warningLog) {

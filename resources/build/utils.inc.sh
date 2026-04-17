@@ -14,7 +14,7 @@ _utils_inc_sh=1
 #   1: UPLOAD_DIR          Directory where artifact can be found
 #   2: ARTIFACT_FILENAME   Filename (without path) of artifact
 #   3: ARTIFACT_NAME       Descriptive name of artifact
-#   4: ARTIFACT_TYPE       File extension of artifact, without initial period (e.g. tar.gz)
+#   4: ARTIFACT_TYPE       File extension of artifact, without initial period (e.g. tar.xz)
 #   5: PLATFORM            Target platform for artifact
 #
 # TODO: Move to CI include?

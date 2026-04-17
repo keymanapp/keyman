@@ -1,17 +1,19 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
+
 import { assert } from 'chai';
-import fs from 'fs';
-
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
-import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
+import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
 
-import { env } from 'node:process';
-const KEYMAN_ROOT = env.KEYMAN_ROOT;
+const require = createRequire(import.meta.url);
+const KEYMAN_ROOT = getKeymanRoot();
 
 describe('Engine - Chirality', function() {
   let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/chirality.json'));

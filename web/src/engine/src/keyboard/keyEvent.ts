@@ -6,12 +6,12 @@
 // a key event.  The most straightforward way to integrate Web OSK events on other platforms is to have
 // other platforms recognize and utilize this type.
 
-import { type JSKeyboard } from "./keyboards/jsKeyboard.js";
 import { type DeviceSpec } from "keyman/common/web-utils";
 
 import { Codes } from './codes.js';
-import { DefaultRules } from "./defaultRules.js";
+import { DefaultOutputRules } from "./defaultOutputRules.js";
 import { ActiveKeyBase } from './keyboards/activeLayout.js';
+import { type Keyboard } from "./keyboards/keyboardLoaderBase.js";
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.
@@ -19,9 +19,9 @@ export type KeyDistribution = { keySpec: ActiveKeyBase, p: number }[];
 
 /**
  * A simple instance of the standard 'default rules' for keystroke processing from the
- * DefaultRules base class.
+ * DefaultOutputRules base class.
  */
-const BASE_DEFAULT_RULES = new DefaultRules();
+const BASE_DEFAULT_RULES = new DefaultOutputRules();
 
 export interface KeyEventSpec {
 
@@ -44,7 +44,7 @@ export interface KeyEventSpec {
    * guarantee that the keyboard instance known to the handler has not changed during JS execution
    * since the user's interaction that raised the event.
    */
-  srcKeyboard?: JSKeyboard;
+  srcKeyboard?: Keyboard;
 
   // Holds a generated fat-finger distribution (when appropriate)
   keyDistribution?: KeyDistribution;
@@ -85,7 +85,7 @@ export class KeyEvent implements KeyEventSpec {
    * guarantee that the keyboard instance known to the handler has not changed during JS execution
    * since the user's interaction that raised the event.
    */
-  srcKeyboard?: JSKeyboard;
+  srcKeyboard?: Keyboard;
 
   // Holds relevant event properties leading to construction of this KeyEvent.
   source?: any; // Technically, KeyEvent|MouseEvent|Touch - but those are DOM types that must be kept out of headless mode.
@@ -135,12 +135,12 @@ export class KeyEvent implements KeyEventSpec {
 
   get isModifier(): boolean {
     switch(this.Lcode) {
-      case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
-      case 17:
-      case 18:
-      case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
-      case 144:
-      case 145:
+      case Codes.keyCodes.K_SHIFT:
+      case Codes.keyCodes.K_CONTROL:
+      case Codes.keyCodes.K_ALT:
+      case Codes.keyCodes.K_CAPS:
+      case Codes.keyCodes.K_NUMLOCK:
+      case Codes.keyCodes.K_SCROLL:
         return true;
       default:
         return false;

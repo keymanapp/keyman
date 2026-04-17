@@ -8,7 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, KeyboardHarness, SyntheticTextStore, TextStore } from "keyman/engine/keyboard";
+import { DefaultOutputRules, KeyEvent, KeyEventSpec, KeyboardHarness, SyntheticTextStore, TextStore } from "keyman/engine/keyboard";
 import { DeviceSpec } from "keyman/common/web-utils";
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
@@ -55,8 +55,11 @@ export class NodeProctor extends Proctor {
     }
 
     // Establish a fresh processor, setting its keyboard appropriately for the test.
-    const processor = new JSKeyboardProcessor(this.device);
-    processor.keyboardInterface = this.keyboardWithHarness as JSKeyboardInterface;
+    const processor = new JSKeyboardProcessor(this.device, {
+      baseLayout: 'us',
+      keyboardInterface: this.keyboardWithHarness as JSKeyboardInterface,
+      defaultOutputRules: new DefaultOutputRules()
+    });
     const keyboard = processor.activeKeyboard;
 
     if(sequence instanceof RecordedKeystrokeSequence) {

@@ -81,11 +81,16 @@
     "./tools/testing/test-utils": {
       "types": "./build/tools/testing/test-utils/obj/index.d.ts",
       "import": "./build/tools/testing/test-utils/obj/index.js"
+    },
+    "./test/resources": {
+      "types": "./src/test/auto/resources/build/index.d.ts",
+      "import": "./src/test/auto/resources/build/index.js"
     }
   },
   "imports": {
     "#gesture-tools": "./build/tools/testing/gesture-processor/unit-test-resources/obj/index.js",
-    "#recorder": "./build/tools/testing/recorder/obj/index.js"
+    "#recorder": "./build/tools/testing/recorder/obj/index.js",
+    "#test-resources/*.js": "./build/test/resources/*.js"
   },
   "repository": {
     "type": "git",
@@ -104,7 +109,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
-    "@playwright/test": "^1.46.1",
+    "@playwright/test": "1.46.1",
     "@sentry/cli": "^2.31.0",
     "@zip.js/zip.js": "^2.7.32",
     "c8": "^7.12.0",

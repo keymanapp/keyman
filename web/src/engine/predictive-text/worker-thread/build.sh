@@ -16,7 +16,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 INTERMEDIATE=./build/intermediate
 LIB=./build/lib
 
-SRCMAP_CLEANER="node $KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js"
+SRCMAP_CLEANER="${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js"
 
 ################################ Main script ################################
 
@@ -63,7 +63,7 @@ function do_build() {
     --target "es6" \
     --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
-  $SRCMAP_CLEANER \
+  node "$SRCMAP_CLEANER" \
     $INTERMEDIATE/worker-main.js.map \
     $INTERMEDIATE/worker-main.js.map \
     --clean
@@ -76,7 +76,7 @@ function do_build() {
     --target "es6" \
     --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
-  $SRCMAP_CLEANER \
+  node "$SRCMAP_CLEANER" \
     $INTERMEDIATE/worker-main.min.js.map \
     $INTERMEDIATE/worker-main.min.js.map \
     --clean

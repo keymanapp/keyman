@@ -1,14 +1,14 @@
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,
-  DefaultRules,
+  DefaultOutputRules,
   type KeyEvent,
   type TextStore
 } from 'keyman/engine/keyboard';
 
 import { ContextManager } from './contextManager.js';
 
-export class DefaultBrowserRules extends DefaultRules {
+export class DefaultBrowserRules extends DefaultOutputRules {
   private contextManager: ContextManager;
 
   constructor(contextManager: ContextManager) {

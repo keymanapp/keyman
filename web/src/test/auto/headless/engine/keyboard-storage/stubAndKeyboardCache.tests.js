@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-storage';
 
-import { NodeKeyboardLoader } from '../../../resources/loader/nodeKeyboardLoader.js';
+import { NodeKeyboardLoader } from 'keyman/test/resources';
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 
 import path from 'path';

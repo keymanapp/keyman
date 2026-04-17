@@ -1,17 +1,18 @@
-import { ManagedPromise } from 'keyman/engine/keyboard';
-import { CloudRequesterInterface } from '../../../../engine/src/keyboard-storage/cloud/requesterInterface.js';
-import {
-  CLOUD_TIMEOUT_ERR,
-  CLOUD_STUB_REGISTRATION_ERR,
-  CloudQueryResult,
-  CloudQueryEngine
-} from '../../../../engine/src/keyboard-storage/cloud/queryEngine.js';
-
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import fs from 'node:fs';
 import https from 'node:https';
 import vm from 'node:vm';
 
-export default class NodeCloudRequester implements CloudRequesterInterface {
+import { ManagedPromise } from 'keyman/common/web-utils';
+import {
+  CloudQueryEngine,
+  CloudQueryResult,
+  CloudRequesterInterface
+} from 'keyman/engine/keyboard-storage';
+
+export class NodeCloudRequester implements CloudRequesterInterface {
   private static QUERY_SEED = 1;
   private readonly fileLocal: boolean;
 
@@ -34,7 +35,7 @@ export default class NodeCloudRequester implements CloudRequesterInterface {
 
     // Set callback timer
     const timeoutObj = setTimeout(() => {
-      promise.reject(new Error(CLOUD_TIMEOUT_ERR));
+      promise.reject(new Error('The Cloud API request timed out.'));
     }, 10000);
 
     const queryId = NodeCloudRequester.QUERY_SEED++;
@@ -56,7 +57,7 @@ export default class NodeCloudRequester implements CloudRequesterInterface {
       });
 
       if(!promise.isResolved) {
-        promise.reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
+        promise.reject(new Error('The Cloud API failed to find an appropriate keyboard.'));
       }
     }
 

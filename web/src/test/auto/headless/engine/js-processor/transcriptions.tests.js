@@ -175,8 +175,8 @@ describe("Transcriptions and Transforms", function() {
     it("handles context-free single-char output rules", function() {
       // We have other texts validating SyntheticTextStores; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
-      const textStore = new SyntheticTextStore("apple");
-      const originalTextStore = SyntheticTextStore.from(textStore);
+      let textStore = new SyntheticTextStore("apple");
+      let originalTextStore = SyntheticTextStore.from(textStore);
       textStore.insertTextBeforeCaret("s");
 
       /* It's not exactly black box, but presently we don't NEED the keyEvent object for the method to work.
@@ -441,7 +441,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       const originalTextStore = SyntheticTextStore.from(textStore);
       textStore.clearSelection();
 
-      const transform = textStore.textStore(originalTextStore);
+      const transform = textStore.buildTransformFrom(originalTextStore);
       assert.deepEqual(transform, {
         insert: '',
         deleteLeft: 0,

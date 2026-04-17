@@ -1,7 +1,8 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
-import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
 

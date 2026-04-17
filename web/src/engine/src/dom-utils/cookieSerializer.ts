@@ -33,7 +33,7 @@ export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieField
     const allCookies = cookieSerializer._loadRawCookies();
     const matchingCookies: { name: string, value: Type }[] = [];
 
-    for (const cookieName in allCookies) {
+    for (const cookieName of Object.keys(allCookies)) {
       if (pattern.test(cookieName)) {
         const cookieValue = cookieSerializer.loadCookie(cookieName, decoder || ((val: string) => val as DecodedCookieFieldValue)) as Type;
         matchingCookies.push({ name: cookieName, value: cookieValue });

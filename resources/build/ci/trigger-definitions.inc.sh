@@ -19,7 +19,7 @@ readonly build_level_release=release
 readonly valid_build_levels="$build_level_skip|$build_level_build|$build_level_release"
 
 #
-# Target platforms
+# Target platforms (note: 'common' matches all common* platforms in build bot commands)
 #
 
 available_platforms=(android common_web common_windows common_mac common_linux ios linux mac web windows developer)

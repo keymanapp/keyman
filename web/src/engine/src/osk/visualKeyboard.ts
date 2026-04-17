@@ -5,17 +5,17 @@ import {
   ActiveKeyBase,
   ActiveLayout,
   ActiveSubKey,
-  DeviceSpec,
   JSKeyboard,
+  Keyboard,
   KeyboardProperties,
   KeyDistribution,
   KeyEvent,
   Layouts,
   StateKeyMap,
-  timedPromise,
   type InternalKeyboardFont,
 } from 'keyman/engine/keyboard';
 import { isEmptyTransform } from 'keyman/common/web-utils';
+import { DeviceSpec, timedPromise } from 'keyman/common/web-utils';
 
 import { buildCorrectiveLayout } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
@@ -87,7 +87,7 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
    * The Keyman keyboard on which to base the on-screen keyboard being represented.
    */
-  keyboard: JSKeyboard,
+  keyboard: Keyboard,
 
   /**
    * Metadata about the keyboard, such as relevant fonts, display name, and language code.
@@ -242,7 +242,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
   public deferLayout: boolean;
 
   // The keyboard object corresponding to this VisualKeyboard.
-  public readonly layoutKeyboard: JSKeyboard;
+  public readonly layoutKeyboard: Keyboard;
   public readonly layoutKeyboardProperties: KeyboardProperties;
 
   get layerId(): string {
@@ -337,7 +337,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
     }
 
     // Override font if specified by keyboard
-    if ('font' in layout) {
+    if (layout && 'font' in layout) {
       this.fontFamily = layout['font'];
     } else {
       this.fontFamily = '';

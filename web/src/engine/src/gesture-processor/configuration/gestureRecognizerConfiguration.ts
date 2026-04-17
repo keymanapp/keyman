@@ -120,7 +120,7 @@ export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
   processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
   processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource([2]);
 
-  processingConfig.itemIdentifier   = processingConfig.itemIdentifier   ?? (():any => null);
+  processingConfig.itemIdentifier   = processingConfig.itemIdentifier   ?? ((): HoveredItemType => null);
   processingConfig.recordingMode = !!processingConfig.recordingMode;
   processingConfig.historyLength = (processingConfig.historyLength ?? 0) > 0 ? processingConfig.historyLength : 0;
 

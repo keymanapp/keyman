@@ -1,10 +1,21 @@
 import { assert } from 'chai'
 import sinon from 'sinon';
-
 import * as PromiseStatusModule from 'promise-status-async';
-import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
 import { GestureModelDefs, buildGestureMatchInspector, gestures } from 'keyman/engine/gesture-processor';
+
+import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
+import { ManagedPromise, timedPromise } from 'keyman/common/web-utils';
+
+import { assertingPromiseStatus as promiseStatus, assertGestureSequence, SequenceAssertion } from 'keyman/test/resources';
+
+import {
+  LongpressModel,
+  MultitapModel,
+  SimpleTapModel,
+  SubkeySelectModel
+} from './isolatedGestureSpecs.js';
+
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?
@@ -15,18 +26,6 @@ type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
 
 const getGestureModelSet = gestures.specs.getGestureModelSet;
 const modelSetForAction = gestures.matchers.modelSetForAction;
-
-import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
-import { ManagedPromise, timedPromise } from 'keyman/common/web-utils';
-
-import { assertGestureSequence, SequenceAssertion } from "../../../../../resources/sequenceAssertions.js";
-
-import {
-  LongpressModel,
-  MultitapModel,
-  SimpleTapModel,
-  SubkeySelectModel
-} from './isolatedGestureSpecs.js';
 
 const TestGestureModelDefinitions: GestureModelDefs<string> = {
   gestures: [

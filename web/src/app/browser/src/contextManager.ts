@@ -1,4 +1,4 @@
-import { JSKeyboard, type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
+import { type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { textStoreForEvent, textStoreForElement, PageContextAttachment } from 'keyman/engine/attachment';
@@ -28,8 +28,7 @@ export interface KeyboardCookie {
  * @param       {Keyboard}    activeKeyboard  The active keyboard
  */
 function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
-  // TODO-web-core: we need to support RTL in Core. Means supporting km_core_keyboard_get_named_attr(KMX.KMXFile.TSS_KMW_RTL) (#15288)
-  const elDir = activeKeyboard instanceof JSKeyboard && activeKeyboard?.isRTL ? 'rtl' : 'ltr';
+  const elDir = activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
   if(Ptarg) {
     if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement

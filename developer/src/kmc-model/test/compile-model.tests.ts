@@ -7,7 +7,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KeymanFileTypes } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler', function () {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   this.timeout(5000);
 
@@ -19,6 +19,7 @@ describe('LexicalModelCompiler', function () {
     'example.qaa.wordbreaker',
     'example.qaa.joinwordbreaker',
     'example.qaa.scriptusesspaces',
+    'example.qaa.custom',
   ];
 
   for (const modelID of MODELS) {
@@ -37,7 +38,11 @@ describe('LexicalModelCompiler', function () {
 
       assert.isFalse(compilation.hasSyntaxError, 'model code had syntax error');
       assert.isNull(compilation.error, `compilation error: ${compilation.error}`);
-      assert.equal(compilation.modelConstructorName, 'TrieModel');
+      if(modelID == 'example.qaa.custom') {
+        assert.isNull(compilation.modelConstructorName);
+      } else {
+        assert.equal(compilation.modelConstructorName, 'TrieModel');
+      }
     });
   }
 });

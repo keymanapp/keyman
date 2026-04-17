@@ -1,5 +1,180 @@
 # Keyman Version History
 
+## 19.0.222 alpha 2026-04-08
+
+* fix(linux): fix memory problem (#15823)
+
+## 19.0.221 alpha 2026-03-27
+
+* fix(common): add missing `default` property to keyman-touch-layout.clean.spec.json (#15787)
+* chore(deps): bump picomatch from 4.0.3 to 4.0.4 in /developer/src/server/src/win32/trayicon/addon-src (#15786)
+* chore(deps): bump picomatch from 2.3.1 to 2.3.2 (#15784)
+* chore(deps-dev): bump flatted from 3.2.5 to 3.4.2 (#15773)
+* chore(deps): bump brace-expansion from 5.0.4 to 5.0.5 in /developer/src/server/src/win32/trayicon/addon-src (#15791)
+
+## 19.0.220 alpha 2026-03-26
+
+* fix(mac): improved adherence to backspace rules for compliant apps (#15561)
+
+## 19.0.219 alpha 2026-03-25
+
+* maint(common): Update GitHub actions for Node 24 (#15762)
+* fix(core): fix keydown/up handling for LDML keyboards (#15609)
+
+## 19.0.218 alpha 2026-03-24
+
+* fix(developer): define globalThis for compiled custom lexical models (#15777)
+
+## 19.0.217 alpha 2026-03-17
+
+* maint(mac): search for brew-installed rsync (#15765)
+
+## 19.0.216 alpha 2026-03-16
+
+* docs: tweak walkthrough content (#15712)
+* chore(deps): bump tar from 7.5.10 to 7.5.11 in /developer/src/server/src/win32/trayicon/addon-src (#15723)
+* docs(linux): add documentation how input methods work in GTK (#15749)
+* docs(core): improve keyhandling doc (#15736)
+* maint(resources): try meson 1.10.1 (#15754)
+* maint(ios): clean carthage before builds (#15757)
+
+## 19.0.215 alpha 2026-03-13
+
+* chore(linux): fix dependency of Debian test suite (#15735)
+* chore(linux): Update debian changelog (#15732)
+
+## 19.0.214 alpha 2026-03-12
+
+* chore(linux): Update debian changelog (#15718)
+* maint(resources): use x86_64 emscripten on arm/windows builds (#15715)
+
+## 19.0.213 alpha 2026-03-10
+
+* maint(linux): set git credential for linux help on the correct repo (#15707)
+
+## 19.0.212 alpha 2026-03-09
+
+* chore(android): Cleanup unused Extracted Text (#15671)
+* chore(deps): bump fast-xml-parser from 5.3.4 to 5.3.8 (#15649)
+* fix(developer): resolve input project path for `kmc copy` (#15700)
+* fix(developer): await copier result before reporting success or failure (#15701)
+* fix(developer): correct INVALID_HANDLE_VALUE check in UnlockProject (#15704)
+* fix(developer): use trimmed version of paths when verifying in New Project (#15705)
+
+## 19.0.211 alpha 2026-03-06
+
+* chore(deps-dev): bump basic-ftp from 5.0.5 to 5.2.0 (#15631)
+* chore(deps-dev): bump rollup from 4.22.4 to 4.59.0 (#15632)
+* chore(deps): bump minimatch and @microsoft/api-extractor (#15647)
+* chore(deps): bump minimatch from 10.1.1 to 10.2.4 in /developer/src/server/src/win32/trayicon/addon-src (#15648)
+* chore(deps): bump tar from 7.5.7 to 7.5.10 in /developer/src/server/src/win32/trayicon/addon-src (#15682)
+* chore(deps): bump multer from 2.0.2 to 2.1.1 (#15681)
+* chore(web): remove implicit any type when setting processingConfig.itemIdentifier (#15689)
+* maint(common): rollback from Typescript 5.8.2 to 5.4.x (#15690)
+* docs: tweak build bot docs and update imsample gitignore (#15691)
+* maint(developer): make `TestCompilerCallbacks` usage more consistent and simplify (#15665)
+* maint(developer): cleanup additional TestCompilerCallbacks references (#15684)
+* fix(developer): prevent new projects from overwriting existing projects (#15669)
+* fix(developer): retrieve debug memo anchor without side effects (#15672)
+* fix(developer): ngrok upgrade (#15626)
+* chore(deps-dev): bump minimatch from 9.0.5 to 9.0.9 in /resources/build/pr-build-status (#15650)
+
+## 19.0.210 alpha 2026-03-05
+
+* fix(developer): apply keyboard description in Windows keyboard import (#15667)
+* fix(developer): improve UI feedback on upgrade (#15670)
+
+## 19.0.209 alpha 2026-03-04
+
+* maint(ios): update fv Cartfile for Xcode 26 (#15655)
+* feat(linux): implement diagnostic report (#15576)
+* refactor(core): cleanup (#15656)
+
+## 19.0.208 alpha 2026-03-03
+
+* docs(core): add keyhandling doc (#15629)
+* fix(developer): handle CRLF as CR internally in LDML debugger (#15616)
+* fix(developer): handle .kps file that has no `<Package>` element (#15622)
+* fix(developer): use correct return values and nullish checks in package-validation (#15653)
+
+## 19.0.207 alpha 2026-03-02
+
+* chore(ios): Cleanup `RELEASE_OEM_FIRSTVOICES` var in build.sh scripts (#15605)
+* fix(developer): package compiler handle missing `info` section in .kps file (#15620)
+* fix(developer): handle window already destroyed when closing editor (#15618)
+
+## 19.0.206 alpha 2026-02-25
+
+* maint(ios): upgrade to Xcode 26.2 (#15498)
+
+## 19.0.205 alpha 2026-02-24
+
+* fix(core): fix iterator in backspace handling (#15596)
+* refactor(core): simplify loop for removing text (#15600)
+* test(core): add LDML baseline test with minimal keyboard (#15608)
+
+## 19.0.204 alpha 2026-02-20
+
+* maint(web): ensure Web build scripts handle paths with spaces properly (#15598)
+
+## 19.0.203 alpha 2026-02-16
+
+* docs: Add status.keyman.com info to website readme (#15591)
+
+## 19.0.202 alpha 2026-02-12
+
+* fix(linux): check for existing file before trying to install (#15573)
+
+## 19.0.201 alpha 2026-02-09
+
+* fix(linux): include missing artifacts in source tarball (#15566)
+* chore(linux): use xz compression for source tarballs (#15568)
+
+## 19.0.200 alpha 2026-02-06
+
+* change(web): define, utilize cleaner Web test-resource import paths (#15564)
+* maint(mac): upgrade to Xcode 26.2 (#15484)
+
+## 19.0.199 alpha 2026-02-05
+
+* chore(deps): bump @isaacs/brace-expansion from 5.0.0 to 5.0.1 in /developer/src/server/src/win32/trayicon/addon-src (#15552)
+* fix(windows): unresponsive splash screen (#15269)
+* maint(common): Update langtags.json to 2026-02-03 release (v1.4) (#15459)
+* feat(android): Use current display language for keyboard search (#15510)
+* chore(linux): Update debian changelog (#15557)
+* chore(linux): update copyright year and standards version (#15559)
+
+## 19.0.198 alpha 2026-02-04
+
+* fix(core): handle backspace decomposition (#15488)
+* fix(core): normalization segment should end on NFC boundary, not NFD (#15506)
+
+## 19.0.197 alpha 2026-02-02
+
+* chore(deps): bump tar from 7.5.6 to 7.5.7 in /developer/src/server/src/win32/trayicon/addon-src (#15514)
+* chore(deps): bump fast-xml-parser from 5.2.2 to 5.3.4 (#15526)
+* fix(windows): handle symstore correctly from bash script (#15524)
+* chore(ios): Add fv_tlingityooxatangi to FirstVoices for iOS app (#15485)
+
+## 19.0.196 alpha 2026-01-30
+
+* chore(common): Update Crowdin strings for `de` (#15511)
+
+## 19.0.195 alpha 2026-01-29
+
+* fix(windows): adjust symbol paths for publishing to symbol server (#15509)
+
+## 19.0.194 alpha 2026-01-27
+
+* fix(windows): export sym store path so symbols are published (#15493)
+
+## 19.0.193 alpha 2026-01-26
+
+* fix(resources): block unsupported platforms from running certain scripts (#15480)
+* chore(deps): bump tar and node-gyp in /developer/src/server/src/win32/trayicon/addon-src (#15469)
+* chore(deps-dev): bump lodash from 4.17.21 to 4.17.23 (#15479)
+* chore(deps): bump tar from 7.5.3 to 7.5.6 in /developer/src/server/src/win32/trayicon/addon-src (#15495)
+
 ## 19.0.192 alpha 2026-01-15
 
 * fix(linux): issues when running ./build.sh test:linux (#15434)
@@ -1150,6 +1325,50 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.249 stable 2026-03-27
+
+* chore(linux): Update debian changelog (#15717)
+* chore(linux): fix dependency of Debian test suite (#15734)
+* chore(linux): Update debian changelog (#15731)
+* maint(ios): Upgrade Sentry to 8.58.0 to support XCode 26 (#15755)
+* fix(developer): define globalThis for compiled custom lexical models (#15778)
+* fix(common): add missing `default` property to keyman-touch-layout.clean.spec.json (#15792)
+
+## 18.0.248 stable 2026-03-12
+
+* fix(ios): Revert Sentry to 8.38.0 to fix FirstVoices crash on startup with 18.0.247 (#15726)
+
+## 18.0.247 stable 2026-03-09
+
+* chore(linux): Update debian changelog (#15556)
+* chore(linux): update copyright year and standards version (#15558)
+* fix(mac): retry for mac disk detach (#15577)
+* maint(mac): upgrade to Xcode 26.2 (#15575)
+* maint(ios): upgrade to Xcode 26.2 (#15614)
+* fix(developer): handle CRLF as CR internally in LDML debugger (#15660)
+* fix(developer): handle .kps file that has no `<Package>` element (#15661)
+* fix(developer): use correct return values and nullish checks in package-validation (#15662)
+* fix(developer): handle window already destroyed when closing editor (#15663)
+* fix(developer): package compiler handle missing `info` section in .kps file (#15664)
+* fix(developer): apply keyboard description in Windows keyboard import (#15668)
+* fix(developer): improve UI feedback on upgrade (#15686)
+* fix(developer): prevent new projects from overwriting existing projects (#15694)
+* fix(developer): retrieve debug memo anchor without side effects (#15695)
+* fix(developer): ngrok upgrade (#15633)
+* fix(developer): await copier result before reporting success or failure (#15702)
+* fix(developer): resolve input project path for `kmc copy` (#15703)
+
+## 18.0.246 stable 2026-02-04
+
+* cherrypick(common):  Update FirstVoices versions in keyboards.csv (#15273)
+* docs(ios): Use /cdn/dev assets for Engine guides (#15274)
+* chore(linux): Update debian changelog (#15281)
+* maint(linux): remove EOL Ubuntu 25.04 Plucky (#15424)
+* docs(developer): update primerprep link (#15468)
+* chore(ios): Add fv_tlingityooxatangi to FirstVoices for iOS app (#15496)
+* fix(core): handle backspace decomposition (#15494)
+* fix(core): normalization segment should end on NFC boundary, not NFD (#15551)
 
 ## 18.0.245 stable 2025-12-03
 
