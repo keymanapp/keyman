@@ -126,6 +126,10 @@ export class TokenResultMapping implements CorrectionResultMapping<SearchNode>{
     return this.node.currentTraversal;
   }
 
+  buildRemappedNode(spaceId: number): SearchNode {
+    return new SearchNode(this.node, spaceId);
+  }
+
   buildInsertionEdges(): SearchNode[] {
     return this.node.buildInsertionEdges();
   }
