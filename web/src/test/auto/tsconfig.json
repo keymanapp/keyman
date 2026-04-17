@@ -17,6 +17,7 @@
 
   "references": [
     { "path": "../../engine" },
-    { "path": "resources" }
+    { "path": "resources" },
+    { "path": "headless-resources" },
   ]
 }

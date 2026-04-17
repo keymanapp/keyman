@@ -1,9 +1,8 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
-import { KM_Core, km_core_option_item, KM_CORE_OPTION_SCOPE } from 'keyman/engine/core-adapter';
+import { KM_Core, km_core_option_item } from 'keyman/engine/core-adapter';
 import { KeyboardMinimalInterface, Keyboard, VariableStoreSerializer, KMXKeyboard } from 'keyman/engine/keyboard';
-import { toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 export class CoreKeyboardInterface implements KeyboardMinimalInterface {
   private _activeKeyboard: Keyboard;
@@ -26,8 +25,11 @@ export class CoreKeyboardInterface implements KeyboardMinimalInterface {
 
 
   private loadSerializedOptions(keyboard: Keyboard): km_core_option_item[] {
-    const stores = this.variableStoreSerializer.findStores(toPrefixedKeyboardId(keyboard.id));
+    // TODO-WEB-CORE: use km_core_keyboard_get_attrs to get list of all variable
+    // store names and then iterate through those rather than reading from
+    // cookie props
     const options: km_core_option_item[] = [];
+    /*const stores = this.variableStoreSerializer.findStores(toPrefixedKeyboardId(keyboard.id));
     for (const store of stores) {
       for (const key in store) {
         if (store.hasOwnProperty(key)) {
@@ -39,7 +41,7 @@ export class CoreKeyboardInterface implements KeyboardMinimalInterface {
           options.push(item);
         }
       }
-    }
+    }*/
     return options;
   }
 }

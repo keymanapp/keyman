@@ -8,12 +8,11 @@
     "noEmitOnError": false
   },
 
-  "include": [ "*.ts", "loader/*.ts", "@types/*.d.ts" ],
+  "include": [ "*.ts" ],
   "exclude": [ "node_modules" ],
 
   "references": [
     { "path": "../../../common/web-utils" },
     { "path": "../../../engine" },
-    { "path": "../headless-resources" },
   ]
 }

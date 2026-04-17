@@ -22,8 +22,7 @@ import {
   type Deadkey,
   type KeyEvent,
   type TextStore,
-  VariableStore,
-  VariableStoreDictionary,
+  VariableStores,
   VariableStoreSerializer,
 } from "keyman/engine/keyboard";
 import { PlatformSystemStore } from './platformSystemStore.js';
@@ -198,8 +197,6 @@ export class JSKeyboardInterface extends KeyboardHarness {
   activeKeyboard: Keyboard;
   activeDevice: DeviceSpec;
 
-  variableStoreSerializer: VariableStoreSerializer;
-
   public get activeJSKeyboard(): JSKeyboard {
     return this.activeKeyboard as JSKeyboard;
   }
@@ -209,7 +206,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     return Codes;
   }
 
-  constructor(_jsGlobal: any, keymanGlobal: KeyboardKeymanGlobal, variableStoreSerializer: VariableStoreSerializer = null) {
+  constructor(_jsGlobal: any, keymanGlobal: KeyboardKeymanGlobal, public readonly variableStoreSerializer: VariableStoreSerializer) {
     super(_jsGlobal, keymanGlobal);
 
     this.systemStores = {};
@@ -219,7 +216,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.systemStores[SystemStoreIDs.TSS_NEWLAYER] = new MutableSystemStore(SystemStoreIDs.TSS_NEWLAYER, '');
     this.systemStores[SystemStoreIDs.TSS_OLDLAYER] = new MutableSystemStore(SystemStoreIDs.TSS_OLDLAYER, '');
 
-    this.variableStoreSerializer = variableStoreSerializer;
+    if(!variableStoreSerializer) {
+      throw new Error('variableStoreSerializer is required');
+    }
   }
 
   /**
@@ -930,10 +929,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   }
 
   /**
-   * Load an option store value from a cookie or default value
+   * Load a variable store value from a cookie or default value
    *
    * @param       {string}      kbdName     keyboard internal name
-   * @param       {string}      storeName   store (option) name, embedded in cookie name
+   * @param       {string}      storeName   variable store name, embedded in cookie name
    * @param       {string}      dfltValue   default value
    * @return      {string}                  current or default option value
    *
@@ -942,43 +941,39 @@ export class JSKeyboardInterface extends KeyboardHarness {
    */
   loadStore(kbdName: string, storeName:string, dfltValue:string): string {
     this.resetContextCache();
-    if(this.variableStoreSerializer) {
-      const cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
-      return cValue[storeName] || dfltValue;
-    } else {
-      return dfltValue;
-    }
+    const cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
+    return cValue ?? dfltValue;
   }
 
   /**
-   * Save an option store value to a cookie
+   * Save a variable store value to a cookie
    *
    * @param       {string}      storeName   store (option) name, embedded in cookie name
-   * @param       {string}      optValue    option value to save
+   * @param       {string}      storeValue  store value to save
    * @return      {boolean}                 true if save successful
    *
    * Note that a keyboard will freely manipulate the value of its variable stores on the
    * script object within its own code.  This function's use is merely to _persist_ that
    * value across sessions, providing a custom user default for later uses of the keyboard.
    */
-  saveStore(storeName:string, optValue:string): boolean {
+  saveStore(storeName:string, storeValue:string): boolean {
     this.resetContextCache();
     const kbd=this.activeKeyboard;
     if(!kbd || typeof kbd.id == 'undefined' || kbd.id == '') {
       return false;
     }
 
-    // And the lookup under that entry looks for the value under the store name, again.
-    const valueObj: VariableStore = {};
-    valueObj[storeName] = optValue;
+    // TODO-WEB-CORE: this.ruleBehavior should be mocked in unit tests; we
+    // should not have code here that behaves differently in a unit test
+    // environment
 
     // Null-check in case of invocation during unit-test
     if(this.ruleBehavior) {
-      this.ruleBehavior.saveStore[storeName] = valueObj;
+      this.ruleBehavior.saveStores[storeName] = storeValue;
     } else {
       // We're in a unit-test environment, directly invoking this method from outside of a keyboard.
       // In this case, we should immediately commit the change.
-      this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, valueObj);
+      this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, storeValue);
     }
     return true;
   }
@@ -1108,7 +1103,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param stores A dictionary of stores which should be found in the
    *               keyboard
    */
-  applyVariableStores(stores: VariableStoreDictionary): void {
+  applyVariableStores(stores: VariableStores): void {
     this.activeJSKeyboard.variableStores = stores;
   }
 

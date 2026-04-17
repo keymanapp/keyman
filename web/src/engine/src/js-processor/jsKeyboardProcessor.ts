@@ -25,7 +25,6 @@ import { ProcessorInitOptions } from './processorInitOptions.js';
 export type LogMessageHandler = (str: string) => void;
 
 export class JSKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
-
   // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
   // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
   public stateKeys = {
@@ -617,10 +616,8 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
 
     this.keyboardInterface.applyVariableStores(data.variableStores);
 
-    if (this.keyboardInterface.variableStoreSerializer) {
-      for (const storeID in data.saveStore) {
-        this.keyboardInterface.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeID, data.saveStore[storeID]);
-      }
+    for (const storeID in data.saveStores) {
+      this.keyboardInterface.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeID, data.saveStores[storeID]);
     }
 
     if (data.triggersDefaultCommand) {

@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url);
 import { MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 
 const device = {
@@ -52,7 +53,7 @@ function runStringRuleSet(input, output) {
 
 describe('Engine - notany() and context()', function() {
   before(async function() {
-    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
     const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_917.js'));
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;

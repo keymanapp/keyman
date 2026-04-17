@@ -85,6 +85,10 @@
     "./test/resources": {
       "types": "./src/test/auto/resources/build/index.d.ts",
       "import": "./src/test/auto/resources/build/index.js"
+    },
+    "./test/headless-resources": {
+      "types": "./src/test/auto/headless-resources/build/index.d.ts",
+      "import": "./src/test/auto/headless-resources/build/index.js"
     }
   },
   "imports": {

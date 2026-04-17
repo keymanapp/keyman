@@ -8,6 +8,7 @@ import { InputProcessor } from 'keyman/engine/main';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { DefaultOutputRules, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { DEFAULT_PROCESSOR_INIT_OPTIONS, NodeKeyboardLoader } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 import { KeyboardTest } from '@keymanapp/recorder-core';
 
 import { NodeWorker } from '@keymanapp/lexical-model-layer/node';
@@ -42,7 +43,7 @@ describe('InputProcessor', function() {
         // will be invalidated.  (No worker, no ability to predict.)
         core = new InputProcessor(device, NodeWorker, {
           baseLayout: 'us',
-          keyboardInterface: new JSKeyboardInterface({}, null, null),
+          keyboardInterface: new JSKeyboardInterface({}, null, new VariableStoreTestSerializer()),
           defaultOutputRules: new DefaultOutputRules()
         });
 
@@ -98,7 +99,7 @@ describe('InputProcessor', function() {
       }
 
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;
@@ -193,7 +194,7 @@ describe('InputProcessor', function() {
 
     before(async function () {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;
