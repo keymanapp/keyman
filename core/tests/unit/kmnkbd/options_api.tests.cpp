@@ -16,15 +16,7 @@
 #include "mock/mock_processor.hpp"
 #include <gtest/gtest.h>
 
-
-// km_core_option_item const test_kb[] =
-// {
-//   {u"hello",     u"world", 0},
-//   KM_CORE_OPTIONS_END
-// };
-
 km::core::path const test_kb_path = "/a/dummy/keyboard.mock";
-km::core::mock_processor mock_processor(test_kb_path);
 
 TEST(km_core_options, verify_list_size) {
   km_core_option_item const api_mock_options[] = {
@@ -37,16 +29,12 @@ TEST(km_core_options, verify_list_size) {
   EXPECT_EQ(km_core_options_list_size(api_mock_options), 3);
 }
 
-GTEST_API_ int
-main(int argc, char **argv) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
-
 TEST(km_core_options, test_empty_list) {
+  km::core::mock_processor mock_processor(test_kb_path);
+
   km_core_option_item const empty_options_list[] = {KM_CORE_OPTIONS_END};
 
-  // Simple sanity tests on an empty options and mock options with 3 items.
+  // Simple sanity test on an empty options list.
   EXPECT_EQ(km_core_options_list_size(empty_options_list), 0);
 
   km_core_state empty_state(mock_processor, empty_options_list);
@@ -62,9 +50,11 @@ TEST(km_core_options, test_empty_list) {
 }
 
 TEST(km_core_options, test_setting_state) {
+  km::core::mock_processor mock_processor(test_kb_path);
+
   km_core_option_item const test_env[] = {
-    {u"test_env_option",   u"yes", 0},
-    {u"testing",   u"maybe", 0},
+    {u"test_env_option",   u"yes", KM_CORE_OPT_ENVIRONMENT},
+    {u"testing",   u"maybe", KM_CORE_OPT_ENVIRONMENT},
     KM_CORE_OPTIONS_END
   };
 
@@ -86,5 +76,13 @@ TEST(km_core_options, test_setting_state) {
     {u"hello",   u"!", KM_CORE_OPT_UNKNOWN},
     KM_CORE_OPTIONS_END
   };
+
+  // The option "hello" has a scope KM_CORE_OPT_UNKNOWN, which is not permitted
   EXPECT_EQ(km_core_state_options_update(&test_state, bad_scope_opts), KM_CORE_STATUS_INVALID_ARGUMENT);
+}
+
+GTEST_API_ int
+main(int argc, char **argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

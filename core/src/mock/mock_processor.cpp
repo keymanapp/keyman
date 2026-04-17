@@ -162,7 +162,7 @@ namespace km {
         {
           state->actions().push_persist(
             update_option(KM_CORE_OPT_KEYBOARD,
-                        u"__test_point",
+                        u"test_keyboard_option",
                         u"F2 pressed test save."));
           break;
         }

@@ -9,6 +9,7 @@ import * as KMX from '../kmx.js';
 import * as r from 'restructure';
 import KMXFile = KMX.KMXFile;
 import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
+import { ModifierKeyConstant } from '../../consts/modifier-key-constants.js';
 
 /* interfaces that match the COMP_PLUS_* structs -- for type safety */
 
@@ -116,7 +117,7 @@ export interface ICOMP_PLUS_KEYS_KEY {
 
 export interface ICOMP_PLUS_KEYS_KMAP {
   vkey: number;
-  mod: number;
+  mod: ModifierKeyConstant;
   key: ITABLE_REF; // keys.keys index
 };
 
@@ -134,7 +135,7 @@ export interface ICOMP_PLUS_KEYS {
 
 export interface ICOMP_PLUS_LAYR_ENTRY {
   id: ISTR_REF;    // str
-  mod: number;     // bitfield
+  mod: ModifierKeyConstant;     // bitfield
   row: ITABLE_REF; // layr.rows index
   count: number;
 };

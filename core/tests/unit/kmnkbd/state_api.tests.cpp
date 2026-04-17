@@ -39,7 +39,7 @@ namespace
   };
 
 constexpr km_core_option_item const expected_persist_opt = {
-  u"__test_point",
+  u"test_keyboard_option",
   u"F2 pressed test save.",
   KM_CORE_OPT_KEYBOARD
 };

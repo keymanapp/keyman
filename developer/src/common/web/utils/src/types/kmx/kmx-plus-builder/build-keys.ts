@@ -108,6 +108,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   keys.flicks.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
   // now, allocate 'flick' entries for each 'flicks'
   keys.flicks.forEach((flicks) => {
+    flicks.flick = keys.flick.length;
     flicks._flicks.forEach((flick) => {
       keys.flick.push({
         directions: build_list_index(sect_list, flick.directions),
