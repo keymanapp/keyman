@@ -14,5 +14,6 @@
   "references": [
     { "path": "../../../common/web-utils" },
     { "path": "../../../engine" },
+    { "path": "../headless-resources" },
   ]
 }
