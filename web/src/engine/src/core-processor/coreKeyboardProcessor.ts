@@ -11,7 +11,6 @@ import {
   StateKeyMap,
   Deadkey,
   Codes,
-  VariableStore,
   VariableStoreSerializer
 } from "keyman/engine/keyboard";
 import { KM_CORE_EVENT_FLAG, KM_CORE_OPTION_SCOPE } from '../core-adapter/KM_Core.js';
@@ -316,9 +315,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
           console.error(`Unsupported option scope: ${option.scope}`);
           continue;
         }
-        const valueObj: VariableStore = {};
-        valueObj[option.key] = option.value;
-        this.keyboardInterface.variableStoreSerializer.saveStore(toPrefixedKeyboardId(this.activeKeyboard.id), option.key, valueObj);
+        this.keyboardInterface.variableStoreSerializer.saveStore(toPrefixedKeyboardId(this.activeKeyboard.id), option.key, option.value);
       }
     }
   }
