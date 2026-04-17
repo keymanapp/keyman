@@ -60,7 +60,6 @@ km_core_process_event_tests_exe = executable(
 )
 test('km_core_process_event', km_core_process_event_tests_exe)
 
-subdir('json')
 subdir('utftest')
 subdir('kmnkbd')
 subdir('kmx')

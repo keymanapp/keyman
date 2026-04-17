@@ -6,6 +6,7 @@
 #include "kmx_file.h"
 #include "path.hpp"
 #include "utfcodec.hpp"
+#include "load_kmx_file.hpp"
 
 namespace km::tests {
 

@@ -1,4 +1,4 @@
-libkeymancore.so.2 libkeymancore2 #MINVER#
+libkeymancore.so.3 libkeymancore3 #MINVER#
 * Build-Depends-Package: libkeymancore-dev
 
 # We only use a C API, so ignore all C++ symbols in the std namespace that bleed through
@@ -39,7 +39,5 @@ libkeymancore.so.2 libkeymancore2 #MINVER#
  km_core_state_imx_deregister_callback@Base 17.0.195
  km_core_state_imx_register_callback@Base 17.0.195
  km_core_state_option_lookup@Base 17.0.195
- km_core_state_options_to_json@Base 17.0.195
  km_core_state_options_update@Base 17.0.195
  km_core_state_queue_action_items@Base 17.0.195
- km_core_state_to_json@Base 17.0.195

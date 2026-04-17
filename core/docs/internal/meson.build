@@ -19,7 +19,6 @@ if hotdoc.found()
                  configuration: cfg)
   deps = files(
     '../include/keyman/keyman_core_api.h',
-    '../src/jsonpp.hpp',
     '../../common/cpp/utfcodec.hpp'
   )
 

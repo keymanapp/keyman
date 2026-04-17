@@ -16,9 +16,6 @@
 #include "option.hpp"
 #include "path.hpp"
 
-// Forward declarations
-class json;
-
 namespace km {
 namespace core
 {
@@ -47,13 +44,9 @@ namespace core
     keyboard_attributes & operator = (keyboard_attributes const &) = delete;
     keyboard_attributes & operator = (keyboard_attributes &&);
 
-    friend json & operator << (json &, km::core::keyboard_attributes const &);
-
     options_store const &   default_opts_store() const noexcept { return _default_opts; }
     options_store &         default_opts_store() noexcept { return _default_opts; }
   };
-
-  json & operator << (json &, km::core::keyboard_attributes const &);
 
 } // namespace core
 } // namespace km

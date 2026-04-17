@@ -10,6 +10,7 @@
 #include "processor.hpp"
 #include <keyman/keyman_core_api_consts.h>
 #include <cstring>
+#include <iterator>
 
 using namespace km::core;
 

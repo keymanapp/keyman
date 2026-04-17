@@ -6,9 +6,9 @@
 #include "state.hpp"
 #include "kmx/kmx_processevent.h"
 
-#include "emscripten_filesystem.h"
 #include "kmnkbd/action_items.hpp"
-#include "load_kmx_file.hpp"
+#include "./helpers/emscripten_filesystem.h"
+#include "./helpers/load_kmx_file.hpp"
 
 using namespace km::core::kmx;
 km::core::path test_dir;

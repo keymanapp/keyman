@@ -60,7 +60,13 @@ Caps Lock.
 
 All calls, types and enums are prefixed with the namespace identifier `km_core_`
 
-### Changes from 16.0
+### Changes in 19.0
+
+* The JSON introspection APIs (which were not fully implemented),
+  `km_core_state_options_to_json` and `km_core_state_to_json`, have been
+  removed.
+
+### Changes in 17.0 (from 16.0)
 
 * The namespace identifier has changed from `km_kbp_` to `km_core_`.
 * Most context APIs are now private, and `km_core_context_set_if_needed` is the
