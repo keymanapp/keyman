@@ -29,6 +29,7 @@ import { HotkeyManager } from './hotkeyManager.js';
 import { BeepHandler } from './beepHandler.js';
 import { KeyboardInterface } from './keyboardInterface.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer/web';
+import { KeyboardDetails } from './keyboardDetails.js';
 
 export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -43,8 +44,8 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
 
   // Properties sometimes set up by a hosting page
-  getOskHeight?: () => number = null;
-  getOskWidth?: () => number = null;
+  public getOskHeight?: () => number = null;
+  public getOskWidth?: () => number = null;
 
   /**
    * Provides a quick link to the base help page for Keyman keyboards.
@@ -53,7 +54,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    */
   public readonly helpURL = 'https://help.keyman.com/go';
 
-  keyEventRefocus = () => {
+  public keyEventRefocus = () => {
     this.contextManager.restoreLastActiveTextStore();
   }
 
@@ -87,7 +88,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     });
   }
 
-  public ensureElementVisibility(e: HTMLElement) {
+  public ensureElementVisibility(e: HTMLElement): void {
     if(!e || !this.osk) {
       return;
     }
@@ -108,7 +109,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     }
   }
 
-  public get util() {
+  public get util(): UtilApiEndpoint {
     return this._util;
   }
 
@@ -120,11 +121,11 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   /**
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/initialized
    */
-  public get initialized() {
+  public get initialized(): number {
     return this._initialized;
   }
 
-  public get ui() {
+  public get ui(): UIModule {
     return this._ui;
   }
 
@@ -157,7 +158,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * @returns A Promise that only resolves once the engine is fully initialized.
    */
-  public async init(options: Required<BrowserInitOptionSpec>) {
+  public async init(options: Required<BrowserInitOptionSpec>): Promise<void> {
     const deviceDetector = new DeviceDetector();
     const device = deviceDetector.detect();
 
@@ -269,7 +270,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
-  public activatingUI(state: boolean | number) {
+  public activatingUI(state: boolean | number): void {
     this.contextManager.focusAssistant.setMaintainingFocus(!!state);
   }
 
@@ -283,7 +284,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl
    */
-  public setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
+  public setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string): void {
     if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -304,6 +305,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     this.contextManager.setKeyboardForTextStore(Pelem._kmwAttachment.textStore, Pkbd, Plc);
   }
+
   /**
    * Function     getKeyboardForControl
    * Scope        Public
@@ -314,7 +316,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    */
-  public getKeyboardForControl(Pelem: HTMLElement) {
+  public getKeyboardForControl(Pelem: HTMLElement): string | null{
     const textStore = textStoreForElement(Pelem);
     return this.contextManager.getKeyboardStubForTextStore(textStore).id;
   }
@@ -328,12 +330,12 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * Description  Returns the language code used with the current independently-managed keyboard for this control.
    *              If it is currently following the global keyboard setting, returns null instead.
    */
-  getLanguageForControl(Pelem: HTMLElement) {
+  public getLanguageForControl(Pelem: HTMLElement): string | null {
     const textStore = textStoreForElement(Pelem);
     return this.contextManager.getKeyboardStubForTextStore(textStore).langId;
   }
 
-  isAttached(x: HTMLElement): boolean {
+  public isAttached(x: HTMLElement): boolean {
     return this.contextManager.page.isAttached(x);
   }
 
@@ -392,16 +394,13 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard.
    *
    * @param       {Object}    Lstub      JSKeyboard stub object
-   * @param       {Object}    Lkbd       JSKeyboard script object
-   * @return      {Object}               Copy of keyboard identification strings
+   * @param       {Object}    Lkbd       Keyboard script object
+   * @return      {Object}               Keyboard details object
    *
    */
-  // TODO-web-core: Lkbd should be type 'Keyboard'
-  // TODO-web-core: add isRTL into KMXKeyboard keyboard definition
   // TODO-web-core: check each property of Lstub for KMXKeyboard availability
-  // TODO-web-core: define an interface for the return type and use it instead of ReturnType<> (and document!)
-  private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: JSKeyboard) { // I2078 - Full keyboard detail
-    const Lr = {
+  private _GetKeyboardDetail(Lstub: KeyboardStub, Lkbd: Keyboard): KeyboardDetails { // I2078 - Full keyboard detail
+   return {
       Name: Lstub.KN,
       InternalName: Lstub.KI,
       LanguageName: Lstub.KL,  // I1300 - Add support for language names
@@ -419,8 +418,6 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       HasLoaded: !!Lkbd,
       IsRTL: Lkbd ? Lkbd.isRTL : null
     };
-
-    return Lr;
   }
 
   /**
@@ -434,10 +431,10 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isCJK
    */
-  public isCJK(k0?: KeyboardObject | ReturnType<KeymanEngine['_GetKeyboardDetail']> /* [b/c Toolbar UI]*/) {
+  public isCJK(k0?: KeyboardObject | KeyboardDetails /* [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
     if(k0) {
-      const kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
+      const kbdDetail = k0 as KeyboardDetails;
       if(kbdDetail.KeyboardID){
         kbd = this.keyboardRequisitioner.cache.getKeyboard(kbdDetail.KeyboardID);
       } else {
@@ -460,7 +457,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard
    **/
-  public getKeyboard(PInternalName: string, PlgCode?: string) {
+  public getKeyboard(PInternalName: string, PlgCode?: string): KeyboardDetails {
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
@@ -483,8 +480,8 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards
    */
-  public getKeyboards(): ReturnType<KeymanEngine['_GetKeyboardDetail']>[] {
-    const Lr: ReturnType<KeymanEngine['_GetKeyboardDetail']>[] = [];
+  public getKeyboards(): KeyboardDetails[] {
+    const Lr: KeyboardDetails[] = [];
 
     const cache = this.keyboardRequisitioner.cache;
     const keyboardStubs = cache.getStubList()
@@ -511,7 +508,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/removeKeyboards
    */
-  public removeKeyboards(...x: string[]) {
+  public removeKeyboards(...x: string[]): boolean {
     for(let i=0; i < x.length; i++) {
       // This will completely forget the keyboard, requiring an async load operation to restore it again.
       // `true` is responsible for this & is required to pass a variable-store unit test.
@@ -543,7 +540,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/focusLastActiveElement
    */
-  public focusLastActiveElement() {
+  public focusLastActiveElement(): void {
     this.contextManager.lastActiveTextStore?.focus();
   }
 
@@ -554,7 +551,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getLastActiveElement
    */
-  public getLastActiveElement() {
+  public getLastActiveElement(): HTMLElement | null {
     return this.contextManager.lastActiveTextStore?.getElement();
   }
 
@@ -564,7 +561,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *  @param  {Object|string} e         element id or element
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
    **/
-  setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
+  setActiveElement(e: string|HTMLElement, setFocus?: boolean): void {
     if(typeof e == 'string') {
       const id = e;
       e = document.getElementById(e);
@@ -588,7 +585,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/moveToElement
    **/
-  public moveToElement(e: string|HTMLElement) {
+  public moveToElement(e: string|HTMLElement): void {
     if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
       e=document.getElementById(e);
     }
@@ -606,7 +603,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/addHotKey
    */
-  public addHotKey(keyCode: number, shiftState: number, handler: () => void) {
+  public addHotKey(keyCode: number, shiftState: number, handler: () => void): void {
     this.hotkeyManager.addHotKey(keyCode, shiftState, handler);
   }
 
@@ -619,7 +616,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/removeHotKey
    */
-  public removeHotKey(keyCode: number, shiftState: number) {
+  public removeHotKey(keyCode: number, shiftState: number): void {
     this.hotkeyManager.removeHotkey(keyCode, shiftState);
   }
 
@@ -631,7 +628,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/attachToControl
    */
-  public attachToControl(Pelem: HTMLElement) {
+  public attachToControl(Pelem: HTMLElement): void {
     this.contextManager.page.attachToControl(Pelem);
   }
 
@@ -643,7 +640,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/detachFromControl
    */
-  public detachFromControl(Pelem: HTMLElement) {
+  public detachFromControl(Pelem: HTMLElement): void {
     this.contextManager.page.detachFromControl(Pelem);
   }
 
@@ -655,7 +652,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/disableControl
    */
-  public disableControl(Pelem: HTMLElement) {
+  public disableControl(Pelem: HTMLElement): void {
     this.contextManager.page.disableControl(Pelem);
   }
 
@@ -667,7 +664,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/enableControl
    */
-  public enableControl(Pelem: HTMLMapElement) {
+  public enableControl(Pelem: HTMLMapElement): void {
     this.contextManager.page.enableControl(Pelem);
   }
 
@@ -725,7 +722,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * instances during integration testing.  The goal is to prevent interactions intended
    * for the 'current' instance from being accidentally intercepted by a discarded one.
    */
-  shutdown() {
+  public shutdown(): void {
     this.pageIntegration.shutdown();
     this.contextManager.shutdown();
     this.osk?.shutdown();
