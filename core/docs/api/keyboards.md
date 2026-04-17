@@ -18,9 +18,13 @@ Provides read-only information about a keyboard.
 ## Specification
 ```c
 typedef struct {
-  km_core_cp const * version_string;
-  km_core_cp const * id;
+  km_core_cu const * version_string;
+  km_core_cu const * id;
+
+  // TODO-web-core: Deprecate this field (#12497)
+  // KMN_DEPRECATED
   km_core_path_name  folder_path;
+
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
 
@@ -34,7 +38,7 @@ typedef struct {
 : Keyman keyboard ID string.
 
 `folder_path`
-: Path to the unpacked folder containing the keyboard and associated resources.
+: Path to the unpacked folder containing the keyboard and associated resources (deprecated).
 
 `default_options`
 : Set of default values for any options included in the keyboard.
@@ -81,8 +85,8 @@ Describes a single Input Method eXtension library and entry point.
 
 ```c
 typedef struct {
-  km_core_cp const * library_name;
-  km_core_cp const * function_name;
+  km_core_cu const * library_name;
+  km_core_cu const * function_name;
   uint32_t imx_id;
 } km_core_keyboard_imx;
 
@@ -106,18 +110,17 @@ typedef struct {
 
 ## Description
 
-Parse and load a keyboard from the supplied blob and return a pointer to the
-loaded keyboard in the out parameter.
+Parse and load keyboard from the supplied blob and a pointer to the loaded keyboard
+into the out paramter.
 
 ## Specification
 
 ```c
 KMN_API
-km_core_status
-km_core_keyboard_load_from_blob(const km_core_path_name kb_name,
-                                const void* blob,
-                                const size_t blob_size,
-                                km_core_keyboard** keyboard);
+km_core_status km_core_keyboard_load_from_blob(const km_core_path_name kb_name,
+                                               const void* blob,
+                                               const size_t blob_size,
+                                               km_core_keyboard** keyboard);
 
 ```
 
@@ -149,7 +152,7 @@ km_core_keyboard_load_from_blob(const km_core_path_name kb_name,
 : In the event the keyboard file is unparseable for any reason
 
 `KM_CORE_STATUS_INVALID_ARGUMENT`
-: In the event the file doesn't exist or is inaccesible or `keyboard` is null.
+: In the event `keyboard` is null.
 
 `KM_CORE_STATUS_OS_ERROR`
 : Bit 31 (high bit) set, bits 0-30 are an OS-specific error code.
@@ -341,7 +344,8 @@ void km_core_state_imx_register_callback(km_core_state *state, km_core_keyboard_
 : pointer to a function that implements the IMX callback
 
 `callback_object`
-: TODO
+: An opaque pointer that can be used to pass context information to the callback function,
+  usually it is a user-defined data structure.
 
 -------------------------------------------------------------------------------
 
@@ -427,7 +431,7 @@ km_core_state_clone(km_core_state const *state,
 ## Parameters
 
 `state`
-: A pointer to the opaque statea object to be cloned.
+: A pointer to the opaque state object to be cloned.
 
 `out`
 : A pointer to result variable: A pointer to the opaque state object
@@ -526,7 +530,7 @@ Returns a debug formatted string of the context from the state.
 
 ```c
 KMN_API
-km_core_cp *
+km_core_cu *
 km_core_state_context_debug(km_core_state *state, km_core_debug_context_type context_type);
 
 ```
@@ -540,16 +544,16 @@ km_core_state_context_debug(km_core_state *state, km_core_debug_context_type con
 
 ## Returns
 
-A pointer to a [km_core_cp] UTF-16 string. Must be disposed of by a call
-to [km_core_cp_dispose].
+A pointer to a [km_core_cu] UTF-16 string. Must be disposed of by a call
+to [km_core_cu_dispose].
 
 -------------------------------------------------------------------------------
 
-# km_core_cp_dispose() {#km_core_cp_dispose}
+# km_core_cu_dispose() {#km_core_cu_dispose}
 
 ## Description
 
-Free the allocated memory belonging to a [km_core_cp] array previously
+Free the allocated memory belonging to a [km_core_cu] array previously
 returned by [km_core_state_context_debug]. May be `nullptr`.
 
 ## Specification
@@ -557,67 +561,18 @@ returned by [km_core_state_context_debug]. May be `nullptr`.
 ```c
 KMN_API
 void
-km_core_cp_dispose(km_core_cp *cp);
+km_core_cu_dispose(km_core_cu *cp);
 
 ```
 ## Parameters
 
 `cp`
-: A pointer to the start of the [km_core_cp] array to be disposed of.
-
--------------------------------------------------------------------------------
-
-# km_core_state_to_json() {#km_core_state_to_json}
-
-## Description
-
-Export the internal state of a [km_core_state] object to a JSON format document
-and place it in the supplied buffer, reporting how much space was used. If null
-is passed as the buffer the number of bytes required is returned. If there is
-insufficent space to hold the document, the contents of the buffer is undefined.
-The encoding of the returned data is UTF-8.
-
-__WARNING__: The structure and format of the JSON document while independently
-versioned is not part of this API and is intended solely for use in diagnostics
-or by development and debugging tools which are aware of processor
-implementation details.
-
-## Specification
-
-```c
-KMN_API
-km_core_status
-km_core_state_to_json(km_core_state const *state,
-                     char *buf,
-                     size_t *space);
-
-```
-## Parameters
-
-`state`
-: An pointer to an opaque state object.
-
-`buf`
-: A pointer to the buffer to place the C string containing the JSON
-  document into. May be null.
-
-`space`
-: A pointer to a size_t variable. This variable must contain the
-  number of bytes available in the buffer pointed to by `buf`, unless `buf` is
-  null. On return it will hold how many bytes were used.
-
-## Returns
-
-`KM_CORE_STATUS_OK`
-: On success.
-
-`KM_CORE_STATUS_NO_MEM`
-: In the event an internal memory allocation fails.
+: A pointer to the start of the [km_core_cu] array to be disposed of.
 
 -------------------------------------------------------------------------------
 
 
-[km_core_cp]: background#km_core_cp "km_core_cp type"
+[km_core_cu]: background#km_core_cu "km_core_cu type"
 [km_core_usv]: background#km_core_usv "km_core_usv type"
 [km_core_virtual_key]: background#km_core_virtual_key "km_core_virtual_key type"
 [km_core_status]: background#km_core_status "km_core_status type"
@@ -640,7 +595,6 @@ km_core_state_to_json(km_core_state const *state,
 [km_core_option_item]: options#km_core_option_item "km_core_option_item struct"
 [km_core_options_list_size]: options#km_core_options_list_size "km_core_options_list_size function"
 [km_core_state_options_update]: options#km_core_state_options_update "km_core_state_options_update function"
-[km_core_state_options_to_json]: options#km_core_state_options_to_json "km_core_state_options_to_json function"
 [km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
 [km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
 [km_core_keyboard_imx]: keyboards#km_core_keyboard_imx "km_core_keyboard_imx struct"
@@ -657,8 +611,7 @@ km_core_state_to_json(km_core_state const *state,
 [km_core_state_dispose]: keyboards#km_core_state_dispose "km_core_state_dispose function"
 [km_core_debug_context_type]: keyboards#km_core_debug_context_type "km_core_debug_context_type enum"
 [km_core_state_context_debug]: keyboards#km_core_state_context_debug "km_core_state_context_debug function"
-[km_core_cp_dispose]: keyboards#km_core_cp_dispose "km_core_cp_dispose function"
-[km_core_state_to_json]: keyboards#km_core_state_to_json "km_core_state_to_json function"
+[km_core_cu_dispose]: keyboards#km_core_cu_dispose "km_core_cu_dispose function"
 [km_core_event_flags]: processor#km_core_event_flags "km_core_event_flags enum"
 [km_core_process_event]: processor#km_core_process_event "km_core_process_event function"
 [km_core_event]: processor#km_core_event "km_core_event function"
