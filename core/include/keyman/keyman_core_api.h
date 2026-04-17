@@ -40,7 +40,7 @@ This is an internal API intended for use only within Keyman Engine.
 * [Options](options)
 * [Processor](processor)
 * [State and Actions](state)
-* [JSON introspection Schema](json-schema)
+* [Key Handling](keyhandling)
 * [Building Keyman Core](building)
 
 ## Requirements
@@ -51,7 +51,6 @@ This is an internal API intended for use only within Keyman Engine.
 5. Support querying Engine attributes.
 6. Support querying Keyboard attributes.
 7. Idempotent
-
 
 ## Design decisions in support of requirements
 - Use C or C99 types and calling convention for the interface, it has the
@@ -96,10 +95,132 @@ modifiers such as Windows key are excluded from this set. Some modifiers are
 transient, such as Control, and others have long-lasting state, such as
 Caps Lock.
 
+- __See more in__   [Keyman Glossary](https://github.com/keymanapp/keyman/wiki/Keyman-glossary)
+
+---
+filename: building.md
+title: How to build Keyman Core
+---
+
+## Prerequisites
+
+### To build
+
+*   Python 3
+*   Meson build system.
+*   C++17 or later compiler.
+
+### Optional
+
+*   [kmc](https://keyman.com/developer/download) (for testing)
+
+## Installing Python3
+
+### Linux
+
+You will be able to install a python3 package in any reputable recent version of
+linux using its package manager if it's not already installed.
+
+### macOS
+
+You can get the official installer from the official Python site:
+[https://www.python.org/downloads/mac-osx](https://www.python.org/downloads/mac-osx/)
+
+### Windows
+
+You can get the official installer from the official Python site:
+[https://www.python.org/downloads/windows](https://www.python.org/downloads/windows/)
+
+## Installing Meson
+
+Ensure you have Python3 correctly installed and can run the command `pip3`.
+
+    $> python3 -m pip install meson
+
+## Building
+
+In your source directory do the following:
+
+    $> cd core
+    $> ./build.sh configure build test
+
+## Note on kmc
+
+kmc is node.js-based the command-line compiler from Keyman Developer, available
+from [keyman.com](https://keyman.com/developer/) or on npm at
+[@keymanapp/kmc](https://npmjs.com/package/@keymanapp/kmc).
+
+### Windows
+
+The search path can be edited through System settings / Advanced system settings
+/ Environment Variables / User environment variables.
+
+If you have Keyman Developer installed, kmc should already be on your path.
+Otherwise, add the path where you extracted the kmcomp archive.
+
+### Linux & MacOS
+
+Install kmc from the NPM package.
+
+---
+filename: keyhandling.md
+title: Keyhandling
+---
+
+# Key Handling
+
+For each key press the processor will called twice, for the key down event
+as well as for the key up event. Depending on the type of key pressed the
+processor might handle the key itself or pass it on to the application.
+The value of `emit_keystroke` in `km_core_actions` struct tells if the
+processor handled the key (`emit_keystroke=0`) or not (`emit_keystroke=1`).
+It is important that the same value gets set for both key down and key up
+events, otherwise the application might miss some events which then looks
+to the user like keys are stuck.
+
+Usually the processor won't handle any frame keys and let the application
+deal with it. This allows shortcut keys like <kbd>Ctrl</kbd>+<kbd>C</kbd>
+to work. The only exception is the <kbd>Backspace</kbd> key which is
+handled internally if enough context is available. Regular keys will be
+handled by the processor.
+
+Note that there is a difference between CLDR/LDML and KMN keyboards if
+there are no rules/transforms defined for a key: KMN keyboards will
+output the cap value of the key (e.g. pressing <kbd>a</kbd> will output
+`a` if no rule is defined), whereas CLDR/LDML keyboards will suppress
+any output for that key.
+
+The following table lists the state of `km_core_actions.emit_keystroke`
+on return of `km_core_process_event` when the following type of key is
+pressed:
+
+|Type                         |   KeyDown     |  KeyUp   |
+|-----------------------------|---------------|----------|
+|Key with rule                |    FALSE      |  FALSE   |
+|Key w/o rule                 |    FALSE      |  FALSE   |
+|Framekeys:                   |               |          |
+|<kbd>Enter</kbd>             |    TRUE       |  TRUE    |
+|<kbd>Backspace</kbd>¹        |    FALSE      |  FALSE   |
+|<kbd>Backspace</kbd>²        |    TRUE       |  TRUE    |
+|<kbd>Ctrl</kbd>+Key          |    TRUE       |  TRUE    |
+|Modifier key <kbd>Shift</kbd>|    TRUE       |  TRUE    |
+|Modifier key <kbd>Ctrl</kbd> |    TRUE       |  TRUE    |
+|Modifier key <kbd>LAlt</kbd> |    TRUE       |  TRUE    |
+
+1: context available<br/>
+2: without or with empty context
+
 ---
 filename: changes.md
 title: Changes - Keyman Core API
 ---
+
+## Changes between 18.0 and 19.0
+
+* Removed deprecated `km_core_keyboard_attrs.folder_path`
+* The JSON introspection APIs (which were not fully implemented),
+  `km_core_state_options_to_json` and `km_core_state_to_json`, have been
+  removed.
 
 ## Changes between 16.0 and 17.0
 
@@ -940,55 +1061,6 @@ km_core_state_options_update(km_core_state *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_to_json()
-
-## Description
-
-Export the contents of a [km_core_options] array to a JSON formatted document and
-place it in the supplied buffer, reporting how much space was used. If null is
-passed as the buffer the number of bytes required is returned in `space`. If
-there is insufficent space to hold the document the contents of the buffer is
-undefined. The returned buffer uses UTF-8 encoding.
-
-## Specification
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_state_options_to_json(km_core_state const *state,
-                       char *buf,
-                       size_t *space);
-
-/*
-```
-## Parameters
-
-`state`
-: An opaque pointer to a state object.
-
-`buf`
-: A pointer to the buffer to place the C string containing the JSON
-  document into, can be null.
-
-`space`
-: A pointer to a size_t variable. This variable must contain the
-  number of bytes available in the buffer pointed to by `buf`, unless `buf` is
-  null. On return it will hold how many bytes were used.
-
-## Returns
-
-`KM_CORE_STATUS_OK`
-: On success.
-
-`KM_CORE_STATUS_INVALID_ARGUMENT`
-: If non-optional parameters are null.
-
-`KM_CORE_STATUS_NO_MEM`
-: In the event an internal memory allocation fails.
-
--------------------------------------------------------------------------------
-
 ---
 filename: keyboards.md
 title: Keyboards - Keyman Core API
@@ -1571,56 +1643,6 @@ km_core_cu_dispose(km_core_cu *cp);
 
 `cp`
 : A pointer to the start of the [km_core_cu] array to be disposed of.
-
--------------------------------------------------------------------------------
-
-# km_core_state_to_json()
-
-## Description
-
-Export the internal state of a [km_core_state] object to a JSON format document
-and place it in the supplied buffer, reporting how much space was used. If null
-is passed as the buffer the number of bytes required is returned. If there is
-insufficent space to hold the document, the contents of the buffer is undefined.
-The encoding of the returned data is UTF-8.
-
-__WARNING__: The structure and format of the JSON document while independently
-versioned is not part of this API and is intended solely for use in diagnostics
-or by development and debugging tools which are aware of processor
-implementation details.
-
-## Specification
-
-```c */
-KMN_API
-km_core_status
-km_core_state_to_json(km_core_state const *state,
-                     char *buf,
-                     size_t *space);
-
-/*
-```
-## Parameters
-
-`state`
-: An pointer to an opaque state object.
-
-`buf`
-: A pointer to the buffer to place the C string containing the JSON
-  document into. May be null.
-
-`space`
-: A pointer to a size_t variable. This variable must contain the
-  number of bytes available in the buffer pointed to by `buf`, unless `buf` is
-  null. On return it will hold how many bytes were used.
-
-## Returns
-
-`KM_CORE_STATUS_OK`
-: On success.
-
-`KM_CORE_STATUS_NO_MEM`
-: In the event an internal memory allocation fails.
 
 -------------------------------------------------------------------------------
 

@@ -276,7 +276,7 @@ export class KeysCompiler extends SectionCompiler {
 
     // now add the reserved key(s).
     r.set(reserved_gap, KeysCompiler.asReserved({
-      flags: constants.keys_key_flags_gap | constants.keys_key_flags_extend,
+      flags: KMXPlus.KeysKeysFlags.gap | KMXPlus.KeysKeysFlags.extend,
       id: sections.strs.allocString(reserved_gap),
       flicks: '',
       longPress: no_list,
@@ -365,10 +365,10 @@ export class KeysCompiler extends SectionCompiler {
       const key = keyBag.get(keyId);
       if (!key) continue; // missing key
 
-      let flags = 0;
+      let flags: KMXPlus.KeysKeysFlags = 0;
       const { flickId, gap, longPressDefaultKeyId, longPressKeyIds, multiTapKeyIds, layerId, output } = key;
       if (!!gap) {
-        flags |= constants.keys_key_flags_gap;
+        flags |= KMXPlus.KeysKeysFlags.gap;
       }
       const id = sections.strs.allocString(key.id, { compileContext: key });
       const longPress: ListItem = sections.list.allocListFromSpaces(

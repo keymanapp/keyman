@@ -6,9 +6,9 @@
 #include "state.hpp"
 #include "kmx/kmx_processevent.h"
 
-#include "emscripten_filesystem.h"
 #include "kmnkbd/action_items.hpp"
-#include "load_kmx_file.hpp"
+#include "./helpers/emscripten_filesystem.h"
+#include "./helpers/load_kmx_file.hpp"
 
 using namespace km::core::kmx;
 km::core::path test_dir;
@@ -49,6 +49,7 @@ protected:
   void Initialize(TestData const& data) {
     km::core::path kmxfile = km::core::path(test_dir / data.keyboard_name);
     auto blob = km::tests::load_kmx_file(kmxfile.native().c_str());
+    ASSERT_FALSE(blob.empty()) << "File " << kmxfile << " does not exist" << std::endl;
 
     EXPECT_EQ(km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), blob.data(), blob.size(), &this->keyboard), KM_CORE_STATUS_OK);
     EXPECT_EQ(km_core_state_create(this->keyboard, test_env_opts, &this->state), KM_CORE_STATUS_OK);
@@ -226,7 +227,8 @@ const TestData values[] = {
   //--------------------------------------------------------------------
   // LDML
   // Key with rule
-  {"LDML_VKey_A", "ldml/keyboards/k_020_fr.kmx", KM_CORE_VKEY_A, 0, u"x", true,
+  // TODO-EMBED-OSK-IN-KMX: do we support '17.0' as well?
+  {"LDML_VKey_A", "ldml/keyboards/19.0/k_020_fr.kmx", KM_CORE_VKEY_A, 0, u"x", true,
     { // KeyDown
       {KM_CORE_IT_CHAR, { 0, }, {'q'}},
       {KM_CORE_IT_END}
@@ -235,7 +237,7 @@ const TestData values[] = {
       {KM_CORE_IT_END}
     }
   },
-  {"LDML_Ctrl_VKey_A", "ldml/keyboards/k_020_fr.kmx", KM_CORE_VKEY_A, KM_CORE_MODIFIER_LCTRL, u"x", true,
+  {"LDML_Ctrl_VKey_A", "ldml/keyboards/19.0/k_020_fr.kmx", KM_CORE_VKEY_A, KM_CORE_MODIFIER_LCTRL, u"x", true,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -247,7 +249,7 @@ const TestData values[] = {
     }
   },
   // Key without rule
-  {"LDML_VKey_X", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_X, 0, u"x", true,
+  {"LDML_VKey_X", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_X, 0, u"x", true,
     { // KeyDown
       {KM_CORE_IT_END} // LDML: no output without rule
     },
@@ -255,7 +257,7 @@ const TestData values[] = {
       {KM_CORE_IT_END}
     }
   },
-  {"LDML_Ctrl_VKey_X", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_X, KM_CORE_MODIFIER_LCTRL, u"x", true,
+  {"LDML_Ctrl_VKey_X", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_X, KM_CORE_MODIFIER_LCTRL, u"x", true,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -267,7 +269,7 @@ const TestData values[] = {
     }
   },
   // Frame key without rule
-  {"LDML_VKey_Enter", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_ENTER, 0, u"x", false,
+  {"LDML_VKey_Enter", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_ENTER, 0, u"x", false,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -279,7 +281,7 @@ const TestData values[] = {
     }
   },
   // Backspace (with available context)
-  {"LDML_VKey_Backspace_Ctxt", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, 0, u"x", true,
+  {"LDML_VKey_Backspace_Ctxt", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, 0, u"x", true,
     { // KeyDown
       // Once we use C++ 20 we can use:
       //{KM_CORE_IT_BACK, { 0, }, {.backspace = {KM_CORE_BT_CHAR, 0}}},
@@ -291,7 +293,7 @@ const TestData values[] = {
     }
   },
   // Backspace (without context)
-  {"LDML_VKey_Backspace_NoCtxt", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, 0, NULL, false,
+  {"LDML_VKey_Backspace_NoCtxt", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, 0, NULL, false,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -303,7 +305,7 @@ const TestData values[] = {
     }
   },
   // Ctrl+Backspace (with context)
-  {"LDML_Ctrl_VKey_Backspace_Ctxt", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, u"x", false,
+  {"LDML_Ctrl_VKey_Backspace_Ctxt", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, u"x", false,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -315,7 +317,7 @@ const TestData values[] = {
     }
   },
   // Ctrl+Backspace (no context)
-  {"LDML_Ctrl_VKey_Backspace_NoCtxt", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, NULL, false,
+  {"LDML_Ctrl_VKey_Backspace_NoCtxt", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, NULL, false,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -327,7 +329,7 @@ const TestData values[] = {
     }
   },
   // Modifier frame key
-  {"LDML_VKey_Shift", "ldml/keyboards/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_SHIFT, 0, u"x", false,
+  {"LDML_VKey_Shift", "ldml/keyboards/19.0/k_000_minimal_keyboard.kmx", KM_CORE_VKEY_SHIFT, 0, u"x", false,
     { // KeyDown
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
       {KM_CORE_IT_END}

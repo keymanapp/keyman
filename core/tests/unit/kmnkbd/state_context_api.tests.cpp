@@ -7,8 +7,8 @@
 #include "path.hpp"
 #include "mock/mock_processor.hpp"
 
-#include "../emscripten_filesystem.h"
-#include "../load_kmx_file.hpp"
+#include "../helpers/emscripten_filesystem.h"
+#include "../helpers/load_kmx_file.hpp"
 #include <test_assert.h>
 
 //-------------------------------------------------------------------------------------

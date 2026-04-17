@@ -14,7 +14,7 @@
 #include <test_assert.h>
 
 #include "keyman_core.h"
-#include "../load_kmx_file.hpp"
+#include "../helpers/load_kmx_file.hpp"
 
 int main(int argc, const char *argv[]) {
 

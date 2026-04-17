@@ -16,8 +16,8 @@ else
 endif
 
 test_util_files = [
-  meson.current_source_dir() / 'emscripten_filesystem.cpp',
-  meson.current_source_dir() / 'load_kmx_file.cpp',
+  meson.current_source_dir() / 'helpers' / 'emscripten_filesystem.cpp',
+  meson.current_source_dir() / 'helpers' / 'load_kmx_file.cpp',
 ]
 
 common_test_files = [
@@ -60,7 +60,6 @@ km_core_process_event_tests_exe = executable(
 )
 test('km_core_process_event', km_core_process_event_tests_exe)
 
-subdir('json')
 subdir('utftest')
 subdir('kmnkbd')
 subdir('kmx')
