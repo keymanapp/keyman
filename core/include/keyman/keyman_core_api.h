@@ -215,8 +215,9 @@ filename: changes.md
 title: Changes - Keyman Core API
 ---
 
-### Changes in 19.0
+## Changes between 18.0 and 19.0
 
+* Removed deprecated `km_core_keyboard_attrs.folder_path`
 * The JSON introspection APIs (which were not fully implemented),
   `km_core_state_options_to_json` and `km_core_state_to_json`, have been
   removed.
@@ -422,11 +423,15 @@ typedef uint8_t (*km_core_keyboard_imx_platform)(km_core_state*, uint32_t, void*
 
 ## Description
 
-An error code mechanism similar to COM’s `HRESULT` scheme (unlike COM, any
+An error code mechanism similar to COM's `HRESULT` scheme (unlike COM, any
 non-zero value is an error).
 
 ## Specification
 
+-->
+// keep in sync with web/src/engine/src/core-adapter/KM_Core.ts
+// (see https://github.com/emscripten-core/emscripten/issues/18585)
+<!--
 ```c */
 enum km_core_status_codes {
   KM_CORE_STATUS_OK = 0,
@@ -1080,11 +1085,6 @@ Provides read-only information about a keyboard.
 typedef struct {
   km_core_cu const * version_string;
   km_core_cu const * id;
-
-  // TODO-web-core: Deprecate this field (#12497)
-  // KMN_DEPRECATED
-  km_core_path_name  folder_path;
-
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
 
@@ -1097,9 +1097,6 @@ typedef struct {
 
 `id`
 : Keyman keyboard ID string.
-
-`folder_path`
-: Path to the unpacked folder containing the keyboard and associated resources (deprecated).
 
 `default_options`
 : Set of default values for any options included in the keyboard.
@@ -1235,7 +1232,7 @@ returned by [km_core_keyboard_load_from_blob].
 ```c */
 KMN_API
 void
-km_core_keyboard_dispose(km_core_keyboard *keyboard);
+km_core_keyboard_dispose(km_core_keyboard const* keyboard);
 
 /*
 ```
@@ -1453,7 +1450,7 @@ the environment passed.
 ```c */
 KMN_API
 km_core_status
-km_core_state_create(km_core_keyboard *keyboard,
+km_core_state_create(km_core_keyboard const *keyboard,
                     km_core_option_item const *env,
                     km_core_state **out);
 
@@ -1539,7 +1536,7 @@ invalid.
 ```c */
 KMN_API
 void
-km_core_state_dispose(km_core_state *state);
+km_core_state_dispose(km_core_state const *state);
 
 /*
 ```
@@ -1607,7 +1604,7 @@ Returns a debug formatted string of the context from the state.
 ```c */
 KMN_API
 km_core_cu *
-km_core_state_context_debug(km_core_state *state, km_core_debug_context_type context_type);
+km_core_state_context_debug(const km_core_state *state, km_core_debug_context_type context_type);
 
 /*
 ```
@@ -1696,7 +1693,7 @@ the state may also be modified.
 ```c */
 KMN_API
 km_core_status
-km_core_process_event(km_core_state *state,
+km_core_process_event(km_core_state const *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
@@ -1752,7 +1749,7 @@ the state may also be modified.
 KMN_API
 km_core_status
 km_core_event(
-  km_core_state *state,
+  km_core_state const *state,
   uint32_t event,
   void* data
 );

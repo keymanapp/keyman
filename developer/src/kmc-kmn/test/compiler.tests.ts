@@ -36,9 +36,9 @@ describe('Compiler class', function() {
     assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
-    const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
-    const infile = baselineDir + 'k_000___null_keyboard.kmn';
-    const outFile = __dirname + '/k_000___null_keyboard.kmx';
+    const fixtureName = baselineDir + 'k_0000___null_keyboard.kmx';
+    const infile = baselineDir + 'k_0000___null_keyboard.kmn';
+    const outFile = __dirname + '/k_0000___null_keyboard.kmx';
 
     if(fs.existsSync(outFile)) {
       fs.rmSync(outFile);

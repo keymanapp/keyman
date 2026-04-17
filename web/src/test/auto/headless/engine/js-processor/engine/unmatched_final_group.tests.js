@@ -1,23 +1,25 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
+
 import { assert } from 'chai';
-import fs from 'fs';
-
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
-import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
 
-import { env } from 'node:process';
-const KEYMAN_ROOT = env.KEYMAN_ROOT;
+const require = createRequire(import.meta.url);
+const KEYMAN_ROOT = getKeymanRoot();
 
 describe('Engine - Unmatched Final Groups', function() {
   let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/ghp_enter.json'));
   // Common test suite setup.
   let testSuite = new KeyboardTest(JSON.parse(testJSONtext));
 
-  var keyboardWithHarness;
+  let keyboardWithHarness;
   let device = {
     formFactor: 'desktop',
     OS: 'windows',
@@ -26,7 +28,7 @@ describe('Engine - Unmatched Final Groups', function() {
 
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
-    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
     const keyboard = await keyboardLoader.loadKeyboardFromPath(KEYMAN_ROOT + '/common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;

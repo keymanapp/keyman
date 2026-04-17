@@ -2,11 +2,19 @@
 title: Changes - Keyman Core API
 ---
 
-### Changes in 19.0
+## Changes between 18.0 and 19.0
 
+* Removed deprecated `km_core_keyboard_attrs.folder_path`
 * The JSON introspection APIs (which were not fully implemented),
   `km_core_state_options_to_json` and `km_core_state_to_json`, have been
   removed.
+
+## Changes between 17.0 and 18.0
+
+* Replaced `km_core_keyboard_load` with `km_core_keyboard_load_from_blob`.
+  Keyboard loading is now done in the engine, and the content of the
+  keyboard passed to Core as a blob.
+* Deprecated `km_core_keyboard_attrs.folder_path`
 
 ## Changes between 16.0 and 17.0
 
