@@ -9,6 +9,7 @@ import { createRequire } from 'module';
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
 const require = createRequire(import.meta.url);
@@ -29,7 +30,7 @@ describe('Engine - Deadkeys', function() {
 
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
-    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
     let keyboard = await keyboardLoader.loadKeyboardFromPath(KEYMAN_ROOT + '/common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;

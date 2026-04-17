@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url);
 import { KeyboardHarness, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
 describe('Headless keyboard loading', function() {
   const laoPath = require.resolve('@keymanapp/common-test-resources/keyboards/lao_2008_basic.js');
@@ -58,7 +59,7 @@ describe('Headless keyboard loading', function() {
 
       // Runs a blank KeyEvent through the keyboard's rule processing...
       // but via separate harness configured with a different captured global.
-      let ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      let ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       ruleHarness.activeKeyboard = keyboard;
       try {
         ruleHarness.processKeystroke(new SyntheticTextStore(), keyboard.constructNullKeyEvent(device));

@@ -5,6 +5,7 @@ import { DeviceSpec } from 'keyman/common/web-utils';
 import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
 declare let window: typeof globalThis;
 // KeymanEngine from the web/ folder... when available.
@@ -27,7 +28,7 @@ describe('Keyboard loading in DOM', function() {
   })
 
   it('throws error when keyboard does not exist', async () => {
-    const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
+    const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
     const keyboardLoader = new DOMKeyboardLoader(harness);
     const nonExisting = '/does/not/exist.js';
 
@@ -36,7 +37,7 @@ describe('Keyboard loading in DOM', function() {
   });
 
   it('throws error when keyboard is invalid', async () => {
-    const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
+    const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
     const keyboardLoader = new DOMKeyboardLoader(harness);
     const nonKeyboardPath = '/common/test/resources/index.mjs';
 
@@ -65,7 +66,7 @@ describe('Keyboard loading in DOM', function() {
   });
 
   it('`window`, enabled rule processing', async () => {
-    const jsHarness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
+    const jsHarness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
     const keyboardLoader = new DOMKeyboardLoader(jsHarness);
     const keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
     const jsKeyboard = keyboard as JSKeyboard;
@@ -97,7 +98,7 @@ describe('Keyboard loading in DOM', function() {
   });
 
   it('load keyboards successfully in parallel without side effects', async () => {
-    let jsHarness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
+    let jsHarness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
     let keyboardLoader = new DOMKeyboardLoader(jsHarness);
 
     // Preload a keyboard and make it active.

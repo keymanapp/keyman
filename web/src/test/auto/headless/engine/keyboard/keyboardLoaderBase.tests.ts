@@ -7,6 +7,7 @@ import { DeviceSpec } from 'keyman/common/web-utils';
 import { KeyboardHarness, MinimalKeymanGlobal, KeyboardDownloadError, InvalidKeyboardError, JSKeyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 import { assertThrowsAsync, assertThrows } from 'keyman/tools/testing/test-utils';
 
 describe('Headless keyboard loading', function() {
@@ -26,7 +27,7 @@ describe('Headless keyboard loading', function() {
   describe('Minimal harness loading', () => {
     it('successfully loads a single keyboard from filesystem', async ()  => {
       // -- START: Standard Recorder-based unit test loading boilerplate --
-      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       const keyboardLoader = new NodeKeyboardLoader(harness);
       const keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
       // --  END:  Standard Recorder-based unit test loading boilerplate --
@@ -42,7 +43,7 @@ describe('Headless keyboard loading', function() {
     });
 
     it('throws error when keyboard does not exist', async () => {
-      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       const keyboardLoader = new NodeKeyboardLoader(harness);
 
       await assertThrowsAsync(async () => await keyboardLoader.loadKeyboardFromPath(nonExisting),
@@ -50,7 +51,7 @@ describe('Headless keyboard loading', function() {
     });
 
     it('throws error when keyboard is invalid', async () => {
-      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       const keyboardLoader = new NodeKeyboardLoader(harness);
 
       await assertThrowsAsync(async () => await keyboardLoader.loadKeyboardFromPath(nonKeyboardPath),
@@ -59,7 +60,7 @@ describe('Headless keyboard loading', function() {
 
     it('successfully loads (has variable stores)', async () => {
       // -- START: Standard Recorder-based unit test loading boilerplate --
-      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       const keyboardLoader = new NodeKeyboardLoader(harness);
       const keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
       // --  END:  Standard Recorder-based unit test loading boilerplate --
@@ -83,7 +84,7 @@ describe('Headless keyboard loading', function() {
       // This shows an important detail: the 'global' object is effectively
       // closure-captured. (Similar constraints may occur when experimenting with
       // 'sandboxed' keyboard loading in the DOM!)
-      const ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      const ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       ruleHarness.activeKeyboard = keyboard as JSKeyboard;
       assertThrows(() => ruleHarness.processKeystroke(new SyntheticTextStore(), (keyboard as JSKeyboard).constructNullKeyEvent(device)), 'k.KKM is not a function');
     });

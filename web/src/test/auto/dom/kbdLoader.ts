@@ -10,8 +10,9 @@ import {
 
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { KeyboardInfoPair } from 'keyman/engine/main';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
-const loader = new DOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal));
+const loader = new DOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
 
 export function loadKeyboardFromPath(path: string) {
   return loader.loadKeyboardFromPath(path);

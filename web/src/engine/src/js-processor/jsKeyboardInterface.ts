@@ -196,14 +196,12 @@ export class JSKeyboardInterface extends KeyboardHarness {
   activeKeyboard: JSKeyboard;
   activeDevice: DeviceSpec;
 
-  variableStoreSerializer: VariableStoreSerializer;
-
   // A 'reference point' that debug keyboards may use to access KMW's code constants.
   public get Codes(): typeof Codes {
     return Codes;
   }
 
-  constructor(_jsGlobal: any, keymanGlobal: KeyboardKeymanGlobal, variableStoreSerializer: VariableStoreSerializer = null) {
+  constructor(_jsGlobal: any, keymanGlobal: KeyboardKeymanGlobal, public readonly variableStoreSerializer: VariableStoreSerializer) {
     super(_jsGlobal, keymanGlobal);
 
     this.systemStores = {};
@@ -213,7 +211,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.systemStores[SystemStoreIDs.TSS_NEWLAYER] = new MutableSystemStore(SystemStoreIDs.TSS_NEWLAYER, '');
     this.systemStores[SystemStoreIDs.TSS_OLDLAYER] = new MutableSystemStore(SystemStoreIDs.TSS_OLDLAYER, '');
 
-    this.variableStoreSerializer = variableStoreSerializer;
+    if(!variableStoreSerializer) {
+      throw new Error('variableStoreSerializer is required');
+    }
   }
 
   /**
@@ -936,12 +936,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
    */
   loadStore(kbdName: string, storeName:string, dfltValue:string): string {
     this.resetContextCache();
-    if(this.variableStoreSerializer) {
-      const cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
-      return cValue ?? dfltValue;
-    } else {
-      return dfltValue;
-    }
+    const cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
+    return cValue ?? dfltValue;
   }
 
   /**
@@ -961,6 +957,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
     if(!kbd || typeof kbd.id == 'undefined' || kbd.id == '') {
       return false;
     }
+
+    // TODO-WEB-CORE: this.ruleBehavior should be mocked in unit tests; we
+    // should not have code here that behaves differently in a unit test
+    // environment
 
     // Null-check in case of invocation during unit-test
     if(this.ruleBehavior) {

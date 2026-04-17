@@ -11,6 +11,7 @@ import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
 const require = createRequire(import.meta.url);
 const KEYMAN_ROOT = getKeymanRoot();
@@ -30,7 +31,7 @@ describe('Engine - Chirality', function() {
 
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
-    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
     let keyboard = await keyboardLoader.loadKeyboardFromPath(KEYMAN_ROOT + '/common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;

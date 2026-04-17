@@ -7,6 +7,7 @@ const require = createRequire(import.meta.url);
 import { Codes, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
 // Compare and contrast the unit tests here with those for app/browser key-event unit testing
 // in the hardware-event-processing set; the output objects there should have the same format
@@ -27,7 +28,7 @@ describe('Engine - rule processing', function() {
 
     before(async () => {
       // -- START: Standard keyboard unit test loading boilerplate --
-      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
       // --  END:  Standard keyboard unit test loading boilerplate --
@@ -106,7 +107,7 @@ describe('Engine - rule processing', function() {
 
     before(async () => {
       // -- START: Standard keyboard unit test loading boilerplate --
-      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(armenianPath);
       // --  END:  Standard keyboard unit test loading boilerplate --
