@@ -172,7 +172,7 @@ class TestNode {
     if (TestNode.Nodes.size > 0) {
       console.error(`Still have ${TestNode.Nodes.size} nodes hanging around`);
       for (const [id, node] of Array.from(TestNode.Nodes.entries())) {
-        console.error(`Remaining node title: '${node.suiteOrTest.title}'`);
+        console.error(`Remaining node title: '${node.suiteOrTest.title}' (id: '${id}')`);
       }
     }
   }
