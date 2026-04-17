@@ -9,67 +9,67 @@ import { TextStore } from '../textStore.js';
 import { NotifyEventCode } from './keyboardLoaderBase.js';
 
 /**
- * Abstract base class for Keyman keyboards, providing common interface
+ * Interface for Keyman keyboards, providing common interface
  * for JSKeyboard and KMXKeyboard.
  */
-export abstract class Keyboard {
+export interface Keyboard {
   /**
    * Unique identifier for the keyboard.
    */
-  abstract get id(): string;
+  get id(): string;
 
   /**
    * Gets the name of the keyboard.
    */
-  abstract get name(): string;
+  get name(): string;
 
   /**
    * Version string of the keyboard.
    */
-  abstract get version(): string;
+  get version(): string;
 
   /**
    * Indicates whether the keyboard uses mnemonic layout.
    */
-  abstract get isMnemonic(): boolean;
+  get isMnemonic(): boolean;
 
   /**
    * Indicates whether the keyboard is chiral (distinguishes left/right modifiers).
    */
-  abstract get isChiral(): boolean;
+  get isChiral(): boolean;
 
   /**
    * Indicates whether the keyboard emulates AltGr.
    */
-  abstract get emulatesAltGr(): boolean;
+  get emulatesAltGr(): boolean;
 
   /**
    * Indicates whether the keyboard is right-to-left.
    */
-  abstract get isRTL(): boolean;
+  get isRTL(): boolean;
 
   /**
    * true if this keyboard uses a (legacy) pick list (Chinese, Japanese, Korean, etc.)
    */
-  abstract get isCJK(): boolean;
+  get isCJK(): boolean;
 
   /**
    * CSS styling for the on-screen keyboard.
    */
-  abstract get oskStyling(): string;
+  get oskStyling(): string;
 
   /**
    * Returns an ActiveLayout object representing the keyboard's layout for this form factor.
    * May return null if a custom desktop "help" OSK is defined.
    * @param formFactor The desired form factor for the layout.
    */
-  abstract layout(formFactor: DeviceSpec.FormFactor): ActiveLayout;
+  layout(formFactor: DeviceSpec.FormFactor): ActiveLayout;
 
   /**
    * Indicates whether the keyboard's desktop layout should be used for the specified device.
    * @param device The device specification to check.
    */
-  abstract usesDesktopLayoutOnDevice(device: DeviceSpec): boolean;
+  usesDesktopLayoutOnDevice(device: DeviceSpec): boolean;
 
   /**
    * Notifies keyboard of keystroke or other event.
@@ -77,7 +77,7 @@ export abstract class Keyboard {
    * @param textStore Text store.
    * @param data 1 for KeyDown or FocusReceived, 0 for KeyUp or FocusLost.
    */
-  abstract notify(eventCode: NotifyEventCode, textStore: TextStore, data: number): void;
+  notify(eventCode: NotifyEventCode, textStore: TextStore, data: number): void;
 
   /**
    * Constructs a KeyEvent from an ActiveKey or ActiveSubKey.
@@ -85,5 +85,5 @@ export abstract class Keyboard {
    * @param device The device specification.
    * @param stateKeys The current state of modifier keys.
    */
-  abstract constructKeyEvent(key: ActiveKey | ActiveSubKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent;
+  constructKeyEvent(key: ActiveKey | ActiveSubKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent;
 }

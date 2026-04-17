@@ -200,7 +200,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
   variableStoreSerializer: VariableStoreSerializer;
 
-  private get activeJSKeyboard(): JSKeyboard {
+  public get activeJSKeyboard(): JSKeyboard {
     return this.activeKeyboard as JSKeyboard;
   }
 

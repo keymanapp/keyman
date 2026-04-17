@@ -50,7 +50,7 @@ type KmwKeyboardObject = KeyboardObject & {
  * and keyboard-centered functionality in an object-oriented way without modifying the
  * wrapped keyboard itself.
  */
-export class JSKeyboard extends Keyboard {
+export class JSKeyboard implements Keyboard {
   public static DEFAULT_SCRIPT_OBJECT: KmwKeyboardObject = {
     'gs': function(textStore: TextStore, keystroke: KeyEvent) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
     'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
@@ -69,7 +69,6 @@ export class JSKeyboard extends Keyboard {
   private layoutStates: {[layout: string]: LayoutState};
 
   constructor(keyboardScript: any) {
-    super();
     if(keyboardScript) {
       this.scriptObject = keyboardScript;
     } else {

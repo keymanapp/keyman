@@ -766,7 +766,7 @@ export abstract class OSKView
 
     // Create new ones for the new, incoming kbd.
     this.kbdStyleSheetManager = new StylesheetManager(this._Box, this.config.doCacheBusting || false);
-    const kbdView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard as JSKeyboard, this.keyboardData?.metadata);
+    const kbdView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard as JSKeyboard, this.keyboardData?.metadata); // TODO-EMBED-OSK-IN-KMX: implement for KMXKeyboard
 
     // Perform the replacement.
     this._Box.replaceChild(kbdView.element, oldKbd.element);

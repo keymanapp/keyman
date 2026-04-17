@@ -520,7 +520,7 @@ describe('CoreKeyboardProcessor', function () {
         keyEvent.source = { type: eventType };
 
         const coreKeyboard = loadKeyboard('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
-        const kmxKeyboard = new KMXKeyboard('test_8568_deadkeys', coreKeyboard);
+        const kmxKeyboard = new KMXKeyboard(coreKeyboard);
         sandbox.replaceGetter(coreProcessor, 'activeKeyboard', () => { return kmxKeyboard; });
         // We return a non-ok value just so that we can return early from
         // processKeyStroke()
@@ -546,7 +546,7 @@ describe('CoreKeyboardProcessor', function () {
       context = KM_Core.instance.state_context(state);
       sandbox = sinon.createSandbox();
       const coreKeyboard = loadKeyboard('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
-      coreProcessor.activeKeyboard = new KMXKeyboard('test_8568_deadkeys', coreKeyboard);
+      coreProcessor.activeKeyboard = new KMXKeyboard(coreKeyboard);
     });
 
     afterEach(() => {

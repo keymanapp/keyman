@@ -13,11 +13,10 @@ import { Keyboard } from './keyboard.js';
 /**
  * Acts as a wrapper class for KMX(+) Keyman keyboards
  */
-export class KMXKeyboard extends Keyboard {
+export class KMXKeyboard implements Keyboard {
   private _state: km_core_state | null = null;
 
-  public constructor(private _name: string, private _keyboard: km_core_keyboard) {
-    super();
+  public constructor(private _keyboard: km_core_keyboard) {
     const environment_opts =
       [
         {
@@ -80,7 +79,8 @@ export class KMXKeyboard extends Keyboard {
   }
 
   public get name(): string {
-    return this._name;
+    // TODO-WEB-CORE: get keyboard name from Core API (to be implemented)
+    return this.id;
   }
 
   public get keyboard(): km_core_keyboard {

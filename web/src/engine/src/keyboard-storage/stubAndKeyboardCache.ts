@@ -152,10 +152,10 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     keyboardID = toPrefixedKeyboardId(keyboardID);
 
     const cachedEntry = this.keyboardTable[keyboardID];
-    if(cachedEntry instanceof Keyboard) {
-      return Promise.resolve(cachedEntry);
-    } else if(cachedEntry instanceof Promise) {
+    if(cachedEntry instanceof Promise) {
       return cachedEntry;
+    } else if(cachedEntry) {
+      return Promise.resolve(cachedEntry);
     }
 
     const stub = this.getStub(keyboardID, null);
@@ -203,10 +203,10 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     let keyboardID: string;
     const languageID = arg1 || '---';
 
-    if(arg0 instanceof Keyboard) {
+    if (arg0 instanceof JSKeyboard || arg0 instanceof KMXKeyboard) {
       keyboardID = arg0.id;
     } else {
-      keyboardID = arg0;
+      keyboardID = arg0 as string;
     }
 
     if(keyboardID) {
@@ -235,7 +235,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
    *              If `false`, only forgets the metadata (stubs).
    */
   forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false) {
-    const id: string = (keyboard instanceof Keyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard);
+    const id: string = (keyboard instanceof JSKeyboard || keyboard instanceof KMXKeyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard as string);
 
     if(this.stubSetTable[id]) {
       delete this.stubSetTable[id];

@@ -62,7 +62,7 @@ export abstract class KeyboardLoaderBase {
       const name = this.extractIdFromUrl(uri);
       const result = KM_Core.instance.keyboard_load_from_blob(name, byteArray);
       if (result.status == KM_CORE_STATUS.OK) {
-        return new KMXKeyboard(name, result.object);
+        return new KMXKeyboard(result.object);
       }
       throw errorBuilder.invalidKeyboard(new Error(`Loading KMX keyboard from ${uri} failed with status ${result.status}`));
     }
