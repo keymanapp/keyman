@@ -1,10 +1,11 @@
 export { ActiveKeyBase, ActiveKey, ActiveSubKey, ActiveRow, ActiveLayer, ActiveLayout } from "./keyboards/activeLayout.js";
 export { ButtonClass, ButtonClasses, LayoutLayer, LayoutFormFactor, LayoutRow, LayoutKey, LayoutSubKey, Layouts } from "./keyboards/defaultLayouts.js";
 export { JSKeyboard, LayoutState } from "./keyboards/jsKeyboard.js";
+export { Keyboard } from './keyboards/keyboard.js';
 export { KeyboardMinimalInterface } from './keyboards/keyboardMinimalInterface.js';
 export { KMXKeyboard } from './keyboards/kmxKeyboard.js';
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
-export { NotifyEventCode, Keyboard, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
+export { NotifyEventCode, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
 export { BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
 export {

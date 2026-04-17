@@ -1,10 +1,10 @@
 import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
-import { JSKeyboard } from "./jsKeyboard.js";
 import { KMXKeyboard } from './kmxKeyboard.js';
 import { KeyboardHarness } from "./keyboardHarness.js";
 import { KeyboardProperties } from "./keyboardProperties.js";
 import { KeyboardLoadErrorBuilder, StubBasedErrorBuilder, UriBasedErrorBuilder } from './keyboardLoadError.js';
 import { Codes } from '../codes.js';
+import { Keyboard } from './keyboard.js';
 
 export enum NotifyEventCode {
   FocusEvent = 0,
@@ -14,7 +14,6 @@ export enum NotifyEventCode {
 };
 
 export type KeyboardStub = KeyboardProperties & { filename: string };
-export type Keyboard = JSKeyboard | KMXKeyboard;
 
 export abstract class KeyboardLoaderBase {
   private _harness: KeyboardHarness;
@@ -86,5 +85,5 @@ export abstract class KeyboardLoaderBase {
 
   protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array>;
 
-  protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<JSKeyboard>;
+  protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard>;
 }

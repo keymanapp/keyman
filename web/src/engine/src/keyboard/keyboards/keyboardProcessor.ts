@@ -5,7 +5,7 @@ import { EventEmitter } from 'eventemitter3';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { KeyEvent } from '../keyEvent.js';
 import { type MutableSystemStore } from "../systemStore.js";
-import { Keyboard } from './keyboardLoaderBase.js';
+import { Keyboard } from './keyboard.js';
 import { KeyboardMinimalInterface } from './keyboardMinimalInterface.js';
 import { ProcessorAction } from './processorAction.js';
 import { StateKeyMap } from './stateKeyMap.js';

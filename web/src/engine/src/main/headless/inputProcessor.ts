@@ -9,14 +9,14 @@ import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
 
 import {
   Codes,
-  JSKeyboard, // TODO-web-core: huh? why is this here
+  JSKeyboard, // required to be able to distinguish between JS and Core kbd processor
+  Keyboard,
   KeyboardMinimalInterface,
   SyntheticTextStore,
   TextStore,
   ProcessorAction,
   SystemStoreIDs,
   type Alternate,
-  type Keyboard,
   type KeyEvent,
   KeyboardProcessor,
   VariableStoreSerializer

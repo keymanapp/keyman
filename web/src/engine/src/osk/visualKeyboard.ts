@@ -1356,7 +1356,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
    *  @return {Object}                            DIV object with filled keyboard layer content
    */
   static buildDocumentationKeyboard(
-    PKbd: JSKeyboard,
+    PKbd: JSKeyboard, // TODO-web-core: do we have to do anything for KMX keyboards?
     kbdProperties: KeyboardProperties,
     pathConfig: OSKResourcePathConfiguration,
     argFormFactor: DeviceSpec.FormFactor,

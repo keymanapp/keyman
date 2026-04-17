@@ -2,7 +2,7 @@
 export { DeviceSpec } from 'keyman/common/web-utils';
 export { Codes, JSKeyboard, KeyboardProperties, SpacebarText } from 'keyman/engine/keyboard';
 
-export { OSKView, JSKeyboardData } from './views/oskView.js';
+export { OSKView, KeyboardData } from './views/oskView.js';
 export { FloatingOSKView, FloatingOSKViewConfiguration } from './views/floatingOskView.js';
 export { AnchoredOSKView } from './views/anchoredOskView.js';
 export { InlinedOSKView } from './views/inlinedOskView.js';
