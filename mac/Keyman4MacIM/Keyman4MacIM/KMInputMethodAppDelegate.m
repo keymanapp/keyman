@@ -756,29 +756,23 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)prepareStorage {
   os_log_debug([KMLogs dataLog], "*** prepareStorage ***");
 
-// TODO: create directory before copy during migration?
-// [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
-// [KMDataRepository.shared createKeyman18DataDirectoryIfNecessary];
-
-// Keyman 18 data migration: TODO: uncomment and modify for double migration
+  // Keyman 18 data migration: TODO: uncomment and modify for double migration
   /*
   if ([KMSettingsRepository.shared keyman18DataMigrationNeeded]) {
     [KMDataRepository.shared migrateDataForKeyman18];
     [KMSettingsRepository.shared migrateSettingsForKeyman18];
   }
   */
-  
-// Keyman 19 data migration
+
+  // if necessary, migrate settings and keyboard data for compatibility with Keyman 19
   if ([KMSettingsRepository.shared keyman19SettingsMigrationNeeded]) {
     [KMDataRepository.shared migrateDataForKeyman19];
-    //[KMSettingsRepository.shared migrateSettingsForKeyman18];
+    [KMSettingsRepository.shared migrateSettingsForKeyman19];
   }
-  
-  [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
 
-  // TODO: delete
+  // TODO: delete, instead manage shared settings
   //[KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
-  [KMSettingsRepository.shared setDataModelVersionIfNecessary];
+  //[KMSettingsRepository.shared setDataModelVersionIfNecessary];
 }
 
 - (void)setDefaultKeymanMenuItems {

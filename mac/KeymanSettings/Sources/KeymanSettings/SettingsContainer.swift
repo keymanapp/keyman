@@ -52,7 +52,15 @@ public class SettingsContainer : ObservableObject {
       }
     }
   }
-  
+
+  public func logSettings() {
+    self.settingsRepository.logSettings()
+  }
+
+  public func clearSettings() {
+    self.settingsRepository.clearSettings()
+  }
+
   // TODO: extract method for keyboard search
   // TODO: throw error for keyboard not found or log and fail silently (should never happen)
   public func isKeyboardEnabled(packageId: UUID, keyboardId: String) -> Bool {

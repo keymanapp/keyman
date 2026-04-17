@@ -9,7 +9,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString *const kKeymanGroupId;
+
 @interface KMDataRepository : NSObject
+
 // keyman18DataDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'
 @property (readonly) NSURL *keyman18DataDirectory;
 

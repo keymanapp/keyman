@@ -11,6 +11,11 @@
 #import "KMDataRepository.h"
 #import "KMLogs.h"
 
+// the name of the app group shared by the Keyman input method and the Keyman configuration app
+// an iOS-style app group of this name is defined for Keyman on developer.apple.com and linked
+// to the each app's provisioning profile
+NSString *const kKeymanGroupId = @"group.com.keyman";
+
 @interface KMDataRepository ()
 @property (readonly) NSURL *applicationSupportSubDirectory;
 @property (readonly) NSURL *documentsSubDirectory;
@@ -22,7 +27,7 @@
  * Three directory trees are represented by the following properties, one in active use
  * and two that are obsolete.
  * The actively used directories, introduced in Keyman 19, are shared via the app group `group.com.keyman`:
- *  'Group Containers/group.com.keyman/Library/Application Support/Keyman-Keyboards/
+ *  'Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages/
  * The obsolete directories from Keyman 18 are:
  *    applicationSupportSubDirectory: '~/Library/Application Support'
  *      keyman18DataDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'
@@ -49,10 +54,7 @@ NSString *const kKeyboardsDirectoryName = @"Keyman-Keyboards";
  */
 NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 
-//NSString *const kKeymanGroupId = @"3YE4W86L3G.com.keyman";
-NSString *const kKeymanGroupId = @"group.com.keyman";
-
-NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/Keyman-Keyboards";
+NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/Keyman-Packages";
 
 + (KMDataRepository *)shared {
   static KMDataRepository *shared = nil;
@@ -61,6 +63,52 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
     shared = [[KMDataRepository alloc] init];
   });
   return shared;
+}
+
+/**
+ * Returns true if URL is an existing directory that is not empty
+ */
++ (BOOL)isExistingNonEmptyDirectory:(NSURL *)directoryUrl {
+  return [KMDataRepository isExistingDirectory: directoryUrl] && ![KMDataRepository isEmptyDirectory: directoryUrl];
+}
+
+/**
+ * Returns true if URL is an existing directory that is empty
+ */
++ (BOOL)isExistingEmptyDirectory:(NSURL *)directoryUrl {
+  return [KMDataRepository isExistingDirectory: directoryUrl] && [KMDataRepository isEmptyDirectory: directoryUrl];
+}
+
+/**
+ * Returns true if the directory is empty
+ */
++ (BOOL)isExistingDirectory:(NSURL *)directoryUrl {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  BOOL nonEmptyDirectoryExists = false;
+  BOOL isDirectory;
+  BOOL urlExists = ([fileManager fileExistsAtPath:directoryUrl.path isDirectory:&isDirectory]);
+  return urlExists && isDirectory;
+}
+
+/**
+ * Returns true if the directory is empty
+ */
++ (BOOL)isEmptyDirectory:(NSURL *)directoryUrl {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  BOOL isEmpty = true;
+  
+  NSError *error = nil;
+  NSArray *contents = [fileManager contentsOfDirectoryAtPath:directoryUrl.path error:&error];
+  
+  if (error) {
+    os_log_debug([KMLogs dataLog], "cannot read directory: %@", directoryUrl.path);
+  } else if (contents.count > 0) {
+    isEmpty = false;
+  } else {
+    isEmpty = true;
+  }
+  
+  return isEmpty;
 }
 
 - (NSURL *)documentsSubDirectory {
@@ -225,34 +273,23 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
  *  otherwise we would not be attempting to migrate.
  */
 - (BOOL)keyboardsExistInDocumentsDirectory {
-  NSFileManager *fileManager = [NSFileManager defaultManager];
-  BOOL isDir;
-  BOOL exists = ([fileManager fileExistsAtPath:self.keyman17KeyboardsDirectory.path isDirectory:&isDir]);
-  return exists;
+  return [KMDataRepository isExistingNonEmptyDirectory: self.keyman17KeyboardsDirectory];
 }
 
 /**
  *  Only called from migrateDataForKeyman19.
- *  Checks to see if the keyboards directory exists in '~/Library/Application Support/keyman.inputmethod.Keyman'
+ *  Checks to see if the keyboards directory exists in '~/Library/Application Support/keyman.inputmethod.Keyman' and is not empty
  */
 - (BOOL)keyboardsExistInInputMethodDataDirectory {
-  NSFileManager *fileManager = [NSFileManager defaultManager];
-  BOOL isDir;
-  BOOL exists = ([fileManager fileExistsAtPath:self.keyman18KeyboardsDirectory.path isDirectory:&isDir]);
-  return exists;
+  return [KMDataRepository isExistingNonEmptyDirectory: self.keyman18KeyboardsDirectory];
 }
 
-// TODO: unused?
 /**
- *  Checks to see if the keyboards directory exists in '~/Library/Group Containers/group.com.keyman/Library/Application Support'
+ *  Checks to see if the keyboards directory exists in '~/Library/Group Containers/group.com.keyman/Library/Application Support' and is not empty
  */
 - (BOOL)keyboardsExistInGroupContainerDirectory {
-  NSFileManager *fileManager = [NSFileManager defaultManager];
-  BOOL isDir;
-  BOOL exists = ([fileManager fileExistsAtPath:self.keyman19KeyboardsDirectory.path isDirectory:&isDir]);
-  return exists;
+  return [KMDataRepository isExistingNonEmptyDirectory: self.keyman19KeyboardsDirectory];
 }
-
 
 // TODO: delete - no reason to move data more than once
 /**
@@ -284,6 +321,49 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 }
 
 /**
+ * Move all the packages contained in the directory
+ */
++ (void)movePackages: (NSURL*)sourceDirectory to: (NSURL*)destinationDirectory {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  NSArray *keys = @[NSURLIsDirectoryKey];
+
+  // fetch the individual keyboard package directories within the keyboards directory
+  NSArray *packageDirectories = [fileManager contentsOfDirectoryAtURL:sourceDirectory includingPropertiesForKeys:keys options:NSDirectoryEnumerationSkipsHiddenFiles error:nil];
+
+  // Iterate and filter for directories
+  for (NSURL *packageUrl in packageDirectories) {
+      NSNumber *isDirectory;
+      [packageUrl getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+      
+      if ([isDirectory boolValue]) {
+        NSString *packageName = packageUrl.lastPathComponent;
+        NSURL *packageSourceUrl = [sourceDirectory URLByAppendingPathComponent:packageName  isDirectory: true];
+        NSURL *packageDestinationUrl = [destinationDirectory URLByAppendingPathComponent:packageName  isDirectory: true];
+
+        os_log_info([KMLogs dataLog], "moving package directory: '%{public}@'", packageName);
+        BOOL movedDirectory = [KMDataRepository moveDirectory: packageSourceUrl to: packageDestinationUrl];
+      }
+  }
+}
+
+/**
+ * Move a single directory
+ */
++ (BOOL)moveDirectory: (NSURL*)sourceDirectory to: (NSURL*)destinationDirectory {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  NSError *moveError = nil;
+  BOOL didMoveData = [fileManager moveItemAtURL:sourceDirectory
+                                      toURL:destinationDirectory
+                                      error:&moveError];
+  if (moveError) {
+    os_log_error([KMLogs dataLog], "data migration failed: '%{public}@'", moveError.localizedDescription);
+  } else {
+    os_log_info([KMLogs dataLog], "data migrated successfully to: '%{public}@'", destinationDirectory.path);
+  }
+  return didMoveData;
+}
+
+/**
  * Migrate the keyboards data from the input method specific location in '~/Application Support/keyman.inputmethod.Keyman/'
  * to the shared location in '~/Library/Group Containers/group.com.keyman/Library/Application Support'
  * This should only be called if the Keyman settings written to the UserDefaults indicates that we have data in the old location.
@@ -296,19 +376,14 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 
   // only move data if there is something to move
   if (dataExistsInOldLocation) {
-    NSError *moveError = nil;
-    didMoveData = [fileManager moveItemAtURL:self.keyman18KeyboardsDirectory
-                         toURL:self.keyman19KeyboardsDirectory
-                         error:&moveError];
-    if (moveError) {
-      os_log_error([KMLogs dataLog], "data migration failed: '%{public}@'", moveError.localizedDescription);
-    } else {
-      os_log_info([KMLogs dataLog], "data migrated successfully to: '%{public}@'", self.keyman19KeyboardsDirectory.path);
-    }
+
+    [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
+    [KMDataRepository movePackages:[self keyman18KeyboardsDirectory] to:[self keyman19KeyboardsDirectory]];
   }
   
   return didMoveData;
 }
+
 
 - (NSString*)buildFullPath:(NSString *)fromPartialPath {
   NSString *fullPath = [self.keyman18KeyboardsDirectory.path stringByAppendingString:fromPartialPath];

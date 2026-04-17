@@ -24,6 +24,12 @@ struct ConfigView: View {
         Button("debug") {
           settings.debug()
         }
+        Button("log defaults") {
+          settings.logSettings()
+        }
+        Button("clear defaults") {
+          settings.clearSettings()
+        }
         Spacer()
       }
       .padding()

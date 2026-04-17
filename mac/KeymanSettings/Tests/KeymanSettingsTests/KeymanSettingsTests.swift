@@ -46,7 +46,7 @@ import Foundation
   @Test("Check Keyman 19 keyboards directory") func testKeyman19KeyboardsDirectory() async throws {
     #expect(true)
     let keyboardsDirectory = try #require(KeymanPaths().keyman19KeyboardsDirectory)
-    #expect(keyboardsDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Keyboards/"))
+    #expect(keyboardsDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/"))
   }
 }
 

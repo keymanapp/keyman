@@ -30,7 +30,7 @@ import Foundation
  *    containerDirectory: '~/Library/Group Containers'
  *      containerKeymanDirectory: '~/Library/Group Containers/group.com.keyman'
  *        groupKeymanSupportDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support'
- *          keyman19KeyboardsDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Keyboards'
+ *          keyman19KeyboardsDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages'
 */
 
 public struct KeymanPaths {
@@ -43,7 +43,7 @@ public struct KeymanPaths {
   static private let keymanSubdirectoryName = "keyman.inputmethod.Keyman"
   
   static private let containerPreferencesPartialPath = "Library/Preferences"
-  static private let containerKeyboardsPartialPath = "Library/Application Support/Keyman-Keyboards"
+  static private let containerKeyboardsPartialPath = "Library/Application Support/Keyman-Packages"
   
   // keyman 17 and earlier
   let keyman17DocumentsDirectory: URL?

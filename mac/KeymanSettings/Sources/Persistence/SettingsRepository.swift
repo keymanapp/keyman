@@ -22,7 +22,7 @@ public struct SettingsRepository {
   let kActiveKeyboardsKey = "KMActiveKeyboardsKey"
   let kSelectedKeyboardKey = "KMSelectedKeyboardKey"
   let kPersistedOptionsKey = "KMPersistedOptionsKey"
-  let kDataModelVersionKey = "KMDataModelVersionKey"
+  let kDataModelVersionKey = "KMDataModelVersion"
   let kShowOskOnActivateKey = "KMShowOskOnActivate"
   let kForceSentryError = "KMForceSentryError"
   
@@ -66,6 +66,29 @@ public struct SettingsRepository {
   public func writeSelectedKeyboard(keyboardName: String) {
     if let sharedDefaults = self.defaults {
       sharedDefaults.set(keyboardName, forKey: kSelectedKeyboardKey)
+    }
+  }
+  
+  public func logSettings() {
+    print("UserDefaults:")
+    if let sharedDefaults = self.defaults {
+      print("kSelectedKeyboardKey: \(sharedDefaults.value(forKey: kSelectedKeyboardKey) ?? "nil")")
+      print("kDataModelVersionKey: \(sharedDefaults.value(forKey: kDataModelVersionKey) ?? "nil")")
+      print("kForceSentryError: \(sharedDefaults.value(forKey: kForceSentryError) ?? "nil")")
+      print("kShowOskOnActivateKey: \(sharedDefaults.value(forKey: kShowOskOnActivateKey) ?? "nil")")
+      print("kActiveKeyboardsKey: \(sharedDefaults.value(forKey: kActiveKeyboardsKey) ?? "nil")")
+      print("kPersistedOptionsKey: \(sharedDefaults.value(forKey: kPersistedOptionsKey) ?? "nil")")
+    }
+  }
+
+  public func clearSettings() {
+    guard let sharedDefaults = self.defaults else {
+      print("Group container UserDefaults not found.")
+      return
+    }
+    
+    sharedDefaults.dictionaryRepresentation().keys.forEach { key in
+      sharedDefaults.removeObject(forKey: key)
     }
   }
 }
