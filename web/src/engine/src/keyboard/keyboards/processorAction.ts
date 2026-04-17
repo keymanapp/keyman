@@ -3,7 +3,7 @@
  */
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { Transcription } from './transcription.js';
-import { VariableStore } from '../variableStore.js';
+import { VariableStores } from '../variableStore.js';
 import { SystemStoreDictionary } from '../systemStore.js';
 
 /**
@@ -29,12 +29,12 @@ export class ProcessorAction {
   /**
    * A set of variable stores with save requests triggered by the matched keyboard rule
    */
-  saveStore: {[name: string]: VariableStore} = {};
+  saveStores: VariableStores = {};
 
   /**
    * A set of variable stores with possible changes to be applied during finalization.
    */
-  variableStores: VariableStore = {};
+  variableStores: VariableStores = {};
 
   /**
    * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.

@@ -631,8 +631,8 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     this.keyboardInterface.applyVariableStores(data.variableStores);
 
     if (this.keyboardInterface.variableStoreSerializer) {
-      for (const storeID in data.saveStore) {
-        this.keyboardInterface.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeID, data.saveStore[storeID]);
+      for (const storeID in data.saveStores) {
+        this.keyboardInterface.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeID, data.saveStores[storeID]);
       }
     }
 

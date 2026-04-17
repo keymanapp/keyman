@@ -4,10 +4,9 @@
  * Definitions for variable stores (see kmn reference)
  */
 
-export type VariableStore = { [name: string]: string; };
+export type VariableStores = { [name: string]: string; };
 
 export interface VariableStoreSerializer {
-  loadStore(keyboardID: string, storeName: string): VariableStore;
-  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore): void;
-  findStores(keyboardID: string): VariableStore[];
+  loadStore(keyboardID: string, storeName: string): string;
+  saveStore(keyboardID: string, storeName: string, storeValue: string): void;
 }
