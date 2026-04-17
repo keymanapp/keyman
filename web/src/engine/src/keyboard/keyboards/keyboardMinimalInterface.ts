@@ -1,5 +1,5 @@
 import { VariableStoreSerializer } from '../variableStore.js';
-import { Keyboard } from './keyboardLoaderBase.js';
+import { Keyboard } from './keyboard.js';
 
 export interface KeyboardMinimalInterface {
   activeKeyboard: Keyboard;

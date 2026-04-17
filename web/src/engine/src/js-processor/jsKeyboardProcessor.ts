@@ -67,7 +67,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
   }
 
   public get activeKeyboard(): JSKeyboard {
-    return this.keyboardInterface.activeKeyboard;
+    return this.keyboardInterface.activeJSKeyboard;
   }
 
   public set activeKeyboard(keyboard: JSKeyboard) {

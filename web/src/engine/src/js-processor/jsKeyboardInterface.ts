@@ -10,6 +10,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,
   JSKeyboard,
+  Keyboard,
   KeyboardHarness,
   KeyboardKeymanGlobal,
   KeyMapping,
@@ -193,8 +194,12 @@ export class JSKeyboardInterface extends KeyboardHarness {
   _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
   // Must be accessible to some of the keyboard API methods.
-  activeKeyboard: JSKeyboard;
+  activeKeyboard: Keyboard;
   activeDevice: DeviceSpec;
+
+  public get activeJSKeyboard(): JSKeyboard {
+    return this.activeKeyboard as JSKeyboard;
+  }
 
   // A 'reference point' that debug keyboards may use to access KMW's code constants.
   public get Codes(): typeof Codes {
@@ -568,7 +573,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     let retVal = false; // I3318
     let keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-    const bitmask = this.activeKeyboard.modifierBitmask;
+    const bitmask = this.activeJSKeyboard.modifierBitmask;
     const modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
     const stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
@@ -648,7 +653,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
   _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
     if(typeof(store) == 'string') {
-      const cachedStores = this.activeKeyboard.explodedStores;
+      const cachedStores = this.activeJSKeyboard.explodedStores;
 
       // Is the result cached?
       if(cachedStores[store]) {
@@ -1000,7 +1005,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
-    return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), textStore, keystroke, true);
+    return this.process(this.activeJSKeyboard.processNewContextEvent.bind(this.activeKeyboard), textStore, keystroke, true);
   }
 
   /**
@@ -1015,7 +1020,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
-    return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), textStore, keystroke, true);
+    return this.process(this.activeJSKeyboard.processPostKeystroke.bind(this.activeKeyboard), textStore, keystroke, true);
   }
 
   /**
@@ -1030,7 +1035,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
-    return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), textStore, keystroke, false);
+    return this.process(this.activeJSKeyboard.process.bind(this.activeKeyboard), textStore, keystroke, false);
   }
 
   private process(callee: (textStore: TextStore, keystroke: KeyEvent) => boolean, textStore: TextStore, keystroke: KeyEvent, readonly: boolean): ProcessorAction {
@@ -1052,7 +1057,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     const preInput = SyntheticTextStore.from(textStore, true);
 
     // Capture the initial state of any variable stores
-    const cachedVariableStores = this.activeKeyboard.variableStores;
+    const cachedVariableStores = this.activeJSKeyboard.variableStores;
 
     // Establishes the results object, allowing corresponding commands to set values here as appropriate.
     this.ruleBehavior = new ProcessorAction();
@@ -1072,8 +1077,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
     // We always backup the changes to variable stores to the ProcessorAction, to
     // be applied during finalization, then restore them to the cached initial
     // values to avoid side-effects with predictive text mocks.
-    this.ruleBehavior.variableStores = this.activeKeyboard.variableStores;
-    this.activeKeyboard.variableStores = cachedVariableStores;
+    this.ruleBehavior.variableStores = this.activeJSKeyboard.variableStores;
+    this.activeJSKeyboard.variableStores = cachedVariableStores;
 
     // `matched` refers to whether or not the FINAL rule (from any group) matched, rather than
     // whether or not ANY rule matched.  If the final rule doesn't match, we trigger the key's
@@ -1099,7 +1104,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *               keyboard
    */
   applyVariableStores(stores: VariableStores): void {
-    this.activeKeyboard.variableStores = stores;
+    this.activeJSKeyboard.variableStores = stores;
   }
 
   /**

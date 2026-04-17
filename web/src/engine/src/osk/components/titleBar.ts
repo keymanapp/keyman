@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 
-import { JSKeyboard } from 'keyman/engine/keyboard';
+import { Keyboard } from 'keyman/engine/keyboard';
 
 import { OSKViewComponent } from './oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
@@ -102,7 +102,7 @@ export class TitleBar extends EventEmitter<EventMap, TitleBar> implements OSKVie
     this._caption.innerHTML = str;
   }
 
-  public setTitleFromKeyboard(keyboard: JSKeyboard) {
+  public setTitleFromKeyboard(keyboard: Keyboard) {
     const title = "<span style='font-weight:bold'>" + keyboard?.name + '</span>';  // I1972  // I2186
     this._caption.innerHTML = title;
   }

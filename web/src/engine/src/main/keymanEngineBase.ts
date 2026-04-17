@@ -3,7 +3,7 @@ import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader } from "keyman/engine/keyboard";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
-import { OSKView, JSKeyboardData } from "keyman/engine/osk";
+import { OSKView, KeyboardData } from "keyman/engine/osk";
 import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId, DOMCloudRequester } from "keyman/engine/keyboard-storage";
 import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
@@ -386,7 +386,7 @@ export class KeymanEngineBase<
     this.core.keyboardProcessor.contextDevice = value?.targetDevice ?? this.config.softDevice;
     if(value) {
       // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
-      if (this.contextManager.activeKeyboard && this.contextManager.activeKeyboard instanceof JSKeyboardData) { // TODO-embed-osk-in-kmx: add support for OSK for KMX keyboards
+      if (this.contextManager.activeKeyboard && this.contextManager.activeKeyboard instanceof KeyboardData) { // TODO-embed-osk-in-kmx: add support for OSK for KMX keyboards
         value.activeKeyboard = this.contextManager.activeKeyboard;
       }
       value.on('keyevent', this.keyEventListener);
