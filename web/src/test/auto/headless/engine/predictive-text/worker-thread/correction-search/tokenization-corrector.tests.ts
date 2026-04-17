@@ -205,9 +205,9 @@ describe('TokenizationCorrector', () => {
         fixture.filter
       );
 
-      assert.sameOrderedMembers(instance.lockedTokens.slice(), []);
-      assert.sameOrderedMembers(instance.boundTokens.slice(), []);
-      assert.equal(instance.unboundToken, tokenization.tail);
+      assert.sameOrderedMembers(instance.uncorrectableTokens.slice(), []);
+      assert.sameOrderedMembers(instance.correctableTokens.slice(), []);
+      assert.equal(instance.predictableToken, tokenization.tail);
     });
 
     it('constructs correctly from a single uncorrectable token', () => {
@@ -221,9 +221,9 @@ describe('TokenizationCorrector', () => {
         fixture.filter
       );
 
-      assert.sameOrderedMembers(instance.lockedTokens.slice(), [tokenization.tail]);
-      assert.sameOrderedMembers(instance.boundTokens.slice(), []);
-      assert.equal(instance.unboundToken, undefined);
+      assert.sameOrderedMembers(instance.uncorrectableTokens.slice(), [tokenization.tail]);
+      assert.sameOrderedMembers(instance.correctableTokens.slice(), []);
+      assert.equal(instance.predictableToken, undefined);
     });
 
     it('constructs from multiple tokens, with the middle one uncorrectable', () => {
@@ -238,9 +238,9 @@ describe('TokenizationCorrector', () => {
         fixture.filter
       );
 
-      assert.sameOrderedMembers(instance.lockedTokens.slice(), [tokenization.tokens[tokenCount-2]]);
-      assert.sameOrderedMembers(instance.boundTokens.slice(), [tokenization.tokens[tokenCount-3]]);
-      assert.equal(instance.unboundToken, tokenization.tail);
+      assert.sameOrderedMembers(instance.uncorrectableTokens.slice(), [tokenization.tokens[tokenCount-2]]);
+      assert.sameOrderedMembers(instance.correctableTokens.slice(), [tokenization.tokens[tokenCount-3]]);
+      assert.equal(instance.predictableToken, tokenization.tail);
     });
 
     it('constructs from multiple tokens, ignoring the first due to bounds', () => {
@@ -255,9 +255,9 @@ describe('TokenizationCorrector', () => {
         fixture.filter
       );
 
-      assert.sameOrderedMembers(instance.lockedTokens.slice(), [tokenization.tokens[tokenCount-2]]);
-      assert.sameOrderedMembers(instance.boundTokens.slice(), []);
-      assert.equal(instance.unboundToken, tokenization.tail);
+      assert.sameOrderedMembers(instance.uncorrectableTokens.slice(), [tokenization.tokens[tokenCount-2]]);
+      assert.sameOrderedMembers(instance.correctableTokens.slice(), []);
+      assert.equal(instance.predictableToken, tokenization.tail);
     });
 
     it('constructs correctly when the final token is uncorrectable', () => {
@@ -271,9 +271,9 @@ describe('TokenizationCorrector', () => {
         fixture.filter
       );
 
-      assert.sameOrderedMembers(instance.lockedTokens.slice(), [tokenization.tail]);
-      assert.sameOrderedMembers(instance.boundTokens.slice(), [tokenization.tokens[0]]);
-      assert.equal(instance.unboundToken, undefined);
+      assert.sameOrderedMembers(instance.uncorrectableTokens.slice(), [tokenization.tail]);
+      assert.sameOrderedMembers(instance.correctableTokens.slice(), [tokenization.tokens[0]]);
+      assert.equal(instance.predictableToken, undefined);
     });
   });
 
@@ -304,9 +304,9 @@ describe('TokenizationCorrector', () => {
         assert.sameOrderedMembers(tokenResults.map((r) => r.matchString), ['theref']);
 
         // Now that an entry has been found, verify the corrector's state.
-        assert.isOk(instance.unboundToken); // should not become bound or locked.
-        assert.isTrue(instance.lockedTokenResults.has(instance.unboundToken));
-        assert.equal(instance.lockedTokenResults.get(instance.unboundToken), tokenResults[0]);
+        assert.isOk(instance.predictableToken); // should not become bound or locked.
+        assert.isTrue(instance.lockedTokenResults.has(instance.predictableToken));
+        assert.equal(instance.lockedTokenResults.get(instance.predictableToken), tokenResults[0]);
       }
 
       searchResult = instance.handleNextNode();
@@ -349,8 +349,8 @@ describe('TokenizationCorrector', () => {
       }
 
       // Now that an entry has been found, verify the corrector's state.
-      assert.isOk(instance.unboundToken); // should not become bound or locked.
-      assert.isTrue(instance.lockedTokenResults.has(instance.unboundToken));
+      assert.isOk(instance.predictableToken); // should not become bound or locked.
+      assert.isTrue(instance.lockedTokenResults.has(instance.predictableToken));
       for(let i=0; i < firstResults.length; i++) {
         assert.equal(instance.lockedTokenResults.get(instance.orderedTokens[i]), firstResults[i]);
       }

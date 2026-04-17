@@ -12,7 +12,8 @@ import { PriorityQueue } from "@keymanapp/web-utils";
 
 import { ContextToken } from "./context-token.js";
 import { CorrectionSearchable, PathResult } from "./correction-searchable.js";
-import { ContextTokenization } from "../test-index.js";
+import { ContextTokenization } from "./context-tokenization.js";
+import { SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenizationResultMapping } from "./tokenization-result-mapping.js";
 
 // PathResult needs to be generic:
@@ -30,43 +31,44 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   public readonly tokenization: ContextTokenization;
   private readonly tailCorrectionLength: number
 
-  private readonly _lockedTokens: ContextToken[];
-  private readonly _boundTokens: ContextToken[];
-  private _unboundToken?: ContextToken;
+  private readonly _uncorrectables: SearchQuotientNode[];
+  private readonly _correctables: SearchQuotientNode[];
+  private _predictable?: SearchQuotientNode;
 
-  private selectionQueue: PriorityQueue<ContextToken>;
-  private tokenCostMap: Map<ContextToken, number>;
-  private _lockedTokenResults: Map<ContextToken, TokenResult>;
+  private selectionQueue: PriorityQueue<SearchQuotientNode>;
+  private tokenCostMap: Map<number, number>;
+  private _lockedTokenResults: Map<SearchQuotientNode, TokenResult>;
   private lastTotalCost: number;
   private handleHasBeenCalled: boolean = false;
 
   get currentCost(): number {
-    const token = this.selectionQueue.peek();
-    if(!token) {
+    const correctable = this.selectionQueue.peek();
+    if(!correctable) {
       return this.lastTotalCost;
     }
 
-    return this.getUpdatedTotalCost(token, token.searchModule.currentCost);
+    return this.getUpdatedTotalCost(correctable, correctable.currentCost);
   };
 
   get orderedTokens(): ReadonlyArray<ContextToken> {
     return this.tokenization.tokens.slice(-this.tailCorrectionLength);
   }
 
-  get lockedTokens(): ReadonlyArray<ContextToken> {
-    return this._lockedTokens;
+  get uncorrectableTokens(): ReadonlyArray<ContextToken> {
+    return this.orderedTokens.filter((t) => this._uncorrectables.find((c) => c.spaceId == t.spaceId));
   }
 
-  get boundTokens(): ReadonlyArray<ContextToken> {
-    return this._boundTokens;
+  get correctableTokens(): ReadonlyArray<ContextToken> {
+    return this.orderedTokens.filter((t) => this._correctables.find((c) => c.spaceId == t.spaceId));
   }
 
-  get unboundToken(): ContextToken {
-    return this._unboundToken;
+  get predictableToken(): ContextToken {
+    return this.orderedTokens.find((t) => this._predictable?.spaceId == t.spaceId);
   }
 
   get lockedTokenResults(): ReadonlyMap<ContextToken, TokenResult> {
-    return this._lockedTokenResults;
+    return new Map([...this._lockedTokenResults.entries()]
+      .map((tuple) => [this.orderedTokens.find((t) => t.searchModule == tuple[0]), tuple[1]]));
   }
 
   // Will have actual result sequences.
@@ -96,24 +98,25 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
 
     const correctables = this.orderedTokens;
 
-    this._lockedTokens = [];
-    this._boundTokens = [];
+    this._uncorrectables = [];
+    this._correctables = [];
 
     correctables.forEach((token, index) => {
+      const searchModule = token.searchModule;
       if(!filterClosure(token)) {
-        this._lockedTokens.push(token);
+        this._uncorrectables.push(searchModule);
       } else if(index == tailCorrectionLength - 1) {
-        this._unboundToken = token;
+        this._predictable = searchModule;
       } else {
-        this._boundTokens.push(token);
+        this._correctables.push(searchModule);
       }
     });
 
     this._lockedTokenResults = new Map();
-    const lockedTokens = this._lockedTokens;
-    lockedTokens.forEach((t) => {
-      const lockedResult = t.searchModule.bestExample;
-      this._lockedTokenResults.set(t, {
+    const uncorrectables = this._uncorrectables;
+    uncorrectables.forEach((uncorrectable) => {
+      const lockedResult = uncorrectable.bestExample;
+      this._lockedTokenResults.set(uncorrectable, {
         matchString: lockedResult.text,
         inputSamplingCost: 0,
         knownCost: -Math.log(lockedResult.p),
@@ -121,20 +124,20 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       });
     });
 
-    let totalCost = lockedTokens.reduce((accum, curr) => accum - Math.log(curr.searchModule.bestExample.p), 0);
-    const tokenCostMap = this.tokenCostMap = new Map<ContextToken, number>();
+    let totalCost = uncorrectables.reduce((accum, curr) => accum - Math.log(curr.bestExample.p), 0);
+    const tokenCostMap = this.tokenCostMap = new Map<number, number>();
 
-    const tokensToQueue = this._boundTokens.concat(this.unboundToken ?? []);
-    tokensToQueue.forEach((t) => {
-      totalCost += t.searchModule.currentCost;
-      tokenCostMap.set(t, t.searchModule.currentCost);
+    const correctablesToQueue = this._correctables.concat(this.predictableToken?.searchModule ?? []);
+    correctablesToQueue.forEach((t) => {
+      totalCost += t.currentCost;
+      tokenCostMap.set(t.spaceId, t.currentCost);
     });
 
     this.lastTotalCost = totalCost;
 
     // Compute a weighting for each token's search space based the increase in
     // tokenization cost that it represents.
-    const tokenUpdateCost = (token: ContextToken) => token.searchModule.currentCost - (tokenCostMap.get(token) ?? 0)
+    const tokenUpdateCost = (searchModule: SearchQuotientNode) => searchModule.currentCost - (tokenCostMap.get(searchModule.spaceId) ?? 0)
     this.selectionQueue = new PriorityQueue((a, b) => {
       const aUpdateCost = tokenUpdateCost(a);
       const bUpdateCost = tokenUpdateCost(b);
@@ -144,15 +147,15 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       return aUpdateCost - bUpdateCost;
     });
 
-    this.selectionQueue.enqueueAll(tokensToQueue);
+    this.selectionQueue.enqueueAll(correctablesToQueue);
   }
 
-  private getUpdatedTotalCost(updatedToken: ContextToken, tokenCost: number): number {
-    return this.lastTotalCost + tokenCost - (this.tokenCostMap.get(updatedToken) ?? 0);
+  private getUpdatedTotalCost(updatedCorrectable: SearchQuotientNode, tokenCost: number): number {
+    return this.lastTotalCost + tokenCost - (this.tokenCostMap.get(updatedCorrectable.spaceId) ?? 0);
   }
 
   private collateResults(): TokenizationResultMapping {
-    return new TokenizationResultMapping(this.orderedTokens.map((t) => this._lockedTokenResults.get(t)), this);
+    return new TokenizationResultMapping(this.orderedTokens.map((t) => this._lockedTokenResults.get(t.searchModule)), this);
   }
 
   handleNextNode(): PathResult<TokenizationResultMapping> {
@@ -167,8 +170,8 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     //     - Produce first search result!
     // 4.  Unbound token is unlocked, but all others are locked.
 
-    const tokenToUpdate = this.selectionQueue.dequeue();
-    const tokenResult = tokenToUpdate?.searchModule.handleNextNode();
+    const correctableToUpdate = this.selectionQueue.dequeue();
+    const tokenResult = correctableToUpdate?.handleNextNode();
 
     if(tokenResult?.type == 'none' || (!tokenResult && this.handleHasBeenCalled)) {
       // If we reach this point, the tokenization has exhausted its search space.
@@ -187,13 +190,13 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     this.handleHasBeenCalled = true;
 
     // Update the cost associated with the token.
-    const cost = this.lastTotalCost = this.getUpdatedTotalCost(tokenToUpdate, tokenResult.cost);
-    this.tokenCostMap.set(tokenToUpdate, tokenResult.cost);
+    const cost = this.lastTotalCost = this.getUpdatedTotalCost(correctableToUpdate, tokenResult.cost);
+    this.tokenCostMap.set(correctableToUpdate.spaceId, tokenResult.cost);
 
     // If we haven't found a valid correction for the token with lowest-cost update,
     // just requeue it and keep searching until we find one.
     if(tokenResult.type != 'complete') {
-      this.selectionQueue.enqueue(tokenToUpdate);
+      this.selectionQueue.enqueue(correctableToUpdate);
 
       // Needs to return the 'proper' type of result.
       return {
@@ -204,22 +207,22 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
 
     // Assertion:  tokenResult.type == 'complete'.  We have a valid correction for
     // at least some part of the tokenization - the represented context variant.
-    if(tokenToUpdate != this.unboundToken) {
+    if(correctableToUpdate != this._predictable) {
       // Lock the 'bound' token now that a valid correction for it has been
       // found. We only consider a single correction for most of a
       // tokenization's tokens, generally only allowing correction variation for
       // the last represented token.
-      this._boundTokens.splice(this._boundTokens.indexOf(tokenToUpdate), 1);
-      this._lockedTokens.push(tokenToUpdate);
+      this._correctables.splice(this._correctables.indexOf(correctableToUpdate), 1);
+      this._uncorrectables.push(correctableToUpdate);
     }
 
     // Either way, update the token -> correction-string map with the obtained result.
-    this._lockedTokenResults.set(tokenToUpdate, tokenResult.mapping);
+    this._lockedTokenResults.set(correctableToUpdate, tokenResult.mapping);
 
     // If we have a correction for all components in need of correction, allow
     // searching for alternative corrections for the 'unbound' token.
-    if(this._boundTokens.length == 0 && this._unboundToken) {
-      this.selectionQueue.enqueue(this._unboundToken);
+    if(this._correctables.length == 0 && this._predictable) {
+      this.selectionQueue.enqueue(this._predictable);
     }
 
     const correctionResults = this.collateResults();
