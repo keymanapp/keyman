@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KMSettingsRepository : NSObject
 + (KMSettingsRepository *)shared;
+- (instancetype)init;
 - (BOOL)keyman18DataMigrationNeeded;
 - (BOOL)keyman19SettingsMigrationNeeded;
 - (void)migrateSettingsForKeyman18;

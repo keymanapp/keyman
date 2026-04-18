@@ -200,62 +200,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
       os_log_info([KMLogs dataLog], "created Keyman data directory: '%{public}@'", self.keyman19KeyboardsDirectory.path);
     }
   } else {
-    // TODO: remove test code
     os_log_info([KMLogs dataLog], "Keyman data directory already exists: '%{public}@'", self.keyman19KeyboardsDirectory.path);
-    NSString *contentString = @"Not a .kmp file";
-    NSString *filePath = [self.keyman19KeyboardsDirectory.path stringByAppendingPathComponent:@"readable.txt"];
-    NSData *data = [contentString dataUsingEncoding:NSUTF8StringEncoding];
-    if ([fileManager createFileAtPath: filePath contents:data attributes:nil]) {
-      os_log_info([KMLogs dataLog], "created file at: %{public}@", filePath);
-    } else {
-      os_log_info([KMLogs dataLog], "failed to create file at: %{public}@", filePath);
-    }
-  }
-}
-
-// TODO: remove once migration to Keyman 19 data directory is complete
-/**
- * Creates Keyman data directory if it does not exist yet. This is the main data subdirectory: keyman.inputmethod.Keyman
- */
-- (void)createKeyman18DataDirectoryIfNecessary {
-  NSFileManager *fileManager = [NSFileManager defaultManager];
-  BOOL isDir;
-  BOOL exists = [fileManager fileExistsAtPath:self.keyman18DataDirectory.path isDirectory:&isDir];
-
-  if (!exists) {
-    NSError *createError = nil;
-    os_log_info([KMLogs dataLog], "createDataDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keyman18DataDirectory.path);
-    [fileManager createDirectoryAtPath:self.keyman18DataDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
-    if (createError) {
-      os_log_error([KMLogs dataLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
-    } else {
-      os_log_info([KMLogs dataLog], "created Keyman data directory: '%{public}@'", self.keyman18DataDirectory.path);
-    }
-  } else {
-    os_log_info([KMLogs dataLog], "Keyman data directory already exists: '%{public}@'", self.keyman18DataDirectory.path);
-  }
-}
-
-/**
- * Creates Keyman keyboard directory if it does not exist yet. This is the 'Keyman-Keyboards' directory.
- * It should not be created until after migrating because its existence would block migrating data from the old location.
- */
-- (void)createKeyboardsDirectoryIfNecessary {
-  NSFileManager *fileManager = [NSFileManager defaultManager];
-  BOOL isDir;
-  BOOL exists = [fileManager fileExistsAtPath:self.keyman18KeyboardsDirectory.path isDirectory:&isDir];
-
-  if (!exists) {
-    NSError *createError = nil;
-    os_log_info([KMLogs dataLog], "createKeyboardsDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keyman18KeyboardsDirectory.path);
-    [fileManager createDirectoryAtPath:self.keyman18KeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:&createError];
-    if (createError) {
-      os_log_error([KMLogs dataLog], "error creating Keyman-Keyboards directory: '%{public}@'", createError.localizedDescription);
-    } else {
-      os_log_info([KMLogs dataLog], "created Keyman-Keyboards subdirectory: '%{public}@'", self.keyman18KeyboardsDirectory.path);
-    }
-  } else {
-    os_log_info([KMLogs dataLog], "Keyman-Keyboards already exists: '%{public}@'", self.keyman18KeyboardsDirectory.path);
   }
 }
 
@@ -316,7 +261,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
       os_log_info([KMLogs dataLog], "data migrated successfully to: '%{public}@'", self.keyman18KeyboardsDirectory.path);
     }
   }
-  
+
   return didMoveData;
 }
 
@@ -379,6 +324,10 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 
     [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
     [KMDataRepository movePackages:[self keyman18KeyboardsDirectory] to:[self keyman19KeyboardsDirectory]];
+
+    // delete the Keyman-Keyboards directory
+    NSError *error = nil;
+    [fileManager removeItemAtURL: self.keyman18KeyboardsDirectory error:&error];
   }
   
   return didMoveData;
@@ -386,7 +335,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 
 
 - (NSString*)buildFullPath:(NSString *)fromPartialPath {
-  NSString *fullPath = [self.keyman18KeyboardsDirectory.path stringByAppendingString:fromPartialPath];
+  NSString *fullPath = [self.keyman19KeyboardsDirectory.path stringByAppendingString:fromPartialPath];
   os_log_debug([KMLogs dataLog], "buildFullPath: '%{public}@' fromPartialPath '%{public}@'",
                fullPath, fromPartialPath);
   return fullPath;

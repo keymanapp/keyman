@@ -107,17 +107,7 @@ public struct PackageRepository {
     guard let keyboardsUrl = self.pathUtil.keyman19KeyboardsDirectory else {
       return []
     }
- 
-//    print("App Group container URL not found. Check your entitlements and provisioning profiles.")
 
-    return readKeyboardPackageSource(keyboardDirectoryUrl: keyboardsUrl)
-  }
-
-  public func readKeymanPackagesForKeyman18() -> [PackageSource] {
-    guard let keyboardsUrl = self.pathUtil.keyman18KeyboardsDirectory else {
-      return []
-    }
-    
     return readKeyboardPackageSource(keyboardDirectoryUrl: keyboardsUrl)
   }
 
