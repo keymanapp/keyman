@@ -85,7 +85,7 @@ export class KeylayoutFileReader {
     }
     catch (err) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
-      return null;
+      throw new Error('Failed to parse keylayout file');
     }
   }
 }
