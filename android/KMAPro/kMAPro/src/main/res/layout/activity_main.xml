@@ -24,8 +24,8 @@
 
         <include
             layout="@layout/check_chrome_webview_layout"
-            android:layout_width="96dp"
-            android:layout_height="104dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/titlebar"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/titlebar" />
@@ -51,14 +51,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:gravity="center_horizontal"
             android:visibility="gone"
             android:padding="6dp"
             android:background="@drawable/bg_keyboard_toolbar_container"
             android:elevation="6dp"
             android:outlineProvider="background"
             app:layout_constraintBottom_toTopOf="@id/keyboardToolbarToggleButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="12dp"
+            app:layout_constraintStart_toStartOf="@id/keyboardToolbarToggleButton"
+            app:layout_constraintEnd_toEndOf="@id/keyboardToolbarToggleButton"
             android:layout_marginBottom="8dp">
 
             <androidx.appcompat.widget.AppCompatImageButton
@@ -117,9 +118,10 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:paddingHorizontal="10dp"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
         android:fitsSystemWindows="true"
         app:itemTextAppearance="@style/NavigationDrawerItemText"
-        app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

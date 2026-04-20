@@ -17,7 +17,6 @@
   https://support.google.com/googleplay/android-developer/answer/9214102#
   <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" /> -->
   <application
-    android:name=".MyApp"
     android:allowBackup="true"
     android:hardwareAccelerated="true"
     android:theme="@style/AppTheme"
@@ -67,13 +66,6 @@
       android:label="@string/app_name"
       android:resizeableActivity="false"
         android:theme="@style/Theme.App.Starting">
-<!--      <activity-->
-<!--          android:name=".SplashScreenActivity"-->
-<!--          android:exported="true"-->
-<!--          android:label="@string/app_name"-->
-<!--          android:resizeableActivity="false"-->
-<!--          android:theme="@style/AppTheme_BrandedLunch"-->
-<!--          >-->
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 

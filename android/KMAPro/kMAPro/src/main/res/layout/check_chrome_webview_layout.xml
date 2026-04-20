@@ -3,20 +3,23 @@
   android:id="@+id/checkWebViewChromeLayout"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
+  android:paddingVertical="4dp"
   android:background="@android:color/white"
+  android:gravity="center_vertical"
   android:orientation="horizontal">
 
   <!-- Banner to display if WebView is not installed/enabled or old version of Chrome installed -->
   <TextView
     android:id="@+id/kmWebViewChromeTextView"
-    android:layout_width="wrap_content"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_weight="1"
     android:background="@android:color/white"
-    android:gravity="start"
+    android:gravity="start|center_vertical"
     android:layout_gravity="center_vertical"
     android:text="@string/text_require_chrome_version"
     android:layout_marginStart="@dimen/button_playstore_margin"
+    android:layout_marginEnd="@dimen/button_playstore_margin"
     android:textSize="@dimen/update_chrome_label_textsize" />
 
   <Button
@@ -33,7 +36,9 @@
     android:paddingEnd="@dimen/button_playstore_padding"
     android:background="@color/ms_material_blue_500"
     android:elevation="1dp"
-    android:singleLine="true"
+    android:minHeight="0dp"
+    android:singleLine="false"
+    android:maxLines="2"
     android:text="@string/button_update_chrome"
     android:textColor="@android:color/white"/>
 
