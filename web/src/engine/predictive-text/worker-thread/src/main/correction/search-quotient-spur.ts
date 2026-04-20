@@ -404,8 +404,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       return {
         type: 'complete',
         cost: currentNode.currentCost,
-        finalNode: currentNode,
-        spaceId: this.spaceId
+        finalNode: currentNode
       };
     }
 

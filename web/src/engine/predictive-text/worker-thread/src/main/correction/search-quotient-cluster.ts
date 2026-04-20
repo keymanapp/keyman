@@ -144,15 +144,16 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.selectionQueue.enqueue(bestPath);
 
     if(currentResult.type == 'complete') {
+      const node = currentResult.finalNode;
+      node.spaceId = this.spaceId;
       this.completedPaths?.push(currentResult.finalNode);
-      currentResult.spaceId = this.spaceId;
     }
 
     return currentResult;
   }
 
   public get previousResults(): TokenResultMapping[] {
-    return this.completedPaths?.map((n => new TokenResultMapping(n, this.spaceId))) ?? [];
+    return this.completedPaths?.map((n) => new TokenResultMapping(n)) ?? [];
   }
 
   get model(): LexicalModelTypes.LexicalModel {

@@ -47,8 +47,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     return {
       type: 'complete',
       cost: node.currentCost,
-      finalNode: node,
-      spaceId: this.spaceId
+      finalNode: node
     };
   }
 

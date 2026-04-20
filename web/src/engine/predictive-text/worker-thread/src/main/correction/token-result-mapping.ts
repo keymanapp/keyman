@@ -19,12 +19,8 @@ import Transform = LexicalModelTypes.Transform;
 export class TokenResultMapping {
   readonly node: SearchNode;
 
-  // Supports SearchPath -> SearchSpace remapping.
-  readonly spaceId: number;
-
-  constructor(node: SearchNode, spaceId?: number) {
+  constructor(node: SearchNode) {
     this.node = node;
-    this.spaceId = spaceId ?? node.spaceId;
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
