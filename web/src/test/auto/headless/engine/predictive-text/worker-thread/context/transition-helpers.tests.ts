@@ -20,10 +20,12 @@ import {
   generateSubsetId,
   LegacyQuotientRoot,
   LegacyQuotientSpur,
+  mergeAlignedTokenizations,
   models,
   PathInputProperties,
   precomputationSubsetKeyer,
   precomputeTransitions,
+  SearchQuotientCluster,
   TokenizationSubset,
   TokenizationTransitionEdits,
   TransitionEdge,
@@ -276,21 +278,29 @@ function generateFixturesForTransitionSource() {
   );
 
   const distrib2Subsets: Map<string, TokenizationSubset> = new Map();
+  const distrib2Tokenizations: Map<string, ContextTokenization> = new Map();
   transitionSet2.flat().forEach((tuple) => {
-    const oldEntry = distrib2Subsets.get(tuple.key);
+    const key = tuple.key;
+    const oldEntry = distrib2Subsets.get(key);
     if(!oldEntry) {
-      distrib2Subsets.set(tuple.key, tuple.subset)
+      distrib2Subsets.set(key, tuple.subset)
+      distrib2Tokenizations.set(key, tuple.transitionedTokenization);
     } else {
+      // merge tokenizations
       const combinedSubset: TokenizationSubset = {
         key: oldEntry.key,
         transitionEdges: new Map(oldEntry.transitionEdges)
       };
+      const oldTokenization = distrib2Tokenizations.get(key);
 
       tuple.subset.transitionEdges.forEach((value, key) => {
         combinedSubset.transitionEdges.set(key, value);
       });
 
-      distrib2Subsets.set(tuple.key, combinedSubset);
+      const mergedTokenization = mergeAlignedTokenizations([oldTokenization, tuple.transitionedTokenization]);
+
+      distrib2Subsets.set(key, combinedSubset);
+      distrib2Tokenizations.set(key, mergedTokenization);
     }
   });
 
@@ -309,7 +319,7 @@ function generateFixturesForTransitionSource() {
         transitionSet: transitionSet2,
         subsets: distrib2Subsets,
         contextKey: transitionSet2[0][0].key,
-        tokenizations: null as Map<string, ContextTokenization>
+        tokenizations: distrib2Tokenizations
       }
     }
   }
@@ -461,12 +471,29 @@ describe('transitionTokenizations', () => {
     }
   });
 
-  // Issue:  we don't yet have converging tokenizations implemented.  That's kind of a prerequisite here.
-  it.skip('handles the "cafe" fixture\'s second input correctly', () => {
+  it('handles the "cafe" fixture\'s second input correctly', () => {
     const { cafe } = generateFixturesForTransitionSource();
 
     const resultTokenizationMap = transitionTokenizations(cafe.key2.subsets, cafe.key2.dist);
+    const resultTokenizations = [...resultTokenizationMap.values()];
 
-    assert.equal(resultTokenizationMap.size, 3);
+    // Both source tokenizations have one spur each that converges to the same target tokenization.
+    assert.equal(resultTokenizations.length, 3);
+
+    const simpleTransitionTokenizations = resultTokenizations.filter((t) => !(t.tail.searchModule instanceof SearchQuotientCluster));
+    const complexTransitionTokenizations = resultTokenizations.filter((t) => t.tail.searchModule instanceof SearchQuotientCluster);
+
+    assert.equal(simpleTransitionTokenizations.length, 2);
+    assert.equal(complexTransitionTokenizations.length, 1);
+
+
+    for(let key of resultTokenizationMap.keys()) {
+      const msg = `Invalid assumption for tokenization with key ${key}`;
+
+      const actual = resultTokenizationMap.get(key);
+      const expected = cafe.key2.tokenizations.get(key);
+
+      assertMatchingTokenization(actual, expected, msg);
+    }
   });
 });
