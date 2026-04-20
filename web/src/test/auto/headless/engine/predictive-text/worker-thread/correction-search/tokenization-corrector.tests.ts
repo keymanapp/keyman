@@ -26,13 +26,13 @@ import {
   SearchQuotientNode,
   SearchQuotientRoot,
   TokenizationCorrector,
-  TokenResult
+  TokenResult,
+  TokenizationResultMapping
 } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
 import TrieModel = models.TrieModel;
 import Transform = LexicalModelTypes.Transform;
-import { TokenizationResultMapping } from '../../../../../../../engine/predictive-text/worker-thread/build/obj/correction/tokenization-result-mapping.js';
 
 const plainModel = new TrieModel(
   jsonFixture('models/tries/english-1000'), {
