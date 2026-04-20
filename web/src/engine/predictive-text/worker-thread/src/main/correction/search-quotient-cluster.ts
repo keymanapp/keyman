@@ -87,6 +87,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
 
     this.lowestPossibleSingleCost = lowestPossibleSingleCost;
     this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => r.node);
+    this.completedPaths.forEach((p) => p.spaceId = this.spaceId);
     this.selectionQueue.enqueueAll(inboundPaths);
 
     return;
