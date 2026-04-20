@@ -135,8 +135,8 @@ export function transitionTokenizations(
  * attempt to merge each token's SearchQuotientNodes as necessary to result in a
  * single instance.
  *
- * An error will be thrown if the instances do not sufficiently converge to the
- * same tokenization pattern.
+ * An error will be thrown if the provided nodes do not sufficiently converge to
+ * the same tokenization pattern.
  * @param tokenizations
  * @returns
  */
@@ -175,7 +175,13 @@ export function mergeAlignedTokenizations(tokenizations: ContextTokenization[]):
         } else {
           return quotientNode;
         }
-      })
+      });
+
+      // Will throw an error (as documented in this function's description) if
+      // the tokens' spurs obtained in `constituentSpurs` do not actually
+      // represent the same input range, and thus do not have matching
+      // wordbreaking boundaries - a state that invalidates this method's
+      // stated preconditions.
       finalizedTokens.push(new ContextToken(new SearchQuotientCluster(constituentSpurs)));
     }
   }
