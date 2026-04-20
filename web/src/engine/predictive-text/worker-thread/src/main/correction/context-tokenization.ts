@@ -575,8 +575,7 @@ export class ContextTokenization {
   evaluateTransition(
     transitionEdge: TransitionEdge,
     transitionId: number,
-    bestProbFromSet: number,
-    appliedSuggestionId?: number
+    bestProbFromSet: number
   ): ContextTokenization {
     const { alignment, inputs } = transitionEdge;
     const sliceIndex = alignment.edgeWindow.sliceIndex;

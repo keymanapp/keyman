@@ -16,8 +16,9 @@ import { KMWString } from '@keymanapp/web-utils';
 import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
+import { precomputeTransitions, transitionTokenizations } from './transition-helpers.js';
+
 import { determineModelTokenizer } from '../model-helpers.js';
-import { legacySubsetKeyer, TokenizationSubsetBuilder } from './tokenization-subsets.js';
 import TransformUtils from '../transformUtils.js';
 
 import Context = LexicalModelTypes.Context;
@@ -204,12 +205,12 @@ export class ContextState {
     // From here on, we work toward the common-case - re-using old info when
     // context (and its tokenization) is changed by an input Transform.
 
-    let trueInputSubsetKey: string;
     const slideUpdateTransform = determineContextSlideTransform(this.context, context);
 
     // Goal:  allow multiple base tokenizations.
-    const startTokenizations = [this.tokenization];
-    const startTokenizationsAfterSlide = startTokenizations.map(t => t.applyContextSlide(lexicalModel, slideUpdateTransform));
+    const startTokenizations = [this.tokenization].map((t) => {
+      return t.applyContextSlide(lexicalModel, slideUpdateTransform);
+    });
 
     // Easy case - no net change to the tokenizations whatsoever; the actual request
     // aims to save-state the most recent results.
@@ -219,38 +220,13 @@ export class ContextState {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
       const state = new ContextState(this);
-      state.tokenization = startTokenizationsAfterSlide[0];
+      state.tokenization = [...startTokenizations.values()][0];
       transition.finalize(state, transformDistribution);
       return transition;
     }
 
-    const subsetBuilder = new TokenizationSubsetBuilder(legacySubsetKeyer);
-    for(let baseTokenization of startTokenizationsAfterSlide) {
-
-      for(let mass of transformDistribution) {
-        const tokenizationAnalysis = baseTokenization.mapWhitespacedTokenization(lexicalModel, mass.sample);
-        subsetBuilder.addPrecomputation(baseTokenization, tokenizationAnalysis, mass.p);
-
-        if(mass.sample == trueInput) {
-          trueInputSubsetKey = subsetBuilder.keyer(tokenizationAnalysis);
-        }
-      }
-    }
-
-    // And now to (partly) detransform from a multiple-tokenization paradigm.
-    const trueInputSubset = subsetBuilder.subsets.get(trueInputSubsetKey);
-    // Right now, we only have one base tokenization, so we just fetch it.
-    const baseTokenization = startTokenizationsAfterSlide[0];
-    // For multiple tokenizations, we'd retrieve each, use the "most likely" one as base,
-    // and then fold all resulting search spaces (on the final token) into one.
-    const tokenizationAnalysis = trueInputSubset.transitionEdges.get(baseTokenization);
-
-    // Determine the best probability from among ALL available inputs, before they're split
-    // into subsets.
-    const bestProb = transformDistribution.reduce((best, curr) => Math.max(best, curr.p), 0);
-    // Should gain one per subsetBuilder.subsets entry.
-    const realignedTokenization = baseTokenization.realign(tokenizationAnalysis.alignment);
-    const resultTokenization = realignedTokenization.evaluateTransition(tokenizationAnalysis, trueInput.id, bestProb);
+    const { subsets, keyMatchingUserContext: trueInputSubsetKey } = precomputeTransitions(startTokenizations, transformDistribution);
+    const resultTokenization = transitionTokenizations(subsets, transformDistribution).get(trueInputSubsetKey);
 
     // ------------
 
@@ -260,17 +236,12 @@ export class ContextState {
     // epic/dict-breaker:  if ANY decently-likely tokenization satisfies this, we still
     // have a reasonable candidate for display of a delayed reversion.  (Not 'all' -
     // 'any'.)
-    const tokens = resultTokenization.tokens;
-    const lastIndex = tokens.length - 1;
-    // Ignore a context-final empty '' token; the interesting one is what comes before.
-    const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
-    const appliedSuggestionTransitionId = nonEmptyTail?.appliedTransitionId;
 
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
-    state.tokenization =  new ContextTokenization(resultTokenization.tokens, tokenizationAnalysis, resultTokenization.taillessTrueKeystroke);
+    state.tokenization = resultTokenization;
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution);
-    transition.revertableTransitionId = appliedSuggestionTransitionId;
+    transition.revertableTransitionId = state.tokenization.tail.appliedTransitionId;
     return transition;
   }
 }
