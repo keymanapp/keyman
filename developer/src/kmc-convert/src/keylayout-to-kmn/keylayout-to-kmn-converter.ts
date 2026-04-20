@@ -45,12 +45,12 @@ export interface KeylayoutFileData {
    * Interface for storing data read from a .keylayout file and used for processing rules.
    * These are used for obtaining one entity form the other (e.g. from action id to output, from keycode to modifier, etc.)
    */
-  actionId?: string;
-  keyCode?: string;
-  key?: string;
-  behavior?: string;
+  actionId?: string | undefined;
+  keyCode?: string | undefined;
+  key?: string | undefined;
+  behavior?: string | undefined;
   modifier?: string;
-  outchar?: string;
+  outchar?: string | undefined;
 };
 
 export interface ActionStateOutput {
@@ -117,7 +117,7 @@ export class KeylayoutToKmnConverter {
 
   constructor(private callbacks: CompilerCallbacks, options: CompilerOptions) {
     this.options = { ...options };
-   };
+  };
 
   /**
    * @brief  member function to run read/convert/write
@@ -125,7 +125,7 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
+  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
@@ -145,7 +145,7 @@ export class KeylayoutToKmnConverter {
       if (!KeylayoutReader.validate(jsonO)) {
         return null;
       }
-    } catch (e) {
+    } catch (e: any) {
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
       return null;
     }
@@ -154,10 +154,13 @@ export class KeylayoutToKmnConverter {
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
     // write to object/ConverterToKmnResult
-    const outputKmn = kmnFileWriter.write(processedData);
+    const outputKmn = processedData ? kmnFileWriter.write(processedData) : null;
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outputKmn, filename: processedData.kmnFilename }
+        kmn: {
+          data: outputKmn ?? new Uint8Array(0),
+          filename: processedData?.kmnFilename ?? ""
+        }
       }
     };
     return result;
@@ -168,7 +171,7 @@ export class KeylayoutToKmnConverter {
    * @param  jsonObj containing filename, behaviorand rules of a json object
    * @return an ProcessedData containing all data ready to print out
    */
-  private convert(jsonObj: any, inputfilename: string, outputFilename?: string): ProcessedData {
+  private convert(jsonObj: any, inputfilename: string, outputFilename?: string): ProcessedData | null {
     // modifiers for each behavior
     const modifierBehavior: string[][] = [];
 
@@ -218,7 +221,7 @@ export class KeylayoutToKmnConverter {
     * @param  jsonObj: json Object containing all data read from a keylayout file
     * @return an object containing the name of the input file, an array of behaviors and a populated array of Rules[]
     */
-  public createRuleData(dataUkelele: ProcessedData, jsonObj: any): ProcessedData {
+  public createRuleData(dataUkelele: ProcessedData, jsonObj: any): ProcessedData | null {
 
     const rules: Rule[] = [];
     let dkCounterC3: number = 0;
@@ -322,8 +325,8 @@ export class KeylayoutToKmnConverter {
                     /*   dk for C2*/                0,
                     /*   unique B */                0,
 
-                    /*   modifierKey*/              b1ModifierKeyObj[m].modifier,
-                    /*   key */                     b1ModifierKeyObj[m].key,
+                    /*   modifierKey*/              b1ModifierKeyObj[m].modifier ?? "",
+                    /*   key */                     b1ModifierKeyObj[m].key ?? "",
                     /*   output */                  new TextEncoder().encode(outputchar)
                   );
                   if ((outputchar !== undefined) && (outputchar !== "undefined") && (outputchar !== "")) {
@@ -402,8 +405,8 @@ export class KeylayoutToKmnConverter {
                             /*   dk for C2*/              dkCounterC2++,
                             /*   unique B */              0,
 
-                            /*   modifierKey*/            b1ModifierKeyObj[n4].modifier,
-                            /*   key */                   b1ModifierKeyObj[n4].key,
+                            /*   modifierKey*/            b1ModifierKeyObj[n4].modifier ?? "",
+                            /*   key */                   b1ModifierKeyObj[n4].key ?? "",
                             /*   output */                new TextEncoder().encode(b1ModifierKeyObj[n4].outchar),
                           );
                           if ((b1ModifierKeyObj[n4].outchar !== undefined)
@@ -490,8 +493,8 @@ export class KeylayoutToKmnConverter {
                                   /*   dk for C2*/              0,
                                   /*   unique B */              0,
 
-                                  /*   modifierKey*/            b1ModifierKeyObj[n7].modifier,
-                                  /*   key */                   b1ModifierKeyObj[n7].key,
+                                  /*   modifierKey*/            b1ModifierKeyObj[n7].modifier ?? "",
+                                  /*   key */                   b1ModifierKeyObj[n7].key ?? "",
                                   /*   output */                new TextEncoder().encode(b1ModifierKeyObj[n7].outchar),
                                 );
                                 if ((b1ModifierKeyObj[n7].outchar !== undefined)
@@ -851,7 +854,7 @@ export class KeylayoutToKmnConverter {
   public getModifierArrayFromKeyModifierArray(data: any, search: KeylayoutFileData[]): string[] {
     const returnString1D: string[] = [];
     for (let i = 0; i < search.length; i++) {
-      returnString1D.push(data[search[i].behavior]);
+      returnString1D.push(data[search[i].behavior ?? ""]);
     }
     return returnString1D;
   }
@@ -946,8 +949,7 @@ export class KeylayoutToKmnConverter {
    * @return an array: KeylayoutFileData[] containing [{KeyName,actionId,behavior,modifier,output}]
    */
   public getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(data: any, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
-    const keyBehaviorModOutput = [];
-
+    const keyBehaviorModOutput: KeylayoutFileData[] = [];
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
         const behaviorIdx: number = Number(search[i].behavior);
@@ -964,7 +966,7 @@ export class KeylayoutToKmnConverter {
       }
     }
     // remove duplicates
-    const uniquekeyBehaviorModOutput = keyBehaviorModOutput.reduce((unique, o) => {
+    const uniquekeyBehaviorModOutput = keyBehaviorModOutput.reduce<KeylayoutFileData[]>((unique, o) => {
       if (!unique.some(obj =>
         obj.actionId === o.actionId &&
         obj.key === o.key &&
@@ -988,10 +990,10 @@ export class KeylayoutToKmnConverter {
    * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
    * @return an array: KeylayoutFileData[] containing [{actionID,output, behavior,keyname,modifier}]
    */
-  public getActionOutputBehaviorKeyModiFromActionIDStateOutput(data: any, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
+  public getActionOutputBehaviorKeyModiFromActionIDStateOutput(data: any, modi: string[][] | null, search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
     const actionOutputBehaviorKeyModi = [];
 
-    if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
+    if ((!modi)||(search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false)|| (!modi))) {
       return [];
     }
     // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
@@ -1016,7 +1018,7 @@ export class KeylayoutToKmnConverter {
     //.............................................................................
 
     // remove duplicates
-    const uniqueactionOutputBehaviorKey = actionOutputBehaviorKeyModi.reduce((unique, o) => {
+    const uniqueactionOutputBehaviorKey = actionOutputBehaviorKeyModi.reduce<KeylayoutFileData[]>((unique, o) => {
       if (!unique.some(obj =>
         obj.outchar === o.outchar &&
         obj.actionId === o.actionId &&
