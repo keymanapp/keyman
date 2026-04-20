@@ -31,8 +31,7 @@ type IntermediateSearchPath = {
 type CompleteSearchPath = {
   type: 'complete',
   cost: number,
-  mapping: TokenResultMapping,
-  spaceId: number
+  mapping: TokenResultMapping
 }
 
 export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;

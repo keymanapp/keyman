@@ -87,6 +87,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
 
     this.lowestPossibleSingleCost = lowestPossibleSingleCost;
     this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => r.node);
+    this.completedPaths.forEach((p) => p.spaceId = this.spaceId);
     this.selectionQueue.enqueueAll(inboundPaths);
 
     return;
@@ -144,15 +145,16 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.selectionQueue.enqueue(bestPath);
 
     if(currentResult.type == 'complete') {
-      this.completedPaths?.push(currentResult.mapping.node);
-      currentResult.spaceId = this.spaceId;
+      const node = currentResult.mapping.node;
+      node.spaceId = this.spaceId;
+      this.completedPaths?.push(node);
     }
 
     return currentResult;
   }
 
   public get previousResults(): TokenResultMapping[] {
-    return this.completedPaths?.map((n => new TokenResultMapping(n, this.spaceId))) ?? [];
+    return this.completedPaths?.map((n) => new TokenResultMapping(n)) ?? [];
   }
 
   get model(): LexicalModelTypes.LexicalModel {

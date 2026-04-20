@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-04-02
+ *
+ * This file defines the type used for tracking critical graph-search properties
+ * utilized during correction-search by the `getBestMatches` algorithm when run
+ * against individual tokens / words.
+ */
+
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
@@ -34,12 +44,8 @@ export function initTokenResultFilterer() {
 export class TokenResultMapping {
   readonly node: SearchNode;
 
-  // Supports SearchPath -> SearchSpace remapping.
-  readonly spaceId: number;
-
-  constructor(node: SearchNode, spaceId?: number) {
+  constructor(node: SearchNode) {
     this.node = node;
-    this.spaceId = spaceId ?? node.spaceId;
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
