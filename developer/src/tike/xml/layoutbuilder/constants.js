@@ -555,7 +555,7 @@ $(function() {
   // This is lifted directly from web/.../specialCharacters.ts and must be kept in sync.
   //
   // `specialCharacters` must be kept in sync with the same values in:
-  // * /web/src/engine/osk/src/specialCharacters.ts
+  // * /web/src/engine/src/osk/specialCharacters.ts
   // * /developer/src/kmc-kmn/src/kmw-compiler/constants.ts
   // * /core/include/ldml/keyman_core_ldml.ts
   //

@@ -4,7 +4,7 @@
 // Defines the PUA code mapping for the various 'special' modifier/control/non-printing keys on keyboards.
 //
 // `specialKeyCaps` must be kept in sync with the same values in:
-// * /web/src/engine/osk/src/specialCharacters.ts
+// * /web/src/engine/src/osk/specialCharacters.ts
 // * /developer/src/tike/xml/layoutBuilder/constants.js
 // * /developer/src/kmc-kmn/src/kmw-compiler/constants.ts
 // * /core/include/ldml/keyman_core_ldml.ts

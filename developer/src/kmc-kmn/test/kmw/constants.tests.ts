@@ -15,7 +15,7 @@
  *   developer/src/kmc-kmn/kmw-compiler/constants.ts
  *   developer/docs/help/reference/file-types/keyman-touch-layout.md
  *   core/include/ldml/keyman_core_ldml.ts
- *   web/src/engine/osk/src/specialCharacters.ts
+ *   web/src/engine/src/osk/specialCharacters.ts
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import 'mocha';
 import {assert} from 'chai';
 
-import keymanWebSpecialCharacters from "./_imported_web_osk_specialCharacters.js";
+import { specialCharacters as keymanWebSpecialCharacters } from "./_imported_web_osk_specialCharacters.js";
 import { CSpecialText17, CSpecialText14, CSpecialText10, CSpecialText17ZWNJ } from "../../src/kmw-compiler/constants.js";
 import { builder } from "./_imported_layoutbuilder_constants.js";
 import { constants as coreLdmlConstants } from "@keymanapp/ldml-keyboard-constants";
@@ -37,7 +37,7 @@ describe('Key cap special text values from KeymanWeb', function() {
     // The key cap special text objects in these three files should be exactly equal:
     //   developer/src/tike/xml/layoutbuilder/constants.js
     //   developer/src/common/web/utils/src/types/keyman-touch-layout/special-key-caps.ts
-    //   web/src/engine/osk/src/specialCharacters.ts
+    //   web/src/engine/src/osk/specialCharacters.ts
     assert.deepEqual(builder.specialCharacters, keymanWebSpecialCharacters);
     assert.deepEqual(specialKeyCaps, keymanWebSpecialCharacters);
   });
@@ -45,7 +45,7 @@ describe('Key cap special text values from KeymanWeb', function() {
   it('should match key cap special text in Developer kmc-kmn KMW compiler', function() {
     // These two files should have the same strings for key caps:
     //   developer/src/kmc-kmn/kmw-compiler/constants.ts
-    //   web/src/engine/osk/src/specialCharacters.ts
+    //   web/src/engine/src/osk/specialCharacters.ts
 
     // No values to compare here - just key names
 
@@ -84,7 +84,7 @@ describe('Key cap special text values from KeymanWeb', function() {
   it('should match key cap special text in Core constants', function() {
     // These two files should have the same constant values for key caps:
     //   core/include/ldml/keyman_core_ldml.ts
-    //   web/src/engine/osk/src/specialCharacters.ts
+    //   web/src/engine/src/osk/specialCharacters.ts
 
     // The Core constants and KeymanWeb constants vary a little:
     //
@@ -119,7 +119,7 @@ describe('Key cap special text values from KeymanWeb', function() {
   it('should be documented correctly', function() {
     // These two files should have the same constant values for key caps:
     //   developer/docs/help/reference/file-types/keyman-touch-layout.md
-    //   web/src/engine/osk/src/specialCharacters.ts
+    //   web/src/engine/src/osk/specialCharacters.ts
     const helpFile =
       path.join(path.dirname(fileURLToPath(import.meta.url)), '../../../../../docs/help/reference/file-types/keyman-touch-layout.md');
     const helpLines = fs.readFileSync(helpFile, 'utf-8').replaceAll(/\r\n/g, '\n').split('\n');
