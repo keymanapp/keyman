@@ -45,7 +45,7 @@ function _publish_to_downloads_keyman_com() {
 
   # Note that the `rsync` tool that exists on Macs by default is a very old version and must be updated to a newer version, e.g. by using Homebrew.
 
-  UPLOAD_DIR="/output/upload/${KEYMAN_VERSION}"
+  UPLOAD_DIR="Keyman4MacIM/output/upload/${KEYMAN_VERSION}"
 
   # Set permissions as required on download site
   builder_echo "Setting upload file permissions for downloads.keyman.com"
