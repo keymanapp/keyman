@@ -21,6 +21,10 @@ export class TokenResultMapping {
 
   constructor(node: SearchNode) {
     this.node = node;
+
+    if(!node) {
+      throw new Error("Token correction-search result may not be null");
+    }
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
