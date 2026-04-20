@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-04-02
+ *
+ * This file defines the type used for tracking critical graph-search properties
+ * utilized during correction-search by the `getBestMatches` algorithm when run
+ * against individual tokens / words.
+ */
+
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CorrectionResultMapping } from "./correction-result-mapping.js";
@@ -21,7 +31,7 @@ export function initTokenResultFilterer() {
       return false;
     }
 
-    if((priorReturns.get(node.resultKey)?.currentCost ?? Number.MAX_VALUE) >= searchResult.totalCost) {
+    if((priorReturns.get(node.resultKey)?.currentCost ?? Number.MAX_VALUE) > searchResult.totalCost) {
       priorReturns.set(node.resultKey, node);
 
       return true;
@@ -37,16 +47,12 @@ export class TokenResultMapping implements CorrectionResultMapping<SearchNode> {
   readonly matchingSpace: SearchQuotientNode;
   readonly node: SearchNode;
 
-  // Supports SearchPath -> SearchSpace remapping.
-  readonly spaceId: number;
-
-  constructor(node: SearchNode, finalQuotientNode: SearchQuotientNode, spaceId?: number) {
+  constructor(node: SearchNode, finalQuotientNode: SearchQuotientNode) {
     this.matchingSpace = finalQuotientNode;
     this.node = node;
-    this.spaceId = spaceId ?? node.spaceId;
   }
 
-  get matchedResult(): SearchNode {
+  get matchedResult(): Readonly<SearchNode> {
     return this.node;
   }
 

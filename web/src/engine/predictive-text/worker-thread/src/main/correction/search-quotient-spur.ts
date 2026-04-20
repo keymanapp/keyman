@@ -405,8 +405,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       return {
         type: 'complete',
         cost: currentNode.currentCost,
-        mapping: new TokenResultMapping(currentNode, this),
-        spaceId: this.spaceId
+        mapping: new TokenResultMapping(currentNode, this)
       };
     }
 

@@ -24,7 +24,7 @@ export interface CorrectionResultMapping<ResultType> {
   /**
    * The object representing the search path completed at the current search step.
    */
-  readonly matchedResult: ResultType;
+  readonly matchedResult: Readonly<ResultType>;
 
   /**
    * Gets the "total cost" of the edge, which should be considered as the

@@ -537,7 +537,7 @@ export async function correctAndEnumerate(
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
   for await(const match of getBestMatches<SearchNode, TokenResultMapping, SearchQuotientNode>(searchModules, timer, initTokenResultFilterer())) {
     // Corrections obtained:  now to predict from them!
-    const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
+    const tokenization = tokenizations.find(t => t.spaceId == match.node.spaceId);
 
     // If our 'match' results in fully deleting the new token, reject it and try again.
     if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {

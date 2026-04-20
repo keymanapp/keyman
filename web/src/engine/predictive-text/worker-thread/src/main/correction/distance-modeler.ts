@@ -148,13 +148,15 @@ export class SearchNode {
   private readonly deleteAfterInsertEditPairs: number;
 
   /**
-   * A unique identifier corresponding to the earliest SearchPath containing
-   * the correction-search graph edge represented by this instance.
+   * A unique identifier corresponding to the SearchQuotientNode last passed
+   * through by the represented search path.
    *
-   * Corresponding search results will be tagged with this, which can be used
-   * to identify the result's original source tokenization.
+   * The correction-search results produced by this search path will be tagged
+   * accordingly to match the correction with its original ContextTokenization.
+   * This is necessary in order to properly construct suggestions that apply as
+   * the user expects should the tokenization pattern itself be corrected.
    */
-  readonly spaceId: number;
+  public spaceId: number;
 
   /**
    * Notes the edit operation used for the most recent edge in the node's
@@ -605,7 +607,7 @@ export async function *getBestMatches<
   searchModules: Correctable[],
   timer: ExecutionTimer,
   filter?: (searchResult: ResultMapping) => boolean
-): AsyncGenerator<ResultMapping> {
+): AsyncGenerator<Readonly<ResultMapping>> {
   // If no filter function is provided, default to one that always returns true.
   filter ??= () => true;
 

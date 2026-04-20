@@ -48,8 +48,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     return {
       type: 'complete',
       cost: node.currentCost,
-      mapping: new TokenResultMapping(node, this),
-      spaceId: this.spaceId
+      mapping: new TokenResultMapping(node, this)
     };
   }
 
