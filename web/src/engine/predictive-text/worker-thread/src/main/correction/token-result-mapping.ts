@@ -29,7 +29,7 @@ export function initTokenResultFilterer() {
       return false;
     }
 
-    if((priorReturns.get(node.resultKey)?.currentCost ?? Number.MAX_VALUE) >= searchResult.totalCost) {
+    if((priorReturns.get(node.resultKey)?.currentCost ?? Number.MAX_VALUE) > searchResult.totalCost) {
       priorReturns.set(node.resultKey, node);
 
       return true;
