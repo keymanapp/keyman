@@ -238,7 +238,7 @@ describe('ContextTransition', () => {
 
       // 3 long, only last token was edited.
       appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
-        if(index >= 3) {
+        if(index >= 4) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {
           assert.isUndefined(token.appliedTransitionId);
@@ -246,7 +246,7 @@ describe('ContextTransition', () => {
       });
 
       appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
-        if(index >= 3) {
+        if(index >= 4) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {
           assert.isUndefined(token.appliedTransitionId);

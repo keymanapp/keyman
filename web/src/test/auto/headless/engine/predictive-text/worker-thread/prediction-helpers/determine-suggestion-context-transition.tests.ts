@@ -199,6 +199,7 @@ describe('determineContextTransition', () => {
         deleteLeft: 0,
         id: 2
       },
+      id: 4,
       transformId: 0,
       displayAs: 'testing'
     };

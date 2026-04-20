@@ -8,24 +8,16 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { applyTransform } from '@keymanapp/models-templates';
 
 import { ContextState } from './context-state.js';
+import { ContextTokenization } from './context-tokenization.js';
+import { precomputeTransitions, transitionTokenizations } from './transition-helpers.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-
-// Mark affected tokens with the applied-suggestion transition ID
-// for easy future reference.
-const tagTokens = (state: ContextState, suggestion: Suggestion) => {
-  const edits = state.tokenization.transitionEdits;
-  const appliedTokenCount = edits.editedTokenCount;
-  const tokens = state.tokenization.tokens;
-  for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
-    tokens[i].appliedTransitionId = suggestion.transformId;
-  }
-}
 
 /**
  * Represents the transition between two context states as triggered
@@ -131,63 +123,122 @@ export class ContextTransition {
    * @param suggestion
    * @returns
    */
-  applySuggestion(suggestion: Suggestion): {
+  applySuggestion(suggestion: Suggestion /*, wasManuallyApplied: boolean */): {
     base: ContextTransition,
     appended?: ContextTransition
   } {
-    const preAppliedState = this.final;
-    if(!preAppliedState.suggestions?.find((s) => s.id == suggestion?.id)) {
+    if(!this.final.suggestions?.find((s) => s.id == suggestion?.id)) {
       throw new Error("Could not find matching suggestion to apply");
     }
 
-    // This closure captures `suggestion`, and definition here / within the class also
-    // gives us private access to `._final`.
-    const buildAppliedTransition = (
-      transition: ContextTransition,
+    const lexicalModel = this.base.model;
+
+    // Goal:  allow multiple base tokenizations.
+
+    // // Only keep the other context versions - along with a copy of the original
+    // // one - if the suggestion was auto-applied; that may not have been
+    // // intentional.  If explicit (via manual), the other context versions are
+    // // considered to have been wrong and should be discarded.  (They can be
+    // // restored via reversion, though.)
+    //
+    // const preservedVariations = (
+    //   wasManuallyApplied ? [] : [this.tokenization].map((t) => {
+    //   return t.applyContextSlide(lexicalModel, slideUpdateTransform);
+    // });
+
+    const performTransitionStep = (
       baseState: ContextState,
-      transform: Transform
+      rootTokenization: ContextTokenization,
+      transformToApply: Transform,
+      inputDistribution: Distribution<Transform>
     ) => {
-      const state = baseState.analyzeTransition(
-        baseState.context,
-        [{sample: transform, p: 1}],
-        true
-      ).final;
+      const appliedDistribution = [{sample: transformToApply, p: 1}];
+      const { subsets: applicationSubsets, keyMatchingUserContext } = precomputeTransitions(
+        [rootTokenization], appliedDistribution
+      );
 
-      tagTokens(state, suggestion);
-      transition._final = state;
+      // Filter out insert and delete edges here!  ONLY the primary substitution
+      // edge should be permitted!
+      const directSuggestionSubset: typeof applicationSubsets = new Map();
 
-      // Applying a suggestion should not forget the original suggestion set.
-      state.appliedSuggestionId = suggestion.id;
-      state.suggestions = preAppliedState.suggestions;
+      // When applying suggestions, only consider the actual tokenization that would result.
+      directSuggestionSubset.set(keyMatchingUserContext, applicationSubsets.get(keyMatchingUserContext));
+
+      // TODO:  verify that 'insert' and 'delete' edit-spurs are ignored (once
+      // they're supported)
+
+      const resultingTokenization = transitionTokenizations(
+        directSuggestionSubset,
+        appliedDistribution
+      ).get(keyMatchingUserContext);
+
+      // Tag the result as revertable - but only on the last token.
+      //
+      // We won't try to partially revert a multi-word suggestion; reversions
+      // are only supported at the end of the last word of the main suggestion
+      // body and after any appended whitespace.
+      resultingTokenization.tail.appliedTransitionId = suggestion.transformId;
+
+      const resultingState = new ContextState(applyTransform(transformToApply, baseState.context), lexicalModel);
+      resultingState.tokenization = resultingTokenization; // [resultingTokenization].concat(preservedVariations);
+      resultingState.appliedInput = baseState.appliedInput;
+      resultingState.appliedSuggestionId = suggestion.id;
+      resultingState.suggestions = this.final.suggestions;
+
+      // Use the transform's ID for the transition.  Note that when applying the
+      // `appendedTransform` component of a suggestion, this will differ from
+      // suggestion.transformId.
+      const resultingTransition = new ContextTransition(baseState, transformToApply.id);
+      resultingTransition.finalize(resultingState, inputDistribution);
+      resultingTransition.revertableTransitionId = suggestion.transformId;
+      // .finalize unsets _.transitionId; re-assign it.
+      resultingTransition._transitionId = transformToApply.id;
+
+      return {
+        transition: resultingTransition,
+        tokenization: resultingTokenization
+      };
     }
 
-    // Start from a deep copy, then replace as needed to overwrite with the context
-    // state resulting from the suggestion while preserving suggestion + primary
-    // keystroke data.
-
-    const resultTransition = new ContextTransition(this);
-    buildAppliedTransition(resultTransition, this.base, suggestion.transform);
-
-    // An applied suggestion should replace the original Transition's effects, though keeping
-    // the original input around.
-    resultTransition._transitionId = suggestion.transformId;
-    resultTransition.final.appliedInput = preAppliedState.appliedInput;
+    // Suggestions always apply to the version of context that the user last saw before
+    // the input triggering the suggestion..
+    //
+    // Clone the base state in order to prevent cross-contamination from other operations (?)
+    const results = performTransitionStep(
+      new ContextState(this.base),
+      this.base.displayTokenization,
+      suggestion.transform,
+      this.inputDistribution
+    );
 
     if(!suggestion.appendedTransform) {
-      return { base: resultTransition };
+      return {
+        base: results.transition,
+        appended: null
+      };
     }
 
-    const finalTransition = new ContextTransition(resultTransition.final, suggestion.appendedTransform.id);
-    buildAppliedTransition(finalTransition, resultTransition.final, suggestion.appendedTransform);
+    // Appended transforms apply to the context resulting from that.
+    const appendingTransition = performTransitionStep(
+      results.transition.final,
+      results.tokenization,
+      suggestion.appendedTransform,
+      []
+    ).transition;
+    appendingTransition.final.appliedInput = { insert: '', deleteLeft: 0 };
 
-    // The appended transform is applied with no intermediate input.
-    finalTransition.final.appliedInput = { insert: '', deleteLeft: 0 };
-    finalTransition.inputDistribution = [];
+    // Ensure the appended tokens all have the transition ID tagged to enable reversion.
+    // We allow reversion on any post-suggestion appended components.
+    const baseTokenizationLength = results.transition.final.displayTokenization.tokens.length;
+    const appliedTokenization = appendingTransition.final.displayTokenization;
+    for(let i = baseTokenizationLength; i < appliedTokenization.tokens.length; i++) {
+      appliedTokenization.tokens[i].appliedTransitionId = suggestion.transformId;
+    }
 
     return {
-      base: resultTransition,
-      appended: finalTransition
-    };
+      base: results.transition,
+      appended: appendingTransition
+    }
   }
 
   /**

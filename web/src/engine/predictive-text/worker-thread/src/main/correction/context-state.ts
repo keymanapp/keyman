@@ -44,7 +44,7 @@ export class ContextState {
   readonly model: LexicalModel;
 
   /**
-   * Denotes the most likely tokenization for the represented Context.
+   * Denotes the possible tokenization(s) for the represented Context.
    */
   tokenization: ContextTokenization;
 
@@ -90,6 +90,14 @@ export class ContextState {
     }
 
     return this.suggestions.find(s => s.id == this.appliedSuggestionId)?.transformId;
+  }
+
+  /**
+   * Returns the ContextTokenization matching the current version of context, as
+   * is visible to the user.
+   */
+  get displayTokenization(): ContextTokenization {
+    return this.tokenization;
   }
 
   /**
@@ -185,17 +193,11 @@ export class ContextState {
    * context after adjusting for sliding context-window behaviors.)
    * @param transformDistribution A distribution of incoming potential edits to the context -
    * typically from a keystroke's fat-finger distribution.
-   *
-   * May also contain a single entry for applying Suggestions or when correction behavior
-   * is disabled.
-   * @param isApplyingSuggestion When true, alters behavior to better model application of suggestions.
    * @returns
    */
   analyzeTransition(
     context: Context,
-    transformDistribution: Distribution<Transform>,
-    // overrides checks for token substitution that can fail for large applied suggestions.
-    isApplyingSuggestion?: boolean
+    transformDistribution: Distribution<Transform>
   ): ContextTransition {
     const lexicalModel = this.model;
 
