@@ -20,8 +20,8 @@ import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export class SubstitutionQuotientSpur extends SearchQuotientSpur {
-  public insertLength: number;
-  public leftDeleteLength: number;
+  public readonly insertLength: number;
+  public readonly leftDeleteLength: number;
 
   constructor(
     parentNode: SearchQuotientNode,

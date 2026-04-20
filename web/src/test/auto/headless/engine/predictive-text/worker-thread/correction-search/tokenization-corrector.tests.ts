@@ -21,12 +21,12 @@ import {
   correctionValidForAutoSelect,
   generateSubsetId,
   getBestMatches,
-  LegacyQuotientSpur,
   models,
   PathInputProperties,
   PathResult,
   SearchQuotientNode,
   SearchQuotientRoot,
+  SubstitutionQuotientSpur,
   TokenizationCorrector,
   TokenResult,
   TokenizationResultMapping
@@ -86,22 +86,21 @@ function buildFixture_therefore() {
   const therefTokens: ContextToken[] = []; // as in "therefore"
   const the_efTokens: ContextToken[] = []; // as in "the effect"
 
-  // TODO:  Use SubstitutionQuotientSpur instead!
   let firstTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=0; i < 3; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
   }
 
   the_efTokens.push(new ContextToken(firstTokenNode, false));
 
-  firstTokenNode = new LegacyQuotientSpur(firstTokenNode, [distributions[3][1]], {
+  firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, [distributions[3][1]], {
     ...inputSources[3],
     subsetId: generateSubsetId()
   });
 
   // whitespace token alternate - using the ' ' input instead.
   const whitespaceToken = new ContextToken(
-    new LegacyQuotientSpur(
+    new SubstitutionQuotientSpur(
       new SearchQuotientRoot(plainModel),
       [distributions[3][0]],
       { ...inputSources[3], subsetId: generateSubsetId() }
@@ -112,11 +111,11 @@ function buildFixture_therefore() {
 
   let secondTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=4; i < distributions.length; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], {
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], {
       ...inputSources[i],
       subsetId: generateSubsetId()
     });
-    secondTokenNode = new LegacyQuotientSpur(secondTokenNode, distributions[i], {
+    secondTokenNode = new SubstitutionQuotientSpur(secondTokenNode, distributions[i], {
       ...inputSources[i],
       subsetId: generateSubsetId()
     })
@@ -171,17 +170,16 @@ function buildFixture_terminalWhitespace() {
   const fullTokens: ContextToken[] = [];
   const lastToken: ContextToken[] = [];
 
-  // TODO:  Use SubstitutionQuotientSpur instead!
   let firstTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=0; i < 5; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
   }
 
   fullTokens.push(new ContextToken(firstTokenNode, false));
 
   // whitespace token alternate - using the ' ' input instead.
   const whitespaceToken = new ContextToken(
-    new LegacyQuotientSpur(
+    new SubstitutionQuotientSpur(
       new SearchQuotientRoot(plainModel),
       distributions[5],
       inputSources[5],
@@ -316,14 +314,16 @@ describe('TokenizationCorrector', () => {
       }
 
       searchResult = instance.handleNextNode();
-      // There should be more results that may be found.
+      // There should be more searching to perform before aborting.
       assert.notEqual(searchResult.type, 'none');
 
       do {
         searchResult = instance.handleNextNode();
       } while(searchResult.type == 'intermediate');
 
-      assert.notEqual(searchResult.type, 'none');
+      // However, no other valid results are within correction range
+      // while rooted on 6 input transforms.
+      assert.equal(searchResult.type, 'none');
     });
 
     it('finds corrections for a group of tokens with two correctable', () => {
