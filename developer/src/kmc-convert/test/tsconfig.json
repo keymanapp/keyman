@@ -6,7 +6,6 @@
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",
       "baseUrl": ".",
-      "ignoreDeprecations": "6.0",
     },
   "include": [
       "**/*.tests.ts",
