@@ -42,7 +42,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     const codepointLength = space.codepointLength + insertLength - inputSample.deleteLeft;
 
     super(space, inputs, inputSource, codepointLength);
-    this.queueNodes(this.buildEdgesForNodes(space.previousResults.map(r => r.node)));
+    this.queueNodes(this.buildEdgesFromResults(space.previousResults));
     this.insertLength = insertLength;
     this.leftDeleteLength = inputSample.deleteLeft;
     return;
@@ -52,19 +52,19 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     return new LegacyQuotientSpur(parentNode, inputs, inputSource) as this;
   }
 
-  protected buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>) {
+  protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>) {
     // With a newly-available input, we can extend new input-dependent paths from
     // our previously-reached 'extractedResults' nodes.
-    let outboundNodes = baseNodes.map((node) => {
+    let outboundNodes = priorResults.map((result) => {
       // Hard restriction:  no further edits will be supported.  This helps keep the search
       // more narrowly focused.
-      const substitutionsOnly = node.editCount == 2;
+      const substitutionsOnly = result.editCount == 2;
 
       let deletionEdges: SearchNode[] = [];
       if(!substitutionsOnly) {
-        deletionEdges         = node.buildDeletionEdges(this.inputs, this.spaceId);
+        deletionEdges         = result.buildDeletionEdges(this.inputs, this.spaceId);
       }
-      const substitutionEdges = node.buildSubstitutionEdges(this.inputs, this.spaceId);
+      const substitutionEdges = result.buildSubstitutionEdges(this.inputs, this.spaceId);
 
       // Skip the queue for the first pass; there will ALWAYS be at least one pass,
       // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
@@ -84,12 +84,12 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     const result = super.handleNextNode();
 
     if(result.type == 'complete') {
-      const currentNode = result.mapping.node;
+      const parentResult = result.mapping;
 
       // Forbid a raw edit-distance of greater than 2.
       // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
-      if(currentNode.editCount < 2) {
-        let insertionEdges = currentNode.buildInsertionEdges();
+      if(parentResult.editCount < 2) {
+        let insertionEdges = parentResult.buildInsertionEdges();
         this.queueNodes(insertionEdges);
       }
     }

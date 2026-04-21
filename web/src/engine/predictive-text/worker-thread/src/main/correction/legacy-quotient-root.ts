@@ -48,7 +48,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     return {
       type: 'complete',
       cost: node.currentCost,
-      mapping: new TokenResultMapping(node, this)
+      mapping: new TokenResultMapping(this, node)
     };
   }
 
@@ -57,7 +57,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
   }
 
   get previousResults(): TokenResultMapping[] {
-    return this.processed.map((n) => new TokenResultMapping(n, this));
+    return this.processed.map((n) => new TokenResultMapping(this, n));
   }
 
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {

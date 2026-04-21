@@ -321,7 +321,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return Math.min(localCost, parentCost);
   }
 
-  protected abstract buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>): SearchNode[];
+  protected abstract buildEdgesFromResults(baseNodes: ReadonlyArray<TokenResultMapping>): SearchNode[];
 
   protected queueNodes(nodes: SearchNode[]) {
     this.selectionQueue.enqueueAll(nodes);
@@ -348,7 +348,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       const result = this.parentNode.handleNextNode();
 
       if(result.type == 'complete') {
-        this.queueNodes(this.buildEdgesForNodes([result.mapping.node]));
+        this.queueNodes(this.buildEdgesFromResults([result.mapping]));
       }
 
       return {
@@ -405,7 +405,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       return {
         type: 'complete',
         cost: currentNode.currentCost,
-        mapping: new TokenResultMapping(currentNode, this)
+        mapping: new TokenResultMapping(this, currentNode)
       };
     }
 
@@ -414,7 +414,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
   }
 
   public get previousResults(): TokenResultMapping[] {
-    return Object.values(this.returnedValues ?? {}).map(v => new TokenResultMapping(v, this));
+    return Object.values(this.returnedValues ?? {}).map(v => new TokenResultMapping(this, v));
   }
 
   public get inputSegments(): InputSegment[] {

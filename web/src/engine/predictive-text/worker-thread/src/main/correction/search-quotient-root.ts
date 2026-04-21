@@ -37,7 +37,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
 
     this.rootNode = new SearchNode(model.traverseFromRoot(), generateSpaceSeed(), t => model.toKey(t));
     this.model = model;
-    this.rootResult = new TokenResultMapping(this.rootNode, this);
+    this.rootResult = new TokenResultMapping(this, this.rootNode);
   }
 
   get spaceId(): number {
@@ -78,7 +78,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return {
       type: 'complete',
       cost: 0,
-      mapping: new TokenResultMapping(this.rootNode, this)
+      mapping: new TokenResultMapping(this, this.rootNode)
     };
   }
 

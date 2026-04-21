@@ -12,7 +12,6 @@ import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { PathResult } from './correction-searchable.js';
-import { SearchNode } from './distance-modeler.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
@@ -37,7 +36,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * When new input is received, its entries are then used to append edges to the path in order
    * to find potential paths to reach a new viable end.
    */
-  private completedPaths?: SearchNode[] = [];
+  private completedPaths?: TokenResultMapping[] = [];
 
   /**
    * Acts as a Map that prevents duplicating a correction-search path if reached
@@ -87,8 +86,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.spaceId = generateSpaceSeed();
 
     this.lowestPossibleSingleCost = lowestPossibleSingleCost;
-    this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => r.node);
-    this.completedPaths.forEach((p) => p.spaceId = this.spaceId);
+    this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => new TokenResultMapping(this, r));
     this.selectionQueue.enqueueAll(inboundPaths);
 
     return;
@@ -146,16 +144,14 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.selectionQueue.enqueue(bestPath);
 
     if(currentResult.type == 'complete') {
-      const node = currentResult.mapping.node;
-      node.spaceId = this.spaceId;
-      this.completedPaths?.push(node);
+      this.completedPaths.push(new TokenResultMapping(this, currentResult.mapping));
     }
 
     return currentResult;
   }
 
   public get previousResults(): TokenResultMapping[] {
-    return this.completedPaths?.map((n) => new TokenResultMapping(n, this)) ?? [];
+    return this.completedPaths;
   }
 
   get model(): LexicalModelTypes.LexicalModel {
