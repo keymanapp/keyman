@@ -148,6 +148,9 @@ export class KmnFileWriter {
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
+        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
+        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
+        // as ... > '', producing an invalid kmn rule.
         if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage?.character ?? "";
@@ -201,6 +204,9 @@ export class KmnFileWriter {
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
+        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
+        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
+        // as ... > '', producing an invalid kmn rule.
         if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage?.character ?? "";
@@ -275,6 +281,9 @@ export class KmnFileWriter {
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
 
+        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
+        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
+        // as ... > '', producing an invalid kmn rule.
         if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage?.character ?? "";

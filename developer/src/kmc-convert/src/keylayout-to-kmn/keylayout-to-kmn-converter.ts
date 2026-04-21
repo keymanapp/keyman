@@ -155,6 +155,10 @@ export class KeylayoutToKmnConverter {
 
     // write to object/ConverterToKmnResult
     const outputKmn = processedData ? kmnFileWriter.write(processedData) : null;
+
+    if (!processedData || !outputKmn) {
+      return null;
+    }
     const result: ConverterToKmnResult = {
       artifacts: {
         kmn: {
@@ -992,8 +996,7 @@ export class KeylayoutToKmnConverter {
    */
   public getActionOutputBehaviorKeyModiFromActionIDStateOutput(data: any, modi: string[][] | null, search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
     const actionOutputBehaviorKeyModi = [];
-
-    if ((!modi)||(search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false)|| (!modi))) {
+    if ((!modi) || (search === "") || (search === undefined)  ) {
       return [];
     }
     // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)

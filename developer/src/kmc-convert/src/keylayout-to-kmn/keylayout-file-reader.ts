@@ -19,7 +19,11 @@ export class KeylayoutFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: Keylayout.KeylayoutXMLSourceFile): boolean {
+  public validate(source: Keylayout.KeylayoutXMLSourceFile|null): boolean {
+    if (!source) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+      return false;
+    }
     if (!SchemaValidators.default.keylayout(source)) {
       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
         this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({
@@ -75,7 +79,7 @@ export class KeylayoutFileReader {
    * @param  inputFilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
+  public read(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile | null {
 
     try {
       const data = new TextDecoder().decode(source);
@@ -85,7 +89,7 @@ export class KeylayoutFileReader {
     }
     catch (err) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
-      throw new Error('Failed to parse keylayout file');
+      return null;
     }
   }
 }
