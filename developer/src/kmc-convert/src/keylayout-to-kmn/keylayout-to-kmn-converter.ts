@@ -135,7 +135,7 @@ export class KeylayoutToKmnConverter {
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
 
     const binaryData = this.callbacks.loadFile(inputFilename);
-    const jsonO: Keylayout.KeylayoutXMLSourceFile = KeylayoutReader.read(binaryData);
+    const jsonO: Keylayout.KeylayoutXMLSourceFile|null = KeylayoutReader.read(binaryData);
 
     if (!jsonO) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));

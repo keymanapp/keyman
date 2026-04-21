@@ -26,7 +26,7 @@ export class ConverterMessages {
   static ERROR_IntputFilenameIsRequired = SevError | 0x0002;
   static Error_IntputFilenameIsRequired = () => m(
     this.ERROR_IntputFilenameIsRequired,
-    `An output filename is required for keyboard conversion.`
+    `An Input filename is required for keyboard conversion.`
   );
 
   static ERROR_FileNotFound = SevError | 0x0003;
