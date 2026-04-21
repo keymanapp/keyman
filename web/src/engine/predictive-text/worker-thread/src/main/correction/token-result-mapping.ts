@@ -12,25 +12,24 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
 
+import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export function initTokenResultFilterer() {
-  const priorReturns: Map<string, SearchNode> = new Map();
+  const priorReturns: Map<string, TokenResultMapping> = new Map();
 
   const closure = (searchResult: TokenResultMapping) => {
-    const node = searchResult.node;
-
-    if(node.isFullReplacement) {
+    if(searchResult.isFullReplacement) {
       // If the entry's 'match' fully replaces the input string, we consider it
       // unreasonable and ignore it.  Also, if we've reached this point...
       // we can(?) assume that everything thereafter is as well.
       return false;
     }
 
-    if((priorReturns.get(node.resultKey)?.currentCost ?? Number.MAX_VALUE) > searchResult.totalCost) {
-      priorReturns.set(node.resultKey, node);
+    if((priorReturns.get(searchResult.matchString)?.totalCost ?? Number.MAX_VALUE) > searchResult.totalCost) {
+      priorReturns.set(searchResult.matchString, searchResult);
 
       return true;
     } else {
@@ -42,10 +41,23 @@ export function initTokenResultFilterer() {
 }
 
 export class TokenResultMapping {
-  readonly node: SearchNode;
+  private readonly node: SearchNode;
+  readonly spaceId: number;
 
-  constructor(node: SearchNode) {
-    this.node = node;
+  constructor(node: SearchNode);
+  constructor(mapping: TokenResultMapping, spaceId: number);
+  constructor(mappingBase: SearchNode | TokenResultMapping, spaceId?: number) {
+    if(!mappingBase) {
+      throw new Error("Result-mapping parameters may not be null");
+    }
+
+    if(mappingBase instanceof SearchNode) {
+      this.node = mappingBase;
+      this.spaceId = mappingBase.spaceId;
+    } else {
+      this.node = mappingBase.node;
+      this.spaceId = spaceId;
+    }
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
@@ -60,6 +72,13 @@ export class TokenResultMapping {
     return this.node.resultKey;
   }
 
+  get editCount(): number {
+    return this.node.editCount;
+  }
+
+  get isFullReplacement(): boolean {
+    return this.node.isFullReplacement;
+  }
   /**
    * Gets the number of Damerau-Levenshtein edits needed to reach the node's
    * matchString from the output induced by the input sequence used to reach it.
@@ -91,5 +110,17 @@ export class TokenResultMapping {
 
   get finalTraversal(): LexiconTraversal {
     return this.node.currentTraversal;
+  }
+
+  buildInsertionEdges(): SearchNode[] {
+    return this.node.buildInsertionEdges();
+  }
+
+  buildDeletionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
+    return this.node.buildDeletionEdges(dist, edgeId);
+  }
+
+  buildSubstitutionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
+    return this.node.buildSubstitutionEdges(dist, edgeId);
   }
 }

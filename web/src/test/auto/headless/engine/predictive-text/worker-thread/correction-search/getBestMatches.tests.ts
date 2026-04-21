@@ -21,7 +21,7 @@ function buildTestTimer() {
 }
 
 describe('getBestMatches', () => {
-  const checkRepeatableResults_teh = async (iter: AsyncGenerator<TokenResultMapping, any, any>) => {
+  const checkRepeatableResults_teh = async (iter: AsyncGenerator<Readonly<TokenResultMapping>, any, any>) => {
     const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
     assert.isFalse(firstIterResult.done);
 
