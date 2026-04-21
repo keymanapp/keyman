@@ -88,30 +88,12 @@ export class Rule {
 
 }
 
-/**
- * @brief  member function to find the number of keys defined in a .keykayout file.
- *         We process 'MAX_KEY_IDENTIFIER' keys at maximum.
- *         In case a keylayout has fewer keys defined, we use that smaller number of keys (USED_KEY_IDENTIFIER)
- * @param  data data read from keylayout file 
- * @return usedKeyCount holding the number of keys of a certain keyMap used in a .keykayout file.
- */
-export function findUsedKeysCount(data: any): number {
-
-  let usedKeyCount = KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER;
-  if (data.keyboard.keyMapSet[0].keyMap[0].key.length < usedKeyCount) {
-    // set max to n-1 (keys are zero indexed )
-    usedKeyCount = data.keyboard.keyMapSet[0].keyMap[0].key.length - 1;
-  }
-  return usedKeyCount;
-}
-
 export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly SKIP_COMMENTED_LINES = false;
-  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint
-  static readonly MAX_KEY_IDENTIFIER = 49;                             // At most we use key Nr 0 (A) -> key Nr 49 (Space)
-  static USED_KEY_IDENTIFIER = KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER;   // we use key Nr 0 (A) -> highest available key of .keylayout file
+  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint (U+0020)
+  static readonly MAX_KEY_IDENTIFIER = 49;                        // We only use key Nr 0 (A) -> key Nr 49 (Space)
 
   private options: CompilerOptions;
 
@@ -210,12 +192,8 @@ export class KeylayoutToKmnConverter {
     dataObject.modifiers = modifierBehavior;  // ukelele uses behaviors e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
     dataObject.rules = rules;
 
-    // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
-    KeylayoutToKmnConverter.USED_KEY_IDENTIFIER = findUsedKeysCount(jsonObj);
-
     // fill rules into 'rules' of dataObject
     return this.createRuleData(dataObject, jsonObj);
-
   }
 
   /**
@@ -728,7 +706,7 @@ export class KeylayoutToKmnConverter {
     if (!keylayoutModifier)
       return false;
     // make sure we always have a whitespace before and after each modifier( to distinguish from caps? )
-    return (" " + keylayoutModifier.flat().join(" ").toUpperCase() + " ").indexOf(" CAPS ") >= 0;;
+    return (" " + keylayoutModifier.flat().join(" ").toUpperCase() + " ").indexOf(" CAPS ") >= 0;
   }
 
   /**

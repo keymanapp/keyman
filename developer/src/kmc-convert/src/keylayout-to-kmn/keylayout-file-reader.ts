@@ -51,13 +51,11 @@ export class KeylayoutFileReader {
       boxXmlArray(keyMapSelect, 'modifier');
     }
 
-    boxXmlArray(source.keyMapSet[0], 'keyMap');
-
     for (const keyMapSet of source?.keyMapSet) {
+      boxXmlArray(keyMapSet, 'keyMap');
       for (const keyMap of keyMapSet.keyMap) {
         boxXmlArray(keyMap, 'key');
       }
-      boxXmlArray(keyMapSet, 'keyMap');
     }
 
     boxXmlArray(source?.actions, 'action');
