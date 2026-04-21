@@ -88,7 +88,7 @@ export class KmnFileWriter {
     // (e.g. when in a keylayout file the same modifiers occur in several behaviors thus producing the same rules).
     // This is to filter out those duplicate Rule objects
     const uniqueDataRules: Rule[] = dataUkelele.rules.filter((curr) => {
-      return (!(curr.output === new TextEncoder().encode("") || curr.output === undefined)
+      return (!(curr.output.length === 0 || curr.output === undefined)
         && (curr.key !== "")
         && ((curr.ruleType === "C0")
           || (curr.ruleType === "C1")
