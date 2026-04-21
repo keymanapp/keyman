@@ -162,8 +162,7 @@ export class KeylayoutToKmnConverter {
     const result: ConverterToKmnResult = {
       artifacts: {
         kmn: {
-          data: outputKmn ?? new Uint8Array(0),
-          filename: processedData?.kmnFilename ?? ""
+          data: outputKmn, filename: processedData.kmnFilename
         }
       }
     };
@@ -996,7 +995,7 @@ export class KeylayoutToKmnConverter {
    */
   public getActionOutputBehaviorKeyModiFromActionIDStateOutput(data: any, modi: string[][] | null, search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
     const actionOutputBehaviorKeyModi = [];
-    if ((!modi) || (search === "") || (search === undefined)  ) {
+    if ((!modi) || (search === "") || (search === undefined)) {
       return [];
     }
     // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
