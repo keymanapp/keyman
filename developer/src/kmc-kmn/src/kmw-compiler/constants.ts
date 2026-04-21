@@ -10,7 +10,7 @@ export const
 // Defines the various 'special' modifier/control/non-printing keys on keyboards.
 //
 // `CSpecialText*` must be kept in sync with:
-// * /web/src/engine/osk/src/specialCharacters.ts
+// * /web/src/engine/src/osk/specialCharacters.ts
 // * /developer/src/tike/xml/layoutBuilder/constants.js
 // * /core/include/ldml/keyman_core_ldml.ts
 //

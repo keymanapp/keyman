@@ -70,7 +70,7 @@ function do_test() {
   # shellcheck disable=SC2016
   echo 'function $(v) {v()}' >> ./test/kmw/_imported_layoutbuilder_constants.js
   cat "${KEYMAN_ROOT}/developer/src/tike/xml/layoutbuilder/constants.js" >> ./test/kmw/_imported_layoutbuilder_constants.js
-  cp "${KEYMAN_ROOT}/web/src/engine/osk/src/specialCharacters.ts" ./test/kmw/_imported_web_osk_specialCharacters.ts
+  cp "${KEYMAN_ROOT}/web/src/engine/src/osk/specialCharacters.ts" ./test/kmw/_imported_web_osk_specialCharacters.ts
 
   typescript_run_eslint_mocha_tests 80
 }
