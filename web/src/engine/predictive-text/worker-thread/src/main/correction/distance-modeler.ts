@@ -597,14 +597,14 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
   spaceQueue.enqueueAll(searchModules);
 
-  let currentReturns: {[resultKey: string]: SearchNode} = {};
+  let currentReturns: {[resultKey: string]: TokenResultMapping} = {};
 
   // Stage 2:  the fun part; actually searching!
   do {
     const entry: TokenResultMapping = timer.time(() => {
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
-        currentReturns[result.node.resultKey] = result.node;
+        currentReturns[result.matchString] = result;
         return result;
       }
 
@@ -631,10 +631,11 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         //
         // If it occurs, we should re-emit it - it'll show up earlier in the
         // suggestions that way, as it should.
-        if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
-          currentReturns[node.resultKey] = node;
+        if((currentReturns[node.resultKey]?.totalCost ?? Number.MAX_VALUE) > newResult.cost) {
+          const trm = new TokenResultMapping(newResult.finalNode)
+          currentReturns[node.resultKey] = trm;
           // Do not track yielded time.
-          return new TokenResultMapping(newResult.finalNode);
+          return trm;
         }
       }
 

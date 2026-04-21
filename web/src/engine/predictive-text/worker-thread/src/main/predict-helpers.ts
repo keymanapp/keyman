@@ -393,7 +393,7 @@ export function determineSuggestionAlignment(
 export function buildAndMapPredictions(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: TokenResultMapping
+  match: Readonly<TokenResultMapping>
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
   const searchSpace = tokenization.tail.searchModule;
@@ -536,7 +536,7 @@ export async function correctAndEnumerate(
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
   for await(const match of getBestMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
-    const tokenization = tokenizations.find(t => t.spaceId == match.node.spaceId);
+    const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
     // If our 'match' results in fully deleting the new token, reject it and try again.
     if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
@@ -548,7 +548,7 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    if(match.node.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
+    if(match.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
       continue;
     }
 
