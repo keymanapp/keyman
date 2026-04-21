@@ -40,24 +40,24 @@ export interface KeyboardDetails {
     /**
      * The user-friendly name of the country in which the language is spoken. (Optional)
      */
-    CountryName: string | null,
+    CountryName?: string,
     /**
      * A three-letter code corresponding to the country. (Optional)
      */
-    CountryCode: string| null,
+    CountryCode?: string,
     /**
      * Deprecated. A unique identifier for the keyboard. (Use 'InternalName' instead.)
      */
-    KeyboardID: string | null,
+    KeyboardID?: string,
     /**
      * The font packaged with the keyboard to support its use. (Optional)
      */
-    Font: InternalKeyboardFont | null,
+    Font?: InternalKeyboardFont,
     /**
      * The font packaged with the keyboard to properly display specialized
      * OSK characters. (Optional)
      */
-    OskFont: InternalKeyboardFont | null,
+    OskFont?: InternalKeyboardFont,
     /**
      * Indicates whether the keyboard is designed for right-to-left scripts,
      * null if the keyboard hasn't been loaded yet (and thus the value is unknown).
