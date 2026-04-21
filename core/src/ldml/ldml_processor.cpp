@@ -179,21 +179,13 @@ ldml_processor::process_event(
   ldml_state.clear();
 
   try {
-    if (!is_key_down) {
-      process_key_up(ldml_state);
+    if (vk == KM_CORE_VKEY_BKSP) {
+      process_backspace(ldml_state);
+    } else if (is_key_down) {
+      process_key_down(ldml_state);
     } else {
-      switch (vk) {
-      // Currently, only one VK gets spoecial treatment.
-      // Special handling for backspace VK
-      case KM_CORE_VKEY_BKSP:
-        process_backspace(ldml_state);
-        break;
-      default:
-        // all other VKs
-        process_key_down(ldml_state);
-      } // end of switch
-    } // end of normal processing
-
+      process_key_up(ldml_state);
+    }
     // all key-up and key-down events end up here.
     // commit the ldml state into the core state
     ldml_state.commit();
@@ -210,11 +202,31 @@ void
 ldml_processor::process_key_up(ldml_event_state &ldml_state)
     const {
   // TODO-LDML: Implement caps lock handling
-  ldml_state.clear();
+
+  // Look up the key
+  bool found = false;
+  const std::u16string key_str = keys.lookup(ldml_state.get_vk(), ldml_state.get_modifier_state(), found);
+
+  if (!found) {
+    ldml_state.emit_passthrough_keystroke();
+  }
 }
 
 void
 ldml_processor::process_backspace(ldml_event_state &ldml_state) const {
+  if (ldml_state.get_modifier_state() & K_MODIFIERFLAG) {
+    // we never process modifier+bksp
+    ldml_state.emit_passthrough_keystroke();
+    return;
+  }
+
+  if (!ldml_state.is_key_down()) {
+    if (!ldml_state.get_state()->backspace_handled_internally()) {
+      ldml_state.emit_passthrough_keystroke();
+    }
+    return;
+  }
+
   if (!!bksp_transforms) {
     // process with an empty string via the bksp transforms
     auto matchedContext = process_output(ldml_state, std::u32string(), bksp_transforms.get());
@@ -233,17 +245,17 @@ void ldml_event_state::emit_backspace() {
   // Find out what the last actual character was and remove it.
   // attempt to get the last char
   // TODO-LDML: emoji backspace
-  auto end = state->context().rbegin();
-  while (end != state->context().rend()) {
-    if (end->type == KM_CORE_CT_CHAR) {
+  while (!state->context().empty()) {
+    auto end = state->context().back();
+    if (end.type == KM_CORE_CT_CHAR) {
       actions.code_points_to_delete++;
       state->context().pop_back();
       return;
     }
     // else loop again
-    assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+    assert(end.type != KM_CORE_CT_END);  // inappropriate here.
     state->context().pop_back();
- }
+  }
   /*
     We couldn't find a character at end of context (context is empty),
     so we'll pass the backspace keystroke on to the app to process; the
@@ -415,26 +427,25 @@ void
 ldml_event_state::remove_text(std::u32string &str, size_t length) {
   // str is the string to remove, so it should be at least as long as length
   assert(length <= str.length());
-  /** track how many context items have been removed, via push_backspace() */
-  size_t contextRemoved = 0;
-  for (auto c = state->context().rbegin(); length > 0 && c != state->context().rend(); c++, contextRemoved++) {
+  while (length > 0 && !state->context().empty()) {
 #ifndef NDEBUG
     /** last char of context */
     km_core_usv lastCtx = str.back();
 #endif
-    uint8_t type        = c->type;
+    auto lastStateCtx = state->context().back();
+    uint8_t type = lastStateCtx.type;
     assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
     if (type == KM_CORE_BT_CHAR) {
       // single char, drop it
       length--;
-      assert(c->character == lastCtx);
+      assert(lastStateCtx.character == lastCtx);
       str.pop_back();
       // Cause prior char to be removed
       actions.code_points_to_delete++;
     } else if (type == KM_CORE_BT_MARKER) {
       assert(length >= 3);
       // #3 - the marker.
-      assert(lastCtx == c->marker);
+      assert(lastCtx == lastStateCtx.marker);
       str.pop_back();
       length--;
       // #2 - the code
@@ -447,13 +458,9 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
       // Nothing in actions
       length--;
     }
-  }
-  assert(length == 0);
-  // now, pop the context items
-  for (size_t i = 0; i < contextRemoved; i++) {
-    // we don't pop during the above loop because the iterator gets confused
     state->context().pop_back();
   }
+  assert(length == 0);
 }
 
 void
@@ -537,10 +544,10 @@ ldml_event_state::ldml_event_state(
     uint8_t i,
     uint16_t e) {
   this->state          = s;
-  this->vk             = v;
-  this->modifier_state = m;
-  this->is_key_down    = i;
-  this->event_flags    = e;
+  this->_vk             = v;
+  this->_modifier_state = m;
+  this->_is_key_down    = i;
+  this->_event_flags    = e;
 
   actions.persist_options = new km_core_option_item[1];
   actions.persist_options[0] = NULL_OPTIONS[0];
