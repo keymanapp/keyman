@@ -17,7 +17,7 @@ builder_describe "Builds Keyman for macOS." \
   "build" \
   "publish     Publishes debug info to Sentry and builds DMG, .download_info for distribution" \
   "test" \
-  "install     Installs result of Keyman4MacIM locally." \
+  "install     Installs Keyman.app and Keyman Configuration.app locally." \
   ":engine     KeymanEngine4Mac" \
   ":app        Keyman4MacIM" \
   ":configapp  Keyman Configuration app" \
@@ -358,11 +358,14 @@ do_install() {
   if builder_is_ci_build; then
     builder_die "build.sh install should not be run on CI"
   elif ! builder_has_option --quick && ! builder_is_debug_build; then
+    echo "about to notarize"
     # do not notarize if quick option is specified or not a relase build
     # notarization fails unless signed with Developer ID certificate
     # which is not used in debug builds
     do_notarize
   else
+    alternate_sign_app
+    echo "not notarizing"
     if [ "$(spctl --status)" == "assessments enabled" ]; then
       echo
       builder_warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
@@ -372,9 +375,11 @@ do_install() {
   fi
 
   builder_heading "Attempting local deployment with command:"
+
   KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
-  builder_echo info "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
-  "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
+  KM4_CONFIG_APP_BASE_PATH="$CONFIGAPP_BASE_PATH/build/Build/Products/$CONFIG"
+  builder_echo info "$KEYMAN_MAC_BASE_PATH/local-deploy.sh \"$KM4MIM_APP_BASE_PATH\" \"$KM4_CONFIG_APP_BASE_PATH\""
+  "$KEYMAN_MAC_BASE_PATH/local-deploy.sh" "$KM4MIM_APP_BASE_PATH" "$KM4_CONFIG_APP_BASE_PATH"
 }
 
 do_publish() {
