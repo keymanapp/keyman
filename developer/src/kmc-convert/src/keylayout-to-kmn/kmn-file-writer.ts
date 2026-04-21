@@ -9,7 +9,6 @@
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn-converter.js';
-import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 export interface messageCharacter {
@@ -38,12 +37,7 @@ export class KmnFileWriter {
     if (dataRules)
       data += dataStores + dataRules;
 
-    try {
-      return new TextEncoder().encode(data);
-    } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename, errorText: err }));
-      return null;
-    }
+    return new TextEncoder().encode(data);
   }
 
   /**
@@ -51,7 +45,10 @@ export class KmnFileWriter {
    * @param  dataUkelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public writeKmnFileHeader(dataUkelele: ProcessedData): string {
+  public writeKmnFileHeader(dataUkelele: ProcessedData | null): string {
+    if (!dataUkelele) {
+      return "";
+    }
 
     let data: string = "";
 
@@ -78,8 +75,10 @@ export class KmnFileWriter {
    * @param  dataUkelele an object containing all data read from a .keylayout file
    * @return string -  all rules to be printed
    */
-  public writeDataRules(dataUkelele: ProcessedData): string {
-
+  public writeDataRules(dataUkelele: ProcessedData | null): string {
+    if (!dataUkelele) {
+      return "";
+    }
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     let data: string = "";
 
@@ -95,7 +94,7 @@ export class KmnFileWriter {
           || (curr.ruleType === "C2" && (curr.deadkey !== ""))
           || (curr.ruleType === "C3" && (curr.deadkey !== "") && (curr.prevDeadkey !== "")))
       );
-    }).reduce((unique, o) => {
+    }).reduce<Rule[]>((unique, o) => {
       if (!unique.some((obj: Rule) =>
         new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
 
@@ -112,7 +111,7 @@ export class KmnFileWriter {
         unique.push(o);
       }
       return unique;
-    }, []);
+    }, [] as Rule[]);
 
     //................................................ C0 C1 ................................................................
 
@@ -149,10 +148,13 @@ export class KmnFileWriter {
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
+        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
+        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
+        // as ... > '', producing an invalid kmn rule.
+        if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          versionOutputCharacter = characterMessage?.character ?? "";
+          warnText[2] = characterMessage?.message ?? "";
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -202,10 +204,13 @@ export class KmnFileWriter {
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
+        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
+        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
+        // as ... > '', producing an invalid kmn rule.
+        if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          versionOutputCharacter = characterMessage?.character ?? "";
+          warnText[2] = characterMessage?.message ?? "";
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -276,10 +281,13 @@ export class KmnFileWriter {
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
 
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
+        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
+        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
+        // as ... > '', producing an invalid kmn rule.
+        if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          versionOutputCharacter = characterMessage?.character ?? "";
+          warnText[2] = characterMessage?.message ?? "";
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -486,7 +494,7 @@ export class KmnFileWriter {
             + " "
             + amb_1_1[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output))?.character ?? "")
             + "\' ");
       }
 
@@ -497,7 +505,7 @@ export class KmnFileWriter {
             + " "
             + dup_1_1[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output))?.character ?? "")
             + "\' ");
       }
     }
@@ -582,7 +590,7 @@ export class KmnFileWriter {
             + " "
             + amb_3_3[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output))?.character ?? "")
             + "\' ");
       }
 
@@ -595,7 +603,7 @@ export class KmnFileWriter {
             + " "
             + dup_3_3[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output))?.character ?? "")
             + "\' ");
       }
 
@@ -723,7 +731,7 @@ export class KmnFileWriter {
             + " "
             + amb_6_3[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output))?.character ?? "")
             + "\' ");
       }
 
@@ -736,7 +744,7 @@ export class KmnFileWriter {
             + " "
             + dup_6_3[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output))?.character ?? "")
             + "\' ");
       }
 
@@ -797,7 +805,7 @@ export class KmnFileWriter {
             + " "
             + amb_6_6[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output))?.character ?? "")
             + "\' ");
       }
 
@@ -810,7 +818,7 @@ export class KmnFileWriter {
             + " "
             + dup_6_6[0].key
             + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character
+            + (this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output))?.character ?? "")
             + "\' ");
       }
     }
@@ -856,7 +864,7 @@ export class KmnFileWriter {
   *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
   *         null in case of an empty string or null or undefined input
   */
-  public writeCharacterOrUnicode(ctr: string, msg: string = ""): messageCharacter {
+  public writeCharacterOrUnicode(ctr: string, msg: string = ""): messageCharacter | null {
 
     if ((ctr === null) || (ctr === undefined) || (ctr.length === 0)) {
       return null;
@@ -874,10 +882,10 @@ export class KmnFileWriter {
 
     // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
     const ctr_val = ((m_uni || m_hex || m_dec) ?
-      m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
+      m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : m_dec ? parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
     );
 
-    // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
+    // for control characters in 'U+...', '&#x...' or '&#...' format as well as in "" format
     if ((ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
 
       // for control characters in 'U+...', '&#x...'  or '&#...' format
@@ -900,7 +908,7 @@ export class KmnFileWriter {
       }
     }
     else {
-      out.character = this.convertToUnicodeCharacter(ctr);;
+      out.character = this.convertToUnicodeCharacter(ctr) ?? "";
     }
     return out;
   }
@@ -911,7 +919,7 @@ export class KmnFileWriter {
    * @param  inputString the value that will converted
    * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
    */
-  public convertToUnicodeCharacter(inputString: string): string {
+  public convertToUnicodeCharacter(inputString: string): string | undefined {
 
 
     // null, undefined will later be refused for conversion

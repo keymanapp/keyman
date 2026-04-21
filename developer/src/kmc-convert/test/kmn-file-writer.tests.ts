@@ -63,7 +63,7 @@ describe('KmnFileWriter', function () {
 
     it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
       const writtenCorrectName = sutW.writeKmnFileHeader(converted);
-      assert.equal(writtenCorrectName, (outExpectedFirst + converted.keylayoutFilename + outExpectedLast));
+      assert.equal(writtenCorrectName, (outExpectedFirst + (converted?.keylayoutFilename ?? "") + outExpectedLast));
     });
   });
 
@@ -74,7 +74,7 @@ describe('KmnFileWriter', function () {
       ["&#x1234;", 'ሴ'],
       ["&#x1F60E;", '😎'],
       ["&#x0002;", '\u0002'],
-      ["&#x1000000;",undefined ],
+      ["&#x1000000;", undefined],
       ["&#97;", 'a'],
       ["&#4660;", 'ሴ'],
       ["&#128518;", '😆'],
@@ -95,12 +95,52 @@ describe('KmnFileWriter', function () {
       ["␤", '␤'],
       ["␕", '␕'],
       ["", ''],
-      [undefined, undefined],
-      [null, undefined]
+      [null, undefined],
+      ["&lt;", '<'],
+      ["&Gt", undefined],
+      ["U+D801", undefined],
+      ["&#xD801;", undefined],
+      ["&#55297;", undefined],
+      ["&#55297;", undefined],
+      ["U+D801", undefined],
+      ["&#xmmm;", undefined],
+      ["&#x11FFFF;", undefined],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
         const result = sutW.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
+      });
+    });
+  });
+
+  describe('writeCharacterOrUnicode ', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ["A", "Msg", "A", "Msg"],
+      ["ሴ", "Msg", "ሴ", "Msg"],
+      ["😀", "Msg", "😀", "Msg"],
+      ["ẘ", "Msg", "ẘ", "Msg"],
+      ["U+0001", "Msg", "U+0001", "Msg; Use of a control character "],
+      ["U+0061", "Msg", "a", "Msg"],
+      ["&#x0002;", "Msg", "U+0002", "Msg; Use of a control character "],
+      ["&#x1234;", "Msg", 'ሴ', "Msg",],
+      ["&#0003;", "Msg", "U+0003", "Msg; Use of a control character "],
+      ["&#4666;", "Msg", "ሺ", "Msg",],
+      [null, "Msg", null, null],
+      [undefined, "Msg", null, null],
+      ["", "Msg", null, null],
+      ["", "Msg", "U+0006", "Msg; Use of a control character "],
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[2] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, values[1] as string);
+        if (result) {
+          assert.equal(result.character, values[2]);
+          assert.equal(result.message, values[3]);
+        }
+        else {
+          assert.isNull(values[2]);
+          assert.isNull(values[3]);
+        }
       });
     });
   });
