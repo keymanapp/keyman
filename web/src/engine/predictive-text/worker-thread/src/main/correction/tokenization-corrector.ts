@@ -94,6 +94,8 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
 
     if(tailCorrectionLength < 1) {
       throw new Error(`Length for correction near tail may not be 0.`);
+    } else if(tailCorrectionLength > tokenization.tokens.length) {
+      throw new Error(`Tail correction length must not extend actual token count`);
     }
 
     const correctables = this.orderedTokens;
