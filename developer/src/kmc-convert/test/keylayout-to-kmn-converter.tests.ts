@@ -36,7 +36,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
   });
 
-  describe('RunTestFiles resulting in errors ', function () {
+  describe('RunTestFiles resulting in errors', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
       [makePathToFixture('../data/Test_DifferentAmountOfMapSelectInKeyMapERROR.keylayout')],
