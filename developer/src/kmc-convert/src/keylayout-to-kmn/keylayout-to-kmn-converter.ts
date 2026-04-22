@@ -162,7 +162,8 @@ export class KeylayoutToKmnConverter {
     const result: ConverterToKmnResult = {
       artifacts: {
         kmn: {
-          data: outputKmn, filename: processedData.kmnFilename
+          data: outputKmn ?? new Uint8Array(0),
+          filename: processedData?.kmnFilename ?? ""
         }
       }
     };
