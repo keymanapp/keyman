@@ -207,10 +207,14 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       };
     }
 
+    // Note that at this stage, we do not requeue the 'predictable' - other
+    // correctables may exist and need their first corrections before we look
+    // for other corrective variations of the 'predictable'.
+
     // Assertion:  tokenResult.type == 'complete'.  We have a valid correction for
     // at least some part of the tokenization - the represented context variant.
     if(correctableToUpdate != this._predictable) {
-      // Lock the 'bound' token now that a valid correction for it has been
+      // Lock the 'correctable' token now that a valid correction for it has been
       // found. We only consider a single correction for most of a
       // tokenization's tokens, generally only allowing correction variation for
       // the last represented token.
@@ -221,9 +225,11 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     // Either way, update the token -> correction-string map with the obtained result.
     this._lockedTokenResults.set(correctableToUpdate, tokenResult.mapping);
 
-    // If we have a correction for all components in need of correction, allow
-    // searching for alternative corrections for the 'unbound' token.
-    if(this._correctables.length == 0 && this._predictable) {
+    // If we have a correction for all components in need of correction, then
+    // search for alternative corrections for the 'predictable' token - even if
+    // we previously stopped searching for more because we found its first
+    // correction before finding one for at least one other 'correctable'.
+    if(this._correctables.length == 0 && this.selectionQueue.count == 0 && this._predictable) {
       this.selectionQueue.enqueue(this._predictable);
     }
 
@@ -236,7 +242,6 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     }
 
     // Determine the proper return type and construct the proper return object accordingly.
-    // const resultMap = new Map(this.lockedTokenResults);
     return {
       type: 'complete',
       cost,
