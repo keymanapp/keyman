@@ -524,9 +524,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
    *    ancestry properly handle quotient-path variance in unit tests.
    */
   get edgeKey(): string {
-    const inputSrc = this.inputSource;
-    const segment = inputSrc.segment;
-    return `E${inputSrc.subsetId}:${segment.start}${segment.end !== undefined ? `-${segment.end}` : ''}`;
+    return `E${this.inputSource?.subsetId ?? ''}:${this.splitClusteringKey}`;
   }
 
   isSameNode(space: SearchQuotientNode): boolean {
@@ -553,11 +551,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
 
   // Used to identify cluster-compatible components of SearchPaths during SearchCluster split operations.
   get splitClusteringKey(): string {
-    const pathSrc = this.inputSource;
-    if(!pathSrc) {
-      return '';
-    }
-
-    return `${pathSrc.segment.start}${pathSrc.segment.end == undefined ? '' : `-${pathSrc.segment.end}`}`;
+    const spurSeg = this.inputSource?.segment;
+    return `${spurSeg?.start ?? 0}${spurSeg?.end == undefined ? '' : `-${spurSeg.end}`}`;
   }
 }
