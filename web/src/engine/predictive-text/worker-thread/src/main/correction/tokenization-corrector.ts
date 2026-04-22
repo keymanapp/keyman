@@ -195,6 +195,18 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     const correctableToUpdate = this.selectionQueue.dequeue();
     const tokenResult = correctableToUpdate?.handleNextNode();
 
+    const delistCorrectable = () => {
+      if(correctableToUpdate != this._predictable) {
+        // Lock the 'correctable' token now that either a valid correction for
+        // it has been found or all possible corrections are exhausted. We only
+        // consider a single correction for most of a tokenization's tokens,
+        // generally only allowing correction variation for the last represented
+        // token.
+        this._correctables.splice(this._correctables.indexOf(correctableToUpdate), 1);
+        this._uncorrectables.push(correctableToUpdate);
+      }
+    }
+
     if(tokenResult.type == 'none') {
       // Transition the node from 'correctable' to 'uncorrectable' - we were
       // unable to find valid corrections for it.
@@ -210,21 +222,14 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       if(correctableToUpdate == this._predictable) {
         this._uncorrectables.push(correctableToUpdate);
         delete this._predictable;
+      } else {
+        delistCorrectable();
       }
-      // else - while we COULD remove the correctable from the correctables
-      // list, there's no real impact to leaving it where it is.
     } else if(tokenResult.type == 'complete') {
       // Note that at this stage, we do not requeue the 'predictable' - other
       // correctables may exist and need their first corrections before we look
       // for other corrective variations of the 'predictable'.
-      if(correctableToUpdate != this._predictable) {
-        // Lock the 'correctable' token now that a valid correction for it has been
-        // found. We only consider a single correction for most of a
-        // tokenization's tokens, generally only allowing correction variation for
-        // the last represented token.
-        this._correctables.splice(this._correctables.indexOf(correctableToUpdate), 1);
-        this._uncorrectables.push(correctableToUpdate);
-      }
+      delistCorrectable();
 
       // Either way, update the token -> correction-string map with the obtained result.
       this._lockedTokenResults.set(correctableToUpdate, tokenResult.mapping);
