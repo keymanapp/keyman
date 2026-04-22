@@ -4,108 +4,102 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <item
-        android:id="@+id/nav_about_current_keyboard"
-        android:icon="@drawable/ic_keyboard"
-        android:title="@string/drawer_about_current_keyboard"
-        app:actionLayout="@layout/nav_right_icon_item" />
+    <group android:id="@+id/nav_group_setup">
+        <item
+            android:id="@+id/nav_about_current_keyboard"
+            android:icon="@drawable/ic_keyboard"
+            android:title="@string/drawer_about_current_keyboard"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_installed_languages"
-        android:icon="@drawable/ic_folder_open"
-        android:title="@string/drawer_menu_installed_languages"
-        app:actionLayout="@layout/nav_right_icon_item" />
+        <item
+            android:id="@+id/nav_installed_languages"
+            android:icon="@drawable/ic_folder_open"
+            android:title="@string/drawer_menu_installed_languages"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_install_keyboard"
-        android:icon="@drawable/ic_content_add"
-        android:title="@string/install_keyboard_or_dictionary"
-        app:actionLayout="@layout/nav_right_icon_item" />
+        <item
+            android:id="@+id/nav_install_keyboard"
+            android:icon="@drawable/ic_content_add"
+            android:title="@string/install_keyboard_or_dictionary"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_checkbox_enable_system_keyboard"
-        android:icon="@drawable/ic_keyboard_on_screen"
-        android:title="@string/enable_system_keyboard"
-        app:actionLayout="@layout/nav_checkbox_item" />
+        <item
+            android:id="@+id/nav_checkbox_enable_system_keyboard"
+            android:icon="@drawable/ic_keyboard_on_screen"
+            android:title="@string/enable_system_keyboard"
+            app:actionLayout="@layout/nav_checkbox_item" />
 
-    <item
-        android:id="@+id/nav_checkbox_set_default_keyboard"
-        android:icon="@drawable/ic_keyboard_default"
-        android:title="@string/set_keyman_as_default"
-        app:actionLayout="@layout/nav_checkbox_item" />
+        <item
+            android:id="@+id/nav_checkbox_set_default_keyboard"
+            android:icon="@drawable/ic_keyboard_default"
+            android:title="@string/set_keyman_as_default"
+            app:actionLayout="@layout/nav_checkbox_item" />
+    </group>
 
-    <item
-        android:id="@+id/nav_divider_top"
-        android:enabled="false"
-        android:title=""
-        app:actionLayout="@layout/nav_divider" />
+    <group android:id="@+id/nav_group_preferences">
+        <item
+            android:id="@+id/nav_display_language"
+            android:icon="@drawable/ic_translate"
+            android:title="@string/change_display_language"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_display_language"
-        android:icon="@drawable/ic_translate"
-        android:title="@string/change_display_language"
-        app:actionLayout="@layout/nav_right_icon_item" />
+        <item
+            android:id="@+id/nav_keyboard_height"
+            android:icon="@drawable/ic_height"
+            android:title="@string/adjust_keyboard_height"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_keyboard_height"
-        android:icon="@drawable/ic_height"
-        android:title="@string/adjust_keyboard_height"
-        app:actionLayout="@layout/nav_right_icon_item" />
+        <item
+            android:id="@+id/nav_longpress_delay"
+            android:icon="@drawable/ic_action_timelapse"
+            android:title="@string/adjust_longpress_delay"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_longpress_delay"
-        android:icon="@drawable/ic_action_timelapse"
-        android:title="@string/adjust_longpress_delay"
-        app:actionLayout="@layout/nav_right_icon_item" />
+        <item
+            android:id="@+id/nav_spacebar_caption"
+            android:icon="@drawable/spacebar_key_bg"
+            android:title="@string/spacebar_caption" />
 
-    <item
-        android:id="@+id/nav_spacebar_caption"
-        android:icon="@drawable/spacebar_key_bg"
-        android:title="@string/spacebar_caption" />
+        <item
+            android:id="@+id/nav_toggle_show_osk"
+            android:icon="@drawable/ic_keyboard_physical"
+            android:title="@string/show_osk"
+            app:actionLayout="@layout/nav_switch_item" />
 
-    <item
-        android:id="@+id/nav_toggle_show_osk"
-        android:icon="@drawable/ic_keyboard_physical"
-        android:title="@string/show_osk"
-        app:actionLayout="@layout/nav_switch_item" />
+        <item
+            android:id="@+id/action_get_started"
+            android:icon="@drawable/ic_action_get_started"
+            android:title="@string/drawer_menu_show_get_started"
+            app:actionLayout="@layout/nav_switch_item" />
 
-    <item
-        android:id="@+id/action_get_started"
-        android:icon="@drawable/ic_action_get_started"
-        android:title="@string/drawer_menu_show_get_started"
-        app:actionLayout="@layout/nav_switch_item" />
+        <item
+            android:id="@+id/nav_toggle_send_crash_report"
+            android:icon="@drawable/ic_warning"
+            android:title="@string/show_send_crash_report"
+            app:actionLayout="@layout/nav_switch_item" />
 
-    <item
-        android:id="@+id/nav_toggle_send_crash_report"
-        android:icon="@drawable/ic_warning"
-        android:title="@string/show_send_crash_report"
-        app:actionLayout="@layout/nav_switch_item" />
+        <item
+            android:id="@+id/nav_palette"
+            android:icon="@drawable/ic_palette"
+            android:title="@string/theme" />
+    </group>
 
-    <item
-        android:id="@+id/nav_palette"
-        android:icon="@drawable/ic_palette"
-        android:title="@string/theme" />
+    <group android:id="@+id/nav_group_help">
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/ic_info_outline"
+            android:title="@string/drawer_menu_help"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_divider_help"
-        android:enabled="false"
-        android:title=""
-        app:actionLayout="@layout/nav_divider" />
+        <item
+            android:id="@+id/nav_help_active_keyboard"
+            android:icon="@drawable/ic_info_outline"
+            android:title="@string/drawer_title_active_keyboard_help_fallback"
+            app:actionLayout="@layout/nav_right_icon_item" />
 
-    <item
-        android:id="@+id/nav_help"
-        android:icon="@drawable/ic_info_outline"
-        android:title="@string/drawer_menu_help"
-        app:actionLayout="@layout/nav_right_icon_item" />
-
-    <item
-        android:id="@+id/nav_help_active_keyboard"
-        android:icon="@drawable/ic_info_outline"
-        android:title="@string/drawer_title_active_keyboard_help_fallback"
-        app:actionLayout="@layout/nav_right_icon_item" />
-
-    <item
-        android:id="@+id/action_update_keyboards"
-        android:icon="@drawable/ic_cloud_download_mode"
-        android:title="@string/drawer_menu_update_keyboards" />
+        <item
+            android:id="@+id/action_update_keyboards"
+            android:icon="@drawable/ic_cloud_download_mode"
+            android:title="@string/drawer_menu_update_keyboards" />
+    </group>
 </menu>

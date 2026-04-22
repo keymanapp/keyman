@@ -92,6 +92,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.MenuCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -297,6 +298,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     navigationView = findViewById(R.id.nav_view);
     navigationView.setItemMaxLines(4);
+    MenuCompat.setGroupDividerEnabled(navigationView.getMenu(), true);
     navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
       @Override
       public boolean onNavigationItemSelected(@NonNull MenuItem item) {
