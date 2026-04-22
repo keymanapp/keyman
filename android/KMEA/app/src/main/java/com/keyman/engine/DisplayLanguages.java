@@ -48,6 +48,8 @@ public class DisplayLanguages {
       new DisplayLanguageType("ff-NG", "Ɗemngal Fulfulde"),
       new DisplayLanguageType("de-DE", "Deutsch (German)"),
       new DisplayLanguageType("en", "English"),
+      new DisplayLanguageType("es-ES", "Español (Spanish)"),
+      new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
       new DisplayLanguageType("fr-FR", "français (French)"),
       new DisplayLanguageType("ha-HG", "Hausa"),
       new DisplayLanguageType("in-ID", "Indonesian"),
@@ -66,10 +68,8 @@ public class DisplayLanguages {
       new DisplayLanguageType("pt-PT", "Português de Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("ru-RU", "Русский (Russian)"),
-      new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
-      new DisplayLanguageType("es-ES", "Español (Spanish)"),
-      new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
-      new DisplayLanguageType("sv-SE", "svenska (Swedish)"),
+      new DisplayLanguageType("shu-latn", "Shuwa (Latin script)"),
+      new DisplayLanguageType("sv-SE", "Svenska (Swedish)"),
       new DisplayLanguageType("vi-VN", "Tiếng Việt (Vietnamese)"),
       new DisplayLanguageType("uk-UA", "Українська (Ukrainian)"),
       new DisplayLanguageType("hia-NG", "Waha")
