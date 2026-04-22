@@ -29,6 +29,12 @@ export const QUEUE_NODE_COMPARATOR: QueueComparator<SearchNode> = function(arg1,
   return arg1.currentCost - arg2.currentCost;
 }
 
+/**
+ * Determines the total correction + edit cost allowed for any correction beyond
+ * the most optimistic probability for a token.
+ */
+export const MAX_EDIT_THRESHOLD_FACTOR = 2.5;
+
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export abstract class SearchQuotientSpur implements SearchQuotientNode {
@@ -377,7 +383,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     // Allows a little 'wiggle room' + 2 "hard" edits.
     // Can be important if needed characters don't actually exist on the keyboard
     // ... or even just not the then-current layer of the keyboard.
-    if(currentNode.currentCost > this.lowestPossibleSingleCost + 2.5 * EDIT_DISTANCE_COST_SCALE) {
+    if(currentNode.currentCost > this.lowestPossibleSingleCost + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE) {
       return unmatchedResult;
     }
 

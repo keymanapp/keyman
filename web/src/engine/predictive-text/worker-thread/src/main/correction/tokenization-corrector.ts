@@ -15,6 +15,8 @@ import { CorrectionSearchable, PathResult } from "./correction-searchable.js";
 import { ContextTokenization } from "./context-tokenization.js";
 import { SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenizationResultMapping } from "./tokenization-result-mapping.js";
+import { EDIT_DISTANCE_COST_SCALE } from "./distance-modeler.js";
+import { MAX_EDIT_THRESHOLD_FACTOR } from "./search-quotient-spur.js";
 
 // PathResult needs to be generic:
 // - a result for correcting a single Token - "TokenResult"?
@@ -120,8 +122,8 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       const lockedResult = uncorrectable.bestExample;
       this._lockedTokenResults.set(uncorrectable, {
         matchString: lockedResult.text,
-        inputSamplingCost: 0,
-        knownCost: -Math.log(lockedResult.p),
+        inputSamplingCost: -Math.log(lockedResult.p),
+        knownCost: 0,
         totalCost: -Math.log(lockedResult.p)
       });
     });
@@ -172,58 +174,79 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     //     - Produce first search result!
     // 4.  Unbound token is unlocked, but all others are locked.
 
-    const correctableToUpdate = this.selectionQueue.dequeue();
-    const tokenResult = correctableToUpdate?.handleNextNode();
-
-    if(tokenResult?.type == 'none' || (!tokenResult && this.handleHasBeenCalled)) {
+    if(this.selectionQueue.count == 0) {
       // If we reach this point, the tokenization has exhausted its search space.
-      return {
-        'type': 'none'
-      };
-    } else if(!tokenResult) {
-      this.handleHasBeenCalled = true;
-      return {
-        'type': 'complete',
-        cost: this.lastTotalCost,
-        mapping: this.collateResults()
-      };
+      if(this.handleHasBeenCalled) {
+        return { type: 'none' };
+      } else {
+        // It is possible that the editable tokenization range exists entirely of
+        // tokens considered to be uncorrectable.
+        this.handleHasBeenCalled = true;
+        return {
+          'type': 'complete',
+          cost: this.lastTotalCost,
+          mapping: this.collateResults()
+        };
+      }
     }
 
     this.handleHasBeenCalled = true;
 
+    const correctableToUpdate = this.selectionQueue.dequeue();
+    const tokenResult = correctableToUpdate?.handleNextNode();
+
+    if(tokenResult.type == 'none') {
+      // Transition the node from 'correctable' to 'uncorrectable' - we were
+      // unable to find valid corrections for it.
+      const lockedResult = correctableToUpdate.bestExample;
+      this._lockedTokenResults.set(correctableToUpdate, {
+        matchString: lockedResult.text,
+        inputSamplingCost: -Math.log(lockedResult.p),
+        knownCost: MAX_EDIT_THRESHOLD_FACTOR, // we'll use the same threshold at which further search is terminated.
+        totalCost: -Math.log(lockedResult.p) + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE
+      });
+
+      // We can make no further predictions if we've exhausted all search options.
+      if(correctableToUpdate == this._predictable) {
+        this._uncorrectables.push(correctableToUpdate);
+        delete this._predictable;
+      }
+      // else - while we COULD remove the correctable from the correctables
+      // list, there's no real impact to leaving it where it is.
+    } else if(tokenResult.type == 'complete') {
+      // Note that at this stage, we do not requeue the 'predictable' - other
+      // correctables may exist and need their first corrections before we look
+      // for other corrective variations of the 'predictable'.
+      if(correctableToUpdate != this._predictable) {
+        // Lock the 'correctable' token now that a valid correction for it has been
+        // found. We only consider a single correction for most of a
+        // tokenization's tokens, generally only allowing correction variation for
+        // the last represented token.
+        this._correctables.splice(this._correctables.indexOf(correctableToUpdate), 1);
+        this._uncorrectables.push(correctableToUpdate);
+      }
+
+      // Either way, update the token -> correction-string map with the obtained result.
+      this._lockedTokenResults.set(correctableToUpdate, tokenResult.mapping);
+    }
+
+    const resultCost = tokenResult.type != 'none' ? tokenResult.cost : this._lockedTokenResults.get(correctableToUpdate).totalCost
+
     // Update the cost associated with the token.
-    const cost = this.lastTotalCost = this.getUpdatedTotalCost(correctableToUpdate, tokenResult.cost);
-    this.tokenCostMap.set(correctableToUpdate.spaceId, tokenResult.cost);
+    const tokenizationCost = this.lastTotalCost = this.getUpdatedTotalCost(correctableToUpdate, resultCost);
+    this.tokenCostMap.set(correctableToUpdate.spaceId, resultCost);
 
     // If we haven't found a valid correction for the token with lowest-cost update,
     // just requeue it and keep searching until we find one.
-    if(tokenResult.type != 'complete') {
+    if(tokenResult.type == 'intermediate') {
       this.selectionQueue.enqueue(correctableToUpdate);
 
       // Needs to return the 'proper' type of result.
       return {
         type: 'intermediate',
-        cost
+        cost: tokenizationCost
       };
     }
-
-    // Note that at this stage, we do not requeue the 'predictable' - other
-    // correctables may exist and need their first corrections before we look
-    // for other corrective variations of the 'predictable'.
-
-    // Assertion:  tokenResult.type == 'complete'.  We have a valid correction for
-    // at least some part of the tokenization - the represented context variant.
-    if(correctableToUpdate != this._predictable) {
-      // Lock the 'correctable' token now that a valid correction for it has been
-      // found. We only consider a single correction for most of a
-      // tokenization's tokens, generally only allowing correction variation for
-      // the last represented token.
-      this._correctables.splice(this._correctables.indexOf(correctableToUpdate), 1);
-      this._uncorrectables.push(correctableToUpdate);
-    }
-
-    // Either way, update the token -> correction-string map with the obtained result.
-    this._lockedTokenResults.set(correctableToUpdate, tokenResult.mapping);
 
     // If we have a correction for all components in need of correction, then
     // search for alternative corrections for the 'predictable' token - even if
@@ -237,14 +260,14 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     if(correctionResults.matchedResult.findIndex((c) => c == undefined) != -1) {
       return {
         type: 'intermediate',
-        cost
+        cost: tokenizationCost
       };
     }
 
     // Determine the proper return type and construct the proper return object accordingly.
     return {
       type: 'complete',
-      cost,
+      cost: tokenizationCost,
       mapping: correctionResults
     };
   }
