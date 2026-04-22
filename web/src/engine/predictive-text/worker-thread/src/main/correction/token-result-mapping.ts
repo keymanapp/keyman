@@ -10,6 +10,7 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
 import { SearchQuotientNode } from "./search-quotient-node.js";
 
@@ -41,7 +42,7 @@ export function initTokenResultFilterer() {
   return closure;
 }
 
-export class TokenResultMapping {
+export class TokenResultMapping implements CorrectionResultMapping<SearchNode>{
   readonly matchingSpace: SearchQuotientNode;
   private readonly node: SearchNode;
   readonly spaceId: number;
