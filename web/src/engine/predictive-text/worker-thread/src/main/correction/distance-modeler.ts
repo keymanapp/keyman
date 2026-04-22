@@ -584,7 +584,7 @@ export class SearchNode {
  * @param timer
  * @returns
  */
-export const getBestTokenMatches = (searchModules: SearchQuotientNode[], timer?: ExecutionTimer) => {
+export const getBestTokenMatches = (searchModules: SearchQuotientNode[], timer: ExecutionTimer) => {
   return getBestMatches<SearchNode, TokenResultMapping, SearchQuotientNode>(searchModules, timer, initTokenResultFilterer());
 }
 
