@@ -408,35 +408,4 @@ describe('KmnFileWriter', function () {
     });
   });
 
- /* describe("write() should throw for invalid output characters ", function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-
-    [
-      ['../data/Test_invalidInput_C0.keylayout', "U+-456", "CAPS", "K_S"],
-      ['../data/Test_invalidInput_C1.keylayout', "U+-123", "NCAPS SHIFT", "K_U"],
-      ['../data/Test_invalidInput_C2.keylayout', "U+-123", "CAPS", "K_D"],
-      ['../data/Test_invalidInput_C3.keylayout', "U+-123", "CAPS", "K_D"],
-    ].forEach(function (values) {
-      it(("write() from describe: should throw on invalid input output character: " + values[0] + ")") +
-        ' contains unsupported character \'' + values[1] +
-        "\' at " + values[2] + " " + values[3] + ".", async function () {
-          const inputName = makePathToFixture(values[0]);
-          const read = sutR.read(compilerTestCallbacks.loadFile(inputName));
-          const converted = sut.convertBound.convert(read, inputName);
-          const result = sutW.writeDataRules(converted);
-
-          assert.isNull(result);
-          assert.equal(compilerTestCallbacks.messages.length, 1);
-          assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnsupportedCharactersDetected({
-            inputFilename: inputName,
-            output: values[1],
-            keymapIndex: values[2],
-            KeyName: values[3]
-          }));
-        });
-    });
-  });*/
-
 });
