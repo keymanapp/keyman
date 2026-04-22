@@ -5,18 +5,6 @@
     "keyboard": {
       "additionalProperties": false,
       "properties": {
-        "@__group": {
-          "type": "string"
-        },
-        "@__id": {
-          "type": "string"
-        },
-        "@__maxout": {
-          "type": "string"
-        },
-        "@__name": {
-          "type": "string"
-        },
         "actions": {
           "additionalProperties": false,
           "properties": {
@@ -24,20 +12,20 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@__id": {
+                  "id": {
                     "type": "string"
                   },
                   "when": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "@__next": {
+                        "next": {
                           "type": "string"
                         },
-                        "@__output": {
+                        "output": {
                           "type": "string"
                         },
-                        "@__state": {
+                        "state": {
                           "type": "string"
                         }
                       },
@@ -61,37 +49,43 @@
           ],
           "type": "object"
         },
+        "group": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
         "keyMapSet": {
           "items": {
             "additionalProperties": false,
             "properties": {
-              "@__id": {
+              "id": {
                 "type": "string"
               },
               "keyMap": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "@__baseIndex": {
+                    "baseIndex": {
                       "type": "string"
                     },
-                    "@__baseMapSet": {
+                    "baseMapSet": {
                       "type": "string"
                     },
-                    "@__index": {
+                    "index": {
                       "type": "string"
                     },
                     "key": {
                       "items": {
                         "additionalProperties": false,
                         "properties": {
-                          "@__action": {
+                          "action": {
                             "type": "string"
                           },
-                          "@__code": {
+                          "code": {
                             "type": "string"
                           },
-                          "@__output": {
+                          "output": {
                             "type": "string"
                           }
                         },
@@ -125,16 +119,16 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@__first": {
+                  "first": {
                     "type": "string"
                   },
-                  "@__last": {
+                  "last": {
                     "type": "string"
                   },
-                  "@__mapSet": {
+                  "mapSet": {
                     "type": "string"
                   },
-                  "@__modifiers": {
+                  "modifiers": {
                     "type": "string"
                   }
                 },
@@ -149,27 +143,30 @@
           ],
           "type": "object"
         },
+        "maxout": {
+          "type": "string"
+        },
         "modifierMap": {
           "additionalProperties": false,
           "properties": {
-            "@__defaultIndex": {
+            "defaultIndex": {
               "type": "string"
             },
-            "@__id": {
+            "id": {
               "type": "string"
             },
             "keyMapSelect": {
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@__mapIndex": {
+                  "mapIndex": {
                     "type": "string"
                   },
                   "modifier": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "@__keys": {
+                        "keys": {
                           "type": "string"
                         }
                       },
@@ -193,6 +190,9 @@
           ],
           "type": "object"
         },
+        "name": {
+          "type": "string"
+        },
         "terminators": {
           "additionalProperties": false,
           "properties": {
@@ -200,10 +200,10 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "@__output": {
+                  "output": {
                     "type": "string"
                   },
-                  "@__state": {
+                  "state": {
                     "type": "string"
                   }
                 },

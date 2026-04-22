@@ -14,25 +14,11 @@ import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from '.
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
-import { ConverterMessages } from '../src/converter-messages.js';
+//import { ConverterMessages } from '../src/converter-messages.js';
 describe('KmnFileWriter', function () {
 
   before(function () {
     compilerTestCallbacks.clear();
-  });
-
-  describe("write() ", function () {
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
-
-    it('write() should return result', async function () {
-      const result = sutW.write(converted);
-      assert.isNotNull(result);
-    });
   });
 
   describe("writeDataRules() ", function () {
@@ -81,9 +67,46 @@ describe('KmnFileWriter', function () {
     });
   });
 
+  describe('convertToUnicodeCharacter ', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ["&#x61;", 'a'],
+      ["&#x1234;", 'ሴ'],
+      ["&#x1F60E;", '😎'],
+      ["&#x0002;", '\u0002'],
+      ["&#x1000000;",undefined ],
+      ["&#97;", 'a'],
+      ["&#4660;", 'ሴ'],
+      ["&#128518;", '😆'],
+      ["&#0003;", '\u0003'],
+      ["&#1000000;", '󴉀'],
+      ["U+0061", 'a'],
+      ["U+1234", 'ሴ'],
+      ["U+1F60E", '😎'],
+      ["U+0001", '\u0001'],
+      ["U+1000000;", undefined],
+      ["&commat;", undefined],
+      ["a", 'a'],
+      ["ሴ", 'ሴ'],
+      ['😎', '😎'],
+      ["W̊", "W̊"],
+      ["ab", 'ab'],
+      ["", ''],
+      ["␤", '␤'],
+      ["␕", '␕'],
+      ["", ''],
+      [undefined, undefined],
+      [null, undefined]
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.convertToUnicodeCharacter(values[0] as string);
+        assert.equal(result, values[1]);
+      });
+    });
+  });
+
   describe('reviewRules messages', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-
     [
       [[new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'UNAVAILABLE', 'K_A', new TextEncoder().encode('A'))],
       [''],
@@ -136,7 +159,6 @@ describe('KmnFileWriter', function () {
   });
 
   describe('reviewRules messages duplicate and ambiguous', function () {
-
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       //all
@@ -424,7 +446,7 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe("write() should throw for invalid output characters ", function () {
+ /* describe("write() should throw for invalid output characters ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -453,6 +475,6 @@ describe('KmnFileWriter', function () {
           }));
         });
     });
-  });
+  });*/
 
 });

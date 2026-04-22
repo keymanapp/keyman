@@ -12,10 +12,10 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="layout" minOccurs="1" maxOccurs="unbounded">
-                <xs:attribute name="@__first" />
-                <xs:attribute name="@__last" />
-                <xs:attribute name="@__mapSet" />
-                <xs:attribute name="@__modifiers" />
+                <xs:attribute name="first" />
+                <xs:attribute name="last" />
+                <xs:attribute name="mapSet" />
+                <xs:attribute name="modifiers" />
               </xs:element>
             </xs:sequence>
             <xs:attribute />
@@ -29,15 +29,15 @@
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="modifier" minOccurs="1" maxOccurs="unbounded">
-                      <xs:attribute name="@__keys" />
+                      <xs:attribute name="keys" />
                     </xs:element>
                   </xs:sequence>
-                  <xs:attribute name="@__mapIndex" />
+                  <xs:attribute name="mapIndex" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
-            <xs:attribute name="@__defaultIndex" />
-            <xs:attribute name="@__id" />
+            <xs:attribute name="defaultIndex" />
+            <xs:attribute name="id" />
           </xs:complexType>
         </xs:element>
 
@@ -48,17 +48,17 @@
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="key" minOccurs="1" maxOccurs="unbounded">
-                      <xs:attribute name="@__code" />
-                      <xs:attribute name="@__action" />
-                      <xs:attribute name="@__output" />
+                      <xs:attribute name="code" />
+                      <xs:attribute name="action" />
+                      <xs:attribute name="output" />
                     </xs:element>
                   </xs:sequence>
-                  <xs:attribute name="@__index" />
-                  <xs:attribute name="@__baseIndex" />
-                  <xs:attribute name="@__baseMapSet" />
+                  <xs:attribute name="index" />
+                  <xs:attribute name="baseIndex" />
+                  <xs:attribute name="baseMapSet" />
                 </xs:complexType>
               </xs:element>
-              <xs:attribute name="@__id" />
+              <xs:attribute name="id" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -70,12 +70,12 @@
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="when" minOccurs="1" maxOccurs="unbounded">
-                      <xs:attribute name="@__state" />
-                      <xs:attribute name="@__output" />
-                      <xs:attribute name="@__next" />
+                      <xs:attribute name="state" />
+                      <xs:attribute name="output" />
+                      <xs:attribute name="next" />
                     </xs:element>
                   </xs:sequence>
-                  <xs:attribute name="@__id" />
+                  <xs:attribute name="id" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
@@ -87,18 +87,18 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="when" minOccurs="1" maxOccurs="unbounded">
-                <xs:attribute name="@__state" />
-                <xs:attribute name="@__output" />
+                <xs:attribute name="state" />
+                <xs:attribute name="output" />
               </xs:element>
             </xs:sequence>
             <xs:attribute />
           </xs:complexType>
         </xs:element>
 
-        <xs:attribute name="@__group" />
-        <xs:attribute name="@__id" />
-        <xs:attribute name="@__name" />
-        <xs:attribute name="@__maxout" />
+        <xs:attribute name="group" />
+        <xs:attribute name="id" />
+        <xs:attribute name="name" />
+        <xs:attribute name="maxout" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
