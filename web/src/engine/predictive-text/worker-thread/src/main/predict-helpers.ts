@@ -434,6 +434,9 @@ export function determineSuggestionRange(
 
   // Can occur when backspacing to the end of a previous word.
   if(tokensToPredict.length == 0) {
+    if(tokenSetA.length == 0 || tokenSetB.length == 0) {
+      throw new Error("Invalid state - a tokenization is missing expected tokens");
+    }
     tokensToRemove.push(tokenSetA.pop());
     tokensToPredict.push(tokenSetB.pop());
   }
@@ -1079,7 +1082,6 @@ export function finalizeSuggestions(
       if(presDL > 0) {
         mergedTransform.deleteLeft -= presDL;
       }
-      // mergedTransform.deleteLeft = prediction.sample.transform.deleteLeft;
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
       // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
