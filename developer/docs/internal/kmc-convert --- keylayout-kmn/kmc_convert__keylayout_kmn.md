@@ -17,7 +17,7 @@ The sequence of keys, action, and output results in a set of modifier keystrokes
 
 ***
 
-# 4 different cases in keylayout-files C0-C4 (minimal examples)<br>
+# 4 different cases in keylayout-files C0-C3 (minimal examples)<br>
 
 
 A .keylayout file may specify a sequence of up to 3 modifiers and keys.
@@ -25,7 +25,7 @@ A .keylayout file may specify a sequence of up to 3 modifiers and keys.
  - We could also use a **third** modifier, key and output following a **second** modifier and key (green+blue:C2)
  - We could also use a **third** modifier, key and output following a **second** modifier and key following a **first** modifier and key (purple+green+blue:C3)
 
-![image]( ModKeyCombination.png)
+![image](ModKeyCombination.png)
 _<left>3 modifier/key combinations of a rule<left>_<br><br>
 
 
@@ -46,17 +46,17 @@ _<left>3 modifier/key combinations of a rule<left>_<br><br>
  <br><br>
 
 
-![image]( minimal_C0kl.png)
-![image]( minimal_C0ru.png)
-_<left>minimal example C0<cleft>_<br><br><br><br><br>
+![image](minimal_C0kl.png)
+![image](minimal_C0ru.png)
+_<left>minimal example C0<left>_<br><br><br><br><br>
 
-![image]( minimal_C1kl.png)
-![image]( minimal_C1ru.png) _<left>minimal example C1<left>_<br><br><br><br><br>
+![image](minimal_C1kl.png)
+![image](minimal_C1ru.png) _<left>minimal example C1<left>_<br><br><br><br><br>
 
-![image]( minimal_C2kl.png)  _<left>minimal example C2<left>_
-![image]( ReadC2_keylayout_howTo.png)  _<left>minimal example C2<left>_<br><br><br><br><br>
+![image](minimal_C2kl.png)  _<left>minimal example C2<left>_
+![image](ReadC2_keylayout_howTo.png)  _<left>minimal example C2<left>_<br><br><br><br><br>
 
-![image]( minimal_C3.png)
+![image](minimal_C3.png)
  _<left>minimal example C3<left>_<br><br><br>
 
 ***
@@ -66,7 +66,7 @@ _<left>minimal example C0<cleft>_<br><br><br><br><br>
 ### Data is read from a .keylayout file using KeymanXmlReader
 At present we use an array of rules to collect all data. In the future this will be replaced by an AST
 
-![image]( kmcConvertArchitecture.png)
+![image](kmcConvertArchitecture.png)
 _<left>architecture of kmc-convert <left>_<br><br><br>
 
 ***
@@ -76,12 +76,12 @@ After reading data and finding all possible modifier-key combinations specified 
 
 If a second or first modifier/key combination is not used the appropriate elements will not contain data
 
-![image]( rule.png)
+![image](rule.png)
 _<left>rule object containing data for all rules<left>_<br><br>
 
 In Rule[ ] each “Rule” is an Object and represents a case C0-C4. This ‘Data’ might look like that:
 
-![image]( rule_table.png)
+![image](rule_table.png)
 _<left>rule object containing data for all rules<left>_<br><br>
 
 Since multiple modifier-key combinations might lead to the same output, several elements might have the same output. 
@@ -145,7 +145,7 @@ If we find duplicate or ambiguous rules or if we discover an unsupported modifie
 If a rule contains parts which have been defined before, they will be omitted without adding a comment, as Keyman can not process duplicate rules in a .kmn file
 
 
-![image]( warningduplicate.png)
+![image](warningduplicate.png)
 _<left>handling of duplicate rules<left>_<br><br>
 
 ##### Simply printing each element of the array of Rule would not work since duplicate lines are not allowed in .kmn files:
@@ -197,7 +197,7 @@ dk(B29) + [SHIFT CAPS K_SPACE]  >  'ˆ'
 <br>
 
 
-![image]( parts_of_a_rule1.png)
+![image](parts_of_a_rule1.png)
 _<left>a rule is made of up to 3 parts<left>_<br>
 <br>
 
@@ -209,7 +209,7 @@ In cases where rules are ambiguous, a warning is displayed before the rule so th
 
 In ambiguous rules where only part3 is specified (C0, C1 rules) **we print out the first occurrence** of the ambiguous rule pair (e.g.+ [CAPS K_X]  >  'X' ) and comment out further ambiguous occurrence(s)  (e.g. + [CAPS K_X]  >  'Y' ) since the first occurrence seems to be used more frequently for a keyboard.
 
-![image]( warningC0C1.png)
+![image](warningC0C1.png)
 _<left>warning for ambiguous C0/C1 rules<left>_<br><br>
 
 
@@ -218,7 +218,7 @@ _<left>warning for ambiguous C0/C1 rules<left>_<br><br>
 
 If a rule has more than part3 specified (= C2 or C3 rule) and part 1 or part 2 of this rule is ambiguous with respect to part3 of a C0/C1 rule, **we use the later occurrence of the ambiguous rule pair** (e.g.  [CAPS K_A]  >  dk(A1)) and comment out the earlier occurrence in the C0/C1 rule ( e.g. + [CAPS K_A]  >  'A' ). 
 
-![image]( warningC2C3.png)
+![image](warningC2C3.png)
 _<left>warning for ambiguous C2/C3 rules<left>_<br><br>
 
 This is necessary because it would be pointless to comment out the earlier parts (part 1 or part 2) if part 3 depends on part 1 or part 2. In that case all parts dependent on earlier parts of a rule would be obsolete if the earlier part of that rule would not be available.
