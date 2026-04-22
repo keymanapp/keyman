@@ -611,7 +611,8 @@ export async function *getBestMatches<
   // If no filter function is provided, default to one that always returns true.
   filter ??= () => true;
 
-  const spaceQueue = new PriorityQueue<Correctable>((a, b) => a.currentCost - b.currentCost);
+  const comparator = (a: Correctable, b: Correctable) => a.currentCost - b.currentCost;
+  let spaceQueue = new PriorityQueue<Correctable>((a, b) => a.currentCost - b.currentCost);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
   // and iterate over it first.
@@ -639,6 +640,7 @@ export async function *getBestMatches<
       let lowestCostSource = spaceQueue.dequeue();
       const newResult = lowestCostSource.handleNextNode();
       spaceQueue.enqueue(lowestCostSource);
+      spaceQueue = new PriorityQueue(comparator, spaceQueue.toArray());
 
       if(newResult.type == 'none') {
         return null;

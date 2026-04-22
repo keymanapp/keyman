@@ -42,7 +42,6 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     const codepointLength = space.codepointLength + insertLength - inputSample.deleteLeft;
 
     super(space, inputs, inputSource, codepointLength);
-    this.queueNodes(this.buildEdgesFromResults(space.previousResults));
     this.insertLength = insertLength;
     this.leftDeleteLength = inputSample.deleteLeft;
     return;
