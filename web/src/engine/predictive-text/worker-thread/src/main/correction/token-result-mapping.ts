@@ -12,7 +12,10 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
-import { SearchQuotientNode } from "./search-quotient-node.js";
+
+// Circular type reference; do not actually require direct use of the prototype
+// or constructor!
+import { type SearchQuotientNode } from "./search-quotient-node.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
