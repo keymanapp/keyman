@@ -24,7 +24,7 @@ public struct SettingsRepository {
   let kPersistedOptionsKey = "KMPersistedOptionsKey"
   let kDataModelVersionKey = "KMDataModelVersion"
   let kShowOskOnActivateKey = "KMShowOskOnActivate"
-  let kForceSentryError = "KMForceSentryError"
+  let kForceSentryErrorKey = "KMForceSentryError"
   
   //  public init() {
   //    self.pathUtil = KeymanPaths()
@@ -55,12 +55,27 @@ public struct SettingsRepository {
     return activeKeyboardsSet
   }
   
+  public func writeActiveKeyboards(activeKeyboardsArray: [String]) {
+    guard let sharedDefaults = self.defaults else {
+      return
+      // TODO: throw error?
+      //throw SettingsError.internalError("Group container UserDefaults not found.")
+    }
+    
+    sharedDefaults.set(activeKeyboardsArray, forKey: kActiveKeyboardsKey)
+
+    //TODO: remove, for debug only
+    let activeKeyboardArrayFromDefaults = sharedDefaults.stringArray(forKey: kActiveKeyboardsKey) ?? []
+    print("Active keyboards from defaults: \(activeKeyboardArrayFromDefaults)")
+  }
+  
   public func readSelectedKeyboard() -> String {
-    if let sharedDefaults = self.defaults {
-      return sharedDefaults.value(forKey: kSelectedKeyboardKey) as? String ?? ""
-    } else {
+    guard let sharedDefaults = self.defaults else {
+      print("Group container UserDefaults not found.")
       return ""
     }
+    
+    return sharedDefaults.string(forKey: kSelectedKeyboardKey) ?? ""
   }
   
   public func writeSelectedKeyboard(keyboardName: String) {
@@ -69,16 +84,56 @@ public struct SettingsRepository {
     }
   }
   
+  public func readForceSentryError() -> Bool {
+    guard let sharedDefaults = self.defaults else {
+      print("Group container UserDefaults not found.")
+      return false
+    }
+    
+    return sharedDefaults.bool(forKey: kShowOskOnActivateKey)
+  }
+
+  public func readShowOskOnActivate() -> Bool {
+    guard let sharedDefaults = self.defaults else {
+      print("Group container UserDefaults not found.")
+      return false
+    }
+    
+    return sharedDefaults.bool(forKey: kShowOskOnActivateKey)
+  }
+
+  public func readDataModelVersion() -> Int {
+    guard let sharedDefaults = self.defaults else {
+      print("Group container UserDefaults not found.")
+      return 0
+    }
+    
+    // note that zero is returned if key is not found in UserDefaults,
+    return sharedDefaults.integer(forKey: kDataModelVersionKey)
+  }
+
+  public func readPersistedOptions() -> Dictionary<String, Any> {
+    guard let sharedDefaults = self.defaults else {
+      print("Group container UserDefaults not found.")
+      return [:]
+    }
+    
+    if let options: Dictionary<String, Any> = sharedDefaults.dictionary(forKey: kPersistedOptionsKey) {
+      return options
+    } else {
+      return [:]
+    }
+  }
+  
+
   public func logSettings() {
     print("UserDefaults:")
-    if let sharedDefaults = self.defaults {
-      print("kSelectedKeyboardKey: \(sharedDefaults.value(forKey: kSelectedKeyboardKey) ?? "nil")")
-      print("kDataModelVersionKey: \(sharedDefaults.value(forKey: kDataModelVersionKey) ?? "nil")")
-      print("kForceSentryError: \(sharedDefaults.value(forKey: kForceSentryError) ?? "nil")")
-      print("kShowOskOnActivateKey: \(sharedDefaults.value(forKey: kShowOskOnActivateKey) ?? "nil")")
-      print("kActiveKeyboardsKey: \(sharedDefaults.value(forKey: kActiveKeyboardsKey) ?? "nil")")
-      print("kPersistedOptionsKey: \(sharedDefaults.value(forKey: kPersistedOptionsKey) ?? "nil")")
-    }
+    print("\(kSelectedKeyboardKey): \(self.readSelectedKeyboard())")
+    print("\(kDataModelVersionKey): \(self.readDataModelVersion())")
+    print("\(kForceSentryErrorKey): \(self.readForceSentryError())")
+    print("\(kShowOskOnActivateKey): \(self.readShowOskOnActivate())")
+    print("\(kActiveKeyboardsKey): \(self.readActiveKeyboards())")
+    print("\(kPersistedOptionsKey): \(self.readPersistedOptions())")
   }
 
   public func clearSettings() {

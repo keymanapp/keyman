@@ -146,15 +146,6 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   return true;
 }
 
-/*
- NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
- NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
- NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
- NSString *const kShowOskOnActivate = @"KMShowOskOnActivate";
- NSString *const kForceSentryError = @"KMForceSentryError";
-
- */
-
 - (void)migrateSettingsForKeyman18 {
   os_log_debug([KMLogs dataLog], "converting settings in UserDefaults for migration");
   [self convertSelectedKeyboardPathForKeyman18Migration];

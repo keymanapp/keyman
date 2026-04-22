@@ -93,6 +93,13 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     }
   }
 
+  public func getKeyboardSettingsKey(for keyboardId: String) -> String? {
+    guard let keyboard = self.keyboards.first(where: { $0.keyboardId == keyboardId }) else {
+      return nil
+    }
+    return keyboard.keyboardSettingsKey
+  }
+
   public func validate() -> Bool {
     var validKeyboards = self.keyboards.isEmpty == false
     

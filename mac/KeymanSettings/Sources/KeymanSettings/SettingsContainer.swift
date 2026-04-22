@@ -53,6 +53,18 @@ public class SettingsContainer : ObservableObject {
     }
   }
 
+  public func addActiveKeyboard(keyboardName: String) {
+    var activeKeyboardsSet = Set(self.activeKeyboards)
+    activeKeyboardsSet.insert(keyboardName)
+    self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(activeKeyboards))
+  }
+  
+  public func removeActiveKeyboard(keyboardName: String) {
+    var activeKeyboardsSet = Set(self.activeKeyboards)
+    activeKeyboardsSet.remove(keyboardName)
+    self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(activeKeyboardsSet))
+  }
+  
   public func logSettings() {
     self.settingsRepository.logSettings()
   }
@@ -79,14 +91,33 @@ public class SettingsContainer : ObservableObject {
     
   public func setKeyboardEnabled(packageId: UUID, keyboardId: String, enabled: Bool) {
     let package = self.installedKeyboardPackages.first(where: { $0.id == packageId })
+ // TODO: replace with guard let
     if (package == nil) {
       print ("ERROR: setKeyboardEnabled could not find package with ID: \(packageId)")
     } else {
       package!.enableKeyboard(keyboardId: keyboardId, enabled: enabled)
+      if let keyboardSettingsKey = package?.getKeyboardSettingsKey(for: keyboardId) {
+        if (enabled) {
+          self.addActiveKeyboard(keyboardName: keyboardSettingsKey)
+        } else {
+          self.removeActiveKeyboard(keyboardName: keyboardSettingsKey)
+        }
+      }
+      // TODO: handle else case
       print ("setKeyboardEnabled for \(keyboardId) setting to \(enabled)")
     }
   }
-    
+
+//  func setKeyboardEnabled(packageName: String, keyboardId: String, enabled: Bool) {
+//    let package = self.installedKeyboardPackages.first(where: { $0.packageName == packageName })
+//    if (package == nil) {
+//      print ("ERROR: setKeyboardEnabled could not find package with ID: \(packageId)")
+//    } else {
+//      package!.enableKeyboard(keyboardId: keyboardId, enabled: enabled)
+//      print ("setKeyboardEnabled for \(keyboardId) setting to \(enabled)")
+//    }
+//  }
+
   /**
    *  read the Keyman packages from the group container directory and store in the keyboardPackages array
    */
