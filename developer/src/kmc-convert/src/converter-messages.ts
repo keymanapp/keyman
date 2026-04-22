@@ -54,9 +54,9 @@ export class ConverterMessages {
   );
 
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
-  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string, key: string, KeyName: string, output: string; }) => m(
+  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string, KeyName: string, output: string; }) => m(
     this.ERROR_UnsupportedCharactersDetected,
-    `Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
+    `Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Key ${def(o.KeyName)}`
   );
 
   static ERROR_UndefinedActionDetected = SevError | 0x0008;

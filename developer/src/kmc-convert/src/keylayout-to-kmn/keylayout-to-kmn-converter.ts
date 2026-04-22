@@ -71,7 +71,7 @@ export class Rule {
   constructor(
     public readonly ruleType: string,             /* C0, C1, C2, C3, or C4 */
 
-    public readonly modifierPrevDeadkey: string, /* first key used by C3 rules*/
+    public readonly modifierPrevDeadkey: string,  /* first key used by C3 rules*/
     public readonly prevDeadkey: string,
     public idPrevDeadkey: number,
     public uniquePrevDeadkey: number,
@@ -83,7 +83,7 @@ export class Rule {
 
     public readonly modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
     public readonly key: string,
-    public readonly output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
+    public readonly output: Uint8Array,           /* output used by C0,C1,C2,C3,C4 rules*/
   ) { }
 
 }
@@ -262,7 +262,6 @@ export class KeylayoutToKmnConverter {
                 rules.push(ruleObj);
               }
             }
-            // }
 
           }
           else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['action'] !== undefined) {
@@ -492,7 +491,6 @@ export class KeylayoutToKmnConverter {
               inputFilename: jsonObj.keyboard['name'] + ".keylayout",
               keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['index'],
               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'],
-              key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'],
               KeyName: this.mapUkeleleKeycodeToVK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'])
             }));
             return null;
@@ -1035,4 +1033,3 @@ export class KeylayoutToKmnConverter {
     convert: this.convert.bind(this),
   };
 }
-
