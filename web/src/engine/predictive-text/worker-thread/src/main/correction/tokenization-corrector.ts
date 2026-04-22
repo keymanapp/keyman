@@ -37,6 +37,8 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   private readonly _correctables: SearchQuotientNode[];
   private _predictable?: SearchQuotientNode;
 
+  private _returnedResults: TokenizationResultMapping[] = [];
+
   private selectionQueue: PriorityQueue<SearchQuotientNode>;
   private tokenCostMap: Map<number, number>;
   private _lockedTokenResults: Map<SearchQuotientNode, TokenResult>;
@@ -83,7 +85,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   // tokenization may then flesh out the ordering of the entries to build the
   // proper corrections / predictions.
   get previousResults(): TokenizationResultMapping[] {
-    return [];
+    return this._returnedResults;
   };
 
   constructor(
@@ -182,10 +184,12 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
         // It is possible that the editable tokenization range exists entirely of
         // tokens considered to be uncorrectable.
         this.handleHasBeenCalled = true;
+        const results = this.collateResults();
+        this._returnedResults.push(results);
         return {
           'type': 'complete',
           cost: this.lastTotalCost,
-          mapping: this.collateResults()
+          mapping: results
         };
       }
     }
@@ -270,6 +274,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     }
 
     // Determine the proper return type and construct the proper return object accordingly.
+    this._returnedResults.push(correctionResults);
     return {
       type: 'complete',
       cost: tokenizationCost,
