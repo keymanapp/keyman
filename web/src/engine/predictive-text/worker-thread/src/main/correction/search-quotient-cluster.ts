@@ -181,16 +181,16 @@ export class SearchQuotientCluster extends SearchQuotientNode {
 
     // What if we're trying to merge something previously split?
     // That can only happen at the head of the incoming space, so we check for it early here.
-    if(space.inputCount == 1 && space instanceof SearchQuotientSpur) {
+    if(space.inputCount == 1 && space instanceof SearchQuotientSpur && space.parents[0] instanceof SearchQuotientRoot) {
       // In such a case... the 'leading edge' of the incoming space needs to be checked
       // against the trailing edge of `this` instance's entries.
       const thisTailInputSource = this.inputSegments[this.inputSegments.length - 1];
-      const thisTailSpaceIds = this.parents.map((path) => (path as SearchQuotientSpur).inputSource.subsetId);
+      const thisTailSpaceIds = this.parents.map((path) => (path as SearchQuotientSpur).inputSource?.subsetId);
       const spaceHeadInputSource = space.inputSegments[0];
 
       const isOnSplitInput =
         thisTailSpaceIds.some((entry) => entry == space.inputSource.subsetId)
-        && thisTailInputSource.end == spaceHeadInputSource.start;
+        && thisTailInputSource?.end == spaceHeadInputSource.start;
 
       // In this case, we only rebuild the single path; an outer stack frame will reconstitute
       // the split cluster from the individual paths built here.
