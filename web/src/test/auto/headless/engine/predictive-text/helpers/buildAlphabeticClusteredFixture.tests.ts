@@ -9,10 +9,9 @@
 
 import { assert } from "chai";
 
-import { SearchQuotientNode } from "@keymanapp/lm-worker/test-index";
+import { SearchQuotientNode, SearchQuotientSpur } from "@keymanapp/lm-worker/test-index";
 
 import { constituentPaths } from "./constituentPaths.js";
-import { quotientPathHasInputs } from "./quotientPathHasInputs.js";
 import { buildAlphabeticClusterFixtures } from "./buildAlphabeticClusteredFixture.js";
 
 describe('buildAlphabeticClusteredFixture() fixture', () => {
@@ -24,7 +23,10 @@ describe('buildAlphabeticClusteredFixture() fixture', () => {
     const allDists = Object.values(distributions).map(set => Object.values(set)).flat();
     const finalClusterPaths = constituentPaths(clusters.cluster_k5c6) as SearchQuotientNode[][];
 
-    allPaths.forEach((spur) => assert.isOk(finalClusterPaths.find(seq => seq.indexOf(spur) > -1)));
-    allDists.forEach((dist) => assert.isOk(allPaths.find(path => quotientPathHasInputs(path, [dist]))));
+    allPaths
+      // This one path doesn't get clustered;  it's the only way to reach excess length in this fixture.
+      .filter((spur) => spur != paths[4].path_k4c6)
+      .forEach((spur) => assert.isOk(finalClusterPaths.find(seq => seq.indexOf(spur) > -1), `spur ${spur.spaceId} is disconnected`));
+    allDists.forEach((dist) => assert.isOk(allPaths.find(path => (path as SearchQuotientSpur).inputs == dist), `distribution ${JSON.stringify(dist)} has no matching path`));
   });
 });
