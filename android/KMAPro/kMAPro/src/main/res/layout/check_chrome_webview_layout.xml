@@ -4,7 +4,7 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:paddingVertical="4dp"
-  android:background="@android:color/white"
+    android:background="?android:attr/windowBackground"
   android:gravity="center_vertical"
   android:orientation="horizontal">
 
@@ -14,7 +14,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:background="@android:color/white"
+      android:background="@android:color/transparent"
     android:gravity="start|center_vertical"
     android:layout_gravity="center_vertical"
     android:text="@string/text_require_chrome_version"
