@@ -118,8 +118,12 @@
 #define KEYMSG_FLAG_DLGMODE(lParam) (HIWORD(lParam) & KF_DLGMODE ? 1 : 0)
 #define KEYMSG_FLAG_MENUMODE(lParam) (HIWORD(lParam) & KF_MENUMODE ? 1 : 0)
 #define KEYMSG_FLAG_ALTDOWN(lParam) (HIWORD(lParam) & KF_ALTDOWN ? 1 : 0)
+// Repeat is actually previous "up" value of the key 
 #define KEYMSG_FLAG_REPEAT(lParam) (HIWORD(lParam) & KF_REPEAT ? 1 : 0)
 #define KEYMSG_FLAG_UP(lParam) (HIWORD(lParam) & KF_UP ? 1 : 0)
+// Combine the transition flags into a single value for higher chance of identification
+// 0 = key down, 1 = repeat, 2 = keyup
+#define KEYMSG_FLAG_TRANSITION(lParam) ((BYTE)((HIWORD(lParam) & (KF_UP | KF_REPEAT)) >> 14))
 
 // TODO: Deprecate overloading of scancodes and use dwExtraInfo instead
 #define SCAN_FLAG_KEYMAN_KEY_EVENT          0xFF
