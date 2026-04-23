@@ -15,14 +15,15 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 import {
+  EDIT_DISTANCE_COST_SCALE,
   generateSubsetId,
-  LegacyQuotientSpur,
   models,
   PathInputProperties,
   PathResult,
   QuotientNodeFinalizer,
   SearchQuotientNode,
   SearchQuotientRoot,
+  SubstitutionQuotientSpur,
   TokenResultMapping
 } from '@keymanapp/lm-worker/test-index';
 
@@ -76,10 +77,9 @@ function buildFixture_therefore() {
     };
   });
 
-  // TODO:  Use SubstitutionQuotientSpur instead!
   let quotientNodes: SearchQuotientNode[] = [new SearchQuotientRoot(plainModel)];
   for(let i=0; i < 9; i++) {
-    quotientNodes.push(new LegacyQuotientSpur(quotientNodes[i], distributions[i], inputSources[i]));
+    quotientNodes.push(new SubstitutionQuotientSpur(quotientNodes[i], distributions[i], inputSources[i]));
   }
 
   return quotientNodes;
@@ -99,7 +99,7 @@ describe('QuotientNodeFinalizer', () => {
 
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
-        assert.equal(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p));
+        assert.approximately(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p), Number.EPSILON * 1000);
         assert.isNotNaN(searchResult.cost);
         assert.equal(searchResult.cost, searchResult.mapping.totalCost);
       } else {
@@ -107,14 +107,16 @@ describe('QuotientNodeFinalizer', () => {
       }
 
       searchResult = therefo.handleNextNode();
-      // There should be more results that may be found.
+      // There should be more searching to perform before aborting.
       assert.notEqual(searchResult.type, 'none');
 
+      // However, no other valid results are within correction range
+      // while rooted on 6 input transforms.
       do {
         searchResult = therefo.handleNextNode();
       } while(searchResult.type == 'intermediate');
 
-      assert.notEqual(searchResult.type, 'none');
+      assert.equal(searchResult.type, 'none');
     });
 
     it('finds only corrections when predictions are forbidden', () => {
@@ -130,6 +132,11 @@ describe('QuotientNodeFinalizer', () => {
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
         assert.isAbove(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p));
+
+        // There are two codepoints missing that are necessary to complete a
+        // full word with the represented prefix.  Check that the penalty is set
+        // appropriately, accounting for floating-point precision issues.
+        assert.isAtLeast(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p) + EDIT_DISTANCE_COST_SCALE * 1.99);
         assert.isNotNaN(searchResult.cost);
         assert.equal(searchResult.cost, searchResult.mapping.totalCost);
       } else {
@@ -137,14 +144,16 @@ describe('QuotientNodeFinalizer', () => {
       }
 
       searchResult = therefo.handleNextNode();
-      // There should be more results that may be found.
+      // There should be more searching to perform before aborting.
       assert.notEqual(searchResult.type, 'none');
 
       do {
         searchResult = therefo.handleNextNode();
       } while(searchResult.type == 'intermediate');
 
-      assert.notEqual(searchResult.type, 'none');
+      // However, no other valid results are within correction range
+      // while rooted on 6 input transforms.
+      assert.equal(searchResult.type, 'none');
     });
   });
 });

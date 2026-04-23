@@ -1,10 +1,10 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  *
- * Created by jahorton on 2025-10-29
+ * Created by jahorton on 2026-03-04
  *
- * This file defines tests for the SearchQuotientSpur classes of the
- * predictive-text correction-search engine.
+ * This file defines tests for the SubstitutionQuotientSpur class of the
+ * predictive-text correction-search engine's search graph.
  */
 
 import { assert } from 'chai';
@@ -12,64 +12,22 @@ import { assert } from 'chai';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
   generateSubsetId,
-  LegacyQuotientRoot,
-  LegacyQuotientSpur,
-  models
+  models,
+  SearchQuotientRoot,
+  SubstitutionQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
+import { buildCantLinearFixture } from '../../helpers/buildCantLinearFixture.js';
 import { analyzeQuotientNodeResults } from '../../helpers/analyzeQuotientNodeResults.js';
 
 import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
-// Similar to the fixture version, but with the LegacyQuotientRoot & LegacyQuotientSpur classes.
-export function buildCantLinearFixture() {
-  const rootPath = new LegacyQuotientRoot(testModel);
-
-  const distrib1 = [
-    { sample: {insert: 'c', deleteLeft: 0, id: 11}, p: 0.5 },
-    { sample: {insert: 'r', deleteLeft: 0, id: 11}, p: 0.4 },
-    { sample: {insert: 't', deleteLeft: 0, id: 11}, p: 0.1 }
-  ];
-  const path1 = new LegacyQuotientSpur(rootPath, distrib1, distrib1[0]);
-
-  const distrib2 = [
-    { sample: {insert: 'a', deleteLeft: 0, id: 12}, p: 0.7 },
-    { sample: {insert: 'e', deleteLeft: 0, id: 12}, p: 0.3 }
-  ];
-  const path2 = new LegacyQuotientSpur(path1, distrib2, distrib2[0]);
-
-  const distrib3 = [
-    { sample: {insert: 'n', deleteLeft: 0, id: 13}, p: 0.8 },
-    { sample: {insert: 'r', deleteLeft: 0, id: 13}, p: 0.2 }
-  ];
-  const path3 = new LegacyQuotientSpur(path2, distrib3, distrib3[0]);
-
-  const distrib4 = [
-    { sample: {insert: 't', deleteLeft: 0, id: 14}, p: 1 }
-  ];
-  const path4 = new LegacyQuotientSpur(path3, distrib4, distrib4[0]);
-
-  return {
-    paths: [null, path1, path2, path3, path4],
-    distributions: [distrib1, distrib2, distrib3, distrib4]
-  };
-}
-
-describe('LegacyQuotientSpur', () => {
+describe('SubstitutionQuotientSpur', () => {
   describe('constructor', () => {
-    it('initializes from a lexical model', () => {
-      const path = new LegacyQuotientRoot(testModel);
-      assert.equal(path.inputCount, 0);
-      assert.equal(path.codepointLength, 0);
-      assert.isNumber(path.spaceId);
-      assert.deepEqual(path.bestExample, {text: '', p: 1});
-      assert.deepEqual(path.parents, []);
-    });
-
     it('may be extended from root path', () => {
-      const rootPath = new LegacyQuotientRoot(testModel);
+      const rootPath = new SearchQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -77,7 +35,7 @@ describe('LegacyQuotientSpur', () => {
         {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
       ];
 
-      const extendedPath = new LegacyQuotientSpur(rootPath, leadEdgeDistribution, leadEdgeDistribution[0]);
+      const extendedPath = new SubstitutionQuotientSpur(rootPath, leadEdgeDistribution, leadEdgeDistribution[0]);
 
       assert.equal(extendedPath.inputCount, 1);
       assert.equal(extendedPath.codepointLength, 1);
@@ -100,8 +58,10 @@ describe('LegacyQuotientSpur', () => {
       assert.deepEqual(rootPath.parents, []);
     });
 
+    // TODO:  for each of the possible ancestor Spur types, + the root!
+    // Properties should have proper relationship with each test's ancestor.
     it('may be built from arbitrary prior SearchQuotientSpur', () => {
-      const rootPath = new LegacyQuotientRoot(testModel);
+      const rootPath = new SearchQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -110,7 +70,7 @@ describe('LegacyQuotientSpur', () => {
       ];
       const inputClone = leadEdgeDistribution.map(e => ({...e}));
 
-      const length1Path = new LegacyQuotientSpur(
+      const length1Path = new SubstitutionQuotientSpur(
         rootPath,
         leadEdgeDistribution,
         leadEdgeDistribution[0]
@@ -122,7 +82,7 @@ describe('LegacyQuotientSpur', () => {
         {sample: {insert: 'h', deleteLeft: 0, id: 17 }, p: 0.15}
       ];
 
-      const length2Path = new LegacyQuotientSpur(
+      const length2Path = new SubstitutionQuotientSpur(
         length1Path,
         tailEdgeDistribution,
         tailEdgeDistribution[0]
@@ -157,23 +117,8 @@ describe('LegacyQuotientSpur', () => {
       assert.deepEqual(length1Path.inputs, leadEdgeDistribution);
     });
 
-    it('throws if input and input-source transition IDs mismatch', () => {
-      const rootPath = new LegacyQuotientRoot(testModel);
-
-      const leadEdgeDistribution = [
-        {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
-        {sample: {insert: 'a', deleteLeft: 0, id: 13 }, p: 0.3},
-        {sample: {insert: 'o', deleteLeft: 0, id: 13 }, p: 0.2}
-      ];
-
-      assert.throws(() => new LegacyQuotientSpur(rootPath, leadEdgeDistribution, {
-        ...leadEdgeDistribution[0],
-        sample: {...leadEdgeDistribution[0].sample, id: 15}
-      }));
-    });
-
     it('may extend with a Transform inserting multiple codepoints', () => {
-      const rootPath = new LegacyQuotientRoot(testModel);
+      const rootPath = new SearchQuotientRoot(testModel);
 
       const leadEdgeDistribution = [
         {sample: {insert: 't', deleteLeft: 0, id: 13 }, p: 0.5},
@@ -182,7 +127,7 @@ describe('LegacyQuotientSpur', () => {
       ];
       const inputClone = leadEdgeDistribution.map(e => ({...e}));
 
-      const length1Path = new LegacyQuotientSpur(
+      const length1Path = new SubstitutionQuotientSpur(
         rootPath,
         leadEdgeDistribution,
         leadEdgeDistribution[0]
@@ -194,7 +139,7 @@ describe('LegacyQuotientSpur', () => {
         {sample: {insert: 'hi', deleteLeft: 0, id: 17 }, p: 0.15}
       ];
 
-      const length2Path = new LegacyQuotientSpur(
+      const length2Path = new SubstitutionQuotientSpur(
         length1Path,
         tailEdgeDistribution,
         tailEdgeDistribution[0]
@@ -232,7 +177,7 @@ describe('LegacyQuotientSpur', () => {
 
   describe('.edgeKey', () => {
     it('changes when input source subset IDs differ', () => {
-      const root = new LegacyQuotientRoot(testModel);
+      const root = new SearchQuotientRoot(testModel);
 
       const {distributions} = buildCantLinearFixture();
       const inputSrc = {
@@ -244,11 +189,11 @@ describe('LegacyQuotientSpur', () => {
         bestProbFromSet: distributions[0][0].p
       };
 
-      const spur1 = new LegacyQuotientSpur(root, distributions[0], {
+      const spur1 = new SubstitutionQuotientSpur(root, distributions[0], {
         ...inputSrc,
         subsetId: generateSubsetId()
       });
-      const spur2 = new LegacyQuotientSpur(root, distributions[0], {
+      const spur2 = new SubstitutionQuotientSpur(root, distributions[0], {
         ...inputSrc,
         subsetId: generateSubsetId()
       });
@@ -257,7 +202,7 @@ describe('LegacyQuotientSpur', () => {
     });
 
     it('changes when different parts of the same input source are used', () => {
-      const root = new LegacyQuotientRoot(testModel);
+      const root = new SearchQuotientRoot(testModel);
 
       const {distributions} = buildCantLinearFixture();
       const inputSrc = {
@@ -269,15 +214,15 @@ describe('LegacyQuotientSpur', () => {
         bestProbFromSet: distributions[0][0].p
       };
 
-      const spur1 = new LegacyQuotientSpur(root, distributions[0], inputSrc);
-      const spur2 = new LegacyQuotientSpur(root, distributions[0], {
+      const spur1 = new SubstitutionQuotientSpur(root, distributions[0], inputSrc);
+      const spur2 = new SubstitutionQuotientSpur(root, distributions[0], {
         ...inputSrc,
         segment: {
           ...inputSrc.segment,
           end: 1
         }
       });
-      const spur3 = new LegacyQuotientSpur(root, distributions[0], {
+      const spur3 = new SubstitutionQuotientSpur(root, distributions[0], {
         ...inputSrc,
         segment: {
           ...inputSrc.segment,
@@ -325,7 +270,7 @@ describe('LegacyQuotientSpur', () => {
       assert.isEmpty(analysis.foundWithDuplicates);
     });
 
-    it('outputs results that insert characters as needed', () => {
+    it('does not output results that insert characters as needed', () => {
       const canPath = buildCantLinearFixture().paths[3];
 
       const matchTargets = [
@@ -334,11 +279,12 @@ describe('LegacyQuotientSpur', () => {
       ];
       const analysis = analyzeQuotientNodeResults(canPath, matchTargets);
 
-      assert.sameMembers(analysis.found, matchTargets);
+      assert.sameMembers(analysis.found, []);
+      assert.sameMembers(analysis.missing, matchTargets);
       assert.isEmpty(analysis.foundWithDuplicates);
     });
 
-    it('outputs results that delete incoming keystrokes as needed', () => {
+    it('does not output results that delete incoming keystrokes as needed', () => {
       const canPath = buildCantLinearFixture().paths[3];
 
       const matchTargets = [
@@ -351,7 +297,8 @@ describe('LegacyQuotientSpur', () => {
       ];
       const analysis = analyzeQuotientNodeResults(canPath, matchTargets);
 
-      assert.sameMembers(analysis.found, matchTargets);
+      assert.sameMembers(analysis.found, []);
+      assert.sameMembers(analysis.missing, matchTargets);
       assert.isEmpty(analysis.foundWithDuplicates);
     });
   });

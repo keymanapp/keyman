@@ -17,7 +17,6 @@ import { EDIT_DISTANCE_COST_SCALE, SearchNode } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathInputProperties, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -43,7 +42,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
   readonly inputs?: Distribution<Transform>;
   readonly inputSource?: PathInputProperties;
 
-  private parentNode: SearchQuotientNode;
+  protected readonly parentNode: SearchQuotientNode;
   readonly spaceId: number;
 
   readonly inputCount: number;
@@ -175,6 +174,11 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     inputSource: PathInputProperties
   ): this;
 
+  // TODO:  Remove once LegacyQuotientRoot + LegacyQuotientSpur are removed!
+  constructRoot(): SearchQuotientRoot {
+    return new SearchQuotientRoot(this.model);
+  }
+
   // spaces are in sequence here.
   // `this` = head 'space'.
   public merge(space: SearchQuotientNode): SearchQuotientNode {
@@ -265,7 +269,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
       //
       // stopgap:  maybe go ahead and check each input for any that are longer?
       // won't matter shortly, though.
-      return [[this, new LegacyQuotientRoot(this.model)]];
+      return [[this, this.constructRoot()]];
     } else {
       const firstSet: Distribution<Transform> = this.inputs.map((input) => ({
         // keep insert head
@@ -302,7 +306,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
       // construct two SearchPath instances based on the two sets!
       return [[
         parent,
-        this.construct(new LegacyQuotientRoot(this.model), secondSet, {
+        this.construct(this.constructRoot(), secondSet, {
           ...this.inputSource,
           segment: {
             ...this.inputSource.segment,

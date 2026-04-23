@@ -13,9 +13,9 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 
 import {
   models,
-  LegacyQuotientSpur,
   SearchQuotientCluster,
-  LegacyQuotientRoot
+  SearchQuotientRoot,
+  SubstitutionQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -31,7 +31,7 @@ const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
  * @returns
  */
 export const buildAlphabeticClusterFixtures = () => {
-  const rootPath = new LegacyQuotientRoot(testModel);
+  const rootPath = new SearchQuotientRoot(testModel);
 
   // consonant-cluster 1, insert 1, delete 0
   const distrib_c1_i1d0: Distribution<Transform> = [
@@ -48,9 +48,9 @@ export const buildAlphabeticClusterFixtures = () => {
   ];
 
   // keystrokes 1, codepoints 1, total inserts 1, delete 0
-  const path_k1c1_i1d0 = new LegacyQuotientSpur(rootPath, distrib_c1_i1d0, distrib_c1_i1d0[0]);
+  const path_k1c1_i1d0 = new SubstitutionQuotientSpur(rootPath, distrib_c1_i1d0, distrib_c1_i1d0[0]);
   // keystrokes 1, codepoints 2, total inserts 2, delete 0
-  const path_k1c2_i2d0 = new LegacyQuotientSpur(rootPath, distrib_c1_i2d0, distrib_c1_i1d0[0]);
+  const path_k1c2_i2d0 = new SubstitutionQuotientSpur(rootPath, distrib_c1_i2d0, distrib_c1_i1d0[0]);
 
   // Second input
 
@@ -62,8 +62,8 @@ export const buildAlphabeticClusterFixtures = () => {
     { sample: { insert: 'u', deleteLeft: 0, deleteRight: 0, id: 12 }, p: 0.1 },
   ];
 
-  const path_k2c2_i2d0 = new LegacyQuotientSpur(path_k1c1_i1d0, distrib_v1_i1d0, distrib_v1_i1d0[0]);
-  const path_k2c3_i3d0 = new LegacyQuotientSpur(path_k1c2_i2d0, distrib_v1_i1d0, distrib_v1_i1d0[0]);
+  const path_k2c2_i2d0 = new SubstitutionQuotientSpur(path_k1c1_i1d0, distrib_v1_i1d0, distrib_v1_i1d0[0]);
+  const path_k2c3_i3d0 = new SubstitutionQuotientSpur(path_k1c2_i2d0, distrib_v1_i1d0, distrib_v1_i1d0[0]);
 
   // Third input
   const distrib_v2_i1d0: Distribution<Transform> = [
@@ -90,15 +90,15 @@ export const buildAlphabeticClusterFixtures = () => {
     { sample: { insert: 'úú', deleteLeft: 1, deleteRight: 0, id: 13 }, p: 0.02 },
   ]; // 0.2 total
 
-  const path_k3c2_i3d1 = new LegacyQuotientSpur(path_k2c2_i2d0, distrib_v2_i1d1, distrib_v2_i1d0[0]);
+  const path_k3c2_i3d1 = new SubstitutionQuotientSpur(path_k2c2_i2d0, distrib_v2_i1d1, distrib_v2_i1d0[0]);
 
-  const path_k3c3_i3d0  = new LegacyQuotientSpur(path_k2c2_i2d0, distrib_v2_i1d0, distrib_v2_i1d0[0]);
-  const path_k3c3_i4d1a = new LegacyQuotientSpur(path_k2c2_i2d0, distrib_v2_i2d1, distrib_v2_i1d0[0]);
-  const path_k3c3_i4d1b = new LegacyQuotientSpur(path_k2c3_i3d0, distrib_v2_i1d1, distrib_v2_i1d0[0]);
+  const path_k3c3_i3d0  = new SubstitutionQuotientSpur(path_k2c2_i2d0, distrib_v2_i1d0, distrib_v2_i1d0[0]);
+  const path_k3c3_i4d1a = new SubstitutionQuotientSpur(path_k2c2_i2d0, distrib_v2_i2d1, distrib_v2_i1d0[0]);
+  const path_k3c3_i4d1b = new SubstitutionQuotientSpur(path_k2c3_i3d0, distrib_v2_i1d1, distrib_v2_i1d0[0]);
 
   // both are built on path k1c2 (splits at index 1)
-  const path_k3c4_i4d0 = new LegacyQuotientSpur(path_k2c3_i3d0, distrib_v2_i1d0, distrib_v2_i1d0[0]);
-  const path_k3c4_i5d1 = new LegacyQuotientSpur(path_k2c3_i3d0, distrib_v2_i2d1, distrib_v2_i1d0[0]);
+  const path_k3c4_i4d0 = new SubstitutionQuotientSpur(path_k2c3_i3d0, distrib_v2_i1d0, distrib_v2_i1d0[0]);
+  const path_k3c4_i5d1 = new SubstitutionQuotientSpur(path_k2c3_i3d0, distrib_v2_i2d1, distrib_v2_i1d0[0]);
 
   const cluster_k3c3 = new SearchQuotientCluster([path_k3c3_i3d0, path_k3c3_i4d1a, path_k3c3_i4d1b]);
   // both are built on path k1c2.
@@ -116,13 +116,13 @@ export const buildAlphabeticClusterFixtures = () => {
     { sample: { insert: 'vw', deleteLeft: 0, deleteRight: 0, id: 14 }, p: 0.1 }
   ];
 
-  const path_k4c4_i2 = new LegacyQuotientSpur(path_k3c2_i3d1, distrib_c2_i2d0, distrib_c2_i2d0[0]);
-  const path_k4c4_i1 = new LegacyQuotientSpur(cluster_k3c3, distrib_c2_i1d0, distrib_c2_i2d0[0]);
+  const path_k4c4_i2 = new SubstitutionQuotientSpur(path_k3c2_i3d1, distrib_c2_i2d0, distrib_c2_i2d0[0]);
+  const path_k4c4_i1 = new SubstitutionQuotientSpur(cluster_k3c3, distrib_c2_i1d0, distrib_c2_i2d0[0]);
 
-  const path_k4c5_i2 = new LegacyQuotientSpur(cluster_k3c3, distrib_c2_i2d0, distrib_c2_i2d0[0]);
-  const path_k4c5_i1 = new LegacyQuotientSpur(cluster_k3c4, distrib_c2_i1d0, distrib_c2_i2d0[0]);
+  const path_k4c5_i2 = new SubstitutionQuotientSpur(cluster_k3c3, distrib_c2_i2d0, distrib_c2_i2d0[0]);
+  const path_k4c5_i1 = new SubstitutionQuotientSpur(cluster_k3c4, distrib_c2_i1d0, distrib_c2_i2d0[0]);
 
-  const path_k4c6 = new LegacyQuotientSpur(cluster_k3c4, distrib_c2_i2d0, distrib_c2_i2d0[0]);
+  const path_k4c6 = new SubstitutionQuotientSpur(cluster_k3c4, distrib_c2_i2d0, distrib_c2_i2d0[0]);
 
   const cluster_k4c4 = new SearchQuotientCluster([path_k4c4_i2, path_k4c4_i1]);
   const cluster_k4c5 = new SearchQuotientCluster([path_k4c5_i2, path_k4c5_i1]);
@@ -135,8 +135,8 @@ export const buildAlphabeticClusterFixtures = () => {
     { sample: { insert: 'z', deleteLeft: 0, deleteRight: 0, id: 15 }, p: 0.4 }
   ];
 
-  const path_k5c6_a = new LegacyQuotientSpur(cluster_k4c4, distrib_c3_i2d0, distrib_c3_i2d0[0]);
-  const path_k5c6_b = new LegacyQuotientSpur(cluster_k4c5, distrib_c3_i1d0, distrib_c3_i2d0[0]);
+  const path_k5c6_a = new SubstitutionQuotientSpur(cluster_k4c4, distrib_c3_i2d0, distrib_c3_i2d0[0]);
+  const path_k5c6_b = new SubstitutionQuotientSpur(cluster_k4c5, distrib_c3_i1d0, distrib_c3_i2d0[0]);
 
   const cluster_k5c6 = new SearchQuotientCluster([path_k5c6_a, path_k5c6_b]);
 
