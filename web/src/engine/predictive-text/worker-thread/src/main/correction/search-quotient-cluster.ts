@@ -12,7 +12,6 @@ import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { PathResult } from './correction-searchable.js';
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { TokenResultMapping } from './token-result-mapping.js';
@@ -221,7 +220,9 @@ export class SearchQuotientCluster extends SearchQuotientNode {
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
     // Don't rebuild if this is already a perfect split point!
     if(this.codepointLength <= charIndex) {
-      return [[this, new LegacyQuotientRoot(this.model)]];
+      // We'll assume that the search path is either using legacy nodes or is not;
+      // we shouldn't see mixed-use cases.
+      return [[this, (this.parents[0] as SearchQuotientSpur).constructRoot()]];
     }
 
     const results = this.parents.flatMap((p) => p.split(charIndex));
