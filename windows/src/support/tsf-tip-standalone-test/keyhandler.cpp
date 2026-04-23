@@ -112,49 +112,44 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     ULONG cFetched;
     WCHAR ch;
     BOOL fCovered;
-
-    // Start the new compositon if there is no composition.
-//    if (!_IsComposing())
-//        _StartComposition(pContext);
-
-    //
-    // Assign VK_ value to the char. So the inserted the character is always
-    // uppercase.
-    //
-    ch = (WCHAR)wParam + 1;
+    LONG n, outn, cch;
 
     // first, test where a keystroke would go in the document if we did an insert
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
         return S_FALSE;
 
-    // is the insertion point covered by a composition?
-/*    if (_pComposition->GetRange(&pRangeComposition) == S_OK)
-    {
-        fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
-
-        pRangeComposition->Release();
-
-        if (!fCovered)
-        {
-            goto Exit;
-        }
+    // USE wparam == VK_T to do the test, removing last character next to
+    // the cursor. First by moving the start anchor one character to the left,
+    // Then Settext replaces the entire range with 0 characters (empty text),
+    // which deletes whatever is in that range.
+    //
+    // For all else Assign VK_ value to the char. So the inserted the character is always
+    // uppercase and display the next VK_ key to prove keyboard is active.
+    if (wParam != 0x54) {  // VK_T
+      ch = (WCHAR)wParam + 1;
+      cch = 1;
+    } else {
+      n   = -1;
+      ch  = L'\0';
+      cch = 0;
+      if (tfSelection.range->ShiftStart(ec, n, &outn, NULL) != S_OK) {
+        tfSelection.range->Release();
+        return S_FALSE;
+      }
     }
-    */
+
     // insert the text
     // we use SetText here instead of InsertTextAtSelection because we've already started a composition
     // we don't want to the app to adjust the insertion point inside our composition
-    if (tfSelection.range->SetText(ec, 0, &ch, 1) != S_OK)
-        goto Exit;
+    if (tfSelection.range->SetText(ec, 0, &ch, cch) != S_OK) {
+      tfSelection.range->Release();
+      return S_FALSE;
+    }
 
     // update the selection, we'll make it an insertion point just past
     // the inserted text.
     tfSelection.range->Collapse(ec, TF_ANCHOR_END);
     pContext->SetSelection(ec, 1, &tfSelection);
-
-    //
-    // set the display attribute to the composition range.
-    //
-    //_SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
 
 Exit:
     tfSelection.range->Release();
@@ -185,27 +180,27 @@ HRESULT CTextService::_HandleSpaceKey(TfEditCookie ec, ITfContext *pContext)
     //
     // set the display attribute to the composition range.
     //
-    // The real text service may have linguistic logic here and set 
-    // the specific range to apply the display attribute rather than 
+    // The real text service may have linguistic logic here and set
+    // the specific range to apply the display attribute rather than
     // applying the display attribute to the entire composition range.
     //
     _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeConverted);
 
-    // 
+    //
     // create an instance of the candidate list class.
-    // 
+    //
     if (_pCandidateList == NULL)
         _pCandidateList = new CCandidateList(this);
 
-    // 
+    //
     // we don't cache the document manager object. So get it from pContext.
-    // 
+    //
     ITfDocumentMgr *pDocumentMgr;
     if (pContext->GetDocumentMgr(&pDocumentMgr) == S_OK)
     {
-        // 
+        //
         // get the composition range.
-        // 
+        //
         ITfRange *pRange;
         if (_pComposition->GetRange(&pRange) == S_OK)
         {
