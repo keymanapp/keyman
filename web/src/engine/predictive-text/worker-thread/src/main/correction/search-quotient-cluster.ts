@@ -13,6 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { PathResult } from './correction-searchable.js';
 import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
+import { SearchQuotientRoot } from './search-quotient-root.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
@@ -71,6 +72,10 @@ export class SearchQuotientCluster extends SearchQuotientNode {
       // If there's a source-range key mismatch - via mismatch in count or in actual ID, we have an error.
       if(path.sourceRangeKey != sourceRangeKey) {
         throw new Error(`SearchQuotientNode does not share the same source identifiers as others in the cluster`);
+      }
+
+      if(path instanceof SearchQuotientRoot) {
+        throw new Error(`SearchQuotientRoot instances may not be part of clusters`);
       }
 
       lowestPossibleSingleCost = Math.min(lowestPossibleSingleCost, path.lowestPossibleSingleCost);
