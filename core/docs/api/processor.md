@@ -43,7 +43,7 @@ the state may also be modified.
 ```c
 KMN_API
 km_core_status
-km_core_process_event(km_core_state *state,
+km_core_process_event(km_core_state const *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
@@ -98,7 +98,7 @@ the state may also be modified.
 KMN_API
 km_core_status
 km_core_event(
-  km_core_state *state,
+  km_core_state const *state,
   uint32_t event,
   void* data
 );
