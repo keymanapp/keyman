@@ -435,10 +435,10 @@ non-zero value is an error).
 
 ## Specification
 
--->
+<!--
 // keep in sync with web/src/engine/src/core-adapter/KM_Core.ts
 // (see https://github.com/emscripten-core/emscripten/issues/18585)
-<!--
+-->
 ```c */
 enum km_core_status_codes {
   KM_CORE_STATUS_OK = 0,
