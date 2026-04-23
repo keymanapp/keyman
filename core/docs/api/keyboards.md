@@ -20,11 +20,6 @@ Provides read-only information about a keyboard.
 typedef struct {
   km_core_cu const * version_string;
   km_core_cu const * id;
-
-  // TODO-web-core: Deprecate this field (#12497)
-  // KMN_DEPRECATED
-  km_core_path_name  folder_path;
-
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
 
@@ -36,9 +31,6 @@ typedef struct {
 
 `id`
 : Keyman keyboard ID string.
-
-`folder_path`
-: Path to the unpacked folder containing the keyboard and associated resources (deprecated).
 
 `default_options`
 : Set of default values for any options included in the keyboard.
@@ -171,7 +163,7 @@ returned by [km_core_keyboard_load_from_blob].
 ```c
 KMN_API
 void
-km_core_keyboard_dispose(km_core_keyboard *keyboard);
+km_core_keyboard_dispose(km_core_keyboard const* keyboard);
 
 ```
 ## Parameters
@@ -381,7 +373,7 @@ the environment passed.
 ```c
 KMN_API
 km_core_status
-km_core_state_create(km_core_keyboard *keyboard,
+km_core_state_create(km_core_keyboard const *keyboard,
                     km_core_option_item const *env,
                     km_core_state **out);
 
@@ -465,7 +457,7 @@ invalid.
 ```c
 KMN_API
 void
-km_core_state_dispose(km_core_state *state);
+km_core_state_dispose(km_core_state const *state);
 
 ```
 ## Parameters
@@ -531,7 +523,7 @@ Returns a debug formatted string of the context from the state.
 ```c
 KMN_API
 km_core_cu *
-km_core_state_context_debug(km_core_state *state, km_core_debug_context_type context_type);
+km_core_state_context_debug(const km_core_state *state, km_core_debug_context_type context_type);
 
 ```
 ## Parameters
