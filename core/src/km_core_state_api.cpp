@@ -15,7 +15,6 @@
 #include <iomanip>
 
 #include "keyman_core.h"
-#include "jsonpp.hpp"
 
 #include "processor.hpp"
 #include "state.hpp"
@@ -28,7 +27,7 @@ using namespace km::core;
 // Forward declarations
 class context;
 
-km_core_status km_core_state_create(km_core_keyboard * keyboard,
+km_core_status km_core_state_create(km_core_keyboard const *keyboard,
                                   km_core_option_item const *env,
                                   km_core_state ** out)
 {
@@ -38,7 +37,7 @@ km_core_status km_core_state_create(km_core_keyboard * keyboard,
 
   try
   {
-    *out = new km_core_state(static_cast<abstract_processor&>(*keyboard), env);
+    *out = new km_core_state(static_cast<abstract_processor&>(*const_cast<km_core_keyboard*>(keyboard)), env);
   }
   catch (std::bad_alloc &)
   {
@@ -60,7 +59,7 @@ km_core_status km_core_state_clone(km_core_state const *state,
 }
 
 
-void km_core_state_dispose(km_core_state *state)
+void km_core_state_dispose(km_core_state const *state)
 {
   delete state;
 }
@@ -136,121 +135,6 @@ km_core_status km_core_state_queue_action_items(
 
   return KM_CORE_STATUS_OK;
 }
-namespace {
-  char const * action_item_name_lut[] = {
-    "",
-    "character",
-    "marker",
-    "alert",
-    "back",
-    "persist",
-    "reset",
-    "vkeydown",
-    "vkeyup",
-    "vshiftdown",
-    "vshiftup"
-  };
-
-  constexpr char const * const scope_names_lut[] = {
-    u8"unspecified",
-    u8"keyboard",
-    u8"environment"
-  };
-}
-
-
-json & operator << (json & j, km_core_action_item const &act)
-{
-  j << json::flat << json::object;
-  if (act.type >= KM_CORE_IT_MAX_TYPE_ID)
-  {
-    j << "invalid" << json::null << json::close;
-    return j;
-  }
-
-  j << action_item_name_lut[act.type];
-  switch (act.type)
-  {
-    case KM_CORE_IT_END:
-    case KM_CORE_IT_ALERT:
-    case KM_CORE_IT_BACK:
-      j << json::null;
-      break;
-    case KM_CORE_IT_CHAR:
-    case KM_CORE_IT_MARKER:
-      j << km_core_context_item {act.type, {0,}, {act.character}}; // TODO: is act.type correct here? it may map okay but this is bad practice to mix constants across types. Similarly using act.character instead of act.type
-      break;
-    case KM_CORE_IT_PERSIST_OPT:
-      j << json::object
-          << scope_names_lut[act.option->scope]
-          << json::flat << json::object
-            << act.option->key << act.option->value
-          << json::close
-        << json::close;
-      break;
-  }
-  j << json::close;
-
-  return j;
-}
-
-
-json & operator << (json & j, actions const & acts)
-{
-    j << json::array;
-    for (auto & act: acts)
-    {
-      if (act.type != KM_CORE_IT_END)
-      {
-        j << act;
-      }
-    }
-    j << json::close;
-    return j;
-}
-
-
-km_core_status km_core_state_to_json(km_core_state const *state,
-                                        char *buf,
-                                        size_t *space)
-{
-  assert(state);
-  if (!state)
-    return KM_CORE_STATUS_INVALID_ARGUMENT;
-
-  std::stringstream _buf;
-  json jo(_buf);
-
-  try
-  {
-    // Pretty print the document.
-    jo << json::object
-        << "$schema" << "keyman/core/docs/introspection.schema"
-        << "keyboard" << state->processor().keyboard()
-//        << "options" << state->options()  TODO: Fix
-        << "context" << state->context()
-        << "actions" << state->actions()
-        << json::close;
-  }
-  catch (std::bad_alloc &)
-  {
-    *space = 0;
-    return KM_CORE_STATUS_NO_MEM;
-  }
-
-  // Fetch the finished doc and copy it to the buffer if there enough space.
-  auto const doc = _buf.str();
-  if (buf && *space > doc.size())
-  {
-    std::copy(doc.begin(), doc.end(), buf);
-    buf[doc.size()] = 0;
-  }
-
-  // Return space needed/used.
-  *space = doc.size()+1;
-  return KM_CORE_STATUS_OK;
-
-}
 
 void km_core_state_imx_register_callback(
   km_core_state *state,
@@ -301,10 +185,11 @@ km_core_cu * _new_error_string(std::u16string const str) {
 }
 
 km_core_cu * km_core_state_context_debug(
-  km_core_state *state,
+  const km_core_state *state_,
   km_core_debug_context_type context_type
 ) {
   km_core_context_item * context_items = nullptr;
+  km_core_state* state = const_cast<km_core_state*>(state_);
 
   if(context_type == KM_CORE_DEBUG_CONTEXT_INTERMEDIATE) {
     if(km_core_state_get_intermediate_context(state, &context_items) != KM_CORE_STATUS_OK) {

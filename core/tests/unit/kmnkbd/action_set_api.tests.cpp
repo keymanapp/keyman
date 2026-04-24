@@ -13,8 +13,8 @@
 #include "action.hpp"
 
 #include <test_assert.h>
-#include "../emscripten_filesystem.h"
-#include "../load_kmx_file.hpp"
+#include "../helpers/emscripten_filesystem.h"
+#include "../helpers/load_kmx_file.hpp"
 
 const km_core_action_item alert_action_item();
 const km_core_action_item bksp_action_item(uint8_t type, uintptr_t value);
@@ -68,7 +68,7 @@ void setup(const char *keyboard, const km_core_cu* context) {
 }
 
 void run_test(km_core_action_item const * action_items, const km_core_actions &actions) {
-  setup("k_000___null_keyboard.kmx", u"");
+  setup("k_0000___null_keyboard.kmx", u"");
   test_state->set_actions(actions);
   auto set_actions = test_state->actions();
 

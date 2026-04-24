@@ -1,7 +1,6 @@
-/***
-   KeymanWeb 17.0
-   Copyright 2019-2023 SIL International
-***/
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 
@@ -820,7 +819,7 @@ if(!keymanweb) {
        * @param       {boolean} updateKeyman
        * @return      {boolean}
        **/
-      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean) {
+      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean): Promise<boolean> {
         keymanweb.activatingUI(true);
 
         if(this.selectedLanguage) {
@@ -943,7 +942,7 @@ if(!keymanweb) {
        * @return      {boolean}
        * Description  Update the UI when all keyboards disabled by user
        **/
-      private readonly offButtonClickEvent = async (event: Event) => {
+      private readonly offButtonClickEvent = async (event: Event): Promise<boolean> => {
         if(this.toolbarNode.className != 'kmw_controls_disabled') {
           this.hideKeyboardsForLanguage(null);
           if(this.selectedLanguage) {
