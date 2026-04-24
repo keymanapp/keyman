@@ -320,7 +320,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return Math.min(localCost, parentCost);
   }
 
-  protected abstract buildEdgesForNodes(baseNodes: ReadonlyArray<SearchNode>): SearchNode[];
+  protected abstract buildEdgesFromResults(baseNodes: ReadonlyArray<TokenResultMapping>): SearchNode[];
 
   protected queueNodes(nodes: SearchNode[]) {
     this.selectionQueue.enqueueAll(nodes);
@@ -347,7 +347,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       const result = this.parentNode.handleNextNode();
 
       if(result.type == 'complete') {
-        this.queueNodes(this.buildEdgesForNodes([result.finalNode]));
+        this.queueNodes(this.buildEdgesFromResults([new TokenResultMapping(result.finalNode)]));
       }
 
       return {
@@ -404,8 +404,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       return {
         type: 'complete',
         cost: currentNode.currentCost,
-        finalNode: currentNode,
-        spaceId: this.spaceId
+        finalNode: currentNode
       };
     }
 

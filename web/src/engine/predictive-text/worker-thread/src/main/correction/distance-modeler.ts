@@ -146,13 +146,15 @@ export class SearchNode {
   private readonly deleteAfterInsertEditPairs: number;
 
   /**
-   * A unique identifier corresponding to the earliest SearchPath containing
-   * the correction-search graph edge represented by this instance.
+   * A unique identifier corresponding to the SearchQuotientNode last passed
+   * through by the represented search path.
    *
-   * Corresponding search results will be tagged with this, which can be used
-   * to identify the result's original source tokenization.
+   * The correction-search results produced by this search path will be tagged
+   * accordingly to match the correction with its original ContextTokenization.
+   * This is necessary in order to properly construct suggestions that apply as
+   * the user expects should the tokenization pattern itself be corrected.
    */
-  readonly spaceId: number;
+  public spaceId: number;
 
   /**
    * Notes the edit operation used for the most recent edge in the node's
@@ -580,7 +582,7 @@ export class SearchNode {
  * @param timer
  * @returns
  */
-export async function *getBestMatches(searchModules: SearchQuotientNode[], timer: ExecutionTimer): AsyncGenerator<TokenResultMapping> {
+export async function *getBestMatches(searchModules: SearchQuotientNode[], timer: ExecutionTimer): AsyncGenerator<Readonly<TokenResultMapping>> {
   const spaceQueue = new PriorityQueue<SearchQuotientNode>((a, b) => a.currentCost - b.currentCost);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
@@ -595,14 +597,14 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
   spaceQueue.enqueueAll(searchModules);
 
-  let currentReturns: {[resultKey: string]: SearchNode} = {};
+  let currentReturns: {[resultKey: string]: TokenResultMapping} = {};
 
   // Stage 2:  the fun part; actually searching!
   do {
     const entry: TokenResultMapping = timer.time(() => {
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
-        currentReturns[result.node.resultKey] = result.node;
+        currentReturns[result.matchString] = result;
         return result;
       }
 
@@ -629,10 +631,11 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         //
         // If it occurs, we should re-emit it - it'll show up earlier in the
         // suggestions that way, as it should.
-        if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
-          currentReturns[node.resultKey] = node;
+        if((currentReturns[node.resultKey]?.totalCost ?? Number.MAX_VALUE) > newResult.cost) {
+          const trm = new TokenResultMapping(newResult.finalNode)
+          currentReturns[node.resultKey] = trm;
           // Do not track yielded time.
-          return new TokenResultMapping(newResult.finalNode);
+          return trm;
         }
       }
 

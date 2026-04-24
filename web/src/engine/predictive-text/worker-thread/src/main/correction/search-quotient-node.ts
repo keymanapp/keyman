@@ -32,8 +32,7 @@ type IntermediateSearchPath = {
 type CompleteSearchPath = {
   type: 'complete',
   cost: number,
-  finalNode: SearchNode,
-  spaceId: number
+  finalNode: SearchNode
 }
 
 export type PathResult = NullPath | IntermediateSearchPath | CompleteSearchPath;

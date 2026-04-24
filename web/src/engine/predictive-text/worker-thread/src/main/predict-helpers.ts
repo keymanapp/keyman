@@ -403,7 +403,7 @@ export function determineSuggestionAlignment(
 export function buildAndMapPredictions(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: TokenResultMapping,
+  match: Readonly<TokenResultMapping>,
   costFactor: number
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
@@ -532,7 +532,7 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    if(match.node.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
+    if(match.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
       continue;
     }
 

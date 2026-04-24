@@ -77,8 +77,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return {
       type: 'complete',
       cost: 0,
-      finalNode: this.rootNode,
-      spaceId: this.spaceId
+      finalNode: this.rootNode
     };
   }
 
