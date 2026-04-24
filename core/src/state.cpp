@@ -55,6 +55,9 @@ state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   _imx_callback = nullptr;
   _imx_object = nullptr;
   memset(const_cast<km_core_actions*>(&_action_struct), 0, sizeof(km_core_actions));
+  // Ensure _action_struct is initialized to the default values
+  km_core_action_item end_item = {KM_CORE_IT_END, {0,}, {0}};
+  action_item_list_to_actions_object(&end_item, &this->_action_struct);
 }
 
 void state::imx_register_callback(
