@@ -57,7 +57,7 @@ export function analyzeQuotientNodeResults(
   let result: PathResult = node.handleNextNode();
   while(result.type != 'none') {
     if(result.type == 'complete') {
-      const resultKey = result.mapping.node.resultKey;
+      const resultKey = result.mapping.matchString;
       if(expectedResults.find((entry) => entry == resultKey)) {
         matchMap.set(resultKey, (matchMap.get(resultKey) ?? 0) + 1);
       }

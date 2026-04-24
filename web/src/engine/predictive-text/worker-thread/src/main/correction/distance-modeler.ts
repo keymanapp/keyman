@@ -597,14 +597,14 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
   spaceQueue.enqueueAll(searchModules);
 
-  let currentReturns: {[resultKey: string]: SearchNode} = {};
+  let currentReturns: {[resultKey: string]: TokenResultMapping} = {};
 
   // Stage 2:  the fun part; actually searching!
   do {
     const entry: TokenResultMapping = timer.time(() => {
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
-        currentReturns[result.node.resultKey] = result.node;
+        currentReturns[result.matchString] = result;
         return result;
       }
 
@@ -615,10 +615,10 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
       if(newResult.type == 'none') {
         return null;
       } else if(newResult.type == 'complete') {
-        const node = newResult.mapping.node;
+        const mapping = newResult.mapping;
 
         // Is the entry a reasonable result?
-        if(node.isFullReplacement) {
+        if(mapping.isFullReplacement) {
           // If the entry's 'match' fully replaces the input string, we consider it
           // unreasonable and ignore it.  Also, if we've reached this point...
           // we can(?) assume that everything thereafter is as well.
@@ -631,9 +631,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         //
         // If it occurs, we should re-emit it - it'll show up earlier in the
         // suggestions that way, as it should.
-        if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
-          currentReturns[node.resultKey] = node;
-          // Do not track yielded time.
+        if((currentReturns[mapping.matchString]?.totalCost ?? Number.MAX_VALUE) > newResult.cost) {
           return newResult.mapping;
         }
       }

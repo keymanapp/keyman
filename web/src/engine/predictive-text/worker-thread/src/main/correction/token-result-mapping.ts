@@ -12,15 +12,29 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
 
+import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export class TokenResultMapping {
-  readonly node: SearchNode;
+  private readonly node: SearchNode;
+  readonly spaceId: number;
 
-  constructor(node: SearchNode) {
-    this.node = node;
+  constructor(node: SearchNode);
+  constructor(mapping: TokenResultMapping, spaceId: number);
+  constructor(mappingBase: SearchNode | TokenResultMapping, spaceId?: number) {
+    if(!mappingBase) {
+      throw new Error("Result-mapping parameters may not be null");
+    }
+
+    if(mappingBase instanceof SearchNode) {
+      this.node = mappingBase;
+      this.spaceId = mappingBase.spaceId;
+    } else {
+      this.node = mappingBase.node;
+      this.spaceId = spaceId;
+    }
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {
@@ -33,6 +47,14 @@ export class TokenResultMapping {
 
   get matchString(): string {
     return this.node.resultKey;
+  }
+
+  get editCount(): number {
+    return this.node.editCount;
+  }
+
+  get isFullReplacement(): boolean {
+    return this.node.isFullReplacement;
   }
 
   /**
@@ -66,5 +88,17 @@ export class TokenResultMapping {
 
   get finalTraversal(): LexiconTraversal {
     return this.node.currentTraversal;
+  }
+
+  buildInsertionEdges(): SearchNode[] {
+    return this.node.buildInsertionEdges();
+  }
+
+  buildDeletionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
+    return this.node.buildDeletionEdges(dist, edgeId);
+  }
+
+  buildSubstitutionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
+    return this.node.buildSubstitutionEdges(dist, edgeId);
   }
 }
