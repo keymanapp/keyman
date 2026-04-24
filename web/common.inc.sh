@@ -96,7 +96,16 @@ function test-headless() {
   if [ ! -z "${2:-}" ]; then
     TEST_BASE="${KEYMAN_ROOT}/web/build/test/headless/"
 
-    # Ensure the compiled tests are available.
+    # If a unit test spec file exists on branch A and not branch B, the test
+    # artifact should be removed to prevent errors should the test attempt to
+    # reference code specific to branch A (or similar).
+    rm -rf "${TEST_BASE}"
+
+    # To do a proper clean & reset to the current branch's headless test set, we
+    # need to nuke the tsconfig.tsbuildinfo file specifically; tsc won't
+    # actually verify that the most recently compiled files actually still
+    # exist!
+    rm "${KEYMAN_ROOT}/web/build/test/tsconfig.tsbuildinfo"
     tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
   fi
 
