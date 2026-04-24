@@ -51,7 +51,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     return new LegacyQuotientSpur(parentNode, inputs, inputSource) as this;
   }
 
-  protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>) {
+  protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>): SearchNode[] {
     // With a newly-available input, we can extend new input-dependent paths from
     // our previously-reached 'extractedResults' nodes.
     let outboundNodes = priorResults.map((result) => {
@@ -83,12 +83,12 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     const result = super.handleNextNode();
 
     if(result.type == 'complete') {
-      const currentMapping = result.mapping;
+      const parentResult = result.mapping;
 
       // Forbid a raw edit-distance of greater than 2.
       // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
-      if(currentMapping.editCount < 2) {
-        let insertionEdges = currentMapping.buildInsertionEdges();
+      if(parentResult.editCount < 2) {
+        let insertionEdges = parentResult.buildInsertionEdges();
         this.queueNodes(insertionEdges);
       }
     }

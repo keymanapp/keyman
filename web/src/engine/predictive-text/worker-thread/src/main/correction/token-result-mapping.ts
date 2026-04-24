@@ -17,6 +17,29 @@ import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
+export function initTokenResultFilterer() {
+  const priorReturnCosts: Map<string, number> = new Map();
+
+  const closure = (searchResult: TokenResultMapping) => {
+    if(searchResult.isFullReplacement) {
+      // If the entry's 'match' fully replaces the input string, we consider it
+      // unreasonable and ignore it.  Also, if we've reached this point...
+      // we can(?) assume that everything thereafter is as well.
+      return false;
+    }
+
+    if((priorReturnCosts.get(searchResult.matchString) ?? Number.MAX_VALUE) > searchResult.totalCost) {
+      priorReturnCosts.set(searchResult.matchString, searchResult.totalCost);
+
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  return closure;
+}
+
 export class TokenResultMapping {
   private readonly node: SearchNode;
   readonly spaceId: number;
@@ -56,7 +79,6 @@ export class TokenResultMapping {
   get isFullReplacement(): boolean {
     return this.node.isFullReplacement;
   }
-
   /**
    * Gets the number of Damerau-Levenshtein edits needed to reach the node's
    * matchString from the output induced by the input sequence used to reach it.
