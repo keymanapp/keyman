@@ -21,10 +21,8 @@ end
 
 -- Support for redirect meta key, adds a meta refresh to the resulting document
 function Meta(meta)
-  for k, v in pairs(meta) do
-    if k == 'redirect' and type(v) == 'table' and v.t == 'MetaInlines' then
-      redirect = v[1].c
-    end
+  if meta.redirect then
+    redirect = pandoc.utils.stringify(meta.redirect)
   end
   return meta
 end
