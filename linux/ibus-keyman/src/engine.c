@@ -83,10 +83,13 @@ struct _IBusKeymanEngine {
   gboolean         rctrl_pressed;
   gboolean         lalt_pressed;
   gboolean         ralt_pressed;
-  IBusLookupTable *table;
   IBusProperty    *status_prop;
   IBusPropList    *prop_list;
   void            *settings;
+  // Flag indicating if there are pending changes (forwarded keystrokes,
+  // deleted surrounding text) that need to be applied by committing an
+  //empty text to the input engine
+  gboolean         is_dirty;
 
   commit_queue_item commit_queue[MAX_QUEUE_SIZE];
   commit_queue_item *commit_item;
@@ -246,45 +249,66 @@ debug_utf8_with_codepoints(const gchar *utf8) {
 
 static gboolean
 client_supports_surrounding_text(IBusEngine *engine) {
+  // This is not always reliable: IBus detects whether the client supports
+  // surrounding text by emitting the retrieve-surrounding signal. As part
+  // of that signal handler, the client is expected to call
+  // gtk_im_context_set_surrounding_with_selection which ends calling
+  // ibus_keyman_engine_set_surrounding_text at a time when IBus is still
+  // in the middle of determining whether the client supports surrounding text.
   g_assert(engine != NULL);
+  if (!engine->enabled) {
+    g_warning("%s: engine is not enabled, so return value is likley incorrect.", __FUNCTION__);
+  }
   return (engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0;
 }
 
 static void
-set_context_if_needed(IBusEngine *engine) {
-  IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+set_context_impl(
+  IBusEngine *engine,
+  IBusText    *text,
+  guint       cursor_pos,
+  guint       anchor_pos
+) {
+  IBusKeymanEngine* keyman                   = (IBusKeymanEngine*)engine;
+  g_autofree gchar* application_context_utf8 = NULL;
+  guint context_start, context_end;
+  context_end              = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
+  context_start            = context_end > MAXCONTEXT_ITEMS ? context_end - MAXCONTEXT_ITEMS : 0;
+  application_context_utf8 = g_utf8_substring(ibus_text_get_text(text), context_start, context_end);
+  g_message(
+      "%s: new application context: |%s| (len:%u) cursor:%d anchor:%d", __FUNCTION__, application_context_utf8,
+      context_end - context_start, cursor_pos, anchor_pos);
 
+  km_core_cu* application_context_utf16 = g_utf8_to_utf16(application_context_utf8, -1, NULL, NULL, NULL);
+  km_core_context_status result;
+  result = km_core_state_context_set_if_needed(keyman->state, application_context_utf16);
+  g_free(application_context_utf16);
+
+  g_message(
+      "%s: context %s", __FUNCTION__,
+      result == KM_CORE_CONTEXT_STATUS_UNCHANGED ? "unchanged"
+      : result == KM_CORE_CONTEXT_STATUS_UPDATED ? "updated"
+      : result == KM_CORE_CONTEXT_STATUS_CLEARED ? "cleared"
+      : result == KM_CORE_CONTEXT_STATUS_ERROR   ? "error"
+                                                 : "invalid argument");
+}
+
+static void
+set_context_if_needed(IBusEngine *engine) {
   if (!client_supports_surrounding_text(engine)) {
     g_message("%s: not a compliant client app", __FUNCTION__);
     return;
   }
 
   IBusText *text;
-  g_autofree gchar *application_context_utf8 = NULL;
-  guint cursor_pos, anchor_pos, context_start, context_end;
+  guint cursor_pos, anchor_pos;
 
   g_autofree gchar *debug_context = NULL;
   g_message("%s: current core context   : %s", __FUNCTION__, debug_context = get_context_debug(engine));
 
   ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
 
-  context_end         = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
-  context_start       = context_end > MAXCONTEXT_ITEMS ? context_end - MAXCONTEXT_ITEMS : 0;
-  application_context_utf8 = g_utf8_substring(ibus_text_get_text(text), context_start, context_end);
-  g_message("%s: new application context: |%s| (len:%u) cursor:%d anchor:%d", __FUNCTION__,
-    application_context_utf8, context_end - context_start, cursor_pos, anchor_pos);
-
-  km_core_cu *application_context_utf16 = g_utf8_to_utf16(application_context_utf8, -1, NULL, NULL, NULL);
-  km_core_context_status result;
-  result = km_core_state_context_set_if_needed(keyman->state, application_context_utf16);
-  g_free(application_context_utf16);
-
-  g_message("%s: context %s", __FUNCTION__,
-    result == KM_CORE_CONTEXT_STATUS_UNCHANGED ? "unchanged"
-    : result == KM_CORE_CONTEXT_STATUS_UPDATED ? "updated"
-    : result == KM_CORE_CONTEXT_STATUS_CLEARED ? "cleared"
-    : result == KM_CORE_CONTEXT_STATUS_ERROR   ? "error"
-                                               : "invalid argument");
+  set_context_impl(engine, text, cursor_pos, anchor_pos);
 }
 
 static void
@@ -461,6 +485,7 @@ ibus_keyman_engine_constructor(
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
     keyman->rctrl_pressed = FALSE;
+    keyman->is_dirty = FALSE;
     initialize_queue_items(keyman, 0, MAX_QUEUE_SIZE);
     keyman->commit_item    = &keyman->commit_queue[0];
     gchar **split_name     = g_strsplit(engine_name, ":", 2);
@@ -557,8 +582,6 @@ ibus_keyman_engine_constructor(
 
     ping_keyman_system_service();
 
-    set_context_if_needed(engine);
-
     return (GObject *) keyman;
 }
 
@@ -629,10 +652,29 @@ static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
     IBusText *text;
     g_autofree gchar *debug = NULL;
     g_message("DAR: %s - %s", __FUNCTION__, debug = debug_utf8_with_codepoints(string));
-    text = ibus_text_new_from_static_string (string);
+    text = ibus_text_new_from_string(string);
     g_object_ref_sink(text);
     ibus_engine_commit_text ((IBusEngine *)keyman, text);
     g_object_unref (text);
+    keyman->is_dirty = FALSE;
+}
+
+/**
+ * Commit an empty string to flush the surrounding text buffer.
+ *
+ * Wayland uses double-buffering for surrounding text and some other
+ * functionality, so we have to commit to apply the changes.
+ * See https://wayland.app/protocols/input-method-unstable-v2
+ */
+static void
+apply_changes(IBusKeymanEngine* keyman) {
+  IBusText* text;
+  g_message("%s - committing", __FUNCTION__);
+  text = ibus_text_new_from_static_string("");
+  g_object_ref_sink(text);
+  ibus_engine_commit_text((IBusEngine*)keyman, text);
+  g_object_unref(text);
+  keyman->is_dirty = FALSE;
 }
 
 //
@@ -643,7 +685,7 @@ is_core_options_end(km_core_option_item *option) {
 }
 
 static void
-process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
+process_output_action(IBusEngine* engine, const km_core_usv* output_utf32) {
   if (output_utf32 == NULL || output_utf32[0] == '\0') {
     return;
   }
@@ -683,12 +725,13 @@ process_backspace_action(IBusEngine *engine, unsigned int code_points_to_delete)
     return;
   }
 
+  IBusKeymanEngine* keyman = (IBusKeymanEngine*)engine;
   if (client_supports_surrounding_text(engine)) {
     g_message("%s: compliant app: deleting surrounding text %d codepoints", __FUNCTION__, code_points_to_delete);
     ibus_engine_delete_surrounding_text(engine, -code_points_to_delete, code_points_to_delete);
+    keyman->is_dirty = TRUE;
   } else {
     g_message("%s: non-compliant app: queueing %d backspaces", __FUNCTION__, code_points_to_delete);
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
     keyman->commit_item->code_points_to_delete = code_points_to_delete;
   }
 }
@@ -761,6 +804,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
       ibus_engine_forward_key_event(engine, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, 0);
       current_item->code_points_to_delete--;
     }
+    keyman->is_dirty = TRUE;
     // don't remove the item from the queue yet - we need to process it
     // again for the output and keystrokes. Instead emit the sentinel key
     // again.
@@ -780,6 +824,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
     g_message("%s: Forwarding key from commit queue: keyval=0x%02x, keycode=0x%02x, state=0x%02x",
       __FUNCTION__, current_item->keyval, current_item->keycode, current_item->state);
     ibus_engine_forward_key_event(engine, current_item->keyval, current_item->keycode, current_item->state);
+    keyman->is_dirty = TRUE;
   }
   keyman->commit_item--;
   memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * (MAX_QUEUE_SIZE - 1));
@@ -790,6 +835,10 @@ static void
 finish_process_actions(IBusEngine *engine) {
   g_assert(engine != NULL);
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  if (keyman->is_dirty) {
+    apply_changes(keyman);
+  }
+
   if (client_supports_surrounding_text(engine)) {
     // compliant app
     return;
@@ -840,6 +889,8 @@ process_actions(
   IBusEngine *engine,
   km_core_actions const *actions
 ) {
+  IBusKeymanEngine* keyman = (IBusKeymanEngine*)engine;
+  keyman->is_dirty = FALSE;
   process_backspace_action(engine, actions->code_points_to_delete);
   process_output_action(engine, actions->output);
   process_persist_action(engine, actions->persist_options);
@@ -1032,8 +1083,12 @@ ibus_keyman_engine_set_surrounding_text(
   guint       cursor_pos,
   guint       anchor_pos
 ){
-    parent_class->set_surrounding_text(engine, text, cursor_pos, anchor_pos);
-    set_context_if_needed(engine);
+  g_message(
+      "%s: text=%s (len: %u), cursor_pos=%d, anchor_pos=%d", __FUNCTION__,
+      ibus_text_get_text(text), ibus_text_get_length(text),cursor_pos, anchor_pos);
+
+  parent_class->set_surrounding_text(engine, text, cursor_pos, anchor_pos);
+  set_context_impl(engine, text, cursor_pos, anchor_pos);
 }
 
 // static void ibus_keyman_engine_set_cursor_location (IBusEngine             *engine,
@@ -1062,7 +1117,11 @@ ibus_keyman_engine_focus_in (IBusEngine *engine)
     g_message("%s", __FUNCTION__);
     ibus_engine_register_properties (engine, keyman->prop_list);
 
-    set_context_if_needed(engine);
+    if (engine->enabled) {
+      // While the engine is not enabled ibus might not yet know if
+      // the client app supports surrounding text.
+      set_context_if_needed(engine);
+    }
     parent_class->focus_in (engine);
 }
 
@@ -1123,7 +1182,8 @@ ibus_keyman_engine_enable (IBusEngine *engine)
         km_service_set_ldmlfile (service, keyman->ldmlfile);
         km_service_set_name (service, keyman->kb_name);
     }
-    parent_class->enable (engine);
+    engine->enabled = TRUE;
+    parent_class->enable(engine);
 }
 
 /**
@@ -1147,6 +1207,8 @@ ibus_keyman_engine_disable (IBusEngine *engine)
     km_service_set_ldmlfile (service, "");
     km_service_set_name (service, "None");
     // g_clear_object(&service);
+
+    engine->enabled = FALSE;
 
     parent_class->disable (engine);
 }
