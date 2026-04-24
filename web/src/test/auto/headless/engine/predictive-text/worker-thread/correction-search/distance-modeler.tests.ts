@@ -9,7 +9,7 @@
 
 import { assert } from 'chai';
 
-import { PriorityQueue } from '@keymanapp/web-utils';
+import { PriorityQueue } from 'keyman/common/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 

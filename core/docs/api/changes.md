@@ -2,6 +2,20 @@
 title: Changes - Keyman Core API
 ---
 
+## Changes between 18.0 and 19.0
+
+* Removed deprecated `km_core_keyboard_attrs.folder_path`
+* The JSON introspection APIs (which were not fully implemented),
+  `km_core_state_options_to_json` and `km_core_state_to_json`, have been
+  removed.
+
+## Changes between 17.0 and 18.0
+
+* Replaced `km_core_keyboard_load` with `km_core_keyboard_load_from_blob`.
+  Keyboard loading is now done in the engine, and the content of the
+  keyboard passed to Core as a blob.
+* Deprecated `km_core_keyboard_attrs.folder_path`
+
 ## Changes between 16.0 and 17.0
 
 * The namespace identifier has changed from `km_kbp_` to `km_core_`.
@@ -16,7 +30,7 @@ title: Changes - Keyman Core API
 -------------------------------------------------------------------------------
 
 
-[km_core_cp]: background#km_core_cp "km_core_cp type"
+[km_core_cu]: background#km_core_cu "km_core_cu type"
 [km_core_usv]: background#km_core_usv "km_core_usv type"
 [km_core_virtual_key]: background#km_core_virtual_key "km_core_virtual_key type"
 [km_core_status]: background#km_core_status "km_core_status type"
@@ -39,7 +53,6 @@ title: Changes - Keyman Core API
 [km_core_option_item]: options#km_core_option_item "km_core_option_item struct"
 [km_core_options_list_size]: options#km_core_options_list_size "km_core_options_list_size function"
 [km_core_state_options_update]: options#km_core_state_options_update "km_core_state_options_update function"
-[km_core_state_options_to_json]: options#km_core_state_options_to_json "km_core_state_options_to_json function"
 [km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
 [km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
 [km_core_keyboard_imx]: keyboards#km_core_keyboard_imx "km_core_keyboard_imx struct"
@@ -56,8 +69,7 @@ title: Changes - Keyman Core API
 [km_core_state_dispose]: keyboards#km_core_state_dispose "km_core_state_dispose function"
 [km_core_debug_context_type]: keyboards#km_core_debug_context_type "km_core_debug_context_type enum"
 [km_core_state_context_debug]: keyboards#km_core_state_context_debug "km_core_state_context_debug function"
-[km_core_cp_dispose]: keyboards#km_core_cp_dispose "km_core_cp_dispose function"
-[km_core_state_to_json]: keyboards#km_core_state_to_json "km_core_state_to_json function"
+[km_core_cu_dispose]: keyboards#km_core_cu_dispose "km_core_cu_dispose function"
 [km_core_event_flags]: processor#km_core_event_flags "km_core_event_flags enum"
 [km_core_process_event]: processor#km_core_process_event "km_core_process_event function"
 [km_core_event]: processor#km_core_event "km_core_event function"

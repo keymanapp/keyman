@@ -23,7 +23,7 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^11.2.2",
-    "playwright": "^1.46.1",
+    "playwright": "1.46.1",
     "sinon": "^17.0.1",
     "source-map-support": "^0.5.21",
     "tslib": "^2.5.2",
@@ -52,11 +52,11 @@
     "common/test/resources",
     "common/web/keyman-version",
     "common/web/langtags",
+    "common/web/sentry-manager",
     "common/web/types",
     "common/tools/sourcemap-path-remapper",
     "common/tools/hextobin",
     "web",
-    "web/src/engine/osk/gesture-processor",
     "web/src/engine/predictive-text/*"
   ],
   "dependencies": {

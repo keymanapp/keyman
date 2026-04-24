@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import { Deadkey, unitTestEndpoints } from 'keyman/engine/js-processor';
+import { Deadkey, unitTestEndpoints } from 'keyman/engine/keyboard';
 
 const DeadkeyTracker = unitTestEndpoints.DeadkeyTracker;
 

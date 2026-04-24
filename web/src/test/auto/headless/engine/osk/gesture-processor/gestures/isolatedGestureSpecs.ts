@@ -1,4 +1,4 @@
-import { gestures } from '@keymanapp/gesture-recognizer';
+import { gestures } from 'keyman/engine/gesture-processor';
 import * as specs from './isolatedPathSpecs.js';
 import specTypeDefs = gestures.specs;
 

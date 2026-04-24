@@ -16,9 +16,10 @@ SUBPROJECT_NAME=tools/testing/recorder
 ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's test-sequence recording tool" \
-  "@/common/web/keyman-version" \
-  "@/web/src/engine/keyboard" \
-  "@../recorder-core" \
+  "@/common/tools/es-bundling  build" \
+  "@/common/web/keyman-version build" \
+  "@/web/src/engine            build" \
+  "@../recorder-core           build" \
   "clean" \
   "configure" \
   "build"
@@ -33,8 +34,8 @@ do_build ( ) {
   compile $SUBPROJECT_NAME
 
   # Base product - the main keyboard processor
-  node "${LIB_BUNDLER}"    "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/index.js" \
-    --out                  "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/index.mjs" \
+  node_es_bundle "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/index.mjs" \
     --format esm
 }
 

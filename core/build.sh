@@ -62,6 +62,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "@/common/tools/hextobin" \
   "@/common/web/keyman-version" \
   "@/developer/src/kmc" \
+  "@/core/tools/api-header-extractor" \
   "clean" \
   "configure" \
   "build" \

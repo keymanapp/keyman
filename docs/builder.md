@@ -1257,9 +1257,6 @@ fi
 
 Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
 
-**Note:** this is currently hosted in shellHelperFunctions.sh, but will
-be moved to builder.typescript.inc.sh in the future.
-
 ### Usage
 
 ```bash

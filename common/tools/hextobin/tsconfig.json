@@ -5,5 +5,5 @@
     "outDir": "build/"
   },
   "exclude": ["node_modules"],
-  "files": ["index.ts", "hextobin.ts"]
+  "files": ["index.ts", "hextobin.ts", "filesystem.ts", "main.ts"]
 }

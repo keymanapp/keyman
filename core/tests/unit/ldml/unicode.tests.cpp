@@ -19,7 +19,7 @@
 #include "action.hpp"
 
 #include <test_assert.h>
-#include "../emscripten_filesystem.h"
+#include "../helpers/emscripten_filesystem.h"
 
 #include "core_icu.h"
 #include <unicode/uversion.h>
