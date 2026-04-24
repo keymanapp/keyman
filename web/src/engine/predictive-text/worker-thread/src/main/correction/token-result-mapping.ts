@@ -18,7 +18,7 @@ import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export function initTokenResultFilterer() {
-  const priorReturns: Map<string, TokenResultMapping> = new Map();
+  const priorReturnCosts: Map<string, number> = new Map();
 
   const closure = (searchResult: TokenResultMapping) => {
     if(searchResult.isFullReplacement) {
@@ -28,8 +28,8 @@ export function initTokenResultFilterer() {
       return false;
     }
 
-    if((priorReturns.get(searchResult.matchString)?.totalCost ?? Number.MAX_VALUE) > searchResult.totalCost) {
-      priorReturns.set(searchResult.matchString, searchResult);
+    if((priorReturnCosts.get(searchResult.matchString) ?? Number.MAX_VALUE) > searchResult.totalCost) {
+      priorReturnCosts.set(searchResult.matchString, searchResult.totalCost);
 
       return true;
     } else {
