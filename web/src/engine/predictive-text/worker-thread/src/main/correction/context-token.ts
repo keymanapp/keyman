@@ -15,7 +15,6 @@ import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 import { generateSubsetId } from './tokenization-subsets.js';
 
-import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
@@ -117,14 +116,6 @@ export class ContextToken {
     });
 
     return new ContextToken(searchModule, isPartial);
-  }
-
-  /**
-   * Call this to record the original keystroke Transforms for the context range
-   * corresponding to this token.
-   */
-  addInput(inputSource: PathInputProperties, distribution: Distribution<Transform>) {
-    this._searchModule = new LegacyQuotientSpur(this._searchModule, distribution, inputSource);
   }
 
   get inputCount() {
