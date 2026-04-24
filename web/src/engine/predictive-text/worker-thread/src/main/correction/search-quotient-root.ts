@@ -77,7 +77,7 @@ export class SearchQuotientRoot implements SearchQuotientNode {
     return {
       type: 'complete',
       cost: 0,
-      finalNode: this.rootNode
+      mapping: new TokenResultMapping(this.rootNode)
     };
   }
 

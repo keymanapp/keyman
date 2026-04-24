@@ -53,6 +53,10 @@ export class TokenResultMapping {
     return this.node.editCount;
   }
 
+  get isFullReplacement(): boolean {
+    return this.node.isFullReplacement;
+  }
+
   /**
    * Gets the number of Damerau-Levenshtein edits needed to reach the node's
    * matchString from the output induced by the input sequence used to reach it.

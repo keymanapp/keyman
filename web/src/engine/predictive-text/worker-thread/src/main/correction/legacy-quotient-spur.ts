@@ -83,12 +83,12 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     const result = super.handleNextNode();
 
     if(result.type == 'complete') {
-      const currentNode = result.finalNode;
+      const currentMapping = result.mapping;
 
       // Forbid a raw edit-distance of greater than 2.
       // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
-      if(currentNode.editCount < 2) {
-        let insertionEdges = currentNode.buildInsertionEdges();
+      if(currentMapping.editCount < 2) {
+        let insertionEdges = currentMapping.buildInsertionEdges();
         this.queueNodes(insertionEdges);
       }
     }

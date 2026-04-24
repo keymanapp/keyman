@@ -347,7 +347,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       const result = this.parentNode.handleNextNode();
 
       if(result.type == 'complete') {
-        this.queueNodes(this.buildEdgesFromResults([new TokenResultMapping(result.finalNode)]));
+        this.queueNodes(this.buildEdgesFromResults([result.mapping]));
       }
 
       return {
@@ -359,7 +359,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     // will have equal .spaceId.
     let currentNode = this.selectionQueue.dequeue();
 
-    let unmatchedResult = {
+    let unmatchedResult: PathResult = {
       type: 'intermediate',
       cost: currentNode.currentCost
     }
@@ -369,7 +369,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     // Forbid a raw edit-distance of greater than 2.
     // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
     if(currentNode.editCount > 2) {
-      return unmatchedResult as PathResult;
+      return unmatchedResult;
     }
 
     // Thresholds _any_ path, partially based on currently-traversed distance.
@@ -377,7 +377,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     // Can be important if needed characters don't actually exist on the keyboard
     // ... or even just not the then-current layer of the keyboard.
     if(currentNode.currentCost > this.lowestPossibleSingleCost + 2.5 * EDIT_DISTANCE_COST_SCALE) {
-      return unmatchedResult as PathResult;
+      return unmatchedResult;
     }
 
     // Stage 2:  process subset further OR build remaining edges
@@ -385,7 +385,7 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     if(currentNode.hasPartialInput) {
       // Re-use the current queue; the number of total inputs considered still holds.
       this.selectionQueue.enqueueAll(currentNode.processSubsetEdge());
-      return unmatchedResult as PathResult;
+      return unmatchedResult;
     }
 
     // OK, we fully crossed a graph edge and have landed on a transition point;
@@ -404,12 +404,12 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
       return {
         type: 'complete',
         cost: currentNode.currentCost,
-        finalNode: currentNode
+        mapping: new TokenResultMapping(currentNode)
       };
     }
 
     // If we've somehow fully exhausted all search options, indicate that none remain.
-    return unmatchedResult as PathResult;
+    return unmatchedResult;
   }
 
   public get previousResults(): TokenResultMapping[] {

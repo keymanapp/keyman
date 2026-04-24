@@ -615,10 +615,10 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
       if(newResult.type == 'none') {
         return null;
       } else if(newResult.type == 'complete') {
-        const node = newResult.finalNode;
+        const mapping = newResult.mapping;
 
         // Is the entry a reasonable result?
-        if(node.isFullReplacement) {
+        if(mapping.isFullReplacement) {
           // If the entry's 'match' fully replaces the input string, we consider it
           // unreasonable and ignore it.  Also, if we've reached this point...
           // we can(?) assume that everything thereafter is as well.
@@ -631,11 +631,9 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         //
         // If it occurs, we should re-emit it - it'll show up earlier in the
         // suggestions that way, as it should.
-        if((currentReturns[node.resultKey]?.totalCost ?? Number.MAX_VALUE) > newResult.cost) {
-          const trm = new TokenResultMapping(newResult.finalNode)
-          currentReturns[node.resultKey] = trm;
-          // Do not track yielded time.
-          return trm;
+        if((currentReturns[mapping.matchString]?.totalCost ?? Number.MAX_VALUE) > newResult.cost) {
+          currentReturns[mapping.matchString] = newResult.mapping;
+          return newResult.mapping;
         }
       }
 

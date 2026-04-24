@@ -143,7 +143,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.selectionQueue.enqueue(bestPath);
 
     if(currentResult.type == 'complete') {
-      this.completedPaths.push(new TokenResultMapping(new TokenResultMapping(currentResult.finalNode), this.spaceId));
+      this.completedPaths.push(new TokenResultMapping(currentResult.mapping, this.spaceId));
     }
 
     return currentResult;
