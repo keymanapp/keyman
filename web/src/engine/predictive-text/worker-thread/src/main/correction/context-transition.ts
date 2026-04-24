@@ -176,8 +176,12 @@ export class ContextTransition {
       // body and after any appended whitespace.
       resultingTokenization.tail.appliedTransitionId = suggestion.transformId;
 
-      const resultingState = new ContextState(applyTransform(transformToApply, baseState.context), lexicalModel);
-      resultingState.tokenization = resultingTokenization; // [resultingTokenization].concat(preservedVariations);
+      const resultingState = new ContextState(
+        applyTransform(transformToApply, baseState.context),
+        lexicalModel,
+        resultingTokenization,
+        [resultingTokenization] // [resultingTokenization].concat(preservedVariations);
+      );
       resultingState.appliedInput = transformToApply;
       resultingState.appliedSuggestionId = suggestion.id;
       resultingState.suggestions = this.final.suggestions;
