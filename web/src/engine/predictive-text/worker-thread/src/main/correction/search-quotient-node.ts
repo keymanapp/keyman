@@ -9,7 +9,8 @@
 
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
-import { SearchNode, SearchResult } from "./distance-modeler.js";
+import { SearchNode } from "./distance-modeler.js";
+import { TokenResultMapping } from "./token-result-mapping.js";
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 
@@ -148,7 +149,7 @@ export interface SearchQuotientNode {
   /**
    * Returns the set of previously-processed results under this batcher's domain.
    */
-  readonly previousResults: SearchResult[];
+  readonly previousResults: TokenResultMapping[];
 
   /**
    * When true, this indicates that the currently-represented portion of context

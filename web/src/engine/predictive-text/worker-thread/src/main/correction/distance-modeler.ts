@@ -6,6 +6,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
+import { TokenResultMapping } from './token-result-mapping.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
 import TransformUtils from '../transformUtils.js';
 
@@ -571,62 +572,6 @@ export class SearchNode {
   }
 }
 
-export class SearchResult {
-  readonly node: SearchNode;
-  // Supports SearchPath -> SearchSpace remapping.
-  readonly spaceId: number;
-
-  constructor(node: SearchNode, spaceId?: number) {
-    this.node = node;
-    this.spaceId = spaceId ?? node.spaceId;
-  }
-
-  get inputSequence(): ProbabilityMass<Transform>[] {
-    return this.node.priorInput;
-  }
-
-  get matchSequence(): TraversableToken<string>[] {
-    return this.node.calculation.matchSequence.map((char, i) => ({key: char, traversal: this.node.matchedTraversals[i+1]}));
-  };
-
-  get matchString(): string {
-    return this.node.resultKey;
-  }
-
-  /**
-   * Gets the number of Damerau-Levenshtein edits needed to reach the node's
-   * matchString from the output induced by the input sequence used to reach it.
-   *
-   * (This is scaled by `SearchSpace.EDIT_DISTANCE_COST_SCALE` when included in
-   * `totalCost`.)
-   */
-  get knownCost(): number {
-    return this.node.editCount;
-  }
-
-  /**
-   * Gets the "input sampling cost" of the edge, which should be considered as the
-   * negative log-likelihood of the input path taken to reach the node.
-   */
-  get inputSamplingCost(): number {
-    return this.node.inputSamplingCost;
-  }
-
-  /**
-   * Gets the "total cost" of the edge, which should be considered as the
-   * negative log-likelihood of the input path taken to reach the node
-   * multiplied by the 'probability' induced by needed Damerau-Levenshtein edits
-   * to the resulting output.
-   */
-  get totalCost(): number {
-    return this.node.currentCost;
-  }
-
-  get finalTraversal(): LexiconTraversal {
-    return this.node.currentTraversal;
-  }
-}
-
 /**
  * Searches for the best available corrections from among the provided
  * SearchSpaces, ending after the configured timer has elapsed or all available
@@ -635,7 +580,7 @@ export class SearchResult {
  * @param timer
  * @returns
  */
-export async function *getBestMatches(searchModules: SearchQuotientNode[], timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+export async function *getBestMatches(searchModules: SearchQuotientNode[], timer: ExecutionTimer): AsyncGenerator<TokenResultMapping> {
   const spaceQueue = new PriorityQueue<SearchQuotientNode>((a, b) => a.currentCost - b.currentCost);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
@@ -644,7 +589,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
   // Does not get any results that another iterator pulls up after this is
   // created - and those results won't come up later in stage 2, either.  Only
   // intended for restarting a search, not searching twice in parallel.
-  const priorResultsQueue = new PriorityQueue<SearchResult>((a, b) => a.totalCost - b.totalCost);
+  const priorResultsQueue = new PriorityQueue<TokenResultMapping>((a, b) => a.totalCost - b.totalCost);
   priorResultsQueue.enqueueAll(searchModules.map((space) => space.previousResults).flat());
 
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
@@ -654,7 +599,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
 
   // Stage 2:  the fun part; actually searching!
   do {
-    const entry = timer.time(() => {
+    const entry: TokenResultMapping = timer.time(() => {
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
         currentReturns[result.node.resultKey] = result.node;
@@ -687,7 +632,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         if((currentReturns[node.resultKey]?.currentCost ?? Number.MAX_VALUE) > node.currentCost) {
           currentReturns[node.resultKey] = node;
           // Do not track yielded time.
-          return new SearchResult(node, newResult.spaceId);
+          return new TokenResultMapping(newResult.finalNode);
         }
       }
 

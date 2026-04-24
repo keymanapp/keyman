@@ -11,10 +11,11 @@
 import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchNode } from './distance-modeler.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
+import { TokenResultMapping } from './token-result-mapping.js';
 
 const PATH_QUEUE_COMPARATOR: QueueComparator<SearchQuotientNode> = (a, b) => {
   return a.currentCost - b.currentCost;
@@ -150,8 +151,8 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     return currentResult;
   }
 
-  public get previousResults(): SearchResult[] {
-    return this.completedPaths?.map((n => new SearchResult(n, this.spaceId))) ?? [];
+  public get previousResults(): TokenResultMapping[] {
+    return this.completedPaths?.map((n => new TokenResultMapping(n, this.spaceId))) ?? [];
   }
 
   get model(): LexicalModelTypes.LexicalModel {

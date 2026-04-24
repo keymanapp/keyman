@@ -12,11 +12,12 @@ import { QueueComparator, KMWString, PriorityQueue } from '@keymanapp/web-utils'
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
-import { EDIT_DISTANCE_COST_SCALE, SearchNode, SearchResult } from './distance-modeler.js';
+import { EDIT_DISTANCE_COST_SCALE, SearchNode } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathInputProperties, PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
+import { TokenResultMapping } from './token-result-mapping.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -412,8 +413,8 @@ export abstract class SearchQuotientSpur implements SearchQuotientNode {
     return unmatchedResult as PathResult;
   }
 
-  public get previousResults(): SearchResult[] {
-    return Object.values(this.returnedValues ?? {}).map(v => new SearchResult(v));
+  public get previousResults(): TokenResultMapping[] {
+    return Object.values(this.returnedValues ?? {}).map(v => new TokenResultMapping(v));
   }
 
   public get inputSegments(): InputSegment[] {

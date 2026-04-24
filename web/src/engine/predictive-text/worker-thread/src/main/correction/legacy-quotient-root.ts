@@ -1,16 +1,17 @@
 import { PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { QUEUE_NODE_COMPARATOR } from './search-quotient-spur.js';
-import { SearchNode, SearchResult } from './distance-modeler.js';
+import { SearchNode } from './distance-modeler.js';
+import { TokenResultMapping } from './token-result-mapping.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
-import { PathResult, SearchQuotientNode } from './search-quotient-node.js';
 
 export class LegacyQuotientRoot extends SearchQuotientRoot {
   private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
-  private processed: SearchResult[] = [];
+  private processed: TokenResultMapping[] = [];
 
   constructor(model: LexicalModel) {
     super(model);
@@ -42,7 +43,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
       this.selectionQueue.enqueueAll(insertionEdges);
     }
 
-    this.processed.push(new SearchResult(node));
+    this.processed.push(new TokenResultMapping(node));
     return {
       type: 'complete',
       cost: node.currentCost,
@@ -55,7 +56,7 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     return this.selectionQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
   }
 
-  get previousResults(): SearchResult[] {
+  get previousResults(): TokenResultMapping[] {
     return this.processed.slice();
   }
 
