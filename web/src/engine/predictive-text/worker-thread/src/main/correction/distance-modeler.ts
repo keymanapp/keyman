@@ -631,9 +631,25 @@ export async function *getBestMatches<
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
 
-        // Just pass it through the filter, even if it _was_ already filtered once before.
-        filter(result);
-        return result;
+        // There's no guarantee that the filter closure is the same instance as
+        // before.
+        //
+        // As a filter function may contain caching and/or deduplication
+        // components, we pass pre-existing results through the filter so that
+        // it may reconstruct related state and thus cache/deduplicate new
+        // results based upon old results.
+        //
+        // See `initTokenResultFilterer()`, which maintains a map used for
+        // deduplication.
+        //
+        // As these _are_ pre-existing results, we know that they previously
+        // passed through the filter with a `true` response.  However, as #14366
+        // isn't implemented, it IS technically possible that a lower-cost
+        // result was found after a higher-cost result in some cases; therefore
+        // there is a chance such a duplicate may exist.  On that basis,
+        // re-filtering even for prior results is reasonably motivated at this
+        // time.
+        return filter(result) ? result : null;
       }
 
       let lowestCostSource = spaceQueue.dequeue();

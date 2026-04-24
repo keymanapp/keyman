@@ -8,7 +8,9 @@
  * `getBestMatches` algorithm.
  */
 
-import { CorrectionResultMapping } from "./correction-result-mapping.js";
+// Circular type reference; do not actually require direct use of the prototype
+// or constructor!
+import { type CorrectionResultMapping } from "./correction-result-mapping.js";
 
 type NullPath = {
   type: 'none'

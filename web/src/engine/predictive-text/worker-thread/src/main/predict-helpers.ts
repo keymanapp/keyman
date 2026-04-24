@@ -12,9 +12,8 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { getBestMatches, SearchNode } from './correction/distance-modeler.js';
-import { SearchQuotientNode } from './correction/search-quotient-node.js';
-import { initTokenResultFilterer, TokenResultMapping } from './correction/token-result-mapping.js';
+import { getBestTokenMatches } from './correction/distance-modeler.js';
+import { TokenResultMapping } from './correction/token-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
 
@@ -449,13 +448,23 @@ export function determineSuggestionRange(
   }
 }
 
+/**
+ * This function takes in metadata about generated corrections (for models that
+ * implement Traversals) and uses that to construct predictions based upon those
+ * corrections.
+ * @param transition    Context-transition data underlying the tokenization that led to the correction
+ * @param tokenization  The tokenization from which the correction was generated.
+ * @param match         The generated correction itself - the correction string and its cost
+ * @param costFactor    A multiplicative factor used to adjust the cost when building prediction probabilities.
+ * @returns
+ */
 export function buildAndMapPredictions(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: Readonly<TokenResultMapping>
+  match: Readonly<TokenResultMapping>,
+  costFactor: number
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
-  const searchSpace = tokenization.tail.searchModule;
 
   // No matter the prediction, once we know the root of the prediction, we'll
   // always 'replace' the same amount of text.  We can handle this before the
@@ -472,39 +481,13 @@ export function buildAndMapPredictions(
     id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
   }
 
-  /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-    * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-    * there are significantly more likely words.  We only need this to allow very minor fat-finger
-    * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-    * key borders.
-    *
-    * Technically, the probabilities this produces won't be normalized as-is... but there's no
-    * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-    * to apply it could become tricky, so it's simpler to leave out.
-    *
-    * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-    * is needed in the future.
-    */
-  if(searchSpace.inputCount <= 1) {
-    /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
-     * ambiguous case that would only arise very near the center of the boundary between two keys.
-     * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
-     * That seems 'within reason' for correction very near boundaries.
-     *
-     * So, with the second-most-likely key being that close in probability, its best suggestion
-     * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
-     * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
-     * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
-     * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
-     */
-    rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
-  }
-
   const predictionRoot = {
     sample: correctionTransform,
-    p: Math.exp(-rootCost)
+    p: Math.exp(-rootCost * costFactor)
   };
 
+  // Worth considering:  extend Traversal to allow direct prediction lookups?
+  // let traversal = match.finalTraversal; // ...
   let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
   predictions.forEach((entry) => {
     entry.preservationTransform = tokenization.taillessTrueKeystroke;
@@ -593,7 +576,7 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches<SearchNode, TokenResultMapping, SearchQuotientNode>(searchModules, timer, initTokenResultFilterer())) {
+  for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
@@ -611,14 +594,26 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    // Worth considering:  extend Traversal to allow direct prediction lookups?
-    // let traversal = match.finalTraversal;
+    /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+     * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+     * there are significantly more likely words.  We only need this to allow very minor fat-finger
+     * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+     * key borders.
+     *
+     * Technically, the probabilities this produces won't be normalized as-is... but there's no
+     * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+     * to apply it could become tricky, so it's simpler to leave out.
+     *
+     * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+     * is needed in the future.
+     */
+    const costFactor = (tokenization.tail.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
 
-    const predictions = buildAndMapPredictions(transition, tokenization, match);
+    const predictions = buildAndMapPredictions(transition, tokenization, match, costFactor);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
-      bestCorrectionCost = predictions[0].correction.p;
+      bestCorrectionCost = match.totalCost * costFactor;
     }
 
     // If we're getting the same prediction again, it's lower-cost.  Update!
@@ -1092,7 +1087,7 @@ export function finalizeSuggestions(
     }
 
     // Is sometimes not set during unit tests.
-    if(prediction.sample.transformId) {
+    if(prediction.sample.transformId !== undefined) {
       prediction.sample.transform.id = prediction.sample.transformId;
     }
 
