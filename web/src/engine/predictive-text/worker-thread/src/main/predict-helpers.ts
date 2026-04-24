@@ -11,9 +11,8 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { getBestMatches, SearchNode } from './correction/distance-modeler.js';
-import { SearchQuotientNode } from './correction/search-quotient-node.js';
-import { initTokenResultFilterer, TokenResultMapping } from './correction/token-result-mapping.js';
+import { getBestTokenMatches } from './correction/distance-modeler.js';
+import { TokenResultMapping } from './correction/token-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
 
@@ -535,7 +534,7 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches<SearchNode, TokenResultMapping, SearchQuotientNode>(searchModules, timer, initTokenResultFilterer())) {
+  for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
