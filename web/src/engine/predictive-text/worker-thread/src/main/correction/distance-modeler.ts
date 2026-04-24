@@ -632,6 +632,7 @@ export async function *getBestMatches(searchModules: SearchQuotientNode[], timer
         // If it occurs, we should re-emit it - it'll show up earlier in the
         // suggestions that way, as it should.
         if((currentReturns[mapping.matchString]?.totalCost ?? Number.MAX_VALUE) > newResult.cost) {
+          currentReturns[mapping.matchString] = newResult.mapping;
           return newResult.mapping;
         }
       }
