@@ -4,6 +4,8 @@ import { PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
+import { CorrectionSearchable } from './correction-searchable.js';
+import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
 import { initTokenResultFilterer, TokenResultMapping } from './token-result-mapping.js';
@@ -583,7 +585,7 @@ export class SearchNode {
  * @returns
  */
 export const getBestTokenMatches = (searchModules: SearchQuotientNode[], timer: ExecutionTimer) => {
-  return getBestMatches(searchModules, timer, initTokenResultFilterer());
+  return getBestMatches<SearchNode, TokenResultMapping, SearchQuotientNode>(searchModules, timer, initTokenResultFilterer());
 }
 
 /**
@@ -594,14 +596,22 @@ export const getBestTokenMatches = (searchModules: SearchQuotientNode[], timer: 
  * @param timer
  * @returns
  */
-export async function *getBestMatches(
-  searchModules: SearchQuotientNode[],
+export async function *getBestMatches<
+  // metadata / analysis of search path results - gives the corrections
+  ResultType,
+  // associates analysis with its generating search-space, provides interface needed for correction-search evaluations
+  ResultMapping extends CorrectionResultMapping<ResultType>,
+   // the type managing the search - SearchQuotientNode (for tokens) or TokenizationCorrector (for tokenizations)
+  Correctable extends CorrectionSearchable<ResultType, ResultMapping>
+> (
+  searchModules: Correctable[],
   timer: ExecutionTimer,
-  filter?: (searchResult: TokenResultMapping) => boolean
-): AsyncGenerator<Readonly<TokenResultMapping>> {
+  filter?: (searchResult: ResultMapping) => boolean
+): AsyncGenerator<Readonly<ResultMapping>> {
+  // If no filter function is provided, default to one that always returns true.
   filter ??= () => true;
 
-  const spaceQueue = new PriorityQueue<SearchQuotientNode>((a, b) => a.currentCost - b.currentCost);
+  const spaceQueue = new PriorityQueue<Correctable>((a, b) => a.currentCost - b.currentCost);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
   // and iterate over it first.
@@ -609,7 +619,7 @@ export async function *getBestMatches(
   // Does not get any results that another iterator pulls up after this is
   // created - and those results won't come up later in stage 2, either.  Only
   // intended for restarting a search, not searching twice in parallel.
-  const priorResultsQueue = new PriorityQueue<TokenResultMapping>((a, b) => a.totalCost - b.totalCost);
+  const priorResultsQueue = new PriorityQueue<ResultMapping>((a, b) => a.totalCost - b.totalCost);
   priorResultsQueue.enqueueAll(searchModules.map((space) => space.previousResults).flat());
 
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
@@ -617,7 +627,7 @@ export async function *getBestMatches(
 
   // Stage 2:  the fun part; actually searching!
   do {
-    const entry: TokenResultMapping = timer.time(() => {
+    const entry: ResultMapping = timer.time(() => {
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
 

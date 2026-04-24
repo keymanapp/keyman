@@ -10,7 +10,12 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
+
+// Circular type reference; do not actually require direct use of the prototype
+// or constructor!
+import { type SearchQuotientNode } from "./search-quotient-node.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
@@ -40,24 +45,33 @@ export function initTokenResultFilterer() {
   return closure;
 }
 
-export class TokenResultMapping {
+export class TokenResultMapping implements CorrectionResultMapping<SearchNode>{
+  readonly matchingSpace: SearchQuotientNode;
   private readonly node: SearchNode;
   readonly spaceId: number;
 
-  constructor(node: SearchNode);
-  constructor(mapping: TokenResultMapping, spaceId: number);
-  constructor(mappingBase: SearchNode | TokenResultMapping, spaceId?: number) {
+  constructor(finalQuotientNode: SearchQuotientNode, node: SearchNode);
+  constructor(finalQuotientNode: SearchQuotientNode, mapping: TokenResultMapping);
+  constructor(finalQuotientNode: SearchQuotientNode, mappingBase: SearchNode | TokenResultMapping) {
     if(!mappingBase) {
       throw new Error("Result-mapping parameters may not be null");
     }
+    this.matchingSpace = finalQuotientNode;
 
     if(mappingBase instanceof SearchNode) {
       this.node = mappingBase;
       this.spaceId = mappingBase.spaceId;
+      if(mappingBase.spaceId != this.matchingSpace.spaceId) {
+        throw new Error("QuotientNode and SearchNode .spaceId values provided to TokenResultMapping constructor should be equal");
+      }
     } else {
       this.node = mappingBase.node;
-      this.spaceId = spaceId;
+      this.spaceId = this.matchingSpace.spaceId;
     }
+  }
+
+  get matchedResult(): Readonly<SearchNode> {
+    return this.node;
   }
 
   get inputSequence(): ProbabilityMass<Transform>[] {

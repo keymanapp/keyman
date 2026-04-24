@@ -11,8 +11,9 @@
 import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { PathResult } from './correction-searchable.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
-import { generateSpaceSeed, InputSegment, PathResult, SearchQuotientNode } from './search-quotient-node.js';
+import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
@@ -85,7 +86,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     this.spaceId = generateSpaceSeed();
 
     this.lowestPossibleSingleCost = lowestPossibleSingleCost;
-    this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => new TokenResultMapping(r, this.spaceId));
+    this.completedPaths = inboundPaths.flatMap(p => p.previousResults).map(r => new TokenResultMapping(this, r));
     this.selectionQueue.enqueueAll(inboundPaths);
 
     return;
@@ -137,7 +138,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
    * sort of result the edge's destination node represents.
    * @returns
    */
-  public handleNextNode(): PathResult {
+  public handleNextNode(): PathResult<TokenResultMapping> {
     const bestPath = this.selectionQueue.dequeue();
     const currentResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
@@ -146,7 +147,7 @@ export class SearchQuotientCluster implements SearchQuotientNode {
     if(currentResult.type == 'complete') {
       finalResult = {
         ...currentResult,
-        mapping: new TokenResultMapping(currentResult.mapping, this.spaceId)
+        mapping: new TokenResultMapping(this, currentResult.mapping)
       };
       this.completedPaths.push(finalResult.mapping);
     }
