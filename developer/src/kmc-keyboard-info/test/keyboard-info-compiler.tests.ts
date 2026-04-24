@@ -9,6 +9,7 @@ import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
 import { KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
 import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { KeyboardInfoFile, KeyboardInfoFileLanguage, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
+import { KmpTransformResult } from '../../kmc-package/src/compiler/kmp-compiler.js';
 
 const KHMER_ANGKOR_KPJ = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
 const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
@@ -150,7 +151,7 @@ describe('keyboard-info-compiler', function () {
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
     let result: KeyboardInfoCompilerResult;
     try {
-      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => null;
+      KmpCompiler.prototype.transformKpsToKmpObject = async (_kpsFilename: string): Promise<KmpTransformResult> => ({});
       result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
@@ -211,7 +212,7 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const kmpCompiler = new KmpCompiler();
     await kmpCompiler.init(callbacks, {});
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(sources.kpsFilename) ?? {};
     assert.isNotNull(kmpJsonData.info.author.url.match(/^mailto\:/));
     const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNotNull(result);
@@ -225,12 +226,12 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const kmpCompiler = new KmpCompiler();
     await kmpCompiler.init(callbacks, {});
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(sources.kpsFilename) ?? {};
     kmpJsonData.info.author.url = "makara_sok@sil.org"; // remove 'mailto:'
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
     let result: KeyboardInfoCompilerResult;
     try {
-      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      KmpCompiler.prototype.transformKpsToKmpObject = async (_kpsFilename: string): Promise<KmpTransformResult> => ({kmpJsonData});
       result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
@@ -282,13 +283,13 @@ describe('keyboard-info-compiler', function () {
     }
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS) ?? {};
     assert.isNotNull(kmpJsonData);
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
     kmpJsonData.files = testCase.files;
     let result: KeyboardInfoCompilerResult;
     try {
-      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      KmpCompiler.prototype.transformKpsToKmpObject = async (_kpsFilename: string): Promise<KmpTransformResult> => ({kmpJsonData});
       result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
@@ -345,7 +346,7 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS) ?? {};
     assert.isNotNull(kmpJsonData);
     if (!testCase.hasJsFileInKps) {
       // remove .js file
@@ -361,7 +362,7 @@ describe('keyboard-info-compiler', function () {
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
     let result: KeyboardInfoCompilerResult;
     try {
-      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      KmpCompiler.prototype.transformKpsToKmpObject = async (_kpsFilename: string): Promise<KmpTransformResult> => ({kmpJsonData});
       compiler['loadKmxFiles'] = (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile) => kmxFiles;
       result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
@@ -381,7 +382,7 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const kmpCompiler = new KmpCompiler();
     await kmpCompiler.init(callbacks, {});
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(sources.kpsFilename) ?? {};
     kmpJsonData.relatedPackages = [
       { id: "dep1", relationship: "deprecates" },
       { id: "dep2", relationship: "deprecates" },
@@ -390,7 +391,7 @@ describe('keyboard-info-compiler', function () {
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
     let result: KeyboardInfoCompilerResult;
     try {
-      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      KmpCompiler.prototype.transformKpsToKmpObject = async (_kpsFilename: string): Promise<KmpTransformResult> => ({kmpJsonData});
       result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
@@ -475,7 +476,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS) ?? {};
     assert.isNotNull(kmpJsonData);
     // remove .kmx file
     kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
@@ -490,7 +491,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS) ?? {};
     assert.isNotNull(kmpJsonData);
     // rename .kmx file in files list so it cannot be loaded from disk
     const kmpIndex = kmpJsonData.files.findIndex(file => KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
@@ -820,7 +821,7 @@ describe('keyboard-info-compiler', function () {
       system: { fileVersion: '', keymanDeveloperVersion: '' },
       options: null,
       files: [{
-        name: "..\\shared\\fonts\\khmer\\mondulkiri\\" + KHMER_ANGKOR_DISPLAY_FONT, // backslashes
+        name: "..\\..\\shared\\fonts\\khmer\\mondulkiri\\" + KHMER_ANGKOR_DISPLAY_FONT, // backslashes
         description: "Font Khmer Mondulkiri",
       }],
     };
