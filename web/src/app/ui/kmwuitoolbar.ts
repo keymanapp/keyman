@@ -1,7 +1,6 @@
-/***
-   KeymanWeb 17.0
-   Copyright 2019-2023 SIL International
-***/
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 
