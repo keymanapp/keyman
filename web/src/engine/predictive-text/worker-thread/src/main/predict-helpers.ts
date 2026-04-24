@@ -11,8 +11,8 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { getBestMatches } from './correction/distance-modeler.js';
-import { initTokenResultFilterer, TokenResultMapping } from './correction/token-result-mapping.js';
+import { getBestTokenMatches } from './correction/distance-modeler.js';
+import { TokenResultMapping } from './correction/token-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
 
