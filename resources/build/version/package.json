@@ -2,7 +2,7 @@
   "description": "Automatically updates HISTORY.md based on pull requests",
   "type": "module",
   "dependencies": {
-    "@actions/core": "^1.9.1",
+    "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.1",
     "emoji-regex": "^10.3.0",
     "typescript": "^5.4.5",
