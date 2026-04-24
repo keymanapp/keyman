@@ -509,7 +509,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  */
 - (NSString *)keyboardsPath {
   if (_keyboardsPath == nil) {
-    _keyboardsPath = [KMDataRepository shared].keymanKeyboardsDirectory.path;
+    _keyboardsPath = [KMDataRepository shared].keyman19KeyboardsDirectory.path;
   }
   
   return _keyboardsPath;
@@ -754,15 +754,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * namely, the keyboard data on disk and the settings in UserDefaults
  */
 - (void)prepareStorage {
-  [KMDataRepository.shared createDataDirectoryIfNecessary];
-  
-  if ([KMSettingsRepository.shared dataMigrationNeeded]) {
-    [KMDataRepository.shared migrateData];
-    [KMSettingsRepository.shared convertSettingsForMigration];
+  os_log_debug([KMLogs dataLog], "*** prepareStorage ***");
+
+  // if necessary, migrate settings and keyboard data for compatibility with Keyman 19
+  if ([KMSettingsRepository.shared keyman19SettingsMigrationNeeded]) {
+    [KMDataRepository.shared migrateDataForKeyman19];
+    [KMSettingsRepository.shared migrateSettingsForKeyman19];
   }
-  
-  [KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
-  [KMSettingsRepository.shared setDataModelVersionIfNecessary];
 }
 
 - (void)setDefaultKeymanMenuItems {
