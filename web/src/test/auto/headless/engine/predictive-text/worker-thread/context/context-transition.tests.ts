@@ -25,9 +25,9 @@ var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
 
 function assertClonedStateMatch(a: ContextState, b: ContextState) {
   assert.notEqual(a, b);
-  assert.notEqual(a.tokenization, b.tokenization);
-  assert.notSameOrderedMembers(a.tokenization.tokens, b.tokenization.tokens);
-  assert.sameOrderedMembers(a.tokenization.exampleInput, b.tokenization.exampleInput);
+  assert.notEqual(a.displayTokenization, b.displayTokenization);
+  assert.notSameOrderedMembers(a.displayTokenization.tokens, b.displayTokenization.tokens);
+  assert.sameOrderedMembers(a.displayTokenization.exampleInput, b.displayTokenization.exampleInput);
 
   assert.deepEqual(a.suggestions, b.suggestions);
 }
@@ -50,7 +50,7 @@ describe('ContextTransition', () => {
 
       const transition = new ContextTransition(baseState, 1);
       assert.sameOrderedMembers(
-        transition.base.tokenization.tokens.map((t) => t.exampleInput),
+        transition.base.displayTokenization.tokens.map((t) => t.exampleInput),
         ['hello', ' ', 'world', ' ', '']
       );
       assert.equal(transition.transitionId, 1);
@@ -67,7 +67,7 @@ describe('ContextTransition', () => {
 
       const transition = new ContextTransition(baseState, 1);
       assert.sameOrderedMembers(
-        transition.base.tokenization.tokens.map((t) => t.exampleInput),
+        transition.base.displayTokenization.tokens.map((t) => t.exampleInput),
         ['hello', ' ', 'world', ' ', '']
       );
 
@@ -143,17 +143,17 @@ describe('ContextTransition', () => {
       assert.notEqual(appliedTransition.base, transition);
       assert.isOk(appliedTransition.appended);
       assert.notEqual(appliedTransition.appended, transition);
-      assert.sameOrderedMembers(appliedTransition.base.final.tokenization.exampleInput, [
+      assert.sameOrderedMembers(appliedTransition.base.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world'
       ]);
-      assert.sameOrderedMembers(appliedTransition.appended.final.tokenization.exampleInput, [
+      assert.sameOrderedMembers(appliedTransition.appended.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world', ' ', ''
       ]);
       assert.equal(appliedTransition.base.final.appliedSuggestionId, suggestions[0].id);
       assert.equal(appliedTransition.appended.final.appliedSuggestionId, suggestions[0].id);
 
       // 3 long, only last token was edited.
-      appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
+      appliedTransition.base.final.displayTokenization.tokens.forEach((token, index) => {
         if(index >= 2) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {
@@ -161,7 +161,7 @@ describe('ContextTransition', () => {
         }
       });
 
-      appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
+      appliedTransition.appended.final.displayTokenization.tokens.forEach((token, index) => {
         if(index >= 2) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {
@@ -227,17 +227,17 @@ describe('ContextTransition', () => {
       assert.notEqual(appliedTransition.base, transition);
       assert.isOk(appliedTransition.appended);
       assert.notEqual(appliedTransition.appended, transition);
-      assert.sameOrderedMembers(appliedTransition.base.final.tokenization.exampleInput, [
+      assert.sameOrderedMembers(appliedTransition.base.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world', '  ', 'the'
       ]);
-      assert.sameOrderedMembers(appliedTransition.appended.final.tokenization.exampleInput, [
+      assert.sameOrderedMembers(appliedTransition.appended.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world', '  ', 'the', ' ', ''
       ]);
       assert.equal(appliedTransition.base.final.appliedSuggestionId, suggestions[0].id);
       assert.equal(appliedTransition.appended.final.appliedSuggestionId, suggestions[0].id);
 
       // 3 long, only last token was edited.
-      appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
+      appliedTransition.base.final.displayTokenization.tokens.forEach((token, index) => {
         if(index >= 4) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {
@@ -245,7 +245,7 @@ describe('ContextTransition', () => {
         }
       });
 
-      appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
+      appliedTransition.appended.final.displayTokenization.tokens.forEach((token, index) => {
         if(index >= 4) {
           assert.equal(token.appliedTransitionId, suggestions[0].transformId);
         } else {

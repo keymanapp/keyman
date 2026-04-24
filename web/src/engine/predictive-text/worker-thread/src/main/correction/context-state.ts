@@ -46,7 +46,13 @@ export class ContextState {
   /**
    * Denotes the possible tokenization(s) for the represented Context.
    */
-  tokenization: ContextTokenization;
+  _tokenizations: ContextTokenization[];
+
+  /**
+   * Tracks the tokenization pattern best matching the word boundary
+   * patterns in the actual context.
+   */
+  _displayTokenization: ContextTokenization;
 
   /**
    * Denotes the keystroke-sourced Transform that was last applied to a
@@ -97,7 +103,14 @@ export class ContextState {
    * is visible to the user.
    */
   get displayTokenization(): ContextTokenization {
-    return this.tokenization;
+    return this._displayTokenization;
+  }
+
+  /**
+   * Denotes the possible tokenization(s) for the represented Context.
+   */
+  get tokenizations(): ContextTokenization[] {
+    return this._tokenizations;
   }
 
   /**
@@ -127,13 +140,16 @@ export class ContextState {
    * @param tokenization Precomputed tokenization for the context, leveraging previous
    * correction-search progress and results
    */
-  constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization);
-  constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization) {
+  constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization, tokenizations?: ContextTokenization[]);
+  constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization, tokenizations?: ContextTokenization[]) {
     if(!(param1 instanceof ContextState)) {
       this.context = param1;
       this.model = model;
       if(tokenization) {
-        this.tokenization = tokenization;
+        this._tokenizations = tokenizations ? tokenizations : [tokenization];
+        this._displayTokenization = tokenization;
+
+        this.inputTransforms = new Map();
       } else {
         this.initFromReset();
       }
@@ -142,7 +158,8 @@ export class ContextState {
 
       Object.assign(this, stateToClone);
       this.inputTransforms = new Map(stateToClone.inputTransforms);
-      this.tokenization = new ContextTokenization(stateToClone.tokenization);
+      this._displayTokenization = new ContextTokenization(stateToClone._displayTokenization);
+      this._tokenizations = stateToClone.tokenizations.map((t) => new ContextTokenization(t));
 
       // A shallow copy of the array is fine, but we'd be best off
       // not aliasing the array itself.
@@ -173,7 +190,8 @@ export class ContextState {
     if(baseTokens.length == 0) {
       baseTokens.push(ContextToken.fromRawText(this.model, ''));
     }
-    this.tokenization = new ContextTokenization(baseTokens);
+    this._displayTokenization = new ContextTokenization(baseTokens);
+    this._tokenizations = [this._displayTokenization];
     this.inputTransforms = new Map();
   }
 
@@ -209,8 +227,7 @@ export class ContextState {
 
     const slideUpdateTransform = determineContextSlideTransform(this.context, context);
 
-    // Goal:  allow multiple base tokenizations.
-    const startTokenizations = [this.tokenization].map((t) => {
+    const startTokenizations = this.tokenizations.map((t) => {
       return t.applyContextSlide(lexicalModel, slideUpdateTransform);
     });
 
@@ -222,14 +239,15 @@ export class ContextState {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
       const state = new ContextState(this);
-      state.tokenization = [...startTokenizations.values()][0];
+      state._tokenizations = [...startTokenizations.values()];
+      state._displayTokenization = this._displayTokenization.applyContextSlide(lexicalModel, slideUpdateTransform);
       transition.finalize(state, transformDistribution);
       return transition;
     }
 
     const { subsets, keyMatchingUserContext: trueInputSubsetKey } = precomputeTransitions(startTokenizations, transformDistribution);
-    const resultTokenization = transitionTokenizations(subsets, transformDistribution).get(trueInputSubsetKey);
-
+    const possibleTokenizations = transitionTokenizations(subsets, transformDistribution);
+    const resultTokenization = possibleTokenizations.get(trueInputSubsetKey);
     // ------------
 
     // So, if we have a suggestion transition ID at the end and didn't just apply...
@@ -240,10 +258,11 @@ export class ContextState {
     // 'any'.)
 
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
-    state.tokenization = resultTokenization;
+    state._tokenizations = [resultTokenization]; // TODO:  [...possibleTokenizations.values()];
+    state._displayTokenization = resultTokenization;
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution);
-    transition.revertableTransitionId = state.tokenization.tail.appliedTransitionId;
+    transition.revertableTransitionId = state._displayTokenization.tail.appliedTransitionId;
     return transition;
   }
 }
