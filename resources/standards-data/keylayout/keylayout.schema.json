@@ -1,0 +1,236 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "keyboard": {
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "when": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "next": {
+                          "type": "string"
+                        },
+                        "output": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "when"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        },
+        "group": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "keyMapSet": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "keyMap": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "baseIndex": {
+                      "type": "string"
+                    },
+                    "baseMapSet": {
+                      "type": "string"
+                    },
+                    "index": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "action": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          },
+                          "output": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "key"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "keyMap"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "layouts": {
+          "additionalProperties": false,
+          "properties": {
+            "layout": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "first": {
+                    "type": "string"
+                  },
+                  "last": {
+                    "type": "string"
+                  },
+                  "mapSet": {
+                    "type": "string"
+                  },
+                  "modifiers": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "layout"
+          ],
+          "type": "object"
+        },
+        "maxout": {
+          "type": "string"
+        },
+        "modifierMap": {
+          "additionalProperties": false,
+          "properties": {
+            "defaultIndex": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "keyMapSelect": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "mapIndex": {
+                    "type": "string"
+                  },
+                  "modifier": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "keys": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "modifier"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "keyMapSelect"
+          ],
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "terminators": {
+          "additionalProperties": false,
+          "properties": {
+            "when": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "output": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "when"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "layouts",
+        "modifierMap",
+        "keyMapSet",
+        "actions",
+        "terminators"
+      ]
+    }
+  },
+  "required": [
+    "keyboard"
+  ],
+  "title": "C:/Projects/keyman/keyman/resources/standards-data/keylayout/dtd/keylayout.xsd",
+  "type": "object"
+}
