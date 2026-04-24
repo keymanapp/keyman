@@ -534,7 +534,7 @@ export async function correctAndEnumerate(
   let rawPredictions: CorrectionPredictionTuple[] = [];
   let bestCorrectionCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-  for await(const match of getBestMatches(searchModules, timer, initTokenResultFilterer())) {
+  for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
