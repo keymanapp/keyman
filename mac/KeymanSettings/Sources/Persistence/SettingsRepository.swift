@@ -17,7 +17,7 @@ public enum UserDefaultsError: Error {
 public struct SettingsRepository {
   fileprivate let pathUtil: KeymanPaths
   let defaultsSuiteName: String
-  let defaults: UserDefaults?
+  let defaults: UserDefaults
   
   let kActiveKeyboardsKey = "KMActiveKeyboardsKey"
   let kSelectedKeyboardKey = "KMSelectedKeyboardKey"
@@ -26,99 +26,52 @@ public struct SettingsRepository {
   let kShowOskOnActivateKey = "KMShowOskOnActivate"
   let kForceSentryErrorKey = "KMForceSentryError"
   
-  //  public init() {
-  //    self.pathUtil = KeymanPaths()
-  //    self.defaultsSuiteName = KeymanPaths.groupId
-  //  }
-  //
   public init(suiteName: String) throws(Error) {
     self.pathUtil = KeymanPaths()
     self.defaultsSuiteName = suiteName
     
-    let userDefaults = UserDefaults(suiteName: suiteName)
-    if userDefaults == nil {
+    // the UserDefaults used are for the app group
+    guard let userDefaults = UserDefaults(suiteName: suiteName) else {
       throw(UserDefaultsError.unknownSuite)
-    } else {
-      self.defaults = userDefaults
     }
+    
+    self.defaults = userDefaults
   }
   
   public func readActiveKeyboards() -> Set<String> {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
-      return Set([])
-    }
-    
-    let activeKeyboardsArray = sharedDefaults.stringArray(forKey: kActiveKeyboardsKey) ?? []
+    let activeKeyboardsArray = self.defaults.stringArray(forKey: kActiveKeyboardsKey) ?? []
     let activeKeyboardsSet = Set(activeKeyboardsArray)
     
     return activeKeyboardsSet
   }
   
   public func writeActiveKeyboards(activeKeyboardsArray: [String]) {
-    guard let sharedDefaults = self.defaults else {
-      return
-      // TODO: throw error?
-      //throw SettingsError.internalError("Group container UserDefaults not found.")
-    }
-    
-    sharedDefaults.set(activeKeyboardsArray, forKey: kActiveKeyboardsKey)
-
-    //TODO: remove, for debug only
-    let activeKeyboardArrayFromDefaults = sharedDefaults.stringArray(forKey: kActiveKeyboardsKey) ?? []
-    print("Active keyboards from defaults: \(activeKeyboardArrayFromDefaults)")
+    self.defaults.set(activeKeyboardsArray, forKey: kActiveKeyboardsKey)
   }
   
   public func readSelectedKeyboard() -> String {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
-      return ""
-    }
-    
-    return sharedDefaults.string(forKey: kSelectedKeyboardKey) ?? ""
+    return self.defaults.string(forKey: kSelectedKeyboardKey) ?? ""
   }
   
   public func writeSelectedKeyboard(keyboardName: String) {
-    if let sharedDefaults = self.defaults {
-      sharedDefaults.set(keyboardName, forKey: kSelectedKeyboardKey)
-    }
+    self.defaults.set(keyboardName, forKey: kSelectedKeyboardKey)
   }
   
   public func readForceSentryError() -> Bool {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
-      return false
-    }
-    
-    return sharedDefaults.bool(forKey: kShowOskOnActivateKey)
+    return self.defaults.bool(forKey: kShowOskOnActivateKey)
   }
 
   public func readShowOskOnActivate() -> Bool {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
-      return false
-    }
-    
-    return sharedDefaults.bool(forKey: kShowOskOnActivateKey)
+    return self.defaults.bool(forKey: kShowOskOnActivateKey)
   }
 
   public func readDataModelVersion() -> Int {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
-      return 0
-    }
-    
     // note that zero is returned if key is not found in UserDefaults,
-    return sharedDefaults.integer(forKey: kDataModelVersionKey)
+    return self.defaults.integer(forKey: kDataModelVersionKey)
   }
 
   public func readPersistedOptions() -> Dictionary<String, Any> {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
-      return [:]
-    }
-    
-    if let options: Dictionary<String, Any> = sharedDefaults.dictionary(forKey: kPersistedOptionsKey) {
+    if let options: Dictionary<String, Any> = self.defaults.dictionary(forKey: kPersistedOptionsKey) {
       return options
     } else {
       return [:]
@@ -137,13 +90,8 @@ public struct SettingsRepository {
   }
 
   public func clearSettings() {
-    guard let sharedDefaults = self.defaults else {
-      print("Group container UserDefaults not found.")
-      return
-    }
-    
-    sharedDefaults.dictionaryRepresentation().keys.forEach { key in
-      sharedDefaults.removeObject(forKey: key)
+    self.defaults.dictionaryRepresentation().keys.forEach { key in
+      self.defaults.removeObject(forKey: key)
     }
   }
 }

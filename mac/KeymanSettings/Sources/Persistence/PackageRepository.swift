@@ -48,15 +48,12 @@ public struct PackageRepository {
           //          ConfigLogger.shared.testLogger.debug("Created directory: \(keyboardDirectory.path)")
           print("Created directory: \(keyboardDirectory.path)")
         } else {
-//          ConfigLogger.shared.testLogger.debug("Directory already exists: \(keyboardDirectory.path)")
           print("Directory already exists: \(keyboardDirectory.path)")
         }
       } catch {
-//        ConfigLogger.shared.testLogger.error("Error creating directory: \(error.localizedDescription)")
         print("Error creating directory: \(error.localizedDescription)")
       }
     } else {
-//      ConfigLogger.shared.testLogger.error("Unable to create directory, Group Container URL not found.")
       print("Unable to create directory, Group Container URL not found.")
     }
   }
@@ -64,7 +61,7 @@ public struct PackageRepository {
   /**
    * for group container testing purposes to check directory access
    */
-  public func writeSomethingToContainer() {
+  public func writeTestFileToContainer() {
     if let keyboardDirectory = self.pathUtil.keyman19KeyboardsDirectory {
       print("About to write to: \(keyboardDirectory.path)")
       
@@ -151,7 +148,6 @@ public struct PackageRepository {
         packageSource?.jsonFileUrl = kmpFileUrl
       }
     } else {
-      //      ConfigLogger.shared.testLogger.debug(" ** \(lastPathComponent) DOES NOT contain the file 'kmp.json')")
       print(" ** \(lastPathComponent) DOES NOT contain the file 'kmp.json')")
     }
     
@@ -164,11 +160,9 @@ public struct PackageRepository {
       let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)
       let source: PackageSource = try! JSONDecoder().decode(PackageSource.self, from: jsonData)
       
-//      ConfigLogger.shared.testLogger.debug("package name: \(source.packageName)")
       print("package name: \(source.packageName)")
       packageSource = source
     } catch {
-//      ConfigLogger.shared.testLogger.debug("package name: \(source.packageName)")
 //      print("package name: \(source.packageName)")
     }
     return packageSource

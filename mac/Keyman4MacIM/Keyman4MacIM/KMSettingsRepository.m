@@ -114,6 +114,8 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
 
   // set kDataModelVersion to indicate that we are using the group container
   [self.groupDefaults setInteger:kVersionStoreDataInGroupContainer forKey:kDataModelVersion];
+  
+  [self removeMigratedInputMethodSettings];
 }
 
 /**
@@ -143,7 +145,26 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
     [self.groupDefaults setBool:forceSentryError forKey:kForceSentryError];
   }
   
+  NSDictionary * persistedOptions = [self.appDefaults dictionaryForKey:kPersistedOptionsKey];
+  if (persistedOptions != nil) {
+    [self.groupDefaults setObject:persistedOptions forKey:kPersistedOptionsKey];
+  }
+  
   return true;
+}
+
+/**
+ * Removes input method settings that have been migrated to the app group.
+ * Does not eradicate everything but only those created by Keyman code.
+ * For example, the OSK window coordinates, created by NSWindow, must remain.
+ */
+- (void)removeMigratedInputMethodSettings {
+  [self.appDefaults removeObjectForKey:kSelectedKeyboardKey];
+  [self.appDefaults removeObjectForKey:kActiveKeyboardsKey];
+  [self.appDefaults removeObjectForKey:kShowOskOnActivate];
+  [self.appDefaults removeObjectForKey:kForceSentryError];
+  [self.appDefaults removeObjectForKey:kPersistedOptionsKey];
+  [self.appDefaults removeObjectForKey:kDataModelVersion];
 }
 
 - (void)migrateSettingsForKeyman18 {

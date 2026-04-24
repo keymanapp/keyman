@@ -12,20 +12,25 @@
 import Foundation
 import Combine
 
+public enum SettingsError: Error {
+    case unknownPackage
+}
+
 public class SettingsContainer : ObservableObject {
-  // keyboard packages are defined on disk
-  @Published public var installedKeyboardPackages: [KeymanPackage]
+  // packages are loaded from disk, each package may contain one or more keyboard
+  @Published public var installedPackages: [KeymanPackage]
   
   fileprivate let packageRepository: PackageRepository
   fileprivate let settingsRepository: SettingsRepository
   
-  // active keyboards and selected keyboard are stored in the UserDefaults
-  fileprivate var activeKeyboards: Set<String>
+  // the selected keyboard is stored in the UserDefaults
   fileprivate var currentKeyboard: String
-  
+#warning("does the config app need to be aware of this?")
+
   public init() {
     self.packageRepository = PackageRepository()
     
+    // create the settings repository, gaining access to the app group UserDefaults
     do {
       try self.settingsRepository = SettingsRepository(suiteName: KeymanPaths.groupId)
       print("Found group container")
@@ -35,36 +40,29 @@ public class SettingsContainer : ObservableObject {
       fatalError("Unable to access settings in group container.")
     }
     
-    self.activeKeyboards = self.settingsRepository.readActiveKeyboards()
     self.currentKeyboard = self.settingsRepository.readSelectedKeyboard()
     
-    self.installedKeyboardPackages = []
-    self.loadPackages()
-    self.synchronizeSettings()
-    self.applySettings()
+    
+    // first load all the installed packages from disk
+    self.installedPackages = []
+    if let persistedPackages = self.loadPackages() {
+      self.installedPackages = persistedPackages
+    }
+    
+    // next, apply the settings to the packages
+    // this mainly consists of marking them as enabled or not
+    self.applySettingsToInstalledPackages()
   }
   
-  // TODO: delete test code
+#warning("delete test code")
   public func debug() {
-   self.installedKeyboardPackages .forEach { package in
+   self.installedPackages .forEach { package in
      package.keyboards.forEach { keyboard in
        print("\(keyboard.keyboardId) enabled: \(keyboard.enabled)")
       }
     }
   }
 
-  public func addActiveKeyboard(keyboardName: String) {
-    var activeKeyboardsSet = Set(self.activeKeyboards)
-    activeKeyboardsSet.insert(keyboardName)
-    self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(activeKeyboards))
-  }
-  
-  public func removeActiveKeyboard(keyboardName: String) {
-    var activeKeyboardsSet = Set(self.activeKeyboards)
-    activeKeyboardsSet.remove(keyboardName)
-    self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(activeKeyboardsSet))
-  }
-  
   public func logSettings() {
     self.settingsRepository.logSettings()
   }
@@ -73,86 +71,100 @@ public class SettingsContainer : ObservableObject {
     self.settingsRepository.clearSettings()
   }
 
-  // TODO: extract method for keyboard search
-  // TODO: throw error for keyboard not found or log and fail silently (should never happen)
-  public func isKeyboardEnabled(packageId: UUID, keyboardId: String) -> Bool {
-    var enabled = false;
-    
-    guard let package = self.installedKeyboardPackages.first(where: { $0.id == packageId }) else {
-      print ("ERROR: setKeyboardEnabled could not find package with ID: \(packageId)")
-      return enabled
+  public func findPackage(packageId: UUID) throws -> KeymanPackage {
+    guard let package = self.installedPackages.first(where: { $0.id == packageId }) else {
+      print ("Error: could not find package with ID: \(packageId)")
+      throw SettingsError.unknownPackage
     }
     
-    enabled = package.isKeyboardEnabled(keyboardId: keyboardId)
-    print ("isEnabled for \(keyboardId) returning with \(enabled)")
-
-    return enabled
-  }
-    
-  public func setKeyboardEnabled(packageId: UUID, keyboardId: String, enabled: Bool) {
-    let package = self.installedKeyboardPackages.first(where: { $0.id == packageId })
- // TODO: replace with guard let
-    if (package == nil) {
-      print ("ERROR: setKeyboardEnabled could not find package with ID: \(packageId)")
-    } else {
-      package!.enableKeyboard(keyboardId: keyboardId, enabled: enabled)
-      if let keyboardSettingsKey = package?.getKeyboardSettingsKey(for: keyboardId) {
-        if (enabled) {
-          self.addActiveKeyboard(keyboardName: keyboardSettingsKey)
-        } else {
-          self.removeActiveKeyboard(keyboardName: keyboardSettingsKey)
-        }
-      }
-      // TODO: handle else case
-      print ("setKeyboardEnabled for \(keyboardId) setting to \(enabled)")
-    }
-  }
-
-//  func setKeyboardEnabled(packageName: String, keyboardId: String, enabled: Bool) {
-//    let package = self.installedKeyboardPackages.first(where: { $0.packageName == packageName })
-//    if (package == nil) {
-//      print ("ERROR: setKeyboardEnabled could not find package with ID: \(packageId)")
-//    } else {
-//      package!.enableKeyboard(keyboardId: keyboardId, enabled: enabled)
-//      print ("setKeyboardEnabled for \(keyboardId) setting to \(enabled)")
-//    }
-//  }
-
-  /**
-   *  read the Keyman packages from the group container directory and store in the keyboardPackages array
-   */
-  func loadPackages() {
-    // TODO: create keyboards directory if it doesn't exist
-    //    if let keyboardsUrl = self.pathUtil.keymanKeyboardsDirectory {
-    //
-    //      if FileManager.default.fileExists(atPath: keyboardsUrl.path) {
-    //        print("directory exists: \(keyboardsUrl.absoluteString)")
-    //      } else {
-    //        print("non-existent directory: \(keyboardsUrl.absoluteString)")
-    //      }
-    //    }
-
-    // load keyboards from disk
-    if (self.packageRepository.keyman19SharedDataDirectoryExists()) {
-      // TODO: remove test code
-      self.packageRepository.writeSomethingToContainer()
-      
-      self.installedKeyboardPackages = self.packageRepository.loadPackages()
-    } else {
-      self.packageRepository.createKeyman19SharedDataDirectories()
-    }
+    return package
   }
   
   /**
-   *  returns set containing the keyboards settings keys for the keyboards of every installed package
+   * returns true if the keyboard is enabled
+   * when enabled, the keyboard appears in the Keyman sub menu in the mac
+   */
+  public func isKeyboardEnabled(packageId: UUID, keyboardId: String) -> Bool {
+    var enabled = false;
+
+    if let package = try? self.findPackage(packageId: packageId) {
+      enabled = package.isKeyboardEnabled(keyboardId: keyboardId)
+      print ("isEnabled for \(keyboardId) returning with \(enabled)")
+    } else {
+      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardId)")
+    }
+    
+    return enabled
+  }
+    
+  /**
+   * enable or disable the keyboard
+   */
+  public func setKeyboardEnabled(packageId: UUID, keyboardId: String, enabled: Bool) {
+    if let package = try? self.findPackage(packageId: packageId) {
+      // update state of Keyboard
+      print ("setKeyboardEnabled for \(keyboardId) setting to \(enabled)")
+      package.enableKeyboard(keyboardId: keyboardId, enabled: enabled)
+    } else {
+      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardId)")
+    }
+    
+    // update persisted state in UserDefaults activeKeyboards array
+    self.persistKeyboardState()
+  }
+
+  /**
+   * persist the keyboard state in the settings (UserDefaults)
+   */
+  func persistKeyboardState() {
+    let enabledKeyboards = self.getAllEnabledKeyboardSettingsKeys()
+    self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(enabledKeyboards))
+  }
+  
+  /**
+   *  read the Keyman packages from the group container directory and store in the keyboardPackages array
+   */
+  func loadPackages() -> [KeymanPackage]? {
+    var packagesArray = nil as [KeymanPackage]?
+
+    // load keyboards from disk
+    if (self.packageRepository.keyman19SharedDataDirectoryExists()) {      
+      packagesArray = self.packageRepository.loadPackages()
+    } else {
+      self.packageRepository.createKeyman19SharedDataDirectories()
+    }
+    
+    return packagesArray
+  }
+  
+  /**
+   *  returns set containing the keyboards settings keys for all installed keyboards
    */
   func getAllKeyboardSettingsKeys() -> Set<String> {
     var settingsKeys = Set<String>()
     
     // loop through all the installed packages and for each of the package's keyboards,
     // insert the settings key for the keyboard
-    self.installedKeyboardPackages.forEach { $0.keyboards.forEach
+    self.installedPackages.forEach { $0.keyboards.forEach
       {settingsKeys.insert($0.keyboardSettingsKey)}
+    }
+
+    return settingsKeys
+  }
+  
+  /**
+   *  returns set containing the keyboards settings keys for all installed keyboards which are enabled
+   */
+  func getAllEnabledKeyboardSettingsKeys() -> Set<String> {
+    var settingsKeys = Set<String>()
+    
+    // loop through all the installed packages and for each of the package's keyboards,
+    // insert the settings key for every enabled keyboard
+    self.installedPackages.forEach { $0.keyboards.forEach {
+        if ($0.enabled) {
+          settingsKeys.insert($0.keyboardSettingsKey)
+        }
+      }
     }
 
     return settingsKeys
@@ -161,20 +173,30 @@ public class SettingsContainer : ObservableObject {
   /**
    *  remove any settings (UserDefaults) for which we have no installed package
    */
-  func synchronizeSettings() {
-    let installedPackageKeys = self.getAllKeyboardSettingsKeys()
+  func validateSettings() {
+    let installedKeyboardKeys = self.getAllKeyboardSettingsKeys()
     let activeKeyboardKeys = self.settingsRepository.readActiveKeyboards()
-    let commonKeyboardKeys = installedPackageKeys.intersection(activeKeyboardKeys)
-
-    // TODO: replace the active keyboards list with the intersection of the current
-    // active keyboards list and the installed packages list
+    
+    if (activeKeyboardKeys.isSubset(of: installedKeyboardKeys)) {
+      print("only installed keyboards are listed as active: no need to synchronize")
+    } else {
+      print("active keyboards list contains uninstalled keyboards: synchronize active keyboards list")
+      let installedActiveKeyboardKeys = activeKeyboardKeys.intersection(installedKeyboardKeys)
+      self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(installedActiveKeyboardKeys))
+    }
   }
   
   /**
-   *  apply the current settings to the installed packages
+   *  apply the state from the current settings to the installed packages
    */
-  func applySettings() {
+  func applySettingsToInstalledPackages() {
+    self.validateSettings()
     
+    let activeKeyboards = self.settingsRepository.readActiveKeyboards()
+
+    // set enabled flag if the keyboard is contained in the set of activeKeyboards
+    self.installedPackages.forEach { $0.keyboards.forEach
+      {$0.enabled = activeKeyboards.contains($0.keyboardSettingsKey)}
+    }
   }
-  
 }

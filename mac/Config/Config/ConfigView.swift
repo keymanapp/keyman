@@ -20,7 +20,7 @@ struct ConfigView: View {
         Image(systemName: "keyboard")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        Text("keyboard count = \(settings.installedKeyboardPackages.count)")
+        Text("keyboard count = \(settings.installedPackages.count)")
         Button("debug") {
           settings.debug()
         }
@@ -50,7 +50,7 @@ struct ConfigView: View {
 //      }
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {
-          ForEach(Array(settings.installedKeyboardPackages.enumerated()), id: \.offset) { index, package in
+          ForEach(Array(settings.installedPackages.enumerated()), id: \.offset) { index, package in
             VStack {
               HStack(alignment: .center, spacing: 10) {
                 Text(package.packageName)
@@ -60,7 +60,7 @@ struct ConfigView: View {
                 // Example of Icon-Only Button
                 Spacer()
                 Button(action: {
-                  settings.installedKeyboardPackages.remove(at: index)
+                  settings.installedPackages.remove(at: index)
                 }) {
                   Label("remove", systemImage: "trash.fill")
                 }

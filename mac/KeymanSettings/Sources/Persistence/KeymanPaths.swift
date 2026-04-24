@@ -205,7 +205,7 @@ public struct KeymanPaths {
     }
   }
 
-  // TODO: not used, remove?
+#warning("not used, remove?")
   fileprivate func checkContainerUrl() -> Bool {
     var containerValid = false
     let sharedFileManager = FileManager.default
