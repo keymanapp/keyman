@@ -96,7 +96,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     // Display notification to download update if available
     if (kbd.hasUpdateAvailable()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, kbVersion));
-      icon = String.valueOf(R.drawable.ic_cloud_download);
+//      icon = String.valueOf(R.drawable.ic_cloud_download);
+      icon = String.valueOf(R.drawable.ic_cloud_download_mode);
     }
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
@@ -105,7 +106,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     hashMap = new HashMap<>();
     final String customHelpLink = kbd.getHelpLink();
     // Check if app declared FileProvider
-    icon = String.valueOf(R.drawable.ic_action_forward);
+    //icon = String.valueOf(R.drawable.ic_action_forward);
+    icon = String.valueOf(R.drawable.ic_action_forward_mode);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
     if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
          (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {

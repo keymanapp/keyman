@@ -153,7 +153,8 @@ public final class LanguageSettingsActivity extends BaseActivity {
     updateActiveLexicalModel();
 
     ImageView imageView = (ImageView) layout.findViewById(R.id.image1);
-    imageView.setImageResource(R.drawable.ic_action_forward);
+    //imageView.setImageResource(R.drawable.ic_action_forward);
+    imageView.setImageResource(R.drawable.ic_action_forward_mode);
     layout.setEnabled(true);
     layout.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -333,7 +334,8 @@ public final class LanguageSettingsActivity extends BaseActivity {
       }
 
       holder.text.setText(kbd.getResourceName());
-      holder.img.setImageResource(R.drawable.ic_action_forward);
+      //holder.img.setImageResource(R.drawable.ic_action_forward);
+      holder.img.setImageResource(R.drawable.ic_action_forward_mode);
 
       return convertView;
     }

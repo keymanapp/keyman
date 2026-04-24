@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="yellow_background">#131313</color>
+
+    <color name="iconColor">#FFFFFF</color>
+    <color name="toolbarColor">@color/ms_black</color>
+    <color name="menuBgColor">#212121</color>
+    <color name="checkboxTick">@color/ms_black</color>
+
+    <color name="activated_bg">#929396</color>
+
+    <color name="dialogBackground">#353535</color>
+    <color name="toolbar">@color/ms_black</color>
+
+    <color name="branded_logo_bg">@color/ms_black</color>
+    <color name="main_text_color">#FFFFFF</color>
+
+</resources>

@@ -6,8 +6,28 @@
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Share</string>
 
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="action_sidebar">Show sidebar menu</string>
+
   <!-- Context: Menu Action -->
   <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
+
+  <!-- Context: Navigation drawer subtitles -->
+
+  <string name="drawer_subtitle_spacebar_caption" comment="Subtitle for Spacebar caption drawer item">Show keyboard name on spacebar</string>
+  <string name="drawer_subtitle_show_osk" comment="Subtitle for Show On Screen Keyboard drawer item">When physical keyboard connected</string>
+
+  <string name="drawer_subtitle_send_crash_report" comment="Subtitle for crash reporting drawer item">Allow error reports to be sent to Keyman team</string>
+
+  <string name="drawer_subtitle_about" comment="Subtitle for About drawer item">Learn how to use Keyman</string>
+  <string name="drawer_subtitle_about_current_keyboard" comment="Subtitle for current keyboard About drawer item">No active keyboard</string>
+  <string name="drawer_about_current_keyboard" comment="Title for current keyboard About drawer item">About active keyboard</string>
+  <string name="drawer_about_no_active_keyboard" comment="Fallback text when no active keyboard is selected">No active keyboard</string>
+  <string name="drawer_subtitle_theme" comment="Subtitle format for current theme setting">Current setting: %1$s</string>
+  <string name="drawer_subtitle_active_keyboard_help" comment="Subtitle for active keyboard help drawer item">Learn how to use the %1$s keyboard</string>
+  <string name="drawer_title_active_keyboard_help" comment="Title for active keyboard help drawer item">%1$s help</string>
+  <string name="drawer_title_active_keyboard_help_fallback" comment="Fallback title for active keyboard help drawer item">Active keyboard help</string>
 
   <!-- Context: Menu Action -->
   <string name="action_text_size" comment="Menu action to adjust text size">Text Size</string>
@@ -102,12 +122,12 @@
 
   <!-- Context: Keyman Settings menu -->
   <plurals name="installed_languages">
-    <item quantity="zero">Installed languages</item>
+    <item quantity="one">Installed languages (%1$d)</item>
     <item quantity="other">Installed languages (%1$d)</item>
   </plurals>
 
   <!-- Context: Keyman Settings menu -->
-  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Install Keyboard or Dictionary</string>
+  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Install keyboard or dictionary</string>
 
   <!-- Context: Keyman Settings menu -->
   <string name="change_display_language" comment="Menu action to change interface language">Display language</string>
@@ -147,7 +167,7 @@
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Do not show caption on spacebar</string>
 
   <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard -->
-  <string name="show_osk" comment="show OSK when physical keyboard is connected">Show On-Screen Keyboard</string>
+  <string name="show_osk" comment="show OSK when physical keyboard is connected">Show on-screen keyboard</string>
 
   <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard hint -->
   <string name="show_osk_hint" comment="When physical keyboard is connected">When physical keyboard is connected</string>
@@ -165,13 +185,24 @@
   <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
 
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report" comment="permission for sending crash reports">Allow sending crash reports over network</string>
+  <string name="show_send_crash_report" comment="permission for sending crash reports">Automatic error reporting</string>
 
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_on" comment="Description when toggle is on">When on, crash reports will be sent</string>
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">Allow error reports to be sent to Keyman team</string>
 
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_off" comment="Description when toggle is off">When off, crash reports won\'t be sent</string>
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">Error reports are not sent to Keyman team</string>
+
+  <!-- Context: Main drawer menu -->
+  <string name="drawer_menu_help" comment="Help drawer item title">User guide</string>
+  <string name="drawer_menu_update_keyboards" comment="Drawer action to update installed keyboards">Update keyboards</string>
+  <string name="drawer_menu_installed_languages" comment="Drawer title for installed languages item">Installed languages</string>
+  <string name="drawer_menu_show_get_started" comment="Drawer title for get started startup option">Show &quot;Get Started&quot; on startup</string>
+  <string name="theme" comment="Menu title for theme settings">Theme</string>
+  <string name="theme_choose" comment="Dialog title for choosing app theme">Choose theme</string>
+  <string name="theme_dark_mode" comment="Theme option">Dark mode</string>
+  <string name="theme_light_mode" comment="Theme option">Light mode</string>
+  <string name="theme_system_default" comment="Theme option">System default</string>
 
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">Install from keyman.com</string>

@@ -1,25 +1,37 @@
 package com.tavultesoft.kmapro;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
 import android.content.Intent;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.keyman.engine.util.KMLog;
 
 import java.util.Calendar;
 
-public class SplashScreenActivity extends Activity {
+public class SplashScreenActivity extends AppCompatActivity {
   private final static String TAG = "Splash";
-
   // For now, disable this Activity so app is not delayed showing version/copyright text
-  private static int SPLASH_TIME_OUT = 0; // msec
+  private static int SPLASH_TIME_OUT = 100; // msec
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+    int savedMode = prefs.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
+    if (savedMode == AppCompatDelegate.MODE_NIGHT_YES) {
+      setTheme(R.style.AppTheme_BrandedLaunchDark);
+    } else {
+      setTheme(R.style.AppTheme_BrandedLaunchLight);
+    }
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_splash_screen);
 
@@ -40,6 +52,8 @@ public class SplashScreenActivity extends Activity {
     int year = Calendar.getInstance().get(Calendar.YEAR);
     String date = String.format("%s%s", copyright.getText(), year);
     //copyright.setText(date);
+
+    AppCompatDelegate.setDefaultNightMode(savedMode);
 
     new Handler().postDelayed(new Runnable() {
       @Override

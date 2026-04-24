@@ -36,7 +36,8 @@
                 android:src="@drawable/ic_action_back"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/image_button_color" />
+                app:tint="@color/iconColor"
+                />
 
             <ImageButton
                 android:id="@+id/forward_button"
@@ -59,7 +60,8 @@
             android:layout_gravity="end"
             android:contentDescription="@string/label_close"
             android:src="@drawable/ic_action_close"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="@color/iconColor"/>
 
     </androidx.appcompat.widget.Toolbar>
 

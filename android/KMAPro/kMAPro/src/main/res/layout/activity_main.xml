@@ -1,42 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraintLayout"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:layout_above="@+id/KMKeyboard"
-    android:orientation="vertical"
-    android:background="@android:color/white"
-    tools:context=".MainActivity">
+    android:fitsSystemWindows="true">
 
-    <include layout="@layout/titlebar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <include
-        layout="@layout/check_chrome_webview_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/titlebar"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/titlebar" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/KMKeyboard"
+        android:orientation="vertical"
+        android:background="@color/toolbarColor"
+        tools:context=".MainActivity"
+        android:fitsSystemWindows="true">
 
-    <com.keyman.engine.KMTextView
-        android:id="@+id/kmTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/checkWebViewChromeLayout"
-        android:background="@drawable/textview_bg"
-        android:ems="10"
-        android:gravity="top"
-        android:hint="@string/textview_hint"
-        android:inputType="textMultiLine|textNoSuggestions"
+        <include layout="@layout/titlebar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <include
+            layout="@layout/check_chrome_webview_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/titlebar"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/titlebar" />
+
+        <com.keyman.engine.KMTextView
+            android:id="@+id/kmTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/checkWebViewChromeLayout"
+            android:background="@drawable/textview_bg"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="@string/textview_hint"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:scrollbars="vertical"
+            app:layout_constraintTop_toBottomOf="@id/checkWebViewChromeLayout">
+
+            <requestFocus />
+        </com.keyman.engine.KMTextView>
+
+        <LinearLayout
+            android:id="@+id/keyboardToolbarContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:visibility="gone"
+            android:padding="6dp"
+            android:background="@drawable/bg_keyboard_toolbar_container"
+            android:elevation="6dp"
+            android:outlineProvider="background"
+            app:layout_constraintBottom_toTopOf="@id/keyboardToolbarToggleButton"
+            app:layout_constraintStart_toStartOf="@id/keyboardToolbarToggleButton"
+            app:layout_constraintEnd_toEndOf="@id/keyboardToolbarToggleButton"
+            android:layout_marginBottom="8dp">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/keyboardToolbarShareButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginBottom="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_share"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_light_action_share" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/keyboardToolbarTextSizeButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginBottom="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_text_size"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_light_action_textsize" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/keyboardToolbarClearButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_clear_text"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_light_action_trash" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/keyboardToolbarToggleButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:visibility="gone"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_keyboard_toolbar_toggle"
+            android:contentDescription="@string/action_overflow"
+            android:padding="10dp"
+            android:elevation="10dp"
+            android:translationZ="3dp"
+            android:outlineProvider="background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_arrow_dropdown" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Sidebar — must be at the bottom of DrawerLayout -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:paddingHorizontal="10dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/checkWebViewChromeLayout">
+        android:fadeScrollbars="false"
+        android:fitsSystemWindows="true"
+        app:itemTextAppearance="@style/NavigationDrawerItemText"
+        app:menu="@menu/nav_menu" />
 
-        <requestFocus />
-    </com.keyman.engine.KMTextView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

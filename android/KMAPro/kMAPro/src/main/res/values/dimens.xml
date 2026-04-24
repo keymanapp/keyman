@@ -18,10 +18,13 @@
     <dimen name="package_label_width">350dp</dimen>
     <dimen name="keyman_bar_height">8dp</dimen>
     <dimen name="checkbox_margin">8dp</dimen>
-    <dimen name="checkbox_margin_left">15dp</dimen>
+<!--    <dimen name="checkbox_margin_left">8dp</dimen>-->
+    <dimen name="checkbox_margin_left">19dp</dimen>
     <dimen name="checkbox_padding">10dp</dimen>
     <dimen name="preference_icon">32dp</dimen>
     <dimen name="update_indicator_size">16dp</dimen>
     <dimen name="update_indicator_bg_margin">0dp</dimen>
     <dimen name="longpress_delay_label_textsize">24sp</dimen>
+    <dimen name="keyboard_toolbar_keyboard_gap">12dp</dimen>
+    <dimen name="keyboard_toolbar_container_bottom_margin">8dp</dimen>
 </resources>
