@@ -7,6 +7,7 @@ import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
+import { ContextToken } from './correction/context-token.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
@@ -388,6 +389,63 @@ export function determineSuggestionAlignment(
   }
 
   return { predictionContext: context, deleteLeft };
+}
+
+/**
+ * Given two ContextTokenizations related by context transition, this function
+ * determines the tail-end range of the tokenization affected by the transition.
+ * @param userContextTokenization
+ * @param variantForSuggestions
+ * @returns
+ */
+export function determineSuggestionRange(
+  userContextTokenization: ContextTokenization,
+  variantForSuggestions: ContextTokenization
+) {
+  // Assumption:  spaceIds monotonically increase as new ones are generated.
+  // Given this, we backtrace on the token tails until finding a spot where the
+  // spaceIds match, dropping any that are newer than the last found in the
+  // other.
+  //
+  // We full-replace all tokens affected by an applied suggestion, so if there's
+  // a mismatch between the final form of a token, that implies that suggestions
+  // would replace the original form of the token anyway.
+  const tokenSetA = userContextTokenization.tokens.slice();
+  const tokenSetB = variantForSuggestions.tokens.slice();
+
+  const tokensToRemove: ContextToken[] = [];
+  const tokensToPredict: ContextToken[] = [];
+
+  const tailIdFor = (tokens: ContextToken[]) => tokens[tokens.length-1]?.spaceId ?? -1;
+  let tailOfA = tailIdFor(tokenSetA);
+  let tailOfB = tailIdFor(tokenSetB);
+  while(tailOfA != tailOfB) {
+    if(tailOfA < tailOfB) {
+      tokensToPredict.push(tokenSetB.pop());
+      tailOfB = tailIdFor(tokenSetB);
+    } else {
+      tokensToRemove.push(tokenSetA.pop());
+      tailOfA = tailIdFor(tokenSetA);
+    }
+  }
+
+  tokensToPredict.reverse();
+
+  // Can occur when backspacing to the end of a previous word.
+  if(tokensToPredict.length == 0) {
+    if(tokenSetA.length == 0 || tokenSetB.length == 0) {
+      throw new Error("Invalid state - a tokenization is missing expected tokens");
+    }
+    tokensToRemove.push(tokenSetA.pop());
+    tokensToPredict.push(tokenSetB.pop());
+  }
+
+  tokensToRemove.reverse();
+
+  return {
+    tokensToRemove,
+    tokensToPredict
+  }
 }
 
 /**

@@ -142,6 +142,9 @@ export class ContextTokenization {
   ) {
     if(!(param1 instanceof ContextTokenization)) {
       const tokens = param1;
+      if(!tokens || tokens.length == 0) {
+        throw new Error("ContextTokenization requires at least one existing ContextToken");
+      }
       this.tokens = [].concat(tokens);
       if(tokenizationPath) {
         this.transitionEdits = {
