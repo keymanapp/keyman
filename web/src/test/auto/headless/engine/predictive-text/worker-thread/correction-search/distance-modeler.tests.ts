@@ -13,12 +13,11 @@ import { PriorityQueue } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { correction, models } from '@keymanapp/lm-worker/test-index';
+import { correction, models, QUEUE_NODE_COMPARATOR } from '@keymanapp/lm-worker/test-index';
 
 import SENTINEL_CODE_UNIT = models.SENTINEL_CODE_UNIT;
 import Distribution = LexicalModelTypes.Distribution;
 import SearchNode = correction.SearchNode;
-import SearchResult = correction.SearchResult;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
@@ -34,12 +33,14 @@ const toKey = (s: string) => testModel.toKey(s);
  */
 const FIRST_CHAR_VARIANTS = 24;
 
-function buildTestTimer() {
-  return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
-}
+let SEARCH_EDGE_SEED = 0;
 
 function assertEdgeChars(edge: correction.SearchNode, input: string, match: string) {
   assert.isTrue(edgeHasChars(edge, input, match));
+}
+
+function lastEntry<T>(arr: readonly T[]): T {
+  return arr.slice().pop();
 }
 
 function edgeHasChars(edge: correction.SearchNode, input: string, match: string) {
@@ -47,12 +48,12 @@ function edgeHasChars(edge: correction.SearchNode, input: string, match: string)
     return false;
   }
 
-  return edge.calculation.lastMatchEntry == match;
+  return lastEntry(edge.calculation.matchSequence) == match;
 }
 
 function findEdgesWithChars(edgeArray: correction.SearchNode[], match: string) {
   let results = edgeArray.filter(function(value) {
-    return value.calculation.lastMatchEntry == match;
+    return lastEntry(value.calculation.matchSequence) == match;
   });
 
   assert.isAtLeast(results.length, 1);
@@ -60,7 +61,8 @@ function findEdgesWithChars(edgeArray: correction.SearchNode[], match: string) {
 }
 
 function fetchCommonTENode() {
-  const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+  const rootSeed = SEARCH_EDGE_SEED++;
+  const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
 
   // Establish desired source node:  prefix 'te'.
   const firstLayerTransforms: Distribution<Transform> = [{
@@ -76,14 +78,16 @@ function fetchCommonTENode() {
     },
     p: 0.25
   }];
+  const firstLayerSeed = SEARCH_EDGE_SEED++;
   const firstLayerNodes = rootNode
-    .buildSubstitutionEdges(firstLayerTransforms)
+    .buildSubstitutionEdges(firstLayerTransforms, firstLayerSeed)
     .flatMap(node => node.processSubsetEdge());
   assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
   firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
 
   const tNode = firstLayerNodes[0];
   assert.equal(tNode.resultKey, 't');
+  assert.equal(tNode.spaceId, firstLayerSeed);
   assert.sameDeepMembers(tNode.priorInput, [firstLayerTransforms[0]]);
   assert.isFalse(tNode.hasPartialInput);
 
@@ -100,8 +104,9 @@ function fetchCommonTENode() {
     },
     p: 0.2
   }];
+  const secondLayerSeed = SEARCH_EDGE_SEED++;
   const secondLayerNodes = tNode
-    .buildSubstitutionEdges(secondLayerTransforms)
+    .buildSubstitutionEdges(secondLayerTransforms, secondLayerSeed)
     .flatMap(node => node.processSubsetEdge());
   // The field narrows down at this point, but still has a decent number
   // of variants (11).
@@ -112,14 +117,16 @@ function fetchCommonTENode() {
 
   assert.equal(teNode.resultKey, 'te');
   assert.equal(teNode.editCount, 0);
+  assert.equal(teNode.spaceId, secondLayerSeed);
 
   return teNode;
 }
 
-describe('Correction Distance Modeler', function() {
-  describe('SearchNode', function() {
+describe('Correction Distance Modeler', () => {
+  describe('SearchNode', () => {
     it('constructs a fresh instance from a traversal + keyingFunction', () => {
-      const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+      const rootSeed = SEARCH_EDGE_SEED++;
+      const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
       assert.equal(rootNode.resultKey, '');
 
       assert.equal(rootNode.editCount, 0);
@@ -129,14 +136,15 @@ describe('Correction Distance Modeler', function() {
       assert.equal((rootNode.currentTraversal as TrieTraversal).prefix, '');
       assert.isFalse(rootNode.hasPartialInput);
       assert.isFalse(rootNode.isFullReplacement)
-      assert.isUndefined(rootNode.calculation.lastInputEntry);
-      assert.isUndefined(rootNode.calculation.lastMatchEntry);
+      assert.isUndefined(lastEntry(rootNode.calculation.inputSequence));
+      assert.isUndefined(lastEntry(rootNode.calculation.matchSequence));
       assert.equal(rootNode.toKey, toKey);
+      assert.equal(rootNode.spaceId, rootSeed);
     });
 
     describe('supports the cloning constructor pattern', () => {
       it('properly deep-copies the root node', () => {
-        const originalNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+        const originalNode = new SearchNode(testModel.traverseFromRoot(), SEARCH_EDGE_SEED++, toKey);
         const clonedNode = new SearchNode(originalNode);
 
         // Root node properties; may as well re-assert 'em.
@@ -149,9 +157,10 @@ describe('Correction Distance Modeler', function() {
         assert.equal((clonedNode.currentTraversal as TrieTraversal).prefix, '');
         assert.isFalse(clonedNode.hasPartialInput);
         assert.isFalse(clonedNode.isFullReplacement)
-        assert.isUndefined(clonedNode.calculation.lastInputEntry);
-        assert.isUndefined(clonedNode.calculation.lastMatchEntry);
+        assert.isUndefined(lastEntry(clonedNode.calculation.inputSequence));
+        assert.isUndefined(lastEntry(clonedNode.calculation.matchSequence));
         assert.equal(clonedNode.toKey, toKey);
+        assert.equal(clonedNode.spaceId, originalNode.spaceId);
 
         // Avoid aliasing for properties holding mutable objects
         assert.notEqual(clonedNode.priorInput, originalNode.priorInput);
@@ -162,7 +171,8 @@ describe('Correction Distance Modeler', function() {
       });
 
       it('properly deep-copies fully-processed nodes later in the search path', () => {
-        const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
 
         // Establish desired source node:  prefix 'te'.
         const firstLayerTransforms: Distribution<Transform> = [{
@@ -179,7 +189,7 @@ describe('Correction Distance Modeler', function() {
           p: 0.25
         }];
         const firstLayerNodes = rootNode
-          .buildSubstitutionEdges(firstLayerTransforms)
+          .buildSubstitutionEdges(firstLayerTransforms, SEARCH_EDGE_SEED++)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
         firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -202,8 +212,9 @@ describe('Correction Distance Modeler', function() {
           },
           p: 0.2
         }];
+        const secondSpaceId = SEARCH_EDGE_SEED++;
         const secondLayerNodes = tNode
-          .buildSubstitutionEdges(secondLayerTransforms)
+          .buildSubstitutionEdges(secondLayerTransforms, secondSpaceId)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(secondLayerNodes.length, 10);
         secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -221,10 +232,11 @@ describe('Correction Distance Modeler', function() {
 
           assert.isFalse(node.hasPartialInput);
           assert.isFalse(node.isFullReplacement)
-          assert.equal(node.calculation.lastInputEntry, 'e');
-          assert.equal(node.calculation.lastMatchEntry, 'e');
+          assert.equal(lastEntry(node.calculation.inputSequence), 'e');
+          assert.equal(lastEntry(node.calculation.matchSequence), 'e');
           assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
           assert.equal(node.toKey, toKey);
+          assert.equal(node.spaceId, secondSpaceId);
         }
 
         assertSourceNodeProps(teNode);
@@ -243,7 +255,8 @@ describe('Correction Distance Modeler', function() {
       });
 
       it('properly deep-copies partially-processed edges later in the search path', () => {
-        const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new SearchNode(testModel.traverseFromRoot(), rootSeed, toKey);
 
         // Establish desired source node:  prefix 'te', with 'e' the first letter of
         // a multi-char insert Transform.
@@ -261,7 +274,7 @@ describe('Correction Distance Modeler', function() {
           p: 0.25
         }];
         const firstLayerNodes = rootNode
-          .buildSubstitutionEdges(firstLayerTransforms)
+          .buildSubstitutionEdges(firstLayerTransforms, SEARCH_EDGE_SEED++)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
         firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -284,8 +297,10 @@ describe('Correction Distance Modeler', function() {
           },
           p: 0.2
         }];
+
+        const secondLayerId = SEARCH_EDGE_SEED++;
         const secondLayerNodes = tNode
-          .buildSubstitutionEdges(secondLayerTransforms)
+          .buildSubstitutionEdges(secondLayerTransforms, secondLayerId)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(secondLayerNodes.length, 10);
         secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
@@ -303,10 +318,11 @@ describe('Correction Distance Modeler', function() {
 
           assert.isTrue(node.hasPartialInput);
           assert.isFalse(node.isFullReplacement)
-          assert.equal(node.calculation.lastInputEntry, 'e');
-          assert.equal(node.calculation.lastMatchEntry, 'e');
+          assert.equal(lastEntry(node.calculation.inputSequence), 'e');
+          assert.equal(lastEntry(node.calculation.matchSequence), 'e');
           assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
           assert.equal(node.toKey, toKey);
+          assert.equal(node.spaceId, secondLayerId);
         }
 
         assertSourceNodeProps(teNode);
@@ -325,32 +341,133 @@ describe('Correction Distance Modeler', function() {
       });
     });
 
-    // Consider adding more, deeper?
-    it('builds insertion edges based on lexicon, from root', function() {
-      let rootTraversal = testModel.traverseFromRoot();
-      assert.isNotEmpty(rootTraversal);
+    describe('buildInsertionEdges()', () => {
+      it('builds insertion edges from (empty) root', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
 
-      let rootNode = new correction.SearchNode(rootTraversal);
-      assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-      let edges = rootNode.buildInsertionEdges();
-      assert.isAbove(edges.length, 0);
+        const edges = rootNode.buildInsertionEdges();
+        assert.isAbove(edges.length, 0);
 
-      let expectedChildCount = 0;
-      for(let child of rootTraversal.children()) {
-        expectedChildCount++;
+        let expectedChildCount = 0;
+        for(const child of rootTraversal.children()) {
+          expectedChildCount++;
 
-        let childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
-        assert.isOk(childEdge);
-        assert.isEmpty(childEdge.priorInput);
-        assert.isEmpty(childEdge.calculation.inputSequence);
-        assert.isAbove(childEdge.currentCost, 0);
-      }
+          let childEdge = edges.filter(value => lastEntry(value.calculation.matchSequence) == child.char)[0];
+          assert.isOk(childEdge);
+          assert.isEmpty(childEdge.priorInput);
+          assert.isEmpty(childEdge.calculation.inputSequence);
+          assert.isAbove(childEdge.currentCost, 0);
+          assert.equal(childEdge.spaceId, rootSeed);
+        }
 
-      assert.equal(edges.length, expectedChildCount);
+        assert.equal(edges.length, expectedChildCount);
+      });
+
+      it('builds insertion edges directly after prior insertion', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const edges = rootNode.buildInsertionEdges();
+        assert.isAbove(edges.length, 0);
+
+        const firstChild = edges[0];
+        const childEdges = firstChild.buildInsertionEdges();
+
+        let expectedChildCount = 0;
+        for(const child of firstChild.currentTraversal.children()) {
+          expectedChildCount++;
+
+          let childEdge = edges.filter(value => lastEntry(value.calculation.matchSequence) == child.char)[0];
+          assert.isOk(childEdge);
+          assert.isEmpty(childEdge.priorInput);
+          assert.isEmpty(childEdge.calculation.inputSequence);
+          assert.isAbove(childEdge.currentCost, 0);
+          assert.equal(childEdge.spaceId, rootSeed);
+        }
+
+        assert.equal(childEdges.length, expectedChildCount);
+      });
+
+      it('does not build insertion edges after a deletion', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const edges = rootNode.buildDeletionEdges([{
+          sample: { insert: 'd', deleteLeft: 0 },
+          p: 1
+        }], SEARCH_EDGE_SEED++);
+        assert.isAbove(edges.length, 0);
+        const firstChild = edges[0];
+
+        const insertEdgesAfterDelete = firstChild.buildInsertionEdges();
+        assert.equal(insertEdgesAfterDelete.length, 0);
+      });
+
+      it('does not build insertion edges after receiving an empty transform as input', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const edges = rootNode.buildSubstitutionEdges([{
+          // intentionally empty!
+          sample: { insert: '', deleteLeft: 0 },
+          p: 1
+        }], SEARCH_EDGE_SEED++).flatMap(n => n.processSubsetEdge());
+        assert.isAbove(edges.length, 0);
+        const firstChild = edges[0];
+        const insertsAfterEmpty = firstChild.buildInsertionEdges();
+
+        assert.equal(insertsAfterEmpty.length, 0);
+      });
+
+      it('builds insertion edges after a substitution', () => {
+        const rootTraversal = testModel.traverseFromRoot();
+        assert.isNotEmpty(rootTraversal);
+
+        const rootSeed = SEARCH_EDGE_SEED++;
+        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+        const subSeed = SEARCH_EDGE_SEED++;
+        const edges = rootNode.buildSubstitutionEdges([{
+          sample: { insert: 't', deleteLeft: 0 },
+          p: 1
+        }], subSeed).flatMap(n => n.processSubsetEdge());
+        assert.isAbove(edges.length, 0);
+        const firstChild = edges[0];
+        const insertsAfterInput = firstChild.buildInsertionEdges();
+
+        let expectedChildCount = 0;
+        for(const child of firstChild.currentTraversal.children()) {
+          expectedChildCount++;
+
+          let childEdge = edges.filter(value => lastEntry(value.calculation.matchSequence) == child.char)[0];
+          assert.isOk(childEdge);
+          assert.equal(childEdge.priorInput.length, 1);
+          assert.equal(childEdge.spaceId, subSeed);
+        }
+
+        assert.equal(insertsAfterInput.length, expectedChildCount);
+      });
     });
 
-    describe('buildDeletionEdges @ token root', () => {
+    it('buildDeletionEdges @ token root: makes single mass deletion batch', () => {
       const synthDistribution = [
         //              Transform,            probability
         //         insert 1,   deleteLeft  0,  p: 0.50
@@ -366,104 +483,28 @@ describe('Correction Distance Modeler', function() {
         {sample: {insert: 'tr', deleteLeft: 1}, p: 0.15},
         // 4 distinct subsets.
       ];
+      const probSum = synthDistribution.reduce((accum, cur) => accum + cur.p, 0);
 
-      it('step 1: batches deletion edge(s) for input transforms', () => {
-        let rootTraversal = testModel.traverseFromRoot();
-        assert.isNotEmpty(rootTraversal);
+      const rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
 
-        let rootNode = new correction.SearchNode(rootTraversal);
-        assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+      const rootSeed = SEARCH_EDGE_SEED++;
+      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+      assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution);
-        assert.equal(subsetNodes.length, 4);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-        const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x))
-        // The known subs for the subsets defined above.
-        for(let i=0; i < expectedCosts.length; i++) {
-          assert.isTrue(subsetNodes[i].hasPartialInput);
-          // From root: the deleteLeft 1 entries have nothing to delete.
-          assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, '');
-
-          // Allow a little value wiggle due to double-precision limitations.
-          assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
-          // No actual edit-tracking is done yet, so these should also match.
-          assert.approximately(subsetNodes[i].currentCost, expectedCosts[i], 1e-8);
-        }
-      });
-
-      it('step 2: first processing layer resolves zero + one char inserts', () => {
-        // From "step 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        const processedNodes = subsetNodes.flatMap(n => n.processSubsetEdge());
-        // All delete-oriented Transform subsets condense down to a single
-        // transform (and edge) each.
-        assert.equal(processedNodes.length, 4);
-
-        // Sorted index 0:  1 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[0].hasPartialInput);
-        assert.equal(processedNodes[0].editCount, 1);
-        assert.equal(processedNodes[0].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[0].inputSamplingCost, subsetNodes[0].inputSamplingCost);
-        assert.isAbove(processedNodes[0].currentCost, subsetNodes[0].currentCost);
-
-        // Sorted index 3:  0 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[3].hasPartialInput);
-        // No insert string => no sentinel char to delete.
-        assert.equal(processedNodes[3].editCount, 0);
-        assert.isUndefined(processedNodes[3].calculation.lastInputEntry);
-        assert.equal(processedNodes[3].inputSamplingCost, subsetNodes[3].inputSamplingCost);
-        assert.equal(processedNodes[3].currentCost, subsetNodes[3].currentCost);
-
-        // Sorted indices 2, 3:  both had 2 inserts.
-        assert.isTrue(processedNodes[1].hasPartialInput);
-        assert.equal(processedNodes[1].editCount, 1);
-        assert.equal(processedNodes[1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[1].inputSamplingCost, subsetNodes[1].inputSamplingCost);
-        assert.isAbove(processedNodes[1].currentCost, subsetNodes[1].currentCost);
-
-        assert.isTrue(processedNodes[2].hasPartialInput);
-        assert.equal(processedNodes[2].editCount, 1);
-        assert.equal(processedNodes[2].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[2].inputSamplingCost, subsetNodes[2].inputSamplingCost);
-        assert.isAbove(processedNodes[2].currentCost, subsetNodes[2].currentCost);
-      });
-
-      it('step 3: second processing layer resolves two char inserts', () => {
-        // From "steps 0, 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildDeletionEdges(synthDistribution);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        // Two nodes were unprocessed at the end of the last step; we handle
-        // them now and filter the others out.  We need the indices here to be
-        // aligned.
-        const step2Nodes = subsetNodes.flatMap(n => n.processSubsetEdge()).filter(n => n.hasPartialInput);
-        const processedNodes = step2Nodes.flatMap(n => n.processSubsetEdge());
-
-        // All delete-oriented Transform subsets condense down to a single
-        // transform (and edge) each.
-        assert.equal(processedNodes.length, 2);
-        // All nodes are now done processing.
-        processedNodes.forEach((processedNode, index) => {
-          assert.isFalse(processedNode.hasPartialInput);
-          assert.isFalse(processedNode.hasPartialInput);
-          assert.equal(processedNode.editCount, 2);
-          assert.equal(processedNode.calculation.inputSequence.length, 2);
-          assert.equal(processedNode.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-          assert.equal(processedNode.inputSamplingCost, step2Nodes[index].inputSamplingCost);
-          assert.isAbove(processedNode.currentCost, step2Nodes[index].currentCost);
-        });
-      });
+      const subsetSeed = SEARCH_EDGE_SEED++;
+      const subsetNodes = rootNode.buildDeletionEdges(synthDistribution, subsetSeed);
+      assert.equal(subsetNodes.length, 1);
+      assert.isFalse(subsetNodes[0].hasPartialInput);
+      // From root: deleted inputs don't perform their deletes OR inserts past a single
+      // sentinel char.
+      assert.equal((subsetNodes[0].currentTraversal as TrieTraversal).prefix, '');
+      assert.equal(subsetNodes[0].spaceId, subsetSeed);
+      assert.equal(subsetNodes[0].editCount, rootNode.editCount + 1);
+      assert.equal(subsetNodes[0].inputSamplingCost, rootNode.inputSamplingCost - Math.log(probSum));
     });
 
-    describe(`buildDeletionEdges starting @ 'te' prefix`, () => {
+    it(`buildDeletionEdges @ 'te' prefix: makes single mass deletion batch`, () => {
       // start prefix 'te'
 
       const synthDistribution = [
@@ -481,102 +522,21 @@ describe('Correction Distance Modeler', function() {
         {sample: {insert: 'al', deleteLeft: 1}, p: 0.15}, // tal(k)
         // 4 distinct subsets.
       ];
+      const probSum = synthDistribution.reduce((accum, cur) => accum + cur.p, 0);
 
-      it('step 1: batches deletion edge(s) for input transforms', () => {
-        const teNode = fetchCommonTENode();
-        assert.equal(teNode.calculation.getHeuristicFinalCost(), 0);
+      const teNode = fetchCommonTENode();
+      assert.equal(teNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution);
-        assert.equal(subsetNodes.length, 4);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-
-        const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x) + teNode.currentCost);
-        // The known subs for the subsets defined above.
-        for(let i=0; i < expectedCosts.length; i++) {
-          assert.isTrue(subsetNodes[i].hasPartialInput);
-          // From a 'te' prefix, the deleteLeft 1 entries do have something to delete.
-          assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, (i == 0 || i == 2) ? 'te' : 't');
-
-          // Allow a little value wiggle due to double-precision limitations.
-          assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
-          // No actual edit-tracking is done yet, so these should also match.
-          assert.approximately(subsetNodes[i].currentCost, expectedCosts[i], 1e-8);
-        }
-      });
-
-      it('step 2: first processing layer resolves zero + one char inserts', () => {
-        // From "step 1" above, assertions removed
-        const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        const processedNodes = subsetNodes.flatMap(n => n.processSubsetEdge());
-        // All delete-oriented Transform subsets condense down to a single
-        // transform (and edge) each.
-        assert.equal(processedNodes.length, 4);
-
-        // Sorted index 0:  1 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[0].hasPartialInput);
-        assert.equal(processedNodes[0].editCount, 1);
-        assert.equal(processedNodes[0].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[0].inputSamplingCost, subsetNodes[0].inputSamplingCost);
-        assert.isAbove(processedNodes[0].currentCost, subsetNodes[0].currentCost);
-
-        // Sorted index 3:  0 insert - should be processed already, in a single
-        // step.
-        assert.isFalse(processedNodes[3].hasPartialInput);
-        // No insert string => no sentinel char to delete.
-        assert.equal(processedNodes[3].editCount, 0);
-        // ... and a prior character exists.
-        assert.equal(processedNodes[3].calculation.lastInputEntry, 't');
-        assert.equal(processedNodes[3].inputSamplingCost, subsetNodes[3].inputSamplingCost);
-        assert.equal(processedNodes[3].currentCost, subsetNodes[3].currentCost);
-
-        // Sorted indices 2, 3:  both had 2 inserts.
-        assert.isTrue(processedNodes[1].hasPartialInput);
-        assert.equal(processedNodes[1].editCount, 1);
-        assert.equal(processedNodes[1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[1].inputSamplingCost, subsetNodes[1].inputSamplingCost);
-        assert.isAbove(processedNodes[1].currentCost, subsetNodes[1].currentCost);
-
-        assert.isTrue(processedNodes[2].hasPartialInput);
-        assert.equal(processedNodes[2].editCount, 1);
-        assert.equal(processedNodes[2].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(processedNodes[2].inputSamplingCost, subsetNodes[2].inputSamplingCost);
-        assert.isAbove(processedNodes[2].currentCost, subsetNodes[2].currentCost);
-      });
-
-      it('step 3: second processing layer resolves two char inserts', () => {
-        const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildDeletionEdges(synthDistribution);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
-
-        // Two nodes were unprocessed at the end of the last step; we handle
-        // them now and filter the others out.  We need the indices here to be
-        // aligned.
-        const step2Nodes = subsetNodes.flatMap(n => n.processSubsetEdge()).filter(n => n.hasPartialInput);
-
-        function assertExpectedProperties(processedNodes: SearchNode[], baseNode: SearchNode, dl: number) {
-          // All delete-oriented Transform subsets condense down to a single
-          // transform (and edge) each.
-          assert.equal(processedNodes.length, 1);
-          // All nodes are now done processing.
-          processedNodes.forEach((processedNode) => {
-            assert.isFalse(processedNode.hasPartialInput);
-            assert.isFalse(processedNode.hasPartialInput);
-            assert.equal(processedNode.editCount, 2);
-            assert.equal(processedNode.calculation.inputSequence.length, 4 - dl);
-            assert.equal(processedNode.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-            assert.equal(processedNode.inputSamplingCost, baseNode.inputSamplingCost);
-            assert.isAbove(processedNode.currentCost, baseNode.currentCost);
-          });
-        }
-
-        assertExpectedProperties(step2Nodes[0].processSubsetEdge(), step2Nodes[0], 1);
-        assertExpectedProperties(step2Nodes[1].processSubsetEdge(), step2Nodes[1], 0);
-      });
+      const subsetSeed = SEARCH_EDGE_SEED++;
+      const subsetNodes = teNode.buildDeletionEdges(synthDistribution, subsetSeed);
+      assert.equal(subsetNodes.length, 1);
+      assert.isFalse(subsetNodes[0].hasPartialInput);
+      // From root: deleted inputs don't perform their deletes OR inserts past a single
+      // sentinel char.
+      assert.equal((subsetNodes[0].currentTraversal as TrieTraversal).prefix, 'te');
+      assert.equal(subsetNodes[0].spaceId, subsetSeed);
+      assert.equal(subsetNodes[0].editCount, teNode.editCount + 1);
+      assert.equal(subsetNodes[0].inputSamplingCost, teNode.inputSamplingCost - Math.log(probSum));
     });
 
     describe('buildSubstitutionEdges @ token root', () => {
@@ -597,13 +557,14 @@ describe('Correction Distance Modeler', function() {
       ];
 
       it('step 1: batches substitution edge(s) for input transforms', () => {
-        let rootTraversal = testModel.traverseFromRoot();
+        const rootTraversal = testModel.traverseFromRoot();
         assert.isNotEmpty(rootTraversal);
 
-        let rootNode = new correction.SearchNode(rootTraversal);
+        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
         assert.equal(subsetNodes.length, 4);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
         const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x))
@@ -612,6 +573,7 @@ describe('Correction Distance Modeler', function() {
           assert.isTrue(subsetNodes[i].hasPartialInput);
           // From root: the deleteLeft 1 entries have nothing to insert.
           assert.equal((subsetNodes[i].currentTraversal as TrieTraversal).prefix, '');
+          assert.equal(subsetNodes[i].spaceId, subsetSeed);
 
           // Allow a little value wiggle due to double-precision limitations.
           assert.approximately(subsetNodes[i].inputSamplingCost, expectedCosts[i], 1e-8);
@@ -622,23 +584,26 @@ describe('Correction Distance Modeler', function() {
 
       it('step 2: first processing layer resolves zero + one char inserts', () => {
         // From "step 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution);
+        const rootTraversal = testModel.traverseFromRoot();
+        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         // Set 0:  set for ins 1, dl 0
         const ins1_dl0 = subsetNodes[0].processSubsetEdge();
         // 3 transforms went in... but 1 ('x') had no lexical match.
         assert.equal(ins1_dl0.length, FIRST_CHAR_VARIANTS + 3 - 1);
+        ins1_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         ins1_dl0.sort((a, b) => a.currentCost - b.currentCost);
         ins1_dl0.forEach(n => assert.isFalse(n.hasPartialInput)); // all fully-processed.
-        assert.equal(ins1_dl0[0].calculation.lastInputEntry, 't');
-        assert.equal(ins1_dl0[0].calculation.lastMatchEntry, 't');
+        assert.equal(lastEntry(ins1_dl0[0].calculation.inputSequence), 't');
+        assert.equal(lastEntry(ins1_dl0[0].calculation.matchSequence), 't');
         assert.equal(ins1_dl0[0].editCount, 0);
-        assert.equal(ins1_dl0[1].calculation.lastInputEntry, 'h');
-        assert.equal(ins1_dl0[1].calculation.lastMatchEntry, 'h');
+        assert.equal(lastEntry(ins1_dl0[1].calculation.inputSequence), 'h');
+        assert.equal(lastEntry(ins1_dl0[1].calculation.matchSequence), 'h');
         assert.equal(ins1_dl0[1].editCount, 0);
         assert.isBelow(ins1_dl0[0].inputSamplingCost, ins1_dl0[1].inputSamplingCost);
         assert.isBelow(ins1_dl0[0].currentCost, ins1_dl0[1].currentCost);
@@ -646,16 +611,16 @@ describe('Correction Distance Modeler', function() {
         // Correction of _other_ input characters to the 't' and the 'h' come
         // after ALL other corrections - these don't get both 't' and 'h' input
         // weights merged into them!
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+        assert.equal(lastEntry(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.inputSequence), SENTINEL_CODE_UNIT);
         // 't' input is more likely, so 't' gives more edit-contribution to 'h' than
         // 'h' gives to 't'
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.lastMatchEntry, 'h');
+        assert.equal(lastEntry(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.matchSequence), 'h');
         assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].editCount, 1);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS-1].inputSamplingCost, ins1_dl0[FIRST_CHAR_VARIANTS].inputSamplingCost);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS-1].currentCost, ins1_dl0[FIRST_CHAR_VARIANTS].currentCost);
 
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.lastMatchEntry, 't');
+        assert.equal(lastEntry(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.inputSequence), SENTINEL_CODE_UNIT);
+        assert.equal(lastEntry(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.matchSequence), 't');
         assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].editCount, 1);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS].inputSamplingCost, ins1_dl0[FIRST_CHAR_VARIANTS+1].inputSamplingCost);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS].currentCost, ins1_dl0[FIRST_CHAR_VARIANTS+1].currentCost);
@@ -667,7 +632,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+          assert.equal(lastEntry(n.calculation.inputSequence), SENTINEL_CODE_UNIT);
         });
 
         // END:  the ins 1, del 0 subset.
@@ -678,11 +643,12 @@ describe('Correction Distance Modeler', function() {
 
         // No inserts, so no insert variants are possible.
         assert.equal(ins0_dl1.length, 1);
+        ins0_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
         assert.isFalse(ins0_dl1[0].hasPartialInput);
 
         // No insert string => no sentinel char to delete.
         assert.equal(ins0_dl1[0].editCount, 0);
-        assert.isUndefined(ins0_dl1[0].calculation.lastInputEntry);
+        assert.isUndefined(lastEntry(ins0_dl1[0].calculation.inputSequence));
         assert.equal(ins0_dl1[0].inputSamplingCost, subsetNodes[3].inputSamplingCost);
         assert.equal(ins0_dl1[0].currentCost, subsetNodes[3].currentCost);
 
@@ -696,9 +662,10 @@ describe('Correction Distance Modeler', function() {
         ins2_dl1.sort((a, b) => a.currentCost - b.currentCost);
         // only one char is processed at this stage.
         ins2_dl1.forEach(n => assert.isTrue(n.hasPartialInput));
+        ins2_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
-        assert.equal(ins2_dl1[0].calculation.lastInputEntry, 't');
-        assert.equal(ins2_dl1[0].calculation.lastMatchEntry, 't');
+        assert.equal(lastEntry(ins2_dl1[0].calculation.inputSequence), 't');
+        assert.equal(lastEntry(ins2_dl1[0].calculation.matchSequence), 't');
         assert.equal(ins2_dl1[0].editCount, 0);
         // The subset hasn't yet split!
         assert.equal(ins2_dl1[0].currentCost, subsetNodes[1].currentCost);
@@ -713,7 +680,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes1.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost1);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+          assert.equal(lastEntry(n.calculation.inputSequence), SENTINEL_CODE_UNIT);
         });
 
 
@@ -727,9 +694,10 @@ describe('Correction Distance Modeler', function() {
         ins2_dl0.sort((a, b) => a.currentCost - b.currentCost);
         // only one char is processed at this stage.
         ins2_dl0.forEach(n => assert.isTrue(n.hasPartialInput));
+        ins2_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
-        assert.equal(ins2_dl0[0].calculation.lastInputEntry, 'c');
-        assert.equal(ins2_dl0[0].calculation.lastMatchEntry, 'c');
+        assert.equal(lastEntry(ins2_dl0[0].calculation.inputSequence), 'c');
+        assert.equal(lastEntry(ins2_dl0[0].calculation.matchSequence), 'c');
         assert.equal(ins2_dl0[0].editCount, 0);
         // The subset won't split.
         assert.equal(ins2_dl0[0].currentCost, subsetNodes[2].currentCost);
@@ -744,15 +712,16 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes2.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost2);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+          assert.equal(lastEntry(n.calculation.inputSequence), SENTINEL_CODE_UNIT);
         });
       });
 
       it('step 3: second processing layer resolves two char inserts', () => {
         // From "steps 0, 1" above, assertions removed
-        let rootTraversal = testModel.traverseFromRoot();
-        let rootNode = new correction.SearchNode(rootTraversal);
-        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution);
+        const rootTraversal = testModel.traverseFromRoot();
+        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
+        const subsetSeed = SEARCH_EDGE_SEED++;
+        const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
 
@@ -766,6 +735,9 @@ describe('Correction Distance Modeler', function() {
 
         // All should be finished now!
         fin_in2_dl1.forEach(n => assert.isFalse(n.hasPartialInput));
+
+        fin_in2_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
+        fin_in2_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         fin_in2_dl1.sort((a, b) => a.currentCost - b.currentCost);
         fin_in2_dl0.sort((a, b) => a.currentCost - b.currentCost);
@@ -842,7 +814,7 @@ describe('Correction Distance Modeler', function() {
         const teNode = fetchCommonTENode();
         assert.equal(teNode.calculation.getHeuristicFinalCost(), 0);
 
-        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution);
+        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution, SEARCH_EDGE_SEED++);
         assert.equal(subsetNodes.length, 4);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
         const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x) + teNode.currentCost);
@@ -862,7 +834,7 @@ describe('Correction Distance Modeler', function() {
       it('step 2: first processing layer resolves zero + one char inserts', () => {
         // From "step 1" above, assertions removed
         const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution);
+        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution, SEARCH_EDGE_SEED++);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         // Set 0:  set for ins 1, dl 0
@@ -873,11 +845,11 @@ describe('Correction Distance Modeler', function() {
 
         ins1_dl0.sort((a, b) => a.currentCost - b.currentCost);
         ins1_dl0.forEach(n => assert.isFalse(n.hasPartialInput)); // all fully-processed.
-        assert.equal(ins1_dl0[0].calculation.lastInputEntry, 'r');
-        assert.equal(ins1_dl0[0].calculation.lastMatchEntry, 'r');
+        assert.equal(lastEntry(ins1_dl0[0].calculation.inputSequence), 'r');
+        assert.equal(lastEntry(ins1_dl0[0].calculation.matchSequence), 'r');
         assert.equal(ins1_dl0[0].editCount, 0);
-        assert.equal(ins1_dl0[1].calculation.lastInputEntry, 'l');
-        assert.equal(ins1_dl0[1].calculation.lastMatchEntry, 'l');
+        assert.equal(lastEntry(ins1_dl0[1].calculation.inputSequence), 'l');
+        assert.equal(lastEntry(ins1_dl0[1].calculation.matchSequence), 'l');
         assert.equal(ins1_dl0[1].editCount, 0);
         assert.isBelow(ins1_dl0[0].inputSamplingCost, ins1_dl0[1].inputSamplingCost);
         assert.isBelow(ins1_dl0[0].currentCost, ins1_dl0[1].currentCost);
@@ -885,16 +857,16 @@ describe('Correction Distance Modeler', function() {
         // Correction of _other_ input characters to the 't' and the 'h' come
         // after ALL other corrections - these don't get both 't' and 'h' input
         // weights merged into them!
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+        assert.equal(lastEntry(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.inputSequence), SENTINEL_CODE_UNIT);
         // 't' input is more likely, so 't' gives more edit-contribution to 'h' than
         // 'h' gives to 't'
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.lastMatchEntry, 'l');
+        assert.equal(lastEntry(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.matchSequence), 'l');
         assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].editCount, 1);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT-1].inputSamplingCost, ins1_dl0[TE_CHILD_PATH_COUNT].inputSamplingCost);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT-1].currentCost, ins1_dl0[TE_CHILD_PATH_COUNT].currentCost);
 
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.lastMatchEntry, 'r');
+        assert.equal(lastEntry(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.inputSequence), SENTINEL_CODE_UNIT);
+        assert.equal(lastEntry(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.matchSequence), 'r');
         assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].editCount, 1);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT].inputSamplingCost, ins1_dl0[TE_CHILD_PATH_COUNT+1].inputSamplingCost);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT].currentCost, ins1_dl0[TE_CHILD_PATH_COUNT+1].currentCost);
@@ -906,7 +878,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+          assert.equal(lastEntry(n.calculation.inputSequence), SENTINEL_CODE_UNIT);
         });
 
         // END:  the ins 1, del 0 subset.
@@ -921,7 +893,7 @@ describe('Correction Distance Modeler', function() {
 
         // No insert string => no sentinel char to delete.
         assert.equal(ins0_dl1[0].editCount, 0);
-        assert.equal(ins0_dl1[0].calculation.lastInputEntry, 't');
+        assert.equal(lastEntry(ins0_dl1[0].calculation.inputSequence), 't');
         assert.equal(ins0_dl1[0].inputSamplingCost, subsetNodes[3].inputSamplingCost);
         assert.equal(ins0_dl1[0].currentCost, subsetNodes[3].currentCost);
 
@@ -937,8 +909,8 @@ describe('Correction Distance Modeler', function() {
         // only one char is processed at this stage.
         ins2_dl1.forEach(n => assert.isTrue(n.hasPartialInput));
 
-        assert.equal(ins2_dl1[0].calculation.lastInputEntry, 'a');
-        assert.equal(ins2_dl1[0].calculation.lastMatchEntry, 'a');
+        assert.equal(lastEntry(ins2_dl1[0].calculation.inputSequence), 'a');
+        assert.equal(lastEntry(ins2_dl1[0].calculation.matchSequence), 'a');
         assert.equal(ins2_dl1[0].editCount, 0);
         // The subset hasn't yet split!
         assert.equal(ins2_dl1[0].currentCost, subsetNodes[1].currentCost);
@@ -953,7 +925,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes1.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost1);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+          assert.equal(lastEntry(n.calculation.inputSequence), SENTINEL_CODE_UNIT);
         });
 
 
@@ -968,8 +940,8 @@ describe('Correction Distance Modeler', function() {
         // only one char is processed at this stage.
         ins2_dl0.forEach(n => assert.isTrue(n.hasPartialInput));
 
-        assert.equal(ins2_dl0[0].calculation.lastInputEntry, 'c');
-        assert.equal(ins2_dl0[0].calculation.lastMatchEntry, 'c');
+        assert.equal(lastEntry(ins2_dl0[0].calculation.inputSequence), 'c');
+        assert.equal(lastEntry(ins2_dl0[0].calculation.matchSequence), 'c');
         assert.equal(ins2_dl0[0].editCount, 0);
         // The subset won't split.
         assert.equal(ins2_dl0[0].currentCost, subsetNodes[2].currentCost);
@@ -984,14 +956,14 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes2.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost2);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+          assert.equal(lastEntry(n.calculation.inputSequence), SENTINEL_CODE_UNIT);
         });
       });
 
       it('step 3: second processing layer resolves two char inserts', () => {
         // From "steps 0, 1" above, assertions removed
         const teNode = fetchCommonTENode();
-        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution);
+        const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution, SEARCH_EDGE_SEED++);
         subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         // ************
@@ -1059,62 +1031,69 @@ describe('Correction Distance Modeler', function() {
       });
     });
 
-    it('Small integration test:  "teh" => "ten", "the"', function() {
+    it('Small integration test:  "teh" => "ten", "the"', () => {
       // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
+      const rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
-      let rootNode = new correction.SearchNode(rootTraversal);
+      const rootSeed = SEARCH_EDGE_SEED++;
+      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
       assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
       // VERY artificial distributions.
-      let synthDistribution1 = [
+      const synthDistribution1 = [
         {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
       ];
 
-      let synthDistribution2 = [
+      const synthDistribution2 = [
         {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
         {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
       ];
 
-      let synthDistribution3 = [
+      const synthDistribution3 = [
         {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
         {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
       ];
 
-      let layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1)
+      const layer1Id = SEARCH_EDGE_SEED++;
+      const layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1, layer1Id)
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      let layer1Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
+      const layer1Queue = new PriorityQueue(QUEUE_NODE_COMPARATOR, layer1Edges);
 
-      let tEdge = layer1Queue.dequeue();
+      const tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
+      assert.equal(tEdge.spaceId, layer1Id); // would be obtained by the token after one input.
 
-      let layer2Edges = tEdge.buildSubstitutionEdges(synthDistribution2)
+      const layer2Id = SEARCH_EDGE_SEED++;
+      const layer2Edges = tEdge.buildSubstitutionEdges(synthDistribution2, layer2Id)
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      let layer2Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
+      const layer2Queue = new PriorityQueue(QUEUE_NODE_COMPARATOR, layer2Edges);
 
-      let eEdge = layer2Queue.dequeue();
+      const eEdge = layer2Queue.dequeue();
       assertEdgeChars(eEdge, 'e', 'e');
+      assert.equal(eEdge.spaceId, layer2Id);
 
-      let hEdge = layer2Queue.dequeue();
+      const hEdge = layer2Queue.dequeue();
       assertEdgeChars(hEdge, 'h', 'h');
+      assert.equal(hEdge.spaceId, layer2Id);
 
       // Needed for a proper e <-> h transposition.
-      let ehEdge = findEdgesWithChars(layer2Edges, 'h')[0];
+      const ehEdge = findEdgesWithChars(layer2Edges, 'h')[0];
 
       assert.isOk(ehEdge);
 
       // Final round:  we'll use three nodes and throw all of their results into the same priority queue.
-      let layer3eEdges  = eEdge.buildSubstitutionEdges(synthDistribution3)
+      const layer3Id = SEARCH_EDGE_SEED++;
+      const layer3eEdges  = eEdge.buildSubstitutionEdges(synthDistribution3, layer3Id)
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      let layer3hEdges  = hEdge.buildSubstitutionEdges(synthDistribution3)
+      const layer3hEdges  = hEdge.buildSubstitutionEdges(synthDistribution3, layer3Id)
         .flatMap(e => e.processSubsetEdge());
-      let layer3ehEdges = ehEdge.buildSubstitutionEdges(synthDistribution3)
+      const layer3ehEdges = ehEdge.buildSubstitutionEdges(synthDistribution3, layer3Id)
         .flatMap(e => e.processSubsetEdge());
-      let layer3Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
+      const layer3Queue = new PriorityQueue(QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
       let bestEdge;
@@ -1123,12 +1102,14 @@ describe('Correction Distance Modeler', function() {
       } while(bestEdge.currentTraversal.entries.length == 0);
 
       assertEdgeChars(bestEdge, 'n', 'n'); // 'ten' - perfect edit distance of 0, though less-likely input sequence.
+      assert.equal(bestEdge.spaceId, layer3Id);
       // No cost assumptions here.
 
       var sibling1;
       do {
         sibling1 = layer3Queue.dequeue();
       } while(sibling1.currentTraversal.entries.length == 0);
+      assert.equal(sibling1.spaceId, layer3Id);
 
       // Both have a raw edit distance of 1 while using the same input-sequence root. ('th')
       let tenFlag = edgeHasChars(sibling1, SENTINEL_CODE_UNIT, 'n'); // subs out the 'h' entirely.  Could also occur with 'a', but is too unlikely.
@@ -1141,192 +1122,13 @@ describe('Correction Distance Modeler', function() {
       do {
         sibling2 = layer3Queue.dequeue();
       } while(sibling2.currentTraversal.entries.length == 0);
+      assert.equal(sibling2.spaceId, layer3Id);
 
       tenFlag = tenFlag || edgeHasChars(sibling2, SENTINEL_CODE_UNIT, 'n');
       theFlag = theFlag || edgeHasChars(sibling2, SENTINEL_CODE_UNIT, 'e');
 
       assert.isTrue(tenFlag && theFlag);
       assert.isAbove(sibling2.currentCost, sibling1.currentCost);
-    });
-  });
-
-  describe('SearchSpaceTier + SearchSpace', function() {
-    let checkRepeatableResults_teh = async function(iter: AsyncGenerator<correction.SearchResult, any, any>) {
-      let firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(firstIterResult.done);
-
-      const firstResult: correction.SearchResult = firstIterResult.value; // Retrieves <actual value>
-      // No checks on the first set's cost.
-      assert.equal(firstResult.matchString, "ten");
-
-      // All start with 'te' but one, and invoke one edit of the same cost.
-      // 'th' has an 'h' at the same cost (input 3) of the 'e' (input 2).
-      let secondBatch = [
-        'tec', 'tel', 'tem',
-        'ter', 'tes', 'th',
-        'te'
-      ];
-
-      async function checkBatch(batch: string[], prevCost: number) {
-        let cost;
-        while(batch.length > 0) {
-          const iter_result = await iter.next();
-          assert.isFalse(iter_result.done);
-
-          const result = iter_result.value;
-          assert.isAbove(result.totalCost, prevCost);
-          if(cost !== undefined) {
-            assert.equal(result.totalCost, cost);
-          } else {
-            cost = result.totalCost;
-          }
-
-          const matchIndex = batch.findIndex((entry) => entry == result.matchString);
-          assert.notEqual(matchIndex, -1, `'${result.matchString}' received as prediction too early`);
-          batch.splice(matchIndex, 1);
-        }
-
-        return cost;
-      }
-
-      const secondCost = await checkBatch(secondBatch, firstResult.totalCost);
-
-      // Single hard edit, all other input probability aspects are equal
-      let thirdBatch = [
-        // 't' -> 'b' (sub)
-        'beh',
-        // '' -> 'c' (insertion)
-        'tech'
-      ];
-
-      await checkBatch(thirdBatch, secondCost);
-
-      // All replace the low-likelihood case for the third input.
-      let fourthBatch = [
-        'the', 'thi', 'tho', 'thr',
-        'thu', 'tha'
-      ];
-
-      await checkBatch(fourthBatch, secondCost);
-
-      // Replace the _first_ input's char OR insert an extra char,
-      // also matching the low-likelihood third-char option.
-      let fifthBatch = [
-        'cen', 'en',  'gen',
-        'ken', 'len', 'men',
-        'sen', 'then', 'wen'
-      ];
-
-      await checkBatch(fifthBatch, secondCost);
-    }
-
-    it('Simple search without input', async function() {
-      // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
-      assert.isNotEmpty(rootTraversal);
-
-      let searchSpace = new correction.SearchSpace(testModel);
-
-      let iter = searchSpace.getBestMatches(buildTestTimer());
-      let firstResult = await iter.next();
-      assert.isFalse(firstResult.done);
-    });
-
-    // Hmm... how best to update this...
-    it('Simple search (paralleling "Small integration test")', async function() {
-      // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
-      assert.isNotEmpty(rootTraversal);
-
-      let searchSpace = new correction.SearchSpace(testModel);
-
-      // VERY artificial distributions.
-      let synthDistribution1 = [
-        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
-      ];
-
-      let synthDistribution2 = [
-        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
-      ];
-
-      let synthDistribution3 = [
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
-      ];
-
-      searchSpace.addInput(synthDistribution1);
-      searchSpace.addInput(synthDistribution2);
-      searchSpace.addInput(synthDistribution3);
-
-      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
-      await checkRepeatableResults_teh(iter);
-    });
-
-    it('Allows reiteration (sequentially)', async function() {
-      // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
-      assert.isNotEmpty(rootTraversal);
-
-      let searchSpace = new correction.SearchSpace(testModel);
-
-      // VERY artificial distributions.
-      let synthDistribution1 = [
-        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
-      ];
-
-      let synthDistribution2 = [
-        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
-      ];
-
-      let synthDistribution3 = [
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
-      ];
-
-      searchSpace.addInput(synthDistribution1);
-      searchSpace.addInput(synthDistribution2);
-      searchSpace.addInput(synthDistribution3);
-
-      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
-      await checkRepeatableResults_teh(iter);
-
-      // The key: do we get the same results the second time?
-      // Reset the iterator first...
-      let iter2 = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
-      await checkRepeatableResults_teh(iter2);
-    });
-
-    it('Empty search space, loaded model', async function() {
-      // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
-      assert.isNotEmpty(rootTraversal);
-
-      let searchSpace = new correction.SearchSpace(testModel);
-      const timer = buildTestTimer();
-      let iter = searchSpace.getBestMatches(timer);
-
-      // While there's no input, insertion operations can produce suggestions.
-      let resultState = await iter.next();
-      let result: SearchResult = resultState.value;
-
-      // Just one suggestion root should be returned as the first result.
-      assert.equal(result.totalCost, 0);             // Gives a perfect match
-      assert.equal(result.inputSequence.length, 0);  // for a state with no input and
-      assert.equal(result.matchString, '');          // an empty match string.
-      assert.isFalse(resultState.done);
-
-      // Should be able to reach more, though.
-      let laterResultState = await iter.next();
-      let laterResult: SearchResult = laterResultState.value;
-
-      // Edit required:  an 'insertion' edge (no input matched, but char pulled
-      // from lexicon)
-      assert.isAbove(laterResult.totalCost, 0);
-      // The most likely word in the lexicon starts with 't'.
-      assert.equal(laterResult.matchString, 't');
-      assert.isFalse(resultState.done);
     });
   });
 });
