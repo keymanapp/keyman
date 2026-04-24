@@ -15,12 +15,13 @@ import TransformUtils from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
+import { LegacyQuotientRoot } from './legacy-quotient-root.js';
+import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { PathInputProperties } from './search-quotient-node.js';
 import { TransitionEdge } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 
 // May be able to "get away" with 2 & 5 or so, but having extra will likely help
 // with edit path stability.
@@ -637,8 +638,10 @@ export class ContextTokenization {
         inputSource.segment.end = appliedLength;
       }
 
-      affectedToken = new ContextToken(affectedToken);
-      affectedToken.addInput(inputSource, distribution);
+      affectedToken = new ContextToken(
+        new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource),
+        affectedToken.isPartial
+      );
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;

@@ -28,7 +28,8 @@ import {
   models,
   TransitionEdge,
   SearchQuotientSpur,
-  traceInsertEdits
+  traceInsertEdits,
+  LegacyQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
@@ -50,13 +51,15 @@ function toTransformToken(text: string, transformId?: number) {
   let isWhitespace = text == ' ';
   let token = ContextToken.fromRawText(plainModel, '');
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
-  token.addInput({
+  token = new ContextToken(new LegacyQuotientSpur(
+    token.searchModule,
+    [ { sample: textAsTransform, p: 1 } ], {
     segment: {
       transitionId: textAsTransform.id,
       start: 0
     }, bestProbFromSet: 1,
     subsetId: generateSubsetId()
-  }, [ { sample: textAsTransform, p: 1 } ]);
+  }));
   token.isWhitespace = isWhitespace;
   return token;
 }
