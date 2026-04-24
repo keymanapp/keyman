@@ -1,7 +1,6 @@
-/***
-   KeymanWeb 17.0
-   Copyright 2019-2023 SIL International
-***/
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 import type { FloatingOSKViewCookie } from 'keyman/engine/osk';
@@ -422,7 +421,7 @@ if(!keymanweb) {
         this.controller.style.background = 'url('+imgPath+'kmwcontroller2x.gif)';
         this.controller.style.padding = '1px 2px';
 
-        // Create keyboard list and OSK control buttones, and set initial styles
+        // Create keyboard list and OSK control buttons, and set initial styles
         const v1=util.loadCookie<KeyboardCookie>('KeymanWeb_Keyboard');
         let kbdEnabledOnLoad=false;
         if(typeof(v1.current) != 'undefined') {
