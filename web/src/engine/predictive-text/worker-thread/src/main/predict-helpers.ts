@@ -323,75 +323,6 @@ export function determineContextTransition(
 }
 
 /**
- * Determines where the context for prediction-generation should be rooted and how
- * much of the context it should replace.
- * @param transition
- * @param lexicalModel
- * @returns
- */
-export function determineSuggestionAlignment(
-  transition: ContextTransition,
-  tokenization: ContextTokenization,
-  lexicalModel: LexicalModel
-): {
-  /**
-   * The context to use directly for generating predictions from the model.
-   */
-  predictionContext: Context,
-  /**
-   * The total number of characters to delete for generated suggestions
-   * in order to replace the prediction root token entirely.
-   */
-  deleteLeft: number
-} {
-  const transitionEdits = tokenization.transitionEdits;
-  const context = transition.base.context;
-  const postContext = transition.final.context;
-  const inputTransform = transition.inputDistribution[0].sample;
-  let deleteLeft: number;
-
-  // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  const wordbreak = determineModelWordbreaker(lexicalModel);
-
-  // Is the token under construction newly-constructed / is there no pre-existing root?
-  if(tokenization.taillessTrueKeystroke && transitionEdits?.addedNewTokens) {
-    return {
-      // If the new token is due to whitespace or due to a different input type
-      // that would likely imply a tokenization boundary, infer 'new word' mode.
-      // Apply any part of the context change that is not considered to be up
-      // for correction.
-      predictionContext: models.applyTransform(tokenization.taillessTrueKeystroke, context),
-      // As the word/token being corrected/predicted didn't originally exist,
-      // there's no part of it to 'replace'.  (Suggestions are applied to the
-      // pre-transform state.)
-      deleteLeft: 0
-    };
-    // If the tokenized context length is shorter... sounds like a backspace (or similar).
-  } else if (transitionEdits?.removedOldTokens) {
-    /* Ooh, we've dropped context here.  Almost certainly from a backspace or
-     * similar effect.  Even if we drop multiple tokens... well, we know exactly
-     * how many chars were actually deleted - `inputTransform.deleteLeft`. Since
-     * we replace a word being corrected/predicted, we take length of the
-     * remaining context's tail token in addition to however far was deleted to
-     * reach that state.
-     */
-    deleteLeft = KMWString.length(wordbreak(postContext)) + inputTransform.deleteLeft;
-  } else {
-    // Suggestions are applied to the pre-input context, so get the token's original length.
-    // We're on the same token, so just delete its text for the replacement op.
-    deleteLeft = KMWString.length(wordbreak(context));
-  }
-
-  // Did the wordbreaker (or similar) append a blank token before the caret?  If so,
-  // preserve that by preventing corrections from triggering left-deletion.
-  if(tokenization.tail.isEmptyToken) {
-    deleteLeft = 0;
-  }
-
-  return { predictionContext: context, deleteLeft };
-}
-
-/**
  * Given two ContextTokenizations related by context transition, this function
  * determines the tail-end range of the tokenization affected by the transition.
  * @param userContextTokenization
@@ -429,8 +360,6 @@ export function determineSuggestionRange(
     }
   }
 
-  tokensToPredict.reverse();
-
   // Can occur when backspacing to the end of a previous word.
   if(tokensToPredict.length == 0) {
     if(tokenSetA.length == 0 || tokenSetB.length == 0) {
@@ -440,6 +369,7 @@ export function determineSuggestionRange(
     tokensToPredict.push(tokenSetB.pop());
   }
 
+  tokensToPredict.reverse();
   tokensToRemove.reverse();
 
   return {
@@ -456,34 +386,39 @@ export function buildAndMapPredictions(
   const model = transition.final.model;
   const searchSpace = tokenization.tail.searchModule;
 
-  // No matter the prediction, once we know the root of the prediction, we'll
-  // always 'replace' the same amount of text.  We can handle this before the
-  // big 'prediction root' loop.
-  const { predictionContext, deleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
+  const applicationTarget = transition.base.displayTokenization;
+  const { tokensToRemove, tokensToPredict } = determineSuggestionRange(applicationTarget, tokenization);
 
-  let correction = match.matchString;
-  let rootCost = match.totalCost;
+  const deleteLeft = tokensToPredict.length > 1 ? 0 : tokensToRemove.reduce((prev, curr) => prev + curr.searchModule.codepointLength, 0);
+
+  // Exists to be extended by the 'correctionTransfrom' below.
+  const emptyContext: Context = {
+    left: '',
+    startOfBuffer: false,
+    endOfBuffer: false
+  };
 
   // Replace the existing context with the correction.
   const correctionTransform: Transform = {
-    insert: correction,  // insert correction string
-    deleteLeft: deleteLeft,
+    insert: match.matchString,  // insert correction string
+    deleteLeft: 0,
     id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
   }
 
+  let rootCost = match.totalCost;
   /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-    * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-    * there are significantly more likely words.  We only need this to allow very minor fat-finger
-    * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-    * key borders.
-    *
-    * Technically, the probabilities this produces won't be normalized as-is... but there's no
-    * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-    * to apply it could become tricky, so it's simpler to leave out.
-    *
-    * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-    * is needed in the future.
-    */
+   * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+   * there are significantly more likely words.  We only need this to allow very minor fat-finger
+   * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+   * key borders.
+   *
+   * Technically, the probabilities this produces won't be normalized as-is... but there's no
+   * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+   * to apply it could become tricky, so it's simpler to leave out.
+   *
+   * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+   * is needed in the future.
+   */
   if(searchSpace.inputCount <= 1) {
     /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
      * ambiguous case that would only arise very near the center of the boundary between two keys.
@@ -504,11 +439,12 @@ export function buildAndMapPredictions(
     p: Math.exp(-rootCost)
   };
 
-  let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
+  let predictions = predictFromCorrections(model, [predictionRoot], emptyContext);
   predictions.forEach((entry) => {
     entry.preservationTransform = tokenization.taillessTrueKeystroke;
     // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
     // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
+    entry.prediction.sample.transform.deleteLeft = deleteLeft;
   });
 
   return predictions;
@@ -1076,13 +1012,10 @@ export function finalizeSuggestions(
     //
     // Note:  may need adjustment if/when supporting phrase-level correction.
     if(tuple.preservationTransform) {
-      const presDL = tuple.preservationTransform.deleteLeft;
-      const mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
-      // Any preserved delete-left is applied early because it directly affects the suggestion
-      // root; we need to remove that preserved delete-left here.
-      if(presDL > 0) {
-        mergedTransform.deleteLeft -= presDL;
-      }
+      const mergedTransform = {
+        ...models.buildMergedTransform(tuple.preservationTransform, {...prediction.sample.transform, deleteLeft: 0}),
+        deleteLeft: prediction.sample.transform.deleteLeft
+      };
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
       // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
