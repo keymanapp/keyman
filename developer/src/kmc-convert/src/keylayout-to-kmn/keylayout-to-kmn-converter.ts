@@ -124,7 +124,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
     try {
-      if (!KeylayoutReader.validate(jsonO)) {
+      if (!KeylayoutReader.validate(jsonO,inputFilename)) {
         return null;
       }
     } catch (e) {
@@ -169,10 +169,10 @@ export class KeylayoutToKmnConverter {
       return null;
     }
     // create an array of modifier combinations and store in dataObject
-    for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
+    for (let j = 0; j < jsonObj.keyboard.modifierMap[0].keyMapSelect.length; j++) {
       const singleModifierSet: string[] = [];
-      for (let k = 0; k < jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier.length; k++) {
-        singleModifierSet.push(jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier[k]['keys']);
+      for (let k = 0; k < jsonObj.keyboard.modifierMap[0].keyMapSelect[j].modifier.length; k++) {
+        singleModifierSet.push(jsonObj.keyboard.modifierMap[0].keyMapSelect[j].modifier[k]['keys']);
       }
       modifierBehavior.push(singleModifierSet);
     }
@@ -203,15 +203,8 @@ export class KeylayoutToKmnConverter {
     let dkCounterC2: number = 0;
     let actionId: string;
 
-    // check if we use CAPS in a modifier throughout the .keylayout file. In this case we need to add NCAPS
+    // check if we use CAPS in a modifier throughout the .keylayout file. In this case we need to add NCAPS at places not specifying CAPS
     const isCapsused = (this.checkIfCapsIsUsed(dataUkelele.modifiers));
-
-    // if there are different amounts of keyMapSelect vs keyMap
-    if (jsonObj.keyboard.modifierMap?.keyMapSelect.length !== jsonObj.keyboard.keyMapSet[0].keyMap.length) {
-      const errorText = dataUkelele.keylayoutFilename;
-      this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText }));
-      return null;
-    }
 
     for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER; j++) {
 
@@ -928,12 +921,12 @@ export class KeylayoutToKmnConverter {
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
         const behaviorIdx: number = Number(search[i].behavior);
-        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviorIdx].modifier.length; j++) {
+        for (let j = 0; j < data.keyboard.modifierMap[0].keyMapSelect[behaviorIdx].modifier.length; j++) {
           const singleDataSet = {
             actionId: search[i].actionId,
             key: search[i].key,
             behavior: search[i].behavior,
-            modifier: this.createKmnModifier(data.keyboard.modifierMap.keyMapSelect[behaviorIdx].modifier[j]['keys'], isCAPSused),
+            modifier: this.createKmnModifier(data.keyboard.modifierMap[0].keyMapSelect[behaviorIdx].modifier[j]['keys'], isCAPSused),
             outchar: search[i].outchar,
           };
           keyBehaviorModOutput.push(singleDataSet);

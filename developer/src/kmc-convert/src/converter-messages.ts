@@ -53,6 +53,12 @@ export class ConverterMessages {
     `Input file could not be read.`
   );
 
+  static ERROR_UnableToParse = SevError | 0x000C;
+  static Error_UnableToParse = () => m(
+    this.ERROR_UnableToParse,
+    `Input data could not be parsed.`
+  );
+
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
   static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string, key: string, KeyName: string, output: string; }) => m(
     this.ERROR_UnsupportedCharactersDetected,

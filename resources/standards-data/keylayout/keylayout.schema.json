@@ -147,48 +147,52 @@
           "type": "string"
         },
         "modifierMap": {
-          "additionalProperties": false,
-          "properties": {
-            "defaultIndex": {
-              "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "keyMapSelect": {
-              "items": {
-                "additionalProperties": false,
-                "properties": {
-                  "mapIndex": {
-                    "type": "string"
-                  },
-                  "modifier": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "keys": {
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
-                    },
-                    "minItems": 1,
-                    "type": "array"
-                  }
-                },
-                "required": [
-                  "modifier"
-                ],
-                "type": "object"
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "defaultIndex": {
+                "type": "string"
               },
-              "minItems": 1,
-              "type": "array"
-            }
+              "id": {
+                "type": "string"
+              },
+              "keyMapSelect": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "mapIndex": {
+                      "type": "string"
+                    },
+                    "modifier": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "keys": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "modifier"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "keyMapSelect"
+            ],
+            "type": "object"
           },
-          "required": [
-            "keyMapSelect"
-          ],
-          "type": "object"
+          "minItems": 1,
+          "type": "array"
         },
         "name": {
           "type": "string"

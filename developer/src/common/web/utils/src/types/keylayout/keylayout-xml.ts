@@ -26,20 +26,19 @@ export interface KL_Keyboard {
   /**
    * attributes of the root element <keyboard>
    */
-  group?: string;
-  id?: string;
-  name?: string;
-  maxoutS?: string;
+  group: string;
+  id: string;
+  name: string;
+  maxout?: string;
   /**
    * <layouts>, <modifierMap>, <keyMapSet>, <actions>, <terminators>
    * the 5 main elements.
    */
-  //layoutsMM: KL_Layouts[];
-  layouts?: KL_Layouts[];
-  modifierMap?: KL_ModifierMap[];
-  keyMapSet?: KL_KeyMapSet[];
-  actions?: KL_Actions[];
-  terminators?: KL_Terminators[];
+  layouts: KL_Layouts[];
+  modifierMap: KL_ModifierMap[];
+  keyMapSet: KL_KeyMapSet[];
+  actions?: KL_Actions;
+  terminators?: KL_Terminators;
 };
 
 export interface KL_Layouts {
@@ -47,7 +46,7 @@ export interface KL_Layouts {
    * <layout> the sub element of <layouts>,
    * containing information about the use of (different) mapSet and modifiers
    */
-  layouts?: KL_Layout;
+  layout: KL_Layout[];
 };
 
 export interface KL_Layout {
@@ -58,22 +57,22 @@ export interface KL_Layout {
    * ( <layout first="4" last="5" mapSet="2a4" modifiers="19c"/> )
    * <mapSet> referencing <keyMapSet id>
    */
-  first?: string;
-  last?: string;
-  mapSet?: string;
-  modifiers?: string;
+  first: string;
+  last: string;
+  mapSet: string;
+  modifiers: string;
 };
 
 export interface KL_ModifierMap {
   /**
    * attributes of the element <modifierMap>
    */
-  id?: string;
-  defaultIndex?: string;
+  id: string;
+  defaultIndex: string;
   /**
    * <keyMapSelect> the sub element of <modifierMap>
    */
-  keyMapSelect?: KL_KeyMapSelect[];
+  keyMapSelect: KL_KeyMapSelect[];
 };
 
 export interface KL_KeyMapSelect {
@@ -82,11 +81,11 @@ export interface KL_KeyMapSelect {
    * containing a set of modifier combinations for a behavior
    * <mapIndex> referencing <keyMap index>
    */
-  mapIndex?: string;
+  mapIndex: string;
   /**
    * <modifier> the sub element of <keyMapSelect>
    */
-  modifier?: KL_Modifier[];
+  modifier: KL_Modifier[];
 };
 
 export interface KL_Modifier {
@@ -94,7 +93,7 @@ export interface KL_Modifier {
    * attributes of the element <modifier>
    * containing one combination of modifier keys
    */
-  keys?: string;
+  keys: string;
 };
 
 export interface KL_KeyMapSet {
@@ -102,11 +101,11 @@ export interface KL_KeyMapSet {
    * attributes of the element <keyMapSet>
    * <id> referencing <layouts mapSet>
    */
-  id?: string;
+  id: string;
   /**
    * <keyMap> the sub element of <keyMapSet>
    */
-  keyMap?: KL_KeyMap[];
+  keyMap: KL_KeyMap[];
 };
 
 export interface KL_KeyMap {
@@ -114,11 +113,13 @@ export interface KL_KeyMap {
    * attributes of the element <keyMap>
    * <index> referencing <keyMapSelect mapIndex>
    */
-  index?: string;
+  index: string;
+  baseMapSet?: string;
+  baseIndex?: string;
   /**
    * <key> the sub element of <keyMap>
    */
-  key?: KL_Key[];
+  key: KL_Key[];
 };
 
 export interface KL_Key {
@@ -126,8 +127,8 @@ export interface KL_Key {
    * attributes of the element <key>
    * containing a keycode and its output or action
    */
-  code?: string;
-  action?: string;
+  code: string;
+  action?: string;  //TODO-KMC-CONVERT: Support <action> sub-element 'anonymous actions'
   output?: string;
 };
 
@@ -135,7 +136,7 @@ export interface KL_Actions {
   /**
    * <action> the sub element of <actions>
    */
-  action?: KL_Action[];
+  action: KL_Action[];
 };
 
 export interface KL_Action {

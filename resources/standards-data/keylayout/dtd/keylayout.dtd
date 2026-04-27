@@ -5,28 +5,57 @@
  *
  * This DTD describes a technical preview of Keylayout Data
  -->
+<!-- Overall structure -->
+<!ELEMENT keyboard (layouts+, modifierMap+, keyMapSet+, actions*, terminators*)>
+<!ATTLIST keyboard group NMTOKEN #REQUIRED >
+<!ATTLIST keyboard id NMTOKEN #REQUIRED >
+<!ATTLIST keyboard name CDATA #REQUIRED >
+<!ATTLIST keyboard maxout NMTOKEN #IMPLIED >
 
-<!ELEMENT keyboard (layouts, keyMapSet) >
-<!ELEMENT keyboard (modifierMap)* >
-<!ATTLIST keyboard (group, id, name, maxout) #REQUIRED >
+<!-- Hardware layout elements -->
+<!ELEMENT layouts (layout+) >
+<!ELEMENT layout EMPTY >
+<!ATTLIST layout first NMTOKEN #REQUIRED >
+<!ATTLIST layout last NMTOKEN #REQUIRED >
+<!ATTLIST layout modifiers IDREF #REQUIRED >
+<!ATTLIST layout mapSet IDREF #REQUIRED >
 
-<!ELEMENT layouts ( layout)* >
-<!ATTLIST layout (first, last, mapSet, modifiers) #REQUIRED >
+<!-- Modifier descriptions -->
+<!ELEMENT modifierMap (keyMapSelect+) >
+<!ATTLIST modifierMap id ID #REQUIRED >
+<!ATTLIST modifierMap defaultIndex NMTOKEN #REQUIRED >
 
-<!ELEMENT modifierMap (keyMapSelect)*>
-<!ATTLIST modifierMap (id, defaultIndex) #REQUIRED >
+<!ELEMENT keyMapSelect (modifier+) >
+<!ATTLIST keyMapSelect mapIndex NMTOKEN #REQUIRED >
 
-<!ELEMENT keyMapSelect (modifier)*>
-<!ATTLIST keyMapSelect (mapIndex) #REQUIRED >
+<!ELEMENT modifier EMPTY >
+<!ATTLIST modifier keys CDATA #REQUIRED >
 
-<!ATTLIST modifier (keys) #REQUIRED >
+<!-- Keyboard mapping -->
+<!ELEMENT keyMapSet (keyMap+) >
+<!ATTLIST keyMapSet id ID #REQUIRED >
 
-<!ELEMENT keyMapSet ( keyMap)* >
-<!ATTLIST keyMapSet (id) #REQUIRED >
+<!ELEMENT keyMap (key+) >
+<!ATTLIST keyMap index NMTOKEN #REQUIRED >
+<!ATTLIST keyMap baseMapSet IDREF #IMPLIED >
+<!ATTLIST keyMap baseIndex NMTOKEN #IMPLIED >
 
-<!ELEMENT keyMap (key)* >
-<!ATTLIST keyMap (index) #REQUIRED >
+<!ELEMENT key (action*) >
+<!ATTLIST key code NMTOKEN #REQUIRED >
+<!ATTLIST key output CDATA #IMPLIED >
+<!ATTLIST key action IDREF #IMPLIED >
 
-<!ATTLIST key (code) #REQUIRED >
-<!ATTLIST key (action #REQUIRED output #IMPLIED | output #REQUIRED action #IMPLIED)>
+<!-- Actions (state records) -->
+<!ELEMENT actions (action+) >
+<!ELEMENT action (when+) >
+<!ATTLIST action id ID #IMPLIED >
 
+<!ELEMENT when EMPTY >
+<!ATTLIST when state NMTOKEN #REQUIRED >
+<!ATTLIST when through NMTOKEN #IMPLIED >
+<!ATTLIST when output CDATA #IMPLIED >
+<!ATTLIST when multiplier NMTOKEN #IMPLIED >
+<!ATTLIST when next NMTOKEN #IMPLIED >
+
+<!-- Terminators -->
+<!ELEMENT terminators (when+) >

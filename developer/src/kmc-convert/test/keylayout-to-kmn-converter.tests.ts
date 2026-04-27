@@ -57,7 +57,9 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_DifferentAmountOfMapSelectInKeyMapERROR.keylayout')],
+      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
+      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout')],
+      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingkeyERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingkeyMapERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingLayoutsERROR.keylayout')],
