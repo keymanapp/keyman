@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+echo "executed postinstall"
+
+# Get the actual user currently logged into the console
+# This works even if the installer is run with sudo or as root
+CONSOLE_USER=$(stat -f "%Su" /dev/console)
+echo "console user is: $CONSOLE_USER"
+
+# Get the home directory of the console user
+USER_HOME=$(eval echo "~$CONSOLE_USER")
+echo "user home directory is: $USER_HOME"
+
+# Define the source file path within the package payload
+# $3 is the target volume mount point, e.g., "/"
+SOURCE_FILE="$3/tmp/Keyman.app"
+
+# Define the path to the Input Methods directory in the user's Library
+DEST_DIR="$USER_HOME/Library/Input Methods"
+echo "destination directory is: $DEST_DIR"
+
+# Create the /Library/Input Methods directory if it doesn't exist
+if [ ! -d "$DEST_DIR" ]; then
+    mkdir -p "$DEST_DIR"
+    # Set the user as owner of the Input Methods directory
+    chown "$CONSOLE_USER":staff "$DEST_DIR"
+fi
+
+# Copy the input method to the destination directory
+# must use cp -R to maintain symbolic links and preserve permissions
+# if we use -r, the input method's code signature will be invalid and the system will not load it
+cp -R "$SOURCE_FILE" "$DEST_DIR/"
+
+# Set the user as owner
+chown "$CONSOLE_USER":staff "$DEST_DIR/Keyman.app"
+
+exit 0

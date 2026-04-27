@@ -14,9 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KMSettingsRepository : NSObject
 + (KMSettingsRepository *)shared;
-- (BOOL)dataMigrationNeeded;
-- (void)convertSettingsForMigration;
+- (instancetype)init;
+- (BOOL)keyman18DataMigrationNeeded;
+- (BOOL)keyman19SettingsMigrationNeeded;
+- (void)migrateSettingsForKeyman18;
 - (void)setDataModelVersionIfNecessary;
+- (void)migrateSettingsForKeyman19;
+- (BOOL)migrateInputMethodSettingsToAppGroup;
 - (NSString *)readSelectedKeyboard;
 - (void)writeSelectedKeyboard:(NSString *)selectedKeyboard;
 - (NSArray *)readActiveKeyboards;

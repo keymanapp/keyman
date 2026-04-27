@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>compileBitcode</key>
+	<true/>
+	<key>method</key>
+	<string>developer-id</string>
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>keyman.inputmethod.Keyman</key>
+		<string>Keyman Mac IM Dist</string>
+		<key>com.keyman.config</key>
+		<string>Keyman Mac Config Dist</string>
+	</dict>
+	<key>teamID</key>
+	<string>3YE4W86L3G</string>
+    <key>signingCertificate</key>
+    <string>039B24583A84F88168463F17FDA6F176C7985044</string> 
+</dict>
+</plist>
