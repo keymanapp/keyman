@@ -22,7 +22,7 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   public var keyboardDirectoryUrl: URL
   // the URL of the .kmx file for the package
   public let kmxFileUrl: URL
-  // the UserDefaults key for this package, used for the selected Keyboard and active keyboards
+  // the UserDefaults key for this package, used for the selected Keyboard and enabled keyboards
   // the key is in the form "/[package directory]/[package name].kmx"
   // for example, "/khmer_angkor/khmer_angkor.kmx"
   public let keyboardSettingsKey: String

@@ -36,6 +36,19 @@ public struct PackageRepository {
   }
   
   /**
+   * delete the package from disk
+   */
+  func deletePackage(package: KeymanPackage) {
+    print("deleting package: \(package.sourceDirectoryUrl)")
+    do {
+      try FileManager.default.removeItem(at: package.sourceDirectoryUrl)
+      print("deleted package: \(package.sourceDirectoryUrl)")
+    } catch {
+      print("could not delete directory: \(error.localizedDescription)")
+    }
+  }
+  
+  /**
    * Creates the directory tree where keyboards are stored under the standard 'Group Containers' directory
    */
   func createKeyman19SharedDataDirectories() {

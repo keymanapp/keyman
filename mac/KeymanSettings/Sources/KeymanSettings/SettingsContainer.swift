@@ -3,8 +3,8 @@
  *
  * Created by Shawn Schantz on 2026-04-02
  *
- * Class that exposes all settings information to the Config app
- * Provides a place for the Config app can bind directly to the settings
+ * Class that exposes all settings information to the Keyman Configuration app
+ * Provides a place for the config app can bind directly to the settings
  * and update when changes are made
  *
  */
@@ -63,6 +63,9 @@ public class SettingsContainer : ObservableObject {
     }
   }
 
+  /**
+   * for debugging: prints UserDefaults values
+   */
   public func logSettings() {
     self.settingsRepository.logSettings()
   }
@@ -80,6 +83,23 @@ public class SettingsContainer : ObservableObject {
     return package
   }
   
+  public func removePackage(at index: Int) {
+    let package = self.installedPackages[index]
+    
+    // will removing this package cause the removal of any enabled keyboards?
+    let removingEnabledKeyboards = !package.getEnabledKeyboardsSettingsKeys().isEmpty
+
+    // delete package from disk
+    self.packageRepository.deletePackage(package: package)
+    
+    // remove package from installed packages list
+    _ = self.installedPackages.remove(at: index)
+    
+    // if we removed any enabled keyboards, then update settings
+    if removingEnabledKeyboards {
+      self.persistKeyboardState()
+    }
+  }
   /**
    * returns true if the keyboard is enabled
    * when enabled, the keyboard appears in the Keyman sub menu in the mac
@@ -109,7 +129,7 @@ public class SettingsContainer : ObservableObject {
       print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardId)")
     }
     
-    // update persisted state in UserDefaults activeKeyboards array
+    // update persisted state in UserDefaults enabledKeyboards array
     self.persistKeyboardState()
   }
 
@@ -118,7 +138,7 @@ public class SettingsContainer : ObservableObject {
    */
   func persistKeyboardState() {
     let enabledKeyboards = self.getAllEnabledKeyboardSettingsKeys()
-    self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(enabledKeyboards))
+    self.settingsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(enabledKeyboards))
   }
   
   /**
@@ -175,14 +195,14 @@ public class SettingsContainer : ObservableObject {
    */
   func validateSettings() {
     let installedKeyboardKeys = self.getAllKeyboardSettingsKeys()
-    let activeKeyboardKeys = self.settingsRepository.readActiveKeyboards()
+    let enabledKeyboardKeys = self.settingsRepository.readEnabledKeyboards()
     
-    if (activeKeyboardKeys.isSubset(of: installedKeyboardKeys)) {
-      print("only installed keyboards are listed as active: no need to synchronize")
+    if (enabledKeyboardKeys.isSubset(of: installedKeyboardKeys)) {
+      print("only installed keyboards are listed as enabled: no need to synchronize")
     } else {
-      print("active keyboards list contains uninstalled keyboards: synchronize active keyboards list")
-      let installedActiveKeyboardKeys = activeKeyboardKeys.intersection(installedKeyboardKeys)
-      self.settingsRepository.writeActiveKeyboards(activeKeyboardsArray: Array(installedActiveKeyboardKeys))
+      print("enabled keyboards list contains uninstalled keyboards: synchronize enabled keyboards list")
+      let installedEnabledKeyboardKeys = enabledKeyboardKeys.intersection(installedKeyboardKeys)
+      self.settingsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(installedEnabledKeyboardKeys))
     }
   }
   
@@ -192,11 +212,11 @@ public class SettingsContainer : ObservableObject {
   func applySettingsToInstalledPackages() {
     self.validateSettings()
     
-    let activeKeyboards = self.settingsRepository.readActiveKeyboards()
+    let enabledKeyboards = self.settingsRepository.readEnabledKeyboards()
 
-    // set enabled flag if the keyboard is contained in the set of activeKeyboards
+    // set enabled flag if the keyboard is contained in the set of enabledKeyboards
     self.installedPackages.forEach { $0.keyboards.forEach
-      {$0.enabled = activeKeyboards.contains($0.keyboardSettingsKey)}
+      {$0.enabled = enabledKeyboards.contains($0.keyboardSettingsKey)}
     }
   }
 }

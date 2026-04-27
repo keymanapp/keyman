@@ -100,6 +100,18 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     return keyboard.keyboardSettingsKey
   }
 
+  public func getEnabledKeyboardsSettingsKeys() -> [String] {
+    var settingsKeyArray = [String]()
+    
+    self.keyboards.forEach { keyboard in
+      if (keyboard.enabled) {
+        settingsKeyArray.append(keyboard.keyboardSettingsKey)
+      }
+    }
+    
+    return settingsKeyArray
+  }
+  
   public func validate() -> Bool {
     var validKeyboards = self.keyboards.isEmpty == false
     

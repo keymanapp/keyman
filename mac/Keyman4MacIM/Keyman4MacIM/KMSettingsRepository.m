@@ -11,7 +11,18 @@
 #import "KMLogs.h"
 #import "KMDataRepository.h"
 
+/**
+ * The UserDefaults key `KMActiveKeyboardsKey` identifies the list of installed keyboard which
+ * the user has enabled to be included in the Keyman keyboard menu. This key name is a little confusing
+ * because the only truly active keyboard is the one that Keyman is applying while typing.
+ * So, with the migration of data for Keyman version 19, this key is renamed to `KMEnabledKeyboardsKey`
+ * Every enabled keyboard will appear in the Keyman keyboards menu.
+ * Only one of these keyboards can be selected at a time, and the selected keyboard is the one that
+ * is actively being used by Keyman for each keystroke.
+ */
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
+NSString *const kEnabledKeyboardsKey = @"KMEnabledKeyboardsKey";
+
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
 NSString *const kShowOskOnActivate = @"KMShowOskOnActivate";
@@ -87,7 +98,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
   
   BOOL migrationNeeded = keymanSettingsExist && !keyboardsStoredInLibrary;
-  os_log([KMLogs dataLog], "dataMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
+  os_log([KMLogs dataLog], "keyman18DataMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
 
   return migrationNeeded;
 }
@@ -104,7 +115,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
   
   BOOL migrationNeeded = keymanSettingsExistForInputMethod;
-  os_log([KMLogs dataLog], "dataMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
+  os_log([KMLogs dataLog], "keyman19SettingsMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
 
   return migrationNeeded;
 }
@@ -132,7 +143,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
 
   NSArray * activeKeyboards = [self.appDefaults arrayForKey:kActiveKeyboardsKey];
   if (activeKeyboards != nil) {
-    [self.groupDefaults setObject:activeKeyboards forKey:kActiveKeyboardsKey];
+    [self.groupDefaults setObject:activeKeyboards forKey:kEnabledKeyboardsKey];
   }
 
   if ([self.appDefaults objectForKey:kShowOskOnActivate] != nil) {

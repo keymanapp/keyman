@@ -34,20 +34,6 @@ struct ConfigView: View {
       }
       .padding()
       
-//      ScrollView(showsIndicators: false) {
-//        List {
-//            // Use $ to get binding to the published array
-//            ForEach($settings.installedKeyboardPackages) { $package in
-//                Section(header: Text("Section")) {
-//                    // Use $ to get binding to the nested array
-//                  ForEach($package.keyboards) { $keyboard in
-//                    Toggle(keyboard.keyboardId, isOn: $keyboard.enabled) // Binding here
-//                    }
-//                }
-//            }
-//        }
-//        .padding()
-//      }
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {
           ForEach(Array(settings.installedPackages.enumerated()), id: \.offset) { index, package in
@@ -60,7 +46,7 @@ struct ConfigView: View {
                 // Example of Icon-Only Button
                 Spacer()
                 Button(action: {
-                  settings.installedPackages.remove(at: index)
+                  settings.removePackage(at: index)
                 }) {
                   Label("remove", systemImage: "trash.fill")
                 }
