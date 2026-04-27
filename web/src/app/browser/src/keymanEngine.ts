@@ -394,9 +394,8 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * @param {Keyboard}     keyboard   Keyboard script object
    *
    * @return {KeyboardDetails}  Keyboard details object
-   *
    */
-  private getKeyboardDetails(stub: KeyboardStub, keyboard: Keyboard): KeyboardDetails {
+  private getKeyboardDetails(stub: KeyboardStub, keyboard: Keyboard): KeyboardDetails | null {
     // works for both JS and KMX keyboards
     return stub && {
       Name: stub.KN,
