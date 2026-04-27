@@ -8,8 +8,8 @@
  */
 
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, Keylayout } from "@keymanapp/developer-utils";
-import { KmnFileWriter } from './kmn-file-writer.js';
-import { KeylayoutFileReader } from './keylayout-file-reader.js';
+import { KmnXKBFileWriter } from './kmnXKB-file-writer.js';
+import { XkbFileReader } from './xkb-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
@@ -88,8 +88,8 @@ export class Rule {
 
 }
 
-export class KeylayoutToKmnConverter {
-  static readonly INPUT_FILE_EXTENSION = '.keylayout';
+export class XkbToKmnConverter {
+  static readonly INPUT_FILE_EXTENSION = '.xkb';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly SKIP_COMMENTED_LINES = false;
   static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint (U+0020)
@@ -108,8 +108,7 @@ export class KeylayoutToKmnConverter {
    * @return null on success
    */
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
-
-    console.log("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°\n      running KeylayoutToKmnConverter with input file "
+    console.log("##############################################################\n      running XkbToKmnConverter with input file "
       + inputFilename + " and output file " + outputFilename);
 
     if (!inputFilename) {
@@ -117,7 +116,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
+    const KeylayoutReader = new XkbFileReader(this.callbacks/*, this.options*/);
 
     const binaryData = this.callbacks.loadFile(inputFilename);
     const jsonO: Keylayout.KeylayoutXMLSourceFile = KeylayoutReader.read(binaryData);
@@ -136,7 +135,7 @@ export class KeylayoutToKmnConverter {
     }
 
     const processedData = await this.convert(jsonO, inputFilename, outputFilename);
-    const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
+    const kmnFileWriter = new KmnXKBFileWriter(this.callbacks, this.options);
 
     // write to object/ConverterToKmnResult
     const outputKmn = kmnFileWriter.write(processedData);
@@ -216,7 +215,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER; j++) {
+    for (let j = 0; j <= XkbToKmnConverter.MAX_KEY_IDENTIFIER; j++) {
 
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
@@ -877,7 +876,7 @@ export class KeylayoutToKmnConverter {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['action'] === search[k].id &&
-            data.keyboard.keyMapSet[0].keyMap[i].key[j]['code'] <= KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER) {
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['code'] <= XkbToKmnConverter.MAX_KEY_IDENTIFIER) {
             const singleDataSet = {
               keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['code'],
               key: this.mapUkeleleKeycodeToVK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['code'])),

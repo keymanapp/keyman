@@ -3,7 +3,7 @@
  *
  * Created by S. Schmitt on 2025-05-12
  *
- * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
+ * Tests for XkbToKmnConverter, XkbFileReader, KmnXKBFileWriter
  *
  */
 
@@ -11,23 +11,23 @@ import 'mocha';
 import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
-import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
-import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+import { XkbToKmnConverter, ProcessedData, Rule } from '../src/xkb-to-kmn/xkb-to-kmn-converter.js';
+import { KmnXKBFileWriter } from '../src/xkb-to-kmn/kmnXKB-file-writer.js';
+import { XkbFileReader } from '../src/xkb-to-kmn/xkb-file-reader.js';
 
-describe('KmnFileWriter', function () {
+describe('KmnXKBFileWriter', function () {
 
   before(function () {
     compilerTestCallbacks.clear();
   });
 
   describe("writeDataRules() ", function () {
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const inputFilename = makePathToFixture('../data/Test.xkb');
+    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const sutR = new XkbFileReader(compilerTestCallbacks);
+    const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.xkb$/, '.kmn'));
 
     it('writeDataRules() should return true (no error) if written', async function () {
       const result = sutW.writeDataRules(converted);
@@ -37,12 +37,12 @@ describe('KmnFileWriter', function () {
   });
 
   describe("writeKmnFileHeader() ", function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const sutR = new XkbFileReader(compilerTestCallbacks);
+    const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const inputFilename = makePathToFixture('../data/Test.xkb');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.xkb$/, '.kmn'));
 
     const outExpectedFirst: string =
       "c ..................................................................................................................\n"
@@ -68,7 +68,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe('convertToUnicodeCharacter ', function () {
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
 
       ["<", '<'],
@@ -181,7 +181,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe('reviewRules messages', function () {
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       [[new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'UNAVAILABLE', 'K_A', new TextEncoder().encode('A'))],
       [''],
@@ -234,7 +234,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe('reviewRules messages duplicate and ambiguous', function () {
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       //all
       [[
@@ -399,7 +399,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe('reviewRules messages duplicate and ambiguous with Extra warning', function () {
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
     [[[
       new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'RALT', 'K_B', new TextEncoder().encode('X')),
       new Rule("C2", '', '', 0, 0, 'RALT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('Y')),
@@ -419,10 +419,10 @@ describe('KmnFileWriter', function () {
   });
 
   describe('write from intermediate data array', function () {
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       [
-        [ /* see ../data/Test_C0.keylayout */
+        [ /* see ../data/Test_C0.xkb */
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
@@ -434,7 +434,7 @@ describe('KmnFileWriter', function () {
           "+ [NCAPS K_D]  >  'd'\n"]
       ],
       [
-        [ /* see ../data/Test_C1.keylayout */
+        [ /* see ../data/Test_C1.xkb */
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))
         ],
@@ -442,14 +442,14 @@ describe('KmnFileWriter', function () {
           "+ [CAPS K_S]  >  'S'\n"]
       ],
       [
-        [ /* see ../data/Test_C2.keylayout */
+        [ /* see ../data/Test_C2.xkb */
           new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
         ],
         ["+ [NCAPS K_U]  >  dk(A1)\n" +
           "dk(A1) + [CAPS K_A]  >  'Â'\n\n"]
       ],
       [
-        [ /* see ../data/Test_C3.keylayout */
+        [ /* see ../data/Test_C3.xkb */
           new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
         ],
         ["+ [NCAPS SHIFT K_D]   >   dk(A2)\n" +
@@ -458,7 +458,7 @@ describe('KmnFileWriter', function () {
         ]
       ],
       [
-        [ /* see ../data/Test_C0_C1_C2_C3.keylayout */
+        [ /* see ../data/Test_C0_C1_C2_C3.xkb */
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
           new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
@@ -492,7 +492,7 @@ describe('KmnFileWriter', function () {
           "dk(B5) + [CAPS K_D]  >  'Â'\n\n"]
       ],
       [
-        [ /* see ../data/Test_C3_several.keylayout */
+        [ /* see ../data/Test_C3_several.xkb */
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),

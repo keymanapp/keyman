@@ -8,7 +8,7 @@
  */
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
-import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn-converter.js';
+import { XkbToKmnConverter, ProcessedData, Rule } from './xkb-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
@@ -17,7 +17,7 @@ export interface messageCharacter {
   character: string;
 };
 
-export class KmnFileWriter {
+export class KmnXKBFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
 
@@ -80,7 +80,7 @@ export class KmnFileWriter {
    */
   public writeDataRules(dataUkelele: ProcessedData): string {
 
-    const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
+    const keylayoutKmnConverter = new XkbToKmnConverter(this.callbacks, this.options);
     let data: string = "";
 
     // filter array of all rules and remove duplicates
@@ -122,7 +122,7 @@ export class KmnFileWriter {
 
         // lookup key nr of the key which is being processed
         let keyNr: number = 0;
-        for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER; j++) {
+        for (let j = 0; j <= XkbToKmnConverter.MAX_KEY_IDENTIFIER; j++) {
           if (keylayoutKmnConverter.mapUkeleleKeycodeToVK(j) === uniqueDataRules[k].key) {
             keyNr = j;
             break;
@@ -161,11 +161,11 @@ export class KmnFileWriter {
         if (warnText[2].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
+          if (!XkbToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
             warningTextToWrite = warnText[2];
           }
 
-          if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+          if (!((warnText[2].length > 0) && XkbToKmnConverter.SKIP_COMMENTED_LINES)) {
             if (versionOutputCharacter === "'") {
               data += warningTextToWrite
                 + "+ ["
@@ -214,11 +214,11 @@ export class KmnFileWriter {
         if (warnText[1].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
+          if (!XkbToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
             warningTextToWrite = warnText[1];
           }
 
-          if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+          if (!((warnText[1].length > 0) && XkbToKmnConverter.SKIP_COMMENTED_LINES)) {
             data += warningTextToWrite
               + "+ [" + (uniqueDataRules[k].modifierDeadkey + " "
                 + uniqueDataRules[k].deadkey).trim()
@@ -230,11 +230,11 @@ export class KmnFileWriter {
         if ((warnText[2].indexOf("duplicate") < 0)) {
 
           let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
+          if (!XkbToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
             warningTextToWrite = warnText[2];
           }
 
-          if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+          if (!((warnText[2].length > 0) && XkbToKmnConverter.SKIP_COMMENTED_LINES)) {
             if (versionOutputCharacter === "'") {
               data += warningTextToWrite
                 + "dk(A"
@@ -289,11 +289,11 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
 
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[0].length > 0)) {
+          if (!XkbToKmnConverter.SKIP_COMMENTED_LINES && (warnText[0].length > 0)) {
             warningTextToWrite = warnText[0];
           }
 
-          if (!((warnText[0].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+          if (!((warnText[0].length > 0) && XkbToKmnConverter.SKIP_COMMENTED_LINES)) {
             data += warningTextToWrite
               + "+ ["
               + (uniqueDataRules[k].modifierPrevDeadkey + " "
@@ -306,11 +306,11 @@ export class KmnFileWriter {
         if (warnText[1].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
+          if (!XkbToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
             warningTextToWrite = warnText[1];
           }
 
-          if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+          if (!((warnText[1].length > 0) && XkbToKmnConverter.SKIP_COMMENTED_LINES)) {
             data += warningTextToWrite
               + "dk(A" + (String(uniqueDataRules[k].idPrevDeadkey) + ")  + ["
                 + uniqueDataRules[k].modifierDeadkey).trim()
@@ -325,11 +325,11 @@ export class KmnFileWriter {
         if (warnText[2].indexOf("duplicate") < 0) {
 
           let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
+          if (!XkbToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
             warningTextToWrite = warnText[2];
           }
 
-          if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+          if (!((warnText[2].length > 0) && XkbToKmnConverter.SKIP_COMMENTED_LINES)) {
             data += warningTextToWrite + "dk(B"
               + (String(uniqueDataRules[k].idDeadkey)
                 + ") + ["
@@ -361,7 +361,7 @@ export class KmnFileWriter {
    */
   public reviewRules(rule: Rule[], index: number): string[] {
 
-    const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
+    const keylayoutKmnConverter = new XkbToKmnConverter(this.callbacks, this.options);
     const warningText: string[] = Array(3).fill("");
 
     // ------------------------- check unavailable modifiers -------------------------
@@ -874,18 +874,18 @@ export class KmnFileWriter {
 
     // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
     const ctr_val = ((m_uni || m_hex || m_dec) ?
-      m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
+      m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : XkbToKmnConverter.MAX_CTRL_CHARACTER
     );
 
     // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
-    if ((ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+    if ((ctr_val < XkbToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < XkbToKmnConverter.MAX_CTRL_CHARACTER)) {
 
       // for control characters in 'U+...', '&#x...'  or '&#...' format
-      if (ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+      if (ctr_val < XkbToKmnConverter.MAX_CTRL_CHARACTER) {
         versionOutputCharacter = "U+" + ctr_val.toString(16).toUpperCase().padStart(4, '0');
       }
       // for control characters in "" format
-      if (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+      if (ctr.charCodeAt(0) < XkbToKmnConverter.MAX_CTRL_CHARACTER) {
         versionOutputCharacter = "U+" + ctr.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
       }
       if (versionOutputCharacter)
