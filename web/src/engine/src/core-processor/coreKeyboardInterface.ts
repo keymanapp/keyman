@@ -2,11 +2,11 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 import { KM_Core, km_core_option_item, KM_CORE_OPTION_SCOPE } from 'keyman/engine/core-adapter';
-import { KeyboardMinimalInterface, Keyboard, VariableStoreSerializer, KMXKeyboard } from 'keyman/engine/keyboard';
+import { KeyboardMinimalInterface, VariableStoreSerializer, KMXKeyboard } from 'keyman/engine/keyboard';
 import { toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 export class CoreKeyboardInterface implements KeyboardMinimalInterface {
-  private _activeKeyboard: Keyboard;
+  private _activeKeyboard: KMXKeyboard;
 
   public constructor(public readonly variableStoreSerializer: VariableStoreSerializer) {
     if (!variableStoreSerializer) {
@@ -14,26 +14,22 @@ export class CoreKeyboardInterface implements KeyboardMinimalInterface {
     }
   }
 
-  public get activeKeyboard(): Keyboard {
+  public get activeKeyboard(): KMXKeyboard {
     return this._activeKeyboard;
   }
-  public set activeKeyboard(keyboard: Keyboard) {
+  public set activeKeyboard(keyboard: KMXKeyboard) {
     this._activeKeyboard = keyboard;
     const options = this.loadSerializedOptions();
 
     if (options.length > 0) {
-      KM_Core.instance.state_options_update(this.KmxKeyboard.state, options);
+      KM_Core.instance.state_options_update(keyboard.state, options);
     }
-  }
-
-  private get KmxKeyboard(): KMXKeyboard {
-    return this._activeKeyboard as KMXKeyboard;
   }
 
   private loadSerializedOptions(): km_core_option_item[] {
     const options: km_core_option_item[] = [];
-    const attrs = KM_Core.instance.keyboard_get_attrs(this.KmxKeyboard.keyboard);
-    const prefixedKeyboardId = toPrefixedKeyboardId(this.KmxKeyboard.id);
+    const attrs = KM_Core.instance.keyboard_get_attrs(this.activeKeyboard.keyboard);
+    const prefixedKeyboardId = toPrefixedKeyboardId(this.activeKeyboard.id);
     const defaultOptions = attrs.object.default_options as km_core_option_item[];
     for (const defaultOption of defaultOptions) {
       if (defaultOption.scope == KM_CORE_OPTION_SCOPE.OPT_KEYBOARD) {
