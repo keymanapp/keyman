@@ -616,7 +616,7 @@ bool load_all_tests(const km::core::path &source, const km::core::path &compiled
   std::wcout << "* source file   = " << source << std::endl
              << "* compiled file = " << compiled << std::endl;
 
-  auto embedded_test_source = new km::tests::LdmlEmbeddedTestSource();
+  auto embedded_test_source = std::make_shared<km::tests::LdmlEmbeddedTestSource>();
 
   const std::string normalMode[] = {"NFD", "NFC"};
 
