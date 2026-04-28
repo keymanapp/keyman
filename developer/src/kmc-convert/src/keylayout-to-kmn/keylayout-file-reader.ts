@@ -11,7 +11,7 @@ import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout, KeymanXMLReader }
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
-import { KL_KeyMapSelect,KL_KeyMap } from "../../../common/web/utils/src/types/keylayout/keylayout-xml.js";
+import { KL_KeyMapSelect, KL_KeyMap } from "../../../common/web/utils/src/types/keylayout/keylayout-xml.js";
 
 export class KeylayoutFileReader {
 
@@ -94,7 +94,7 @@ export class KeylayoutFileReader {
     // check if all keyMapSelect elements have a corresponding keyMap element in the .keylayout file
     if (!this.checkForCorrespondingElements(source)) {
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: inputFilename }));
-      return null;
+      return false;
     }
     return true;
   }
@@ -110,7 +110,7 @@ export class KeylayoutFileReader {
 
     boxXmlArray(source, 'keyMapSet');
 
-    if(source.layouts) {
+    if (source.layouts) {
       boxXmlArray(source.layouts, 'layout');
     }
 

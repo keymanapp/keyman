@@ -64,7 +64,7 @@ export class Converter implements KeymanCompiler {
     };
 
     if (!inputFilename) {
-      this.callbacks.reportMessage(ConverterMessages.Error_IntputFilenameIsRequired());
+      this.callbacks.reportMessage(ConverterMessages.Error_InputFilenameIsRequired());
       return null;
     }
 

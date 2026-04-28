@@ -30,10 +30,10 @@ export interface ConverterToKmnResult extends ConverterResult {
   artifacts: ConverterToKmnArtifacts;
 };
 
- /**
-  * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
-  * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
-  */
+/**
+ * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
+ * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
+ */
 export interface ProcessedData {
 
   keylayoutFilename: string;
@@ -166,7 +166,7 @@ export class KeylayoutToKmnConverter {
       rules: []
     };
 
-    if ((jsonObj === null) || (!jsonObj.hasOwnProperty("keyboard"))) {
+    if ((jsonObj === null)) {
       return null;
     }
     // create an array of modifier combinations and store in dataObject
@@ -441,7 +441,7 @@ export class KeylayoutToKmnConverter {
               // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behavior,modifier,output] .........................................................................
               /*  eg: ['49','K_SPACE','a0','0','Â'] */    const b1KeycodeObj: KeylayoutFileData[] = this.getKeyActionOutputArrayFromActionStateOutputArray(jsonObj, b6ActionIdObj);
               /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ const b1ModifierKeyObj: KeylayoutFileData[] = this.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(jsonObj, b1KeycodeObj, isCapsused);
-              // ...........................................................................................................................................................................................
+                  // ...........................................................................................................................................................................................
 
                   for (let n1 = 0; n1 < b2PrevDeadkeyModifierObj.length; n1++) {
                     for (let n2 = 0; n2 < b2PrevDeadkeyModifierObj[n1].length; n2++) {
