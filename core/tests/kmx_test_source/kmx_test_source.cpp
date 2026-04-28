@@ -1,3 +1,10 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Keyman Core - Shared test library to load .kmn test rules for automated
+ * testing of .kmn keyboards
+ */
+
 #include <algorithm>
 #include <cctype>
 #include <fstream>
@@ -13,13 +20,8 @@
 #include <kmx/kmx_xstring.h>
 
 #include "path.hpp"
-#include "state.hpp"
-#include "utfcodec.hpp"
 
 #include "kmx_test_source.hpp"
-
-#include <test_assert.h>
-#include <test_color.h>
 
 namespace km {
 namespace tests {
@@ -47,14 +49,16 @@ trim(std::string &s) {
   rtrim(s);
 }
 
-std::u16string
-KmxTestSource::parse_source_string(std::string const &s) {
-  std::u16string t;
+bool
+KmxTestSource::parse_source_string(std::string const &s, std::u16string& result) {
+  result = u"";
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
       p++;
       km_core_usv v;
-      test_assert(p != s.end());
+      if(p == s.end()) {
+        return false;
+      }
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
@@ -62,24 +66,26 @@ KmxTestSource::parse_source_string(std::string const &s) {
         std::string s1 = s.substr(p - s.begin(), 8);
         v              = std::stoul(s1, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
-        test_assert(v >= 0x0001 && v <= 0x10FFFF);
+        if(!(v >= 0x0001 && v <= 0x10FFFF)) {
+          return false;
+        }
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cu(v);
+          result += km_core_cu(v);
         } else {
-          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
+          result += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          result += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
       } else if (*p == 'd') {
         // Deadkey
         // TODO, not yet supported
-        test_assert(false);
+        return false;
       }
     } else {
-      t += *p;
+      result += *p;
     }
   }
-  return t;
+  return true;
 }
 
 bool
@@ -91,8 +97,8 @@ KmxTestSource::parse_option_string(std::string line, kmx_options &options, kmx_o
   kmx_option o;
 
   o.type  = type;
-  o.key   = parse_source_string(line.substr(0, x));
-  o.value = parse_source_string(line.substr(x + 1));
+  if(!parse_source_string(line.substr(0, x), o.key)) return false;
+  if(!parse_source_string(line.substr(x + 1), o.value)) return false;
 
   options.emplace_back(o);
   return true;
@@ -146,12 +152,18 @@ KmxTestSource::load_source(
       if (line == "\\b") {
         expected_beep = true;
       } else {
-        expected = parse_source_string(line);
+        if(!parse_source_string(line, expected)) {
+          return __LINE__;
+        }
       }
     } else if (is_token(s_expected_context, line)) {
-      expected_context = parse_source_string(line);
+      if(!parse_source_string(line, expected_context)) {
+        return __LINE__;
+      }
     } else if (is_token(s_context, line)) {
-      context = parse_source_string(line);
+      if(!parse_source_string(line, context)) {
+        return __LINE__;
+      }
     } else if (is_token(s_option, line)) {
       if (!parse_option_string(line, options, KOT_INPUT))
         return __LINE__;
@@ -162,7 +174,11 @@ KmxTestSource::load_source(
       if (!parse_option_string(line, options, KOT_SAVED))
         return __LINE__;
     } else if (is_token(s_capsLock, line)) {
-      _caps_lock_on = parse_source_string(line).compare(u"1") == 0;
+      std::u16string r;
+      if(!parse_source_string(line, r)) {
+        return __LINE__;
+      }
+      _caps_lock_on = r.compare(u"1") == 0;
     }
   }
 
@@ -215,7 +231,9 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
 
 key_event
 KmxTestSource::char_to_event(char ch) {
-  test_assert(ch >= 32);
+  if(ch < 32) {
+    return {0,0};
+  }
   return {
       km::core::kmx::s_char_to_vkey[(int)ch - 32].vk,
       (uint16_t)(km::core::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
@@ -261,8 +279,12 @@ KmxTestSource::vkey_to_event(std::string const &vk_event) {
   }
 
   // The string should be empty at this point
-  test_assert(!std::getline(f, s, ' '));
-  test_assert(vk != 0);
+  if(std::getline(f, s, ' ')) {
+    return {0,0};
+  }
+  if(vk == 0) {
+    return {0,0};
+  }
 
   return {vk, modifier_state};
 }
@@ -279,7 +301,9 @@ KmxTestSource::next_key(std::string &keys) {
       return char_to_event(ch);
     }
     auto n = keys.find(']');
-    test_assert(n != std::string::npos);
+    if(n == std::string::npos) {
+      return {0, 0};
+    }
     auto vkey = keys.substr(1, n - 1);
     keys.erase(0, n + 1);
     return vkey_to_event(vkey);

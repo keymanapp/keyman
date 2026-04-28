@@ -9,8 +9,7 @@
 
 #include "kmx/kmx_plus.h"
 
-#include <test_assert.h>
-#include <test_color.h>
+#include <gtest/gtest.h>
 
 namespace km {
 namespace tests {
@@ -111,7 +110,7 @@ public:
   virtual void toggle_caps_lock_state();
   virtual void set_caps_lock_on(bool caps_lock_on);
   virtual km_core_status get_expected_load_status();
-  virtual const std::u16string &get_context() = 0;
+  virtual void get_context(std::u16string &) = 0;
   virtual bool get_expected_beep() const;
   /**
    * fillin a list
@@ -124,8 +123,8 @@ public:
   // helper functions
   static key_event char_to_event(char ch);
   static uint16_t get_modifier(std::string const &m);
-  static std::u16string parse_source_string(std::string const &s);
-  static std::u16string parse_u8_source_string(std::string const &s);
+  static bool parse_source_string(std::string const &s, std::u16string& result);
+  static bool parse_u8_source_string(std::string const &s, std::u16string& result);
 
   // sets the normalization switch.
   // why is this here? to prevent an additional pass of parsing the KMX+ file.
@@ -135,7 +134,7 @@ public:
   }
 
   bool get_normalization_disabled() const {
-    test_assert(setup); // make sure set_ was called first
+    EXPECT_TRUE(setup); // make sure set_ was called first
     return normalization_disabled;
   }
 
@@ -147,13 +146,13 @@ private:
   bool _caps_lock_on = false;
 protected:
   /** populate rawdata and kmxplus */
-  int load_kmx_plus(const km::core::path &compiled);
+  bool load_kmx_plus(const km::core::path &compiled);
   // copy of the kbd data, for lookups
   std::vector<uint8_t> rawdata;
   std::unique_ptr<km::core::kmx::kmx_plus> kmxplus;
 };
 
-typedef std::map<std::string, std::unique_ptr<km::tests::LdmlTestSource>> JsonTestMap;
+typedef std::map<std::string, std::shared_ptr<km::tests::LdmlTestSource>> JsonTestMap;
 
 class LdmlJsonTestSourceFactory {
   public:
@@ -162,7 +161,7 @@ class LdmlJsonTestSourceFactory {
      * @param compiled the KMX - for lookup
      * @param path the json
     */
-    int load(const km::core::path &compiled, const km::core::path &path);
+    bool load(const km::core::path &compiled, const km::core::path &path);
 
     static km::core::path source_to_test_json(const km::core::path& kmx);
 
@@ -180,10 +179,10 @@ public:
   /**
    * Load the test_source from comments in the .xml source
    */
-  int load_source(const km::core::path &path, const km::core::path &compiled);
+  bool load_source(const km::core::path &path, const km::core::path &compiled, bool& has_tests);
 
   virtual km_core_status get_expected_load_status();
-  virtual const std::u16string &get_context();
+  virtual void get_context(std::u16string &result);
   virtual bool get_expected_beep() const;
 
   virtual void next_action(ldml_action &fillin);
@@ -200,8 +199,8 @@ private:
   /** did we check the keylist yet? */
   bool check_keylist = true;
   /** set the expected keys in the keylist */
-  void set_keylist(std::string const& s) {
-    expected_keylist = parse_source_string(s);
+  bool set_keylist(std::string const& s) {
+    return parse_source_string(s, expected_keylist);
   }
 
   std::u16string expected_keylist;

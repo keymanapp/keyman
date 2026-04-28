@@ -1,26 +1,28 @@
-
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Keyman Core - Helper functions for referencing fixtures in WASM builds
+ */
 
 #ifdef __EMSCRIPTEN__
 
 #include <emscripten.h>
 #include <iostream>
-#include <test_assert.h>
+#include "path.hpp"
 
-const std::string get_wasm_file_path(const std::string& filename) {
+bool get_wasm_file_path(const std::string& filename, km::core::path& result) {
   // Verify that we are passing a fully-qualified path
   // TODO: we need to support relative paths based on CWD
 #if _DEBUG_FOPEN
   std::cout << "get_wasm_file_path ENTER (" << filename << ")" << std::endl;
 #endif
 
-  test_assert(
+  if(!(
     (filename.length() > 0 && filename.at(0) == '/') ||
     (filename.length() > 1 && filename.at(1) == ':')
-  );
-
-#if _DEBUG_FOPEN
-  std::cout << "get_wasm_file_path test_assert passed " << std::endl;
-#endif
+  )) {
+    return false;
+  }
 
   EM_ASM_({
     //console.log('EM_ASM enter');
@@ -66,7 +68,8 @@ const std::string get_wasm_file_path(const std::string& filename) {
   std::cout << "get_wasm_file_path opening virtual path: " << f << std::endl;
 #endif
 
-  return f;
+  result = f;
+  return true;
 }
 
 #endif
