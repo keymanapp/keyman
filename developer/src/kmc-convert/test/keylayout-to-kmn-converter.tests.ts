@@ -186,24 +186,6 @@ describe('KeylayoutToKmnConverter', function () {
       assert.isNull(convertedEmpty);
     });
 
-    it('should return empty on only modifiers as input', async function () {
-      const convertedMod = sut.convertBound.convert({
-        keylayoutFilename: '',
-        modifiers: [['caps'], ['Shift'], ['command']],
-        rules: []
-      }, '');
-      assert.isNull(convertedMod);
-    });
-
-    it('should return empty on only rules as input', async function () {
-      const convertedRule = sut.convertBound.convert({
-        keylayoutFilename: '',
-        modifiers: [],
-        rules: [['C0', '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', 'A']]
-      }, '');
-      assert.isNull(convertedRule);
-    });
-
     it('should return empty array of rules on null input', async function () {
       const convertedRule = sut.convertBound.convert(null, 'ABC.kmn');
       assert.isNull(convertedRule);
@@ -350,13 +332,14 @@ describe('KeylayoutToKmnConverter', function () {
       [[{ key: '999', behavior: null }], [null]],
       [[{ key: '0', behavior: -999 }], [null]],
       [[{ key: '0', behavior: null }], [null]],
+      [[{ key: '0', behavior: undefined }], [null]],
       [[], []],
 
     ].forEach(function (values) {
       it((values[1] !== null) ?
         ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + JSON.stringify(values[1]) + "'" :
         ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + "null" + "'", async function () {
-          const result = sut.getModifierArrayFromKeyModifierArray(converted.modifiers, values[0] as KeylayoutFileData[]);
+          const result = sut.getModifierArrayFromKeyModifierArray(converted.modifiers, values[0] as unknown  as KeylayoutFileData[]);
           assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });

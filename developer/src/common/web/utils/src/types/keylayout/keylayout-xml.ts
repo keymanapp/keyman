@@ -158,7 +158,9 @@ export interface KL_When {
    * to define which output or next is followed by a state
    */
   state?: string;
+  through?: string;
   output?: string;
+  multiplier?: string;
   next?: string;
 };
 

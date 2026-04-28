@@ -11,6 +11,7 @@ import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout, KeymanXMLReader }
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
+import { KL_KeyMapSelect,KL_KeyMap } from "../../../common/web/utils/src/types/keylayout/keylayout-xml.js";
 
 export class KeylayoutFileReader {
 
@@ -23,10 +24,10 @@ export class KeylayoutFileReader {
    * @param  keyMapSelect the keyMapSelect element to find in keyMapSet
    * @return true if the keyMapSet element is found, false if not
    */
-  public findMapIndexinKeymap(jsonObj: any, keyMapSelect: any): boolean {
+  public findMapIndexinKeymap(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMapSelect: KL_KeyMapSelect): boolean {
     for (const keyMapSet of jsonObj.keyboard.keyMapSet) {
       for (const keyMap of keyMapSet.keyMap) {
-        if (keyMap['index'] === keyMapSelect) {
+        if (keyMap['index'] === keyMapSelect.mapIndex) {
           return true;
         }
       }
@@ -40,10 +41,10 @@ export class KeylayoutFileReader {
    * @param  keyMap the keyMap element to find in modifierMap
    * @return true if the keyMap element is found, false if not
    */
-  public findIndexinKeymapSelect(jsonObj: any, keyMap: any): boolean {
+  public findIndexinKeymapSelect(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMap: KL_KeyMap): boolean {
     for (const modifierMap of jsonObj.keyboard.modifierMap) {
       for (const keyMapSelect of modifierMap.keyMapSelect) {
-        if (keyMapSelect['mapIndex'] === keyMap) {
+        if (keyMapSelect['mapIndex'] === keyMap.index) {
           return true;
         }
       }
@@ -58,19 +59,19 @@ export class KeylayoutFileReader {
    * @param  jsonObj the read keylayout data to be checked
    * @return true if all keyMapSelect elements have a corresponding keyMap element, false if not
    */
-  public checkForCorrespondingElements(jsonObj: any): boolean {
+  public checkForCorrespondingElements(jsonObj: Keylayout.KeylayoutXMLSourceFile): boolean {
     let available = true;
 
     // check if all keyMapSelect elements have a corresponding keyMap element in the .keylayout file
     for (const modifierMap of jsonObj.keyboard.modifierMap) {
       for (const keyMapSelect of modifierMap.keyMapSelect) {
-        available = available && this.findMapIndexinKeymap(jsonObj, keyMapSelect['mapIndex']);
+        available = available && this.findMapIndexinKeymap(jsonObj, keyMapSelect);
       }
     }
     // check if all keyMap elements have a corresponding keyMapSelect element in the .keylayout file
     for (const keyMapSet of jsonObj.keyboard.keyMapSet) {
       for (const keyMap of keyMapSet.keyMap) {
-        available = available && this.findIndexinKeymapSelect(jsonObj, keyMap['index']);
+        available = available && this.findIndexinKeymapSelect(jsonObj, keyMap);
       }
     }
     return available;

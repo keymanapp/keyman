@@ -4,29 +4,86 @@
  * Created by S. Schmitt on 2025-07-14
  *
  * This DTD describes a technical preview of Keylayout Data
- -->
+ *
+ * Unless otherwise specified we used TN 2056:
+ * https://developer.apple.com/library/archive/technotes/tn2056/_index.html#//apple_ref/doc/uid/DTS10003085-CH1-SUBSECTION7
+ *
+ *  kmc-convert does not need and therefore does not process the following attributes:
+ *       group, id, maxout,
+ *       first, last, mapSet, modifiers,
+ *       defaultIndex,
+ *       baseMapSet, baseIndex,
+ *       through, multiplier
+ *  kmc-convert does not need and therefore does not process the following elements:
+ *       terminators
+ *  kmc-convert does not need and therefore does not process 'anonymous actions'
+ * -->
 
-<!ELEMENT keyboard (layouts, keyMapSet) >
-<!ELEMENT keyboard (modifierMap)* >
-<!ATTLIST keyboard (group, id, name, maxout) #REQUIRED >
 
-<!ELEMENT layouts ( layout)* >
-<!ATTLIST layout (first, last, mapSet, modifiers) #REQUIRED >
+<!-- Overall structure -->
+<!-- from TN 2056:
+<!ELEMENT keyboard (layouts+, modifierMap+, keyMapSet+, actions*, terminators*)>
+but kmc-convert uses instead: -->
+<!ELEMENT keyboard layouts>
+<!ELEMENT keyboard modifierMap+>
+<!ELEMENT keyboard keyMapSet+>
+<!ELEMENT keyboard actions*>
+<!ELEMENT keyboard terminators*>
 
-<!ELEMENT modifierMap (keyMapSelect)*>
-<!ATTLIST modifierMap (id, defaultIndex) #REQUIRED >
+<!ATTLIST keyboard group NMTOKEN #REQUIRED >
+<!ATTLIST keyboard id NMTOKEN #REQUIRED >
+<!ATTLIST keyboard name CDATA #REQUIRED >
+<!ATTLIST keyboard maxout NMTOKEN #IMPLIED >
 
-<!ELEMENT keyMapSelect (modifier)*>
-<!ATTLIST keyMapSelect (mapIndex) #REQUIRED >
+<!-- Hardware layout elements -->
+<!ELEMENT layouts (layout+) >
+<!ELEMENT layout EMPTY >
+<!ATTLIST layout first NMTOKEN #REQUIRED >
+<!ATTLIST layout last NMTOKEN #REQUIRED >
+<!ATTLIST layout mapSet IDREF #REQUIRED >
+<!ATTLIST layout modifiers IDREF #REQUIRED >
 
-<!ATTLIST modifier (keys) #REQUIRED >
+<!-- Modifier descriptions -->
+<!ELEMENT modifierMap (keyMapSelect+) >
+<!ATTLIST modifierMap id ID #REQUIRED >
+<!ATTLIST modifierMap defaultIndex NMTOKEN #REQUIRED >
 
-<!ELEMENT keyMapSet ( keyMap)* >
-<!ATTLIST keyMapSet (id) #REQUIRED >
+<!ELEMENT keyMapSelect (modifier+) >
+<!ATTLIST keyMapSelect mapIndex NMTOKEN #REQUIRED >
 
-<!ELEMENT keyMap (key)* >
-<!ATTLIST keyMap (index) #REQUIRED >
+<!ELEMENT modifier EMPTY >
+<!ATTLIST modifier keys CDATA #REQUIRED >
 
-<!ATTLIST key (code) #REQUIRED >
+<!-- Keyboard mapping most keyboards use ANSI only but some use JIS also -->
+<!ELEMENT keyMapSet (keyMap+) >
+<!ATTLIST keyMapSet id ID #REQUIRED >
+
+<!ELEMENT keyMap (key+) >
+<!ATTLIST keyMap index NMTOKEN #REQUIRED >
+<!ATTLIST keyMap baseMapSet IDREF #IMPLIED >
+<!ATTLIST keyMap baseIndex NMTOKEN #IMPLIED >
+
+<!ELEMENT key (action*) >
+<!ATTLIST key code NMTOKEN #REQUIRED >
+<!-- from TN 2056:
+<!ATTLIST key output CDATA #IMPLIED >
+<!ATTLIST key action IDREF #IMPLIED >
+since output or action needs to be present kmc-convert uses instead: -->
 <!ATTLIST key (action #REQUIRED output #IMPLIED | output #REQUIRED action #IMPLIED)>
 
+<!-- Actions (state records) -->
+<!ELEMENT actions (action+) >
+
+<!ELEMENT action (when+) >
+<!ATTLIST action id ID #IMPLIED >
+
+<!ELEMENT when EMPTY >
+<!ATTLIST when state NMTOKEN #REQUIRED >
+<!ATTLIST when through NMTOKEN #IMPLIED >
+<!ATTLIST when output CDATA #IMPLIED >
+<!ATTLIST when multiplier NMTOKEN #IMPLIED >
+<!ATTLIST when next NMTOKEN #IMPLIED >
+
+<!-- Terminators -->
+<!-- kmc-convert does not use terminators -->
+<!ELEMENT terminators (when+)>

@@ -74,7 +74,7 @@ describe('KmnFileWriter', function () {
       ["&#x1234;", 'ሴ'],
       ["&#x1F60E;", '😎'],
       ["&#x0002;", '\u0002'],
-      ["&#x1000000;",undefined ],
+      ["&#x1000000;", undefined],
       ["&#97;", 'a'],
       ["&#4660;", 'ሴ'],
       ["&#128518;", '😆'],
@@ -148,9 +148,9 @@ describe('KmnFileWriter', function () {
       ['c WARNING: unavailable modifier : here: '],
       ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) : here: ']],
 
-    ].forEach(function (values: any, index: number) {
-      it(('rule " ' + values[0][0].ruleType + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0], 0);
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
+      it(('rule " ' + (values[0][0] as Rule).ruleType as string + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.reviewRules(values[0] as Rule[], 0);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -313,9 +313,9 @@ describe('KmnFileWriter', function () {
       [''],
       ["c WARNING: duplicate rule: earlier: [CAPS K_C]  >  'X' here: "]],
 
-    ].forEach(function (values: any, index: number) {
-      it('rule ' + values[0][0].ruleType + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0], 1);
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
+      it('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.reviewRules(values[0] as Rule[], 1);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -333,9 +333,9 @@ describe('KmnFileWriter', function () {
     [''],
     [''],
     ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' here: PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
-    ].forEach(function (values: any, index: number) {
-      it(('rule ' + values[0][0].ruleType + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0], 2);
+  ].forEach(function (values: (string[] | Rule[])[], index: number) {
+      it(('rule ' + (values[0][0]as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.reviewRules(values[0]as Rule[], 2);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -432,13 +432,13 @@ describe('KmnFileWriter', function () {
           "dk(B2) + [NCAPS RALT K_A]  >  'â'\n\n"
         ]
       ],
-    ].forEach(function (values: any) {
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('an array of Rules should create a set of kmn rules '), async function () {
         const data: ProcessedData = {
           keylayoutFilename: "",
           kmnFilename: "",
           modifiers: [[]],
-          rules: values[0]
+          rules: values[0] as Rule[]
         };
         const result1 = sutW.writeDataRules(data);
         assert.isTrue(result1 === values[1][0]);

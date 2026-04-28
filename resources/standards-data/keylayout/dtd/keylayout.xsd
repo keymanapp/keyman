@@ -8,7 +8,10 @@
     <xs:complexType>
       <xs:sequence>
 
-        <xs:element name="layouts">
+        <!-- in TN 2056, the 'layouts' element is defined as maxOccurs="unbounded",
+        but in practice, only one 'layouts' element is used per .keylayout file.
+        <xs:element name="layouts" minOccurs="1" maxOccurs="unbounded"> -->
+        <xs:element name="layouts" minOccurs="1" maxOccurs="1">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="layout" minOccurs="1" maxOccurs="unbounded">
@@ -63,7 +66,7 @@
           </xs:complexType>
         </xs:element>
 
-        <xs:element name="actions">
+        <xs:element name="actions" minOccurs="0" maxOccurs="1">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="action" minOccurs="1" maxOccurs="unbounded">
@@ -83,7 +86,7 @@
           </xs:complexType>
         </xs:element>
 
-        <xs:element name="terminators">
+        <xs:element name="terminators" minOccurs="0" maxOccurs="1">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="when" minOccurs="1" maxOccurs="unbounded">
