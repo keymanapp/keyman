@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 
-import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
+import type { KeymanEngine, KeyboardCookie, KeyboardDetails, UIModule } from 'keyman/app/browser';
 
 declare global {
   interface Window {
@@ -30,8 +30,6 @@ type ToolbarCookie = {
   maxrecent: number;
 } & Record<`recent${number}`, string>;
 
-type KeyboardDetail = ReturnType<KeymanEngine['_GetKeyboardDetail']>;
-
 type LanguageEntry = {
   /** Language id */
   id: string;
@@ -42,13 +40,13 @@ type LanguageEntry = {
   /**
    * A rich list of keyboard metadata for keyboards matching this language's language code (`id`).
    */
-  keyboards: KeyboardDetail[];
+  keyboards: KeyboardDetails[];
 }
 
 interface ListedKeyboard {
   priority: number;
   lang: LanguageEntry,
-  keyboard: KeyboardDetail;
+  keyboard: KeyboardDetails;
   buttonNode: HTMLDivElement;
   aNode: HTMLAnchorElement;
 }
@@ -127,7 +125,7 @@ if(!keymanweb) {
        */
       maxListedKeyboards = 1;
       lastActiveControl: HTMLElement = null;
-      selectedKeyboard: KeyboardDetail = null;
+      selectedKeyboard: KeyboardDetails = null;
       selectedLanguage = '';
       helpOffsetX = 0;
       helpOffsetY = 0;
@@ -562,7 +560,7 @@ if(!keymanweb) {
        * @param       {Object}  b
        * @return      {number}
        **/
-      readonly sortKeyboards = function(a: KeyboardDetail, b: KeyboardDetail) {
+      readonly sortKeyboards = function(a: KeyboardDetails, b: KeyboardDetails) {
         if(a.RegionCode < b.RegionCode) {
           return -2;
         }
@@ -610,7 +608,7 @@ if(!keymanweb) {
        * @param       {Object}  lang
        * @param       {Object}  kbd
        **/
-      addKeyboardToList(lang: LanguageEntry, kbd: KeyboardDetail) {
+      addKeyboardToList(lang: LanguageEntry, kbd: KeyboardDetails) {
         const found = this.findListedKeyboard(lang);
         if(found == null) {
           // Add the button
@@ -794,7 +792,7 @@ if(!keymanweb) {
        **/
       selectLanguage(event: Event, lang: LanguageEntry) {
         const found = this.findListedKeyboard(lang);
-        let kbd: KeyboardDetail = null;
+        let kbd: KeyboardDetails = null;
 
         if(found == null) {
           kbd = lang.keyboards[0];
@@ -819,7 +817,7 @@ if(!keymanweb) {
        * @param       {boolean} updateKeyman
        * @return      {boolean}
        **/
-      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean): Promise<boolean> {
+      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetails, updateKeyman: boolean): Promise<boolean> {
         keymanweb.activatingUI(true);
 
         if(this.selectedLanguage) {
