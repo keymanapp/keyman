@@ -3,6 +3,7 @@
 #include <gdk/gdk.h>
 #include <giomm-2.4/giomm.h>
 #include <glibmm-2.4/glibmm.h>
+#include <gdk/gdkx.h>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -21,6 +22,7 @@ protected:
   gint argc = 0;
   char** argv = nullptr;
   Glib::ustring default_layout;
+  bool onX11 = false;
 
 private:
   void initialize_keymap() {
@@ -54,11 +56,15 @@ private:
     if (layout == "de" || layout == "us") {
       default_layout = layout;
     }
+
   }
 
   void SetUp() override {
     initialize_keymap();
     get_default_layout();
+    if (!GDK_IS_X11_DISPLAY(test_display)) {
+        GTEST_SKIP() << "Not running on X11 display, skipping tests that require X11 keymap functionality.";
+    }
   }
 
   void TearDown() override {
@@ -70,6 +76,7 @@ private:
       gdk_display_close(test_display);
       test_display = nullptr;
     }
+    onX11 = false;
   }
 
 
@@ -186,7 +193,7 @@ TEST_F(KeyboardConversionTest, GetKeySymFromUnderlyingKeyCodeShiftLCTRLFLAGRALTF
 
 TEST_F(KeyboardConversionTest, DeGetKeySymFromUnderlyingKeyCode) {
   if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not US.";
+    GTEST_SKIP() << "Default layout is not DE.";
   }
 
   KMX_DWORD expected_chars[] = {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j',
@@ -213,7 +220,7 @@ TEST_F(KeyboardConversionTest, DeGetKeySymFromUnderlyingKeyCode) {
 
 TEST_F(KeyboardConversionTest, DeKMXgetKeyValUnderlyingFromKeyCodeUnderlyingShift) {
   if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not US.";
+    GTEST_SKIP() << "Default layout is not DE.";
   }
 
   KMX_DWORD expected_chars[] = { u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
@@ -240,15 +247,9 @@ TEST_F(KeyboardConversionTest, DeKMXgetKeyValUnderlyingFromKeyCodeUnderlyingShif
 TEST_F(KeyboardConversionTest, DeKMXgetKeyValUnderlyingFromKeyCodeUnderlyingLCTRLFLAGRALTFLAG) {
   // Test with valid key code - should return character or deadkey
   if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not US.";
+    GTEST_SKIP() << "Default layout is not DE.";
   }
 
-  /*KMX_DWORD expected_chars[] = {u'æ', u'\xad2', u'¢', u'ð', u'€', u'ǰ', u'ο', u'ʱ', u'ࣽ', u'\xffff',
-                                u'\x3a2', u'Ƴ', u'µ', u'\xad3', u'ø', u'þ', u'@', u'¶', u'ſ', u'μ',
-                                u'ࣾ', u'૾', u'ſ', u'«', u'ࣻ', u'»', u'}', u'¹', u'²', u'³', u'¼', u'½',
-                                u'¬', u'{', u'[', u']', u'\000', u'′', u'\\', u'\xffff', u'\xffff',
-                                u'~', u'\xad1', u'\xffff', u'\xffff', u'·', u'…', u'પ', u'\000', u'|',};
-  */
   KMX_DWORD expected_chars[] = {u'æ', u'\xfffe', u'¢', u'ð', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe',
                                 u'\xfffe', u'\xffff', u'\xfffe', u'\xfffe', u'µ', u'\xfffe', u'ø', u'þ',
                                 u'@', u'¶', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'«',
@@ -272,7 +273,7 @@ TEST_F(KeyboardConversionTest, DeKMXgetKeyValUnderlyingFromKeyCodeUnderlyingLCTR
 
 TEST_F(KeyboardConversionTest, DeGetKeySymFromUnderlyingKeyCodeShiftLCTRLFLAGRALTFLAG) {
   if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not US.";
+    GTEST_SKIP() << "Default layout is not DE.";
   }
 
   KMX_DWORD expected_chars[] = {u'Æ', u'\xfffe', u'©', u'Ð', u'\xfffe', u'ª', u'\xfffe',
