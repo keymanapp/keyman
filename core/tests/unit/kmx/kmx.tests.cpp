@@ -153,7 +153,7 @@ apply_action(
     std::cout << "action: emit keystroke" << std::endl;
     break;
   case KM_CORE_IT_CAPSLOCK:
-    std::cout << "action: capsLock " << act.capsLock << std::endl;
+    std::cout << "action: capsLock " << std::to_string(act.capsLock) << std::endl;
     test_source.set_caps_lock_on(act.capsLock);
     break;
   default:

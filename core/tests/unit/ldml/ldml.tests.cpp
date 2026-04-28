@@ -112,7 +112,7 @@ apply_action(
     break;
   case KM_CORE_IT_BACK:
   {
-    std::cout << "  + back(" << act.backspace.expected_type << ")" << std::endl;
+    std::cout << "  + back(" << std::to_string(act.backspace.expected_type) << ")" << std::endl;
 
     // single char removed in context
     km_core_usv ch = 0;
