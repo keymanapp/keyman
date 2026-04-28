@@ -474,8 +474,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     const cache = this.keyboardRequisitioner.cache;
     const keyboardStubs = cache.getStubList()
-    for (let i = 0; i < keyboardStubs.length; i++) {
-      const stub = keyboardStubs[i];
+    for (const stub of keyboardStubs) {
       const keyboard = cache.getKeyboardForStub(stub);
       const keyboardDetails = this.getKeyboardDetails(stub, keyboard);
       if (keyboardDetails) {
