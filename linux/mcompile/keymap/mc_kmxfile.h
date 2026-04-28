@@ -4,7 +4,7 @@
 
 #include "km_types.h"
 #include <kmx_file.h>
-#include "mcompile.h"
+#include <cstdio>
 
 #ifndef _KMXFILE_H
 #define _KMXFILE_H
@@ -77,6 +77,9 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
 /** @brief open a file */
 FILE* Open_File(const KMX_CHAR* filename, const KMX_CHAR* mode);
+
+/** @brief print (error) messages */
+void KMX_LogError(const wchar_t* fmt, ...);
 
 #endif  // _KMXFILE_H
 

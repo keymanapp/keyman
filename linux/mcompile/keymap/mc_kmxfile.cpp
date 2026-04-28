@@ -5,7 +5,11 @@
  */
 
 #include "mc_kmxfile.h"
+#include <km_u16.h>
 #include <typeinfo>
+#include <cstring>
+#include <stdarg.h>
+
 
 #define CERR_None                                          0x00000000
 #define CERR_CannotAllocateMemory                          0x00008004
@@ -582,3 +586,28 @@ FILE* Open_File(const KMX_CHAR* filename, const KMX_CHAR* mode) {
   return fopen(cpath.c_str(), cmode.c_str());
 #endif
 };
+
+#define _countof(a) (sizeof(a) / sizeof(*(a)))
+
+/**
+ * @brief  print (error) messages
+ * @param  fmt text to print
+ */
+void KMX_LogError(const wchar_t* fmt, ...) {
+  wchar_t fmtbuf[256];
+  const wchar_t* end = L"\0";
+  const wchar_t* nl  = L"\n";
+  va_list vars;
+  int j = 0;
+
+  va_start(vars, fmt);
+  vswprintf(fmtbuf, _countof(fmtbuf), fmt, vars);
+  fmtbuf[255] = 0;
+
+  do {
+    putwchar(fmtbuf[j]);
+    j++;
+  } while (fmtbuf[j] != *end);
+  putwchar(*nl);
+}
+

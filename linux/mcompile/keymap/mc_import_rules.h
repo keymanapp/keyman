@@ -3,6 +3,9 @@
 #ifndef MC_IMPORT_RULES_H
 #define MC_IMPORT_RULES_H
 
+#include <vector>
+#include "km_types.h"
+
 /** @brief Base class for Deadkey*/
 class DeadKey {
 private:
