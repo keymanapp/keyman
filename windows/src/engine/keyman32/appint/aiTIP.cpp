@@ -114,14 +114,6 @@ void ProcessToggleChange(UINT key) {   // I4793
   }
 }
 
-/**
- * Update the cache of the last key event received, this is set here - TIP processing, and by
- * the GetMessage hook.
- * @param  _td      Theread data to update
- * @param  wParam   WPARAM of the key event
- * @param  scan     Scan code of the key event
- * @param  keyTransition   Transition state of the key event (0 = key down, 1 = repeat, 3 = key up)
- */
 void UpdateLastKeyCache(PKEYMAN64THREADDATA _td, WPARAM wParam, BYTE scan, BYTE keyTransition) {
   _td->LastKey = wParam;
   _td->LastScanCode = scan;
@@ -142,7 +134,7 @@ BOOL TIPProcessKeyInternal(
   BOOL isUp = keyFlags & KF_UP ? TRUE : FALSE;
   BOOL extended = keyFlags & KF_EXTENDED ? TRUE : FALSE;
   BYTE scan = keyFlags & 0xFF;
-  BYTE keyTransition = (BYTE)((HIWORD(lParam) & (KF_UP | KF_REPEAT)) >> 14);
+  BYTE keyTransition =  KEYMSG_FLAG_TRANSITION(lParam);
   WPARAM prevKey = _td->LastKey;
   BYTE prevScanCode = _td->LastScanCode;
   BYTE prevKeyTransition = _td->LastTransition;
@@ -152,7 +144,7 @@ BOOL TIPProcessKeyInternal(
   SendDebugMessageFormat("VirtualKey=%s lParam=%x   IsUp=%d Extended=%d Updateable=%d Preserved=%d",
     Debug_VirtualKey((WORD) wParam), lParam, isUp, extended, Updateable, Preserved);
 
-  if (_td->LastKey == wParam && scan == 0) {  // I4642 - handle issue with Logos application. 
+  if (_td->LastKey == wParam && scan == 0) {  // I4642 - handle issue with Logos application.
     scan = _td->LastScanCode;
     SendDebugMessageFormat("Scan code was zero so using cached scan code %x", scan);
   }
