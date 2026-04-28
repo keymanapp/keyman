@@ -107,9 +107,10 @@ export class KeylayoutFileReader {
   public boxArray(source: any) {
 
     boxXmlArray(source, 'modifierMap');
+
     boxXmlArray(source, 'keyMapSet');
 
-    if (source.layouts) {
+    if(source.layouts) {
       boxXmlArray(source.layouts, 'layout');
     }
 

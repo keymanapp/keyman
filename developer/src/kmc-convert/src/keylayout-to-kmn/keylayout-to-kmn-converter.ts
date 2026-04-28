@@ -7,6 +7,7 @@
  *
  */
 
+// ToDo-kmc-convert all warnings/squiggely lines will be adressed in PR #15860
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, Keylayout } from "@keymanapp/developer-utils";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
@@ -14,7 +15,7 @@ import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
 export interface ConverterResult extends KeymanCompilerResult {
-  /**
+  /*
    * Internal in-memory build artifacts from a successful compilation. Caller
    * can write these to disk with {@link Converter.write}
    */
@@ -22,29 +23,29 @@ export interface ConverterResult extends KeymanCompilerResult {
 };
 
 export interface ConverterToKmnResult extends ConverterResult {
-  /**
+  /*
    * Internal in-memory build artifacts from a successful compilation. Caller
    * can write these to disk with {@link Converter.write}
    */
   artifacts: ConverterToKmnArtifacts;
 };
 
-export interface ProcessedData {
-  /**
+ /**
   * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
   * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
   */
+export interface ProcessedData {
+
   keylayoutFilename: string;
   kmnFilename: string;
   modifiers: string[][];
   rules: Rule[];
 };
-
+/**
+ * Interface for storing data read from a .keylayout file and used for processing rules.
+ * These are used for obtaining one entity form the other (e.g. from action id to output, from keycode to modifier, etc.)
+ */
 export interface KeylayoutFileData {
-  /**
-   * Interface for storing data read from a .keylayout file and used for processing rules.
-   * These are used for obtaining one entity form the other (e.g. from action id to output, from keycode to modifier, etc.)
-   */
   actionId?: string;
   keyCode?: string;
   key?: string;
@@ -53,12 +54,12 @@ export interface KeylayoutFileData {
   outchar?: string;
 };
 
+/**
+ * Interface for storing data read from a .keylayout file and used for processing rules.
+ * These are used for obtaining the triplet [action id, state, output]
+ * e.g. ['a9','1','â'] from <when state="1" output="â"/> for action id a9
+ */
 export interface ActionStateOutput {
-  /**
-  * Interface for storing data read from a .keylayout file and used for processing rules.
-  * These are used for obtaining the triplet [action id, state, output]
-  * e.g. ['a9','1','â'] from <when state="1" output="â"/> for action id a9
-  */
   id: string;
   state: string;
   output: string;
@@ -255,7 +256,6 @@ export class KeylayoutToKmnConverter {
                 rules.push(ruleObj);
               }
             }
-            // }
 
           }
           else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['action'] !== undefined) {
@@ -441,7 +441,7 @@ export class KeylayoutToKmnConverter {
               // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behavior,modifier,output] .........................................................................
               /*  eg: ['49','K_SPACE','a0','0','Â'] */    const b1KeycodeObj: KeylayoutFileData[] = this.getKeyActionOutputArrayFromActionStateOutputArray(jsonObj, b6ActionIdObj);
               /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ const b1ModifierKeyObj: KeylayoutFileData[] = this.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(jsonObj, b1KeycodeObj, isCapsused);
-                  // ...........................................................................................................................................................................................
+              // ...........................................................................................................................................................................................
 
                   for (let n1 = 0; n1 < b2PrevDeadkeyModifierObj.length; n1++) {
                     for (let n2 = 0; n2 < b2PrevDeadkeyModifierObj[n1].length; n2++) {

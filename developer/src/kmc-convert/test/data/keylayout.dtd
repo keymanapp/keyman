@@ -23,7 +23,7 @@
 <!-- Overall structure -->
 <!-- from TN 2056:
 <!ELEMENT keyboard (layouts+, modifierMap+, keyMapSet+, actions*, terminators*)>
-but kmc-convert uses instead: -->
+  kmc-convert uses instead: -->
 <!ELEMENT keyboard layouts>
 <!ELEMENT keyboard modifierMap+>
 <!ELEMENT keyboard keyMapSet+>

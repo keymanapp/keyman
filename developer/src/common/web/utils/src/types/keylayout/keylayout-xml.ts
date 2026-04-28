@@ -16,23 +16,30 @@
  */
 
 export interface KeylayoutXMLSourceFile {
-  /**
+  /*
    * <keyboard> -- the root element
    */
   keyboard: KL_Keyboard;
 };
 
 export interface KL_Keyboard {
-  /**
-   * attributes of the root element <keyboard>
-   */
+  /*
+  attributes of the main element <keyboard>
+  even if they are not optional kmc-convert might not use some attributes(group, id, maxout)
+  */
   group: string;
   id: string;
   name: string;
   maxout?: string;
-  /**
+  /*
    * <layouts>, <modifierMap>, <keyMapSet>, <actions>, <terminators>
    * the 5 main elements.
+   *
+   * The keyboard element must contain exactly one <layouts> element,
+   * one or more <modifierMap> elements,
+   * one or more <keyMapSet> elements,
+   * an optional <actions> element,
+   * and an optional <terminators> element. (Source: TN2056)
    */
   layouts: KL_Layouts[];
   modifierMap: KL_ModifierMap[];
@@ -42,20 +49,18 @@ export interface KL_Keyboard {
 };
 
 export interface KL_Layouts {
-  /**
-   * <layout> the sub element of <layouts>,
-   * containing information about the use of (different) mapSet and modifiers
-   */
+  // <layout> the sub element of <layouts>, contains one or more <layout> elements
   layout: KL_Layout[];
 };
 
 export interface KL_Layout {
-  /**
+  /*
    * attributes of the sub element <layout>
    * containing information about the use of mapSet and modifiers for certain keys
    * e.g. key 4 - key 5 use mapSet 2a4 and modifiers 19c
    * ( <layout first="4" last="5" mapSet="2a4" modifiers="19c"/> )
    * <mapSet> referencing <keyMapSet id>
+   * even if they are not optional kmc-convert might not use some attributes(first, last, mapSet, modifiers)
    */
   first: string;
   last: string;
@@ -64,98 +69,94 @@ export interface KL_Layout {
 };
 
 export interface KL_ModifierMap {
-  /**
+  /*
    * attributes of the element <modifierMap>
+   * even if they are not optional kmc-convert might not use some attributes(defaultIndex)
    */
   id: string;
   defaultIndex: string;
-  /**
+  /*
    * <keyMapSelect> the sub element of <modifierMap>
+   * The element contains one or more <keyMapSelect> elements, each of which correspond to one <keyMap> table
    */
   keyMapSelect: KL_KeyMapSelect[];
 };
 
 export interface KL_KeyMapSelect {
-  /**
+  /*
    * attributes of the element <keyMapSelect>
    * containing a set of modifier combinations for a behavior
    * <mapIndex> referencing <keyMap index>
    */
   mapIndex: string;
-  /**
-   * <modifier> the sub element of <keyMapSelect>
-   */
+  // <modifier> the sub element of <keyMapSelect>
   modifier: KL_Modifier[];
 };
 
 export interface KL_Modifier {
-  /**
+  /*
    * attributes of the element <modifier>
-   * containing one combination of modifier keys
+   * each containing one combination of modifier keys
    */
   keys: string;
 };
 
 export interface KL_KeyMapSet {
-  /**
+  /*
    * attributes of the element <keyMapSet>
    * <id> referencing <layouts mapSet>
    */
   id: string;
-  /**
-   * <keyMap> the sub element of <keyMapSet>
+  /* <keyMap> the sub element of <keyMapSet>
+   * The <KeyMapSet> contains one or more <keyMap> elements, each of which correspond to one <keyMapSelect> table
    */
   keyMap: KL_KeyMap[];
 };
 
 export interface KL_KeyMap {
-  /**
+  /*
    * attributes of the element <keyMap>
    * <index> referencing <keyMapSelect mapIndex>
+   * even if they are not optional kmc-convert might not use some attributes(baseMapSet, baseIndex)
    */
   index: string;
   baseMapSet?: string;
   baseIndex?: string;
-  /**
-   * <key> the sub element of <keyMap>
-   */
+  // <key> the sub element of <keyMap>
   key: KL_Key[];
 };
 
 export interface KL_Key {
-  /**
+  /*
    * attributes of the element <key>
    * containing a keycode and its output or action
    */
   code: string;
-  action?: string;  //TODO-KMC-CONVERT: Support <action> sub-element 'anonymous actions'
+  action?: string;  //TODO-KMC-CONVERT: Support <action> sub-element 'anonymous actions' in the future
   output?: string;
 };
 
 export interface KL_Actions {
-  /**
-   * <action> the sub element of <actions>
-   */
+  //<action> the sub element of <actions>
   action: KL_Action[];
 };
 
 export interface KL_Action {
-  /**
+  /*
    * attributes of the element <action>
    * defining an action id
    */
   id?: string;
-  /**
-   * <when> a sub element of <action>
-   */
+  // <when> a sub element of <action>
   when?: KL_When[];
 };
 
 export interface KL_When {
-  /**
+  /*
    * attributes of the element <when>
    * contain either a state-output pair or a state-next pair
    * to define which output or next is followed by a state
+   * even if they are not optional kmc-convert might not use some attributes(through, multiplier)
    */
   state?: string;
   through?: string;
@@ -163,10 +164,7 @@ export interface KL_When {
   multiplier?: string;
   next?: string;
 };
-
 export interface KL_Terminators {
-  /**
-   * <when> a sub element of <terminators>
-   */
+  //<when> a sub element of <terminators>
   when?: KL_When[];
 };
