@@ -390,33 +390,31 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *   This was defined as an array, so is kept that way, but
    *   Javascript treats it as an object anyway
    *
-   * This is a public API function documented at
-   * https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard.
+   * @param {KeyboardStub} stub       Keyboard stub object
+   * @param {Keyboard}     keyboard   Keyboard script object
    *
-   * @param       {Object}    Lstub      JSKeyboard stub object
-   * @param       {Object}    Lkbd       Keyboard script object
-   * @return      {Object}               Keyboard details object
+   * @return {KeyboardDetails}  Keyboard details object
    *
    */
-  // TODO-web-core: check each property of Lstub for KMXKeyboard availability
-  private _GetKeyboardDetail(Lstub: KeyboardStub, Lkbd: Keyboard): KeyboardDetails { // I2078 - Full keyboard detail
-   return {
-      Name: Lstub.KN,
-      InternalName: Lstub.KI,
-      LanguageName: Lstub.KL,  // I1300 - Add support for language names
-      LanguageCode: Lstub.KLC, // I1702 - Add support for language codes, region names, region codes, country names and country codes
-      RegionName: Lstub.KR,
-      RegionCode: Lstub.KRC,
+  private getKeyboardDetails(stub: KeyboardStub, keyboard: Keyboard): KeyboardDetails {
+    // works for both JS and KMX keyboards
+    return stub && {
+      Name: stub.KN,
+      InternalName: stub.KI,
+      LanguageName: stub.KL,  // I1300 - Add support for language names
+      LanguageCode: stub.KLC, // I1702 - Add support for language codes, region names, region codes, country names and country codes
+      RegionName: stub.KR,
+      RegionCode: stub.KRC,
       // @ts-ignore
-      CountryName: Lstub['KC'] as string,
+      CountryName: stub['KC'] as string,
       // @ts-ignore
-      CountryCode: Lstub['KCC'] as string,
+      CountryCode: stub['KCC'] as string,
       // @ts-ignore
-      KeyboardID: Lstub['KD'] as string,
-      Font: Lstub.KFont,
-      OskFont: Lstub.KOskFont,
-      HasLoaded: !!Lkbd,
-      IsRTL: Lkbd ? Lkbd.isRTL : null
+      KeyboardID: stub['KD'] as string,
+      Font: stub.KFont,
+      OskFont: stub.KOskFont,
+      HasLoaded: !!keyboard,
+      IsRTL: keyboard ? keyboard.isRTL : null
     };
   }
 
@@ -461,12 +459,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     const stub = this.keyboardRequisitioner.cache.getStub(id, langCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    if (keyboard instanceof JSKeyboard) {
-      return stub && this._GetKeyboardDetail(stub, keyboard);
-    } else {
-      // TODO-web-core: do this work in _GetKeyboardDetail (implement for KMX keyboards)
-      return null;
-    }
+    return this.getKeyboardDetails(stub, keyboard);
   }
 
   /**
@@ -483,11 +476,9 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     const keyboardStubs = cache.getStubList()
     for (const stub of keyboardStubs) {
       const keyboard = cache.getKeyboardForStub(stub);
-      if (keyboard instanceof JSKeyboard) {
-        const keyboardDetails = this._GetKeyboardDetail(stub, keyboard);
+      const keyboardDetails = this.getKeyboardDetails(stub, keyboard);
+      if (keyboardDetails) {
         detailsForAllKeyboards.push(keyboardDetails);
-      } else {
-        // TODO-web-core:  do this work in _GetKeyboardDetail (implement for KMX keyboards if needed)
       }
     }
     return detailsForAllKeyboards;
