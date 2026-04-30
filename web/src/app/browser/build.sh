@@ -63,7 +63,7 @@ compile_and_copy() {
     --minify \
     --target     "es6"
 
-  node_es_bundle "${BUILD_ROOT}/obj/test-index.js" \
+  node_es_bundle "${BUILD_ROOT}/obj/index.js" \
     --out        "${BUILD_ROOT}/lib/index.mjs" \
     --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/lib" \
