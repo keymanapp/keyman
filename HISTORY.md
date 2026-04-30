@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.224 alpha 2026-04-30
+
+* fix(linux): fix context after typing Bksp with Wayland (#15820)
+
 ## 19.0.223 alpha 2026-04-23
 
 * fix(android): Reorder display language list (#15863)
