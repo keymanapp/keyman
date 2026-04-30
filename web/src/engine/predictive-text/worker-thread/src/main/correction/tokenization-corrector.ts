@@ -24,7 +24,8 @@ export type TokenResult = {
   matchString: string,
   inputSamplingCost: number,
   knownCost: number,
-  totalCost: number
+  totalCost: number,
+  inputCount: number
 }
 
 export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray<TokenResult>, TokenizationResultMapping> {
@@ -128,7 +129,8 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
         matchString: lockedResult.text,
         inputSamplingCost: 0,
         knownCost: -Math.log(lockedResult.p),
-        totalCost: -Math.log(lockedResult.p)
+        totalCost: -Math.log(lockedResult.p),
+        inputCount: uncorrectable.inputCount
       });
     });
 

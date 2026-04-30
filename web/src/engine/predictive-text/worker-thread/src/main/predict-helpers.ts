@@ -12,10 +12,11 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { getBestMatches, SearchNode } from './correction/distance-modeler.js';
+import { EDIT_DISTANCE_COST_SCALE, getBestMatches, SearchNode } from './correction/distance-modeler.js';
 import { SearchQuotientNode } from './correction/search-quotient-node.js';
 import { TokenizationCorrector } from './correction/tokenization-corrector.js';
 import { initTokenResultFilterer, TokenResultMapping } from './correction/token-result-mapping.js';
+import { TokenizationResultMapping } from './correction/tokenization-result-mapping.js';
 
 const searchForProperty = defaultWordbreaker.searchForProperty;
 
@@ -381,11 +382,10 @@ export function determineSuggestionRange(
 
 export function buildAndMapPredictions(
   transition: ContextTransition,
-  tokenization: ContextTokenization,
-  match: Readonly<TokenResultMapping>
+  tokenizationCorrection: TokenizationResultMapping,
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
-  const searchSpace = tokenization.tail.searchModule;
+  const tokenization = tokenizationCorrection.matchingSpace.tokenization;
 
   const applicationTarget = transition.base.displayTokenization;
   const { tokensToRemove, tokensToPredict } = determineSuggestionRange(applicationTarget, tokenization);
@@ -399,56 +399,123 @@ export function buildAndMapPredictions(
     endOfBuffer: false
   };
 
-  // Replace the existing context with the correction.
-  const correctionTransform: Transform = {
-    insert: match.matchString,  // insert correction string
-    deleteLeft: 0,
-    id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
-  }
-
-  let rootCost = match.totalCost;
-  /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-   * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-   * there are significantly more likely words.  We only need this to allow very minor fat-finger
-   * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-   * key borders.
-   *
-   * Technically, the probabilities this produces won't be normalized as-is... but there's no
-   * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-   * to apply it could become tricky, so it's simpler to leave out.
-   *
-   * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-   * is needed in the future.
-   */
-  if(searchSpace.inputCount <= 1) {
-    /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
-     * ambiguous case that would only arise very near the center of the boundary between two keys.
-     * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
-     * That seems 'within reason' for correction very near boundaries.
-     *
-     * So, with the second-most-likely key being that close in probability, its best suggestion
-     * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
-     * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
-     * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
-     * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
-     */
-    rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
-  }
-
-  const predictionRoot = {
-    sample: correctionTransform,
-    p: Math.exp(-rootCost)
-  };
-
-  let predictions = predictFromCorrections(model, [predictionRoot], emptyContext);
-  predictions.forEach((entry) => {
-    entry.preservationTransform = tokenization.taillessTrueKeystroke;
-    // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
-    // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
-    entry.prediction.sample.transform.deleteLeft = deleteLeft;
+  const correctionTransforms = tokenizationCorrection.matchedResult.map((correction, i) => {
+    return {
+      insert: correction.matchString,  // insert correction string
+      deleteLeft: i == 0 ? deleteLeft : 0,
+      id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
+    };
   });
 
-  return predictions;
+  const correctionCost = tokenizationCorrection.matchedResult.map((correction) => {
+    let rootCost = correction.totalCost;
+    /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+     * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+     * there are significantly more likely words.  We only need this to allow very minor fat-finger
+     * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+     * key borders.
+     *
+     * Technically, the probabilities this produces won't be normalized as-is... but there's no
+     * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+     * to apply it could become tricky, so it's simpler to leave out.
+     *
+     * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+     * is needed in the future.
+     */
+    if(correction.inputCount <= 1) {
+      /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
+       * ambiguous case that would only arise very near the center of the boundary between two keys.
+       * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
+       * That seems 'within reason' for correction very near boundaries.
+       *
+       * So, with the second-most-likely key being that close in probability, its best suggestion
+       * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
+       * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
+       * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
+       * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
+       */
+      rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
+    }
+
+    return Math.exp(-rootCost);
+  }).reduce((accum, curr) => accum * curr, 1);
+
+  const predictionComponents = correctionTransforms.map((correctionTransform, i) => {
+    const predictions = model.predict(correctionTransform, emptyContext);
+
+    // Failsafe:  if there are no matching predictions, create a fake prediction
+    // matching the original text.
+    if(predictions.length == 0) {
+      predictions.push({
+        sample: {
+          transform: correctionTransform,
+          displayAs: correctionTransform.insert
+        },
+        // It's not found in the lexicon, so we'll take a low probability for it.
+        //
+        // Edit penalties will be applied via the correction component separately later on.
+        p: -Math.exp(EDIT_DISTANCE_COST_SCALE)
+      });
+    }
+
+    // Regardless of origin, overwrite the transform's deleteLeft value with what it should actually hold.
+    predictions.forEach((entry) => {
+      entry.sample.transform.deleteLeft = deleteLeft;
+    });
+
+    // Use traversals if possible - extract the most likely entry that is on the traversal,
+    // rather than predicting (and possibly extending) tokens not adjacent to the caret.
+    //
+    // Also, fall back to the actual correction string should prediction not be valid here.
+    return i == correctionTransforms.length - 1 ? predictions : [predictions[0]];
+  });
+
+  // Constructs a common prefix for all but the final token's component.
+  const predictionPrefix = predictionComponents
+    .slice(0, predictionComponents.length-1)
+    .reduce((accum, curr) => models.buildMergedTransform(accum, curr[0].sample.transform), { insert: '', deleteLeft: 0 });
+  const prefixProb = predictionComponents
+    .slice(0, predictionComponents.length-1)
+    .reduce((accum, curr) => accum * curr[0].p, 1)
+
+  const completePredictionTuples: CorrectionPredictionTuple[] = predictionComponents[predictionComponents.length-1].map((prediction) => {
+    const predictionCost = prediction.p * prefixProb;
+    return {
+      // Will need to do this differently.  We want to have each component
+      // individualized b/c casing. Case should be maintained for prior tokens
+      // and managed independently for each.
+      //
+      // detectCurrentCasing is designed to determine casing based on context;
+      // makes sense for 'context up to each token'.
+      //
+      // applySuggestionCasing applies onto suggestions, so we'll want to build
+      // the FULL suggestion AFTER applying casing changes (to each token's
+      // suggestion component).
+      prediction: {
+        sample: {
+          transformId: transition.transitionId,
+          transform: models.buildMergedTransform(predictionPrefix, prediction.sample.transform),
+          displayAs: models.buildMergedTransform(predictionPrefix, prediction.sample.transform).insert // should composite the displayAs strings instead...
+        },
+        p: predictionCost,
+      },
+      correction: {
+        // Is used partly for word-casing, partly for auto-select enabling.
+        sample: '', // plain correction string instead...
+        p: correctionCost
+      },
+      totalProb: predictionCost * correctionCost,
+      matchLevel: SuggestionSimilarity.none,
+      // Long-term, we shouldn't have `.preservationTransform` here.
+      //
+      // Needed for now until the search actually operates based on
+      // TokenizationCorrector, rather than the half-converted use currently in
+      // place.
+      preservationTransform: tokenization.taillessTrueKeystroke
+    }
+  });
+
+  return completePredictionTuples;
 }
 
 export function prepareTokenizationSearch(
@@ -585,7 +652,9 @@ export async function correctAndEnumerate(
     // Worth considering:  extend Traversal to allow direct prediction lookups?
     // let traversal = match.finalTraversal;
 
-    const predictions = buildAndMapPredictions(transition, tokenization, match);
+    const suggestionRange = determineSuggestionRange(transition.base.displayTokenization, tokenization)
+    const corrector = new TokenizationCorrector(tokenization, suggestionRange.tokensToPredict.length, () => true);
+    const predictions = buildAndMapPredictions(transition, new TokenizationResultMapping([match], corrector));
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
