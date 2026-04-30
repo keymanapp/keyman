@@ -4,12 +4,12 @@
   "exports": {
     "./app/browser": {
       "es6-bundling": "./src/app/browser/src/index.ts",
-      "types": "./build/app/browser/obj/index.d.js",
+      "types": "./build/app/browser/obj/index.d.ts",
       "import": "./build/app/browser/obj/index.js"
     },
     "./common/web-utils": {
       "es6-bundling": "./src/common/web-utils/src/index.ts",
-      "types": "./build/common/web-utils/obj/index.d.js",
+      "types": "./build/common/web-utils/obj/index.d.ts",
       "import": "./build/common/web-utils/obj/index.js"
     },
     "./engine/attachment": {
