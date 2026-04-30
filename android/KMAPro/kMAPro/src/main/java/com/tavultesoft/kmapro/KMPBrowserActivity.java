@@ -16,12 +16,15 @@ import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
@@ -81,7 +84,20 @@ public class KMPBrowserActivity extends BaseActivity {
     }
 
     setupEdgeToEdge(R.id.kmp_browser_layout);
-    setupStatusBarColors(R.color.complementary_5, android.R.color.white);
+//    setupStatusBarColors(R.color.complementary_5, android.R.color.white);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      Window window = getWindow();
+      window.setStatusBarColor(ContextCompat.getColor(this, R.color.keyman_blue));
+      boolean isDarkBackground = true;
+      int flags = window.getDecorView().getSystemUiVisibility();
+      if (isDarkBackground) {
+        flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      } else {
+        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      }
+      window.getDecorView().setSystemUiVisibility(flags);
+      WindowCompat.setDecorFitsSystemWindows(window, false);
+    }
 
     webView = (WebView) findViewById(R.id.kmpBrowserWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);

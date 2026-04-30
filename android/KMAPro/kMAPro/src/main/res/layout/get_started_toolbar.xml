@@ -18,8 +18,10 @@
             android:layout_centerVertical="true"
             android:contentDescription="@string/image_view"
             android:paddingStart="0dp"
-            android:layout_marginStart="@dimen/checkbox_margin"
-            android:src="@drawable/ic_action_get_started" />
+            android:layout_marginStart="@dimen/checkbox_margin_left"
+            android:src="@drawable/ic_action_get_started"
+            app:tint="@color/iconColor"/>
+        <!--            android:layout_marginStart="@dimen/checkbox_margin"-->
 
         <TextView
             android:id="@+id/menu_title"
@@ -39,7 +41,8 @@
             android:layout_centerVertical="true"
             android:layout_gravity="end"
             android:contentDescription="@string/image_button"
-            android:src="@drawable/ic_action_close" />
+            android:src="@drawable/ic_action_close"
+            app:tint="@color/iconColor"/>
 
     </androidx.appcompat.widget.Toolbar>
 

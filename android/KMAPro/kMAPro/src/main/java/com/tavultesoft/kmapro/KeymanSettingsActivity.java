@@ -38,6 +38,12 @@ public class KeymanSettingsActivity extends BaseActivity {
 
     innerFragment = (KeymanSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.keyman_settings_fragment);
 
+    // Scroll to a specific preference if requested (e.g. from sidebar)
+    String scrollToKey = getIntent().getStringExtra("scrollToPreference");
+    if (scrollToKey != null) {
+      innerFragment.scrollToPreference(scrollToKey);
+    }
+
     // For Keyman sites, disable keyboard picker task flag so keyboard picker doesn't dismiss Keyman app
     KMManager.dontCloseParentAppOnShowKeyboardPicker();
   }
