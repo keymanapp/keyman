@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Keyman Core - Helper functions for loading a .kmx file fixture
+ */
+
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -32,4 +38,4 @@ std::vector<uint8_t> load_kmx_file(km::core::path const& kb_path) {
   return data;
 }
 
-}
+};
