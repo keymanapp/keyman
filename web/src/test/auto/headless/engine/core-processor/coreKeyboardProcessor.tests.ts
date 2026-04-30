@@ -45,10 +45,16 @@ describe('CoreKeyboardProcessor', function () {
   let context: km_core_context;
   let textStore: SyntheticTextStore;
   let sandbox: sinon.SinonSandbox;
+  const device = {
+    formFactor: 'desktop',
+    OS: 'windows',
+    browser: 'native',
+    touchable: false
+  } as DeviceSpec;
 
   describe('saveMarkersToTextStore', function () {
     beforeEach(async function () {
-      coreProcessor = new CoreKeyboardProcessor();
+      coreProcessor = new CoreKeyboardProcessor(device, 'us');
       await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
@@ -209,7 +215,7 @@ describe('CoreKeyboardProcessor', function () {
 
   describe('applyContextFromTextStore', function () {
     beforeEach(async function () {
-      coreProcessor = new CoreKeyboardProcessor();
+      coreProcessor = new CoreKeyboardProcessor(device, 'us');
       await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
@@ -492,7 +498,7 @@ describe('CoreKeyboardProcessor', function () {
     let process_event_spy: any;
 
     beforeEach(async function () {
-      coreProcessor = new CoreKeyboardProcessor();
+      coreProcessor = new CoreKeyboardProcessor(device, 'us');
       await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);
@@ -540,7 +546,7 @@ describe('CoreKeyboardProcessor', function () {
     const nonTouchable = false;
 
     beforeEach(async function () {
-      coreProcessor = new CoreKeyboardProcessor();
+      coreProcessor = new CoreKeyboardProcessor(device, 'us');
       await coreProcessor.init(coreurl, new VariableStoreCookieSerializer());
       state = createState('/common/test/resources/keyboards/test_8568_deadkeys.kmx');
       context = KM_Core.instance.state_context(state);

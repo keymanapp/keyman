@@ -65,9 +65,11 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       var textStore = new SyntheticTextStore();
       ruleSeq.test(proctor, textStore);
 
+      const processorInitOptions = { ...DEFAULT_PROCESSOR_INIT_OPTIONS };
+      processorInitOptions.keyboardInterface = keyboardWithHarness;
+
       // Now for the real test!
-      let processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
-      processor.keyboardInterface = keyboardWithHarness;
+      let processor = new JSKeyboardProcessor(device, processorInitOptions);
       var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, textStore, ruleDef.rule);
 
       var msg = matchTest.msg;
@@ -1121,9 +1123,11 @@ describe('Engine - Context Matching', function() {
       const textStore = new SyntheticTextStore();
       ruleSeq.test(proctor, textStore);
 
+      const processorInitOptions = { ...DEFAULT_PROCESSOR_INIT_OPTIONS };
+      processorInitOptions.keyboardInterface = keyboardWithHarness;
+
       // Now for the real test!
-      const processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
-      processor.keyboardInterface = keyboardWithHarness;
+      const processor = new JSKeyboardProcessor(device, processorInitOptions);
       const res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, textStore);
 
       assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);

@@ -2,37 +2,30 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 
-import { EventEmitter } from 'eventemitter3';
 import { KM_Core, KM_CORE_STATUS, KM_CORE_CT, km_core_context, km_core_context_items, km_core_option_item } from 'keyman/engine/core-adapter';
 import {
-  BeepHandler,
-  EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
+  AbstractKeyboardProcessor,
   KeyEvent, KMXKeyboard, SyntheticTextStore, MutableSystemStore, TextStore, ProcessorAction,
-  StateKeyMap,
   Deadkey,
-  Codes,
   VariableStoreSerializer
 } from "keyman/engine/keyboard";
 import { KM_CORE_EVENT_FLAG, KM_CORE_OPTION_SCOPE } from '../core-adapter/KM_Core.js';
-import { ModifierKeyConstants } from '@keymanapp/common-types';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { CoreKeyboardInterface } from './coreKeyboardInterface.js';
 import { toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
-
-const lockNames = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
-const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
-const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
-const noLockModifers = [ModifierKeyConstants.NOTCAPITALFLAG, ModifierKeyConstants.NOTNUMLOCKFLAG, ModifierKeyConstants.NOTSCROLLFLAG] as const;
 
 /**
  * Implements the core keyboard processing engine that interacts with the
  * shared Keyman Core component which handles .kmx keyboards.
  */
-export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
+export class CoreKeyboardProcessor extends AbstractKeyboardProcessor<KMXKeyboard, CoreKeyboardInterface> {
   private _newLayerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
   private _oldLayerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
   private _layerStore: MutableSystemStore = new MutableSystemStore(0, 'default');
-  private _keyboardInterface: CoreKeyboardInterface;
+
+  public constructor(device: DeviceSpec, baseLayout: string) {
+    super(device, baseLayout, null);
+  }
 
   /**
    * Initialize the core processor with the provided base path.
@@ -47,75 +40,6 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   public async init(basePath: string, storeSerializer: VariableStoreSerializer): Promise<void> {
     await KM_Core.createCoreProcessor(basePath);
     this._keyboardInterface = new CoreKeyboardInterface(storeSerializer);
-  }
-
-  /**
-   * Tracks the simulated value for supported state keys, allowing the OSK to
-   * mirror a physical keyboard for them. Uses the exact keyCode name from the
-   * Codes definitions to enable certain optimizations elsewhere in the code.
-   *
-   * @type {StateKeyMap}
-   */
-  public stateKeys: StateKeyMap = {
-    "K_CAPS": false,
-    "K_NUMLOCK": false,
-    "K_SCROLL": false
-  }
-
-  /**
-   * Indicates the device (platform) to be used for non-keystroke events.
-   * Used for events such as those sent to `begin postkeystroke` and
-   * `begin newcontext` entry points.
-   *
-   * @type {DeviceSpec}
-   */
-  public contextDevice: DeviceSpec;
-
-  /**
-   * Optional handler for beep events triggered by the processor.
-   * Allows custom handling of beep feedback, such as for alerts or errors.
-   *
-   * @type {BeepHandler}
-   */
-  public beepHandler?: BeepHandler;
-
-  /**
-   * Bitfield representing the most recent modifier state (Alt, Ctrl, Shift, etc.)
-   * as observed or simulated by the processor. Used to quickly detect changes in
-   * modifier state not otherwise captured by the hosting page (important for AltGr).
-   *
-   * @type {number}
-   */
-  public modStateFlags: number = 0;
-
-  /**
-   * Stores the identifier for the base keyboard layout in use.
-   * Used to determine the default layout for key mapping and processing.
-   *
-   * @type {string}
-   */
-  public baseLayout: string;
-
-  /**
-   * The currently active keyboard.
-   *
-   * @type {Keyboard}
-   */
-  public get activeKeyboard(): Keyboard {
-    return this.keyboardInterface.activeKeyboard;
-  }
-  public set activeKeyboard(keyboard: Keyboard) {
-    this.keyboardInterface.activeKeyboard = keyboard;
-  }
-
-  /**
-   * The keyboard interface used by the processor.
-   * Provides access to the keyboard interface implementation.
-   *
-   * @type {KeyboardMinimalInterface}
-   */
-  get keyboardInterface(): KeyboardMinimalInterface {
-    return this._keyboardInterface;
   }
 
   /**
@@ -160,7 +84,7 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     this._layerStore.set(value);
   }
 
-  private getLayerId(modifier: number): string {
+  protected getLayerId(modifier: number): string {
     // TODO-web-core: implement
     // return Layouts.getLayerId(modifier);
     return 'default'; // TODO-web-core: put into LayerNames enum
@@ -273,19 +197,18 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   public processKeystroke(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
 
     const preInput = SyntheticTextStore.from(textStore, true);
-    const activeKeyboard = this.activeKeyboard as KMXKeyboard;
-    const coreContext = KM_Core.instance.state_context(activeKeyboard.state);
+    const coreContext = KM_Core.instance.state_context(this.activeKeyboard.state);
 
     this.applyContextFromTextStore(coreContext, textStore);
 
-    const status = KM_Core.instance.process_event(activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, keyEvent.source?.type === 'keydown', KM_CORE_EVENT_FLAG.DEFAULT);
+    const status = KM_Core.instance.process_event(this.activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, keyEvent.source?.type === 'keydown', KM_CORE_EVENT_FLAG.DEFAULT);
     // TODO-web-core: properly set flags (#15283)
     if (status != KM_CORE_STATUS.OK) {
       console.error('KeymanWeb: km_core_process_event failed with status: ' + status);
       return null;
     }
     const processorAction = new ProcessorAction();
-    const core_actions = KM_Core.instance.state_get_actions(activeKeyboard.state);
+    const core_actions = KM_Core.instance.state_get_actions(this.activeKeyboard.state);
 
     textStore.deleteCharsBeforeCaret(core_actions.code_points_to_delete);
     textStore.insertTextBeforeCaret(core_actions.output);
@@ -336,117 +259,6 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
     // (irrelevant for web-core since that is handled in Core), but also after
     // applying a suggestion, which we do need to handle.
     return null;
-  }
-
-  // TODO-web-core: this could be shared with JsKeyboardProcessor
-  /**
-   * Determines if the given key event is a modifier key press.
-   * Returns true if the event corresponds to a modifier key, otherwise false.
-   *
-   * @param {KeyEvent}   keyEvent    The key event to evaluate.
-   * @param {TextStore}  textStore   The current text store context.
-   * @param {boolean}    isKeyDown   Indicates if the key event is a key down event.
-   *
-   * @returns {boolean} True if the event is a modifier key press, false otherwise.
-   */
-  public doModifierPress(keyEvent: KeyEvent, textStore: TextStore, isKeyDown: boolean): boolean {
-    if(!this.activeKeyboard) {
-      return false;
-    }
-
-    if(keyEvent.isModifier) {
-      this.activeKeyboard.notify(keyEvent.Lcode, textStore, isKeyDown ? 1 : 0);
-      // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-      if(!keyEvent.device.touchable) {
-        return this._UpdateVKShift(keyEvent); // I2187
-      } else {
-        return true;
-      }
-    }
-
-    if(keyEvent.LmodifierChange) {
-      this.activeKeyboard.notify(0, textStore, 1);
-      if(!keyEvent.device.touchable) {
-        this._UpdateVKShift(keyEvent);
-      }
-    }
-
-    // No modifier keypresses detected.
-    return false;
-  }
-
-
-  // TODO-web-core: this could be shared with JsKeyboardProcessor
-  /**
-   * Updates the virtual keyboard shift state based on the provided key event.
-   * Handles modifier key simulation, state key updates, and layer selection for the OSK.
-   *
-   * @param {KeyEvent} e - The key event used to update the shift state.
-   *
-   * @returns {boolean} True if the update was processed, otherwise true if no active keyboard.
-   */
-  private _UpdateVKShift(e: KeyEvent): boolean {
-    let keyShiftState=0;
-
-    if(!this.activeKeyboard) {
-      return true;
-    }
-
-    if(e) {
-      // read shift states from event
-      keyShiftState = e.Lmodifiers;
-
-      // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-      if(this.activeKeyboard.isChiral && this.activeKeyboard.emulatesAltGr &&
-          (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
-        keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
-        keyShiftState &= ~ModifierKeyConstants.RALTFLAG;
-      }
-
-      // Set stateKeys where corresponding value is passed in e.Lstates
-      let stateMutation = false;
-      for(let i=0; i < lockNames.length; i++) {
-        if((e.Lstates & Codes.stateBitmasks[lockNames[i]]) != 0) {
-          this.stateKeys[lockKeys[i]] = ((e.Lstates & lockModifiers[i]) != 0);
-          stateMutation = true;
-        }
-      }
-
-      if(stateMutation) {
-        this.emit('statekeychange', this.stateKeys);
-      }
-    }
-
-    this.updateStates();
-
-    if (this.activeKeyboard.isMnemonic && this.stateKeys['K_CAPS'] && (!e || !e.isModifier)) {
-      // Modifier keypresses don't trigger mnemonic manipulation of modifier state.
-      // Only an output key does; active use of Caps will also flip the SHIFT flag.
-      // Mnemonic keystrokes manipulate the SHIFT property based on CAPS state.
-      // We need to unflip them when tracking the OSK layer.
-      keyShiftState ^= ModifierKeyConstants.K_SHIFTFLAG;
-    }
-
-    this.layerId = this.getLayerId(keyShiftState);
-    return true;
-  }
-
-  // TODO-web-core: this could be shared with JsKeyboardProcessor
-  private updateStates(): void {
-    for (let i = 0; i < lockKeys.length; i++) {
-      const key = lockKeys[i];
-      const flag = this.stateKeys[key];
-
-      // Ensures that the current mod-state info properly matches the currently-simulated
-      // state key states.
-      if (flag) {
-        this.modStateFlags |= lockModifiers[i];
-        this.modStateFlags &= ~noLockModifers[i];
-      } else {
-        this.modStateFlags &= ~lockModifiers[i];
-        this.modStateFlags |= noLockModifers[i];
-      }
-    }
   }
 
   /**
