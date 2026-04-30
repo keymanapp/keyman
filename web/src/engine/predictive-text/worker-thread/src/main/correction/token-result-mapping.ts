@@ -74,6 +74,10 @@ export class TokenResultMapping implements CorrectionResultMapping<SearchNode>{
     return this.node;
   }
 
+  get inputCount(): number {
+    return this.matchingSpace.inputCount;
+  }
+
   get inputSequence(): ProbabilityMass<Transform>[] {
     return this.node.priorInput;
   }
