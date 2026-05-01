@@ -121,6 +121,7 @@ namespace kmcmp{
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
   int BeginLine[4];
+  int TargetVersion;
 
   KMX_BOOL IsValidCallStore(PFILE_STORE fs);
   void CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
@@ -1132,6 +1133,12 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_VERSION:
+    if(kmcmp::TargetVersion != 0) {
+      // If the targetVersion option is passed in, then we don't use automatic
+      // versioning, and we ignore the &VERSION store
+      // TODO-EMBED-OSK-IN-KMX: consider a compiler hint?
+      return TRUE;
+    }
     if ((fk->dwFlags & KF_AUTOMATICVERSION) == 0) {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_VersionAlreadyIncluded);
       return FALSE;
@@ -1156,6 +1163,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
+    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Embedded OSK
 
     else {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidVersion);
@@ -1200,6 +1208,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
       sp->dpString = q;
     }
     break;
+
   case TSS_KMW_RTL:
   case TSS_KMW_HELPTEXT:
     if(!VerifyKeyboardVersion(fk, VERSION_70)) {
@@ -1290,6 +1299,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
       return FALSE;
     }
     // Used by KMW compiler
+    fk->extra->touchLayoutFilename = string_from_u16string(sp->dpString);
     break;
 
   case TSS_KEYBOARDVERSION:   // I4140
@@ -3355,6 +3365,12 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
     wcslen(fk->szMessage)*2 + 2 +*/
     fk->dwBitmapSize;
 
+  if(fk->version >= VERSION_190) {
+    // For version 19+, we always reserve space for the KMX+
+    // header, but we'll write it out as null in kmcmplib
+    size += sizeof(COMP_KEYBOARD_KMXPLUSINFO);
+  }
+
   for (i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++)
   {
     if (kmcmp::FSaveDebug) size += u16len(fgp->szName) * 2 + 2;
@@ -3396,21 +3412,13 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
 
   offset = sizeof(COMP_KEYBOARD);
 
-  /*ck->dpLanguageName = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szLanguageName);
-  offset += wcslen(fk->szLanguageName)*2 + 2;
-
-  ck->dpName = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szName);
-  offset += wcslen(fk->szName)*2 + 2;
-
-  ck->dpCopyright = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szCopyright);
-  offset += wcslen(fk->szCopyright)*2 + 2;
-
-  ck->dpMessage = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szMessage);
-  offset += wcslen(fk->szMessage)*2 + 2;*/
+  if(fk->version >= VERSION_190) {
+    // Reserved space for KMX+ data
+    COMP_KEYBOARD_KMXPLUSINFO *kmxPlusInfo = reinterpret_cast<COMP_KEYBOARD_KMXPLUSINFO *>(buf + offset);
+    kmxPlusInfo->dpKMXPlus = 0;
+    kmxPlusInfo->dwKMXPlusSize = 0;
+    offset += sizeof(COMP_KEYBOARD_KMXPLUSINFO);
+  }
 
   ck->dpStoreArray = (KMX_DWORD)offset;
   sp = (PCOMP_STORE)(buf + offset);

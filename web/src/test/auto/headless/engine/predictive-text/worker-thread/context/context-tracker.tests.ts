@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
-import { deepCopy } from '@keymanapp/web-utils';
+import { deepCopy } from 'keyman/common/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 

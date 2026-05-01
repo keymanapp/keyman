@@ -17,7 +17,7 @@ value.
 
 -------------------------------------------------------------------------------
 
-# km_core_option_scope enum
+# km_core_option_scope enum {#km_core_option_scope}
 
 ## Description
 
@@ -48,7 +48,7 @@ enum km_core_option_scope {
 
 -------------------------------------------------------------------------------
 
-# km_core_option_item struct
+# km_core_option_item struct {#km_core_option_item}
 
 ## Description
 
@@ -58,8 +58,8 @@ Platform layer.
 ## Specification
 ```c
 struct km_core_option_item {
-  km_core_cp const *   key;
-  km_core_cp const *   value;
+  km_core_cu const *   key;
+  km_core_cu const *   value;
   uint8_t             scope;
 };
 
@@ -78,7 +78,7 @@ struct km_core_option_item {
 
 -------------------------------------------------------------------------------
 
-# km_core_options_list_size()
+# km_core_options_list_size() {#km_core_options_list_size}
 
 ## Description
 Return the length of a terminated [km_core_option_item] array (options
@@ -116,8 +116,8 @@ KMN_API
 km_core_status
 km_core_state_option_lookup(km_core_state const *state,
                       uint8_t scope,
-                      km_core_cp const *key,
-                      km_core_cp const **value);
+                      km_core_cu const *key,
+                      km_core_cu const **value);
 
 ```
 ## Parameters
@@ -150,7 +150,7 @@ km_core_state_option_lookup(km_core_state const *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_update()
+# km_core_state_options_update() {#km_core_state_options_update}
 
 ## Description
 
@@ -188,55 +188,8 @@ km_core_state_options_update(km_core_state *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_to_json()
 
-## Description
-
-Export the contents of a [km_core_options] array to a JSON formatted document and
-place it in the supplied buffer, reporting how much space was used. If null is
-passed as the buffer the number of bytes required is returned in `space`. If
-there is insufficent space to hold the document the contents of the buffer is
-undefined. The returned buffer uses UTF-8 encoding.
-
-## Specification
-
-```c
-KMN_API
-km_core_status
-km_core_state_options_to_json(km_core_state const *state,
-                       char *buf,
-                       size_t *space);
-
-```
-## Parameters
-
-`state`
-: An opaque pointer to a state object.
-
-`buf`
-: A pointer to the buffer to place the C string containing the JSON
-  document into, can be null.
-
-`space`
-: A pointer to a size_t variable. This variable must contain the
-  number of bytes available in the buffer pointed to by `buf`, unless `buf` is
-  null. On return it will hold how many bytes were used.
-
-## Returns
-
-`KM_CORE_STATUS_OK`
-: On success.
-
-`KM_CORE_STATUS_INVALID_ARGUMENT`
-: If non-optional parameters are null.
-
-`KM_CORE_STATUS_NO_MEM`
-: In the event an internal memory allocation fails.
-
--------------------------------------------------------------------------------
-
-
-[km_core_cp]: background#km_core_cp "km_core_cp type"
+[km_core_cu]: background#km_core_cu "km_core_cu type"
 [km_core_usv]: background#km_core_usv "km_core_usv type"
 [km_core_virtual_key]: background#km_core_virtual_key "km_core_virtual_key type"
 [km_core_status]: background#km_core_status "km_core_status type"
@@ -259,7 +212,6 @@ km_core_state_options_to_json(km_core_state const *state,
 [km_core_option_item]: options#km_core_option_item "km_core_option_item struct"
 [km_core_options_list_size]: options#km_core_options_list_size "km_core_options_list_size function"
 [km_core_state_options_update]: options#km_core_state_options_update "km_core_state_options_update function"
-[km_core_state_options_to_json]: options#km_core_state_options_to_json "km_core_state_options_to_json function"
 [km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
 [km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
 [km_core_keyboard_imx]: keyboards#km_core_keyboard_imx "km_core_keyboard_imx struct"
@@ -276,8 +228,7 @@ km_core_state_options_to_json(km_core_state const *state,
 [km_core_state_dispose]: keyboards#km_core_state_dispose "km_core_state_dispose function"
 [km_core_debug_context_type]: keyboards#km_core_debug_context_type "km_core_debug_context_type enum"
 [km_core_state_context_debug]: keyboards#km_core_state_context_debug "km_core_state_context_debug function"
-[km_core_cp_dispose]: keyboards#km_core_cp_dispose "km_core_cp_dispose function"
-[km_core_state_to_json]: keyboards#km_core_state_to_json "km_core_state_to_json function"
+[km_core_cu_dispose]: keyboards#km_core_cu_dispose "km_core_cu_dispose function"
 [km_core_event_flags]: processor#km_core_event_flags "km_core_event_flags enum"
 [km_core_process_event]: processor#km_core_process_event "km_core_process_event function"
 [km_core_event]: processor#km_core_event "km_core_event function"
