@@ -10,12 +10,12 @@
 */
 
 #include "mcompile.h"
+#include "keymap.h"
+#include "deadkey.h"
+
 
 const int nr_DK_pairs = 1000;
 static const int size_DK_array = (nr_DK_pairs + 1) *3;
-
-/** @brief convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
-KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar* argv[]);
 
 /** @brief Collect the key data, translate it to kmx and append to the existing keyboard */
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion);  // I4353   // I4327
@@ -24,85 +24,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
 int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, std::vector<KMX_WORD> &dk_vec, GdkKeymap* keymap);
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
-
-#define _countof(a) (sizeof(a) / sizeof(*(a)))
-
-/**
- * @brief  main function for mcompile for Linux
- * @param  argc number of commandline arguments
- * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
- * @return 0 on success
- */
-
-  int main(int argc, char* argv[]) {
-
-
-  int bDeadkeyConversion = 0;
-
-  if (argc > 1)
-    bDeadkeyConversion = (strcmp(argv[1], "-d") == 0);  // I4552
-
-  int n = (bDeadkeyConversion ? 2 : 1);
-
-  if (argc < 3 || argc > 4 || (argc - n) != 2) {  // I4273// I4273
-    printf(
-        "Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
-        "        \tmcompile converts a Keyman mnemonic layout to\n"
-        "        \ta positional one based on the currently used \n"
-        "        \tLinux keyboard layout\n"
-        "        \t(-d convert deadkeys to plain keys) \n \n");  // I4552
-
-    return 1;
-  }
-
-  // -u option is not available for Linux and macOS
-
-  KMX_CHAR* infile = argv[n];
-  KMX_CHAR* outfile = argv[n + 1];
-
-  printf("mcompile%s \"%s\" \"%s\"\n", bDeadkeyConversion ? " -d" : "", infile, outfile);  // I4174
-
-  // 1. Load the keyman keyboard file
-
-  // 2. For each key on the system layout, determine its output character and perform a
-  //    1-1 replacement on the keyman keyboard of that character with the base VK + shift
-  //    state.  This fixup will transform the char to a vk, which will avoid any issues
-  //    with the key.
-  //
-  //
-  //  For each deadkey, we need to determine its possible outputs.  Then we generate a VK
-  //  rule for that deadkey, e.g. [K_LBRKT] > dk(c101)
-  //
-  //  Next, update each rule that references the output from that deadkey to add an extra
-  //  context deadkey at the end of the context match, e.g. 'a' dk(c101) + [K_SPACE] > 'b'.
-  //  This will require a memory layout change for the .kmx file, plus fixups on the
-  //  context+output index offsets
-  //
-  //  --> virtual character keys
-  //
-  //  [CTRL ' '] : we look at the character, and replace it in the same way, but merely
-  //  switch the shift state from the VIRTUALCHARKEY to VIRTUALKEY, without changing any
-  //  other properties of the key.
-  //
-  // 3. Write the new keyman keyboard file
-
-  LPKMX_KEYBOARD kmxfile;
-
-  if (!KMX_LoadKeyboard(infile, &kmxfile)) {
-    KMX_LogError(L"Failed to load keyboard (%d)\n", errno);
-    return 3;
-  }
-
-  if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {  // I4552F
-    if(!KMX_SaveKeyboard(kmxfile, outfile)) {
-      KMX_LogError(L"Failed to save keyboard (%d)\n", errno);
-      return 3;
-    }
-  }
-
-  delete kmxfile;
-  return 0;
-}
 
 // Map of all shift states that we will work with
 const KMX_DWORD VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG | LCTRLFLAG | RALTFLAG, 0xFFFF};
@@ -555,24 +476,3 @@ int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, std::vector<KMX_WO
   return dk_vec.size();
 }
 
-/**
- * @brief  print (error) messages
- * @param  fmt text to print
- */
-void KMX_LogError(const wchar_t* fmt, ...) {
-  wchar_t fmtbuf[256];
-  const wchar_t* end = L"\0";
-  const wchar_t* nl  = L"\n";
-  va_list vars;
-  int j = 0;
-
-  va_start(vars, fmt);
-  vswprintf(fmtbuf, _countof(fmtbuf), fmt, vars);
-  fmtbuf[255] = 0;
-
-  do {
-    putwchar(fmtbuf[j]);
-    j++;
-  } while (fmtbuf[j] != *end);
-  putwchar(*nl);
-}

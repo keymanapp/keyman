@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include "mc_kmxfile.h"
 #include "keymap.h"
+#include "deadkey.h"
+
+extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
 const int KMX_ShiftStateMap[] = {
     ISVIRTUALKEY,
