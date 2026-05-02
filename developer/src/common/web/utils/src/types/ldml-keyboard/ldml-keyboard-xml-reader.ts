@@ -100,31 +100,31 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
     boxXmlArray(source?.keyboard3?.locales, 'locale');
     boxXmlArray(source?.keyboard3, 'transforms');
     if(source?.keyboard3?.layers) {
-      for(const layers of source?.keyboard3?.layers) {
+      for(const layers of source.keyboard3.layers) {
         boxXmlArray(layers, 'layer');
-        if(layers?.layer) {
-          for(const layer of layers?.layer) {
+        if(layers.layer) {
+          for(const layer of layers.layer) {
             boxXmlArray(layer, 'row');
           }
         }
       }
     }
     if(source?.keyboard3?.forms?.form) {
-      boxXmlArray(source?.keyboard3?.forms, 'form');
-      for(const form of source?.keyboard3?.forms?.form) {
+      boxXmlArray(source.keyboard3.forms, 'form');
+      for(const form of source.keyboard3.forms.form) {
         boxXmlArray(form, 'scanCodes');
       }
     }
     if(source?.keyboard3?.flicks) {
-      boxXmlArray(source?.keyboard3?.flicks, 'flick');
-      for(const flick of source?.keyboard3?.flicks?.flick) {
+      boxXmlArray(source.keyboard3.flicks, 'flick');
+      for(const flick of source.keyboard3.flicks.flick) {
         boxXmlArray(flick, 'flickSegment');
       }
     }
     if(source?.keyboard3?.variables) {
-      boxXmlArray(source?.keyboard3?.variables, 'set');
-      boxXmlArray(source?.keyboard3?.variables, 'string');
-      boxXmlArray(source?.keyboard3?.variables, 'uset');
+      boxXmlArray(source.keyboard3.variables, 'set');
+      boxXmlArray(source.keyboard3.variables, 'string');
+      boxXmlArray(source.keyboard3.variables, 'uset');
     }
     if(source?.keyboard3?.transforms) {
       for(const transforms of source.keyboard3.transforms)  {
