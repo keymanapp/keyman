@@ -1,26 +1,17 @@
-/*
- * Keyman is copyright (C) SIL International. MIT License.
- *
- * Created by Tim Eves (TSE) on 2018-10-17
- */
-#pragma once
-
-/**
 ---
-filename: virtual-keys.md
 title: Virtual Keys - Keyman Core API
 ---
 
 API declarations for modifier keys, handy access masks and Keyman VKEY names.
 These follow the same keytop->code associations as the Windows API. This is a
 separate header to maintain readability of the primary API header.
-*/
 
-/**
- * @name km_core_modifier_state enum
- *
- * An integral type bitmask representing the state of each modifier key.
- */
+
+# km_core_modifier_state enum {#km_core_modifier_state}
+
+An integral type bitmask representing the state of each modifier key.
+
+```c
 enum km_core_modifier_state {
   KM_CORE_MODIFIER_NONE        = 0,
   KM_CORE_MODIFIER_LCTRL       = 1 << 0,
@@ -32,9 +23,6 @@ enum km_core_modifier_state {
   KM_CORE_MODIFIER_ALT         = 1 << 6,
   /*
     KM_CORE_MODIFIER_META        = 1 << 7,    // Either Meta-key flag (tentative).  Not usable by keyboards currently
-                                             // Used internally (currently, only by KMW) to ensure Meta-key
-                                             // shortcuts safely bypass rules
-                                             // Meta key = Command key on macOS, Windows key on Windows
   */
   KM_CORE_MODIFIER_CAPS        = 1 << 8,
   KM_CORE_MODIFIER_NOCAPS      = 1 << 9,
@@ -46,11 +34,11 @@ enum km_core_modifier_state {
     KM_CORE_MODIFIER_VIRTUALKEY  = 1 << 14,
   */
 };
+```
+An integral type bitmask representing common bitmask sets for
+km_core_modifier_state
 
-/**
- * An integral type bitmask representing common bitmask sets for
- * km_core_modifier_state
- */
+```c
 enum km_core_modifier_mask {
   KM_CORE_MODIFIER_MASK_ALL         = 0x7f,
   KM_CORE_MODIFIER_MASK_ALT_GR_SIM  = KM_CORE_MODIFIER_LCTRL|KM_CORE_MODIFIER_LALT,
@@ -61,17 +49,18 @@ enum km_core_modifier_mask {
 /*KM_CORE_MODIFIER_MASK_NUMLOCK     = 0x0C00,
   KM_CORE_MODIFIER_MASK_SCROLLLOCK  = 0x3000,*/
 };
+```
 
-/**
- * @name km_core_virtual_key_value
- *
- * These are Windows API VKEYs, using Keyman VKEY names. Underlying values from
- * winuser.h
- * (https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
- * Note, some codes are defined here for parity with winuser.h, but are not
- * available in .kmn language. These codes are marked as "internal" by using
- * `__` in the name: `KM_CORE_VKEY__<name>__`
- */
+# km_core_virtual_key_value {#km_core_virtual_key_value}
+
+These are Windows API VKEYs, using Keyman VKEY names. Underlying values from
+winuser.h
+(https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
+Note, some codes are defined here for parity with winuser.h, but are not
+available in .kmn language. These codes are marked as "internal" by using
+`__` in the name: `KM_CORE_VKEY__<name>__`
+
+```c
 enum km_core_virtual_key_value {
   KM_CORE_VKEY__00,
   KM_CORE_VKEY_LBUTTON,           // 0x01
@@ -331,7 +320,67 @@ enum km_core_virtual_key_value {
   KM_CORE_VKEY__FF,               // 0xff
 };
 
-/*
-$EOF
-*/
-
+[km_core_cu]: background#km_core_cu "km_core_cu type"
+[km_core_usv]: background#km_core_usv "km_core_usv type"
+[km_core_virtual_key]: background#km_core_virtual_key "km_core_virtual_key type"
+[km_core_status]: background#km_core_status "km_core_status type"
+[km_core_keyboard]: background#km_core_keyboard "km_core_keyboard struct"
+[km_core_state]: background#km_core_state "km_core_state struct"
+[km_core_options]: background#km_core_options "km_core_options struct"
+[km_core_keyboard_imx_platform]: background#km_core_keyboard_imx_platform "km_core_keyboard_imx_platform callback function"
+[km_core_status_codes]: background#km_core_status_codes "km_core_status_codes enum"
+[km_core_attr]: background#km_core_attr "km_core_attr struct"
+[km_core_tech_value]: background#km_core_tech_value "km_core_tech_value enum"
+[km_core_get_engine_attrs]: background#km_core_get_engine_attrs "km_core_get_engine_attrs function"
+[km_core_bool]: background#km_core_bool "km_core_bool enum"
+[km_core_caps_state]: state#km_core_caps_state "km_core_caps_state enum"
+[km_core_actions]: state#km_core_actions "km_core_actions struct"
+[km_core_state_get_actions]: state#km_core_state_get_actions "km_core_state_get_actions function"
+[km_core_context_status]: state#km_core_context_status "km_core_context_status enum"
+[km_core_state_context_set_if_needed]: state#km_core_state_context_set_if_needed "km_core_state_context_set_if_needed function"
+[km_core_state_context_clear]: state#km_core_state_context_clear "km_core_state_context_clear function"
+[km_core_option_scope]: options#km_core_option_scope "km_core_option_scope enum"
+[km_core_option_item]: options#km_core_option_item "km_core_option_item struct"
+[km_core_options_list_size]: options#km_core_options_list_size "km_core_options_list_size function"
+[km_core_state_option_lookup]: options#km_core_state_option_lookup "km_core_state_option_lookup function"
+[km_core_state_options_update]: options#km_core_state_options_update "km_core_state_options_update function"
+[km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
+[km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
+[km_core_keyboard_imx]: keyboards#km_core_keyboard_imx "km_core_keyboard_imx struct"
+[km_core_keyboard_load_from_blob]: keyboards#km_core_keyboard_load_from_blob "km_core_keyboard_load_from_blob function"
+[km_core_keyboard_dispose]: keyboards#km_core_keyboard_dispose "km_core_keyboard_dispose function"
+[km_core_keyboard_get_attrs]: keyboards#km_core_keyboard_get_attrs "km_core_keyboard_get_attrs function"
+[km_core_keyboard_get_key_list]: keyboards#km_core_keyboard_get_key_list "km_core_keyboard_get_key_list function"
+[km_core_keyboard_key_list_dispose]: keyboards#km_core_keyboard_key_list_dispose "km_core_keyboard_key_list_dispose function"
+[km_core_keyboard_get_imx_list]: keyboards#km_core_keyboard_get_imx_list "km_core_keyboard_get_imx_list function"
+[km_core_keyboard_imx_list_dispose]: keyboards#km_core_keyboard_imx_list_dispose "km_core_keyboard_imx_list_dispose function"
+[km_core_state_imx_register_callback]: keyboards#km_core_state_imx_register_callback "km_core_state_imx_register_callback function"
+[km_core_state_imx_deregister_callback]: keyboards#km_core_state_imx_deregister_callback "km_core_state_imx_deregister_callback function"
+[km_core_state_create]: keyboards#km_core_state_create "km_core_state_create function"
+[km_core_state_clone]: keyboards#km_core_state_clone "km_core_state_clone function"
+[km_core_state_dispose]: keyboards#km_core_state_dispose "km_core_state_dispose function"
+[km_core_debug_context_type]: keyboards#km_core_debug_context_type "km_core_debug_context_type enum"
+[km_core_state_context_debug]: keyboards#km_core_state_context_debug "km_core_state_context_debug function"
+[km_core_cu_dispose]: keyboards#km_core_cu_dispose "km_core_cu_dispose function"
+[km_core_event_flags]: processor#km_core_event_flags "km_core_event_flags enum"
+[km_core_process_event]: processor#km_core_process_event "km_core_process_event function"
+[km_core_event]: processor#km_core_event "km_core_event function"
+[km_core_event_code]: processor#km_core_event_code "km_core_event_code enum"
+[km_core_action_item]: actions#km_core_action_item "km_core_action_item struct"
+[km_core_state_action_items]: actions#km_core_state_action_items "km_core_state_action_items function"
+[km_core_state_queue_action_items]: actions#km_core_state_queue_action_items "km_core_state_queue_action_items function"
+[km_core_process_queued_actions]: actions#km_core_process_queued_actions "km_core_process_queued_actions function"
+[km_core_context_type]: context#km_core_context_type "km_core_context_type enum"
+[km_core_context_item]: context#km_core_context_item "km_core_context_item struct"
+[KM_CORE_CONTEXT_ITEM_END]: context#KM_CORE_CONTEXT_ITEM_END "KM_CORE_CONTEXT_ITEM_END macro"
+[km_core_state_get_intermediate_context]: context#km_core_state_get_intermediate_context "km_core_state_get_intermediate_context function"
+[km_core_context_items_dispose]: context#km_core_context_items_dispose "km_core_context_items_dispose function"
+[km_core_state_context]: context#km_core_state_context "km_core_state_context function"
+[km_core_state_app_context]: context#km_core_state_app_context "km_core_state_app_context function"
+[km_core_context_set]: context#km_core_context_set "km_core_context_set function"
+[km_core_context_clear]: context#km_core_context_clear "km_core_context_clear function"
+[km_core_context_item_list_size]: context#km_core_context_item_list_size "km_core_context_item_list_size function"
+[km_core_context_get]: context#km_core_context_get "km_core_context_get function"
+[km_core_context_length]: context#km_core_context_length "km_core_context_length function"
+[km_core_modifier_state]: virtual-keys#km_core_modifier_state "km_core_modifier_state enum"
+[km_core_virtual_key_value]: virtual-keys#km_core_virtual_key_value "km_core_virtual_key_value "
