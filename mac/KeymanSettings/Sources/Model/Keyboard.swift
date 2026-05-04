@@ -22,10 +22,11 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   public var keyboardDirectoryUrl: URL
   // the URL of the .kmx file for the package
   public let kmxFileUrl: URL
-  // the UserDefaults key for this package, used for the selected Keyboard and enabled keyboards
+  // a key to uniquely identify the keyboard
+  // in the UserDefaults this key is used for the selected Keyboard and enabled keyboards properties
   // the key is in the form "/[package directory]/[package name].kmx"
   // for example, "/khmer_angkor/khmer_angkor.kmx"
-  public let keyboardSettingsKey: String
+  public let keyboardKey: String
 
   public init(keyboardSource: KeyboardSource, directoryUrl: URL) {
     self.enabled = true
@@ -33,12 +34,23 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     self.keyboardId = keyboardSource.id
     self.keyboardDirectoryUrl = directoryUrl
     self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
-    self.keyboardSettingsKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
+    self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
 
-//    ConfigLogger.shared.testLogger.debug("keyboard created for: \(keyboardSource.id)")
-    print("keyboard created for: \(keyboardSource.id) \r   with kmxFileUrl: \(self.kmxFileUrl) \r   and settingsKey: \(self.keyboardSettingsKey)")
+    print("keyboard created for: \(keyboardSource.id) \r   with kmxFileUrl: \(self.kmxFileUrl) \r   and settingsKey: \(self.keyboardKey)")
   }
 
+  /**
+   * initializer that does not rely on package source -- provided to create unit test data
+   */
+  public init(name: String, keyboardId: String, keyboardDirectoryUrl: URL, enabled: Bool) {
+    self.name = name
+    self.keyboardId = keyboardId
+    self.keyboardDirectoryUrl = keyboardDirectoryUrl
+    self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
+    self.enabled = enabled
+    self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
+  }
+  
   public static func == (lhs: Keyboard, rhs: Keyboard) -> Bool {
     return lhs.keyboardId == rhs.keyboardId && lhs.enabled == rhs.enabled
   }

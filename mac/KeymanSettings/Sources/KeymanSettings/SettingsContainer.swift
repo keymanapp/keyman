@@ -7,6 +7,15 @@
  * Provides a place for the config app can bind directly to the settings
  * and update when changes are made
  *
+ * The Settings consist of two types of data:
+ * - Keyman packages that have been installed on disk in the Group Containers directory
+ * - Some lightwieght settings that are stored in the macOS UserDefaults Database
+ *
+ * Both the packages and the defaults are in a shared location that can be accessed by
+ * the Keyman config app and the Keyman input method.
+ *
+ * This class accesses the two types of data through PackageRepository and DefaultsRepository
+ * and publishes the combined data to the UI through the `installedPackages` array.
  */
 
 import Foundation
@@ -20,11 +29,11 @@ public class SettingsContainer : ObservableObject {
   // packages are loaded from disk, each package may contain one or more keyboard
   @Published public var installedPackages: [KeymanPackage]
   
-  fileprivate let packageRepository: PackageRepository
-  fileprivate let settingsRepository: SettingsRepository
+  fileprivate let packageRepository: PackageRepo
+  fileprivate let defaultsRepository: DefaultsRepo
   
   // the selected keyboard is stored in the UserDefaults
-  fileprivate var currentKeyboard: String
+  fileprivate var selectedKeyboard: String
 #warning("does the config app need to be aware of this?")
 
   public init() {
@@ -32,7 +41,7 @@ public class SettingsContainer : ObservableObject {
     
     // create the settings repository, gaining access to the app group UserDefaults
     do {
-      try self.settingsRepository = SettingsRepository(suiteName: KeymanPaths.groupId)
+      try self.defaultsRepository = DefaultsRepository(suiteName: KeymanPaths.groupId)
       print("Found group container")
     } catch UserDefaultsError.unknownSuite {
       fatalError("Group container not found.")
@@ -40,18 +49,24 @@ public class SettingsContainer : ObservableObject {
       fatalError("Unable to access settings in group container.")
     }
     
-    self.currentKeyboard = self.settingsRepository.readSelectedKeyboard()
+    self.selectedKeyboard = self.defaultsRepository.readSelectedKeyboard()
     
     
     // first load all the installed packages from disk
     self.installedPackages = []
-    if let persistedPackages = self.loadPackages() {
-      self.installedPackages = persistedPackages
-    }
+    self.loadPackages()
     
     // next, apply the settings to the packages
     // this mainly consists of marking them as enabled or not
     self.applySettingsToInstalledPackages()
+  }
+
+  public init(defaultsRepo: DefaultsRepo, packageRepo: PackageRepo) {
+    self.defaultsRepository = defaultsRepo
+    self.packageRepository = packageRepo
+    self.selectedKeyboard = self.defaultsRepository.readSelectedKeyboard()
+
+    self.installedPackages = []
   }
   
 #warning("delete test code")
@@ -67,17 +82,17 @@ public class SettingsContainer : ObservableObject {
    * for debugging: prints UserDefaults values
    */
   public func logSettings() {
-    self.settingsRepository.logSettings()
+    self.defaultsRepository.logDefaults()
   }
 
   public func clearSettings() {
-    self.settingsRepository.clearSettings()
+    self.defaultsRepository.clearDefaults()
   }
 
-  public func findPackage(packageId: UUID) throws -> KeymanPackage {
+  public func findPackage(packageId: UUID) -> KeymanPackage? {
     guard let package = self.installedPackages.first(where: { $0.id == packageId }) else {
       print ("Error: could not find package with ID: \(packageId)")
-      throw SettingsError.unknownPackage
+      return nil
     }
     
     return package
@@ -104,15 +119,14 @@ public class SettingsContainer : ObservableObject {
    * returns true if the keyboard is enabled
    * when enabled, the keyboard appears in the Keyman sub menu in the mac
    */
-  public func isKeyboardEnabled(packageId: UUID, keyboardId: String) -> Bool {
-    var enabled = false;
-
-    if let package = try? self.findPackage(packageId: packageId) {
-      enabled = package.isKeyboardEnabled(keyboardId: keyboardId)
-      print ("isEnabled for \(keyboardId) returning with \(enabled)")
-    } else {
-      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardId)")
+  public func isKeyboardEnabled(packageId: UUID, keyboardKey: String) -> Bool {
+    guard let package = self.findPackage(packageId: packageId) else {
+      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)")
+      return false
     }
+
+    let enabled = package.isKeyboardEnabled(keyboardKey: keyboardKey)
+    print ("isEnabled for \(keyboardKey) returning with \(enabled)")
     
     return enabled
   }
@@ -120,14 +134,14 @@ public class SettingsContainer : ObservableObject {
   /**
    * enable or disable the keyboard
    */
-  public func setKeyboardEnabled(packageId: UUID, keyboardId: String, enabled: Bool) {
-    if let package = try? self.findPackage(packageId: packageId) {
-      // update state of Keyboard
-      print ("setKeyboardEnabled for \(keyboardId) setting to \(enabled)")
-      package.enableKeyboard(keyboardId: keyboardId, enabled: enabled)
-    } else {
-      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardId)")
+  public func setKeyboardEnabled(packageId: UUID, keyboardKey: String, enabled: Bool) {
+    guard let package = self.findPackage(packageId: packageId) else {
+      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)")
+      return
     }
+
+    print ("setKeyboardEnabled for \(keyboardKey) setting to \(enabled)")
+    package.enableKeyboard(keyboardKey: keyboardKey, enabled: enabled)
     
     // update persisted state in UserDefaults enabledKeyboards array
     self.persistKeyboardState()
@@ -138,23 +152,25 @@ public class SettingsContainer : ObservableObject {
    */
   func persistKeyboardState() {
     let enabledKeyboards = self.getAllEnabledKeyboardSettingsKeys()
-    self.settingsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(enabledKeyboards))
+    self.defaultsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(enabledKeyboards))
   }
   
   /**
    *  read the Keyman packages from the group container directory and store in the keyboardPackages array
    */
-  func loadPackages() -> [KeymanPackage]? {
-    var packagesArray = nil as [KeymanPackage]?
+  func loadPackages() {
+   var packagesArray = nil as [KeymanPackage]?
 
-    // load keyboards from disk
+    // read keyboards from disk
     if (self.packageRepository.keyman19SharedDataDirectoryExists()) {      
       packagesArray = self.packageRepository.loadPackages()
     } else {
       self.packageRepository.createKeyman19SharedDataDirectories()
     }
     
-    return packagesArray
+    if let persistedPackages = packagesArray {
+      self.installedPackages = persistedPackages
+    }
   }
   
   /**
@@ -166,7 +182,7 @@ public class SettingsContainer : ObservableObject {
     // loop through all the installed packages and for each of the package's keyboards,
     // insert the settings key for the keyboard
     self.installedPackages.forEach { $0.keyboards.forEach
-      {settingsKeys.insert($0.keyboardSettingsKey)}
+      {settingsKeys.insert($0.keyboardKey)}
     }
 
     return settingsKeys
@@ -182,7 +198,7 @@ public class SettingsContainer : ObservableObject {
     // insert the settings key for every enabled keyboard
     self.installedPackages.forEach { $0.keyboards.forEach {
         if ($0.enabled) {
-          settingsKeys.insert($0.keyboardSettingsKey)
+          settingsKeys.insert($0.keyboardKey)
         }
       }
     }
@@ -195,14 +211,14 @@ public class SettingsContainer : ObservableObject {
    */
   func validateSettings() {
     let installedKeyboardKeys = self.getAllKeyboardSettingsKeys()
-    let enabledKeyboardKeys = self.settingsRepository.readEnabledKeyboards()
+    let enabledKeyboardKeys = self.defaultsRepository.readEnabledKeyboards()
     
     if (enabledKeyboardKeys.isSubset(of: installedKeyboardKeys)) {
       print("only installed keyboards are listed as enabled: no need to synchronize")
     } else {
       print("enabled keyboards list contains uninstalled keyboards: synchronize enabled keyboards list")
       let installedEnabledKeyboardKeys = enabledKeyboardKeys.intersection(installedKeyboardKeys)
-      self.settingsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(installedEnabledKeyboardKeys))
+      self.defaultsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(installedEnabledKeyboardKeys))
     }
   }
   
@@ -212,11 +228,16 @@ public class SettingsContainer : ObservableObject {
   func applySettingsToInstalledPackages() {
     self.validateSettings()
     
-    let enabledKeyboards = self.settingsRepository.readEnabledKeyboards()
+    let enabledKeyboards = self.defaultsRepository.readEnabledKeyboards()
 
     // set enabled flag if the keyboard is contained in the set of enabledKeyboards
     self.installedPackages.forEach { $0.keyboards.forEach
-      {$0.enabled = enabledKeyboards.contains($0.keyboardSettingsKey)}
+      {
+        let keyboard = $0
+        print("before keyboard \(keyboard.name) has enabled status: \(keyboard.enabled)")
+        $0.enabled = enabledKeyboards.contains($0.keyboardKey)
+        print("after keyboard \(keyboard.name) has enabled status: \(keyboard.enabled)")
+      }
     }
   }
 }

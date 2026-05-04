@@ -3,8 +3,8 @@
  *
  * Created by Shawn Schantz on 2025-12-10
  *
- * SettingsRepository is responsible for reading, writing and removing
- * settings stored in the UserDefaults
+ * DefaultsRepository is responsible for reading, writing and removing
+ * values stored in the UserDefaults
  *
  */
 
@@ -14,7 +14,7 @@ public enum UserDefaultsError: Error {
     case unknownSuite
 }
 
-public struct SettingsRepository {
+public class DefaultsRepository: DefaultsRepo {
   fileprivate let pathUtil: KeymanPaths
   let defaultsSuiteName: String
   let defaults: UserDefaults
@@ -52,6 +52,7 @@ public struct SettingsRepository {
   
   /**
    * update the list of enabled keyboards in the UserDefaults
+   * each String in the array must be formatted `/[packageName]/[keyboardName].kmx`
    */
   public func writeEnabledKeyboards(enabledKeyboardsArray: [String]) {
     self.defaults.set(enabledKeyboardsArray, forKey: kEnabledKeyboardsKey)
@@ -67,13 +68,14 @@ public struct SettingsRepository {
   
   /**
    * update the selected keyboard keyboards in the UserDefaults
+   * `keyboardName` must be formatted `/[packageName]/[keyboardName].kmx`
    */
   public func writeSelectedKeyboard(keyboardName: String) {
     self.defaults.set(keyboardName, forKey: kSelectedKeyboardKey)
   }
   
   /**
-   * read the boolean setting which allows a Sentry error to be generated for testing
+   * read the boolean value that allows a Sentry error to be generated for testing
    * This value is set in the **standard** application UserDefaults -- not the shared app group defaults.
    * This is necessary because it must be set to true from the command line.
    */
@@ -82,7 +84,7 @@ public struct SettingsRepository {
   }
 
   /**
-   * read the data model version for the settings to know what values and format to expect
+   * read the data model version to know what values and format to expect
    */
   public func readDataModelVersion() -> Int {
     // note that zero is returned if key is not found in UserDefaults,
@@ -90,7 +92,7 @@ public struct SettingsRepository {
   }
 
   /**
-   * read the boolean setting which indicates whether the OSK is opened when the input method is activated
+   * read the boolean value that indicates whether the OSK is opened when the input method is activated
    * There may be no need to read this from with the config app.
    */
   public func readShowOskOnActivate() -> Bool {
@@ -114,7 +116,7 @@ public struct SettingsRepository {
  * with app group UserDefaults, there is no way to view from the command line
  * (unlike standard application-level UserDefaults)
  */
-  public func logSettings() {
+  public func logDefaults() {
     print("UserDefaults:")
     print("\(kSelectedKeyboardKey): \(self.readSelectedKeyboard())")
     print("\(kDataModelVersionKey): \(self.readDataModelVersion())")
@@ -128,7 +130,7 @@ public struct SettingsRepository {
    * for debugging: clear all the entries for the app group UserDefaults
    * unlike standard application-level UserDefaults, there is no way to view from the command line
    */
-  public func clearSettings() {
+  public func clearDefaults() {
     self.defaults.dictionaryRepresentation().keys.forEach { key in
       self.defaults.removeObject(forKey: key)
     }

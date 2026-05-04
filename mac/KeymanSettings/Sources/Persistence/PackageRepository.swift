@@ -3,14 +3,14 @@
  *
  * Created by Shawn Schantz on 2025-12-10
  *
- * DataRepository is responsible for reading, writing and removing
+ * PackageRepository is responsible for reading, writing and removing
  * Keyman data on disk.
  *
  */
 
 import Foundation
 
-public struct PackageRepository {
+public class PackageRepository: PackageRepo {
   fileprivate let packageFileName = "kmp.json"
   fileprivate let pathUtil: KeymanPaths
   
@@ -18,7 +18,10 @@ public struct PackageRepository {
     self.pathUtil = KeymanPaths()
   }
   
-  func loadPackages() -> [KeymanPackage] {
+  /**
+   * after reading the Keyman packages from disk, wrap each package as a `KeymanPackage` object
+   */
+  public func loadPackages() -> [KeymanPackage] {
     var installedPackages: [KeymanPackage] = []
     let packageSourceArray = self.readKeymanPackagesForKeyman19()
     
@@ -38,7 +41,7 @@ public struct PackageRepository {
   /**
    * delete the package from disk
    */
-  func deletePackage(package: KeymanPackage) {
+  public func deletePackage(package: KeymanPackage) {
     print("deleting package: \(package.sourceDirectoryUrl)")
     do {
       try FileManager.default.removeItem(at: package.sourceDirectoryUrl)
@@ -51,7 +54,7 @@ public struct PackageRepository {
   /**
    * Creates the directory tree where keyboards are stored under the standard 'Group Containers' directory
    */
-  func createKeyman19SharedDataDirectories() {
+  public func createKeyman19SharedDataDirectories() {
     if let keyboardDirectory = pathUtil.keyman19KeyboardsDirectory {
       
       do {
@@ -71,10 +74,11 @@ public struct PackageRepository {
     }
   }
   
+  // TODO: delete
   /**
    * for group container testing purposes to check directory access
    */
-  public func writeTestFileToContainer() {
+  func writeTestFileToContainer() {
     if let keyboardDirectory = self.pathUtil.keyman19KeyboardsDirectory {
       print("About to write to: \(keyboardDirectory.path)")
       
@@ -113,7 +117,10 @@ public struct PackageRepository {
       return exists && isDirectory.boolValue
   }
 
-  public func readKeymanPackagesForKeyman19() -> [PackageSource] {
+  /**
+   * read keyboard packages at Keyman 19 location, inside Group Containers directory
+   */
+  func readKeymanPackagesForKeyman19() -> [PackageSource] {
     guard let keyboardsUrl = self.pathUtil.keyman19KeyboardsDirectory else {
       return []
     }
@@ -121,7 +128,10 @@ public struct PackageRepository {
     return readKeyboardPackageSource(keyboardDirectoryUrl: keyboardsUrl)
   }
 
-  public func readKeyboardPackageSource(keyboardDirectoryUrl: URL) -> [PackageSource] {
+  /**
+   * loop through all the sub-directories in the keyboards directory and try to read them as packages
+   */
+  func readKeyboardPackageSource(keyboardDirectoryUrl: URL) -> [PackageSource] {
     var packages: [PackageSource] = []
     
     do {
@@ -148,6 +158,9 @@ public struct PackageRepository {
     return packages
   }
 
+  /**
+   * check the specified directory for kmp.json file and read it if it exists
+   */
   func readKeyboardPackageFromDirectory(keyboardDirectoryUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
     let lastPathComponent = keyboardDirectoryUrl.lastPathComponent
@@ -167,7 +180,10 @@ public struct PackageRepository {
     return packageSource
   }
  
-  public func readKeyboardPackage(_ kmpFileUrl: URL) -> PackageSource? {
+  /**
+   * read the kmp.json file at the specified URL
+   */
+  func readKeyboardPackage(_ kmpFileUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
     do {
       let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)

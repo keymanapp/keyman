@@ -22,34 +22,25 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   }()
 
   public var id = UUID()
-  let source: PackageSource
-  public var keyboards: [Keyboard]
-  
+
   // the URL of the directory in which the package is contained
   public let sourceDirectoryUrl: URL
   // the URL of the kmp.json file for the package
+
+  public var keyboards: [Keyboard]
+  public let packageName: String
+  public let packageVersion: String
+  
+  public let copyright: String?
   public let jsonFileUrl: URL
   public let readmeFileUrl: URL?
   public let graphicFileUrl: URL?
   public let graphicImage: NSImage?
   
-  // computed properties for convenience
-  public var packageName: String {
-    return source.info.name.description
-  }
-  public var packageVersion: String {
-    return source.info.version.description
-  }
-  public var copyright: String? {
-    if let copy = source.info.copyright?.description {
-      return copy
-    } else {
-      return nil
-    }
-  }
-
   init(packageSource: PackageSource) {
-    self.source = packageSource
+    self.packageName = packageSource.info.name.description
+    self.packageVersion = packageSource.info.version.description
+    self.copyright = packageSource.info.copyright?.description
     self.sourceDirectoryUrl = packageSource.directoryUrl!
     self.jsonFileUrl = packageSource.jsonFileUrl!
     
@@ -65,7 +56,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
 
     var keyboardsArray = [Keyboard]()
     
-    if let keyboards = source.keyboards {
+    if let keyboards = packageSource.keyboards {
       for keyboardSource in keyboards {
         let keyboard = Keyboard(keyboardSource: keyboardSource, directoryUrl: self.sourceDirectoryUrl)
         keyboardsArray.append(keyboard)
@@ -73,21 +64,38 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     }
     self.keyboards = keyboardsArray
     
-//    ConfigLogger.shared.testLogger.debug("package created for: \(packageSource.packageName)")
     print("package created for: \(packageSource.packageName)")
   }
-  
-  public func isKeyboardEnabled(keyboardId: String) -> Bool {
+
+  /**
+   * initializer that does not rely on package source -- provided to create unit test data
+   */
+  public init(sourceDirectoryUrl: URL, keyboards: [Keyboard], packageName: String, packageVersion: String, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
+    self.sourceDirectoryUrl = sourceDirectoryUrl
+    self.keyboards = keyboards
+    self.packageName = packageName
+    self.packageVersion = packageVersion
+    self.copyright = copyright
+    self.jsonFileUrl = jsonFileUrl
+    self.readmeFileUrl = readmeFileUrl
+    self.graphicFileUrl = graphicFileUrl
+    self.graphicImage = graphicImage
+  }
+
+  public func isKeyboardEnabled(keyboardKey: String) -> Bool {
     var enabled = false
-    if let keyboard = self.keyboards.first(where: { $0.keyboardId == keyboardId }) {
+    if let keyboard = self.keyboards.first(where: { $0.keyboardKey == keyboardKey }) {
+      let akeyboard = keyboard
+      print("keyboard: \(akeyboard.keyboardKey) is enabled: \(keyboard.enabled)")
       enabled = keyboard.enabled
     }
     
+    print("returning: \(enabled)")
     return enabled
   }
 
-  public func enableKeyboard(keyboardId: String, enabled: Bool) {
-    let keyboard = self.keyboards.first(where: { $0.keyboardId == keyboardId })
+  public func enableKeyboard(keyboardKey: String, enabled: Bool) {
+    let keyboard = self.keyboards.first(where: { $0.keyboardKey == keyboardKey })
     if (keyboard != nil) {
       keyboard!.enabled = enabled
     }
@@ -97,7 +105,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     guard let keyboard = self.keyboards.first(where: { $0.keyboardId == keyboardId }) else {
       return nil
     }
-    return keyboard.keyboardSettingsKey
+    return keyboard.keyboardKey
   }
 
   public func getEnabledKeyboardsSettingsKeys() -> [String] {
@@ -105,7 +113,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     
     self.keyboards.forEach { keyboard in
       if (keyboard.enabled) {
-        settingsKeyArray.append(keyboard.keyboardSettingsKey)
+        settingsKeyArray.append(keyboard.keyboardKey)
       }
     }
     

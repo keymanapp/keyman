@@ -20,8 +20,8 @@ struct KeyboardListView: View {
       ForEach($keyboards) { $keyboard in
         HStack {
           Toggle("", isOn: Binding(
-            get: { settings.isKeyboardEnabled(packageId: packageId, keyboardId: keyboard.keyboardId) },
-            set: { newValue in settings.setKeyboardEnabled(packageId: packageId, keyboardId: keyboard.keyboardId, enabled: newValue)
+            get: { settings.isKeyboardEnabled(packageId: packageId, keyboardKey: keyboard.keyboardKey) },
+            set: { newValue in settings.setKeyboardEnabled(packageId: packageId, keyboardKey: keyboard.keyboardKey, enabled: newValue)
               settings.objectWillChange.send() }
           ))
           Text(keyboard.keyboardId)
