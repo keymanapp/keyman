@@ -17,16 +17,10 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
  */
 export class ConverterMessages {
 
-  static ERROR_OutputFilenameIsRequired = SevError | 0x0001;
-  static Error_OutputFilenameIsRequired = () => m(
-    this.ERROR_OutputFilenameIsRequired,
-    `An output filename is required for keyboard conversion.`
-  );
-
-  static ERROR_IntputFilenameIsRequired = SevError | 0x0002;
-  static Error_IntputFilenameIsRequired = () => m(
-    this.ERROR_IntputFilenameIsRequired,
-    `An Input filename is required for keyboard conversion.`
+  static ERROR_InputFilenameIsRequired = SevError | 0x0002;
+  static Error_InputFilenameIsRequired = () => m(
+    this.ERROR_InputFilenameIsRequired,
+    `An input filename is required for keyboard conversion.`
   );
 
   static ERROR_FileNotFound = SevError | 0x0003;
@@ -51,6 +45,12 @@ export class ConverterMessages {
   static Error_UnableToRead = () => m(
     this.ERROR_UnableToRead,
     `Input file could not be read.`
+  );
+
+  static ERROR_UnableToParse = SevError | 0x000C;
+  static Error_UnableToParse = () => m(
+    this.ERROR_UnableToParse,
+    `Input data could not be parsed.`
   );
 
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;

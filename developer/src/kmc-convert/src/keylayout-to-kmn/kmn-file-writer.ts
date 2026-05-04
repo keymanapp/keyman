@@ -144,7 +144,7 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
@@ -200,7 +200,7 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
@@ -279,7 +279,7 @@ export class KmnFileWriter {
 
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
 
         // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
         // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
