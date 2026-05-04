@@ -17,127 +17,89 @@ value.
 
 -------------------------------------------------------------------------------
 
+
 # km_core_option_scope enum {#km_core_option_scope}
-
-## Description
-
-## Specification
 
 ```c
 enum km_core_option_scope {
+  /** An unknown option type. Reserved. */
   KM_CORE_OPT_UNKNOWN      = 0,
+  /** An option that is defined for the currently active keyboard; not all
+   *  processors support this type of option. These options are specific to the
+   *  active keyboard. */
   KM_CORE_OPT_KEYBOARD     = 1,
+  /** Properties of the current environment, often but not necessarily always
+   *  read-only. */
   KM_CORE_OPT_ENVIRONMENT  = 2,
   KM_CORE_OPT_MAX_SCOPES
 };
-
 ```
-## Values
-
-`KM_CORE_OPT_UNKNOWN`
-: An unknown option type. Reserved.
-
-`KM_CORE_OPT_KEYBOARD`
-: An option that is defined for the currently active keyboard;
-  not all processors support this type of option. These options
-  are specific to the active keyboard.
-
-`KM_CORE_OPT_ENVIRONMENT`
-: Properties of the current environment, often but not necessarily
-  always read-only.
-
--------------------------------------------------------------------------------
 
 # km_core_option_item struct {#km_core_option_item}
 
-## Description
+Defines a single option to be passed into the Keyman Core from the Platform
+layer.
 
-Defines a single option to be passed into the Keyman Core from the
-Platform layer.
-
-## Specification
 ```c
 struct km_core_option_item {
+  /** Null-terminated string key for the option */
   km_core_cu const *   key;
+  /** Null-terminated string value for the option */
   km_core_cu const *   value;
+  /** Scope which an option belongs to, from [km_core_option_scope]. */
   uint8_t             scope;
 };
-
 #define KM_CORE_OPTIONS_END { 0, 0, 0 }
 ```
-## Members
 
-`key`
-: Null-terminated string key for the option
+# km_core_options_list_size function {#km_core_options_list_size}
 
-`value`
-: Null-terminated string value for the option
-
-`scope`
-: Scope which an option belongs to, from [km_core_option_scope].
-
--------------------------------------------------------------------------------
-
-# km_core_options_list_size() {#km_core_options_list_size}
-
-## Description
 Return the length of a terminated [km_core_option_item] array (options
 list).
 
-## Specification
+
+## Parameters
+
+### opts
+A pointer to a `KM_CORE_OPTIONS_END` terminated array of
+[km_core_option_item] values.
+
+## Returns
+The number of items in the list, not including terminating
+item, or 0 if `opts` is null.
+
 ```c
 KMN_API
 size_t
 km_core_options_list_size(km_core_option_item const *opts);
-
 ```
-## Parameters
 
-`opts`
-: A pointer to a `KM_CORE_OPTIONS_END` terminated array of
-  [km_core_option_item] values.
-
-## Returns
-
-The number of items in the list, not including terminating item,
-or 0 if `opts` is null.
-
--------------------------------------------------------------------------------
-
-# km_core_state_option_lookup
-
-## Description
+# km_core_state_option_lookup function {#km_core_state_option_lookup}
 
 Lookup an option based on its key, in an options list.
 
-## Specification
-```c
-KMN_API
-km_core_status
-km_core_state_option_lookup(km_core_state const *state,
-                      uint8_t scope,
-                      km_core_cu const *key,
-                      km_core_cu const **value);
 
-```
 ## Parameters
 
-`state`
-: An opaque pointer to a state object.
+### state
+An opaque pointer to a state object.
 
-`scope`
-: Which key-value store to interrogate.
+### scope
+Which key-value store to interrogate.
 
-`key`
-: A UTF-16 string that matches the key in the target [km_core_option_item].
+### key
+A UTF-16 string that matches the key in the target
 
-`value`
-: A pointer to the result variable: A pointer to a UTF-16 string value owned
-  by the state or keyboard object at the time of the call. This pointer is
-  only valid *until* the next call to any function on this API and should be
-  used immediately.
+### value
+A pointer to the result variable: A pointer to a UTF-16
+string value owned by the state or keyboard object at the
+time of the call. This pointer is only valid *until* the next
+call to any function on this API and should be used
+immediately.
+
 
 ## Returns
+One of the following values:
 
 `KM_CORE_STATUS_OK`
 : On success.
@@ -148,31 +110,33 @@ km_core_state_option_lookup(km_core_state const *state,
 `KM_CORE_STATUS_KEY_ERROR`
 : The key cannot be found.
 
--------------------------------------------------------------------------------
+```c
+KMN_API
+km_core_status
+km_core_state_option_lookup(
+  km_core_state const *state,
+  uint8_t scope,
+  km_core_cu const *key,
+  km_core_cu const **value
+);
+```
 
-# km_core_state_options_update() {#km_core_state_options_update}
-
-## Description
+# km_core_state_options_update function {#km_core_state_options_update}
 
 Adds or updates one or more options from a list of [km_core_option_item]s.
 
-## Specification
-``` */
-KMN_API
-km_core_status
-km_core_state_options_update(km_core_state *state,
-                      km_core_option_item const *new_opts);
 
-```
 ## Parameters
-`state`
-: An opaque pointer to a state object.
 
-`new_opts`
-: An array of [km_core_option_item] objects to update or add. Must be
-  terminated with `KM_CORE_OPTIONS_END`.
+### state
+An opaque pointer to a state object.
+
+### new_opts
+An array of [km_core_option_item] objects to update or add.
+Must be terminated with `KM_CORE_OPTIONS_END`.
 
 ## Returns
+One of the following values:
 
 `KM_CORE_STATUS_OK`
 : On success.
@@ -186,17 +150,23 @@ km_core_state_options_update(km_core_state *state,
 `KM_CORE_STATUS_KEY_ERROR`
 : The key cannot be found.
 
--------------------------------------------------------------------------------
-
+```c
+KMN_API
+km_core_status
+km_core_state_options_update(
+  km_core_state *state,
+  km_core_option_item const *new_opts
+);
+```
 
 [km_core_cu]: background#km_core_cu "km_core_cu type"
 [km_core_usv]: background#km_core_usv "km_core_usv type"
 [km_core_virtual_key]: background#km_core_virtual_key "km_core_virtual_key type"
 [km_core_status]: background#km_core_status "km_core_status type"
-[km_core_modifier_state]: background#km_core_modifier_state "km_core_modifier_state type"
 [km_core_keyboard]: background#km_core_keyboard "km_core_keyboard struct"
 [km_core_state]: background#km_core_state "km_core_state struct"
 [km_core_options]: background#km_core_options "km_core_options struct"
+[km_core_keyboard_imx_platform]: background#km_core_keyboard_imx_platform "km_core_keyboard_imx_platform callback function"
 [km_core_status_codes]: background#km_core_status_codes "km_core_status_codes enum"
 [km_core_attr]: background#km_core_attr "km_core_attr struct"
 [km_core_tech_value]: background#km_core_tech_value "km_core_tech_value enum"
@@ -211,6 +181,7 @@ km_core_state_options_update(km_core_state *state,
 [km_core_option_scope]: options#km_core_option_scope "km_core_option_scope enum"
 [km_core_option_item]: options#km_core_option_item "km_core_option_item struct"
 [km_core_options_list_size]: options#km_core_options_list_size "km_core_options_list_size function"
+[km_core_state_option_lookup]: options#km_core_state_option_lookup "km_core_state_option_lookup function"
 [km_core_state_options_update]: options#km_core_state_options_update "km_core_state_options_update function"
 [km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
 [km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
@@ -220,6 +191,7 @@ km_core_state_options_update(km_core_state *state,
 [km_core_keyboard_get_attrs]: keyboards#km_core_keyboard_get_attrs "km_core_keyboard_get_attrs function"
 [km_core_keyboard_get_key_list]: keyboards#km_core_keyboard_get_key_list "km_core_keyboard_get_key_list function"
 [km_core_keyboard_key_list_dispose]: keyboards#km_core_keyboard_key_list_dispose "km_core_keyboard_key_list_dispose function"
+[km_core_keyboard_get_imx_list]: keyboards#km_core_keyboard_get_imx_list "km_core_keyboard_get_imx_list function"
 [km_core_keyboard_imx_list_dispose]: keyboards#km_core_keyboard_imx_list_dispose "km_core_keyboard_imx_list_dispose function"
 [km_core_state_imx_register_callback]: keyboards#km_core_state_imx_register_callback "km_core_state_imx_register_callback function"
 [km_core_state_imx_deregister_callback]: keyboards#km_core_state_imx_deregister_callback "km_core_state_imx_deregister_callback function"
@@ -233,3 +205,21 @@ km_core_state_options_update(km_core_state *state,
 [km_core_process_event]: processor#km_core_process_event "km_core_process_event function"
 [km_core_event]: processor#km_core_event "km_core_event function"
 [km_core_event_code]: processor#km_core_event_code "km_core_event_code enum"
+[km_core_action_item]: actions#km_core_action_item "km_core_action_item struct"
+[km_core_state_action_items]: actions#km_core_state_action_items "km_core_state_action_items function"
+[km_core_state_queue_action_items]: actions#km_core_state_queue_action_items "km_core_state_queue_action_items function"
+[km_core_process_queued_actions]: actions#km_core_process_queued_actions "km_core_process_queued_actions function"
+[km_core_context_type]: context#km_core_context_type "km_core_context_type enum"
+[km_core_context_item]: context#km_core_context_item "km_core_context_item struct"
+[KM_CORE_CONTEXT_ITEM_END]: context#KM_CORE_CONTEXT_ITEM_END "KM_CORE_CONTEXT_ITEM_END macro"
+[km_core_state_get_intermediate_context]: context#km_core_state_get_intermediate_context "km_core_state_get_intermediate_context function"
+[km_core_context_items_dispose]: context#km_core_context_items_dispose "km_core_context_items_dispose function"
+[km_core_state_context]: context#km_core_state_context "km_core_state_context function"
+[km_core_state_app_context]: context#km_core_state_app_context "km_core_state_app_context function"
+[km_core_context_set]: context#km_core_context_set "km_core_context_set function"
+[km_core_context_clear]: context#km_core_context_clear "km_core_context_clear function"
+[km_core_context_item_list_size]: context#km_core_context_item_list_size "km_core_context_item_list_size function"
+[km_core_context_get]: context#km_core_context_get "km_core_context_get function"
+[km_core_context_length]: context#km_core_context_length "km_core_context_length function"
+[km_core_modifier_state]: virtual-keys#km_core_modifier_state "km_core_modifier_state enum"
+[km_core_virtual_key_value]: virtual-keys#km_core_virtual_key_value "km_core_virtual_key_value "

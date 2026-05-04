@@ -23,7 +23,13 @@ fi
 . "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 
 CORE_ROOT="$KEYMAN_ROOT/core"
-CORE_H_FILE="$CORE_ROOT/include/keyman/keyman_core_api.h"
+CORE_H_FILES=(\
+  "$CORE_ROOT/include/keyman/keyman_core_api.h" \
+  "$CORE_ROOT/include/keyman/keyman_core_api_actions.h" \
+  "$CORE_ROOT/include/keyman/keyman_core_api_context.h" \
+  "$CORE_ROOT/include/keyman/keyman_core_api_debug.h" \
+  "$CORE_ROOT/include/keyman/keyman_core_api_vkeys.h" \
+)
 CORE_H_DOC="index.md"
 OUTPATH="$CORE_ROOT/docs/api"
 
@@ -31,7 +37,7 @@ do_build_and_run() {
   tsc --build
   rm -rf "$OUTPATH"
   mkdir -p "$OUTPATH"
-  node --enable-source-maps ./build/src/index.js "${CORE_H_FILE}" "${OUTPATH}"
+  node --enable-source-maps ./build/src/index.js "${OUTPATH}" "${CORE_H_FILES[@]}"
   echo "Wrote documentation to ${OUTPATH}/${CORE_H_DOC}"
 }
 
