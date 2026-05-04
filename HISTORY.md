@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.226 alpha 2026-05-04
+
+* chore(common): cleanup optionals in ldml keyboard reader (#15865)
+
 ## 19.0.225 alpha 2026-05-01
 
 * fix(windows): contextual help chm file has blank pages (#15724)
