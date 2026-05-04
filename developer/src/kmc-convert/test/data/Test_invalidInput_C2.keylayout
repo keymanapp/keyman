@@ -35,7 +35,7 @@
     </keyMapSet>
     <actions>
         <action id="a0">
-            <when state="1" output="U+-123"/>      <!-- C3-> keyman rule part 6 -->
+            <when state="1" output="U+-123"/>      <!-- C3-> keyman rule part 6 should output U+-123 since it is treated as string-->
         </action>
         <action id="a1">
             <when state="none" output="S"/>   <!-- C1-> keyman rule part 1-->

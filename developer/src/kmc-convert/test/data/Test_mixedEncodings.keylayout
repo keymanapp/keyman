@@ -25,7 +25,10 @@
             <key code="0" output="A"/>
             <key code="1" output="&#x42;"/>
             <key code="2" output="&#67;"/>
-            <key code="3" output="U+0044"/>
+            <key code="3" output="U+2345"/>
+            <key code="4" output="U+0001"/>
+            <key code="5" output="&#x0002;"/>
+            <key code="6" output=''/>
         </keyMap>
         <keyMap index="1">
             <key code="0" output="&#x1F600;"/>
@@ -33,6 +36,7 @@
             <key code="2" output="&#128514;"/>
             <key code="3" output="&gt;"/>
             <key code="4" output="<"/>
+            <key code="5" output="&#0003;"/>
         </keyMap>
     </keyMapSet>
     <actions>

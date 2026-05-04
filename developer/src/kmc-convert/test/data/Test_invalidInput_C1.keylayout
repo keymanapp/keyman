@@ -38,7 +38,7 @@
             <when state="1" output="Â"/>      <!-- C3-> keyman rule part 6 -->
         </action>
         <action id="a1">
-            <when state="none" output="U+-123"/>   <!-- C1-> keyman rule part 1-->
+            <when state="none" output="U+-123"/>   <!-- C1-> keyman rule part 1 should output U+-123 since it is treated as string-->
             <when state="3" next="1"/>        <!-- C3-> keyman rule part 5 -->
         </action>
         <action id="a2">
@@ -48,7 +48,7 @@
             <when state="none" next="1"/>     <!-- C2-> keyman rule part 3 -->
         </action>
         <action id="a4">
-            <when state="none" output="U"/>   <!-- C1-> keyman rule part 1 -->
+            <when state="none" output="U+1234"/>   <!-- C1-> keyman rule part 1 should output U+-1234 since it is treated as string-->
         </action>
     </actions>
     <terminators>

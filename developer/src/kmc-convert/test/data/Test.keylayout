@@ -205,7 +205,7 @@
             <key code="50" output="-"/>
         </keyMap>
         <keyMap index="3">
-            <key code="0" output="U+1F600"/>
+            <key code="0" output="&#x1F600;"/>
             <key code="1" output="&#x1F601;"/>
             <key code="2" output="&#x1234;"/>
             <key code="3" output="ሴ"/>

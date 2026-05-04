@@ -14,7 +14,7 @@
  * @brief  function to convert a character, numeric character reference or a unicode value to a character or unicode Codepoint
  *         if input is a valid single character or Codepoint like 'c','ä', 'ሴ', 'ẘ', '😎',  the same character or Codepoint is returned (e.g. 'c' -> 'c', '😎' -> '😎')
  *         if input is a valid multi character/Codepoint string like 'ab', 'abcde', '😎😆',  the same string is returned (e.g. 'abcde' -> 'abcde' ,  😎😆 ->😎😆 )
- *         if input is a valid Unicode value, numeric character reference in hex or decimal, the corresponding character or unicode Codepointis returned (e.g. &#x1F60E; -> 😎)
+ *         if input is a valid numeric character reference in hex or decimal, the corresponding character or unicode Codepoint is returned (e.g. &#x1F60E; -> 😎)
  *         if input is a one of the named character reference  &gt; &lt; &amp; &quot; &apos;, the corresponding character is returned ( e.g. '&gt;'  -> '>')
  * @param  inputString the string or stringvalue that will converted
  * @return the input character/Codepoint if input is a valid character/Codepoint
@@ -27,13 +27,6 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
     if (inputString == null || inputString == undefined) {
         return undefined;
     }
-
-    //  U+ followed by 1.-6. hex digits will later be used for conversion
-    const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(inputString);
-
-    // invalid U+ ( U+ followed by anything) will later be refused for conversion
-    const m_uni_inv = /^(U\+)+(.?)+$/i.exec(inputString);
-
     // &#x followed by 1.-6. hex digits will later be used for conversion
     const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
 
@@ -46,29 +39,14 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
     //  &# followed by anything will later be refused for conversion
     const m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
 
-    // one or more characters except starting with U+ or & will later be used for conversion
-    const m_chr = /^(?!U\+|&).+$/i.exec(inputString);
+    // one or more characters except starting & will later be used for conversion
+    const m_chr = /^(?!&).+$/i.exec(inputString);
 
-    // '&', '&#','&#x', or 'U+' with or without ; will later be refused for conversion
-    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+|(U\+)+;?)$|^$/i.exec(inputString);
-
-    // valid 'U+xxxx'
-    if (m_uni) {
-        const codePoint_u = parseInt(m_uni[1], 16);
-        // Reject surrogates and invalid codepoints
-        if ((codePoint_u >= 0xD800 && codePoint_u <= 0xDFFF) || codePoint_u > 0x10FFFF) {
-            return undefined;
-        }
-        return String.fromCodePoint(codePoint_u);
-    }
-
-    // invalid 'U+xxxx'
-    else if (m_uni_inv) {
-        return undefined;
-    }
+    // '&', '&#','&#x' with or without ; will later be refused for conversion
+    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+;?)$|^$/i.exec(inputString);
 
     // valid '&#x...'
-    else if (m_hex) {
+    if (m_hex) {
         const codePoint_h = parseInt(m_hex[1], 16);
         // Reject surrogates and invalid codepoints
         if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
@@ -101,7 +79,7 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
         return undefined;
     }
 
-    // single 'U+', '&', ''
+    // single '&', ''
     else if (m_chr_inv) {
         return inputString;
     }

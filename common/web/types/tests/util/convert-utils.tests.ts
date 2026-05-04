@@ -3,9 +3,9 @@ import { assert } from 'chai';
 import { convertUtil } from '@keymanapp/common-types';
 
 describe('convert-utils', function () {
-
   describe('convertToUnicodeCharacter', function () {
     [
+      ["<", '<'],
       ["a", 'a'],
       ["ሴ", 'ሴ'],
       ["W̊", "W̊"],
@@ -15,12 +15,7 @@ describe('convert-utils', function () {
       ["ẘẈ", "ẘẈ"],
       ["😎😆", '😎😆'],
       ["aሴ😆", 'aሴ😆'],
-      ["U+0061", 'a'],
-      ["U+1234", 'ሴ'],
-      ["U+1E9A", "ẚ"],
-      ["U+1F60A", '😊'],
-      ["U+0001", '\u0001'],
-      ["U+1000000;", undefined],
+      ["U+0061", 'U+0061'],
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
       ["&#x1E98;", "ẘ"],
@@ -45,16 +40,7 @@ describe('convert-utils', function () {
       ["", ''],
       [undefined, undefined],
       [null, undefined],
-      ["U+", undefined],
-      ['U+', undefined],
-      ['U+U+', undefined],
-      ['U+D799', '힙'],
-      ['U+D800', undefined],
-      ['U+D83D', undefined],
-      ['U+DFFF', undefined],
-      ['U+10FFFF', '􏿿'],
-      ['U+E000', ''],
-      ['U+1000000', undefined],
+      ["U+", "U+"],
       ['&', '&'],
       ['&;', '&;'],
       ['&&', '&&'],

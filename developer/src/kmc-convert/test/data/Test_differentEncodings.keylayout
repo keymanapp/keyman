@@ -21,7 +21,7 @@
     <keyMapSet id="ANSI">
         <keyMap index="0">
             <key code="0" output="&#x1F601;"/>
-            <key code="1" output="U+1F603"/>
+            <key code="1" output="&#x1F603;"/>
             <key code="2" output="&#128514;"/>
             <key code="3" output="😀"/>
         </keyMap>

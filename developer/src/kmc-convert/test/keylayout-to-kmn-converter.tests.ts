@@ -60,6 +60,14 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunSpecialTestFiles', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
+      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
+      [makePathToFixture('../data/Test_invalidInput_C0.keylayout')],
+      [makePathToFixture('../data/Test_invalidInput_C1.keylayout')],
+      [makePathToFixture('../data/Test_invalidInput_C2.keylayout')],
+      [makePathToFixture('../data/Test_invalidInput_C3.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C0.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C2.keylayout')],
+      [makePathToFixture('../data/Test_Character_Codepoint_C3.keylayout')],
       [makePathToFixture('../data/Test_C0.keylayout')],
       [makePathToFixture('../data/Test_C1.keylayout')],
       [makePathToFixture('../data/Test_C2.keylayout')],

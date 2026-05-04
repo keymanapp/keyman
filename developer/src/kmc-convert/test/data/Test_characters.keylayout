@@ -35,8 +35,8 @@
             <key code="0" output=" "/>
             <key code="1" output="&#x1234;"/>
             <key code="2" output="&#2345;"/>
-            <key code="3" output="U+1F600"/>
-            <key code="4" output="U+0002"/>
+            <key code="3" output="&#x1F600;"/>
+            <key code="4" output="&#x0002;"/>
             <key code="5" output="&#x0004;"/>
             <key code="6" output="&amp;"/>
             <key code="43" output="&lt;"/>
