@@ -151,7 +151,7 @@ public class SettingsContainer : ObservableObject {
    * persist the keyboard state in the settings (UserDefaults)
    */
   func persistKeyboardState() {
-    let enabledKeyboards = self.getAllEnabledKeyboardSettingsKeys()
+    let enabledKeyboards = self.getAllEnabledKeyboardKeys()
     self.defaultsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(enabledKeyboards))
   }
   
@@ -176,7 +176,7 @@ public class SettingsContainer : ObservableObject {
   /**
    *  returns set containing the keyboards settings keys for all installed keyboards
    */
-  func getAllKeyboardSettingsKeys() -> Set<String> {
+  func getAllKeyboardKeys() -> Set<String> {
     var settingsKeys = Set<String>()
     
     // loop through all the installed packages and for each of the package's keyboards,
@@ -191,7 +191,7 @@ public class SettingsContainer : ObservableObject {
   /**
    *  returns set containing the keyboards settings keys for all installed keyboards which are enabled
    */
-  func getAllEnabledKeyboardSettingsKeys() -> Set<String> {
+  func getAllEnabledKeyboardKeys() -> Set<String> {
     var settingsKeys = Set<String>()
     
     // loop through all the installed packages and for each of the package's keyboards,
@@ -210,7 +210,7 @@ public class SettingsContainer : ObservableObject {
    *  remove any settings (UserDefaults) for which we have no installed package
    */
   func validateSettings() {
-    let installedKeyboardKeys = self.getAllKeyboardSettingsKeys()
+    let installedKeyboardKeys = self.getAllKeyboardKeys()
     let enabledKeyboardKeys = self.defaultsRepository.readEnabledKeyboards()
     
     if (enabledKeyboardKeys.isSubset(of: installedKeyboardKeys)) {

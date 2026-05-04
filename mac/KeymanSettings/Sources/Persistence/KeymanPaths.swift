@@ -5,7 +5,7 @@
  *
  * KeymanPaths provides the file paths of the Keyman input method and
  * all Keyman keyboard documents. This is used for installing and removing
- * the input method and keyboards.
+ * the input method and packages.
  *
  * Obsolete locations are also included and used for migrating data and
  * updating settings.
@@ -21,41 +21,41 @@ import Foundation
  * Variables that represent only a single directory end with 'DirectoryName' rather than 'Directory'
  * For Keyman versions 17 and earlier, the directory hierarchy is as follows:
  *    documentsDirectory: '~/Documents'
- *      keyman17KeyboardsDirectory: '~/Documents/Keyman-Keyboards'
+ *      keyman17PackagesDirectory: '~/Documents/Keyman-Keyboards'
  * For Keyman version 18:
  *    supportDirectory: '~/Library/Application Support'
  *      supportKeymanDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'
- *        keyman18KeyboardsDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
+ *        keyman18PackagesDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
  * For Keyman version 19 (and later):
  *    containerDirectory: '~/Library/Group Containers'
  *      containerKeymanDirectory: '~/Library/Group Containers/group.com.keyman'
  *        groupKeymanSupportDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support'
- *          keyman19KeyboardsDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages'
+ *          keyman19PackagesDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages'
 */
 
 public struct KeymanPaths {
   static let keymanBundleId = "keyman.inputmethod.Keyman"
   static let configBundleId = "com.keyman.config"
-//  static let groupId = "3YE4W86L3G.com.keyman"
   static let groupId = "group.com.keyman"
 
-  static private let keyboardsDirectoryName = "Keyman-Keyboards"
+  static private let preKeyman19PackagesDirectoryName = "Keyman-Keyboards"
   static private let keymanSubdirectoryName = "keyman.inputmethod.Keyman"
   
+  // keyman 19 directory names
   static private let containerPreferencesPartialPath = "Library/Preferences"
-  static private let containerKeyboardsPartialPath = "Library/Application Support/Keyman-Packages"
+  static private let containerPackagesPartialPath = "Library/Application Support/Keyman-Packages"
   
   // keyman 17 and earlier
   let keyman17DocumentsDirectory: URL?
-  let keyman17KeyboardsDirectory: URL?
+  let keyman17PackagesDirectory: URL?
   
   // keyman 18
   let keyman18SupportDirectory: URL?
   let keyman18DataDirectory: URL?
-  let keyman18KeyboardsDirectory: URL?
+  let keyman18PackagesDirectory: URL?
 
   // current directories for keyman 19
-  let keyman19KeyboardsDirectory: URL?
+  let keyman19PackagesDirectory: URL?
   let keyman19DataDirectory: URL?
   let keyman19ContainerDirectory: URL?
   let keyman19PreferencesDirectory: URL?
@@ -64,14 +64,14 @@ public struct KeymanPaths {
     let documentsDir = KeymanPaths.buildDocumentsUrl()
     self.keyman17DocumentsDirectory = documentsDir
     
-    self.keyman17KeyboardsDirectory = KeymanPaths.buildKeyman17KeyboardsUrl(documents: self.keyman17DocumentsDirectory)
+    self.keyman17PackagesDirectory = KeymanPaths.buildKeyman17PackagesUrl(documents: self.keyman17DocumentsDirectory)
     
     let supportDir = KeymanPaths.buildSupportDirectory()
     self.keyman18SupportDirectory = supportDir
     
     let keyman18DataDir = KeymanPaths.buildKeyman18DataDirectory(support: supportDir)
     self.keyman18DataDirectory = keyman18DataDir
-    self.keyman18KeyboardsDirectory = KeymanPaths.buildKeyman18KeyboardsUrl(data: keyman18DataDir)
+    self.keyman18PackagesDirectory = KeymanPaths.buildKeyman18PackagesUrl(data: keyman18DataDir)
     
     let containerDir = KeymanPaths.buildContainerUrl()
     self.keyman19ContainerDirectory = containerDir
@@ -81,8 +81,8 @@ public struct KeymanPaths {
     self.keyman19PreferencesDirectory = KeymanPaths.buildContainerPreferencesUrl(container: containerDir)
     
     
-    let keyman19KeyboardsDir = KeymanPaths.buildKeyman19KeyboardsUrl(container: containerDir)
-    self.keyman19KeyboardsDirectory = keyman19KeyboardsDir
+    let keyman19PackagesDir = KeymanPaths.buildKeyman19PackagesUrl(container: containerDir)
+    self.keyman19PackagesDirectory = keyman19PackagesDir
     
     //self.logPaths()
   }
@@ -90,15 +90,15 @@ public struct KeymanPaths {
   /*
   fileprivate func logPaths() {
     ConfigLogger.shared.testLogger.debug("documents: \(self.keyman17DocumentsDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("keyman 17 keyboards: \(self.keyman17KeyboardsDirectory!.absoluteString)")
+    ConfigLogger.shared.testLogger.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.absoluteString)")
     
     ConfigLogger.shared.testLogger.debug("support directory: \(self.keyman18SupportDirectory!.absoluteString)")
     ConfigLogger.shared.testLogger.debug("support keyman directory: \(self.keyman18DataDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("keyman 18 keyboards: \(self.keyman18KeyboardsDirectory!.absoluteString)")
+    ConfigLogger.shared.testLogger.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.absoluteString)")
     
     ConfigLogger.shared.testLogger.debug("container: \(self.keyman19ContainerDirectory!.absoluteString)")
     ConfigLogger.shared.testLogger.debug("preferences: \(self.keyman19PreferencesDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("keyman 19 keyboards: \(self.keyman19KeyboardsDirectory!.absoluteString)")
+    ConfigLogger.shared.testLogger.debug("keyman 19 packages: \(self.keyman19PackagesDirectory!.absoluteString)")
   }
   */
 
@@ -140,12 +140,11 @@ public struct KeymanPaths {
     }
   }
   
-  private static func buildKeyman17KeyboardsUrl(documents: URL?) -> URL? {
-    if let keyman17KeyboardsDirectory = documents?.appendingPathComponent(keyboardsDirectoryName, isDirectory: true) {
-      return keyman17KeyboardsDirectory
+  private static func buildKeyman17PackagesUrl(documents: URL?) -> URL? {
+    if let keyman17PackagesDirectory = documents?.appendingPathComponent(preKeyman19PackagesDirectoryName, isDirectory: true) {
+      return keyman17PackagesDirectory
     } else {
-//      ConfigLogger.shared.testLogger.error("could not build keyman17 keyboards directory")
-      print("could not build keyman17 keyboards directory")
+      print("could not build keyman17 packages directory")
       return nil
     }
   }
@@ -177,9 +176,9 @@ public struct KeymanPaths {
     }
   }
 
-  private static func buildKeyman18KeyboardsUrl(data: URL?) -> URL? {
+  private static func buildKeyman18PackagesUrl(data: URL?) -> URL? {
     if let keymanDataUrl = data {
-      return keymanDataUrl.appendingPathComponent(KeymanPaths.keyboardsDirectoryName)
+      return keymanDataUrl.appendingPathComponent(KeymanPaths.preKeyman19PackagesDirectoryName)
     } else {
       return nil
     }
@@ -197,9 +196,9 @@ public struct KeymanPaths {
     }
   }
 
-  private static func buildKeyman19KeyboardsUrl(container: URL?) -> URL? {
+  private static func buildKeyman19PackagesUrl(container: URL?) -> URL? {
     if let containerUrl = container {
-      return containerUrl.appendingPathComponent(KeymanPaths.containerKeyboardsPartialPath)
+      return containerUrl.appendingPathComponent(KeymanPaths.containerPackagesPartialPath)
     } else {
       return nil
     }

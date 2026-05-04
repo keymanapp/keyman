@@ -70,9 +70,9 @@ import Foundation
     #expect(documentsDirectory.absoluteString.hasSuffix("Documents/"))
   }
   
-  @Test("Check Keyman 17 keyboards directory") func testKeyman17KeyboardsDirectory() async throws {
+  @Test("Check Keyman 17 packages directory") func testKeyman17KeyboardsDirectory() async throws {
     #expect(true)
-    let keyboardsDirectory = try #require(KeymanPaths().keyman17KeyboardsDirectory)
+    let keyboardsDirectory = try #require(KeymanPaths().keyman17PackagesDirectory)
     #expect(keyboardsDirectory.absoluteString.hasSuffix("Documents/Keyman-Keyboards/"))
   }
   
@@ -88,9 +88,9 @@ import Foundation
     #expect(supportDirectory.absoluteString.hasSuffix("Library/Application%20Support/keyman.inputmethod.Keyman/"))
   }
   
-  @Test("Check Keyman 18 keyboards directory") func testKeyman18SupportKeyboardsDirectory() async throws {
+  @Test("Check Keyman 18 packages directory") func testKeyman18SupportKeyboardsDirectory() async throws {
     #expect(true)
-    let keyboardsDirectory = try #require(KeymanPaths().keyman18KeyboardsDirectory)
+    let keyboardsDirectory = try #require(KeymanPaths().keyman18PackagesDirectory)
     #expect(keyboardsDirectory.absoluteString.hasSuffix("Library/Application%20Support/keyman.inputmethod.Keyman/Keyman-Keyboards/"))
   }
   
@@ -100,9 +100,9 @@ import Foundation
     #expect(containerDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/"))
   }
   
-  @Test("Check Keyman 19 keyboards directory") func testKeyman19KeyboardsDirectory() async throws {
+  @Test("Check Keyman 19 packages directory") func testKeyman19KeyboardsDirectory() async throws {
     #expect(true)
-    let keyboardsDirectory = try #require(KeymanPaths().keyman19KeyboardsDirectory)
+    let keyboardsDirectory = try #require(KeymanPaths().keyman19PackagesDirectory)
     #expect(keyboardsDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/"))
   }
 }
@@ -151,14 +151,14 @@ import Foundation
     let packageRepo = PackageRepository()
     
     let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let _ =  try #require(packageRepo.readKeyboardPackage(kmpUrl))
+    let _ =  try #require(packageRepo.readPackage(kmpUrl))
   }
   
   @Test("Read package name") func readPackageName() async throws {
     let packageRepo = PackageRepository()
     
     let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readKeyboardPackage(kmpUrl))
+    let source =  try #require(packageRepo.readPackage(kmpUrl))
     #expect(source.packageName == "GFF Amharic Keyboard")
   }
   
@@ -166,7 +166,7 @@ import Foundation
     let packageRepo = PackageRepository()
     
     let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readKeyboardPackage(kmpUrl))
+    let source =  try #require(packageRepo.readPackage(kmpUrl))
     #expect(source.packageVersion == "3.1.2")
   }
   
@@ -174,7 +174,7 @@ import Foundation
     let packageRepo = PackageRepository()
     
     let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readKeyboardPackage(kmpUrl))
+    let source =  try #require(packageRepo.readPackage(kmpUrl))
     #expect(source.copyright == "© Geʾez Frontier Foundation, SIL International")
   }
   
@@ -182,7 +182,7 @@ import Foundation
     let packageRepo = PackageRepository()
     
     let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readKeyboardPackage(kmpUrl))
+    let source =  try #require(packageRepo.readPackage(kmpUrl))
     #expect(source.keyboards?.count == 1)
   }
   
@@ -190,7 +190,7 @@ import Foundation
     let packageRepo = PackageRepository()
     
     let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readKeyboardPackage(kmpUrl))
+    let source =  try #require(packageRepo.readPackage(kmpUrl))
     let keyboard = try #require(source.keyboards?.first)
     #expect(keyboard.name == "አማርኛ (Amharic)")
   }

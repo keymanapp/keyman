@@ -52,10 +52,10 @@ public class PackageRepository: PackageRepo {
   }
   
   /**
-   * Creates the directory tree where keyboards are stored under the standard 'Group Containers' directory
+   * Creates the directory tree where packages are stored under the standard 'Group Containers' directory
    */
   public func createKeyman19SharedDataDirectories() {
-    if let keyboardDirectory = pathUtil.keyman19KeyboardsDirectory {
+    if let keyboardDirectory = pathUtil.keyman19PackagesDirectory {
       
       do {
         // create the directory if it doesn't already exist
@@ -79,7 +79,7 @@ public class PackageRepository: PackageRepo {
    * for group container testing purposes to check directory access
    */
   func writeTestFileToContainer() {
-    if let keyboardDirectory = self.pathUtil.keyman19KeyboardsDirectory {
+    if let keyboardDirectory = self.pathUtil.keyman19PackagesDirectory {
       print("About to write to: \(keyboardDirectory.path)")
       
       do {
@@ -101,11 +101,11 @@ public class PackageRepository: PackageRepo {
    * Check to see whether the shared Keyman data directory exists under 'Library/Group Containers/'
    */
   public func keyman19SharedDataDirectoryExists() -> Bool {
-    guard let keyboardsUrl = self.pathUtil.keyman19KeyboardsDirectory else {
+    guard let packagesUrl = self.pathUtil.keyman19PackagesDirectory else {
       return false
     }
     
-    return self.directoryExistsAtPath(directoryUrl: keyboardsUrl)
+    return self.directoryExistsAtPath(directoryUrl: packagesUrl)
   }
   
   /**
@@ -118,26 +118,26 @@ public class PackageRepository: PackageRepo {
   }
 
   /**
-   * read keyboard packages at Keyman 19 location, inside Group Containers directory
+   * read packages at Keyman 19 location, inside Group Containers directory
    */
   func readKeymanPackagesForKeyman19() -> [PackageSource] {
-    guard let keyboardsUrl = self.pathUtil.keyman19KeyboardsDirectory else {
+    guard let packagesUrl = self.pathUtil.keyman19PackagesDirectory else {
       return []
     }
 
-    return readKeyboardPackageSource(keyboardDirectoryUrl: keyboardsUrl)
+    return readPackageSource(packageDirectoryUrl: packagesUrl)
   }
 
   /**
-   * loop through all the sub-directories in the keyboards directory and try to read them as packages
+   * loop through all the sub-directories in the packages directory and try to read them as packages
    */
-  func readKeyboardPackageSource(keyboardDirectoryUrl: URL) -> [PackageSource] {
+  func readPackageSource(packageDirectoryUrl: URL) -> [PackageSource] {
     var packages: [PackageSource] = []
     
     do {
       // Get the URLs for all items in the directory that are not hidden
       let directoryContents = try FileManager.default.contentsOfDirectory(
-        at: keyboardDirectoryUrl,
+        at: packageDirectoryUrl,
         includingPropertiesForKeys: nil,
         options: [.skipsHiddenFiles]
       )
@@ -145,7 +145,7 @@ public class PackageRepository: PackageRepo {
       for itemUrl in directoryContents {
         // if the item is a directory, then attempt to read it as a keyboard package
         if (itemUrl.hasDirectoryPath) {
-          if let packageSource =  readKeyboardPackageFromDirectory(keyboardDirectoryUrl: itemUrl) {
+          if let packageSource =  readPackageFromDirectory(packageDirectoryUrl: itemUrl) {
             packages.append(packageSource)
           }
         }
@@ -161,16 +161,16 @@ public class PackageRepository: PackageRepo {
   /**
    * check the specified directory for kmp.json file and read it if it exists
    */
-  func readKeyboardPackageFromDirectory(keyboardDirectoryUrl: URL) -> PackageSource? {
+  func readPackageFromDirectory(packageDirectoryUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
-    let lastPathComponent = keyboardDirectoryUrl.lastPathComponent
-    let kmpFileUrl = keyboardDirectoryUrl.appendingPathComponent(packageFileName)
+    let lastPathComponent = packageDirectoryUrl.lastPathComponent
+    let kmpFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
     
     if FileManager.default.fileExists(atPath: kmpFileUrl.path) {
-      if let source = readKeyboardPackage(kmpFileUrl) {
+      if let source = readPackage(kmpFileUrl) {
         packageSource = source
         // save the keyboard directory and path of the kmp.json for this keyboard
-        packageSource?.directoryUrl = keyboardDirectoryUrl
+        packageSource?.directoryUrl = packageDirectoryUrl
         packageSource?.jsonFileUrl = kmpFileUrl
       }
     } else {
@@ -183,7 +183,7 @@ public class PackageRepository: PackageRepo {
   /**
    * read the kmp.json file at the specified URL
    */
-  func readKeyboardPackage(_ kmpFileUrl: URL) -> PackageSource? {
+  func readPackage(_ kmpFileUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
     do {
       let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)
