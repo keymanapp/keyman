@@ -81,7 +81,7 @@ export class KeylayoutFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: Keylayout.KeylayoutXMLSourceFile|null): boolean {
+  public validate(source: Keylayout.KeylayoutXMLSourceFile, inputFilename: string): boolean {
     if (!source) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
       return false;
