@@ -106,7 +106,7 @@ class StoreBeep {
 }
 
 type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul;
-type ContextEntry = RuleChar | ContextNonCharEntry;
+export type ContextEntry = RuleChar | ContextNonCharEntry;
 
 export type StoreNonCharEntry = RuleDeadkey | StoreBeep;
 
