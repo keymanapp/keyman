@@ -65,6 +65,12 @@ describe('KmnFileWriter', function () {
       const writtenCorrectName = sutW.writeKmnFileHeader(converted);
       assert.equal(writtenCorrectName, (outExpectedFirst + (converted?.keylayoutFilename ?? "") + outExpectedLast));
     });
+    it(('writeKmnFileHeader should return no text with null filename ').padEnd(62, " ") + 'on correct input', async function () {
+      const writtenEmptytName = sutW.writeKmnFileHeader(null);
+      assert.equal(writtenEmptytName, '');
+    });
+
+
   });
 
   describe('convertToUnicodeCharacter ', function () {
@@ -483,7 +489,12 @@ describe('KmnFileWriter', function () {
         const result1 = sutW.writeDataRules(data);
         assert.isTrue(result1 === values[1][0]);
       });
+
     });
+    it(('null should create empty string '), async function () {
+        const result1 = sutW.writeDataRules(null);
+        assert.isTrue(result1 === '');
+      });
   });
 
 });

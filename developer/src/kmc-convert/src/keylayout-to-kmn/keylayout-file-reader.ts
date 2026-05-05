@@ -19,7 +19,9 @@ export class KeylayoutFileReader {
 
 
   /**
-   * @brief  helper function to find a specific keyMap index in a keyMapSet
+   * @brief  helper function to check if a specific keyMap index exists in a keyMapSet
+   * neccessary because the amount of  <keyMap index> must correspond to
+   * the amount of <keyMapSelect mapIndex>
    * @param  jsonObj the read keylayout data to be checked
    * @param  keyMapSelect the keyMapSelect element to find in keyMapSet
    * @return true if the keyMapSet element is found, false if not
@@ -36,7 +38,9 @@ export class KeylayoutFileReader {
   }
 
   /**
-   * @brief  helper function to find a specific keyMapSelect index in a modifierMap
+   * @brief  helper function to check if a specific keyMapSelect index exists in a modifierMap
+   * neccessary because the amount of <keyMap index> must correspond to
+   * the amount of <keyMapSelect mapIndex>
    * @param  jsonObj the read keylayout data to be checked
    * @param  keyMap the keyMap element to find in modifierMap
    * @return true if the keyMap element is found, false if not
@@ -53,8 +57,8 @@ export class KeylayoutFileReader {
   }
 
   /**
-   * @brief  member function checking if all keyMapSelect elements have a corresponding keyMap
-   * element in the .keylayout file (if not, the .keylayout file is invalid and will not be converted)
+   * @brief  member function checking if all keyMapSelect elements have exact one corresponding keyMap element (per keyMapSet)
+   * in the .keylayout file (if not, the .keylayout file is invalid and will not be converted)
    * see TN2056 (https://developer.apple.com/library/archive/technotes/tn2056/_index.html#//apple_ref/doc/uid/DTS10003085-CH1-SUBSECTION7)
    * @param  jsonObj the read keylayout data to be checked
    * @return true if all keyMapSelect elements have a corresponding keyMap element, false if not
