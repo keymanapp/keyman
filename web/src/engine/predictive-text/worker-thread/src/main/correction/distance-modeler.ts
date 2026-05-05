@@ -4,7 +4,7 @@ import { PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
-import { CorrectionSearchable } from './correction-searchable.js';
+import { CORRECTION_QUEUE_COMPARATOR, CorrectionSearchable } from './correction-searchable.js';
 import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
@@ -611,7 +611,7 @@ export async function *getBestMatches<
   // If no filter function is provided, default to one that always returns true.
   filter ??= () => true;
 
-  const spaceQueue = new PriorityQueue<Correctable>((a, b) => a.currentCost - b.currentCost);
+  let spaceQueue = new PriorityQueue<Correctable>(CORRECTION_QUEUE_COMPARATOR);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
   // and iterate over it first.
@@ -655,6 +655,7 @@ export async function *getBestMatches<
       let lowestCostSource = spaceQueue.dequeue();
       const newResult = lowestCostSource.handleNextNode();
       spaceQueue.enqueue(lowestCostSource);
+      spaceQueue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, spaceQueue.toArray());
 
       if(newResult.type == 'none') {
         return null;

@@ -1,17 +1,16 @@
 import { PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { PathResult } from './correction-searchable.js';
+import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
-import { QUEUE_NODE_COMPARATOR } from './search-quotient-spur.js';
 import { SearchNode } from './distance-modeler.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import { TokenResultMapping } from './token-result-mapping.js';
 
 export class LegacyQuotientRoot extends SearchQuotientRoot {
-  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
+  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR);
   private processed: SearchNode[] = [];
 
   constructor(model: LexicalModel) {
@@ -45,10 +44,12 @@ export class LegacyQuotientRoot extends SearchQuotientRoot {
     }
 
     this.processed.push(node);
+    const result = new TokenResultMapping(this, node);
+    this.saveResult(result);
     return {
       type: 'complete',
       cost: node.currentCost,
-      mapping: new TokenResultMapping(this, node)
+      mapping: result
     };
   }
 
