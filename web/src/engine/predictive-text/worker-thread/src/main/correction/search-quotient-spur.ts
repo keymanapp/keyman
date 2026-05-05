@@ -431,9 +431,9 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     const result = new TokenResultMapping(this, currentNode);
     if(currentNode.spaceId == this.spaceId) {
       // Verify that we don't already have a better-cost result for the
-      // correction already.
-      const isUnhandled = this.saveResult(result);
-      if(!isUnhandled) {
+      // correction.
+      const isNewOptimalEntry = this.saveResult(result);
+      if(!isNewOptimalEntry) {
         // Not a better cost, so reject it and move on to the next potential result.
         return this.handleNextNode();
       }
