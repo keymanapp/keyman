@@ -17,8 +17,10 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import {
   ContextToken,
   ContextTokenization,
+  correction,
   correctionValidForAutoSelect,
   generateSubsetId,
+  getBestMatches,
   LegacyQuotientSpur,
   models,
   PathInputProperties,
@@ -40,6 +42,10 @@ const plainModel = new TrieModel(
     wordBreaker: defaultBreaker
   }
 );
+
+function buildTestTimer() {
+  return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
+}
 
 function buildFixture_therefore() {
   let ID_SEED = 11;
@@ -419,6 +425,44 @@ describe('TokenizationCorrector', () => {
 
       const nilResult = instance.handleNextNode();
       assert.equal(nilResult.type, 'none');
+    });
+
+    describe('with getBestMatches()', () => {
+      it('finds results from each of two tokenization variants sharing lower-level SearchQuotientNodes', async () => {
+        const fixture = buildFixture_therefore();
+
+        const tokenizations = [fixture.theref, fixture.the_ef];
+        const correctors = tokenizations.map((t) => new TokenizationCorrector(t, t.tokens.length, fixture.filter));
+
+        let haveSeenSingleTokenCorrection = false;
+        let haveSeenThreeTokenCorrection = false;
+        for await(let phraseMatch of getBestMatches<
+          ReadonlyArray<TokenResult>,
+          TokenizationResultMapping,
+          TokenizationCorrector
+          >(correctors, buildTestTimer())) {
+
+          if(phraseMatch.matchedResult.length == 1) {
+            if(!haveSeenSingleTokenCorrection) {
+              assert.sameOrderedMembers(phraseMatch.matchedResult.map((t) => t.matchString), ['theref' /* -ore */]);
+            }
+
+            haveSeenSingleTokenCorrection = true;
+          } else if(phraseMatch.matchedResult.length == 3) {
+            if(!haveSeenThreeTokenCorrection) {
+              assert.sameOrderedMembers(phraseMatch.matchedResult.map((t) => t.matchString), ['the', ' ', 'ef' /* -fort */]);
+            }
+            haveSeenThreeTokenCorrection = true;
+          }
+
+          if(haveSeenSingleTokenCorrection && haveSeenThreeTokenCorrection) {
+            break;
+          }
+        }
+
+        assert.isTrue(haveSeenSingleTokenCorrection, 'A single-token correction was expected but not found');
+        assert.isTrue(haveSeenThreeTokenCorrection,  'A three-token correction was expected but not found');
+      });
     });
   });
 });

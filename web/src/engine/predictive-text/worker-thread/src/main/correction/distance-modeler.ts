@@ -276,14 +276,17 @@ export class SearchNode {
    * character not seen in the input, as if the user accidentally skipped typing
    * it.  No new input will be expected, but the search will continue one
    * character deeper in the backing lexicon.
+   * @param spaceId
    * @returns An array of SearchNodes corresponding to lexical entries that are
    * prefixed with the lexicon entry represented by the current Node's
    * matchSequence text.
    */
-  buildInsertionEdges(): SearchNode[] {
+  buildInsertionEdges(spaceId?: number): SearchNode[] {
     if(this.hasPartialInput) {
       throw new Error("Invalid state:  will not take new input while still processing Transform subset");
     }
+
+    spaceId ??= this.spaceId;
 
     // Do not create insertion nodes after an empty transform; only before.
     // "Before" and "after" are identical for empty transforms - why duplicate?
@@ -307,9 +310,9 @@ export class SearchNode {
     let edges: SearchNode[] = [];
 
     for(let lexicalChild of this.currentTraversal.children()) {
-      let childCalc = this.calculation.addMatchChar(lexicalChild.char);
+      const childCalc = this.calculation.addMatchChar(lexicalChild.char);
 
-      let searchChild = new SearchNode(this, this.spaceId, PathEdge.INSERTION);
+      const searchChild = new SearchNode(this, spaceId, PathEdge.INSERTION);
       searchChild.calculation = childCalc;
       searchChild.priorInput = this.priorInput;
       searchChild.matchedTraversals.push(lexicalChild.traversal());

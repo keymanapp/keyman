@@ -12,6 +12,7 @@ export * from './correction/search-quotient-spur.js';
 export * from './correction/search-quotient-node.js';
 export * from './correction/legacy-quotient-root.js';
 export * from './correction/legacy-quotient-spur.js';
+export * from './correction/quotient-node-finalizer.js';
 export * from './correction/search-quotient-root.js';
 export { ExtendedEditOperation, SegmentableDistanceCalculation } from './correction/segmentable-calculation.js';
 export * from './correction/tokenization-corrector.js';
