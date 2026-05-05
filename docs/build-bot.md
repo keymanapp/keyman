@@ -60,8 +60,9 @@ Build-bot: <BuildLevel>:[Platforms] ...
   * `core`: build Keyman Core, on all three build platforms, and also WASM
     (note: `release` is equivalent to `build` buildLevel for `core`)
 
-The list of platforms can be found in the `available_platforms` variable in
-trigger-definitions.inc.sh.
+The list of platforms is built from the `available_platforms_regex` variable in
+trigger-definitions.inc.sh (which is a superset of `available_platforms`, with
+the addition of `common` and `core`).
 
 ## Build Level
 

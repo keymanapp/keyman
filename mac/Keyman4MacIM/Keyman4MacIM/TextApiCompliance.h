@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) checkComplianceAfterInsert:(NSString *)insertedText deleted:(NSString *)deletedText;
 -(BOOL)isComplianceUncertain;
 -(BOOL)canReadText;
+-(BOOL)canReplaceText;
 -(BOOL)mustBackspaceUsingEvents;
 @end
 

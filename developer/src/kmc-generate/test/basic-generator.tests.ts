@@ -32,9 +32,10 @@ class BasicGeneratorTest extends BasicGenerator {
 }
 
 describe('BasicGenerator', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('should configure default settings', async function() {
     const bg = new BasicGenerator();
-    const callbacks = new TestCompilerCallbacks();
     assert.isTrue(await bg.init(callbacks, options));
     assert.isTrue(bg.test_preGenerate());
 
@@ -45,7 +46,6 @@ describe('BasicGenerator', function () {
     const bg = new BasicGeneratorTest();
     bg.setup();
 
-    const callbacks = new TestCompilerCallbacks();
     assert.isTrue(await bg.init(callbacks, options));
     assert.isTrue(bg.test_preGenerate());
 

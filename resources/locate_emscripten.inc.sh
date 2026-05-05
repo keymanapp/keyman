@@ -4,6 +4,15 @@
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
 
+# On Windows/ARM64 machines, we build with the Emscripten x64 toolchain
+
+if builder_is_windows; then
+  if [[ "${MSYSTEM-x}" == CLANGARM64 ]]; then
+    builder_echo "Using x86_64 for emscripten"
+    export EMSDK_ARCH=x86_64
+  fi
+fi
+
 #
 # We don't want to rely on emcc being on the path, because Emscripten puts far
 # too many things onto the path (in particular for us, node).

@@ -127,6 +127,7 @@ uses
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.LDMLKeyboardProjectTemplate,
   Keyman.Developer.System.ProjectTemplate,
+  Keyman.Developer.UI.Project.ProjectUI,
   Keyman.System.KeyboardUtils,
   UfrmMain;
 
@@ -350,8 +351,6 @@ begin
 end;
 
 function TfrmNewLDMLKeyboardProjectParameters.Validate: Boolean;
-var
-  ProjectFolder: string;
 begin
   if not FormValidation.Update then
   begin
@@ -360,23 +359,7 @@ begin
   end;
 
   Result := TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True);
-
-  if Result then
-  begin
-    if not DirectoryExists(editPath.Text) then
-    begin
-      if MessageDlg('The target folder '+editPath.Text+' does not exist. Create it now?', mtConfirmation, mbOkCancel, 0) = mrCancel then
-        Exit(False);
-    end;
-
-    ProjectFolder := IncludeTrailingPathDelimiter(editPath.Text) + editKeyboardID.Text;
-    if DirectoryExists(ProjectFolder) then
-    begin
-      if MessageDlg('The project folder '+ProjectFolder+' already exists. Are you sure you want to overwrite it?', mtWarning,
-          mbOkCancel, 0) = mrCancel then
-        Exit(False);
-    end;
-  end;
+  Result := Result and VerifyNewProjectPathWithUser(BasePath, KeyboardID);
 end;
 
 { Languages Grid }

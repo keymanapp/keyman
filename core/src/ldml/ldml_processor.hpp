@@ -176,6 +176,9 @@ public:
     * @return the number of context items consumed
     */
    size_t context_to_string(std::u32string &str, bool include_markers = true);
+   km_core_state* get_state() const { return state; }
+
+   uint8_t is_key_down() const { return _is_key_down; }
 
  private:
    km_core_virtual_key _vk;

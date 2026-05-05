@@ -44,6 +44,7 @@ contains
   TextFileFormat in '..\general\TextFileFormat.pas',
   LeftTabbedPageControl in 'LeftTabbedPageControl.pas',
   MenuImgList in 'MenuImgList.pas',
-  StringGridEditControlled in 'StringGridEditControlled.pas';
+  StringGridEditControlled in 'StringGridEditControlled.pas',
+  tom_TLB in 'tom_TLB.pas';
 
 end.

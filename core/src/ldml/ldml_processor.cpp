@@ -179,21 +179,13 @@ ldml_processor::process_event(
   ldml_state.clear();
 
   try {
-    if (!is_key_down) {
-      process_key_up(ldml_state);
+    if (vk == KM_CORE_VKEY_BKSP) {
+      process_backspace(ldml_state);
+    } else if (is_key_down) {
+      process_key_down(ldml_state);
     } else {
-      switch (vk) {
-      // Currently, only one VK gets spoecial treatment.
-      // Special handling for backspace VK
-      case KM_CORE_VKEY_BKSP:
-        process_backspace(ldml_state);
-        break;
-      default:
-        // all other VKs
-        process_key_down(ldml_state);
-      } // end of switch
-    } // end of normal processing
-
+      process_key_up(ldml_state);
+    }
     // all key-up and key-down events end up here.
     // commit the ldml state into the core state
     ldml_state.commit();
@@ -210,11 +202,31 @@ void
 ldml_processor::process_key_up(ldml_event_state &ldml_state)
     const {
   // TODO-LDML: Implement caps lock handling
-  ldml_state.clear();
+
+  // Look up the key
+  bool found = false;
+  const std::u16string key_str = keys.lookup(ldml_state.get_vk(), ldml_state.get_modifier_state(), found);
+
+  if (!found) {
+    ldml_state.emit_passthrough_keystroke();
+  }
 }
 
 void
 ldml_processor::process_backspace(ldml_event_state &ldml_state) const {
+  if (ldml_state.get_modifier_state() & K_MODIFIERFLAG) {
+    // we never process modifier+bksp
+    ldml_state.emit_passthrough_keystroke();
+    return;
+  }
+
+  if (!ldml_state.is_key_down()) {
+    if (!ldml_state.get_state()->backspace_handled_internally()) {
+      ldml_state.emit_passthrough_keystroke();
+    }
+    return;
+  }
+
   if (!!bksp_transforms) {
     // process with an empty string via the bksp transforms
     auto matchedContext = process_output(ldml_state, std::u32string(), bksp_transforms.get());

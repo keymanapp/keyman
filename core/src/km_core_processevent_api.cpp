@@ -50,6 +50,9 @@ km_core_process_event(km_core_state *state,
   if(state == nullptr) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
+  if (vk == KM_CORE_VKEY_BKSP && is_key_down) {
+    state->set_backspace_handled_internally(false);
+  }
   km_core_status status = state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
 
   if (state_should_invalidate_context(state, vk, modifier_state, is_key_down, event_flags)) {
@@ -77,6 +80,10 @@ km_core_process_event(km_core_state *state,
   }
 
   state->apply_actions_and_merge_app_context();
+
+  if (vk == KM_CORE_VKEY_BKSP) {
+    state->set_backspace_handled_internally(!state->action_struct().emit_keystroke);
+  }
 
   return status;
 }

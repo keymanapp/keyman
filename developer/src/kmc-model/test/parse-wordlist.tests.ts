@@ -22,11 +22,10 @@ const SENCOTEN_WORDLIST = {
 
 
 describe('parsing a word list', function () {
-  const testCallbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   beforeEach(function () {
-    testCallbacks.clear();
-    setCompilerCallbacks(testCallbacks);
+    setCompilerCallbacks(callbacks);
   });
 
   afterEach(function () {
@@ -43,12 +42,12 @@ describe('parsing a word list', function () {
     const withoutBOM: WordList = {};
     parseWordListFromContents(withoutBOM, file);
     assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
 
     const withBOM: WordList = {};
     parseWordListFromContents(withBOM, `${BOM}${file}`)
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
   });
 
   it('should read word lists in UTF-8', function () {
@@ -58,7 +57,7 @@ describe('parsing a word list', function () {
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
   });
 
   it('should read word lists in UTF-16 little-endian (with BOM)', function () {
@@ -69,7 +68,7 @@ describe('parsing a word list', function () {
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
   });
 
   it('should NOT read word lists in UTF-16 big-endian (with BOM)', function () {
@@ -106,22 +105,22 @@ describe('parsing a word list', function () {
 
     assert.deepEqual(repeatedWords, expected);
 
-    assert.lengthOf(testCallbacks.messages, 4);
+    assert.lengthOf(callbacks.messages, 4);
     // hello has been seen multiple times:
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
+    assert.isTrue(callbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
     // helló and hello + U+0301 have both been seen:
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
+    assert.isTrue(callbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
 
     // Let's parse another file:
 
-    testCallbacks.clear();
+    callbacks.clear();
     // Now, parse a DIFFERENT file, but with an NFD entry.
     parseWordListFromContents(repeatedWords, "hello\u0301\t5\n");
-    assert.lengthOf(testCallbacks.messages, 1);
+    assert.lengthOf(callbacks.messages, 1);
     // hello + U+0301 (NFD) has been seen, but...
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
+    assert.isTrue(callbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
     // BUT! We have not seen a duplicate **within the same file**
-    assert.isFalse(testCallbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
+    assert.isFalse(callbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
 
     assert.deepEqual(repeatedWords, {
       hello: expected['hello'],

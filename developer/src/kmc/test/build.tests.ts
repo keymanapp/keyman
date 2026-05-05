@@ -1,11 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { clearOptions } from '../src/util/options.js';
 import { assert } from 'chai';
 import 'mocha';
 import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';
 import { makePathToFixture } from './helpers/index.js';
-
-const callbacks = new TestCompilerCallbacks();
 
 interface CompilerWarningsAsErrorsTruthTable {
   cli: boolean;
@@ -14,8 +15,9 @@ interface CompilerWarningsAsErrorsTruthTable {
 };
 
 describe('compilerWarningsAsErrors', function () {
-  beforeEach(() => {
-    callbacks.clear();
+  const callbacks = new TestCompilerCallbacks(this);
+
+  this.beforeEach(function() {
     clearOptions();
   });
 

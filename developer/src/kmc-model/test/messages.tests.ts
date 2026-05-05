@@ -8,17 +8,7 @@ import { makePathToFixture } from './helpers/index.js';
 
 describe('ModelCompilerMessages', function () {
 
-  const callbacks = new TestCompilerCallbacks();
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid ModelCompilerMessages object', function() {
     return verifyCompilerMessagesObject(ModelCompilerMessages, CompilerErrorNamespace.ModelCompiler);

@@ -8,7 +8,6 @@ export class Configuration {
   public readonly lockFilename: string;
   public readonly pidFilename: string;
   public readonly configFilename: string;
-  public readonly ngrokBinPath: string;
 
   /* Configuration values - set in config.json by TIKE */
 
@@ -17,7 +16,6 @@ export class Configuration {
   /* ngrok Configuration */
 
   public readonly useNgrok: boolean;
-  public readonly ngrokControlPort: number;
   public readonly ngrokToken: string;
   public readonly ngrokVisible: boolean;
 
@@ -42,8 +40,6 @@ export class Configuration {
 
     // ngrok configuration
     this.useNgrok = cfg?.useNgrok ?? false;
-    this.ngrokBinPath = this.appDataPath + 'bin/';
-    this.ngrokControlPort = cfg?.ngrokControlPort ?? 8009;
     this.ngrokToken = cfg?.ngrokToken ?? '';
     this.ngrokVisible = cfg?.ngrokVisible ?? false;
   }
