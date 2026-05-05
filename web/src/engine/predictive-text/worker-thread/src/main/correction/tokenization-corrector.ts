@@ -82,7 +82,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
    * Returns the tokens, in order, that are considered "uncorrectable"; correction-search will not
    * perform no further text-correction on them.
    *
-   * Note that some tokens may have started out this way initially, becoming "uncorrectable" after
+   * Note that some tokens may have started out as "correctable" initially, becoming "uncorrectable" after
    * their first viable correction was found.
    *
    * Other tokens may have been labeled "uncorrectable" from the start.
