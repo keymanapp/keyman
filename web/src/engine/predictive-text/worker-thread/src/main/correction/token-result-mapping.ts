@@ -12,6 +12,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
+import { TokenResult } from './tokenization-corrector.js';
 
 // Circular type reference; do not actually require direct use of the prototype
 // or constructor!
@@ -23,7 +24,7 @@ import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 export function initTokenResultFilterer() {
-  const priorReturns: Map<string, TokenResultMapping> = new Map();
+  const priorReturnCosts: Map<string, number> = new Map();
 
   const closure = (searchResult: TokenResultMapping) => {
     if(searchResult.isFullReplacement) {
@@ -33,8 +34,8 @@ export function initTokenResultFilterer() {
       return false;
     }
 
-    if((priorReturns.get(searchResult.matchString)?.totalCost ?? Number.MAX_VALUE) > searchResult.totalCost) {
-      priorReturns.set(searchResult.matchString, searchResult);
+    if((priorReturnCosts.get(searchResult.matchString) ?? Number.MAX_VALUE) > searchResult.totalCost) {
+      priorReturnCosts.set(searchResult.matchString, searchResult.totalCost);
 
       return true;
     } else {
@@ -45,7 +46,7 @@ export function initTokenResultFilterer() {
   return closure;
 }
 
-export class TokenResultMapping implements CorrectionResultMapping<SearchNode>{
+export class TokenResultMapping implements CorrectionResultMapping<SearchNode>, TokenResult {
   readonly matchingSpace: SearchQuotientNode;
   private readonly node: SearchNode;
   readonly spaceId: number;
