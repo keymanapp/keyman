@@ -8,11 +8,11 @@
  * engine.
  */
 
-import { QueueComparator, KMWString, PriorityQueue } from '@keymanapp/web-utils';
+import { KMWString, PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
-import { PathResult } from './correction-searchable.js';
+import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
 import { EDIT_DISTANCE_COST_SCALE, SearchNode } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathInputProperties, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
@@ -25,14 +25,16 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
-export const QUEUE_NODE_COMPARATOR: QueueComparator<SearchNode> = function(arg1, arg2) {
-  return arg1.currentCost - arg2.currentCost;
-}
+/**
+ * Determines the total correction + edit cost allowed for any correction beyond
+ * the most optimistic probability for a token.
+ */
+export const MAX_EDIT_THRESHOLD_FACTOR = 2.5;
 
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export abstract class SearchQuotientSpur extends SearchQuotientNode {
-  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(QUEUE_NODE_COMPARATOR);
+  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR);
 
   /**
    * Holds all incoming Nodes generated from a parent `SearchSpace` that have not yet been
@@ -150,7 +152,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     entries.forEach(function(edge) { edge.calculation = edge.calculation.increaseMaxDistance(); });
 
     // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
-    this.selectionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, entries);
+    this.selectionQueue = new PriorityQueue<SearchNode>(CORRECTION_QUEUE_COMPARATOR, entries);
   }
 
   /**
@@ -375,18 +377,18 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     // prioritized.  We'd rather prioritize the processing of nearly-completed
     // nodes of similar cost.
     //
-    // Per #14366, the cost should be monotonically increasing - new nodes built
-    // on new parent results should never have better cost than what's already
-    // local.
+    // Per #14366, the cost should be monotonically increasing.  As a result,
+    // new nodes built on new parent results should never have better cost than
+    // what's been previously processed.
     if(parentCost < localCost) {
       const result = this.parentNode.handleNextNode();
-      // The parent will insert the node into our queue.  We don't need it, though
-      // any siblings certainly will.
 
       // Preserve the array instance, but trash all entries.
       // The array is registered with the parent; do not replace!
       this.incomingNodes.splice(0, this.incomingNodes.length);
 
+      // Results obtained from the parent are used to construct inbound edges
+      // represented by this SearchQuotientNode.
       if(result.type == 'complete') {
         this.queueNodes(this.buildEdgesFromResults([result.mapping]));
       }
@@ -417,7 +419,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     // Allows a little 'wiggle room' + 2 "hard" edits.
     // Can be important if needed characters don't actually exist on the keyboard
     // ... or even just not the then-current layer of the keyboard.
-    if(currentNode.currentCost > this.lowestPossibleSingleCost + 2.5 * EDIT_DISTANCE_COST_SCALE) {
+    if(currentNode.currentCost > this.lowestPossibleSingleCost + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE) {
       return unmatchedResult;
     }
 
@@ -435,9 +437,9 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     const result = new TokenResultMapping(this, currentNode);
     if(currentNode.spaceId == this.spaceId) {
       // Verify that we don't already have a better-cost result for the
-      // correction already.
-      const isUnhandled = this.saveResult(result);
-      if(!isUnhandled) {
+      // correction.
+      const isNewOptimalEntry = this.saveResult(result);
+      if(!isNewOptimalEntry) {
         // Not a better cost, so reject it and move on to the next potential result.
         return this.handleNextNode();
       }

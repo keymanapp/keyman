@@ -27,6 +27,10 @@ type CompleteSearchPath<MappingType> = {
 
 export type PathResult<MappingType> = NullPath | IntermediateSearchPath | CompleteSearchPath<MappingType>;
 
+export function CORRECTION_QUEUE_COMPARATOR<T extends {currentCost: number}>(a: T, b: T) {
+  return a.currentCost - b.currentCost;
+}
+
 /**
  * Represents objects that support correction search via the `getBestMatches`
  * method, providing metadata relative to optimizing the search process for
