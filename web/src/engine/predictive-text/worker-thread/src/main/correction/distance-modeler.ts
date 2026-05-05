@@ -4,7 +4,7 @@ import { PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
-import { CorrectionSearchable } from './correction-searchable.js';
+import { CORRECTION_QUEUE_COMPARATOR, CorrectionSearchable } from './correction-searchable.js';
 import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
@@ -614,8 +614,7 @@ export async function *getBestMatches<
   // If no filter function is provided, default to one that always returns true.
   filter ??= () => true;
 
-  const comparator = (a: Correctable, b: Correctable) => a.currentCost - b.currentCost;
-  let spaceQueue = new PriorityQueue<Correctable>((a, b) => a.currentCost - b.currentCost);
+  let spaceQueue = new PriorityQueue<Correctable>(CORRECTION_QUEUE_COMPARATOR);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
   // and iterate over it first.
@@ -635,15 +634,31 @@ export async function *getBestMatches<
       if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
 
-        // Just pass it through the filter, even if it _was_ already filtered once before.
-        filter(result);
-        return result;
+        // There's no guarantee that the filter closure is the same instance as
+        // before.
+        //
+        // As a filter function may contain caching and/or deduplication
+        // components, we pass pre-existing results through the filter so that
+        // it may reconstruct related state and thus cache/deduplicate new
+        // results based upon old results.
+        //
+        // See `initTokenResultFilterer()`, which maintains a map used for
+        // deduplication.
+        //
+        // As these _are_ pre-existing results, we know that they previously
+        // passed through the filter with a `true` response.  However, as #14366
+        // isn't implemented, it IS technically possible that a lower-cost
+        // result was found after a higher-cost result in some cases; therefore
+        // there is a chance such a duplicate may exist.  On that basis,
+        // re-filtering even for prior results is reasonably motivated at this
+        // time.
+        return filter(result) ? result : null;
       }
 
       let lowestCostSource = spaceQueue.dequeue();
       const newResult = lowestCostSource.handleNextNode();
       spaceQueue.enqueue(lowestCostSource);
-      spaceQueue = new PriorityQueue(comparator, spaceQueue.toArray());
+      spaceQueue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, spaceQueue.toArray());
 
       if(newResult.type == 'none') {
         return null;

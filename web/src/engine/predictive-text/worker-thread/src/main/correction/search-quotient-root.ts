@@ -24,7 +24,7 @@ export class SearchQuotientRoot extends SearchQuotientNode {
   private hasBeenProcessed: boolean = false;
 
   /**
-   * Constructs a fresh SearchSpace instance for used in predictive-text correction
+   * Constructs a fresh SearchSpace instance for use in predictive-text correction
    * and suggestion searches.
    * @param baseSpaceId
    * @param model

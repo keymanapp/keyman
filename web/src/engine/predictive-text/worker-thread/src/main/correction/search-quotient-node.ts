@@ -116,7 +116,7 @@ export abstract class SearchQuotientNode implements CorrectionSearchable<SearchN
    * what sort of result the edge's destination node represents.
    * @returns
    */
-  abstract handleNextNode(): PathResult<TokenResultMapping>
+  abstract handleNextNode(): PathResult<TokenResultMapping>;
 
   /**
    * Increases the editing range that will be considered for determining
@@ -235,7 +235,8 @@ export abstract class SearchQuotientNode implements CorrectionSearchable<SearchN
   /**
    * Log the results of a processed node and queue it within all subscribed
    * processor nodes for construction of deeper search paths.
-   * @param node
+   * @param result A search result whose path terminates at this SearchQuotientNode.
+   * @returns true if the entry is new or of better cost; else, false.
    */
   protected saveResult(result: TokenResultMapping): boolean {
     const priorMatch = this.returnedValues[result.matchString];

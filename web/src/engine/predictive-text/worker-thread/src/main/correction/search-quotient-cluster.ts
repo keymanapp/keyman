@@ -8,23 +8,19 @@
  * engine.
  */
 
-import { QueueComparator, PriorityQueue } from '@keymanapp/web-utils';
+import { PriorityQueue } from '@keymanapp/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { PathResult } from './correction-searchable.js';
+import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
 import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
-const PATH_QUEUE_COMPARATOR: QueueComparator<SearchQuotientNode> = (a, b) => {
-  return a.currentCost - b.currentCost;
-}
-
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class SearchQuotientCluster extends SearchQuotientNode {
-  private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(PATH_QUEUE_COMPARATOR);
+  private selectionQueue: PriorityQueue<SearchQuotientNode> = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR);
   readonly spaceId: number;
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single
@@ -110,7 +106,7 @@ export class SearchQuotientCluster extends SearchQuotientNode {
     entries.forEach((path) => path.increaseMaxEditDistance());
 
     // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
-    this.selectionQueue = new PriorityQueue<SearchQuotientNode>(PATH_QUEUE_COMPARATOR, entries.slice());
+    this.selectionQueue = new PriorityQueue<SearchQuotientNode>(CORRECTION_QUEUE_COMPARATOR, entries.slice());
   }
 
   /**
@@ -139,7 +135,7 @@ export class SearchQuotientCluster extends SearchQuotientNode {
     const bestPath = this.selectionQueue.dequeue();
     const baseResult = bestPath.handleNextNode();
     this.selectionQueue.enqueue(bestPath);
-    this.selectionQueue = new PriorityQueue(PATH_QUEUE_COMPARATOR, this.selectionQueue.toArray());
+    this.selectionQueue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, this.selectionQueue.toArray());
 
     let finalResult = baseResult;
     if(baseResult.type == 'complete') {

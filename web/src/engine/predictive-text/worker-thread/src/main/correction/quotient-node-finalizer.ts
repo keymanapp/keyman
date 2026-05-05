@@ -23,8 +23,8 @@ import { TokenResultMapping } from './token-result-mapping.js';
  *
  * Other important mechanics of this type:
  * - Separate instances should be constructed for each token per tokenization
- *   pattern it may be found within.  Doing so will each tokenization pattern to
- *   receive and process the same results for the token.
+ *   pattern it may be found within.  Doing so will allow each tokenization
+ *   pattern to receive and process the same results for the token.
  * - It should also be constructed for a token regardless of whether it actually
  *   does occur within multiple tokenizations.  As it is possible that one token
  *   is a "continuation" of a different token without its terminal word
@@ -38,16 +38,13 @@ export class QuotientNodeFinalizer extends SearchQuotientSpur {
   private allowPrediction: boolean;
 
   /**
-   * Extends an existing SearchQuotientNode (and its correction data) by a keystroke based
-   * on a subset of the incoming keystroke's fat-finger distribution.
+   * Extends an existing SearchQuotientNode (and its correction data) by a
+   * keystroke based on a subset of the incoming keystroke's fat-finger
+   * distribution.
    *
    * @param parentNode
-   * @param inputs
-   * @param inputSource Either:
-   * 1.  Data about the actual context range represented by `inputs` and
-   * its underlying keystroke.
-   * 2.  The sample from the incoming distribution that represents data actually
-   * applied to the context.  It need not be included within the subset passed to `inputs`.
+   * @param allowPrediction  Indicates whether this instance is allowed to
+   * extend the word for predictions or should limit its results to corrections.
    */
   constructor(
     parentNode: SearchQuotientNode,
@@ -57,6 +54,8 @@ export class QuotientNodeFinalizer extends SearchQuotientSpur {
     this.allowPrediction = allowPrediction;
   }
 
+  // Mandated by the SearchQuotientNode type (`abstract`), but only needed for
+  // splits and merges (which aren't supported by this type)
   construct(parentNode: SearchQuotientNode): this {
     return new QuotientNodeFinalizer(parentNode, this.allowPrediction) as this;
   }
