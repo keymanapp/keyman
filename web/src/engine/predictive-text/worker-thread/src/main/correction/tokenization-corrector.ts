@@ -123,7 +123,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
    */
   get generatedTokenResults(): ReadonlyMap<ContextToken, TokenResult> {
     return new Map([...this._generatedTokenResults.entries()]
-      .map((tuple) => [this.orderedTokens.find((t) => t.searchModule.spaceId == tuple[0]), tuple[1]]));
+      .map((tuple) => [this.tokenLookupMap.get(tuple[0]), tuple[1]]));
   }
 
   // Will have actual result sequences.
