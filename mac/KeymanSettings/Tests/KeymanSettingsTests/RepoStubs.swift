@@ -15,9 +15,10 @@ import KeymanSettings
  * keeps everything in memory rather than accessing UserDefaults.
  */
 
-public let moabiteKeyboardKey = "/extinctpackage/moabite_basic.kmx"
-public let hittiteKeyboardKey = "/extinctpackage/hittite_basic.kmx"
-public let uninstalledKeyboardKey = "/extinctpackage/girgashite_basic.kmx"
+public let extinctPackageName = "sil_extinct"
+public let moabiteKeyboardKey = "/\(extinctPackageName)/moabite_basic.kmx"
+public let hittiteKeyboardKey = "/\(extinctPackageName)/hittite_basic.kmx"
+public let uninstalledKeyboardKey = "/\(extinctPackageName)/girgashite_basic.kmx"
 
 class DefaultsRepoStub: DefaultsRepo {
   private var selectedKeyboard: String
@@ -40,10 +41,14 @@ class DefaultsRepoStub: DefaultsRepo {
   }
   
   func readSelectedKeyboard() -> String {
-    self.selectedKeyboard = hittiteKeyboardKey
     return self.selectedKeyboard
   }
+
+  func writeSelectedKeyboard(keyboardName: String) {
+    self.selectedKeyboard = keyboardName
+  }
   
+
   func logDefaults() {
     print("UserDefaults:")
     print("\("KMSelectedKeyboardsKey"): \(self.readSelectedKeyboard())")
@@ -61,6 +66,7 @@ class DefaultsRepoStub: DefaultsRepo {
  * stores them in memory with no access to disk
  */
 class PackageRepoStub: PackageRepo {
+  public let nullPackageId = UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   public var testPackageId = UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 
   func keyman19SharedDataDirectoryExists() -> Bool {
@@ -76,7 +82,7 @@ class PackageRepoStub: PackageRepo {
    */
   func loadPackages() -> [KeymanPackage] {
     let packagesDirectoryUrl = URL(filePath: "/Users/shawn-sil/Library/Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/")!
-    let testPackageDirectoryName = "extinctpackage"
+    let testPackageDirectoryName = extinctPackageName
     let testPackageUrl = packagesDirectoryUrl.appendingPathComponent(testPackageDirectoryName)
     let moabiteKeyboardId = "moabite_basic"
     let moabiteKeyboard = Keyboard(name: "moabite basic", keyboardId: moabiteKeyboardId, keyboardDirectoryUrl: testPackageUrl, enabled: true)

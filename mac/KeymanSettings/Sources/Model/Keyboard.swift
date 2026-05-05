@@ -76,7 +76,7 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     return settingsKey
   }
   
-#warning("throw/handle error if no kmx file found in directory")
+// TODO: "throw/handle error if no kmx file found in directory
   public func validateKmxFile() -> Bool {
     let fileManager = FileManager.default
     if fileManager.fileExists(atPath: self.kmxFileUrl.path) {

@@ -4,11 +4,8 @@
  * Created by Shawn Schantz on 2025-12-10
  *
  * KeymanPaths provides the file paths of the Keyman input method and
- * all Keyman keyboard documents. This is used for installing and removing
+ * all Keyman package data. This is used for installing and removing
  * the input method and packages.
- *
- * Obsolete locations are also included and used for migrating data and
- * updating settings.
  */
 
 import Foundation
@@ -102,6 +99,9 @@ public struct KeymanPaths {
   }
   */
 
+  /**
+   * build the URL to specified file in the Input Methods directory
+   */
   public func buildInputMethodPathUrl(fileName:String) -> URL? {
     let inputMethodUrl:URL
     
@@ -113,7 +113,7 @@ public struct KeymanPaths {
         create: true
       )
       
-      inputMethodUrl = inputMethodDirectoryUrl.appendingPathComponent(fileName)
+      inputMethodUrl = inputMethodDirectoryUrl.appendingPathComponent(fileName, isDirectory: false)
       return inputMethodUrl
     } catch {
 //      ConfigLogger.shared.testLogger.debug("\(error)")
@@ -122,6 +122,9 @@ public struct KeymanPaths {
     }
   }
 
+  /**
+   * build the URL to the user's Documents directory
+   */
   static func buildDocumentsUrl() -> URL? {
     var documentsDirectoryUrl:URL
     
@@ -134,12 +137,14 @@ public struct KeymanPaths {
       )
       return documentsDirectoryUrl
     } catch {
-//      ConfigLogger.shared.testLogger.error("\(error)")
       print("\(error)")
      return nil
     }
   }
   
+  /**
+   * build the URL to the packages directory for Keyman 17, inside the user's Documents directory
+   */
   private static func buildKeyman17PackagesUrl(documents: URL?) -> URL? {
     if let keyman17PackagesDirectory = documents?.appendingPathComponent(preKeyman19PackagesDirectoryName, isDirectory: true) {
       return keyman17PackagesDirectory
@@ -149,6 +154,9 @@ public struct KeymanPaths {
     }
   }
 
+  /**
+   * build the URL to the application support directory for the Keyman input method
+   */
   private static func buildSupportDirectory() -> URL? {
     let supportDirectoryUrl:URL
     
@@ -162,49 +170,63 @@ public struct KeymanPaths {
       
       return supportDirectoryUrl
     } catch {
-//      ConfigLogger.shared.testLogger.debug("\(error)")
       print("\(error)")
       return nil
     }
   }
   
+  /**
+   * build the URL to the data directory for Keyman 18, inside the application support directory for the Keyman input method
+   */
   private static func buildKeyman18DataDirectory(support: URL?) -> URL? {
     if let supportUrl = support {
-      return supportUrl.appendingPathComponent(KeymanPaths.keymanSubdirectoryName)
+      return supportUrl.appendingPathComponent(KeymanPaths.keymanSubdirectoryName, isDirectory: true)
     } else {
       return nil
     }
   }
 
+  /**
+   * build the URL to the packages directory for Keyman 18, inside the application support directory for the Keyman input method
+   */
   private static func buildKeyman18PackagesUrl(data: URL?) -> URL? {
     if let keymanDataUrl = data {
-      return keymanDataUrl.appendingPathComponent(KeymanPaths.preKeyman19PackagesDirectoryName)
+      return keymanDataUrl.appendingPathComponent(KeymanPaths.preKeyman19PackagesDirectoryName, isDirectory: true)
     } else {
       return nil
     }
   }
 
+  /**
+   * build the URL to the app group container
+   */
   private static func buildContainerUrl() -> URL? {
     return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: KeymanPaths.groupId)
   }
 
+  /**
+   * build the URL to the preference directory inside the app group container
+   */
   private static func buildContainerPreferencesUrl(container: URL?) -> URL? {
     if let containerUrl = container {
-      return containerUrl.appendingPathComponent(containerPreferencesPartialPath)
+      return containerUrl.appendingPathComponent(containerPreferencesPartialPath, isDirectory: true)
     } else {
       return nil
     }
   }
 
-  private static func buildKeyman19PackagesUrl(container: URL?) -> URL? {
+  /**
+   * build the URL to the packages directory inside the app group container directory
+   */
+ private static func buildKeyman19PackagesUrl(container: URL?) -> URL? {
     if let containerUrl = container {
-      return containerUrl.appendingPathComponent(KeymanPaths.containerPackagesPartialPath)
+      return containerUrl.appendingPathComponent(KeymanPaths.containerPackagesPartialPath, isDirectory: true)
     } else {
       return nil
     }
   }
 
-#warning("not used, remove?")
+  // TODO: remove
   fileprivate func checkContainerUrl() -> Bool {
     var containerValid = false
     let sharedFileManager = FileManager.default
@@ -213,7 +235,6 @@ public struct KeymanPaths {
     
     if let containerUrl = sharedFileManager.containerURL(forSecurityApplicationGroupIdentifier: KeymanPaths.groupId) {
       containerValid = true
-//      ConfigLogger.shared.testLogger.debug("containerUrl = \(containerUrl)")
       print("containerUrl = \(containerUrl)")
     }
     

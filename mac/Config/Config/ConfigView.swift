@@ -25,10 +25,10 @@ struct ConfigView: View {
           settings.debug()
         }
         Button("log defaults") {
-          settings.logSettings()
+          settings.logUserDefaults()
         }
         Button("clear defaults") {
-          settings.clearSettings()
+          settings.clearUserDefaults()
         }
         Spacer()
       }

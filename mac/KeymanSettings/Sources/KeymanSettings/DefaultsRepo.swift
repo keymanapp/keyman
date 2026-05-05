@@ -14,6 +14,7 @@ public protocol DefaultsRepo {
   func readEnabledKeyboards() -> Set<String>
   func writeEnabledKeyboards(enabledKeyboardsArray: [String])
   func readSelectedKeyboard() -> String
+  func writeSelectedKeyboard(keyboardName: String)
   func logDefaults()
   func clearDefaults()
 }

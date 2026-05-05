@@ -9,7 +9,7 @@ import Foundation
     print("init")
   }
   
-  @Test("Check settings creation ") func testSettingsCreation() async throws {
+  @Test("Check settings creation") func testSettingsCreation() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -18,45 +18,112 @@ import Foundation
     
     settingsContainer.loadPackages()
     
-    let package = try #require(settingsContainer.findPackage(packageId: packageRepo.testPackageId))
-
+    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
     #expect(defaultsRepo.readEnabledKeyboards().contains(moabiteKeyboardKey))
   }
-  
+
+  @Test("Check finding packages by UUID") func testFindPackage() async throws {
+    let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
+    let packageRepo = PackageRepoStub()
+    let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
+    settingsContainer.loadPackages()
+    
+    // verify that we can find that test package and cannot find the null package
+    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
+    #expect(settingsContainer.findPackage(packageId: packageRepo.nullPackageId) == nil)
+  }
+
+  @Test("Check remove package") func testRemovePackage() async throws {
+    let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
+    let packageRepo = PackageRepoStub()
+    let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
+    settingsContainer.loadPackages()
+    
+    // verify that we cannot find the test package after removing it
+    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
+    settingsContainer.removePackage(at: 0)
+    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) == nil)
+  }
+
   /**
-   * include uninstalled keyboard in the list of enabled keyboards and verify that it is removed after `validateSettings()` is called
+   * test whether an uninstalled keyboard is removed from the list of enabled keyboards when calling `validateSettings()`
    */
   @Test("Check settings validation ") func testSettingsValidation() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, uninstalledKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
-
+    
     settingsContainer.loadPackages()
-    settingsContainer.validateSettings()
+    settingsContainer.validateUserDefaults()
     let enabledKeyboards = defaultsRepo.readEnabledKeyboards()
     
     #expect(!enabledKeyboards.contains(uninstalledKeyboardKey))
     #expect(enabledKeyboards.contains(moabiteKeyboardKey))
   }
+  
+  /**
+   * test whether keyboard state changes from disabled to enabled when settings are applied
+   */
+  @Test("Check settings applied ") func testSettingsApplied() async throws {
+    let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
+    let packageRepo = PackageRepoStub()
+    let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
+
+    settingsContainer.loadPackages()
+    let package = try #require(settingsContainer.findPackage(packageId: packageRepo.testPackageId))
+
+    // the hittite keyboard is initialized as disabled
+    #expect(!package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
+
+    // it should be enabled after user defaults are applied
+    settingsContainer.applyUserDefaultsToInstalledPackages()
+
+    #expect(package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
+  }
+  
+  @Test("Check get installed keyboards") func testGetInstalledKeyboards() async throws {
+    let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
+    let packageRepo = PackageRepoStub()
+    let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
+    settingsContainer.loadPackages()
+    
+    // verify that two keyboards are installed
+    #expect(settingsContainer.getInstalledKeyboardKeys().count == 2)
+  }
+
+  @Test("Check get enabled keyboards") func testGetEnabledKeyboards() async throws {
+    let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
+    let packageRepo = PackageRepoStub()
+    let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
+    settingsContainer.loadPackages()
+    
+    // verify that one keyboard is enabled
+    #expect(settingsContainer.getEnabledKeyboardKeys().count == 1)
+  }
+
+  @Test("Check keyboard enabled") func testIsKeyboardEnabled() async throws {
+    let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
+    let packageRepo = PackageRepoStub()
+    let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
+    settingsContainer.loadPackages()
+    
+    // verify that moabite keyboard is enabled
+    #expect(settingsContainer.isKeyboardEnabled(packageId: packageRepo.testPackageId, keyboardKey: moabiteKeyboardKey))
+  }
+
+  @Test("Check enable keyboard") func testEnableKeyboard() async throws {
+    let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
+    let packageRepo = PackageRepoStub()
+    let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
+    settingsContainer.loadPackages()
+    
+    // verify that the hittite keyboard changes from disabled to enabled
+    #expect(!settingsContainer.isKeyboardEnabled(packageId: packageRepo.testPackageId, keyboardKey: hittiteKeyboardKey))
+    settingsContainer.setKeyboardEnabled(packageId: packageRepo.testPackageId, keyboardKey: hittiteKeyboardKey, enabled: true)
+    #expect(settingsContainer.isKeyboardEnabled(packageId: packageRepo.testPackageId, keyboardKey: hittiteKeyboardKey))
+  }
 }
 
-/**
- * see that keyboard state changes from disabled to enabled when settings are applied
- */
-@Test("Check settings applied ") func testSettingsApplied() async throws {
-  let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
-  let packageRepo = PackageRepoStub()
-  let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
-
-  settingsContainer.loadPackages()
-  let package = try #require(settingsContainer.findPackage(packageId: packageRepo.testPackageId))
-
-  #expect(!package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
-
-  settingsContainer.applySettingsToInstalledPackages()
-
-  #expect(package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
-}
 
 
 @Suite("Check Keyman paths") struct KeymanPathsTests {
@@ -109,30 +176,32 @@ import Foundation
 
 // defaults read test.suite.name
 
-@Suite("Settings check") struct KeymanSettingsRepositoryTests {
-  var settingsRepo: DefaultsRepository
-  
+@Suite("UserDefaults check") struct KeymanSettingsRepositoryTests {
+  var settingsRepo: DefaultsRepo
+  let hittiteKeyboardKey = "/sil_extinct/hittite.kmx"
+  let moabiteKeyboardKey = "/sil_extinct/moabite.kmx"
+
   fileprivate init() async throws {
     print("init Settings")
     do {
       try self.settingsRepo = DefaultsRepository(suiteName: "test.suite.name")
-      print("Found group container")
     } catch UserDefaultsError.unknownSuite {
-      fatalError("Group container not found.")
+      fatalError("Cannot access UserDefaults suite.")
     } catch {
-      fatalError("Unable to access settings in group container.")
+      fatalError("Cannot access UserDefaults suite.")
     }
-    
-    self.settingsRepo.writeSelectedKeyboard(keyboardName: "keyboardtest")
   }
   
-  @Test("Write selected keyboard") func writeSelectedKeyboard() async throws {
-    settingsRepo.writeSelectedKeyboard(keyboardName: "testing")
-    #expect(settingsRepo.readSelectedKeyboard() == "testing")
+  @Test("Write and read selected keyboard") func writeSelectedKeyboard() async throws {
+    settingsRepo.writeSelectedKeyboard(keyboardName: moabiteKeyboardKey)
+    #expect(settingsRepo.readSelectedKeyboard() == moabiteKeyboardKey)
   }
   
-  @Test("Read selected keyboard") func readSelectedKeyboard() async throws {
-    #expect(settingsRepo.readSelectedKeyboard() == "keyboardtest")
+  @Test("Write and read enabled keyboards") func writeEnabledKeyboards() async throws {
+    settingsRepo.writeEnabledKeyboards(enabledKeyboardsArray: [hittiteKeyboardKey, moabiteKeyboardKey])
+    #expect(settingsRepo.readEnabledKeyboards().count == 2)
+    #expect(settingsRepo.readEnabledKeyboards().contains(hittiteKeyboardKey))
+    #expect(settingsRepo.readEnabledKeyboards().contains(moabiteKeyboardKey))
   }
 }
 
