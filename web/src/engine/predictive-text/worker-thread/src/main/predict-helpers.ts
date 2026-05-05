@@ -401,7 +401,7 @@ export function determineSuggestionAlignment(
 export function determineSuggestionRange(
   userContextTokenization: ContextTokenization,
   variantForSuggestions: ContextTokenization
-) {
+): { tokensToRemove: ContextToken[], tokensToPredict: ContextToken[] } {
   // Assumption:  spaceIds monotonically increase as new ones are generated.
   // Given this, we backtrace on the token tails until finding a spot where the
   // spaceIds match, dropping any that are newer than the last found in the
