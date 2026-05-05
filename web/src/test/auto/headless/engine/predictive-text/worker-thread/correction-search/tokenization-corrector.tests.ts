@@ -305,8 +305,8 @@ describe('TokenizationCorrector', () => {
 
         // Now that an entry has been found, verify the corrector's state.
         assert.isOk(instance.predictableToken); // should not become bound or locked.
-        assert.isTrue(instance.lockedTokenResults.has(instance.predictableToken));
-        assert.equal(instance.lockedTokenResults.get(instance.predictableToken), tokenResults[0]);
+        assert.isTrue(instance.generatedTokenResults.has(instance.predictableToken));
+        assert.equal(instance.generatedTokenResults.get(instance.predictableToken), tokenResults[0]);
       }
 
       searchResult = instance.handleNextNode();
@@ -350,9 +350,9 @@ describe('TokenizationCorrector', () => {
 
       // Now that an entry has been found, verify the corrector's state.
       assert.isOk(instance.predictableToken); // should not become bound or locked.
-      assert.isTrue(instance.lockedTokenResults.has(instance.predictableToken));
+      assert.isTrue(instance.generatedTokenResults.has(instance.predictableToken));
       for(let i=0; i < firstResults.length; i++) {
-        assert.equal(instance.lockedTokenResults.get(instance.orderedTokens[i]), firstResults[i]);
+        assert.equal(instance.generatedTokenResults.get(instance.orderedTokens[i]), firstResults[i]);
       }
 
       searchResult = instance.handleNextNode();
