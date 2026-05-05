@@ -158,9 +158,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
     BYTE keyTransitionEvent = KEYMSG_FLAG_TRANSITION(mp->lParam);
     CheckScheduledRefresh();
-    _td->LastScanCode = scan;
-    _td->LastKey = mp->wParam;
-    _td->LastTransition = keyTransitionEvent;
+    UpdateLastKeyCache(_td, mp->wParam, scan, keyTransitionEvent);
 
     switch (mp->wParam) {
     case VK_MENU:
