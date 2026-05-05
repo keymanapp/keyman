@@ -17,7 +17,7 @@ deps = [gtk, xkb]
 subdir('resources')
 
 cpp_files = files(
-  'converter.cpp',
+  'main.cpp',
   'keymap.cpp',
   'deadkey.cpp',
   'mcompile.cpp',
@@ -47,7 +47,5 @@ mcompile = executable(
   dependencies: deps,
   include_directories : common_include_dir
 )
-
-gtest = subproject('gtest')
 
 subdir('test')

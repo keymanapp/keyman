@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) 2004 - 2026 SIL International. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
+
 
 #pragma once
 #ifndef MC_IMPORT_RULES_H

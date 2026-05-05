@@ -1,3 +1,11 @@
+/*
+ * Keyman is copyright (C) 2004 - 2026 SIL International. MIT License.
+ *
+ * Created by Markus-SWAG on 2026-05-05
+ *
+ * Mnemonic layout support for Linux
+ */
+
 #include "mcompile.h"
 
 /**
@@ -7,23 +15,23 @@
  * @return 0 on success
  */
 
-  int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
 
   int bDeadkeyConversion = 0;
 
   if (argc > 1)
-    bDeadkeyConversion = (strcmp(argv[1], "-d") == 0);  // I4552
+    bDeadkeyConversion = (strcmp(argv[1], "-d") == 0);
 
   int n = (bDeadkeyConversion ? 2 : 1);
 
-  if (argc < 3 || argc > 4 || (argc - n) != 2) {  // I4273// I4273
+  if (argc < 3 || argc > 4 || (argc - n) != 2) {
     printf(
         "Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
         "        \tmcompile converts a Keyman mnemonic layout to\n"
         "        \ta positional one based on the currently used \n"
         "        \tLinux keyboard layout\n"
-        "        \t(-d convert deadkeys to plain keys) \n \n");  // I4552
+        "        \t(-d convert deadkeys to plain keys) \n \n");
 
     return 1;
   }
@@ -33,7 +41,7 @@
   KMX_CHAR* infile = argv[n];
   KMX_CHAR* outfile = argv[n + 1];
 
-  printf("mcompile%s \"%s\" \"%s\"\n", bDeadkeyConversion ? " -d" : "", infile, outfile);  // I4174
+  printf("mcompile%s \"%s\" \"%s\"\n", bDeadkeyConversion ? " -d" : "", infile, outfile);
 
   // 1. Load the keyman keyboard file
 
@@ -59,20 +67,21 @@
   //
   // 3. Write the new keyman keyboard file
 
-  LPKMX_KEYBOARD kmxfile;
+  LPKMX_KEYBOARD kmxfile = nullptr;
 
   if (!KMX_LoadKeyboard(infile, &kmxfile)) {
     KMX_LogError(L"Failed to load keyboard (%d)\n", errno);
+    delete kmxfile;
     return 3;
   }
 
-  if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {  // I4552F
+  if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {
     if(!KMX_SaveKeyboard(kmxfile, outfile)) {
       KMX_LogError(L"Failed to save keyboard (%d)\n", errno);
+      delete kmxfile;
       return 3;
     }
   }
 
-  delete kmxfile;
   return 0;
 }

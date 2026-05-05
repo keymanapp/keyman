@@ -1,3 +1,11 @@
+/*
+ * Keyman is copyright (C) 2004 - 2026 SIL International. MIT License.
+ *
+ * Created by Markus-SWAG on 2026-05-05
+ *
+ * Mnemonic layout support for Linux
+ */
+
 #include <gtest/gtest.h>
 #include <vector>
 #include <gdk/gdk.h>
@@ -36,7 +44,7 @@ private:
   }
 
 
-  void get_default_layout() {
+  void retrieve_default_layout() {
     std::vector<std::tuple<Glib::ustring, Glib::ustring>> sources;
 
     Gio::init();
@@ -61,7 +69,7 @@ private:
 
   void SetUp() override {
     initialize_keymap();
-    get_default_layout();
+    retrieve_default_layout();
     if (!GDK_IS_X11_DISPLAY(test_display)) {
         GTEST_SKIP() << "Not running on X11 display, skipping tests that require X11 keymap functionality.";
     }
