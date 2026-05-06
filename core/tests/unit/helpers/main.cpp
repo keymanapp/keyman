@@ -20,6 +20,7 @@ main(int argc, char **argv) {
 #ifdef __EMSCRIPTEN__
   if(!get_wasm_file_path(km::core::path(argv[0]).parent(), test_dir)) {
     // not a fully qualified path
+    std::cout << "Error: argv[0] did not give a fully qualified path!" << std::endl;
     return 1;
   }
 #else

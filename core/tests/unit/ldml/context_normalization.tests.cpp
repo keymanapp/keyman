@@ -51,22 +51,22 @@ protected:
     km_core_cu_dispose(context);
   }
 
-  void is_identical_context(km_core_cu const *cached_context, km_core_debug_context_type context_type) {
+  void assert_identical_context(km_core_cu const *cached_context, km_core_debug_context_type context_type) {
     size_t buf_size;
-    km_core_context_item * citems = nullptr;
+    km_core_context_item * context_items = nullptr;
 
     debug_context(context_type);
 
     if(context_type == KM_CORE_DEBUG_CONTEXT_APP) {
-      ASSERT_STATUS_OK(km_core_context_get(km_core_state_app_context(test_state), &citems));
+      ASSERT_STATUS_OK(km_core_context_get(km_core_state_app_context(test_state), &context_items));
     } else {
-      ASSERT_STATUS_OK(km_core_context_get(km_core_state_context(test_state), &citems));
+      ASSERT_STATUS_OK(km_core_context_get(km_core_state_context(test_state), &context_items));
     }
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, nullptr, &buf_size));
+    ASSERT_STATUS_OK(context_items_to_utf16(context_items, nullptr, &buf_size));
     km_core_cu* new_cached_context = new km_core_cu[buf_size];
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, new_cached_context, &buf_size));
+    ASSERT_STATUS_OK(context_items_to_utf16(context_items, new_cached_context, &buf_size));
 
-    km_core_context_items_dispose(citems);
+    km_core_context_items_dispose(context_items);
 
     ASSERT_EQ(std::u16string(cached_context), new_cached_context);
     delete[] new_cached_context;
@@ -77,8 +77,8 @@ TEST_F(ContextNormalizationTests, TestContextNormalizationAlreadyNfd) {
   km_core_cu const *app_context_nfd = u"A\u0300";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_001_tiny.kmx"));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, app_context_nfd), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_APP));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_CACHED));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_APP));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_CACHED));
 }
 
 TEST_F(ContextNormalizationTests, TestContextNormalizationBasic) {
@@ -86,8 +86,8 @@ TEST_F(ContextNormalizationTests, TestContextNormalizationBasic) {
   km_core_cu const *cached_context =      u"This is a test A\u0300";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_001_tiny.kmx"));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, application_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
 }
 
 TEST_F(ContextNormalizationTests, TestContextNormalizationHefty) {
@@ -96,8 +96,8 @@ TEST_F(ContextNormalizationTests, TestContextNormalizationHefty) {
   km_core_cu const *cached_context =      u"A\u0300" u"e\u0316\u0301" u"\u0073\u0323\u0307"  u"\u0041\u030a"     u"\U000114B9\U000114B0";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_001_tiny.kmx"));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, application_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
 }
 
 
@@ -110,8 +110,8 @@ TEST_F(ContextNormalizationTests, TestContextNormalizationInvalidUnicode) {
   km_core_cu const cached_context[] =      { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
   ASSERT_NO_FATAL_FAILURE(Initialize("k_001_tiny.kmx"));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, application_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
 }
 
 TEST_F(ContextNormalizationTests, TestContextNormalizationLoneTrailingSurrogate) {
@@ -120,6 +120,6 @@ TEST_F(ContextNormalizationTests, TestContextNormalizationLoneTrailingSurrogate)
   km_core_cu const cached_context[] = /* skipped*/ { 0x0020, 0x0020, 0x0000 };
   ASSERT_NO_FATAL_FAILURE(Initialize("k_001_tiny.kmx"));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, application_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(application_context+1, KM_CORE_DEBUG_CONTEXT_APP)); // first code unit is skipped
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(application_context+1, KM_CORE_DEBUG_CONTEXT_APP)); // first code unit is skipped
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
 }
