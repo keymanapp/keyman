@@ -783,7 +783,7 @@ km_core_options_list_size(km_core_option_item const *opts);
  * @param   state   An opaque pointer to a state object.
  * @param   scope   Which key-value store to interrogate.
  * @param   key     A UTF-16 string that matches the key in the target
-                    [km_core_option_item].
+ *                  [km_core_option_item].
  * @param   value   A pointer to the result variable: A pointer to a UTF-16
  *                  string value owned by the state or keyboard object at the
  *                  time of the call. This pointer is only valid *until* the next
@@ -1346,9 +1346,7 @@ enum km_core_event_code {
   //future: KM_CORE_EVENT_KEYBOARD_DEACTIVATED = 2,
 };
 
-/*
-$EOF
-*/
+/* $EOF */
 
 #if defined(__cplusplus)
 } // extern "C"

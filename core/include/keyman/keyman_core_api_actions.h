@@ -158,9 +158,7 @@ km_core_process_queued_actions(
   km_core_state *state
 );
 
-/*
-$EOF
-*/
+/* $EOF */
 
 #if defined(__cplusplus)
 } // extern "C"

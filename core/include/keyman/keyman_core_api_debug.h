@@ -201,9 +201,7 @@ km_core_state_debug_items(
   size_t *num_items
 );
 
-/*
-$EOF
-*/
+/* $EOF */
 
 #if defined(__cplusplus)
 } // extern "C"

@@ -48,6 +48,8 @@ enum km_core_modifier_state {
 };
 
 /**
+ * @name km_core_modifier_mask
+ *
  * An integral type bitmask representing common bitmask sets for
  * km_core_modifier_state
  */
@@ -331,7 +333,4 @@ enum km_core_virtual_key_value {
   KM_CORE_VKEY__FF,               // 0xff
 };
 
-/*
-$EOF
-*/
-
+/* $EOF */

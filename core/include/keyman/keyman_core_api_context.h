@@ -282,9 +282,7 @@ km_core_context_length(
   km_core_context *context
 );
 
-/*
-$EOF
-*/
+/* $EOF */
 
 #if defined(__cplusplus)
 } // extern "C"
