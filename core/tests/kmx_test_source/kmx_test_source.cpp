@@ -3,6 +3,9 @@
  *
  * Keyman Core - Shared test library to load .kmn test rules for automated
  * testing of .kmn keyboards
+ *
+ * Note that this file is superficially similar to ldml_test_source.cpp, but the
+ * parsing and use diverges far enough that they cannot be easily merged.
  */
 
 #include <algorithm>

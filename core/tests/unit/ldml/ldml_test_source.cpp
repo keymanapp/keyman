@@ -2,6 +2,9 @@
  * Keyman is copyright (C) SIL International. MIT License.
  *
  * Keyman Core - Helper to load LDML keyboard test definitions
+ *
+ * Note that this file is superficially similar to kmx_test_source.cpp, but the
+ * parsing and use diverges far enough that they cannot be easily merged.
  */
 
 #include <algorithm>
