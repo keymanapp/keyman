@@ -77,7 +77,6 @@ void debug_items_equal(
   }
 }
 
-// TODO-WEB-CORE: avoid cout; instead use google test reporting once all tests are google test
 void compare_debug_items(
   km_core_state const * state,
   std::initializer_list<km_core_state_debug_item> const & expected
@@ -86,11 +85,12 @@ void compare_debug_items(
   auto act = km_core_state_debug_items(state, &n);
 
   for (auto &rhs: expected) {
-    if ((int)--n < 0) {
-      std::cout << "expected longer than actual" << std::endl;
+    if(n == 0) {
       print_debug_item("next expected item:", rhs);
-      FAIL();
+      ASSERT_NE(n, 0) << "expected longer than actual";
     }
+
+    n--;
 
     bool result;
     ASSERT_NO_FATAL_FAILURE(debug_items_equal(*act++, rhs, result));
@@ -98,9 +98,8 @@ void compare_debug_items(
   }
 
   if(n != 0) {
-    std::cout << "actual longer than expected" << std::endl;
     print_debug_item("next actual item:", *act);
-    FAIL();
+    ASSERT_EQ(n, 0) << "actual longer than expected";
   }
 }
 
