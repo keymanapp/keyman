@@ -78,6 +78,8 @@ jobs:
                   summary += addStatus(o, 'user-test', status.context, status.state);
                 } else if(status.context == 'API Verification') {
                   summary += addStatus(o, 'check', status.context, status.state);
+                } else if (status.context == 'Linux source verification') {
+                  summary += addStatus(o, 'check', status.context, status.state);
                 } else if(status.context == 'Ubuntu Packaging') {
                   summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.context == 'npm pack/publish') {
@@ -219,6 +221,7 @@ jobs:
               });
             }
 
+
             const { owner, repo } = context.repo;
             const sha =
               context.payload?.check_suite?.sha ||    /* check run completed */
@@ -230,4 +233,5 @@ jobs:
             const checkRunId = await createCheck(github, owner, repo, sha);
             const res = await test(github, owner, repo, sha);
             await updateCheck(github, owner, repo, checkRunId, res[0], res[1], res[2]);
+
 
