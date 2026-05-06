@@ -2,12 +2,6 @@
 # Keyman is copyright (C) SIL Global. MIT License.
 
 function checkPrerequisites() {
-  if [[ "${UPLOAD:=}" == "yes" ]]; then
-    SIM=""
-  else
-    SIM="-s"
-  fi
-
   # Check the tier
   if [[ -z "${KEYMAN_TIER:=}" ]]; then
     echo "TIER.md or \${KEYMAN_TIER} must be set to (alpha, beta, stable) to use this script"
