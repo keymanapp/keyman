@@ -104,13 +104,13 @@ TEST(KMXPlusTest, VkeysHandledCorrectly) {
   bool found = false;
   ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_F"), 0, found), u"");
-  ASSERT_EQ(found, true); // K_F found, but empty string (gap)
+  ASSERT_TRUE(found); // K_F found, but empty string (gap)
   ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_ENTER"), 0, found), u"");
-  ASSERT_EQ(found, false); // K_ENTER not found, empty string
+  ASSERT_FALSE(found); // K_ENTER not found, empty string
   ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_A"), 0, found), u"K_A-0");
-  ASSERT_EQ(found, true); // expect
+  ASSERT_TRUE(found); // expect
   ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_A"), LCTRLFLAG, found), u"K_A-LCTRLFLAG");
   ASSERT_EQ(vk.lookup(km::tests::get_vk(
@@ -173,13 +173,13 @@ TEST(KMXPlusTest, UsetHandledCorrectly) {
   };
 
   SimpleUSet u0(&r[0], 2);
-  ASSERT_EQ(u0.contains(0x62), true); // b
-  ASSERT_EQ(u0.contains(0x41), false); // A
-  ASSERT_EQ(u0.contains(0x127), true); // ħ
+  ASSERT_TRUE(u0.contains(0x62)); // b
+  ASSERT_FALSE(u0.contains(0x41)); // A
+  ASSERT_TRUE(u0.contains(0x127)); // ħ
 
   SimpleUSet uempty;
-  ASSERT_EQ(uempty.contains(0x62), false);
-  ASSERT_EQ(uempty.contains(0x127), false);
+  ASSERT_FALSE(uempty.contains(0x62));
+  ASSERT_FALSE(uempty.contains(0x127));
 }
 
 /** tests of the COMP_KMXPLUS_STRS::valid_string() */

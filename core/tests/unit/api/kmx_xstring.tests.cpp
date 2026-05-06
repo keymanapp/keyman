@@ -1352,23 +1352,23 @@ TEST(XStringTests, TestU32stringToU16string) {
 
 TEST(XStringTests, TestIsValid) {
   // valid
-  ASSERT_EQ(Uni_IsValid(0x0000), true);
-  ASSERT_EQ(Uni_IsValid(0x0127), true);
-  ASSERT_EQ(Uni_IsValid(U'🙀'), true);
+  ASSERT_TRUE(Uni_IsValid(0x0000));
+  ASSERT_TRUE(Uni_IsValid(0x0127));
+  ASSERT_TRUE(Uni_IsValid(U'🙀'));
 
   // invalid
-  ASSERT_EQ(Uni_IsValid(0xDECAFBAD), false); // out of range
-  ASSERT_EQ(Uni_IsValid(0x566D4128), false);
-  ASSERT_EQ(Uni_IsValid(0xFFFF), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0xFFFE), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0x10FFFF), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0x10FFFE), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0x01FFFF), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0x01FFFE), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0x02FFFF), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0x02FFFE), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0xFDD1), false); // nonchar
-  ASSERT_EQ(Uni_IsValid(0xFDD0), false); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0xDECAFBAD)); // out of range
+  ASSERT_FALSE(Uni_IsValid(0x566D4128));
+  ASSERT_FALSE(Uni_IsValid(0xFFFF)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0xFFFE)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0x10FFFF)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0x10FFFE)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0x01FFFF)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0x01FFFE)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0x02FFFF)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0x02FFFE)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0xFDD1)); // nonchar
+  ASSERT_FALSE(Uni_IsValid(0xFDD0)); // nonchar
 
 
  // positive range test

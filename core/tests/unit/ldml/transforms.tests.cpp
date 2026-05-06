@@ -200,8 +200,8 @@ TEST(TransformsTests, TestReordersWithStandaloneNodLanaExample) {
   const COMP_KMXPLUS_USET_USET &toneMarksUset = usets[0];
   const SimpleUSet toneMarks(&ranges[toneMarksUset.range], toneMarksUset.count);
   // validate that the range [1A75, 1A79] matches
-  ASSERT_EQ(toneMarks.contains(0x1A76), true);
-  ASSERT_EQ(toneMarks.contains(0x1A60), false);
+  ASSERT_TRUE(toneMarks.contains(0x1A76));
+  ASSERT_FALSE(toneMarks.contains(0x1A60));
 
   std::cout << __FILE__ << ":" << __LINE__ << " - element API test " << std::endl;
   // element test
@@ -209,28 +209,28 @@ TEST(TransformsTests, TestReordersWithStandaloneNodLanaExample) {
     element es(U'a', (80 << LDML_ELEM_FLAGS_ORDER_BITSHIFT) | LDML_ELEM_FLAGS_PREBASE);  // tertiary -12, primary 80
     std::cout << "es flags" << std::hex << es.get_flags() << std::dec << std::endl;
     // verify element metadata
-    ASSERT_EQ(es.is_uset(), false);
+    ASSERT_FALSE(es.is_uset());
     ASSERT_EQ(es.get_order(), 0x50);
     ASSERT_EQ(es.get_tertiary(), 0);
-    ASSERT_EQ(es.is_prebase(), true);
-    ASSERT_EQ(es.is_tertiary_base(), false);
+    ASSERT_TRUE(es.is_prebase());
+    ASSERT_FALSE(es.is_tertiary_base());
     // verify element matching
-    ASSERT_EQ(es.matches(U'a'), true);
-    ASSERT_EQ(es.matches(U'b'), false);
+    ASSERT_TRUE(es.matches(U'a'));
+    ASSERT_FALSE(es.matches(U'b'));
 
     element eu(toneMarks, 0x37F40000);
     // element metadata
     std::cout << "eu flags" << std::hex << eu.get_flags() << std::dec << std::endl;
-    ASSERT_EQ(eu.is_uset(), true);
+    ASSERT_TRUE(eu.is_uset());
     std::cout << "order" << (int)eu.get_order() << std::endl;
     ASSERT_EQ(eu.get_order(), -12);
     ASSERT_EQ(eu.get_tertiary(), 55);
-    ASSERT_EQ(eu.is_prebase(), false);
-    ASSERT_EQ(eu.is_tertiary_base(), false);
+    ASSERT_FALSE(eu.is_prebase());
+    ASSERT_FALSE(eu.is_tertiary_base());
     // element matching
-    ASSERT_EQ(eu.matches(U'a'), false);
-    ASSERT_EQ(eu.matches(U'\u1A76'), true);
-    ASSERT_EQ(eu.matches(U'\u1A75'), true);
+    ASSERT_FALSE(eu.matches(U'a'));
+    ASSERT_TRUE(eu.matches(U'\u1A76'));
+    ASSERT_TRUE(eu.matches(U'\u1A75'));
 
     element_list l;  // '[tones]a'
     l.emplace_back(es);
