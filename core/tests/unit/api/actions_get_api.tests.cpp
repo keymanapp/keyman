@@ -132,8 +132,6 @@ TEST_P(GetActionApiTest, TestActionsApi) {
   auto data = GetParam();
   ASSERT_NO_FATAL_FAILURE(Initialize(data));
 
-  // setup(initial_app_context, final_cached_context, actions_code_points_to_delete, actions_output);
-
   auto actual_actions = km_core_state_get_actions(test_state);
 
   std::cout << " (" << data.test_name << "): delete: " << data.expected_delete << " output: |" << std::u32string(actual_actions->output) << "|" << std::endl;

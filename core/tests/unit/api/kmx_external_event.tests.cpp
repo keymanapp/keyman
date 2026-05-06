@@ -16,14 +16,13 @@
 
 #include "../helpers/core_test_helpers.h"
 
+using namespace km::core::kmx;
+
 /**
  * This test will test the infrastructure around the external event processing
  * The functions tested are:
  * - km_core_event with the event KM_CORE_EVENT_KEYBOARD_ACTIVATED
  */
-
-using namespace km::core::kmx;
-
 TEST(ExternalEventTests, TestExternalEvent) {
 
   km_core_keyboard * test_kb = nullptr;
