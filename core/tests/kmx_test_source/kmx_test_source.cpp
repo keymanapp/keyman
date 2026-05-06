@@ -66,7 +66,7 @@ KmxTestSource::parse_source_string(std::string const &s, std::u16string& result)
         std::string s1 = s.substr(p - s.begin(), 8);
         v              = std::stoul(s1, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
-        if(!(v >= 0x0001 && v <= 0x10FFFF)) {
+        if(v < 0x0001 || v > 0x10FFFF) {
           return false;
         }
         p += n - 1;

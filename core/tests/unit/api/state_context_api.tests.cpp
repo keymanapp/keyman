@@ -29,6 +29,7 @@ protected:
     auto blob = km::tests::load_kmx_file(path.native().c_str());
     const auto mock_extension = ".mock";
     if (strlen(keyboard) > strlen(mock_extension) && strcmp(keyboard + strlen(keyboard) - strlen(mock_extension), mock_extension) == 0) {
+      // mocked keyboard load
       km::core::abstract_processor* kp = new km::core::mock_processor(keyboard);
       test_kb = static_cast<km_core_keyboard*>(kp);
     } else {
@@ -57,24 +58,24 @@ protected:
     }
   }
 
-  void is_identical_context(km_core_cu const *cached_context) {
+  void assert_identical_context(km_core_cu const *expected_context) {
     size_t buf_size;
     ASSERT_STATUS_OK(km_core_context_get(km_core_state_context(test_state), &citems));
     ASSERT_STATUS_OK(context_items_to_utf16(citems, nullptr, &buf_size));
-    km_core_cu *new_cached_context = new km_core_cu[buf_size];
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, new_cached_context, &buf_size));
-    ASSERT_EQ(std::u16string(cached_context), new_cached_context);
-    delete[] new_cached_context;
+    km_core_cu *actual_context = new km_core_cu[buf_size];
+    ASSERT_STATUS_OK(context_items_to_utf16(citems, actual_context, &buf_size));
+    ASSERT_EQ(std::u16string(expected_context), actual_context);
+    delete[] actual_context;
   }
 
-  void is_different_context(km_core_cu const *cached_context) {
+  void assert_different_context(km_core_cu const *expected_context) {
     size_t buf_size;
     ASSERT_STATUS_OK(km_core_context_get(km_core_state_context(test_state), &citems));
     ASSERT_STATUS_OK(context_items_to_utf16(citems, nullptr, &buf_size));
-    km_core_cu *new_cached_context = new km_core_cu[buf_size];
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, new_cached_context, &buf_size));
-    ASSERT_NE(std::u16string(cached_context), new_cached_context);
-    delete[] new_cached_context;
+    km_core_cu *actual_context = new km_core_cu[buf_size];
+    ASSERT_STATUS_OK(context_items_to_utf16(citems, actual_context, &buf_size));
+    ASSERT_NE(std::u16string(expected_context), actual_context);
+    delete[] actual_context;
   }
 };
 
@@ -117,7 +118,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededIdenticalContext) {
   km_core_cu const *new_app_context = u"This is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context, false));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(cached_context));
 }
 
 // 1a. cached context has markers and is identical to app context
@@ -145,8 +146,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededDifferentContext) {
   km_core_cu const *new_app_context = u"This is a    test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 // 3. cached context is shorter than app context, but content is same as far as it goes
@@ -155,8 +156,8 @@ TEST_F(StateContextApiTests,  TestContextSetIfNeededAppContextIsLonger) {
   km_core_cu const *new_app_context = u"Longer This is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 // 3a. cached context has markers and is shorter than app context,
@@ -181,7 +182,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextShorterAndMarker
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
   ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems));
   ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextShorterAndMarkersNfu) {
@@ -220,8 +221,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextCleared) {
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   km_core_state_context_clear(test_state);
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 // 5. cached context is longer than app context, but content is same as far as it goes
@@ -230,8 +231,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededAppContextIsShorter) {
   km_core_cu const *new_app_context = u"is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 // 5a. cached context has markers and is longer than app context, but
@@ -294,8 +295,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededApplicationContextEmpty) {
   km_core_cu const *new_app_context = u"";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 // 7. surrogate pairs in context
@@ -304,7 +305,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsUnchanged) {
   km_core_cu const *new_app_context = u"a\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsAppContextLonger) {
@@ -312,7 +313,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsAppContextLonge
   km_core_cu const *new_app_context = u"xa\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsCachedContextLonger) {
@@ -320,7 +321,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsCachedContextLo
   km_core_cu const *new_app_context = u"a\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsUnchangedAndMarkers) {
@@ -393,8 +394,8 @@ TEST_F(StateContextApiTests, TestContextClear) {
   km_core_cu const *cached_context = u"This is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_STATUS_OK(km_core_state_context_clear(test_state));
-  ASSERT_NO_FATAL_FAILURE(is_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(is_identical_context(u""));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(u""));
 }
 
 //-------------------------------------------------------------------------------------
