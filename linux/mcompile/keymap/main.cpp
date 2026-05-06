@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) 2004 - 2026 SIL Global. MIT License.
+ * Keyman is copyright (C)  SIL Global. MIT License.
  *
  * Created by Markus-SWAG on 2026-05-05
  *
