@@ -178,6 +178,8 @@ if builder_has_option --test; then
   testparams="$opt_tests $testparams"
 fi
 
+JUNIT_RESULTS=()
+
 do_action test
 
 if builder_start_action test:mac; then
@@ -187,20 +189,36 @@ if builder_start_action test:mac; then
   target=mac-`uname -m`
   MESON_PATH="$KEYMAN_ROOT/core/build/$target/$BUILDER_CONFIGURATION"
   meson test -C "$MESON_PATH" $testparams
+  JUNIT_RESULTS+=("##teamcity[importData type='junit' path='keyman/core/build/$target/$BUILDER_CONFIGURATION/meson-logs/testlog.junit.xml']")
   builder_finish_action success test:mac
 fi
 
 if builder_start_action test:win; then
-  # We can assume that build:win has run so both architectures will be available
-  MESON_PATH="$KEYMAN_ROOT/core/build/x86/$BUILDER_CONFIGURATION"
-  meson test -C "$MESON_PATH" $testparams
-  MESON_PATH="$KEYMAN_ROOT/core/build/x64/$BUILDER_CONFIGURATION"
-  meson test -C "$MESON_PATH" $testparams
+  if ! builder_has_action test:x86; then
+    # We can assume that build:win has run so both architectures will be available
+    MESON_PATH="$KEYMAN_ROOT/core/build/x86/$BUILDER_CONFIGURATION"
+    meson test -C "$MESON_PATH" $testparams
+    JUNIT_RESULTS+=("##teamcity[importData type='junit' path='keyman/core/build/x86/$BUILDER_CONFIGURATION/meson-logs/testlog.junit.xml']")
+  fi
+
+  if ! builder_has_action test:x64; then
+    MESON_PATH="$KEYMAN_ROOT/core/build/x64/$BUILDER_CONFIGURATION"
+    meson test -C "$MESON_PATH" $testparams
+    JUNIT_RESULTS+=("##teamcity[importData type='junit' path='keyman/core/build/x64/$BUILDER_CONFIGURATION/meson-logs/testlog.junit.xml']")
+  fi
+
   # We do not yet have CI/build hardware support for arm64 Windows testing
   #MESON_PATH="$KEYMAN_ROOT/core/build/arm64/$BUILDER_CONFIGURATION"
   #meson test -C "$MESON_PATH" $testparams
 
   builder_finish_action success test:win
+fi
+
+# Report JUnit test results to CI
+if builder_has_action test; then
+  if builder_is_ci_build; then
+    printf '%s\n' "${JUNIT_RESULTS[@]}"
+  fi
 fi
 
 # -------------------------------------------------------------------------------

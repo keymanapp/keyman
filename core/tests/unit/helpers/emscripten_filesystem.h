@@ -2,7 +2,8 @@
 
 #ifdef __EMSCRIPTEN__
 #include <iostream>
+#include "path.hpp"
 
-const std::string get_wasm_file_path(const std::string& filename);
+bool get_wasm_file_path(const std::string& filename, km::core::path& result);
 
 #endif
