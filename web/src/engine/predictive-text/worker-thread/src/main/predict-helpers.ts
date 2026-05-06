@@ -6,7 +6,7 @@ import { searchForProperty, WordBreakProperty } from '@keymanapp/models-wordbrea
 import { TransformUtils } from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTokenLike } from './correction/context-token.js';
-import { ContextTokenization } from './correction/context-tokenization.js';
+import { ContextTokenization, mapWhitespacedTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
 import { ContextTransition } from './correction/context-transition.js';
@@ -189,89 +189,72 @@ export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: Correctio
   return b.totalProb - a.totalProb;
 }
 
-export async function correctAndEnumerateWithoutTraversals(
+export function correctAndEnumerateWithoutTraversals(
   lexicalModel: LexicalModel,
-  transformDistribution: Distribution<Transform>,
+  corrections: Distribution<Transform>,
   context: Context
-): Promise<{
-  /**
-   * For models that support correction-search caching, this provides the
-   * cached object corresponding to this method's operation.
-   *
-   * Otherwise, is `null`.
-   */
-  postContextState?: ContextState;
+): CorrectionPredictionTuple[] {
+  let returnedPredictions: CorrectionPredictionTuple[] = [];
 
-  /**
-   * The suggestions generated based on the user's input state.
-   */
-  rawPredictions: CorrectionPredictionTuple[];
+  const tokenizer = determineModelTokenizer(lexicalModel);
+  const tokenization = tokenizer(context); // issue at present if no tokens exist!
 
-  /**
-   * The id of a prior ContextTransition event that triggered a Suggestion found
-   * at the end of the Context.  Will be undefined if no edits have occurred
-   * since the Suggestion was applied.
-   */
-  revertableTransitionId?: number
-}> {
-  const inputTransform = transformDistribution[0].sample;
-  let rawPredictions: CorrectionPredictionTuple[] = [];
+  for(let correction of corrections) {
+    // Step 1:  determine tokenization effects.  We can't use the
+    // ContextTokenization pattern due to the model's lack of LexiconTraversal
+    // support, though.
+    const transformId = correction.sample.id;
 
-  let predictionRoots: ProbabilityMass<Transform>[];
+    const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
+    const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
+    // tokenizationMapping.alignment.edgeWindow.editBoundary.
+    const tokenizedCorrectionEntries = [...tokenizedCorrection.values()];
+    const deleteLeft = tokenizedCorrectionEntries.reduce((total, curr) => total + curr.deleteLeft, 0);
 
-  // Only allow new-word suggestions if space was the most likely keypress.
-  const allowSpace = TransformUtils.isWhitespace(inputTransform);
-  const allowBksp = TransformUtils.isBackspace(inputTransform);
+    const rootContext = models.applyTransform({insert: '', deleteLeft}, context);
 
-  // Generates raw prediction distributions for each valid input.  Can only 'correct'
-  // against the final input.
-  //
-  // This is the old, 12.0-13.0 'correction' style.
-  if(allowSpace) {
-    // Detect start of new word; prevent whitespace loss here.
-    predictionRoots = [{sample: inputTransform, p: 1.0}];
-  } else {
-    predictionRoots = transformDistribution.map((alt) => {
-      let transform = alt.sample;
+    // Start:  determine the proper root for the first tokenized correction component.
+    const edgeWindow = tokenizationMapping.alignment.edgeWindow;
+    const nonEmptyBoundaryRoot = edgeWindow.editBoundary.text == '' ? tokenization.left[edgeWindow.editBoundary.tokenIndex-1]?.text ?? '' : edgeWindow.editBoundary.text;
+    const appliedBoundaryTail = nonEmptyBoundaryRoot + tokenizedCorrectionEntries[0].insert;
 
-      // Filter out special keys unless they're expected.
-      if(TransformUtils.isWhitespace(transform) && !allowSpace) {
-        return null;
-      } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
-        return null;
+    // If the previous text can be tokenized into multiple tokens, the first correction's text should stand alone.
+    // If not, the correction root should incorporate `nonEmptyBoundaryRoot` as a prefix.
+    const tailTransform = tokenizedCorrectionEntries[0];
+    if(tokenizer({left: appliedBoundaryTail, startOfBuffer: false, endOfBuffer: false}).left.length > 1) {
+      tokenizedCorrectionEntries[0] = {
+        ...tailTransform,
+        deleteLeft: 0
       }
+    } else {
+      tokenizedCorrectionEntries[0] = {
+        insert: nonEmptyBoundaryRoot + tailTransform.insert,
+        deleteLeft: 0
+      }
+    }
 
-      return alt;
+    const preservationTransform = tokenizedCorrectionEntries.slice(0, -1).reduce((accum, curr) => {
+      return models.buildMergedTransform(accum, {...curr, deleteLeft: 0});
+    }, { insert: '', deleteLeft, id: correction.sample.id});
+
+
+    const predictions = predictFromCorrectionSequence(lexicalModel, tokenizedCorrectionEntries.map((e) =>{
+      return {
+        sample: e,
+        p: correction.p
+      }
+    }), rootContext, transformId);
+
+    predictions.forEach((p) => {
+      p.preservationTransform = preservationTransform;
+      if(transformId) {
+        p.prediction.sample.transformId = transformId;
+      }
+      returnedPredictions.push(p);
     });
   }
 
-  const wordbreak = determineModelWordbreaker(lexicalModel);
-  // Remove `null` entries, then determine suggestions.
-  predictionRoots = predictionRoots.filter(tuple => !!tuple);
-  predictionRoots.forEach((pr) => {
-    const postContext = models.applyTransform(pr.sample, context);
-    const tailTokenText = wordbreak(postContext);
-    const rootContext = models.applyTransform({insert: '', deleteLeft: KMWString.length(tailTokenText)}, postContext);
-
-    const results = predictFromCorrectionSequence(lexicalModel, [{
-      sample: {
-        insert: tailTokenText,
-        deleteLeft: 0,
-        id: pr.sample.id
-      },
-      p: pr.p
-    }], rootContext, pr.sample.id);
-    results.forEach((r) => rawPredictions.push(r));
-  })
-
-  if(allowSpace) {
-    rawPredictions.forEach((entry) => entry.preservationTransform = inputTransform);
-  }
-
-  return {
-    postContextState: null,
-    rawPredictions: rawPredictions
-  };
+  return returnedPredictions;
 }
 
 /**
@@ -585,7 +568,9 @@ export async function correctAndEnumerate(
   // It's mostly here to support models compiled before Keyman 14.0, which was
   // when the `LexiconTraversal` pattern was established.
   if(!contextTracker) {
-    return correctAndEnumerateWithoutTraversals(lexicalModel, transformDistribution, context);
+    return {
+      rawPredictions: correctAndEnumerateWithoutTraversals(lexicalModel, transformDistribution, context)
+    };
   }
 
   // 'else':  the current, 14.0+ pattern, which is able to leverage
