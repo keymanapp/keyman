@@ -277,6 +277,17 @@ const TestData values[] = {
   },
 
   {
+    "OneBackspaceToDeleteLastNfdCharacterWithNfcAppContext15487",
+    /* app context pre transform: */     u"abce\u0302", // NFD
+    /* cached context post transform: */ u"abce",
+    /* cached context post transform: */ nullptr,
+    /* action del, output: */            1, U"",  // NFD input;  delete 1: \u0302
+    // ---- results ----
+    /* action del, output: */            1, U"",             // NFC output; delete 1: e
+    /* app_context: */                   u"abce"
+  },
+
+  {
     "OneBackspaceForNfdConvertsIntoOneCharInNfcAndRecombine",
     /* app context pre transform: */     u"abcê",
     /* cached context post transform: */ u"abce\u0323\u0302",
