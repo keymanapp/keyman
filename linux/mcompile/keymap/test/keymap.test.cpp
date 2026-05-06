@@ -1,11 +1,3 @@
-/*
- * Keyman is copyright (C) 2004 - 2026 SIL International. MIT License.
- *
- * Created by Markus-SWAG on 2026-05-05
- *
- * Mnemonic layout support for Linux
- */
-
 #include <gtest/gtest.h>
 #include <vector>
 #include <gdk/gdk.h>
@@ -20,7 +12,74 @@
 #include "mcompile.h"
 #include "keymap.h"
 
-class KeyboardConversionTest : public ::testing::Test {
+class TestDataValues {
+
+  private:
+    guint keycode;
+    KMX_WCHAR expected_char;
+    std::string layout;
+    guint shiftstate;
+
+
+  public:
+    TestDataValues(guint k, KMX_WCHAR e, std::string l, guint s) : keycode(k), expected_char(e), layout(l), shiftstate(s) {
+      this->keycode = k;
+      this->expected_char = e;
+      this->layout = l;
+      this->shiftstate = s;
+    }
+
+    guint get_keycode() {
+        return keycode;
+    }
+
+    KMX_WCHAR get_expected_char() {
+        return expected_char;
+    }
+
+    std::string get_layout() {
+        return layout;
+    }
+
+    guint get_shiftstate() {
+        return shiftstate;
+    }
+};
+
+class KeyboardTestParameters {
+
+  public:
+
+     KeyboardTestParameters(std::vector<KMX_WCHAR> e, std::string l, guint s) : expected_keysyms(e), layout(l), shiftstate(s) {
+      expected_keysyms = e;
+      layout = l;
+      shiftstate = s;
+      generate_test_data_values();
+    }
+
+    std::vector<TestDataValues> get_test_data() {
+        return test_data_values;
+    }
+
+  protected:
+    std::vector<KMX_WCHAR> expected_keysyms;
+    std::vector<TestDataValues> test_data_values = {};
+    std::string layout;
+    guint shiftstate;
+    std::vector<guint> keycodes = { 38, 56, 54, 40, 26, 41, 42, 43, 31, 44, 45, 46, 58, 57, 32,
+                               33, 24, 27, 39, 28, 30, 55, 25, 53, 29, 52, 19, 10, 11, 12,
+                               13, 14, 15, 16, 17, 18, 65, 49, 20, 21, 34, 35, 51, 47, 48,
+                               59, 60, 61, 123, 94};
+
+    void generate_test_data_values() {
+      EXPECT_EQ(keycodes.size(), expected_keysyms.size()) << "Keycodes and expected keysyms vectors must be of the same size.";
+      for (guint k = 0; k < keycodes.size() && k < expected_keysyms.size(); k++) {
+        test_data_values.emplace_back(TestDataValues(keycodes[k], expected_keysyms[k], layout, shiftstate));
+      }
+    }
+};
+
+class KeyboardConversionTest : public ::testing::TestWithParam<TestDataValues> {
 
 public:
 
@@ -29,8 +88,8 @@ protected:
   GdkDisplay* test_display;
   gint argc = 0;
   char** argv = nullptr;
-  Glib::ustring default_layout;
-  bool onX11 = false;
+  std::string default_layout;
+
 
 private:
   void initialize_keymap() {
@@ -55,16 +114,23 @@ private:
     auto variant = Glib::VariantBase::cast_dynamic<SourcesVariant>(base);
     sources = variant.get();
 
-    ASSERT_FALSE(sources.empty()) << "ERROR: No input sources found";
-
-    const auto& [type, layout] = sources[0];
-
-    std::cout << "Default input source type: " << type << ", layout: " << layout << std::endl;
-    ASSERT_EQ(type, "xkb");
-    if (layout == "de" || layout == "us") {
-      default_layout = layout;
+    if (sources.empty()) {
+      GTEST_SKIP() << "ERROR: No input sources found";
     }
 
+    const auto& [type, system_layout] = sources[0];
+
+    if (type == "xkb") {
+      if (system_layout == "de" || system_layout == "us") {
+        default_layout = system_layout;
+      }
+      else {
+        GTEST_SKIP() << "Default layout is not DE or US.";
+      }
+    }
+    else {
+      GTEST_SKIP() << "Default input source type is not xkb.";
+    }
   }
 
   void SetUp() override {
@@ -84,224 +150,134 @@ private:
       gdk_display_close(test_display);
       test_display = nullptr;
     }
-    onX11 = false;
   }
-
-
 };
 
-guint keycodes[] = { 38, 56, 54, 40, 26, 41, 42, 43, 31, 44, 45, 46, 58, 57, 32,
-                     33, 24, 27, 39, 28, 30, 55, 25, 53, 29, 52, 19, 10, 11, 12,
-                     13, 14, 15, 16, 17, 18, 65, 49, 20, 21, 34, 35, 51, 47, 48,
-                     59, 60, 61, 123, 94};
+TEST_P(KeyboardConversionTest, Base) {
+  guint keycode;
+  KMX_WCHAR expected_char;
+  std::string test_layout;
+  guint shiftstate;
+  TestDataValues parameter = GetParam();
 
+  keycode = parameter.get_keycode();
+  expected_char = parameter.get_expected_char();
+  test_layout = parameter.get_layout();
+  shiftstate = parameter.get_shiftstate();
 
-TEST_F(KeyboardConversionTest, KMXgetKeyValUnderlyingFromKeyCodeUnderlyingBase) {
-
-  if (default_layout != "us") {
-    GTEST_SKIP() << "Default layout is not US.";
+  std::cout << "Testing keycode: " << keycode << " expecting char: " << expected_char << " with layout: " << test_layout << " and shiftstate: " << shiftstate << std::endl;
+  if (test_layout != default_layout) {
+    GTEST_SKIP() << "Default layout is not " << default_layout << ".";
   }
-
-  KMX_DWORD expected_chars[] = {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i',
-                                u'j', u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r',
-                                u's', u't', u'u', u'v', u'w', u'x', u'y', u'z', u'0',
-                                u'1', u'2', u'3', u'4', u'5', u'6', u'7', u'8', u'9',
-                                u' ', u'`', u'-', u'=', u'[', u']', u'\\', u';', u'\'',
-                                u',', u'.', u'/', u'\000', u'<'};
 
   KMX_WCHAR deadkey;
-  for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-    KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
+  KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
       test_keymap,
-      keycodes[k],
-      0,
+      keycode,
+      shiftstate,
       &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k];
-  }
-}
+  );
+  EXPECT_EQ(result, expected_char) << "Failed for keycode: " << keycode;
 
-
-TEST_F(KeyboardConversionTest, KMXgetKeyValUnderlyingFromKeyCodeUnderlyingShift) {
-  // Test with valid key code - should return character or deadkey
-
-  if (default_layout != "us") {
-    GTEST_SKIP() << "Default layout is not US.";
-  }
-  KMX_DWORD expected_chars[] = { u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
-                                 u'J', u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R',
-                                 u'S', u'T', u'U', u'V', u'W', u'X', u'Y', u'Z', u')',
-                                 u'!', u'@', u'#', u'$', u'%', u'^', u'&', u'*', u'(',
-                                 u' ', u'~', u'_', u'+', u'{', u'}', u'|', u':', u'"',
-                                 u'<', u'>', u'?', u'\000', u'>'};
-
-  KMX_WCHAR deadkey;
-  for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-    KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
-      test_keymap,
-      keycodes[k],
-      K_SHIFTFLAG,
-      &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k] << " with shift state";
-  }
-}
-
-
-TEST_F(KeyboardConversionTest, KMXgetKeyValUnderlyingFromKeyCodeUnderlyingLCTRLFLAGRALTFLAG) {
-  // Test with valid key code - should return character or deadkey
-
-  if (default_layout != "us") {
-    GTEST_SKIP() << "Default layout is not US.";
   }
 
-  KMX_DWORD expected_chars[] = {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j', u'k',
+
+  INSTANTIATE_TEST_SUITE_P(BaseUs,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                                {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i',
+                                 u'j', u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r',
+                                 u's', u't', u'u', u'v', u'w', u'x', u'y', u'z', u'0',
+                                 u'1', u'2', u'3', u'4', u'5', u'6', u'7', u'8', u'9',
+                                 u' ', u'`', u'-', u'=', u'[', u']', u'\\', u';', u'\'',
+                                 u',', u'.', u'/', u'\000', u'<'},
+                                 "us",
+                                 0).get_test_data()));
+
+
+INSTANTIATE_TEST_SUITE_P(ShiftUs,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                                {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
+                                  u'J', u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R',
+                                  u'S', u'T', u'U', u'V', u'W', u'X', u'Y', u'Z', u')',
+                                  u'!', u'@', u'#', u'$', u'%', u'^', u'&', u'*', u'(',
+                                  u' ', u'~', u'_', u'+', u'{', u'}', u'|', u':', u'"',
+                                  u'<', u'>', u'?', u'\000', u'>'},
+                                  "us",
+                                  K_SHIFTFLAG).get_test_data()));
+
+
+INSTANTIATE_TEST_SUITE_P(AltGrUs,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                              {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j', u'k',
                                 u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't', u'u', u'v',
                                 u'w', u'x', u'y', u'z', u'0', u'1', u'2', u'3', u'4', u'5', u'6',
                                 u'7', u'8', u'9', u'\000', u'`', u'-', u'=', u'[', u']', u'\\',
-                                u';', u'\'', u',', u'.', u'/', u'\000', u'|'};
-  KMX_WCHAR deadkey;
+                                u';', u'\'', u',', u'.', u'/', u'\000', u'|'},
+                                "us",
+                                (LCTRLFLAG | RALTFLAG)).get_test_data()));
 
-  for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-    KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
-      test_keymap,
-      keycodes[k],
-      LCTRLFLAG | RALTFLAG,
-      &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k];
-  }
-}
-
-
-TEST_F(KeyboardConversionTest, GetKeySymFromUnderlyingKeyCodeShiftLCTRLFLAGRALTFLAG) {
-  if (default_layout != "us") {
-    GTEST_SKIP() << "Default layout is not US.";
-  }
-
-  KMX_DWORD expected_chars[] = {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I', u'J', u'K',
+INSTANTIATE_TEST_SUITE_P(ShiftAltGrUs,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                               {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I', u'J', u'K',
                                 u'L', u'M', u'N', u'O', u'P', u'Q', u'R', u'S', u'T', u'U', u'V',
                                 u'W', u'X', u'Y', u'Z', u')', u'!', u'@', u'#', u'$', u'%', u'^',
                                 u'&', u'*', u'(', u'\000', u'~', u'_', u'+', u'{', u'}', u'|',
-                                u':', u'"', u'<', u'>', u'?', u'\000', u'¦'};
+                                u':', u'"', u'<', u'>', u'?', u'\000', u'¦'},
+                                "us",
+                                (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG)).get_test_data()));
 
-  KMX_WCHAR deadkey;
-
-  for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-    KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
-      test_keymap,
-      keycodes[k],
-      K_SHIFTFLAG | LCTRLFLAG | RALTFLAG,
-      &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k];
-  }
-}
-
-
-TEST_F(KeyboardConversionTest, DeGetKeySymFromUnderlyingKeyCode) {
-  if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not DE.";
-  }
-
-  KMX_DWORD expected_chars[] = {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j',
-                                u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't',
-                                u'u', u'v', u'w', u'x', u'z', u'y', u'0', u'1', u'2', u'3',
-                                u'4', u'5', u'6', u'7', u'8', u'9', u' ', u'\xffff', u'ß',
-                                u'\xffff', u'ü', u'+', u'#', u'ö', u'ä', u',', u'.', u'-',
-                                u'\000', u'<', };
-
-  KMX_WCHAR deadkey;
-
-  std::cout << "Testing KMX_get_KeyValUnderlying_From_KeyCodeUnderlying with base shift state" << std::endl;
-  for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-    KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
-      test_keymap,
-      keycodes[k],
-      0,   // Base shift state
-      &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k];
-  }
-}
+INSTANTIATE_TEST_SUITE_P(BaseDe,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                                 {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j',
+                                  u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't',
+                                  u'u', u'v', u'w', u'x', u'z', u'y', u'0', u'1', u'2', u'3',
+                                  u'4', u'5', u'6', u'7', u'8', u'9', u' ', u'\xffff', u'ß',
+                                  u'\xffff', u'ü', u'+', u'#', u'ö', u'ä', u',', u'.', u'-',
+                                  u'\000', u'<'},
+                                 "de",
+                                 0).get_test_data()));
 
 
-TEST_F(KeyboardConversionTest, DeKMXgetKeyValUnderlyingFromKeyCodeUnderlyingShift) {
-  if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not DE.";
-  }
-
-  KMX_DWORD expected_chars[] = { u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
+INSTANTIATE_TEST_SUITE_P(ShiftDe,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                                {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
                                  u'J', u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R',
                                  u'S', u'T', u'U', u'V', u'W', u'X', u'Z', u'Y', u'=',
                                  u'!', u'"', u'§', u'$', u'%', u'&', u'/', u'(', u')',
                                  u' ', u'°', u'?', u'\xffff', u'Ü', u'*', u'\'', u'Ö',
-                                 u'Ä', u';', u':', u'_', u'\000', u'>', };
-
-  KMX_WCHAR deadkey;
-
-   for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-     KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
-       test_keymap,
-       keycodes[k],
-      K_SHIFTFLAG,
-      &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k] << " with shift state";
-  }
-}
+                                 u'Ä', u';', u':', u'_', u'\000', u'>'},
+                                  "de",
+                                  K_SHIFTFLAG).get_test_data()));
 
 
-TEST_F(KeyboardConversionTest, DeKMXgetKeyValUnderlyingFromKeyCodeUnderlyingLCTRLFLAGRALTFLAG) {
-  // Test with valid key code - should return character or deadkey
-  if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not DE.";
-  }
+INSTANTIATE_TEST_SUITE_P(AltGrDe,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                                 {u'æ', u'\xfffe', u'¢', u'ð', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe',
+                                  u'\xfffe', u'\xffff', u'\xfffe', u'\xfffe', u'µ', u'\xfffe', u'ø', u'þ',
+                                  u'@', u'¶', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'«',
+                                  u'\xfffe', u'»', u'}', u'¹', u'²', u'³', u'¼', u'½', u'¬', u'{', u'[',
+                                  u']', u'\000', u'\xfffe', u'\\', u'\xffff', u'\xffff', u'~', u'\xfffe',
+                                  u'\xffff', u'\xffff', u'·', u'\xfffe', u'\xfffe', u'\000', u'|'},
+                                  "de",
+                                 (LCTRLFLAG | RALTFLAG)).get_test_data()));
 
-  KMX_DWORD expected_chars[] = {u'æ', u'\xfffe', u'¢', u'ð', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe',
-                                u'\xfffe', u'\xffff', u'\xfffe', u'\xfffe', u'µ', u'\xfffe', u'ø', u'þ',
-                                u'@', u'¶', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'«',
-                                u'\xfffe', u'»', u'}', u'¹', u'²', u'³', u'¼', u'½', u'¬', u'{', u'[',
-                                u']', u'\000', u'\xfffe', u'\\', u'\xffff', u'\xffff', u'~', u'\xfffe',
-                                u'\xffff', u'\xffff', u'·', u'\xfffe', u'\xfffe', u'\000', u'|', };
-
-  KMX_WCHAR deadkey;
-
-  for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-    KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
-      test_keymap,
-      keycodes[k],
-      LCTRLFLAG | RALTFLAG,
-      &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k];
-  }
-}
-
-
-TEST_F(KeyboardConversionTest, DeGetKeySymFromUnderlyingKeyCodeShiftLCTRLFLAGRALTFLAG) {
-  if (default_layout != "de") {
-    GTEST_SKIP() << "Default layout is not DE.";
-  }
-
-  KMX_DWORD expected_chars[] = {u'Æ', u'\xfffe', u'©', u'Ð', u'\xfffe', u'ª', u'\xfffe',
+INSTANTIATE_TEST_SUITE_P(ShiftAltGrDe,
+                         KeyboardConversionTest,
+                         testing::ValuesIn(KeyboardTestParameters(
+                               {u'Æ', u'\xfffe', u'©', u'Ð', u'\xfffe', u'ª', u'\xfffe',
                                 u'\xfffe', u'\xfffe', u'\xffff', u'&', u'\xfffe', u'º',
                                 u'\xfffe', u'Ø', u'Þ', u'\xfffe', u'®', u'\xfffe', u'\xfffe',
                                 u'\xfffe', u'\xfffe', u'§', u'\xfffe', u'¥', u'\xfffe', u'°',
                                 u'¡', u'\xfffe', u'£', u'¤', u'\xfffe', u'\xfffe', u'\xfffe',
                                 u'\xfffe', u'±', u'\000', u'\xfffe', u'¿', u'\xffff', u'\xffff',
                                 u'¯', u'\xffff', u'\xffff', u'\xffff', u'×', u'÷', u'\xfffe',
-                                u'\000', u'\xffff', };
-
-  KMX_WCHAR deadkey;
-
-  for (uint k = 0; k < sizeof(keycodes)/sizeof(keycodes[0]); k++) {
-    KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(
-      test_keymap,
-      keycodes[k],
-      K_SHIFTFLAG | LCTRLFLAG | RALTFLAG,
-      &deadkey
-    );
-    EXPECT_EQ(result, expected_chars[k]) << "Failed for keycode: " << keycodes[k];
-  }
-}
+                                u'\000', u'\xffff'},
+                                "de",
+                                (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG)).get_test_data()));
