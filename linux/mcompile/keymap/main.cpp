@@ -83,5 +83,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  delete kmxfile;
+
   return 0;
 }
