@@ -1,3 +1,9 @@
+*
+ * Keyman is copyright (C)  SIL Global. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
+
 #include <gtest/gtest.h>
 #include <vector>
 #include <gdk/gdk.h>
