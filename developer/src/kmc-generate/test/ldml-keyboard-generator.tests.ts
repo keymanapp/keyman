@@ -33,6 +33,8 @@ function getFilenames(p: string, base?: string): string[] {
 describe('LdmlKeyboardGenerator', function () {
   let clock: sinon.SinonFakeTimers;
 
+  const callbacks = new TestCompilerCallbacks(this);
+
   before(function() {
     // We will always be 12 April 2024 to match test fixtures
     clock = sinon.useFakeTimers(new Date(2024, 3, 12));
@@ -44,7 +46,6 @@ describe('LdmlKeyboardGenerator', function () {
 
   it('should generate a LDML keyboard from provided options', async function() {
     const generator = new LdmlKeyboardGenerator();
-    const callbacks = new TestCompilerCallbacks();
     assert(await generator.init(callbacks, options));
     const result = await generator.run();
     assert.exists(result);

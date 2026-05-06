@@ -43,7 +43,7 @@ jobs:
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
@@ -121,7 +121,7 @@ jobs:
         echo "- $(find . -name keyman_\*.dsc)" >> $GITHUB_STEP_SUMMARY
 
     - name: Store source package
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
         name: keyman-srcpkg
         path: |
@@ -140,7 +140,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -166,7 +166,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -204,13 +204,13 @@ jobs:
         sudo rm -rf /usr/share/dotnet
 
     - name: Download Source Artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         name: keyman-srcpkg
         path: artifacts
 
     - name: Download Binary Artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         path: artifacts
         pattern: keyman-binarypkgs-*
@@ -281,7 +281,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Download Artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         name: keyman-signedpkgs
 
@@ -343,7 +343,7 @@ jobs:
 
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         path: artifacts
         pattern: keyman-*
@@ -362,7 +362,7 @@ jobs:
         echo "SKIP_API_CHECK=${{ github.event.client_payload.skipApiCheck }}" >> artifacts/env
 
     - name: Cache artifacts
-      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: |
           artifacts

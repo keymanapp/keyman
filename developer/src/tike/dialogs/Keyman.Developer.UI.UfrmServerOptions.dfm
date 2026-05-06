@@ -4,7 +4,7 @@ object frmServerOptions: TfrmServerOptions
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Keyman Developer Server Options'
-  ClientHeight = 378
+  ClientHeight = 407
   ClientWidth = 433
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -40,7 +40,7 @@ object frmServerOptions: TfrmServerOptions
   end
   object cmdOK: TButton
     Left = 272
-    Top = 346
+    Top = 374
     Width = 73
     Height = 25
     Caption = 'OK'
@@ -51,7 +51,7 @@ object frmServerOptions: TfrmServerOptions
   end
   object cmdCancel: TButton
     Left = 352
-    Top = 346
+    Top = 374
     Width = 73
     Height = 25
     Cancel = True
@@ -63,27 +63,27 @@ object frmServerOptions: TfrmServerOptions
     Left = 8
     Top = 144
     Width = 417
-    Height = 129
+    Height = 157
     Caption = 'Setup'
     TabOrder = 3
     object lblAuthToken: TLabel
       Left = 16
-      Top = 93
+      Top = 117
       Width = 100
       Height = 13
       Caption = '&Authentication token'
       FocusControl = editAuthToken
     end
-    object lblVersion: TLabel
+    object lblNgrokInstallState: TLabel
       Left = 183
       Top = 29
-      Width = 43
+      Width = 87
       Height = 13
-      Caption = '(version)'
+      Caption = '(installation state)'
     end
     object lblGetToken: TLabel
       Left = 360
-      Top = 93
+      Top = 117
       Width = 47
       Height = 13
       Cursor = crHandPoint
@@ -96,12 +96,19 @@ object frmServerOptions: TfrmServerOptions
       ParentFont = False
       OnClick = lblGetTokenClick
     end
+    object lblVCRedistInstallState: TLabel
+      Left = 183
+      Top = 57
+      Width = 87
+      Height = 13
+      Caption = '(installation state)'
+    end
     object editAuthToken: TEdit
       Left = 122
-      Top = 90
+      Top = 114
       Width = 231
       Height = 21
-      TabOrder = 2
+      TabOrder = 3
     end
     object cmdDownload: TButton
       Left = 16
@@ -114,17 +121,26 @@ object frmServerOptions: TfrmServerOptions
     end
     object cmdCreateAccount: TButton
       Left = 16
-      Top = 55
+      Top = 79
       Width = 161
       Height = 25
       Caption = '&Create free ngrok account...'
-      TabOrder = 1
+      TabOrder = 2
       OnClick = cmdCreateAccountClick
+    end
+    object cmdInstallVCRedist: TButton
+      Left = 16
+      Top = 52
+      Width = 161
+      Height = 25
+      Caption = '&Install required redistributable'
+      TabOrder = 1
+      OnClick = cmdInstallVCRedistClick
     end
   end
   object gbAdvanced: TGroupBox
     Left = 8
-    Top = 279
+    Top = 307
     Width = 417
     Height = 61
     Caption = 'Advanced Options'

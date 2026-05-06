@@ -23,22 +23,12 @@ function normalizeNewLine(s: string): string {
 }
 
 describe('KeymanProjectCopier', function() {
-  const callbacks = new TestCompilerCallbacks(makePathToFixture('online'));
+  const callbacks = new TestCompilerCallbacks(this, makePathToFixture('online'));
 
   this.beforeAll(function() {
     if(TEST_SAVE_ARTIFACTS) {
       outputRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kmc-copy-'));
       console.log(`Output written to '${outputRoot}'`);
-    }
-  });
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
     }
   });
 

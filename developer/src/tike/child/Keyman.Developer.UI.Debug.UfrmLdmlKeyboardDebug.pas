@@ -74,6 +74,7 @@ type
     procedure memoClick(Sender: TObject);   // I4808
     procedure memoKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
+    procedure memoDblClick(Sender: TObject);
   private
     FFileName: string;
     debugkeyboard: TDebugKeyboard;
@@ -108,6 +109,7 @@ type
     function SetKeyEventContext: Boolean;
     function HandleMemoKeydown(var Message: TMessage): Boolean;
     procedure Run(vkey: Word);
+    procedure UpdateMemoSelection;
 
   protected
     function GetHelpTopic: string; override;
@@ -206,13 +208,13 @@ end;
 
 procedure TfrmLdmlKeyboardDebug.memoGotFocus(Sender: TObject);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 procedure TfrmLdmlKeyboardDebug.memoKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 function TfrmLdmlKeyboardDebug.HandleMemoKeydown(var Message: TMessage): Boolean;
@@ -631,7 +633,7 @@ begin
         SendMessage(memo.Handle, (WM_USER + 97) {EM_SETTEXTEX}, NativeUint(@ste), NativeUInt(PChar(str)));
         selection.Start := lhs.Length + output.Length;
         selection.Finish := selection.Start;
-        selection.Anchor := selection.Start;
+        selection.Caret := selection.Start;
         memo.Selection := selection;
       finally
         memo.Lines.EndUpdate;
@@ -816,22 +818,32 @@ end;
 procedure TfrmLdmlKeyboardDebug.memoChange(Sender: TObject);
 begin
   UpdateDeadkeys;
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 procedure TfrmLdmlKeyboardDebug.memoClick(Sender: TObject);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
+end;
+
+procedure TfrmLdmlKeyboardDebug.memoDblClick(Sender: TObject);
+begin
+  UpdateMemoSelection;
 end;
 
 procedure TfrmLdmlKeyboardDebug.memoSelMove(Sender: TObject);
+begin
+  UpdateMemoSelection;
+end;
+
+procedure TfrmLdmlKeyboardDebug.UpdateMemoSelection;
 begin
   if memo.Focused then
   begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
   end;
 
-  if not memo.ReadOnly and not memo.SelectionChanging then
+  if not memo.ReadOnly then
   begin
     UpdateCharacterGrid;   // I4808
   end;
@@ -855,7 +867,7 @@ begin
     len := text.Length - start;
   end;
   TCharacterGridRenderer.Fill(sgChars, text, FDeadkeys, start, len,
-    memo.Selection.Anchor, True);
+    memo.Selection.Caret, True);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 

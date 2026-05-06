@@ -1,10 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { assert } from 'chai';
 import 'mocha';
 import { makePathToFixture } from './helpers/index.js';
 import { expandFileList, expandFileLists } from '../src/util/fileLists.js';
-
-const callbacks = new TestCompilerCallbacks();
 
 // expandFileList expands each file name relative to the file list's supplied
 // filename, so we need to compare against the full path.
@@ -21,11 +22,9 @@ const expectedFiles = [
   'file5.kmn'
 ];
 
-beforeEach(function() {
-  callbacks.clear();
-});
-
 describe('expandFileList', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('should report a missing filelist correctly', async function() {
     const path = makePathToFixture('file-lists', 'does-not-exist.txt');
 
@@ -45,6 +44,8 @@ describe('expandFileList', function () {
 });
 
 describe('expandFileLists', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('should splice a filelist in correctly', async function() {
     // We just use this to test the splicing so no path resolution is made
     const files = [

@@ -7,7 +7,7 @@ import { KmnCompiler } from '../../src/main.js';
 import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
 
 describe('KmwCompilerMessages', function () {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid KmwCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KmwCompilerMessages, CompilerErrorNamespace.KmwCompiler);

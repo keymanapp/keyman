@@ -304,7 +304,8 @@ uses
   Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},
   Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters.pas' {frmCloneLocalProjectParameters},
   Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters.pas' {frmCloneKeymanCloudProjectParameters},
-  Keyman.Developer.UI.FormValidation in 'main\Keyman.Developer.UI.FormValidation.pas';
+  Keyman.Developer.UI.FormValidation in 'main\Keyman.Developer.UI.FormValidation.pas',
+  tom_TLB in '..\common\delphi\components\tom_TLB.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
