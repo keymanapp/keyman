@@ -23,29 +23,29 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunSpecialTestFiles', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_C0.keylayout')],
-      [makePathToFixture('../data/Test_C1.keylayout')],
-      [makePathToFixture('../data/Test_C2.keylayout')],
-      [makePathToFixture('../data/Test_C2_several.keylayout')],
-      [makePathToFixture('../data/Test_C3.keylayout')],
-      [makePathToFixture('../data/Test_C3_several.keylayout')],
-      [makePathToFixture('../data/Test_C0_C1_C2_C3.keylayout')],
-      [makePathToFixture('../data/Test_maxKeyCode.keylayout')],
-      [makePathToFixture('../data/Test_messages.keylayout')],
-      [makePathToFixture('../data/Test_messages_controlCharacter.keylayout')],
-      [makePathToFixture('../data/Test_messages_superior_C2.keylayout')],
-      [makePathToFixture('../data/Test_messages_superior_C3.keylayout')],
-      [makePathToFixture('../data/Test_duplicate_missing_keycode.keylayout')],
-      [makePathToFixture('../data/Test_modifier.keylayout')],
-      [makePathToFixture('../data/Test_modifierNoCaps.keylayout')],
-      [makePathToFixture('../data/Test_differentAmountOfKeysInBehaviours.keylayout')],
-      [makePathToFixture('../data/Test_duplicate_missing_keys.keylayout')],
-      [makePathToFixture('../data/Test_duplicate_keys.keylayout')],
-      [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
-      [makePathToFixture('../data/Test_nr_elements.keylayout')],
-      [makePathToFixture('../data/Test.keylayout')],
-      [makePathToFixture('../data/Test_differentEncodings.keylayout')],
-      [makePathToFixture('../data/Test_ExtraWarning.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_C0.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_C1.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_C2.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_C2_several.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_C3.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_C3_several.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_C0_C1_C2_C3.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_maxKeyCode.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_messages.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_messages_controlCharacter.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_messages_superior_C2.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_messages_superior_C3.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_duplicate_missing_keycode.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_modifier.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_modifierNoCaps.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_differentAmountOfKeysInBehaviours.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_duplicate_missing_keys.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_duplicate_keys.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_ambiguous_keys.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_nr_elements.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_differentEncodings.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_ExtraWarning.keylayout')],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(files[0]);
@@ -57,17 +57,17 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
-      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout')],
-      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingLayoutsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingmodifierMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyMapSetERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingActionsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingTerminatorsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingkeyERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingkeyMapERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingLayoutsERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingmodifierMapERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingkeyMapSetERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingActionsERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingTerminatorsERROR.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_MissingAllERROR.keylayout')],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
         sut.run(files[0]);
@@ -79,7 +79,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunSpecialTestFiles - create Error: unsupported characters', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_characters.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_characters.keylayout')],
     ].forEach(function (files) {
       it(files + " should give Error: unsupported characters ", async function () {
         sut.run(files[0]);
@@ -91,7 +91,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunSpecialTestFiles - create Error: undefined action', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_undefinedAction.keylayout')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test_undefinedAction.keylayout')],
     ].forEach(function (files) {
       it(files + " should give Error: undefined action detected", async function () {
         sut.run(files[0]);
@@ -127,7 +127,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should throw on unavailable input file name and null output file name', async function () {
-      const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
+      const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
@@ -139,14 +139,14 @@ describe('KeylayoutToKmnConverter', function () {
   describe('Run kmc-convert with or without outputfile name', async function () {
     this.timeout(5000); // allow longer time for this test
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const infile = '../data/Test.keylayout';
+    const infile = '../data/tests-keylayout-kmn/Test.keylayout';
     [
-      [makePathToFixture('../data/Test.kmn')],
+      [makePathToFixture('../data/tests-keylayout-kmn/Test.kmn')],
       [makePathToFixture('')],
       [],
       [null],
-      [makePathToFixture('../data/test_OtherOutputName.kmn')],
-      [makePathToFixture('../data/OutputXName.bb')],
+      [makePathToFixture('../data/tests-keylayout-kmn/test_OtherOutputName.kmn')],
+      [makePathToFixture('../data/tests-keylayout-kmn/OutputXName.bb')],
     ].forEach(function (files) {
       it(infile + " should run ", async function () {
         await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
@@ -160,12 +160,12 @@ describe('KeylayoutToKmnConverter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
 
     // ProcessedData from usable file
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     // ProcessedData from unavailable file
-    const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
+    const inputFilenameUnavailable = makePathToFixture('../data/tests-keylayout-kmn/X.keylayout');
     const readUnavailable = sutR.read(compilerTestCallbacks.loadFile(inputFilenameUnavailable));
     const convertedUnavailable = sut.convertBound.convert(readUnavailable, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
 
@@ -322,7 +322,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getModifierArrayFromKeyModifierArray ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
     [
@@ -348,7 +348,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getKeyModifierArrayFromActionID ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     [
       ['A_16', [{ "key": "32", "behavior": "5" }]],
@@ -374,7 +374,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getActionIdFromActionNext ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     [
       ['none', ''],
@@ -400,7 +400,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getActionIndexFromActionId ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     [
       ['none', -1],
@@ -424,7 +424,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getOutputFromActionIdNone ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     [
       ['A_14', 'u'],
@@ -454,7 +454,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
 
     const b1KeycodeArr: KeylayoutFileData[] = [
@@ -562,7 +562,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getActionStateOutputArrayFromActionState ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     [['1', [
       { "id": "A_0", "state": "1", "output": "ˆ" },
@@ -609,7 +609,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getActionOutputbehaviorKeyModiFromActionIDStateOutput ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
     [
@@ -644,7 +644,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('getKeyActionOutputArrayFromActionStateOutputArray ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
 
     const b6ActionIdArr: ActionStateOutput[] = [
@@ -751,35 +751,35 @@ describe('KeylayoutToKmnConverter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     [
       [
-        ['../data/Test_C0.keylayout'],
+        ['../data/tests-keylayout-kmn/Test_C0.keylayout'],
         [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
         new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
         new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
         new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_D', new TextEncoder().encode('d'))]
       ],
       [
-        ['../data/Test_C1.keylayout'],
+        ['../data/tests-keylayout-kmn/Test_C1.keylayout'],
         [new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
         new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))]
       ],
       [
-        ['../data/Test_C2.keylayout'],
+        ['../data/tests-keylayout-kmn/Test_C2.keylayout'],
         [new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))],
       ],
       [
-        ['../data/Test_C3.keylayout'],
+        ['../data/tests-keylayout-kmn/Test_C3.keylayout'],
         [new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))]
       ],
 
       [
-        ['../data/Test_C3_several.keylayout'],
+        ['../data/tests-keylayout-kmn/Test_C3_several.keylayout'],
         [new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
         new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
         new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
         new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â'))]
       ],
       [
-        ['../data/Test_C0_C1_C2_C3.keylayout'],
+        ['../data/tests-keylayout-kmn/Test_C0_C1_C2_C3.keylayout'],
         [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
         new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
         new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),

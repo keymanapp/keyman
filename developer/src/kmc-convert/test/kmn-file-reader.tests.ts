@@ -22,7 +22,7 @@ describe('KeylayoutFileReader', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
 
     it('read() should return filled array on correct input', async function () {
-      const inputFilename = makePathToFixture('../data/Test.keylayout');
+      const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
       const result = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
       assert.isNotEmpty(result);
     });
@@ -38,7 +38,7 @@ describe('KeylayoutFileReader', function () {
     });
 
     it('read() should return empty array on unavailable file name', async function () {
-      const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
+      const inputFilenameUnavailable = makePathToFixture('../data/tests-keylayout-kmn/X.keylayout');
       const result = sutR.read(compilerTestCallbacks.loadFile(inputFilenameUnavailable));
       assert.isNull(result);
     });

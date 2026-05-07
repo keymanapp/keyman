@@ -22,7 +22,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe("writeDataRules() ", function () {
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -40,7 +40,7 @@ describe('KmnFileWriter', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename = makePathToFixture('../data/tests-keylayout-kmn/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 

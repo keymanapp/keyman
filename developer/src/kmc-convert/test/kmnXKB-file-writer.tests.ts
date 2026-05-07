@@ -22,7 +22,7 @@ describe('KmnXKBFileWriter', function () {
   });
 
   describe("Xkb-kmn: writeDataRules() ", function () {
-    const inputFilename = makePathToFixture('../data/Test.xkb');
+    const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.xkb');
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new XkbFileReader(compilerTestCallbacks);
     const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -40,7 +40,7 @@ describe('KmnXKBFileWriter', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new XkbFileReader(compilerTestCallbacks);
     const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/Test.xkb');
+    const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.xkb');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
     const converted = sut.convertBound.convert(read, inputFilename.replace(/\.xkb$/, '.kmn'));
 
@@ -422,7 +422,7 @@ describe('KmnXKBFileWriter', function () {
     const sutW = new KmnXKBFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       [
-        [ /* see ../data/Test_C0.xkb */
+        [ /* see ../data/tests-xkb-kmn/Test_C0.xkb */
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
@@ -434,7 +434,7 @@ describe('KmnXKBFileWriter', function () {
           "+ [NCAPS K_D]  >  'd'\n"]
       ],
       [
-        [ /* see ../data/Test_C1.xkb */
+        [ /* see ../data/tests-xkb-kmn/Test_C1.xkb */
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))
         ],
@@ -442,14 +442,14 @@ describe('KmnXKBFileWriter', function () {
           "+ [CAPS K_S]  >  'S'\n"]
       ],
       [
-        [ /* see ../data/Test_C2.xkb */
+        [ /* see ../data/tests-xkb-kmn/Test_C2.xkb */
           new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
         ],
         ["+ [NCAPS K_U]  >  dk(A1)\n" +
           "dk(A1) + [CAPS K_A]  >  'Â'\n\n"]
       ],
       [
-        [ /* see ../data/Test_C3.xkb */
+        [ /* see ../data/tests-xkb-kmn/Test_C3.xkb */
           new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
         ],
         ["+ [NCAPS SHIFT K_D]   >   dk(A2)\n" +
@@ -458,7 +458,7 @@ describe('KmnXKBFileWriter', function () {
         ]
       ],
       [
-        [ /* see ../data/Test_C0_C1_C2_C3.xkb */
+        [ /* see ../data/tests-xkb-kmn/Test_C0_C1_C2_C3.xkb */
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
           new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
@@ -492,7 +492,7 @@ describe('KmnXKBFileWriter', function () {
           "dk(B5) + [CAPS K_D]  >  'Â'\n\n"]
       ],
       [
-        [ /* see ../data/Test_C3_several.xkb */
+        [ /* see ../data/tests-xkb-kmn/Test_C3_several.xkb */
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
