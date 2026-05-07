@@ -43,19 +43,20 @@ public class DisplayLanguages {
       new DisplayLanguageType("ar-SA", "(Arabic) العربية"),
       new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
       new DisplayLanguageType("bwr-NG", "Bura-Pabir"),
+      new DisplayLanguageType("zh-CN", "中文(简体) (Simplified Chinese)"),
       new DisplayLanguageType("cs-CZ", "čeština (Czech)"),
       new DisplayLanguageType("ff-NG", "Ɗemngal Fulfulde"),
+      new DisplayLanguageType("de-DE", "Deutsch (German)"),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("es-ES", "Español (Spanish)"),
       new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
-      new DisplayLanguageType("fr-FR", "French"),
+      new DisplayLanguageType("fr-FR", "français (French)"),
       new DisplayLanguageType("ha-HG", "Hausa"),
       new DisplayLanguageType("in-ID", "Indonesian"),
       new DisplayLanguageType("it-IT", "Italiana"),
-      new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("kn-IN", "ಕನ್ನಡ (Kannada)"),
       new DisplayLanguageType("kr-NG", "Kanuri"),
-      new DisplayLanguageType("km-KH", "Khmer"),
+      new DisplayLanguageType("km-KH", "ខ្មែរ (Khmer)"),
       new DisplayLanguageType("ckl-NG", "Kibaku"),
       new DisplayLanguageType("mfi-NG", "Mandara (Wandala)"),
       new DisplayLanguageType("mrt-NG", "Marghi"),
@@ -67,12 +68,11 @@ public class DisplayLanguages {
       new DisplayLanguageType("pt-PT", "Português de Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("ru-RU", "Русский (Russian)"),
-      new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
-      new DisplayLanguageType("sv-SE", "svenska (Swedish)"),
+      new DisplayLanguageType("shu-latn", "Shuwa (Latin script)"),
+      new DisplayLanguageType("sv-SE", "Svenska (Swedish)"),
       new DisplayLanguageType("vi-VN", "Tiếng Việt (Vietnamese)"),
       new DisplayLanguageType("uk-UA", "Українська (Ukrainian)"),
-      new DisplayLanguageType("hia-NG", "Waha"),
-      new DisplayLanguageType("zh-CN", "中文(简体) (Simplified Chinese)")
+      new DisplayLanguageType("hia-NG", "Waha")
     };
     return languages;
   }
