@@ -38,7 +38,7 @@ const plainModel = new TrieModel(
   }
 );
 
-function buildFixture_therefore() {
+function buildFixture_therefore(): SearchQuotientNode[] {
   let ID_SEED = 11;
 
   const distributionSrc: [string, number][][] = [

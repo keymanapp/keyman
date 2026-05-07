@@ -13,7 +13,7 @@ import { PriorityQueue } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { correction, models, QUEUE_NODE_COMPARATOR } from '@keymanapp/lm-worker/test-index';
+import { correction, CORRECTION_QUEUE_COMPARATOR, models } from '@keymanapp/lm-worker/test-index';
 
 import SENTINEL_CODE_UNIT = models.SENTINEL_CODE_UNIT;
 import Distribution = LexicalModelTypes.Distribution;
@@ -83,7 +83,7 @@ function fetchCommonTENode() {
     .buildSubstitutionEdges(firstLayerTransforms, firstLayerSeed)
     .flatMap(node => node.processSubsetEdge());
   assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
-  firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+  firstLayerNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
   const tNode = firstLayerNodes[0];
   assert.equal(tNode.resultKey, 't');
@@ -111,7 +111,7 @@ function fetchCommonTENode() {
   // The field narrows down at this point, but still has a decent number
   // of variants (11).
   assert.isAbove(secondLayerNodes.length, 10);
-  secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+  secondLayerNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
   const teNode = secondLayerNodes[0];
 
@@ -192,7 +192,7 @@ describe('Correction Distance Modeler', () => {
           .buildSubstitutionEdges(firstLayerTransforms, SEARCH_EDGE_SEED++)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
-        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+        firstLayerNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
         const tNode = firstLayerNodes[0];
         assert.equal(tNode.resultKey, 't');
@@ -217,7 +217,7 @@ describe('Correction Distance Modeler', () => {
           .buildSubstitutionEdges(secondLayerTransforms, secondSpaceId)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(secondLayerNodes.length, 10);
-        secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+        secondLayerNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
         const teNode = secondLayerNodes[0];
 
@@ -277,7 +277,7 @@ describe('Correction Distance Modeler', () => {
           .buildSubstitutionEdges(firstLayerTransforms, SEARCH_EDGE_SEED++)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
-        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+        firstLayerNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
         const tNode = firstLayerNodes[0];
         assert.equal(tNode.resultKey, 't');
@@ -303,7 +303,7 @@ describe('Correction Distance Modeler', () => {
           .buildSubstitutionEdges(secondLayerTransforms, secondLayerId)
           .flatMap(node => node.processSubsetEdge());
         assert.isAbove(secondLayerNodes.length, 10);
-        secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+        secondLayerNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
         const teNode = secondLayerNodes[0];
 
@@ -566,7 +566,7 @@ describe('Correction Distance Modeler', () => {
         const subsetSeed = SEARCH_EDGE_SEED++;
         const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
         assert.equal(subsetNodes.length, 4);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
         const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x))
         // The known subs for the subsets defined above.
         for(let i=0; i < expectedCosts.length; i++) {
@@ -588,7 +588,7 @@ describe('Correction Distance Modeler', () => {
         const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
         const subsetSeed = SEARCH_EDGE_SEED++;
         const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
         subsetNodes.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
         // Set 0:  set for ins 1, dl 0
@@ -597,7 +597,7 @@ describe('Correction Distance Modeler', () => {
         assert.equal(ins1_dl0.length, FIRST_CHAR_VARIANTS + 3 - 1);
         ins1_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
-        ins1_dl0.sort((a, b) => a.currentCost - b.currentCost);
+        ins1_dl0.sort(CORRECTION_QUEUE_COMPARATOR);
         ins1_dl0.forEach(n => assert.isFalse(n.hasPartialInput)); // all fully-processed.
         assert.equal(lastEntry(ins1_dl0[0].calculation.inputSequence), 't');
         assert.equal(lastEntry(ins1_dl0[0].calculation.matchSequence), 't');
@@ -659,7 +659,7 @@ describe('Correction Distance Modeler', () => {
         // 2 transforms went in, but start with the same char - and importantly,
         // there are no other alternatives for that char as lead!
         assert.equal(ins2_dl1.length, FIRST_CHAR_VARIANTS + 1 - 1);
-        ins2_dl1.sort((a, b) => a.currentCost - b.currentCost);
+        ins2_dl1.sort(CORRECTION_QUEUE_COMPARATOR);
         // only one char is processed at this stage.
         ins2_dl1.forEach(n => assert.isTrue(n.hasPartialInput));
         ins2_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
@@ -691,7 +691,7 @@ describe('Correction Distance Modeler', () => {
         // Only 1 transforms went in - importantly, there are no other
         // alternatives for that char as lead!
         assert.equal(ins2_dl0.length, FIRST_CHAR_VARIANTS + 1 - 1);
-        ins2_dl0.sort((a, b) => a.currentCost - b.currentCost);
+        ins2_dl0.sort(CORRECTION_QUEUE_COMPARATOR);
         // only one char is processed at this stage.
         ins2_dl0.forEach(n => assert.isTrue(n.hasPartialInput));
         ins2_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
@@ -722,7 +722,7 @@ describe('Correction Distance Modeler', () => {
         const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
         const subsetSeed = SEARCH_EDGE_SEED++;
         const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
 
         // ************
@@ -739,8 +739,8 @@ describe('Correction Distance Modeler', () => {
         fin_in2_dl1.forEach(n => assert.equal(n.spaceId, subsetSeed));
         fin_in2_dl0.forEach(n => assert.equal(n.spaceId, subsetSeed));
 
-        fin_in2_dl1.sort((a, b) => a.currentCost - b.currentCost);
-        fin_in2_dl0.sort((a, b) => a.currentCost - b.currentCost);
+        fin_in2_dl1.sort(CORRECTION_QUEUE_COMPARATOR);
+        fin_in2_dl0.sort(CORRECTION_QUEUE_COMPARATOR);
 
         // Not going to define hard counts here, but there should easily
         // be more.
@@ -816,7 +816,7 @@ describe('Correction Distance Modeler', () => {
 
         const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution, SEARCH_EDGE_SEED++);
         assert.equal(subsetNodes.length, 4);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
         const expectedCosts = [0.5, .25, 0.15, 0.1].map(x => -Math.log(x) + teNode.currentCost);
         // The known subs for the subsets defined above.
         for(let i=0; i < expectedCosts.length; i++) {
@@ -835,7 +835,7 @@ describe('Correction Distance Modeler', () => {
         // From "step 1" above, assertions removed
         const teNode = fetchCommonTENode();
         const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution, SEARCH_EDGE_SEED++);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
         // Set 0:  set for ins 1, dl 0
         const ins1_dl0 = subsetNodes[0].processSubsetEdge();
@@ -843,7 +843,7 @@ describe('Correction Distance Modeler', () => {
         // 3 transforms went in... but 1 ('x') had no lexical match.
         assert.equal(ins1_dl0.length, TE_CHILD_PATH_COUNT + 3 - 1);
 
-        ins1_dl0.sort((a, b) => a.currentCost - b.currentCost);
+        ins1_dl0.sort(CORRECTION_QUEUE_COMPARATOR);
         ins1_dl0.forEach(n => assert.isFalse(n.hasPartialInput)); // all fully-processed.
         assert.equal(lastEntry(ins1_dl0[0].calculation.inputSequence), 'r');
         assert.equal(lastEntry(ins1_dl0[0].calculation.matchSequence), 'r');
@@ -905,7 +905,7 @@ describe('Correction Distance Modeler', () => {
         // there are no other alternatives for that char as lead!
         const T_CHILD_PATH_COUNT = 9; // 'h', 'o', 'i', 'w', 'a', 'u', 'e', 'r', 'y'
         assert.equal(ins2_dl1.length, T_CHILD_PATH_COUNT + 1 - 1);
-        ins2_dl1.sort((a, b) => a.currentCost - b.currentCost);
+        ins2_dl1.sort(CORRECTION_QUEUE_COMPARATOR);
         // only one char is processed at this stage.
         ins2_dl1.forEach(n => assert.isTrue(n.hasPartialInput));
 
@@ -936,7 +936,7 @@ describe('Correction Distance Modeler', () => {
         // Only 1 transform went in - importantly, there are no other
         // alternatives for that char as lead!
         assert.equal(ins2_dl0.length, TE_CHILD_PATH_COUNT + 1 - 1);
-        ins2_dl0.sort((a, b) => a.currentCost - b.currentCost);
+        ins2_dl0.sort(CORRECTION_QUEUE_COMPARATOR);
         // only one char is processed at this stage.
         ins2_dl0.forEach(n => assert.isTrue(n.hasPartialInput));
 
@@ -964,7 +964,7 @@ describe('Correction Distance Modeler', () => {
         // From "steps 0, 1" above, assertions removed
         const teNode = fetchCommonTENode();
         const subsetNodes = teNode.buildSubstitutionEdges(synthDistribution, SEARCH_EDGE_SEED++);
-        subsetNodes.sort((a, b) => a.currentCost - b.currentCost);
+        subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
 
         // ************
         // The intermediate, not-fully-processed node sets.
@@ -977,8 +977,8 @@ describe('Correction Distance Modeler', () => {
         // All should be finished now!
         fin_in2_dl1.forEach(n => assert.isFalse(n.hasPartialInput));
 
-        fin_in2_dl1.sort((a, b) => a.currentCost - b.currentCost);
-        fin_in2_dl0.sort((a, b) => a.currentCost - b.currentCost);
+        fin_in2_dl1.sort(CORRECTION_QUEUE_COMPARATOR);
+        fin_in2_dl0.sort(CORRECTION_QUEUE_COMPARATOR);
 
         // Not going to define hard counts here, but there should easily
         // be more.
@@ -1059,7 +1059,7 @@ describe('Correction Distance Modeler', () => {
       const layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1, layer1Id)
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      const layer1Queue = new PriorityQueue(QUEUE_NODE_COMPARATOR, layer1Edges);
+      const layer1Queue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, layer1Edges);
 
       const tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
@@ -1069,7 +1069,7 @@ describe('Correction Distance Modeler', () => {
       const layer2Edges = tEdge.buildSubstitutionEdges(synthDistribution2, layer2Id)
         // No 2+ inserts here; we're fine with just one call.
         .flatMap(e => e.processSubsetEdge());
-      const layer2Queue = new PriorityQueue(QUEUE_NODE_COMPARATOR, layer2Edges);
+      const layer2Queue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, layer2Edges);
 
       const eEdge = layer2Queue.dequeue();
       assertEdgeChars(eEdge, 'e', 'e');
@@ -1093,7 +1093,7 @@ describe('Correction Distance Modeler', () => {
         .flatMap(e => e.processSubsetEdge());
       const layer3ehEdges = ehEdge.buildSubstitutionEdges(synthDistribution3, layer3Id)
         .flatMap(e => e.processSubsetEdge());
-      const layer3Queue = new PriorityQueue(QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
+      const layer3Queue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
       let bestEdge;
