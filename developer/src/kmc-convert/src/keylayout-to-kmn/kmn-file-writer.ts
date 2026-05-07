@@ -145,7 +145,7 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
@@ -198,7 +198,7 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
@@ -274,7 +274,7 @@ export class KmnFileWriter {
 
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14564 use functions from util instead of the ones in this class
+        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
 
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
