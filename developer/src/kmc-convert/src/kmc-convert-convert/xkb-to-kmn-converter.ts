@@ -8,8 +8,8 @@
  */
 
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, Keylayout } from "@keymanapp/developer-utils";
-import { KmnXKBFileWriter } from './kmnXKB-file-writer.js';
-import { XkbFileReader } from './xkb-file-reader.js';
+import { KmnFileWriter } from './../kmc-convert-write/kmn-file-writer.js';
+import { XkbFileReader } from './../kmc-convert-read/xkb-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
@@ -134,7 +134,7 @@ export class XkbToKmnConverter {
     }
 
     const processedData = await this.convert(jsonO, inputFilename, outputFilename);
-    const kmnFileWriter = new KmnXKBFileWriter(this.callbacks, this.options);
+    const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
     // write to object/ConverterToKmnResult
     const outputKmn = kmnFileWriter.write(processedData);

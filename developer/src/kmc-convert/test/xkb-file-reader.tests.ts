@@ -10,7 +10,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks, makePathToFixture } from './helpers/index.js';
-import { XkbFileReader } from '../src/xkb-to-kmn/xkb-file-reader.js';
+import { XkbFileReader } from '../src/kmc-convert-read/xkb-file-reader.js';
 
 describe('XkbFileReader', function () {
 
