@@ -3,11 +3,8 @@
 # Build dist tarballs or Debian orig tarballs
 # and put them in dist/
 
-# parameters: ./dist.sh [origdist] [proj]
+# parameters: ./dist.sh [origdist]
 # origdist = create Debian orig.tar.xz
-# proj = only make tarball for this project
-
-set -e
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary

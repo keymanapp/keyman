@@ -191,7 +191,6 @@ To upload the packages to launchpad, run the following script from the `linux/` 
 - `--upload` - Upload to launchpad. If omitted only simulate the upload.
 - `--no-upload` - Don't upload to launchpad, don't even simulate it.
 - `--no-lintian` - Don't run lintian while creating soure package.
-- `--project "<project>"` - only upload this package
 - `--dist "<dist>"` - only upload for this distribution
 - `--packageversion "<version>"` - Default `1~sil1`. Normally use the
   default so don't specify it. But if you change packaging and run another

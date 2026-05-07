@@ -15,7 +15,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe \
   "Build source packages suitable to import into the Debian package repos" \
   build \
-  "--project=PROJECT          Only process this project. Default: keyman" \
   "--dist=DIST                Distribution to create packages for (unstable, experimental, etc). Default: UNRELEASED." \
   "--debrevision=DEBREVISION  The debian revision number. Default: 1."
 
@@ -28,15 +27,12 @@ checkPrerequisites
 rm -rf debianpackage
 mkdir -p debianpackage
 
-for proj in ${projects}; do
-    downloadSource debianpackage
+downloadSource debianpackage
 
-    cd "${proj}-${version}"
-    if [[ -n "${DIST:-}" ]]; then
-        EXTRA_ARGS="--distribution ${DIST} --force-distribution"
-    fi
-    # shellcheck disable=SC2086
-    dch --newversion "${version}-${DEBREVISION:-1}" ${EXTRA_ARGS:-} ""
-    debuild -d -S -sa -Zxz
-    cd "${KEYMAN_ROOT}/linux"
-done
+cd "keyman-${version}"
+if [[ -n "${DIST:-}" ]]; then
+    EXTRA_ARGS="--distribution ${DIST} --force-distribution"
+fi
+# shellcheck disable=SC2086
+dch --newversion "${version}-${DEBREVISION:-1}" ${EXTRA_ARGS:-} ""
+debuild -d -S -sa -Zxz
