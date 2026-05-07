@@ -28,6 +28,7 @@ protected:
     auto blob = km::tests::load_kmx_file(path.native().c_str());
     const auto mock_extension = ".mock";
     if (strlen(keyboard) > strlen(mock_extension) && strcmp(keyboard + strlen(keyboard) - strlen(mock_extension), mock_extension) == 0) {
+      // mocked keyboard load
       km::core::abstract_processor* kp = new km::core::mock_processor(keyboard);
       test_kb = static_cast<km_core_keyboard*>(kp);
     } else {

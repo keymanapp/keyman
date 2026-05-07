@@ -85,6 +85,7 @@ TEST_P(GetActionApiTest, TestActionsApi) {
   auto data = GetParam();
   ASSERT_NO_FATAL_FAILURE(Initialize(data));
 
+<<<<<<< chore/core/15913-unit-test-follow-on
   if(data.final_cached_context_string == nullptr) {
     // We skip the shared tests that don't have a input context string
     return;
@@ -92,6 +93,8 @@ TEST_P(GetActionApiTest, TestActionsApi) {
 
   // setup(initial_app_context, final_cached_context, actions_code_points_to_delete, actions_output);
 
+=======
+>>>>>>> refactor/core/api-documentation
   auto actual_actions = km_core_state_get_actions(test_state);
 
   std::cout << " (" << data.test_name << "): delete: " << data.expected_delete << " output: |" << std::u32string(actual_actions->output) << "|" << std::endl;
