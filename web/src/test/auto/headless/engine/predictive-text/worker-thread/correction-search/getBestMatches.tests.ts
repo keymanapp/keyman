@@ -214,13 +214,13 @@ describe('Correction Searching', () => {
         const distrib_o2 = [
           { sample: { insert: 'o', deleteLeft: 0, id: 12 }, p: 0.3 }
         ];
-        const distrib_i2 = [
+        const distrib_r2 = [
           { sample: { insert: 'r', deleteLeft: 0, id: 12 }, p: 0.2 }
         ];
 
         const thPath = new LegacyQuotientSpur(tPath, distrib_h2, distrib_h2[0]);
         const toPath = new LegacyQuotientSpur(tPath, distrib_o2, thPath.inputSource);
-        const trPath = new LegacyQuotientSpur(tPath, distrib_i2, thPath.inputSource);
+        const trPath = new LegacyQuotientSpur(tPath, distrib_r2, thPath.inputSource);
 
         const twoCharCluster = new SearchQuotientCluster([thPath, toPath, trPath]);
 
@@ -294,7 +294,7 @@ describe('Correction Searching', () => {
         // Passes through t and r, then diverges.
         const gen_trvr = getBestTokenMatches([paths.trvrPath], buildTestTimer());
 
-        // Do we get further expected results if we keep querying?
+        // Verify that each divergent QuotientNode has further expected results if we keep querying.
         assert.equal(((await gen_trvr.next()).value as TokenResultMapping).matchString, 'tre');
         assert.equal(((await gen_trvr.next()).value as TokenResultMapping).matchString, 'tro');
         assert.equal(((await gen_trvr.next()).value as TokenResultMapping).matchString, 'tra');
