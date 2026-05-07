@@ -28,13 +28,13 @@ import Foundation
  *      containerKeymanDirectory: '~/Library/Group Containers/group.com.keyman'
  *        groupKeymanSupportDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support'
  *          keyman19PackagesDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages'
-*/
+ */
 
 public struct KeymanPaths {
   static let keymanBundleId = "keyman.inputmethod.Keyman"
   static let configBundleId = "com.keyman.config"
   static let groupId = "group.com.keyman"
-
+  
   static private let preKeyman19PackagesDirectoryName = "Keyman-Keyboards"
   static private let keymanSubdirectoryName = "keyman.inputmethod.Keyman"
   
@@ -50,13 +50,13 @@ public struct KeymanPaths {
   let keyman18SupportDirectory: URL?
   let keyman18DataDirectory: URL?
   let keyman18PackagesDirectory: URL?
-
+  
   // current directories for keyman 19
   let keyman19PackagesDirectory: URL?
   let keyman19DataDirectory: URL?
   let keyman19ContainerDirectory: URL?
   let keyman19PreferencesDirectory: URL?
-
+  
   public init() {
     let documentsDir = KeymanPaths.buildDocumentsUrl()
     self.keyman17DocumentsDirectory = documentsDir
@@ -74,7 +74,7 @@ public struct KeymanPaths {
     self.keyman19ContainerDirectory = containerDir
     
     self.keyman19DataDirectory = containerDir
-
+    
     self.keyman19PreferencesDirectory = KeymanPaths.buildContainerPreferencesUrl(container: containerDir)
     
     
@@ -85,20 +85,20 @@ public struct KeymanPaths {
   }
   
   /*
-  fileprivate func logPaths() {
-    ConfigLogger.shared.testLogger.debug("documents: \(self.keyman17DocumentsDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.absoluteString)")
-    
-    ConfigLogger.shared.testLogger.debug("support directory: \(self.keyman18SupportDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("support keyman directory: \(self.keyman18DataDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.absoluteString)")
-    
-    ConfigLogger.shared.testLogger.debug("container: \(self.keyman19ContainerDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("preferences: \(self.keyman19PreferencesDirectory!.absoluteString)")
-    ConfigLogger.shared.testLogger.debug("keyman 19 packages: \(self.keyman19PackagesDirectory!.absoluteString)")
-  }
-  */
-
+   fileprivate func logPaths() {
+   ConfigLogger.shared.testLogger.debug("documents: \(self.keyman17DocumentsDirectory!.absoluteString)")
+   ConfigLogger.shared.testLogger.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.absoluteString)")
+   
+   ConfigLogger.shared.testLogger.debug("support directory: \(self.keyman18SupportDirectory!.absoluteString)")
+   ConfigLogger.shared.testLogger.debug("support keyman directory: \(self.keyman18DataDirectory!.absoluteString)")
+   ConfigLogger.shared.testLogger.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.absoluteString)")
+   
+   ConfigLogger.shared.testLogger.debug("container: \(self.keyman19ContainerDirectory!.absoluteString)")
+   ConfigLogger.shared.testLogger.debug("preferences: \(self.keyman19PreferencesDirectory!.absoluteString)")
+   ConfigLogger.shared.testLogger.debug("keyman 19 packages: \(self.keyman19PackagesDirectory!.absoluteString)")
+   }
+   */
+  
   /**
    * build the URL to specified file in the Input Methods directory
    */
@@ -116,12 +116,12 @@ public struct KeymanPaths {
       inputMethodUrl = inputMethodDirectoryUrl.appendingPathComponent(fileName, isDirectory: false)
       return inputMethodUrl
     } catch {
-//      ConfigLogger.shared.testLogger.debug("\(error)")
+      //      ConfigLogger.shared.testLogger.debug("\(error)")
       print("\(error)")
       return nil
     }
   }
-
+  
   /**
    * build the URL to the user's Documents directory
    */
@@ -138,7 +138,7 @@ public struct KeymanPaths {
       return documentsDirectoryUrl
     } catch {
       print("\(error)")
-     return nil
+      return nil
     }
   }
   
@@ -153,7 +153,7 @@ public struct KeymanPaths {
       return nil
     }
   }
-
+  
   /**
    * build the URL to the application support directory for the Keyman input method
    */
@@ -185,7 +185,7 @@ public struct KeymanPaths {
       return nil
     }
   }
-
+  
   /**
    * build the URL to the packages directory for Keyman 18, inside the application support directory for the Keyman input method
    */
@@ -196,14 +196,14 @@ public struct KeymanPaths {
       return nil
     }
   }
-
+  
   /**
    * build the URL to the app group container
    */
   private static func buildContainerUrl() -> URL? {
     return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: KeymanPaths.groupId)
   }
-
+  
   /**
    * build the URL to the preference directory inside the app group container
    */
@@ -214,18 +214,18 @@ public struct KeymanPaths {
       return nil
     }
   }
-
+  
   /**
    * build the URL to the packages directory inside the app group container directory
    */
- private static func buildKeyman19PackagesUrl(container: URL?) -> URL? {
+  private static func buildKeyman19PackagesUrl(container: URL?) -> URL? {
     if let containerUrl = container {
       return containerUrl.appendingPathComponent(KeymanPaths.containerPackagesPartialPath, isDirectory: true)
     } else {
       return nil
     }
   }
-
+  
   // TODO: remove
   fileprivate func checkContainerUrl() -> Bool {
     var containerValid = false

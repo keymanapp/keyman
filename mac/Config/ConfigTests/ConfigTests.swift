@@ -1,12 +1,13 @@
-//
-//  ConfigTests.swift
-//  ConfigTests
-//
-//  Created by Shawn - SIL on 2/26/26.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Shawn Schantz on 2026-02-26
+ *
+ * Tests for Config app
+ *
+ */
 
 import Testing
-@testable import Config
 
 struct ConfigTests {
 

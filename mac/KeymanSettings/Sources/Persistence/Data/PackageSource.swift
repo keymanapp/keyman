@@ -3,7 +3,7 @@
  *
  * Created by Shawn Schantz on 2025-12-19
  *
- * Value object that describes a package as loaded from a .KMP file
+ * Value object for loading a package from kmp.json
  *
  */
 
@@ -13,13 +13,13 @@ import Foundation
 public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   public var id = UUID()
   var directoryUrl: URL?
-  var jsonFileUrl: URL?
+  var kmpJsonFileUrl: URL?
   let system: SystemInfo?
   let options: Options?
   let info: Info
   let files: [PackageFile]?
   let keyboards: [KeyboardSource]?
-
+  
   // computed properties for convenience
   var packageName: String {
     return info.name.description
@@ -48,7 +48,7 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
       return nil
     }
   }
-
+  
   enum CodingKeys: String, CodingKey {
     case system
     case options
@@ -60,8 +60,8 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     directoryUrl = nil
-    jsonFileUrl = nil
-
+    kmpJsonFileUrl = nil
+    
     self.info = try container.decode(Info.self, forKey: .info)
     self.keyboards = try container.decodeIfPresent([KeyboardSource].self, forKey: .keyboards)
     self.system = try container.decodeIfPresent(SystemInfo.self, forKey: .system)
@@ -80,12 +80,12 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   }
   
   public func hash(into hasher: inout Hasher) {
-      hasher.combine(id) // only combine the unique ID
+    hasher.combine(id) // only combine the unique ID
   }
   
   // Custom Equatable conformance (required by Hashable)
   public static func == (lhs: PackageSource, rhs: PackageSource) -> Bool {
-      return lhs.id == rhs.id // only compare unique IDs
+    return lhs.id == rhs.id // only compare unique IDs
   }
 }
 

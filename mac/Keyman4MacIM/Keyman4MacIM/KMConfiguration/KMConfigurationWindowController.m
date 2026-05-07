@@ -116,7 +116,7 @@
 - (void)refreshAction:(id)sender {
   [self.AppDelegate setKmxFileList:nil];
   [self setTableContents:nil];
-  [self saveActiveKeyboards];
+  [self saveEnabledKeyboards];
   [self.tableView reloadData];
   _lastReloadDate = [NSDate date];
 }
@@ -197,12 +197,12 @@
   return self.AppDelegate.kmxFileList;
 }
 
-- (NSMutableArray *)activeKeyboards {
-  return self.AppDelegate.activeKeyboards;
+- (NSMutableArray *)enabledKeyboards {
+  return self.AppDelegate.enabledKeyboards;
 }
 
-- (void)saveActiveKeyboards {
-  [self.AppDelegate saveActiveKeyboards];
+- (void)saveEnabledKeyboards {
+  [self.AppDelegate saveEnabledKeyboards];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
@@ -267,7 +267,7 @@
       NSString *kmxFilePath = [self kmxFilePathAtIndex:row];
       NSString *partialPath = [KMDataRepository.shared trimToPartialPath:kmxFilePath];
       os_log_debug([KMLogs uiLog], "tableView:viewForTableColumn, kmxFilePath = %{public}@ for row %li, partialPath = %{public}@", kmxFilePath, (long)row, partialPath);
-      [cellView.checkBox setState:([self.activeKeyboards containsObject:partialPath])?NSOnState:NSOffState];
+      [cellView.checkBox setState:([self.enabledKeyboards containsObject:partialPath])?NSOnState:NSOffState];
     }
     
     return cellView;
@@ -375,15 +375,15 @@
     os_log_debug([KMLogs uiLog], "enabling active keyboard: %{public}@", kmxFileName);
     NSString *message = [NSString stringWithFormat:@"enabling active keyboard: %@", kmxFileName];
     [KMSentryHelper addUserBreadCrumb:@"config" message:message];
-    [self.activeKeyboards addObject:partialPath];
-    [self saveActiveKeyboards];
+    [self.enabledKeyboards addObject:partialPath];
+    [self saveEnabledKeyboards];
   }
   else if (checkBox.state == NSOffState) {
     os_log_debug([KMLogs uiLog], "disabling active keyboard: %{public}@", kmxFileName);
     NSString *message = [NSString stringWithFormat:@"disabling active keyboard: %@", kmxFileName];
     [KMSentryHelper addUserBreadCrumb:@"config" message:message];
-    [self.activeKeyboards removeObject:partialPath];
-    [self saveActiveKeyboards];
+    [self.enabledKeyboards removeObject:partialPath];
+    [self saveEnabledKeyboards];
   }
 }
 
@@ -523,7 +523,7 @@
   if ([self shouldReloadData]) {
     [self.AppDelegate setKmxFileList:nil];
     [self setTableContents:nil];
-    [self saveActiveKeyboards];
+    [self saveEnabledKeyboards];
     [self.tableView reloadData];
     _lastReloadDate = [NSDate date];
   }

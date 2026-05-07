@@ -23,9 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)migrateInputMethodSettingsToAppGroup;
 - (NSString *)readSelectedKeyboard;
 - (void)writeSelectedKeyboard:(NSString *)selectedKeyboard;
-- (NSArray *)readActiveKeyboards;
-- (void)writeActiveKeyboards: (NSArray *) keyboards;
-- (void)clearActiveKeyboards;
+- (NSArray *)readEnabledKeyboards;
+- (void)writeEnabledKeyboards: (NSArray *) keyboards;
+- (void)clearEnabledKeyboards;
 - (NSDictionary *)readOptionsForSelectedKeyboard;
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value;
 - (BOOL)readShowOskOnActivate;

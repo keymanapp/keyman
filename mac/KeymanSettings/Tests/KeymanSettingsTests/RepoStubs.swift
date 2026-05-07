@@ -3,8 +3,8 @@
  *
  * Created by Shawn Schantz on 2026-04-29
  *
- * Contains stubs for the repository classes to support
- * unit tests that do not access the file system or UserDefaults database. *
+ * Contains stubs for the repository classes to support unit tests
+ * so that they do not access the file system or UserDefaults database.
  */
 
 import Foundation
@@ -43,12 +43,12 @@ class DefaultsRepoStub: DefaultsRepo {
   func readSelectedKeyboard() -> String {
     return self.selectedKeyboard
   }
-
+  
   func writeSelectedKeyboard(keyboardName: String) {
     self.selectedKeyboard = keyboardName
   }
   
-
+  
   func logDefaults() {
     print("UserDefaults:")
     print("\("KMSelectedKeyboardsKey"): \(self.readSelectedKeyboard())")
@@ -68,7 +68,7 @@ class DefaultsRepoStub: DefaultsRepo {
 class PackageRepoStub: PackageRepo {
   public let nullPackageId = UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   public var testPackageId = UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
-
+  
   func keyman19SharedDataDirectoryExists() -> Bool {
     true
   }
@@ -81,7 +81,7 @@ class PackageRepoStub: PackageRepo {
    * creates a package containing two keyboards, one enabled and one disabled
    */
   func loadPackages() -> [KeymanPackage] {
-    let packagesDirectoryUrl = URL(filePath: "/Users/shawn-sil/Library/Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/")!
+    let packagesDirectoryUrl = URL(filePath: "/Users/linguist-sil/Library/Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/")!
     let testPackageDirectoryName = extinctPackageName
     let testPackageUrl = packagesDirectoryUrl.appendingPathComponent(testPackageDirectoryName)
     let moabiteKeyboardId = "moabite_basic"
@@ -90,7 +90,7 @@ class PackageRepoStub: PackageRepo {
     let hittiteKeyboard = Keyboard(name: "hittite basic", keyboardId: hittiteKeyboardId, keyboardDirectoryUrl: testPackageUrl, enabled: false)
     
     let testPackage = KeymanPackage(sourceDirectoryUrl: testPackageUrl,
-                                 keyboards: [moabiteKeyboard, hittiteKeyboard], packageName: "Extinct Languages", packageVersion: "1.1.03", jsonFileUrl: testPackageUrl.appendingPathComponent("kmp.json"))
+                                    keyboards: [moabiteKeyboard, hittiteKeyboard], packageName: "Extinct Languages", packageVersion: "1.1.03", jsonFileUrl: testPackageUrl.appendingPathComponent("kmp.json"))
     testPackageId = testPackage.id
     
     return [testPackage]

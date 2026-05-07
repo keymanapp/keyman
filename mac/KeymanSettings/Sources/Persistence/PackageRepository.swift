@@ -96,7 +96,7 @@ public class PackageRepository: PackageRepo {
       print("App Group container URL not found. Check your entitlements and provisioning profiles.")
     }
   }
- 
+  
   /**
    * Check to see whether the shared Keyman data directory exists under 'Library/Group Containers/'
    */
@@ -112,11 +112,11 @@ public class PackageRepository: PackageRepo {
    * returns true if a directory exists at the specified URL
    */
   func directoryExistsAtPath(directoryUrl: URL) -> Bool {
-      var isDirectory: ObjCBool = false
+    var isDirectory: ObjCBool = false
     let exists = FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: &isDirectory)
-      return exists && isDirectory.boolValue
+    return exists && isDirectory.boolValue
   }
-
+  
   /**
    * read packages at Keyman 19 location, inside Group Containers directory
    */
@@ -124,10 +124,10 @@ public class PackageRepository: PackageRepo {
     guard let packagesUrl = self.pathUtil.keyman19PackagesDirectory else {
       return []
     }
-
+    
     return readPackageSource(packageDirectoryUrl: packagesUrl)
   }
-
+  
   /**
    * loop through all the sub-directories in the packages directory and try to read them as packages
    */
@@ -157,42 +157,42 @@ public class PackageRepository: PackageRepo {
     print("\(packages.count) packages read")
     return packages
   }
-
+  
   /**
-   * check the specified directory for kmp.json file and read it if it exists
+   * check the specified directory for the kmp.json file and read it if it exists
    */
   func readPackageFromDirectory(packageDirectoryUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
     let lastPathComponent = packageDirectoryUrl.lastPathComponent
-    let kmpFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
+    let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
     
-    if FileManager.default.fileExists(atPath: kmpFileUrl.path) {
-      if let source = readPackage(kmpFileUrl) {
+    if FileManager.default.fileExists(atPath: kmpJsonFileUrl.path) {
+      if let source = readPackage(packageDirectoryUrl: packageDirectoryUrl, kmpFileUrl: kmpJsonFileUrl) {
         packageSource = source
-        // save the keyboard directory and path of the kmp.json for this keyboard
-        packageSource?.directoryUrl = packageDirectoryUrl
-        packageSource?.jsonFileUrl = kmpFileUrl
       }
     } else {
-      print(" ** \(lastPathComponent) DOES NOT contain the file 'kmp.json')")
+      print(" ** the package directory \(lastPathComponent) does not contain the file 'kmp.json')")
     }
     
     return packageSource
   }
- 
+  
   /**
-   * read the kmp.json file at the specified URL
+   * read and parse the kmp.json file at the specified URL
    */
-  func readPackage(_ kmpFileUrl: URL) -> PackageSource? {
+  func readPackage(packageDirectoryUrl: URL, kmpFileUrl: URL) -> PackageSource? {
     var packageSource: PackageSource?
     do {
       let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)
-      let source: PackageSource = try! JSONDecoder().decode(PackageSource.self, from: jsonData)
+      var source: PackageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
       
       print("package name: \(source.packageName)")
+      // save the keyboard directory and path of the kmp.json for this keyboard
+      source.directoryUrl = packageDirectoryUrl
+      source.kmpJsonFileUrl = kmpFileUrl
       packageSource = source
     } catch {
-//      print("package name: \(source.packageName)")
+      print("\(error.localizedDescription)")
     }
     return packageSource
   }

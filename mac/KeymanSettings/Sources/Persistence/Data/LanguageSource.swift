@@ -3,7 +3,7 @@
  *
  * Created by Shawn Schantz on 2025-12-19
  *
- * Value object that describes a language as loaded from a .KMP file
+ * Value object for loading a language from kmp.json
  *
  */
 

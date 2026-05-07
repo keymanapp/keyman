@@ -3,7 +3,7 @@
  *
  * Created by Shawn Schantz on 2026-02-26
  *
- * Placeholder class
+ * Main view used for configuring Keyman
  */
 
 import SwiftUI

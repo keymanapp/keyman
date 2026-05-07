@@ -1,3 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Shawn Schantz on 2026-03-06
+ *
+ * Tests for KeymanSettings package
+ *
+ */
+
 import Testing
 import Foundation
 @testable import KeymanSettings
@@ -21,7 +30,7 @@ import Foundation
     #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
     #expect(defaultsRepo.readEnabledKeyboards().contains(moabiteKeyboardKey))
   }
-
+  
   @Test("Check finding packages by UUID") func testFindPackage() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
@@ -32,7 +41,7 @@ import Foundation
     #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
     #expect(settingsContainer.findPackage(packageId: packageRepo.nullPackageId) == nil)
   }
-
+  
   @Test("Check remove package") func testRemovePackage() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
@@ -44,7 +53,7 @@ import Foundation
     settingsContainer.removePackage(at: 0)
     #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) == nil)
   }
-
+  
   /**
    * test whether an uninstalled keyboard is removed from the list of enabled keyboards when calling `validateSettings()`
    */
@@ -68,16 +77,16 @@ import Foundation
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
-
+    
     settingsContainer.loadPackages()
     let package = try #require(settingsContainer.findPackage(packageId: packageRepo.testPackageId))
-
+    
     // the hittite keyboard is initialized as disabled
     #expect(!package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
-
+    
     // it should be enabled after user defaults are applied
     settingsContainer.applyUserDefaultsToInstalledPackages()
-
+    
     #expect(package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
   }
   
@@ -90,7 +99,7 @@ import Foundation
     // verify that two keyboards are installed
     #expect(settingsContainer.getInstalledKeyboardKeys().count == 2)
   }
-
+  
   @Test("Check get enabled keyboards") func testGetEnabledKeyboards() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
@@ -100,7 +109,7 @@ import Foundation
     // verify that one keyboard is enabled
     #expect(settingsContainer.getEnabledKeyboardKeys().count == 1)
   }
-
+  
   @Test("Check keyboard enabled") func testIsKeyboardEnabled() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
@@ -110,7 +119,7 @@ import Foundation
     // verify that moabite keyboard is enabled
     #expect(settingsContainer.isKeyboardEnabled(packageId: packageRepo.testPackageId, keyboardKey: moabiteKeyboardKey))
   }
-
+  
   @Test("Check enable keyboard") func testEnableKeyboard() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
@@ -180,7 +189,7 @@ import Foundation
   var settingsRepo: DefaultsRepo
   let hittiteKeyboardKey = "/sil_extinct/hittite.kmx"
   let moabiteKeyboardKey = "/sil_extinct/moabite.kmx"
-
+  
   fileprivate init() async throws {
     print("init Settings")
     do {
@@ -205,62 +214,75 @@ import Foundation
   }
 }
 
-@Suite("Load KMP data") struct KeymanPackageRepositoryTests {
-  var testKmpUrl: URL? = nil
-  
+@Suite("Read Keyman package") struct KeymanPackageRepositoryTests {
+  let packageRepo = PackageRepository()
+  let kmpUrl: URL
+  let source: PackageSource?
+  let fakePackageUrl: URL = URL(fileURLWithPath: "/fake/test/destination/amharic-fake")
+
   fileprivate init() async throws {
-    print("init")
-  }
-  
-  func getAmharicKmpUrl() -> URL? {
-    return Bundle.module.url(forResource: "amharic.kmp", withExtension: "json")
-  }
-  
-  @Test("Read package") func loadPackageSource() async throws {
-    let packageRepo = PackageRepository()
-    
-    let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let _ =  try #require(packageRepo.readPackage(kmpUrl))
+    self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
+    source =  packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
   }
   
   @Test("Read package name") func readPackageName() async throws {
-    let packageRepo = PackageRepository()
-    
-    let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readPackage(kmpUrl))
-    #expect(source.packageName == "GFF Amharic Keyboard")
+    let packageSource = try #require(source)
+    #expect(packageSource.packageName == "GFF Amharic Keyboard")
   }
   
   @Test("Read package version") func readPackageVersion() async throws {
-    let packageRepo = PackageRepository()
-    
-    let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readPackage(kmpUrl))
-    #expect(source.packageVersion == "3.1.2")
+    let packageSource = try #require(source)
+    #expect(packageSource.packageVersion == "3.1.2")
   }
   
   @Test("Read copyright") func readCopyright() async throws {
-    let packageRepo = PackageRepository()
-    
-    let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readPackage(kmpUrl))
-    #expect(source.copyright == "© Geʾez Frontier Foundation, SIL International")
+    let packageSource = try #require(source)
+    #expect(packageSource.copyright == "© Geʾez Frontier Foundation, SIL International")
   }
   
   @Test("Read keyboard count") func readKeyboardCount() async throws {
-    let packageRepo = PackageRepository()
-    
-    let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readPackage(kmpUrl))
-    #expect(source.keyboards?.count == 1)
+    let packageSource = try #require(source)
+    #expect(packageSource.keyboards?.count == 1)
   }
   
   @Test("Read keyboard name") func readKeyboardName() async throws {
-    let packageRepo = PackageRepository()
-    
-    let kmpUrl = try #require(self.getAmharicKmpUrl())
-    let source =  try #require(packageRepo.readPackage(kmpUrl))
-    let keyboard = try #require(source.keyboards?.first)
+    let packageSource = try #require(source)
+    let keyboard = try #require(packageSource.keyboards?.first)
     #expect(keyboard.name == "አማርኛ (Amharic)")
   }
+  
+  /**
+   * Ensure that Keyboard objects are correctly created from Keyboardsource
+   */
+  @Suite("Check keyboard state") struct KeyboardStateTests {
+    let packageRepo = PackageRepository()
+    let kmpUrl: URL
+    let packageSource: PackageSource?
+    let fakePackageUrl: URL = URL(fileURLWithPath: "/fake/test/destination/amharic-fake")
+    
+    fileprivate init() async throws {
+      self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
+      self.packageSource =  packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
+    }
+
+    @Test("Check keyboard is disabled") func checkKeyboardDisabled() async throws {
+      let package = try #require(self.packageSource)
+      let directoryUrl = try #require(package.directoryUrl)
+      let keyboards = try #require(package.keyboards)
+      let keyboardSource = try #require(keyboards.first)
+      let keyboard = Keyboard(keyboardSource: keyboardSource, directoryUrl: directoryUrl)
+      
+      #expect(keyboard.enabled)
+    }
+
+    @Test("Check keyboard key") func checkKeyboardKey() async throws {
+      let package = try #require(self.packageSource)
+      let directoryUrl = try #require(package.directoryUrl)
+      let keyboards = try #require(package.keyboards)
+      let keyboardSource = try #require(keyboards.first)
+      let keyboard = Keyboard(keyboardSource: keyboardSource, directoryUrl: directoryUrl)
+      
+      #expect(keyboard.keyboardKey == "/amharic-fake/gff_amharic.kmx")
+    }
+ }
 }

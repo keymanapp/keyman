@@ -321,13 +321,19 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 
   // only move data if there is something to move
   if (dataExistsInOldLocation) {
-
     [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
     [KMDataRepository movePackages:[self keyman18KeyboardsDirectory] to:[self keyman19KeyboardsDirectory]];
 
     // delete the Keyman-Keyboards directory
     NSError *error = nil;
     [fileManager removeItemAtURL: self.keyman18KeyboardsDirectory error:&error];
+    
+    if (error == nil) {
+      didMoveData = YES;
+      os_log_debug([KMLogs dataLog], "data migrated for keyman 19");
+    } else {
+      os_log_error([KMLogs dataLog], "error attempting to migrate data for keyman 19: %@", [error localizedDescription]);
+    }
   }
   
   return didMoveData;

@@ -18,7 +18,7 @@
  * So, with the migration of data for Keyman version 19, this key is renamed to `KMEnabledKeyboardsKey`
  * Every enabled keyboard will appear in the Keyman keyboards menu.
  * Only one of these keyboards can be selected at a time, and the selected keyboard is the one that
- * is actively being used by Keyman for each keystroke.
+ * is actively being applied by Keyman with each keystroke.
  */
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kEnabledKeyboardsKey = @"KMEnabledKeyboardsKey";
@@ -58,7 +58,7 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
 NSString *const kDataModelVersion = @"KMDataModelVersion";
 NSInteger const kVersionStoreDataInLibraryDirectory = 1; // introduced with Keyman 18
 NSInteger const kVersionStoreDataInGroupContainer = 2; // introduced with Keyman 19
-NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirectory;
+NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContainer;
 
 @interface KMSettingsRepository ()
 @property (nonatomic, strong) NSUserDefaults *appDefaults;
@@ -269,35 +269,35 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   }
 }
 
-- (NSMutableArray *)activeKeyboards {
-  NSMutableArray * activeKeyboards = [[self.groupDefaults arrayForKey:kActiveKeyboardsKey] mutableCopy];
+- (NSMutableArray *)enabledKeyboards {
+  NSMutableArray * enabledKeyboards = [[self.groupDefaults arrayForKey:kEnabledKeyboardsKey] mutableCopy];
   
-  if (!activeKeyboards) {
-    activeKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
+  if (!enabledKeyboards) {
+    enabledKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
   }
-  return activeKeyboards;
+  return enabledKeyboards;
 }
 
-- (NSArray *)readActiveKeyboards {
-  os_log_debug([KMLogs dataLog], "KMSettingsRepository readActiveKeyboards");
-  NSArray *keyboardsArray = [self.groupDefaults arrayForKey:kActiveKeyboardsKey];
+- (NSArray *)readEnabledKeyboards {
+  os_log_debug([KMLogs dataLog], "KMSettingsRepository readEnabledKeyboards");
+  NSArray *keyboardsArray = [self.groupDefaults arrayForKey:kEnabledKeyboardsKey];
   
-  // if the kActiveKeyboardsKey does not exist, then create an empty array
+  // if the kEnabledKeyboardsKey does not exist, then create an empty array
   if (!keyboardsArray) {
-    os_log_debug([KMLogs dataLog], "KMActiveKeyboardsKey key not found in NSUserDefualts");
+    os_log_debug([KMLogs dataLog], "kEnabledKeyboardsKey key not found in NSUserDefualts");
     keyboardsArray = [[NSArray alloc] init];
   }
   return keyboardsArray;
 }
 
-- (void)writeActiveKeyboards: (NSArray *) keyboards {
-  os_log_debug([KMLogs dataLog], "KMSettingsRepository writeActiveKeyboards");
-  [self.groupDefaults setObject:keyboards forKey:kActiveKeyboardsKey];
+- (void)writeEnabledKeyboards: (NSArray *) keyboards {
+  os_log_debug([KMLogs dataLog], "KMSettingsRepository writeEnabledKeyboards");
+  [self.groupDefaults setObject:keyboards forKey:kEnabledKeyboardsKey];
 }
 
-- (void)clearActiveKeyboards {
-  os_log_debug([KMLogs dataLog], "KMSettingsRepository clearActiveKeyboards");
-  [self.groupDefaults setObject:nil forKey:kActiveKeyboardsKey];
+- (void)clearEnabledKeyboards {
+  os_log_debug([KMLogs dataLog], "KMSettingsRepository clearEnabledKeyboards");
+  [self.groupDefaults setObject:nil forKey:kEnabledKeyboardsKey];
 }
 
 
@@ -365,7 +365,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
 }
 
 - (void)convertActiveKeyboardArrayForKeyman18Migration {
-  NSMutableArray *keyboards = [self activeKeyboards];
+  NSMutableArray *keyboards = [self enabledKeyboards];
   NSMutableArray *convertedActiveKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
   BOOL didConvert = NO;
   
@@ -384,7 +384,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   
   // only write array to UserDefaults if we actually converted something
   if (didConvert) {
-    [self writeActiveKeyboards:convertedActiveKeyboards];
+    [self writeEnabledKeyboards:convertedActiveKeyboards];
   }
 }
 

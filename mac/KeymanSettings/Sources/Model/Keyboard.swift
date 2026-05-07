@@ -3,11 +3,10 @@
  *
  * Created by Shawn Schantz on 2026-02-24
  *
- * Wrapper object that represents a Keyman keyboard as loaded from a .KMP file
- * Mostly immutable, but can be marked as enabled/disabled
+ * Object that represents a Keyman keyboard
+ * Each keyboard can be marked as enabled/disabled
  *
  */
-
 
 import Foundation
 import AppKit
@@ -27,7 +26,7 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   // the key is in the form "/[package directory]/[package name].kmx"
   // for example, "/khmer_angkor/khmer_angkor.kmx"
   public let keyboardKey: String
-
+  
   public init(keyboardSource: KeyboardSource, directoryUrl: URL) {
     self.enabled = true
     self.name = keyboardSource.name
@@ -35,10 +34,10 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     self.keyboardDirectoryUrl = directoryUrl
     self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
     self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
-
+    
     print("keyboard created for: \(keyboardSource.id) \r   with kmxFileUrl: \(self.kmxFileUrl) \r   and settingsKey: \(self.keyboardKey)")
   }
-
+  
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
@@ -51,32 +50,48 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
   }
   
+  /**
+   * provided for Equatable conformance
+   */
   public static func == (lhs: Keyboard, rhs: Keyboard) -> Bool {
     return lhs.keyboardId == rhs.keyboardId && lhs.enabled == rhs.enabled
   }
-
+  
+  /**
+   * provided for Hashable conformance
+   */
   public func hash(into hasher: inout Hasher) {
-      hasher.combine(keyboardId)
+    hasher.combine(keyboardId)
   }
-
+  
+  /**
+   * generate the url for the keyboard's kmx file
+   */
   static func deriveKmxFileUrl(from keyboardDirectory: URL, keyboardId: String) -> URL {
     return keyboardDirectory.appendingPathComponent("\(keyboardId).kmx")
   }
   
-  static func deriveKeyboardSettingsKey(from keyboardDirectory: URL, keyboardId: String) -> String {
+  /**
+   * generate the keyboard's key
+   * see the above comment for `keyboardKey` for a description of the format of the key
+   */
+ static func deriveKeyboardSettingsKey(from keyboardDirectory: URL, keyboardId: String) -> String {
     // get parent directory
     let parentDirectoryName = keyboardDirectory.lastPathComponent
-
+    
     // get filename from keyboardId
     let kmxFilename = "\(keyboardId).kmx"
-
+    
     let settingsKey = "/\(parentDirectoryName)/\(kmxFilename)"
     print("settingsKey: \(settingsKey)")
-
+    
     return settingsKey
   }
   
-// TODO: "throw/handle error if no kmx file found in directory
+  // TODO: "throw/handle error if no kmx file found in directory
+  /**
+   * validate whether a corresponding kmx file exists for this keyboard
+   */
   public func validateKmxFile() -> Bool {
     let fileManager = FileManager.default
     if fileManager.fileExists(atPath: self.kmxFileUrl.path) {
@@ -86,24 +101,4 @@ public class Keyboard: Identifiable, Hashable, Equatable {
       return false
     }
   }
-  
-  public func findKmxFile(in keyboardDirectoryUrl: URL) -> URL? {
-    var kmxFileUrl: URL? = nil
-    let fileManager = FileManager.default
-    
-    do {
-      let fileURLs = try fileManager.contentsOfDirectory(at: keyboardDirectoryUrl, includingPropertiesForKeys: nil)
-      let filteredFiles = fileURLs.filter { $0.pathExtension == "kmx" }
-      
-      if (!filteredFiles.isEmpty) {
-        kmxFileUrl = filteredFiles.first!
-      }
-    } catch {
-      print("Error reading directory: \(error)")
-    }
-    
-    return kmxFileUrl;
-  }
-
-
 }

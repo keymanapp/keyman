@@ -14,7 +14,7 @@ struct KeyboardListView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State var packageId: UUID
   @State var keyboards: [Keyboard]
-
+  
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       ForEach($keyboards) { $keyboard in

@@ -11,7 +11,7 @@
 import Foundation
 
 public enum UserDefaultsError: Error {
-    case unknownSuite
+  case unknownSuite
 }
 
 public class DefaultsRepository: DefaultsRepo {
@@ -77,12 +77,13 @@ public class DefaultsRepository: DefaultsRepo {
   /**
    * read the boolean value that allows a Sentry error to be generated for testing
    * This value is set in the **standard** application UserDefaults -- not the shared app group defaults.
-   * This is necessary because it must be set to true from the command line.
+   * This is necessary because it must be set to true from the command line, and the
+   * app group defaults are not accessible from the command line.
    */
   public func readForceSentryError() -> Bool {
-    return UserDefaults.standard.bool(forKey: kShowOskOnActivateKey)
+    return UserDefaults.standard.bool(forKey: kForceSentryErrorKey)
   }
-
+  
   /**
    * read the data model version to know what values and format to expect
    */
@@ -90,7 +91,7 @@ public class DefaultsRepository: DefaultsRepo {
     // note that zero is returned if key is not found in UserDefaults,
     return self.defaults.integer(forKey: kDataModelVersionKey)
   }
-
+  
   /**
    * read the boolean value that indicates whether the OSK is opened when the input method is activated
    * There may be no need to read this from with the config app.
@@ -98,7 +99,7 @@ public class DefaultsRepository: DefaultsRepo {
   public func readShowOskOnActivate() -> Bool {
     return self.defaults.bool(forKey: kShowOskOnActivateKey)
   }
-
+  
   /**
    * read the list of persisted options that are recorded dynamically from the input method
    * There may be no need to read this from with the config app.
@@ -111,11 +112,11 @@ public class DefaultsRepository: DefaultsRepo {
     }
   }
   
-/**
- * for debugging: prints UserDefaults values to the console
- * with app group UserDefaults, there is no way to view from the command line
- * (unlike standard application-level UserDefaults)
- */
+  /**
+   * for debugging: prints UserDefaults values to the console
+   * with app group UserDefaults, there is no way to view from the command line
+   * (unlike standard application-level UserDefaults)
+   */
   public func logDefaults() {
     print("UserDefaults:")
     print("\(kSelectedKeyboardKey): \(self.readSelectedKeyboard())")
@@ -125,7 +126,7 @@ public class DefaultsRepository: DefaultsRepo {
     print("\(kEnabledKeyboardsKey): \(self.readEnabledKeyboards())")
     print("\(kPersistedOptionsKey): \(self.readPersistedOptions())")
   }
-
+  
   /**
    * for debugging: clear all the entries for the app group UserDefaults
    * unlike standard application-level UserDefaults, there is no way to view from the command line

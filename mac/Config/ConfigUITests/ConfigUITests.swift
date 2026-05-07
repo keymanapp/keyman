@@ -1,9 +1,11 @@
-//
-//  ConfigUITests.swift
-//  ConfigUITests
-//
-//  Created by Shawn - SIL on 2/26/26.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Shawn Schantz on 2026-02-26
+ *
+ * UI Tests for Config app
+ *
+ */
 
 import XCTest
 

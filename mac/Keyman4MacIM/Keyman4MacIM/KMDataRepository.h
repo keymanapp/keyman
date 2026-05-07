@@ -23,8 +23,6 @@ extern NSString *const kKeymanGroupId;
 @property (readonly) NSURL *keyman19KeyboardsDirectory;
 
 + (KMDataRepository *)shared;
-- (void)createKeyman18DataDirectoryIfNecessary;
-- (void)createKeyboardsDirectoryIfNecessary;
 - (void)createKeyman19SharedDirectoriesIfNecessary;
 - (BOOL)migrateDataForKeyman18;
 - (BOOL)migrateDataForKeyman19;
