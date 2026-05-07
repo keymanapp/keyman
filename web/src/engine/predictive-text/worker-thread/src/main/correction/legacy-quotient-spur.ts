@@ -57,7 +57,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     return new LegacyQuotientRoot(this.model);
   }
 
-  protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>) {
+  protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>): SearchNode[] {
     // With a newly-available input, we can extend new input-dependent paths from
     // our previously-reached 'extractedResults' nodes.
     let outboundNodes = priorResults.map((result) => {

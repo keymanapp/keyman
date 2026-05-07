@@ -457,6 +457,10 @@ string") into the appropriate spec format.
 
 # .keyman-touch-layout version history
 
+## 2026-03-26 2.1.2 stable
+* Add missing 'default' property for longpress (sk) keys to clean spec. No other
+  changes.
+
 ## 2024-02-23 2.1.1 stable
 * Loosen `layer.id` requirements to any non-whitespace characters, recommend
   only alphanumeric, -, _. clean spec enforces this recommendation.
