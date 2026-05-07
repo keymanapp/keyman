@@ -10,8 +10,8 @@ import 'mocha';
 import { assert } from 'chai';
 import * as NodeAssert from 'node:assert';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { ActionStateOutput, KeylayoutFileData, KeylayoutToKmnConverter, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
-import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+import { ActionStateOutput, KeylayoutFileData, KeylayoutToKmnConverter, Rule } from '../src/kmc-convert-convert/keylayout-to-kmn-converter.js';
+import { KeylayoutFileReader } from '../src//kmc-convert-read/keylayout-file-reader.js';
 import { ConverterMessages } from '../src/converter-messages.js';
 
 describe('KeylayoutToKmnConverter', function () {

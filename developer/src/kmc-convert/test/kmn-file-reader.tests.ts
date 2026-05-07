@@ -10,7 +10,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks, makePathToFixture } from './helpers/index.js';
-import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+import { KeylayoutFileReader } from '../src//kmc-convert-read/keylayout-file-reader.js';
 
 describe('KeylayoutFileReader', function () {
 

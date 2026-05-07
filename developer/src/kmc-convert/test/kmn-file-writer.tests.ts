@@ -11,9 +11,9 @@ import 'mocha';
 import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
-import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
-import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src//kmc-convert-convert/keylayout-to-kmn-converter.js';
+import { KmnFileWriter } from '../src//kmc-convert-write/kmn-file-writer.js';
+import { KeylayoutFileReader } from '../src//kmc-convert-read/keylayout-file-reader.js';
 
 describe('KmnFileWriter', function () {
 

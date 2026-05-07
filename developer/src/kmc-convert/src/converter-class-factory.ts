@@ -3,7 +3,7 @@
  *
  * Lists all the available converters and finds matching converter
  */
-import { KeylayoutToKmnConverter } from './keylayout-to-kmn/keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter } from './kmc-convert-convert/keylayout-to-kmn-converter.js';
 import { XkbToKmnConverter } from './xkb-to-kmn/xkb-to-kmn-converter.js';
 
 const converters = [

@@ -8,7 +8,7 @@
  */
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
-import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter, ProcessedData, Rule } from './../kmc-convert-convert/keylayout-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 

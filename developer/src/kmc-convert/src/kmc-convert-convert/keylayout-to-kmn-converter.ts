@@ -9,8 +9,9 @@
 
 // ToDo-kmc-convert all warnings/squiggely lines will be adressed in PR #15860
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, Keylayout } from "@keymanapp/developer-utils";
-import { KmnFileWriter } from './kmn-file-writer.js';
-import { KeylayoutFileReader } from './keylayout-file-reader.js';
+
+import { KmnFileWriter } from './../kmc-convert-write/kmn-file-writer.js';
+import { KeylayoutFileReader } from './../kmc-convert-read/keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
