@@ -8,7 +8,9 @@
  * `getBestMatches` algorithm.
  */
 
-import { CorrectionResultMapping } from "./correction-result-mapping.js";
+// Circular type reference; do not actually require direct use of the prototype
+// or constructor!
+import { type CorrectionResultMapping } from "./correction-result-mapping.js";
 
 type NullPath = {
   type: 'none'
@@ -26,6 +28,10 @@ type CompleteSearchPath<MappingType> = {
 }
 
 export type PathResult<MappingType> = NullPath | IntermediateSearchPath | CompleteSearchPath<MappingType>;
+
+export function CORRECTION_QUEUE_COMPARATOR<T extends {currentCost: number}>(a: T, b: T) {
+  return a.currentCost - b.currentCost;
+}
 
 /**
  * Represents objects that support correction search via the `getBestMatches`
