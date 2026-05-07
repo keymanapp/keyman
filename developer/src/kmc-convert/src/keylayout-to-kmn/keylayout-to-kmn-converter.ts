@@ -110,8 +110,6 @@ export class KeylayoutToKmnConverter {
    */
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
 
-    console.log("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°\n      running KeylayoutToKmnConverter with input file "
-      + inputFilename + " and output file " + outputFilename);
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
@@ -169,7 +167,7 @@ export class KeylayoutToKmnConverter {
       rules: []
     };
 
-    if ((jsonObj === null)) {
+    if (jsonObj === null) {
       return null;
     }
     // create an array of modifier combinations and store in dataObject

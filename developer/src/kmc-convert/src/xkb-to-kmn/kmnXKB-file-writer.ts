@@ -152,7 +152,7 @@ export class KmnXKBFileWriter {
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          warnText[2] = characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -205,7 +205,7 @@ export class KmnXKBFileWriter {
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          warnText[2] = characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -279,7 +279,7 @@ export class KmnXKBFileWriter {
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          warnText[2] = characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -1030,7 +1030,7 @@ export class KmnXKBFileWriter {
     const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+;?)$|^$/i.exec(inputString);
 
     // valid '&#x...'
-     if (m_hex) {
+    if (m_hex) {
       const codePoint_h = parseInt(m_hex[1], 16);
       // Reject surrogates and invalid codepoints
       if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
