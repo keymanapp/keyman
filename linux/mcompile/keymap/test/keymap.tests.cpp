@@ -20,7 +20,7 @@
 
 class TestDataValues {
 
-  private:
+  protected:
     guint keycode;
     KMX_WCHAR expected_char;
     std::string layout;
@@ -85,7 +85,7 @@ class KeyboardTestParameters {
     }
 };
 
-class KeyboardConversionTest : public ::testing::TestWithParam<TestDataValues> {
+class KeyboardConversionTest : public testing::Test {
 
 public:
 
@@ -159,7 +159,11 @@ private:
   }
 };
 
-TEST_P(KeyboardConversionTest, Base) {
+class GetKeyValUnderlyingFromKeyCodeUnderlyingTest : public KeyboardConversionTest,
+                                                     public testing::WithParamInterface<TestDataValues> {
+};
+
+TEST_P(GetKeyValUnderlyingFromKeyCodeUnderlyingTest, KmxGetKeyValUnderlyingFromKeyCodeUnderlying) {
   guint keycode;
   KMX_WCHAR expected_char;
   std::string test_layout;
@@ -184,12 +188,10 @@ TEST_P(KeyboardConversionTest, Base) {
       &deadkey
   );
   EXPECT_EQ(result, expected_char) << "Failed for keycode: " << keycode;
+}
 
-  }
-
-
-  INSTANTIATE_TEST_SUITE_P(BaseUs,
-                         KeyboardConversionTest,
+INSTANTIATE_TEST_SUITE_P(BaseUs,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                                 {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i',
                                  u'j', u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r',
@@ -202,7 +204,7 @@ TEST_P(KeyboardConversionTest, Base) {
 
 
 INSTANTIATE_TEST_SUITE_P(ShiftUs,
-                         KeyboardConversionTest,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                                 {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
                                   u'J', u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R',
@@ -215,7 +217,7 @@ INSTANTIATE_TEST_SUITE_P(ShiftUs,
 
 
 INSTANTIATE_TEST_SUITE_P(AltGrUs,
-                         KeyboardConversionTest,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                               {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j', u'k',
                                 u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't', u'u', u'v',
@@ -226,7 +228,7 @@ INSTANTIATE_TEST_SUITE_P(AltGrUs,
                                 (LCTRLFLAG | RALTFLAG)).get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(ShiftAltGrUs,
-                         KeyboardConversionTest,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                                {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I', u'J', u'K',
                                 u'L', u'M', u'N', u'O', u'P', u'Q', u'R', u'S', u'T', u'U', u'V',
@@ -237,7 +239,7 @@ INSTANTIATE_TEST_SUITE_P(ShiftAltGrUs,
                                 (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG)).get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(BaseDe,
-                         KeyboardConversionTest,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                                  {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j',
                                   u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't',
@@ -250,7 +252,7 @@ INSTANTIATE_TEST_SUITE_P(BaseDe,
 
 
 INSTANTIATE_TEST_SUITE_P(ShiftDe,
-                         KeyboardConversionTest,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                                 {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
                                  u'J', u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R',
@@ -263,7 +265,7 @@ INSTANTIATE_TEST_SUITE_P(ShiftDe,
 
 
 INSTANTIATE_TEST_SUITE_P(AltGrDe,
-                         KeyboardConversionTest,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                                  {u'æ', u'\xfffe', u'¢', u'ð', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe',
                                   u'\xfffe', u'\xffff', u'\xfffe', u'\xfffe', u'µ', u'\xfffe', u'ø', u'þ',
@@ -275,7 +277,7 @@ INSTANTIATE_TEST_SUITE_P(AltGrDe,
                                  (LCTRLFLAG | RALTFLAG)).get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(ShiftAltGrDe,
-                         KeyboardConversionTest,
+                         GetKeyValUnderlyingFromKeyCodeUnderlyingTest,
                          testing::ValuesIn(KeyboardTestParameters(
                                {u'Æ', u'\xfffe', u'©', u'Ð', u'\xfffe', u'ª', u'\xfffe',
                                 u'\xfffe', u'\xfffe', u'\xffff', u'&', u'\xfffe', u'º',
@@ -287,3 +289,204 @@ INSTANTIATE_TEST_SUITE_P(ShiftAltGrDe,
                                 u'\000', u'\xffff'},
                                 "de",
                                 (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG)).get_test_data()));
+
+
+class GetKeyValFromKeyCodeTestDataValues : public TestDataValues {
+  public:
+    GetKeyValFromKeyCodeTestDataValues(guint k, KMX_WCHAR e, std::string l, guint s, int c) :
+        TestDataValues(k, e, l, s), caps(c) {
+      keycode = k;
+      expected_char = e;
+      layout = l;
+      shiftstate = s;
+      caps = c;
+    }
+
+    int get_caps() {
+        return caps;
+    }
+
+    protected:
+        int caps;
+
+};
+
+class GetKeyValFromKeyCodeTestParameters {
+  public:
+
+    GetKeyValFromKeyCodeTestParameters(std::vector<KMX_WCHAR> e, std::string l, guint s, int c) : expected_keysyms(e), layout(l), shiftstate(s), caps(c) {
+      expected_keysyms = e;
+      layout = l;
+      shiftstate = s;
+      caps = c;
+      generate_test_data_values();
+    }
+
+    std::vector<GetKeyValFromKeyCodeTestDataValues> get_test_data() {
+        return test_data_values;
+    }
+
+
+  protected:
+    std::vector<KMX_WCHAR> expected_keysyms;
+    std::vector<GetKeyValFromKeyCodeTestDataValues> test_data_values = {};
+    std::string layout;
+    guint shiftstate;
+    int caps;
+    std::vector<guint> keycodes = { 38, 56, 54, 40, 26, 41, 42, 43, 31, 44, 45, 46, 58, 57, 32,
+                               33, 24, 27, 39, 28, 30, 55, 25, 53, 29, 52, 19, 10, 11, 12,
+                               13, 14, 15, 16, 17, 18, 65, 49, 20, 21, 34, 35, 51, 47, 48,
+                               59, 60, 61, 123, 94};
+
+
+    void generate_test_data_values(){
+          EXPECT_EQ(keycodes.size(), expected_keysyms.size()) << "Keycodes and expected keysyms vectors must be of the same size.";
+          for (guint k = 0; k < keycodes.size() && k < expected_keysyms.size(); k++) {
+             test_data_values.emplace_back(GetKeyValFromKeyCodeTestDataValues(keycodes[k], expected_keysyms[k], layout, shiftstate, caps));
+          }
+    }
+};
+
+class GetKeyValFromKeyCodeTest : public KeyboardConversionTest,
+                                 public testing::WithParamInterface<GetKeyValFromKeyCodeTestDataValues> {
+
+};
+
+
+TEST_P(GetKeyValFromKeyCodeTest, kmxGetKeyValFromKeyCode) {
+  guint keycode;
+  KMX_WCHAR expected_char;
+  std::string test_layout;
+  guint shiftstate;
+  int caps;
+
+  GetKeyValFromKeyCodeTestDataValues parameter = GetParam();
+
+  keycode = parameter.get_keycode();
+  expected_char = parameter.get_expected_char();
+  test_layout = parameter.get_layout();
+  shiftstate = parameter.get_shiftstate();
+  caps = parameter.get_caps();
+
+  std::cout << "Testing keycode: " << keycode << " expecting char: " << expected_char << " with layout: " << test_layout << " and shiftstate: " << shiftstate << " caps: " << caps << std::endl;
+  if (test_layout != default_layout) {
+    GTEST_SKIP() << "Default layout is not " << default_layout << ".";
+  }
+
+  KMX_DWORD keyV = KMX_get_KeyVal_From_KeyCode(
+                       test_keymap,
+                       keycode,
+                       ShiftState(convert_Shiftstate_to_LinuxShiftstate(shiftstate)),
+                       caps);
+  EXPECT_EQ(keyV, expected_char) << "Failed for keycode: " << keycode;
+}
+
+INSTANTIATE_TEST_SUITE_P(BaseUs,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                                {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i',
+                                 u'j', u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r',
+                                 u's', u't', u'u', u'v', u'w', u'x', u'y', u'z', u'0',
+                                 u'1', u'2', u'3', u'4', u'5', u'6', u'7', u'8', u'9',
+                                 u' ', u'`', u'-', u'=', u'[', u']', u'\\', u';', u'\'',
+                                 u',', u'.', u'/', u'\000', u'<'},
+                                 "us",
+                                 0,
+                                 0).get_test_data()));
+
+INSTANTIATE_TEST_SUITE_P(ShiftUs,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                                {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
+                                  u'J', u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R',
+                                  u'S', u'T', u'U', u'V', u'W', u'X', u'Y', u'Z', u')',
+                                  u'!', u'@', u'#', u'$', u'%', u'^', u'&', u'*', u'(',
+                                  u' ', u'~', u'_', u'+', u'{', u'}', u'|', u':', u'"',
+                                  u'<', u'>', u'?', u'\000', u'>'},
+                                  "us",
+                                  K_SHIFTFLAG,
+                                  0).get_test_data()));
+
+
+INSTANTIATE_TEST_SUITE_P(AltGrUs,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                              {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j', u'k',
+                                u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't', u'u', u'v',
+                                u'w', u'x', u'y', u'z', u'0', u'1', u'2', u'3', u'4', u'5', u'6',
+                                u'7', u'8', u'9', u'\000', u'`', u'-', u'=', u'[', u']', u'\\',
+                                u';', u'\'', u',', u'.', u'/', u'\000', u'|'},
+                                "us",
+                                (LCTRLFLAG | RALTFLAG)
+                                ,0).get_test_data()));
+
+INSTANTIATE_TEST_SUITE_P(ShiftAltGrUs,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                               {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I', u'J', u'K',
+                                u'L', u'M', u'N', u'O', u'P', u'Q', u'R', u'S', u'T', u'U', u'V',
+                                u'W', u'X', u'Y', u'Z', u')', u'!', u'@', u'#', u'$', u'%', u'^',
+                                u'&', u'*', u'(', u'\000', u'~', u'_', u'+', u'{', u'}', u'|',
+                                u':', u'"', u'<', u'>', u'?', u'\000', u'¦'},
+                                "us",
+                                (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG)
+                                ,0).get_test_data()));
+
+INSTANTIATE_TEST_SUITE_P(BaseDe,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                                 {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j',
+                                  u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't',
+                                  u'u', u'v', u'w', u'x', u'z', u'y', u'0', u'1', u'2', u'3',
+                                  u'4', u'5', u'6', u'7', u'8', u'9', u' ', u'\xffff', u'ß',
+                                  u'\xffff', u'ü', u'+', u'#', u'ö', u'ä', u',', u'.', u'-',
+                                  u'\000', u'<'},
+                                 "de",
+                                 0,
+                                 0).get_test_data()));
+
+
+INSTANTIATE_TEST_SUITE_P(ShiftDe,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                                {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I',
+                                 u'J', u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R',
+                                 u'S', u'T', u'U', u'V', u'W', u'X', u'Z', u'Y', u'=',
+                                 u'!', u'"', u'§', u'$', u'%', u'&', u'/', u'(', u')',
+                                 u' ', u'°', u'?', u'\xffff', u'Ü', u'*', u'\'', u'Ö',
+                                 u'Ä', u';', u':', u'_', u'\000', u'>'},
+                                  "de",
+                                 K_SHIFTFLAG,
+                                 0).get_test_data()));
+
+
+INSTANTIATE_TEST_SUITE_P(AltGrDe,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                                 {u'æ', u'\xfffe', u'¢', u'ð', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe',
+                                  u'\xfffe', u'\xffff', u'\xfffe', u'\xfffe', u'µ', u'\xfffe', u'ø', u'þ',
+                                  u'@', u'¶', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'«',
+                                  u'\xfffe', u'»', u'}', u'¹', u'²', u'³', u'¼', u'½', u'¬', u'{', u'[',
+                                  u']', u'\000', u'\xfffe', u'\\', u'\xffff', u'\xffff', u'~', u'\xfffe',
+                                  u'\xffff', u'\xffff', u'·', u'\xfffe', u'\xfffe', u'\000', u'|'},
+                                  "de",
+                                  (LCTRLFLAG | RALTFLAG),
+                                  0).get_test_data()));
+
+INSTANTIATE_TEST_SUITE_P(ShiftAltGrDe,
+                         GetKeyValFromKeyCodeTest,
+                         testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
+                               {u'Æ', u'\xfffe', u'©', u'Ð', u'\xfffe', u'ª', u'\xfffe',
+                                u'\xfffe', u'\xfffe', u'\xffff', u'&', u'\xfffe', u'º',
+                                u'\xfffe', u'Ø', u'Þ', u'\xfffe', u'®', u'\xfffe', u'\xfffe',
+                                u'\xfffe', u'\xfffe', u'§', u'\xfffe', u'¥', u'\xfffe', u'°',
+                                u'¡', u'\xfffe', u'£', u'¤', u'\xfffe', u'\xfffe', u'\xfffe',
+                                u'\xfffe', u'±', u'\000', u'\xfffe', u'¿', u'\xffff', u'\xffff',
+                                u'¯', u'\xffff', u'\xffff', u'\xffff', u'×', u'÷', u'\xfffe',
+                                u'\000', u'\xffff'},
+                                "de",
+                                (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG),
+                                0).get_test_data()));
+
+
+
