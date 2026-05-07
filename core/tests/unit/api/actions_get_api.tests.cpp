@@ -68,6 +68,7 @@ protected:
     }
     if(test_actions) {
       delete [] test_actions->output;
+      delete [] test_actions->persist_options;
       delete test_actions;
       test_actions = nullptr;
     }
@@ -86,11 +87,9 @@ TEST_P(GetActionApiTest, TestActionsApi) {
   ASSERT_NO_FATAL_FAILURE(Initialize(data));
 
   if(data.final_cached_context_string == nullptr) {
-    // We skip the shared tests that don't have a input context string
+    GTEST_SKIP() << "Skip the shared tests that don't have a input context string";
     return;
   }
-
-  // setup(initial_app_context, final_cached_context, actions_code_points_to_delete, actions_output);
 
   auto actual_actions = km_core_state_get_actions(test_state);
 

@@ -66,6 +66,8 @@ void assert_identical_context(const km_core_context *actual_context, km_core_cu 
   ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, nullptr, &buf_size));
   km_core_cu *actual_context_cu = new km_core_cu[buf_size];
   ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, actual_context_cu, &buf_size));
+  km_core_context_items_dispose(actual_context_items);
+
   ASSERT_EQ(actual_context_cu, std::u16string(expected_context));
   delete[] actual_context_cu;
 }
@@ -77,6 +79,8 @@ void assert_different_context(const km_core_context *actual_context, km_core_cu 
   ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, nullptr, &buf_size));
   km_core_cu *actual_context_cu = new km_core_cu[buf_size];
   ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, actual_context_cu, &buf_size));
+  km_core_context_items_dispose(actual_context_items);
+
   ASSERT_NE(actual_context_cu, std::u16string(expected_context));
   delete[] actual_context_cu;
 }

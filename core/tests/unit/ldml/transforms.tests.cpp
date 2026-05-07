@@ -1017,7 +1017,6 @@ TEST(TransformsTests, TestNormalizeMarkerBeforeDoubleGreek) {
 }
 
 void TEST_NFD_PLAIN(std::u32string x, std::u32string y) {
-  marker_map map;
   const std::u32string src        = x;
   const std::u32string expect_nfd = y;
   std::u32string dst_nfd          = src;
