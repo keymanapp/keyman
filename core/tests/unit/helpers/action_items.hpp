@@ -64,7 +64,7 @@ bool action_items(
     }
   }
 
-  if(n != 0) {
+  if(n > 0) {
     std::cout << "actual longer than expected" << std::endl;
     km::tests::print_action_item("next actual item:", *act);
     return false;

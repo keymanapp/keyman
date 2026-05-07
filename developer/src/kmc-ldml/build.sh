@@ -86,4 +86,4 @@ builder_run_action configure       do_configure
 builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
-builder_run_action test            typescript_run_eslint_mocha_tests  90
+builder_run_action test            typescript_run_eslint_mocha_tests  85

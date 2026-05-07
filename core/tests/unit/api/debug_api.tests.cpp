@@ -26,14 +26,14 @@ class DebugApiTests : public testing::Test {
 protected:
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
-  km_core_context_item * citems = nullptr;
+  km_core_context_item * context_items = nullptr;
 
   void Initialize(const char *keyboard) {
     km::core::path path = km::core::path(test_dir / ".." / "kmx" / keyboard);
     auto blob = km::tests::load_kmx_file(path.native().c_str());
     ASSERT_STATUS_OK(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
     ASSERT_STATUS_OK(km_core_state_create(test_kb, test_empty_env_opts, &test_state));
-    ASSERT_STATUS_OK(context_items_from_utf16(u"Hello 😁", &citems));
+    ASSERT_STATUS_OK(context_items_from_utf16(u"Hello 😁", &context_items));
 
     // Pre-test sanity: ensure debugging is disabled
     ASSERT_EQ(km_core_state_debug_get(test_state), 0);
@@ -43,14 +43,14 @@ protected:
       km_core_state_debug_item{KM_CORE_DEBUG_END, {}, {}, {}}
     }));
 
-    ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
-    ASSERT_STATUS_OK(km_core_context_set(km_core_state_app_context(test_state), citems));
+    ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), context_items));
+    ASSERT_STATUS_OK(km_core_context_set(km_core_state_app_context(test_state), context_items));
   }
 
   void TearDown() override {
-    if(citems) {
-      km_core_context_items_dispose(citems);
-      citems = nullptr;
+    if(context_items) {
+      km_core_context_items_dispose(context_items);
+      context_items = nullptr;
     }
     if(test_state) {
       km_core_state_dispose(test_state);
