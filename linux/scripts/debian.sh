@@ -30,7 +30,7 @@ mkdir -p debianpackage
 downloadSource debianpackage
 
 cd "keyman-${version}"
-if [[ -n "${DIST:-}" ]]; then
+if builder_has_option --dist; then
     EXTRA_ARGS="--distribution ${DIST} --force-distribution"
 fi
 # shellcheck disable=SC2086
