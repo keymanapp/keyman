@@ -15,72 +15,15 @@
 #include "context.hpp"
 
 #include "../helpers/core_test_helpers.h"
+#include "./actions_test_data.h"
 
-// TODO-WEB-CORE: merge with actions_normalize.tests.cpp? These are identical;
-// note that actions_get_api and actions_set_api data are subtly different,
-// opportunity to merge those too?
-
-struct TestData {
-  const char* test_name;
-
-  /**
-   * the app context stored in the state, _before_ transform is applied -- NFU
-   */
-  const km_core_cu *initial_app_context;
-
-  /**
-   * cached context _after_ actions have been applied -- guaranteed NFD
-   * (essentially, this is initial_cached_context -
-   * actions_code_points_to_delete + actions_output) - no markers supported
-   */
-  const km_core_cu *final_cached_context_string;
-
-  /**
-   * cached context _after_ actions have been applied -- guaranteed NFD
-   * (essentially, this is initial_cached_context -
-   * actions_code_points_to_delete + actions_output) - markers supported
-   */
-  const km_core_context_item *final_cached_context_items;
-
-  /**
-   * number of NFD code points that the keyboard processor has asked to remove in its actions
-   */
-  int actions_code_points_to_delete;
-
-  /**
-   * NFD string that the keyboard processor has asked to insert in its actions
-   */
-  const std::u32string actions_output;
-
-  /**
-   * expected: NFU code points to ask app to remove
-   */
-  const unsigned int expected_delete;
-
-  /**
-   * expected: adjusted NFC output to insert into the app
-   */
-  const std::u32string expected_output;
-
-  /**
-   * expected: NFU adjusted final app context, which will be NFC from the
-   * boundary of the transform, but will not have been modified prior to that.
-   * Should match char-for-char what the app ends up with in its text buffer.
-   */
-  const km_core_cu *expected_final_app_context;
-};
-
-std::string GenerateTestName(const testing::TestParamInfo<TestData>& info) {
-  return info.param.test_name;
-}
-
-class ActionsUpdateAppContextNfuApiTest : public testing::TestWithParam<TestData> {
+class ActionsUpdateAppContextNfuApiTest : public testing::TestWithParam<ActionsTestData> {
 protected:
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
   km_core_actions test_actions = {0};
 
-  void Initialize(TestData const& data) {
+  void Initialize(ActionsTestData const& data) {
     km::core::path path = km::core::path::join(test_dir, "..", "ldml", "fixtures", "keyboards", "17.0", "k_001_tiny.kmx");
     auto blob = km::tests::load_kmx_file(path.native().c_str());
     ASSERT_STATUS_OK(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
@@ -172,7 +115,23 @@ const km_core_context_item items_2[] = { //u"a\U0001F607bca\U0001F60E\uFFFF\u000
   KM_CORE_CONTEXT_ITEM_END
 };
 
-const TestData values[] = {
+const km_core_context_item items_11067[] = {
+  { KM_CORE_CT_CHAR,   {0,}, { U'𐒻' } },
+  { KM_CORE_CT_CHAR,   {0,}, { U'𐒷' } },
+  KM_CORE_CONTEXT_ITEM_END
+};
+
+/**
+ * Test cases for non-normalized app context update. These look superficially
+ * similar to the data in `actionsTestData`, but diverge when taking into
+ * account normalization of output. Several normalization-related tests in
+ * `actionsTestData` are therefore also currently excluded here.
+ *
+ * @todo: (low priority) `actionsTestData` and `actionsTestDataNFU` could be
+ *        combined with additional entries for each NFU result.
+ */
+
+const std::vector<ActionsTestData> actionsTestDataNFU = {
   // Null boundary tests
 
   {
@@ -182,8 +141,9 @@ const TestData values[] = {
     /* cached context post transform: */ nullptr,
     /* action del, output: */            0, U"",
     // ---- results ----
-    /* action del, output: */            0, U"",
-    /* app_context: */                   u""
+    /* expected action del, output: */   0, U"",
+    /* expected app_context: */          u"",
+    /* expected del */                   U""
   },
 
   {
@@ -193,8 +153,9 @@ const TestData values[] = {
     /* cached context post transform: */ nullptr,
     /* action del, output: */            0, U"",
     // ---- results ----
-    /* action del, output: */            0, U"",
-    /* app_context: */                   u"abc"
+    /* expected action del, output: */   0, U"",
+    /* expected app_context: */          u"abc",
+    /* expected del */                   U""
   },
 
   {
@@ -204,9 +165,25 @@ const TestData values[] = {
     /* cached context post transform: */ nullptr,
     /* action del, output: */            0, U"def",
     // ---- results ----
-    /* action del, output: */            0, U"def",
-    /* app_context: */                   u"def"
+    /* expected action del, output: */   0, U"def",
+    /* expected app_context: */          u"def",
+    /* expected del */                   U""
   },
+
+    // Simple tests -- no deletions involved
+
+  {
+    "NoNormalization",
+    /* app context pre transform: */     u"abc",
+    /* cached context post transform: */ u"abcdef",
+    /* cached context post transform: */ nullptr,
+    /* action del, output: */            0, U"def",
+    // ---- results ----
+    /* expected action del, output: */   0, U"def",
+    /* expected app_context: */          u"abcdef",
+    /* expected del */                   U""
+  },
+
 
   // surrogate pair tests
 
@@ -217,8 +194,9 @@ const TestData values[] = {
     /* cached context post transform: */ nullptr,
     /* action del, output: */            1, U"a\u0323\u0302",
     // ---- results ----
-    /* action del, output: */            1, U"a\u0323\u0302",
-    /* app_context: */                   u"abc\U0001F607a\u0323\u0302"
+    /* expected action del, output: */   1, U"a\u0323\u0302",
+    /* expected app_context: */          u"abc\U0001F607a\u0323\u0302",
+    /* expected del */                   U"ê"
   },
 
   {
@@ -228,8 +206,9 @@ const TestData values[] = {
     /* cached context post transform: */ nullptr,
     /* action del, output: */            0, U"\U0001F607",
     // ---- results ----
-    /* action del, output: */            0, U"\U0001F607",
-    /* app_context: */                   u"abc\U0001F607"
+    /* expected action del, output: */   0, U"\U0001F607",
+    /* expected app_context: */          u"abc\U0001F607",
+    /* expected del */                   U""
   },
 
   {
@@ -239,8 +218,9 @@ const TestData values[] = {
     /* cached context post transform: */ nullptr,
     /* action del, output: */            1, U"a\U0001F60E",
     // ---- results ----
-    /* action del, output: */            1, U"a\U0001F60E",
-    /* app_context: */                   u"a\U0001F607bca\U0001F60E"
+    /* expected action del, output: */   1, U"a\U0001F60E",
+    /* expected app_context: */          u"a\U0001F607bca\U0001F60E",
+    /* expected del */                   U"ê"
   },
 
   // Marker tests
@@ -252,8 +232,9 @@ const TestData values[] = {
     /* cached context post transform: */ &items_1[0],
     /* action del, output: */            1, U"a\U0001F60E",
     // ---- results ----
-    /* action del, output: */            1, U"a\U0001F60E",
-    /* app_context: */                   u"a\U0001F607bca\U0001F60E"
+    /* expected action del, output: */   1, U"a\U0001F60E",
+    /* expected app_context: */          u"a\U0001F607bca\U0001F60E",
+    /* expected del */                   U"ê"
   },
 
   {
@@ -263,9 +244,23 @@ const TestData values[] = {
     /* cached context post transform: */ &items_2[0],
     /* action del, output: */            1, U"a\U0001F60E",
     // ---- results ----
-    /* action del, output: */            1, U"a\U0001F60E",
-    /* app_context: */                   u"a\U0001F607bca\U0001F60E"
+    /* expected action del, output: */   1, U"a\U0001F60E",
+    /* expected app_context: */          u"a\U0001F607bca\U0001F60E",
+    /* expected del */                   U"ê"
+  },
+
+  // regression #11067
+  {
+    "ANonBmpCharInContext11067",
+    /* app context pre transform: */     u"𐒻",
+    /* cached context post transform: */ u"𐒻𐒷",
+    /* cached context post transform: */ &items_11067[0],
+    /* action del, output: */            1, U"𐒻𐒷",
+    // ---- results ----
+    /* expected action del, output: */   1, U"𐒻𐒷",
+    /* expected app_context: */          u"𐒻𐒷",
+    /* expected del: */                  U"\x104BB"
   }
 };
 
-INSTANTIATE_TEST_SUITE_P(KeymanCore, ActionsUpdateAppContextNfuApiTest, testing::ValuesIn(values), GenerateTestName);
+INSTANTIATE_TEST_SUITE_P(KeymanCore, ActionsUpdateAppContextNfuApiTest, testing::ValuesIn(actionsTestDataNFU), GenerateTestName);

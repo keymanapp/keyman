@@ -22,7 +22,6 @@ class StateContextApiTests : public testing::Test {
 protected:
   km_core_keyboard *test_kb    = nullptr;
   km_core_state *test_state    = nullptr;
-  km_core_context_item *citems = nullptr;
 
   void Initialize(const char *keyboard, const km_core_cu *context, bool setup_app_context = true) {
     km::core::path path = km::core::path(test_dir / ".." / "kmx" / keyboard);
@@ -36,18 +35,20 @@ protected:
       ASSERT_STATUS_OK(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
     }
     ASSERT_STATUS_OK(km_core_state_create(test_kb, test_empty_env_opts, &test_state));
-    ASSERT_STATUS_OK(context_items_from_utf16(context, &citems));
-    ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+
+    km_core_context_item *context_items = nullptr;
+    ASSERT_STATUS_OK(context_items_from_utf16(context, &context_items));
+    ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), context_items));
     if (setup_app_context) {
-      ASSERT_STATUS_OK(km_core_context_set(km_core_state_app_context(test_state), citems));
+      ASSERT_STATUS_OK(km_core_context_set(km_core_state_app_context(test_state), context_items));
+    }
+    if (context_items) {
+      km_core_context_items_dispose(context_items);
+      context_items = nullptr;
     }
   }
 
   void TearDown() override {
-    if (citems) {
-      km_core_context_items_dispose(citems);
-      citems = nullptr;
-    }
     if (test_state) {
       km_core_state_dispose(test_state);
       test_state = nullptr;
@@ -57,57 +58,63 @@ protected:
       test_kb = nullptr;
     }
   }
-
-  void assert_identical_context(km_core_cu const *expected_context) {
-    size_t buf_size;
-    ASSERT_STATUS_OK(km_core_context_get(km_core_state_context(test_state), &citems));
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, nullptr, &buf_size));
-    km_core_cu *actual_context = new km_core_cu[buf_size];
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, actual_context, &buf_size));
-    ASSERT_EQ(std::u16string(expected_context), actual_context);
-    delete[] actual_context;
-  }
-
-  void assert_different_context(km_core_cu const *expected_context) {
-    size_t buf_size;
-    ASSERT_STATUS_OK(km_core_context_get(km_core_state_context(test_state), &citems));
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, nullptr, &buf_size));
-    km_core_cu *actual_context = new km_core_cu[buf_size];
-    ASSERT_STATUS_OK(context_items_to_utf16(citems, actual_context, &buf_size));
-    ASSERT_NE(std::u16string(expected_context), actual_context);
-    delete[] actual_context;
-  }
 };
 
+void assert_identical_context(const km_core_context *actual_context, km_core_cu const *expected_context) {
+  km_core_context_item *actual_context_items;
+  size_t buf_size;
+  ASSERT_STATUS_OK(km_core_context_get(actual_context, &actual_context_items));
+  ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, nullptr, &buf_size));
+  km_core_cu *actual_context_cu = new km_core_cu[buf_size];
+  ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, actual_context_cu, &buf_size));
+  km_core_context_items_dispose(actual_context_items);
 
-void assert_identical_context_with_markers(const km_core_context *context, const km_core_context_item *citems) {
-  km_core_context_item *citems_new;
-  ASSERT_STATUS_OK(km_core_context_get(context, &citems_new));
-  for (int i = 0; citems[i].type || citems_new[i].type; i++) {
-    ASSERT_EQ(citems_new[i].type, citems[i].type) << "Unexpected type:";
-    if (citems[i].type == KM_CORE_CT_CHAR) {
-      ASSERT_EQ(citems_new[i].character, citems[i].character) << "Unexpected character:";
-    } else {
-      ASSERT_EQ(citems_new[i].marker, citems[i].marker) << "Unexpected marker:";
-    }
-  }
-  km_core_context_items_dispose(citems_new);
+  ASSERT_EQ(actual_context_cu, std::u16string(expected_context));
+  delete[] actual_context_cu;
 }
 
-// citems contains markers, but we will skip over them
-void assert_identical_context_without_markers(const km_core_context *context, const km_core_context_item *citems) {
-  km_core_context_item *citems_new;
-  ASSERT_STATUS_OK(km_core_context_get(context, &citems_new));
-  for (int i = 0, i_new = 0; citems[i].type || citems_new[i_new].type; i++) {
-    if (citems[i].type == KM_CORE_CT_CHAR) {
-      ASSERT_EQ(citems_new[i_new].type, citems[i].type) << "Unexpected type:";
-      ASSERT_EQ(citems_new[i_new].character, citems[i].character) << "Unexpected character:";
-      i_new++;
-    } else if(citems[i].type == KM_CORE_CT_END) {
-      ASSERT_EQ(citems_new[i_new].type, citems[i].type) << "Unexpected type:";
+void assert_different_context(const km_core_context *actual_context, km_core_cu const *expected_context) {
+  km_core_context_item *actual_context_items;
+  size_t buf_size;
+  ASSERT_STATUS_OK(km_core_context_get(actual_context, &actual_context_items));
+  ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, nullptr, &buf_size));
+  km_core_cu *actual_context_cu = new km_core_cu[buf_size];
+  ASSERT_STATUS_OK(context_items_to_utf16(actual_context_items, actual_context_cu, &buf_size));
+  km_core_context_items_dispose(actual_context_items);
+
+  ASSERT_NE(actual_context_cu, std::u16string(expected_context));
+  delete[] actual_context_cu;
+}
+
+
+void assert_identical_context_with_markers(const km_core_context *actual_context, const km_core_context_item *expected_context_items) {
+  km_core_context_item *actual_context_items;
+  ASSERT_STATUS_OK(km_core_context_get(actual_context, &actual_context_items));
+  for (int i = 0; expected_context_items[i].type || actual_context_items[i].type; i++) {
+    ASSERT_EQ(actual_context_items[i].type, expected_context_items[i].type) << "Unexpected type:";
+    if (expected_context_items[i].type == KM_CORE_CT_CHAR) {
+      ASSERT_EQ(actual_context_items[i].character, expected_context_items[i].character) << "Unexpected character:";
+    } else {
+      ASSERT_EQ(actual_context_items[i].marker, expected_context_items[i].marker) << "Unexpected marker:";
     }
   }
-  km_core_context_items_dispose(citems_new);
+  km_core_context_items_dispose(actual_context_items);
+}
+
+// expected_context_items contains markers, but we will skip over them
+void assert_identical_context_without_markers(const km_core_context *actual_context, const km_core_context_item *expected_context_items) {
+  km_core_context_item *actual_context_items;
+  ASSERT_STATUS_OK(km_core_context_get(actual_context, &actual_context_items));
+  for (int i = 0, i_new = 0; expected_context_items[i].type || actual_context_items[i_new].type; i++) {
+    if (expected_context_items[i].type == KM_CORE_CT_CHAR) {
+      ASSERT_EQ(actual_context_items[i_new].type, expected_context_items[i].type) << "Unexpected type:";
+      ASSERT_EQ(actual_context_items[i_new].character, expected_context_items[i].character) << "Unexpected character:";
+      i_new++;
+    } else if(expected_context_items[i].type == KM_CORE_CT_END) {
+      ASSERT_EQ(actual_context_items[i_new].type, expected_context_items[i].type) << "Unexpected type:";
+    }
+  }
+  km_core_context_items_dispose(actual_context_items);
 }
 
 // Scenarios from #10100:
@@ -118,7 +125,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededIdenticalContext) {
   km_core_cu const *new_app_context = u"This is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context, false));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), cached_context));
 }
 
 // 1a. cached context has markers and is identical to app context
@@ -127,17 +134,17 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededIdenticalContextAndMarkers) {
   km_core_cu const *new_app_context = u"123";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_MARKER, {0}, {5}}, {KM_CORE_CT_CHAR, {0}, {'1'}}, {KM_CORE_CT_MARKER, {0}, {1}},
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
 
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), expected_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
 
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), citems));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), citems));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_context_items));
 }
 
 // 2. cached context same length as app context but content is different
@@ -146,8 +153,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededDifferentContext) {
   km_core_cu const *new_app_context = u"This is a    test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(km_core_state_context(test_state), cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 // 3. cached context is shorter than app context, but content is same as far as it goes
@@ -156,8 +163,8 @@ TEST_F(StateContextApiTests,  TestContextSetIfNeededAppContextIsLonger) {
   km_core_cu const *new_app_context = u"Longer This is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(km_core_state_context(test_state), cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 // 3a. cached context has markers and is shorter than app context,
@@ -167,22 +174,22 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextShorterAndMarker
   km_core_cu const *new_app_context = u"0123";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const initial_context_items[] = {
       {KM_CORE_CT_MARKER, {0}, {5}}, {KM_CORE_CT_CHAR, {0}, {'1'}}, {KM_CORE_CT_MARKER, {0}, {1}},
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), initial_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
-  km_core_context_item const expected_citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {'0'}},
       {KM_CORE_CT_MARKER, {0}, {5}}, {KM_CORE_CT_CHAR, {0}, {'1'}}, {KM_CORE_CT_MARKER, {0}, {1}},
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_context_items));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextShorterAndMarkersNfu) {
@@ -190,22 +197,22 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextShorterAndMarker
   km_core_cu const *new_app_context = u"abcệ";
   ASSERT_NO_FATAL_FAILURE(Initialize("/a/dummy/keyboard.mock", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const initial_context_items[] = {
       {KM_CORE_CT_MARKER, {0}, {1}}, {KM_CORE_CT_CHAR, {0}, {'b'}}, {KM_CORE_CT_MARKER, {0}, {2}},
       {KM_CORE_CT_CHAR, {0}, {'c'}}, {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}},
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), initial_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
-  km_core_context_item const expected_citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_MARKER, {0}, {1}}, {KM_CORE_CT_CHAR, {0}, {'b'}}, {KM_CORE_CT_MARKER, {0}, {2}},
       {KM_CORE_CT_CHAR, {0}, {'c'}}, {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}},
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
   km_core_context_item const expected_app_citems[] = {
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_CHAR, {0}, {'b'}},
@@ -221,8 +228,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextCleared) {
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   km_core_state_context_clear(test_state);
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(km_core_state_context(test_state), cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 // 5. cached context is longer than app context, but content is same as far as it goes
@@ -231,8 +238,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededAppContextIsShorter) {
   km_core_cu const *new_app_context = u"is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(km_core_state_context(test_state), cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 // 5a. cached context has markers and is longer than app context, but
@@ -242,21 +249,21 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextLongerAndMarkers
   km_core_cu const *new_app_context = u"123";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const initial_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {'0'}},
       {KM_CORE_CT_MARKER, {0}, {5}}, {KM_CORE_CT_CHAR, {0}, {'1'}}, {KM_CORE_CT_MARKER, {0}, {1}},
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), initial_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
-  km_core_context_item const expected_citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_MARKER, {0}, {5}}, {KM_CORE_CT_CHAR, {0}, {'1'}}, {KM_CORE_CT_MARKER, {0}, {1}},
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_context_items));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextLongerAndMarkersNfu) {
@@ -264,22 +271,22 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededCachedContextLongerAndMarkers
   km_core_cu const *new_app_context = u"bcệ";
   ASSERT_NO_FATAL_FAILURE(Initialize("/a/dummy/keyboard.mock", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const initial_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_MARKER, {0}, {1}}, {KM_CORE_CT_CHAR, {0}, {'b'}}, {KM_CORE_CT_MARKER, {0}, {2}},
       {KM_CORE_CT_CHAR, {0}, {'c'}}, {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}},
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), initial_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
-  km_core_context_item const expected_citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_MARKER, {0}, {1}}, {KM_CORE_CT_CHAR, {0}, {'b'}}, {KM_CORE_CT_MARKER, {0}, {2}},
       {KM_CORE_CT_CHAR, {0}, {'c'}}, {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}},
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
 
   km_core_context_item const expected_app_citems[] = {
       {KM_CORE_CT_CHAR, {0}, {'b'}},
@@ -295,8 +302,8 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededApplicationContextEmpty) {
   km_core_cu const *new_app_context = u"";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(km_core_state_context(test_state), cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 // 7. surrogate pairs in context
@@ -305,7 +312,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsUnchanged) {
   km_core_cu const *new_app_context = u"a\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsAppContextLonger) {
@@ -313,7 +320,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsAppContextLonge
   km_core_cu const *new_app_context = u"xa\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsCachedContextLonger) {
@@ -321,7 +328,7 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsCachedContextLo
   km_core_cu const *new_app_context = u"a\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(new_app_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), new_app_context));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsUnchangedAndMarkers) {
@@ -329,16 +336,16 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsUnchangedAndMar
   km_core_cu const *new_app_context = u"a\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_MARKER, {0}, {5}},
       {KM_CORE_CT_CHAR, {0}, {0x10100}},
       KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), expected_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), citems));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), citems));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_context_items));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsAppContextLongerAndMarkers) {
@@ -346,23 +353,23 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsAppContextLonge
   km_core_cu const *new_app_context = u"\U00010200a\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const initial_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_MARKER, {0}, {5}},
       {KM_CORE_CT_CHAR, {0}, {0x10100}},
       KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), initial_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  km_core_context_item const expected_citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {0x10200}},
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_MARKER, {0}, {5}},
       {KM_CORE_CT_CHAR, {0}, {0x10100}},
       KM_CORE_CONTEXT_ITEM_END};
 
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_context_items));
 }
 
 TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsCachedContextLongerAndMarkers) {
@@ -370,23 +377,23 @@ TEST_F(StateContextApiTests, TestContextSetIfNeededSurrogatePairsCachedContextLo
   km_core_cu const *new_app_context = u"a\U00010100";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const initial_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {0x10200}},
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_MARKER, {0}, {5}},
       {KM_CORE_CT_CHAR, {0}, {0x10100}},
       KM_CORE_CONTEXT_ITEM_END};
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), initial_context_items));
 
   ASSERT_EQ(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
-  km_core_context_item const expected_citems[] = {
+  km_core_context_item const expected_context_items[] = {
       {KM_CORE_CT_CHAR, {0}, {'a'}},
       {KM_CORE_CT_MARKER, {0}, {5}},
       {KM_CORE_CT_CHAR, {0}, {0x10100}},
       KM_CORE_CONTEXT_ITEM_END};
 
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_with_markers(km_core_state_context(test_state), expected_context_items));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_context_items));
 }
 
 
@@ -394,8 +401,8 @@ TEST_F(StateContextApiTests, TestContextClear) {
   km_core_cu const *cached_context = u"This is a test";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
   ASSERT_STATUS_OK(km_core_state_context_clear(test_state));
-  ASSERT_NO_FATAL_FAILURE(assert_different_context(cached_context));
-  ASSERT_NO_FATAL_FAILURE(assert_identical_context(u""));
+  ASSERT_NO_FATAL_FAILURE(assert_different_context(km_core_state_context(test_state), cached_context));
+  ASSERT_NO_FATAL_FAILURE(assert_identical_context(km_core_state_context(test_state), u""));
 }
 
 //-------------------------------------------------------------------------------------
@@ -413,7 +420,7 @@ TEST_F(StateContextApiTests, TestContextDebugVarious) {
   km_core_cu const *cached_context =      u"123\U0001F923";
   ASSERT_NO_FATAL_FAILURE(Initialize("k_0000___null_keyboard.kmx", cached_context));
 
-  km_core_context_item const citems[] = {
+  km_core_context_item const expected_context_items[] = {
     { KM_CORE_CT_MARKER, {0}, { 5 } },
     { KM_CORE_CT_CHAR, {0}, { '1' } },
     { KM_CORE_CT_MARKER, {0}, { 1 } },
@@ -426,7 +433,7 @@ TEST_F(StateContextApiTests, TestContextDebugVarious) {
     KM_CORE_CONTEXT_ITEM_END
   };
 
-  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), citems));
+  ASSERT_STATUS_OK(km_core_context_set(km_core_state_context(test_state), expected_context_items));
 
   auto str = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_CACHED);
   // std::cout << str << std::endl;

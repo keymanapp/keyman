@@ -40,15 +40,15 @@ tests = [
   ['debug-api-tests', 'debug_api.tests.cpp'],
   ['kmx_xstring-tests', 'kmx_xstring.tests.cpp'],
   ['kmx_context-tests', 'kmx_context.tests.cpp'],
-  ['actions_normalize-tests', 'actions_normalize.tests.cpp'],
+  ['actions_normalize-tests', ['actions_normalize.tests.cpp', 'actions_test_data.cpp']],
 
   # renamed to avoid heuristic that causes "update" in a filename to require
   # elevation on Windows! this could also be avoided by adding a manifest
   # resource to each executable (e.g. with mt.exe)
   # https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/architecture#installer-detection-technology
-  ['actions_updatx_app_context_nfu-tests', 'actions_update_app_context_nfu.tests.cpp'],
+  ['actions_updatx_app_context_nfu-tests', ['actions_update_app_context_nfu.tests.cpp', 'actions_test_data.cpp']],
 
-  ['actions_get_api-tests', 'actions_get_api.tests.cpp'],
+  ['actions_get_api-tests', ['actions_get_api.tests.cpp', 'actions_test_data.cpp']],
   ['km_core_keyboard_api-tests', 'km_core_keyboard_api.tests.cpp'],
   ['km_core_process_event-tests', 'km_core_process_event.tests.cpp'],
   ['key_list-tests', 'kmx_key_list.tests.cpp'],
