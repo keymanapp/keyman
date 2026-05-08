@@ -260,7 +260,13 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       return null;
     }
     // parse (load) the string into an object tree
-    const source = reader.load(data);
+    let source: LDMLKeyboardXMLSourceFile = null;
+    try {
+      source = reader.load(data);
+    } catch(e) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: e.toString() }));
+      return null;
+    }
     if (!source) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to load XML file' }));
       return null;
@@ -295,7 +301,17 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;
     }
-    const source = reader.loadTestData(data);
+
+    let source: LDMLKeyboardTestDataXMLSourceFile | null = null;
+
+    try {
+      source = reader!.loadTestData(data);
+    }
+    catch(e) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: e.toString() }));
+      return null;
+    }
+
     /* c8 ignore next 4 */
     if (!source) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to load XML file' }));
