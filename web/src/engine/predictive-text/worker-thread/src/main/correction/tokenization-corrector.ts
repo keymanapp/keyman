@@ -277,8 +277,9 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     const correctableToUpdate = this.selectionQueue.dequeue();
     const tokenResult = correctableToUpdate?.handleNextNode();
 
+    const correctionIsThePredictable = correctableToUpdate == this._predictable;
     const delistCorrectable = () => {
-      if(correctableToUpdate != this._predictable) {
+      if(correctionIsThePredictable) {
         // Lock the 'correctable' token now that either a valid correction for
         // it has been found or all possible corrections are exhausted. We only
         // consider a single correction for most of a tokenization's tokens,
@@ -289,8 +290,9 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       }
     }
 
-    const correctionIsThePredictable = correctableToUpdate == this._predictable;
     if(tokenResult.type == 'none') {
+      // If it's a correction, or if we were unable to find a correction for
+      // the predictable token - both cases need a 'default 'entry.
       if(!correctionIsThePredictable || !this.predictableMatchFound) {
         // Transition the node from 'correctable' to 'uncorrectable' - we were
         // unable to find valid corrections for it.
@@ -304,7 +306,9 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       }
 
       // We can make no further predictions if we've exhausted all search options.
-      if(correctableToUpdate == this._predictable) {
+      // If we've reached this case, we're likely at the end of the search
+      // (unless correction for a correctable is still possible).
+      if(correctionIsThePredictable) {
         this._uncorrectables.push(correctableToUpdate);
         delete this._predictable;
       } else {
