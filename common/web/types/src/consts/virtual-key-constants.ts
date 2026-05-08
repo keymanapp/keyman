@@ -39,7 +39,7 @@ export const USVirtualKeyCodes = {
   K_7:55,
   K_8:56,
   K_9:57,
-  K_A:65,
+  K_A:65,       /*34.*/
   K_B:66,
   K_C:67,
   K_D:68,

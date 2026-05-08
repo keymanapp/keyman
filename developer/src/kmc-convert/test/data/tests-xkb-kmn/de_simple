@@ -1,0 +1,60 @@
+// Common Latin alphabet layout
+// 0x1001E9E on key key <AE12>, key <AC10> , key <LSGT> added for testing purposes by SAB
+
+default partial
+xkb_symbols "basic" {
+
+    key <AE01>	{ [         1,     exclam,  onesuperior,   exclamdown ]	}; 
+	key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};
+    key <AE03>	{ [         3,    section, threesuperior,    sterling ]	};
+    key <AE04>	{ [         4,     dollar,   onequarter,     currency ]	};
+    key <AE05>	{ [         5,    percent,      onehalf, threeeighths ]	};
+    key <AE06>	{ [         6, asciicircum, threequarters, fiveeighths] };
+    key <AE07>	{ [         7,  ampersand,    braceleft, seveneighths ]	};
+    key <AE08>	{ [         8,   asterisk,  bracketleft,    trademark ]	};
+    key <AE09>	{ [         9,  parenleft, bracketright,    plusminus ]	};
+    key <AE10>	{ [         0, parenright,   braceright,       degree ]	};
+    key <AE11>	{ [    ssharp, question, backslash,  0x1001E9E        ] };
+    key <AE12>	{ [  NoSymbol,  NoSymbol,  NoSymbol,         0x1001E9E]	};
+
+
+    key <AD01>	{ [         q,          Q,           at,  Greek_OMEGA ]	};
+    key <AD02>	{ [         w,          W,      lstroke,      Lstroke ]	};
+    key <AD03>	{ [         e,          E,     EuroSign,     EuroSign ]	};
+    key <AD04>	{ [         r,          R,    paragraph,   registered ]	};
+    key <AD05>	{ [         t,          T,       tslash,       Tslash ]	};
+    key <AD06>	{ [         z,          Z,    leftarrow,          yen ]	};
+    key <AD07>	{ [         u,          U,    downarrow,      uparrow ]	};
+    key <AD08>	{ [         i,          I,   rightarrow,     idotless ]	};
+    key <AD09>	{ [         o,          O,       oslash,     Ooblique ]	};
+    key <AD10>	{ [         p,          P,        thorn,        THORN ]	};
+    key <AD11>	{ [udiaeresis, Udiaeresis,     NoSymbol,     NoSymbol ] };
+    key <AD12>	{ [      plus,   asterisk,   asciitilde,  macron 	  ]	};
+ 
+    key <AC01>	{ [         a,          A,           ae,           AE ]	};
+    key <AC02>	{ [         s,          S,       ssharp,      section ]	};
+    key <AC03>	{ [         d,          D,          eth,          ETH ]	};
+    key <AC04>	{ [         f,          F,      dstroke,  ordfeminine ]	};
+    key <AC05>	{ [         g,          G,          eng,          ENG ]	};
+    key <AC06>	{ [         h,          H,      hstroke,      Hstroke ]	};
+    key <AC07>  { [         j,          J,        NoSymbol, NoSymbol  ] };
+    key <AC08>	{ [         k,          K,          kra,    ampersand ]	};
+    key <AC09>	{ [         l,          L,      lstroke,      Lstroke ]	};
+    key <AC10>	{ [odiaeresis, Odiaeresis, NoSymbol,         0x1001E9E] };
+    key <AC11>	{ [adiaeresis, Adiaeresis, NoSymbol,   NoSymbol       ] };
+    key <TLDE>	{ [NoSymbol,                 degree,	U2032,  U2033 ] };
+
+    key <BKSL>	{ [numbersign, apostrophe,rightsinglequotemark,NoSymbol ] };
+    key <AB01>	{ [         y,          Y,  guillemotright,    U203A 	] };
+    key <AB02>	{ [         x,          X,  guillemotleft,    U2039 	] };
+    key <AB03>	{ [         c,          C,         cent,    copyright 	] };
+    key <AB04>	{ [         v,          V,   doublelowquotemark, singlelowquotemark  ] };
+    key <AB05>	{ [         b,          B,  leftdoublequotemark, leftsinglequotemark ] };
+    key <AB06>	{ [         n,          N, rightdoublequotemark, rightsinglequotemark] };
+    key <AB07>	{ [         m,          M,           mu,    masculine 			] };
+    key <AB08>  { [     comma,  semicolon,       periodcentered,     multiply	] };
+    key <AB09>	{ [    period,      colon,                U2026,     division 	] };
+    key <AB10>	{ [     minus, underscore,               endash,     emdash		] };
+    key <LSGT>	{ [     less,     greater,                  bar, 0x1001E9E 		] };
+
+};
