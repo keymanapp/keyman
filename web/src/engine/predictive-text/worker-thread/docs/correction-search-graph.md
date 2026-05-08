@@ -13,7 +13,8 @@ assumption is, of course, invalid: the output of keystroke A may selectively
 establish the context needed for a Keyman keyboard rule matched by one or more
 potential outputs for keystroke B.  Efforts to address this limitation are
 considered out-of-scope at this time and will be addressed later in a future
-epic - epic/true-correction - documented as issue #14709.
+epic - epic/true-correction - documented as issue
+[#14709](https://github.com/keymanapp/keyman/issues/14709).
 
 ## Graph Structure
 
@@ -44,7 +45,7 @@ corresponding to keystroke 2's `t` output:
 - `'a' + 't'` => a node representing `'at'`
 - `'e' + 't'` => a node representing `'et'`
 - `'i' + 't'` => a node representing `'it`'
-  - A similar three exist for the `n` output.
+  - A similar tree exists for the `n` output.
 
 ### Resulting Graph Properties
 
@@ -163,7 +164,8 @@ dimension) will reduce the path to a simpler state - and generally speaking, to
 one of lower cost. This is the sole case that may currently invalidate the
 [dynamic programming requirement of "optimal
 substructure"](https://en.wikipedia.org/wiki/Dynamic_programming#Computer_science).
-(See #14366.)  With further time investment, we should be able to develop and
+(See [#14366](https://github.com/keymanapp/keyman/issues/14366).)
+With further time investment, we should be able to develop and
 implement a strategy to meet the conditions for optimal substructure even for
 such cases.
 
