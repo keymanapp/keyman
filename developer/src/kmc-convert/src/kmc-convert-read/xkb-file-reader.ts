@@ -7,7 +7,7 @@
  *
  */
 
-import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout, KeymanXMLReader } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout } from "@keymanapp/developer-utils";
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
@@ -149,18 +149,19 @@ export class XkbFileReader {
    * @param  inputFilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(source: Uint8Array): Keylayout.KeylayoutXMLSourceFile {
+  public read(source: Uint8Array): string |null{
 
     try {
       const data = new TextDecoder().decode(source);
-      const jsonObj = new KeymanXMLReader('keylayout').parse(data) as Keylayout.KeylayoutXMLSourceFile;
+      console.log('typeof(data)',typeof(data))
 
-      if (!jsonObj?.keyboard) {
-        this.callbacks.reportMessage(ConverterMessages.Error_UnableToParse());
+      // ToDo-kmc-convert double msg?
+
+      if (!data) {
+        this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
         return null;
       }
-      this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
-      return jsonObj;
+      return data;
     }
     catch (err) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());

@@ -21,12 +21,31 @@ export class KmnFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
 
+  // TODO-kmc-convert remove
+  public writeToFile(dataUkelele: ProcessedData): boolean | null {
+
+    let data: string = "\n";
+
+    // add top part of kmn file: STORES
+    data += this.writeKmnFileHeader(dataUkelele);
+
+    // add bottom part of kmn file: RULES
+    data += this.writeDataRules(dataUkelele);
+
+    try {
+      this.callbacks.fs.writeFileSync(dataUkelele.kmnFilename, new TextEncoder().encode(data));
+      return true;
+    } catch (err: any) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename, errorText: err }));
+      return false;
+    }
+  }
   /**
    * @brief  member function to write data from object to a Uint8Array
    * @param  dataUkelele the array holding all keyboard data
    * @return a Uint8Array holding data
    */
-  public write(dataUkelele: ProcessedData): Uint8Array {
+  public write(dataUkelele: ProcessedData): Uint8Array|null {
     let data: string = "\n";
 
     // top part of kmn file: STORES
@@ -40,7 +59,7 @@ export class KmnFileWriter {
 
     try {
       return new TextEncoder().encode(data);
-    } catch (err) {
+    } catch (err:any) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename, errorText: err }));
       return null;
     }
@@ -152,7 +171,7 @@ export class KmnFileWriter {
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          warnText[2] = characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -205,7 +224,7 @@ export class KmnFileWriter {
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          warnText[2] = characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -279,7 +298,7 @@ export class KmnFileWriter {
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
           versionOutputCharacter = characterMessage.character;
-          warnText[2] =  characterMessage.message;
+          warnText[2] = characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -1030,7 +1049,7 @@ export class KmnFileWriter {
     const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+;?)$|^$/i.exec(inputString);
 
     // valid '&#x...'
-     if (m_hex) {
+    if (m_hex) {
       const codePoint_h = parseInt(m_hex[1], 16);
       // Reject surrogates and invalid codepoints
       if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
