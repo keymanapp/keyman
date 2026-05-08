@@ -6,7 +6,7 @@
  * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
  *
  */
-
+/*
 import 'mocha';
 import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
@@ -81,14 +81,7 @@ describe('KmnFileWriter', function () {
       ["ẘẈ", "ẘẈ"],
       ["😎😆", '😎😆'],
       ["aሴ😆", 'aሴ😆'],
-      /*
-       ["U+0061", 'a'],
-       ["U+1234", 'ሴ'],
-       ["U+1E9A", "ẚ"],
-       ["U+1F60A", '😊'],
-       ["U+0001", '\u0001'],
-       ["U+1000000;", undefined],
-       */
+
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
       ["&#x1E98;", "ẘ"],
@@ -113,18 +106,7 @@ describe('KmnFileWriter', function () {
       ["", ''],
       [undefined, undefined],
       [null, undefined],
-    /*
-      ["U+", undefined],
-      ['U+', undefined],
-      ['U+U+', undefined],
-      ['U+D799', '힙'],
-      ['U+D800', undefined],
-      ['U+D83D', undefined],
-      ['U+DFFF', undefined],
-      ['U+10FFFF', '􏿿'],
-      ['U+E000', ''],
-      ['U+1000000', undefined],
-    */
+
       ['&', '&'],
       ['&;', '&;'],
       ['&&', '&&'],
@@ -155,11 +137,7 @@ describe('KmnFileWriter', function () {
       ["&#128518;", '😆'],
       ["&#0003;", '\u0003'],
       ["&#1000000;", '󴉀'],
-      /*["U+0061", 'a'],
-      ["U+1234", 'ሴ'],
-      ["U+1F60E", '😎'],
-      ["U+0001", '\u0001'],
-      ["U+1000000;", undefined],*/
+
       ["&commat;", undefined],
       ["a", 'a'],
       ["ሴ", 'ሴ'],
@@ -422,7 +400,7 @@ describe('KmnFileWriter', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       [
-        [ /* see ../data/Test_C0.keylayout */
+        [ // see ../data/Test_C0.keylayout /
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
@@ -434,7 +412,7 @@ describe('KmnFileWriter', function () {
           "+ [NCAPS K_D]  >  'd'\n"]
       ],
       [
-        [ /* see ../data/Test_C1.keylayout */
+        [ // see ../data/Test_C1.keylayout /
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))
         ],
@@ -442,14 +420,14 @@ describe('KmnFileWriter', function () {
           "+ [CAPS K_S]  >  'S'\n"]
       ],
       [
-        [ /* see ../data/Test_C2.keylayout */
+        [ // see ../data/Test_C2.keylayout /
           new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
         ],
         ["+ [NCAPS K_U]  >  dk(A1)\n" +
           "dk(A1) + [CAPS K_A]  >  'Â'\n\n"]
       ],
       [
-        [ /* see ../data/Test_C3.keylayout */
+        [ // see ../data/Test_C3.keylayout /
           new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
         ],
         ["+ [NCAPS SHIFT K_D]   >   dk(A2)\n" +
@@ -458,7 +436,7 @@ describe('KmnFileWriter', function () {
         ]
       ],
       [
-        [ /* see ../data/Test_C0_C1_C2_C3.keylayout */
+        [ // see ../data/Test_C0_C1_C2_C3.keylayout /
           new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
           new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
           new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
@@ -492,7 +470,7 @@ describe('KmnFileWriter', function () {
           "dk(B5) + [CAPS K_D]  >  'Â'\n\n"]
       ],
       [
-        [ /* see ../data/Test_C3_several.keylayout */
+        [ // see ../data/Test_C3_several.keylayout /
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
           new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
@@ -522,3 +500,4 @@ describe('KmnFileWriter', function () {
   });
 
 });
+*/

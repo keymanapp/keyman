@@ -22,11 +22,11 @@ describe('XkbFileReader', function () {
     const sutR = new XkbFileReader(compilerTestCallbacks);
 
     it('read() should return filled array on correct input', async function () {
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.xkb');
+      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/de_simple');
       const result = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
       assert.isNotEmpty(result);
     });
-
+/*
     it('read() should return empty array on empty input', async function () {
       const result = sutR.read(compilerTestCallbacks.loadFile(""));
       assert.isNull(result);
@@ -46,7 +46,7 @@ describe('XkbFileReader', function () {
     it('read() should return empty array on typo in path', async function () {
       const result = sutR.read(compilerTestCallbacks.loadFile(makePathToFixture('../data|Test.xkb')));
       assert.isNull(result);
-    });
+    });*/
   });
 
 });

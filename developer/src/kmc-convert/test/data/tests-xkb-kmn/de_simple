@@ -30,7 +30,7 @@ xkb_symbols "basic" {
     key <AD10>	{ [         p,          P,        thorn,        THORN ]	};
     key <AD11>	{ [udiaeresis, Udiaeresis,     NoSymbol,     NoSymbol ] };
     key <AD12>	{ [      plus,   asterisk,   asciitilde,  macron 	  ]	};
- 
+
     key <AC01>	{ [         a,          A,           ae,           AE ]	};
     key <AC02>	{ [         s,          S,       ssharp,      section ]	};
     key <AC03>	{ [         d,          D,          eth,          ETH ]	};

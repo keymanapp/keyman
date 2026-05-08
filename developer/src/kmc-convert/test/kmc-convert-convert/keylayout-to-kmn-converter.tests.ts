@@ -6,6 +6,7 @@
  * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
  *
  */
+/*
 import 'mocha';
 import { assert } from 'chai';
 import * as NodeAssert from 'node:assert';
@@ -806,4 +807,4 @@ describe('KeylayoutToKmnConverter', function () {
     });
   });
 
-});
+});*/

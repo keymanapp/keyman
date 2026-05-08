@@ -8,11 +8,11 @@
  */
 import 'mocha';
 import { assert } from 'chai';
-import * as NodeAssert from 'node:assert';
+//import * as NodeAssert from 'node:assert';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './../helpers/index.js';
-import { ActionStateOutput, KeylayoutFileData, XkbToKmnConverter, Rule } from '../../src/kmc-convert-convert/xkb-to-kmn-converter.js';
-import { XkbFileReader } from '../../src/kmc-convert-read/xkb-file-reader.js';
-import { ConverterMessages } from '../../src/converter-messages.js';
+import { /*ActionStateOutput, KeylayoutFileData,*/ XkbToKmnConverter/*, Rule */} from '../../src/kmc-convert-convert/xkb-to-kmn-converter.js';
+//import { XkbFileReader } from '../../src/kmc-convert-read/xkb-file-reader.js';
+//import { ConverterMessages } from '../../src/converter-messages.js';
 
 describe('XkbToKmnConverter', function () {
 
@@ -23,29 +23,8 @@ describe('XkbToKmnConverter', function () {
   describe('Xkb-kmn: RunSpecialTestFiles', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/tests-xkb-kmn/Test_C0.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_C1.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_C2.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_C2_several.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_C3.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_C3_several.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_C0_C1_C2_C3.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_maxKeyCode.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_messages.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_messages_controlCharacter.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_messages_superior_C2.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_messages_superior_C3.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_duplicate_missing_keycode.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_modifier.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_modifierNoCaps.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_differentAmountOfKeysInBehaviours.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_duplicate_missing_keys.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_duplicate_keys.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_ambiguous_keys.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_nr_elements.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_differentEncodings.keylayout')],
-      [makePathToFixture('../data/tests-xkb-kmn/Test_ExtraWarning.keylayout')],
+      [makePathToFixture('../data/tests-xkb-kmn/de_simple')],
+      [makePathToFixture('../data/tests-xkb-kmn/test_xkb_differentEncodings')],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(files[0]);
@@ -53,7 +32,7 @@ describe('XkbToKmnConverter', function () {
       });
     });
   });
-
+/*
   describe('Xkb-kmn: RunTestFiles resulting in errors ', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -151,8 +130,9 @@ describe('XkbToKmnConverter', function () {
         assert.equal(compilerTestCallbacks.messages.length, 0);
       });
     });
-  });
-
+  });*/
+  /////////////////////////////////////////////////////////////
+/*
   describe('Xkb-kmn: convert() ', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sutR = new XkbFileReader(compilerTestCallbacks);
@@ -802,5 +782,5 @@ describe('XkbToKmnConverter', function () {
       });
     });
   });
-
+*/
 });

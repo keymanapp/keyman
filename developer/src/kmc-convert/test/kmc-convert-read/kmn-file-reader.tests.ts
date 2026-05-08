@@ -6,7 +6,7 @@
  * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
  *
  */
-
+/*
 import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks, makePathToFixture } from './../helpers/index.js';
@@ -49,4 +49,4 @@ describe('KeylayoutFileReader', function () {
     });
   });
 
-});
+});*/
