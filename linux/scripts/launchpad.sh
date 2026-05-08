@@ -20,7 +20,8 @@ builder_describe \
   "--no-lintian                     Don't run lintian while creating soure package." \
   "--dist=DIST                      Only upload this distribution. Default: upload all supported dists." \
   "--packageversion=PACKAGEVERSION  String to append to the package version. Default: '1~sil1'." \
-  "--outputdir=OUTPUTDIR            Directory for resulting artifacts. Default: \$KEYMAN_ROOT/linux/launchpad."
+  "--outputdir=OUTPUTDIR            Directory for resulting artifacts. Default: \$KEYMAN_ROOT/linux/launchpad." \
+  "--retries=RETRIES                Number of retries on network errors. Default: 5."
 
 builder_parse "$@"
 
@@ -53,8 +54,47 @@ else
 fi
 echo "ppa: ${ppa}"
 
+function upload_with_retry() {
+  local changes_file="$1"
+  local retries="$2"
+  local sim="$3"
+  local ppa="$4"
+  local attempt=0
+  local max_attempts=$((retries+1))
+  local rc=0
+  local output
+
+  while (( attempt++ < max_attempts )); do
+    builder_echo "Uploading ${changes_file} (attempt ${attempt}/${max_attempts})..."
+    set -o pipefail
+    # shellcheck disable=SC2312,SC2086  # no quotes for $sim - it might not be set
+    output=$(dput ${sim:-} "${ppa}" "${changes_file}" 2>&1 | tee /dev/stderr)
+    rc=$?
+    set +o pipefail
+    if [[ ${rc} == 0 ]]; then
+      return 0
+    fi
+    # Check if error is a network-related error
+    if [[ ${rc} == 1 ]] && echo "${output}" | grep -iE 'Connection reset|Connection refused|Network is unreachable|Name or service not known|Connection timed out|Temporary failure|Broken pipe|Connection aborted' > /dev/null 2>&1; then
+      if (( attempt < max_attempts )); then
+        builder_echo warning "Network error detected, retrying..."
+        sleep $((attempt * 5))
+      fi
+    else
+      # Non-network error, fail immediately
+      builder_echo error "Upload failed with non-network error (exit code: ${rc})"
+      builder_echo error "${output}"
+      return "${rc}"
+    fi
+  done
+
+  builder_echo error "Failed to upload after ${max_attempts} attempts"
+  return 1
+}
+
 distributions="${DIST:-jammy noble questing resolute}"
 packageversion="${PACKAGEVERSION:-1~sil1}"
+retries="${RETRIES:-5}"
 
 if ! builder_has_option --no-download; then
   rm -rf launchpad
@@ -81,7 +121,8 @@ done
 if ! builder_has_option --no-upload; then
   cd ..
   for dist in ${distributions}; do
-    # shellcheck disable=SC2248  # no quotes for $SIM - it might not be set
-    dput ${SIM:-} "${ppa}" "keyman_${version}-${packageversion}~${dist}_source.changes"
+    if ! upload_with_retry "keyman_${version}-${packageversion}~${dist}_source.changes" "${retries}" "${SIM}" "${ppa}"; then
+      builder_die "Upload failed for distribution ${dist}"
+    fi
   done
 fi
