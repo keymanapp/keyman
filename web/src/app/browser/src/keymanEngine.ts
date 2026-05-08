@@ -6,7 +6,7 @@ import {
   TwoStateActivator,
   VisualKeyboard
 } from 'keyman/engine/osk';
-import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
+import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { JSKeyboard, Keyboard, KMXKeyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
@@ -390,33 +390,30 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *   This was defined as an array, so is kept that way, but
    *   Javascript treats it as an object anyway
    *
-   * This is a public API function documented at
-   * https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard.
+   * @param {KeyboardStub} stub       Keyboard stub object
+   * @param {Keyboard}     keyboard   Keyboard script object
    *
-   * @param       {Object}    Lstub      JSKeyboard stub object
-   * @param       {Object}    Lkbd       Keyboard script object
-   * @return      {Object}               Keyboard details object
-   *
+   * @return {KeyboardDetails}  Keyboard details object
    */
-  // TODO-web-core: check each property of Lstub for KMXKeyboard availability
-  private _GetKeyboardDetail(Lstub: KeyboardStub, Lkbd: Keyboard): KeyboardDetails { // I2078 - Full keyboard detail
-   return {
-      Name: Lstub.KN,
-      InternalName: Lstub.KI,
-      LanguageName: Lstub.KL,  // I1300 - Add support for language names
-      LanguageCode: Lstub.KLC, // I1702 - Add support for language codes, region names, region codes, country names and country codes
-      RegionName: Lstub.KR,
-      RegionCode: Lstub.KRC,
+  private getKeyboardDetails(stub: KeyboardStub, keyboard: Keyboard): KeyboardDetails | null {
+    // works for both JS and KMX keyboards
+    return stub && {
+      Name: stub.KN,
+      InternalName: stub.KI,
+      LanguageName: stub.KL,  // I1300 - Add support for language names
+      LanguageCode: stub.KLC, // I1702 - Add support for language codes, region names, region codes, country names and country codes
+      RegionName: stub.KR,
+      RegionCode: stub.KRC,
       // @ts-ignore
-      CountryName: Lstub['KC'] as string,
+      CountryName: stub['KC'] as string,
       // @ts-ignore
-      CountryCode: Lstub['KCC'] as string,
+      CountryCode: stub['KCC'] as string,
       // @ts-ignore
-      KeyboardID: Lstub['KD'] as string,
-      Font: Lstub.KFont,
-      OskFont: Lstub.KOskFont,
-      HasLoaded: !!Lkbd,
-      IsRTL: Lkbd ? Lkbd.isRTL : null
+      KeyboardID: stub['KD'] as string,
+      Font: stub.KFont,
+      OskFont: stub.KOskFont,
+      HasLoaded: !!keyboard,
+      IsRTL: keyboard ? keyboard.isRTL : null
     };
   }
 
@@ -451,54 +448,39 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   /**
    * Get keyboard meta data for the selected keyboard and language
    *
-   * @param       {string}    PInternalName     Internal name of keyboard
-   * @param       {string=}   PlgCode           language code
-   * @return      {Object}                      Details of named keyboard
+   * @param       {string}    id         Internal name of keyboard
+   * @param       {string?}   langCode   language code
+   * @return      {KeyboardDetails}      Details of named keyboard
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard
    **/
-  public getKeyboard(PInternalName: string, PlgCode?: string): KeyboardDetails {
-    const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
+  public getKeyboard(id: string, langCode?: string): KeyboardDetails {
+    const stub = this.keyboardRequisitioner.cache.getStub(id, langCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    if (keyboard instanceof JSKeyboard) {
-      return stub && this._GetKeyboardDetail(stub, keyboard);
-    } else {
-      // TODO-web-core: do this work in _GetKeyboardDetail (implement for KMX keyboards)
-      return null;
-    }
+    return this.getKeyboardDetails(stub, keyboard);
   }
 
   /**
-   * Get API-friendly array of available keyboard stubs
+   * Get API-friendly array of available keyboard metadata
    *
-   * Refer to https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards.
-   *
-   * The type of each entry of the array corresponds to that of `getKeyboard`.
-   *
-   * @return   {Array}     Array of available keyboards
+   * @return   {KeyboardDetails[]}     Array of available keyboards
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards
    */
   public getKeyboards(): KeyboardDetails[] {
-    const Lr: KeyboardDetails[] = [];
+    const detailsForAllKeyboards: KeyboardDetails[] = [];
 
     const cache = this.keyboardRequisitioner.cache;
     const keyboardStubs = cache.getStubList()
-    for(let Ln=0; Ln < keyboardStubs.length; Ln++) { // I1511 - array prototype extended
-      const Lstub = keyboardStubs[Ln];
-
-      // In Chrome, (including on Android), Array.prototype.find() requires Chrome 45.
-      // This is a later version than the default on our oldest-supported Android devices.
-      const Lkbd = cache.getKeyboardForStub(Lstub);
-      if (Lkbd instanceof JSKeyboard) {
-        const Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
-        Lr.push(Lrn);
-      } else {
-        // TODO-web-core:  do this work in _GetKeyboardDetail (implement for KMX keyboards if needed)
+    for (const stub of keyboardStubs) {
+      const keyboard = cache.getKeyboardForStub(stub);
+      const keyboardDetails = this.getKeyboardDetails(stub, keyboard);
+      if (keyboardDetails) {
+        detailsForAllKeyboards.push(keyboardDetails);
       }
     }
-    return Lr;
+    return detailsForAllKeyboards;
   }
 
   /**
@@ -514,7 +496,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       // `true` is responsible for this & is required to pass a variable-store unit test.
       this.keyboardRequisitioner.cache.forgetKeyboard(x[i], true);
 
-      if(this.contextManager.activeKeyboard?.metadata.id == prefixed(x[i])) {
+      if(this.contextManager.activeKeyboard?.metadata.id == toPrefixedKeyboardId(x[i])) {
         this.contextManager.activateKeyboard('', '');
       }
     }
