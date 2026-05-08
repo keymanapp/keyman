@@ -50,8 +50,6 @@
                   summary += addStatus(o, 'user-test', status.context, status.state);
                 } else if(status.context == 'API Verification') {
                   summary += addStatus(o, 'check', status.context, status.state);
-                } else if (status.context == 'Linux source verification') {
-                  summary += addStatus(o, 'check', status.context, status.state);
                 } else if(status.context == 'Ubuntu Packaging') {
                   summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.context == 'npm pack/publish') {

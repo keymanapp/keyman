@@ -14,7 +14,7 @@ function checkPrerequisites() {
     exit 1
   fi
 
-  if ! command -v xmllint > /dev/null; then
+  if ! builder_has_option --no-download && ! command -v xmllint > /dev/null; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
     exit 1
   fi
