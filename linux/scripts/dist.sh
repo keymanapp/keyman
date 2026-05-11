@@ -141,6 +141,7 @@ dpkg-source \
   --tar-ignore=__pycache__ \
   --tar-ignore=node_modules \
   --tar-ignore=keyman_1* \
+  --tar-ignore=launchpad \
   --tar-ignore=dist \
   --tar-ignore=VERSION \
   \

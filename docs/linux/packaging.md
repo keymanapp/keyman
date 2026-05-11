@@ -181,28 +181,19 @@ for the different distros and architectures.
 To upload the packages to launchpad, run the following script from the `linux/` directory:
 
 ```bash
-./scripts/launchpad.sh [UPLOAD="yes"] [KEYMAN_TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"]
+./scripts/launchpad.sh [options]
 ```
 
-#### Parameters
-
-- `UPLOAD="yes"` - do the dput for real
-- `KEYMAN_TIER="<tier>"` - alpha, beta, or stable, default from `../TIER.md`
-- `PROJECT="<project>"` - only upload this package
-- `DIST="<dist>"` - only upload for this distribution
-- `PACKAGEVERSION="<version>"` - normally use the default so don't specify
-  it. But if you change packaging and run another upload you need to increment
-  the number at the end of `PACKAGEVERSION`. e.g. next one is `1~sil2` then
-  `1~sil3`…
+See `launchpad.sh --help` for supported parameters.
 
 ### Releasing a new version
 
 As part of releasing a new version it might be good to do some local testing
 first before uploading to Launchpad:
 
-- Run `launchpad.sh` with `UPLOAD="no"` to build the packages
+- Run `launchpad.sh` with `--simulate` to build the packages
 - Then install them on a clean VM and make sure no glaring bugs
-- Once you are happy with the packages you can run `launchpad.sh` with `UPLOAD="yes"`
+- Once you are happy with the packages you can run `launchpad.sh` with `--upload`
 
 ### Troubleshooting
 
