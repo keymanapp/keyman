@@ -61,9 +61,11 @@ protected:
   std::vector<TestDataValues> test_data_values = {};
   std::string layout;
   guint shiftstate;
-  std::vector<guint> keycodes = {38, 56, 54, 40, 26, 41, 42, 43, 31, 44, 45, 46, 58, 57, 32,  33, 24,
-                                 27, 39, 28, 30, 55, 25, 53, 29, 52, 19, 10, 11, 12, 13, 14,  15, 16,
-                                 17, 18, 65, 49, 20, 21, 34, 35, 51, 47, 48, 59, 60, 61, 123, 94};
+  std::vector<guint> keycodes = {38, 56, 54, 40, 26, 41, 42, 43, 31, 44,
+                                 45, 46, 58, 57, 32, 33, 24, 27, 39, 28,
+                                 30, 55, 25, 53, 29, 52, 19, 10, 11, 12,
+                                 13, 14, 15, 16, 17, 18, 65, 49, 20, 21,
+                                 34, 35, 51, 47, 48, 59, 60, 61, 123, 94};
 
   void generate_test_data_values() {
     EXPECT_EQ(keycodes.size(), expected_keysyms.size()) << "Keycodes and expected keysyms vectors must be of the same size.";
@@ -286,12 +288,8 @@ protected:
 
 class GetKeyValFromKeyCodeTestParameters {
 public:
-  GetKeyValFromKeyCodeTestParameters(std::vector<KMX_WCHAR> e, std::string l, guint s, int c)
+  GetKeyValFromKeyCodeTestParameters(std::vector<KMX_DWORD> e, std::string l, guint s, int c)
       : expected_keysyms(e), layout(l), shiftstate(s), caps(c) {
-    expected_keysyms = e;
-    layout           = l;
-    shiftstate       = s;
-    caps             = c;
     generate_test_data_values();
   }
 
@@ -300,14 +298,16 @@ public:
   }
 
 protected:
-  std::vector<KMX_WCHAR> expected_keysyms;
+  std::vector<KMX_DWORD> expected_keysyms;
   std::vector<GetKeyValFromKeyCodeTestDataValues> test_data_values = {};
   std::string layout;
   guint shiftstate;
   int caps;
-  std::vector<guint> keycodes = {38, 56, 54, 40, 26, 41, 42, 43, 31, 44, 45, 46, 58, 57, 32,  33, 24,
-                                 27, 39, 28, 30, 55, 25, 53, 29, 52, 19, 10, 11, 12, 13, 14,  15, 16,
-                                 17, 18, 65, 49, 20, 21, 34, 35, 51, 47, 48, 59, 60, 61, 123, 94};
+  std::vector<guint> keycodes = {38, 56, 54, 40, 26, 41, 42, 43, 31, 44,
+                                 45, 46, 58, 57, 32, 33, 24, 27, 39, 28,
+                                 30, 55, 25, 53, 29, 52, 19, 10, 11, 12,
+                                 13, 14, 15, 16, 17, 18, 65, 49, 20, 21,
+                                 34, 35, 51, 47, 48, 59, 60, 61, 123, 94};
 
   void generate_test_data_values() {
     EXPECT_EQ(keycodes.size(), expected_keysyms.size()) << "Keycodes and expected keysyms vectors must be of the same size.";
@@ -342,9 +342,9 @@ TEST_P(GetKeyValFromKeyCodeTest, kmxGetKeyValFromKeyCode) {
     GTEST_SKIP() << "Default layout is not " << default_layout << ".";
   }
 
-  KMX_DWORD keyV =
+  KMX_WCHAR keyV =
       KMX_get_KeyVal_From_KeyCode(test_keymap, keycode, ShiftState(convert_Shiftstate_to_LinuxShiftstate(shiftstate)), caps);
-  EXPECT_EQ(keyV, expected_char) << "Failed for keycode: " << keycode;
+  EXPECT_EQ(keyV, expected_char) << "Failed for keycode: " << keycode << " keyval: " << ((KMX_WCHAR)keyV) <<  " expected_char:" << ((int)expected_char);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -410,7 +410,7 @@ INSTANTIATE_TEST_SUITE_P(
                           {u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j',
                            u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't',
                            u'u', u'v', u'w', u'x', u'z', u'y', u'0', u'1', u'2', u'3',
-                           u'4', u'5', u'6', u'7', u'8', u'9', u' ', u'\xffff', u'ß', u'\xffff',
+                           u'4', u'5', u'6', u'7', u'8', u'9', u' ', u'﹒', u'ß', u'﹑',
                            u'ü', u'+', u'#', u'ö', u'ä', u',', u'.', u'-', u'\000', u'<'},
                           "de",
                           0,
@@ -424,7 +424,7 @@ INSTANTIATE_TEST_SUITE_P(
                           {u'A', u'B', u'C', u'D', u'E', u'F', u'G', u'H', u'I', u'J',
                            u'K', u'L', u'M', u'N', u'O', u'P', u'Q', u'R', u'S', u'T',
                            u'U', u'V', u'W', u'X', u'Z', u'Y', u'=', u'!', u'"', u'§',
-                           u'$', u'%', u'&', u'/', u'(', u')', u' ', u'°', u'?', u'\xffff',
+                           u'$', u'%', u'&', u'/', u'(', u')', u' ', u'°', u'?', u'﹐',
                            u'Ü', u'*', u'\'', u'Ö', u'Ä', u';', u':', u'_', u'\000', u'>'},
                           "de",
                           K_SHIFTFLAG,
@@ -435,11 +435,11 @@ INSTANTIATE_TEST_SUITE_P(
     AltGrDe,
     GetKeyValFromKeyCodeTest,
     testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
-                          {u'æ',      u'\xfffe', u'¢',      u'ð',      u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'\xffff',
-                           u'\xfffe', u'\xfffe', u'µ',      u'\xfffe', u'ø',      u'þ',      u'@',      u'¶',      u'\xfffe', u'\xfffe',
-                           u'\xfffe', u'\xfffe', u'\xfffe', u'«',      u'\xfffe', u'»',      u'}',      u'¹',      u'²',      u'³',
-                           u'¼',      u'½',      u'¬',      u'{',      u'[',      u']',      u'\000',   u'\xfffe', u'\\',     u'\xffff',
-                           u'\xffff', u'~',      u'\xfffe', u'\xffff', u'\xffff', u'·',      u'\xfffe', u'\xfffe', u'\000',   u'|'},
+                          {u'æ', u'\xad2', u'¢', u'ð', u'€', u'ǰ', u'ο', u'ʱ', u'ࣽ', u'﹠',
+                           u'\x3a2', u'Ƴ', u'µ', u'\xad3', u'ø', u'þ', u'@', u'¶', u'ſ', u'μ',
+                           u'ࣾ', u'૾', u'ſ', u'«', u'ࣻ', u'»', u'}', u'¹', u'²', u'³',
+                           u'¼', u'½', u'¬', u'{', u'[', u']', u'\000', u'′', u'\\', u'﹛',
+                           u'﹗', u'~', u'\xad1', u'﹙', u'﹒', u'·', u'…', u'પ', u'\000', u'|'},
                           "de",
                           (LCTRLFLAG | RALTFLAG),
                           0)
@@ -449,12 +449,11 @@ INSTANTIATE_TEST_SUITE_P(
     ShiftAltGrDe,
     GetKeyValFromKeyCodeTest,
     testing::ValuesIn(GetKeyValFromKeyCodeTestParameters(
-                          {u'Æ',      u'\xfffe', u'©',      u'Ð',      u'\xfffe', u'ª',      u'\xfffe', u'\xfffe', u'\xfffe',
-                           u'\xffff', u'&',      u'\xfffe', u'º',      u'\xfffe', u'Ø',      u'Þ',      u'\xfffe', u'®',
-                           u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'§',      u'\xfffe', u'¥',      u'\xfffe', u'°',
-                           u'¡',      u'\xfffe', u'£',      u'¤',      u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'±',
-                           u'\000',   u'\xfffe', u'¿',      u'\xffff', u'\xffff', u'¯',      u'\xffff', u'\xffff', u'\xffff',
-                           u'×',      u'÷',      u'\xfffe', u'\000',   u'\xffff'},
+                          {u'Æ', u'ૐ', u'©', u'Ð', u'€', u'ª', u'ν', u'ʡ', u'ʹ', u'﹖',
+                           u'&', u'ƣ', u'º', u'\xad1', u'Ø', u'Þ', u'ߙ', u'®', u'ẞ', u'ά',
+                           u'ࣼ', u'૽', u'§', u'‹', u'¥', u'›', u'°', u'¡', u'ૃ', u'£',
+                           u'¤', u'ૄ', u'ૅ', u'\xac6', u'ૉ', u'±', u'\000', u'″', u'¿', u'﹜',
+                           u'﹘', u'¯', u'﹕', u'﹠', u'﹚', u'×', u'÷', u'\xaa9', u'\000', u'﹨'},
                           "de",
                           (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG),
                           0)
