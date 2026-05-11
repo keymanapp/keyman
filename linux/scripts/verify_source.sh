@@ -49,8 +49,6 @@ verify_can_build() {
   local target_dir="$1"
   builder_echo heading "Verifying build of tarball"
   cd "${target_dir}"
-  # running `npm i` should happen automatically. See #15905
-  npm i
   ./build.sh configure,build
 }
 
