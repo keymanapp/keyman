@@ -117,6 +117,7 @@ private:
 
     BOOL _keystrokeSinkInitialized;
     BOOL fEatenBuf[256];
+    BOOL fOnTestEatenBuf[256];
 
     ITfThreadMgr *_pThreadMgr;
     TfClientId _tfClientId;
