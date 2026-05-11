@@ -36,6 +36,8 @@
     "restructure": "3.0.1"
   },
   "devDependencies": {
+    "@keymanapp/hextobin": "*",
+    "@types/node": "^20.4.1",
     "ajv": "^8.12.0",
     "ajv-cli": "^5.0.0",
     "ajv-formats": "^2.1.1",
@@ -77,7 +79,6 @@
       "src/schemas/*",
       "tests/",
       "src/keyboard-object.ts",
-      "src/outputTarget.interface.ts",
       "src/*.d.ts",
       "src/main.ts",
       "src/schema-validators.ts",

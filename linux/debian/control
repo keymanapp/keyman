@@ -119,7 +119,7 @@ Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv
 Section: libdevel
 Depends:
  libicu-dev,
- libkeymancore2 (= ${binary:Version}),
+ libkeymancore3 (= ${binary:Version}),
  ${misc:Depends},
 Conflicts: libkmnkbp-dev
 Replaces: libkmnkbp-dev
@@ -141,7 +141,7 @@ Description: Development files for Keyman keyboard processing library
  .
  This package contains development headers and libraries.
 
-Package: libkeymancore2
+Package: libkeymancore3
 Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Section: libs
 Pre-Depends:
@@ -173,7 +173,7 @@ Package: ibus-keyman
 Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Depends:
  ibus (>= 1.3.7),
- libkeymancore2 (= ${binary:Version}),
+ libkeymancore3 (= ${binary:Version}),
  keyman-system-service (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends},
