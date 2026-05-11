@@ -97,4 +97,24 @@ describe('kps-file-reader', function () {
     assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_NotAPackageFile));
   });
 
+  // ERROR_UnsupportedPackageFileVersion
+
+  [
+    '5.0',
+    '7.0.0',
+    '14.0',
+    '20.0',
+    'garbage',
+  ].forEach(version => {
+    it(`should generate ERROR_UnsupportedPackageFileVersion if package source file has unsupported version '${version}'`, async function() {
+      version = version.replaceAll(/\./g, '');
+      const input = fs.readFileSync(makePathToFixture('kps', `error_unsupported_package_file_version_${version}.kps`));
+      const reader = new KpsFileReader(callbacks);
+      const kps = reader.read(input);
+
+      assert.isNull(kps);
+      assert.lengthOf(callbacks.messages, 1);
+      assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_UnsupportedPackageFileVersion));
+    });
+  });
 });
