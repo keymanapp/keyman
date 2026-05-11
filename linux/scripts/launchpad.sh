@@ -45,11 +45,11 @@ else
 fi
 
 if [[ "${KEYMAN_TIER}" == "stable" ]]; then
-  ppa="ppa:keymanapp/keyman"
+  ppa="keyman-ppa:keyman"
 elif [[ "${KEYMAN_TIER}" == "beta" ]]; then
-  ppa="ppa:keymanapp/keyman-beta"
+  ppa="keyman-ppa:keyman-beta"
 else
-  ppa="ppa:keymanapp/keyman-alpha"
+  ppa="keyman-ppa:keyman-alpha"
 fi
 echo "ppa: ${ppa}"
 
