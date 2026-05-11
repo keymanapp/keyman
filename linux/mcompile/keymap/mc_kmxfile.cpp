@@ -609,5 +609,6 @@ void KMX_LogError(const wchar_t* fmt, ...) {
     j++;
   } while (fmtbuf[j] != *end);
   putwchar(*nl);
+  va_end(vars);
 }
 
