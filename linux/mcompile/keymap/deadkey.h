@@ -10,7 +10,7 @@
 
 #include "mc_import_rules.h"
 #include <map>
-#include <keymap.h>
+#include "keymap.h"
 
 struct KMX_DeadkeyMapping {  // I4353
   KMX_WCHAR deadkey, dkid;
