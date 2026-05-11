@@ -9,9 +9,6 @@ project(
 gtk = dependency('gtk+-3.0', version: '>= 2.4')
 xkb = dependency('xkbcommon')
 
-giomm_dep   = dependency('giomm-2.4')
-glibmm_dep  = dependency('glibmm-2.4')
-
 deps = [gtk, xkb]
 
 subdir('resources')

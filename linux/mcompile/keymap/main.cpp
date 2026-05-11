@@ -71,14 +71,14 @@ int main(int argc, char* argv[]) {
 
   if (!KMX_LoadKeyboard(infile, &kmxfile)) {
     KMX_LogError(L"Failed to load keyboard (%d)\n", errno);
-    delete kmxfile;
+    delete[] kmxfile;
     return 3;
   }
 
   if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {
     if(!KMX_SaveKeyboard(kmxfile, outfile)) {
       KMX_LogError(L"Failed to save keyboard (%d)\n", errno);
-      delete kmxfile;
+      delete[] kmxfile;
       return 3;
     }
   }

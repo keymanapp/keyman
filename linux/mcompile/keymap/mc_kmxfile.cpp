@@ -580,10 +580,6 @@ FILE* Open_File(const KMX_CHAR* filename, const KMX_CHAR* mode) {
   return fopen(cpath.c_str(), (const KMX_CHAR*)mode);
 #else
   return fopen(filename, mode);
-  std::string cpath, cmode;
-  cpath = (const KMX_CHAR*)filename;
-  cmode = (const KMX_CHAR*)mode;
-  return fopen(cpath.c_str(), cmode.c_str());
 #endif
 };
 

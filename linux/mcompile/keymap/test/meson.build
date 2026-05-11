@@ -1,3 +1,6 @@
+giomm_dep   = dependency('giomm-2.4')
+glibmm_dep  = dependency('glibmm-2.4')
+
 gtest = subproject('gtest')
 
 gtest_main_dep = gtest.get_variable('gtest_main_dep')
