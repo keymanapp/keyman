@@ -219,7 +219,6 @@ jobs:
               });
             }
 
-
             const { owner, repo } = context.repo;
             const sha =
               context.payload?.check_suite?.sha ||    /* check run completed */
@@ -231,5 +230,4 @@ jobs:
             const checkRunId = await createCheck(github, owner, repo, sha);
             const res = await test(github, owner, repo, sha);
             await updateCheck(github, owner, repo, checkRunId, res[0], res[1], res[2]);
-
 
