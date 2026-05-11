@@ -3,11 +3,8 @@
 # Build dist tarballs or Debian orig tarballs
 # and put them in dist/
 
-# parameters: ./dist.sh [origdist] [proj]
+# parameters: ./dist.sh [origdist]
 # origdist = create Debian orig.tar.xz
-# proj = only make tarball for this project
-
-set -e
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -134,13 +131,14 @@ dpkg-source \
   --tar-ignore=experiments \
   --tar-ignore=debian \
   --tar-ignore=.github \
-  --tar-ignore=.pc \
   --tar-ignore=.vscode \
+  --tar-ignore=.configured \
   --tar-ignore=.devcontainer \
   --tar-ignore=.pc \
   --tar-ignore=__pycache__ \
   --tar-ignore=node_modules \
   --tar-ignore=keyman_1* \
+  --tar-ignore=launchpad \
   --tar-ignore=dist \
   --tar-ignore=VERSION \
   \
