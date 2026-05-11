@@ -39,13 +39,13 @@ public class KMPBrowserActivity extends BaseActivity {
   private static final String TAG = "KMPBrowserActivity";
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
-  private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s?lang=%s";
+  private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/%s/download-keyboards%s";
   private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
 
   // Patterns for determining if a link should be opened in external browser
   // 1. Host isn't keyman.com (production/staging)
   // 2. Host is keyman.com but not /keyboards/
-  private static final String INTERNAL_KEYBOARDS_LINK_FORMATSTR = "^http(s)?://(%s|%s)/keyboards([/?].*)?$";
+  private static final String INTERNAL_KEYBOARDS_LINK_FORMATSTR = "^http(s)?://(%s|%s)/.*?keyboards([/?].*)?$";
   private static final String keyboardPatternFormatStr = KMString.format(INTERNAL_KEYBOARDS_LINK_FORMATSTR,
     KMPLink.KMP_PRODUCTION_HOST,
     KMPLink.KMP_STAGING_HOST);
@@ -239,7 +239,7 @@ public class KMPBrowserActivity extends BaseActivity {
     String languageStr = (languageID != null) ? KMString.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
 
     String appMajorVersion = KMManager.getMajorVersion();
-    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr, displayLang);
+    String kmpSearchUrl = KMString.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, displayLang, appMajorVersion, languageStr);
     return kmpSearchUrl;
   }
 
