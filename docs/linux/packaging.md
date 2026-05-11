@@ -171,6 +171,17 @@ Package builds on Launchpad are triggered manually by running the Keyman script
     export DEBFULLNAME="Firstname Lastname"
     ```
 
+5. Create a `[keyman-ppa]` section in your `~/.config/dput/dput.cf` (or `~/.dput.cf`)
+   config file:
+
+    ```
+    [keyman-ppa]
+    fqdn                    = ppa.launchpad.net
+    method                  = sftp
+    incoming                = ~keymanapp/%(keyman-ppa)s
+    login                   = *
+    ```
+
 ### Building packages on Launchpad
 
 The `launchpad.sh` script downloads the current source code (beta or stable) from
