@@ -184,27 +184,14 @@ To upload the packages to launchpad, run the following script from the `linux/` 
 ./scripts/launchpad.sh [options]
 ```
 
-#### Parameters
-
-- `--no-download` - Don't download source. Assume keyman-<version> exists
-  as subdirectory of current dir.
-- `--upload` - Upload to launchpad. If omitted only simulate the upload.
-- `--no-upload` - Don't upload to launchpad, don't even simulate it.
-- `--no-lintian` - Don't run lintian while creating soure package.
-- `--dist "<dist>"` - only upload for this distribution
-- `--packageversion "<version>"` - Default `1~sil1`. Normally use the
-  default so don't specify it. But if you change packaging and run another
-  upload you need to increment the number at the end of `version`, e.g.
-  next one is `1~sil2` then `1~sil3`…
-- `--outputdir <outputdir>` - Directory for resulting artifacts.
-  Default: `$KEYMAN_ROOT/linux/launchpad`.
+See `launchpad.sh --help` for supported parameters.
 
 ### Releasing a new version
 
 As part of releasing a new version it might be good to do some local testing
 first before uploading to Launchpad:
 
-- Run `launchpad.sh` without `--upload` to build the packages
+- Run `launchpad.sh` with `--simulate` to build the packages
 - Then install them on a clean VM and make sure no glaring bugs
 - Once you are happy with the packages you can run `launchpad.sh` with `--upload`
 

@@ -8,7 +8,7 @@ function checkPrerequisites() {
     exit 1
   fi
 
-  if ! command -v xmllint > /dev/null; then
+  if ! builder_has_option --no-download && ! command -v xmllint > /dev/null; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
     exit 1
   fi
@@ -32,7 +32,7 @@ function downloadSource() {
   cd ..
   mv "keyman-${version}" "${KEYMAN_ROOT}/linux/${packageDir}"
   mv "keyman_${version}.orig.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
-  mv "keyman-${version}.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
+  mv "keyman_${version}.pkg.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
   mv "keyman"*.asc "${KEYMAN_ROOT}/linux/${packageDir}"
   rm "keyman"*.debian.tar.xz
   cd "${KEYMAN_ROOT}/linux/${packageDir}" || exit

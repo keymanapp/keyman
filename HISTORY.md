@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.229 alpha 2026-05-08
+
+* maint(linux): fix source tarball used for packaging (#15926)
+
+## 19.0.228 alpha 2026-05-06
+
+* fix(windows): caps lock stores to work in compliant applications (#15771)
+* chore: move localization documentation to /docs (#15909)
+
 ## 19.0.227 alpha 2026-05-05
 
 * maint(linux): make emscripten setup on build agents idempotent (#15908)

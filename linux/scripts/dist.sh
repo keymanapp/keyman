@@ -67,6 +67,7 @@ to_exclude=(
   linux/docs/help \
   linux/keyman-config/keyman_config/version.py \
   linux/keyman-config/buildtools/build-langtags.py \
+  linux/upload \
 )
 
 if [[ -z "${create_origdist+x}" ]]; then

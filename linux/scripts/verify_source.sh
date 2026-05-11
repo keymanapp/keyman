@@ -7,38 +7,23 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
+# shellcheck source=resources/build/builder-full.inc.sh
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-VERIFY_SOURCE=true
-VERIFY_LAUNCHPAD=true
-CREATE_TARBALL=true
+builder_describe \
+  "Verify source tarball and source package" \
+  build \
+  "--no-create-tarball   Skip creating a new tarball. Instead use existing one." \
+  "--source-only         Only check that it's possible to build Keyman from the source tarball." \
+  "--launchpad-only      Only check that lintian doesn't produce errors when run on the source package." \
+  "--target-dir=TARGET_DIR  Directory where to put generate files. Default: /tmp/keyman-<version>."
 
-while (( $# > 0)); do
-  case "$1" in
-    --no-create-tarball)
-      CREATE_TARBALL=false
-      shift
-      ;;
-    --source-only)
-      VERIFY_LAUNCHPAD=false
-      shift
-      ;;
-    --launchpad-only)
-      VERIFY_SOURCE=false
-      shift
-      ;;
-    --help|-h)
-      echo "Usage: $0 [--source-only|--launchpad-only] [--no-create-tarball] [<target directory>]"
-      exit 0
-      ;;
-    *)
-      break
-      ;;
-  esac
-done
+builder_parse "$@"
 
-TARGET_DIR="${1:-/tmp/keyman-${KEYMAN_VERSION}}"
+if ! builder_has_option --target-dir; then
+  TARGET_DIR="/tmp/keyman-${KEYMAN_VERSION}"
+fi
 
 create_source_tarball() {
   local target_dir="$1"
@@ -83,7 +68,7 @@ create_source_package() {
   cp -r "../keyman" "keyman-${KEYMAN_VERSION}"
   cp -r "${KEYMAN_ROOT}/linux/debian" "keyman-${KEYMAN_VERSION}"
   cp "${target_dir}/keyman-${KEYMAN_VERSION}.tar.xz" "keyman_${KEYMAN_VERSION}.orig.tar.xz"
-  "keyman-${KEYMAN_VERSION}/linux/scripts/launchpad.sh" --no-download --no-upload \
+  "keyman-${KEYMAN_VERSION}/linux/scripts/launchpad.sh" --no-download \
     --dist "$(lsb_release -c -s)" --outputdir "${target_dir}/launchpad" --no-lintian
 }
 
@@ -94,13 +79,13 @@ verify_lintian() {
 
 cd "${KEYMAN_ROOT}/linux"
 
-if ${CREATE_TARBALL}; then
+if ! builder_has_option --no-create-tarball; then
   builder_echo start tarball "Building source tarball"
   create_source_tarball "${TARGET_DIR}"
   builder_echo end tarball success "Finished building source tarball"
 fi
 
-if ${VERIFY_SOURCE}; then
+if ! builder_has_option --launchpad-only; then
   builder_echo start verifySource "Verifying source tarball"
   extract_source_tarball "${TARGET_DIR}"
   verify_can_build "${TARGET_DIR}/keyman"
@@ -108,7 +93,7 @@ if ${VERIFY_SOURCE}; then
   builder_echo end verifySource success "Finished verifying source tarball"
 fi
 
-if ${VERIFY_LAUNCHPAD}; then
+if ! builder_has_option --source-only; then
   builder_echo start lintian "Verifying Launchpad source package"
   extract_source_tarball "${TARGET_DIR}"
   create_source_package "${TARGET_DIR}"

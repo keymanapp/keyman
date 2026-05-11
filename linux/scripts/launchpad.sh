@@ -15,9 +15,9 @@ builder_describe \
   "Build source packages from nightly builds and upload to PPA" \
   build \
   "--no-download                    Don't download source. Assume keyman-<version> exists as subdirectory of current dir." \
-  "--upload                         Upload to launchpad. If omitted only simulate the upload." \
-  "--no-upload                      Don't upload to launchpad, don't even simulate it." \
-  "--no-lintian                     Don't run lintian while creating soure package." \
+  "--upload                         Upload to launchpad." \
+  "--simulate                       Simulate the upload to launchpad." \
+  "--no-lintian                     Don't run lintian while creating source package." \
   "--dist=DIST                      Only upload this distribution. Default: upload all supported dists." \
   "--packageversion=PACKAGEVERSION  String to append to the package version. Default: '1~sil1'." \
   "--outputdir=OUTPUTDIR            Directory for resulting artifacts. Default: \$KEYMAN_ROOT/linux/launchpad."
@@ -32,10 +32,10 @@ if [[ -z "${OUTPUTDIR:-}" ]]; then
   OUTPUTDIR="${KEYMAN_ROOT}/linux/launchpad"
 fi
 
-if builder_has_option --upload; then
-  SIM=""
-else
+if builder_has_option --simulate; then
   SIM="-s"
+else
+  SIM=""
 fi
 
 if builder_has_option --no-lintian; then
@@ -78,7 +78,7 @@ for dist in ${distributions}; do
   # shellcheck disable=SC2248  # no quotes for $LINTIAN_OPTS - might be empty string
   debuild ${LINTIAN_OPTS} -d -S -sa -Zxz
 done
-if ! builder_has_option --no-upload; then
+if builder_has_option --upload || builder_has_option --simulate; then
   cd ..
   for dist in ${distributions}; do
     # shellcheck disable=SC2248  # no quotes for $SIM - it might not be set
