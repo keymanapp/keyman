@@ -162,9 +162,12 @@ export class ModelCompositor {
     // lexicon for a word.  (Example:  "Apple" the company vs "apple" the fruit.)
     for(let tuple of rawPredictions) {
       if(currentCasing && currentCasing != 'lower') {
-        applySuggestionCasing(tuple.prediction.sample, basePrefix, this.lexicalModel, currentCasing);
+        applySuggestionCasing(tuple.components.prediction, basePrefix, this.lexicalModel, currentCasing);
       }
     }
+
+    // what if... we fuse suggestions together here, after the 'apply casing' step?
+    // deduplication, etc function fine from a fused-prediction perspective here.
 
     // We want to dedupe before trimming the list so that we can present a full set
     // of viable distinct suggestions if available.

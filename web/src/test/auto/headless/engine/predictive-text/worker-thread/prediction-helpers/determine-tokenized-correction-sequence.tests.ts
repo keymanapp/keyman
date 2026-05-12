@@ -21,7 +21,7 @@ import {
   ContextState,
   ContextToken,
   ContextTokenization,
-  CorrectionPredictionTuple,
+  IntermediateCompositedPrediction,
   ModelCompositor,
   TokenizationResultMapping
 } from "@keymanapp/lm-worker/test-index";
@@ -341,24 +341,27 @@ describe('determineTokenizedCorrectionSequence', () => {
     });
     assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
 
-    const dummiedTuple: CorrectionPredictionTuple = {
-      prediction: {
-        sample: {
+    const dummiedTuple: IntermediateCompositedPrediction = {
+      components: {
+        prediction: {
           transform: { insert: 'dog', deleteLeft: 0 },
           displayAs: 'dog'
         },
-        p: .25
+        correction: 'd'
       },
-      correction: {
-        sample: 'd',
-        p: trueInput.p
-      },
-      totalProb: .25 * trueInput.p
+      metadata: {
+        probabilities: {
+          prediction: .25,
+          correction: trueInput.p,
+          total: .25 * trueInput.p
+        },
+        autoSelectable: true
+      }
     };
 
     results.applyInPost(dummiedTuple);
 
-    assert.deepEqual(dummiedTuple.preservationTransform, {
+    assert.deepEqual(dummiedTuple.metadata.preservationTransform, {
       insert: trueInput.sample.insert.substring(0, KMWString.length(trueInput.sample.insert) - 1), // remove the 'd'.
       deleteLeft: trueInput.sample.deleteLeft - 1
     });

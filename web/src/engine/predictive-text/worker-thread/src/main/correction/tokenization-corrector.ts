@@ -58,6 +58,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   private _previousResults: TokenizationResultMapping[] = [];
 
   // fully private
+  public readonly modelsCorrectables: boolean;
   private selectionQueue: PriorityQueue<QuotientNodeFinalizer>;
   private tokenCostMap: Map<number, number>;
   private tokenLookupMap: Map<number, ContextToken>;
@@ -172,13 +173,16 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     this._correctables = [];
 
     this.tokenLookupMap = new Map();
+    let modelsCorrectables = false;
 
     orderedTokens.forEach((token, index) => {
       // New issue:  this mangles the space IDs!  We almost certainly need some
       // sort of proper map to the source token.
       const searchModule = new QuotientNodeFinalizer(token.searchModule, index == orderedTokens.length - 1);
       this.tokenLookupMap.set(searchModule.spaceId, token);
-      if(!filterClosure(token)) {
+      const passesFilter = filterClosure(token);
+      modelsCorrectables ||= passesFilter;
+      if(!passesFilter) {
         this._uncorrectables.push(searchModule);
       } else if(index == tailCorrectionLength - 1) {
         // The sole assignment case for this field.  It may only be assigned for
@@ -189,6 +193,8 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
         this._correctables.push(searchModule);
       }
     });
+    // Set a readonly flag indicating if this Corrector started with correctable entries.
+    this.modelsCorrectables = modelsCorrectables;
 
     this._generatedTokenResults = new Map();
     const uncorrectables = this._uncorrectables;

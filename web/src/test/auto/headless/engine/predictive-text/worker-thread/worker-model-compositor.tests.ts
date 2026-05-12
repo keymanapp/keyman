@@ -869,6 +869,9 @@ describe('ModelCompositor', function() {
         deleteLeft: 1
       }
 
+      // Future adjustment:  add the 'baseSuggestion' to DummyModel so that it actually
+      // returns the suggestion again.
+      //  `new models.DummyModel(..., futureSuggestions: [[baseSuggestion]])`
       let model = new models.DummyModel({punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
 
@@ -883,6 +886,7 @@ describe('ModelCompositor', function() {
 
       // As this test is a bit... 'hard-wired', we only get the 'keep' suggestion.
       // It should still be accurate, though.
+      // Can be fixed via the "Future adjustment" noted above.
       assert.equal(suggestions.length, 1);
 
       let expectedTransform = {
