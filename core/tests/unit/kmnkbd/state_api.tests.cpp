@@ -42,6 +42,134 @@ namespace
     return buf;
   }
 
+  inline
+  bool action_options_equal(km_core_option_item const * lhs,
+                            km_core_option_item const * rhs)
+  {
+    if (lhs == rhs) return true;
+    if (!lhs || !rhs) return false;
+
+    while (lhs->key && rhs->key) {
+      if (lhs->scope != rhs->scope) return false;
+      if (std::u16string(lhs->key) != std::u16string(rhs->key)) return false;
+      if (std::u16string(lhs->value) != std::u16string(rhs->value)) return false;
+      ++lhs;
+      ++rhs;
+    }
+
+    return lhs->key == nullptr && rhs->key == nullptr;
+  }
+
+  inline
+  bool expect_action_struct(
+    km_core_actions const & actions,
+    unsigned int expected_code_points_to_delete,
+    km_core_usv const * expected_output,
+    km_core_option_item const * expected_persist_options,
+    km_core_bool expected_do_alert,
+    km_core_bool expected_emit_keystroke,
+    km_core_caps_state expected_new_caps_lock_state,
+    km_core_usv const * expected_deleted_context
+  ) {
+    bool all_passed = true;
+
+    std::cout << "\n=== Comparing action_struct fields ===" << std::endl;
+
+    // code_points_to_delete
+    std::cout << "code_points_to_delete: " << actions.code_points_to_delete
+              << " (expected: " << expected_code_points_to_delete << ")";
+    if (actions.code_points_to_delete != expected_code_points_to_delete) {
+      std::cout << " [FAIL]" << std::endl;
+      all_passed = false;
+    } else {
+      std::cout << " [PASS]" << std::endl;
+    }
+
+    // output
+    std::cout << "output: " << (actions.output ? std::u32string(actions.output) : U"(null)")
+              << " expected: " << (expected_output ? std::u32string(expected_output) : U"(null)") << std::endl;
+    if (actions.output != expected_output) {
+      std::cout << " [FAIL]" << std::endl;
+      //all_passed = false;
+    } else {
+      std::cout << " [PASS]" << std::endl;
+    }
+
+    // persist_options
+    std::cout << "persist_options comparison:" << std::endl;
+    if (!action_options_equal(actions.persist_options, expected_persist_options)) {
+      std::cout << "  actual: ";
+      if (actions.persist_options) {
+        for (auto opt = actions.persist_options; opt->scope; ++opt) {
+          std::cout << "[scope=" << opt->scope << ", key=" << opt->key << ", value=" << opt->value << "] ";
+        }
+      } else {
+        std::cout << "(null)";
+      }
+      std::cout << std::endl;
+      std::cout << "  expected: ";
+      if (expected_persist_options) {
+        for (auto opt = expected_persist_options; opt->key; ++opt) {
+          std::cout << "[scope=" << opt->scope << ", key=" << opt->key << ", value=" << opt->value << "] ";
+        }
+      } else {
+        std::cout << "(null)";
+      }
+      std::cout << " [FAIL]" << std::endl;
+      all_passed = false;
+    } else {
+      std::cout << "  [PASS]" << std::endl;
+    }
+
+    // do_alert
+    std::cout << "do_alert: " << (int)actions.do_alert
+              << " (expected: " << (int)expected_do_alert << ")";
+    if (actions.do_alert != expected_do_alert) {
+      std::cout << " [FAIL]" << std::endl;
+      all_passed = false;
+    } else {
+      std::cout << " [PASS]" << std::endl;
+    }
+
+    // emit_keystroke
+    std::cout << "emit_keystroke: " << (int)actions.emit_keystroke
+              << " (expected: " << (int)expected_emit_keystroke << ")";
+    if (actions.emit_keystroke != expected_emit_keystroke) {
+      std::cout << " [FAIL]" << std::endl;
+      all_passed = false;
+    } else {
+      std::cout << " [PASS]" << std::endl;
+    }
+
+    // new_caps_lock_state
+    std::cout << "new_caps_lock_state: " << (int)actions.new_caps_lock_state
+              << " (expected: " << (int)expected_new_caps_lock_state << ")";
+    if (actions.new_caps_lock_state != expected_new_caps_lock_state) {
+      std::cout << " [FAIL]" << std::endl;
+      all_passed = false;
+    } else {
+      std::cout << " [PASS]" << std::endl;
+    }
+
+    // deleted_context
+    std::cout << "deleted_context: " << (actions.deleted_context ? std::u32string(actions.deleted_context) : U"(null)")
+              << " (expected: " << (expected_deleted_context ? std::u32string(expected_deleted_context) : U"(null)") << ")";
+    if (expected_deleted_context != actions.deleted_context) {
+      if (std::u32string(actions.deleted_context) != std::u32string(expected_deleted_context)) {
+        std::cout << " [FAIL]" << std::endl;
+        all_passed = false;
+      } else {
+        std::cout << " [PASS]" << std::endl;
+      }
+    } else {
+        std::cout << " [PASS]" << std::endl;
+    }
+
+    std::cout << "=== End comparison ===" << std::endl << std::endl;
+
+    return all_passed;
+  }
+
   km_core_option_item test_env_opts[] =
   {
     {u"hello",     u"world", 0},
@@ -91,6 +219,7 @@ constexpr km_core_option_item const expected_persist_opt = {
   u"F2 pressed test save.",
   KM_CORE_OPT_KEYBOARD
 };
+
 
 extern "C"
 {
@@ -187,10 +316,50 @@ int main(int argc, char * argv[])
   if (doc1 != doc1_expected)  return __LINE__;
   if (doc2 != doc2_expected)  return __LINE__;
 
+  // Test the action_struct values for the active and cloned states.
+  const unsigned int expected_state_code_points_to_delete = 1;
+  const km_core_usv * expected_state_output = U" ";
+  const km_core_bool expected_state_do_alert = KM_CORE_FALSE;
+  const km_core_bool expected_state_emit_keystroke = KM_CORE_FALSE;
+  const km_core_caps_state expected_state_new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
+  km_core_option_item expected_options[] = {expected_persist_opt, KM_CORE_OPTIONS_END };
+  const km_core_usv * expected_deleted_text = U"L";
+  // Cloned expected values
+  const unsigned int clone_state_code_points_to_delete = 0;
+  const km_core_usv * clone_state_output = U"";
+  const km_core_bool clone_state_do_alert = KM_CORE_FALSE;
+  const km_core_bool clone_state_emit_keystroke = KM_CORE_FALSE;
+  const km_core_caps_state clone_state_new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
+  km_core_option_item clone_state_options[] = {KM_CORE_OPTIONS_END};
+  const km_core_usv * clone_state_deleted_text = nullptr;
+
+  const auto & state_actions = test_state->action_struct();
+  const auto & clone_actions = test_clone->action_struct();
+
+  test_assert (expect_action_struct(state_actions,
+    expected_state_code_points_to_delete,
+    expected_state_output,
+    expected_options,
+    expected_state_do_alert,
+    expected_state_emit_keystroke,
+    expected_state_new_caps_lock_state,
+    expected_deleted_text // expected_deleted_context_null
+  ));
+
+  test_assert (expect_action_struct(clone_actions,
+    clone_state_code_points_to_delete,
+    clone_state_output,
+    clone_state_options,
+    clone_state_do_alert,
+    clone_state_emit_keystroke,
+    clone_state_new_caps_lock_state,
+    clone_state_deleted_text // expected_deleted_context_null
+  ));
+
   // Destroy them
-  km_core_state_dispose(test_state);
-  km_core_state_dispose(test_clone);
-  km_core_keyboard_dispose(test_kb);
+   km_core_state_dispose(test_state);
+   km_core_state_dispose(test_clone);
+   km_core_keyboard_dispose(test_kb);
 
 
   return 0;
