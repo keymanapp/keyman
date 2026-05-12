@@ -57,10 +57,14 @@ function _cleanup_before_creating_source_package() {
 function _make_release_source_tarball() {
   builder_echo start "make source tarball" "Make source tarball"
   rm -rf dist
+  mkdir -p "upload/${KEYMAN_VERSION}"
   ./scripts/reconf.sh
   PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" ./scripts/dist.sh
-  mkdir -p "upload/${KEYMAN_VERSION}"
-  cp -a dist/*.tar.xz "upload/${KEYMAN_VERSION}"
+  mv dist/*.tar.xz "upload/${KEYMAN_VERSION}/"
+  builder_echo heading "Make source for packaging"
+  PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" ./scripts/dist.sh origdist
+  mv "dist/keyman_${KEYMAN_VERSION}.orig.tar.xz" "dist/keyman_${KEYMAN_VERSION}.pkg.tar.xz"
+  mv dist/*.tar.xz "upload/${KEYMAN_VERSION}/"
   (
     cd "upload/${KEYMAN_VERSION}"
     sha256sum ./*.tar.xz > SHA256SUMS
@@ -84,10 +88,9 @@ function _sign_source_tarball() {
 function _publish_to_downloads() {
   builder_echo start "publish to downloads" "Publish to downloads.keyman.com"
 
-  local UPLOAD_DIR KEYMAN_TXZ
+  local UPLOAD_DIR
 
   UPLOAD_DIR="upload/${KEYMAN_VERSION}"
-  KEYMAN_TXZ="keyman-${KEYMAN_VERSION}.tar.xz"
 
   # Set permissions as required on download site
   builder_echo "Setting upload file permissions for downloads.keyman.com"
@@ -96,7 +99,8 @@ function _publish_to_downloads() {
   chmod g+w  "${UPLOAD_DIR}"/*
   chmod a+r  "${UPLOAD_DIR}"/*
 
-  write_download_info "${UPLOAD_DIR}" "${KEYMAN_TXZ}" "Keyman for Linux" tar.xz linux
+  write_download_info "${UPLOAD_DIR}" "keyman-${KEYMAN_VERSION}.tar.xz" "Keyman for Linux source tarball" tar.xz linux
+  write_download_info "${UPLOAD_DIR}" "keyman_${KEYMAN_VERSION}.pkg.tar.xz" "Keyman for Linux source for packaging" tar.xz linux
   tc_rsync_upload "${UPLOAD_DIR}" "linux/${KEYMAN_TIER}"
 
   builder_echo end "publish to downloads" success "Publish to downloads.keyman.com"
