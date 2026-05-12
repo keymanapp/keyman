@@ -2,9 +2,9 @@
 
 Localization for Keyman is maintained at https://translate.keyman.com
 
-Downloading and updating files between Keyman and Crowdin happens 
+Downloading and updating files between Keyman and Crowdin happens
 on GitHub by way of the Crowdin git integration. The configuration file for all platforms
-is a YAML file named [crowdin.yml](../../../crowdin.yml). Currently, the git integration tracks the `master` branch.
+is a YAML file named [crowdin.yml](../../crowdin.yml). Currently, the git integration tracks the `master` branch.
 
 A daily GitHub action to update the source files in Crowdin, which are organized in a top-level folder "master".
 
@@ -60,7 +60,7 @@ project.
 https://crowdin.com/project/keyman/settings#languages
 
 Only the project owner (sil_ltops) can edit custom language codes (at the bottom of the "Target Languages" list).
-For some of these, the language mapping needs to be maintained in the "Language Mapping" button on the project settings menu (instead of the [crowdin.yml](../../../crowdin.yml)) configuration file.
+For some of these, the language mapping needs to be maintained in the "Language Mapping" button on the project settings menu (instead of the [crowdin.yml](../../crowdin.yml)) configuration file.
 
 Language mappings have been set up for "Greek (Polytonic)" and "Shuwa (Latin)" so downloading with the Crowdin CLI would be:
 ```
