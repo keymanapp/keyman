@@ -3,4 +3,3 @@
     android:src="@drawable/ic_light_dialog_textsize_up"
     android:tint="@color/iconColor"
     android:autoMirrored="true"/>
-<!--    android:tint="@android:color/black"-->

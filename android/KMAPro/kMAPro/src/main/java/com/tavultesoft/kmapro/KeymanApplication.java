@@ -1,10 +1,14 @@
+/**
+ * Copyright (C) SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmapro;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+
 import androidx.appcompat.app.AppCompatDelegate;
 
-public class MyApp extends Application {
+public class KeymanApplication extends Application {
   @Override
   public void onCreate() {
     SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);

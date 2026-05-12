@@ -29,7 +29,6 @@
     <color name="menuBgColor">@color/neutral_1</color>
     <color name="checkboxTick">@color/neutral_2</color>
     <color name="yellow_background">#FFFFFFCF</color>
-<!--    <color name="yellow_background">#E6E6E6</color>-->
     <color name="branded_logo_bg">@color/neutral_1</color>
     <color name="activated_bg">@color/complementary_1</color>
 

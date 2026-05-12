@@ -21,7 +21,6 @@
             android:layout_marginStart="@dimen/checkbox_margin_left"
             android:src="@drawable/ic_action_get_started"
             app:tint="@color/iconColor"/>
-        <!--            android:layout_marginStart="@dimen/checkbox_margin"-->
 
         <TextView
             android:id="@+id/menu_title"

@@ -38,12 +38,6 @@
 
     <style name="AppTheme.Dialog" parent="AppTheme.Light.Dialog" />
 
-<!--    <style name="AppTheme.BrandedLaunch" parent="Theme.AppCompat.NoActionBar">-->
-<!--        <item name="android:windowBackground">@drawable/branded_logo</item>-->
-<!--    </style>-->
-<!--    <style name="AppTheme.BrandedLaunch" parent="Theme.SplashScreen">-->
-<!--        <item name="android:windowBackground">@drawable/branded_logo</item>-->
-<!--    </style>-->
     <style name="Theme.App.Starting" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@android:color/white</item>
     </style>
@@ -74,9 +68,4 @@
         <item name="android:maxLines">4</item>
         <item name="android:ellipsize">end</item>
     </style>
-
-<!--    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">-->
-<!--        <item name="android:windowBackground">@color/splashBackground</item>-->
-<!--    </style>-->
-
 </resources>

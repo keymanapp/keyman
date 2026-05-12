@@ -182,8 +182,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    // setTheme(R.style.AppTheme);
-
     SharedPreferences theme_prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     int savedMode = theme_prefs.getInt(KEY_THEME_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     AppCompatDelegate.setDefaultNightMode(savedMode);
@@ -217,7 +215,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(
-        prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
+        prefs.getString(KeymanSettingsKeys.SPACEBAR_TEXT, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
     checkHapticFeedback();
@@ -231,29 +229,22 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     navView.requestLayout();
 
     constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
-    // setupEdgeToEdge(R.id.constraintLayout);
-    // setupStatusBarColors(android.R.color.white, R.color.neutral_2);
-    // START OF FIXED STATUS BAR LOGIC
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       Window window = getWindow();
       window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
       window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-      // Set the status bar color based on your dynamic color resource
       window.setStatusBarColor(ContextCompat.getColor(this, R.color.toolbarColor));
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         int flags = window.getDecorView().getSystemUiVisibility();
 
-        // Check if the system is currently in Night Mode
         boolean isDarkMode = (getResources().getConfiguration().uiMode &
             Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
 
         if (!isDarkMode) {
-          // LIGHT MODE: Make icons BLACK so they show up on white
           flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         } else {
-          // DARK MODE: Make icons WHITE (by removing the light flag)
           flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         }
         window.getDecorView().setSystemUiVisibility(flags);
@@ -267,14 +258,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(true);
-    // ImageView logo = new ImageView(this);
-    // logo.setImageResource(R.drawable.keyman_logo);
-    // Toolbar.LayoutParams params = new Toolbar.LayoutParams(
-    // Toolbar.LayoutParams.WRAP_CONTENT,
-    // Toolbar.LayoutParams.WRAP_CONTENT,
-    // Gravity.CENTER
-    // );
-    // toolbar.addView(logo, params);
     getSupportActionBar().setLogo(R.drawable.keyman_logo);
 
     getSupportActionBar().setDisplayUseLogoEnabled(false);
@@ -283,15 +266,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setLogo(R.drawable.keyman_logo_mode);
-    // getSupportActionBar().setLogo(R.drawable.keyman_logo);
 
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
     drawerLayout = findViewById(R.id.drawer_layout);
     drawerLayout.setScrimColor(Color.parseColor("#80000000"));
-    // Initialize drawerToggle WITHOUT toolbar to prevent it from showing up at the
-    // start
     drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
     drawerLayout.addDrawerListener(drawerToggle);
     drawerToggle.syncState();
@@ -306,96 +286,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         if (id == R.id.nav_toggle_show_osk || id == R.id.action_get_started
             || id == R.id.nav_toggle_send_crash_report) {
           toggleDrawerSwitch(navigationView, id);
-        } else if (id == R.id.nav_checkbox_enable_system_keyboard) {
-          drawerLayout.closeDrawers();
-          startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
-        } else if (id == R.id.nav_checkbox_set_default_keyboard) {
-          drawerLayout.closeDrawers();
-          showDefaultKeyboardPickerFromMainPage();
-
-        } else if (id == R.id.action_update_keyboards) {
-          drawerLayout.closeDrawers();
-          KMManager.getUpdateTool().executeOpenUpdates();
-          // Dismiss icon
-          updateUpdateCountIndicator(0);
-          final MenuItem _keyboardupdate = navigationView.getMenu().findItem(R.id.action_update_keyboards);
-          if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
-            _keyboardupdate.setVisible(false);
-          }
-
           return true;
-        } else if (item.getItemId() == R.id.action_settings) {
-          showSettings();
-          return true;
-        } else if (id == R.id.nav_installed_languages) {
-          drawerLayout.closeDrawers();
-          Intent intent = new Intent(context, LanguagesSettingsActivity.class);
-          intent.putExtra(KMManager.KMKey_DisplayKeyboardSwitcher, false);
-          startActivity(intent);
-        } else if (id == R.id.nav_install_keyboard) {
-          drawerLayout.closeDrawers();
-          startActivity(new Intent(context, KeymanSettingsInstallActivity.class));
-        } else if (id == R.id.nav_display_language) {
-          drawerLayout.closeDrawers();
-          startActivity(new Intent(context, KeymanSettingsLocalizeActivity.class));
-        } else if (id == R.id.nav_keyboard_height) {
-          drawerLayout.closeDrawers();
-          startActivity(new Intent(context, AdjustKeyboardHeightActivity.class));
-        } else if (id == R.id.nav_longpress_delay) {
-          drawerLayout.closeDrawers();
-          startActivity(new Intent(context, AdjustLongpressDelayActivity.class));
-        } else if (id == R.id.nav_spacebar_caption) {
-          drawerLayout.closeDrawers();
-
-          // Same entries as in KeymanSettingsFragment
-          CharSequence[] entries = {
-              getString(R.string.spacebar_caption_language),
-              getString(R.string.spacebar_caption_keyboard),
-              getString(R.string.spacebar_caption_language_keyboard),
-              getString(R.string.spacebar_caption_blank)
-          };
-
-          KMManager.SpacebarText[] values = {
-              KMManager.SpacebarText.LANGUAGE,
-              KMManager.SpacebarText.KEYBOARD,
-              KMManager.SpacebarText.LANGUAGE_KEYBOARD,
-              KMManager.SpacebarText.BLANK
-          };
-
-          // Find the currently selected index
-          KMManager.SpacebarText current = KMManager.getSpacebarText();
-          int currentIndex = Arrays.asList(values).indexOf(current);
-
-          new AlertDialog.Builder(context)
-              .setTitle(getString(R.string.spacebar_caption))
-              .setSingleChoiceItems(entries, currentIndex, (dialog, which) -> {
-                KMManager.setSpacebarText(values[which]);
-
-                // Persist the selection just like KeymanSettingsFragment does
-                SharedPreferences prefs = getSharedPreferences(
-                    getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-                prefs.edit()
-                    .putString(KeymanSettingsActivity.spacebarTextKey, values[which].toString())
-                    .apply();
-
-                dialog.dismiss();
-              })
-              .setNegativeButton(getString(R.string.label_cancel), null)
-              .show();
-          // } else if (id == R.id.nav_settings) {
-          // drawerLayout.closeDrawers();
-          // startActivity(new Intent(context, KeymanSettingsActivity.class));
-        } else if (id == R.id.nav_help) {
-          drawerLayout.closeDrawers();
-          startActivity(new Intent(context, InfoActivity.class));
-        } else if (id == R.id.nav_palette) {
-          drawerLayout.closeDrawers();
-          openThemeDialog();
-        } else if (id == R.id.nav_about_current_keyboard || id == R.id.nav_help_active_keyboard) {
-          drawerLayout.closeDrawers();
-          showCurrentKeyboardSettings();
         }
-        return true;
+
+        drawerLayout.closeDrawers();
+        return handleDrawerNavigationItemSelected(id);
       }
     });
     updateCurrentKeyboardDrawerItemTitle(navigationView);
@@ -678,28 +573,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     lastOrientation = newConfig.orientation;
   }
 
-  @SuppressLint("RestrictedApi")
-  // @Override
-  // public boolean onPrepareOptionsMenu(final Menu menu) {
-  // this.menu = menu;
-  // final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-  // if (_overflowMenuItem != null) {
-  // MenuItem updateKeyboards = this.menu.findItem(R.id.action_update_keyboards);
-  // updateUpdateCountIndicator(updateKeyboards,
-  // KMManager.getUpdateTool().getOpenUpdateCount(), true);
-  // }
-  // return super.onPrepareOptionsMenu(menu);
-  // }
-
   private void updateUpdateCountIndicator(int anUpdateCount) {
     if (menu == null) {
       return;
     }
-    // final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-    // if (_overflowMenuItem != null) {
-    // updateUpdateCountIndicator(_overflowMenuItem, anUpdateCount, false);
-    // }
-
     final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
     if (_keyboardupdate != null && anUpdateCount > 0) {
       _keyboardupdate.setVisible(true);
@@ -733,7 +610,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
     this.menu = menu;
 
@@ -752,20 +628,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    // Android Gradle 8.0 no longer declares resources final, so can't use switch
-    // statement here
     if (item.getItemId() == R.id.action_info) {
       showInfo();
       return true;
     } else if (item.getItemId() == R.id.action_share) {
       showShareDialog();
       return true;
-      /*
-       * Disable Web Browser to investigate Google sign-in
-       * } else if ((item.getItemId() == R.id.action_web) {
-       * showWebBrowser();
-       * return true;
-       */
     } else if (item.getItemId() == R.id.action_text_size) {
       showTextSizeDialog();
       return true;
@@ -780,7 +648,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return true;
     } else if (item.getItemId() == R.id.action_update_keyboards) {
       KMManager.getUpdateTool().executeOpenUpdates();
-      // Dismiss icon
       updateUpdateCountIndicator(0);
       final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
       if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
@@ -789,7 +656,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
       return true;
     } else if (item.getItemId() == R.id.action_sidebar) {
-      // Open the drawer from the end when the hamburger (overflow) icon is clicked
       if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
         drawerLayout.closeDrawer(GravityCompat.END);
       } else {
@@ -1210,8 +1076,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
    * @return String
    */
   private String getTextSizeString() {
-    // Instead of formatting the number, will truncate formatting and concat the
-    // actual textSize
     String label = getString(R.string.text_size).replace("%1$d", "");
     return label + KMString.format(" %d", textSize);
   }
@@ -1235,7 +1099,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       }
     });
 
-    // dialogBuilder.show(); no dialog
     final AlertDialog dialog = dialogBuilder.create();
     dialog.show();
     dialog.getWindow().setBackgroundDrawableResource(R.color.dialogBackground);
@@ -1263,13 +1126,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void checkSendCrashReport() {
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true);
+    boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsKeys.SEND_CRASH_REPORT, true);
     KMManager.setMaySendCrashReport(maySendCrashReport);
   }
 
   private void checkHapticFeedback() {
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
+    boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsKeys.HAPTIC_FEEDBACK, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
   }
 
@@ -1451,20 +1314,95 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void showSettings() {
-    Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
-    startActivity(settingsIntent);
+    if (drawerLayout != null) {
+      drawerLayout.openDrawer(GravityCompat.END);
+    }
+  }
+
+  private boolean handleDrawerNavigationItemSelected(int id) {
+    if (id == R.id.nav_checkbox_enable_system_keyboard) {
+      startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+    } else if (id == R.id.nav_checkbox_set_default_keyboard) {
+      showDefaultKeyboardPickerFromMainPage();
+    } else if (id == R.id.action_update_keyboards) {
+      KMManager.getUpdateTool().executeOpenUpdates();
+      updateUpdateCountIndicator(0);
+      final MenuItem keyboardUpdate = navigationView.getMenu().findItem(R.id.action_update_keyboards);
+      if (keyboardUpdate != null && keyboardUpdate.isVisible()) {
+        keyboardUpdate.setVisible(false);
+      }
+    } else if (id == R.id.action_settings) {
+      showSettings();
+    } else if (id == R.id.nav_installed_languages) {
+      Intent intent = new Intent(context, LanguagesSettingsActivity.class);
+      intent.putExtra(KMManager.KMKey_DisplayKeyboardSwitcher, false);
+      startActivity(intent);
+    } else if (id == R.id.nav_install_keyboard) {
+      startActivity(new Intent(context, KeymanSettingsInstallActivity.class));
+    } else if (id == R.id.nav_display_language) {
+      startActivity(new Intent(context, KeymanSettingsLocalizeActivity.class));
+    } else if (id == R.id.nav_keyboard_height) {
+      startActivity(new Intent(context, AdjustKeyboardHeightActivity.class));
+    } else if (id == R.id.nav_longpress_delay) {
+      startActivity(new Intent(context, AdjustLongpressDelayActivity.class));
+    } else if (id == R.id.nav_spacebar_caption) {
+      showSpacebarCaptionDialog();
+    } else if (id == R.id.nav_help) {
+      startActivity(new Intent(context, InfoActivity.class));
+    } else if (id == R.id.nav_palette) {
+      openThemeDialog();
+    } else if (id == R.id.nav_about_current_keyboard || id == R.id.nav_help_active_keyboard) {
+      showCurrentKeyboardSettings();
+    }
+
+    return true;
+  }
+
+  private void showSpacebarCaptionDialog() {
+    CharSequence[] entries = {
+        getString(R.string.spacebar_caption_language),
+        getString(R.string.spacebar_caption_keyboard),
+        getString(R.string.spacebar_caption_language_keyboard),
+        getString(R.string.spacebar_caption_blank)
+    };
+
+    KMManager.SpacebarText[] values = {
+        KMManager.SpacebarText.LANGUAGE,
+        KMManager.SpacebarText.KEYBOARD,
+        KMManager.SpacebarText.LANGUAGE_KEYBOARD,
+        KMManager.SpacebarText.BLANK
+    };
+
+    KMManager.SpacebarText current = KMManager.getSpacebarText();
+    int currentIndex = Arrays.asList(values).indexOf(current);
+
+    new AlertDialog.Builder(context)
+        .setTitle(getString(R.string.spacebar_caption))
+        .setSingleChoiceItems(entries, currentIndex, (dialog, which) -> {
+          KMManager.setSpacebarText(values[which]);
+
+          SharedPreferences prefs = getSharedPreferences(
+              getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+          prefs.edit()
+              .putString(KeymanSettingsKeys.SPACEBAR_TEXT, values[which].toString())
+              .apply();
+
+          dialog.dismiss();
+        })
+        .setNegativeButton(getString(R.string.label_cancel), null)
+        .show();
   }
 
   private void initializeDrawerToggleOptions(NavigationView navigationView) {
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
     bindDrawerSwitch(navigationView, R.id.nav_toggle_show_osk,
-        prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false),
+        prefs.getBoolean(KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD, false),
         new SwitchChangeHandler() {
           @Override
           public void onChanged(boolean isChecked) {
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, isChecked);
+            editor.putBoolean(KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD, isChecked);
             editor.apply();
           }
         });
@@ -1481,12 +1419,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         });
 
     bindDrawerSwitch(navigationView, R.id.nav_toggle_send_crash_report,
-        prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true),
+        prefs.getBoolean(KeymanSettingsKeys.SEND_CRASH_REPORT, true),
         new SwitchChangeHandler() {
           @Override
           public void onChanged(boolean isChecked) {
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(KeymanSettingsActivity.sendCrashReport, isChecked);
+            editor.putBoolean(KeymanSettingsKeys.SEND_CRASH_REPORT, isChecked);
             editor.apply();
             KMManager.setMaySendCrashReport(isChecked);
           }
@@ -1859,7 +1797,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     Paint p = new Paint();
     p.setStyle(Paint.Style.FILL);
-    // p.setColor(Color.BLACK);
     p.setColor(ContextCompat.getColor(context, R.color.toolbarColor));
     canvas.drawRect(new Rect(0, 0, width, actionBarHeight), p);
 
