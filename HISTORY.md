@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 19.0.229 alpha 2026-05-08
+
+* maint(linux): fix source tarball used for packaging (#15926)
+
+## 19.0.228 alpha 2026-05-06
+
+* fix(windows): caps lock stores to work in compliant applications (#15771)
+* chore: move localization documentation to /docs (#15909)
+
+## 19.0.227 alpha 2026-05-05
+
+* maint(linux): make emscripten setup on build agents idempotent (#15908)
+
+## 19.0.226 alpha 2026-05-04
+
+* chore(common): cleanup optionals in ldml keyboard reader (#15865)
+
+## 19.0.225 alpha 2026-05-01
+
+* fix(windows): contextual help chm file has blank pages (#15724)
+
+## 19.0.224 alpha 2026-04-30
+
+* fix(linux): fix context after typing Bksp with Wayland (#15820)
+
 ## 19.0.223 alpha 2026-04-23
 
 * fix(android): Reorder display language list (#15863)
