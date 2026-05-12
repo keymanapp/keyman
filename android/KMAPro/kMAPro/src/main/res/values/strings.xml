@@ -25,7 +25,7 @@
   <string name="drawer_about_current_keyboard" comment="Title for current keyboard About drawer item">About active keyboard</string>
   <string name="drawer_about_no_active_keyboard" comment="Fallback text when no active keyboard is selected">No active keyboard</string>
   <string name="drawer_subtitle_theme" comment="Subtitle format for current theme setting">Current setting: %1$s</string>
-  <string name="drawer_subtitle_active_keyboard_help" comment="Subtitle for active keyboard help drawer item">Learn how to use the %1$s keyboard</string>
+  <string name="drawer_subtitle_active_keyboard_help" comment="Subtitle for active keyboard help drawer item">Learn how to use the %1$s </string>
   <string name="drawer_title_active_keyboard_help" comment="Title for active keyboard help drawer item">%1$s help</string>
   <string name="drawer_title_active_keyboard_help_fallback" comment="Fallback title for active keyboard help drawer item">Active keyboard help</string>
 
