@@ -205,12 +205,15 @@ function do_browser_tests() {
 
   pushd "${KEYMAN_ROOT}"
   if is_test_included dom; then
+    builder_echo "Running browser-based tests..."
     web-test-runner --config "web/src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
   fi
   if is_test_included integrated; then
+    builder_echo "Running integration tests..."
     web-test-runner --config "web/src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
   fi
   if is_test_included e2e; then
+    builder_echo "Running end-to-end tests..."
     npx playwright test --config "web/src/test/auto/e2e/playwright.config.ts"
   fi
   popd

@@ -178,6 +178,7 @@ export default class PlaywrightTeamcityReporter implements Reporter {
   private root!: TestNode;
 
   public constructor(options: { parentFlow?: string } = {}) {
+    console.log('Initializing Playwright TeamCity Reporter');
     TestNode.RootFlow = options.parentFlow ?? 'unit_tests';
   }
 
