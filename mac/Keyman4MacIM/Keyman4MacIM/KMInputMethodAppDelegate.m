@@ -295,6 +295,36 @@ id _lastServerWithOSKShowing = nil;
         downloadUrl = [NSURL URLWithString:urlString];
       }
     }
+  } else if ([url.lastPathComponent isEqualToString:@"select"]) {
+    // Live keyboard selection via IPC. Used by the `keyman` CLI; the
+    // query string carries a single `path=<percent-encoded canonical
+    // id>` parameter (the same /<package>/<file>.kmx form stored in
+    // KMSelectedKeyboardKey). See mac/keyman-cli/.
+    NSString *requestedPath = nil;
+    NSArray *params = [[url query] componentsSeparatedByString:@"&"];
+    for (NSString *value in params) {
+      NSUInteger index = [value rangeOfString:@"path="].location;
+      if (index != NSNotFound) {
+        NSString *encoded = [value substringFromIndex:index + 5];
+        requestedPath = [encoded stringByRemovingPercentEncoding];
+        break;
+      }
+    }
+    if (requestedPath == nil || requestedPath.length == 0) {
+      os_log_error([KMLogs keyboardLog], "processURL select: missing path query parameter");
+      return;
+    }
+    NSUInteger pathIndex = [self.activeKeyboards indexOfObject:requestedPath];
+    if (pathIndex == NSNotFound) {
+      os_log_error([KMLogs keyboardLog],
+                   "processURL select: '%{public}@' is not in the active keyboards list",
+                   requestedPath);
+      return;
+    }
+    NSInteger tag = (NSInteger)pathIndex + KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self selectKeyboardFromMenu:tag];
+    });
   }
 }
 
