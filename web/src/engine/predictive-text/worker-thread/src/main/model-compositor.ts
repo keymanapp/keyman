@@ -174,7 +174,7 @@ export class ModelCompositor {
     const deduplicatedSuggestionTuples = dedupeSuggestions(this.lexicalModel, rawPredictions, context);
 
     // Needs "casing" to be applied first.
-    const hasExistingKeep = processSimilarity(this.lexicalModel, deduplicatedSuggestionTuples, context, transformDistribution[0]);
+    const hasExistingKeep = processSimilarity(this.lexicalModel, deduplicatedSuggestionTuples, context, postContext);
 
     // If no existing suggestion directly matches the user-visible version of
     // the token, also add a 'keep' suggestion (with `.matchesModel = false`)
