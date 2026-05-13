@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public final class KMPLink {
 
   public static final String KMP_PRODUCTION_HOST = "keyman.com";
-  public static final String KMP_STAGING_HOST =  "keyman.com"; // #7227 disabling: "keyman-staging.com";
+  public static final String KMP_STAGING_HOST =  "keyman-staging.com";
 
   private static final String KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR = "^http(s)?://(%s|%s)/keyboards/install/([^\\?/]+)(\\?(.+))?$";
   private static final String installPatternFormatStr = KMString.format(KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR,

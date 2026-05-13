@@ -118,7 +118,7 @@ const
   // Alpha versions will work against the staging server so that they
   // can access new APIs etc that will only be available there. The staging
   // servers have resource constraints but should be okay for limited use.
-  S_KeymanCom_Staging = 'https://keyman.com';  // #7227 disabling: 'https://keyman-staging.com';
+  S_KeymanCom_Staging = 'https://keyman-staging.com';
   S_APIServer_Staging = 'api.keyman.com';  // #7227 disabling: 'api.keyman-staging.com';
 
 const

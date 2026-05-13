@@ -78,7 +78,7 @@ public enum KeymanHosts {
         case .alpha:
           fallthrough
         case .beta:
-          return URL.init(string: "https://keyman.com")! // #7227 disabling: "https://keyman-staging.com")!
+          return URL.init(string: "https://keyman-staging.com")!
         case .stable:
           return URL.init(string: "https://keyman.com")!
       }
