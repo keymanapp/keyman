@@ -947,8 +947,10 @@ export function applySuggestionCasing(predictionToken: TokenizedPredictionData, 
   });
 
   // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
-  suggestion.transform.insert = lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
-  suggestion.displayAs = lexicalModel.applyCasing(casingForm, suggestion.displayAs);
+  if(casingForm && casingForm != 'lower') {
+    suggestion.transform.insert = lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
+    suggestion.displayAs = lexicalModel.applyCasing(casingForm, suggestion.displayAs);
+  }
 }
 
 export function compositeIntermediatePredictions(predictions: IntermediateTokenizedPrediction[]): IntermediateCompositedPrediction[] {
