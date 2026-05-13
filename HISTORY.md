@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.231 alpha 2026-05-13
+
+* chore(deps): bump lodash and @microsoft/api-extractor (#15829)
+* chore(deps-dev): bump basic-ftp from 5.0.5 to 5.2.2 (#15848)
+* chore(deps): bump uuid and @actions/core (#15866)
+
 ## 19.0.230 alpha 2026-05-11
 
 * chore(linux): add verification for source tarball and source package (#15916)
