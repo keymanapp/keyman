@@ -76,6 +76,7 @@ if [[ -z "${create_origdist+x}" ]]; then
 
   # shellcheck disable=2034  # to_include appears to be unused
   to_include+=(
+    common/schemas \
     common/tools/hextobin \
     common/web/keyman-version \
     common/web/langtags \
