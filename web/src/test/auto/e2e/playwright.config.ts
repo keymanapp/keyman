@@ -76,7 +76,10 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: `"${KEYMAN_ROOT}/node_modules/.bin/gosh" "../../../../build.sh start"`,
+    // Normally we'd run `web/build.sh start` or `gosh web/build.sh start`
+    // here, but that's causing problems on Windows.
+    command: 'node web/src/tools/testing/test-server/index.cjs',
+    cwd: KEYMAN_ROOT,
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.KEYMAN_IS_CI_BUILD,
   },
