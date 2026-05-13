@@ -29,7 +29,8 @@ import {
   SubstitutionQuotientSpur,
   TokenizationCorrector,
   TokenResult,
-  TokenizationResultMapping
+  TokenizationResultMapping,
+  TokenizationResult
 } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -302,7 +303,7 @@ describe('TokenizationCorrector', () => {
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
         const mapping = searchResult.mapping;
-        const tokenResults = mapping.matchedResult;
+        const tokenResults = mapping.matchedResult.tokenCorrections;
         assert.isNotNaN(searchResult.cost);
         assert.equal(searchResult.cost, searchResult.mapping.totalCost);
         assert.equal(tokenResults.length, 1);
@@ -327,7 +328,7 @@ describe('TokenizationCorrector', () => {
       assert.equal(searchResult.type, 'none');
     });
 
-    it('finds a default correction for a single correctable token without a model match', () => {
+    it('returns no result when a single correctable token lacks a model match', () => {
       const fixture = buildFixture_therefore();
 
       const theref = fixture.theref.tail;
@@ -371,23 +372,6 @@ describe('TokenizationCorrector', () => {
         searchResult = instance.handleNextNode();
       } while(searchResult.type == 'intermediate');
 
-      assert.equal(searchResult.type, 'complete');
-      if(searchResult.type == 'complete') {
-        const mapping = searchResult.mapping;
-        const tokenResults = mapping.matchedResult;
-        assert.isNotNaN(searchResult.cost);
-        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
-        assert.equal(tokenResults.length, 1);
-        assert.sameOrderedMembers(tokenResults.map((r) => r.matchString), ['therefxyz']);
-
-        // Now that an entry has been found, verify the corrector's state.
-        assert.isNotOk(instance.predictableToken); // should become an uncorrectable.
-        assert.isTrue(instance.generatedTokenResults.has(therefxyz));
-        assert.equal(instance.generatedTokenResults.get(therefxyz), tokenResults[0]);
-      }
-
-      // There should be no further possible suggestions.
-      searchResult = instance.handleNextNode();
       assert.equal(searchResult.type, 'none');
     });
 
@@ -411,7 +395,7 @@ describe('TokenizationCorrector', () => {
       let firstResults: ReadonlyArray<TokenResult>;
       if(searchResult.type == 'complete') {
         const mapping = searchResult.mapping;
-        const tokenResults = mapping.matchedResult;
+        const tokenResults = mapping.matchedResult.tokenCorrections;
         firstResults = tokenResults;
         assert.isNotNaN(searchResult.cost);
         assert.equal(searchResult.cost, searchResult.mapping.totalCost);
@@ -434,7 +418,7 @@ describe('TokenizationCorrector', () => {
         searchResult = instance.handleNextNode();
         if(searchResult.type == 'complete') {
           const mapping = searchResult.mapping;
-          const tokenResults = mapping.matchedResult;
+          const tokenResults = mapping.matchedResult.tokenCorrections;
 
           // Verify that the first (bound) token is not altered further.
           // It should receive no further correction attempts.
@@ -445,7 +429,7 @@ describe('TokenizationCorrector', () => {
       } while(searchResult.type != 'none');
     });
 
-    it('immediately returns a single result when the only represented token is uncorrectable', () => {
+    it('immediately returns with no result when the only represented token is uncorrectable', () => {
       const fixture = buildFixture_terminalWhitespace();
 
       const tokenization = fixture.spaceOnly;
@@ -457,13 +441,7 @@ describe('TokenizationCorrector', () => {
       );
 
       const searchResult = instance.handleNextNode();
-      assert.equal(searchResult.type, 'complete');
-      if(searchResult.type == 'complete') {
-        assert.equal(searchResult.mapping.matchedResult[0].matchString, ' ');
-      }
-
-      const nilResult = instance.handleNextNode();
-      assert.equal(nilResult.type, 'none');
+      assert.equal(searchResult.type, 'none');
     });
 
     it('returns a single result when the final token is uncorrectable', () => {
@@ -484,8 +462,8 @@ describe('TokenizationCorrector', () => {
 
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
-        assert.equal(searchResult.mapping.matchedResult[0].matchString, 'space');
-        assert.equal(searchResult.mapping.matchedResult[1].matchString, ' ');
+        assert.equal(searchResult.mapping.matchedResult.tokenCorrections[0].matchString, 'space');
+        assert.equal(searchResult.mapping.matchedResult.tokenCorrections[1].matchString, ' ');
       }
 
       const nilResult = instance.handleNextNode();
@@ -502,20 +480,20 @@ describe('TokenizationCorrector', () => {
         let haveSeenSingleTokenCorrection = false;
         let haveSeenThreeTokenCorrection = false;
         for await(let phraseMatch of getBestMatches<
-          ReadonlyArray<TokenResult>,
+          TokenizationResult,
           TokenizationResultMapping,
           TokenizationCorrector
           >(correctors, buildTestTimer())) {
 
-          if(phraseMatch.matchedResult.length == 1) {
+          if(phraseMatch.matchedResult.tokenCorrections.length == 1) {
             if(!haveSeenSingleTokenCorrection) {
-              assert.sameOrderedMembers(phraseMatch.matchedResult.map((t) => t.matchString), ['theref' /* -ore */]);
+              assert.sameOrderedMembers(phraseMatch.matchedResult.tokenCorrections.map((t) => t.matchString), ['theref' /* -ore */]);
             }
 
             haveSeenSingleTokenCorrection = true;
-          } else if(phraseMatch.matchedResult.length == 3) {
+          } else if(phraseMatch.matchedResult.tokenCorrections.length == 3) {
             if(!haveSeenThreeTokenCorrection) {
-              assert.sameOrderedMembers(phraseMatch.matchedResult.map((t) => t.matchString), ['the', ' ', 'ef' /* -fort */]);
+              assert.sameOrderedMembers(phraseMatch.matchedResult.tokenCorrections.map((t) => t.matchString), ['the', ' ', 'ef' /* -fort */]);
             }
             haveSeenThreeTokenCorrection = true;
           }
