@@ -41,7 +41,7 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
     htmlEntities: true,
     ignoreAttributes: false, // We'd like attributes, please
-    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+    tagValueProcessor: (_tagName: string, tagValue: string /*, _jPathOrMatcher: JPathOrMatcher, _hasAttributes: boolean, _isLeafNode: boolean*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
       // currently, the LDML spec doesn't have any element values, but this
       // future-proofs us a little in that element values are allowed, just trimmed.
@@ -70,7 +70,7 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
-        return null;  // no change to leaf nodes
+        return undefined;  // no change to leaf nodes
       }
     },
     trimValues: false, // preserve spaces
