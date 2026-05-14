@@ -89,7 +89,7 @@ describe('constituentPaths', () => {
           return type == 'insert' && typeSeq[index+1] == 'delete';
         });
       });
-      assert.isNotOk(shouldOccur);
+      assert.isOk(shouldOccur);
     });
   });
 });
