@@ -150,7 +150,6 @@ export class XkbToKmnConverter {
   async run(inputFilename_withVariant: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
 
     const variant_name = inputFilename_withVariant.substring(inputFilename_withVariant.indexOf('(') + 1, inputFilename_withVariant.indexOf(')'));
-    console.log('variant_name of run', variant_name);
 
     let inputFilename = inputFilename_withVariant;
     if (variant_name)
@@ -203,16 +202,10 @@ export class XkbToKmnConverter {
       rules: []
     };
 
-    //const paragraph_name = "basic";
     const start_brack = inputfilename.indexOf('(');
     const end_brack = inputfilename.indexOf(')');
     const variant_name = inputfilename.substring(start_brack + 1, end_brack);
     const inputfilenameUntilBracket = inputfilename.substring(0, start_brack);
-
-
-
-
-
 
     dataObject.keylayoutFilename = inputfilename;
     if (start_brack >= 0) {
@@ -220,19 +213,15 @@ export class XkbToKmnConverter {
     }
 
     // fill dataObject with filenames, behaviors and (initialized) rules
-    // dataObject.keylayoutFilename = inputfilename;
     if (!outputFilename) {
       if (variant_name)
         dataObject.kmnFilename = dataObject.keylayoutFilename + "_" + variant_name + '.kmn';
       else
         dataObject.kmnFilename = dataObject.keylayoutFilename + '.kmn';
-      //dataObject.kmnFilename = inputfilename + '.kmn';
     }
     else
       dataObject.kmnFilename = outputFilename;
 
-
-    console.log('varidataObject.dataObject.keylayoutFilename\n', dataObject.keylayoutFilename, "\n", dataObject.kmnFilename);
     // fill rules into 'rules' of dataObject
     const out = this.createRuleData(dataObject, xkb_data);
     return out;
@@ -253,8 +242,6 @@ export class XkbToKmnConverter {
     // Todo-kmc-convert: create paragraphname  from inputfilename
     // ToDo-kmc-convert remove this-it`s neccessary as we could not process the include (include "de(basic)")
     const xkbData = xkbData_in.replace(/include \"/g, '\/\/include \"');
-    //const paragraph_name = "deadtilde";
-    //const paragraph_name = "basic";
     const start_vari = dataObject.kmnFilename.lastIndexOf('_');
     const end_vari = dataObject.kmnFilename.indexOf('.');
     let variant_name = '';
@@ -262,30 +249,18 @@ export class XkbToKmnConverter {
       variant_name = dataObject.kmnFilename.substring(start_vari + 1, end_vari);
 
 
-    //dataObject.kmnFilename = dataObject.keylayoutFilename.substring(0, start_brack) + "_" + variant_name;
-
     let paragraph_name = '';
     // Todo find default keyword (default xkb_symbols "basic") and use this
     if (variant_name)
       paragraph_name = variant_name;
     else {
-      /* const pos_start_def_keyword = xkbData_in.indexOf('default xkb_symbols \"');
-       const keywordstring = xkbData_in.substring(pos_start_def_keyword);
-       const pos_quote = keywordstring.indexOf('\"');
-       const shortstring = keywordstring.substring(pos_quote + 1);
-       const pos_end_def_keyword = shortstring.indexOf('\"');
-       //paragraph_name = "basic";
-       paragraph_name = shortstring.substring(0, pos_end_def_keyword);*/
-
-      //const word= "symbols"
       paragraph_name = xkbData_in.split(/default xkb_symbols\s*\"(.*?)\"\s\{/)[1];
-
     }
-    console.log('paragraph_name', paragraph_name);
+
     // remove all comments, remove whitespace, split into block for each xkb_symbol definition
     const noComments = xkbData.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '');
-    const xkbData_noWhitespace = noComments.replaceAll(/[\s,]+/g, ',').slice(0, -1);
-    const xkb_symbols_blocks = xkbData_noWhitespace.split("xkb_symbols");
+    const noCommentsNoWhitespace = noComments.replaceAll(/[\s,]+/g, ',').slice(0, -1);
+    const xkb_symbols_blocks = noCommentsNoWhitespace.split("xkb_symbols");
 
     // find paragraphname in xkb_symbols, clean data and return appropriate paragraph
     for (let i = 0; i < xkb_symbols_blocks.length; i++) {
@@ -299,35 +274,6 @@ export class XkbToKmnConverter {
       }
     }
     return '';
-  }
-
-  /**
-    * @brief  ToDo check description
-   * @brief* @brief  ToDo check description
-   * @brief member function to extract all lines starting with with '<keyXXXX>' from input data
-    * @param  xkbData: an string containing the contents of the xkb file
-    * @return an array of lines containing key - output pairs.
-    */
-  public createCompleteLines(xkbData: string, dataObject: ProcessedData): string[] {
-
-    // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
-    // then push all rows starting with "key" to a 1D-Vector
-    const paragraph = this.findParagraph(xkbData, dataObject);
-    if (!paragraph)
-      console.log('ToDo-kmc-convert add Err-msg findParagraph');
-
-    const lineArray = [];
-
-    // each rule and type in a seperate line
-    // Todo_kmc-convert needed?
-    const lines = paragraph.split('key');
-
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i]) {
-        lineArray.push(lines[i].replaceAll(/[\s;]]+/g, ',').slice(1, -1));
-      }
-    }
-    return lineArray;
   }
 
   public getModifier(typename: string): string[] | null {
@@ -352,41 +298,37 @@ export class XkbToKmnConverter {
     }
     return null;
   }
-  public getOutputcher(line: string): string {
-    // kmc-konvert-better solution
 
-
-
-    const pos_type = line.indexOf('type');
-    if (pos_type >= 0) {
-
-      const pos_type2 = line.indexOf('symbols');
-      if (pos_type2 >= 0) {
-        const shorterline = line.substring(pos_type2);
-        const pos_equal2 = shorterline.indexOf('"');
-        const out = shorterline.substring(pos_equal2);
-          return out;
-
-
-/*
-
-        const myTip = line.split(/type.*\s*=(.*?)\[/);
-        if (myTip[2] !== out)
-          console.log('paragraph_name1 NOT EQUAL ###################################', out, myTip);
-        else console.log('paragraph_name1 is EQUAL ................#', out, myTip);
-        return myTip[2];*/
-
-
-
-
-
-
-
-
-      }
+  public get_Keyname(line: string): string {
+    if (line.indexOf('<A') >= 0) {
+      return line.split((/(\<A.*?>)/)).filter(Boolean)[0];
     }
-    return line;
+    return '';
   }
+
+  public getOutput(line: string): string {
+    let out: string = '';
+
+    // e.g. if  key <AE11> {type[Group1]="FOUR_LEVEL_PLUS_LOCK",  symbols[Group1]=[ssharp, question, backslash, questiondown, 0x1001E9E ]};
+    if (line.indexOf('symbols') >= 0) {
+      out = line.split(/symbols.*(.*?)=,/).filter(Boolean)[1];
+    }
+
+    // e.g. if key.type[Group1] = "ONE_LEVEL";
+    else if (line.indexOf('key.type') >= 0) {
+      out = '';
+    }
+
+    // nornal
+    else if (line.indexOf('<A') >= 0) {
+      const out1arr = line.split(/<A[A-E][0-9]{2}>,/);
+      out = out1arr[1];
+    }
+
+    return out;
+  }
+
+
 
   public getKeytype(data_key: string, default_type: string): string {
 
@@ -401,7 +343,6 @@ export class XkbToKmnConverter {
     }
     return default_type;
   }
-
 
   public filldata_paragraph(xkbData: string, dataObject: ProcessedData, data_paragraph_arr: Data_xkb[]): Data_xkb[] {
 
@@ -426,71 +367,25 @@ export class XkbToKmnConverter {
 
     for (let i = 0; i < lineArray.length; i++) {
 
-      // get Data for key_type OK
-      const outputChar = [];
+      // get Data for key_type e.g. "FOUR_LEVEL"
       const key_type = this.getKeytype(lineArray[i], default_key_type);
       default_key_type = key_type;
 
-      // get Data for modifier OK
+      // get Data modifier Data of keytype e.g. ["","shift","Caps"]
       const modi_Data = this.getModifier(key_type);
 
-      // get Data for keyname
-      // Todo-kmc-convert move to function
-      let keyname = '';
-      const pos_key_start = lineArray[i].indexOf('<A');
-      // Todo-kmc-convert better solution
-      if (pos_key_start >= 0) {
-        const keyname1 = lineArray[i].substring(pos_key_start);
-        const pos_key_end = keyname1.indexOf('>');
-        keyname = keyname1.substring(pos_key_start, pos_key_end + 1);
-      }
+      // get name of key e.g. '<AE01>'
+      const keyname = this.get_Keyname(lineArray[i]);
 
-      // get Data for outputmove to functionbetter solution
-      let out: string = '';
-      const pos_type = lineArray[i].indexOf('type');
-      if (pos_type >= 0) {
-
-        // use of key <AE11> {type[Group1]="
-        /* const pos_symbols = lineArray[i].indexOf('symbols');
-         if (pos_symbols >= 0) {
-           const shortstring = lineArray[i].substring(pos_symbols);
-           const pos_first_equal = shortstring.indexOf('=');
-           out = shortstring.substring(pos_first_equal + 2);
-         }*/
-        const pos_symbols = lineArray[i].indexOf('symbols');
-        if (pos_symbols >= 0) {
-          out = lineArray[i].split(/symbols.*(.*?)=,/)[2];
-        }
-        else {
-          // use of key.type
-          const pos_first_equal = lineArray[i].indexOf('=');
-          out = lineArray[i].substring(pos_first_equal + 2);
-        }
-      }
-      else {
-        // normal
-        if (lineArray[i].indexOf('<A') >= 0) {
-          const completestring = lineArray[i];
-          const onlyOut = completestring.split('>,');
-          out = onlyOut[1];
-        }
-      }
-      const elements = out.split(',');
-
-      // get Data for outputChar
-      for (let j = 0; j < elements.length; j++) {
-        const outputcharOK = this.getOutputcher(elements[j]);
-        outputChar.push(outputcharOK);
-      }
-
-
-
+      // get output e.g. '1,exclam,onesuperior,exclamdown'
+      const out = this.getOutput(lineArray[i]);
+      const output_elements = out.split(',');
 
       const singleData_paragraph: Data_xkb = {
         xkb_keyname: keyname as string,
         xkb_keytype: default_key_type,
         xkb_modifiers: modi_Data as string[],
-        xkb_output: outputChar,
+        xkb_output: output_elements,
       };
 
       if (keyname) {
@@ -523,13 +418,8 @@ export class XkbToKmnConverter {
 
     const data_paragraph_arr: Data_xkb[] = [];
 
-    const lines = this.createCompleteLines(xkb_data, dataObject);
     // Todo-kmc-convert check data_paragraph_arr vs dataObject
     this.filldata_paragraph(xkb_data, dataObject, data_paragraph_arr);
-
-    // fill darta_data_paragraph
-    if (!lines)
-      console.log("ToDo-kmc-convert add ErrorMsg");
 
     // Todo-kmc-convert check nr(modi)= nr(output)
 
