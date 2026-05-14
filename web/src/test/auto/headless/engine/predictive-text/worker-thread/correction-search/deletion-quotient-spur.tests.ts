@@ -3,7 +3,7 @@
  *
  * Created by jahorton on 2026-03-06
  *
- * This file defines tests for the InsertionQuotientSpur class of the
+ * This file defines tests for the DeletionQuotientSpur class of the
  * predictive-text correction-search engine's search graph.
  */
 
