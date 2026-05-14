@@ -279,7 +279,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
 
     const correctionIsThePredictable = correctableToUpdate == this._predictable;
     const delistCorrectable = () => {
-      if(correctionIsThePredictable) {
+      if(!correctionIsThePredictable) {
         // Lock the 'correctable' token now that either a valid correction for
         // it has been found or all possible corrections are exhausted. We only
         // consider a single correction for most of a tokenization's tokens,
