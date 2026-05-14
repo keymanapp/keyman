@@ -88,9 +88,11 @@ namespace
     // output
     std::cout << "output: " << (actions.output ? std::u32string(actions.output) : U"(null)")
               << " expected: " << (expected_output ? std::u32string(expected_output) : U"(null)") << std::endl;
-    if (actions.output != expected_output) {
-      std::cout << " [FAIL]" << std::endl;
-      //all_passed = false;
+    if (expected_output != actions.output) {
+      if (std::u32string(actions.output) != std::u32string(expected_output)) {
+        std::cout << " [FAIL]" << std::endl;
+        all_passed = false;
+      }
     } else {
       std::cout << " [PASS]" << std::endl;
     }
@@ -297,6 +299,11 @@ int main(int argc, char * argv[])
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_L,
                                   KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
   test_assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('L')}}, {KM_CORE_IT_END}}));
+
+  // Without the calling `km_core_state_context_set_if_needed` action struct has a delete for 'L'?
+  km_core_cu const *state_context = get_context_as_string(km_core_state_context(test_state));
+  km_core_state_context_set_if_needed(test_state, state_context);
+
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_F2, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
 
   km_core_action_item action = {KM_CORE_IT_PERSIST_OPT, {0,}, };
@@ -316,14 +323,15 @@ int main(int argc, char * argv[])
   if (doc1 != doc1_expected)  return __LINE__;
   if (doc2 != doc2_expected)  return __LINE__;
 
-  // Test the action_struct values for the active and cloned states.
-  const unsigned int expected_state_code_points_to_delete = 1;
-  const km_core_usv * expected_state_output = U" ";
+  // Test the action_struct values for the active and cloned states are
+  //  independent and match their respective expected values.
+  const unsigned int expected_state_code_points_to_delete = 0;
+  const km_core_usv * expected_state_output = U"";
   const km_core_bool expected_state_do_alert = KM_CORE_FALSE;
   const km_core_bool expected_state_emit_keystroke = KM_CORE_FALSE;
   const km_core_caps_state expected_state_new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
   km_core_option_item expected_options[] = {expected_persist_opt, KM_CORE_OPTIONS_END };
-  const km_core_usv * expected_deleted_text = U"L";
+  const km_core_usv * expected_deleted_text = U"";
   // Cloned expected values
   const unsigned int clone_state_code_points_to_delete = 0;
   const km_core_usv * clone_state_output = U"";
@@ -343,7 +351,7 @@ int main(int argc, char * argv[])
     expected_state_do_alert,
     expected_state_emit_keystroke,
     expected_state_new_caps_lock_state,
-    expected_deleted_text // expected_deleted_context_null
+    expected_deleted_text
   ));
 
   test_assert (expect_action_struct(clone_actions,
@@ -353,14 +361,13 @@ int main(int argc, char * argv[])
     clone_state_do_alert,
     clone_state_emit_keystroke,
     clone_state_new_caps_lock_state,
-    clone_state_deleted_text // expected_deleted_context_null
+    clone_state_deleted_text
   ));
 
   // Destroy them
    km_core_state_dispose(test_state);
    km_core_state_dispose(test_clone);
    km_core_keyboard_dispose(test_kb);
-
 
   return 0;
 }
