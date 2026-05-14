@@ -36,30 +36,134 @@ describe('XkbToKmnConverter', function () {
   });
 
 /*
-  describe('findParagraph ', function () {
+  describe('Xkb-kmn: getModifier ', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      ['', ''],
+      ['ONE_LEVEL', ['']],
+      ['FOUR_LEVEL_PLUS_LOCK', ["", "SHIFT", "RALT", "SHIFT RALT", "LOCK"]],
+      ['EIGHT_LEVEL', ["", "SHIFT", "ALT", "SHIFT ALT", "X", "X SHIFT", "X ALT", "X SHIFT ALT"]],
+      ['', null],
+      ['unknownLevel', null],
+      [99, null],
+      [null, null],
+      [undefined, null],
+
     ].forEach(function (values) {
-      it(("findParagraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
-        const result = sut.findParagraph(values[0] as string);
-        assert.equal(result, values[1]);
+      it(("getModifier(" + values[0] + ")").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
+        const result = sut.getModifier(values[0] as string);
+        assert.deepStrictEqual((result), (values[1]));
       });
     });
   });
 
-
-  describe('createCompleteLines ', function () {
+  describe('Xkb-kmn: get_Keyname ', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      ['', ''],
+      ['<AD04>,r,R,paragraph,registered', '<AD04>'],
+      ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols[Group1]=[ssharp,question,backslash,questiondown,B;', '<AE11>'],
+      ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', null],
+      ['unknown', null],
+      ['', null],
+      [null, null],
+      [undefined, null],
     ].forEach(function (values) {
-      it(("findPacreateCompleteLinesragraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
-        const result = sut.createCompleteLines(values[0] as string);
-        assert.equal(result, values[1]);
+      it(("get_Keyname(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+        const result = sut.get_Keyname(values[0] as string);
+        assert.deepStrictEqual((result), (values[1]));
+      });
+    });
+  });
+
+  describe('Xkb-kmn: getOutput ', function () {
+    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ['<AD04>,r,R,paragraph,registered', 'r,R,paragraph,registered'],
+      ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols,Group1,=,ssharp,question,backslash,questiondown,B', 'ssharp,question,backslash,questiondown,B'],
+      ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', undefined],
+      ['unknown', null],
+      ['', null],
+      [null, null],
+      [undefined, null],
+    ].forEach(function (values) {
+      it(("getOutput(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+        const result = sut.getOutput(values[0] as string);
+        assert.deepStrictEqual((result), (values[1]));
+      });
+    });
+  });
+
+  describe('Xkb-kmn: getKeytype ', function () {
+    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ['<AD04>,r,R,paragraph,registered', 'DEFAULT_LEVEL'],
+      ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols[Group1]=[ssharp,question,backslash,questiondown,B;', 'FOUR_LEVEL_PLUS_LOCK'],
+      ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', 'DEFAULT_LEVEL'],
+      ['unknown', 'DEFAULT_LEVEL'],
+      ['', 'DEFAULT_LEVEL'],
+      [null, null],
+      [undefined, null],
+    ].forEach(function (values) {
+      it(("getKeytype(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+        const result = sut.getKeytype(values[0] as string, 'DEFAULT_LEVEL');
+        assert.deepStrictEqual((result), (values[1]));
+      });
+    });
+  });
+
+  describe('Xkb-kmn: get_KMVirtKC_from_keyname ', function () {
+    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ['<AD04>', 'K_R'],
+      ['<TLDE>', 'K_BKQUOTE'],
+      ['<TXXE>', ''],
+      ['', 'K_4'],
+      [null, null],
+      [undefined, null],
+    ].forEach(function (values) {
+      it(("get_KMVirtKC_from_keyname(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+        const result = sut.get_KMVirtKC_from_keyname(values[0] as string);
+        assert.deepStrictEqual((result), (values[1]));
       });
     });
   });*/
+
+//......................................................................................................
+//......................................................................................................
+//......................................................................................................
+//......................................................................................................
+//......................................................................................................
+//......................................................................................................
+  
+/*
+    describe('findParagraph ', function () {
+      // Todo 
+       ['variant', 'all definition text'], 
+       ['unexisting vriant', ''], 
+       ['null, null], 
+       ['', ''], 
+      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      [
+        ['', ''],
+      ].forEach(function (values) {
+        it(("findParagraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
+          const result = sut.findParagraph(values[0] as string);
+          assert.equal(result, values[1]);
+        });
+      });
+    });
+  
+  
+    describe('createCompleteLines ', function () {
+      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      [
+        ['', ''],
+      ].forEach(function (values) {
+        it(("findPacreateCompleteLinesragraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
+          const result = sut.createCompleteLines(values[0] as string);
+          assert.equal(result, values[1]);
+        });
+      });
+    });*/
 
 
   describe('get_KMVirtKC_from_keyname ', function () {
@@ -433,496 +537,499 @@ describe('XkbToKmnConverter', function () {
         [[[' ', ' '], [' ']], false],
       ].forEach(function (values) {
         it(("checkIfCapsIsUsed(" + values[0] + ")").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
-          const result = sut.checkIfCapsIsUsed(values[0] as string[][]);
+      /    const result = sut.checkIfCapsIsUsed(values[0] as string[][]);
           assert.isTrue(result === values[1]);
         });
       });
     });
+*/
 
-    describe('Xkb-kmn: getModifierArrayFromKeyModifierArray ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
-      [
-        [[{ key: '0', behavior: 0 }], [['', 'shift? caps? ']]],
-        [[{ key: '0', behavior: 2 }], [['shift? leftShift caps? ', 'anyShift caps?', 'shift leftShift caps ', 'shift? rightShift caps? ']]],
-        [[{ key: '0', behavior: 999 }], [null]],
-        [[{ key: '999', behavior: null }], [null]],
-        [[{ key: '0', behavior: -999 }], [null]],
-        [[{ key: '0', behavior: null }], [null]],
-        [[], []],
-
-      ].forEach(function (values) {
-        it((values[1] !== null) ?
-          ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + JSON.stringify(values[1]) + "'" :
-          ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + "null" + "'", async function () {
-            const result = sut.getModifierArrayFromKeyModifierArray(converted.modifiers, values[0] as unknown as KeylayoutFileData[]);
-            assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
+  /*
+  
+      describe('Xkb-kmn: getModifierArrayFromKeyModifierArray ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+        const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+        [
+          [[{ key: '0', behavior: 0 }], [['', 'shift? caps? ']]],
+          [[{ key: '0', behavior: 2 }], [['shift? leftShift caps? ', 'anyShift caps?', 'shift leftShift caps ', 'shift? rightShift caps? ']]],
+          [[{ key: '0', behavior: 999 }], [null]],
+          [[{ key: '999', behavior: null }], [null]],
+          [[{ key: '0', behavior: -999 }], [null]],
+          [[{ key: '0', behavior: null }], [null]],
+          [[], []],
+  
+        ].forEach(function (values) {
+          it((values[1] !== null) ?
+            ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + JSON.stringify(values[1]) + "'" :
+            ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + "null" + "'", async function () {
+              const result = sut.getModifierArrayFromKeyModifierArray(converted.modifiers, values[0] as unknown as KeylayoutFileData[]);
+              assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
+            });
+        });
+      });
+  
+      describe('Xkb-kmn: getKeyModifierArrayFromActionID ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+        [
+          ['A_16', [{ "key": "32", "behavior": "5" }]],
+          ['A_19', [{ "key": "45", "behavior": "5" }]],
+          ['A_18', [{ "key": "24", "behavior": "0" }, { "key": "24", "behavior": "5" }]],
+          ['unknown', []],
+          [undefined, []],
+          [null, []],
+          [' ', []],
+          ['', []],
+        ].forEach(function (values) {
+          let outstring = '[ ';
+          for (let i = 0; i < values[1].length; i++) {
+            outstring = outstring + "[ " + JSON.stringify(values[1][i]) + "], ";
+          }
+          it(("getKeyModifierArrayFromActionID('" + values[0] + "')").padEnd(57, " ") + ' should return ' + outstring.substring(0, outstring.lastIndexOf(']') + 2) + " ]", async function () {
+            const result = sut.getKeyModifierArrayFromActionID(read, String(values[0]));
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
           });
-      });
-    });
-
-    describe('Xkb-kmn: getKeyModifierArrayFromActionID ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      [
-        ['A_16', [{ "key": "32", "behavior": "5" }]],
-        ['A_19', [{ "key": "45", "behavior": "5" }]],
-        ['A_18', [{ "key": "24", "behavior": "0" }, { "key": "24", "behavior": "5" }]],
-        ['unknown', []],
-        [undefined, []],
-        [null, []],
-        [' ', []],
-        ['', []],
-      ].forEach(function (values) {
-        let outstring = '[ ';
-        for (let i = 0; i < values[1].length; i++) {
-          outstring = outstring + "[ " + JSON.stringify(values[1][i]) + "], ";
-        }
-        it(("getKeyModifierArrayFromActionID('" + values[0] + "')").padEnd(57, " ") + ' should return ' + outstring.substring(0, outstring.lastIndexOf(']') + 2) + " ]", async function () {
-          const result = sut.getKeyModifierArrayFromActionID(read, String(values[0]));
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
       });
-    });
-
-    describe('Xkb-kmn: getActionIdFromActionNext ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      [
-        ['none', ''],
-        ['0', ''],
-        ['A_18', ''],
-        ['1', 'A_16'],
-        ['2', 'A_8'],
-        ['3', 'A_17'],
-        ['', ''],
-        [' ', ''],
-        ['99', ''],
-        [null, ''],
+  
+      describe('Xkb-kmn: getActionIdFromActionNext ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+        [
+          ['none', ''],
+          ['0', ''],
+          ['A_18', ''],
+          ['1', 'A_16'],
+          ['2', 'A_8'],
+          ['3', 'A_17'],
+          ['', ''],
+          [' ', ''],
+          ['99', ''],
+          [null, ''],
+          [undefined, ''],
+          ['unknown', ''],
+        ].forEach(function (values) {
+          it(("getActionIdFromActionNext('" + values[0] + "')").padEnd(49, " ") + ' should return ' + "'" + values[1] + "'", async function () {
+            const result = sut.getActionIdFromActionNext(read, String(values[0]));
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+          });
+        });
+      });
+  
+      describe('Xkb-kmn: getActionIndexFromActionId ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+        [
+          ['none', -1],
+          ['A_16', 8],
+          ['A_18', 10],
+          ['A_19', 11],
+          ['0', -1],
+          ['', -1],
+          [' ', -1],
+          [null, -1],
+          [undefined, -1],
+          ['unknown', -1],
+        ].forEach(function (values) {
+          it(("getActionIndexFromActionId('" + values[0] + "')").padEnd(50, " ") + ' should return ' + values[1], async function () {
+            const result = sut.getActionIndexFromActionId(read, String(values[0]));
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+          });
+        });
+      });
+  
+      describe('Xkb-kmn: getOutputFromActionIdNone ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+        [
+          ['A_14', 'u'],
+          ['', ''],
+          [' ', ''],
+          ['A_18', ''],
+          ['unknown', ''],
+        ].forEach(function (values) {
+          it(
+            ("getOutputFromActionIdNone('" + values[0] + "')").padEnd(56, " ") + ' should return ' + "'" + values[1] + "'", async function () {
+              const result = sut.getOutputFromActionIdNone(read, String(values[0]));
+              assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+            });
+        });
+  
+        [[null, ''],
         [undefined, ''],
-        ['unknown', ''],
-      ].forEach(function (values) {
-        it(("getActionIdFromActionNext('" + values[0] + "')").padEnd(49, " ") + ' should return ' + "'" + values[1] + "'", async function () {
-          const result = sut.getActionIdFromActionNext(read, String(values[0]));
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
-        });
-      });
-    });
-
-    describe('Xkb-kmn: getActionIndexFromActionId ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      [
-        ['none', -1],
-        ['A_16', 8],
-        ['A_18', 10],
-        ['A_19', 11],
-        ['0', -1],
-        ['', -1],
-        [' ', -1],
-        [null, -1],
-        [undefined, -1],
-        ['unknown', -1],
-      ].forEach(function (values) {
-        it(("getActionIndexFromActionId('" + values[0] + "')").padEnd(50, " ") + ' should return ' + values[1], async function () {
-          const result = sut.getActionIndexFromActionId(read, String(values[0]));
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
-        });
-      });
-    });
-
-    describe('Xkb-kmn: getOutputFromActionIdNone ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      [
-        ['A_14', 'u'],
-        ['', ''],
-        [' ', ''],
-        ['A_18', ''],
-        ['unknown', ''],
-      ].forEach(function (values) {
-        it(
-          ("getOutputFromActionIdNone('" + values[0] + "')").padEnd(56, " ") + ' should return ' + "'" + values[1] + "'", async function () {
+        [99, ''],
+        ].forEach(function (values) {
+          it(("getOutputFromActionIdNone('" + values[0] + "')").padEnd(56, " ") + ' should return ' + values[1], async function () {
             const result = sut.getOutputFromActionIdNone(read, String(values[0]));
             assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
           });
-      });
-
-      [[null, ''],
-      [undefined, ''],
-      [99, ''],
-      ].forEach(function (values) {
-        it(("getOutputFromActionIdNone('" + values[0] + "')").padEnd(56, " ") + ' should return ' + values[1], async function () {
-          const result = sut.getOutputFromActionIdNone(read, String(values[0]));
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
       });
-    });
-
-    describe('Xkb-kmn: getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-
-      const b1KeycodeArr: KeylayoutFileData[] = [
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: 'ˆ' },
-        { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: 'ˆ' },
-        { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '2', outchar: 'Â' },
-        { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '1', outchar: 'Â' },
-        { keyCode: '14', key: 'K_E', actionId: 'A_10', behavior: '0', outchar: 'ê' },
-        { keyCode: '34', key: 'K_I', actionId: 'A_11', behavior: '0', outchar: 'î' },
-        { keyCode: '31', key: 'K_O', actionId: 'A_13', behavior: '0', outchar: 'ô' },
-        { keyCode: '32', key: 'K_U', actionId: 'A_14', behavior: '0', outchar: 'û' },
-        { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '2', outchar: 'Ê' },
-        { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '1', outchar: 'Ê' },
-        { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '2', outchar: 'Î' },
-        { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '1', outchar: 'Î' },
-        { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '2', outchar: 'Ô' },
-        { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '1', outchar: 'Ô' },
-        { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '2', outchar: 'Û' },
-        { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '1', outchar: 'Û' },
-        { keyCode: '0', key: 'K_A', actionId: 'A_9', behavior: '0', outchar: 'â' }
-
-      ];
-      const b1ModifierKeyArr: KeylayoutFileData[] = [
-        { actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_SPACE', behavior: '1', modifier: 'CAPS', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_SPACE', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_SPACE', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_Z', behavior: '4', modifier: 'NCAPS SHIFT RALT', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_9', behavior: '4', modifier: 'NCAPS SHIFT RALT', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_COMMA', behavior: '4', modifier: 'NCAPS SHIFT RALT', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_SPACE', behavior: '3', modifier: 'NCAPS RALT CTRL', outchar: 'ˆ' },
-        { actionId: 'A_0', key: 'K_SPACE', behavior: '3', modifier: 'NCAPS CTRL', outchar: 'ˆ' },
-        { actionId: 'A_1', key: 'K_A', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Â' },
-        { actionId: 'A_1', key: 'K_A', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Â' },
-        { actionId: 'A_1', key: 'K_A', behavior: '1', modifier: 'CAPS', outchar: 'Â' },
-        { actionId: 'A_10', key: 'K_E', behavior: '0', modifier: 'NCAPS', outchar: 'ê' },
-        { actionId: 'A_11', key: 'K_I', behavior: '0', modifier: 'NCAPS', outchar: 'î' },
-        { actionId: 'A_13', key: 'K_O', behavior: '0', modifier: 'NCAPS', outchar: 'ô' },
-        { actionId: 'A_14', key: 'K_U', behavior: '0', modifier: 'NCAPS', outchar: 'û' },
-        { actionId: 'A_2', key: 'K_E', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Ê' },
-        { actionId: 'A_2', key: 'K_E', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Ê' },
-        { actionId: 'A_2', key: 'K_E', behavior: '1', modifier: 'CAPS', outchar: 'Ê' },
-        { actionId: 'A_3', key: 'K_I', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Î' },
-        { actionId: 'A_3', key: 'K_I', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Î' },
-        { actionId: 'A_3', key: 'K_I', behavior: '1', modifier: 'CAPS', outchar: 'Î' },
-        { actionId: 'A_5', key: 'K_O', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Ô' },
-        { actionId: 'A_5', key: 'K_O', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Ô' },
-        { actionId: 'A_5', key: 'K_O', behavior: '1', modifier: 'CAPS', outchar: 'Ô' },
-        { actionId: 'A_6', key: 'K_U', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Û' },
-        { actionId: 'A_6', key: 'K_U', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Û' },
-        { actionId: 'A_6', key: 'K_U', behavior: '1', modifier: 'CAPS', outchar: 'Û' },
-        { actionId: 'A_9', key: 'K_A', behavior: '0', modifier: 'NCAPS', outchar: 'â' }
-      ];
-
-      [[b1KeycodeArr, b1ModifierKeyArr],
-      [[{ keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
-      [[{ keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '', outchar: 'ˆ' }], [{ actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
-      [[{ keyCode: '49', key: 'K_SPACE', actionId: '', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: '', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
-      [[{ keyCode: '49', key: '', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: 'A_0', key: '', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
-      [[{ keyCode: '', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
-      [[{ keyCode: '', key: '', actionId: '', behavior: '0', modifier: '', outchar: '' }], [{ actionId: '', key: '', behavior: '0', modifier: 'NCAPS', outchar: '' }]],
-      ].forEach(function (values) {
-        const isCapsUsed = true;
-        const stringIn = "getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray(['" + "', '" + "', '" + values[0][0].keyCode + "', '" + values[0][0].key + "', '" + values[0][0].actionId + "', '" + values[0][0].modifier + "', '" + values[0][0].outchar + "'])";
-        const stringOut = "['" + "', '" + "', '" + values[1][0].key + "', '" + values[1][0].actionId + "', '" + "', '" + values[1][0].modifier + "', '" + values[1][0].outchar + "']";
-
-        it((JSON.stringify(values[1]).length > 60) ? 'an array of objects should return an array of objects' :
-          stringIn.padEnd(74, " ") + ' should return ' + stringOut, async function () {
-            const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, values[0], isCapsUsed);
-            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
-          });
-      });
-
-      [[{ keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }, { actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: '', outchar: 'ˆ' }],
-      [{ keyCode: '', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }, { actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: '', outchar: 'ˆ' }],
-      [{ keyCode: '', key: '', actionId: '', behavior: '0', modifier: '', outchar: '' }, { actionId: '', key: '', behavior: '0', modifier: '', outchar: '' }],
-      ].forEach(function (values) {
-        const isCapsUsed = false;
-        const stringIn = "getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray([ '" + values[0].keyCode + "', '" + values[0].key + "', '" + values[0].actionId + "', '" + values[0].modifier + "', '" + values[0].outchar + "'])";
-        const stringOut = "['" + values[1].actionId + "', '" + "', '" + values[1].modifier + "', '" + values[1].key + "', '" + values[1].outchar + "']";
-
-        it(stringIn.padEnd(74, " ") + ' should return ' + stringOut, async function () {
-          const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, [values[0]], isCapsUsed);
-          assert.equal(JSON.stringify(result), JSON.stringify([values[1]]));
-        });
-      });
-
-      [[[], []],
-      [undefined, []],
-      [null, []],
-      ].forEach(function (values) {
-        const isCaps = true;
-        it(("getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray([" + values[0] + "])").padEnd(74, " ") + ' should return ' + "[" + values[1] + "]", async function () {
-          const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, values[0], isCaps);
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
-        });
-      });
-    });
-
-    describe('Xkb-kmn: getActionStateOutputArrayFromActionState ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      [['1', [
-        { "id": "A_0", "state": "1", "output": "ˆ" },
-        { "id": "A_1", "state": "1", "output": "Â" },
-        { "id": "A_10", "state": "1", "output": "ê" },
-        { "id": "A_11", "state": "1", "output": "î" },
-        { "id": "A_13", "state": "1", "output": "ô" },
-        { "id": "A_14", "state": "1", "output": "û" },
-        { "id": "A_2", "state": "1", "output": "Ê" },
-        { "id": "A_3", "state": "1", "output": "Î" },
-        { "id": "A_5", "state": "1", "output": "Ô" },
-        { "id": "A_6", "state": "1", "output": "Û" },
-        { "id": "A_9", "state": "1", "output": "â" }
-      ],],
-      ['2', [
-        { "id": "A_0", "state": "2", "output": "`" },
-        { "id": "A_1", "state": "2", "output": "À" },
-        { "id": "A_10", "state": "2", "output": "è" },
-        { "id": "A_11", "state": "2", "output": "ì" },
-        { "id": "A_13", "state": "2", "output": "ò" },
-        { "id": "A_14", "state": "2", "output": "ù" },
-        { "id": "A_2", "state": "2", "output": "È" },
-        { "id": "A_3", "state": "2", "output": "Ì" },
-        { "id": "A_5", "state": "2", "output": "Ò" },
-        { "id": "A_6", "state": "2", "output": "Ù" },
-        { "id": "A_9", "state": "2", "output": "à" }
-      ],],
-      ['789', [],],
-      ['', [],],
-      [' ', [],],
-      [123, [],],
-      [null, [],],
-      [undefined, [],],
-      ].forEach(function (values) {
-        it((JSON.stringify(values[1]).length > 30) ?
-          ("getActionStateOutputArrayFromActionState('" + values[0] + "')").padEnd(60, " ") + ' should return an array of objects' :
-          ("getActionStateOutputArrayFromActionState('" + values[0] + "')").padEnd(60, " ") + ' should return ' + "'" + JSON.stringify(values[1]) + "'", async function () {
-            const result = sut.getActionStateOutputArrayFromActionState(read, String(values[0]));
-            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
-          });
-      });
-    });
-
-    describe('Xkb-kmn: getActionOutputbehaviorKeyModiFromActionIDStateOutput ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
-      [
-        ['A_1', 'A', true,
-          [{ "outchar": "A", "actionId": "A_1", "behavior": "1", "key": "K_A", "modifier": "CAPS" },
-          { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "NCAPS SHIFT" },
-          { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "SHIFT CAPS" }]
-        ],
-        ['A_1', 'A', false,
-          [{ "outchar": "A", "actionId": "A_1", "behavior": "1", "key": "K_A", "modifier": "CAPS" },
-          { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "SHIFT" },
-          { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "SHIFT CAPS" }]
-        ],
-        ['A_9', 'a', true, [{ "outchar": "a", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "NCAPS" }]],
-        ['A_9', 'a', false, [{ "outchar": "a", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "" }]],
-        ['A_9', 'a', , [{ "outchar": "a", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "" }]],
-        ['A_9', '', true, [{ "outchar": "", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "NCAPS" }]],
-        ['A_9', '', false, [{ "outchar": "", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "" }]],
-        ['', 'a', true, []],
-        ['', 'a', false, []],
-        ['', '', , []],
-      ].forEach(function (values) {
-        it((JSON.stringify(values[3]).length > 35) ?
-          ("getActionOutputbehaviorKeyModiFromActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return an array of objects' :
-          ("getActionOutputbehaviorKeyModiFromActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return ' + "'" + JSON.stringify(values[3]) + "'", async function () {
-            const result = sut.getActionOutputBehaviorKeyModiFromActionIDStateOutput(read, converted.modifiers, String(values[0]), String(values[1]), Boolean(values[2]));
-            assert.equal(JSON.stringify(result), JSON.stringify(values[3]));
-          });
-      });
-    });
-
-    describe('Xkb-kmn: getKeyActionOutputArrayFromActionStateOutputArray ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
-      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-
-      const b6ActionIdArr: ActionStateOutput[] = [
-        { "id": "A_0", "state": "1", "output": "ˆ" },
-        { "id": "A_1", "state": "1", "output": "Â" },
-        { "id": "A_10", "state": "1", "output": "ê" },
-        { "id": "A_11", "state": "1", "output": "î" },
-        { "id": "A_13", "state": "1", "output": "ô" },
-        { "id": "A_14", "state": "1", "output": "û" },
-        { "id": "A_2", "state": "1", "output": "Ê" },
-        { "id": "A_3", "state": "1", "output": "Î" },
-        { "id": "A_5", "state": "1", "output": "Ô" },
-        { "id": "A_6", "state": "1", "output": "Û" },
-        { "id": "A_9", "state": "1", "output": "â" }
-      ];
-
-      const b1KeycodeArr: KeylayoutFileData[] = [
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: 'ˆ' },
-        { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '1', outchar: 'Â' },
-        { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '2', outchar: 'Â' },
-        { keyCode: '14', key: 'K_E', actionId: 'A_10', behavior: '0', outchar: 'ê' },
-        { keyCode: '34', key: 'K_I', actionId: 'A_11', behavior: '0', outchar: 'î' },
-        { keyCode: '31', key: 'K_O', actionId: 'A_13', behavior: '0', outchar: 'ô' },
-        { keyCode: '32', key: 'K_U', actionId: 'A_14', behavior: '0', outchar: 'û' },
-        { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '1', outchar: 'Ê' },
-        { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '2', outchar: 'Ê' },
-        { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '1', outchar: 'Î' },
-        { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '2', outchar: 'Î' },
-        { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '1', outchar: 'Ô' },
-        { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '2', outchar: 'Ô' },
-        { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '1', outchar: 'Û' },
-        { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '2', outchar: 'Û' },
-        { keyCode: '0', key: 'K_A', actionId: 'A_9', behavior: '0', outchar: 'â' }
-      ];
-
-      [[b6ActionIdArr, b1KeycodeArr],
-      ].forEach(function (values) {
-        it(("getKeyActionOutputArrayFromActionStateOutputArray([['" + JSON.stringify(values[0]) + "'],..])").padEnd(73, " ") + '1 should return an array of objects', async function () {
-          const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
-        });
-      });
-
-      const oneEntryResult = [
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: 'ˆ' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: 'ˆ' },
-        { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
-        { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: 'ˆ' }
-      ];
   
-      const oneEntryResultNoOutput = [
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: '' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: '' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: '' },
-        { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: '' },
-        { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: '' },
-        { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: '' },
-        { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: '' },
-      ];
-
-      [[[{ "id": "A_0", "state": "1", "output": "ˆ" }], oneEntryResult],
-      [[{ "id": "A_0", "state": "1", "output": "" }], oneEntryResultNoOutput],
-      [[{ "id": "A_0", "state": "", "output": "ˆ" }], oneEntryResult],
-      ].forEach(function (values) {
-        it(("getKeyActionOutputArrayFromActionStateOutputArray(['" + JSON.stringify(values[0]) + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
-          const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+      describe('Xkb-kmn: getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+  
+        const b1KeycodeArr: KeylayoutFileData[] = [
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: 'ˆ' },
+          { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: 'ˆ' },
+          { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '2', outchar: 'Â' },
+          { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '1', outchar: 'Â' },
+          { keyCode: '14', key: 'K_E', actionId: 'A_10', behavior: '0', outchar: 'ê' },
+          { keyCode: '34', key: 'K_I', actionId: 'A_11', behavior: '0', outchar: 'î' },
+          { keyCode: '31', key: 'K_O', actionId: 'A_13', behavior: '0', outchar: 'ô' },
+          { keyCode: '32', key: 'K_U', actionId: 'A_14', behavior: '0', outchar: 'û' },
+          { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '2', outchar: 'Ê' },
+          { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '1', outchar: 'Ê' },
+          { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '2', outchar: 'Î' },
+          { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '1', outchar: 'Î' },
+          { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '2', outchar: 'Ô' },
+          { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '1', outchar: 'Ô' },
+          { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '2', outchar: 'Û' },
+          { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '1', outchar: 'Û' },
+          { keyCode: '0', key: 'K_A', actionId: 'A_9', behavior: '0', outchar: 'â' }
+  
+        ];
+        const b1ModifierKeyArr: KeylayoutFileData[] = [
+          { actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_SPACE', behavior: '1', modifier: 'CAPS', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_SPACE', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_SPACE', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_Z', behavior: '4', modifier: 'NCAPS SHIFT RALT', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_9', behavior: '4', modifier: 'NCAPS SHIFT RALT', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_COMMA', behavior: '4', modifier: 'NCAPS SHIFT RALT', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_SPACE', behavior: '3', modifier: 'NCAPS RALT CTRL', outchar: 'ˆ' },
+          { actionId: 'A_0', key: 'K_SPACE', behavior: '3', modifier: 'NCAPS CTRL', outchar: 'ˆ' },
+          { actionId: 'A_1', key: 'K_A', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Â' },
+          { actionId: 'A_1', key: 'K_A', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Â' },
+          { actionId: 'A_1', key: 'K_A', behavior: '1', modifier: 'CAPS', outchar: 'Â' },
+          { actionId: 'A_10', key: 'K_E', behavior: '0', modifier: 'NCAPS', outchar: 'ê' },
+          { actionId: 'A_11', key: 'K_I', behavior: '0', modifier: 'NCAPS', outchar: 'î' },
+          { actionId: 'A_13', key: 'K_O', behavior: '0', modifier: 'NCAPS', outchar: 'ô' },
+          { actionId: 'A_14', key: 'K_U', behavior: '0', modifier: 'NCAPS', outchar: 'û' },
+          { actionId: 'A_2', key: 'K_E', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Ê' },
+          { actionId: 'A_2', key: 'K_E', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Ê' },
+          { actionId: 'A_2', key: 'K_E', behavior: '1', modifier: 'CAPS', outchar: 'Ê' },
+          { actionId: 'A_3', key: 'K_I', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Î' },
+          { actionId: 'A_3', key: 'K_I', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Î' },
+          { actionId: 'A_3', key: 'K_I', behavior: '1', modifier: 'CAPS', outchar: 'Î' },
+          { actionId: 'A_5', key: 'K_O', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Ô' },
+          { actionId: 'A_5', key: 'K_O', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Ô' },
+          { actionId: 'A_5', key: 'K_O', behavior: '1', modifier: 'CAPS', outchar: 'Ô' },
+          { actionId: 'A_6', key: 'K_U', behavior: '2', modifier: 'NCAPS SHIFT', outchar: 'Û' },
+          { actionId: 'A_6', key: 'K_U', behavior: '2', modifier: 'SHIFT CAPS', outchar: 'Û' },
+          { actionId: 'A_6', key: 'K_U', behavior: '1', modifier: 'CAPS', outchar: 'Û' },
+          { actionId: 'A_9', key: 'K_A', behavior: '0', modifier: 'NCAPS', outchar: 'â' }
+        ];
+  
+        [[b1KeycodeArr, b1ModifierKeyArr],
+        [[{ keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
+        [[{ keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '', outchar: 'ˆ' }], [{ actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
+        [[{ keyCode: '49', key: 'K_SPACE', actionId: '', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: '', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
+        [[{ keyCode: '49', key: '', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: 'A_0', key: '', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
+        [[{ keyCode: '', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }], [{ actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: 'NCAPS', outchar: 'ˆ' }]],
+        [[{ keyCode: '', key: '', actionId: '', behavior: '0', modifier: '', outchar: '' }], [{ actionId: '', key: '', behavior: '0', modifier: 'NCAPS', outchar: '' }]],
+        ].forEach(function (values) {
+          const isCapsUsed = true;
+          const stringIn = "getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray(['" + "', '" + "', '" + values[0][0].keyCode + "', '" + values[0][0].key + "', '" + values[0][0].actionId + "', '" + values[0][0].modifier + "', '" + values[0][0].outchar + "'])";
+          const stringOut = "['" + "', '" + "', '" + values[1][0].key + "', '" + values[1][0].actionId + "', '" + "', '" + values[1][0].modifier + "', '" + values[1][0].outchar + "']";
+  
+          it((JSON.stringify(values[1]).length > 60) ? 'an array of objects should return an array of objects' :
+            stringIn.padEnd(74, " ") + ' should return ' + stringOut, async function () {
+              const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, values[0], isCapsUsed);
+              assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+            });
+        });
+  
+        [[{ keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }, { actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: '', outchar: 'ˆ' }],
+        [{ keyCode: '', key: 'K_SPACE', actionId: 'A_0', behavior: '0', modifier: '0', outchar: 'ˆ' }, { actionId: 'A_0', key: 'K_SPACE', behavior: '0', modifier: '', outchar: 'ˆ' }],
+        [{ keyCode: '', key: '', actionId: '', behavior: '0', modifier: '', outchar: '' }, { actionId: '', key: '', behavior: '0', modifier: '', outchar: '' }],
+        ].forEach(function (values) {
+          const isCapsUsed = false;
+          const stringIn = "getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray([ '" + values[0].keyCode + "', '" + values[0].key + "', '" + values[0].actionId + "', '" + values[0].modifier + "', '" + values[0].outchar + "'])";
+          const stringOut = "['" + values[1].actionId + "', '" + "', '" + values[1].modifier + "', '" + values[1].key + "', '" + values[1].outchar + "']";
+  
+          it(stringIn.padEnd(74, " ") + ' should return ' + stringOut, async function () {
+            const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, [values[0]], isCapsUsed);
+            assert.equal(JSON.stringify(result), JSON.stringify([values[1]]));
+          });
+        });
+  
+        [[[], []],
+        [undefined, []],
+        [null, []],
+        ].forEach(function (values) {
+          const isCaps = true;
+          it(("getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray([" + values[0] + "])").padEnd(74, " ") + ' should return ' + "[" + values[1] + "]", async function () {
+            const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, values[0], isCaps);
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+          });
         });
       });
-
-      [[[{ "id": "", "state": "1", "output": "ˆ" }], []],
-      [[{ "id": "", "state": "", "output": "" }], []],
-      [[{ "id": " ", "state": " ", "output": "" }], []],
-
-      ].forEach(function (values) {
-        it(("getKeyActionOutputArrayFromActionStateOutputArray(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
-          const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+  
+      describe('Xkb-kmn: getActionStateOutputArrayFromActionState ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+        [['1', [
+          { "id": "A_0", "state": "1", "output": "ˆ" },
+          { "id": "A_1", "state": "1", "output": "Â" },
+          { "id": "A_10", "state": "1", "output": "ê" },
+          { "id": "A_11", "state": "1", "output": "î" },
+          { "id": "A_13", "state": "1", "output": "ô" },
+          { "id": "A_14", "state": "1", "output": "û" },
+          { "id": "A_2", "state": "1", "output": "Ê" },
+          { "id": "A_3", "state": "1", "output": "Î" },
+          { "id": "A_5", "state": "1", "output": "Ô" },
+          { "id": "A_6", "state": "1", "output": "Û" },
+          { "id": "A_9", "state": "1", "output": "â" }
+        ],],
+        ['2', [
+          { "id": "A_0", "state": "2", "output": "`" },
+          { "id": "A_1", "state": "2", "output": "À" },
+          { "id": "A_10", "state": "2", "output": "è" },
+          { "id": "A_11", "state": "2", "output": "ì" },
+          { "id": "A_13", "state": "2", "output": "ò" },
+          { "id": "A_14", "state": "2", "output": "ù" },
+          { "id": "A_2", "state": "2", "output": "È" },
+          { "id": "A_3", "state": "2", "output": "Ì" },
+          { "id": "A_5", "state": "2", "output": "Ò" },
+          { "id": "A_6", "state": "2", "output": "Ù" },
+          { "id": "A_9", "state": "2", "output": "à" }
+        ],],
+        ['789', [],],
+        ['', [],],
+        [' ', [],],
+        [123, [],],
+        [null, [],],
+        [undefined, [],],
+        ].forEach(function (values) {
+          it((JSON.stringify(values[1]).length > 30) ?
+            ("getActionStateOutputArrayFromActionState('" + values[0] + "')").padEnd(60, " ") + ' should return an array of objects' :
+            ("getActionStateOutputArrayFromActionState('" + values[0] + "')").padEnd(60, " ") + ' should return ' + "'" + JSON.stringify(values[1]) + "'", async function () {
+              const result = sut.getActionStateOutputArrayFromActionState(read, String(values[0]));
+              assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+            });
         });
       });
-
-      [[, []],
-      [undefined, []],
-      [null, []],
-      ].forEach(function (values) {
-        it(("getKeyActionOutputArrayFromActionStateOutputArray(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
-          const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
-          assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+  
+      describe('Xkb-kmn: getActionOutputbehaviorKeyModiFromActionIDStateOutput ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+        const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+        [
+          ['A_1', 'A', true,
+            [{ "outchar": "A", "actionId": "A_1", "behavior": "1", "key": "K_A", "modifier": "CAPS" },
+            { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "NCAPS SHIFT" },
+            { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "SHIFT CAPS" }]
+          ],
+          ['A_1', 'A', false,
+            [{ "outchar": "A", "actionId": "A_1", "behavior": "1", "key": "K_A", "modifier": "CAPS" },
+            { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "SHIFT" },
+            { "outchar": "A", "actionId": "A_1", "behavior": "2", "key": "K_A", "modifier": "SHIFT CAPS" }]
+          ],
+          ['A_9', 'a', true, [{ "outchar": "a", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "NCAPS" }]],
+          ['A_9', 'a', false, [{ "outchar": "a", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "" }]],
+          ['A_9', 'a', , [{ "outchar": "a", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "" }]],
+          ['A_9', '', true, [{ "outchar": "", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "NCAPS" }]],
+          ['A_9', '', false, [{ "outchar": "", "actionId": "A_9", "behavior": "0", "key": "K_A", "modifier": "" }]],
+          ['', 'a', true, []],
+          ['', 'a', false, []],
+          ['', '', , []],
+        ].forEach(function (values) {
+          it((JSON.stringify(values[3]).length > 35) ?
+            ("getActionOutputbehaviorKeyModiFromActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return an array of objects' :
+            ("getActionOutputbehaviorKeyModiFromActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return ' + "'" + JSON.stringify(values[3]) + "'", async function () {
+              const result = sut.getActionOutputBehaviorKeyModiFromActionIDStateOutput(read, converted.modifiers, String(values[0]), String(values[1]), Boolean(values[2]));
+              assert.equal(JSON.stringify(result), JSON.stringify(values[3]));
+            });
         });
       });
-    });
-
-    describe('Xkb-kmn: createRuleData ', function () {
-      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      const sutR = new XkbFileReader(compilerTestCallbacks);
-      [
-        [
-          ['../data/tests-xkb-kmn/Test_C0.keylayout'],
-          [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
-          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
-          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
-          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_D', new TextEncoder().encode('d'))]
-        ],
-        [
-          ['../data/tests-xkb-kmn/Test_C1.keylayout'],
-          [new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
-          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))]
-        ],
-        [
-          ['../data/tests-xkb-kmn/Test_C2.keylayout'],
-          [new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))],
-        ],
-        [
-          ['../data/tests-xkb-kmn/Test_C3.keylayout'],
-          [new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))]
-        ],
-
-        [
-          ['../data/tests-xkb-kmn/Test_C3_several.keylayout'],
-          [new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â'))]
-        ],
-        [
-          ['../data/tests-xkb-kmn/Test_C0_C1_C2_C3.keylayout'],
-          [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
-          new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
-          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 1, 'CAPS', 'K_S', 2, 6, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 3, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 4, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 5, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
-          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_S', 2, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
-          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_U', new TextEncoder().encode('U')),]
-        ],
-      ].forEach(function (values: any) {
-        it('data of \'' + values[0] + "' passed into createRuleData() " + 'should create an array of rules', async function () {
-          const inputFilename = makePathToFixture(values[0][0]);
-          const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-          const processedData = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
-          assert.deepEqual(processedData.rules[0], values[1][0]);
+  
+      describe('Xkb-kmn: getKeyActionOutputArrayFromActionStateOutputArray ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        const inputFilename = makePathToFixture('../data/tests-xkb-kmn/Test.keylayout');
+        const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+  
+        const b6ActionIdArr: ActionStateOutput[] = [
+          { "id": "A_0", "state": "1", "output": "ˆ" },
+          { "id": "A_1", "state": "1", "output": "Â" },
+          { "id": "A_10", "state": "1", "output": "ê" },
+          { "id": "A_11", "state": "1", "output": "î" },
+          { "id": "A_13", "state": "1", "output": "ô" },
+          { "id": "A_14", "state": "1", "output": "û" },
+          { "id": "A_2", "state": "1", "output": "Ê" },
+          { "id": "A_3", "state": "1", "output": "Î" },
+          { "id": "A_5", "state": "1", "output": "Ô" },
+          { "id": "A_6", "state": "1", "output": "Û" },
+          { "id": "A_9", "state": "1", "output": "â" }
+        ];
+  
+        const b1KeycodeArr: KeylayoutFileData[] = [
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: 'ˆ' },
+          { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '1', outchar: 'Â' },
+          { keyCode: '0', key: 'K_A', actionId: 'A_1', behavior: '2', outchar: 'Â' },
+          { keyCode: '14', key: 'K_E', actionId: 'A_10', behavior: '0', outchar: 'ê' },
+          { keyCode: '34', key: 'K_I', actionId: 'A_11', behavior: '0', outchar: 'î' },
+          { keyCode: '31', key: 'K_O', actionId: 'A_13', behavior: '0', outchar: 'ô' },
+          { keyCode: '32', key: 'K_U', actionId: 'A_14', behavior: '0', outchar: 'û' },
+          { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '1', outchar: 'Ê' },
+          { keyCode: '14', key: 'K_E', actionId: 'A_2', behavior: '2', outchar: 'Ê' },
+          { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '1', outchar: 'Î' },
+          { keyCode: '34', key: 'K_I', actionId: 'A_3', behavior: '2', outchar: 'Î' },
+          { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '1', outchar: 'Ô' },
+          { keyCode: '31', key: 'K_O', actionId: 'A_5', behavior: '2', outchar: 'Ô' },
+          { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '1', outchar: 'Û' },
+          { keyCode: '32', key: 'K_U', actionId: 'A_6', behavior: '2', outchar: 'Û' },
+          { keyCode: '0', key: 'K_A', actionId: 'A_9', behavior: '0', outchar: 'â' }
+        ];
+  
+        [[b6ActionIdArr, b1KeycodeArr],
+        ].forEach(function (values) {
+          it(("getKeyActionOutputArrayFromActionStateOutputArray([['" + JSON.stringify(values[0]) + "'],..])").padEnd(73, " ") + '1 should return an array of objects', async function () {
+            const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+          });
+        });
+  
+        const oneEntryResult = [
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: 'ˆ' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: 'ˆ' },
+          { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: 'ˆ' },
+          { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: 'ˆ' }
+        ];
+    
+        const oneEntryResultNoOutput = [
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '0', outchar: '' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '1', outchar: '' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '2', outchar: '' },
+          { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behavior: '3', outchar: '' },
+          { keyCode: '6', key: 'K_Z', actionId: 'A_0', behavior: '4', outchar: '' },
+          { keyCode: '25', key: 'K_9', actionId: 'A_0', behavior: '4', outchar: '' },
+          { keyCode: '43', key: 'K_COMMA', actionId: 'A_0', behavior: '4', outchar: '' },
+        ];
+  
+        [[[{ "id": "A_0", "state": "1", "output": "ˆ" }], oneEntryResult],
+        [[{ "id": "A_0", "state": "1", "output": "" }], oneEntryResultNoOutput],
+        [[{ "id": "A_0", "state": "", "output": "ˆ" }], oneEntryResult],
+        ].forEach(function (values) {
+          it(("getKeyActionOutputArrayFromActionStateOutputArray(['" + JSON.stringify(values[0]) + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
+            const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+          });
+        });
+  
+        [[[{ "id": "", "state": "1", "output": "ˆ" }], []],
+        [[{ "id": "", "state": "", "output": "" }], []],
+        [[{ "id": " ", "state": " ", "output": "" }], []],
+  
+        ].forEach(function (values) {
+          it(("getKeyActionOutputArrayFromActionStateOutputArray(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
+            const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+          });
+        });
+  
+        [[, []],
+        [undefined, []],
+        [null, []],
+        ].forEach(function (values) {
+          it(("getKeyActionOutputArrayFromActionStateOutputArray(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
+            const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+            assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+          });
         });
       });
-    });
-  */
+  
+      describe('Xkb-kmn: createRuleData ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const sutR = new XkbFileReader(compilerTestCallbacks);
+        [
+          [
+            ['../data/tests-xkb-kmn/Test_C0.keylayout'],
+            [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
+            new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
+            new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
+            new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_D', new TextEncoder().encode('d'))]
+          ],
+          [
+            ['../data/tests-xkb-kmn/Test_C1.keylayout'],
+            [new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
+            new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))]
+          ],
+          [
+            ['../data/tests-xkb-kmn/Test_C2.keylayout'],
+            [new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))],
+          ],
+          [
+            ['../data/tests-xkb-kmn/Test_C3.keylayout'],
+            [new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))]
+          ],
+  
+          [
+            ['../data/tests-xkb-kmn/Test_C3_several.keylayout'],
+            [new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â'))]
+          ],
+          [
+            ['../data/tests-xkb-kmn/Test_C0_C1_C2_C3.keylayout'],
+            [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
+            new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
+            new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 1, 'CAPS', 'K_S', 2, 6, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 3, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 4, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 5, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
+            new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_S', 2, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+            new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_U', new TextEncoder().encode('U')),]
+          ],
+        ].forEach(function (values: any) {
+          it('data of \'' + values[0] + "' passed into createRuleData() " + 'should create an array of rules', async function () {
+            const inputFilename = makePathToFixture(values[0][0]);
+            const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+            const processedData = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+            assert.deepEqual(processedData.rules[0], values[1][0]);
+          });
+        });
+      });
+    */
 });
