@@ -222,7 +222,6 @@ constexpr km_core_option_item const expected_persist_opt = {
   KM_CORE_OPT_KEYBOARD
 };
 
-
 extern "C"
 {
   uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_object){

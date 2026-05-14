@@ -93,9 +93,6 @@ namespace core
     return key == nullptr;
   }
 
-  /**
-   * Clones an array of km_core_option_item, performing deep copies of the strings.
-   */
   km_core_option_item * clone_options(km_core_option_item const *src);
 
 } // namespace core

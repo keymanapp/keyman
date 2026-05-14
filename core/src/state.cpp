@@ -11,7 +11,6 @@
 #include <keyman/keyman_core_api_consts.h>
 #include <cstring>
 
-
 using namespace km::core;
 
 void actions::push_persist(option const &opt) {
