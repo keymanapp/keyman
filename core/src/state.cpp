@@ -122,10 +122,10 @@ void state::apply_actions_and_merge_app_context() {
 
   if(this->processor().supports_normalization()) {
     // Normalize to NFC for those keyboard processors that support it
-    if(!km::core::actions_normalize(&cached_context, &app_context, this->_action_struct)) {
-      km::core::actions_dispose(this->_action_struct);
-      return;
-    }
+    //if(!km::core::actions_normalize(&cached_context, &app_context, this->_action_struct)) {
+    //  km::core::actions_dispose(this->_action_struct);
+   //   return;
+    //}
   } else {
     // For all other keyboard processors, we just copy the cached_context to the app_context
     if(!km::core::actions_update_app_context_nfu(&cached_context, &app_context)) {
@@ -133,6 +133,5 @@ void state::apply_actions_and_merge_app_context() {
       return;
     }
   }
-
   this->_action_struct.deleted_context = km::core::get_deleted_context(app_context_for_deletion, this->_action_struct.code_points_to_delete);
 }

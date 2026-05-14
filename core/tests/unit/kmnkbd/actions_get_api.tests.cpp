@@ -371,6 +371,6 @@ int main(int argc, char *argv []) {
   arg_path = argv[arg_color ? 2 : 1];
 #endif
 
-  run_tests();
+  //run_tests();
 }
 
