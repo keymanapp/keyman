@@ -9,7 +9,7 @@
  */
 
 import { SENTINEL_CODE_UNIT } from "@keymanapp/models-templates";
-import { SearchNode } from "./distance-modeler.js";
+import { PathEdge, SearchNode } from "./distance-modeler.js";
 import { SearchQuotientNode } from "./search-quotient-node.js";
 import { SearchQuotientSpur } from "./search-quotient-spur.js";
 import { TokenResultMapping } from "./token-result-mapping.js";
@@ -34,7 +34,7 @@ export class InsertionQuotientSpur extends SearchQuotientSpur {
     return baseNodes
       // If there are already at least 2 edits for a node, do not add new edits.
       // Also, do not permit insert edits to follow delete edits.
-      .filter((n) => n.lastEdgeType != 'deletion' && n.editCount < 2)
+      .filter((n) => n.lastEdgeType != PathEdge.DELETION && n.editCount < 2)
       .flatMap((n) => n.buildInsertionEdges(this.spaceId));
   }
 
