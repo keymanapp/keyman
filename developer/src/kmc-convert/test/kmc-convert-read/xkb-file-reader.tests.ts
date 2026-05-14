@@ -22,7 +22,7 @@ describe('XkbFileReader', function () {
     const sutR = new XkbFileReader(compilerTestCallbacks);
 
     it('read() should return filled array on correct input', async function () {
-      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/de_simple');
+      const inputFilename = makePathToFixture('../data/tests-xkb-kmn/de-simple');
       const result = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
       assert.isNotEmpty(result);
     });

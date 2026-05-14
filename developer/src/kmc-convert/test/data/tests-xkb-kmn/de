@@ -1,5 +1,4 @@
-default
-xkb_symbols "basic" {
+default xkb_symbols "basic" {
 
     include "latin(type4)"
 
@@ -36,7 +35,7 @@ xkb_symbols "basic" {
     key <LSGT>	{ [     less,     greater,                  bar, dead_belowmacron ] };
 
     include "kpdl(comma)"
-ẞß
+
     include "level3(ralt_switch)"
 };
 

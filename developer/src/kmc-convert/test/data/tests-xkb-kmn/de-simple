@@ -1,8 +1,7 @@
 // Common Latin alphabet layout
 // 0x1001E9E on key key <AE12>, key <AC10> , key <LSGT> added for testing purposes by SAB
 
-default partial
-xkb_symbols "basic" {
+default xkb_symbols "basic" {
 
     key <AE01>	{ [         1,     exclam,  onesuperior,   exclamdown ]	}; 
 	key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};
