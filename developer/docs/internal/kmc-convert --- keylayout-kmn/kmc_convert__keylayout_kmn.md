@@ -63,8 +63,13 @@ _<left>minimal example C0<left>_<br><br><br><br><br>
 
 # Architecture of kmc-convert <br>(keylayout ->kmn)
 
+In the future the architecture of kmc-convert will look like this:
+
+![image](kmc_convert_futureArchitecture.png)
+
+As a start we first focus on a conversion where datra is stored in an array instead of using an AST as described below
+
 ### Data is read from a .keylayout file using KeymanXmlReader
-At present we use an array of rules to collect all data. In the future this will be replaced by an AST
 
 ![image](kmcConvertArchitecture.png)
 _<left>architecture of kmc-convert <left>_<br><br><br>
