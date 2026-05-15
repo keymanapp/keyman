@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.232 alpha 2026-05-15
+
+* docs: clarify Build-bot test build trigger (#15958)
+
 ## 19.0.231 alpha 2026-05-13
 
 * chore(deps): bump lodash and @microsoft/api-extractor (#15829)
