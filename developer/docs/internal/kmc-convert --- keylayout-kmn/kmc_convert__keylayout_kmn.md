@@ -81,7 +81,7 @@ After reading data and finding all possible modifier-key combinations specified 
 
 If a second or first modifier/key combination is not used the appropriate elements will not contain data
 
-![image](rule.png)
+![image](Rule.png)
 _<left>rule object containing data for all rules<left>_<br><br>
 
 In Rule[ ] each “Rule” is an Object and represents a case C0-C4. This ‘Data’ might look like that:
