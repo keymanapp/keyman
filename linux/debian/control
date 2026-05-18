@@ -90,6 +90,7 @@ Depends:
  dconf-cli,
  gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
  keyman-engine,
+ procps,
  python3-bs4,
  python3-fonttools,
  python3-gi,
