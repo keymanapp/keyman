@@ -88,11 +88,21 @@ namespace
     // output
     std::cout << "output: " << (actions.output ? std::u32string(actions.output) : U"(null)")
               << " expected: " << (expected_output ? std::u32string(expected_output) : U"(null)") << std::endl;
-    if (expected_output != actions.output) {
+    bool output_equal = false;
+    if (expected_output == actions.output) { // nullptr or same pointer
+      output_equal = true;
+    } else if (!expected_output || !actions.output) {
+      output_equal = false;
+    } else if (expected_output && actions.output) {
       if (std::u32string(actions.output) != std::u32string(expected_output)) {
-        std::cout << " [FAIL]" << std::endl;
-        all_passed = false;
+        output_equal = false;
+      } else {
+        output_equal = true;
       }
+    }
+    if (!output_equal) {
+      std::cout << " [FAIL]" << std::endl;
+      all_passed = false;
     } else {
       std::cout << " [PASS]" << std::endl;
     }
@@ -166,6 +176,25 @@ namespace
     } else {
         std::cout << " [PASS]" << std::endl;
     }
+    bool deleted_equal = false;
+    if (expected_deleted_context == actions.deleted_context) { // nullptr or same pointer
+      deleted_equal = true;
+    } else if (!expected_deleted_context || !actions.deleted_context) {
+      deleted_equal = false;
+    } else if (expected_deleted_context && actions.deleted_context) {
+      if (std::u32string(actions.deleted_context) != std::u32string(expected_deleted_context)) {
+        deleted_equal = false;
+      } else {
+        deleted_equal = true;
+      }
+    }
+    if (!deleted_equal) {
+      std::cout << " [FAIL]" << std::endl;
+      all_passed = false;
+    } else {
+      std::cout << " [PASS]" << std::endl;
+    }
+
 
     std::cout << "=== End comparison ===" << std::endl << std::endl;
 
@@ -302,6 +331,7 @@ int main(int argc, char * argv[])
   // Without the calling `km_core_state_context_set_if_needed` action struct has a delete for 'L'?
   km_core_cu const *state_context = get_context_as_string(km_core_state_context(test_state));
   km_core_state_context_set_if_needed(test_state, state_context);
+  delete [] state_context;
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_F2, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
 
