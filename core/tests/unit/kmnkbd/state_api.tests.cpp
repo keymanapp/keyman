@@ -251,6 +251,12 @@ constexpr km_core_option_item const expected_persist_opt = {
   KM_CORE_OPT_KEYBOARD
 };
 
+//constexpr km_core_option_item const clone_persist_opt = {
+//  u"__test_clone",
+//  u"Not in original",
+//  KM_CORE_OPT_KEYBOARD
+//};
+
 extern "C"
 {
   uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_object){
@@ -270,6 +276,7 @@ int main(int argc, char * argv[])
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr,
                * test_clone = nullptr;
+//               * test_clone2 = nullptr;
   test_kb = (km_core_keyboard *)new km::core::mock_processor(km::core::path("dummy.mock"));
 
   // Simple sanity tests.
@@ -393,9 +400,34 @@ int main(int argc, char * argv[])
     clone_state_deleted_text
   ));
 
+// Need to test the option pointer is pointing to the correct the correct _option_items_stack.
+// This could not be tested like this as the way commit() works adding KM_CORE_IT_END to the
+// end of the actions list. This means when calling km_core_state_queue_action_items
+// I get an assert in push_persist "empty() || back().type != KM_CORE_IT_END" it is a protection
+// against adding a action to an already commited list.
+// To test this change I need to do mocking closer to the integration of that actions list.
+
+
+
+// km_core_action_item actions_test[] = {
+//   { KM_CORE_IT_PERSIST_OPT, {0,}, },
+//   { KM_CORE_IT_END,         {0,}, }
+// };
+
+// actions_test[0].option = &clone_persist_opt;
+
+//try_status(km_core_state_create(test_kb, test_env_opts, &test_clone2));
+
+
+//km_core_state_queue_action_items(test_clone2, actions_test);
+//test_assert(action_items(test_clone2, actions_test));
+
+//test_assert(action_items(test_clone2, {action_clone, {KM_CORE_IT_END}}));
+
   // Destroy them
    km_core_state_dispose(test_state);
    km_core_state_dispose(test_clone);
+   //km_core_state_dispose(test_clone2);
    km_core_keyboard_dispose(test_kb);
 
   return 0;

@@ -36,6 +36,25 @@ void actions::push_capslock(bool turnOn) {
   emplace_back(std::move(ai));
 }
 
+actions::actions(actions const &other)
+: std::vector<action>(other)
+, _option_items_stack(other._option_items_stack)
+{
+  // Update all option pointers to point to the new stack
+  for (auto &item : *this) {
+    if (item.type == KM_CORE_IT_PERSIST_OPT && item.option) {
+      // Find the corresponding option in the new stack
+      // The pointers in the original point to positions in other._option_items_stack
+      // We need to find the equivalent position in our _option_items_stack
+      auto original_ptr = item.option;
+      auto original_base = reinterpret_cast<km_core_option_item const *>(other._option_items_stack.data());
+      auto offset = original_ptr - original_base;
+      if (offset >= 0 && static_cast<size_t>(offset) < _option_items_stack.size()) {
+        item.option = &_option_items_stack[offset];
+      }
+    }
+  }
+}
 
 state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   : _processor(ap)

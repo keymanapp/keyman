@@ -125,8 +125,17 @@ namespace km {
     {
       assert(state);
       assert(action_item);
-      if ((!state) || (!action_item))
+      if ((!state) || (!action_item)){
         return false;
+      }
+      // For this mock processor we only support queuing PERSIST_OPT action items.
+      if (action_item->type == KM_CORE_IT_PERSIST_OPT && action_item->option) {
+        state->actions().push_persist(update_option(static_cast<km_core_option_scope>(action_item->option->scope), action_item->option->key, action_item->option->value));
+        return true;
+      }
+      else {
+        return false;
+      }
       return false;
     }
 
