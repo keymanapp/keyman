@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { deepCopy } from "keyman/common/web-utils";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { models, predictFromCorrections, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
+import { models, predictFromCorrectionSequence, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -71,10 +71,10 @@ const DUMMY_MODEL_CONFIG = {
   languageUsesCasing: true
 };
 
-describe('predictFromCorrections', () => {
+describe('predictFromCorrectionSequence', () => {
   it('handles a single correction prefixing multiple entries - no transform ID', () => {
     const context: Context = {
-      left: 'It',
+      left: '',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
@@ -82,7 +82,7 @@ describe('predictFromCorrections', () => {
 
     const correctionDistribution: Distribution<Transform> = [{
         sample: {
-          insert: 's',
+          insert: 'Its',
           deleteLeft: 0
         },
         p: 0.6
@@ -112,12 +112,15 @@ describe('predictFromCorrections', () => {
       futureSuggestions: [ dummied_suggestions ]
     });
 
-    const predictions = predictFromCorrections(model, correctionDistribution, context);
+    const predictions = predictFromCorrectionSequence(model, correctionDistribution, context);
     predictions.forEach((entry) => assert.equal(entry.correction.sample, 'Its'));
     predictions.forEach((entry) => assert.equal(entry.correction.p, 0.6));
     predictions.sort(tupleDisplayOrderSort);
 
-    assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions);
+    assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((s) => {
+      delete s.p;
+      return s;
+    }));
 
     assert.approximately(predictions[0].totalProb, 0.18 * 0.6, 0.00001);
     assert.approximately(predictions[1].totalProb, 0.02 * 0.6, 0.00001);
@@ -125,7 +128,7 @@ describe('predictFromCorrections', () => {
 
   it('handles a single correction prefixing multiple entries - with transform ID', () => {
     const context: Context = {
-      left: 'It',
+      left: '',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
@@ -133,7 +136,7 @@ describe('predictFromCorrections', () => {
 
     const correctionDistribution: Distribution<Transform> = [{
         sample: {
-          insert: 's',
+          insert: 'Its',
           deleteLeft: 0,
           id: 314159
         },
@@ -164,7 +167,7 @@ describe('predictFromCorrections', () => {
       futureSuggestions: [ dummied_suggestions ]
     });
 
-    const predictions = predictFromCorrections(model, correctionDistribution, context);
+    const predictions = predictFromCorrectionSequence(model, correctionDistribution, context);
     predictions.forEach((entry) => assert.equal(entry.correction.sample, 'Its'));
     predictions.forEach((entry) => assert.equal(entry.correction.p, 0.6));
     predictions.sort(tupleDisplayOrderSort);
@@ -173,89 +176,11 @@ describe('predictFromCorrections', () => {
     assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((entry) => {
       entry = deepCopy(entry);
       entry.transformId = 314159;
+      delete entry.p;
       return entry;
     }));
 
     assert.approximately(predictions[0].totalProb, 0.18 * 0.6, 0.00001);
     assert.approximately(predictions[1].totalProb, 0.02 * 0.6, 0.00001);
-  });
-
-  it('handles multiple corrections at once', () => {
-    const context: Context = {
-      left: 'It',
-      right: '',
-      startOfBuffer: true,
-      endOfBuffer: true
-    };
-
-    // Note:  each correction is used in order in a separate model.predict call.
-    /** @type {Distribution<Transform>} */
-    const correctionDistribution: Distribution<Transform> = [{
-        // postContext:  is
-        sample: {
-          insert: 's',
-          deleteLeft: 1
-        },
-        p: 0.4
-      }, {
-        // postContext: its
-        sample: {
-          insert: 's',
-          deleteLeft: 0
-        },
-        p: 0.6
-      }
-    ];
-
-    const dummied_suggestions: Outcome<Suggestion>[][] = [
-      // postContext:  is
-      [{
-        transform: {
-          insert: "is",
-          deleteLeft: 2
-        },
-        displayAs: "is",
-        p: 0.4
-      }, {
-        transform: {
-          insert: "isn't",
-          deleteLeft: 2
-        },
-        displayAs: "isn't",
-        p: 0.2
-      }],
-      // postContext: its
-      [{
-        transform: {
-          insert: "it's",
-          deleteLeft: 2
-        },
-        displayAs: "it's",
-        p: 0.18
-      }, {
-        transform: {
-          insert: "its",
-          deleteLeft: 2
-        },
-        displayAs: "its",
-        p: 0.02
-      }]
-    ];
-
-    const model = new DummyModel({
-      ...DUMMY_MODEL_CONFIG,
-      futureSuggestions: dummied_suggestions
-    });
-
-    const predictions = predictFromCorrections(model, correctionDistribution, context);
-    predictions.sort(tupleDisplayOrderSort);
-
-    assert.sameOrderedMembers(predictions.map((entry) => entry.prediction.sample.displayAs), ["is", "it's", "isn't", "its"]);
-    assert.sameDeepMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.flatMap((entry) => entry));
-
-    assert.approximately(predictions[0].totalProb, 0.4 * 0.4, 0.00001);
-    assert.approximately(predictions[1].totalProb, 0.18 * 0.6, 0.00001);
-    assert.approximately(predictions[2].totalProb, 0.4 * 0.2, 0.00001);
-    assert.approximately(predictions[3].totalProb, 0.02 * 0.6, 0.00001);
   });
 });
