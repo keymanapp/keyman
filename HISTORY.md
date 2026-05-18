@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 19.0.233 alpha 2026-05-18
+
+* chore(deps): bump path-to-regexp and express (#15902)
+* chore(deps): bump ip-address and socks (#15918)
+* chore(deps): bump fast-uri from 3.1.0 to 3.1.2 (#15932)
+* chore(deps): bump fast-xml-parser from 5.3.8 to 5.7.1 (#15868)
+* chore(deps): bump ip-address from 10.1.0 to 10.2.0 in /developer/src/server/src/win32/trayicon/addon-src (#15921)
+* fix(linux): add dependency on `procps` (#15967)
+* maint(linux): fix source tarball verification (#15966)
+
 ## 19.0.232 alpha 2026-05-15
 
 * docs: clarify Build-bot test build trigger (#15958)
