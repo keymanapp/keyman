@@ -22,7 +22,7 @@ export interface ConverterResult extends KeymanCompilerResult {
   artifacts: ConverterArtifacts;
 };
 
-export interface ConverterToKmnResult extends ConverterResult {
+interface ConverterToKmnResult extends ConverterResult {
   /*
    * Internal in-memory build artifacts from a successful compilation. Caller
    * can write these to disk with {@link Converter.write}
@@ -1038,7 +1038,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /** @internal */
-  public convertBound = {
+  public unitTestEndpoints = {
     convert: this.convert.bind(this),
   };
 }
