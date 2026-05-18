@@ -663,23 +663,25 @@ export function shouldStopSearchingEarly(
  * Given a generated set of corrections from the correction-search process, this
  * function searches the lexical model for valid predictions rooted on each.
  *
- * While doing so, it also associates each prediction with metadata used for
- * to "rank" and select the best predictions once the search is complete.  This
- * is performed at later stages.
+ * While doing so, it also associates each prediction with metadata used for to
+ * "rank" and select the best predictions once the search is complete.  This is
+ * performed at later stages.
  * @param lexicalModel
- * @param corrections
- * @param context
+ * @param corrections Each `correction` should insert a full token's text to be
+ * appended to the context resulting from all preceding corrections.
+ * @param rootContext This context should represent all portions of the post-context
+ * not represented by the entries of the `corrections` array.
  * @returns
  */
 export function predictFromCorrectionSequence(
   lexicalModel: LexicalModel,
   corrections: ProbabilityMass<Transform>[],
-  context: Context
+  rootContext: Context
 ): CorrectionPredictionTuple[] {
   let predictionPrefixSequence: ProbabilityMass<Suggestion>[] = [];
   let tailPredictions: ProbabilityMass<Suggestion>[];
 
-  let currentContext = context;
+  let currentContext = rootContext;
   let successfulPredictions = 0;
 
   for(let i = 0; i < corrections.length; i++) {
@@ -701,7 +703,7 @@ export function predictFromCorrectionSequence(
         // It's not found in the lexicon, so we'll take a low probability for it.
         //
         // Edit penalties will be applied via the correction component separately later on.
-        p: -Math.exp(EDIT_DISTANCE_COST_SCALE)
+        p: Math.exp(-EDIT_DISTANCE_COST_SCALE)
       });
     }
 
