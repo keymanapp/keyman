@@ -92,7 +92,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
-    it('run() should throw on null input file name and null output file name', async function () {
+    it(') should throw on null input file name and null output file name', async function () {
       // note, could use 'chai as promised' library to make this more fluent:
       const result = sut.run(null, null);
       assert.isNotNull(result);
@@ -119,7 +119,8 @@ describe('KeylayoutToKmnConverter', function () {
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead());
+      //assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead());
+      assert.isTrue(compilerTestCallbacks.hasMessage(ConverterMessages.ERROR_UnableToRead));
       assert.equal(compilerTestCallbacks.messages[1].code, 5292037);
     });
   });

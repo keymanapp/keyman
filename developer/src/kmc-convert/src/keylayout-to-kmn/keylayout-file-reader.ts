@@ -161,9 +161,9 @@ export class KeylayoutFileReader {
       this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
       return jsonObj;
     }
-    catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+    catch (err: any) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ errorText: err }));
       return null;
     }
   }
-}
+};
