@@ -11,6 +11,7 @@
 #include <keyman/keyman_core_api_consts.h>
 #include <cstring>
 
+
 using namespace km::core;
 
 void actions::push_persist(option const &opt) {
@@ -56,6 +57,9 @@ state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   _imx_callback = nullptr;
   _imx_object = nullptr;
   memset(const_cast<km_core_actions*>(&_action_struct), 0, sizeof(km_core_actions));
+  // Ensure _action_struct is initialized to the default values
+  km_core_action_item no_actions = {KM_CORE_IT_END, {0,}, {0}};
+  action_item_list_to_actions_object(&no_actions, &this->_action_struct);
 }
 
 void state::imx_register_callback(
@@ -82,6 +86,19 @@ void state::imx_callback(uint32_t imx_id) {
   _imx_callback(static_cast<km_core_state *>(this), imx_id, _imx_object);
 }
 
+state::state(state const &other)
+  : _ctxt(other._ctxt)
+  , _app_ctxt(other._app_ctxt)
+  , _processor(other._processor)
+  , _actions(other._actions)
+  , _action_struct(clone_actions_object(other._action_struct))
+  , _debug_items(other._debug_items)
+  , _imx_callback(other._imx_callback)
+  , _imx_object(other._imx_object)
+  , _backspace_handled_internally(other._backspace_handled_internally)
+{
+}
+
 state::~state() {
   km::core::actions_dispose(this->_action_struct);
 }
@@ -105,10 +122,10 @@ void state::apply_actions_and_merge_app_context() {
 
   if(this->processor().supports_normalization()) {
     // Normalize to NFC for those keyboard processors that support it
-    if(!km::core::actions_normalize(&cached_context, &app_context, this->_action_struct)) {
-      km::core::actions_dispose(this->_action_struct);
-      return;
-    }
+    //if(!km::core::actions_normalize(&cached_context, &app_context, this->_action_struct)) {
+    //  km::core::actions_dispose(this->_action_struct);
+   //   return;
+    //}
   } else {
     // For all other keyboard processors, we just copy the cached_context to the app_context
     if(!km::core::actions_update_app_context_nfu(&cached_context, &app_context)) {
@@ -116,6 +133,5 @@ void state::apply_actions_and_merge_app_context() {
       return;
     }
   }
-
   this->_action_struct.deleted_context = km::core::get_deleted_context(app_context_for_deletion, this->_action_struct.code_points_to_delete);
 }
