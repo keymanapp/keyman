@@ -36,7 +36,19 @@ welcome.htm
     is also the entry point for help when accessed via Keyman's help
     system or Keyman Configuration.
 
-## Step 1) Share the lexical model package file
+## Sharing the lexical model through Keyman Cloud
+
+Follow the [Keyman Cloud Lexical Models Repository guide](/developer/lexical-models) for
+instructions on how to make your lexical model available through Keyman Cloud,
+where it will become seamlessly available to all users of Keyman.
+
+## Sharing the lexical model through other channels
+
+Using Keyman Cloud is the recommended and simplest model of distribution, as it
+is generally seamless for end users. However, it is also possible to distribute
+a lexical model package through other mechanisms:
+
+### Step 1) Share the lexical model package file
 
 Once the lexical model package .kmp file is created, you can share them
 via external storage devices (USB drive, SD card, etc). If that is not
@@ -45,7 +57,7 @@ this example, the lexical model package for SENĆOŦEN is being uploaded:
 
 1.  nrc.str.sencoten.model.kmp (the lexical model package .kmp file)
 
-## Step 2) Create a link to the KMP file
+### Step 2) Create a link to the KMP file
 
 Once all the files have been uploaded, you will need to provide a link
 to the lexical model package .kmp file for your device to download and
