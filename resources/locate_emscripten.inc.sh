@@ -38,7 +38,7 @@ locate_emscripten() {
   if [[ -z "${EMSCRIPTEN_BASE:-}" ]]; then
     if [[ -z "${EMCC:-}" ]]; then
       local EMCC
-      EMCC="$(command -v "${EMCC_EXECUTABLE}")"
+      EMCC="$(command -v "${EMCC_EXECUTABLE}" || true)"
       [[ -z "${EMCC}" ]] && builder_die "locate_emscripten: Could not locate emscripten (${EMCC_EXECUTABLE}) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
     fi
     [[ -f "${EMCC}" && ! -x "${EMCC}" ]] && builder_die "locate_emscripten: Variable EMCC (${EMCC}) points to ${EMCC_EXECUTABLE} but it is not executable"

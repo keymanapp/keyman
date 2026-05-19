@@ -124,7 +124,7 @@ function add_zip_files() {
     if [[ -z "${SEVENZ+x}" ]]; then
       if builder_is_windows; then
         if [[ -z "${SEVENZ_HOME+x}" ]]; then
-          SEVENZ="$(command -v 7z.exe)"
+          SEVENZ="$(command -v 7z.exe || true)"
         else
           SEVENZ="${SEVENZ_HOME}/7z.exe"
         fi
