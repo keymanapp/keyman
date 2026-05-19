@@ -85,6 +85,19 @@ void state::imx_callback(uint32_t imx_id) {
   _imx_callback(static_cast<km_core_state *>(this), imx_id, _imx_object);
 }
 
+state::state(state const &other)
+  : _ctxt(other._ctxt)
+  , _app_ctxt(other._app_ctxt)
+  , _processor(other._processor)
+  , _actions(other._actions)
+  , _action_struct(clone_actions_object(other._action_struct))
+  , _debug_items(other._debug_items)
+  , _imx_callback(other._imx_callback)
+  , _imx_object(other._imx_object)
+  , _backspace_handled_internally(other._backspace_handled_internally)
+{
+}
+
 state::~state() {
   km::core::actions_dispose(this->_action_struct);
 }
