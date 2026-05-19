@@ -15,7 +15,7 @@ import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
 export interface ConverterResult extends KeymanCompilerResult {
-  /*
+  /**
    * Internal in-memory build artifacts from a successful compilation. Caller
    * can write these to disk with {@link Converter.write}
    */
@@ -23,7 +23,7 @@ export interface ConverterResult extends KeymanCompilerResult {
 };
 
 interface ConverterToKmnResult extends ConverterResult {
-  /*
+  /**
    * Internal in-memory build artifacts from a successful compilation. Caller
    * can write these to disk with {@link Converter.write}
    */
@@ -32,7 +32,7 @@ interface ConverterToKmnResult extends ConverterResult {
 
 /**
  * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
- * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
+ * This data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
  */
 export interface ProcessedData {
 
@@ -41,6 +41,7 @@ export interface ProcessedData {
   modifiers: string[][];
   rules: Rule[];
 };
+
 /**
  * Interface for storing data read from a .keylayout file and used for processing rules.
  * These are used for obtaining one entity form the other (e.g. from action id to output, from keycode to modifier, etc.)
