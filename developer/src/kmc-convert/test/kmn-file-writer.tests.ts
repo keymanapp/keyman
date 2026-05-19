@@ -3,7 +3,7 @@
  *
  * Created by S. Schmitt on 2025-05-12
  *
- * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
+ * Tests for KmnFileWriter
  *
  */
 
@@ -112,7 +112,7 @@ describe('KmnFileWriter', function () {
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule " ' + (values[0][0] as Rule).ruleType as string + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0] as Rule[], 0);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 0);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -277,7 +277,7 @@ describe('KmnFileWriter', function () {
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0] as Rule[], 1);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 1);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -295,9 +295,9 @@ describe('KmnFileWriter', function () {
     [''],
     [''],
     ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' here: PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
-  ].forEach(function (values: (string[] | Rule[])[], index: number) {
-      it(('rule ' + (values[0][0]as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0]as Rule[], 2);
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
+      it(('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);

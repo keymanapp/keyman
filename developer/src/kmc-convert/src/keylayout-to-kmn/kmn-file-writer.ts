@@ -13,10 +13,14 @@ import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { convertUtil } from '@keymanapp/common-types';
 
-export interface messageCharacter {
+interface MessageCharacter {
   message: string;
   character: string;
 };
+// Todo-kmc-convert edit interface
+/*interface ReviewRulesResult {
+  warningMessage: string[];
+};*/
 
 export class KmnFileWriter {
 
@@ -177,12 +181,24 @@ export class KmnFileWriter {
                 + '\"\n';
             }
             else {
-              data += warningTextToWrite
-                + "+ ["
-                + (uniqueDataRules[k].modifierKey + ' ' + uniqueDataRules[k].key).trim()
-                + `]  >  \'`
-                + versionOutputCharacter
-                + '\'\n';
+              // surround all output characters with '' (e.g. + [K_A]  >  'A')
+              // but don`t for U+xxxx in control character message (e.g.  c Use of a control character + [K_A]  >  U+0011 )
+              if (warningTextToWrite.indexOf("control character") === -1) {
+                data += warningTextToWrite
+                  + "+ ["
+                  + (uniqueDataRules[k].modifierKey + ' ' + uniqueDataRules[k].key).trim()
+                  + `]  >  \'`
+                  + versionOutputCharacter
+                  + '\'\n';
+              }
+              else {
+                data += warningTextToWrite
+                  + "+ ["
+                  + (uniqueDataRules[k].modifierKey + ' ' + uniqueDataRules[k].key).trim()
+                  + `]  >  `
+                  + versionOutputCharacter
+                  + '\n';
+              }
             }
           }
         }
@@ -249,17 +265,28 @@ export class KmnFileWriter {
                 + '\"\n';
             }
             else {
-              data += warningTextToWrite
-                + "dk(A"
-                + (String(uniqueDataRules[k].idDeadkey) + ") + ["
-                  + uniqueDataRules[k].modifierKey).trim()
-                + " "
-                + uniqueDataRules[k].key + "]  >  \'"
-                + versionOutputCharacter
-                + "\'\n";
+              // surround all output characters with '' (e.g. + [K_A]  >  'A')
+              // but don`t for U+xxxx in control character message (e.g.  c Use of a control character + [K_A]  >  U+0011 )
+              if (warningTextToWrite.indexOf("control character") === -1) {
+                data += warningTextToWrite
+                  + "dk(A"
+                  + (String(uniqueDataRules[k].idDeadkey) + ") + ["
+                    + uniqueDataRules[k].modifierKey).trim()
+                  + " "
+                  + uniqueDataRules[k].key + "]  >  \'"
+                  + versionOutputCharacter
+                  + "\'\n";
+              } else {
+                data += warningTextToWrite
+                  + "dk(A"
+                  + (String(uniqueDataRules[k].idDeadkey) + ") + ["
+                    + uniqueDataRules[k].modifierKey).trim()
+                  + " "
+                  + uniqueDataRules[k].key + "]  >  "
+                  + versionOutputCharacter
+                  + "\n";
+              }
             }
-
-
           }
           data += "\n";
         }
@@ -333,15 +360,31 @@ export class KmnFileWriter {
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite + "dk(B"
-              + (String(uniqueDataRules[k].idDeadkey)
-                + ") + ["
-                + uniqueDataRules[k].modifierKey).trim()
-              + " "
-              + uniqueDataRules[k].key
-              + "]  >  \'"
-              + versionOutputCharacter
-              + "\'\n";
+            // surround all output characters with '' (e.g. + [K_A]  >  'A')
+            // but don`t for U+xxxx in control character message (e.g.  c Use of a control character + [K_A]  >  U+0011 )
+            if (warningTextToWrite.indexOf("control character") === -1) {
+              data += warningTextToWrite + "dk(B"
+                + (String(uniqueDataRules[k].idDeadkey)
+                  + ") + ["
+                  + uniqueDataRules[k].modifierKey).trim()
+                + " "
+                + uniqueDataRules[k].key
+                + "]  >  \'"
+                + versionOutputCharacter
+                + "\'\n";
+            } else {
+              data += warningTextToWrite + "dk(B"
+                + (String(uniqueDataRules[k].idDeadkey)
+                  + ") + ["
+                  + uniqueDataRules[k].modifierKey).trim()
+                + " "
+                + uniqueDataRules[k].key
+                + "]  >  "
+                + versionOutputCharacter
+                + "\n";
+
+            }
+
           }
         }
 
@@ -362,7 +405,10 @@ export class KmnFileWriter {
    * @param  index the index of a rule in Rule[]
    * @return a string[] containing possible warnings for a rule
    */
-  public reviewRules(rule: Rule[], index: number): string[] {
+  private reviewRules(rule: Rule[], index: number): string[] {
+    /*const result: ReviewRulesResult = {
+      warningMessage: []
+    };*/
 
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     const warningText: string[] = Array(3).fill("");
@@ -848,6 +894,7 @@ export class KmnFileWriter {
         warningText[2] = warningText[2] + extraWarning;
       }
     }
+    //result.warningMessage = warningText;
     return warningText;
   }
 
@@ -859,14 +906,14 @@ export class KmnFileWriter {
   *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
   *         null in case of an empty string or null or undefined input
   */
-  public writeCharacterOrUnicode(ctr: string, msg: string = ""): messageCharacter {
+  public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter {
 
     if ((ctr === null) || (ctr === undefined) || (ctr.length === 0)) {
       return null;
     }
 
     let versionOutputCharacter;
-    const out: messageCharacter = {
+    const out: MessageCharacter = {
       message: msg,
       character: ctr
     };
@@ -880,7 +927,7 @@ export class KmnFileWriter {
       m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
     );
 
-    // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
+    // for control characters in 'U+...', '&#x...' or '&#...' format as well as in "" format
     if ((ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
 
       // for control characters in 'U+...', '&#x...'  or '&#...' format
@@ -907,4 +954,11 @@ export class KmnFileWriter {
     }
     return out;
   }
+
+
+  /** @internal */
+  public unitTestEndpoints = {
+    reviewRules: this.reviewRules.bind(this),
+  };
 }
+

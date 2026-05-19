@@ -17,12 +17,6 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
  */
 export class ConverterMessages {
 
-  static ERROR_InputFilenameIsRequired = SevError | 0x0002;
-  static Error_InputFilenameIsRequired = () => m(
-    this.ERROR_InputFilenameIsRequired,
-    `An input filename is required for keyboard conversion.`
-  );
-
   static ERROR_FileNotFound = SevError | 0x0003;
   static Error_FileNotFound = (o: { inputFilename: string; }) => m(
     this.ERROR_FileNotFound,
@@ -42,27 +36,21 @@ export class ConverterMessages {
   );
 
   static ERROR_UnableToRead = SevError | 0x0006;
-  static Error_UnableToRead = () => m(
+  static Error_UnableToRead = (o: { errorText: string; }) => m(
     this.ERROR_UnableToRead,
-    `Input file could not be read.`
-  );
-
-  static ERROR_UnableToParse = SevError | 0x000C;
-  static Error_UnableToParse = () => m(
-    this.ERROR_UnableToParse,
-    `Input data could not be parsed.`
+    `Input file could not be read. ${def(o.errorText)}`
   );
 
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
-  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string, KeyName: string, output: string; }) => m(
+  static Error_UnsupportedCharactersDetected = (o: { keymapIndex: string, key: string, KeyName: string, output: string; }) => m(
     this.ERROR_UnsupportedCharactersDetected,
-    `Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Key ${def(o.KeyName)}`
+    `Input file contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
   );
 
   static ERROR_UndefinedActionDetected = SevError | 0x0008;
-  static Error_UndefinedActionDetected = (o: { inputFilename: string, action: string, KeyName: string, keymapIndex: string; }) => m(
+  static Error_UndefinedActionDetected = (o: { action: string, KeyName: string, keymapIndex: string; }) => m(
     this.ERROR_UndefinedActionDetected,
-    `${def(o.inputFilename)}: Action id ${def(o.action)} of key ${def(o.KeyName)} in keymapIndex ${def(o.keymapIndex)} is not defined`
+    `Action id ${def(o.action)} of key ${def(o.KeyName)} in keymapIndex ${def(o.keymapIndex)} is not defined`
   );
 
   static ERROR_NoConverterFound = SevError | 0x0009;
@@ -83,4 +71,9 @@ export class ConverterMessages {
     `Output file for '${def(o.outputFilename)}' could not be written. ${def(o.errorText)}`
   );
 
+  static ERROR_UnableToParse = SevError | 0x000C;
+  static Error_UnableToParse = () => m(
+    this.ERROR_UnableToParse,
+    `Input data could not be parsed.`
+  );
 }

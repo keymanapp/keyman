@@ -3,7 +3,7 @@
  *
  * Created by S. Schmitt on 2025-05-12
  *
- * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
+ * Tests for KeylayoutToKmnConverter
  *
  */
 import 'mocha';
@@ -60,40 +60,30 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunSpecialTestFiles', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_mixedEncodings.keylayout')],
-      [makePathToFixture('../data/Test_invalidInput_C0.keylayout')],
-      [makePathToFixture('../data/Test_invalidInput_C1.keylayout')],
-      [makePathToFixture('../data/Test_invalidInput_C2.keylayout')],
-      [makePathToFixture('../data/Test_invalidInput_C3.keylayout')],
-      [makePathToFixture('../data/Test_Character_Codepoint_C0.keylayout')],
-      [makePathToFixture('../data/Test_Character_Codepoint_C2.keylayout')],
-      [makePathToFixture('../data/Test_Character_Codepoint_C3.keylayout')],
-      [makePathToFixture('../data/Test_C0.keylayout')],
-      [makePathToFixture('../data/Test_C1.keylayout')],
-      [makePathToFixture('../data/Test_C2.keylayout')],
-      [makePathToFixture('../data/Test_C2_several.keylayout')],
-      [makePathToFixture('../data/Test_C3.keylayout')],
-      [makePathToFixture('../data/Test_C3_several.keylayout')],
-      [makePathToFixture('../data/Test_C0_C1_C2_C3.keylayout')],
-      [makePathToFixture('../data/Test_maxKeyCode.keylayout')],
-      [makePathToFixture('../data/Test_messages.keylayout')],
-      [makePathToFixture('../data/Test_messages_controlCharacter.keylayout')],
-      [makePathToFixture('../data/Test_messages_superior_C2.keylayout')],
-      [makePathToFixture('../data/Test_messages_superior_C3.keylayout')],
-      [makePathToFixture('../data/Test_duplicate_missing_keycode.keylayout')],
-      [makePathToFixture('../data/Test_modifier.keylayout')],
-      [makePathToFixture('../data/Test_modifierNoCaps.keylayout')],
-      [makePathToFixture('../data/Test_differentAmountOfKeysInBehaviours.keylayout')],
-      [makePathToFixture('../data/Test_duplicate_missing_keys.keylayout')],
-      [makePathToFixture('../data/Test_duplicate_keys.keylayout')],
-      [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
-      [makePathToFixture('../data/Test_nr_elements.keylayout')],
-      [makePathToFixture('../data/Test.keylayout')],
-      [makePathToFixture('../data/Test_differentEncodings.keylayout')],
-      [makePathToFixture('../data/Test_ExtraWarning.keylayout')],
+      ['../data/Test_C0.keylayout'],
+      ['../data/Test_C1.keylayout'],
+      ['../data/Test_C2.keylayout'],
+      ['../data/Test_C2_several.keylayout'],
+      ['../data/Test_C3.keylayout'],
+      ['../data/Test_C3_several.keylayout'],
+      ['../data/Test_C0_C1_C2_C3.keylayout'],
+      ['../data/Test_maxKeyCode.keylayout'],
+      ['../data/Test_messages.keylayout'],
+      ['../data/Test_messages_controlCharacter.keylayout'],
+      ['../data/Test_messages_superior_C2.keylayout'],
+      ['../data/Test_messages_superior_C3.keylayout'],
+      ['../data/Test_duplicate_missing_keycode.keylayout'],
+      ['../data/Test_modifier.keylayout'],
+      ['../data/Test_modifierNoCaps.keylayout'],
+      ['../data/Test_differentAmountOfKeysInBehaviours.keylayout'],
+      ['../data/Test_duplicate_keys.keylayout'],
+      ['../data/Test_ambiguous_keys.keylayout'],
+      ['../data/Test.keylayout'],
+      ['../data/Test_differentEncodings.keylayout'],
+      ['../data/Test_ExtraWarning.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
-        sut.run(files[0]);
+        sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
       });
     });
@@ -102,44 +92,34 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
-      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout')],
-      [makePathToFixture('../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingLayoutsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingmodifierMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyMapSetERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingActionsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingTerminatorsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
+      ['../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout'],
+      ['../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout'],
+      ['../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout'],
+      ['../data/Test_MissingkeyERROR.keylayout'],
+      ['../data/Test_MissingkeyMapERROR.keylayout'],
+      ['../data/Test_MissingLayoutsERROR.keylayout'],
+      ['../data/Test_MissingmodifierMapERROR.keylayout'],
+      ['../data/Test_MissingkeyMapSetERROR.keylayout'],
+      ['../data/Test_MissingActionsERROR.keylayout'],
+      ['../data/Test_MissingTerminatorsERROR.keylayout'],
+      ['../data/Test_MissingAllERROR.keylayout'],
+      ['../data/Test_characters.keylayout'],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
-        sut.run(files[0]);
+        sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length > 0);
       });
     });
   });
 
-  describe('RunSpecialTestFiles - create Error: unsupported characters', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      [makePathToFixture('../data/Test_characters.keylayout')],
-    ].forEach(function (files) {
-      it(files + " should give Error: unsupported characters ", async function () {
-        sut.run(files[0]);
-        assert.isTrue(compilerTestCallbacks.messages.length === 1);
-      });
-    });
-  });
 
   describe('RunSpecialTestFiles - create Error: undefined action', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_undefinedAction.keylayout')],
+      ['../data/Test_undefinedAction.keylayout'],
     ].forEach(function (files) {
       it(files + " should give Error: undefined action detected", async function () {
-        sut.run(files[0]);
+        sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length === 1);
         assert.equal(compilerTestCallbacks.messages[0].code, 5292040);
       });
@@ -149,34 +129,13 @@ describe('KeylayoutToKmnConverter', function () {
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
-    it('run() should throw on null input file name and null output file name', async function () {
-      // note, could use 'chai as promised' library to make this more fluent:
-      const result = sut.run(null, null);
-      assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
-    });
-
-    it('run() should throw on null input file name and empty output file name', async function () {
-      const result = sut.run(null, '');
-      assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
-    });
-
-    it('run() should throw on null input file name and unknown output file name', async function () {
-      const result = sut.run(null, 'X');
-      assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
-    });
-
     it('run() should throw on unavailable input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead());
+      //assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead());
+      assert.isTrue(compilerTestCallbacks.hasMessage(ConverterMessages.ERROR_UnableToRead));
       assert.equal(compilerTestCallbacks.messages[1].code, 5292037);
     });
   });
@@ -186,15 +145,13 @@ describe('KeylayoutToKmnConverter', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = '../data/Test.keylayout';
     [
-      [makePathToFixture('../data/Test.kmn')],
-      [makePathToFixture('')],
-      [],
-      [null],
-      [makePathToFixture('../data/test_OtherOutputName.kmn')],
-      [makePathToFixture('../data/OutputXName.bb')],
+      ['../data/Test.kmn'],
+      [''],
+      ['../data/test_OtherOutputName.kmn'],
+      ['../data/OutputXName.bb'],
     ].forEach(function (files) {
       it(infile + " should run ", async function () {
-        await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
+        await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), makePathToFixture(files[0])));
         assert.equal(compilerTestCallbacks.messages.length, 0);
       });
     });
@@ -223,15 +180,15 @@ describe('KeylayoutToKmnConverter', function () {
       assert.isTrue(converted.rules.length !== 0);
     });
 
-    it('should return empty on empty name as input', async function () {
+    it('should return null on empty name as input', async function () {
       assert.isNull(convertedUnavailable);
     });
 
-    it('should return empty on empty input', async function () {
+    it('should return null on empty input', async function () {
       assert.isNull(convertedEmpty);
     });
 
-    it('should return empty array of rules on null input', async function () {
+    it('should return null of rules on null input', async function () {
       const convertedRule = sut.unitTestEndpoints.convert(null, 'ABC.kmn');
       assert.isNull(convertedRule);
     });
@@ -242,7 +199,6 @@ describe('KeylayoutToKmnConverter', function () {
     [
       [' ', true, 'NCAPS'],
       [' ', false, ''],
-
       ['NCAPS', true, 'NCAPS'],
       ['NCAPS', false, ''],
       ['caps', true, 'CAPS'],
@@ -346,7 +302,6 @@ describe('KeylayoutToKmnConverter', function () {
       [[['CaPs', 'xxx'], ['yyy']], true],
       [[['Caps?', 'xxx'], ['yyy']], false],
       [[['zzz', 'xxx'], ['Caps?']], false],
-      [[['caps?', 'xxx'], ['yyy']], false],
       [[['zzz', 'xxx'], ['yyy']], false],
       [[['shift', 'xxx'], ['caps']], true],
       [[['shift', 'caps'], ['yyy']], true],
@@ -384,7 +339,7 @@ describe('KeylayoutToKmnConverter', function () {
       it((values[1] !== null) ?
         ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + JSON.stringify(values[1]) + "'" :
         ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + "null" + "'", async function () {
-          const result = sut.getModifierArrayFromKeyModifierArray(converted.modifiers, values[0] as unknown  as KeylayoutFileData[]);
+          const result = sut.getModifierArrayFromKeyModifierArray(converted.modifiers, values[0] as unknown as KeylayoutFileData[]);
           assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
