@@ -11,6 +11,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "${KEYMAN_ROOT}/resources/locate_emscripten.inc.sh"
+
 builder_describe \
   "Verify source tarball and source package" \
   build \
@@ -81,12 +83,24 @@ create_source_package() {
   cp -r "${KEYMAN_ROOT}/linux/debian" "keyman-${KEYMAN_VERSION}"
   cp "${target_dir}/keyman_${KEYMAN_VERSION}.pkg.tar.xz" "keyman_${KEYMAN_VERSION}.orig.tar.xz"
   "keyman-${KEYMAN_VERSION}/linux/scripts/launchpad.sh" --no-download \
-    --dist "$(lsb_release -c -s)" --outputdir "${target_dir}/launchpad" --no-lintian
+    --dist "$(lsb_release -c -s)" --outputdir "${target_dir}/launchpad" --no-lintian --no-sign
 }
 
 verify_lintian() {
   builder_echo heading "Running lintian"
   lintian "keyman_${KEYMAN_VERSION}"*source.changes
+}
+
+install_emscripten() {
+  local target_dir="$1"
+  if [[ ! -d "${target_dir}/emsdk" ]]; then
+    builder_echo heading "Installing Emscripten for build verification"
+    install_emscripten_into "${target_dir}/emsdk"
+  else
+    builder_echo heading "Emscripten already exists in ${target_dir}/emsdk, skipping installation"
+  fi
+  EMSCRIPTEN_BASE="${target_dir}/emsdk/upstream/emscripten"
+  export EMSCRIPTEN_BASE
 }
 
 cd "${KEYMAN_ROOT}/linux"
@@ -100,6 +114,9 @@ fi
 if ! builder_has_option --launchpad-only; then
   builder_echo start verifySource "Verifying source tarball"
   extract_source_tarball "${TARGET_DIR}"
+  if builder_is_ci_test_build; then
+    install_emscripten "${TARGET_DIR}"
+  fi
   verify_can_build "${TARGET_DIR}/keyman"
   rm -rf "${TARGET_DIR}/keyman"
   builder_echo end verifySource success "Finished verifying source tarball"

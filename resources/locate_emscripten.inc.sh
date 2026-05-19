@@ -117,3 +117,22 @@ _select_emscripten_version_with_emsdk() {
     fi
   )
 }
+
+install_emscripten_into() {
+  if [[ -z "${1:-}" ]]; then
+    builder_die "${FUNCNAME[0]} requires a directory argument"
+  fi
+
+  local EMSDK_DIR=$1
+  builder_heading "Installing emscripten into ${EMSDK_DIR}"
+
+  mkdir -p "${EMSDK_DIR}"
+  (
+    cd "${EMSDK_DIR}"
+    git clone https://github.com/emscripten-core/emsdk.git .
+    ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+    ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+    cd upstream/emscripten
+    npm install
+  )
+}

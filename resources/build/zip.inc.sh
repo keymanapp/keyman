@@ -125,6 +125,11 @@ function add_zip_files() {
       if builder_is_windows; then
         if [[ -z "${SEVENZ_HOME+x}" ]]; then
           SEVENZ="$(command -v 7z.exe || true)"
+          if [[ -z "${SEVENZ}" ]]; then
+            builder_die "7z.exe not found on path. Please install 7-Zip " \
+              "and ensure 7z.exe is on the path or set SEVENZ_HOME " \
+              "environment variable to the folder containing 7z.exe."
+          fi
         else
           SEVENZ="${SEVENZ_HOME}/7z.exe"
         fi
