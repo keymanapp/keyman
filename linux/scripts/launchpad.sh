@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Build source packages from nightly builds and upload to PPA
 
+# shellcheck disable=SC2310 # -e will be disabled in if
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -18,6 +20,7 @@ builder_describe \
   "--upload                         Upload to launchpad." \
   "--simulate                       Simulate the upload to launchpad." \
   "--no-lintian                     Don't run lintian while creating source package." \
+  "--no-sign                        Don't sign the source package." \
   "--dist=DIST                      Only upload this distribution. Default: upload all supported dists." \
   "--packageversion=PACKAGEVERSION  String to append to the package version. Default: '1~sil1'." \
   "--outputdir=OUTPUTDIR            Directory for resulting artifacts. Default: \$KEYMAN_ROOT/linux/launchpad." \
@@ -39,10 +42,13 @@ else
   SIM=""
 fi
 
+DEBUILD_OPTS=()
 if builder_has_option --no-lintian; then
-  LINTIAN_OPTS="--no-lintian"
-else
-  LINTIAN_OPTS=""
+  DEBUILD_OPTS+=("--no-lintian")
+fi
+
+if builder_has_option --no-sign; then
+  DEBUILD_OPTS+=("--no-sign")
 fi
 
 if [[ "${KEYMAN_TIER}" == "stable" ]]; then
@@ -115,8 +121,9 @@ for dist in ${distributions}; do
   cp "../keyman-changelog" debian/changelog
   dch -v "${version}-${packageversion}~${dist}" "source package for PPA"
   dch -D "${dist}" -r ""
-  # shellcheck disable=SC2248  # no quotes for $LINTIAN_OPTS - might be empty string
-  debuild ${LINTIAN_OPTS} -d -S -sa -Zxz
+  # According to the docs, -S is equivalent to --build=source, but that causes debuild to fail.
+  # There is no long option for -sa (passed to dpkg-genchanges)
+  debuild "${DEBUILD_OPTS[@]}" --no-check-builddeps --compression=xz -S -sa
 done
 if builder_has_option --upload || builder_has_option --simulate; then
   cd ..
