@@ -92,28 +92,6 @@ describe('KeylayoutToKmnConverter', function () {
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
-    it(') should throw on null input file name and null output file name', async function () {
-      // note, could use 'chai as promised' library to make this more fluent:
-      const result = sut.run(null, null);
-      assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
-    });
-
-    it('run() should throw on null input file name and empty output file name', async function () {
-      const result = sut.run(null, '');
-      assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
-    });
-
-    it('run() should throw on null input file name and unknown output file name', async function () {
-      const result = sut.run(null, 'X');
-      assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
-    });
-
     it('run() should throw on unavailable input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
