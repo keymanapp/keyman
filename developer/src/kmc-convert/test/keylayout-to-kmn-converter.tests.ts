@@ -207,17 +207,17 @@ describe('KeylayoutToKmnConverter', function () {
     // ProcessedData from usable file
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     // ProcessedData from unavailable file
     const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
     const readUnavailable = sutR.read(compilerTestCallbacks.loadFile(inputFilenameUnavailable));
-    const convertedUnavailable = sut.convertBound.convert(readUnavailable, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
+    const convertedUnavailable = sut.unitTestEndpoints.convert(readUnavailable, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
 
     // ProcessedData from empty file
     const inputFilenameEmpty = makePathToFixture('');
     const readEmpty = sutR.read(compilerTestCallbacks.loadFile(inputFilenameEmpty));
-    const convertedEmpty = sut.convertBound.convert(readEmpty, inputFilenameEmpty);
+    const convertedEmpty = sut.unitTestEndpoints.convert(readEmpty, inputFilenameEmpty);
 
     it('should return converted array on correct input', async function () {
       assert.isTrue(converted.rules.length !== 0);
@@ -232,7 +232,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('should return empty array of rules on null input', async function () {
-      const convertedRule = sut.convertBound.convert(null, 'ABC.kmn');
+      const convertedRule = sut.unitTestEndpoints.convert(null, 'ABC.kmn');
       assert.isNull(convertedRule);
     });
   });
@@ -369,7 +369,7 @@ describe('KeylayoutToKmnConverter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
     [
       [[{ key: '0', behavior: 0 }], [['', 'shift? caps? ']]],
       [[{ key: '0', behavior: 2 }], [['shift? leftShift caps? ', 'anyShift caps?', 'shift leftShift caps ', 'shift? rightShift caps? ']]],
@@ -656,7 +656,7 @@ describe('KeylayoutToKmnConverter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
     [
       ['A_1', 'A', true,
         [{ "outchar": "A", "actionId": "A_1", "behavior": "1", "key": "K_A", "modifier": "CAPS" },
@@ -845,7 +845,7 @@ describe('KeylayoutToKmnConverter', function () {
       it('data of \'' + values[0] + "' passed into createRuleData() " + 'should create an array of rules', async function () {
         const inputFilename = makePathToFixture(values[0][0]);
         const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-        const processedData = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+        const processedData = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
         assert.deepEqual(processedData.rules[0], values[1][0]);
       });
     });

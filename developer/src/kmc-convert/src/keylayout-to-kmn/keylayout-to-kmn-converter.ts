@@ -1037,7 +1037,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /** @internal */
-  public convertBound = {
+  public unitTestEndpoints = {
     convert: this.convert.bind(this),
   };
 }
