@@ -22,7 +22,7 @@ export interface ConverterResult extends KeymanCompilerResult {
   artifacts: ConverterArtifacts;
 };
 
-export interface ConverterToKmnResult extends ConverterResult {
+interface ConverterToKmnResult extends ConverterResult {
   /*
    * Internal in-memory build artifacts from a successful compilation. Caller
    * can write these to disk with {@link Converter.write}
@@ -111,10 +111,9 @@ export class KeylayoutToKmnConverter {
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
 
     if (!inputFilename) {
-      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
+      throw new Error('Input filename is required');
       return null;
     }
-
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
 
     const binaryData = this.callbacks.loadFile(inputFilename);
@@ -321,7 +320,6 @@ export class KeylayoutToKmnConverter {
               const b1ActionIndex: number = this.getActionIndexFromActionId(jsonObj, actionId);
               if (b1ActionIndex < 0) {
                 this.callbacks.reportMessage(ConverterMessages.Error_UndefinedActionDetected({
-                  inputFilename: jsonObj.keyboard['name'] + ".keylayout",
                   action: actionId,
                   KeyName: this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'])),
                   keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['index']
@@ -492,9 +490,8 @@ export class KeylayoutToKmnConverter {
             }
           } else {
             this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
-              inputFilename: jsonObj.keyboard['name'] + ".keylayout",
               keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['index'],
-              output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] as string,
+              output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] ?? '' as string,
               key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'],
               KeyName: this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code']))
             }));
@@ -1047,7 +1044,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /** @internal */
-  public convertBound = {
+  public unitTestEndpoints = {
     convert: this.convert.bind(this),
   };
 }

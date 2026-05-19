@@ -87,7 +87,7 @@ export class KeylayoutFileReader {
    */
   public validate(source: Keylayout.KeylayoutXMLSourceFile, inputFilename: string): boolean {
     if (!source) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));
       return false;
     }
     if (!SchemaValidators.default.keylayout(source)) {
@@ -169,9 +169,9 @@ export class KeylayoutFileReader {
       this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
       return jsonObj;
     }
-    catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+    catch (err: any) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ errorText: err }));
       return null;
     }
   }
-}
+};
