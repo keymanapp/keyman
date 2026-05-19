@@ -3,7 +3,7 @@
  *
  * Created by S. Schmitt on 2025-05-12
  *
- * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
+ * Tests for KeylayoutFileReader
  *
  */
 
@@ -27,23 +27,23 @@ describe('KeylayoutFileReader', function () {
       assert.isNotEmpty(result);
     });
 
-    it('read() should return empty array on empty input', async function () {
+    it('read() should return null on empty input', async function () {
       const result = sutR.read(compilerTestCallbacks.loadFile(""));
       assert.isNull(result);
     });
 
-    it('read() should return empty array on space as input', async function () {
+    it('read() should return null on space as input', async function () {
       const result = sutR.read(compilerTestCallbacks.loadFile(" "));
       assert.isNull(result);
     });
 
-    it('read() should return empty array on unavailable file name', async function () {
+    it('read() should return null on unavailable file name', async function () {
       const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
       const result = sutR.read(compilerTestCallbacks.loadFile(inputFilenameUnavailable));
       assert.isNull(result);
     });
 
-    it('read() should return empty array on typo in path', async function () {
+    it('read() should return null on typo in path', async function () {
       const result = sutR.read(compilerTestCallbacks.loadFile(makePathToFixture('../data|Test.keylayout')));
       assert.isNull(result);
     });
