@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.234 alpha 2026-05-19
+
+* chore(deps): bump brace-expansion from 5.0.5 to 5.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#15969)
+* chore(deps): bump ws from 8.18.1 to 8.20.1 (#15971)
+* chore: move to .localhost for local server URLs (#15963)
+
 ## 19.0.233 alpha 2026-05-18
 
 * chore(deps): bump path-to-regexp and express (#15902)
