@@ -13,7 +13,6 @@ import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
 import { EDIT_DISTANCE_COST_SCALE, getBestTokenMatches } from './correction/distance-modeler.js';
-import { TokenResultMapping } from './correction/token-result-mapping.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
@@ -26,6 +25,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
+import { TokenResult } from './correction/tokenization-corrector.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -441,23 +441,54 @@ export function determineSuggestionRange<T extends ContextTokenLike>(
 }
 
 /**
+ * Specifies the core, preprocessed data necessary for generating predictions,
+ * regardless of model type.
+ */
+export interface PredictionParameters {
+  /**
+   * The portion of context that should remain unchanged by generated suggestions
+   */
+  rootContext: Context,
+
+  /**
+   * A tokenization of the corrected part of the context, usable to generate
+   * suggestions.
+   *
+   * Note that each correction will be applied iteratively to the rootContext.
+   * That is, when suggesting based on the correction at index 1, the
+   * "unchanged" (root) context used for that suggestion will include the
+   * changes from the entry at index 0 (or possibly, a suggestion derived from it).
+   */
+  tokenizedCorrection: ProbabilityMass<Transform>[],
+
+  /**
+   * A closure to be applied to the generated suggestion's metadata.
+   * @param entry
+   * @returns
+   */
+  applyInPost: (entry: CorrectionPredictionTuple) => void
+}
+
+/**
  * This function takes in metadata about generated corrections (for models that
- * implement Traversals) and uses that to construct predictions based upon those
- * corrections.
- * @param transition    Context-transition data underlying the tokenization that led to the correction
- * @param tokenization  The tokenization from which the correction was generated.
- * @param match         The generated correction itself - the correction string and its cost
- * @param costFactor    A multiplicative factor used to adjust the cost when building prediction probabilities.
+ * implement Traversals) and uses that to produce the corresponding parameters
+ * to use for generating suggestions.
+ * @param transition    Context-transition data underlying the tokenization that
+ * led to the correction
+ * @param tokenization  The tokenization from which the correction was
+ * generated.
+ * @param match         The generated correction itself - the correction string
+ * and its cost
+ * @param costFactor    A multiplicative factor used to adjust the cost when
+ * building prediction probabilities.
  * @returns
  */
-export function buildAndMapPredictions(
+export function determineTokenizedCorrectionSequence(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: Readonly<TokenResultMapping>,
+  match: Readonly<TokenResult>,
   costFactor: number
-): CorrectionPredictionTuple[] {
-  const model = transition.final.model;
-
+): PredictionParameters {
   const applicationTarget = transition.base.displayTokenization;
   const { deleteLeft } = determineSuggestionRange(applicationTarget.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
 
@@ -467,7 +498,12 @@ export function buildAndMapPredictions(
   const correctionTransform: Transform = {
     insert: match.matchString,  // insert correction string
     deleteLeft: 0,
-    id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
+  }
+
+  // The correction should always be based on the most recent external
+  // transform/transcription ID.
+  if(transition.transitionId !== undefined) {
+    correctionTransform.id = transition.transitionId;
   }
 
   const rootCost = match.totalCost;
@@ -476,15 +512,16 @@ export function buildAndMapPredictions(
     p: Math.exp(-rootCost * costFactor)
   };
 
-  const predictions = predictFromCorrectionSequence(model, [predictionRoot], rootContext, transition.transitionId);
-  predictions.forEach((entry) => {
-    entry.preservationTransform = tokenization.taillessTrueKeystroke;
-    // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
-    // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
-    entry.prediction.sample.transform.deleteLeft = deleteLeft;
-  });
-
-  return predictions;
+  return {
+    rootContext,
+    tokenizedCorrection: [predictionRoot],
+    applyInPost: (entry: CorrectionPredictionTuple) => {
+      entry.preservationTransform = tokenization.taillessTrueKeystroke;
+      // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
+      // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
+      entry.prediction.sample.transform.deleteLeft = deleteLeft;
+    }
+  };
 }
 
 /**
@@ -598,7 +635,9 @@ export async function correctAndEnumerate(
      */
     const costFactor = (tokenization.tail.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
 
-    const predictions = buildAndMapPredictions(transition, tokenization, match, costFactor);
+    const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, match, costFactor);
+    const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep.tokenizedCorrection, predictionPrep.rootContext, transition.transitionId);
+    predictions.forEach((p) => predictionPrep.applyInPost(p));
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
