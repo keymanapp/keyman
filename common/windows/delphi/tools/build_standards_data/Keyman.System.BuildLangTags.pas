@@ -155,6 +155,10 @@ begin
       FResult.Add('');
       FResult.Add('implementation');
       FResult.Add('');
+      FResult.Add('uses');
+      FResult.Add('  System.Classes,');
+      FResult.Add('  System.SysUtils;');
+      FResult.Add('');
       FResult.Add('{ TLangTagsMap }');
       FResult.Add('');
       FResult.Add(Format('const CLangTags: array[0..%d] of TLangTag = (', [FLangTags.Count - IndexOfVersionRecord - 2]));
@@ -229,7 +233,16 @@ begin
       FResult.Add('  begin');
       FResult.Add('    FLangTags := TLangTagsDictionary.Create;');
       FResult.Add('    for i := 0 to High(CLangTags) do');
-      FResult.Add('      FLangTags.Add(CLangTags[i].tag, CLangTags[i]);');
+      FResult.Add('    begin');
+      FResult.Add('      try');
+      FResult.Add('        FLangTags.Add(CLangTags[i].tag, CLangTags[i]);');
+      FResult.Add('      except');
+      FResult.Add('        on E:EListError do');
+      FResult.Add('        begin');
+      FResult.Add('          raise Exception.Create(''Failed to add ''+CLangTags[i].tag+'': ''+E.Message);');
+      FResult.Add('        end;');
+      FResult.Add('      end;');
+      FResult.Add('    end;');
       FResult.Add('  end;');
       FResult.Add('  Result := FLangTags;');
       FResult.Add('end;');
@@ -243,11 +256,19 @@ begin
       FResult.Add('  begin');
       FResult.Add('    FAllTags := TAllTagsDictionary.Create;');
       FResult.Add('    for i := 0 to High(CAllTags) do');
-      FResult.Add('      FAllTags.Add(CAllTags[i].tag, CAllTags[i].Base);');
+      FResult.Add('    begin');
+      FResult.Add('      try');
+      FResult.Add('        FAllTags.Add(CAllTags[i].tag, CAllTags[i].Base);');
+      FResult.Add('      except');
+      FResult.Add('        on E:EListError do');
+      FResult.Add('        begin');
+      FResult.Add('          raise Exception.Create(''Failed to add ''+CAllTags[i].tag+''=''+CAllTags[i].Base+'': ''+E.Message);');
+      FResult.Add('        end;');
+      FResult.Add('      end;');
+      FResult.Add('    end;');
       FResult.Add('  end;');
       FResult.Add('  Result := FAllTags;');
       FResult.Add('end;');
-
       FResult.Add('end.');
 
       FResult.SaveToFile(DestinationFile, TEncoding.UTF8);

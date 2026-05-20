@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Test standards data import compliance" clean configure build test
+builder_describe "Test standards data import compliance" clean configure build test edit
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -23,6 +23,7 @@ builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        delphi_msbuild standardsdata.dproj "//p:Platform=Win32" "//p:CI=CI"
 builder_run_action test:project         "$WIN32_TARGET" -b -exit:continue
+builder_run_action edit:project         start standardsdata.dproj
 
 # NOTE: The .dproj needs $(CI) added to the Delphi Compiler/Conditional defines (All
 # configurations - all platforms) section in order for the CI flag to be passed in.
