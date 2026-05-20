@@ -34,6 +34,10 @@
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/windows/cpp/include/vkeys.h"
+#include "../../../common/include/keyman_vkey.h"
+
+using namespace km_vk;
+
 
 #define SSN__PREFIX		L"&"
 

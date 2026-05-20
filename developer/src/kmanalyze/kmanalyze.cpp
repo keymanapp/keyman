@@ -7,6 +7,9 @@
 #include <vector>
 #include <codecvt>
 #include <locale>
+#include "../../../common/include/keyman_vkey.h"
+
+using namespace km_vk;
 
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
 
@@ -602,7 +605,7 @@ void PrintTree(LPKEYBOARD kbd, GROUPTREE *t, int depth) {
 
 
 // MapVirtualKeys is copied from syskbd.cpp (keyman32)
-#define VK_COLON	0xBA
+/*#define VK_COLON	0xBA
 #define VK_EQUAL	0xBB
 #define VK_COMMA	0xBC
 #define VK_HYPHEN	0xBD
@@ -613,7 +616,7 @@ void PrintTree(LPKEYBOARD kbd, GROUPTREE *t, int depth) {
 #define VK_BKSLASH	0xDC
 #define VK_RBRKT	0xDD
 #define VK_QUOTE	0xDE
-#define VK_xDF		0xDF
+#define VK_xDF		0xDF*/
 
 WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags)
 {
