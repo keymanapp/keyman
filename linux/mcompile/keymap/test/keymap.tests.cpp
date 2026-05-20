@@ -24,6 +24,7 @@ protected:
   KMX_WCHAR expected_char;
   std::string layout;
   guint shiftstate;
+  KMX_WCHAR expected_deadkey_value;
 
 public:
   TestDataValues(guint k, KMX_WCHAR e, std::string l, guint s) : keycode(k), expected_char(e), layout(l), shiftstate(s) {
@@ -44,23 +45,40 @@ public:
   guint get_shiftstate() {
     return shiftstate;
   }
+
+
+};
+
+
+class KeyboardTestDataValues : public TestDataValues {
+public:
+  KeyboardTestDataValues(guint k, KMX_WCHAR e, std::string l, guint s, KMX_WCHAR d) : TestDataValues(k, e, l, s), expected_deadkey_value(d) {
+  }
+
+  KMX_WCHAR get_expected_deadkey_value() {
+    return expected_deadkey_value;
+  }
+
+protected:
+  KMX_WCHAR expected_deadkey_value;
 };
 
 class KeyboardTestParameters {
 public:
-  KeyboardTestParameters(std::vector<KMX_WCHAR> e, std::string l, guint s) : expected_keysyms(e), layout(l), shiftstate(s) {
+  KeyboardTestParameters(std::vector<KMX_WCHAR> e, std::string l, guint s, std::vector<KMX_WCHAR> d) : expected_keysyms(e), layout(l), shiftstate(s), expected_deadkey_values(d) {
     generate_test_data_values();
   }
 
-  std::vector<TestDataValues> get_test_data() {
+  std::vector<KeyboardTestDataValues> get_test_data() {
     return test_data_values;
   }
 
 protected:
   std::vector<KMX_WCHAR> expected_keysyms;
-  std::vector<TestDataValues> test_data_values = {};
+  std::vector<KeyboardTestDataValues> test_data_values = {};
   std::string layout;
   guint shiftstate;
+  std::vector<KMX_WCHAR> expected_deadkey_values = {};
   std::vector<guint> keycodes = {38, 56, 54, 40, 26, 41, 42, 43, 31, 44,
                                  45, 46, 58, 57, 32, 33, 24, 27, 39, 28,
                                  30, 55, 25, 53, 29, 52, 19, 10, 11, 12,
@@ -69,8 +87,9 @@ protected:
 
   void generate_test_data_values() {
     EXPECT_EQ(keycodes.size(), expected_keysyms.size()) << "Keycodes and expected keysyms vectors must be of the same size.";
+    EXPECT_EQ(keycodes.size(), expected_deadkey_values.size()) << "Keycodes and expected deadkey values vectors must be of the same size.";
     for (uint k = 0; k < keycodes.size() && k < expected_keysyms.size(); k++) {
-      test_data_values.emplace_back(TestDataValues(keycodes[k], expected_keysyms[k], layout, shiftstate));
+      test_data_values.emplace_back(KeyboardTestDataValues(keycodes[k], expected_keysyms[k], layout, shiftstate, expected_deadkey_values[k]));
     }
   }
 };
@@ -144,19 +163,21 @@ private:
 };
 
 class GetKeyValUnderlyingFromKeyCodeUnderlyingTest : public KeyboardConversionTest,
-                                                     public testing::WithParamInterface<TestDataValues> {};
+                                                     public testing::WithParamInterface<KeyboardTestDataValues> {};
 
 TEST_P(GetKeyValUnderlyingFromKeyCodeUnderlyingTest, KmxGetKeyValUnderlyingFromKeyCodeUnderlying) {
   guint keycode;
   KMX_WCHAR expected_char;
   std::string test_layout;
   guint shiftstate;
-  TestDataValues parameter = GetParam();
+  KMX_WCHAR expected_deadkey_value;
+  KeyboardTestDataValues parameter = GetParam();
 
   keycode       = parameter.get_keycode();
   expected_char = parameter.get_expected_char();
   test_layout   = parameter.get_layout();
   shiftstate    = parameter.get_shiftstate();
+  expected_deadkey_value = parameter.get_expected_deadkey_value();
 
   std::cout << "Testing keycode: " << keycode << " expecting char: " << expected_char << " with layout: " << test_layout
             << " and shiftstate: " << shiftstate << std::endl;
@@ -164,9 +185,10 @@ TEST_P(GetKeyValUnderlyingFromKeyCodeUnderlyingTest, KmxGetKeyValUnderlyingFromK
     GTEST_SKIP() << "Default layout is not " << default_layout << ".";
   }
 
-  KMX_WCHAR deadkey;
+  KMX_WCHAR deadkey = 0;
   KMX_WCHAR result = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(test_keymap, keycode, shiftstate, &deadkey);
   EXPECT_EQ(result, expected_char) << "Failed for keycode: " << keycode;
+  EXPECT_EQ(deadkey, expected_deadkey_value) << "Failed for keycode: " << keycode;
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -179,7 +201,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'4', u'5', u'6', u'7', u'8', u'9', u' ', u'`', u'-', u'=',
                            u'[', u']', u'\\', u';', u'\'', u',', u'.', u'/', u'\000', u'<'},
                           "us",
-                          0)
+                          0,
+                          {0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0})
                           .get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(
@@ -192,7 +219,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'$', u'%', u'^', u'&', u'*', u'(', u' ', u'~', u'_', u'+',
                            u'{', u'}', u'|', u':', u'"', u'<', u'>', u'?', u'\000', u'>'},
                           "us",
-                          K_SHIFTFLAG)
+                          K_SHIFTFLAG,
+                          {0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0})
                           .get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(
@@ -205,7 +237,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'4', u'5', u'6', u'7', u'8', u'9', u'\000', u'`', u'-', u'=',
                            u'[', u']', u'\\', u';', u'\'', u',', u'.', u'/', u'\000', u'|'},
                           "us",
-                          (LCTRLFLAG | RALTFLAG))
+                          (LCTRLFLAG | RALTFLAG),
+                          {0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0})
                           .get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(
@@ -218,7 +255,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'$', u'%', u'^', u'&', u'*', u'(', u'\000', u'~', u'_', u'+',
                            u'{', u'}', u'|', u':', u'"', u'<', u'>', u'?', u'\000', u'¦'},
                           "us",
-                          (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))
+                          (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG),
+                          {0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0})
                           .get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(
@@ -231,7 +273,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'4', u'5', u'6', u'7', u'8', u'9', u' ', u'\xffff', u'ß', u'\xffff',
                            u'ü', u'+', u'#', u'ö', u'ä', u',', u'.', u'-', u'\000', u'<'},
                           "de",
-                          0)
+                          0,
+                          {0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,u'^',0,u'´',
+                           0,0,0,0,0,0,0,0,0,0})
                           .get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(
@@ -244,7 +291,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'$', u'%', u'&', u'/', u'(', u')', u' ', u'°', u'?', u'\xffff',
                            u'Ü', u'*', u'\'', u'Ö', u'Ä', u';', u':', u'_', u'\000', u'>'},
                           "de",
-                          K_SHIFTFLAG)
+                          K_SHIFTFLAG,
+                          {0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,u'`',
+                           0,0,0,0,0,0,0,0,0,0})
                           .get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(
@@ -257,7 +309,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'¼',      u'½',      u'¬',      u'{',      u'[',      u']',      u'\000',   u'\xfffe', u'\\',     u'\xffff',
                            u'\xffff', u'~',      u'\xfffe', u'\xffff', u'\xffff', u'·',      u'\xfffe', u'\xfffe', u'\000',   u'|'},
                           "de",
-                          (LCTRLFLAG | RALTFLAG))
+                          (LCTRLFLAG | RALTFLAG),
+                          {0,0,0,0,0,0,0,0,0,u'\000',
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,u'¸',
+                           u'¨',0,0,u'˝',u'^',0,0,0,0,0})
                           .get_test_data()));
 
 INSTANTIATE_TEST_SUITE_P(
@@ -270,7 +327,12 @@ INSTANTIATE_TEST_SUITE_P(
                            u'¤',      u'\xfffe', u'\xfffe', u'\xfffe', u'\xfffe', u'±',      u'\000',   u'\xfffe', u'¿',      u'\xffff',
                            u'\xffff', u'¯',      u'\xffff', u'\xffff', u'\xffff', u'×',      u'÷',      u'\xfffe', u'\000',   u'\xffff'},
                           "de",
-                          (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))
+                          (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG),
+                          {0,0,0,0,0,0,0,0,0,u'˙',
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,u'˛',
+                           u'˚',0,u'˘',u'\000',u'ˇ',0,0,0,0,u'\000'})
                           .get_test_data()));
 
 class GetKeyValFromKeyCodeTestDataValues : public TestDataValues {
