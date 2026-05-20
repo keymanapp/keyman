@@ -79,10 +79,17 @@ implementation
 uses
   DebugPaths,
   Keyman.System.AndroidStringToKeymanLocaleString,
+  KeymanPaths,
+  KeymanVersion,
   KLog,
   ErrorControlledRegistry,
   MessageIdentifierConsts,
   RegistryKeys;
+
+const
+  S_DefaultLocale = 'en';
+  S_DefaultLocaleName = 'English';
+  S_TestLocale = 'qqq';
 
 { TCustomisationMessageManager }
 
@@ -127,10 +134,28 @@ var
     Result := True;
   end;
 
+  procedure AddDefaultLanguage;
+  var
+    locale: TCustomisationLocale;
+  begin
+    locale := TCustomisationLocale.Create;
+    locale.ID := S_DefaultLocale;
+    locale.Name := S_DefaultLocaleName;
+    locale.NameWithEnglish := S_DefaultLocaleName;
+    FLanguages.Add(locale.ID, locale);
+  end;
+
 begin
   Result := '';
-  FLocalePath := ExtractFilePath(FCustStorageFileName)+'locale\';
+  FLocalePath := TKeymanPaths.KeymanLocalePath;
   FLanguages.Clear;
+
+  // Add default locale
+
+  AddDefaultLanguage;
+  Result := Result + locale.ID + #13#10;
+
+  // Load other defined locales
 
   try
     FLocaleIndexDoc := CoDomDocument.Create;
@@ -152,6 +177,9 @@ begin
         locale := TCustomisationLocale.Create;
         if not LoadLocaleData(node, locale) then
           locale.Free
+        else if (locale.ID = S_TestLocale) and (CKeymanVersionInfo.Environment <> ENVIRONMENT_LOCAL) and (CKeymanVersionInfo.Environment <> ENVIRONMENT_TEST) then
+          // Exclude test UI except when running a test build
+          locale.Free
         else
         begin
           FLanguages.Add(locale.ID, locale);
@@ -163,7 +191,9 @@ begin
   except
     // If any locale items are invalid, we will have only English
     // Currently, we cannot report errors to Sentry from kmcomapi
-    Result := '';
+    FLanguages.Clear;
+    AddDefaultLanguage;
+    Result := S_DefaultLocale;
   end;
 end;
 
@@ -200,7 +230,7 @@ var
   locale: TCustomisationLocale;
 begin
   if LocaleName = '' then
-    Result := ExtractFilePath(FCustStorageFileName)+'locale\'
+    Result := TKeymanPaths.KeymanLocalePath
   else if not FLanguages.TryGetValue(LocaleName, locale) then
     Result := ''
   else
