@@ -413,6 +413,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       KEYMAN_VERSION: ${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}
+      HAS_VERIFY_SOURCE: ${{ steps.check_requirements.outputs.HAS_VERIFY_SOURCE }}
 
     steps:
     - name: Set pending status on PR builds
@@ -437,23 +438,36 @@ jobs:
         clean: false
         path: ${{ github.workspace }}/keyman/
 
+    # TODO: Remove after release of Keyman 19
+    - name: Check requirements
+      id: check_requirements
+      shell: bash
+      run: |
+        if [[ -f "${GITHUB_WORKSPACE}/keyman/linux/scripts/verify_source.sh" ]]; then
+          echo "HAS_VERIFY_SOURCE=true" >> $GITHUB_OUTPUT
+        fi
+
     - name: Install devscripts
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
       uses: ./keyman/.github/actions/apt-install
       with:
         packages: devscripts equivs
 
     - name: Install dependencies
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
       run: |
         cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh --gha dependencies
 
     - name: Verify source tarball
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
       shell: bash
       run: |
         cd ${{ github.workspace }}/keyman/linux
         ./scripts/verify_source.sh --source-only --target-dir "${{ github.workspace }}/keyman-${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}"
 
     - name: Verify Ubuntu source package
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
       shell: bash
       run: |
         cd ${{ github.workspace }}/keyman/linux
@@ -463,10 +477,16 @@ jobs:
     name: Set result status of source verification on PR builds
     needs: [source_verification]
     runs-on: ubuntu-latest
-    if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
+    if: ${{ always() && github.event.client_payload.isTestBuild == 'true' && (github.repository == 'keymanapp/keyman' || github.event.client_payload.force) }}
     steps:
+    - name: Requirements not met
+      if: needs.source_verification.result == 'success' && needs.source_verification.outputs.HAS_VERIFY_SOURCE != 'true'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=Linux source verification requirements not met" >> $GITHUB_ENV
+
     - name: Set success
-      if: needs.source_verification.result == 'success'
+      if: needs.source_verification.result == 'success' && needs.source_verification.outputs.HAS_VERIFY_SOURCE == 'true'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Linux source verification succeeded" >> $GITHUB_ENV
