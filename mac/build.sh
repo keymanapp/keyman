@@ -110,7 +110,7 @@ execBuildCommand() {
     eval "$cmnd" || ret_code=$?
     set -e
 
-    mac_print_xcode_build_script_logs
+    mac_print_xcode_build_script_logs $ret_code
 
     if [ $ret_code != 0 ]; then
         builder_die "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
