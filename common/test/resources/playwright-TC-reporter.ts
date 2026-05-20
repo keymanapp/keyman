@@ -14,7 +14,7 @@ class TestNode {
   private id: string;
   private suiteOrTest: Suite | TestCase;
   private flowId: number;
-  private parent: TestNode;
+  private parent: TestNode | null;
   private childrenToVisit: TestNode[] = [];
 
   public constructor(suiteOrTest: Suite | TestCase) {
@@ -89,12 +89,20 @@ class TestNode {
 
   private end(result: TestResult, force: boolean = false): void {
     if (this.childrenToVisit.length > 0 && force) {
-      while (this.childrenToVisit.length > 0) {
-        const child = this.childrenToVisit[0];
-        child.end(result, force);
+      for (const child of [...this.childrenToVisit]) {
+        child.end(result, true);
       }
+      this.childrenToVisit.length = 0;
     }
 
+    // Only run this block on a normal (non-forced) end. Forced ends happen during endAll()
+    // teardown for nodes that didn't complete normally, where we have no meaningful result to
+    // report and the node's start/finish pairing may be incomplete. In that case we also skip the
+    // cleanup below because endAll()'s safety-net loop drains OpenNodes / Nodes globally, and our
+    // parent is already iterating its own children and clearing childrenToVisit itself —
+    // re-running removeFromOpenNodes / Nodes.delete / removeChild here would double-remove and
+    // log spurious errors, or trigger a re-entrant parent.end(null, false) cascade in the middle
+    // of the ongoing iteration.
     if (!force) {
       if (this.suiteOrTest.title !== '') {
         if (this.isTest) {
@@ -103,10 +111,10 @@ class TestNode {
         } else {
           console.log(`##teamcity[testSuiteFinished name='${this.suiteOrTest.title}']`);
         }
-        console.log(`##teamcity[flowFinished flowId = '${this.flowId}']`);
+        console.log(`##teamcity[flowFinished flowId='${this.flowId}']`);
       }
-      this.removeFromOpenNodes();
 
+      this.removeFromOpenNodes();
       this.parent?.removeChild(this);
       TestNode.Nodes.delete(this.id);
     }
@@ -122,6 +130,10 @@ class TestNode {
   }
 
   private removeChild(child: TestNode) {
+    if (this.childrenToVisit.length == 0) {
+      // already cleared all children in a end(result, true) call, nothing to do
+      return;
+    }
     const childIndex = this.childrenToVisit.indexOf(child);
     if (childIndex < 0) {
       console.error(`Can't find child '${child.id}' in parent '${this.id}'`);
@@ -166,6 +178,12 @@ class TestNode {
         const id = TestNode.OpenNodes[TestNode.OpenNodes.length - 1];
         console.log(`Closing '${id}'`);
         const node = TestNode.Nodes.get(id);
+        if (!node) {
+          console.error(`Node for '${id}' not found in Nodes map, removing from OpenNodes`);
+          TestNode.OpenNodes.pop();
+          continue;
+        }
+
         node.end(null);
       }
     }
@@ -179,7 +197,7 @@ class TestNode {
 }
 
 export default class PlaywrightTeamcityReporter implements Reporter {
-  private root: TestNode = null;
+  private root!: TestNode;
 
   public constructor(options: { parentFlow?: string } = {}) {
     console.log('Initializing Playwright TeamCity Reporter');
