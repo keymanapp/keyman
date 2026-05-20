@@ -71,6 +71,7 @@ describe('KeylayoutFileReader', function () {
       //const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
       const validated = sutR.validate(undefined, inputFilename);
       assert.isFalse(validated);
+    });
   });
 
   describe('validate() should return false on inputfiles with errors ', function () {
@@ -200,11 +201,14 @@ describe('KeylayoutFileReader', function () {
       ['../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout', false],
       ['../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout', false],
     ].forEach(function (values) {
-      it(("checkForCorrespondingElements in " + values[0] ).padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
+      it(("checkForCorrespondingElements in " + values[0]).padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         const jsonO: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(makePathToFixture(values[0] as string)));
         const result = sutR.checkForCorrespondingElements(jsonO as Keylayout.KeylayoutXMLSourceFile);
         assert.isTrue(result === values[1]);
       });
+    });
+  });
+
   describe("read() check structure of returned JSON", function () {
 
     it('read() should have the correct JSON structure', async function () {
