@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.235 alpha 2026-05-20
+
+* fix(linux): fix source tarball verification (#15975)
+* fix(windows): add apply actions call to core_event (#15867)
+* chore(ios): add extra logging to xcodebuild (#15964)
+* maint(linux): skip source verification if script is missing (#15979)
+
 ## 19.0.234 alpha 2026-05-19
 
 * chore(deps): bump brace-expansion from 5.0.5 to 5.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#15969)
