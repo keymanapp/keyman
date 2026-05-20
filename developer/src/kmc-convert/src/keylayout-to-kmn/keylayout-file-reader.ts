@@ -17,7 +17,6 @@ export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
 
-
   /**
    * @brief  helper function to check if a specific keyMap index exists in a keyMapSet
    * neccessary because the amount of  <keyMap index> must correspond to
