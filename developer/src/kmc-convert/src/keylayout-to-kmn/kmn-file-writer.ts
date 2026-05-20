@@ -18,9 +18,14 @@ interface MessageCharacter {
   character: string;
 };
 // Todo-kmc-convert edit interface
-/*interface ReviewRulesResult {
-  warningMessage: string[];
-};*/
+interface ReviewRulesResult {
+  warningMessage_0: string;
+  warningMessage_1: string;
+  warningMessage_2: string;
+  hasWarning_0: boolean;
+  hasWarning_1: boolean;
+  hasWarning_2: boolean;
+};
 
 export class KmnFileWriter {
 
@@ -406,9 +411,6 @@ export class KmnFileWriter {
    * @return a string[] containing possible warnings for a rule
    */
   private reviewRules(rule: Rule[], index: number): string[] {
-    /*const result: ReviewRulesResult = {
-      warningMessage: []
-    };*/
 
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     const warningText: string[] = Array(3).fill("");
@@ -462,7 +464,6 @@ export class KmnFileWriter {
         warningText[2] = "unavailable modifier : ";
       }
     }
-
     // ------------------------- check ambiguous/duplicate rules -------------------------
 
     if ((rule[index].ruleType === "C0") || (rule[index].ruleType === "C1")) {
@@ -894,8 +895,730 @@ export class KmnFileWriter {
         warningText[2] = warningText[2] + extraWarning;
       }
     }
-    //result.warningMessage = warningText;
+
     return warningText;
+  }
+
+  public reviewRules_returnObject(rule: Rule[], index: number): ReviewRulesResult {
+
+    const resultWarnings: ReviewRulesResult = {
+      warningMessage_0: '',
+      warningMessage_1: '',
+      warningMessage_2: '',
+      hasWarning_0: false,
+      hasWarning_1: false,
+      hasWarning_2: false
+    };
+
+    const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
+    const warningText: string[] = Array(3).fill("");
+
+    // ------------------------- check unavailable modifiers -------------------------
+
+    if ((rule[index].ruleType === "C0") || (rule[index].ruleType === "C1")) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+        warningText[2] = "unavailable modifier : ";
+        resultWarnings.warningMessage_2 = "unavailable modifier : ";
+        resultWarnings.hasWarning_2 = true;
+      }
+    }
+
+    else if (rule[index].ruleType === "C2") {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
+        warningText[1] = "unavailable modifier : ";
+        warningText[2] = "unavailable superior rule ( ["
+          + rule[index].modifierDeadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].idDeadkey
+          + ") ) : ";
+
+        resultWarnings.warningMessage_1 = "unavailable modifier : ";
+        resultWarnings.hasWarning_1 = true;
+        resultWarnings.warningMessage_2 = "unavailable superior rule ( [" + rule[index].modifierDeadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].idDeadkey
+          + ") ) : ";
+        resultWarnings.hasWarning_2 = true;
+      }
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+        warningText[2] = "unavailable modifier : ";
+
+        resultWarnings.warningMessage_2 = "unavailable modifier : ";
+        resultWarnings.hasWarning_2 = true;
+      }
+    }
+
+    else if (rule[index].ruleType === "C3") {
+
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
+        warningText[0] = "unavailable modifier : ";
+        warningText[1] = "unavailable superior rule ( ["
+          + rule[index].modifierPrevDeadkey + " "
+          + rule[index].prevDeadkey
+          + "]  >  dk(A"
+          + rule[index].idPrevDeadkey
+          + ") ) : ";
+        resultWarnings.warningMessage_0 = "unavailable modifier : ";
+        resultWarnings.hasWarning_0 = true;
+
+        resultWarnings.warningMessage_1 = "unavailable superior rule ( ["
+          + rule[index].modifierPrevDeadkey + " "
+          + rule[index].prevDeadkey
+          + "]  >  dk(A"
+          + rule[index].idPrevDeadkey
+          + ") ) : ";
+        resultWarnings.hasWarning_1 = true;
+      }
+
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
+        warningText[1] = "unavailable modifier : ";
+        warningText[2] = "unavailable superior rule ( ["
+          + rule[index].modifierDeadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(B"
+          + rule[index].idDeadkey
+          + ") ) : ";
+        resultWarnings.warningMessage_1 = "unavailable modifier : ";
+        resultWarnings.hasWarning_1 = true;
+        resultWarnings.warningMessage_2 = "unavailable superior rule ( ["
+          + rule[index].modifierDeadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(B"
+          + rule[index].idDeadkey
+          + ") ) : ";
+        resultWarnings.hasWarning_2 = true;
+      }
+
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+        warningText[2] = "unavailable modifier : ";
+        resultWarnings.warningMessage_2 = "unavailable modifier : ";
+        resultWarnings.hasWarning_2 = true;
+      }
+    }
+    // ------------------------- check ambiguous/duplicate rules -------------------------
+
+    if ((rule[index].ruleType === "C0") || (rule[index].ruleType === "C1")) {
+
+      // 1-1: + [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'A'
+      const amb_1_1 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C0" || curr.ruleType === "C1")
+        && curr.modifierPrevDeadkey === ""
+        && curr.prevDeadkey === ""
+        && curr.modifierDeadkey === ""
+        && curr.deadkey === ""
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+      // 1-1: + [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'N'
+      const dup_1_1 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C0" || curr.ruleType === "C1")
+        && curr.modifierPrevDeadkey === ""
+        && curr.prevDeadkey === ""
+        && curr.modifierDeadkey === ""
+        && curr.deadkey === ""
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+
+      // 4-1: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+      const amb_4_1 = rule.filter((curr, idx) =>
+        ((curr.ruleType === "C3"))
+        && curr.modifierPrevDeadkey === rule[index].modifierKey
+        && curr.prevDeadkey === rule[index].key
+      );
+
+      // 2-1: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+      const amb_2_1 = rule.filter((curr, idx) =>
+        ((curr.ruleType === "C2"))
+        && curr.modifierDeadkey === rule[index].modifierKey
+        && curr.deadkey === rule[index].key
+      );
+
+      if (amb_4_1.length > 0) {
+        warningText[2] = warningText[2]
+          + ("ambiguous rule: later: ["
+            + amb_4_1[0].modifierPrevDeadkey
+            + " "
+            + amb_4_1[0].prevDeadkey
+            + "]  >  dk(C"
+            + amb_2_1[0].idDeadkey
+            + ") ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2 + ("ambiguous rule: later: ["
+          + amb_4_1[0].modifierPrevDeadkey
+          + " "
+          + amb_4_1[0].prevDeadkey
+          + "]  >  dk(C"
+          + amb_2_1[0].idDeadkey
+          + ") ");
+        resultWarnings.hasWarning_2 = true;
+      }
+
+      if (amb_2_1.length > 0) {
+        warningText[2] = warningText[2]
+          + ("ambiguous rule: later: ["
+            + amb_2_1[0].modifierDeadkey
+            + " "
+            + amb_2_1[0].deadkey
+            + "]  >  dk(A"
+            + amb_2_1[0].idDeadkey
+            + ") ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2
+          + ("ambiguous rule: later: ["
+            + amb_2_1[0].modifierDeadkey
+            + " "
+            + amb_2_1[0].deadkey
+            + "]  >  dk(A"
+            + amb_2_1[0].idDeadkey
+            + ") ");
+        resultWarnings.hasWarning_2 = true;
+      }
+
+      if (amb_1_1.length > 0) {
+        warningText[2] = warningText[2]
+          + ("ambiguous rule: earlier: ["
+            + amb_1_1[0].modifierKey
+            + " "
+            + amb_1_1[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2
+          + ("ambiguous rule: earlier: ["
+            + amb_1_1[0].modifierKey
+            + " "
+            + amb_1_1[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character
+            + "\' ");
+        resultWarnings.hasWarning_2 = true;
+      }
+
+      if (dup_1_1.length > 0) {
+        warningText[2] = warningText[2]
+          + ("duplicate rule: earlier: ["
+            + dup_1_1[0].modifierKey
+            + " "
+            + dup_1_1[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2
+          + ("duplicate rule: earlier: ["
+            + dup_1_1[0].modifierKey
+            + " "
+            + dup_1_1[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character
+            + "\' ");
+        resultWarnings.hasWarning_2 = true;
+      }
+    }
+
+    if (rule[index].ruleType === "C2") {
+
+      // 2-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C3)
+      const amb_2_2 = rule.filter((curr, idx) =>
+        curr.ruleType === "C2"
+        && curr.modifierDeadkey === rule[index].modifierDeadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.idDeadkey !== rule[index].idDeadkey
+        && idx < index
+      );
+
+      // 2-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C11)
+      const dup_2_2 = rule.filter((curr, idx) =>
+        curr.ruleType === "C2"
+        && curr.modifierDeadkey === rule[index].modifierDeadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.idDeadkey === rule[index].idDeadkey
+        && idx < index
+      );
+
+      //3-3: dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
+      const amb_3_3 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C2")
+        && curr.idDeadkey === rule[index].idDeadkey
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+
+      //3-3: dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
+      const dup_3_3 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C2")
+        && curr.idDeadkey === rule[index].idDeadkey
+        && rule[index].uniqueDeadkey === 0
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+
+      // 4-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(B11)
+      const amb_4_2 = rule.filter((curr, idx) =>
+        ((curr.ruleType === "C3"))
+        && curr.modifierPrevDeadkey === rule[index].modifierDeadkey
+        && curr.prevDeadkey === rule[index].deadkey
+        && curr.idPrevDeadkey === rule[index].idDeadkey
+      );
+
+      if (amb_2_2.length > 0) {
+        warningText[1] = warningText[1]
+          + ("ambiguous rule: earlier: ["
+            + amb_2_2[0].modifierDeadkey
+            + " "
+            + amb_2_2[0].deadkey
+            + "]  >  dk(C"
+            + amb_2_2[0].idDeadkey
+            + ") ");
+        resultWarnings.warningMessage_1 = resultWarnings.warningMessage_1
+          + ("ambiguous rule: earlier: ["
+            + amb_2_2[0].modifierDeadkey
+            + " "
+            + amb_2_2[0].deadkey
+            + "]  >  dk(C"
+            + amb_2_2[0].idDeadkey
+            + ") ");
+        resultWarnings.hasWarning_1 = true;
+      }
+
+      if (dup_2_2.length > 0) {
+        warningText[1] = warningText[1]
+          + ("duplicate rule: earlier: ["
+            + dup_2_2[0].modifierDeadkey
+            + " "
+            + dup_2_2[0].deadkey
+            + "]  >  dk(C"
+            + dup_2_2[0].idDeadkey
+            + ") ");
+        resultWarnings.warningMessage_1 = resultWarnings.warningMessage_1 + ("duplicate rule: earlier: ["
+          + dup_2_2[0].modifierDeadkey
+          + " "
+          + dup_2_2[0].deadkey
+          + "]  >  dk(C"
+          + dup_2_2[0].idDeadkey
+          + ") ");
+        resultWarnings.hasWarning_1 = true;
+      }
+
+      if (amb_3_3.length > 0) {
+        warningText[2] = warningText[2]
+          + ("ambiguous rule: earlier: dk(A"
+            + amb_3_3[0].idDeadkey
+            + ") + ["
+            + amb_3_3[0].modifierKey
+            + " "
+            + amb_3_3[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2
+          + ("ambiguous rule: earlier: dk(A"
+            + amb_3_3[0].idDeadkey
+            + ") + ["
+            + amb_3_3[0].modifierKey
+            + " "
+            + amb_3_3[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character
+            + "\' ");
+        resultWarnings.hasWarning_2 = true;
+      }
+
+      if (dup_3_3.length > 0) {
+        warningText[2] = warningText[2]
+          + ("duplicate rule: earlier: dk(A"
+            + dup_3_3[0].idDeadkey
+            + ") + ["
+            + dup_3_3[0].modifierKey
+            + " "
+            + dup_3_3[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2 + ("duplicate rule: earlier: dk(A"
+          + dup_3_3[0].idDeadkey
+          + ") + ["
+          + dup_3_3[0].modifierKey
+          + " "
+          + dup_3_3[0].key
+          + "]  >  \'"
+          + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character
+          + "\' ");
+        resultWarnings.hasWarning_2 = true;
+      }
+
+      if (amb_4_2.length > 0) {
+        warningText[0] = warningText[0]
+          + ("ambiguous rule: later: ["
+            + amb_4_2[0].modifierPrevDeadkey
+            + " "
+            + amb_4_2[0].prevDeadkey
+            + "]  >  dk(C"
+            + amb_4_2[0].idPrevDeadkey
+            + ") ");
+        resultWarnings.warningMessage_0 = resultWarnings.warningMessage_0
+          + ("ambiguous rule: later: ["
+            + amb_4_2[0].modifierPrevDeadkey
+            + " "
+            + amb_4_2[0].prevDeadkey
+            + "]  >  dk(C"
+            + amb_4_2[0].idPrevDeadkey
+            + ") ");
+        resultWarnings.hasWarning_0 = true;
+      }
+    }
+
+    if (rule[index].ruleType === "C3") {
+
+      // 2-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(B11)
+      const amb_2_4 = rule.filter((curr, idx) =>
+        ((curr.ruleType === "C2"))
+        && curr.modifierDeadkey === rule[index].modifierPrevDeadkey
+        && curr.deadkey === rule[index].prevDeadkey
+        && curr.idDeadkey === rule[index].idPrevDeadkey
+      );
+
+      // 6-3  dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
+      const amb_6_3 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C2")
+        && curr.idPrevDeadkey === rule[index].idPrevDeadkey
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+      );
+
+      // 6-3 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
+      const dup_6_3 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C2")
+        && curr.idPrevDeadkey === rule[index].idPrevDeadkey
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)
+      );
+
+      // 4-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C1)
+      const amb_4_4 = rule.filter((curr, idx) =>
+        curr.ruleType === "C3"
+        && curr.modifierPrevDeadkey === rule[index].modifierPrevDeadkey
+        && curr.idPrevDeadkey !== rule[index].idPrevDeadkey
+        && curr.prevDeadkey === rule[index].prevDeadkey
+        && rule[index].uniquePrevDeadkey !== 0
+        && idx < index
+      );
+
+      // 4-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C11)
+      const dup_4_4 = rule.filter((curr, idx) =>
+        curr.ruleType === "C3"
+        && curr.modifierPrevDeadkey === rule[index].modifierPrevDeadkey
+        && curr.prevDeadkey === rule[index].prevDeadkey
+        && curr.idPrevDeadkey === rule[index].idPrevDeadkey
+        && idx < index
+      );
+
+      // 5-5  dk(C1) + [SHIFT CAPS K_A]  >   dk(C2)  <-> dk(C1) + [SHIFT CAPS K_A]  >  dk(C3)
+      const amb_5_5 = rule.filter((curr, idx) => (
+        (curr.ruleType === "C3")
+        && curr.idPrevDeadkey === rule[index].idPrevDeadkey
+        && curr.modifierDeadkey === rule[index].modifierDeadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.idDeadkey === rule[index].idDeadkey)
+        && idx < index
+        && (rule[index].uniqueDeadkey !== 0 || rule[index].uniquePrevDeadkey !== 0)
+      );
+
+      // 5-5 dk(C1) + [SHIFT CAPS K_A]  >   dk(C2)  <-> dk(C1) + [SHIFT CAPS K_A]  >  dk(C2)
+      const dup_5_5 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C3")
+        && curr.idPrevDeadkey === rule[index].idPrevDeadkey
+        && curr.modifierPrevDeadkey === rule[index].modifierPrevDeadkey
+        && curr.prevDeadkey === rule[index].prevDeadkey
+        && curr.modifierDeadkey === rule[index].modifierDeadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.idDeadkey === rule[index].idDeadkey
+        && rule[index].uniqueDeadkey === 0
+        && idx < index
+      );
+
+      // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
+      const amb_6_6 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C3")
+        && curr.idPrevDeadkey === rule[index].idPrevDeadkey
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+        && idx < index
+      );
+
+      // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
+      const dup_6_6 =
+        rule.filter((curr, idx) =>
+          (curr.ruleType === "C3")
+          && curr.idDeadkey === rule[index].idDeadkey
+          && curr.modifierKey === rule[index].modifierKey
+          && curr.key === rule[index].key
+          && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
+          && idx < index
+        );
+
+      if (amb_2_4.length > 0) {
+        warningText[0] = warningText[0]
+          + ("ambiguous rule: earlier: ["
+            + amb_2_4[0].modifierDeadkey
+            + " "
+            + amb_2_4[0].deadkey
+            + "]  >  dk(A"
+            + amb_2_4[0].idDeadkey
+            + ") ");
+        resultWarnings.warningMessage_0 = resultWarnings.warningMessage_0 + ("ambiguous rule: earlier: ["
+          + amb_2_4[0].modifierDeadkey
+          + " "
+          + amb_2_4[0].deadkey
+          + "]  >  dk(A"
+          + amb_2_4[0].idDeadkey
+          + ") ");
+        resultWarnings.hasWarning_0 = true;
+      }
+
+      if (amb_6_3.length > 0) {
+        warningText[1] = warningText[1]
+          + ("ambiguous rule: earlier: dk(C"
+            + amb_6_3[0].idDeadkey
+            + ") + ["
+            + amb_6_3[0].modifierKey
+            + " "
+            + amb_6_3[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_1 = resultWarnings.warningMessage_1
+          + ("ambiguous rule: earlier: dk(C"
+            + amb_6_3[0].idDeadkey
+            + ") + ["
+            + amb_6_3[0].modifierKey
+            + " "
+            + amb_6_3[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character
+            + "\' ");
+        resultWarnings.hasWarning_1 = true;
+      }
+
+      if (dup_6_3.length > 0) {
+        warningText[1] = warningText[1]
+          + ("duplicate rule: earlier: dk(C"
+            + dup_6_3[0].idDeadkey
+            + ") + ["
+            + dup_6_3[0].modifierKey
+            + " "
+            + dup_6_3[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_1 = resultWarnings.warningMessage_1
+          + ("duplicate rule: earlier: dk(C"
+            + dup_6_3[0].idDeadkey
+            + ") + ["
+            + dup_6_3[0].modifierKey
+            + " "
+            + dup_6_3[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character
+            + "\' ");
+        resultWarnings.hasWarning_1 = true;
+      }
+
+      if (amb_4_4.length > 0) {
+        warningText[0] = warningText[0]
+          + ("ambiguous rule: earlier: ["
+            + amb_4_4[0].modifierPrevDeadkey
+            + " "
+            + amb_4_4[0].prevDeadkey
+            + "]  >  dk(C"
+            + amb_4_4[0].idPrevDeadkey
+            + ") ");
+        resultWarnings.warningMessage_0 = resultWarnings.warningMessage_0 + ("ambiguous rule: earlier: ["
+          + amb_4_4[0].modifierPrevDeadkey
+          + " "
+          + amb_4_4[0].prevDeadkey
+          + "]  >  dk(C"
+          + amb_4_4[0].idPrevDeadkey
+          + ") ");
+        resultWarnings.hasWarning_0 = true;
+      }
+
+      if (dup_4_4.length > 0) {
+        warningText[0] = warningText[0]
+          + ("duplicate rule: earlier: ["
+            + dup_4_4[0].modifierPrevDeadkey
+            + " "
+            + dup_4_4[0].prevDeadkey
+            + "]  >  dk(C"
+            + dup_4_4[0].idPrevDeadkey
+            + ") ");
+        resultWarnings.warningMessage_0 = resultWarnings.warningMessage_0 + ("duplicate rule: earlier: ["
+          + dup_4_4[0].modifierPrevDeadkey
+          + " "
+          + dup_4_4[0].prevDeadkey
+          + "]  >  dk(C"
+          + dup_4_4[0].idPrevDeadkey
+          + ") ");
+        resultWarnings.hasWarning_0 = true;
+      }
+
+      if (amb_5_5.length > 0) {
+        warningText[1] = warningText[1]
+          + ("ambiguous rule: earlier: dk(B"
+            + amb_5_5[0].idPrevDeadkey
+            + ") + ["
+            + amb_5_5[0].modifierDeadkey
+            + " "
+            + amb_5_5[0].deadkey
+            + "]  >  dk(B"
+            + amb_5_5[0].idDeadkey
+            + ") ");
+        resultWarnings.warningMessage_1 = resultWarnings.warningMessage_1 + ("ambiguous rule: earlier: dk(B"
+          + amb_5_5[0].idPrevDeadkey
+          + ") + ["
+          + amb_5_5[0].modifierDeadkey
+          + " "
+          + amb_5_5[0].deadkey
+          + "]  >  dk(B"
+          + amb_5_5[0].idDeadkey
+          + ") ");
+        resultWarnings.hasWarning_1 = true;
+      }
+
+      if (dup_5_5.length > 0) {
+        warningText[1] = warningText[1]
+          + ("duplicate rule: earlier: dk(B"
+            + dup_5_5[0].idPrevDeadkey
+            + ") + ["
+            + dup_5_5[0].modifierDeadkey
+            + " "
+            + dup_5_5[0].deadkey
+            + "]  >  dk(B"
+            + dup_5_5[0].idDeadkey
+            + ") ");
+        resultWarnings.warningMessage_1 = resultWarnings.warningMessage_1 + ("duplicate rule: earlier: dk(B"
+          + dup_5_5[0].idPrevDeadkey
+          + ") + ["
+          + dup_5_5[0].modifierDeadkey
+          + " "
+          + dup_5_5[0].deadkey
+          + "]  >  dk(B"
+          + dup_5_5[0].idDeadkey
+          + ") ");
+        resultWarnings.hasWarning_1 = true;
+      }
+
+      if (amb_6_6.length > 0) {
+        warningText[2] = warningText[2]
+          + ("ambiguous rule: earlier: dk(B"
+            + amb_6_6[0].idDeadkey
+            + ") + ["
+            + amb_6_6[0].modifierKey
+            + " "
+            + amb_6_6[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2 + ("ambiguous rule: earlier: dk(B"
+          + amb_6_6[0].idDeadkey
+          + ") + ["
+          + amb_6_6[0].modifierKey
+          + " "
+          + amb_6_6[0].key
+          + "]  >  \'"
+          + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character
+          + "\' ");
+        resultWarnings.hasWarning_2 = true;
+      }
+
+      if (dup_6_6.length > 0) {
+        warningText[2] = warningText[2]
+          + ("duplicate rule: earlier: dk(B"
+            + dup_6_6[0].idDeadkey
+            + ") + ["
+            + dup_6_6[0].modifierKey
+            + " "
+            + dup_6_6[0].key
+            + "]  >  \'"
+            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character
+            + "\' ");
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2 + ("duplicate rule: earlier: dk(B"
+          + dup_6_6[0].idDeadkey
+          + ") + ["
+          + dup_6_6[0].modifierKey
+          + " "
+          + dup_6_6[0].key
+          + "]  >  \'"
+          + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character
+          + "\' ");
+        resultWarnings.hasWarning_2 = true;
+      }
+    }
+
+    // In rare cases a rule might not be written out therefore we need to inform the user:
+    // usually we write the first occurance of an ambiguous C0/C1 rule and comment out the later
+    //    assuming that if several C0/C1 rules are ambiguous the user prefers to use the first C0/C1 rule
+    // for C2/C3 rules we write the last occurance of an ambiguous rule and comment out the earlier
+    //    assuming that if a C0/C1 and a C2/C3 rule is ambiguous the user prefers to use the C2/C3 rule over the C0/C1 rule
+    // if both happens, nothing would be written, therefore this messsage
+
+    const extraWarning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  ";
+
+    if (warningText[0] !== "") {
+      warningText[0] = "c WARNING: " + warningText[0] + "here: ";
+
+      if ((warningText[0].indexOf("earlier:") > 0) && (warningText[0].indexOf("later:") > 0)) {
+        warningText[0] = warningText[0] + extraWarning;
+      }
+    }
+    if (resultWarnings.warningMessage_0) {
+      resultWarnings.warningMessage_0 = "c WARNING: " + resultWarnings.warningMessage_0 + "here: ";
+
+      if ((resultWarnings.warningMessage_0.indexOf("earlier:") > 0) && (resultWarnings.warningMessage_0.indexOf("later:") > 0)) {
+        resultWarnings.warningMessage_0 = resultWarnings.warningMessage_0 + extraWarning;
+      }
+    }
+
+    if (warningText[1] !== "") {
+      warningText[1] = "c WARNING: " + warningText[1] + "here: ";
+      if ((warningText[1].indexOf("earlier:") > 0) && (warningText[1].indexOf("later:") > 0)) {
+        warningText[1] = warningText[1] + extraWarning;
+      }
+    }
+    if (resultWarnings.warningMessage_1 !== "") {
+      resultWarnings.warningMessage_1 = "c WARNING: " + resultWarnings.warningMessage_1 + "here: ";
+      if ((resultWarnings.warningMessage_1.indexOf("earlier:") > 0) && (resultWarnings.warningMessage_1.indexOf("later:") > 0)) {
+        resultWarnings.warningMessage_1 = resultWarnings.warningMessage_1 + extraWarning;
+      }
+    }
+
+    if (warningText[2] !== "") {
+      warningText[2] = "c WARNING: " + warningText[2] + "here: ";
+
+      if ((warningText[2].indexOf("earlier:") > 0) && (warningText[2].indexOf("later:") > 0)) {
+        warningText[2] = warningText[2] + extraWarning;
+      }
+    }
+
+    if (resultWarnings.warningMessage_2 !== "") {
+      resultWarnings.warningMessage_2 = "c WARNING: " + resultWarnings.warningMessage_2 + "here: ";
+
+      if ((resultWarnings.warningMessage_2.indexOf("earlier:") > 0) && (resultWarnings.warningMessage_2.indexOf("later:") > 0)) {
+        resultWarnings.warningMessage_2 = resultWarnings.warningMessage_2 + extraWarning;
+      }
+    }
+    return resultWarnings;
   }
 
   /**

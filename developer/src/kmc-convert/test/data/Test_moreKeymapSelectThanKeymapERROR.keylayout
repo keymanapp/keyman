@@ -8,7 +8,7 @@
     tests for Errors if more keyMapSelect(3) than KeyMap(2) are available
 
 -->
-<keyboard group="126" id="-1272" name="Test_DifferentAmountOfMapSelectInKeyMapERROR" maxout="1">
+<keyboard group="126" id="-1272" name="Test_moreKeymapSelectThanKeymapERROR" maxout="1">
     <layouts>
         <layout first="0" last="0" mapSet="138" modifiers="30"/>
     </layouts>
