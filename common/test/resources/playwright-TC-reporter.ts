@@ -16,6 +16,7 @@ class TestNode {
   private flowId: number;
   private parent: TestNode | null;
   private childrenToVisit: TestNode[] = [];
+  private childrenCleared: boolean = false;
 
   public constructor(suiteOrTest: Suite | TestCase) {
     this.suiteOrTest = suiteOrTest;
@@ -88,11 +89,13 @@ class TestNode {
   }
 
   private end(result: TestResult, force: boolean = false): void {
-    if (this.childrenToVisit.length > 0 && force) {
+    if (force) {
+      // use a copy of the array because child.end will mutate the array
       for (const child of [...this.childrenToVisit]) {
         child.end(result, true);
       }
-      this.childrenToVisit.length = 0;
+      this.childrenToVisit = [];
+      this.childrenCleared = true;
     }
 
     // Only run this block on a normal (non-forced) end. Forced ends happen during endAll()
@@ -130,7 +133,7 @@ class TestNode {
   }
 
   private removeChild(child: TestNode) {
-    if (this.childrenToVisit.length == 0) {
+    if (this.childrenCleared) {
       // already cleared all children in a end(result, true) call, nothing to do
       return;
     }
