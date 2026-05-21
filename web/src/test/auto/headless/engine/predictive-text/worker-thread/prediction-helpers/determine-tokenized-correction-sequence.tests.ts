@@ -236,7 +236,7 @@ describe('determineTokenizedCorrectionSequence', () => {
   });
 
   // Will be handled far better after resolving multi-tokenization handling.
-  it.skip(`properly analyzes post-split case`, () => {
+  it.skip(`properly analyzes post-split new-wordbreak case`, () => {
     const context: Context = {
       left: 'the quick brown fox can\'',
       right: '',

@@ -189,72 +189,65 @@ export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: Correctio
   return b.totalProb - a.totalProb;
 }
 
-export function correctAndEnumerateWithoutTraversals(
+export function determineTraversallessCorrectionSequences(
   lexicalModel: LexicalModel,
   corrections: Distribution<Transform>,
   context: Context
-): CorrectionPredictionTuple[] {
-  let returnedPredictions: CorrectionPredictionTuple[] = [];
+): PredictionParameters[] {
+  let returnedPredictionData: PredictionParameters[] = [];
 
   const tokenizer = determineModelTokenizer(lexicalModel);
+  const wordbreak = determineModelWordbreaker(lexicalModel);
+
   const tokenization = tokenizer(context); // issue at present if no tokens exist!
+  const tokenMapper = (t: models.Token) => {
+    return {
+      exampleInput: t.text
+    } as ContextTokenLike;
+  }
 
   for(let correction of corrections) {
     // Step 1:  determine tokenization effects.  We can't use the
     // ContextTokenization pattern due to the model's lack of LexiconTraversal
     // support, though.
     const transformId = correction.sample.id;
+    const postContext = models.applyTransform(correction.sample, context);
+    const postTokenization = tokenizer(postContext);
+
+    const transitionEffects = determineSuggestionRange(tokenization.left.map(tokenMapper), postTokenization.left.map(tokenMapper), (a, b) => a.exampleInput == b.exampleInput);
+    const match: TokenResult = {
+      matchString: wordbreak(postContext),
+      inputSamplingCost: -Math.log(correction.p),
+      knownCost: 0,
+      totalCost: -Math.log(correction.p)
+    };
+
+    const suggestionParams = buildCorrectionSequence(transitionEffects, context, match, 1);
 
     const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
     const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
-    // tokenizationMapping.alignment.edgeWindow.editBoundary.
     const tokenizedCorrectionEntries = [...tokenizedCorrection.values()];
-    const deleteLeft = tokenizedCorrectionEntries.reduce((total, curr) => total + curr.deleteLeft, 0);
+    const { tokensToRemove, tokensToPredict } = transitionEffects;
+    const deleteLeft = tokensToPredict.length > 1 ? 0 : tokensToRemove.reduce((prev, curr) => prev + curr.codepointLength, 0);
 
-    const rootContext = models.applyTransform({insert: '', deleteLeft}, context);
-
-    // Start:  determine the proper root for the first tokenized correction component.
-    const edgeWindow = tokenizationMapping.alignment.edgeWindow;
-    const nonEmptyBoundaryRoot = edgeWindow.editBoundary.text == '' ? tokenization.left[edgeWindow.editBoundary.tokenIndex-1]?.text ?? '' : edgeWindow.editBoundary.text;
-    const appliedBoundaryTail = nonEmptyBoundaryRoot + tokenizedCorrectionEntries[0].insert;
-
-    // If the previous text can be tokenized into multiple tokens, the first correction's text should stand alone.
-    // If not, the correction root should incorporate `nonEmptyBoundaryRoot` as a prefix.
-    const tailTransform = tokenizedCorrectionEntries[0];
-    if(tokenizer({left: appliedBoundaryTail, startOfBuffer: false, endOfBuffer: false}).left.length > 1) {
-      tokenizedCorrectionEntries[0] = {
-        ...tailTransform,
-        deleteLeft: 0
-      }
-    } else {
-      tokenizedCorrectionEntries[0] = {
-        insert: nonEmptyBoundaryRoot + tailTransform.insert,
-        deleteLeft: 0
-      }
-    }
-
+    // IF:  array has multiple entries, then build the preservation-transform as below, including the deleteLeft.
+    // If not, don't make one!
     const preservationTransform = tokenizedCorrectionEntries.slice(0, -1).reduce((accum, curr) => {
       return models.buildMergedTransform(accum, {...curr, deleteLeft: 0});
     }, { insert: '', deleteLeft, id: correction.sample.id});
 
-
-    const predictions = predictFromCorrectionSequence(lexicalModel, tokenizedCorrectionEntries.map((e) =>{
-      return {
-        sample: e,
-        p: correction.p
+    returnedPredictionData.push({
+      ...suggestionParams,
+      applyInPost: (p) => {
+        p.preservationTransform = preservationTransform;
+        if(transformId) {
+          p.prediction.sample.transformId = transformId;
+        }
       }
-    }), rootContext, transformId);
-
-    predictions.forEach((p) => {
-      p.preservationTransform = preservationTransform;
-      if(transformId) {
-        p.prediction.sample.transformId = transformId;
-      }
-      returnedPredictions.push(p);
-    });
+    })
   }
 
-  return returnedPredictions;
+  return returnedPredictionData;
 }
 
 /**
@@ -568,8 +561,13 @@ export async function correctAndEnumerate(
   // It's mostly here to support models compiled before Keyman 14.0, which was
   // when the `LexiconTraversal` pattern was established.
   if(!contextTracker) {
+    const predictionData = determineTraversallessCorrectionSequences(lexicalModel, transformDistribution, context);
     return {
-      rawPredictions: correctAndEnumerateWithoutTraversals(lexicalModel, transformDistribution, context)
+      rawPredictions: predictionData.flatMap((entry) => {
+        const predictions = predictFromCorrectionSequence(lexicalModel, entry.tokenizedCorrection, entry.rootContext, transformDistribution[0]?.sample.id);
+        predictions.forEach((p) => entry.applyInPost(p));
+        return predictions;
+      })
     };
   }
 
