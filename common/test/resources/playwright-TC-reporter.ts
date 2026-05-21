@@ -14,7 +14,7 @@ class TestNode {
   private id: string;
   private suiteOrTest: Suite | TestCase;
   private flowId: number;
-  private parent: TestNode;
+  private parent: TestNode | null;
   private childrenToVisit: TestNode[] = [];
 
   public constructor(suiteOrTest: Suite | TestCase) {
@@ -87,29 +87,20 @@ class TestNode {
     }
   }
 
-  private end(result: TestResult, force: boolean = false): void {
-    if (this.childrenToVisit.length > 0 && force) {
-      while (this.childrenToVisit.length > 0) {
-        const child = this.childrenToVisit[0];
-        child.end(result, force);
+  private end(result: TestResult): void {
+    if (this.suiteOrTest.title !== '') {
+      if (this.isTest) {
+        const { msgTitle, details } = this.getTestResult(result) ?? { msgTitle: 'testFinished', details: '' };
+        console.log(`##teamcity[${msgTitle} name='${this.suiteOrTest.title}' ${details}]`);
+      } else {
+        console.log(`##teamcity[testSuiteFinished name='${this.suiteOrTest.title}']`);
       }
+      console.log(`##teamcity[flowFinished flowId='${this.flowId}']`);
     }
 
-    if (!force) {
-      if (this.suiteOrTest.title !== '') {
-        if (this.isTest) {
-          const { msgTitle, details } = this.getTestResult(result) ?? { msgTitle: 'testFinished', details: '' };
-          console.log(`##teamcity[${msgTitle} name='${this.suiteOrTest.title}' ${details}]`);
-        } else {
-          console.log(`##teamcity[testSuiteFinished name='${this.suiteOrTest.title}']`);
-        }
-        console.log(`##teamcity[flowFinished flowId = '${this.flowId}']`);
-      }
-      this.removeFromOpenNodes();
-
-      this.parent?.removeChild(this);
-      TestNode.Nodes.delete(this.id);
-    }
+    this.removeFromOpenNodes();
+    this.parent?.removeChild(this);
+    TestNode.Nodes.delete(this.id);
   }
 
   private removeFromOpenNodes(): void {
@@ -134,7 +125,7 @@ class TestNode {
     }
 
     // No more children, so close this node
-    this.end(null, false);
+    this.end(null);
   }
 
   public static startTest(test: TestCase): void {
@@ -159,13 +150,18 @@ class TestNode {
     if (this.childrenToVisit.length > 0) {
       console.error(`Root node still has ${this.childrenToVisit.length} open children`);
     }
-    this.end(null, true);
     if (TestNode.OpenNodes.length > 0) {
       console.error(`Still have ${TestNode.OpenNodes.length} open nodes`);
       while (TestNode.OpenNodes.length > 0) {
         const id = TestNode.OpenNodes[TestNode.OpenNodes.length - 1];
         console.log(`Closing '${id}'`);
         const node = TestNode.Nodes.get(id);
+        if (!node) {
+          console.error(`Node for '${id}' not found in Nodes map, removing from OpenNodes`);
+          TestNode.OpenNodes.pop();
+          continue;
+        }
+
         node.end(null);
       }
     }
@@ -179,7 +175,7 @@ class TestNode {
 }
 
 export default class PlaywrightTeamcityReporter implements Reporter {
-  private root: TestNode = null;
+  private root!: TestNode;
 
   public constructor(options: { parentFlow?: string } = {}) {
     console.log('Initializing Playwright TeamCity Reporter');
