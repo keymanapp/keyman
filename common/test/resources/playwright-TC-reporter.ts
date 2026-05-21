@@ -16,7 +16,6 @@ class TestNode {
   private flowId: number;
   private parent: TestNode | null;
   private childrenToVisit: TestNode[] = [];
-  private childrenCleared: boolean = false;
 
   public constructor(suiteOrTest: Suite | TestCase) {
     this.suiteOrTest = suiteOrTest;
@@ -88,39 +87,20 @@ class TestNode {
     }
   }
 
-  private end(result: TestResult, force: boolean = false): void {
-    if (force) {
-      // use a copy of the array because child.end will mutate the array
-      for (const child of [...this.childrenToVisit]) {
-        child.end(result, true);
+  private end(result: TestResult): void {
+    if (this.suiteOrTest.title !== '') {
+      if (this.isTest) {
+        const { msgTitle, details } = this.getTestResult(result) ?? { msgTitle: 'testFinished', details: '' };
+        console.log(`##teamcity[${msgTitle} name='${this.suiteOrTest.title}' ${details}]`);
+      } else {
+        console.log(`##teamcity[testSuiteFinished name='${this.suiteOrTest.title}']`);
       }
-      this.childrenToVisit = [];
-      this.childrenCleared = true;
+      console.log(`##teamcity[flowFinished flowId='${this.flowId}']`);
     }
 
-    // Only run this block on a normal (non-forced) end. Forced ends happen during endAll()
-    // teardown for nodes that didn't complete normally, where we have no meaningful result to
-    // report and the node's start/finish pairing may be incomplete. In that case we also skip the
-    // cleanup below because endAll()'s safety-net loop drains OpenNodes / Nodes globally, and our
-    // parent is already iterating its own children and clearing childrenToVisit itself —
-    // re-running removeFromOpenNodes / Nodes.delete / removeChild here would double-remove and
-    // log spurious errors, or trigger a re-entrant parent.end(null, false) cascade in the middle
-    // of the ongoing iteration.
-    if (!force) {
-      if (this.suiteOrTest.title !== '') {
-        if (this.isTest) {
-          const { msgTitle, details } = this.getTestResult(result) ?? { msgTitle: 'testFinished', details: '' };
-          console.log(`##teamcity[${msgTitle} name='${this.suiteOrTest.title}' ${details}]`);
-        } else {
-          console.log(`##teamcity[testSuiteFinished name='${this.suiteOrTest.title}']`);
-        }
-        console.log(`##teamcity[flowFinished flowId='${this.flowId}']`);
-      }
-
-      this.removeFromOpenNodes();
-      this.parent?.removeChild(this);
-      TestNode.Nodes.delete(this.id);
-    }
+    this.removeFromOpenNodes();
+    this.parent?.removeChild(this);
+    TestNode.Nodes.delete(this.id);
   }
 
   private removeFromOpenNodes(): void {
@@ -133,10 +113,6 @@ class TestNode {
   }
 
   private removeChild(child: TestNode) {
-    if (this.childrenCleared) {
-      // already cleared all children in a end(result, true) call, nothing to do
-      return;
-    }
     const childIndex = this.childrenToVisit.indexOf(child);
     if (childIndex < 0) {
       console.error(`Can't find child '${child.id}' in parent '${this.id}'`);
@@ -149,7 +125,7 @@ class TestNode {
     }
 
     // No more children, so close this node
-    this.end(null, false);
+    this.end(null);
   }
 
   public static startTest(test: TestCase): void {
@@ -174,7 +150,6 @@ class TestNode {
     if (this.childrenToVisit.length > 0) {
       console.error(`Root node still has ${this.childrenToVisit.length} open children`);
     }
-    this.end(null, true);
     if (TestNode.OpenNodes.length > 0) {
       console.error(`Still have ${TestNode.OpenNodes.length} open nodes`);
       while (TestNode.OpenNodes.length > 0) {
