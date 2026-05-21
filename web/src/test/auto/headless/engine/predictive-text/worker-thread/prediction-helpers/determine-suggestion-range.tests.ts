@@ -170,12 +170,14 @@ function buildQuickBrownFixture() {
   };
 }
 
+const tokenEquality = (a: ContextToken, b: ContextToken) => a.spaceId == b.spaceId;
+
 describe('determineSuggestionRange', () => {
   it('adjusts the final token if no tokenization changes occur', () => {
     const fixture = buildQuickBrownFixture();
     const noChange = fixture.variations.noChange;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, noChange.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, noChange.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, noChange.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, noChange.range.tokensToPredict);
@@ -185,7 +187,7 @@ describe('determineSuggestionRange', () => {
     const fixture = buildQuickBrownFixture();
     const plainInsert = fixture.variations.plainInsert;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, plainInsert.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, plainInsert.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, plainInsert.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, plainInsert.range.tokensToPredict);
@@ -195,7 +197,7 @@ describe('determineSuggestionRange', () => {
     const fixture = buildQuickBrownFixture();
     const newTokenInsert = fixture.variations.newTokenInsert;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, newTokenInsert.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, newTokenInsert.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, newTokenInsert.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, newTokenInsert.range.tokensToPredict);
@@ -205,7 +207,7 @@ describe('determineSuggestionRange', () => {
     const fixture = buildQuickBrownFixture();
     const charReplace = fixture.variations.charReplace;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, charReplace.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, charReplace.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, charReplace.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, charReplace.range.tokensToPredict);
@@ -215,7 +217,7 @@ describe('determineSuggestionRange', () => {
     const fixture = buildQuickBrownFixture();
     const del5Insert5 = fixture.variations.del5Insert5;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, del5Insert5.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, del5Insert5.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, del5Insert5.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, del5Insert5.range.tokensToPredict);
@@ -225,7 +227,7 @@ describe('determineSuggestionRange', () => {
     const fixture = buildQuickBrownFixture();
     const eraseToken = fixture.variations.eraseToken;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, eraseToken.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, eraseToken.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, eraseToken.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, eraseToken.range.tokensToPredict);
@@ -235,7 +237,7 @@ describe('determineSuggestionRange', () => {
     const fixture = buildQuickBrownFixture();
     const deleteToBound = fixture.variations.deleteToBound;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, deleteToBound.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, deleteToBound.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, deleteToBound.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, deleteToBound.range.tokensToPredict);
@@ -255,7 +257,7 @@ describe('determineSuggestionRange', () => {
       null
     )
 
-    const analysis = determineSuggestionRange(originalQuickBrownTokenization, foxVsAlligatorTokenization);
+    const analysis = determineSuggestionRange(originalQuickBrownTokenization.tokens, foxVsAlligatorTokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(
       analysis.tokensToRemove,
@@ -279,7 +281,7 @@ describe('determineSuggestionRange', () => {
       null
     )
 
-    const analysis = determineSuggestionRange(originalQuickBrownTokenization, dogsAndCatTokenization);
+    const analysis = determineSuggestionRange(originalQuickBrownTokenization.tokens, dogsAndCatTokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(
       analysis.tokensToRemove,
