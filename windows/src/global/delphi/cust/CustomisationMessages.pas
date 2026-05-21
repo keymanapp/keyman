@@ -146,14 +146,13 @@ var
   end;
 
 begin
-  Result := '';
   FLocalePath := TKeymanPaths.KeymanLocalePath;
   FLanguages.Clear;
 
   // Add default locale
 
   AddDefaultLanguage;
-  Result := Result + locale.ID + #13#10;
+  Result := S_DefaultLocale + #13#10;
 
   // Load other defined locales
 
