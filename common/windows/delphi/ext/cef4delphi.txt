@@ -18,7 +18,7 @@ Installation notes
 ------------------
 
 Copy the source/ and packages/ folders from the CEF4Delphi repository
-into the windows/src/ext/cef4delphi folder. Ensure that the
+into the common/windows/delphi/ext/cef4delphi folder. Ensure that the
 CEF4Delphi_binary repository is kept in sync with the cef4delphi source
 version.
 

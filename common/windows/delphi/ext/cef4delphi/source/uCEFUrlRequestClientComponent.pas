@@ -1,73 +1,39 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFUrlRequestClientComponent;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows, WinApi.Messages, WinApi.ActiveX,{$ENDIF}
-    System.Classes, System.Math,
+    System.Classes,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows, ActiveX,{$ENDIF} Classes, Math,
+    Classes,
     {$IFDEF FPC}
-    LCLProc, LCLType, LCLIntf, LResources, LMessages, InterfaceBase,
+    LCLProc, LCLType, LCLIntf, LResources, InterfaceBase,
     {$ELSE}
     Messages,
     {$ENDIF}
   {$ENDIF}
-  uCEFTypes, uCEFInterfaces, uCEFUrlRequestClientEvents, uCEFUrlrequestClient, uCEFUrlRequest;
+  uCEFTypes, {$IFDEF DELPHI16_UP}uCEFConstants,{$ENDIF} uCEFInterfaces, uCEFUrlRequestClientEvents, uCEFUrlrequestClient;
 
 type
-  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
+  {$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]{$ENDIF}
+  /// <summary>
+  /// The TCEFUrlRequestClientComponent class puts together all CEF URL request procedures, functions, properties and events in one place.
+  /// </summary>
   TCEFUrlRequestClientComponent = class(TComponent, ICEFUrlRequestClientEvents)
     protected
       FClient               : ICefUrlrequestClient;
       FThreadID             : TCefThreadId;
+      FComponentID          : integer;
 
       FOnRequestComplete    : TOnRequestComplete;
       FOnUploadProgress     : TOnUploadProgress;
@@ -75,6 +41,8 @@ type
       FOnDownloadData       : TOnDownloadData;
       FOnGetAuthCredentials : TOnGetAuthCredentials;
       FOnCreateURLRequest   : TNotifyEvent;
+
+      function  GetComponentID : integer;
 
       // ICefUrlrequestClient
       procedure doOnRequestComplete(const request: ICefUrlRequest);
@@ -92,18 +60,81 @@ type
       constructor Create(AOwner: TComponent); override;
       procedure   AfterConstruction; override;
       procedure   BeforeDestruction; override;
-
+      /// <summary>
+      /// Create the URLRequest in the context of TCEFUrlRequestClientComponent.ThreadId, which is the CEF UI thread by default.
+      /// </summary>
       procedure   AddURLRequest;
-
+      /// <summary>
+      /// Returns the client.
+      /// </summary>
       property Client               : ICefUrlrequestClient   read FClient;
+      /// <summary>
+      /// CEF thread used to create the URLRequest. Most of the client events will be executed on the same thread.
+      /// </summary>
       property ThreadID             : TCefThreadId           read FThreadID              write FThreadID;
 
     published
+      /// <summary>
+      /// Notifies the client that the request has completed. Use the
+      /// ICefUrlRequest.GetRequestStatus function to determine if the request
+      /// was successful or not.
+      /// </summary>
+      /// <remarks>
+      /// <para>This event will be called on the TCEFUrlRequestClientComponent.ThreadId thread, which is the CEF UI thread by default.</para>
+      /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/cef_urlrequest_capi.h">CEF source file: /include/capi/cef_urlrequest_capi.h (cef_urlrequest_client_t)</see></para>
+      /// </remarks>
       property OnRequestComplete    : TOnRequestComplete     read FOnRequestComplete     write FOnRequestComplete;
+      /// <summary>
+      /// Notifies the client of upload progress. |current| denotes the number of
+      /// bytes sent so far and |total| is the total size of uploading data (or -1
+      /// if chunked upload is enabled). This function will only be called if the
+      /// UR_FLAG_REPORT_UPLOAD_PROGRESS flag is set on the request.
+      /// </summary>
+      /// <remarks>
+      /// <para>This event will be called on the TCEFUrlRequestClientComponent.ThreadId thread, which is the CEF UI thread by default.</para>
+      /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/cef_urlrequest_capi.h">CEF source file: /include/capi/cef_urlrequest_capi.h (cef_urlrequest_client_t)</see></para>
+      /// </remarks>
       property OnUploadProgress     : TOnUploadProgress      read FOnUploadProgress      write FOnUploadProgress;
+      /// <summary>
+      /// Notifies the client of download progress. |current| denotes the number of
+      /// bytes received up to the call and |total| is the expected total size of
+      /// the response (or -1 if not determined).
+      /// </summary>
+      /// <remarks>
+      /// <para>This event will be called on the TCEFUrlRequestClientComponent.ThreadId thread, which is the CEF UI thread by default.</para>
+      /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/cef_urlrequest_capi.h">CEF source file: /include/capi/cef_urlrequest_capi.h (cef_urlrequest_client_t)</see></para>
+      /// </remarks>
       property OnDownloadProgress   : TOnDownloadProgress    read FOnDownloadProgress    write FOnDownloadProgress;
+      /// <summary>
+      /// Called when some part of the response is read. |data| contains the current
+      /// bytes received since the last call. This function will not be called if
+      /// the UR_FLAG_NO_DOWNLOAD_DATA flag is set on the request.
+      /// </summary>
+      /// <remarks>
+      /// <para>This event will be called on the TCEFUrlRequestClientComponent.ThreadId thread, which is the CEF UI thread by default.</para>
+      /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/cef_urlrequest_capi.h">CEF source file: /include/capi/cef_urlrequest_capi.h (cef_urlrequest_client_t)</see></para>
+      /// </remarks>
       property OnDownloadData       : TOnDownloadData        read FOnDownloadData        write FOnDownloadData;
+      /// <summary>
+      /// Called on the IO thread when the browser needs credentials from the user.
+      /// |isProxy| indicates whether the host is a proxy server. |host| contains
+      /// the hostname and |port| contains the port number. Return true (1) to
+      /// continue the request and call ICefAuthCallback.cont() when the
+      /// authentication information is available. If the request has an associated
+      /// browser/frame then returning false (0) will result in a call to
+      /// GetAuthCredentials on the ICefRequestHandler associated with that
+      /// browser, if any. Otherwise, returning false (0) will cancel the request
+      /// immediately. This function will only be called for requests initiated from
+      /// the browser process.
+      /// </summary>
+      /// <remarks>
+      /// <para>This event will be called on the browser process CEF IO thread.</para>
+      /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/cef_urlrequest_capi.h">CEF source file: /include/capi/cef_urlrequest_capi.h (cef_urlrequest_client_t)</see></para>
+      /// </remarks>
       property OnGetAuthCredentials : TOnGetAuthCredentials  read FOnGetAuthCredentials  write FOnGetAuthCredentials;
+      /// <summary>
+      /// Event triggered when the URLRequest has been created.
+      /// </summary>
       property OnCreateURLRequest   : TNotifyEvent           read FOnCreateURLRequest    write FOnCreateURLRequest;
   end;
 
@@ -146,7 +177,7 @@ uses
   {$ELSE}
   SysUtils,
   {$ENDIF}
-  uCEFRequest, uCEFTask, uCEFMiscFunctions;
+  uCEFTask, uCEFMiscFunctions, uCEFApplicationCore;
 
 
 constructor TCEFUrlRequestClientComponent.Create(AOwner: TComponent);
@@ -161,6 +192,7 @@ begin
   FOnDownloadData       := nil;
   FOnGetAuthCredentials := nil;
   FOnCreateURLRequest   := nil;
+  FComponentID          := 0;
 end;
 
 procedure TCEFUrlRequestClientComponent.AfterConstruction;
@@ -169,13 +201,24 @@ begin
 
   if not(csDesigning in ComponentState) then
     FClient := TCustomCefUrlrequestClient.Create(self);
+
+  if assigned(GlobalCEFApp) then
+    FComponentID := GlobalCEFApp.NextComponentID;
 end;
 
 procedure TCEFUrlRequestClientComponent.BeforeDestruction;
 begin
+  if assigned(GlobalCEFApp) then
+    GlobalCEFApp.RemoveComponentID(FComponentID);
+
   DestroyRequestClient;
 
   inherited BeforeDestruction;
+end;
+
+function TCEFUrlRequestClientComponent.GetComponentID : integer;
+begin
+  Result := FComponentID;
 end;
 
 procedure TCEFUrlRequestClientComponent.DestroyRequestClient;

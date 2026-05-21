@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFTextfieldDelegate;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -63,20 +26,45 @@ type
       procedure OnAfterUserAction(const textfield: ICefTextfield);
 
     public
+      /// <summary>
+      /// Returns a ICefTextfieldDelegate instance using a PCefTextfieldDelegate data pointer.
+      /// </summary>
       class function UnWrap(data: Pointer): ICefTextfieldDelegate;
   end;
 
+  /// <summary>
+  /// Implement this interface to handle Textfield events. The functions of this
+  /// interface will be called on the browser process UI thread unless otherwise
+  /// indicated.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/views/cef_textfield_delegate_capi.h">CEF source file: /include/capi/views/cef_textfield_delegate_capi.h (cef_textfield_delegate_t)</see></para>
+  /// </remarks>
   TCefTextfieldDelegateOwn = class(TCefViewDelegateOwn, ICefTextfieldDelegate)
     protected
+      /// <summary>
+      /// Called when |textfield| receives a keyboard event. |event| contains
+      /// information about the keyboard event. Return true (1) if the keyboard
+      /// event was handled or false (0) otherwise for default handling.
+      /// </summary>
       procedure OnKeyEvent(const textfield: ICefTextfield; const event: TCefKeyEvent; var aResult : boolean); virtual;
+      /// <summary>
+      /// Called after performing a user action that may change |textfield|.
+      /// </summary>
       procedure OnAfterUserAction(const textfield: ICefTextfield); virtual;
-
+      /// <summary>
+      /// Links the methods in the internal CEF record data pointer with the methods in this class.
+      /// </summary>
       procedure InitializeCEFMethods; override;
 
     public
       constructor Create; override;
   end;
 
+  /// <summary>
+  /// This class handles all the ICefTextfieldDelegate and ICefViewDelegate methods which call the ICefTextfieldDelegateEvents methods.
+  /// ICefTextfieldDelegateEvents will be implemented by the control receiving the ICefTextfieldDelegate events.
+  /// </summary>
   TCustomTextfieldDelegate = class(TCefTextfieldDelegateOwn)
     protected
       FEvents : Pointer;
@@ -88,21 +76,27 @@ type
       procedure OnGetHeightForWidth(const view: ICefView; width: Integer; var aResult: Integer); override;
       procedure OnParentViewChanged(const view: ICefView; added: boolean; const parent: ICefView); override;
       procedure OnChildViewChanged(const view: ICefView; added: boolean; const child: ICefView); override;
+      procedure OnWindowChanged(const view: ICefView; added: boolean); override;
+      procedure OnLayoutChanged(const view: ICefView; new_bounds: TCefRect); override;
       procedure OnFocus(const view: ICefView); override;
       procedure OnBlur(const view: ICefView); override;
+      procedure OnThemeChanged(const view: ICefView); override;
 
       // ICefTextfieldDelegate
       procedure OnKeyEvent(const textfield: ICefTextfield; const event: TCefKeyEvent; var aResult : boolean); override;
       procedure OnAfterUserAction(const textfield: ICefTextfield); override;
 
     public
+      /// <summary>
+      /// Creates an instance of this class liked to an interface that's implemented by a control receiving the events.
+      /// </summary>
       constructor Create(const events: ICefTextfieldDelegateEvents); reintroduce;
   end;
 
 implementation
 
 uses
-  uCEFLibFunctions, uCEFMiscFunctions, uCEFTextfield;
+  uCEFMiscFunctions, uCEFTextfield;
 
 
 // **************************************************************
@@ -203,6 +197,8 @@ end;
 
 procedure TCustomTextfieldDelegate.OnGetPreferredSize(const view: ICefView; var aResult : TCefSize);
 begin
+  inherited OnGetPreferredSize(view, aResult);
+
   try
     if (FEvents <> nil) then
       ICefTextfieldDelegateEvents(FEvents).doOnGetPreferredSize(view, aResult);
@@ -214,6 +210,8 @@ end;
 
 procedure TCustomTextfieldDelegate.OnGetMinimumSize(const view: ICefView; var aResult : TCefSize);
 begin
+  inherited OnGetMinimumSize(view, aResult);
+
   try
     if (FEvents <> nil) then
       ICefTextfieldDelegateEvents(FEvents).doOnGetMinimumSize(view, aResult);
@@ -225,6 +223,8 @@ end;
 
 procedure TCustomTextfieldDelegate.OnGetMaximumSize(const view: ICefView; var aResult : TCefSize);
 begin
+  inherited OnGetMaximumSize(view, aResult);
+
   try
     if (FEvents <> nil) then
       ICefTextfieldDelegateEvents(FEvents).doOnGetMaximumSize(view, aResult);
@@ -236,6 +236,8 @@ end;
 
 procedure TCustomTextfieldDelegate.OnGetHeightForWidth(const view: ICefView; width: Integer; var aResult: Integer);
 begin
+  inherited OnGetHeightForWidth(view, width, aResult);
+
   try
     if (FEvents <> nil) then
       ICefTextfieldDelegateEvents(FEvents).doOnGetHeightForWidth(view, width, aResult);
@@ -267,6 +269,28 @@ begin
   end;
 end;
 
+procedure TCustomTextfieldDelegate.OnWindowChanged(const view: ICefView; added: boolean);
+begin
+  try
+    if (FEvents <> nil) then
+      ICefTextfieldDelegateEvents(FEvents).doOnWindowChanged(view, added);
+  except
+    on e : exception do
+      if CustomExceptionHandler('TCustomTextfieldDelegate.OnWindowChanged', e) then raise;
+  end;
+end;
+
+procedure TCustomTextfieldDelegate.OnLayoutChanged(const view: ICefView; new_bounds: TCefRect);
+begin
+  try
+    if (FEvents <> nil) then
+      ICefTextfieldDelegateEvents(FEvents).doOnLayoutChanged(view, new_bounds);
+  except
+    on e : exception do
+      if CustomExceptionHandler('TCustomTextfieldDelegate.OnLayoutChanged', e) then raise;
+  end;
+end;
+
 procedure TCustomTextfieldDelegate.OnFocus(const view: ICefView);
 begin
   try
@@ -286,6 +310,17 @@ begin
   except
     on e : exception do
       if CustomExceptionHandler('TCustomTextfieldDelegate.OnBlur', e) then raise;
+  end;
+end;
+
+procedure TCustomTextfieldDelegate.OnThemeChanged(const view: ICefView);
+begin
+  try
+    if (FEvents <> nil) then
+      ICefTextfieldDelegateEvents(FEvents).doOnThemeChanged(view);
+  except
+    on e : exception do
+      if CustomExceptionHandler('TCustomTextfieldDelegate.OnThemeChanged', e) then raise;
   end;
 end;
 

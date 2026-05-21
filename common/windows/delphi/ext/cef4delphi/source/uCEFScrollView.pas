@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFScrollView;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -57,18 +20,54 @@ uses
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes, uCEFView;
 
 type
+  /// <summary>
+  /// A ScrollView will show horizontal and/or vertical scrollbars when necessary
+  /// based on the size of the attached content view. Methods must be called on
+  /// the browser process UI thread unless otherwise indicated.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/views/cef_scroll_view_capi.h">CEF source file: /include/capi/views/cef_scroll_view_capi.h (cef_scroll_view_t)</see></para>
+  /// </remarks>
   TCefScrollViewRef = class(TCefViewRef, ICefScrollView)
     protected
+      /// <summary>
+      /// Set the content View. The content View must have a specified size (e.g.
+      /// via ICefView.SetBounds or ICefViewDelegate.GetPreferredSize).
+      /// </summary>
       procedure SetContentView(const view: ICefView);
+      /// <summary>
+      /// Returns the content View.
+      /// </summary>
       function  GetContentView : ICefView;
+      /// <summary>
+      /// Returns the visible region of the content View.
+      /// </summary>
       function  GetVisibleContentRect : TCefRect;
+      /// <summary>
+      /// Returns true (1) if the horizontal scrollbar is currently showing.
+      /// </summary>
       function  HasHorizontalScrollbar : boolean;
+      /// <summary>
+      /// Returns the height of the horizontal scrollbar.
+      /// </summary>
       function  GetHorizontalScrollbarHeight : Integer;
+      /// <summary>
+      /// Returns true (1) if the vertical scrollbar is currently showing.
+      /// </summary>
       function  HasVerticalScrollbar : boolean;
+      /// <summary>
+      /// Returns the width of the vertical scrollbar.
+      /// </summary>
       function  GetVerticalScrollbarWidth : Integer;
 
     public
+      /// <summary>
+      /// Returns a ICefScrollView instance using a PCefScrollView data pointer.
+      /// </summary>
       class function UnWrap(data: Pointer): ICefScrollView;
+      /// <summary>
+      /// Create a new ScrollView.
+      /// </summary>
       class function CreateScrollView(const delegate: ICefViewDelegate): ICefScrollView;
   end;
 

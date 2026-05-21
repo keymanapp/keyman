@@ -1,88 +1,100 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFLinuxFunctions;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
+{$IFDEF LINUX}
 uses
-  {$IFDEF LINUX}
-    {$IFDEF FPC}
-      ctypes, keysym, xf86keysym, x, xlib,
-      {$IFDEF LCLGTK2}gtk2, glib2, gdk2, gtk2proc, gtk2int, Gtk2Def, gdk2x, Gtk2Extra,{$ENDIF}
-    {$ENDIF}
+  {$IFDEF FPC}
+    ctypes, keysym, xf86keysym, x, xlib, LCLVersion,
+    {$IFDEF LCLGTK2}gdk2, gtk2proc, gtk2int, Gtk2Def, gdk2x, Gtk2Extra,{$ENDIF}
+    {$IFDEF LCLGTK3}LazGdk3, LazGtk3, LazGLib2, gtk3procs,{$ENDIF}
+    {$IFDEF LCLQT}qt4,{$ENDIF}
+    {$IFDEF LCLQT5}qt5,{$ENDIF}
+    {$IFDEF LCLQT6}qt6,{$ENDIF}
+  {$ELSE}
+    uCEFLinuxTypes,
   {$ENDIF}
-  uCEFLinuxTypes, uCEFTypes;
+  uCEFTypes;
+{$ENDIF}
+
+{$IFNDEF FPC}
+const
+  // We define this constant only to avoid warnings in Delphi
+  LCL_FULLVERSION = 3000001;
+{$ENDIF}
 
 {$IFDEF LINUX}
-procedure GdkEventKeyToCEFKeyEvent(GdkEvent: PGdkEventKey; var aCEFKeyEvent : TCEFKeyEvent);
 function  KeyboardCodeFromXKeysym(keysym : uint32) : integer;
+{$IF DEFINED(LINUXFMX) or DEFINED(LCLGTK2) or (DEFINED(LCLGTK3) and (LCL_FULLVERSION<3000000))}
 function  GetCefStateModifiers(state : uint32) : integer;
-function  GdkEventToWindowsKeyCode(Event: PGdkEventKey) : integer;
+{$IFEND}
+{$IF DEFINED(LCLGTK3) and (LCL_FULLVERSION>3000000)}
+function  GetCefStateModifiers(state : TGdkModifierType) : integer;
+{$IFEND}
 function  GetWindowsKeyCodeWithoutLocation(key_code : integer) : integer;
 function  GetControlCharacter(windows_key_code : integer; shift : boolean) : integer;
+{$IF DEFINED(LINUXFMX) or DEFINED(LCLGTK2) or DEFINED(LCLGTK3)}
+procedure GdkEventKeyToCEFKeyEvent(GdkEvent: PGdkEventKey; var aCEFKeyEvent : TCEFKeyEvent);
+function  GdkEventToWindowsKeyCode(Event: PGdkEventKey) : integer;
+{$IFEND}
+{$IF DEFINED(LCLQT) OR DEFINED(LCLQT5) OR DEFINED(LCLQT6)}
+function  GetCefStateModifiers(KeyboardModifiers : QtKeyboardModifiers; NativeModifiers : LongWord) : TCefEventFlags;
+function  GetCefWindowsKeyCode(key : QtKey) : integer;
+procedure QTKeyEventToCEFKeyEvent(Event_ : QKeyEventH; var aCEFKeyEvent : TCEFKeyEvent);
+function  AdjustCefKeyCharEvent(Event_ : QKeyEventH; var aCEFKeyEvent : TCEFKeyEvent): boolean;
+{$IFEND}
+
 {$IFDEF FMX}
+type
+   TXErrorHandler   = function (para1:PDisplay; para2:PXErrorEvent):longint; cdecl;
+   TXIOErrorHandler = function (para1:PDisplay):longint; cdecl;
+
+function XSetErrorHandler(para1:TXErrorHandler):TXErrorHandler; cdecl; external 'libX11.so';
+function XSetIOErrorHandler(para1:TXIOErrorHandler):TXIOErrorHandler; cdecl; external 'libX11.so';
+
 function gdk_keyval_to_unicode(keyval: guint): guint32; cdecl; external 'libgdk-3.so';
 function g_signal_connect_data(instance: gpointer; detailed_signal: Pgchar; c_handler: TGCallback; data: gpointer; destroy_data: TGClosureNotify; connect_flags: TGConnectFlags): gulong; cdecl; external 'libgobject-2.0.so';
 function g_signal_connect(instance: gpointer; detailed_signal: Pgchar; c_handler: TGCallback; data: gpointer): gulong; overload;
 function g_signal_connect(instance: gpointer; const detailed_signal: AnsiString; c_handler: TGCallback; data: gpointer): gulong; overload;
+function gdk_screen_width:gint; cdecl; external 'libgdk-3.so';
+function gdk_screen_width_mm:gint; cdecl; external 'libgdk-3.so';
+function gdk_screen_get_default:PGdkScreen; cdecl; external 'libgdk-3.so';
+function gdk_screen_get_resolution(screen:PGdkScreen):gdouble; cdecl; external 'libgdk-3.so';
 {$ENDIF}
 {$IFDEF FPC}
+{$IFDEF LCLGTK3}
+function gdk_x11_window_get_xid(window: PGdkWindow): TXID; cdecl; external 'libgdk-3.so.0';
+function gdk_x11_get_default_xdisplay: PDisplay; cdecl; external 'libgdk-3.so.0';
+procedure gdk_set_allowed_backends(const backends: PGchar); cdecl; external 'libgdk-3.so.0';
+function gdk_x11_display_get_xdisplay(display: PGdkDisplay): PDisplay; cdecl; external 'libgdk-3.so.0';
+function gdk_x11_screen_get_screen_number(screen: PGdkScreen): longint; cdecl; external 'libgdk-3.so.0';
+function gdk_x11_visual_get_xvisual(visual: PGdkVisual): PVisual; cdecl; external 'libgdk-3.so.0';
+procedure UseDefaultX11VisualForGtk(widget : PGtkWidget); 
+procedure FlushDisplay(widget : PGtkWidget); 
+{$ENDIF}
 procedure ShowX11Message(const aMessage : string);
 {$ENDIF}{$ENDIF}
 
 implementation
 
+{$IFDEF LINUX}
 uses
   {$IFDEF DELPHI16_UP}
   System.SysUtils,
   {$ELSE}
   SysUtils,
-  {$ENDIF}
+  {$ENDIF}                   
   uCEFLinuxConstants, uCEFConstants;
+{$ENDIF}
 
 {$IFDEF LINUX}
 function KeyboardCodeFromXKeysym(keysym : uint32) : integer;
@@ -467,6 +479,7 @@ begin
   end;
 end;
 
+{$IF DEFINED(LINUXFMX) or DEFINED(LCLGTK2) or (DEFINED(LCLGTK3) and (LCL_FULLVERSION<3000000))}
 function GetCefStateModifiers(state : uint32) : integer;
 begin
   Result := EVENTFLAG_NONE;
@@ -492,30 +505,34 @@ begin
   if ((state and GDK_BUTTON3_MASK) <> 0) then
     Result := Result or EVENTFLAG_RIGHT_MOUSE_BUTTON;
 end;
-
-function GdkEventToWindowsKeyCode(event: PGdkEventKey) : integer;
-var
-  windows_key_code, keyval : integer;
+{$IFEND}
+{$IF DEFINED(LCLGTK3) and (LCL_FULLVERSION>3000000)}
+function GetCefStateModifiers(state : TGdkModifierType) : integer;
 begin
-  windows_key_code := KeyboardCodeFromXKeysym(event^.keyval);
-  if (windows_key_code <> 0) then
-    begin
-      Result := windows_key_code;
-      exit;
-    end;
+  Result := EVENTFLAG_NONE;
 
-  if (event^.hardware_keycode < length(kHardwareCodeToGDKKeyval)) then
-    begin
-      keyval := kHardwareCodeToGDKKeyval[event^.hardware_keycode];
-      if (keyval <> 0) then
-        begin
-          Result := KeyboardCodeFromXKeysym(keyval);
-          exit;
-        end;
-    end;
+  if (GDK_SHIFT_MASK in state) then
+    Result := Result or EVENTFLAG_SHIFT_DOWN;
 
-  Result := KeyboardCodeFromXKeysym(event^.keyval);
+  if (GDK_LOCK_MASK in state) then
+    Result := Result or EVENTFLAG_CAPS_LOCK_ON;
+
+  if (GDK_CONTROL_MASK in state) then
+    Result := Result or EVENTFLAG_CONTROL_DOWN;
+
+  if (GDK_MOD1_MASK in state) then
+    Result := Result or EVENTFLAG_ALT_DOWN;
+
+  if (GDK_BUTTON1_MASK in state) then
+    Result := Result or EVENTFLAG_LEFT_MOUSE_BUTTON;
+
+  if (GDK_BUTTON2_MASK in state) then
+    Result := Result or EVENTFLAG_MIDDLE_MOUSE_BUTTON;
+
+  if (GDK_BUTTON3_MASK in state) then
+    Result := Result or EVENTFLAG_RIGHT_MOUSE_BUTTON;
 end;
+{$IFEND}
 
 function GetWindowsKeyCodeWithoutLocation(key_code : integer) : integer;
 begin
@@ -549,11 +566,13 @@ begin
       end;
 end;
 
+{$IF DEFINED(LINUXFMX) or DEFINED(LCLGTK2) or DEFINED(LCLGTK3)}
 procedure GdkEventKeyToCEFKeyEvent(GdkEvent: PGdkEventKey; var aCEFKeyEvent : TCEFKeyEvent);
 var
   windows_key_code : integer;
 begin
   windows_key_code                     := GdkEventToWindowsKeyCode(GdkEvent);
+  aCEFKeyEvent.size	               := SizeOf(TCEFKeyEvent);
   aCEFKeyEvent.windows_key_code        := GetWindowsKeyCodeWithoutLocation(windows_key_code);
   aCEFKeyEvent.native_key_code         := GdkEvent^.hardware_keycode;
   aCEFKeyEvent.modifiers               := GetCefStateModifiers(GdkEvent^.state);
@@ -574,6 +593,174 @@ begin
    else
     aCEFKeyEvent.character := aCEFKeyEvent.unmodified_character;
 end;
+
+function GdkEventToWindowsKeyCode(event: PGdkEventKey) : integer;
+var
+  windows_key_code, keyval : integer;
+begin
+  windows_key_code := KeyboardCodeFromXKeysym(event^.keyval);
+  if (windows_key_code <> 0) then
+    begin
+      Result := windows_key_code;
+      exit;
+    end;
+
+  if (event^.hardware_keycode < length(kHardwareCodeToGDKKeyval)) then
+    begin
+      keyval := kHardwareCodeToGDKKeyval[event^.hardware_keycode];
+      if (keyval <> 0) then
+        begin
+          Result := KeyboardCodeFromXKeysym(keyval);
+          exit;
+        end;
+    end;
+
+  Result := KeyboardCodeFromXKeysym(event^.keyval);
+end;
+{$IFEND}
+
+{$IF DEFINED(LCLQT) OR DEFINED(LCLQT5) OR DEFINED(LCLQT6)}
+function  GetCefStateModifiers(KeyboardModifiers : QtKeyboardModifiers; NativeModifiers : LongWord) : TCefEventFlags;
+Const
+  GDK_SHIFT_MASK   = 1 shl 0;
+  GDK_LOCK_MASK    = 1 shl 1;
+  GDK_CONTROL_MASK = 1 shl 2;
+  GDK_MOD1_MASK    = 1 shl 3;
+  GDK_BUTTON1_MASK = 1 shl 8;
+  GDK_BUTTON2_MASK = 1 shl 9;
+  GDK_BUTTON3_MASK = 1 shl 10;
+begin
+  Result := EVENTFLAG_NONE;
+
+  if (KeyboardModifiers and QtShiftModifier)   <> 0 then Result := Result or EVENTFLAG_SHIFT_DOWN;
+  if (KeyboardModifiers and QtControlModifier) <> 0 then Result := Result or EVENTFLAG_CONTROL_DOWN;
+  if (KeyboardModifiers and QtAltModifier)     <> 0 then Result := Result or EVENTFLAG_ALT_DOWN;
+  if (KeyboardModifiers and QtKeypadModifier)  <> 0 then Result := Result or EVENTFLAG_IS_KEY_PAD;
+
+  if (NativeModifiers   and GDK_SHIFT_MASK)    <> 0 then Result := Result or EVENTFLAG_SHIFT_DOWN;
+  if (NativeModifiers   and GDK_LOCK_MASK)     <> 0 then Result := Result or EVENTFLAG_CAPS_LOCK_ON;
+  if (NativeModifiers   and GDK_CONTROL_MASK)  <> 0 then Result := Result or EVENTFLAG_CONTROL_DOWN;
+  if (NativeModifiers   and GDK_MOD1_MASK)     <> 0 then Result := Result or EVENTFLAG_ALT_DOWN;
+  if (NativeModifiers   and GDK_BUTTON1_MASK)  <> 0 then Result := Result or EVENTFLAG_LEFT_MOUSE_BUTTON;
+  if (NativeModifiers   and GDK_BUTTON2_MASK)  <> 0 then Result := Result or EVENTFLAG_MIDDLE_MOUSE_BUTTON;
+  if (NativeModifiers   and GDK_BUTTON3_MASK)  <> 0 then Result := Result or EVENTFLAG_RIGHT_MOUSE_BUTTON;
+end;
+
+function GetCefWindowsKeyCode(key : QtKey): integer;
+begin
+  case key of
+    QtKey_Escape        : Result := VKEY_ESCAPE;
+    QtKey_Tab,
+    QtKey_Backtab       : Result := VKEY_TAB;
+    QtKey_Backspace     : Result := VKEY_BACK;
+    QtKey_Return,
+    QtKey_Enter         : Result := VKEY_RETURN;
+    QtKey_Insert        : Result := VKEY_INSERT;
+    QtKey_Delete        : Result := VKEY_DELETE;
+    QtKey_Pause         : Result := VKEY_PAUSE;
+    QtKey_Print         : Result := VKEY_PRINT;
+    QtKey_Clear         : Result := VKEY_CLEAR;
+    QtKey_Home          : Result := VKEY_HOME;
+    QtKey_End           : Result := VKEY_END;
+    QtKey_Left          : Result := VKEY_LEFT;
+    QtKey_Up            : Result := VKEY_UP;
+    QtKey_Right         : Result := VKEY_RIGHT;
+    QtKey_Down          : Result := VKEY_DOWN;
+    QtKey_PageUp        : Result := VKEY_PRIOR;
+    QtKey_PageDown      : Result := VKEY_NEXT;
+    QtKey_Shift         : Result := VKEY_SHIFT;
+    QtKey_Control       : Result := VKEY_CONTROL;
+    QtKey_Alt           : Result := VKEY_MENU;
+    QtKey_CapsLock      : Result := VKEY_CAPITAL;
+    QtKey_NumLock       : Result := VKEY_NUMLOCK;
+    QtKey_ScrollLock    : Result := VKEY_SCROLL;
+    QtKey_F1..QtKey_F24 : Result := key - QtKey_F1 + VKEY_F1;
+    QtKey_Help          : Result := VKEY_HELP;
+    QtKey_Space         : Result := VKEY_SPACE;
+    QtKey_Exclam        : Result := VKEY_1;
+    QtKey_QuoteDbl      : Result := VKEY_OEM_7;
+    QtKey_NumberSign    : Result := VKEY_3;
+    QtKey_Dollar        : Result := VKEY_4;
+    QtKey_Percent       : Result := VKEY_5;
+    QtKey_Ampersand     : Result := VKEY_7;
+    QtKey_Apostrophe    : Result := VKEY_OEM_7;
+    QtKey_ParenLeft     : Result := VKEY_9;
+    QtKey_ParenRight    : Result := VKEY_0;
+    QtKey_Asterisk      : Result := VKEY_8;
+    QtKey_Plus          : Result := VKEY_OEM_PLUS;
+    QtKey_Comma         : Result := VKEY_OEM_COMMA;
+    QtKey_Minus         : Result := VKEY_OEM_MINUS;
+    QtKey_Period        : Result := VKEY_OEM_PERIOD;
+    QtKey_Slash         : Result := VKEY_OEM_2;
+    QtKey_0..QtKey_9    : Result := key;
+    QtKey_Colon,
+    QtKey_Semicolon     : Result := VKEY_OEM_1;
+    QtKey_Less          : Result := VKEY_OEM_COMMA;
+    QtKey_Equal         : Result := VKEY_OEM_PLUS;
+    QtKey_Greater       : Result := VKEY_OEM_PERIOD;
+    QtKey_Question      : Result := VKEY_OEM_2;
+    QtKey_At            : Result := VKEY_2;
+    QtKey_A..QtKey_Z    : Result := key;
+    QtKey_BracketLeft   : Result := VKEY_OEM_4;
+    QtKey_Backslash     : Result := VKEY_OEM_5;
+    QtKey_BracketRight  : Result := VKEY_OEM_6;
+    QtKey_AsciiCircum   : Result := VKEY_6;
+    QtKey_Underscore    : Result := VKEY_OEM_MINUS;
+    QtKey_QuoteLeft     : Result := VKEY_OEM_3;
+    QtKey_BraceLeft     : Result := VKEY_OEM_4;
+    QtKey_Bar           : Result := VKEY_OEM_5;
+    QtKey_BraceRight    : Result := VKEY_OEM_6;
+    QtKey_AsciiTilde    : Result := VKEY_OEM_3;
+    QtKey_multiply      : Result := VKEY_MULTIPLY;
+    QtKey_VolumeDown    : Result := VKEY_VOLUME_DOWN;
+    QtKey_VolumeMute    : Result := VKEY_VOLUME_MUTE;
+    QtKey_VolumeUp      : Result := VKEY_VOLUME_UP;
+    QtKey_MediaPlay     : Result := VKEY_MEDIA_PLAY_PAUSE;
+    QtKey_MediaStop     : Result := VKEY_MEDIA_STOP;
+    QtKey_Select        : Result := VKEY_SELECT;
+    QtKey_Printer       : Result := VKEY_SNAPSHOT;
+    QtKey_Execute       : Result := VKEY_EXECUTE;
+    else                  Result := 0;
+  end;
+end;
+
+procedure QTKeyEventToCEFKeyEvent(Event_: QKeyEventH; var aCEFKeyEvent : TCEFKeyEvent);  
+var
+  windows_key_code : integer;
+begin                                                 
+  windows_key_code                     := GetCefWindowsKeyCode(QKeyEvent_key(Event_));
+
+  aCEFKeyEvent.size	               := SizeOf(TCEFKeyEvent);
+  aCEFKeyEvent.modifiers               := GetCefStateModifiers(QKeyEvent_modifiers(Event_), QKeyEvent_nativeModifiers(Event_));
+  aCEFKeyEvent.windows_key_code        := GetWindowsKeyCodeWithoutLocation(windows_key_code);
+  aCEFKeyEvent.native_key_code         := QKeyEvent_nativeScanCode(Event_);
+  aCEFKeyEvent.is_system_key           := ord((aCEFKeyEvent.modifiers and EVENTFLAG_ALT_DOWN) <> 0);
+  aCEFKeyEvent.unmodified_character    := WideChar(QKeyEvent_nativeVirtualKey(Event_));
+  aCEFKeyEvent.focus_on_editable_field := ord(False);
+
+  if ((aCEFKeyEvent.modifiers and EVENTFLAG_CONTROL_DOWN) <> 0) then
+    aCEFKeyEvent.character := WideChar(GetControlCharacter(windows_key_code, ((aCEFKeyEvent.modifiers and EVENTFLAG_SHIFT_DOWN) <> 0)))
+   else
+    aCEFKeyEvent.character := aCEFKeyEvent.unmodified_character;
+end;
+
+function AdjustCefKeyCharEvent(Event_ : QKeyEventH; var aCEFKeyEvent : TCEFKeyEvent): boolean;
+var
+  TempKey : WideString;
+begin
+  Result := False;
+
+  QKeyEvent_text(Event_, @TempKey);
+  if (length(TempKey) > 0) then
+    begin
+      aCEFKeyEvent.windows_key_code     := ord(TempKey[1]);
+      aCEFKeyEvent.unmodified_character := TempKey[1];
+      aCEFKeyEvent.character            := aCEFKeyEvent.unmodified_character;
+      Result                            := True;
+    end;
+end;
+
+{$IFEND}
 
 {$IFDEF FMX}
 function g_signal_connect(instance: gpointer; detailed_signal: Pgchar; c_handler: TGCallback; data: gpointer): gulong;
@@ -635,6 +822,86 @@ begin
 
   XCloseDisplay(TempDisplay);
 end;
-{$ENDIF}{$ENDIF}
+{$ENDIF}
+
+{$IFDEF LCLGTK3}
+procedure UseDefaultX11VisualForGtk(widget : PGtkWidget);
+type
+  PGdkX11Screen = type PGdkScreen;
+var
+  screen : PGdkScreen;
+  visuals, cursor : PGList;
+  x11_screen : PGdkX11Screen;
+  default_xvisual : PVisual;
+  visual : PGdkVisual;
+
+  function GDK_X11_VISUAL(obj : pointer) : PGdkVisual;
+  begin
+    Result := PGdkVisual(obj);
+  end;
+
+  function GDK_SCREEN_X11(obj : pointer) : PGdkX11Screen;
+  begin
+     GDK_SCREEN_X11 := PGdkX11Screen(obj);
+  end;
+
+  function GDK_SCREEN_XDISPLAY(screen : PGdkScreen) : PDisplay;
+  begin
+     GDK_SCREEN_XDISPLAY := gdk_x11_display_get_xdisplay(gdk_screen_get_display(screen));
+  end;
+
+  function GDK_SCREEN_XNUMBER(screen : PGdkScreen) : longint;
+  begin
+     GDK_SCREEN_XNUMBER := gdk_x11_screen_get_screen_number(screen);
+  end;
+
+begin
+  // GTK+ > 3.15.1 uses an X11 visual optimized for GTK+'s OpenGL stuff
+  // since revid dae447728d: https://github.com/GNOME/gtk/commit/dae447728d
+  // However, it breaks CEF: https://github.com/cztomczak/cefcapi/issues/9
+  // Let's use the default X11 visual instead of the GTK's blessed one.
+  // Copied from: https://github.com/cztomczak/cefcapi.
+  screen     := gdk_screen_get_default();
+  visuals    := gdk_screen_list_visuals(screen);
+  x11_screen := GDK_SCREEN_X11(screen);
+
+  if (x11_screen <> nil) then
+    begin
+      default_xvisual := DefaultVisual(GDK_SCREEN_XDISPLAY(x11_screen),
+                                       GDK_SCREEN_XNUMBER(x11_screen));
+
+      if (default_xvisual <> nil) then
+        begin
+          cursor := visuals;
+
+          while (cursor <> nil) do
+            begin
+              visual := GDK_X11_VISUAL(cursor^.data);
+
+              if (default_xvisual^.visualid = gdk_x11_visual_get_xvisual(visual)^.visualid) then
+                begin
+                  gtk_widget_set_visual(widget, visual);
+                  break;
+                end;
+
+              cursor := cursor^.next;
+            end;
+        end;
+    end;
+
+  g_list_free(visuals);
+end;
+
+procedure FlushDisplay(widget : PGtkWidget);
+var
+  gdk_window : PGdkWindow;
+  display : PGdkDisplay;
+begin
+  gdk_window := gtk_widget_get_window(widget);
+  display    := gdk_window_get_display(gdk_window);
+  gdk_display_flush(display);
+end;
+{$ENDIF}
+{$ENDIF}
 
 end.

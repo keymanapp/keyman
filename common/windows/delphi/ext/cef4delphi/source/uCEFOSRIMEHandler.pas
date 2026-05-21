@@ -1,40 +1,3 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFOSRIMEHandler;
 
 {$IFDEF FPC}
@@ -47,9 +10,9 @@ interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Classes, System.Math, WinApi.imm,
+    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Classes, WinApi.imm,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows, imm, {$IFDEF FPC}imm_dyn,{$ENDIF}{$ENDIF} Classes, Math,
+    {$IFDEF MSWINDOWS}Windows, imm, {$IFDEF FPC}imm_dyn,{$ENDIF}{$ENDIF} Classes,
   {$ENDIF}
   uCEFTypes;
 
@@ -73,11 +36,14 @@ type
   {$ENDIF}
   {$ENDIF}
 
+  /// <summary>
+  /// Class used to handle the IME window.
+  /// </summary>
   TCEFOSRIMEHandler = class
     protected
       FHWND              : HWND;
       FCompositionRange  : TCefRange;
-      FCursorIndex       : integer;
+      FCursorIndex       : cardinal;
       FIMERect           : TCefRect;
       FSystemCaret       : boolean;
       FInputLanguageID   : LANGID;
@@ -92,48 +58,135 @@ type
       procedure GetCompositionInfo(imc : HIMC; aParam : LPARAM; var composition_text : ustring; var underlines : TCefCompositionUnderlineDynArray; var composition_start : integer);
       function  GetString(imc : HIMC; aParam : WParam; aType : integer; var aResult : ustring) : boolean;
       {$IFDEF MSWINDOWS}
-      function  IsSelectionAttribute(aAttribute : byte) : boolean;
+      function  IsSelectionAttribute(aAttribute : AnsiChar) : boolean;
       {$ENDIF}
-      procedure GetCompositionSelectionRange(imc : HIMC; var target_start, target_end : integer);
-      procedure GetCompositionUnderlines(imc : HIMC; target_start, target_end : integer; var underlines : TCefCompositionUnderlineDynArray);
+      procedure GetCompositionSelectionRange(imc : HIMC; var target_start, target_end : cardinal);
+      procedure GetCompositionUnderlines(imc : HIMC; target_start, target_end : cardinal; var underlines : TCefCompositionUnderlineDynArray);
 
     public
       constructor Create(aHWND : HWND);
       destructor  Destroy; override;
 
       {$IFDEF MSWINDOWS}
+      /// <summary>
+      /// Sets InputLanguageID using the name of the active input locale identifier obtained from a GetKeyboardLayoutNameW call.
+      /// </summary>
+      /// <remarks>
+      /// <para><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getkeyboardlayoutnamew">See the GetKeyboardLayoutNameW article.</see></para>
+      /// </remarks>
       procedure   SetInputLanguage;
       {$ENDIF}
+      /// <summary>
+      /// Calls CreateCaret for some languages in order to creates a new shape
+      /// for the system caret and assigns ownership of the caret to the specified
+      /// window.
+      /// </summary>
+      /// <remarks>
+      /// <para><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createcaret">See the CreateCaret article.</see></para>
+      /// </remarks>
       procedure   CreateImeWindow;
+      /// <summary>
+      /// Calls DestroyCaret for some languages in order to destroy the caret's
+      /// current shape, frees the caret from the window, and removes the caret
+      /// from the screen.
+      /// </summary>
+      /// <remarks>
+      /// <para><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-destroycaret">See the DestroyCaret article.</see></para>
+      /// </remarks>
       procedure   DestroyImeWindow;
+      /// <summary>
+      /// Cleans up the all resources attached to the given IMM32Manager object, and
+      /// reset its composition status.
+      /// </summary>
+      /// <remarks>
+      /// <para><see href="https://learn.microsoft.com/en-us/windows/win32/api/imm/nf-imm-immnotifyime">See the ImmNotifyIME article.</see></para>
+      /// </remarks>
       procedure   CleanupComposition;
+      /// <summary>
+      /// Reset the composition status. Cancel the ongoing composition if it exists.
+      /// </summary>
       procedure   ResetComposition;
+      /// <summary>
+      /// Retrieve a composition result of the ongoing composition if it exists.
+      /// </summary>
       function    GetResult(aParam : LPARAM; var aResult : ustring) : boolean;
+      /// <summary>
+      /// Retrieve the current composition status of the ongoing composition.
+      /// Includes composition text, underline information and selection range in the
+      /// composition text. IMM32 does not support char selection.
+      /// </summary>
       function    GetComposition(aParam : LPARAM; var composition_text : ustring; var underlines : TCefCompositionUnderlineDynArray; var composition_start : integer) : boolean;
+      /// <summary>
+      /// Enable the IME attached to the given window, i.e. allows user-input events
+      /// to be dispatched to the IME. In Chromium, this function is used when a
+      /// renderer process moves its input focus to another edit control, or a
+      /// renrerer process moves the position of the focused edit control.
+      /// </summary>
       procedure   EnableIME;
+      /// <summary>
+      /// Disable the IME attached to the given window, i.e. prohibits any user-input
+      /// events from being dispatched to the IME. In Chromium, this function is used
+      /// when a renreder process sets its input focus to a password input.
+      /// </summary>
       procedure   DisableIME;
+      /// <summary>
+      /// Cancels an ongoing composition of the IME.
+      /// </summary>
       procedure   CancelIME;
-      procedure   UpdateCaretPosition(index : integer);
+      /// <summary>
+      /// Updates the IME caret position of the given window.
+      /// </summary>
+      procedure   UpdateCaretPosition(index : cardinal);
+      /// <summary>
+      /// Updates the composition range. |selected_range| is the range of characters
+      /// that have been selected. |character_bounds| is the bounds of each character
+      /// in view device coordinates.
+      /// </summary>
       procedure   ChangeCompositionRange(const selection_range : TCefRange; const character_bounds : TCefRectDynArray);
+      /// <summary>
+      /// Updates the position of the IME windows.
+      /// </summary>
       procedure   MoveImeWindow;
 
+      /// <summary>
+      /// Retrieves whether or not there is an ongoing composition.
+      /// </summary>
       property    IsComposing     : boolean   read FIsComposing;
+      /// <summary>
+      /// The current input Language ID retrieved from Windows
+      /// used for processing language-specific operations in IME.
+      /// </summary>
       property    InputLanguageID : LANGID    read FInputLanguageID;
+      /// <summary>
+      /// Returns the primary language ID based on the InputLanguageID value.
+      /// </summary>
       property    PrimaryLangID   : word      read GetPrimaryLangID;
+      /// <summary>
+      /// Returns the sublanguage ID based on the InputLanguageID value.
+      /// </summary>
       property    SubLangID       : word      read GetSubLangID;
+      /// <summary>
+      /// Resturns True if the library was loaded successfully.
+      /// </summary>
       property    Initialized     : boolean   read GetInitialized;
 
   end;
+
+// Original Chromium source code :
+// https://source.chromium.org/chromium/chromium/src/+/main:ui/base/ime/win/imm32_manager.cc
+
+// Original CEF source code :
+// https://bitbucket.org/chromiumembedded/cef/src/master/tests/cefclient/browser/osr_ime_handler_win.cc
 
 implementation
 
 uses
   {$IFDEF DELPHI16_UP}
-  System.SysUtils,
+    System.SysUtils
   {$ELSE}
-  SysUtils,
+    SysUtils
   {$ENDIF}
-  uCEFMiscFunctions;
+  {$IFDEF MSWINDOWS}, uCEFMiscFunctions{$ENDIF};
 
 constructor TCEFOSRIMEHandler.Create(aHWND : HWND);
 begin
@@ -142,7 +195,7 @@ begin
   FHWND                  := aHWND;
   FCompositionRange.from := 0;
   FCompositionRange.to_  := 0;
-  FCursorIndex           := -1;
+  FCursorIndex           := high(cardinal);
   FIMERect.x             := -1;
   FIMERect.y             := -1;
   FIMERect.width         := 0;
@@ -209,10 +262,8 @@ procedure TCEFOSRIMEHandler.GetCompositionInfo(    imc               : HIMC;
                                                var underlines        : TCefCompositionUnderlineDynArray;
                                                var composition_start : integer);
 var
-  TempStart  : integer;
-  TempEnd    : integer;
-  TempLen    : integer;
-  i          : integer;
+  TempLen, TempTargetStart, TempTargetEnd : cardinal;
+  i : integer;
 begin
   if (underlines <> nil) then
     begin
@@ -220,13 +271,13 @@ begin
       underlines := nil;
     end;
 
-  TempLen   := length(composition_text);
-  TempStart := TempLen;
-  TempEnd   := TempLen;
+  TempLen         := length(composition_text);
+  TempTargetStart := TempLen;
+  TempTargetEnd   := TempLen;
 
   {$IFDEF MSWINDOWS}
   if ((aParam and GCS_COMPATTR) <> 0) then
-    GetCompositionSelectionRange(imc, TempStart, TempEnd);
+    GetCompositionSelectionRange(imc, TempTargetStart, TempTargetEnd);
 
   if ((aParam and CS_NOMOVECARET) = 0) and ((aParam and GCS_CURSORPOS) <> 0) then
     composition_start := ImmGetCompositionString(imc, GCS_CURSORPOS, nil, 0)
@@ -234,51 +285,51 @@ begin
     composition_start := 0;
 
   if ((aParam and GCS_COMPCLAUSE) <> 0) then
-    GetCompositionUnderlines(imc, TempStart, TempEnd, underlines);
+    GetCompositionUnderlines(imc, TempTargetStart, TempTargetEnd, underlines);
   {$ENDIF}
 
   if (underlines = nil) or (length(underlines) = 0) then
     begin
       i := 0;
 
-      if (TempStart > 0)       then inc(i);
-      if (TempEnd > TempStart) then inc(i);
-      if (TempEnd < TempLen)   then inc(i);
+      if (TempTargetStart > 0)             then inc(i);
+      if (TempTargetEnd > TempTargetStart) then inc(i);
+      if (TempTargetEnd < TempLen)         then inc(i);
 
       if (i > 0) then
         begin
           SetLength(underlines, i);
           i := 0;
 
-          if (TempStart > 0) then
+          if (TempTargetStart > 0) then
             begin
               underlines[i].color            := DEFAULT_BLINK_UNDERLINE_COLOR;
               underlines[i].background_color := DEFAULT_BLINK_BACKGROUND_COLOR;
               underlines[i].range.from       := 0;
-              underlines[i].range.to_        := TempStart;
+              underlines[i].range.to_        := TempTargetStart;
               underlines[i].thick            := 0;
               underlines[i].style            := DEFAULT_BLINK_UNDERLINE_STYLE;
 
               inc(i);
             end;
 
-          if (TempEnd > TempStart) then
+          if (TempTargetEnd > TempTargetStart) then
             begin
               underlines[i].color            := DEFAULT_BLINK_UNDERLINE_COLOR;
               underlines[i].background_color := DEFAULT_BLINK_BACKGROUND_COLOR;
-              underlines[i].range.from       := TempStart;
-              underlines[i].range.to_        := TempEnd;
+              underlines[i].range.from       := TempTargetStart;
+              underlines[i].range.to_        := TempTargetEnd;
               underlines[i].thick            := 1;
               underlines[i].style            := DEFAULT_BLINK_UNDERLINE_STYLE;
 
               inc(i);
             end;
 
-          if (TempEnd < TempLen) then
+          if (TempTargetEnd < TempLen) then
             begin
               underlines[i].color            := DEFAULT_BLINK_UNDERLINE_COLOR;
               underlines[i].background_color := DEFAULT_BLINK_BACKGROUND_COLOR;
-              underlines[i].range.from       := TempEnd;
+              underlines[i].range.from       := TempTargetEnd;
               underlines[i].range.to_        := TempLen;
               underlines[i].thick            := 0;
               underlines[i].style            := DEFAULT_BLINK_UNDERLINE_STYLE;
@@ -287,103 +338,89 @@ begin
     end;
 end;
 
-function TCEFOSRIMEHandler.GetString(imc : HIMC; aParam : WParam; aType : integer; var aResult : ustring) : boolean;
+function TCEFOSRIMEHandler.GetString(    imc     : HIMC;
+                                         aParam  : WParam;
+                                         aType   : integer;
+                                     var aResult : ustring) : boolean;
+{$IFDEF MSWINDOWS}
 var
-  TempBufferLen : integer;
-  TempBuffer    : PWChar;
+  TempStringSize : integer;
+  TempBuffer : PWideChar;
+{$ENDIF}
 begin
   Result := False;
-
+  {$IFDEF MSWINDOWS}
   if ((aParam and aType) = 0) then exit;
 
-  {$IFDEF MSWINDOWS}
-  {$IFDEF FPC}
-  TempBufferLen := ImmGetCompositionStringW(imc, aType, nil, 0);
-  {$ELSE}
-  TempBufferLen := ImmGetCompositionString(imc, aType, nil, 0);
-  {$ENDIF}
+  TempStringSize := ImmGetCompositionStringW(imc, aType, nil, 0);
 
-  if (GetLastError <> 0) or (TempBufferLen <= 0) then exit;
-  {$ENDIF}
+  if (TempStringSize <= 0) then exit;
 
-  TempBuffer    := nil;
-  TempBufferLen := TempBufferLen + SizeOf(wchar);
+  TempStringSize := TempStringSize + SizeOf(WideChar);
+  TempBuffer     := nil;
 
   try
     try
-      GetMem(TempBuffer, TempBufferLen);
-      FillChar(TempBuffer^, TempBufferLen, 0);
-
-      {$IFDEF MSWINDOWS}
-      {$IFDEF FPC}
-      TempBufferLen := ImmGetCompositionStringW(imc, aType, TempBuffer, TempBufferLen);
-      {$ELSE}
-      TempBufferLen := ImmGetCompositionString(imc, aType, TempBuffer, TempBufferLen);
-      {$ENDIF}
-      {$ENDIF}
-
-      if (TempBufferLen > 0) then
-        begin
-          aResult := TempBuffer;
-          Result  := True;
-        end;
+      GetMem(TempBuffer, TempStringSize);
+      FillChar(TempBuffer^, TempStringSize, 0);
+      ImmGetCompositionStringW(imc, aType, TempBuffer, TempStringSize);
+      aResult := TempBuffer;
+      Result  := True;
     except
       on e : exception do
         if CustomExceptionHandler('TCEFOSRIMEHandler.GetString', e) then raise;
     end;
   finally
-    if (TempBuffer <> nil) then FreeMem(TempBuffer);
+    if (TempBuffer <> nil) then
+      FreeMem(TempBuffer);
   end;
+  {$ENDIF}
 end;
 
 {$IFDEF MSWINDOWS}
-function TCEFOSRIMEHandler.IsSelectionAttribute(aAttribute : byte) : boolean;
+function TCEFOSRIMEHandler.IsSelectionAttribute(aAttribute : AnsiChar) : boolean;
 begin
-  Result := (aAttribute = ATTR_TARGET_CONVERTED) or
-            (aAttribute = ATTR_TARGET_NOTCONVERTED);
+  Result := (ord(aAttribute) = ATTR_TARGET_CONVERTED) or
+            (ord(aAttribute) = ATTR_TARGET_NOTCONVERTED);
 end;
 {$ENDIF}
 
-procedure TCEFOSRIMEHandler.GetCompositionSelectionRange(imc : HIMC; var target_start, target_end : integer);
+procedure TCEFOSRIMEHandler.GetCompositionSelectionRange(imc : HIMC; var target_start, target_end : cardinal);
+{$IFDEF MSWINDOWS}
 var
-  i             : integer;
-  TempBufferLen : integer;
-  TempBuffer    : array of byte;
+  i, TempStart, TempEnd, TempBufferLen : integer;
+  TempBuffer : array of AnsiChar;
+{$ENDIF}
 begin
-  TempBuffer := nil;
   {$IFDEF MSWINDOWS}
+  TempBuffer := nil;
   try
     try
-      TempBufferLen := ImmGetCompositionString(imc, GCS_COMPATTR, nil, 0);
+      TempBufferLen := ImmGetCompositionStringW(imc, GCS_COMPATTR, nil, 0);
 
-      if (GetLastError = 0) and (TempBufferLen > 0) then
+      if (TempBufferLen > 0) then
         begin
           SetLength(TempBuffer, TempBufferLen);
-          for i := 0 to pred(TempBufferLen) do TempBuffer[i] := 0;
+          for i := 0 to pred(TempBufferLen) do TempBuffer[i] := #0;
 
-          TempBufferLen := ImmGetCompositionString(imc, GCS_COMPATTR, @TempBuffer[0], TempBufferLen);
+          TempBufferLen := ImmGetCompositionStringW(imc, GCS_COMPATTR, @TempBuffer[0], TempBufferLen);
 
-          if (TempBufferLen > 0) then
-            begin
-              i := 0;
-              while (i < TempBufferLen) do
-                if IsSelectionAttribute(TempBuffer[i]) then
-                  begin
-                    target_start := i;
-                    break;
-                  end
-                 else
-                  inc(i);
+          TempStart := 0;
+          while (TempStart < TempBufferLen) do
+            if IsSelectionAttribute(TempBuffer[TempStart]) then
+              break
+             else
+              inc(TempStart);
 
-              while (i < TempBufferLen) do
-                if not(IsSelectionAttribute(TempBuffer[i])) then
-                  begin
-                    target_end := i;
-                    break;
-                  end
-                 else
-                  inc(i);
-            end;
+          TempEnd := TempStart;
+          while (TempEnd < TempBufferLen) do
+            if not(IsSelectionAttribute(TempBuffer[TempEnd])) then
+              break
+             else
+              inc(TempEnd);
+
+          target_start := TempStart;
+          target_end   := TempEnd;
         end;
     except
       on e : exception do
@@ -400,60 +437,55 @@ begin
 end;
 
 procedure TCEFOSRIMEHandler.GetCompositionUnderlines(    imc          : HIMC;
-                                                         target_start : integer;
-                                                         target_end   : integer;
+                                                         target_start : cardinal;
+                                                         target_end   : cardinal;
                                                      var underlines   : TCefCompositionUnderlineDynArray);
+{$IFDEF MSWINDOWS}
 var
   i, j, TempSize : integer;
   TempUndLen     : integer;
-  TempBufferLen  : integer;
+  TempLen        : integer;
   TempBuffer     : array of cardinal;
+{$ENDIF}
 begin
-  TempBuffer := nil;
-
   {$IFDEF MSWINDOWS}
+  TempBuffer := nil;
   try
     try
-      TempBufferLen := ImmGetCompositionString(imc, GCS_COMPCLAUSE, nil, 0);
+      TempSize := ImmGetCompositionStringW(imc, GCS_COMPCLAUSE, nil, 0);
+      TempLen  := TempSize div SizeOf(cardinal);
 
-      if (GetLastError = 0) and (TempBufferLen > 0) then
+      if (TempLen > 0) then
         begin
-          TempSize := TempBufferLen div SizeOf(cardinal);
-          SetLength(TempBuffer, TempSize);
-          for i := 0 to pred(TempSize) do TempBuffer[i] := 0;
+          SetLength(TempBuffer, TempLen);
+          for i := 0 to pred(TempLen) do TempBuffer[i] := 0;
 
-          TempBufferLen := ImmGetCompositionString(imc, GCS_COMPCLAUSE, @TempBuffer[0], TempBufferLen);
+          ImmGetCompositionStringW(imc, GCS_COMPCLAUSE, @TempBuffer[0], TempSize);
 
-          if (TempBufferLen > 0) then
+          if (underlines <> nil) then
+            TempUndLen := length(underlines)
+           else
+            TempUndLen := 0;
+
+          SetLength(underlines, TempUndLen + pred(TempSize));
+          i := 0;
+          while (i < pred(TempLen)) do
             begin
-              TempSize := TempBufferLen div SizeOf(cardinal);
+              j := i + TempUndLen;
 
-              if (underlines <> nil) then
-                TempUndLen := length(underlines)
+              underlines[j].range.from       := TempBuffer[i];
+              underlines[j].range.to_        := TempBuffer[succ(i)];
+              underlines[j].color            := DEFAULT_BLINK_UNDERLINE_COLOR;
+              underlines[j].background_color := DEFAULT_BLINK_BACKGROUND_COLOR;
+              underlines[j].style            := DEFAULT_BLINK_UNDERLINE_STYLE;
+
+              if (underlines[j].range.from >= target_start) and
+                 (underlines[j].range.to_  <= target_end)   then
+                underlines[j].thick := 1
                else
-                TempUndLen := 0;
+                underlines[j].thick := 0;
 
-              SetLength(underlines, TempUndLen + pred(TempSize));
-              i := 0;
-
-              while (i < pred(TempSize)) do
-                begin
-                  j := i + TempUndLen;
-
-                  underlines[j].range.from       := TempBuffer[i];
-                  underlines[j].range.to_        := TempBuffer[succ(i)];
-                  underlines[j].color            := DEFAULT_BLINK_UNDERLINE_COLOR;
-                  underlines[j].background_color := DEFAULT_BLINK_BACKGROUND_COLOR;
-                  underlines[j].style            := DEFAULT_BLINK_UNDERLINE_STYLE;
-
-                  if (underlines[j].range.from >= target_start) and
-                     (underlines[j].range.to_  <= target_end)   then
-                    underlines[j].thick := 1
-                   else
-                    underlines[j].thick := 0;
-
-                  inc(i);
-                end;
+              inc(i);
             end;
         end;
     except
@@ -521,12 +553,14 @@ begin
 end;
 
 procedure TCEFOSRIMEHandler.CleanupComposition;
+{$IFDEF MSWINDOWS}
 var
   TempIMC : HIMC;
+{$ENDIF}
 begin
+  {$IFDEF MSWINDOWS}
   if Initialized and FIsComposing then
     begin
-      {$IFDEF MSWINDOWS}
       TempIMC := ImmGetContext(FHWND);
 
       if (TempIMC <> 0) then
@@ -537,24 +571,26 @@ begin
         end;
 
       ResetComposition;
-      {$ENDIF}
     end;
+  {$ENDIF}
 end;
 
 procedure TCEFOSRIMEHandler.ResetComposition;
 begin
   FIsComposing := False;
-  FCursorIndex := -1;
+  FCursorIndex := high(cardinal);
 end;
 
 function TCEFOSRIMEHandler.GetResult(aParam : LPARAM; var aResult : ustring) : boolean;
+{$IFDEF MSWINDOWS}
 var
   TempIMC : HIMC;
+{$ENDIF}
 begin
   Result := False;
+  {$IFDEF MSWINDOWS}
   if not(Initialized) then exit;
 
-  {$IFDEF MSWINDOWS}
   TempIMC := ImmGetContext(FHWND);
 
   if (TempIMC <> 0) then
@@ -570,13 +606,15 @@ function TCEFOSRIMEHandler.GetComposition(    aParam            : LPARAM;
                                           var composition_text  : ustring;
                                           var underlines        : TCefCompositionUnderlineDynArray;
                                           var composition_start : integer) : boolean;
+{$IFDEF MSWINDOWS}
 var
   TempIMC : HIMC;
+{$ENDIF}
 begin
   Result := False;
+  {$IFDEF MSWINDOWS}
   if not(Initialized) then exit;
 
-  {$IFDEF MSWINDOWS}
   TempIMC := ImmGetContext(FHWND);
 
   if (TempIMC <> 0) then
@@ -623,12 +661,14 @@ begin
 end;
 
 procedure TCEFOSRIMEHandler.CancelIME;
+{$IFDEF MSWINDOWS}
 var
   TempIMC : HIMC;
+{$ENDIF}
 begin
+  {$IFDEF MSWINDOWS}
   if Initialized and FIsComposing then
     begin
-      {$IFDEF MSWINDOWS}
       TempIMC := ImmGetContext(FHWND);
 
       if (TempIMC <> 0) then
@@ -639,11 +679,11 @@ begin
         end;
 
       ResetComposition;
-      {$ENDIF}
     end;
+  {$ENDIF}
 end;
 
-procedure TCEFOSRIMEHandler.UpdateCaretPosition(index : integer);
+procedure TCEFOSRIMEHandler.UpdateCaretPosition(index : cardinal);
 begin
   FCursorIndex := index;
   MoveImeWindow();
@@ -679,10 +719,11 @@ end;
 procedure TCEFOSRIMEHandler.MoveImeWindow;
 {$IFDEF MSWINDOWS}
 var
-  TempRect        : TCefRect;
-  TempLocation    : integer;
-  TempIMC         : HIMC;
-  TempCandidate   : TCandidateForm;
+  TempRect         : TCefRect;
+  TempLocation     : cardinal;
+  TempIMC          : HIMC;
+  TempCandidatePos : TCandidateForm;
+  TempCandidateExc : TCandidateForm;
 const
   CARET_MARGIN = 1;
 {$ENDIF}
@@ -693,7 +734,7 @@ begin
   TempRect     := FIMERect;
   TempLocation := FCursorIndex;
 
-  if (TempLocation = -1) then
+  if (TempLocation = high(cardinal)) then
     TempLocation := FCompositionRange.from;
 
   if (TempLocation >= FCompositionRange.from) then
@@ -702,8 +743,7 @@ begin
   if (FCompositionBounds = nil) then
     exit
    else
-    if (TempLocation >= 0) and
-       (TempLocation < length(FCompositionBounds)) then
+    if (TempLocation < cardinal(length(FCompositionBounds))) then
       TempRect := FCompositionBounds[TempLocation]
      else
       if (length(FCompositionBounds) > 0) then
@@ -717,16 +757,16 @@ begin
     try
       if (PrimaryLangID = LANG_CHINESE) then
         begin
-          TempCandidate.dwIndex        := 0;
-          TempCandidate.dwStyle        := CFS_CANDIDATEPOS;
-          TempCandidate.ptCurrentPos.X := TempRect.x;
-          TempCandidate.ptCurrentPos.Y := TempRect.y;
-          TempCandidate.rcArea.Left    := 0;
-          TempCandidate.rcArea.Top     := 0;
-          TempCandidate.rcArea.Right   := 0;
-          TempCandidate.rcArea.Bottom  := 0;
+          TempCandidatePos.dwIndex        := 0;
+          TempCandidatePos.dwStyle        := CFS_CANDIDATEPOS;
+          TempCandidatePos.ptCurrentPos.X := TempRect.x;
+          TempCandidatePos.ptCurrentPos.Y := TempRect.y;
+          TempCandidatePos.rcArea.Left    := 0;
+          TempCandidatePos.rcArea.Top     := 0;
+          TempCandidatePos.rcArea.Right   := 0;
+          TempCandidatePos.rcArea.Bottom  := 0;
 
-          ImmSetCandidateWindow(TempIMC, @TempCandidate);
+          ImmSetCandidateWindow(TempIMC, @TempCandidatePos);
         end;
 
       if FSystemCaret then
@@ -735,20 +775,19 @@ begin
           else            SetCaretPos(TempRect.x, TempRect.y);
         end;
 
-
       if (PrimaryLangID = LANG_KOREAN) then
         TempRect.y := TempRect.y + CARET_MARGIN;
 
-      TempCandidate.dwIndex        := 0;
-      TempCandidate.dwStyle        := CFS_EXCLUDE;
-      TempCandidate.ptCurrentPos.X := TempRect.x;
-      TempCandidate.ptCurrentPos.Y := TempRect.y;
-      TempCandidate.rcArea.Left    := TempRect.x;
-      TempCandidate.rcArea.Top     := TempRect.y;
-      TempCandidate.rcArea.Right   := TempRect.x + TempRect.width;
-      TempCandidate.rcArea.Bottom  := TempRect.y + TempRect.height;
+      TempCandidateExc.dwIndex        := 0;
+      TempCandidateExc.dwStyle        := CFS_EXCLUDE;
+      TempCandidateExc.ptCurrentPos.X := TempRect.x;
+      TempCandidateExc.ptCurrentPos.Y := TempRect.y;
+      TempCandidateExc.rcArea.Left    := TempRect.x;
+      TempCandidateExc.rcArea.Top     := TempRect.y;
+      TempCandidateExc.rcArea.Right   := TempRect.x + TempRect.width;
+      TempCandidateExc.rcArea.Bottom  := TempRect.y + TempRect.height;
 
-      ImmSetCandidateWindow(TempIMC, @TempCandidate);
+      ImmSetCandidateWindow(TempIMC, @TempCandidateExc);
     finally
       ImmReleaseContext(FHWND, TempIMC);
     end;

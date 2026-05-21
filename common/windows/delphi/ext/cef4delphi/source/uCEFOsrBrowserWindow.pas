@@ -1,52 +1,9 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
+﻿unit uCEFOsrBrowserWindow;
 
-(*
+{$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+{$ENDIF}
 
-  === State of Implementation ===
-
-  On MacOS the keyboard support is currently incomplete
-
-
-*)
-
-unit uCEFOsrBrowserWindow;
-
-{$mode objfpc}{$H+}
 {$i cef.inc}
 
 interface
@@ -58,10 +15,9 @@ uses
   {$IFDEF FPC}
   LResources, PropEdits,
   {$ENDIF}
-  uCEFApplication, uCEFChromiumWindow, uCEFTypes, uCEFInterfaces, uCEFChromium,
-  uCEFLinkedWinControlBase, uCEFBufferPanel,
-  uCEFBrowserWindow, uCEFBitmapBitBuffer, uCEFMiscFunctions,
-  uCEFConstants, uCEFChromiumEvents, Forms, ExtCtrls, LCLType, Graphics,
+  uCEFApplication, uCEFTypes, uCEFInterfaces, uCEFBufferPanel,
+  uCEFBrowserWindow, uCEFMiscFunctions, uCEFConstants, uCEFChromiumEvents,
+  Forms, ExtCtrls, LCLType, Graphics,
   Controls, syncobjs, Classes, sysutils, math;
 
 type
@@ -87,6 +43,15 @@ type
 
   TEmbeddedOsrChromium = class(TEmbeddedChromium)
   end;
+
+(*
+
+  === State of Implementation ===
+
+  On MacOS the keyboard support is currently incomplete
+
+
+*)
 
   { TOsrBrowserWindow - Off-Screen-Rendering
 
@@ -123,8 +88,9 @@ type
       procedure SyncIMERangeChanged;
 
       procedure DoGetChromiumBeforePopup(Sender: TObject;
-        const browser: ICefBrowser; const frame: ICefFrame; const targetUrl,
-        targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
+        const browser: ICefBrowser; const frame: ICefFrame; popup_id: Integer;
+        const targetUrl, targetFrameName: ustring;
+        targetDisposition: TCefWindowOpenDisposition;
         userGesture: Boolean; const popupFeatures: TCefPopupFeatures;
         var windowInfo: TCefWindowInfo; var client: ICefClient;
         var settings: TCefBrowserSettings; var extra_info: ICefDictionaryValue;
@@ -272,15 +238,16 @@ begin
 end;
 
 procedure TOsrBrowserWindow.DoGetChromiumBeforePopup(Sender: TObject;
-  const browser: ICefBrowser; const frame: ICefFrame; const targetUrl,
-  targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
+  const browser: ICefBrowser; const frame: ICefFrame; popup_id: Integer;
+  const targetUrl, targetFrameName: ustring;
+  targetDisposition: TCefWindowOpenDisposition;
   userGesture: Boolean; const popupFeatures: TCefPopupFeatures;
   var windowInfo: TCefWindowInfo; var client: ICefClient;
   var settings: TCefBrowserSettings; var extra_info: ICefDictionaryValue;
   var noJavascriptAccess: Boolean; var Result: Boolean);
 begin
   // For simplicity, this demo blocks all popup windows and new tabs
-  Result := (targetDisposition in [WOD_NEW_FOREGROUND_TAB, WOD_NEW_BACKGROUND_TAB, WOD_NEW_POPUP, WOD_NEW_WINDOW]);
+  Result := (targetDisposition in [CEF_WOD_NEW_FOREGROUND_TAB, CEF_WOD_NEW_BACKGROUND_TAB, CEF_WOD_NEW_POPUP, CEF_WOD_NEW_WINDOW]);
 end;
 
 procedure TOsrBrowserWindow.DoGetChromiumPopupShow(Sender: TObject;
@@ -311,7 +278,7 @@ end;
 procedure TOsrBrowserWindow.DoGetChromiumTooltip(Sender: TObject;
   const browser: ICefBrowser; var AText: ustring; out Result: Boolean);
 begin
-  hint     := aText;
+  hint     := {$IFDEF FPC}UTF8Encode({$ENDIF}aText{$IFDEF FPC}){$ENDIF};
   ShowHint := (length(aText) > 0);
   Result   := True;
 end;
@@ -496,8 +463,10 @@ begin
 
                     while (i < j) do
                       begin
+                        {$warnings off}
                         TempBufferBits := TempBitmap.Scanline[dirtyRects^[n].y + i];
                         dst            := @PByte(TempBufferBits)[TempDstOffset];
+                        {$warnings on}
 
                         {$IFDEF DARWIN}
                         ls := TempLineSize;
@@ -633,13 +602,13 @@ end;
 procedure TOsrBrowserWindow.DoEnter;
 begin
   inherited DoEnter;
-  Chromium.SendFocusEvent(True);
+  Chromium.SetFocus(True);
 end;
 
 procedure TOsrBrowserWindow.DoExit;
 begin
   inherited DoExit;
-  Chromium.SendFocusEvent(False);
+  Chromium.SetFocus(False);
 end;
 
 procedure TOsrBrowserWindow.Click;
@@ -740,7 +709,6 @@ procedure TOsrBrowserWindow.MouseLeave;
 var
   TempEvent : TCefMouseEvent;
   TempPoint : TPoint;
-  TempTime  : integer;
 begin
   inherited MouseLeave;
 

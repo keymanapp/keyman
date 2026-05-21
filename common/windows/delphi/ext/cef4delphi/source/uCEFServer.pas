@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFServer;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -124,12 +87,12 @@ var
   TempContentType : TCefString;
 begin
   TempContentType := CefString(content_type);
-  PCefServer(FData)^.send_http200response(PCefServer(FData), connection_id, @TempContentType, data, data_size);
+  PCefServer(FData)^.send_http200_response(PCefServer(FData), connection_id, @TempContentType, data, data_size);
 end;
 
 procedure TCEFServerRef.SendHttp404response(connection_id: Integer);
 begin
-  PCefServer(FData)^.send_http404response(PCefServer(FData), connection_id);
+  PCefServer(FData)^.send_http404_response(PCefServer(FData), connection_id);
 end;
 
 procedure TCEFServerRef.SendHttp500response(connection_id: Integer; const error_message: ustring);
@@ -137,7 +100,7 @@ var
   TempError : TCefString;
 begin
   TempError := CefString(error_message);
-  PCefServer(FData)^.send_http500response(PCefServer(FData), connection_id, @TempError);
+  PCefServer(FData)^.send_http500_response(PCefServer(FData), connection_id, @TempError);
 end;
 
 procedure TCEFServerRef.SendHttpResponse(connection_id, response_code: Integer; const content_type: ustring; content_length: int64; const extra_headers: ICefStringMultimap);

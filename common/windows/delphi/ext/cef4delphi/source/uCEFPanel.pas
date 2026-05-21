@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFPanel;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -57,23 +20,77 @@ uses
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes, uCEFView;
 
 type
+  /// <summary>
+  /// A Panel is a container in the views hierarchy that can contain other Views
+  /// as children. Methods must be called on the browser process UI thread unless
+  /// otherwise indicated.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/views/cef_panel_capi.h">CEF source file: /include/capi/views/cef_panel_capi.h (cef_panel_t)</see></para>
+  /// </remarks>
   TCefPanelRef = class(TCefViewRef, ICefPanel)
     protected
+      /// <summary>
+      /// Returns this Panel as a Window or NULL if this is not a Window.
+      /// </summary>
       function  GetAsWindow : ICefWindow;
+      /// <summary>
+      /// Set this Panel's Layout to FillLayout and return the FillLayout object.
+      /// </summary>
       function  SetToFillLayout : ICefFillLayout;
+      /// <summary>
+      /// Set this Panel's Layout to BoxLayout and return the BoxLayout object.
+      /// </summary>
       function  SetToBoxLayout(const settings: TCefBoxLayoutSettings): ICefBoxLayout;
+      /// <summary>
+      /// Get the Layout.
+      /// </summary>
       function  GetLayout : ICefLayout;
+      /// <summary>
+      /// Lay out the child Views (set their bounds based on sizing heuristics
+      /// specific to the current Layout).
+      /// </summary>
       procedure Layout;
+      /// <summary>
+      /// Add a child View.
+      /// </summary>
       procedure AddChildView(const view: ICefView);
+      /// <summary>
+      /// Add a child View at the specified |index|. If |index| matches the result
+      /// of GetChildCount() then the View will be added at the end.
+      /// </summary>
       procedure AddChildViewAt(const view: ICefView; index: Integer);
+      /// <summary>
+      /// Move the child View to the specified |index|. A negative value for |index|
+      /// will move the View to the end.
+      /// </summary>
       procedure ReorderChildView(const view: ICefView; index: Integer);
+      /// <summary>
+      /// Remove a child View. The View can then be added to another Panel.
+      /// </summary>
       procedure RemoveChildView(const view: ICefView);
+      /// <summary>
+      /// Remove all child Views. The removed Views will be deleted if the client
+      /// holds no references to them.
+      /// </summary>
       procedure RemoveAllChildViews;
+      /// <summary>
+      /// Returns the number of child Views.
+      /// </summary>
       function  GetChildViewCount : NativeUInt;
+      /// <summary>
+      /// Returns the child View at the specified |index|.
+      /// </summary>
       function  GetChildViewAt(index: Integer): ICefView;
 
     public
+      /// <summary>
+      /// Returns a ICefPanel instance using a PCefPanel data pointer.
+      /// </summary>
       class function UnWrap(data: Pointer): ICefPanel;
+      /// <summary>
+      /// Create a new Panel.
+      /// </summary>
       class function CreatePanel(const delegate: ICefPanelDelegate): ICefPanel;
   end;
 

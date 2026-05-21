@@ -1,40 +1,3 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFWinControl;
 
 {$I cef.inc}
@@ -46,38 +9,62 @@ unit uCEFWinControl;
   {$ENDIF}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
 {$MINENUMSIZE 4}
 
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows, {$ENDIF} System.Classes, Vcl.Controls, Vcl.Graphics,
+    {$IFDEF MSWINDOWS}WinApi.Windows, {$ENDIF} System.Classes, Vcl.Controls, Vcl.Graphics;
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes, Forms, Controls, Graphics,
+    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes, Forms, Controls, Graphics
     {$IFDEF FPC}
-    LCLProc, LCLType, LCLIntf, LResources, InterfaceBase,
+      {$IF DEFINED(LCLQT) OR DEFINED(LCLQT5) OR DEFINED(LCLQT6) OR DEFINED(LCLGTK3)}, ExtCtrls{$IFEND}
+      , LCLProc, LCLType, LCLIntf, LResources, InterfaceBase {$IFDEF MACOSX}, CocoaAll{$ENDIF}
     {$ENDIF}
+    ;
   {$ENDIF}
-  {$IFDEF FPC}{$IFDEF MACOSX}
-  CocoaAll,
-  {$ENDIF}{$ENDIF}
-  uCEFTypes, uCEFInterfaces;
 
 type
-  TCEFWinControl = class(TWinControl)
+  /// <summary>
+  /// Custom TWinControl used by CEF browsers.
+  /// </summary>
+  TCEFWinControl = class({$IF DEFINED(LCLQT) OR DEFINED(LCLQT5) OR DEFINED(LCLQT6) OR DEFINED(LCLGTK3)}TCustomPanel{$ELSE}TWinControl{$IFEND})
     protected
       function  GetChildWindowHandle : {$IFNDEF MSWINDOWS}{$IFDEF FPC}LclType.{$ENDIF}{$ENDIF}THandle; virtual;
       procedure Resize; override;
 
     public
+      /// <summary>
+      /// Take a snapshot of the browser contents into aBitmap. This function only works in Windows without hardware acceleration.
+      /// </summary>
       function    TakeSnapshot(var aBitmap : TBitmap) : boolean;
+      /// <summary>
+      /// Destroy the child windows created by the browser.
+      /// </summary>
       function    DestroyChildWindow : boolean;
+      /// <summary>
+      /// Exposes the CreateHandle procedure to create the Handle at any time.
+      /// </summary>
       procedure   CreateHandle; override;
+      /// <summary>
+      /// Invalidate the child windows created by the browser.
+      /// </summary>
       procedure   InvalidateChildren;
+      /// <summary>
+      /// Updates the size of the child windows created by the browser.
+      /// </summary>
       procedure   UpdateSize; virtual;
-
+      {$IF DEFINED(LCLQT) OR DEFINED(LCLQT5) OR DEFINED(LCLQT6)}
+      /// <summary>
+      /// Set this widget as native with a native window handle.
+      /// </summary>
+      procedure   SetQTWidgetAsNative;
+      {$IFEND}
+      /// <summary>
+      /// Handle of the first child window created by the browser.
+      /// </summary>
       property  ChildWindowHandle : THandle  read GetChildWindowHandle;
 
     published
@@ -101,6 +88,9 @@ type
       property  OnDragOver;
       property  OnStartDrag;
       property  OnEndDrag;
+      {$IFNDEF FPC}
+      property  OnCanResize;
+      {$ENDIF}
       {$IFDEF DELPHI14_UP}
       property  Touch;
       property  OnGesture;
@@ -113,8 +103,9 @@ type
 
 implementation
 
-uses
-  uCEFMiscFunctions, uCEFClient, uCEFConstants;
+{$IFDEF LCLQT}uses qtwidgets, qt4;{$ENDIF}
+{$IFDEF LCLQT5}uses qtwidgets, qt5;{$ENDIF}
+{$IFDEF LCLQT6}uses qtwidgets, qt6;{$ENDIF}
 
 function TCEFWinControl.GetChildWindowHandle : {$IFNDEF MSWINDOWS}{$IFDEF FPC}LclType.{$ENDIF}{$ENDIF}THandle;
 begin
@@ -131,9 +122,18 @@ begin
   inherited CreateHandle;
 end;
 
+{$IF DEFINED(LCLQT) OR DEFINED(LCLQT5) OR DEFINED(LCLQT6)}
+procedure TCEFWinControl.SetQTWidgetAsNative;
+begin
+  TQtWidget(Handle).setAttribute(QtWA_NativeWindow); // This widget becomes native...
+  TQtWidget(Handle).setAttribute(QtWA_DontCreateNativeAncestors); // ...but not the ancestors.
+end;
+{$IFEND}
+
 procedure TCEFWinControl.InvalidateChildren;
 begin
-  if HandleAllocated then RedrawWindow(Handle, nil, 0, RDW_INVALIDATE or RDW_ALLCHILDREN);
+  if HandleAllocated then
+    RedrawWindow(Handle, nil, 0, RDW_INVALIDATE or RDW_ALLCHILDREN);
 end;
 
 procedure TCEFWinControl.UpdateSize;
@@ -167,7 +167,6 @@ var
 begin
   Result := False;
   {$IFDEF MSWINDOWS}
-  if (aBitmap = nil) then exit;
 
   TempHWND := ChildWindowHandle;
   if (TempHWND = 0) then exit;
@@ -176,7 +175,9 @@ begin
   TempWidth  := TempRect.Right  - TempRect.Left;
   TempHeight := TempRect.Bottom - TempRect.Top;
 
-  aBitmap        := TBitmap.Create;
+  if (aBitmap = nil) then
+    aBitmap := TBitmap.Create;
+
   aBitmap.Height := TempHeight;
   aBitmap.Width  := TempWidth;
 

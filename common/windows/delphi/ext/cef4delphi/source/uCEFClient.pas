@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFClient;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -55,6 +18,7 @@ type
   TCefClientRef = class(TCefBaseRefCountedRef, ICefClient)
     protected
       procedure GetAudioHandler(var aHandler : ICefAudioHandler); virtual;
+      procedure GetCommandHandler(var aHandler : ICefCommandHandler); virtual;
       procedure GetContextMenuHandler(var aHandler : ICefContextMenuHandler); virtual;
       procedure GetDialogHandler(var aHandler : ICefDialogHandler); virtual;
       procedure GetDisplayHandler(var aHandler : ICefDisplayHandler); virtual;
@@ -62,10 +26,13 @@ type
       procedure GetDragHandler(var aHandler : ICefDragHandler); virtual;
       procedure GetFindHandler(var aHandler : ICefFindHandler); virtual;
       procedure GetFocusHandler(var aHandler : ICefFocusHandler); virtual;
+      procedure GetFrameHandler(var aHandler : ICefFrameHandler); virtual;
+      procedure GetPermissionHandler(var aHandler: ICefPermissionHandler); virtual;
       procedure GetJsdialogHandler(var aHandler : ICefJsdialogHandler); virtual;
       procedure GetKeyboardHandler(var aHandler : ICefKeyboardHandler); virtual;
       procedure GetLifeSpanHandler(var aHandler : ICefLifeSpanHandler); virtual;
       procedure GetLoadHandler(var aHandler : ICefLoadHandler); virtual;
+      procedure GetPrintHandler(var aHandler : ICefPrintHandler); virtual;
       procedure GetRenderHandler(var aHandler : ICefRenderHandler); virtual;
       procedure GetRequestHandler(var aHandler : ICefRequestHandler); virtual;
       function  OnProcessMessageReceived(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const message_ : ICefProcessMessage): Boolean; virtual;
@@ -79,6 +46,7 @@ type
   TCefClientOwn = class(TCefBaseRefCountedOwn, ICefClient)
     protected
       procedure GetAudioHandler(var aHandler : ICefAudioHandler); virtual;
+      procedure GetCommandHandler(var aHandler : ICefCommandHandler); virtual;
       procedure GetContextMenuHandler(var aHandler : ICefContextMenuHandler); virtual;
       procedure GetDialogHandler(var aHandler : ICefDialogHandler); virtual;
       procedure GetDisplayHandler(var aHandler : ICefDisplayHandler); virtual;
@@ -86,10 +54,13 @@ type
       procedure GetDragHandler(var aHandler : ICefDragHandler); virtual;
       procedure GetFindHandler(var aHandler : ICefFindHandler); virtual;
       procedure GetFocusHandler(var aHandler : ICefFocusHandler); virtual;
+      procedure GetFrameHandler(var aHandler : ICefFrameHandler); virtual;
+      procedure GetPermissionHandler(var aHandler: ICefPermissionHandler); virtual;
       procedure GetJsdialogHandler(var aHandler : ICefJsdialogHandler); virtual;
       procedure GetKeyboardHandler(var aHandler : ICefKeyboardHandler); virtual;
       procedure GetLifeSpanHandler(var aHandler : ICefLifeSpanHandler); virtual;
       procedure GetLoadHandler(var aHandler : ICefLoadHandler); virtual;
+      procedure GetPrintHandler(var aHandler : ICefPrintHandler); virtual;
       procedure GetRenderHandler(var aHandler : ICefRenderHandler); virtual;
       procedure GetRequestHandler(var aHandler : ICefRequestHandler); virtual;
       function  OnProcessMessageReceived(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const message_ : ICefProcessMessage): Boolean; virtual;
@@ -104,6 +75,7 @@ type
     protected
       FEvents             : Pointer;
       FAudioHandler       : ICefAudioHandler;
+      FCommandHandler     : ICefCommandHandler;
       FLoadHandler        : ICefLoadHandler;
       FFocusHandler       : ICefFocusHandler;
       FContextMenuHandler : ICefContextMenuHandler;
@@ -117,8 +89,12 @@ type
       FRequestHandler     : ICefRequestHandler;
       FDragHandler        : ICefDragHandler;
       FFindHandler        : ICefFindHandler;
+      FPrintHandler       : ICefPrintHandler;
+      FFrameHandler       : ICefFrameHandler;
+      FPermissionHandler  : ICefPermissionHandler;
 
       procedure GetAudioHandler(var aHandler : ICefAudioHandler); override;
+      procedure GetCommandHandler(var aHandler : ICefCommandHandler); override;
       procedure GetContextMenuHandler(var aHandler : ICefContextMenuHandler); override;
       procedure GetDialogHandler(var aHandler : ICefDialogHandler); override;
       procedure GetDisplayHandler(var aHandler : ICefDisplayHandler); override;
@@ -126,10 +102,13 @@ type
       procedure GetDragHandler(var aHandler : ICefDragHandler); override;
       procedure GetFindHandler(var aHandler : ICefFindHandler); override;
       procedure GetFocusHandler(var aHandler : ICefFocusHandler); override;
+      procedure GetFrameHandler(var aHandler : ICefFrameHandler); override;
+      procedure GetPermissionHandler(var aHandler: ICefPermissionHandler); override;
       procedure GetJsdialogHandler(var aHandler : ICefJsdialogHandler); override;
       procedure GetKeyboardHandler(var aHandler : ICefKeyboardHandler); override;
       procedure GetLifeSpanHandler(var aHandler : ICefLifeSpanHandler); override;
       procedure GetLoadHandler(var aHandler : ICefLoadHandler); override;
+      procedure GetPrintHandler(var aHandler : ICefPrintHandler); override;
       procedure GetRenderHandler(var aHandler : ICefRenderHandler); override;
       procedure GetRequestHandler(var aHandler : ICefRequestHandler); override;
       function  OnProcessMessageReceived(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const message_ : ICefProcessMessage): Boolean; override;
@@ -150,11 +129,13 @@ uses
   {$ELSE}
   SysUtils,
   {$ENDIF}
-  uCEFMiscFunctions, uCEFLibFunctions, uCEFProcessMessage, uCEFBrowser, uCEFLoadHandler,
-  uCEFFocusHandler, uCEFContextMenuHandler, uCEFDialogHandler, uCEFKeyboardHandler,
-  uCEFDisplayHandler, uCEFDownloadHandler, uCEFJsDialogHandler,
-  uCEFLifeSpanHandler, uCEFRequestHandler, uCEFRenderHandler, uCEFDragHandler,
-  uCEFFindHandler, uCEFConstants, uCEFApplicationCore, uCEFFrame, uCEFAudioHandler;
+  uCEFMiscFunctions, uCEFProcessMessage, uCEFBrowser, uCEFLoadHandler,
+  uCEFFocusHandler, uCEFContextMenuHandler, uCEFDialogHandler,
+  uCEFKeyboardHandler, uCEFDisplayHandler, uCEFDownloadHandler,
+  uCEFJsDialogHandler, uCEFLifeSpanHandler, uCEFRequestHandler,
+  uCEFRenderHandler, uCEFDragHandler, uCEFFindHandler, uCEFFrame,
+  uCEFAudioHandler, uCEFPrintHandler, uCEFFrameHandler, uCEFCommandHandler,
+  uCEFPermissionHandler;
 
 
 // ******************************************************
@@ -170,6 +151,11 @@ begin
 end;
 
 procedure TCefClientRef.GetAudioHandler(var aHandler : ICefAudioHandler);
+begin
+  aHandler := nil;
+end;
+
+procedure TCefClientRef.GetCommandHandler(var aHandler : ICefCommandHandler);
 begin
   aHandler := nil;
 end;
@@ -209,6 +195,16 @@ begin
   aHandler := nil;
 end;
 
+procedure TCefClientRef.GetFrameHandler(var aHandler : ICefFrameHandler);
+begin
+  aHandler := nil;
+end;
+
+procedure TCefClientRef.GetPermissionHandler(var aHandler: ICefPermissionHandler);
+begin
+  aHandler := nil;
+end;
+
 procedure TCefClientRef.GetJsdialogHandler(var aHandler : ICefJsDialogHandler);
 begin
   aHandler := nil;
@@ -225,6 +221,11 @@ begin
 end;
 
 procedure TCefClientRef.GetLoadHandler(var aHandler : ICefLoadHandler);
+begin
+  aHandler := nil;
+end;
+
+procedure TCefClientRef.GetPrintHandler(var aHandler : ICefPrintHandler);
 begin
   aHandler := nil;
 end;
@@ -261,11 +262,30 @@ var
   TempHandler : ICefAudioHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);    
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
       TCefClientOwn(TempObject).GetAudioHandler(TempHandler);
+      if (TempHandler <> nil) then Result := TempHandler.Wrap;
+    finally
+      TempHandler := nil;
+    end;
+end;
+
+function cef_client_own_get_command_handler(self: PCefClient): PCefCommandHandler; stdcall;
+var
+  TempObject  : TObject;
+  TempHandler : ICefCommandHandler;
+begin
+  Result      := nil;
+  TempObject  := CefGetObject(self);
+  TempHandler := nil;
+
+  if (TempObject <> nil) and (TempObject is TCefClientOwn) then
+    try
+      TCefClientOwn(TempObject).GetCommandHandler(TempHandler);
       if (TempHandler <> nil) then Result := TempHandler.Wrap;
     finally
       TempHandler := nil;
@@ -278,7 +298,8 @@ var
   TempHandler : ICefContextMenuHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);    
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -295,7 +316,8 @@ var
   TempHandler : ICefDialogHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);  
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -312,7 +334,8 @@ var
   TempHandler : ICefDisplayHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);    
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -329,7 +352,8 @@ var
   TempHandler : ICefDownloadHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);      
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -346,7 +370,8 @@ var
   TempHandler : ICefDragHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);   
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -363,7 +388,8 @@ var
   TempHandler : ICefFindHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);    
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -380,11 +406,30 @@ var
   TempHandler : ICefFocusHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);  
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
       TCefClientOwn(TempObject).GetFocusHandler(TempHandler);
+      if (TempHandler <> nil) then Result := TempHandler.Wrap;
+    finally
+      TempHandler := nil;
+    end;
+end;
+
+function cef_client_own_get_frame_handler(self: PCefClient): PCefFrameHandler; stdcall;
+var
+  TempObject  : TObject;
+  TempHandler : ICefFrameHandler;
+begin
+  Result      := nil;
+  TempObject  := CefGetObject(self);
+  TempHandler := nil;
+
+  if (TempObject <> nil) and (TempObject is TCefClientOwn) then
+    try
+      TCefClientOwn(TempObject).GetFrameHandler(TempHandler);
       if (TempHandler <> nil) then Result := TempHandler.Wrap;
     finally
       TempHandler := nil;
@@ -397,7 +442,8 @@ var
   TempHandler : ICefJsDialogHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);  
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -414,7 +460,8 @@ var
   TempHandler : ICefKeyboardHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);     
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -431,7 +478,8 @@ var
   TempHandler : ICefLifeSpanHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);   
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -448,7 +496,8 @@ var
   TempHandler : ICefLoadHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);     
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -459,13 +508,14 @@ begin
     end;
 end;
 
-function cef_client_own_get_get_render_handler(self: PCefClient): PCefRenderHandler; stdcall;
+function cef_client_own_get_render_handler(self: PCefClient): PCefRenderHandler; stdcall;
 var
   TempObject  : TObject;
   TempHandler : ICefRenderHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);  
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
@@ -482,11 +532,48 @@ var
   TempHandler : ICefRequestHandler;
 begin
   Result      := nil;
-  TempObject  := CefGetObject(self);
+  TempObject  := CefGetObject(self);  
+  TempHandler := nil;
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
     try
       TCefClientOwn(TempObject).GetRequestHandler(TempHandler);
+      if (TempHandler <> nil) then Result := TempHandler.Wrap;
+    finally
+      TempHandler := nil;
+    end;
+end;
+
+function cef_client_own_get_print_handler(self: PCefClient): PCefPrintHandler; stdcall;
+var
+  TempObject  : TObject;
+  TempHandler : ICefPrintHandler;
+begin
+  Result     := nil;
+  TempObject := CefGetObject(self);
+
+  if (TempObject <> nil) and (TempObject is TCefClientOwn) then
+    try
+      TempHandler := nil;
+      TCefClientOwn(TempObject).GetPrintHandler(TempHandler);
+      if (TempHandler <> nil) then Result := TempHandler.Wrap;
+    finally
+      TempHandler := nil;
+    end;
+end;
+
+function cef_client_own_get_permission_handler(self: PCefClient): PCefPermissionHandler; stdcall;
+var
+  TempObject  : TObject;
+  TempHandler : ICefPermissionHandler;
+begin
+  Result     := nil;
+  TempObject := CefGetObject(self);
+
+  if (TempObject <> nil) and (TempObject is TCefClientOwn) then
+    try
+      TempHandler := nil;
+      TCefClientOwn(TempObject).GetPermissionHandler(TempHandler);
       if (TempHandler <> nil) then Result := TempHandler.Wrap;
     finally
       TempHandler := nil;
@@ -499,16 +586,19 @@ function cef_client_own_on_process_message_received(self           : PCefClient;
                                                     source_process : TCefProcessId;
                                                     message_       : PCefProcessMessage): Integer; stdcall;
 var
-  TempObject  : TObject;
+  TempObject : TObject;
+  TempResult : boolean;
 begin
-  Result      := Ord(False);
-  TempObject  := CefGetObject(self);
+  TempResult := False;
+  TempObject := CefGetObject(self);
 
   if (TempObject <> nil) and (TempObject is TCefClientOwn) then
-    Result := Ord(TCefClientOwn(TempObject).OnProcessMessageReceived(TCefBrowserRef.UnWrap(browser),
+    TempResult := TCefClientOwn(TempObject).OnProcessMessageReceived(TCefBrowserRef.UnWrap(browser),
                                                                      TCefFrameRef.UnWrap(frame),
                                                                      source_process,
-                                                                     TCefProcessMessageRef.UnWrap(message_)));
+                                                                     TCefProcessMessageRef.UnWrap(message_));
+
+  Result := Ord(TempResult);
 end;
 
 constructor TCefClientOwn.Create;
@@ -518,6 +608,7 @@ begin
   with PCefClient(FData)^ do
     begin
       get_audio_handler           := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_audio_handler;
+      get_command_handler         := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_command_handler;
       get_context_menu_handler    := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_context_menu_handler;
       get_dialog_handler          := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_dialog_handler;
       get_display_handler         := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_display_handler;
@@ -525,17 +616,25 @@ begin
       get_drag_handler            := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_drag_handler;
       get_find_handler            := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_find_handler;
       get_focus_handler           := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_focus_handler;
+      get_frame_handler           := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_frame_handler;
+      get_permission_handler      := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_permission_handler;
       get_jsdialog_handler        := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_jsdialog_handler;
       get_keyboard_handler        := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_keyboard_handler;
       get_life_span_handler       := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_life_span_handler;
       get_load_handler            := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_load_handler;
-      get_render_handler          := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_get_render_handler;
+      get_print_handler           := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_print_handler;
+      get_render_handler          := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_render_handler;
       get_request_handler         := {$IFDEF FPC}@{$ENDIF}cef_client_own_get_request_handler;
       on_process_message_received := {$IFDEF FPC}@{$ENDIF}cef_client_own_on_process_message_received;
     end;
 end;
 
 procedure TCefClientOwn.GetAudioHandler(var aHandler : ICefAudioHandler);
+begin
+  aHandler := nil;
+end;
+
+procedure TCefClientOwn.GetCommandHandler(var aHandler : ICefCommandHandler);
 begin
   aHandler := nil;
 end;
@@ -575,6 +674,16 @@ begin
   aHandler := nil;
 end;
 
+procedure TCefClientOwn.GetFrameHandler(var aHandler : ICefFrameHandler);
+begin
+  aHandler := nil;
+end;
+
+procedure TCefClientOwn.GetPermissionHandler(var aHandler: ICefPermissionHandler);
+begin
+  aHandler := nil;
+end;
+
 procedure TCefClientOwn.GetJsdialogHandler(var aHandler : ICefJsDialogHandler);
 begin
   aHandler := nil;
@@ -591,6 +700,11 @@ begin
 end;
 
 procedure TCefClientOwn.GetLoadHandler(var aHandler : ICefLoadHandler);
+begin
+  aHandler := nil;
+end;
+
+procedure TCefClientOwn.GetPrintHandler(var aHandler : ICefPrintHandler);
 begin
   aHandler := nil;
 end;
@@ -641,6 +755,7 @@ begin
        else
         begin
           if events.MustCreateAudioHandler       then FAudioHandler       := TCustomAudioHandler.Create(events);
+          if events.MustCreateCommandHandler     then FCommandHandler     := TCustomCommandHandler.Create(events);
           if events.MustCreateLoadHandler        then FLoadHandler        := TCustomLoadHandler.Create(events);
           if events.MustCreateFocusHandler       then FFocusHandler       := TCustomFocusHandler.Create(events);
           if events.MustCreateContextMenuHandler then FContextMenuHandler := TCustomContextMenuHandler.Create(events);
@@ -654,6 +769,9 @@ begin
           if events.MustCreateRequestHandler     then FRequestHandler     := TCustomRequestHandler.Create(events);
           if events.MustCreateDragHandler        then FDragHandler        := TCustomDragHandler.Create(events);
           if events.MustCreateFindHandler        then FFindHandler        := TCustomFindHandler.Create(events);
+          if events.MustCreatePrintHandler       then FPrintHandler       := TCustomPrintHandler.Create(events);
+          if events.MustCreateFrameHandler       then FFrameHandler       := TCustomFrameHandler.Create(events);
+          if events.MustCreatePermissionHandler  then FPermissionHandler  := TCustomPermissionHandler.Create(events);
         end;
     end;
 end;
@@ -670,6 +788,7 @@ begin
   FEvents := nil;
 
   if (FAudioHandler       <> nil) then FAudioHandler.RemoveReferences;
+  if (FCommandHandler     <> nil) then FCommandHandler.RemoveReferences;
   if (FLoadHandler        <> nil) then FLoadHandler.RemoveReferences;
   if (FFocusHandler       <> nil) then FFocusHandler.RemoveReferences;
   if (FContextMenuHandler <> nil) then FContextMenuHandler.RemoveReferences;
@@ -683,11 +802,15 @@ begin
   if (FRenderHandler      <> nil) then FRenderHandler.RemoveReferences;
   if (FDragHandler        <> nil) then FDragHandler.RemoveReferences;
   if (FFindHandler        <> nil) then FFindHandler.RemoveReferences;
+  if (FPrintHandler       <> nil) then FPrintHandler.RemoveReferences;
+  if (FFrameHandler       <> nil) then FFrameHandler.RemoveReferences;
+  if (FPermissionHandler  <> nil) then FPermissionHandler.RemoveReferences;
 end;
 
 procedure TCustomClientHandler.InitializeVars;
 begin
   FAudioHandler       := nil;
+  FCommandHandler     := nil;
   FLoadHandler        := nil;
   FFocusHandler       := nil;
   FContextMenuHandler := nil;
@@ -701,6 +824,9 @@ begin
   FRenderHandler      := nil;
   FDragHandler        := nil;
   FFindHandler        := nil;
+  FPrintHandler       := nil;
+  FFrameHandler       := nil;
+  FPermissionHandler  := nil;
   FEvents             := nil;
 end;
 
@@ -708,6 +834,14 @@ procedure TCustomClientHandler.GetAudioHandler(var aHandler : ICefAudioHandler);
 begin
   if (FAudioHandler <> nil) then
     aHandler := FAudioHandler
+   else
+    aHandler := nil;
+end;
+
+procedure TCustomClientHandler.GetCommandHandler(var aHandler : ICefCommandHandler);
+begin
+  if (FCommandHandler <> nil) then
+    aHandler := FCommandHandler
    else
     aHandler := nil;
 end;
@@ -768,6 +902,22 @@ begin
     aHandler := nil;
 end;
 
+procedure TCustomClientHandler.GetFrameHandler(var aHandler : ICefFrameHandler);
+begin
+  if (FFrameHandler <> nil) then
+    aHandler := FFrameHandler
+   else
+    aHandler := nil;
+end;
+
+procedure TCustomClientHandler.GetPermissionHandler(var aHandler: ICefPermissionHandler);
+begin
+  if (FPermissionHandler <> nil) then
+    aHandler := FPermissionHandler
+   else
+    aHandler := nil;
+end;
+
 procedure TCustomClientHandler.GetJsdialogHandler(var aHandler : ICefJsDialogHandler);
 begin
   if (FJsDialogHandler <> nil) then
@@ -796,6 +946,14 @@ procedure TCustomClientHandler.GetLoadHandler(var aHandler : ICefLoadHandler);
 begin
   if (FLoadHandler <> nil) then
     aHandler := FLoadHandler
+   else
+    aHandler := nil;
+end;
+
+procedure TCustomClientHandler.GetPrintHandler(var aHandler : ICefPrintHandler);
+begin
+  if (FPrintHandler <> nil) then
+    aHandler := FPrintHandler
    else
     aHandler := nil;
 end;

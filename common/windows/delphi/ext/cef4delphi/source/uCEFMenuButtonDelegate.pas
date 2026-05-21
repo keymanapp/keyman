@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFMenuButtonDelegate;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -62,18 +25,41 @@ type
       procedure OnMenuButtonPressed(const menu_button: ICefMenuButton; const screen_point: TCefPoint; const button_pressed_lock: ICefMenuButtonPressedLock);
 
     public
+      /// <summary>
+      /// Returns a ICefMenuButtonDelegate instance using a PCefMenuButtonDelegate data pointer.
+      /// </summary>
       class function UnWrap(data: Pointer): ICefMenuButtonDelegate;
   end;
 
+  /// <summary>
+  /// Implement this interface to handle MenuButton events. The functions of this
+  /// interface will be called on the browser process UI thread unless otherwise
+  /// indicated.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/views/cef_menu_button_delegate_capi.h">CEF source file: /include/capi/views/cef_menu_button_delegate_capi.h (cef_menu_button_delegate_t)</see></para>
+  /// </remarks>
   TCefMenuButtonDelegateOwn = class(TCefButtonDelegateOwn, ICefMenuButtonDelegate)
     protected
+      /// <summary>
+      /// Called when |button| is pressed. Call ICefMenuButton.ShowMenu() to
+      /// show a popup menu at |screen_point|. When showing a custom popup such as a
+      /// window keep a reference to |button_pressed_lock| until the popup is hidden
+      /// to maintain the pressed button state.
+      /// </summary>
       procedure OnMenuButtonPressed(const menu_button: ICefMenuButton; const screen_point: TCefPoint; const button_pressed_lock: ICefMenuButtonPressedLock); virtual;
-
+      /// <summary>
+      /// Links the methods in the internal CEF record data pointer with the methods in this class.
+      /// </summary>
       procedure InitializeCEFMethods; override;
     public
       constructor Create; override;
   end;
 
+  /// <summary>
+  /// This class handles all the ICefMenuButtonDelegate methods which call the ICefMenuButtonDelegateEvents methods.
+  /// ICefMenuButtonDelegateEvents will be implemented by the control receiving the ICefMenuButtonDelegate events.
+  /// </summary>
   TCustomMenuButtonDelegate = class(TCefMenuButtonDelegateOwn)
     protected
       FEvents : Pointer;
@@ -85,8 +71,11 @@ type
       procedure OnGetHeightForWidth(const view: ICefView; width: Integer; var aResult: Integer); override;
       procedure OnParentViewChanged(const view: ICefView; added: boolean; const parent: ICefView); override;
       procedure OnChildViewChanged(const view: ICefView; added: boolean; const child: ICefView); override;
+      procedure OnWindowChanged(const view: ICefView; added: boolean); override;
+      procedure OnLayoutChanged(const view: ICefView; new_bounds: TCefRect); override;
       procedure OnFocus(const view: ICefView); override;
       procedure OnBlur(const view: ICefView); override;
+      procedure OnThemeChanged(const view: ICefView); override;
 
       // ICefButtonDelegate
       procedure OnButtonPressed(const button: ICefButton); override;
@@ -96,13 +85,16 @@ type
       procedure OnMenuButtonPressed(const menu_button: ICefMenuButton; const screen_point: TCefPoint; const button_pressed_lock: ICefMenuButtonPressedLock); override;
 
     public
+      /// <summary>
+      /// Creates an instance of this class liked to an interface that's implemented by a control receiving the events.
+      /// </summary>
       constructor Create(const events: ICefMenuButtonDelegateEvents); reintroduce;
   end;
 
 implementation
 
 uses
-  uCEFLibFunctions, uCEFMiscFunctions, uCEFMenuButton, uCEFMenuButtonPressedLock;
+  uCEFMiscFunctions, uCEFMenuButton, uCEFMenuButtonPressedLock;
 
 
 // **************************************************************
@@ -247,6 +239,28 @@ begin
   end;
 end;
 
+procedure TCustomMenuButtonDelegate.OnWindowChanged(const view: ICefView; added: boolean);
+begin
+  try
+    if (FEvents <> nil) then
+      ICefMenuButtonDelegateEvents(FEvents).doOnWindowChanged(view, added);
+  except
+    on e : exception do
+      if CustomExceptionHandler('TCustomMenuButtonDelegate.OnWindowChanged', e) then raise;
+  end;
+end;
+
+procedure TCustomMenuButtonDelegate.OnLayoutChanged(const view: ICefView; new_bounds: TCefRect);
+begin
+  try
+    if (FEvents <> nil) then
+      ICefMenuButtonDelegateEvents(FEvents).doOnLayoutChanged(view, new_bounds);
+  except
+    on e : exception do
+      if CustomExceptionHandler('TCustomMenuButtonDelegate.OnLayoutChanged', e) then raise;
+  end;
+end;
+
 procedure TCustomMenuButtonDelegate.OnFocus(const view: ICefView);
 begin
   try
@@ -266,6 +280,17 @@ begin
   except
     on e : exception do
       if CustomExceptionHandler('TCustomMenuButtonDelegate.OnBlur', e) then raise;
+  end;
+end;
+
+procedure TCustomMenuButtonDelegate.OnThemeChanged(const view: ICefView);
+begin
+  try
+    if (FEvents <> nil) then
+      ICefMenuButtonDelegateEvents(FEvents).doOnThemeChanged(view);
+  except
+    on e : exception do
+      if CustomExceptionHandler('TCustomMenuButtonDelegate.OnThemeChanged', e) then raise;
   end;
 end;
 

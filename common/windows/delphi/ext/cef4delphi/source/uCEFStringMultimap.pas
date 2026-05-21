@@ -1,68 +1,56 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFStringMultimap;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
-  uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes;
+  uCEFInterfaces, uCEFTypes;
 
 type
+  /// <summary>
+  /// CEF string multimaps are a set of key/value string pairs.
+  /// More than one value can be assigned to a single key.
+  /// </summary>
   TCefCustomStringMultimap = class(TInterfacedObject, ICefStringMultimap)
     protected
       FHandle : TCefStringMultimap;
 
       function  GetHandle: TCefStringMultimap; virtual;
+      /// <summary>
+      /// Return the number of elements in the string multimap.
+      /// </summary>
       function  GetSize: NativeUInt; virtual;
+      /// <summary>
+      /// Return the number of values with the specified key.
+      /// </summary>
       function  FindCount(const Key: ustring): NativeUInt; virtual;
+      /// <summary>
+      /// Return the value_index-th value with the specified key.
+      /// </summary>
       function  GetEnumerate(const Key: ustring; ValueIndex: NativeUInt): ustring; virtual;
+      /// <summary>
+      /// Return the key at the specified zero-based string multimap index.
+      /// </summary>
       function  GetKey(Index: NativeUInt): ustring; virtual;
+      /// <summary>
+      /// Return the value at the specified zero-based string multimap index.
+      /// </summary>
       function  GetValue(Index: NativeUInt): ustring; virtual;
+      /// <summary>
+      /// Append a new key/value pair at the end of the string multimap.
+      /// </summary>
       function  Append(const Key, Value: ustring) : boolean; virtual;
+      /// <summary>
+      /// Clear the string multimap.
+      /// </summary>
       procedure Clear; virtual;
 
     public
@@ -71,7 +59,13 @@ type
 
   TCefStringMultimapOwn = class(TCefCustomStringMultimap)
     public
+      /// <summary>
+      /// Allocate a new string multimap.
+      /// </summary>
       constructor Create; override;
+      /// <summary>
+      /// Free the string multimap.
+      /// </summary>
       destructor  Destroy; override;
   end;
 

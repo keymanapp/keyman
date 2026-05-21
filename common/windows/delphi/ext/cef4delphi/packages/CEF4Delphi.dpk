@@ -13,8 +13,8 @@ package CEF4Delphi;
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION OFF}
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
 {$STACKFRAMES ON}
@@ -33,7 +33,7 @@ requires
   vcl;
 
 contains
-  CEF4Delphi_Register in 'CEF4Delphi_Register.pas',
+  CEF4DelphiVCL_Register in 'CEF4DelphiVCL_Register.pas',
   uCEFFindHandler in '..\source\uCEFFindHandler.pas',
   uCEFConstants in '..\source\uCEFConstants.pas',
   uCEFTypes in '..\source\uCEFTypes.pas',
@@ -63,7 +63,6 @@ contains
   uCEFCookieManager in '..\source\uCEFCookieManager.pas',
   uCEFCompletionCallback in '..\source\uCEFCompletionCallback.pas',
   uCEFRequestContextHandler in '..\source\uCEFRequestContextHandler.pas',
-  uCEFWebPluginInfo in '..\source\uCEFWebPluginInfo.pas',
   uCEFDomDocument in '..\source\uCEFDomDocument.pas',
   uCEFDomNode in '..\source\uCEFDomNode.pas',
   uCEFv8Value in '..\source\uCEFv8Value.pas',
@@ -89,7 +88,6 @@ contains
   uCEFv8StackFrame in '..\source\uCEFv8StackFrame.pas',
   uCEFv8StackTrace in '..\source\uCEFv8StackTrace.pas',
   uCEFv8Handler in '..\source\uCEFv8Handler.pas',
-  uCEFRequestCallback in '..\source\uCEFRequestCallback.pas',
   uCEFCustomStreamReader in '..\source\uCEFCustomStreamReader.pas',
   uCEFCallback in '..\source\uCEFCallback.pas',
   uCEFResourceHandler in '..\source\uCEFResourceHandler.pas',
@@ -117,8 +115,6 @@ contains
   uCEFRenderProcessHandler in '..\source\uCEFRenderProcessHandler.pas',
   uCEFUrlrequestClient in '..\source\uCEFUrlrequestClient.pas',
   uCEFUrlRequest in '..\source\uCEFUrlRequest.pas',
-  uCEFWebPluginInfoVisitor in '..\source\uCEFWebPluginInfoVisitor.pas',
-  uCEFWebPluginUnstableCallback in '..\source\uCEFWebPluginUnstableCallback.pas',
   uCEFEndTracingCallback in '..\source\uCEFEndTracingCallback.pas',
   uCEFFileDialogCallback in '..\source\uCEFFileDialogCallback.pas',
   uCEFDragData in '..\source\uCEFDragData.pas',
@@ -137,7 +133,6 @@ contains
   uCEFChromiumOptions in '..\source\uCEFChromiumOptions.pas',
   uCEFChromiumFontOptions in '..\source\uCEFChromiumFontOptions.pas',
   uCEFPDFPrintOptions in '..\source\uCEFPDFPrintOptions.pas',
-  uCEFRegisterCDMCallback in '..\source\uCEFRegisterCDMCallback.pas',
   uCEFThread in '..\source\uCEFThread.pas',
   uCEFv8Interceptor in '..\source\uCEFv8Interceptor.pas',
   uCEFWaitableEvent in '..\source\uCEFWaitableEvent.pas',
@@ -151,9 +146,6 @@ contains
   uCEFAccessibilityHandler in '..\source\uCEFAccessibilityHandler.pas',
   uCEFOLEDragAndDrop in '..\source\uCEFOLEDragAndDrop.pas',
   uCEFDragAndDropMgr in '..\source\uCEFDragAndDropMgr.pas',
-  uCEFGetExtensionResourceCallback in '..\source\uCEFGetExtensionResourceCallback.pas',
-  uCEFExtension in '..\source\uCEFExtension.pas',
-  uCEFExtensionHandler in '..\source\uCEFExtensionHandler.pas',
   uCEFBufferPanel in '..\source\uCEFBufferPanel.pas',
   uCEFApp in '..\source\uCEFApp.pas',
   uCEFWorkScheduler in '..\source\uCEFWorkScheduler.pas',
@@ -223,7 +215,32 @@ contains
   uCEFPrintDialogCallback in '..\source\uCEFPrintDialogCallback.pas',
   uCEFPrintJobCallback in '..\source\uCEFPrintJobCallback.pas',
   uCEFWorkSchedulerQueueThread in '..\source\uCEFWorkSchedulerQueueThread.pas',
-  uCEFLinkedWinControlBase in '..\source\uCEFLinkedWinControlBase.pas';
+  uCEFLinkedWinControlBase in '..\source\uCEFLinkedWinControlBase.pas',
+  uCEFTimerWorkScheduler in '..\source\uCEFTimerWorkScheduler.pas',
+  uCEFFrameHandler in '..\source\uCEFFrameHandler.pas',
+  uCEFOverlayController in '..\source\uCEFOverlayController.pas',
+  uCEFFileDialogInfo in '..\source\uCEFFileDialogInfo.pas',
+  uCEFCommandHandler in '..\source\uCEFCommandHandler.pas',
+  uCEFMediaAccessCallback in '..\source\uCEFMediaAccessCallback.pas',
+  uCEFPermissionPromptCallback in '..\source\uCEFPermissionPromptCallback.pas',
+  uCEFPermissionHandler in '..\source\uCEFPermissionHandler.pas',
+  uCEFSharedMemoryRegion in '..\source\uCEFSharedMemoryRegion.pas',
+  uCEFSharedProcessMessageBuilder in '..\source\uCEFSharedProcessMessageBuilder.pas',
+  uCEFRunQuickMenuCallback in '..\source\uCEFRunQuickMenuCallback.pas',
+  uCEFPreferenceRegistrar in '..\source\uCEFPreferenceRegistrar.pas',
+  uCEFPreferenceManager in '..\source\uCEFPreferenceManager.pas',
+  uCEFApplicationEvents in '..\source\uCEFApplicationEvents.pas',
+  uCEFBrowserBitmap in '..\source\uCEFBrowserBitmap.pas',
+  uCEFComponentIdList in '..\source\uCEFComponentIdList.pas',
+  uCEFUnresponsiveProcessCallback in '..\source\uCEFUnresponsiveProcessCallback.pas',
+  uCEFWindowInfoWrapper in '..\source\uCEFWindowInfoWrapper.pas',
+  uCEFTaskManager in '..\source\uCEFTaskManager.pas',
+  uCEFPreferenceObserver in '..\source\uCEFPreferenceObserver.pas',
+  uCEFSettingObserver in '..\source\uCEFSettingObserver.pas',
+  uCEFv8BackingStore in '..\source\uCEFv8BackingStore.pas',
+  uCEFComponentUpdater in '..\source\uCEFComponentUpdater.pas',
+  uCEFComponentUpdateCallback in '..\source\uCEFComponentUpdateCallback.pas',
+  uCEFComponent in '..\source\uCEFComponent.pas';
 
 end.
 

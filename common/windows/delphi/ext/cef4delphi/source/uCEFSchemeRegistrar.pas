@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFSchemeRegistrar;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -52,8 +15,24 @@ uses
   uCEFBaseScopedWrapper, uCEFTypes;
 
 type
+  /// <summary>
+  /// Class that manages custom scheme registrations.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/cef_scheme_capi.h">CEF source file: /include/capi/cef_scheme_capi.h (cef_scheme_registrar_t)</see></para>
+  /// </remarks>
   TCefSchemeRegistrarRef = class(TCEFBaseScopedWrapperRef)
     public
+      /// <summary>
+      /// <para>Register a custom scheme. This function should not be called for the
+      /// built-in HTTP, HTTPS, FILE, FTP, ABOUT and DATA schemes.</para>
+      /// <para>This function may be called on any thread. It should only be called once
+      /// per unique |scheme_name| value. If |scheme_name| is already registered or
+      /// if an error occurs this function will return false (0).</para>
+      /// </summary>
+      /// <remarks>
+      /// <para><see>See the CEF_SCHEME_OPTION_* constants in the uCEFConstants unit for possible values for |options|.</see></para>
+      /// </remarks>
       function AddCustomScheme(const schemeName: ustring; options : TCefSchemeOptions): Boolean;
   end;
 

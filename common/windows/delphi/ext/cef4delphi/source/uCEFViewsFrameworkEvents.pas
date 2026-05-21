@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFViewsFrameworkEvents;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -64,8 +27,11 @@ type
   TOnGetHeightForWidthEvent = procedure(const Sender: TObject; const view: ICefView; width: Integer; var aResult: Integer) of object;
   TOnParentViewChangedEvent = procedure(const Sender: TObject; const view: ICefView; added: boolean; const parent: ICefView) of object;
   TOnChildViewChangedEvent  = procedure(const Sender: TObject; const view: ICefView; added: boolean; const child: ICefView) of object;
+  TOnWindowChangedEvent     = procedure(const Sender: TObject; const view: ICefView; added: boolean) of object;
+  TOnLayoutChangedEvent     = procedure(const Sender: TObject; const view: ICefView; new_bounds: TCefRect) of object;
   TOnFocusEvent             = procedure(const Sender: TObject; const view: ICefView) of object;
   TOnBlurEvent              = procedure(const Sender: TObject; const view: ICefView) of object;
+  TOnThemeChangedEvent      = procedure(const Sender: TObject; const view: ICefView) of object;
 
   // ICefTextfieldDelegate
   TOnTextfieldKeyEventEvent = procedure(const Sender: TObject; const textfield: ICefTextfield; const event: TCefKeyEvent; var aResult : boolean) of object;
@@ -74,10 +40,16 @@ type
   // ICefPanelDelegate
 
   // ICefBrowserViewDelegate
-  TOnBrowserCreatedEvent                 = procedure(const Sender: TObject; const browser_view: ICefBrowserView; const browser: ICefBrowser) of object;
-  TOnBrowserDestroyedEvent               = procedure(const Sender: TObject; const browser_view: ICefBrowserView; const browser: ICefBrowser) of object;
-  TOnGetDelegateForPopupBrowserViewEvent = procedure(const Sender: TObject; const browser_view: ICefBrowserView; const settings: TCefBrowserSettings; const client: ICefClient; is_devtools: boolean; var aResult : ICefBrowserViewDelegate) of object;
-  TOnPopupBrowserViewCreatedEvent        = procedure(const Sender: TObject; const browser_view, popup_browser_view: ICefBrowserView; is_devtools: boolean; var aResult : boolean) of object;
+  TOnBrowserCreatedEvent                             = procedure(const Sender: TObject; const browser_view: ICefBrowserView; const browser: ICefBrowser) of object;
+  TOnBrowserDestroyedEvent                           = procedure(const Sender: TObject; const browser_view: ICefBrowserView; const browser: ICefBrowser) of object;
+  TOnGetDelegateForPopupBrowserViewEvent             = procedure(const Sender: TObject; const browser_view: ICefBrowserView; const settings: TCefBrowserSettings; const client: ICefClient; is_devtools: boolean; var aResult : ICefBrowserViewDelegate) of object;
+  TOnPopupBrowserViewCreatedEvent                    = procedure(const Sender: TObject; const browser_view, popup_browser_view: ICefBrowserView; is_devtools: boolean; var aResult : boolean) of object;
+  TOnGetChromeToolbarTypeEvent                       = procedure(const Sender: TObject; const browser_view: ICefBrowserView; var aChromeToolbarType: TCefChromeToolbarType) of object;
+  TOnUseFramelessWindowForPictureInPicture           = procedure(const Sender: TObject; const browser_view: ICefBrowserView; var aResult : boolean) of object;
+  TOnGestureCommandEvent                             = procedure(const Sender: TObject; const browser_view: ICefBrowserView; gesture_command: TCefGestureCommand; var aResult : boolean) of object;
+  TOnGetBrowserRuntimeStyleEvent                     = procedure(const Sender: TObject; var aResult : TCefRuntimeStyle) of object;
+  TOnAllowMoveForPictureInPictureEvent               = procedure(const Sender: TObject; const browser_view: ICefBrowserView; var aResult : boolean) of object;
+  TOnAllowPictureInPictureWithoutUserActivationEvent = procedure(const Sender: TObject; const browser_view: ICefBrowserView; var aResult : boolean) of object;
 
   // ICefButtonDelegate
   TOnButtonPressedEvent      = procedure(const Sender: TObject; const button: ICefButton) of object;
@@ -87,17 +59,29 @@ type
   TOnMenuButtonPressedEvent = procedure(const Sender: TObject; const menu_button: ICefMenuButton; const screen_point: TCefPoint; const button_pressed_lock: ICefMenuButtonPressedLock) of object;
 
   // ICefWindowDelegate
-  TOnWindowCreatedEvent    = procedure(const Sender: TObject; const window: ICefWindow) of object;
-  TOnWindowDestroyedEvent  = procedure(const Sender: TObject; const window: ICefWindow) of object;
-  TOnGetParentWindowEvent  = procedure(const Sender: TObject; const window: ICefWindow; var is_menu, can_activate_menu: boolean; var aResult : ICefWindow) of object;
-  TOnGetInitialBoundsEvent = procedure(const Sender: TObject; const window: ICefWindow; var aResult : TCefRect) of object;
-  TOnIsFramelessEvent      = procedure(const Sender: TObject; const window: ICefWindow; var aResult : boolean) of object;
-  TOnCanResizeEvent        = procedure(const Sender: TObject; const window: ICefWindow; var aResult : boolean) of object;
-  TOnCanMaximizeEvent      = procedure(const Sender: TObject; const window: ICefWindow; var aResult : boolean) of object;
-  TOnCanMinimizeEvent      = procedure(const Sender: TObject; const window: ICefWindow; var aResult : boolean) of object;
-  TOnCanCloseEvent         = procedure(const Sender: TObject; const window: ICefWindow; var aResult : boolean) of object;
-  TOnAcceleratorEvent      = procedure(const Sender: TObject; const window: ICefWindow; command_id: Integer; var aResult : boolean) of object;
-  TOnWindowKeyEventEvent   = procedure(const Sender: TObject; const window: ICefWindow; const event: TCefKeyEvent; var aResult : boolean) of object;
+  TOnWindowCreatedEvent              = procedure(const Sender: TObject; const window_: ICefWindow) of object;
+  TOnWindowClosingEvent              = procedure(const Sender: TObject; const window_: ICefWindow) of object;
+  TOnWindowDestroyedEvent            = procedure(const Sender: TObject; const window_: ICefWindow) of object;
+  TOnWindowActivationChangedEvent    = procedure(const Sender: TObject; const window_: ICefWindow; active: boolean) of object;
+  TOnWindowBoundsChangedEvent        = procedure(const Sender: TObject; const window_: ICefWindow; const new_bounds: TCefRect) of object;
+  TOnWindowFullscreenTransitionEvent = procedure(const Sender: TObject; const window_: ICefWindow; is_completed: boolean) of object;
+  TOnGetParentWindowEvent            = procedure(const Sender: TObject; const window_: ICefWindow; var is_menu, can_activate_menu: boolean; var aResult : ICefWindow) of object;
+  TOnIsWindowModalDialogEvent        = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : boolean) of object;
+  TOnGetInitialBoundsEvent           = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : TCefRect) of object;
+  TOnGetInitialShowStateEvent        = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : TCefShowState) of object;
+  TOnIsFramelessEvent                = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : boolean) of object;
+  TOnWithStandardWindowButtonsEvent  = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : boolean) of object;
+  TOnGetTitlebarHeightEvent          = procedure(const Sender: TObject; const window_: ICefWindow; var titlebar_height: Single; var aResult : boolean) of object;
+  TOnAcceptsFirstMouseEvent          = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : TCefState) of object;
+  TOnCanResizeEvent                  = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : boolean) of object;
+  TOnCanMaximizeEvent                = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : boolean) of object;
+  TOnCanMinimizeEvent                = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : boolean) of object;
+  TOnCanCloseEvent                   = procedure(const Sender: TObject; const window_: ICefWindow; var aResult : boolean) of object;
+  TOnAcceleratorEvent                = procedure(const Sender: TObject; const window_: ICefWindow; command_id: Integer; var aResult : boolean) of object;
+  TOnWindowKeyEventEvent             = procedure(const Sender: TObject; const window_: ICefWindow; const event: TCefKeyEvent; var aResult : boolean) of object;
+  TOnThemeColorsChangedEvent         = procedure(const Sender: TObject; const window_: ICefWindow; chrome_theme: Integer) of object;
+  TOnGetWindowRuntimeStyleEvent      = procedure(const Sender: TObject; var aResult : TCefRuntimeStyle) of object;
+  TOnGetLinuxWindowPropertiesEvent   = procedure(const Sender: TObject; const window_: ICefWindow; var properties: TLinuxWindowProperties; var aResult: boolean) of object;
 
 implementation
 

@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFApplication;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -83,15 +46,18 @@ const
   CHROMEELF_DLL                 = uCefApplicationCore.CHROMEELF_DLL;
 
 type
+  /// <summary>
+  ///  Main class used to simplify the CEF initialization and destruction.
+  /// </summary>
   TCefApplication = class(TCefApplicationCore)
     protected
       FDestroyApplicationObject      : boolean;
       FDestroyAppWindows             : boolean;
       {$IFDEF FPC}
-      FContextInitializedHandlers: TMethodList;
-      FContextInitializedDone: Boolean;
+      FContextInitializedHandlers    : TMethodList;
 
       procedure CallContextInitializedHandlers(Data: PtrInt);
+      procedure doOnContextInitialized; override;
       {$ENDIF}
 
       procedure BeforeInitSubProcess; override;
@@ -101,12 +67,10 @@ type
       destructor  Destroy; override;
       procedure   UpdateDeviceScaleFactor; override;
 
-      property DestroyApplicationObject: boolean read FDestroyApplicationObject write FDestroyApplicationObject;
-      property DestroyAppWindows       : boolean read FDestroyAppWindows        write FDestroyAppWindows;
+      property DestroyApplicationObject : boolean read FDestroyApplicationObject write FDestroyApplicationObject;
+      property DestroyAppWindows        : boolean read FDestroyAppWindows        write FDestroyAppWindows;
 
       {$IFDEF FPC}
-      procedure Internal_OnContextInitialized; override; // In UI thread
-
       Procedure AddContextInitializedHandler(AHandler: TNotifyEvent);
       Procedure RemoveContextInitializedHandler(AHandler: TNotifyEvent);
       {$ENDIF}
@@ -209,22 +173,24 @@ begin
   {$ENDIF}
 
   inherited Create;
-  if GlobalCEFApp = nil then
+
+  if (GlobalCEFApp = nil) then
     GlobalCEFApp := Self;
 
-  FDestroyApplicationObject      := False;
-  FDestroyAppWindows             := True;
+  FDestroyApplicationObject := False;
+  FDestroyAppWindows        := True;
 end;
 
 destructor TCefApplication.Destroy;
 begin
-  if GlobalCEFApp = Self then
+  if (GlobalCEFApp = Self) then
     GlobalCEFApp := nil;
-  inherited Destroy;
 
   {$IFDEF FPC}
-  FContextInitializedHandlers.Free;
+  FreeAndNil(FContextInitializedHandlers);
   {$ENDIF}
+
+  inherited Destroy;
 end;
 
 procedure TCefApplication.UpdateDeviceScaleFactor;
@@ -240,6 +206,8 @@ begin
   {$IFNDEF FMX}
   if RunningWindows10OrNewer then
     begin
+      {$warnings off}
+      {$hints off}
       if assigned(screen.ActiveForm) and
          screen.ActiveForm.HandleAllocated then
         TempHandle := screen.ActiveForm.Handle
@@ -249,6 +217,9 @@ begin
           TempHandle := Application.MainForm.Handle
          else
           TempHandle := Application.Handle;
+     {$hints on}
+     {$warnings on}
+     TempDPI := 0;
 
      if GetDPIForHandle(TempHandle, TempDPI) then
        FDeviceScaleFactor := TempDPI / USER_DEFAULT_SCREEN_DPI
@@ -264,30 +235,32 @@ begin
 end;
 
 {$IFDEF FPC}
-procedure TCefApplication.Internal_OnContextInitialized;
+procedure TCefApplication.doOnContextInitialized;
 begin
-  inherited Internal_OnContextInitialized;
+  inherited doOnContextInitialized;
+
   Application.QueueAsyncCall(@CallContextInitializedHandlers, 0);
 end;
 
 procedure TCefApplication.AddContextInitializedHandler(AHandler: TNotifyEvent);
 begin
-  FContextInitializedHandlers.Add(TMethod(AHandler));
-  if FContextInitializedDone then
-    AHandler(Self);
+  if FGlobalContextInitialized then
+    AHandler(Self)
+   else
+    if (FContextInitializedHandlers <> nil) then
+      FContextInitializedHandlers.Add(TMethod(AHandler));
 end;
 
 procedure TCefApplication.RemoveContextInitializedHandler(AHandler: TNotifyEvent);
 begin
-  FContextInitializedHandlers.Remove(TMethod(AHandler));
+  if (FContextInitializedHandlers <> nil) then
+    FContextInitializedHandlers.Remove(TMethod(AHandler));
 end;
-{$ENDIF}
 
-{$IFDEF FPC}
 procedure TCefApplication.CallContextInitializedHandlers(Data: PtrInt);
 begin
-  FContextInitializedHandlers.CallNotifyEvents(Self);
-  FContextInitializedDone := True;
+  if (FContextInitializedHandlers <> nil) then
+    FContextInitializedHandlers.CallNotifyEvents(Self);
 end;
 {$ENDIF}
 
@@ -301,7 +274,7 @@ var
 begin
   {$IFNDEF FPC}
   {$IFNDEF FMX}
-  if Application <> nil then
+  if (Application <> nil) then
     begin
       if FDestroyApplicationObject then
         begin
@@ -335,7 +308,8 @@ begin
               if (Application.PopupControlWnd <> 0) then DeallocateHWnd(Application.PopupControlWnd);
               {$ENDIF}
             end;
-          if not IsLibrary then
+
+          if not(IsLibrary) then
             begin
               // Undo the OleInitialize from TApplication.Create. The sub-processes want a different
               // COM thread model and fail with an assertion if the Debug-DLLs are used.
