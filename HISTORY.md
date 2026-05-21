@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.236 alpha 2026-05-21
+
+* docs(developer): write up basic internal docs on kmc modules (#15982)
+* chore(common): move common cpp files and remove unused files (#15981)
+* docs(developer): update links to lexical model distribution (#15974)
+
 ## 19.0.235 alpha 2026-05-20
 
 * fix(linux): fix source tarball verification (#15975)
