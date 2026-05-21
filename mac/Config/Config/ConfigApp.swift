@@ -11,12 +11,23 @@ import KeymanSettings
 
 @main
 struct ConfigApp: App {
-//  @StateObject var configuration = Configuration()
   @StateObject var settings = SettingsContainer()
+  @StateObject var installation = InstallationContainer()
+  @Environment(\.openWindow) private var openWindow
+  
   var body: some Scene {
-    WindowGroup {
+    Window("Configuration", id: "config") {
       ConfigView()
         .environmentObject(settings)
-   }
+        .task {
+          if !installation.isInstallationComplete() {
+            openWindow(id: "install")
+          }
+        }
+    }
+    Window("Installation", id: "install") {
+      InstallView()
+        .environmentObject(installation)
+    }
   }
 }

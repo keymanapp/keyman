@@ -34,6 +34,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		D87D6F492FAF95400083A95E /* Installation */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Installation;
+			sourceTree = "<group>";
+		};
 		D88F03C82F50ED5000C02A31 /* Config */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Config;
@@ -80,6 +85,7 @@
 		D88F03BD2F50ED5000C02A31 = {
 			isa = PBXGroup;
 			children = (
+				D87D6F492FAF95400083A95E /* Installation */,
 				D88F03C82F50ED5000C02A31 /* Config */,
 				D88F03D62F50ED5100C02A31 /* ConfigTests */,
 				D88F03E02F50ED5100C02A31 /* ConfigUITests */,
@@ -121,6 +127,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				D87D6F492FAF95400083A95E /* Installation */,
 				D88F03C82F50ED5000C02A31 /* Config */,
 			);
 			name = Config;
@@ -426,7 +433,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
 				PRODUCT_NAME = "Keyman Configuration";
@@ -463,7 +470,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
 				PRODUCT_NAME = "Keyman Configuration";

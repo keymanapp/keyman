@@ -14,28 +14,55 @@ public enum UserDefaultsError: Error {
   case unknownSuite
 }
 
+// TODO: replace with enum
+public let kNewInstall = "new-installation"
+public let kMigrationComplete = "migration-complete"
+public let kInputMethodRegistered = "input-method-registered"
+public let kInputMethodSelected = "input-method-selected"
+public let kInputMethodEnabled = "input-method-enabled"
+public let kAccessGranted = "access-granted"
+public let kRestartRequired = "restart-required"
+public let kInstallComplete = "install-complete"
+
 public class DefaultsRepository: DefaultsRepo {
   fileprivate let pathUtil: KeymanPaths
   let defaultsSuiteName: String
-  let defaults: UserDefaults
-  
+  let groupDefaults: UserDefaults
+
   let kEnabledKeyboardsKey = "KMEnabledKeyboardsKey"
   let kSelectedKeyboardKey = "KMSelectedKeyboardKey"
   let kPersistedOptionsKey = "KMPersistedOptionsKey"
   let kDataModelVersionKey = "KMDataModelVersion"
   let kShowOskOnActivateKey = "KMShowOskOnActivate"
   let kForceSentryErrorKey = "KMForceSentryError"
-  
+  let kInstallationState = "KMInstallationState"
+  let kTimeRestartRequested = "KMTimeRestartRequested"
+
   public init(suiteName: String) throws(Error) {
     self.pathUtil = KeymanPaths()
     self.defaultsSuiteName = suiteName
     
-    // the UserDefaults used are for the app group
+    // create defaults for the suite
     guard let userDefaults = UserDefaults(suiteName: suiteName) else {
       throw(UserDefaultsError.unknownSuite)
     }
     
-    self.defaults = userDefaults
+    self.groupDefaults = userDefaults
+  }
+  
+  /**
+   * read the current state of the installation
+   * if the value is not found, then return kNewInstall
+   */
+  public func readInstallationState() -> String {
+    return self.groupDefaults.string(forKey: kInstallationState) ?? kNewInstall
+  }
+  
+  /**
+   * write the state of the installation
+   */
+  public func writeInstallationState(_ state: String) {
+    self.groupDefaults.set(state, forKey: kInstallationState)
   }
   
   /**
@@ -44,7 +71,7 @@ public class DefaultsRepository: DefaultsRepo {
    * when it is selected from the System Input Source menu.
    */
   public func readEnabledKeyboards() -> Set<String> {
-    let enabledKeyboardsArray = self.defaults.stringArray(forKey: kEnabledKeyboardsKey) ?? []
+    let enabledKeyboardsArray = self.groupDefaults.stringArray(forKey: kEnabledKeyboardsKey) ?? []
     let enabledKeyboardsSet = Set(enabledKeyboardsArray)
     
     return enabledKeyboardsSet
@@ -55,7 +82,7 @@ public class DefaultsRepository: DefaultsRepo {
    * each String in the array must be formatted `/[packageName]/[keyboardName].kmx`
    */
   public func writeEnabledKeyboards(enabledKeyboardsArray: [String]) {
-    self.defaults.set(enabledKeyboardsArray, forKey: kEnabledKeyboardsKey)
+    self.groupDefaults.set(enabledKeyboardsArray, forKey: kEnabledKeyboardsKey)
   }
   
   /**
@@ -63,7 +90,7 @@ public class DefaultsRepository: DefaultsRepo {
    * The selected keyboard is the one that Keyman is applying for each keydown event.
    */
   public func readSelectedKeyboard() -> String {
-    return self.defaults.string(forKey: kSelectedKeyboardKey) ?? ""
+    return self.groupDefaults.string(forKey: kSelectedKeyboardKey) ?? ""
   }
   
   /**
@@ -71,7 +98,7 @@ public class DefaultsRepository: DefaultsRepo {
    * `keyboardName` must be formatted `/[packageName]/[keyboardName].kmx`
    */
   public func writeSelectedKeyboard(keyboardName: String) {
-    self.defaults.set(keyboardName, forKey: kSelectedKeyboardKey)
+    self.groupDefaults.set(keyboardName, forKey: kSelectedKeyboardKey)
   }
   
   /**
@@ -89,15 +116,36 @@ public class DefaultsRepository: DefaultsRepo {
    */
   public func readDataModelVersion() -> Int {
     // note that zero is returned if key is not found in UserDefaults,
-    return self.defaults.integer(forKey: kDataModelVersionKey)
+    return self.groupDefaults.integer(forKey: kDataModelVersionKey)
   }
   
+  /**
+   * read the date/time that the restart was requested
+   */
+  public func readRestartRequestTime() -> Date? {
+    return self.groupDefaults.object(forKey: kTimeRestartRequested) as? Date
+  }
+  
+  /**
+   * write the date/time that the restart was requested
+   */
+  public func writeRestartRequestTime(_ date: Date) {
+    self.groupDefaults.set(date, forKey: kTimeRestartRequested)
+  }
+
+  /**
+   * delete the value that the date/time that the restart was requested
+   */
+  public func clearRestartRequestTime() {
+    self.groupDefaults.removeObject(forKey: kTimeRestartRequested)
+  }
+
   /**
    * read the boolean value that indicates whether the OSK is opened when the input method is activated
    * There may be no need to read this from with the config app.
    */
   public func readShowOskOnActivate() -> Bool {
-    return self.defaults.bool(forKey: kShowOskOnActivateKey)
+    return self.groupDefaults.bool(forKey: kShowOskOnActivateKey)
   }
   
   /**
@@ -105,7 +153,7 @@ public class DefaultsRepository: DefaultsRepo {
    * There may be no need to read this from with the config app.
    */
   public func readPersistedOptions() -> Dictionary<String, Any> {
-    if let options: Dictionary<String, Any> = self.defaults.dictionary(forKey: kPersistedOptionsKey) {
+    if let options: Dictionary<String, Any> = self.groupDefaults.dictionary(forKey: kPersistedOptionsKey) {
       return options
     } else {
       return [:]
@@ -125,6 +173,8 @@ public class DefaultsRepository: DefaultsRepo {
     print("\(kShowOskOnActivateKey): \(self.readShowOskOnActivate())")
     print("\(kEnabledKeyboardsKey): \(self.readEnabledKeyboards())")
     print("\(kPersistedOptionsKey): \(self.readPersistedOptions())")
+    print("\(kInstallationState): \(self.readInstallationState())")
+    print("\(kTimeRestartRequested): \(self.readRestartRequestTime(), default: "none")")
   }
   
   /**
@@ -132,8 +182,8 @@ public class DefaultsRepository: DefaultsRepo {
    * unlike standard application-level UserDefaults, there is no way to view from the command line
    */
   public func clearDefaults() {
-    self.defaults.dictionaryRepresentation().keys.forEach { key in
-      self.defaults.removeObject(forKey: key)
+    self.groupDefaults.dictionaryRepresentation().keys.forEach { key in
+      self.groupDefaults.removeObject(forKey: key)
     }
   }
 }

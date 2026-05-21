@@ -34,4 +34,13 @@ cp -R "$SOURCE_FILE" "$DEST_DIR/"
 # Set the user as owner
 chown "$CONSOLE_USER":staff "$DEST_DIR/Keyman.app"
 
+# TODO: add code here to extract keyboard name from package path
+echo "The installer package name is: $PACKAGE_PATH"
+
+# define path of tmp file to write keyboard info
+KEYBOARD_FILE_PATH="$3/var/tmp/keyboard-to-install.txt"
+
+#write keyboard file
+/bin/echo "sil_euro_latin" > "${KEYBOARD_FILE_PATH}"
+
 exit 0
