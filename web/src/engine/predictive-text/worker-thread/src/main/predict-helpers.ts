@@ -228,14 +228,12 @@ export function determineTraversallessCorrectionSequences(
     const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
     const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
     const tokenizedCorrectionEntries = [...tokenizedCorrection.values()];
-    const { tokensToRemove, tokensToPredict } = transitionEffects;
-    const deleteLeft = tokensToPredict.length > 1 ? 0 : tokensToRemove.reduce((prev, curr) => prev + curr.codepointLength, 0);
 
     // IF:  array has multiple entries, then build the preservation-transform as below, including the deleteLeft.
     // If not, don't make one!
     const preservationTransform = tokenizedCorrectionEntries.slice(0, -1).reduce((accum, curr) => {
-      return models.buildMergedTransform(accum, {...curr, deleteLeft: 0});
-    }, { insert: '', deleteLeft, id: correction.sample.id});
+      return { insert: accum.insert + curr.insert, deleteLeft: accum.deleteLeft + curr.deleteLeft };
+    }, { insert: '', deleteLeft: 0, id: correction.sample.id});
 
     returnedPredictionData.push({
       ...suggestionParams,
